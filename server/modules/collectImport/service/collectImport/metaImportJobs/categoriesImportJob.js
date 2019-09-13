@@ -39,17 +39,23 @@ class CategoriesImportJob extends Job {
         break
 
       // 1. insert a category for each collectCodeList
-      const categoryToCreate = Category.newCategory({
-        [Category.props.name]: collectCodeList.attributes.name
-      })
-      let category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryToCreate, tx)
+      const categoryName = collectCodeList.attributes.name
 
-      category = await this.insertLevels(category, collectCodeList, tx)
+      if (!R.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)) {
+        // skip sampling_design (sampling point data) code list, imported by SamplingPointDataImportJob
 
-      const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
-      await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
+        const categoryToCreate = Category.newCategory({
+          [Category.props.name]: categoryName
+        })
+        let category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryToCreate, tx)
 
-      categories.push(category)
+        category = await this.insertLevels(category, collectCodeList, tx)
+
+        const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
+        await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
+
+        categories.push(category)
+      }
 
       this.incrementProcessedItems()
     }
@@ -132,9 +138,7 @@ class CategoriesImportJob extends Job {
   }
 
   async itemsInsertHandler (items, tx) {
-    const surveyId = this.getSurveyId()
-
-    await CategoryManager.insertItems(surveyId, items, tx)
+    await CategoryManager.insertItems(this.getUser(), this.getSurveyId(), items, tx)
   }
 
 }

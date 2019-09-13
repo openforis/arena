@@ -11,6 +11,7 @@ const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
 
+const Geometry = require('../../../../common/geometry')
 const { isBlank } = require('../../../../common/stringUtils')
 const DateTimeUtils = require('../../../../common/dateUtils')
 
@@ -96,7 +97,7 @@ const props = {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const defaultSrsCode = Survey.getDefaultSRS(surveyInfo).code
       const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol, defaultSrsCode)]
-      return () => isBlank(x) || isBlank(y) ? null : `SRID=${srs};POINT(${x} ${y})`
+      return () => isBlank(x) || isBlank(y) ? null : Geometry.newPoint(srs, x, y)
     },
     [colTypeProcessor]: () => () => sqlTypes.point,
   },

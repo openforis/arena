@@ -7,7 +7,7 @@ const mergeProps = (def, draft) => {
   const { props, propsDraft } = def
 
   const propsMerged = draft
-    ? R.mergeRight(props, propsDraft, def)
+    ? R.mergeRight(props, propsDraft)
     : props
 
   return R.pipe(

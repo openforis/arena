@@ -1,77 +1,75 @@
-const { groupNames, permissions } = require('../../auth/authGroups')
-const { keys: authGroupKeys } = require('../../auth/authGroups')
+const AuthGroups = require('../../auth/authGroups')
 
 const getDefaultAuthGroups = () => [
   {
-    name: groupNames.surveyAdmin,
+    name: AuthGroups.groupNames.surveyAdmin,
     permissions: [
-      permissions.permissionsEdit,
-      permissions.surveyEdit,
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordEdit,
-      permissions.userInvite,
+      AuthGroups.permissions.permissionsEdit,
+      AuthGroups.permissions.surveyEdit,
+      AuthGroups.permissions.recordView,
+      AuthGroups.permissions.recordCreate,
+      AuthGroups.permissions.recordEdit,
+      AuthGroups.permissions.userInvite,
     ],
     recordSteps: {
-      '1': authGroupKeys.all,
-      '2': authGroupKeys.all,
-      '3': authGroupKeys.all,
+      '1': AuthGroups.keys.all,
+      '2': AuthGroups.keys.all,
+      '3': AuthGroups.keys.all,
     },
   },
   {
-    name: groupNames.surveyEditor,
+    name: AuthGroups.groupNames.surveyEditor,
     permissions: [
-      permissions.surveyEdit,
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordEdit,
+      AuthGroups.permissions.surveyEdit,
+      AuthGroups.permissions.recordView,
+      AuthGroups.permissions.recordCreate,
+      AuthGroups.permissions.recordEdit,
     ],
     recordSteps: {
-      '1': authGroupKeys.all,
-      '2': authGroupKeys.all,
-      '3': authGroupKeys.all,
-    },
-  },
-  ,
-  {
-    name: groupNames.dataAnalyst,
-    permissions: [
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordEdit,
-    ],
-    recordSteps: {
-      '1': authGroupKeys.all,
-      '2': authGroupKeys.all,
-      '3': authGroupKeys.all,
+      '1': AuthGroups.keys.all,
+      '2': AuthGroups.keys.all,
+      '3': AuthGroups.keys.all,
     },
   },
   {
-    name: groupNames.dataCleanser,
+    name: AuthGroups.groupNames.dataAnalyst,
     permissions: [
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordEdit,
+      AuthGroups.permissions.recordView,
+      AuthGroups.permissions.recordCreate,
+      AuthGroups.permissions.recordEdit,
     ],
     recordSteps: {
-      '1': authGroupKeys.all,
-      '2': authGroupKeys.all,
+      '1': AuthGroups.keys.all,
+      '2': AuthGroups.keys.all,
+      '3': AuthGroups.keys.all,
     },
   },
   {
-    name: groupNames.dataEditor,
+    name: AuthGroups.groupNames.dataCleanser,
     permissions: [
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordEdit,
+      AuthGroups.permissions.recordView,
+      AuthGroups.permissions.recordCreate,
+      AuthGroups.permissions.recordEdit,
     ],
     recordSteps: {
-      '1': authGroupKeys.own,
+      '1': AuthGroups.keys.all,
+      '2': AuthGroups.keys.all,
+    },
+  },
+  {
+    name: AuthGroups.groupNames.dataEditor,
+    permissions: [
+      AuthGroups.permissions.recordView,
+      AuthGroups.permissions.recordCreate,
+      AuthGroups.permissions.recordEdit,
+    ],
+    recordSteps: {
+      '1': AuthGroups.keys.own,
     },
   },
   // ,
   // {
-  //   name: groupNames.surveyGuest,
+  //   name: AuthGroups.groupNames.surveyGuest,
   //   labels: {[lang]: 'Survey guest'},
   //   descriptions: {[lang]: `Can view records`},
   // },

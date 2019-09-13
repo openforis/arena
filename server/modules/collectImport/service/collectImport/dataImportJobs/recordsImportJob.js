@@ -63,7 +63,7 @@ class RecordsImportJob extends Job {
       // this.logDebug(`${entryName} parseToJson done`)
 
       // this.logDebug(`${entryName} recordToCreate start`)
-      const recordToCreate = Record.newRecord(user)
+      const recordToCreate = Record.newRecord(user, false, CollectRecord.getDateCreated(collectRecordJson))
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)
       await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)
@@ -124,19 +124,13 @@ class RecordsImportJob extends Job {
   async traverseCollectRecordAndInsertNodes (survey, record, collectRecordJson) {
     const { nodeDefsInfoByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
-    const collectRootEntityName = R.pipe(
-      R.keys,
-      R.reject(R.equals('_declaration')),
-      R.head,
-    )(collectRecordJson)
-
-    const collectRootEntity = collectRecordJson[collectRootEntityName]
-
     const recordUuid = Record.getUuid(record)
     let recordValidation = Record.getValidation(record)
 
+    const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
     const collectRootEntityDefPath = `/${collectRootEntityName}`
     const collectRootEntityDef = CollectSurvey.getNodeDefByPath(collectRootEntityDefPath)(collectSurvey)
+    const collectRootEntity = CollectRecord.getRootEntity(collectRecordJson, collectRootEntityName)
 
     const queue = new Queue([{
       nodeParent: null,

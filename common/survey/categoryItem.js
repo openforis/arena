@@ -15,6 +15,10 @@ const props = {
   extra: 'extra',
 }
 
+const keysExtraDef = {
+  dataType: 'dataType'
+}
+
 // ====== CREATE
 const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
   [keys.uuid]: uuidv4(),
@@ -31,6 +35,7 @@ const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item
 module.exports = {
   keys,
   props,
+  keysExtraDef,
 
   //CREATE
   newItem,

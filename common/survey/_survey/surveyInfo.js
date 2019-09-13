@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const SurveyUtils = require('../surveyUtils')
-
 const AuthGroups = require('../../auth/authGroups')
-const { isBlank } = require('../../stringUtils')
+
+const ObjectUtils = require('../../objectUtils')
+const StringUtils = require('../../stringUtils')
 
 const keys = {
   info: 'info',
@@ -32,21 +32,21 @@ const getInfo = R.propOr({}, keys.info)
 // ====== READ surveyInfo
 const getId = R.prop(keys.id)
 
-const getUuid = SurveyUtils.getUuid
+const getUuid = ObjectUtils.getUuid
 
-const getName = SurveyUtils.getProp(keys.name, '')
+const getName = ObjectUtils.getProp(keys.name, '')
 
-const getDescriptions = SurveyUtils.getProp(keys.descriptions, {})
+const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
 
 const isPublished = R.propEq(keys.published, true)
 
 const isDraft = R.propEq(keys.draft, true)
 
-const getLanguages = SurveyUtils.getProp(keys.languages, [])
+const getLanguages = ObjectUtils.getProp(keys.languages, [])
 
 const getDefaultLanguage = R.pipe(getLanguages, R.head)
 
-const getLabels = SurveyUtils.getProp(keys.labels, {})
+const getLabels = ObjectUtils.getProp(keys.labels, {})
 
 const getDefaultLabel = surveyInfo => {
   const labels = getLabels(surveyInfo)
@@ -55,13 +55,13 @@ const getDefaultLabel = surveyInfo => {
 }
 
 const getLabel = (surveyInfo, lang) => {
-  const label = SurveyUtils.getLabel(lang)(surveyInfo)
-  return isBlank(label)
+  const label = ObjectUtils.getLabel(lang)(surveyInfo)
+  return StringUtils.isBlank(label)
     ? getName(surveyInfo)
     : label
 }
 
-const getSRS = SurveyUtils.getProp(keys.srs, [])
+const getSRS = ObjectUtils.getProp(keys.srs, [])
 
 const getDefaultSRS = R.pipe(getSRS, R.head)
 
@@ -74,9 +74,9 @@ const getStatus = surveyInfo =>
       ? 'DRAFT'
       : ''
 
-const getCollectUri = SurveyUtils.getProp(keys.collectUri)
+const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
-const getCollectReport = SurveyUtils.getProp(keys.collectReport, {})
+const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
 
 const hasCollectReportIssues = R.pipe(
   getCollectReport,
@@ -85,13 +85,11 @@ const hasCollectReportIssues = R.pipe(
 
 const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
-const getLanguage = preferredLang => surveyInfo => {
-  return R.pipe(
-    getLanguages,
-    R.find(R.equals(preferredLang)),
-    R.defaultTo(getDefaultLanguage(surveyInfo))
-  )(surveyInfo)
-}
+const getLanguage = preferredLang => surveyInfo => R.pipe(
+  getLanguages,
+  R.find(R.equals(preferredLang)),
+  R.defaultTo(getDefaultLanguage(surveyInfo))
+)(surveyInfo)
 
 // ====== UPDATE
 const markDraft = R.assoc(keys.draft, true)
@@ -104,12 +102,14 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 const getAuthGroups = R.prop(keys.authGroups)
 
-const getAuthGroupAdmin = R.pipe(
+const _getAuthGroupByName = name => R.pipe(
   getAuthGroups,
-  R.find(g => g.name === AuthGroups.groupNames.surveyAdmin))
+  R.find(R.propEq(AuthGroups.keys.name, name))
+)
 
-const isAuthGroupAdmin = group => surveyInfo =>
-  AuthGroups.getUuid(getAuthGroupAdmin(surveyInfo)) === AuthGroups.getUuid(group)
+const getAuthGroupAdmin = _getAuthGroupByName(AuthGroups.groupNames.surveyAdmin)
+
+const isAuthGroupAdmin = group => surveyInfo => AuthGroups.isEqual(group)(getAuthGroupAdmin(surveyInfo))
 
 module.exports = {
   keys,

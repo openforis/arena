@@ -3,16 +3,14 @@ const fs = require('fs')
 
 const Queue = require('../../../common/queue')
 
-const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
+const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
   let headers = null
   let total = 0
   let canceled = false
-  let stream = null
   const queue = new Queue()
 
   const start = () => new Promise((resolve, reject) => {
-    stream = fs.createReadStream(filePath)
     let started = false
     let ended = false
 
@@ -68,6 +66,10 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
   return { start, cancel }
 }
 
+const createReader = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
+  createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
+
 module.exports = {
-  createReader
+  createReader,
+  createReaderFromStream
 }

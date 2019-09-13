@@ -81,12 +81,7 @@ const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols
         const resultRow = {
           ...row,
           cols: {},
-          record: {
-            [Record.keys.uuid]: recordUuid,
-            [Validator.keys.validation]: {
-              [Validator.keys.valid]: Validator.isValid(record)
-            }
-          },
+          record,
           parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
         }
 

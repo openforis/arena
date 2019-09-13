@@ -32,13 +32,14 @@ class FileZip {
     })
   }
 
+  hasEntry (entryName) {
+    return !!this.streamZip.entry(entryName)
+  }
+
   getEntryData (entryName) {
-    try {
-      return this.streamZip.entryDataSync(entryName)
-    } catch(e) {
-      // entry not found
-      return null
-    }
+    return this.hasEntry(entryName)
+      ? this.streamZip.entryDataSync(entryName)
+      : null
   }
 
   getEntryAsText (entryName) {
@@ -47,9 +48,15 @@ class FileZip {
   }
 
   async getEntryStream (entryName) {
-    return new Promise(resolve =>
-      this.streamZip.stream(entryName, (err, stm) => resolve(stm))
-    )
+    return this.hasEntry(entryName)
+      ? new Promise((resolve, reject) =>
+        this.streamZip.stream(entryName, (err, stm) =>
+          err
+            ? reject(err)
+            : resolve(stm)
+        )
+      )
+      : null
   }
 
   getEntryNames (path = '') {
