@@ -6,6 +6,7 @@ const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
 const Expression = require('../../exprParser/expression')
+const ObjectUtils = require('../../objectUtils')
 
 const SystemError = require('../../../server/utils/systemError')
 
@@ -70,9 +71,20 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   async (propName, nodeDefExpression) => {
     const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
     return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
-      ? 'only_last_can_have_empty_apply_if'
+      ? { key: ValidatorErrorKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
       : null
   }
+
+const validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
+  R.any(nodeDefExpr => !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
+    NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
+    NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
+  )(nodeDefExpressions)
+    ? {
+      [Validator.keys.valid]: false,
+      [Validator.keys.errors]: [{ key: ValidatorErrorKeys.nodeDefEdit.expressionDuplicate }]
+    }
+    : null
 
 const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness) => {
   const nodeDefExpression = nodeDefExpressions[i]
@@ -94,22 +106,27 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
       ]
     }
   )
-  return validation
+  return Validator.isValidationValid(validation)
+    ? validateExpressionUniqueness(nodeDefExpressions, nodeDefExpression)
+    : validation
 }
 
-const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true) => {
+const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true, errorKey = null) => {
   const result = Validator.newValidationValid()
 
   const validations = await Promise.all(
-    nodeDefExpressions.map(async (nodeDefExpression, i) =>
-      await validateExpression(survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness)
+    nodeDefExpressions.map((nodeDefExpression, i) =>
+      validateExpression(survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness)
     )
   )
 
   validations.forEach((validation, i) => {
-    result.fields[i + ''] = validation
-    result.valid = result.valid && (!validation || validation.valid)
+    result[Validator.keys.fields]['' + i] = validation
+    result[Validator.keys.valid] = Validator.isValidationValid(result) && Validator.isValidationValid(validation)
   })
+
+  if (errorKey && !Validator.isValidationValid(result))
+    result[Validator.keys.errors] = [{ key: errorKey }]
 
   return result
 }

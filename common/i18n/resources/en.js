@@ -373,16 +373,21 @@ module.exports = {
 
     nodeDefEdit: {
       applyIfDuplicate: '"Apply if" condition is duplicate',
+      applyIfInvalid: 'Invalid "Apply if" condition',
       countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
       countMinMustBePositiveNumber: 'Min Count must be a positive integer',
       categoryRequired: 'Category is required',
       childrenEmpty: '$t(common.childrenEmpty)',
+      defaultValuesInvalid: 'Invalid "Default Values"',
       defaultValuesNotSpecified: 'Default value not specified',
+      expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
+      expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',
       nameInvalid: 'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
       taxonomyRequired: 'Taxonomy is required',
+      validationsInvalid: 'Invalid "Validations"',
     },
 
     record: {
