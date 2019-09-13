@@ -30,6 +30,11 @@ class SamplingPointDataImportJob extends CategoryImportJob {
     }, 'SamplingPointDataImportJob')
   }
 
+  async shouldExecute () {
+    //skip import if summary is not specified (csv file not found)
+    return !!this.summary
+  }
+
   async beforeSuccess () {
     await super.beforeSuccess()
 

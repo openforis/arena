@@ -35,11 +35,6 @@ class CategoryImportJob extends Job {
     this.logDebug('summary', this.summary)
   }
 
-  async shouldExecute () {
-    //skip import if summary is not specified
-    return !!this.summary
-  }
-
   async execute () {
     // 2. fetch or create category
     this.category = await this._fetchOrCreateCategory()
@@ -59,13 +54,14 @@ class CategoryImportJob extends Job {
       // errors found in csv rows
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
+    } else {
+      // 6. no errors found, insert items
+      await this._insertItems()
     }
   }
 
   async beforeSuccess () {
     await super.beforeSuccess()
-
-    await this._insertItems()
 
     // fetch and validate category
     this.category = await CategoryManager.fetchCategoryByUuid(this.surveyId, Category.getUuid(this.category), true, true, this.tx)
