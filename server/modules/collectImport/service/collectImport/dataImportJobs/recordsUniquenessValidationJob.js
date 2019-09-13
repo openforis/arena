@@ -29,7 +29,7 @@ class RecordsUniquenessValidationJob extends Job {
     this.total = 2
 
     // 1. fetch survey and node defs
-    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
+    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, true, true, false, this.tx)
     this.incrementProcessedItems()
 
     const nodeDefRoot = Survey.getRootNodeDef(this.survey)
@@ -79,7 +79,7 @@ class RecordsUniquenessValidationJob extends Job {
   async flushRecordValidationBatchUpdate () {
     if (Object.keys(this.validationByRecordUuid).length > 0) {
       const recordAndValidationValues = Object.entries(this.validationByRecordUuid)
-      await RecordManager.updateRecordValidationsFromValues(this.getSurveyId(), recordAndValidationValues, this.tx)
+      await RecordManager.updateRecordValidationsFromValues(this.surveyId, recordAndValidationValues, this.tx)
       this.validationByRecordUuid = {}
     }
   }

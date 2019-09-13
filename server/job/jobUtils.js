@@ -39,7 +39,7 @@ const calculatedElapsedMillis = job =>
 const jobToJSON = job => ({
   type: job.type,
   userUuid: job.userUuid,
-  surveyId: job.getSurveyId(),
+  surveyId: job.surveyId,
 
   innerJobs: job.innerJobs.map(j => jobToJSON(j)),
 

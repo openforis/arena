@@ -14,14 +14,12 @@ class CategoriesValidationJob extends Job {
   }
 
   async execute (tx) {
-    const surveyId = this.getSurveyId()
-
-    const categories = await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false, tx)
+    const categories = await CategoryManager.fetchCategoriesBySurveyId(this.surveyId, true, false, tx)
 
     this.total = categories.length
 
     for (const category of categories) {
-      const validatedCategory = await CategoryManager.validateCategory(surveyId, categories, category, true)
+      const validatedCategory = await CategoryManager.validateCategory(this.surveyId, categories, category, true)
       if (!Validator.isValid(validatedCategory)) {
         this.errors[Category.getName(validatedCategory)] = Validator.getInvalidFieldValidations(validatedCategory.validation)
       }

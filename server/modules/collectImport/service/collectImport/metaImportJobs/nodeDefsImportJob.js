@@ -153,7 +153,7 @@ class NodeDefsImportJob extends Job {
 
     // 3. insert node def into db
     const nodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, props)
-    let nodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, nodeDefParam, tx)
+    let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
     // 3a. increment processed items before recursive call to insertNodeDef
@@ -200,7 +200,7 @@ class NodeDefsImportJob extends Job {
     // 5. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)
 
-    nodeDef = await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx)
+    nodeDef = await NodeDefManager.updateNodeDefProps(this.user, surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx)
 
     // 6. store nodeDef in cache
     let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
@@ -350,7 +350,7 @@ class NodeDefsImportJob extends Job {
   }
 
   async addNodeDefImportIssue (nodeDefUuid, expressionType, expression = null, applyIf = null, messages = {}, tx) {
-    await CollectImportReportManager.insertItem(this.getSurveyId(), nodeDefUuid, {
+    await CollectImportReportManager.insertItem(this.surveyId, nodeDefUuid, {
       [CollectImportReportItem.propKeys.expressionType]: expressionType,
       [CollectImportReportItem.propKeys.expression]: expression,
       [CollectImportReportItem.propKeys.applyIf]: applyIf,
@@ -382,11 +382,11 @@ class NodeDefsImportJob extends Job {
         [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)(NodeDef.getLabels())
       }
       const qualifierNodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), nodeDefType.text, props)
-      const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, qualifierNodeDefParam, tx)
+      const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, tx)
       const propsAdvanced = {
         [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(util.format(qualifiableItemApplicableExpressionFormat, nodeDefName, itemCode))]
       }
-      await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, NodeDef.getUuid(qualifierNodeDef), {}, propsAdvanced, tx)
+      await NodeDefManager.updateNodeDefProps(this.user, this.surveyId, NodeDef.getUuid(qualifierNodeDef), {}, propsAdvanced, tx)
 
       this.nodeDefs[NodeDef.getUuid(qualifierNodeDef)] = qualifierNodeDef
     }
