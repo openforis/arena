@@ -12,8 +12,9 @@ const errorMiddleware = require('./middleware/errorMiddleware')
 const authApi = require('../modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
 const WebSocket = require('../utils/webSocket')
-const RecordPreviewCleanup = require('./recordPreviewCleanup')
-const ExpiredJwtTokensCleanup = require('./expiredJwtTokensCleanup')
+const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
+const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
+const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -30,7 +31,7 @@ module.exports = async () => {
     limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: '/tmp/arena-upload',
+    tempFileDir: TempFilesCleanup.tempFolder,
   }))
 
   headerMiddleware.init(app)
@@ -66,4 +67,5 @@ module.exports = async () => {
   // ====== schedulers
   await RecordPreviewCleanup.init()
   await ExpiredJwtTokensCleanup.init()
+  await TempFilesCleanup.init()
 }

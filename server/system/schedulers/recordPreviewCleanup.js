@@ -1,7 +1,7 @@
 const schedule = require('node-schedule')
 
-const SurveyManager = require('../modules/survey/manager/surveyManager')
-const RecordService = require('../modules/record/service/recordService')
+const SurveyManager = require('../../modules/survey/manager/surveyManager')
+const RecordService = require('../../modules/record/service/recordService')
 
 const initSchedule = () =>
   schedule.scheduleJob('0 0 * * *', () => {

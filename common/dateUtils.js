@@ -106,6 +106,7 @@ module.exports = {
   subDays,
   addDays,
   differenceInDays,
+  differenceInHours,
   subMonths,
   subYears,
 }
