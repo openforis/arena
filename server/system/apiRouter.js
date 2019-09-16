@@ -10,7 +10,7 @@ require('../modules/survey/api/surveyApi').init(router)
 require('../modules/nodeDef/api/nodeDefApi').init(router)
 require('../modules/category/api/categoryApi').init(router)
 require('../modules/taxonomy/api/taxonomyApi').init(router)
-require('../modules/srs/api/srsApi').init(router)
+require('../modules/geo/api/geoApi').init(router)
 require('../modules/collectImport/api/collectImportApi').init(router)
 
 require('../modules/record/api/recordApi').init(router)
