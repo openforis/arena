@@ -71,4 +71,7 @@ PGPASSWORD=arena
 COGNITO_REGION=cognito_region
 COGNITO_USER_POOL_ID=cognito_user_pool_id
 COGNITO_CLIENT_ID=cognito_client_id
+
+# temp folder
+TEMP_FOLDER=/tmp/arena_upload
 ```

@@ -15,6 +15,7 @@ const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
 const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
+const Environment = require('./environment')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -31,7 +32,7 @@ module.exports = async () => {
     limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: TempFilesCleanup.tempFolder,
+    tempFileDir: Environment.tempFolder,
   }))
 
   headerMiddleware.init(app)
