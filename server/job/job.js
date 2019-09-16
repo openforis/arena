@@ -110,7 +110,7 @@ class Job {
 
       const shouldExecute = await this.shouldExecute()
       this.logDebug('Should execute?', shouldExecute)
-      
+
       if (shouldExecute) {
         // 2. execute
         if (this.innerJobs.length > 0) {
@@ -270,18 +270,8 @@ class Job {
     return this.getContextProp(Job.keysContext.survey)
   }
 
-  //TODO replace it with surveyId getter
-  getSurveyId () {
-    return this.surveyId
-  }
-
   get surveyId () {
     return this.getContextProp(Job.keysContext.surveyId)
-  }
-
-  //TODO replace it with user getter
-  getUser () {
-    return this.user
   }
 
   get user () {
@@ -289,7 +279,7 @@ class Job {
   }
 
   get userUuid () {
-    return User.getUuid(this.getUser())
+    return User.getUuid(this.user)
   }
 
   getCurrentInnerJob () {

@@ -13,7 +13,7 @@ class TaxonomiesValidationJob extends Job {
   }
 
   async execute (tx) {
-    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.getSurveyId(), true, true, tx)
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, tx)
 
     const invalidTaxonomies = R.filter(taxonomy => !isValid(taxonomy), taxonomies)
 

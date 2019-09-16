@@ -48,8 +48,7 @@ class TaxonomyImportJob extends Job {
   async execute (tx) {
     await this.csvParser.init()
 
-    const { taxonomyUuid } = this
-    const surveyId = this.getSurveyId()
+    const { surveyId, taxonomyUuid } = this
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
 
@@ -85,9 +84,7 @@ class TaxonomyImportJob extends Job {
   async _parseCSVRows (taxonomy) {
     this.logDebug('start CSV file parsing')
 
-    const surveyId = this.getSurveyId()
-
-    this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
+    this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.vernacularLanguageCodes)
 
     this.processed = 0
 
@@ -146,7 +143,10 @@ class TaxonomyImportJob extends Job {
       this.addError({
         all: {
           valid: false,
-          errors: [{ key: ValidatorErrorKeys.taxonomyImportJob.missingRequiredColumns, params: { columns: R.join(', ', missingColumns) } }]
+          errors: [{
+            key: ValidatorErrorKeys.taxonomyImportJob.missingRequiredColumns,
+            params: { columns: R.join(', ', missingColumns) }
+          }]
         }
       })
       return false

@@ -29,30 +29,30 @@ class SurveyPropsPublishJob extends Job {
     super(SurveyPropsPublishJob.type, params)
   }
 
-  async execute (tx) {
+  async execute () {
+    const { surveyId, user, tx } = this
+
     this.total = 7
 
-    const id = this.getSurveyId()
-
-    const langsDeleted = await findDeletedLanguages(id, tx)
+    const langsDeleted = await findDeletedLanguages(surveyId, tx)
     this.incrementProcessedItems()
 
-    await NodeDefManager.permanentlyDeleteNodeDefs(id, tx)
+    await NodeDefManager.permanentlyDeleteNodeDefs(surveyId, tx)
     this.incrementProcessedItems()
 
-    await NodeDefManager.publishNodeDefsProps(id, langsDeleted, tx)
+    await NodeDefManager.publishNodeDefsProps(surveyId, langsDeleted, tx)
     this.incrementProcessedItems()
 
-    await CategoryManager.publishProps(id, langsDeleted, tx)
+    await CategoryManager.publishProps(surveyId, langsDeleted, tx)
     this.incrementProcessedItems()
 
-    await TaxonomyManager.publishTaxonomiesProps(id, tx)
+    await TaxonomyManager.publishTaxonomiesProps(surveyId, tx)
     this.incrementProcessedItems()
 
-    const surveyInfo = await SurveyManager.publishSurveyProps(id, langsDeleted, tx)
+    const surveyInfo = await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
     this.incrementProcessedItems()
 
-    await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, { surveyUuid: Survey.getUuid(surveyInfo) }, tx)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPublish, { surveyUuid: Survey.getUuid(surveyInfo) }, tx)
     this.incrementProcessedItems()
   }
 

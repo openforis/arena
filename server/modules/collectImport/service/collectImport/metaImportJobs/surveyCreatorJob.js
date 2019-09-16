@@ -31,7 +31,7 @@ class SurveyCreatorJob extends Job {
     const collectProjectLabels = CollectSurvey.getElementsByName('project')(collectSurvey)
     const label = CollectSurvey.toLabels(collectProjectLabels, defaultLanguage)[defaultLanguage]
 
-    const survey = await SurveyManager.createSurvey(this.getUser(), {
+    const survey = await SurveyManager.createSurvey(this.user, {
       name,
       label,
       lang: defaultLanguage,
@@ -40,7 +40,7 @@ class SurveyCreatorJob extends Job {
 
     const surveyId = Survey.getId(survey)
 
-    await SurveyManager.updateSurveyProp(this.getUser(), surveyId, Survey.infoKeys.languages, languages, tx)
+    await SurveyManager.updateSurveyProp(this.user, surveyId, Survey.infoKeys.languages, languages, tx)
 
     this.setContext({ surveyId, defaultLanguage })
   }

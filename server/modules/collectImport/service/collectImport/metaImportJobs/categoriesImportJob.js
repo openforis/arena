@@ -47,7 +47,7 @@ class CategoriesImportJob extends Job {
         const categoryToCreate = Category.newCategory({
           [Category.props.name]: categoryName
         })
-        let category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryToCreate, tx)
+        let category = await CategoryManager.insertCategory(this.user, surveyId, categoryToCreate, tx)
 
         category = await this.insertLevels(category, collectCodeList, tx)
 
@@ -69,16 +69,13 @@ class CategoriesImportJob extends Job {
   }
 
   async insertLevels (category, codeList, tx) {
-    const user = this.getUser()
-    const surveyId = this.getSurveyId()
-
     const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(codeList)
     if (hierarchyLevels.length > 1) {
       let firstLevel = Category.getLevelByIndex(0)(category)
       const collectFirstLevel = hierarchyLevels[0]
 
       // update first level name
-      firstLevel = await CategoryManager.updateLevelProp(user, surveyId, Category.getUuid(firstLevel), CategoryLevel.props.name, collectFirstLevel.attributes.name, tx)
+      firstLevel = await CategoryManager.updateLevelProp(this.user, this.surveyId, Category.getUuid(firstLevel), CategoryLevel.props.name, collectFirstLevel.attributes.name, tx)
       category = Category.assocLevel(firstLevel)(category)
 
       // insert other levels
@@ -88,7 +85,7 @@ class CategoriesImportJob extends Job {
 
         const hierarchyLevel = hierarchyLevels[i]
         const levelToCreate = Category.assocLevelName(hierarchyLevel.attributes.name)(Category.newLevel(category))
-        const level = await CategoryManager.insertLevel(user, surveyId, levelToCreate, tx)
+        const level = await CategoryManager.insertLevel(this.user, this.surveyId, levelToCreate, tx)
 
         category = Category.assocLevel(level)(category)
       }
@@ -138,7 +135,7 @@ class CategoriesImportJob extends Job {
   }
 
   async itemsInsertHandler (items, tx) {
-    await CategoryManager.insertItems(this.getUser(), this.getSurveyId(), items, tx)
+    await CategoryManager.insertItems(this.user, this.surveyId, items, tx)
   }
 
 }

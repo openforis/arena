@@ -35,12 +35,12 @@ class RecordsImportJob extends Job {
 
   async onStart () {
     await super.onStart()
-    await RecordManager.disableTriggers(this.getSurveyId(), this.tx)
+    await RecordManager.disableTriggers(this.surveyId, this.tx)
   }
 
-  async execute (tx) {
-    const user = this.getUser()
-    const surveyId = this.getSurveyId()
+  async execute () {
+    const { surveyId, user, tx } = this
+
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
     const entryNames = this.getEntryNames()
@@ -75,7 +75,7 @@ class RecordsImportJob extends Job {
 
       //persist validation
       // this.logDebug(`${entryName} persistValidation start`)
-      await RecordManager.persistValidation(survey, record, recordValidation, this.tx)
+      await RecordManager.persistValidation(survey, record, recordValidation, tx)
       // this.logDebug(`${entryName} persistValidation end`)
 
       // this.logDebug(`-- end import record ${entryName}`)
@@ -90,7 +90,7 @@ class RecordsImportJob extends Job {
 
   async beforeEnd () {
     await super.beforeEnd()
-    await RecordManager.enableTriggers(this.getSurveyId(), this.tx)
+    await RecordManager.enableTriggers(this.surveyId, this.tx)
   }
 
   getEntryNames () {
@@ -283,8 +283,7 @@ class RecordsImportJob extends Job {
   }
 
   async nodesBatchInsertHandler (nodeValues, tx) {
-    const surveyId = this.getSurveyId()
-    await RecordManager.insertNodesFromValues(surveyId, nodeValues, tx)
+    await RecordManager.insertNodesFromValues(this.surveyId, nodeValues, tx)
   }
 
 }

@@ -32,7 +32,7 @@ class SurveyRdbGeneratorJob extends Job {
 
     //2 ==== traverse entities to create and populate tables
     const traverseNodeDef = async nodeDef => {
-      if(this.isCanceled())
+      if (this.isCanceled())
         return
 
       const nodeDefName = NodeDef.getName(nodeDef)
@@ -55,13 +55,11 @@ class SurveyRdbGeneratorJob extends Job {
   }
 
   async fetchSurvey (tx) {
-    const surveyId = this.getSurveyId()
-
-    const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
+    const surveySummary = await SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, fetchDraft, false, false, tx)
+    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, fetchDraft, false, false, tx)
   }
 
 }

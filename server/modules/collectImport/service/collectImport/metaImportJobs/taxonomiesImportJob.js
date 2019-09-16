@@ -66,7 +66,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.taxonomyPropKeys.name]: taxonomyName,
     })
-    const taxonomy = await TaxonomyManager.insertTaxonomy(this.getUser(), surveyId, taxonomyParam, tx)
+    const taxonomy = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     // 3. parse CSV file
@@ -94,7 +94,7 @@ class TaxonomiesImportJob extends Job {
     this.headers = headers
     this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
 
-    this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), this.getSurveyId(), this.vernacularLangCodes)
+    this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.vernacularLangCodes)
 
     this.currentRow = 1
     this.incrementProcessedItems()
