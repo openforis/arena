@@ -11,13 +11,15 @@ const SurveyDefaults = require('./_survey/surveyDefaults')
 const SurveyDependencies = require('./_survey/surveyDependencies')
 const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
 
+const Srs = require('../geo/srs')
+
 const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
   uuid: uuidv4(),
   props: {
     name,
     labels: { [lang]: label },
     languages: [lang],
-    srs: [{ code: '4326', name: 'GCS WGS 1984' }], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+    srs: [Srs.latLonSrs],
     ...collectUri
       ? { collectUri }
       : {}

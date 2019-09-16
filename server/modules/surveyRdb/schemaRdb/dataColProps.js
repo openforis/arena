@@ -11,9 +11,10 @@ const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
 
-const Geometry = require('../../../../common/geometry')
-const { isBlank } = require('../../../../common/stringUtils')
+const Point = require('../../../../common/geo/point')
 const DateTimeUtils = require('../../../../common/dateUtils')
+
+const GeoService = require('../../geo/service/geoService')
 
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
@@ -94,10 +95,11 @@ const props = {
 
   [nodeDefType.coordinate]: {
     [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
-      const surveyInfo = Survey.getSurveyInfo(survey)
-      const defaultSrsCode = Survey.getDefaultSRS(surveyInfo).code
-      const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol, defaultSrsCode)]
-      return () => isBlank(x) || isBlank(y) ? null : Geometry.newPoint(srs, x, y)
+      const [x, y, srsCode] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
+
+      return () => GeoService.isCoordinateValid(srsCode, x, y)
+        ? Point.newPoint(srsCode, x, y)
+        : null
     },
     [colTypeProcessor]: () => () => sqlTypes.point,
   },
