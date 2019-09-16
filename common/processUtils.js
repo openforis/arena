@@ -1,10 +1,16 @@
-const development = 'development'
+const R = require('ramda')
 
-const getProcessNodeEnv = () => process.env.NODE_ENV || development
+const environments = {
+  development: 'development'
+}
 
-const isEnvDevelopment = () => getProcessNodeEnv() === development
+const getEnvVariable = (variable, defaultValue = null) => R.propOr(defaultValue, variable)(process.env)
+
+const processNodeEnv = getEnvVariable('NODE_ENV', environments.development)
+
+const envDevelopment = processNodeEnv === environments.development
 
 module.exports = {
-  getProcessNodeEnv,
-  isEnvDevelopment,
+  getEnvVariable,
+  envDevelopment
 }

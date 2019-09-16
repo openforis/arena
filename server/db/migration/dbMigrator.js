@@ -8,12 +8,12 @@ const logger = Log.getLogger('DBMigrator')
 const db = require('../db')
 const config = require('./migrationConfig')
 
-const { getProcessNodeEnv } = require('../../../common/processUtils')
+const ProcessEnv = require('../../system/processEnv')
 const { getSurveyDBSchema } = require('../../modules/survey/repository/surveySchemaRepositoryUtils')
 
 const { fetchAllSurveyIds } = require('../../modules/survey/repository/surveyRepository')
 
-const env = getProcessNodeEnv()
+const env = ProcessEnv.nodeEnv
 
 const publicSchema = 'public'
 

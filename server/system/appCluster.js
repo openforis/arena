@@ -15,7 +15,7 @@ const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
 const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
-const Environment = require('./environment')
+const ProcessEnv = require('../system/processEnv')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -32,7 +32,7 @@ module.exports = async () => {
     limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: Environment.tempFolder,
+    tempFileDir: ProcessEnv.tempFolder,
   }))
 
   headerMiddleware.init(app)
@@ -56,10 +56,8 @@ module.exports = async () => {
   errorMiddleware.init(app)
 
   // ====== server
-  const httpServerPort = process.env.PORT || '9090'
-
-  const server = app.listen(httpServerPort, () => {
-    logger.info(`server initialization end - listening on port ${httpServerPort}`)
+  const server = app.listen(ProcessEnv.port, () => {
+    logger.info(`server initialization end - listening on port ${ProcessEnv.port}`)
   })
 
   // ====== socket middleware

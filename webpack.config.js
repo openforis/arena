@@ -9,15 +9,17 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 require('dotenv').config()
 const uuidv4 = require('uuid/v4')
 
+const ProcessEnv = require('./server/system/processEnv')
+
 const mode = {
   development: 'development',
   production: 'production'
 }
 
-const prodBuild = process.env.NODE_ENV === mode.production
-const buildReport = process.env.BUILD_REPORT === 'true'
+const prodBuild = ProcessEnv.nodeEnv === mode.production
+const buildReport = ProcessEnv.buildReport
 
-const lastCommit = process.env.SOURCE_VERSION || 'N/A'
+const lastCommit = ProcessEnv.sourceVersion
 const versionString = lastCommit + '_' + new Date().toISOString()
 
 // ==== init plugins
@@ -31,11 +33,11 @@ const plugins = [
   new webpack.DefinePlugin({
     __SYSTEM_VERSION__: `"${versionString}"`,
     __BUST__: `"${uuidv4()}"`,
-    __COGNITO_REGION__: JSON.stringify(process.env.COGNITO_REGION),
-    __COGNITO_USER_POOL_ID__: JSON.stringify(process.env.COGNITO_USER_POOL_ID),
-    __COGNITO_CLIENT_ID__: JSON.stringify(process.env.COGNITO_CLIENT_ID),
+    __COGNITO_REGION__: JSON.stringify(ProcessEnv.cognitoRegion),
+    __COGNITO_USER_POOL_ID__: JSON.stringify(ProcessEnv.cognitoUserPoolId),
+    __COGNITO_CLIENT_ID__: JSON.stringify(ProcessEnv.cognitoClientId),
     'process.env': {
-      'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'NODE_ENV': JSON.stringify(ProcessEnv.nodeEnv),
     }
   }),
   new GoogleFontsPlugin({

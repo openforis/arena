@@ -1,16 +1,18 @@
+const ProcessEnv = require('../../system/processEnv')
+
 module.exports = {
-  
+
   development: {
     driver: 'pg',
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    schema: process.env.PGSCHEMA,
+    user: ProcessEnv.pgUser,
+    password: ProcessEnv.pgPassword,
+    host: ProcessEnv.pgHost,
+    database: ProcessEnv.pgDatabase,
+    schema: ProcessEnv.pgSchema,
   },
-  
+
   production: {
     ssl: true,
   }
-  
+
 }
