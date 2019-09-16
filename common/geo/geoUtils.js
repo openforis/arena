@@ -12,10 +12,10 @@ const geographic = require('@esri/proj-codes/pe_list_geogcs.json')
 const proj4 = require('proj4')
 const isValidCoordinates = require('is-valid-coordinates')
 
-const Srs = require('../../../../common/geo/srs')
-const ObjectUtils = require('../../../../common/objectUtils')
-const NumberUtils = require('../../../../common/numberUtils')
-const StringUtils = require('../../../../common/stringUtils')
+const Srs = require('./srs')
+const ObjectUtils = require('../objectUtils')
+const NumberUtils = require('../numberUtils')
+const StringUtils = require('../stringUtils')
 
 const invalidLonLatCoordinates = [0, 90]
 

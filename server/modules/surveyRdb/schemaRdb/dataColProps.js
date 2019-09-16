@@ -12,9 +12,8 @@ const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
 
 const Point = require('../../../../common/geo/point')
+const GeoUtils = require('../../../../common/geo/geoUtils')
 const DateTimeUtils = require('../../../../common/dateUtils')
-
-const GeoService = require('../../geo/service/geoService')
 
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
@@ -97,7 +96,7 @@ const props = {
     [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       const [x, y, srsCode] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
 
-      return () => GeoService.isCoordinateValid(srsCode, x, y)
+      return () => GeoUtils.isCoordinateValid(srsCode, x, y)
         ? Point.newPoint(srsCode, x, y)
         : null
     },

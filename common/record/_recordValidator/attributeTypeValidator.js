@@ -9,7 +9,7 @@ const { nodeDefType } = NodeDef
 const Taxon = require('../../survey/taxon')
 
 const Node = require('../node')
-const GeoService = require('../../../server/modules/geo/service/geoService')
+const GeoUtils = require('../../geo/geoUtils')
 
 const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 
@@ -21,7 +21,7 @@ const typeValidatorFns = {
     validateCode(survey, nodeDef, node),
 
   [nodeDefType.coordinate]: (survey, nodeDef, node, value) =>
-    GeoService.isCoordinateValid(
+    GeoUtils.isCoordinateValid(
       Node.getCoordinateSrs(node),
       Node.getCoordinateX(node),
       Node.getCoordinateY(node)

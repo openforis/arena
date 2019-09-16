@@ -1,13 +1,13 @@
 const Request = require('../../../utils/request')
 
-const GeoService = require('../service/geoService')
+const GeoUtils = require('../../../../common/geo/geoUtils')
 
 module.exports.init = app => {
   // ==== READ
   app.get('/geo/srs/find', async (req, res) => {
     const { codeOrName } = Request.getParams(req)
 
-    const srss = await GeoService.findSrsByCodeOrName(codeOrName)
+    const srss = await GeoUtils.findSrsByCodeOrName(codeOrName)
 
     res.json({ srss })
   })
