@@ -168,6 +168,15 @@ const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
   thread.postMessage({ type: recordThreadMessageTypes.nodeDelete, nodeUuid })
 }
 
+const deleteRecordsPreview = async () => {
+  const surveyIds = await SurveyManager.fetchAllSurveyIds()
+  await Promise.all(
+    surveyIds.map(surveyId =>
+      RecordManager.deleteRecordsPreview(surveyId)
+    )
+  )
+}
+
 module.exports = {
   // ====== RECORD
 
@@ -185,7 +194,7 @@ module.exports = {
 
   // delete
   deleteRecord,
-  deleteRecordsPreview: RecordManager.deleteRecordsPreview,
+  deleteRecordsPreview,
 
   checkIn,
   checkOut,

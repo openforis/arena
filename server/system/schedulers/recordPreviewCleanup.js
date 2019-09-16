@@ -1,6 +1,5 @@
 const schedule = require('node-schedule')
 
-const SurveyManager = require('../../modules/survey/manager/surveyManager')
 const RecordService = require('../../modules/record/service/recordService')
 
 const initSchedule = () =>
@@ -16,17 +15,8 @@ const initSchedule = () =>
     )
   })
 
-const cleanUpRecordsPreview = async () => {
-  const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  await Promise.all(
-    surveyIds.map(async surveyId =>
-      await RecordService.deleteRecordsPreview(surveyId)
-    )
-  )
-}
-
 const init = async () => {
-  await cleanUpRecordsPreview()
+  await RecordService.deleteRecordsPreview()
   initSchedule()
 }
 
