@@ -1,9 +1,9 @@
 import React from 'react'
 import axios from 'axios'
 
-import Survey from '../../../../../../common/survey/survey'
-
 import InputChips from '../../../../../commonComponents/form/inputChips'
+
+import Srs from '../../../../../../common/geo/srs'
 
 const SrsEditor = props => {
 
@@ -20,8 +20,8 @@ const SrsEditor = props => {
   return (
     <InputChips
       itemsLookupFunction={srsLookupFunction}
-      itemKeyProp="code"
-      itemLabelFunction={srs => `${srs.name} (EPSG:${srs.code})`}
+      itemKeyProp={Srs.keys.code}
+      itemLabelFunction={srs => `${Srs.getName(srs)} (EPSG:${Srs.getCode(srs)})`}
       selection={srs}
       dropdownAutocompleteMinChars={3}
       requiredItems={1}

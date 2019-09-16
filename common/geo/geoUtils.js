@@ -17,7 +17,7 @@ const ObjectUtils = require('../objectUtils')
 const NumberUtils = require('../numberUtils')
 const StringUtils = require('../stringUtils')
 
-const invalidLonLatCoordinates = [0, 90]
+const invalidLonLatCoordinates = [0, 90] //proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 
 const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 

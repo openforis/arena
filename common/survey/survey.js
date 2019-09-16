@@ -19,7 +19,7 @@ const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
     name,
     labels: { [lang]: label },
     languages: [lang],
-    srs: [Srs.latLonSrs],
+    srs: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
     ...collectUri
       ? { collectUri }
       : {}
