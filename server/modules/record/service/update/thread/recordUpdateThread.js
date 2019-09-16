@@ -117,7 +117,7 @@ class RecordUpdateThread extends Thread {
 
       case messageTypes.nodePersist:
         this.record = await RecordManager.persistNode(
-          this.user,
+          msg.user,
           this.survey,
           this.record,
           msg.node,
@@ -128,7 +128,7 @@ class RecordUpdateThread extends Thread {
 
       case messageTypes.nodeDelete:
         this.record = await RecordManager.deleteNode(
-          this.user,
+          msg.user,
           this.survey,
           this.record,
           msg.nodeUuid,

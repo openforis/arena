@@ -160,12 +160,12 @@ const persistNode = async (user, surveyId, node, file) => {
     await FileManager.insertFile(surveyId, fileObj)
   }
   const thread = _getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), false, true)
-  thread.postMessage({ type: recordThreadMessageTypes.nodePersist, node })
+  thread.postMessage({ type: recordThreadMessageTypes.nodePersist, node, user })
 }
 
 const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
   const thread = _getOrCreatedRecordThread(user, surveyId, recordUuid, false, true)
-  thread.postMessage({ type: recordThreadMessageTypes.nodeDelete, nodeUuid })
+  thread.postMessage({ type: recordThreadMessageTypes.nodeDelete, nodeUuid, user })
 }
 
 module.exports = {
