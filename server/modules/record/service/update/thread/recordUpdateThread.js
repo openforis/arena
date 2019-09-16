@@ -15,6 +15,8 @@ const Queue = require('../../../../../../common/queue')
 
 const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
 
+const RecordUpdateThreadParams = require('./recordUpdateThreadParams')
+
 class RecordUpdateThread extends Thread {
 
   constructor (paramsObj) {
@@ -34,16 +36,20 @@ class RecordUpdateThread extends Thread {
   }
 
   async _init () {
-    await this._initRecord()
-    await this._initSurvey()
+    await this._fetchRecord()
+    await this._fetchSurvey()
+
+    if (RecordUpdateThreadParams.getInitRecord(this.params)) {
+      await this._initRecord()
+    }
   }
 
-  async _initRecord () {
-    const recordUuid = R.prop('recordUuid', this.params)
+  async _fetchRecord () {
+    const recordUuid = RecordUpdateThreadParams.getRecordUuid(this.params)
     this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid)
   }
 
-  async _initSurvey () {
+  async _fetchSurvey () {
     const preview = Record.isPreview(this.record)
     const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true, false)
 
@@ -53,6 +59,16 @@ class RecordUpdateThread extends Thread {
       : await SurveyManager.fetchDependencies(this.surveyId)
 
     this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
+  }
+
+  async _initRecord () {
+    this.record = await RecordManager.initNewRecord(
+      this.user,
+      this.survey,
+      this.record,
+      this.handleNodesUpdated.bind(this),
+      this.handleNodesValidationUpdated.bind(this)
+    )
   }
 
   async handleNodesUpdated (updatedNodes) {

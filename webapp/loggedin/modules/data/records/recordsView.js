@@ -32,7 +32,7 @@ const RecordsView = props => {
       headerLeftComponent={RecordsHeaderLeft}
       rowHeaderComponent={RecordsRowHeader}
       rowComponent={RecordsRow}
-      noItemsLabelKey={'data.records.noRecordsAdded'}
+      noItemsLabelKey={'dataView.records.noRecordsAdded'}
 
       surveyInfo={surveyInfo}
       user={user}

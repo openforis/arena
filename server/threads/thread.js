@@ -3,6 +3,7 @@ const { parentPort, workerData, isMainThread } = require('worker_threads')
 const Log = require('../log/log')
 
 const threadMessageTypes = require('./threadMessageTypes')
+const ThreadParams = require('./threadParams')
 
 /**
  * Base class for thread execution in Worker Pool
@@ -45,16 +46,16 @@ class Thread {
     //TO OVERRIDE
   }
 
-  _getParam(name) {
+  _getParam (name) {
     return this.params[name]
   }
 
   get user () {
-    return this._getParam('user')
+    return this._getParam(ThreadParams.keys.user)
   }
 
   get surveyId () {
-    return this._getParam('surveyId')
+    return this._getParam(ThreadParams.keys.surveyId)
   }
 
 }

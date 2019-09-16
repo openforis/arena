@@ -57,7 +57,7 @@ module.exports = {
   fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
 
   // ==== UPDATE
-  createRecord: RecordUpdateManager.createRecord,
+  initNewRecord: RecordUpdateManager.initNewRecord,
   updateRecordStep: RecordUpdateManager.updateRecordStep,
   persistNode: RecordUpdateManager.persistNode,
   updateNodesDependents: RecordUpdateManager.updateNodesDependents,

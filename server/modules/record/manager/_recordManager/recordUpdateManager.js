@@ -29,20 +29,19 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 
 //==== CREATE
 
-const createRecord = async (user, survey, recordToCreate, client = db) =>
+const initNewRecord = async (user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, client = db) =>
   await client.tx(async t => {
-    const preview = Record.isPreview(recordToCreate)
+    const preview = Record.isPreview(record)
     const surveyId = Survey.getId(survey)
 
-    const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
     if (!preview)
-      await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, record, t)
 
     const rootNodeDef = Survey.getRootNodeDef(survey)
 
-    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
+    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    return await persistNode(user, survey, record, rootNode, null, null, t)
+    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, t)
   })
 
 //==== UPDATE
@@ -118,7 +117,7 @@ const deleteNode = async (user, survey, record, nodeUuid,
   )
 
 const _updateNodeAndValidateRecordUniqueness = async (user, survey, record, node, nodesUpdateFn,
-                                   nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                                                      nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
   await t.tx(async t => {
     await _beforeNodeUpdate(user, survey, record, node, t)
 
@@ -205,7 +204,7 @@ const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
 
 module.exports = {
   // RECORD
-  createRecord,
+  initNewRecord,
   updateRecordStep,
 
   deleteRecord,

@@ -22,15 +22,23 @@ const FileManager = require('../manager/fileManager')
 const RecordUsersMap = require('./update/recordUsersMap')
 const RecordThreads = require('./update/thread/recordThreads')
 const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
+const RecordUpdateThreadParams = require('./update/thread/recordUpdateThreadParams')
+const ThreadParams = require('../../../threads/threadParams')
 
 /**
  * ======
  * THREAD
  * ======
  */
-const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageHandling) => {
+const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageHandling = false, initRecord = false) => {
   const filePath = path.resolve(__dirname, 'update', 'thread', 'recordUpdateThread.js')
-  const data = { user, surveyId, recordUuid }
+
+  const data = {
+    [ThreadParams.keys.user]: user,
+    [ThreadParams.keys.surveyId]: surveyId,
+    [RecordUpdateThreadParams.keys.recordUuid]: recordUuid,
+    [RecordUpdateThreadParams.keys.initRecord]: initRecord
+  }
 
   const messageHandler = msg => {
 
@@ -70,9 +78,12 @@ const _getOrCreatedRecordThread = (user, surveyId, recordUuid, preview = false, 
 const createRecord = async (user, surveyId, recordToCreate) => {
   Log.debug('create record: ', recordToCreate)
 
-  const preview = Record.isPreview(recordToCreate)
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, preview, true, false)
-  return await RecordManager.createRecord(user, survey, recordToCreate)
+  const record = await RecordManager.insertRecord(surveyId, recordToCreate)
+
+  // create record thread and initialize record
+  _createRecordThread(user, surveyId, Record.getUuid(recordToCreate), Record.isPreview(recordToCreate), false, true)
+
+  return record
 }
 
 const deleteRecord = async (user, surveyId, recordUuid) => {

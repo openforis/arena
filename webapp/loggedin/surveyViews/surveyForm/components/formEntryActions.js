@@ -31,7 +31,7 @@ const RecordEntryButtons = (props) => {
   return (
     <React.Fragment>
 
-      <ErrorBadge validation={{ valid }} labelKey="data.invalidRecord"/>
+      <ErrorBadge validation={{ valid }} labelKey="dataView.invalidRecord"/>
 
       <div className="survey-form-header__record-actions-steps">
         {
