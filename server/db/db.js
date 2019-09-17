@@ -2,7 +2,7 @@ const Log = require('../log/log')
 
 const logger = Log.getLogger('DB')
 
-const ProcessEnv = require('../system/processEnv')
+const ProcessEnv = require('../utils/processEnv')
 
 const debugOptions = {
   query: (e) => {

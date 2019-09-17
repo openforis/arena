@@ -3,7 +3,7 @@ const jwkToPem = require('jwk-to-pem')
 const jsonwebtoken = require('jsonwebtoken')
 
 const JwtConstants = require('../../../common/auth/jwtConstants')
-const ProcessEnv = require('../../system/processEnv')
+const ProcessEnv = require('../../utils/processEnv')
 
 const region = ProcessEnv.cognitoRegion
 const poolId = ProcessEnv.cognitoUserPoolId

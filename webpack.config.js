@@ -9,7 +9,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 require('dotenv').config()
 const uuidv4 = require('uuid/v4')
 
-const ProcessEnv = require('./server/system/processEnv')
+const ProcessEnv = require('./server/utils/processEnv')
 
 const mode = {
   development: 'development',

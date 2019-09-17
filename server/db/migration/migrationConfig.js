@@ -1,4 +1,4 @@
-const ProcessEnv = require('../../system/processEnv')
+const ProcessEnv = require('../../utils/processEnv')
 
 module.exports = {
 

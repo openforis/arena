@@ -1,6 +1,6 @@
 const aws = require('aws-sdk')
 
-const ProcessEnv = require('./processEnv')
+const ProcessEnv = require('../utils/processEnv')
 
 const _getAwsClient = () =>
   new aws.CognitoIdentityServiceProvider({
