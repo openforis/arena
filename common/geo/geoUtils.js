@@ -25,14 +25,14 @@ const formatName = (name = '') => R.replace(/_/g, ' ')(name)
  * Array of all srs.
  * Every item has this format: {code: epsgCode, name: "Formatted coordinate reference system name"}
  */
-const srs = R.pipe(
+const srsArray = R.pipe(
   R.concat(projected.ProjectedCoordinateSystems),
   R.concat(geographic.GeographicCoordinateSystems),
   R.map(item => Srs.newSrs(item.wkid.toString(), formatName(item.name), item.wkt)),
   R.sortBy(R.prop(Srs.keys.name))
 )([])
 
-const srsByCode = ObjectUtils.toIndexedObj(srs, Srs.keys.code)
+const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
 
 /**
  * Finds a list of srs whose name or code matches the specified parameter
@@ -44,7 +44,7 @@ const findSrsByCodeOrName = (codeOrName, limit = 200) =>
       StringUtils.contains(codeOrName, item.name)
     ),
     R.take(limit)
-  )(srs)
+  )(srsArray)
 
 const getSrsByCode = code => srsByCode[code]
 
