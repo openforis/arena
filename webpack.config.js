@@ -11,12 +11,6 @@ const uuidv4 = require('uuid/v4')
 
 const ProcessUtils = require('./common/processUtils')
 
-const mode = {
-  development: 'development',
-  production: 'production'
-}
-
-const prodBuild = ProcessUtils.ENV.nodeEnv === mode.production
 const buildReport = ProcessUtils.ENV.buildReport
 
 const lastCommit = ProcessUtils.ENV.sourceVersion
@@ -60,7 +54,7 @@ if (buildReport) {
 // ====== webpack config
 const webPackConfig = {
   entry: ['./webapp/main.js'],
-  mode: prodBuild ? mode.production : mode.development,
+  mode: ProcessUtils.ENV.nodeEnv,
   output: {
     filename: 'bundle-[hash].js',
     path: path.resolve(__dirname, 'dist'),
