@@ -2,6 +2,8 @@ const Log = require('../log/log')
 
 const logger = Log.getLogger('DB')
 
+const ProcessUtils = require('../../common/processUtils')
+
 const debugOptions = {
   query: (e) => {
     logger.debug(`QUERY: ${e.query}`)
@@ -20,20 +22,20 @@ const configCommon = {
   // max number of clients in the pool
   max: 10,
   // whether to use ssl connections
-  ssl: process.env.PGSSL === 'true'
+  ssl: ProcessUtils.ENV.pgSsl
 }
 
-const config = process.env.DATABASE_URL
+const config = ProcessUtils.ENV.dbUrl
   ? {
-    connectionString: process.env.DATABASE_URL,
+    connectionString: ProcessUtils.ENV.dbUrl,
     ...configCommon
   }
   : {
-    user: process.env.PGUSER,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    host: process.env.PGHOST,
-    port: process.env.PGPORT,
+    user: ProcessUtils.ENV.pgUser,
+    database: ProcessUtils.ENV.pgDatabase,
+    password: ProcessUtils.ENV.pgPassword,
+    host: ProcessUtils.ENV.pgHost,
+    port: ProcessUtils.ENV.pgPort,
     ...configCommon
   }
 

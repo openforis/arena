@@ -1,9 +1,11 @@
 const aws = require('aws-sdk')
 
+const ProcessUtils = require('../../common/processUtils')
+
 const _getAwsClient = () =>
   new aws.CognitoIdentityServiceProvider({
     apiVersion: '2016-04-19',
-    region: process.env.COGNITO_REGION,
+    region: ProcessUtils.ENV.cognitoRegion,
   })
 
 const _sendAwsRequest = request =>
@@ -16,7 +18,7 @@ const _sendAwsRequest = request =>
 
 const inviteUser = (email, temporaryPassword) => {
   const params = {
-    UserPoolId: process.env.COGNITO_USER_POOL_ID,
+    UserPoolId: ProcessUtils.ENV.cognitoUserPoolId,
     // Username and email are the same in our case
     Username: email,
     TemporaryPassword: temporaryPassword,
@@ -60,7 +62,7 @@ const updateUser = (oldEmail, email, name) => {
   const params = {
     UserAttributes,
     Username: oldEmail,
-    UserPoolId: process.env.COGNITO_USER_POOL_ID
+    UserPoolId: ProcessUtils.ENV.cognitoUserPoolId
   }
 
   return _sendAwsRequest(_getAwsClient().adminUpdateUserAttributes(params))
@@ -91,7 +93,7 @@ const sendEmail = (from, to, subject, body) => {
   // Returns a promise
   return new aws.SES({
     apiVersion: '2010-12-01',
-    region: process.env.COGNITO_REGION,
+    region: ProcessUtils.ENV.cognitoRegion,
   }).sendEmail(params).promise()
 }
 

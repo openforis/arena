@@ -1,10 +1,37 @@
-const development = 'development'
+const R = require('ramda')
 
-const getProcessNodeEnv = () => process.env.NODE_ENV || development
+const environments = {
+  development: 'development',
+  production: 'production',
+}
 
-const isEnvDevelopment = () => getProcessNodeEnv() === development
+const getEnvVariable = (variable, defaultValue = null) => R.pathOr(defaultValue, ['env', variable])(process)
+
+const ENV = {
+  port: getEnvVariable('PORT', '9090'),
+  nodeEnv: getEnvVariable('NODE_ENV', environments.development),
+  tempFolder: getEnvVariable('TEMP_FOLDER', '/tmp/arena_upload'),
+  adminEmail: getEnvVariable('ADMIN_EMAIL'),
+  buildReport: getEnvVariable('BUILD_REPORT') === 'true',
+  sourceVersion: getEnvVariable('SOURCE_VERSION', 'N/A'),
+  //COGNITO
+  cognitoRegion: getEnvVariable('COGNITO_REGION'),
+  cognitoUserPoolId: getEnvVariable('COGNITO_USER_POOL_ID'),
+  cognitoClientId: getEnvVariable('COGNITO_CLIENT_ID'),
+  //DB
+  dbUrl: getEnvVariable('DATABASE_URL'),
+  pgUser: getEnvVariable('PGUSER'),
+  pgPassword: getEnvVariable('PGPASSWORD'),
+  pgDatabase: getEnvVariable('PGDATABASE'),
+  pgSchema: getEnvVariable('PGSCHEMA'),
+  pgHost: getEnvVariable('PGHOST'),
+  pgPort: getEnvVariable('PGPORT'),
+  pgSsl: getEnvVariable('PGSSL') === 'true'
+}
+
+const envDevelopment = ENV.nodeEnv === environments.development
 
 module.exports = {
-  getProcessNodeEnv,
-  isEnvDevelopment,
+  ENV,
+  envDevelopment
 }

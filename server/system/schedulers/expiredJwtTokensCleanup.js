@@ -1,6 +1,6 @@
 const schedule = require('node-schedule')
 
-const AuthService = require('../modules/auth/service/authService')
+const AuthService = require('../../modules/auth/service/authService')
 
 const init = () =>
   schedule.scheduleJob('0 1 * * *', () => {

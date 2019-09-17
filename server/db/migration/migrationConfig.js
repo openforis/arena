@@ -1,16 +1,18 @@
+const ProcessUtils = require('../../../common/processUtils')
+
 module.exports = {
-  
+
   development: {
     driver: 'pg',
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    schema: process.env.PGSCHEMA,
+    user: ProcessUtils.ENV.pgUser,
+    password: ProcessUtils.ENV.pgPassword,
+    host: ProcessUtils.ENV.pgHost,
+    database: ProcessUtils.ENV.pgDatabase,
+    schema: ProcessUtils.ENV.pgSchema,
   },
-  
+
   production: {
     ssl: true,
   }
-  
+
 }

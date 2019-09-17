@@ -10,7 +10,7 @@ import * as LoginState from '../login/loginState'
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from './appErrorsMiddleware'
-import { isEnvDevelopment } from '../../common/processUtils'
+import ProcessUtils from '../../common/processUtils'
 
 const appReducer = {
   app,
@@ -27,7 +27,7 @@ const createReducer = asyncReducers => (
 
 const middlewares = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
-if (isEnvDevelopment()) {
+if (ProcessUtils.envDevelopment) {
   const { logger } = require('redux-logger')
 
   middlewares.push(logger)

@@ -12,8 +12,10 @@ const errorMiddleware = require('./middleware/errorMiddleware')
 const authApi = require('../modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
 const WebSocket = require('../utils/webSocket')
-const RecordPreviewCleanup = require('./recordPreviewCleanup')
-const ExpiredJwtTokensCleanup = require('./expiredJwtTokensCleanup')
+const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
+const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
+const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
+const ProcessUtils = require('../../common/processUtils')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -30,7 +32,7 @@ module.exports = async () => {
     limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: '/tmp/arena-upload',
+    tempFileDir: ProcessUtils.ENV.tempFolder,
   }))
 
   headerMiddleware.init(app)
@@ -54,10 +56,8 @@ module.exports = async () => {
   errorMiddleware.init(app)
 
   // ====== server
-  const httpServerPort = process.env.PORT || '9090'
-
-  const server = app.listen(httpServerPort, () => {
-    logger.info(`server initialization end - listening on port ${httpServerPort}`)
+  const server = app.listen(ProcessUtils.ENV.port, () => {
+    logger.info(`server initialization end - listening on port ${ProcessUtils.ENV.port}`)
   })
 
   // ====== socket middleware
@@ -66,4 +66,5 @@ module.exports = async () => {
   // ====== schedulers
   await RecordPreviewCleanup.init()
   await ExpiredJwtTokensCleanup.init()
+  await TempFilesCleanup.init()
 }
