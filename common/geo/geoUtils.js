@@ -1,3 +1,9 @@
+/**
+ * DO NOT INCLUDE this module in the client side code.
+ *
+ * This module uses @esri/proj-codes library and stores all the Spatial Reference Systems (with code, name and wkt)
+ * into an array that can be huge.
+ */
 const R = require('ramda')
 /**
  * Projected coordinate reference systems
