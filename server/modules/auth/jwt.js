@@ -3,10 +3,10 @@ const jwkToPem = require('jwk-to-pem')
 const jsonwebtoken = require('jsonwebtoken')
 
 const JwtConstants = require('../../../common/auth/jwtConstants')
-const ProcessEnv = require('../../utils/processEnv')
+const ProcessUtils = require('../../../common/processUtils')
 
-const region = ProcessEnv.cognitoRegion
-const poolId = ProcessEnv.cognitoUserPoolId
+const region = ProcessUtils.ENV.cognitoRegion
+const poolId = ProcessUtils.ENV.cognitoUserPoolId
 const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`
 
 const verificationOptions = {

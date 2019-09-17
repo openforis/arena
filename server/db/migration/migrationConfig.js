@@ -1,14 +1,14 @@
-const ProcessEnv = require('../../utils/processEnv')
+const ProcessUtils = require('../../../common/processUtils')
 
 module.exports = {
 
   development: {
     driver: 'pg',
-    user: ProcessEnv.pgUser,
-    password: ProcessEnv.pgPassword,
-    host: ProcessEnv.pgHost,
-    database: ProcessEnv.pgDatabase,
-    schema: ProcessEnv.pgSchema,
+    user: ProcessUtils.ENV.pgUser,
+    password: ProcessUtils.ENV.pgPassword,
+    host: ProcessUtils.ENV.pgHost,
+    database: ProcessUtils.ENV.pgDatabase,
+    schema: ProcessUtils.ENV.pgSchema,
   },
 
   production: {

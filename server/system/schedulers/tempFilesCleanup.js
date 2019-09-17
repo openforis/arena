@@ -5,7 +5,7 @@ const schedule = require('node-schedule')
 const Logger = require('../../log/log').getLogger('TempFilesCleanup')
 
 const DateUtils = require('../../../common/dateUtils')
-const ProcessEnv = require('../../utils/processEnv')
+const ProcessUtils = require('../../../common/processUtils')
 
 const initSchedule = () =>
   // execute the cron job every day at 2AM
@@ -15,7 +15,7 @@ const initSchedule = () =>
   })
 
 const cleanupTempFiles = async (olderThanHours = null) => {
-  const tempFolder = ProcessEnv.tempFolder
+  const tempFolder = ProcessUtils.ENV.tempFolder
 
   Logger.debug(`Cleaning up temp files in folder ${tempFolder}`)
 
