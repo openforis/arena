@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
 const Taxon = require('../../../../../../common/survey/taxon')
-const ValidatorErrorKeys = require('../../../../../../common/validation/validatorErrorKeys')
+const Validator = require('../../../../../../common/validation/validator')
 const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
 const Job = require('../../../../../job/job')
@@ -64,7 +64,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomyName = speciesFileName.substring(0, speciesFileName.length - 4)
 
     const taxonomyParam = Taxonomy.newTaxonomy({
-      [Taxonomy.taxonomyPropKeys.name]: taxonomyName,
+      [Taxonomy.keysProps.name]: taxonomyName,
     })
     const taxonomy = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
@@ -138,7 +138,7 @@ class TaxonomiesImportJob extends Job {
         [Taxon.propKeys.code]: {
           valid: false,
           errors: [{
-            key: ValidatorErrorKeys.taxonomyEdit.codeDuplicate,
+            key: Validator.messageKeys.taxonomyEdit.codeDuplicate,
             params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
           }],
         },
@@ -154,7 +154,7 @@ class TaxonomiesImportJob extends Job {
         [Taxon.propKeys.scientificName]: {
           valid: false,
           errors: [{
-            key: ValidatorErrorKeys.taxonomyEdit.scientificNameDuplicate,
+            key: Validator.messageKeys.taxonomyEdit.scientificNameDuplicate,
             params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
           }],
         },

@@ -4,7 +4,6 @@ const Record = require('../../../../../common/record/record')
 const RecordValidation = require('../../../../../common/record/recordValidation')
 const Node = require('../../../../../common/record/node')
 const Validator = require('../../../../../common/validation/validator')
-const ValidatorErrorKeys = require('../../../../../common/validation/validatorErrorKeys')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
 
@@ -51,7 +50,7 @@ const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, e
 const _newValidationRecordDuplicate = isUnique => ({
   [Validator.keys.fields]: {
     [RecordValidation.keys.recordKeys]: {
-      [Validator.keys.errors]: isUnique ? [] : [{ key: ValidatorErrorKeys.record.keyDuplicate }],
+      [Validator.keys.errors]: isUnique ? [] : [{ key: Validator.messageKeys.record.keyDuplicate }],
       [Validator.keys.valid]: isUnique
     }
   }

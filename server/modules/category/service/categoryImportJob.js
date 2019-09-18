@@ -8,7 +8,6 @@ const CategoryImportSummary = require('../../../../common/survey/categoryImportS
 const CategoryLevel = require('../../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../../common/survey/categoryItem')
 const Validator = require('../../../../common/validation/validator')
-const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
 const StringUtils = require('../../../../common/stringUtils')
 const ObjectUtils = require('../../../../common/objectUtils')
 
@@ -48,7 +47,7 @@ class CategoryImportJob extends Job {
 
     if (this.total === 0) {
       // error: empty file
-      this._addError(ValidatorErrorKeys.categoryImport.emptyFile)
+      this._addError(Validator.messageKeys.categoryImport.emptyFile)
       await this.setStatusFailed()
     } else if (this.hasErrors()) {
       // errors found in csv rows
@@ -242,12 +241,12 @@ class CategoryImportJob extends Job {
   _addErrorCodeDuplicate (levelIndex, codes) {
     const code = codes[levelIndex]
     const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(this.summary)
-    this._addError(ValidatorErrorKeys.categoryImport.codeDuplicate, { columnName, code })
+    this._addError(Validator.messageKeys.categoryImport.codeDuplicate, { columnName, code })
   }
 
   _addErrorCodeRequired (levelIndex) {
     const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(this.summary)
-    this._addError(ValidatorErrorKeys.categoryImport.codeRequired, { columnName })
+    this._addError(Validator.messageKeys.categoryImport.codeRequired, { columnName })
   }
 
   _addError (key, params = {}) {

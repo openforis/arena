@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const Validator = require('../../validation/validator')
-const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
@@ -71,7 +70,7 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   async (propName, nodeDefExpression) => {
     const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
     return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
-      ? { key: ValidatorErrorKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
+      ? { key: Validator.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
       : null
   }
 
@@ -82,7 +81,7 @@ const validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
   )(nodeDefExpressions)
     ? {
       [Validator.keys.valid]: false,
-      [Validator.keys.errors]: [{ key: ValidatorErrorKeys.nodeDefEdit.expressionDuplicate }]
+      [Validator.keys.errors]: [{ key: Validator.messageKeys.nodeDefEdit.expressionDuplicate }]
     }
     : null
 
@@ -92,14 +91,14 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
     nodeDefExpression,
     {
       [NodeDefExpression.keys.expression]: [
-        Validator.validateRequired(ValidatorErrorKeys.nodeDefEdit.expressionRequired),
+        Validator.validateRequired(Validator.messageKeys.nodeDefEdit.expressionRequired),
         validateExpressionProp(survey, nodeDef)
       ],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
         ...validateApplyIfUniqueness
           ? [
-            Validator.validateItemPropUniqueness(ValidatorErrorKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
+            Validator.validateItemPropUniqueness(Validator.messageKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
             validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
           ]
           : []
