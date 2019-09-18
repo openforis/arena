@@ -18,7 +18,7 @@ class SurveyInfoValidationJob extends Job {
 
     if (!Validator.isValidationValid(validation)) {
       this.errors = {
-        'info': Validator.getInvalidFieldValidations(validation)
+        'info': Validator.getFieldValidations(validation)
       }
       await this.setStatusFailed()
     }

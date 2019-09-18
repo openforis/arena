@@ -29,7 +29,7 @@ const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
 
 export const getValidationFieldMessages = (i18n, showKeys = true) => validation => R.pipe(
   // extract invalid fields error messages
-  Validator.getInvalidFieldValidations,
+  Validator.getFieldValidations,
   Object.entries,
   R.map(([field, fieldValidation]) => `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`),
   // prepend validation error messages
