@@ -19,10 +19,10 @@ class NodeDefsValidationJob extends Job {
 
     R.pipe(
       Survey.getNodeDefsValidation,
-      Validator.getInvalidFieldValidations,
+      Validator.getFieldValidations,
       R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        this.errors[NodeDef.getName(nodeDef)] = Validator.getInvalidFieldValidations(nodeDefValidation)
+        this.errors[NodeDef.getName(nodeDef)] = Validator.getFieldValidations(nodeDefValidation)
       })
     )(survey)
 
