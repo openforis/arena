@@ -10,7 +10,7 @@ import { normalizeName } from '../../../../../common/stringUtils'
 
 import Category from '../../../../../common/survey/category'
 import CategoryItem from '../../../../../common/survey/categoryItem'
-import { getFieldValidation } from '../../../../../common/validation/validator'
+import Validator from '../../../../../common/validation/validator'
 
 const ItemEdit = (props) => {
 
@@ -63,7 +63,7 @@ const ItemEdit = (props) => {
               <FormItem label={i18n.t('common.code')}>
                 <Input value={CategoryItem.getCode(item)}
                        disabled={disabled}
-                       validation={getFieldValidation('code')(validation)}
+                       validation={Validator.getFieldValidation('code')(validation)}
                        onChange={value => putCategoryItemProp(category, level, item, 'code', normalizeName(value))}
                        readOnly={readOnly}/>
               </FormItem>
