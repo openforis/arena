@@ -2,6 +2,16 @@ const R = require('ramda')
 
 const ValidatorErrorKeys = require('./validatorErrorKeys')
 
+// const objectInvalid = {
+//   [keys.valid]: false,
+//   [keys.fields]: {
+//     'aaa': {
+//       errors: [{ key: 'error_key', params }],
+//       warnings: [{ key: 'error_key', params }],
+//     }
+//   },
+// }
+
 const keywords = [
   'asc',
   'date_created',
