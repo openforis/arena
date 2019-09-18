@@ -4,7 +4,6 @@ const Category = require('../../../common/survey/category')
 const CategoryLevel = require('../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../common/survey/categoryItem')
 const Validator = require('../../../common/validation/validator')
-const ValidatorErrorKeys = require('../../../common/validation/validatorErrorKeys')
 
 const keys = {
   children: 'children',
@@ -16,9 +15,9 @@ const keys = {
 
 const levelValidators = (levels, itemsByParentUuid) => ({
   'props.name': [
-    Validator.validateRequired(ValidatorErrorKeys.nameRequired),
-    Validator.validateNotKeyword(ValidatorErrorKeys.nameCannotBeKeyword),
-    Validator.validateItemPropUniqueness(ValidatorErrorKeys.categoryEdit.levelDuplicate)(levels)
+    Validator.validateRequired(Validator.messageKeys.nameRequired),
+    Validator.validateNotKeyword(Validator.messageKeys.nameCannotBeKeyword),
+    Validator.validateItemPropUniqueness(Validator.messageKeys.categoryEdit.levelDuplicate)(levels)
   ],
   [keys.items]: [validateNotEmptyFirstLevelItems(itemsByParentUuid)]
 })
@@ -49,14 +48,14 @@ const validateItemCodeUniqueness = itemsByCode =>
     const itemsWithSameCode = itemsByCode[CategoryItem.getCode(item)]
 
     return itemsWithSameCode.length > 1
-      ? { key: ValidatorErrorKeys.categoryEdit.codeDuplicate }
+      ? { key: Validator.messageKeys.categoryEdit.codeDuplicate }
       : null
   }
 
 const itemValidators = (isLeaf, itemsByParentUuid, siblingsByCode) => ({
   'props.code': [
-    Validator.validateRequired(ValidatorErrorKeys.categoryEdit.codeRequired),
-    Validator.validateNotKeyword(ValidatorErrorKeys.categoryEdit.codeCannotBeKeyword),
+    Validator.validateRequired(Validator.messageKeys.categoryEdit.codeRequired),
+    Validator.validateNotKeyword(Validator.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsByCode)
   ],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemsByParentUuid)],
@@ -68,12 +67,12 @@ const getChildrenItems = (itemsByParentUuid, parentItemUuid) =>
 const validateNotEmptyChildrenItems = (isLeaf, itemsByParentUuid) =>
   (propName, item) =>
     !isLeaf && R.isEmpty(getChildrenItems(itemsByParentUuid, CategoryItem.getUuid(item)))
-      ? { key: ValidatorErrorKeys.categoryEdit.childrenEmpty }
+      ? { key: Validator.messageKeys.categoryEdit.childrenEmpty }
       : null
 
 const validateNotEmptyFirstLevelItems = itemsByParentUuid => (propName, level) =>
   CategoryLevel.getIndex(level) === 0 && R.isEmpty(getChildrenItems(itemsByParentUuid, null))
-    ? { key: ValidatorErrorKeys.categoryEdit.itemsEmpty }
+    ? { key: Validator.messageKeys.categoryEdit.itemsEmpty }
     : null
 
 const validateItem = async (category, siblings, siblingsByUuid, siblingsByCode, itemsByParentUuid, parentItemUuid, itemUuid) => {
@@ -95,7 +94,7 @@ const validateItem = async (category, siblings, siblingsByUuid, siblingsByCode, 
         ? validation
         : Validator.assocFieldValidation(keys.children, {
           [Validator.keys.valid]: false,
-          [Validator.keys.errors]: [{ key: ValidatorErrorKeys.categoryEdit.itemsInvalid }]
+          [Validator.keys.errors]: [{ key: Validator.messageKeys.categoryEdit.itemsInvalid }]
         })(validation)
 
     return R.assoc(
@@ -126,7 +125,7 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
   return {
     fields: childValidations,
     valid: childrenValid,
-    errors: childrenValid ? [] : [{ key: ValidatorErrorKeys.categoryEdit.childrenInvalid }]
+    errors: childrenValid ? [] : [{ key: Validator.messageKeys.categoryEdit.childrenInvalid }]
   }
 }
 
@@ -134,9 +133,9 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
 
 const categoryValidators = (categories) => ({
   'props.name': [
-    Validator.validateRequired(ValidatorErrorKeys.nameRequired),
-    Validator.validateNotKeyword(ValidatorErrorKeys.nameCannotBeKeyword),
-    Validator.validateItemPropUniqueness(ValidatorErrorKeys.nameDuplicate)(categories)
+    Validator.validateRequired(Validator.messageKeys.nameRequired),
+    Validator.validateNotKeyword(Validator.messageKeys.nameCannotBeKeyword),
+    Validator.validateItemPropUniqueness(Validator.messageKeys.nameDuplicate)(categories)
   ],
 })
 

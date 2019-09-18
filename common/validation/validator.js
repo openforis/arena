@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const ValidatorFunctions = require('./_validator/validatorFunctions.js')
+const ValidatorErrorKeys = require('./_validator/validatorErrorKeys.js')
 
 // const objectInvalid = {
 //   [keys.valid]: false,
@@ -145,6 +146,7 @@ const recalculateValidity = validation =>
 
 module.exports = {
   keys,
+  messageKeys: ValidatorErrorKeys,
 
   newValidationValid,
 

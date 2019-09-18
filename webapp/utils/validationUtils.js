@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import Markdown from 'react-remarkable'
 
 import Validator from '../../common/validation/validator'
-import ValidatorErrorKeys from '../../common/validation/validatorErrorKeys'
 
 const getErrorText = i18n => error =>
   error.key === Validator.keys.customErrorMessageKey
@@ -20,7 +19,7 @@ const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
   R.ifElse(
     R.isEmpty,
     () => getErrorText(i18n)({
-      key: ValidatorErrorKeys.invalidField, //default error message
+      key: Validator.messageKeys.invalidField, //default error message
       params: { field }
     }),
     R.join(', ')

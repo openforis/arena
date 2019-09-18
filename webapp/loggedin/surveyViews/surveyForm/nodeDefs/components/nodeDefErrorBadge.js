@@ -10,7 +10,6 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
 import RecordValidation from '../../../../../../common/record/recordValidation'
 import Validator from '../../../../../../common/validation/validator'
-import ValidatorErrorKeys from '../../../../../../common/validation/validatorErrorKeys'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 import * as RecordState from '../../../record/recordState'
@@ -69,7 +68,7 @@ const mapStateToProps = (state, props) => {
       } else if (!R.all(Validator.isValid)(nodes)) {
         validation = {
           [Validator.keys.valid]: false,
-          [Validator.keys.errors]: [{ key: ValidatorErrorKeys.record.oneOrMoreInvalidValues }]
+          [Validator.keys.errors]: [{ key: Validator.messageKeys.record.oneOrMoreInvalidValues }]
         }
       }
     } else if (!R.isEmpty(nodes)) {

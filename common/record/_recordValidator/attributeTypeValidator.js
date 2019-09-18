@@ -11,7 +11,7 @@ const Taxon = require('../../survey/taxon')
 const Node = require('../node')
 const GeoUtils = require('../../geo/geoUtils')
 
-const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
+const Validator = require('../../validation/validator')
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
@@ -87,7 +87,7 @@ const validateValueType = (survey, nodeDef) => (propName, node) => {
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
-  return valid ? null : { key: ValidatorErrorKeys.record.valueInvalid }
+  return valid ? null : { key: Validator.messageKeys.record.valueInvalid }
 }
 
 module.exports = {

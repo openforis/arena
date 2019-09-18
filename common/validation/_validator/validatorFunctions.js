@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const ValidatorErrorKeys = require('../validatorErrorKeys')
+const ValidatorErrorKeys = require('./validatorErrorKeys')
 const ValidatorNameKeywords = require('./validatorNameKeywords')
 
 /**

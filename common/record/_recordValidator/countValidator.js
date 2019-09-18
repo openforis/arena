@@ -9,7 +9,6 @@ const Node = require('../node')
 const RecordValidation = require('../recordValidation')
 
 const Validator = require('../../validation/validator')
-const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const NumberUtils = require('../../numberUtils')
 
 const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
@@ -110,14 +109,14 @@ const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, min
             [RecordValidation.keys.minCount]: {
               [Validator.keys.valid]: minCountValid,
               [Validator.keys.errors]: minCountValid ? [] : [{
-                key: ValidatorErrorKeys.record.nodesMinCountNotReached,
+                key: Validator.messageKeys.record.nodesMinCountNotReached,
                 params: { minCount }
               }],
             },
             [RecordValidation.keys.maxCount]: {
               [Validator.keys.valid]: maxCountValid,
               [Validator.keys.errors]: maxCountValid ? [] : [{
-                key: ValidatorErrorKeys.record.nodesMaxCountExceeded,
+                key: Validator.messageKeys.record.nodesMaxCountExceeded,
                 params: { maxCount }
               }],
             }
