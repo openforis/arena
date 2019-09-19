@@ -14,6 +14,7 @@ import TaxonTable from './taxonTable'
 import Taxonomy from '../../../../../common/survey/taxonomy'
 import StringUtils from '../../../../../common/stringUtils'
 import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'
@@ -51,7 +52,7 @@ const TaxonomyEdit = props => {
         <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
           <div>
             <Input value={Taxonomy.getName(taxonomy)}
-                   validation={Validator.getFieldValidation('name')(validation)}
+                   validation={Validation.getFieldValidation('name')(validation)}
                    onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
                    readOnly={readOnly}/>
           </div>

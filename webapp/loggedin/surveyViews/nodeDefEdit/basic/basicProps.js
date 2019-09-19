@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 
 import { uuidv4 } from '../../../../../common/uuid'
 import { normalizeName } from '../../../../../common/stringUtils'
@@ -52,7 +52,7 @@ const BasicProps = props => {
       <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
-          validation={Validator.getFieldValidation('name')(validation)}
+          validation={Validation.getFieldValidation('name')(validation)}
           onChange={value => putNodeDefProp(nodeDef, 'name', normalizeName(value))}/>
       </FormItem>
 

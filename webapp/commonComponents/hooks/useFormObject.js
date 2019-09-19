@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import * as R from 'ramda'
 
 import Validator from '../../../common/validation/validator'
+import Validation from '../../../common/validation/validation'
 
 export default (obj, validatorFn = null, validationEnabled = false) => {
   const [state, setState] = useState({
@@ -33,7 +34,7 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
   }))
 
   const getFieldValidation = field => state.validationEnabled
-    ? Validator.getFieldValidation(field)(state.validation)
+    ? Validation.getFieldValidation(field)(state.validation)
     : null
 
   const enableValidation = () => {
@@ -44,7 +45,7 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
 
   return {
     object: state.obj,
-    objectValid: Validator.isValidationValid(state.validation),
+    objectValid: Validation.isValid(state.validation),
     setObjectField,
     setValidation,
     enableValidation,

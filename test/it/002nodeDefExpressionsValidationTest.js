@@ -2,7 +2,7 @@ const {expect} = require('chai')
 
 const SurveyValidator = require('../../common/survey/surveyValidator')
 const Survey = require('../../common/survey/survey')
-const Validator = require('../../common/validation/validator')
+const Validation = require('../../common/validation/validation')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 
 const {fetchFullContextSurvey} = require('../testContext')
@@ -80,8 +80,8 @@ describe('NodeDefExpressions Validation Test', async () => {
   for (const expr of expressions) {
     it(expr.t, async () => {
       const validation = await validateExpression(survey, expr.n, expr.e)
-      expect(expr.v).to.equal(validation.valid)
-      expect(expr.v).to.equal(Validator.getFieldValidation('0')(validation).valid)
+      expect(expr.v).to.equal(Validation.isValid(validation))
+      expect(expr.v).to.equal(Validation.isValid(Validation.getFieldValidation('0')(validation)))
     })
   }
 })

@@ -8,6 +8,7 @@ const CategoryImportSummary = require('../../../../common/survey/categoryImportS
 const CategoryLevel = require('../../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../../common/survey/categoryItem')
 const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 const StringUtils = require('../../../../common/stringUtils')
 const ObjectUtils = require('../../../../common/objectUtils')
 
@@ -251,10 +252,7 @@ class CategoryImportJob extends Job {
 
   _addError (key, params = {}) {
     this.addError({
-      error: {
-        [Validator.keys.valid]: false,
-        [Validator.keys.errors]: [{ key, params }]
-      }
+      error: Validation.newInstance(false, {}, [{ key, params }])
     })
   }
 

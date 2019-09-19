@@ -12,6 +12,7 @@ import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 import Record from '../../../../../common/record/record'
 import Node from '../../../../../common/record/node'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
@@ -120,7 +121,7 @@ const mapStateToProps = (state, props) => {
         Validator.assocValidation(
           R.pipe(
             Validator.getValidation,
-            Validator.getFieldValidation(Node.getUuid(n)),
+            Validation.getFieldValidation(Node.getUuid(n)),
           )(record)
         )(n)
       )

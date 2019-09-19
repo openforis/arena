@@ -4,7 +4,7 @@ import React from 'react'
 
 import useI18n from '../commonComponents/useI18n'
 
-import Validator from '../../common/validation/validator'
+import Validation from '../../common/validation/validation'
 
 import ValidationTooltip from './validationTooltip'
 
@@ -16,7 +16,7 @@ const ErrorBadge = props => {
   } = props
 
   const i18n = useI18n()
-  const invalid = !Validator.isValidationValid(validation)
+  const invalid = !Validation.isValid(validation)
 
   return invalid
     ? (

@@ -3,7 +3,7 @@ const R = require('ramda')
 const Job = require('../../../../../job/job')
 
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
-const Validator = require('../../../../../../common/validation/validator')
+const Validation = require('../../../../../../common/validation/validation')
 
 const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 
@@ -15,11 +15,11 @@ class TaxonomiesValidationJob extends Job {
   async execute (tx) {
     const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, tx)
 
-    const invalidTaxonomies = R.filter(taxonomy => !Validator.isValid(taxonomy), taxonomies)
+    const invalidTaxonomies = R.reject(Validation.isValid)(taxonomies)
 
     if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
-        (acc, taxonomy) => R.assoc(Taxonomy.getName(taxonomy), Validator.getFieldValidations(taxonomy.validation), acc),
+        (acc, taxonomy) => R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
         {},
         invalidTaxonomies
       )

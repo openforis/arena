@@ -3,6 +3,7 @@ const R = require('ramda')
 const NodeDefValidations = require('../nodeDefValidations')
 const NodeDef = require('../nodeDef')
 const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
 const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) => {
@@ -16,14 +17,13 @@ const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) =>
     : {}
 
   return R.pipe(
-    R.assocPath(
-      [Validator.keys.fields, NodeDefValidations.keys.expressions],
+    Validation.assocFieldValidation(
+      NodeDefValidations.keys.expressions,
       await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
     ),
-    Validator.cleanup,
     R.when(
-      validation => errorKey && !Validator.isValidationValid(validation) && !Validator.hasErrors(validation),
-      R.assoc(Validator.keys.errors, [{ key: errorKey }])
+      validation => errorKey && !Validation.isValid(validation) && !Validation.hasErrors(validation),
+      Validation.setErrors([{ key: errorKey }])
     )
   )(validation)
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as ValidationUtils from '../utils/validationUtils'
-import Validator from '../../common/validation/validator'
+import Validation from '../../common/validation/validation'
 
 import Tooltip from './tooltip'
 
@@ -10,7 +10,7 @@ import useI18n from '../commonComponents/useI18n'
 export default ({ validation, className, showKeys, children }) => {
   const i18n = useI18n()
 
-  const isValid = Validator.isValidationValid(validation)
+  const isValid = Validation.isValid(validation)
   const type = isValid ? '' : 'error'
   const messagesHtml = isValid
     ? null

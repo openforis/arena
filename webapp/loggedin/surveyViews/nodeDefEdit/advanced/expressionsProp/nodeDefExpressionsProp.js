@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
-import Validator from '../../../../../../common/validation/validator'
+import Validation from '../../../../../../common/validation/validation'
 
 import ExpressionsProp from './expressionsProp'
 
@@ -33,7 +33,7 @@ const NodeDefExpressionsProp = props => {
       multiple={multiple}
       values={values}
       showLabels={showLabels}
-      validation={Validator.getFieldValidation(propName)(nodeDefValidation)}
+      validation={Validation.getFieldValidation(propName)(nodeDefValidation)}
       onChange={onChange}
       nodeDefUuidContext={nodeDefUuidContext}
       nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}

@@ -4,7 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
-import Validator from '../../../../../../common/validation/validator'
+import Validation from '../../../../../../common/validation/validation'
 
 import { FormItem } from '../../../../../commonComponents/form/input'
 import ExpressionProp from './expressionProp'
@@ -52,7 +52,7 @@ const ExpressionsProp = props => {
               key={i}
               {...props}
               expression={value}
-              validation={Validator.getFieldValidation(i)(validation)}
+              validation={Validation.getFieldValidation(i)(validation)}
               onDelete={onDelete}
               onUpdate={onUpdate}
             />

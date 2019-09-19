@@ -9,6 +9,7 @@ const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepos
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
@@ -23,7 +24,9 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
     R.assoc('surveyId', surveyId),
     R.assoc(
       Validator.keys.validation,
-      includeValidationFields ? validation : { [Validator.keys.valid]: Validator.isValidationValid(validation) },
+      includeValidationFields
+        ? validation
+        : Validation.newInstance(Validation.isValid(validation)),
     ),
   )(record)
 }

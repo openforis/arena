@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
@@ -101,14 +102,17 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef), Validator.messageKeys.nodeDefEdit.validationsInvalid)
   ])
 
-  return {
-    [Validator.keys.valid]: R.all(Validator.isValidationValid, validations),
-    [Validator.keys.fields]: {
-      [NodeDef.propKeys.defaultValues]: validations[0],
-      [NodeDef.propKeys.applicable]: validations[1],
-      [NodeDef.propKeys.validations]: validations[2]
-    }
-  }
+  return Validation.newInstance(
+    R.all(Validation.isValid, validations),
+    R.reject(
+      Validation.isValid,
+      {
+        [NodeDef.propKeys.defaultValues]: validations[0],
+        [NodeDef.propKeys.applicable]: validations[1],
+        [NodeDef.propKeys.validations]: validations[2],
+      }
+    )
+  )
 }
 
 const validateNodeDef = async (survey, nodeDef) => {
@@ -118,23 +122,23 @@ const validateNodeDef = async (survey, nodeDef) => {
 
   const validation = R.pipe(
     R.mergeDeepLeft(advancedPropsValidation),
-    R.assoc(Validator.keys.valid, Validator.isValidationValid(nodeDefValidation) && Validator.isValidationValid(advancedPropsValidation))
+    R.assoc(Validator.keys.valid, Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation))
   )(nodeDefValidation)
 
-  return Validator.isValidationValid(validation) ? null : validation
+  return Validation.isValid(validation) ? null : validation
 }
 
 const validateNodeDefs = async survey => {
   const nodeDefs = Survey.getNodeDefs(survey)
-  const validation = Validator.newValidationValid()
+  const validation = Validation.newInstance()
 
   for (const nodeDefUuid of Object.keys(nodeDefs)) {
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const nodeDefValidation = await validateNodeDef(survey, nodeDef)
 
-    if (!Validator.isValidationValid(nodeDefValidation)) {
-      validation[Validator.keys.fields][nodeDefUuid] = nodeDefValidation
-      validation[Validator.keys.valid] = false
+    if (!Validation.isValid(nodeDefValidation)) {
+      Validation.setField(nodeDefUuid, nodeDefValidation)(validation)
+      Validation.setValid(false)(validation)
     }
   }
 

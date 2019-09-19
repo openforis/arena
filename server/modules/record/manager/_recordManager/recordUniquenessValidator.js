@@ -4,6 +4,7 @@ const Record = require('../../../../../common/record/record')
 const RecordValidation = require('../../../../../common/record/recordValidation')
 const Node = require('../../../../../common/record/node')
 const Validator = require('../../../../../common/validation/validator')
+const Validation = require('../../../../../common/validation/validation')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
 
@@ -39,22 +40,25 @@ const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, e
       for (const nodeKeyUuid of nodesKeyUuids) {
         validationNodesKeyFields[nodeKeyUuid] = _newValidationRecordDuplicate(isUnique)
       }
-      result[recordUuid] = {
-        [Validator.keys.fields]: validationNodesKeyFields
-      }
+      result[recordUuid] = Validation.newInstance(
+        isUnique,
+        validationNodesKeyFields
+      )
     }
   }
   return result
 }
 
-const _newValidationRecordDuplicate = isUnique => ({
-  [Validator.keys.fields]: {
-    [RecordValidation.keys.recordKeys]: {
-      [Validator.keys.errors]: isUnique ? [] : [{ key: Validator.messageKeys.record.keyDuplicate }],
-      [Validator.keys.valid]: isUnique
-    }
+const _newValidationRecordDuplicate = isUnique => Validation.newInstance(
+  isUnique,
+  {
+    [RecordValidation.keys.recordKeys]: Validation.newInstance(
+      isUnique,
+      {},
+      isUnique ? [] : [{ key: Validator.messageKeys.record.keyDuplicate }]
+    )
   }
-})
+)
 
 module.exports = {
   validateRecordKeysUniqueness,
