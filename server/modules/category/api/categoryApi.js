@@ -44,9 +44,8 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/categories/:categoryUuid/import', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, summary } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { summary } = Request.getBody(req)
 
       const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
       res.json({ job })
@@ -124,9 +123,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
@@ -138,9 +136,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid, levelUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, levelUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateLevelProp(user, surveyId, levelUuid, key, value)
 
@@ -152,9 +149,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/categories/:categoryUuid/items/:itemUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid, itemUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, itemUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateItemProp(user, surveyId, itemUuid, key, value)
 

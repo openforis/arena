@@ -38,9 +38,7 @@ module.exports.init = app => {
 
   app.get(`/survey/:surveyId/nodeDefs`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const draft = Request.getBoolParam(req, 'draft')
-      const validate = Request.getBoolParam(req, 'validate')
+      const { surveyId, draft, validate } = Request.getParams(req)
       const advanced = true // always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
       const sendNodeDefs = true
 
@@ -73,8 +71,7 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const nodeDefUuid = Request.getRestParam(req, 'nodeDefUuid')
-      const surveyId = Request.getRestParam(req, 'surveyId')
+      const { nodeDefUuid, surveyId } = Request.getParams(req)
 
       await NodeDefService.markNodeDefDeleted(user, surveyId, nodeDefUuid)
 

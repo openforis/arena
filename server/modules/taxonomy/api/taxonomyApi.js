@@ -131,9 +131,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/taxonomies/:taxonomyUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, taxonomyUuid } = Request.getParams(req)
+      const { surveyId, taxonomyUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await TaxonomyService.updateTaxonomyProp(user, surveyId, taxonomyUuid, key, value)
 

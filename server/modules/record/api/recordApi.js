@@ -22,8 +22,7 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const surveyId = Request.getRestParam(req, 'surveyId')
-
+      const { surveyId } = Request.getParams(req)
       const record = Request.getBody(req)
 
       if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
@@ -41,12 +40,11 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const node = JSON.parse(Request.getBody(req).node)
+      const { node, surveyId } = Request.getParams(req)
+      const parsedNode = JSON.parse(node)
       const file = Request.getFile(req)
 
-      const surveyId = Request.getRestParam(req, 'surveyId')
-
-      await RecordService.persistNode(user, surveyId, node, file)
+      await RecordService.persistNode(user, surveyId, parsedNode, file)
 
       sendOk(res)
     } catch (err) {
@@ -58,7 +56,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
+      const { surveyId } = Request.getParams(req)
 
       const count = await RecordService.countRecordsBySurveyId(surveyId)
       res.json(count)
@@ -109,9 +107,7 @@ module.exports.init = app => {
   // RECORD promote / demote
   app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const recordUuid = Request.getRestParam(req, 'recordUuid')
-      const { step } = Request.getBody(req)
+      const { surveyId, recordUuid, step } = Request.getParams(req)
 
       await RecordService.updateRecordStep(surveyId, recordUuid, step)
 
@@ -138,8 +134,7 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const recordUuid = Request.getRestParam(req, 'recordUuid')
+      const { surveyId, recordUuid } = Request.getParams(req)
 
       await RecordService.checkOut(user, surveyId, recordUuid)
 
@@ -152,8 +147,7 @@ module.exports.init = app => {
   // ==== DELETE
   app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const recordUuid = Request.getRestParam(req, 'recordUuid')
+      const { surveyId, recordUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
       await RecordService.deleteRecord(user, surveyId, recordUuid)

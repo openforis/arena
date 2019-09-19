@@ -11,10 +11,7 @@ const getParams = req => R.pipe(
   // convert String boolean values to Boolean type
   R.mapObjIndexed(val =>
     R.ifElse(
-      R.or(
-        R.equals('true'),
-        R.equals('false')
-      ),
+      v => v === 'true' || v === 'false',
       R.always(val === 'true'),
       R.identity
     )(val)
@@ -28,11 +25,6 @@ const getRestParam = (req, param, defaultValue = null) => {
 
   return queryValue || paramsValue || bodyValue || defaultValue
 }
-
-const getBoolParam = R.pipe(
-  getRestParam,
-  value => R.equals('true', value) || R.equals(true, value),
-)
 
 const getJsonParam = (req, param, defaultValue = null) => {
   const jsonStr = getRestParam(req, param, null)
@@ -65,8 +57,6 @@ const getI18n = R.prop('i18n')
 module.exports = {
   getServerUrl,
   getParams,
-  getRestParam,
-  getBoolParam,
   getJsonParam,
   getRequiredParam,
   getFile,

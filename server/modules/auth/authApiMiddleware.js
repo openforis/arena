@@ -1,5 +1,3 @@
-const R = require('ramda')
-
 const Request = require('../../utils/request')
 
 const SurveyManager = require('../survey/manager/surveyManager')
@@ -8,8 +6,6 @@ const UserService = require('../user/service/userService')
 
 const Authorizer = require('../../../common/auth/authorizer')
 const Survey = require('../../../common/survey/survey')
-const User = require('../../../common/user/user')
-const AuthGroups = require('../../../common/auth/authGroups')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
