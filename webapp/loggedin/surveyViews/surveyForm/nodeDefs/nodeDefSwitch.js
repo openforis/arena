@@ -118,9 +118,9 @@ const mapStateToProps = (state, props) => {
 
     const nodesValidated = R.pipe(
       R.map(n =>
-        Validator.assocValidation(
+        Validation.assocValidation(
           R.pipe(
-            Validator.getValidation,
+            Validation.getValidation,
             Validation.getFieldValidation(Node.getUuid(n)),
           )(record)
         )(n)

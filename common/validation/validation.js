@@ -1,11 +1,16 @@
 const R = require('ramda')
 
+const ValidatorErrorKeys = require('./_validator/validatorErrorKeys')
 const ObjectUtils = require('../objectUtils')
 
 const keys = {
   fields: 'fields',
   valid: 'valid',
   errors: 'errors',
+
+  customErrorMessageKey: 'custom',
+
+  validation: 'validation',
 }
 
 //====== UTILS
@@ -66,7 +71,6 @@ const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
 //====== UPDATE
 
 const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
-const setFields = fields => ObjectUtils.setInPath([keys.fields], fields)
 const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
 const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
 
@@ -74,10 +78,22 @@ const assocFieldValidation = (field, fieldValidation) => R.pipe(
   R.assocPath([keys.fields, field], fieldValidation),
   cleanup
 )
+
 const dissocFieldValidation = field => R.pipe(
   R.dissocPath([keys.fields, field]),
   cleanup
 )
+
+const dissocFieldValidationsByPath = path => validation => {
+  if (path.length === 1) {
+    return dissocFieldValidation(path[0])(validation)
+  } else {
+    const firstField = path[0]
+    const validationFirstField = getFieldValidation(firstField)(validation)
+    return dissocFieldValidationsByPath(path.slice(1))(validationFirstField)
+  }
+}
+
 const mergeValidation = validationNew => validationOld => R.pipe(
   validation => ({
     [keys.fields]: R.mergeDeepRight(
@@ -88,8 +104,16 @@ const mergeValidation = validationNew => validationOld => R.pipe(
   cleanup,
 )(validationOld)
 
+// Object
+
+const getValidation = R.propOr(newInstance(), keys.validation)
+const isObjValid = R.pipe(getValidation, isValid)
+const assocValidation = R.assoc(keys.validation)
+
 module.exports = {
   keys,
+
+  messageKeys: ValidatorErrorKeys,
 
   newInstance,
 
@@ -101,7 +125,6 @@ module.exports = {
   hasErrors,
 
   setValid,
-  setFields,
   setField,
   setErrors,
 
@@ -110,4 +133,8 @@ module.exports = {
   mergeValidation,
   recalculateValidity,
 
+  // Object
+  getValidation,
+  isObjValid,
+  assocValidation,
 }

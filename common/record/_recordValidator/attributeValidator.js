@@ -20,7 +20,7 @@ const _validateRequired = (survey, nodeDef) => (propName, node) =>
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
   ) &&
   Node.isValueBlank(node)
-    ? { key: Validator.messageKeys.record.valueRequired }
+    ? { key: Validation.messageKeys.record.valueRequired }
     : null
 
 /**
@@ -42,7 +42,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
       const messages = _getCustomValidationMessages(survey, expression)
 
       errorMessage = {
-        key: Validator.keys.customErrorMessageKey,
+        key: Validation.keys.customErrorMessageKey,
         messages
       }
       break

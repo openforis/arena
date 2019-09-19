@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as CognitoAuth from '../app/cognitoAuth'
 
-import Validator from '../../common/validation/validator'
+import Validation from '../../common/validation/validation'
 
 import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader, showNotificationMessage } from '../app/actions'
@@ -22,7 +22,7 @@ const _createAction = cognitoResponseHandler => async dispatch => {
 
     await cognitoResponseHandler(dispatch)
   } catch (error) {
-    dispatch(setLoginError(Validator.messageKeys.user[error.code]))
+    dispatch(setLoginError(Validation.messageKeys.user[error.code]))
   } finally {
     dispatch(hideAppLoader())
   }

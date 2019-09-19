@@ -3,7 +3,7 @@ const R = require('ramda')
 const { uuidv4 } = require('./../uuid')
 const { isBlank, trim } = require('../stringUtils')
 
-const Validator = require('../validation/validator')
+const Validation = require('../validation/validation')
 const NodeDef = require('../survey/nodeDef')
 const SurveyUtils = require('../survey/surveyUtils')
 
@@ -169,7 +169,7 @@ module.exports = {
   isDirty: R.propEq(keys.dirty, true),
   isRoot: R.pipe(getParentUuid, R.isNil),
 
-  getValidation: Validator.getValidation,
+  getValidation: Validation.getValidation,
 
   // ==== READ metadata
   getMeta,
@@ -183,7 +183,7 @@ module.exports = {
   // ==== UPDATE
   assocValue: R.assoc(keys.value),
   assocMeta: R.assoc(keys.meta),
-  assocValidation: Validator.assocValidation,
+  assocValidation: Validation.assocValidation,
   mergeMeta,
 
   // ==== UTILS

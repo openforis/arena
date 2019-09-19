@@ -9,7 +9,6 @@ import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
 import RecordValidation from '../../../../../../common/record/recordValidation'
-import Validator from '../../../../../../common/validation/validator'
 import Validation from '../../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../../survey/surveyState'
@@ -67,7 +66,7 @@ const mapStateToProps = (state, props) => {
         //only entities can have children with min/max count validation
         validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
-        validation = Validation.newInstance(false, {}, [{ key: Validator.messageKeys.record.oneOrMoreInvalidValues }])
+        validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])
       }
     } else if (!R.isEmpty(nodes)) {
       validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)

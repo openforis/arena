@@ -9,7 +9,7 @@ import ErrorBadge from '../../../../../commonComponents/errorBadge'
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
-import Validator from '../../../../../../common/validation/validator'
+import Validation from '../../../../../../common/validation/validation'
 import Authorizer from '../../../../../../common/auth/authorizer'
 import Date from '../../../../../../common/dateUtils'
 
@@ -30,7 +30,7 @@ const RecordsRow = props => {
     <>
       <div>
         <ErrorBadge
-          validation={Validator.getValidation(record)}
+          validation={Validation.getValidation(record)}
           showLabel={false}
           className="error-badge-inverse"
         />

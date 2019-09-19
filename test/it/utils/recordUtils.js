@@ -4,7 +4,6 @@ const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const RecordValidation = require('../../../common/record/recordValidation')
-const Validator = require('../../../common/validation/validator')
 const Validation = require('../../../common/validation/validation')
 
 const Queue = require('../../../common/queue')
@@ -86,13 +85,13 @@ const traverse = visitorFn => async record => {
 }
 
 const getValidationMinCount = (parentNode, childDef) => R.pipe(
-  Validator.getValidation,
+  Validation.getValidation,
   RecordValidation.getValidationChildrenCount(parentNode, childDef),
   Validation.getFieldValidation(RecordValidation.keys.minCount)
 )
 
 const getValidationMaxCount = (parentNode, childDef) => R.pipe(
-  Validator.getValidation,
+  Validation.getValidation,
   RecordValidation.getValidationChildrenCount(parentNode, childDef),
   Validation.getFieldValidation(RecordValidation.keys.maxCount)
 )

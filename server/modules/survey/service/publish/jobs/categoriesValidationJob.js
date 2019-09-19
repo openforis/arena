@@ -1,7 +1,6 @@
 const Job = require('../../../../../job/job')
 
 const Category = require('../../../../../../common/survey/category')
-const Validator = require('../../../../../../common/validation/validator')
 const Validation = require('../../../../../../common/validation/validation')
 
 const CategoryManager = require('../../../../category/manager/categoryManager')
@@ -19,7 +18,7 @@ class CategoriesValidationJob extends Job {
 
     for (const category of categories) {
       const validatedCategory = await CategoryManager.validateCategory(this.surveyId, categories, category, true)
-      const validation = Validator.getValidation(validatedCategory)
+      const validation = Validation.getValidation(validatedCategory)
       if (!Validation.isValid(validation)) {
         this.addError(Validation.getFieldValidations(validation), Category.getName(validatedCategory))
       }

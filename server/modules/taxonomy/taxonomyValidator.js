@@ -1,19 +1,20 @@
 const Taxonomy = require('../../../common/survey/taxonomy')
 const Taxon = require('../../../common/survey/taxon')
 const Validator = require('../../../common/validation/validator')
+const Validation = require('../../../common/validation/validation')
 const ObjectUtils = require('../../../common/objectUtils')
 
 /**
  * ====== TAXONOMY
  */
 const validateNotEmptyTaxa = taxaCount => () =>
-  taxaCount === 0 ? { key: Validator.messageKeys.taxonomyEdit.taxaEmpty } : null
+  taxaCount === 0 ? { key: Validation.messageKeys.taxonomyEdit.taxaEmpty } : null
 
 const taxonomyValidators = (taxonomies, taxaCount) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [
-    Validator.validateRequired(Validator.messageKeys.nameRequired),
-    Validator.validateNotKeyword(Validator.messageKeys.nameCannotBeKeyword),
-    Validator.validateItemPropUniqueness(Validator.messageKeys.nameDuplicate)(taxonomies)
+    Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(taxonomies)
   ],
   'taxa': [validateNotEmptyTaxa(taxaCount)]
 })
@@ -26,14 +27,14 @@ const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
  */
 const taxonValidators = (taxa) => ({
   [`${ObjectUtils.keys.props}.${Taxon.propKeys.code}`]: [
-    Validator.validateRequired(Validator.messageKeys.taxonomyEdit.codeRequired),
-    Validator.validateItemPropUniqueness(Validator.messageKeys.taxonomyEdit.codeDuplicate)(taxa)
+    Validator.validateRequired(Validation.messageKeys.taxonomyEdit.codeRequired),
+    Validator.validateItemPropUniqueness(Validation.messageKeys.taxonomyEdit.codeDuplicate)(taxa)
   ],
-  [`${ObjectUtils.keys.props}.${Taxon.propKeys.family}`]: [Validator.validateRequired(Validator.messageKeys.taxonomyEdit.familyRequired)],
-  [`${ObjectUtils.keys.props}.${Taxon.propKeys.genus}`]: [Validator.validateRequired(Validator.messageKeys.taxonomyEdit.genusRequired)],
+  [`${ObjectUtils.keys.props}.${Taxon.propKeys.family}`]: [Validator.validateRequired(Validation.messageKeys.taxonomyEdit.familyRequired)],
+  [`${ObjectUtils.keys.props}.${Taxon.propKeys.genus}`]: [Validator.validateRequired(Validation.messageKeys.taxonomyEdit.genusRequired)],
   [`${ObjectUtils.keys.props}.${Taxon.propKeys.scientificName}`]: [
-    Validator.validateRequired(Validator.messageKeys.taxonomyEdit.scientificNameRequired),
-    Validator.validateItemPropUniqueness(Validator.messageKeys.taxonomyEdit.scientificNameDuplicate)(taxa)
+    Validator.validateRequired(Validation.messageKeys.taxonomyEdit.scientificNameRequired),
+    Validator.validateItemPropUniqueness(Validation.messageKeys.taxonomyEdit.scientificNameDuplicate)(taxa)
   ],
 })
 

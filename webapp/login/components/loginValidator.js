@@ -11,31 +11,31 @@ const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.spli
 
 const _validatePassword = (propName, item) => {
   const password = getProp(propName)(item)
-  return !validPasswordRe.test(password) ? { key: Validator.messageKeys.user.passwordInvalid } : null
+  return !validPasswordRe.test(password) ? { key: Validation.messageKeys.user.passwordInvalid } : null
 }
 
 const _validatePasswordStrength = (propName, item) => {
   const password = getProp(propName)(item)
-  return !passwordStrengthRe.test(password) ? { key: Validator.messageKeys.user.passwordUnsafe } : null
+  return !passwordStrengthRe.test(password) ? { key: Validation.messageKeys.user.passwordUnsafe } : null
 }
 
 const _validatePasswordConfirm = (propName, item) => {
   const password = item.password
   const passwordConfirm = getProp(propName)(item)
-  return password !== passwordConfirm ? { key: Validator.messageKeys.user.passwordsDoNotMatch } : null
+  return password !== passwordConfirm ? { key: Validation.messageKeys.user.passwordsDoNotMatch } : null
 }
 
 const _validateVerificationCode = (propName, item) => {
   const verificationCodeRe = new RegExp(/^[\S]+$/)
   const verificationCode = item[propName]
-  return !verificationCodeRe.test(verificationCode) ? { key: Validator.messageKeys.user.CodeMismatchException } : null
+  return !verificationCodeRe.test(verificationCode) ? { key: Validation.messageKeys.user.CodeMismatchException } : null
 }
 
 
 export const validateResetPasswordObj = async obj => await Validator.validate(
   obj,
   {
-    'password': [Validator.validateRequired(Validator.messageKeys.user.passwordRequired), _validatePassword, _validatePasswordStrength],
+    'password': [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword, _validatePasswordStrength],
     'passwordConfirm': [_validatePasswordConfirm],
     'verificationCode': [_validateVerificationCode],
   })
@@ -43,23 +43,23 @@ export const validateResetPasswordObj = async obj => await Validator.validate(
 export const validateAcceptInvitationObj = async obj => await Validator.validate(
   obj,
   {
-    'userName': [Validator.validateRequired(Validator.messageKeys.user.userNameRequired)],
+    'userName': [Validator.validateRequired(Validation.messageKeys.user.userNameRequired)],
     'passwordConfirm': [_validatePasswordConfirm],
-    'password': [Validator.validateRequired(Validator.messageKeys.user.passwordRequired), _validatePassword, _validatePasswordStrength],
+    'password': [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword, _validatePasswordStrength],
   })
 
 export const validateLoginObj = async obj => await Validator.validate(
   obj,
   {
-    'email': [Validator.validateRequired(Validator.messageKeys.user.emailRequired), UserValidator.validateEmail],
-    'password': [Validator.validateRequired(Validator.messageKeys.user.passwordRequired)]
+    'email': [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
+    'password': [Validator.validateRequired(Validation.messageKeys.user.passwordRequired)]
   }
 )
 
 export const validateEmail = async obj => await Validator.validate(
   obj,
   {
-    'email': [Validator.validateRequired(Validator.messageKeys.user.emailRequired), UserValidator.validateEmail]
+    'email': [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail]
   }
 )
 

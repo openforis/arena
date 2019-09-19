@@ -8,7 +8,7 @@ const Record = require('../record')
 const Node = require('../node')
 const RecordValidation = require('../recordValidation')
 
-const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 const NumberUtils = require('../../numberUtils')
 
 const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
@@ -99,33 +99,41 @@ const _countChildren = (record, parentNode, childDef) => {
     )(nodes)
 }
 
-const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, minCount, maxCount) => ({
-  [Validator.keys.fields]: {
-    [RecordValidation.keys.childrenCount]: {
-      [Validator.keys.fields]: {
-        [NodeDef.getUuid(nodeDefChild)]: {
-          [Validator.keys.valid]: minCountValid && maxCountValid,
-          [Validator.keys.fields]: {
-            [RecordValidation.keys.minCount]: {
-              [Validator.keys.valid]: minCountValid,
-              [Validator.keys.errors]: minCountValid ? [] : [{
-                key: Validator.messageKeys.record.nodesMinCountNotReached,
-                params: { minCount }
-              }],
-            },
-            [RecordValidation.keys.maxCount]: {
-              [Validator.keys.valid]: maxCountValid,
-              [Validator.keys.errors]: maxCountValid ? [] : [{
-                key: Validator.messageKeys.record.nodesMaxCountExceeded,
-                params: { maxCount }
-              }],
-            }
+const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, minCount, maxCount) => Validation.newInstance(
+  true,
+  {
+    [RecordValidation.keys.childrenCount]: Validation.newInstance(
+      true,
+      {
+        [NodeDef.getUuid(nodeDefChild)]: Validation.newInstance(
+          minCountValid && maxCountValid,
+          {
+            [RecordValidation.keys.minCount]: Validation.newInstance(
+              minCountValid,
+              {},
+              minCountValid
+                ? []
+                : [{
+                  key: Validation.messageKeys.record.nodesMinCountNotReached,
+                  params: { minCount }
+                }]
+            ),
+            [RecordValidation.keys.maxCount]: Validation.newInstance(
+              maxCountValid,
+              {},
+              maxCountValid
+                ? []
+                : [{
+                  key: Validation.messageKeys.record.nodesMaxCountExceeded,
+                  params: { maxCount }
+                }]
+            )
           }
-        }
-      },
-    }
+        )
+      }
+    )
   }
-})
+)
 
 module.exports = {
   validateChildrenCountNodes,

@@ -3,7 +3,6 @@ const { uuidv4 } = require('../uuid')
 
 const ObjectUtils = require('../objectUtils')
 
-const Validator = require('../validation/validator')
 const Validation = require('../validation/validation')
 
 const CategoryLevel = require('./categoryLevel')
@@ -100,7 +99,7 @@ const isItemLeaf = item =>
     getItemLevelIndex(item)(category) === getLevelsArray(category).length - 1
 
 const getItemValidation = item => R.pipe(
-  Validator.getValidation,
+  Validation.getValidation,
   Validation.getFieldValidation(keys.items),
   Validation.getFieldValidation(CategoryItem.getUuid(item)),
 )
@@ -142,7 +141,7 @@ module.exports = {
 
   //READ
   getLevelValidation: levelIndex => R.pipe(
-    Validator.getValidation,
+    Validation.getValidation,
     Validation.getFieldValidation(keys.levels),
     Validation.getFieldValidation(levelIndex),
   ),

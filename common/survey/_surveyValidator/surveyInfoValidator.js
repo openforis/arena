@@ -1,10 +1,11 @@
 const R = require('ramda')
 
 const Validator = require('../../../common/validation/validator')
+const Validation = require('../../../common/validation/validation')
 
 const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
   return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)
-    ? { key: Validator.messageKeys.nameDuplicate }
+    ? { key: Validation.messageKeys.nameDuplicate }
     : null
 }
 
@@ -12,11 +13,11 @@ const validateNewSurvey = async (survey, surveyInfos) => await Validator.validat
   survey,
   {
     'name': [
-      Validator.validateRequired(Validator.messageKeys.nameRequired),
-      Validator.validateNotKeyword(Validator.messageKeys.nameCannotBeKeyword),
+      Validator.validateRequired(Validation.messageKeys.nameRequired),
+      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       validateSurveyNameUniqueness(surveyInfos)
     ],
-    'lang': [Validator.validateRequired(Validator.messageKeys.surveyInfoEdit.langRequired)],
+    'lang': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
   }
 )
 
@@ -24,12 +25,12 @@ const validateSurveyInfo = async (surveyInfo, surveyInfos) => await Validator.va
   surveyInfo,
   {
     'props.name': [
-      Validator.validateRequired(Validator.messageKeys.nameRequired),
-      Validator.validateNotKeyword(Validator.messageKeys.nameCannotBeKeyword),
+      Validator.validateRequired(Validation.messageKeys.nameRequired),
+      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       validateSurveyNameUniqueness(surveyInfos)
     ],
-    'props.languages': [Validator.validateRequired(Validator.messageKeys.surveyInfoEdit.langRequired)],
-    'props.srs': [Validator.validateRequired(Validator.messageKeys.surveyInfoEdit.srsRequired)],
+    'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
+    'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
   }
 )
 

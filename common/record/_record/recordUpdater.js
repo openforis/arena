@@ -44,9 +44,9 @@ const assocNodes = nodes => record => {
 const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
 const mergeNodeValidations = nodeValidations => record => R.pipe(
-  Validator.getValidation,
+  Validation.getValidation,
   Validation.mergeValidation(nodeValidations),
-  validationMerged => Validator.assocValidation(validationMerged)(record)
+  validationMerged => Validation.assocValidation(validationMerged)(record)
 )(record)
 
 // ====== DELETE
@@ -65,9 +65,9 @@ const deleteNode = node => record => {
 
   // 2. update validation
   recordUpdated = R.pipe(
-    Validator.getValidation,
+    Validation.getValidation,
     Validation.dissocFieldValidation(nodeUuid),
-    newValidation => Validator.assocValidation(newValidation)(recordUpdated)
+    newValidation => Validation.assocValidation(newValidation)(recordUpdated)
   )(recordUpdated)
 
   // 3. remove node from index

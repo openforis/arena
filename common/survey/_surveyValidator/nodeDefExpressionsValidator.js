@@ -71,7 +71,7 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   async (propName, nodeDefExpression) => {
     const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
     return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
-      ? { key: Validator.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
+      ? { key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
       : null
   }
 
@@ -80,7 +80,7 @@ const validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
     NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
     NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
   )(nodeDefExpressions)
-    ? Validation.newInstance(false, {}, [{ key: Validator.messageKeys.nodeDefEdit.expressionDuplicate }])
+    ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.expressionDuplicate }])
     : null
 
 const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness) => {
@@ -89,14 +89,14 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
     nodeDefExpression,
     {
       [NodeDefExpression.keys.expression]: [
-        Validator.validateRequired(Validator.messageKeys.nodeDefEdit.expressionRequired),
+        Validator.validateRequired(Validation.messageKeys.nodeDefEdit.expressionRequired),
         validateExpressionProp(survey, nodeDef)
       ],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
         ...validateApplyIfUniqueness
           ? [
-            Validator.validateItemPropUniqueness(Validator.messageKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
+            Validator.validateItemPropUniqueness(Validation.messageKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
             validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
           ]
           : []

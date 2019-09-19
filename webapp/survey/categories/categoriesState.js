@@ -2,9 +2,10 @@ import * as R from 'ramda'
 
 import Category from '../../../common/survey/category'
 import CategoryLevel from '../../../common/survey/categoryLevel'
+import CategoryItem from '../../../common/survey/categoryItem'
 
-import SurveyUtils from '../../../common/survey/surveyUtils'
-import Validator from '../../../common/validation/validator'
+import Validation from '../../../common/validation/validation'
+import ObjectUtils from '../../../common/objectUtils'
 
 // category
 
@@ -15,15 +16,15 @@ export const dissocCategory = category => R.dissoc(Category.getUuid(category))
 export const assocCategoryProp = (category, key, value) => R.pipe(
   R.assocPath([
       Category.getUuid(category),
-      SurveyUtils.keys.props,
+      Object.keys.props,
       key
     ],
     value
   ),
   R.dissocPath([
     Category.getUuid(category),
-    Validator.keys.validation,
-    Validator.keys.fields,
+    Validation.keys.validation,
+    Validation.keys.fields,
     key
   ]),
 )
@@ -35,7 +36,7 @@ export const assocCategoryLevelProp = (category, level, key, value) => R.pipe(
       Category.getUuid(category),
       Category.keys.levels,
       CategoryLevel.getIndex(level) + '',
-      SurveyUtils.keys.props,
+      ObjectUtils.keys.props,
       key
     ],
     value
@@ -44,8 +45,8 @@ export const assocCategoryLevelProp = (category, level, key, value) => R.pipe(
     Category.getUuid(category),
     Category.keys.levels,
     CategoryLevel.getIndex(level) + '',
-    Validator.keys.validation,
-    Validator.keys.fields,
+    Validation.keys.validation,
+    Validation.keys.fields,
     key
   ])
 )
@@ -58,15 +59,16 @@ export const dissocCategoryLevel = (category, level) =>
   ])
 
 // category level items
+
 export const dissocCategoryLevelItemValidation = (category, item, key) =>
   R.dissocPath([
     Category.getUuid(category),
-    Validator.keys.validation,
-    Validator.keys.fields,
+    Validation.keys.validation,
+    Validation.keys.fields,
     CategoryLevel.keys.items,
-    Validator.keys.fields,
-    Category.getUuid(item),
-    Validator.keys.fields,
+    Validation.keys.fields,
+    CategoryItem.getUuid(item),
+    Validation.keys.fields,
     key
   ])
 

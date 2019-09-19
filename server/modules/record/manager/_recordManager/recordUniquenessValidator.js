@@ -3,7 +3,6 @@ const R = require('ramda')
 const Record = require('../../../../../common/record/record')
 const RecordValidation = require('../../../../../common/record/recordValidation')
 const Node = require('../../../../../common/record/node')
-const Validator = require('../../../../../common/validation/validator')
 const Validation = require('../../../../../common/validation/validation')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
@@ -55,7 +54,7 @@ const _newValidationRecordDuplicate = isUnique => Validation.newInstance(
     [RecordValidation.keys.recordKeys]: Validation.newInstance(
       isUnique,
       {},
-      isUnique ? [] : [{ key: Validator.messageKeys.record.keyDuplicate }]
+      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }]
     )
   }
 )

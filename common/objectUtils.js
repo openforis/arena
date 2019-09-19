@@ -7,6 +7,7 @@ const keys = {
   uuid: 'uuid',
   parentUuid: 'parentUuid',
   props: 'props',
+  validation: 'validation'
 }
 
 const keysProps = {
