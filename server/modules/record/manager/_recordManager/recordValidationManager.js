@@ -6,7 +6,6 @@ const NodeDef = require('../../../../../common/survey/nodeDef')
 const Record = require('../../../../../common/record/record')
 const RecordValidator = require('../../../../../common/record/recordValidator')
 const Node = require('../../../../../common/record/node')
-const Validator = require('../../../../../common/validation/validator')
 const Validation = require('../../../../../common/validation/validation')
 
 const RecordRepository = require('../../repository/recordRepository')
@@ -23,10 +22,6 @@ const validateNodesAndPersistValidation = async (survey, record, nodes, tx) => {
   const recordKeysValidation = nodesKeyUpdated
     ? await RecordUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
     : {}
-
-  if (nodesKeyUpdated) {
-
-  }
 
   // 3. merge validations
   const validation = Validation.recalculateValidity(

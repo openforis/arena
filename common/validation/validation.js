@@ -28,10 +28,10 @@ const cleanup = validation => R.pipe(
     const errors = getErrors(validation)
     return R.isEmpty(errors)
       ? newValidation
-      : {
-        ...newValidation,
-        ...newInstance(false, errors)
-      }
+      : R.pipe(
+        setValid(false),
+        setErrors(errors)
+      )(newValidation)
   }
 )(validation)
 

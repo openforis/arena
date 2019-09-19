@@ -23,19 +23,25 @@ const levelValidators = (levels, itemsByParentUuid) => ({
   [keys.items]: [validateNotEmptyFirstLevelItems(itemsByParentUuid)]
 })
 
-const validateLevel = async (levels, itemsByParentUuid, level) =>
+const validateLevel = (levels, itemsByParentUuid) => async level =>
   await Validator.validate(level, levelValidators(levels, itemsByParentUuid))
 
 const validateLevels = async (category, itemsByParentUuid) => {
   const levels = Category.getLevelsArray(category)
 
   const validations = await Promise.all(
-    levels.map(
-      async level => await validateLevel(levels, itemsByParentUuid, level)
-    )
+    levels.map(validateLevel(levels, itemsByParentUuid))
   )
 
-  return Validation.newInstance(R.all(Validation.isValid, validations), Object.assign({}, validations))
+  const valid = R.all(Validation.isValid, validations)
+
+  return valid
+    ? null
+    : Validation.newInstance(
+      false,
+      Object.assign({}, validations),
+      [{ key: Validator.messageKeys.categoryEdit.levelsInvalid }]
+    )
 }
 
 // ====== ITEMS
@@ -148,17 +154,17 @@ const validateCategory = async (categories, category, items) => {
   const levelsValidation = await validateLevels(category, itemsByParentUuid)
   const itemsValidation = await validateItemsByParentUuid(category, itemsByParentUuid, null)
 
-  return {
-    ...categoryValidation,
-    ...Validation.newInstance(
-      R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation]),
-      {
-        ...Validation.getFieldValidations(categoryValidation),
-        levels: levelsValidation,
-        items: itemsValidation
-      }
+  return R.pipe(
+    Validation.setValid(R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),
+    R.unless(
+      R.always(Validation.isValid(levelsValidation)),
+      Validation.setField(keys.levels, levelsValidation)
     ),
-  }
+    R.unless(
+      R.always(Validation.isValid(itemsValidation)),
+      Validation.setField(keys.items, itemsValidation)
+    ),
+  )(categoryValidation)
 }
 
 module.exports = {

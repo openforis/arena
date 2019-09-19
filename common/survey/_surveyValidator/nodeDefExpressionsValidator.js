@@ -123,7 +123,7 @@ const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniq
   })
 
   if (errorKey && !Validation.isValid(result))
-    Validation.setErrors([{ key: errorKey }], result)
+    Validation.setErrors([{ key: errorKey }])(result)
 
   return result
 }

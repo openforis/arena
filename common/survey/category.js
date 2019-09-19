@@ -12,7 +12,8 @@ const CategoryItem = require('./categoryItem')
 const keys = {
   uuid: 'uuid',
   levels: 'levels',
-  props: 'props'
+  props: 'props',
+  items: 'items',
 }
 
 const props = {
@@ -53,7 +54,7 @@ const newLevel = (category, props = {}) => {
     [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
     [CategoryLevel.keys.index]: index,
     [CategoryLevel.keys.props]: {
-      name: 'level_' + (index + 1),
+      [CategoryLevel.props.name]: 'level_' + (index + 1),
       ...props
     }
   }
@@ -100,8 +101,8 @@ const isItemLeaf = item =>
 
 const getItemValidation = item => R.pipe(
   Validator.getValidation,
-  Validation.getFieldValidation('items'),
-  Validation.getFieldValidation(CategoryItem.ObjectUtils.getUuid(item)),
+  Validation.getFieldValidation(keys.items),
+  Validation.getFieldValidation(CategoryItem.getUuid(item)),
 )
 
 // ======= UPDATE

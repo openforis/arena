@@ -360,6 +360,7 @@ module.exports = {
       itemsInvalid: 'At least one invalid item',
       itemsEmpty: 'Define at least one item',
       levelDuplicate: 'Level name is duplicate',
+      levelsInvalid: 'At least one invalid level',
     },
 
     categoryImport: {
@@ -553,7 +554,7 @@ module.exports = {
              <br>
              The OpenForis Arena team
              </p>`,
-      temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong/></p>',
+      temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
     }
   }
 }

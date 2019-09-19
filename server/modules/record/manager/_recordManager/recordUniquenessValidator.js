@@ -55,7 +55,7 @@ const _newValidationRecordDuplicate = isUnique => Validation.newInstance(
     [RecordValidation.keys.recordKeys]: Validation.newInstance(
       isUnique,
       {},
-      [{ key: Validator.messageKeys.record.keyDuplicate }]
+      isUnique ? [] : [{ key: Validator.messageKeys.record.keyDuplicate }]
     )
   }
 )
