@@ -3,9 +3,9 @@ import * as R from 'ramda'
 
 import { useFormObject } from '../../../../../commonComponents/hooks'
 
-import Validator from '../../../../../../common/validation/validator'
 import StringUtils from '../../../../../../common/stringUtils'
 import ObjectUtils from '../../../../../../common/objectUtils'
+import Validation from '../../../../../../common/validation/validation'
 
 export const useSurveyInfoViewState = props => {
 
@@ -17,7 +17,7 @@ export const useSurveyInfoViewState = props => {
   } = useFormObject(ObjectUtils.getProps(surveyInfo), null)
 
   useEffect(() => {
-    setValidation(Validator.getValidation(surveyInfo))
+    setValidation(Validation.getValidation(surveyInfo))
   }, [surveyInfo])
 
   // setter methods

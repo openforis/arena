@@ -4,12 +4,10 @@ const Job = require('../../../job/job')
 
 const { languageCodes } = require('../../../../common/app/languages')
 const { isNotBlank } = require('../../../../common/stringUtils')
-const ObjectUtils = require('../../../../common/objectUtils')
 const CSVParser = require('../../../utils/file/csvParser')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
-const Validator = require('../../../../common/validation/validator')
 const Validation = require('../../../../common/validation/validation')
 
 const TaxonomyValidator = require('../taxonomyValidator')
@@ -127,10 +125,10 @@ class TaxonomyImportJob extends Job {
   async processRow (data) {
     const taxon = await this.parseTaxon(data)
 
-    if (Validator.isValid(taxon)) {
+    if (Validation.isObjValid(taxon)) {
       await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, this.tx)
     } else {
-      this.addError(R.pipe(Validator.getValidation, Validation.getFieldValidations)(taxon))
+      this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
     this.incrementProcessedItems()
   }
@@ -144,7 +142,7 @@ class TaxonomyImportJob extends Job {
         all: {
           valid: false,
           errors: [{
-            key: Validator.messageKeys.taxonomyImportJob.missingRequiredColumns,
+            key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
             params: { columns: R.join(', ', missingColumns) }
           }]
         }
@@ -167,10 +165,10 @@ class TaxonomyImportJob extends Job {
     //validate taxon uniqueness among inserted values
     if (Validation.isValid(validation)) {
       const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
-      this._addValueToIndex(Taxon.propKeys.code, code, Validator.messageKeys.taxonomyEdit.codeDuplicate, validation)
+      this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
 
       const scientificName = Taxon.getScientificName(taxon)
-      this._addValueToIndex(Taxon.propKeys.scientificName, scientificName, Validator.messageKeys.taxonomyEdit.scientificNameDuplicate, validation)
+      this._addValueToIndex(Taxon.propKeys.scientificName, scientificName, Validation.messageKeys.taxonomyEdit.scientificNameDuplicate, validation)
     }
 
     return {
@@ -182,14 +180,17 @@ class TaxonomyImportJob extends Job {
   _addValueToIndex (field, value, errorKeyDuplicate, validation) {
     const duplicateRow = this.rowsByField[field][value]
     if (duplicateRow) {
-      ObjectUtils.setInPath([Validator.keys.fields, field], {
-        [Validator.keys.valid]: false,
-        [Validator.keys.errors]: [{
-          key: errorKeyDuplicate,
-          params: { row: this.processed + 1, duplicateRow }
-        }],
-      })(validation)
-      validation[Validator.keys.valid] = false
+      Validation.setValid(false)
+      Validation.setField(
+        field,
+        Validation.newInstance(
+          false,
+          {},
+          [{
+            key: errorKeyDuplicate,
+            params: { row: this.processed + 1, duplicateRow }
+          }]
+        ))(validation)
     } else {
       this.rowsByField[field][value] = this.processed + 1
     }

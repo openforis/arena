@@ -10,9 +10,9 @@ const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) =>
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
       [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.min}`]:
-        [Validator.validatePositiveNumber(Validator.messageKeys.nodeDefEdit.countMinMustBePositiveNumber)],
+        [Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMinMustBePositiveNumber)],
       [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.max}`]:
-        [Validator.validatePositiveNumber(Validator.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber)],
+        [Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber)],
     })
     : {}
 

@@ -2,7 +2,6 @@ const R = require('ramda')
 
 const Validation = require('./validation')
 const ValidatorFunctions = require('./_validator/validatorFunctions.js')
-const ValidatorErrorKeys = require('./_validator/validatorErrorKeys.js')
 
 // const objectInvalid = {
 //   [keys.valid]: false,
@@ -10,19 +9,18 @@ const ValidatorErrorKeys = require('./_validator/validatorErrorKeys.js')
 //   [keys.warnings]: [{ key: 'error_key', params }],
 //   [keys.fields]: {
 //      'aaa': {
+//        [keys.valid]: false,
 //        [keys.errors]: [{ key: 'error_key', params }],
 //        [keys.warnings]: [{ key: 'error_key', params }],
+//        [keys.fields]: {
+//          'bbb': {
+//            [keys.valid]: false,
+//            [keys.errors]: [{ key: 'error_key', params }],
+//            [keys.warnings]: [{ key: 'error_key', params }],
+//        }
 //     }
 //   },
 // }
-
-const keys = {
-  validation: 'validation',
-  customErrorMessageKey: 'custom',
-  fields: 'fields',
-  valid: 'valid',
-  errors: 'errors',
-}
 
 const validateProp = async (obj, prop, validations = []) => {
   const errors = R.reject(
@@ -54,25 +52,8 @@ const validate = async (obj, propsValidations, removeValidFields = true) => {
   return validation
 }
 
-//==== getters
-
-//TODO move to objectUtils
-const getValidation = R.propOr(Validation.newInstance(), keys.validation)
-const isValid = R.pipe(getValidation, Validation.isValid)
-const assocValidation = v => R.assoc(keys.validation, v)
-
 module.exports = {
-  keys,
-  messageKeys: ValidatorErrorKeys,
-
   validate,
-
-  // READ
-  getValidation,
-  isValid,
-
-  // UPDATE
-  assocValidation,
 
   // validator functions
   validateRequired: ValidatorFunctions.validateRequired,

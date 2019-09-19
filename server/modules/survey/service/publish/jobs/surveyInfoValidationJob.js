@@ -1,6 +1,5 @@
 const Job = require('../../../../../job/job')
 
-const Validator = require('../../../../../../common/validation/validator')
 const Validation = require('../../../../../../common/validation/validation')
 const Survey = require('../../../../../../common/survey/survey')
 
@@ -15,12 +14,10 @@ class SurveyInfoValidationJob extends Job {
   async execute (tx) {
     const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, true, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
-    const validation = Validator.getValidation(surveyInfo)
+    const validation = Validation.getValidation(surveyInfo)
 
     if (!Validation.isValid(validation)) {
-      this.errors = {
-        'info': Validation.getFieldValidations(validation)
-      }
+      this.addError(Validation.getFieldValidations(validation), Survey.infoKeys.info)
       await this.setStatusFailed()
     }
   }

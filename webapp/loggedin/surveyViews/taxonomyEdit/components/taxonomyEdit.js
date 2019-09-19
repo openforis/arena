@@ -13,7 +13,6 @@ import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
 import StringUtils from '../../../../../common/stringUtils'
-import Validator from '../../../../../common/validation/validator'
 import Validation from '../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../survey/surveyState'
@@ -38,7 +37,7 @@ const TaxonomyEdit = props => {
     }
   }, [Taxonomy.getUuid(taxonomy)])
 
-  const validation = Validator.getValidation(taxonomy)
+  const validation = Validation.getValidation(taxonomy)
 
   const i18n = useI18n()
 

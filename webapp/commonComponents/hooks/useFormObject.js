@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import * as R from 'ramda'
 
-import Validator from '../../../common/validation/validator'
 import Validation from '../../../common/validation/validation'
 
 export default (obj, validatorFn = null, validationEnabled = false) => {
@@ -16,8 +15,8 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     (async () => {
       if (validatorFn) {
         setValidation(await validatorFn(state.obj))
-      } else if (Validator.getValidation(obj)) {
-        setValidation(Validator.getValidation(obj))
+      } else {
+        setValidation(Validation.getValidation(obj))
       }
     })()
   }, [state.obj])

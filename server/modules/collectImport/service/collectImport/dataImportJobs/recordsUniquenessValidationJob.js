@@ -3,7 +3,6 @@ const R = require('ramda')
 const Survey = require('../../../../../../common/survey/survey')
 
 const RecordValidation = require('../../../../../../common/record/recordValidation')
-const Validator = require('../../../../../../common/validation/validator')
 const Validation = require('../../../../../../common/validation/validation')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
@@ -98,7 +97,7 @@ const _createValidationRecordDuplicate = () => Validation.newInstance(
     [RecordValidation.keys.recordKeys]: Validation.newInstance(
       false,
       {},
-      [{ key: Validator.messageKeys.record.keyDuplicate }]
+      [{ key: Validation.messageKeys.record.keyDuplicate }]
     )
   })
 

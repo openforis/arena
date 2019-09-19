@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
 const Taxon = require('../../../../../../common/survey/taxon')
-const Validator = require('../../../../../../common/validation/validator')
+const Validation = require('../../../../../../common/validation/validation')
 const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
 const Job = require('../../../../../job/job')
@@ -138,7 +138,7 @@ class TaxonomiesImportJob extends Job {
         [Taxon.propKeys.code]: {
           valid: false,
           errors: [{
-            key: Validator.messageKeys.taxonomyEdit.codeDuplicate,
+            key: Validation.messageKeys.taxonomyEdit.codeDuplicate,
             params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
           }],
         },
@@ -154,7 +154,7 @@ class TaxonomiesImportJob extends Job {
         [Taxon.propKeys.scientificName]: {
           valid: false,
           errors: [{
-            key: Validator.messageKeys.taxonomyEdit.scientificNameDuplicate,
+            key: Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
             params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
           }],
         },
