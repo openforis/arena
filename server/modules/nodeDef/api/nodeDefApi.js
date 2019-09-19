@@ -21,7 +21,7 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { nodeDefRequest } = Request.getBody(req)
+      const nodeDefRequest = Request.getBody(req)
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 

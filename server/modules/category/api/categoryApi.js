@@ -46,7 +46,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { summary } = Request.getBody(req)
+      const summary = Request.getBody(req)
 
       const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
       res.json({ job })
