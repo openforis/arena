@@ -21,7 +21,7 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { body: nodeDefRequest } = req
+      const { nodeDefRequest } = Request.getBody(req)
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
@@ -55,9 +55,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/props', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { body, user } = req
-      const { props, propsAdvanced } = body
-
+      const user = Request.getUser(req)
+      const { props, propsAdvanced } = Request.getBody(req)
       const { surveyId, nodeDefUuid } = Request.getParams(req)
 
       await NodeDefService.updateNodeDefProps(user, surveyId, nodeDefUuid, props, propsAdvanced)
@@ -73,7 +72,7 @@ module.exports.init = app => {
 
   app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
       const nodeDefUuid = Request.getRestParam(req, 'nodeDefUuid')
       const surveyId = Request.getRestParam(req, 'surveyId')
 

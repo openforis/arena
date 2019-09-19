@@ -15,7 +15,7 @@ module.exports.init = app => {
   app.post('/survey', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { body } = req
+      const body = Request.getBody(req)
       const validation = await SurveyService.validateNewSurvey(body)
 
       if (Validator.isValidationValid(validation)) {
@@ -63,7 +63,7 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { body } = req
+      const body = Request.getBody(req)
 
       const surveyId = Request.getRestParam(req, 'surveyId')
 

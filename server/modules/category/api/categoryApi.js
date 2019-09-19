@@ -21,7 +21,7 @@ module.exports.init = app => {
     try {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body } = req
+      const body = Request.getBody(req)
 
       const category = await CategoryService.insertCategory(user, surveyId, body)
       res.json({ category })
@@ -46,7 +46,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body: summary } = req
+      const { summary } = Request.getBody(req)
 
       const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
       res.json({ job })
@@ -59,7 +59,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body } = req
+      const body = Request.getBody(req)
 
       await CategoryService.insertLevel(user, surveyId, body)
 
@@ -73,7 +73,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body } = req
+      const body = Request.getBody(req)
 
       const item = await CategoryService.insertItem(user, surveyId, body)
 
@@ -126,7 +126,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body: { key, value } } = req
+      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
@@ -140,7 +140,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid, levelUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body: { key, value } } = req
+      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateLevelProp(user, surveyId, levelUuid, key, value)
 
@@ -154,7 +154,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid, itemUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { body: { key, value } } = req
+      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateItemProp(user, surveyId, itemUuid, key, value)
 
