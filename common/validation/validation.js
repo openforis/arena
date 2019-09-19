@@ -6,26 +6,7 @@ const keys = {
   errors: 'errors',
 }
 
-// CREATE
-const newInstance = (valid = true, fields = {}, errors = []) => ({
-  [keys.valid]: valid,
-  [keys.fields]: fields,
-  [keys.errors]: errors,
-})
-
-// READ
-const isValid = R.propOr(true, keys.valid)
-const getFieldValidations = R.propOr({}, keys.fields)
-const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
-
-// field validation
-const getErrors = R.propOr([], keys.errors)
-const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
-
-const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
-const setFields = fields => ObjectUtils.setInPath([keys.fields], fields)
-const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
-const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
+//====== UTILS
 
 /**
  * Removes valid fields validations and updates 'valid' attribute
@@ -52,6 +33,41 @@ const cleanup = validation => R.pipe(
   }
 )(validation)
 
+const recalculateValidity = validation => R.pipe(
+  getFieldValidations,
+  // update validity in each field
+  R.map(recalculateValidity),
+  fields => {
+    const errors = getErrors(validation)
+    const valid = R.all(isValid, R.values(fields)) && R.isEmpty(errors)
+    return newInstance(valid, fields, errors)
+  }
+)(validation)
+
+//====== CREATE
+
+const newInstance = (valid = true, fields = {}, errors = []) => ({
+  [keys.valid]: valid,
+  [keys.fields]: fields,
+  [keys.errors]: errors,
+})
+
+//====== READ
+
+const isValid = R.propOr(true, keys.valid)
+const getFieldValidations = R.propOr({}, keys.fields)
+const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
+
+const getErrors = R.propOr([], keys.errors)
+const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
+
+//====== UPDATE
+
+const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
+const setFields = fields => ObjectUtils.setInPath([keys.fields], fields)
+const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
+const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
+
 const assocFieldValidation = (field, fieldValidation) => R.pipe(
   R.assocPath([keys.fields, field], fieldValidation),
   cleanup
@@ -69,20 +85,6 @@ const mergeValidation = validationNew => validationOld => R.pipe(
   }),
   cleanup,
 )(validationOld)
-
-const recalculateValidity = validation =>
-  R.pipe(
-    getFieldValidations,
-    // update validity in each field
-    R.map(recalculateValidity),
-    newFields => {
-      const errors = getErrors(validation)
-      return R.pipe(
-        R.assoc(keys.valid, R.all(isValid, R.values(newFields)) && R.isEmpty(errors)),
-        R.assoc(keys.fields, newFields)
-      )(validation)
-    }
-  )(validation)
 
 module.exports = {
   keys,

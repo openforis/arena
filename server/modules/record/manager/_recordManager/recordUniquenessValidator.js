@@ -58,7 +58,7 @@ const _newValidationRecordDuplicate = isUnique => Validation.newInstance(
       [{ key: Validator.messageKeys.record.keyDuplicate }]
     )
   }
-}
+)
 
 module.exports = {
   validateRecordKeysUniqueness,

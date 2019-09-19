@@ -58,9 +58,6 @@ const getValidation = R.propOr(Validation.newInstance(), keys.validation)
 const isValid = R.pipe(getValidation, Validation.isValid)
 const assocValidation = v => R.assoc(keys.validation, v)
 
-//==== update
-
-
 module.exports = {
   keys,
   messageKeys: ValidatorErrorKeys,
@@ -81,5 +78,4 @@ module.exports = {
   validateName: ValidatorFunctions.validateName,
   validatePositiveNumber: ValidatorFunctions.validatePositiveNumber,
   isKeyword: ValidatorFunctions.isKeyword,
-
 }
