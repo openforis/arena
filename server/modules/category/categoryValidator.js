@@ -5,6 +5,7 @@ const CategoryLevel = require('../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../common/survey/categoryItem')
 const Validator = require('../../../common/validation/validator')
 const Validation = require('../../../common/validation/validation')
+const ObjectUtils = require('../../../common/objectUtils')
 
 const keys = {
   children: 'children',
@@ -15,7 +16,7 @@ const keys = {
 // ====== LEVELS
 
 const levelValidators = (levels, itemsByParentUuid) => ({
-  'props.name': [
+  [`${ObjectUtils.keys.props}.${CategoryLevel.props.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels)
@@ -56,7 +57,7 @@ const validateItemCodeUniqueness = itemsByCode =>
   }
 
 const itemValidators = (isLeaf, itemsByParentUuid, siblingsByCode) => ({
-  'props.code': [
+  [`${ObjectUtils.keys.props}.${CategoryItem.props.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsByCode)
@@ -78,16 +79,16 @@ const validateNotEmptyFirstLevelItems = itemsByParentUuid => (propName, level) =
     ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
     : null
 
-const validateItem = async (category, siblings, siblingsByUuid, siblingsByCode, itemsByParentUuid, parentItemUuid, itemUuid) => {
-  const item = siblingsByUuid[itemUuid][0]
+const validateItem = (category, siblings, siblingsByUuid, siblingsByCode, itemsByParentUuid) => async item => {
+  const itemUuid = CategoryItem.getUuid(item)
 
   const isLeaf = Category.isItemLeaf(item)(category)
 
   const validation = await Validator.validate(item, itemValidators(isLeaf, itemsByParentUuid, siblingsByCode))
 
-  if (isLeaf) {
+  if (isLeaf || !Validation.isValid(Validation.getFieldValidation(keys.children)(validation))) {
     return { [itemUuid]: validation }
-  } else if (Validation.isValid(Validation.getFieldValidation(keys.children)(validation))) {
+  } else {
     //children are not empty, validate each item
 
     const childValidations = await validateItemsByParentUuid(category, itemsByParentUuid, itemUuid)
@@ -95,22 +96,21 @@ const validateItem = async (category, siblings, siblingsByUuid, siblingsByCode, 
     const combinedValidation =
       Validation.isValid(childValidations)
         ? validation
-        : (
-          Validation.setField(
-            keys.children,
-            Validation.newInstance(false, {}, [{ key: Validation.messageKeys.categoryEdit.itemsInvalid }])
-          )(validation)
+        : R.pipe(
+        Validation.setValid(false),
+        Validation.setField(
+          keys.children,
+          Validation.newInstance(false, {}, [{ key: Validation.messageKeys.categoryEdit.itemsInvalid }])
         )
+        )(validation)
 
     return R.pipe(
       Validation.getFieldValidations,
-      R.assoc(
-        itemUuid,
-        { ...combinedValidation }
-      )
+      fieldValidations => ({
+        ...fieldValidations,
+        [itemUuid]: combinedValidation
+      })
     )(childValidations)
-  } else {
-    return validation
   }
 }
 
@@ -119,17 +119,28 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
   const childrenByCode = R.groupBy(CategoryItem.getCode)(children)
   const childrenByUuid = R.groupBy(R.prop(CategoryItem.keys.uuid))(children)
 
-  const childValidationsArr = await Promise.all(children.map(
-    child => validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid, parentItemUuid, CategoryItem.getUuid(child))
+  const childrenValidationsArr = await Promise.all(children.map(
+    validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid, parentItemUuid)
   ))
 
-  const childValidations = R.mergeAll(childValidationsArr)
-
-  const childrenValid = R.all(Validation.isValid)(R.values(childValidations))
+  //merge children validations
+  let childrenValid = true
+  const childrenValidationsMerged = childrenValidationsArr.reduce((validationsAcc, childValidations) => {
+      Object.entries(childValidations).forEach(
+        ([childUuid, childValidation]) => {
+          if (!Validation.isValid(childValidation)) {
+            validationsAcc[childUuid] = childValidation
+            childrenValid = false
+          }
+        })
+      return validationsAcc
+    },
+    {}
+  )
 
   return Validation.newInstance(
     childrenValid,
-    childValidations,
+    childrenValidationsMerged,
     childrenValid ? [] : [{ key: Validation.messageKeys.categoryEdit.childrenInvalid }]
   )
 }
@@ -137,7 +148,7 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
 // ====== CATEGORY
 
 const categoryValidators = (categories) => ({
-  'props.name': [
+  [`${ObjectUtils.keys.props}.${Category.props.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(categories)
