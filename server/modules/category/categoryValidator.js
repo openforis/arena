@@ -4,6 +4,7 @@ const Category = require('../../../common/survey/category')
 const CategoryLevel = require('../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../common/survey/categoryItem')
 const Validator = require('../../../common/validation/validator')
+const Validation = require('../../../common/validation/validation')
 
 const keys = {
   children: 'children',
@@ -34,11 +35,7 @@ const validateLevels = async (category, itemsByParentUuid) => {
     )
   )
 
-  return {
-    [Validator.keys.valid]: R.all(Validator.isValidationValid, validations),
-    [Validator.keys.fields]: Object.assign({}, validations)
-  }
-
+  return Validation.newInstance(R.all(Validation.isValid, validations), Object.assign({}, validations))
 }
 
 // ====== ITEMS
@@ -84,18 +81,20 @@ const validateItem = async (category, siblings, siblingsByUuid, siblingsByCode, 
 
   if (isLeaf) {
     return { [itemUuid]: validation }
-  } else if (Validator.isValid(Validator.getFieldValidation(keys.children)(validation))) {
+  } else if (Validator.isValid(Validation.getFieldValidation(keys.children)(validation))) {
     //children are not empty, validate each item
 
     const childValidations = await validateItemsByParentUuid(category, itemsByParentUuid, itemUuid)
 
     const combinedValidation =
-      Validator.isValidationValid(childValidations)
+      Validation.isValid(childValidations)
         ? validation
-        : Validator.assocFieldValidation(keys.children, {
-          [Validator.keys.valid]: false,
-          [Validator.keys.errors]: [{ key: Validator.messageKeys.categoryEdit.itemsInvalid }]
-        })(validation)
+        : (
+          Validation.assocFieldValidation(
+            keys.children,
+            Validation.newInstance(false, {}, [{ key: Validator.messageKeys.categoryEdit.itemsInvalid }])
+          )(validation)
+        )
 
     return R.assoc(
       itemUuid,
@@ -119,7 +118,7 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
 
   const childrenValid = R.pipe(
     R.values,
-    R.all(Validator.isValidationValid)
+    R.all(Validation.isValid)
   )(childValidations)
 
   return {
@@ -151,12 +150,14 @@ const validateCategory = async (categories, category, items) => {
 
   return {
     ...categoryValidation,
-    [Validator.keys.fields]: {
-      ...categoryValidation[Validator.keys.fields],
-      levels: levelsValidation,
-      items: itemsValidation
-    },
-    [Validator.keys.valid]: R.all(Validator.isValidationValid, [categoryValidation, levelsValidation, itemsValidation])
+    ...Validation.newInstance(
+      R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation]),
+      {
+        ...Validation.getFieldValidations(categoryValidation),
+        levels: levelsValidation,
+        items: itemsValidation
+      }
+    ),
   }
 }
 

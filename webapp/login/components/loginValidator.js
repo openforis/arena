@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import Validator from '../../../common/validation/validator'
+import Validation from '../../../common/validation/validation'
 import UserValidator from '../../../common/user/userValidator'
 
 const validPasswordRe = new RegExp(/^[\S]+.*[\S]+$/)
@@ -63,7 +64,7 @@ export const validateEmail = async obj => await Validator.validate(
 )
 
 export const getFirstError = (validation, order) => {
-  const firstMatch = order.map(field => Validator.getFieldValidation(field)(validation))
-    .find(v => !Validator.isValidationValid(v))
+  const firstMatch = order.map(field => Validation.getFieldValidation(field)(validation))
+    .find(v => !Validation.isValid(v))
   return Validator.getErrors(firstMatch)[0].key
 }

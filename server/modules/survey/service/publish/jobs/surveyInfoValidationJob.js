@@ -1,6 +1,7 @@
 const Job = require('../../../../../job/job')
 
 const Validator = require('../../../../../../common/validation/validator')
+const Validation = require('../../../../../../common/validation/validation')
 const Survey = require('../../../../../../common/survey/survey')
 
 const SurveyManager = require('../../../manager/surveyManager')
@@ -16,9 +17,9 @@ class SurveyInfoValidationJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(survey)
     const validation = Validator.getValidation(surveyInfo)
 
-    if (!Validator.isValidationValid(validation)) {
+    if (!Validation.isValid(validation)) {
       this.errors = {
-        'info': Validator.getFieldValidations(validation)
+        'info': Validation.getFieldValidations(validation)
       }
       await this.setStatusFailed()
     }

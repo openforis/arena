@@ -7,7 +7,7 @@ const UserService = require('../service/userService')
 
 const User = require('../../../../common/user/user')
 const UserValidator = require('../../../../common/user/userValidator')
-const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 
 const SystemError = require('../../../../server/utils/systemError')
 
@@ -22,7 +22,7 @@ module.exports.init = app => {
       const { surveyId, email, groupUuid } = Request.getParams(req)
       const validation = await UserValidator.validateInvitation(req.body)
 
-      if (!Validator.isValidationValid(validation)) {
+      if (!Validation.isValid(validation)) {
         throw new SystemError('invalidUser')
       }
 
@@ -107,7 +107,7 @@ module.exports.init = app => {
     try {
       const validation = await UserValidator.validateUser(req.body)
 
-      if (!Validator.isValidationValid(validation)) {
+      if (!Validation.isValid(validation)) {
         throw new SystemError('invalidUser')
       }
 

@@ -8,6 +8,7 @@ const Record = require('../record')
 const Node = require('../node')
 const RecordExprParser = require('../recordExprParser')
 const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 const StringUtils = require('../../stringUtils')
 
 const AttributeTypeValidator = require('./attributeTypeValidator')
@@ -62,7 +63,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef) => {
       ]
     }, false)
   } else {
-    return Validator.newValidationValid()
+    return Validation.newInstance()
   }
 }
 

@@ -11,7 +11,7 @@ const NodeDefValidations = require('../../../../../../common/survey/nodeDefValid
 const Record = require('../../../../../../common/record/record')
 const Node = require('../../../../../../common/record/node')
 const RecordValidator = require('../../../../../../common/record/recordValidator')
-const Validator = require('../../../../../../common/validation/validator')
+const Validation = require('../../../../../../common/validation/validation')
 
 const SystemError = require('../../../../../utils/systemError')
 
@@ -176,9 +176,9 @@ class RecordsImportJob extends Job {
 
         } else {
           const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
-          if (!Validator.isValidationValid(validationAttribute)) {
-            recordValidation[Validator.keys.valid] = false
-            recordValidation[Validator.keys.fields][Node.getUuid(nodeToInsert)] = validationAttribute
+          if (!Validation.isValid(validationAttribute)) {
+            Validation.setValid(false)(recordValidation)
+            Validation.setField(Node.getUuid(nodeToInsert), validationAttribute)(recordValidation)
           }
         }
       }
@@ -195,7 +195,7 @@ class RecordsImportJob extends Job {
     const nodesToInsert = []
 
     const nodeUuid = Node.getUuid(node)
-    let nodeValidation = Validator.getFieldValidation(nodeUuid)(recordValidation)
+    let nodeValidation = Validation.getFieldValidation(nodeUuid)(recordValidation)
 
     const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
     for (const collectNodeDefChild of collectNodeDefChildren) {
@@ -232,10 +232,10 @@ class RecordsImportJob extends Job {
         if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
           const validationCount = RecordValidator.validateChildrenCount(survey, node, nodeDefChild, childrenCount)
 
-          if (!Validator.isValidationValid(validationCount)) {
-            recordValidation[Validator.keys.valid] = false
+          if (!Validation.isValid(validationCount)) {
+            Validation.setValid(false)(recordValidation)
             nodeValidation = R.mergeDeepRight(nodeValidation, validationCount)
-            recordValidation[Validator.keys.fields][nodeUuid] = nodeValidation
+            Validation.setField(nodeUuid, nodeValidation)(recordValidation)
           }
 
         }

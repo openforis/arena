@@ -7,9 +7,10 @@ const { isNotBlank } = require('../../../../common/stringUtils')
 const ObjectUtils = require('../../../../common/objectUtils')
 const CSVParser = require('../../../utils/file/csvParser')
 
-const Validator = require('../../../../common/validation/validator')
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
+const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 
 const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')
@@ -129,7 +130,7 @@ class TaxonomyImportJob extends Job {
     if (Validator.isValid(taxon)) {
       await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, this.tx)
     } else {
-      this.addError(R.pipe(Validator.getValidation, Validator.getFieldValidations)(taxon))
+      this.addError(R.pipe(Validator.getValidation, Validation.getFieldValidations)(taxon))
     }
     this.incrementProcessedItems()
   }
@@ -164,7 +165,7 @@ class TaxonomyImportJob extends Job {
     const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
 
     //validate taxon uniqueness among inserted values
-    if (Validator.isValidationValid(validation)) {
+    if (Validation.isValid(validation)) {
       const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
       this._addValueToIndex(Taxon.propKeys.code, code, Validator.messageKeys.taxonomyEdit.codeDuplicate, validation)
 

@@ -7,6 +7,7 @@ const Record = require('../../../../../common/record/record')
 const RecordValidator = require('../../../../../common/record/recordValidator')
 const Node = require('../../../../../common/record/node')
 const Validator = require('../../../../../common/validation/validator')
+const Validation = require('../../../../../common/validation/validation')
 
 const RecordRepository = require('../../repository/recordRepository')
 
@@ -28,12 +29,13 @@ const validateNodesAndPersistValidation = async (survey, record, nodes, tx) => {
   }
 
   // 3. merge validations
-  const validation = Validator.recalculateValidity(
-    R.mergeDeepLeft(
-      {
-        [Validator.keys.fields]: recordKeysValidation
-      },
-      nodesValidation
+  const validation = Validation.recalculateValidity(
+    Validation.newInstance(
+      true,
+      R.mergeDeepLeft(
+        recordKeysValidation,
+        Validation.getFieldValidations(nodesValidation)
+      )
     )
   )
 
@@ -58,7 +60,7 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
 
   const recordValidationUpdated = R.pipe(
     Record.getValidation,
-    Validator.mergeValidation(nodesValidation)
+    Validation.mergeValidation(nodesValidation)
   )(record)
 
   await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)

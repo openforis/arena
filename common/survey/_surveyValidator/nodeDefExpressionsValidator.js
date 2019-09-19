@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
@@ -79,10 +80,7 @@ const validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
     NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
     NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
   )(nodeDefExpressions)
-    ? {
-      [Validator.keys.valid]: false,
-      [Validator.keys.errors]: [{ key: Validator.messageKeys.nodeDefEdit.expressionDuplicate }]
-    }
+    ? Validation.newInstance(false, {}, [{ key: Validator.messageKeys.nodeDefEdit.expressionDuplicate }])
     : null
 
 const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness) => {
@@ -105,13 +103,13 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
       ]
     }
   )
-  return Validator.isValidationValid(validation)
+  return Validation.isValid(validation)
     ? validateExpressionUniqueness(nodeDefExpressions, nodeDefExpression)
     : validation
 }
 
 const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true, errorKey = null) => {
-  const result = Validator.newValidationValid()
+  const result = Validation.newInstance()
 
   const validations = await Promise.all(
     nodeDefExpressions.map((nodeDefExpression, i) =>
@@ -120,12 +118,12 @@ const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniq
   )
 
   validations.forEach((validation, i) => {
-    result[Validator.keys.fields]['' + i] = validation
-    result[Validator.keys.valid] = Validator.isValidationValid(result) && Validator.isValidationValid(validation)
+    Validation.setField('' + i, validation)(result)
+    Validation.setValid(Validation.isValid(result) && Validation.isValid(validation))(result)
   })
 
-  if (errorKey && !Validator.isValidationValid(result))
-    result[Validator.keys.errors] = [{ key: errorKey }]
+  if (errorKey && !Validation.isValid(result))
+    Validation.setErrors([{ key: errorKey }], result)
 
   return result
 }

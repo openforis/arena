@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const ValidatorErrorKeys = require('./validatorErrorKeys')
 const ValidatorNameKeywords = require('./validatorNameKeywords')
+const ObjectUtils = require('../../objectUtils')
 
 /**
  * Internal names must contain only lowercase letters, numbers and underscores starting with a letter
@@ -23,12 +24,7 @@ const validateRequired = errorKey => (propName, obj) => {
 
 const validateItemPropUniqueness = errorKey => items => (propName, item) => {
   const hasDuplicates = R.any(
-    i => getProp(propName)(i) === getProp(propName)(item) &&
-      (
-        R.prop('id')(i) !== R.prop('id')(item) || // TODO check where id is used
-        R.prop('uuid')(i) !== R.prop('uuid')(item)
-      )
-    ,
+    i => !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
     items
   )
 

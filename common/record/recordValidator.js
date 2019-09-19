@@ -1,4 +1,4 @@
-const Validator = require('../validation/validator')
+const Validation = require('../validation/validation')
 
 const CountValidator = require('./_recordValidator/countValidator')
 const AttributeValidator = require('./_recordValidator/attributeValidator')
@@ -12,14 +12,15 @@ const validateNodes = async (survey, record, nodes) => {
   const nodeCountValidations = CountValidator.validateChildrenCountNodes(survey, record, nodes)
 
   // 3. merge validations
-  const validation = {
-    [Validator.keys.fields]: {
-      ...attributeValidations,
-      ...nodeCountValidations
-    }
-  }
-
-  return Validator.recalculateValidity(validation)
+  return Validation.recalculateValidity(
+    Validation.newInstance(
+      true,
+      {
+        ...attributeValidations,
+        ...nodeCountValidations
+      }
+    )
+  )
 }
 
 module.exports = {

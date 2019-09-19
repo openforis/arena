@@ -8,7 +8,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Taxonomy from '../../../../../common/survey/taxonomy'
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as NodeDefEditState from '../nodeDefEditState'
@@ -45,7 +45,7 @@ const TaxonProps = (props) => {
           <Dropdown items={taxonomies}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Taxonomy.getName}
-                    validation={Validator.getFieldValidation(propKeys.taxonomyUuid)(validation)}
+                    validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
                     selection={taxonomy}
                     disabled={!canUpdateTaxonomy}
                     onChange={putTaxonomyProp}/>

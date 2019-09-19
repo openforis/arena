@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import Markdown from 'react-remarkable'
 
 import Validator from '../../common/validation/validator'
+import Validation from '../../common/validation/validation'
 
 const getErrorText = i18n => error =>
   error.key === Validator.keys.customErrorMessageKey
@@ -10,7 +11,7 @@ const getErrorText = i18n => error =>
     : i18n.t(error.key, error.params)
 
 const getValidationErrorMessages = i18n => R.pipe(
-  Validator.getErrors,
+  Validation.getErrors,
   R.map(getErrorText(i18n)),
 )
 
@@ -28,7 +29,7 @@ const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
 
 export const getValidationFieldMessages = (i18n, showKeys = true) => validation => R.pipe(
   // extract invalid fields error messages
-  Validator.getFieldValidations,
+  Validation.getFieldValidations,
   Object.entries,
   R.map(([field, fieldValidation]) => `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`),
   // prepend validation error messages
