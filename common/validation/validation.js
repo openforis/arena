@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const ObjectUtils = require('../objectUtils')
+
 const keys = {
   fields: 'fields',
   valid: 'valid',

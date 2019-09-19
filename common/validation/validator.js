@@ -19,6 +19,9 @@ const ValidatorErrorKeys = require('./_validator/validatorErrorKeys.js')
 const keys = {
   validation: 'validation',
   customErrorMessageKey: 'custom',
+  fields: 'fields',
+  valid: 'valid',
+  errors: 'errors',
 }
 
 const validateProp = async (obj, prop, validations = []) => {
@@ -28,7 +31,7 @@ const validateProp = async (obj, prop, validations = []) => {
       validations.map(validationFn => validationFn(prop, obj))
     )
   )
-  return Validation.newInstance(R.isEmpty(errors), errors)
+  return Validation.newInstance(R.isEmpty(errors), {}, errors)
 }
 
 const validate = async (obj, propsValidations, removeValidFields = true) => {
