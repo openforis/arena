@@ -15,7 +15,7 @@ class TaxonomiesValidationJob extends Job {
   async execute (tx) {
     const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, tx)
 
-    const invalidTaxonomies = R.reject(Validation.isValid)(taxonomies)
+    const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)
 
     if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
@@ -23,7 +23,7 @@ class TaxonomiesValidationJob extends Job {
         {},
         invalidTaxonomies
       )
-      this.setStatusFailed()
+      await this.setStatusFailed()
     }
   }
 }
