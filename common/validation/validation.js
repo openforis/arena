@@ -103,16 +103,6 @@ const dissocFieldValidation = field => R.pipe(
   cleanup
 )
 
-const dissocFieldValidationsByPath = path => validation => {
-  if (path.length === 1) {
-    return dissocFieldValidation(path[0])(validation)
-  } else {
-    const firstField = path[0]
-    const validationFirstField = getFieldValidation(firstField)(validation)
-    return dissocFieldValidationsByPath(path.slice(1))(validationFirstField)
-  }
-}
-
 const mergeValidation = validationNew => validationOld => R.pipe(
   validation => ({
     [keys.fields]: R.mergeDeepRight(
