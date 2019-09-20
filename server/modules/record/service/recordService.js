@@ -18,8 +18,8 @@ const RecordManager = require('../manager/recordManager')
 const FileManager = require('../manager/fileManager')
 
 const RecordUsersMap = require('./update/recordUsersMap')
-const RecordThreads = require('./update/thread/recordThreads')
-const RecordServiceThreads = require('./recordServiceThreads')
+const RecordThreads = require('./update/recordThreadsMap')
+const RecordServiceThreads = require('./update/recordServiceThreads')
 const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
 
 /**

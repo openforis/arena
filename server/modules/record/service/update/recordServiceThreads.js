@@ -1,15 +1,15 @@
 const R = require('ramda')
 const path = require('path')
 
-const ThreadManager = require('../../../threads/threadManager')
-const RecordUpdateThreadParams = require('./update/thread/recordUpdateThreadParams')
-const ThreadParams = require('../../../threads/threadParams')
+const ThreadManager = require('../../../../threads/threadManager')
+const RecordUpdateThreadParams = require('../update/thread/recordUpdateThreadParams')
+const ThreadParams = require('../../../../threads/threadParams')
 
-const WebSocket = require('../../../utils/webSocket')
+const WebSocket = require('../../../../utils/webSocket')
 
-const RecordUsersMap = require('./update/recordUsersMap')
-const RecordThreads = require('./update/thread/recordThreads')
-const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
+const RecordUsersMap = require('../update/recordUsersMap')
+const RecordThreads = require('../update/recordThreadsMap')
+const recordThreadMessageTypes = require('../update/thread/recordThreadMessageTypes')
 
 const recordThreadTimeouts = {}
 
