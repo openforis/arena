@@ -20,9 +20,10 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
-      const { body, user } = req
+      const user = Request.getUser(req)
+      const taxonomyReq = Request.getBody(req)
 
-      const taxonomy = await TaxonomyService.insertTaxonomy(user, surveyId, body)
+      const taxonomy = await TaxonomyService.insertTaxonomy(user, surveyId, taxonomyReq)
 
       res.json({ taxonomy })
     } catch (err) {
@@ -130,8 +131,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/taxonomies/:taxonomyUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, taxonomyUuid } = Request.getParams(req)
-      const { body: { key, value }, user } = req
+      const { surveyId, taxonomyUuid, key, value } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       await TaxonomyService.updateTaxonomyProp(user, surveyId, taxonomyUuid, key, value)
 

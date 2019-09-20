@@ -1,8 +1,7 @@
-const {sendOk} = require('../utils/response')
+const Request = require('../utils/request')
+const Response = require('../utils/response')
 
-const {cancelActiveJobByUserUuid} = require('./jobManager')
-
-const User = require('../../common/user/user')
+const JobManager = require('./jobManager')
 
 module.exports.init = app => {
 
@@ -10,9 +9,9 @@ module.exports.init = app => {
    * ====== DELETE
    */
   app.delete('/jobs/active', async (req, res) => {
-    await cancelActiveJobByUserUuid(User.getUuid(req.user))
+    await JobManager.cancelActiveJobByUserUuid(Request.getUserUuid(req))
 
-    sendOk(res)
+    Response.sendOk(res)
   })
 
 }

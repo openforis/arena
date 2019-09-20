@@ -20,7 +20,7 @@ module.exports.init = app => {
       const user = Request.getUser(req)
 
       const { surveyId, email, groupUuid } = Request.getParams(req)
-      const validation = await UserValidator.validateInvitation(req.body)
+      const validation = await UserValidator.validateInvitation(Request.getBody(req))
 
       if (!Validation.isValid(validation)) {
         throw new SystemError('invalidUser')
@@ -50,7 +50,7 @@ module.exports.init = app => {
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const surveyId = Request.getRestParam(req, 'surveyId')
+      const { surveyId } = Request.getParams(req)
 
       const count = await UserService.countUsersBySurveyId(user, surveyId)
       res.json(count)
@@ -105,7 +105,7 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      const validation = await UserValidator.validateUser(req.body)
+      const validation = await UserValidator.validateUser(Request.getBody(req))
 
       if (!Validation.isValid(validation)) {
         throw new SystemError('invalidUser')
