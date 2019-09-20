@@ -26,6 +26,7 @@ const keys = {
   fields: 'fields',
   valid: 'valid',
   errors: 'errors',
+  warnings: 'warnings',
 
   customErrorMessageKey: 'custom',
 
@@ -37,27 +38,34 @@ const keys = {
 /**
  * Removes valid fields validations and updates 'valid' attribute
  */
-const cleanup = validation => R.pipe(
-  getFieldValidations,
-  // cleanup field validations
-  R.map(cleanup),
-  R.reject(isValid),
-  R.ifElse(
-    R.isEmpty,
-    () => newInstance(),
-    invalidFieldValidations => newInstance(false, invalidFieldValidations),
-  ),
-  // cleanup errors
-  newValidation => {
-    const errors = getErrors(validation)
-    return R.isEmpty(errors)
-      ? newValidation
-      : R.pipe(
-        setValid(false),
-        setErrors(errors)
-      )(newValidation)
-  }
-)(validation)
+const cleanup = validation => {
+  const cleanupArrayProp = propName =>
+    validationCleaned => {
+      const valuesOld = R.propOr([], propName)(validation)
+      return R.isEmpty(valuesOld)
+        ? validationCleaned
+        : R.pipe(
+          R.assoc(propName, valuesOld),
+          setValid(false),
+        )(validationCleaned)
+    }
+
+  return R.pipe(
+    getFieldValidations,
+    // cleanup field validations
+    R.map(cleanup),
+    R.reject(isValid),
+    R.ifElse(
+      R.isEmpty,
+      () => newInstance(),
+      invalidFieldValidations => newInstance(false, invalidFieldValidations),
+    ),
+    // cleanup errors
+    cleanupArrayProp(keys.errors),
+    // cleanup warnings
+    cleanupArrayProp(keys.warnings),
+  )(validation)
+}
 
 const recalculateValidity = validation => R.pipe(
   getFieldValidations,
@@ -65,17 +73,19 @@ const recalculateValidity = validation => R.pipe(
   R.map(recalculateValidity),
   fields => {
     const errors = getErrors(validation)
-    const valid = R.all(isValid, R.values(fields)) && R.isEmpty(errors)
-    return newInstance(valid, fields, errors)
+    const warnings = getWarnings(validation)
+    const valid = R.all(isValid, R.values(fields)) && R.isEmpty(errors) && R.isEmpty(warnings)
+    return newInstance(valid, fields, errors, warnings)
   }
 )(validation)
 
 //====== CREATE
 
-const newInstance = (valid = true, fields = {}, errors = []) => ({
+const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
   [keys.valid]: valid,
   [keys.fields]: fields,
   [keys.errors]: errors,
+  [keys.warnings]: warnings,
 })
 
 //====== READ
@@ -86,6 +96,7 @@ const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field]
 
 const getErrors = R.propOr([], keys.errors)
 const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
+const getWarnings = R.propOr([], keys.warnings)
 
 //====== UPDATE
 
