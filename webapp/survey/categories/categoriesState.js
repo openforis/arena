@@ -16,7 +16,7 @@ export const dissocCategory = category => R.dissoc(Category.getUuid(category))
 export const assocCategoryProp = (category, key, value) => R.pipe(
   R.assocPath([
       Category.getUuid(category),
-      Object.keys.props,
+      ObjectUtils.keys.props,
       key
     ],
     value
