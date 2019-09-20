@@ -11,7 +11,6 @@ import NodeDefEditButtons from './components/nodeDefEditButtons'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
-import Validator from '../../../../../common/validation/validator'
 import Validation from '../../../../../common/validation/validation'
 import Record from '../../../../../common/record/record'
 import Node from '../../../../../common/record/node'
