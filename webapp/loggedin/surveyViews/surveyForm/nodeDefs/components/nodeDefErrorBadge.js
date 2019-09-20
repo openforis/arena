@@ -9,8 +9,7 @@ import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
 import RecordValidation from '../../../../../../common/record/recordValidation'
-import Validator from '../../../../../../common/validation/validator'
-import ValidatorErrorKeys from '../../../../../../common/validation/validatorErrorKeys'
+import Validation from '../../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 import * as RecordState from '../../../record/recordState'
@@ -18,7 +17,7 @@ import * as RecordState from '../../../record/recordState'
 const NodeDefErrorBadge = props => {
   const { validation, children } = props
 
-  const valid = Validator.isValidationValid(validation)
+  const valid = Validation.isValid(validation)
 
   return valid && children
     ? (
@@ -48,7 +47,7 @@ NodeDefErrorBadge.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, nodes, node, edit } = props
 
-  let validation = Validator.newValidationValid()
+  let validation = Validation.newInstance()
 
   if (edit) {
     const survey = SurveyState.getSurvey(state)
@@ -66,11 +65,8 @@ const mapStateToProps = (state, props) => {
       } else if (NodeDef.isEntity(nodeDef)) {
         //only entities can have children with min/max count validation
         validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
-      } else if (!R.all(Validator.isValid)(nodes)) {
-        validation = {
-          [Validator.keys.valid]: false,
-          [Validator.keys.errors]: [{ key: ValidatorErrorKeys.record.oneOrMoreInvalidValues }]
-        }
+      } else if (!R.all(Validation.isValid)(nodes)) {
+        validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])
       }
     } else if (!R.isEmpty(nodes)) {
       validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)

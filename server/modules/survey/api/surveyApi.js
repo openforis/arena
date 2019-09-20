@@ -1,7 +1,7 @@
 const Response = require('../../../utils/response')
 const Request = require('../../../utils/request')
 
-const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 
 const SurveyService = require('../service/surveyService')
 
@@ -18,7 +18,7 @@ module.exports.init = app => {
       const surveyReq = Request.getBody(req)
       const validation = await SurveyService.validateNewSurvey(surveyReq)
 
-      if (Validator.isValidationValid(validation)) {
+      if (Validation.isValid(validation)) {
         const survey = await SurveyService.createSurvey(user, surveyReq)
 
         res.json({ survey })

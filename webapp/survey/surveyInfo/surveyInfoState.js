@@ -1,7 +1,5 @@
-import * as R from 'ramda'
-
 import Survey from '../../../common/survey/survey'
-import Validator from '../../../common/validation/validator'
+import Validation from '../../../common/validation/validation'
 
 /**
  * ======
@@ -11,4 +9,4 @@ import Validator from '../../../common/validation/validator'
 
 export const markDraft = Survey.markDraft
 
-export const assocValidation = Validator.assocValidation
+export const assocValidation = Validation.assocValidation

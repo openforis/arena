@@ -2,7 +2,7 @@ const R = require('ramda')
 const { uuidv4 } = require('./../uuid')
 
 const SurveyUtils = require('../survey/surveyUtils')
-const Validator = require('../validation/validator')
+const Validation = require('../validation/validation')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
 
@@ -48,6 +48,7 @@ module.exports = {
   getAncestorByNodeDefUuid: RecordReader.getAncestorByNodeDefUuid,
 
   getNodeSiblingsAndSelf: RecordReader.getNodeSiblingsAndSelf,
+  getNodeChildren: RecordReader.getNodeChildren,
   getNodeChildrenByDefUuid: RecordReader.getNodeChildrenByDefUuid,
   getNodeChildByDefUuid: RecordReader.getNodeChildByDefUuid,
   visitDescendantsAndSelf: RecordReader.visitDescendantsAndSelf,
@@ -72,5 +73,5 @@ module.exports = {
 
   // ====== VALIDATION
   mergeNodeValidations: RecordUpdater.mergeNodeValidations,
-  getValidation: Validator.getValidation,
+  getValidation: Validation.getValidation,
 }

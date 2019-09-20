@@ -13,7 +13,7 @@ import CategoryImportSummary from './components/categoryImportSummary'
 
 import Category from '../../../../common/survey/category'
 import CategoryLevel from '../../../../common/survey/categoryLevel'
-import Validator from '../../../../common/validation/validator'
+import Validation from '../../../../common/validation/validation'
 import Authorizer from '../../../../common/auth/authorizer'
 
 import * as AppState from '../../../app/appState'
@@ -29,7 +29,7 @@ const CategoryEditView = props => {
     putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory,
   } = props
 
-  const { validation } = category
+  const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
   const i18n = useI18n()
@@ -40,8 +40,8 @@ const CategoryEditView = props => {
         <div className="category-edit__header">
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input value={Category.getName(category)}
-                   validation={Validator.getFieldValidation('name')(validation)}
-                   onChange={value => putCategoryProp(category, 'name', StringUtils.normalizeName(value))}
+                   validation={Validation.getFieldValidation(Category.props.name)(validation)}
+                   onChange={value => putCategoryProp(category, Category.props.name, StringUtils.normalizeName(value))}
                    readOnly={readOnly}/>
 
           </FormItem>

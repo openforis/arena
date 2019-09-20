@@ -1,12 +1,9 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../../../../../../common/objectUtils')
-
 const Survey = require('../../../../../../common/survey/survey')
 
 const RecordValidation = require('../../../../../../common/record/recordValidation')
-const Validator = require('../../../../../../common/validation/validator')
-const ValidatorErrorKeys = require('../../../../../../common/validation/validatorErrorKeys')
+const Validation = require('../../../../../../common/validation/validation')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')
@@ -94,29 +91,27 @@ class RecordsUniquenessValidationJob extends Job {
 
 RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
 
-const _createValidationRecordDuplicate = () => ({
-  [Validator.keys.valid]: false,
-  [Validator.keys.fields]: {
-    [RecordValidation.keys.recordKeys]: {
-      [Validator.keys.valid]: false,
-      [Validator.keys.errors]: [{ key: ValidatorErrorKeys.record.keyDuplicate }]
-    }
-  }
-})
+const _createValidationRecordDuplicate = () => Validation.newInstance(
+  false,
+  {
+    [RecordValidation.keys.recordKeys]: Validation.newInstance(
+      false,
+      {},
+      [{ key: Validation.messageKeys.record.keyDuplicate }]
+    )
+  })
 
 const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
-  const nodeValidation = Validator.getFieldValidation(nodeUuid)(validationRecord)
+  const nodeValidation = Validation.getFieldValidation(nodeUuid)(validationRecord)
 
   //merge new validation with node validation
   const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, validationNode)
 
   //replace node validation in record validation
-  ObjectUtils.setInPath([Validator.keys.fields, nodeUuid], nodeValidationUpdated)(validationRecord)
-
-  return {
-    ...validationRecord,
-    [Validator.keys.valid]: false
-  }
+  return R.pipe(
+    Validation.setValid(false),
+    Validation.setField(nodeUuid, nodeValidationUpdated),
+  )(validationRecord)
 }
 
 module.exports = RecordsUniquenessValidationJob

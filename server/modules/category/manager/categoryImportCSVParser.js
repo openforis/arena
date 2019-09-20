@@ -3,7 +3,7 @@ const R = require('ramda')
 
 const Category = require('../../../../common/survey/category')
 const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
-const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
+const Validation = require('../../../../common/validation/validation')
 const ObjectUtils = require('../../../../common/objectUtils')
 const StringUtils = require('../../../../common/stringUtils')
 const SystemError = require('../../../utils/systemError')
@@ -27,7 +27,7 @@ const createImportSummaryFromStream = async stream => {
   const columnNames = await _readHeaders(stream)
 
   if (R.find(StringUtils.isBlank)(columnNames)) {
-    throw new SystemError(ValidatorErrorKeys.categoryImport.emptyHeaderFound)
+    throw new SystemError(Validation.messageKeys.categoryImport.emptyHeaderFound)
   }
 
   const levelsByName = {}
@@ -176,13 +176,13 @@ const _validateSummary = summary => {
       if (!CategoryImportSummary.hasColumn(CategoryImportSummary.columnTypes.code, CategoryImportSummary.getColumnLevelIndex(column))(summary)) {
         const levelName = CategoryImportSummary.getColumnLevelName(column)
         const columnNameMissing = `${levelName}${columnCodeSuffix}`
-        throw new SystemError(ValidatorErrorKeys.categoryImport.columnMissing, { columnNameMissing })
+        throw new SystemError(Validation.messageKeys.categoryImport.columnMissing, { columnNameMissing })
       }
     }
   })
 
   if (!atLeastOneCodeColumn) {
-    throw new SystemError(ValidatorErrorKeys.categoryImport.codeColumnMissing)
+    throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
 }
 

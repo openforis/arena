@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const Node = require('../node')
-const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 
 const keys = require('./recordKeys')
 const NodesIndex = require('./recordNodesIndex')
@@ -43,9 +43,9 @@ const assocNodes = nodes => record => {
 const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
 const mergeNodeValidations = nodeValidations => record => R.pipe(
-  Validator.getValidation,
-  Validator.mergeValidation(nodeValidations),
-  validationMerged => Validator.assocValidation(validationMerged)(record)
+  Validation.getValidation,
+  Validation.mergeValidation(nodeValidations),
+  validationMerged => Validation.assocValidation(validationMerged)(record)
 )(record)
 
 // ====== DELETE
@@ -64,9 +64,9 @@ const deleteNode = node => record => {
 
   // 2. update validation
   recordUpdated = R.pipe(
-    Validator.getValidation,
-    Validator.dissocFieldValidation(nodeUuid),
-    newValidation => Validator.assocValidation(newValidation)(recordUpdated)
+    Validation.getValidation,
+    Validation.dissocFieldValidation(nodeUuid),
+    newValidation => Validation.assocValidation(newValidation)(recordUpdated)
   )(recordUpdated)
 
   // 3. remove node from index

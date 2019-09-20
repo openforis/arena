@@ -14,6 +14,7 @@ module.exports = {
     itemsInvalid: 'validationErrors.categoryEdit.itemsInvalid',
     itemsEmpty: 'validationErrors.categoryEdit.itemsEmpty',
     levelDuplicate: 'validationErrors.categoryEdit.levelDuplicate',
+    levelsInvalid: 'validationErrors.categoryEdit.levelsInvalid',
   },
 
   categoryImport: {

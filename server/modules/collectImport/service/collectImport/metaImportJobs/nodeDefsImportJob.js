@@ -327,7 +327,7 @@ class NodeDefsImportJob extends Job {
     let finalName = collectNodeDefName
 
     if (R.includes(finalName, this.nodeDefNames)
-      || R.includes(finalName, Validator.keywords)) {
+      || Validator.isKeyword(finalName)) {
       // name is in use or is a keyword
 
       // try to add parent node def name as prefix

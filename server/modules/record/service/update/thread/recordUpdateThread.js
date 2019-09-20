@@ -10,7 +10,7 @@ const RecordManager = require('../../../manager/recordManager')
 
 const Survey = require('../../../../../../common/survey/survey')
 const Record = require('../../../../../../common/record/record')
-const Validator = require('../../../../../../common/validation/validator')
+const Validation = require('../../../../../../common/validation/validation')
 const Queue = require('../../../../../../common/queue')
 
 const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
@@ -87,7 +87,7 @@ class RecordUpdateThread extends Thread {
       type: WebSocketEvents.nodeValidationsUpdate,
       content: {
         recordUuid: Record.getUuid(this.record),
-        recordValid: Validator.isValid(recordUpdated),
+        recordValid: Validation.isObjValid(recordUpdated),
         validations
       }
     })

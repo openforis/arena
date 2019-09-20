@@ -2,7 +2,7 @@ import React from 'react'
 
 import useI18n from '../../../../commonComponents/useI18n'
 
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import { FormItem } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
@@ -24,7 +24,7 @@ const AdvancedProps = props => {
             <Checkbox
               checked={NodeDef.isReadOnly(nodeDef)}
               disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
-              validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
+              validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
               onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}
             />
           </FormItem>

@@ -11,7 +11,7 @@ const keys = {
   published: 'published'
 }
 
-const taxonomyPropKeys = {
+const keysProps = {
   name: 'name',
   vernacularLanguageCodes: 'vernacularLanguageCodes',
 }
@@ -23,14 +23,14 @@ const newTaxonomy = (props = {}) => ({
 })
 
 module.exports = {
-  taxonomyPropKeys,
+  keysProps,
 
   //CREATE
   newTaxonomy,
 
   //READ
   getUuid,
-  getName: getProp(taxonomyPropKeys.name, ''),
-  getVernacularLanguageCodes: getProp(taxonomyPropKeys.vernacularLanguageCodes, []),
+  getName: getProp(keysProps.name, ''),
+  getVernacularLanguageCodes: getProp(keysProps.vernacularLanguageCodes, []),
   isPublished: R.propOr(false, keys.published)
 }

@@ -3,8 +3,6 @@ const fastcsv = require('fast-csv')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const Record = require('../../../../common/record/record')
-const Validator = require('../../../../common/validation/validator')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DataTable = require('../schemaRdb/dataTable')

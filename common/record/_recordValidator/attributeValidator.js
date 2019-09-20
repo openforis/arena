@@ -8,7 +8,7 @@ const Record = require('../record')
 const Node = require('../node')
 const RecordExprParser = require('../recordExprParser')
 const Validator = require('../../validation/validator')
-const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
+const Validation = require('../../validation/validation')
 const StringUtils = require('../../stringUtils')
 
 const AttributeTypeValidator = require('./attributeTypeValidator')
@@ -20,7 +20,7 @@ const _validateRequired = (survey, nodeDef) => (propName, node) =>
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
   ) &&
   Node.isValueBlank(node)
-    ? { key: ValidatorErrorKeys.record.valueRequired }
+    ? { key: Validation.messageKeys.record.valueRequired }
     : null
 
 /**
@@ -42,7 +42,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
       const messages = _getCustomValidationMessages(survey, expression)
 
       errorMessage = {
-        key: Validator.keys.customErrorMessageKey,
+        key: Validation.keys.customErrorMessageKey,
         messages
       }
       break
@@ -63,7 +63,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef) => {
       ]
     }, false)
   } else {
-    return Validator.newValidationValid()
+    return Validation.newInstance()
   }
 }
 

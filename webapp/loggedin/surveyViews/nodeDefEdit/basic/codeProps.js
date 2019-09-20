@@ -11,7 +11,7 @@ import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Category from '../../../../../common/survey/category'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as NodeDefEditState from '../nodeDefEditState'
@@ -66,7 +66,7 @@ const CodeProps = (props) => {
                     items={categories}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Category.getName}
-                    validation={Validator.getFieldValidation(propKeys.categoryUuid)(validation)}
+                    validation={Validation.getFieldValidation(propKeys.categoryUuid)(validation)}
                     selection={category}
                     onChange={putCategoryProp}/>
           <button className="btn btn-s"
