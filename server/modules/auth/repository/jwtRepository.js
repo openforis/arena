@@ -13,9 +13,10 @@ const findBlacklistedToken = async (tokenJti, client = db) =>
   `, [tokenJti])
 
 const deleteExpiredJwtTokens = async (seconds, client = db) =>
-  await client.query(`
+  await client.any(`
     DELETE FROM jwt_token_blacklist
     WHERE expiration < $1
+    RETURNING *
   `, [seconds])
 
 module.exports = {
