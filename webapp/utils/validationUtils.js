@@ -6,7 +6,7 @@ import Validation from '../../common/validation/validation'
 
 const getErrorText = i18n => error =>
   error.key === Validation.keys.customErrorMessageKey
-    ? error.messages[i18n.lang]
+    ? R.propOr(R.pipe(R.values, R.head)(error.messages), i18n.lang)(error.messages) //default to first message
     : i18n.t(error.key, error.params)
 
 const getValidationErrorMessages = i18n => R.pipe(
