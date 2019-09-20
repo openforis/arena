@@ -14,7 +14,7 @@ const ExpressionProp = (props) => {
 
   const {
     nodeDefUuidContext, nodeDefUuidCurrent, validation,
-    expression, applyIf, showLabels, severity, readOnly,
+    expression, applyIf, severity, showLabels, readOnly,
     isContextParent, canBeConstant, isBoolean,
     onUpdate, onDelete,
   } = props
@@ -123,8 +123,9 @@ ExpressionProp.defaultProps = {
   validation: null,
 
   expression: '',
-  applyIf: true,
-  showLabels: false,
+  applyIf: true, //show apply if expression editor
+  severity: false, //show severity (error/warning) button group
+  showLabels: false, //show error message labels editor
   readOnly: false,
 
   isContextParent: false,
