@@ -21,9 +21,9 @@ module.exports.init = app => {
     try {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const categoryReq = Request.getBody(req)
 
-      const category = await CategoryService.insertCategory(user, surveyId, body)
+      const category = await CategoryService.insertCategory(user, surveyId, categoryReq)
       res.json({ category })
     } catch (err) {
       next(err)
@@ -59,9 +59,9 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const level = Request.getBody(req)
 
-      await CategoryService.insertLevel(user, surveyId, body)
+      await CategoryService.insertLevel(user, surveyId, level)
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
@@ -73,9 +73,9 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const itemReq = Request.getBody(req)
 
-      const item = await CategoryService.insertItem(user, surveyId, body)
+      const item = await CategoryService.insertItem(user, surveyId, itemReq)
 
       await sendValidatedCategory(surveyId, categoryUuid, res, { item })
     } catch (err) {
@@ -124,9 +124,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
@@ -138,9 +137,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid, levelUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, levelUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateLevelProp(user, surveyId, levelUuid, key, value)
 
@@ -152,9 +150,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/categories/:categoryUuid/items/:itemUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid, itemUuid } = Request.getParams(req)
+      const { surveyId, categoryUuid, itemUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
 
       await CategoryService.updateItemProp(user, surveyId, itemUuid, key, value)
 
