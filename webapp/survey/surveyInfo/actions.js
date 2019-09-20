@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import Survey from '../../../common/survey/survey'
-import Validator from '../../../common/validation/validator'
+import Validation from '../../../common/validation/validation'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
@@ -18,12 +18,12 @@ export const updateSurveyInfoProps = props => async (dispatch, getState) => {
   const { data } = await axios.put(`/api/survey/${surveyId}/info`, props)
 
   const surveyInfo = Survey.getSurveyInfo(data)
-  if (Validator.isValid(surveyInfo)) {
+  if (Validation.isObjValid(surveyInfo)) {
     dispatch(showNotificationMessage('common.saved'))
     dispatch({ type: surveyInfoUpdate, surveyInfo })
   } else {
     dispatch(showNotificationMessage('common.formContainsErrors', null, AppState.notificationSeverity.error))
-    dispatch({ type: surveyInfoValidationUpdate, validation: Validator.getValidation(surveyInfo) })
+    dispatch({ type: surveyInfoValidationUpdate, validation: Validation.getValidation(surveyInfo) })
   }
 
   dispatch(hideAppLoader())

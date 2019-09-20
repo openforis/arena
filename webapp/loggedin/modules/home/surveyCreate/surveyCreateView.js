@@ -11,7 +11,7 @@ import UploadButton from '../../../../commonComponents/form/uploadButton'
 import useI18n from '../../../../commonComponents/useI18n'
 import { useOnUpdate } from '../../../../commonComponents/hooks'
 
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 import StringUtils from '../../../../../common/stringUtils'
 
 import * as SurveyState from '../../../../survey/surveyState'
@@ -48,21 +48,21 @@ const SurveyCreateView = (props) => {
         <Input
           placeholder={i18n.t('common.name')}
           value={name}
-          validation={Validator.getFieldValidation('name')(validation)}
+          validation={Validation.getFieldValidation('name')(validation)}
           onChange={value => updateNewSurveyProp('name', StringUtils.normalizeName(value))}/>
       </div>
       <div>
         <Input
           placeholder={i18n.t('common.label')}
           value={label}
-          validation={Validator.getFieldValidation('label')(validation)}
+          validation={Validation.getFieldValidation('label')(validation)}
           onChange={value => updateNewSurveyProp('label', value)}/>
       </div>
       <div>
         <LanguageDropdown
           selection={lang}
           onChange={e => updateNewSurveyProp('lang', e)}
-          validation={Validator.getFieldValidation('lang')(validation)}/>
+          validation={Validation.getFieldValidation('lang')(validation)}/>
       </div>
       <button className="btn"
               onClick={() => createSurvey({ name, label, lang })}>

@@ -2,16 +2,15 @@ import React from 'react'
 import * as R from 'ramda'
 import Markdown from 'react-remarkable'
 
-import Validator from '../../common/validation/validator'
-import ValidatorErrorKeys from '../../common/validation/validatorErrorKeys'
+import Validation from '../../common/validation/validation'
 
 const getErrorText = i18n => error =>
-  error.key === Validator.keys.customErrorMessageKey
-    ? error.messages[i18n.lang]
+  error.key === Validation.keys.customErrorMessageKey
+    ? R.propOr(R.pipe(R.values, R.head)(error.messages), i18n.lang)(error.messages) //default to first message
     : i18n.t(error.key, error.params)
 
 const getValidationErrorMessages = i18n => R.pipe(
-  Validator.getErrors,
+  Validation.getErrors,
   R.map(getErrorText(i18n)),
 )
 
@@ -20,7 +19,7 @@ const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
   R.ifElse(
     R.isEmpty,
     () => getErrorText(i18n)({
-      key: ValidatorErrorKeys.invalidField, //default error message
+      key: Validation.messageKeys.invalidField, //default error message
       params: { field }
     }),
     R.join(', ')
@@ -29,7 +28,7 @@ const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
 
 export const getValidationFieldMessages = (i18n, showKeys = true) => validation => R.pipe(
   // extract invalid fields error messages
-  Validator.getInvalidFieldValidations,
+  Validation.getFieldValidations,
   Object.entries,
   R.map(([field, fieldValidation]) => `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`),
   // prepend validation error messages

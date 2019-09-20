@@ -12,8 +12,8 @@ import useI18n from '../../../../commonComponents/useI18n'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
-import { normalizeName } from '../../../../../common/stringUtils'
-import { getFieldValidation } from '../../../../../common/validation/validator'
+import StringUtils from '../../../../../common/stringUtils'
+import Validation from '../../../../../common/validation/validation'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'
@@ -37,7 +37,7 @@ const TaxonomyEdit = props => {
     }
   }, [Taxonomy.getUuid(taxonomy)])
 
-  const { validation } = taxonomy
+  const validation = Validation.getValidation(taxonomy)
 
   const i18n = useI18n()
 
@@ -51,8 +51,8 @@ const TaxonomyEdit = props => {
         <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
           <div>
             <Input value={Taxonomy.getName(taxonomy)}
-                   validation={getFieldValidation('name')(validation)}
-                   onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
+                   validation={Validation.getFieldValidation('name')(validation)}
+                   onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
                    readOnly={readOnly}/>
           </div>
         </FormItem>

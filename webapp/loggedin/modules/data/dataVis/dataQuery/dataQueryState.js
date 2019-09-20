@@ -3,7 +3,7 @@ import * as DataVisState from '../dataVisState'
 
 import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
-import Validator from '../../../../../../common/validation/validator'
+import Validation from '../../../../../../common/validation/validation'
 
 export const defaults = {
   offset: 0,
@@ -137,7 +137,7 @@ export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) =>
     R.map(row =>
       R.ifElse(
         R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
-        R.assocPath([rowKeys.record, Validator.keys.validation, Validator.keys.valid], recordValid),
+        R.assocPath([rowKeys.record, Validation.keys.validation, Validation.keys.valid], recordValid),
         R.identity
       )(row)
     ),

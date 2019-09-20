@@ -8,7 +8,7 @@ const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepos
 
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
-const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
@@ -18,12 +18,14 @@ const recordSelectFields = `uuid, owner_uuid, step, ${DbUtils.selectDate('date_c
 const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
   return R.pipe(
-    R.dissoc(Validator.keys.validation),
+    R.dissoc(Validation.keys.validation),
     camelize,
     R.assoc('surveyId', surveyId),
     R.assoc(
-      Validator.keys.validation,
-      includeValidationFields ? validation : { [Validator.keys.valid]: Validator.isValidationValid(validation) },
+      Validation.keys.validation,
+      includeValidationFields
+        ? validation
+        : Validation.newInstance(Validation.isValid(validation)),
     ),
   )(record)
 }

@@ -4,7 +4,7 @@ const Job = require('../../../../../job/job')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
-const Validator = require('../../../../../../common/validation/validator')
+const Validation = require('../../../../../../common/validation/validation')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 
@@ -19,15 +19,15 @@ class NodeDefsValidationJob extends Job {
 
     R.pipe(
       Survey.getNodeDefsValidation,
-      Validator.getInvalidFieldValidations,
+      Validation.getFieldValidations,
       R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        this.errors[NodeDef.getName(nodeDef)] = Validator.getInvalidFieldValidations(nodeDefValidation)
+        this.errors[NodeDef.getName(nodeDef)] = Validation.getFieldValidations(nodeDefValidation)
       })
     )(survey)
 
     if (!R.isEmpty(this.errors)) {
-      this.setStatusFailed()
+      await this.setStatusFailed()
     }
   }
 }

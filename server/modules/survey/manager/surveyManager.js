@@ -11,7 +11,7 @@ const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
 const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 const ObjectUtils = require('../../../../common/objectUtils')
-const Validator = require('../../../../common/validation/validator')
+const Validation = require('../../../../common/validation/validation')
 
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
@@ -138,7 +138,7 @@ const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
 const updateSurveyProps = async (user, surveyId, props, client = db) =>
   await client.tx(async t => {
     const validation = await validateSurveyInfo({ id: surveyId, props })
-    if (Validator.isValidationValid(validation)) {
+    if (Validation.isValid(validation)) {
 
       const surveyInfoPrev = await fetchSurveyById(surveyId, true, false, t)
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)

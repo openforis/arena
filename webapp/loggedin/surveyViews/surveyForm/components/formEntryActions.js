@@ -6,7 +6,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 
 import Record from '../../../../../common/record/record'
 import RecordStep from '../../../../../common/record/recordStep'
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 
 import ErrorBadge from '../../../../commonComponents/errorBadge'
 
@@ -120,7 +120,7 @@ const mapStateToProps = (state) => {
     step: RecordStep.getStep(stepId),
     stepNext: RecordStep.getNextStep(stepId),
     stepPrev: RecordStep.getPreviousStep(stepId),
-    valid: Validator.isValid(record),
+    valid: Validation.isObjValid(record),
   }
 }
 

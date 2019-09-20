@@ -13,7 +13,7 @@ import Survey from '../../../../../common/survey/survey'
 import Category from '../../../../../common/survey/category'
 import CategoryLevel from '../../../../../common/survey/categoryLevel'
 import CategoryItem from '../../../../../common/survey/categoryItem'
-import Validator from '../../../../../common/validation/validator'
+import Validation from '../../../../../common/validation/validation'
 
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
@@ -75,7 +75,7 @@ const LevelEdit = props => {
 
     <FormItem label={i18n.t('common.name')}>
       <Input value={CategoryLevel.getName(level)}
-             validation={Validator.getFieldValidation('name')(validation)}
+             validation={Validation.getFieldValidation('name')(validation)}
              onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
              readOnly={readOnly}/>
     </FormItem>

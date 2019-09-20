@@ -7,7 +7,7 @@ const NodeDef = require('../../common/survey/nodeDef')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
-const Validator = require('../../common/validation/validator')
+const Validation = require('../../common/validation/validation')
 
 const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
 const RecordManager = require('../../server/modules/record/manager/recordManager')
@@ -84,9 +84,9 @@ const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpe
 
   record = await RecordManager.persistNode(getContextUser(), survey, record, Node.assocValue(value)(node))
 
-  const nodeValidation = Validator.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
+  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
 
-  expect(Validator.isValidationValid(nodeValidation)).to.equal(validationExpected)
+  expect(Validation.isValid(nodeValidation)).to.equal(validationExpected)
 }
 
 const deleteNodeAndExpectMinCountToBe = async (parentNodePath, childNodeName, childNodePosition, expectedValidation) => {
@@ -97,7 +97,7 @@ const deleteNodeAndExpectMinCountToBe = async (parentNodePath, childNodeName, ch
 
   const minCountValidation = RecordUtils.getValidationMinCount(parentNode, childDef)(record)
 
-  expect(Validator.isValidationValid(minCountValidation)).to.equal(expectedValidation)
+  expect(Validation.isValid(minCountValidation)).to.equal(expectedValidation)
 }
 
 const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = true, expectedValidation = true) => {
@@ -112,7 +112,7 @@ const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = tr
     ? RecordUtils.getValidationMinCount(parentNode, childDef)(record)
     : RecordUtils.getValidationMaxCount(parentNode, childDef)(record)
 
-  expect(Validator.isValidationValid(countValidation)).to.equal(expectedValidation)
+  expect(Validation.isValid(countValidation)).to.equal(expectedValidation)
 }
 
 describe('Record Validation Test', async () => {

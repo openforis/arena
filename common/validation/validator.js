@@ -1,47 +1,7 @@
 const R = require('ramda')
 
-const ValidatorErrorKeys = require('./validatorErrorKeys')
-
-const keywords = [
-  'asc',
-  'date_created',
-  'date_modified',
-  'desc',
-  'file',
-  'id',
-  'node_def_uuid',
-  'owner_uuid',
-  'parent_id',
-  'parent_uuid',
-  'props',
-  'props_draft',
-  'props_advanced',
-  'record_uuid',
-  'step',
-  'uuid',
-  'value',
-]
-
-const keys = {
-  fields: 'fields',
-  valid: 'valid',
-  errors: 'errors',
-  validation: 'validation',
-  customErrorMessageKey: 'custom',
-}
-
-const newValidationValid = () => ({
-  [keys.valid]: true,
-  [keys.fields]: {},
-})
-
-/**
- * Internal names must contain only lowercase letters, numbers and underscores,
- * starting with a letter
- */
-const validNameRegex = /^[a-z][a-z0-9_]*$/
-
-const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
+const Validation = require('./validation')
+const ValidatorFunctions = require('./_validator/validatorFunctions.js')
 
 const validateProp = async (obj, prop, validations = []) => {
   const errors = R.reject(
@@ -50,202 +10,37 @@ const validateProp = async (obj, prop, validations = []) => {
       validations.map(validationFn => validationFn(prop, obj))
     )
   )
-  return {
-    valid: R.isEmpty(errors),
-    errors,
-  }
+  return Validation.newInstance(R.isEmpty(errors), {}, errors)
 }
 
-const validate = async (obj, propsValidations, performCleanup = true) => {
-  const validation = newValidationValid()
+const validate = async (obj, propsValidations, removeValidFields = true) => {
+  const validation = Validation.newInstance()
 
-  for (const prop of Object.keys(propsValidations)) {
-    const validationProp = await validateProp(obj, prop, propsValidations[prop])
-    const validationPropKey = R.pipe(R.split('.'), R.last)(prop)
-    validation[keys.fields][validationPropKey] = validationProp
+  for (const [prop, propValidations] of Object.entries(propsValidations)) {
+    const validationProp = await validateProp(obj, prop, propValidations)
+    const validationPropValid = Validation.isValid(validationProp)
 
-    if (!isValidationValid(validationProp)) {
-      validation[keys.valid] = false
+    if (!validationPropValid || !removeValidFields) {
+      const validationPropKey = R.pipe(R.split('.'), R.last)(prop)
+      Validation.setField(validationPropKey, validationProp)(validation)
+    }
+
+    if (!validationPropValid) {
+      Validation.setValid(false)(validation)
     }
   }
 
-  return performCleanup
-    ? cleanup(validation)
-    : validation
+  return validation
 }
-
-const validateRequired = errorKey => (propName, obj) => {
-  const value = R.pipe(
-    getProp(propName),
-    R.defaultTo(''),
-  )(obj)
-
-  return R.isEmpty(value)
-    ? { key: errorKey }
-    : null
-}
-
-const validateItemPropUniqueness = errorKey => items =>
-  (propName, item) => {
-
-    const hasDuplicates = R.any(
-      i => getProp(propName)(i) === getProp(propName)(item) &&
-        (
-          R.prop('id')(i) !== R.prop('id')(item) ||
-          R.prop('uuid')(i) !== R.prop('uuid')(item)
-        )
-      , items)
-
-    return hasDuplicates
-      ? { key: errorKey }
-      : null
-  }
-
-const validateNotKeyword = errorKey => (propName, item) => {
-  const value = getProp(propName)(item)
-  return R.includes(value, keywords)
-    ? { key: errorKey, params: { value } }
-    : null
-}
-
-const validateName = errorKey => (propName, item) => {
-  const prop = getProp(propName)(item)
-  return !prop || validNameRegex.test(prop)
-    ? null
-    : { key: errorKey }
-}
-
-const validateNumber = (propName, item) => {
-  const value = getProp(propName)(item)
-  return value && isNaN(value) ? { key: ValidatorErrorKeys.invalidNumber } : null
-}
-
-const validatePositiveNumber = errorKey => (propName, item) => {
-  const invalidNumberError = validateNumber(propName, item)
-  if (invalidNumberError) {
-    return invalidNumberError
-  } else {
-    const value = getProp(propName)(item)
-    return !value || value > 0 ? null : { key: errorKey }
-  }
-}
-
-//==== getters
-const getValidation = R.propOr(newValidationValid(), keys.validation)
-
-//TODO rename to isValid
-const isValidationValid = R.propOr(true, keys.valid)
-
-//TODO rename to isObjValid
-const isValid = R.pipe(getValidation, isValidationValid)
-
-const getFieldValidations = R.propOr({}, keys.fields)
-
-const getFieldValidation = field => R.pathOr(newValidationValid(), [keys.fields, field])
-
-const getInvalidFieldValidations = R.pipe(
-  getFieldValidations,
-  R.reject(isValidationValid)
-)
-
-const getErrors = R.propOr([], keys.errors)
-
-const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
-
-//==== update
-/**
- * Removes valid fields validations and updates 'valid' attribute
- */
-const cleanup = validation => R.pipe(
-  getFieldValidations,
-  // cleanup field validations
-  R.map(cleanup),
-  R.reject(isValidationValid),
-  R.ifElse(
-    R.isEmpty,
-    () => newValidationValid(),
-    invalidFieldValidations => ({
-      [keys.fields]: invalidFieldValidations,
-      [keys.valid]: false
-    }),
-  ),
-  // cleanup errors
-  newValidation => {
-    const errors = getErrors(validation)
-    return R.isEmpty(errors)
-      ? newValidation
-      : {
-        ...newValidation,
-        [keys.errors]: errors,
-        [keys.valid]: false
-      }
-  }
-)(validation)
-
-const assocValidation = v => R.assoc(keys.validation, v)
-
-const assocFieldValidation = (field, fieldValidation) => R.pipe(
-  R.assocPath([keys.fields, field], fieldValidation),
-  cleanup
-)
-
-const dissocFieldValidation = field => R.pipe(
-  R.dissocPath([keys.fields, field]),
-  cleanup
-)
-
-const mergeValidation = validationNew => validationOld => R.pipe(
-  validation => ({
-    [keys.fields]: R.mergeDeepRight(
-      getFieldValidations(validation),
-      getFieldValidations(validationNew)
-    )
-  }),
-  cleanup,
-)(validationOld)
-
-const recalculateValidity = validation =>
-  R.pipe(
-    getFieldValidations,
-    // update validity in each field
-    R.map(recalculateValidity),
-    newFields => {
-      const errors = getErrors(validation)
-      return R.pipe(
-        R.assoc(keys.valid, R.all(isValidationValid, R.values(newFields)) && R.isEmpty(errors)),
-        R.assoc(keys.fields, newFields)
-      )(validation)
-    }
-  )(validation)
 
 module.exports = {
-  keys,
-  keywords,
-
-  newValidationValid,
-
   validate,
-  validateRequired,
-  validateItemPropUniqueness,
-  validateNotKeyword,
-  validateName,
-  validatePositiveNumber,
 
-  // READ
-  getValidation,
-  isValidationValid,
-  isValid,
-  getFieldValidation,
-  getFieldValidations,
-  getInvalidFieldValidations,
-  getErrors,
-  hasErrors,
-
-  // UPDATE
-  cleanup,
-  assocValidation,
-  assocFieldValidation,
-  dissocFieldValidation,
-  mergeValidation,
-  recalculateValidity
+  // validator functions
+  validateRequired: ValidatorFunctions.validateRequired,
+  validateItemPropUniqueness: ValidatorFunctions.validateItemPropUniqueness,
+  validateNotKeyword: ValidatorFunctions.validateNotKeyword,
+  validateName: ValidatorFunctions.validateName,
+  validatePositiveNumber: ValidatorFunctions.validatePositiveNumber,
+  isKeyword: ValidatorFunctions.isKeyword,
 }

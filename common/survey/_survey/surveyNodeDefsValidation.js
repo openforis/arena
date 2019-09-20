@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const NodeDef = require('../nodeDef')
-const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 
 const keys = {
   nodeDefsValidation: 'nodeDefsValidation'
@@ -13,7 +13,7 @@ const assocNodeDefsValidation = R.assoc(keys.nodeDefsValidation)
 
 const getNodeDefValidation = nodeDef => R.pipe(
   getNodeDefsValidation,
-  Validator.getFieldValidation(NodeDef.getUuid(nodeDef))
+  Validation.getFieldValidation(NodeDef.getUuid(nodeDef))
 )
 
 module.exports = {
