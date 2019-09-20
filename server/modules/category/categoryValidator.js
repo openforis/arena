@@ -5,7 +5,6 @@ const CategoryLevel = require('../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../common/survey/categoryItem')
 const Validator = require('../../../common/validation/validator')
 const Validation = require('../../../common/validation/validation')
-const ObjectUtils = require('../../../common/objectUtils')
 
 const keys = {
   children: 'children',
@@ -16,7 +15,7 @@ const keys = {
 // ====== LEVELS
 
 const levelValidators = (levels, itemsByParentUuid) => ({
-  [`${ObjectUtils.keys.props}.${CategoryLevel.props.name}`]: [
+  [`${CategoryLevel.keys.props}.${CategoryLevel.props.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels)
@@ -57,7 +56,7 @@ const validateItemCodeUniqueness = itemsByCode =>
   }
 
 const itemValidators = (isLeaf, itemsByParentUuid, siblingsByCode) => ({
-  [`${ObjectUtils.keys.props}.${CategoryItem.props.code}`]: [
+  [`${CategoryItem.keys.props}.${CategoryItem.props.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsByCode)
@@ -148,7 +147,7 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
 // ====== CATEGORY
 
 const categoryValidators = (categories) => ({
-  [`${ObjectUtils.keys.props}.${Category.props.name}`]: [
+  [`${Category.keys.props}.${Category.props.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(categories)
