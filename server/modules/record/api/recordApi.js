@@ -24,7 +24,7 @@ module.exports.init = app => {
       const user = Request.getUser(req)
       const surveyId = Request.getRestParam(req, 'surveyId')
 
-      const record = req.body
+      const record = Request.getBody(req)
 
       if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
         throw new Error('Error record create. User is different')
@@ -41,7 +41,7 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const node = JSON.parse(req.body.node)
+      const node = JSON.parse(Request.getBody(req).node)
       const file = Request.getFile(req)
 
       const surveyId = Request.getRestParam(req, 'surveyId')
@@ -111,7 +111,7 @@ module.exports.init = app => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const recordUuid = Request.getRestParam(req, 'recordUuid')
-      const step = req.body.step
+      const { step } = Request.getBody(req)
 
       await RecordService.updateRecordStep(surveyId, recordUuid, step)
 

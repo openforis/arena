@@ -54,7 +54,7 @@ module.exports.init = app => {
 
   app.get('/auth/user', async (req, res, next) => {
     try {
-      await sendUser(res, req.user)
+      await sendUser(res, Request.getUser(req))
     } catch (err) {
       next(err)
     }

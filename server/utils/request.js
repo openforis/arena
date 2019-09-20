@@ -51,6 +51,8 @@ const getRequiredParam = (req, param) => {
 
 const getFile = R.pathOr(null, ['files', 'file'])
 
+const getBody = R.propOr(null, 'body')
+
 // User
 
 const getUser = R.prop('user')
@@ -68,6 +70,7 @@ module.exports = {
   getJsonParam,
   getRequiredParam,
   getFile,
+  getBody,
 
   // User
   getUserUuid,
