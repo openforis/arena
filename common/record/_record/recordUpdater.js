@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const Node = require('../node')
-const Validator = require('../../validation/validator')
 const Validation = require('../../validation/validation')
 
 const keys = require('./recordKeys')
