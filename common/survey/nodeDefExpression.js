@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const { uuidv4 } = require('./../uuid')
-const { isBlank } = require('../stringUtils')
+const StringUtils = require('../stringUtils')
 
 const SurveyUtils = require('./surveyUtils')
 
@@ -10,6 +10,12 @@ const keys = {
   expression: 'expression',
   applyIf: 'applyIf',
   messages: 'messages',
+  severity: 'severity'
+}
+
+const severities = {
+  error: 'error',
+  warning: 'warning'
 }
 
 // ====== CREATE
@@ -29,9 +35,11 @@ const getApplyIf = R.prop(keys.applyIf)
 
 const getMessages = R.propOr({}, keys.messages)
 
+const getSeverity = R.propOr(severities.error, keys.severity)
+
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
-const isEmpty = (expression = {}) => isBlank(getExpression(expression)) && isBlank(getApplyIf(expression))
+const isEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
 
 // ====== UPDATE
 
@@ -49,10 +57,12 @@ const assocMessage = message =>
     return assocMessages(messagesNew)(nodeDefExpression)
   }
 
+const assocSeverity = severity => assocProp(keys.severity, severity)
+
 // ====== UTILS
 
 const extractNodeDefNames = (jsExpr = '') => {
-  if (isBlank(jsExpr))
+  if (StringUtils.isBlank(jsExpr))
     return []
 
   const names = []
@@ -79,6 +89,7 @@ const findReferencedNodeDefs = nodeDefExpressions =>
 
 module.exports = {
   keys,
+  severities,
 
   //CREATE
   createExpression,
@@ -93,6 +104,7 @@ module.exports = {
     getMessages,
     R.propOr(defaultValue, lang)
   ),
+  getSeverity,
   isEmpty,
   isPlaceholder,
 
@@ -101,6 +113,7 @@ module.exports = {
   assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
   assocMessage,
   assocMessages,
+  assocSeverity,
 
   //UTILS
   findReferencedNodeDefs

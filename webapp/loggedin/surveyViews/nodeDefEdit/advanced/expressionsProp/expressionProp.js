@@ -8,17 +8,30 @@ import useI18n from '../../../../../commonComponents/useI18n'
 
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
 import * as ValidationUtils from '../../../../../utils/validationUtils'
+import ButtonGroup from '../../../../../commonComponents/form/buttonGroup'
 
 const ExpressionProp = (props) => {
 
   const {
     nodeDefUuidContext, nodeDefUuidCurrent, validation,
-    expression, applyIf, showLabels, readOnly,
+    expression, applyIf, showLabels, severity, readOnly,
     isContextParent, canBeConstant, isBoolean,
     onUpdate, onDelete,
   } = props
 
   const i18n = useI18n()
+
+  const severityItems = [
+    {
+      key: NodeDefExpression.severities.error,
+      label: i18n.t('common.error')
+    },
+    {
+      key: NodeDefExpression.severities.warning,
+      label: i18n.t('common.warning')
+    }
+
+  ]
 
   const errorMessages = ValidationUtils.getValidationFieldMessages(i18n, false)(validation)
 
@@ -73,7 +86,15 @@ const ExpressionProp = (props) => {
             />
           </div>
         }
-
+        {
+          severity &&
+          <ButtonGroup selectedItemKey={NodeDefExpression.getSeverity(expression)}
+                       onChange={severityVal =>
+                         onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))
+                       }
+                       items={severityItems}
+          />
+        }
         {
           showLabels &&
           <LabelsEditor
@@ -84,7 +105,6 @@ const ExpressionProp = (props) => {
             }
           />
         }
-
       </div>
     </Tooltip>
   )
