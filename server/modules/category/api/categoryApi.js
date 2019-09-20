@@ -44,8 +44,9 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/categories/:categoryUuid/import', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid, summary } = Request.getParams(req)
+      const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
+      const summary = Request.getBody(req)
 
       const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
       res.json({ job })
