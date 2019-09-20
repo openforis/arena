@@ -123,13 +123,13 @@ const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
 
 const deleteRecordsPreview = async () => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const nDeletedRecordsBySurvey = await Promise.all(
+  const countDeletedRecordsBySurvey = await Promise.all(
     surveyIds.map(surveyId =>
       RecordManager.deleteRecordsPreview(surveyId)
     )
   )
 
-  return nDeletedRecordsBySurvey.reduce((sum, n) => sum + n, 0)
+  return countDeletedRecordsBySurvey.reduce((sum, n) => sum + n, 0)
 }
 
 module.exports = {
