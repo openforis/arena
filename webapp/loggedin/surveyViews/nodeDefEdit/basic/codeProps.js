@@ -19,8 +19,6 @@ import * as NodeDefEditState from '../nodeDefEditState'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
 
-const { propKeys } = NodeDef
-
 const CodeProps = (props) => {
   const {
     nodeDef, validation,
@@ -50,8 +48,8 @@ const CodeProps = (props) => {
   const disabled = !canUpdateCategory
 
   const putCategoryProp = category => {
-    putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, null) //reset parent code
-    putNodeDefProp(nodeDef, propKeys.categoryUuid, Category.getUuid(category))
+    putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) //reset parent code
+    putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
 
 
@@ -67,7 +65,7 @@ const CodeProps = (props) => {
                     items={categories}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Category.getName}
-                    validation={Validation.getFieldValidation(propKeys.categoryUuid)(validation)}
+                    validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
                     selection={category}
                     onChange={putCategoryProp}/>
           <button className="btn btn-s"
@@ -99,7 +97,7 @@ const CodeProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getName}
-                    onChange={def => putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
+                    onChange={def => putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
         </div>
       </FormItem>
 

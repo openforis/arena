@@ -88,12 +88,18 @@ const ExpressionProp = (props) => {
         }
         {
           severity &&
-          <ButtonGroup selectedItemKey={NodeDefExpression.getSeverity(expression)}
-                       onChange={severityVal =>
-                         onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))
-                       }
-                       items={severityItems}
-          />
+          <div className="expression-item severity">
+            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.severity')}</div>
+
+            <ButtonGroup
+              selectedItemKey={NodeDefExpression.getSeverity(expression)}
+              onChange={severityVal =>
+                onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))
+              }
+              items={severityItems}
+              disabled={NodeDefExpression.isEmpty(expression)}
+            />
+          </div>
         }
         {
           showLabels &&
@@ -103,6 +109,7 @@ const ExpressionProp = (props) => {
             onChange={labelItem =>
               onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
             }
+            readOnly={NodeDefExpression.isEmpty(expression)}
           />
         }
       </div>
