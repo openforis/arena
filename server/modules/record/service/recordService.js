@@ -44,7 +44,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   await RecordManager.deleteRecord(user, surveyId, recordUuid)
   const userUuid = User.getUuid(user)
 
-  //notify the other users that record has been deleted
+  // notify other users viewing or editing the record that it has been deleted
   const recordUsersIds = RecordUsersMap.getUserUuids(recordUuid)
   recordUsersIds.forEach(userUuidRecord => {
     if (userUuidRecord !== userUuid) {
@@ -93,8 +93,7 @@ const dissocUserFromRecordThread = userUuid => {
     if (thread) {
       const userUuids = RecordUsersMap.getUserUuids(recordUuid)
       if (R.isEmpty(userUuids)) {
-        RecordThreads.markZombie(recordUuid)
-        thread.postMessage({ type: recordThreadMessageTypes.threadKill })
+        RecordServiceThreads.killRecordThread(recordUuid)
       }
     }
   }

@@ -51,22 +51,24 @@ const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageH
   return RecordThreads.put(recordUuid, thread)
 }
 
+const killRecordThread = recordUuid => {
+  const thread = RecordThreads.get(recordUuid)
+
+  RecordThreads.markZombie(recordUuid)
+  thread.postMessage({ type: recordThreadMessageTypes.threadKill })
+}
+
 const getOrCreatedRecordThread = (user, surveyId, recordUuid, preview = false, singleMessageHandling = false, initRecord = false) => {
   const thread = RecordThreads.get(recordUuid) ||
     _createRecordThread(user, surveyId, recordUuid, preview, singleMessageHandling, initRecord)
 
   clearTimeout(recordThreadTimeouts[recordUuid])
-  recordThreadTimeouts[recordUuid] = setTimeout(
-    () => {
-      RecordThreads.markZombie(recordUuid)
-      thread.postMessage({ type: recordThreadMessageTypes.threadKill })
-    },
-    2 * 60 * 60 * 1000
-  )
+  recordThreadTimeouts[recordUuid] = setTimeout(() => killRecordThread(recordUuid), 60 * 60 * 1000)
 
   return thread
 }
 
 module.exports = {
-  getOrCreatedRecordThread
+  getOrCreatedRecordThread,
+  killRecordThread,
 }
