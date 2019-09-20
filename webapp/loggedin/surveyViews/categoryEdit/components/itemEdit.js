@@ -63,8 +63,8 @@ const ItemEdit = (props) => {
               <FormItem label={i18n.t('common.code')}>
                 <Input value={CategoryItem.getCode(item)}
                        disabled={disabled}
-                       validation={Validation.getFieldValidation('code')(validation)}
-                       onChange={value => putCategoryItemProp(category, level, item, 'code', normalizeName(value))}
+                       validation={Validation.getFieldValidation(CategoryItem.props.code)(validation)}
+                       onChange={value => putCategoryItemProp(category, level, item, CategoryItem.props.code, normalizeName(value))}
                        readOnly={readOnly}/>
               </FormItem>
 

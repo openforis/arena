@@ -3,25 +3,6 @@ const R = require('ramda')
 const Validation = require('./validation')
 const ValidatorFunctions = require('./_validator/validatorFunctions.js')
 
-// const objectInvalid = {
-//   [keys.valid]: false,
-//   [keys.errors]: [{ key: 'error_key', params }],
-//   [keys.warnings]: [{ key: 'error_key', params }],
-//   [keys.fields]: {
-//      'aaa': {
-//        [keys.valid]: false,
-//        [keys.errors]: [{ key: 'error_key', params }],
-//        [keys.warnings]: [{ key: 'error_key', params }],
-//        [keys.fields]: {
-//          'bbb': {
-//            [keys.valid]: false,
-//            [keys.errors]: [{ key: 'error_key', params }],
-//            [keys.warnings]: [{ key: 'error_key', params }],
-//        }
-//     }
-//   },
-// }
-
 const validateProp = async (obj, prop, validations = []) => {
   const errors = R.reject(
     R.isNil,

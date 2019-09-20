@@ -3,6 +3,25 @@ const R = require('ramda')
 const ValidatorErrorKeys = require('./_validator/validatorErrorKeys')
 const ObjectUtils = require('../objectUtils')
 
+// const objectInvalid = {
+//   [keys.valid]: false,
+//   [keys.errors]: [{ key: 'error_key', params }],
+//   [keys.warnings]: [{ key: 'error_key', params }],
+//   [keys.fields]: {
+//      'aaa': {
+//        [keys.valid]: false,
+//        [keys.errors]: [{ key: 'error_key', params }],
+//        [keys.warnings]: [{ key: 'error_key', params }],
+//        [keys.fields]: {
+//          'bbb': {
+//            [keys.valid]: false,
+//            [keys.errors]: [{ key: 'error_key', params }],
+//            [keys.warnings]: [{ key: 'error_key', params }],
+//        }
+//     }
+//   },
+// }
+
 const keys = {
   fields: 'fields',
   valid: 'valid',
