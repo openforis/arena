@@ -40,11 +40,11 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { node, surveyId } = Request.getParams(req)
-      const parsedNode = JSON.parse(node)
+      const { surveyId } = Request.getParams(req)
+      const node = Request.getJsonParam('node')
       const file = Request.getFile(req)
 
-      await RecordService.persistNode(user, surveyId, parsedNode, file)
+      await RecordService.persistNode(user, surveyId, node, file)
 
       sendOk(res)
     } catch (err) {
