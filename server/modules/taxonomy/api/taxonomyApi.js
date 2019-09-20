@@ -21,9 +21,9 @@ module.exports.init = app => {
     try {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const taxonomyReq = Request.getBody(req)
 
-      const taxonomy = await TaxonomyService.insertTaxonomy(user, surveyId, body)
+      const taxonomy = await TaxonomyService.insertTaxonomy(user, surveyId, taxonomyReq)
 
       res.json({ taxonomy })
     } catch (err) {

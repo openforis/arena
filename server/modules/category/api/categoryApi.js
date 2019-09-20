@@ -21,9 +21,9 @@ module.exports.init = app => {
     try {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const categoryReq = Request.getBody(req)
 
-      const category = await CategoryService.insertCategory(user, surveyId, body)
+      const category = await CategoryService.insertCategory(user, surveyId, categoryReq)
       res.json({ category })
     } catch (err) {
       next(err)
@@ -58,9 +58,9 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const level = Request.getBody(req)
 
-      await CategoryService.insertLevel(user, surveyId, body)
+      await CategoryService.insertLevel(user, surveyId, level)
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
@@ -72,9 +72,9 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const itemReq = Request.getBody(req)
 
-      const item = await CategoryService.insertItem(user, surveyId, body)
+      const item = await CategoryService.insertItem(user, surveyId, itemReq)
 
       await sendValidatedCategory(surveyId, categoryUuid, res, { item })
     } catch (err) {

@@ -39,8 +39,7 @@ module.exports.init = app => {
 
   app.get('/surveyRdb/:surveyId/:tableName/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRequiredParam(req, 'surveyId')
-      const tableName = Request.getRequiredParam(req, 'tableName')
+      const { surveyId, tableName } = Request.getParams(req)
       const cols = Request.getJsonParam(req, 'cols', [])
       const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getJsonParam(req, 'sort', '')

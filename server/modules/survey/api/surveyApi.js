@@ -15,11 +15,11 @@ module.exports.init = app => {
   app.post('/survey', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
-      const validation = await SurveyService.validateNewSurvey(body)
+      const surveyReq = Request.getBody(req)
+      const validation = await SurveyService.validateNewSurvey(surveyReq)
 
       if (Validator.isValidationValid(validation)) {
-        const survey = await SurveyService.createSurvey(user, body)
+        const survey = await SurveyService.createSurvey(user, surveyReq)
 
         res.json({ survey })
       } else {
@@ -61,11 +61,11 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const body = Request.getBody(req)
+      const props = Request.getBody(req)
 
       const { surveyId } = Request.getParams(req)
 
-      const survey = await SurveyService.updateSurveyProps(user, surveyId, body)
+      const survey = await SurveyService.updateSurveyProps(user, surveyId, props)
 
       res.json(survey)
     } catch (err) {
