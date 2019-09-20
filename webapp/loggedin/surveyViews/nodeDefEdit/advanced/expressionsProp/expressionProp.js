@@ -8,17 +8,30 @@ import useI18n from '../../../../../commonComponents/useI18n'
 
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
 import * as ValidationUtils from '../../../../../utils/validationUtils'
+import ButtonGroup from '../../../../../commonComponents/form/buttonGroup'
 
 const ExpressionProp = (props) => {
 
   const {
     nodeDefUuidContext, nodeDefUuidCurrent, validation,
-    expression, applyIf, showLabels, readOnly,
+    expression, applyIf, severity, showLabels, readOnly,
     isContextParent, canBeConstant, isBoolean,
     onUpdate, onDelete,
   } = props
 
   const i18n = useI18n()
+
+  const severityItems = [
+    {
+      key: NodeDefExpression.severities.error,
+      label: i18n.t('common.error')
+    },
+    {
+      key: NodeDefExpression.severities.warning,
+      label: i18n.t('common.warning')
+    }
+
+  ]
 
   const errorMessages = ValidationUtils.getValidationFieldMessages(i18n, false)(validation)
 
@@ -73,7 +86,21 @@ const ExpressionProp = (props) => {
             />
           </div>
         }
+        {
+          severity &&
+          <div className="expression-item severity">
+            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.severity')}</div>
 
+            <ButtonGroup
+              selectedItemKey={NodeDefExpression.getSeverity(expression)}
+              onChange={severityVal =>
+                onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))
+              }
+              items={severityItems}
+              disabled={NodeDefExpression.isEmpty(expression)}
+            />
+          </div>
+        }
         {
           showLabels &&
           <LabelsEditor
@@ -82,9 +109,9 @@ const ExpressionProp = (props) => {
             onChange={labelItem =>
               onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
             }
+            readOnly={NodeDefExpression.isEmpty(expression)}
           />
         }
-
       </div>
     </Tooltip>
   )
@@ -96,8 +123,9 @@ ExpressionProp.defaultProps = {
   validation: null,
 
   expression: '',
-  applyIf: true,
-  showLabels: false,
+  applyIf: true, //show apply if expression editor
+  severity: false, //show severity (error/warning) button group
+  showLabels: false, //show error message labels editor
   readOnly: false,
 
   isContextParent: false,
