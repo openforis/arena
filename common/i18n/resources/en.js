@@ -173,6 +173,7 @@ module.exports = {
 
   recordView: {
     justDeleted: 'This record has just been deleted by another user',
+    editTimeout: 'Record editing session has expired',
   },
 
   dataView: {

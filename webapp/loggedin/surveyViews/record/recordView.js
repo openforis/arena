@@ -27,7 +27,7 @@ import {
   checkOutRecord,
   recordNodesUpdate,
   nodeValidationsUpdate,
-  recordDeleted
+  exitEdit
 } from './actions'
 
 const RecordView = props => {
@@ -41,7 +41,7 @@ const RecordView = props => {
     const {
       recordUuidUrlParam, parentNodeUuidUrlParam, draftDefs,
       checkInRecord,
-      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, history
+      recordNodesUpdate, nodeValidationsUpdate, exitEdit, history
     } = props
 
     // check in record
@@ -52,7 +52,11 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       alert(i18n.t('recordView.justDeleted'))
-      recordDeleted(history)
+      exitEdit(history)
+    })
+    AppWebSocket.on(WebSocketEvents.recordEditTimeout, () => {
+      alert(i18n.t('recordView.editTimeout'))
+      exitEdit(history)
     })
 
     // add beforeunload event listener
@@ -64,6 +68,7 @@ const RecordView = props => {
     AppWebSocket.off(WebSocketEvents.nodesUpdate)
     AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
     AppWebSocket.off(WebSocketEvents.recordDelete)
+    AppWebSocket.off(WebSocketEvents.recordEditTimeout)
 
     const { recordUuidUrlParam, checkOutRecord, resetForm } = props
 
@@ -120,7 +125,7 @@ const enhance = compose(
     mapStateToProps,
     {
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, recordDeleted
+      recordNodesUpdate, nodeValidationsUpdate, exitEdit
     }
   )
 )

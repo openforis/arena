@@ -18,7 +18,6 @@ const RecordManager = require('../manager/recordManager')
 const FileManager = require('../manager/fileManager')
 
 const RecordUsersMap = require('./update/recordUsersMap')
-const RecordThreads = require('./update/recordThreadsMap')
 const RecordServiceThreads = require('./update/recordServiceThreads')
 const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
 
@@ -63,9 +62,6 @@ const checkIn = async (user, surveyId, recordUuid, draft) => {
   const preview = Record.isPreview(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    if (RecordThreads.isZombie(recordUuid)) {
-      RecordThreads.reviveZombie(recordUuid)
-    }
     RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, false)
   }
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
@@ -89,7 +85,7 @@ const dissocUserFromRecordThread = userUuid => {
     RecordUsersMap.dissocUser(recordUuid, userUuid)
 
     // terminate thread if there are no more users editing the record
-    const thread = RecordThreads.get(recordUuid)
+    const thread = RecordServiceThreads.getRecordThread(recordUuid)
     if (thread) {
       const userUuids = RecordUsersMap.getUserUuids(recordUuid)
       if (R.isEmpty(userUuids)) {

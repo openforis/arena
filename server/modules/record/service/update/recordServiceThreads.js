@@ -6,6 +6,7 @@ const RecordUpdateThreadParams = require('./thread/recordUpdateThreadParams')
 const ThreadParams = require('../../../../threads/threadParams')
 
 const WebSocket = require('../../../../utils/webSocket')
+const WebSocketEvents = require('../../../../../common/webSocket/webSocketEvents')
 
 const RecordUsersMap = require('../update/recordUsersMap')
 const RecordThreadsMap = require('../update/recordThreadsMap')
@@ -59,16 +60,28 @@ const killRecordThread = recordUuid => {
 }
 
 const getOrCreatedRecordThread = (user, surveyId, recordUuid, singleMessageHandling = false, initRecord = false) => {
+  if (RecordThreadsMap.isZombie(recordUuid)) {
+    RecordThreadsMap.reviveZombie(recordUuid)
+  }
+
   const thread = RecordThreadsMap.get(recordUuid) ||
     _createRecordThread(user, surveyId, recordUuid, singleMessageHandling, initRecord)
 
   clearTimeout(recordThreadTimeouts[recordUuid])
-  recordThreadTimeouts[recordUuid] = setTimeout(() => killRecordThread(recordUuid), 60 * 60 * 1000)
+  recordThreadTimeouts[recordUuid] = setTimeout(() => {
+    killRecordThread(recordUuid)
+
+    const userUuids = RecordUsersMap.getUserUuids(recordUuid)
+    userUuids.forEach(userUuid =>
+      WebSocket.notifyUser(userUuid, WebSocketEvents.recordEditTimeout, recordUuid)
+    )
+  }, 60 * 60 * 1000)
 
   return thread
 }
 
 module.exports = {
   getOrCreatedRecordThread,
+  getRecordThread: RecordThreadsMap.get,
   killRecordThread,
 }
