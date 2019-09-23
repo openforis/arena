@@ -41,7 +41,7 @@ module.exports.init = app => {
     try {
       const user = Request.getUser(req)
       const { surveyId } = Request.getParams(req)
-      const node = Request.getJsonParam('node')
+      const node = Request.getJsonParam(req, 'node')
       const file = Request.getFile(req)
 
       await RecordService.persistNode(user, surveyId, node, file)
