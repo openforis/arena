@@ -6,7 +6,7 @@ const keys = {
   severity: 'severity',
   messages: 'messages',
 
-  custom: 'custom',
+  customErrorMessageKey: 'custom',
 }
 
 const severities = {
@@ -21,25 +21,18 @@ const newInstance = (key, params = null, severity = null, messages = null) => ({
   ...messages ? { [keys.messages]: messages } : {},
 })
 
-const newInstanceCustom = (severity, messages) => newInstance(
-  keys.custom,
-  null,
-  severity,
-  messages
-)
-
 const getKey = R.prop(keys.key)
 const getParams = R.propOr({}, keys.params)
 const getSeverity = R.propOr(severities.error, keys.severity)
 
 // custom messages
-const hasCustomMessages = result => getKey(result) === keys.custom
 const getMessages = R.propOr({}, keys.messages)
 const getMessage = lang => R.pipe(
   getMessages,
   // default to first message
   messages => R.propOr(R.pipe(R.values, R.head), lang)(messages)
 )
+const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
 
 module.exports = {
   keys,
@@ -47,7 +40,6 @@ module.exports = {
   severities,
 
   newInstance,
-  newInstanceCustom,
 
   getKey,
   getParams,
@@ -55,5 +47,5 @@ module.exports = {
   getMessages,
   getMessage,
   isError: R.pipe(getSeverity, R.equals(severities.error)),
-  hasCustomMessages,
+  hasMessages,
 }

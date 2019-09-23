@@ -6,7 +6,7 @@ import Validation from '../../common/validation/validation'
 import ValidationResult from '../../common/validation/validationResult'
 
 const getErrorText = i18n => error =>
-  ValidationResult.hasCustomMessages(error)
+  ValidationResult.hasMessages(error)
     ? ValidationResult.getMessage(i18n.lang)(error)
     : i18n.t(ValidationResult.getKey(error), ValidationResult.getParams(error))
 
