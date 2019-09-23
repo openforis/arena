@@ -72,9 +72,9 @@ const getOrCreatedRecordThread = (user, surveyId, recordUuid, singleMessageHandl
 
     const userUuids = RecordUsersMap.getUserUuids(recordUuid)
     userUuids.forEach(userUuid =>
-      WebSocket.notifyUser(userUuid, WebSocketEvents.recordEditTimeout, recordUuid)
+      WebSocket.notifyUser(userUuid, WebSocketEvents.recordSessionExpired, recordUuid)
     )
-  }, 60 * 60 * 1000)
+  }, 5 * 1000)
 
   return thread
 }

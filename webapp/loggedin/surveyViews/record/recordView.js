@@ -6,10 +6,6 @@ import * as R from 'ramda'
 
 import { getUrlParam } from '../../../utils/routerUtils'
 
-import useI18n from '../../../commonComponents/useI18n'
-
-import { appModuleUri, appModules } from '../../appModules'
-
 import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'
 
@@ -29,13 +25,12 @@ import {
   checkOutRecord,
   recordNodesUpdate,
   nodeValidationsUpdate,
-  recordDeleted
+  recordDeleted,
+  sessionExpired,
 } from './actions'
 
 const RecordView = props => {
-  const { recordLoaded, preview, canEditRecord, } = props
-
-  const i18n = useI18n()
+  const { recordLoaded, sessionExpired, preview, canEditRecord } = props
 
   const recordLoadedRef = useRef(false)
 
@@ -53,12 +48,10 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
-      alert(i18n.t('recordView.justDeleted'))
       recordDeleted(history)
     })
-    AppWebSocket.on(WebSocketEvents.recordEditTimeout, () => {
-      alert(i18n.t('recordView.editTimeout'))
-      history.push(appModuleUri(appModules.data))
+    AppWebSocket.on(WebSocketEvents.recordSessionExpired, () => {
+      sessionExpired(history)
     })
 
     // add beforeunload event listener
@@ -70,7 +63,7 @@ const RecordView = props => {
     AppWebSocket.off(WebSocketEvents.nodesUpdate)
     AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
     AppWebSocket.off(WebSocketEvents.recordDelete)
-    AppWebSocket.off(WebSocketEvents.recordEditTimeout)
+    AppWebSocket.off(WebSocketEvents.recordSessionExpired)
 
     const { recordUuidUrlParam, checkOutRecord, resetForm } = props
 
@@ -127,7 +120,7 @@ const enhance = compose(
     mapStateToProps,
     {
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, recordDeleted
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, sessionExpired,
     }
   )
 )
