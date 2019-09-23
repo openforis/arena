@@ -75,7 +75,16 @@ class CategoriesImportJob extends Job {
       const collectFirstLevel = hierarchyLevels[0]
 
       // update first level name
-      firstLevel = await CategoryManager.updateLevelProp(this.user, this.surveyId, Category.getUuid(firstLevel), CategoryLevel.props.name, collectFirstLevel.attributes.name, tx)
+      const { level: levelUpdated } = await CategoryManager.updateLevelProp(
+        this.user,
+        this.surveyId,
+        Category.getUuid(category),
+        Category.getUuid(firstLevel),
+        CategoryLevel.props.name,
+        collectFirstLevel.attributes.name,
+        tx
+      )
+      firstLevel = levelUpdated
       category = Category.assocLevel(firstLevel)(category)
 
       // insert other levels
@@ -85,7 +94,7 @@ class CategoriesImportJob extends Job {
 
         const hierarchyLevel = hierarchyLevels[i]
         const levelToCreate = Category.assocLevelName(hierarchyLevel.attributes.name)(Category.newLevel(category))
-        const level = await CategoryManager.insertLevel(this.user, this.surveyId, levelToCreate, tx)
+        const { level } = await CategoryManager.insertLevel(this.user, this.surveyId, levelToCreate, tx)
 
         category = Category.assocLevel(level)(category)
       }
@@ -95,7 +104,7 @@ class CategoriesImportJob extends Job {
 
   async insertItems (category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
     const level = Category.getLevelByIndex(levelIndex)(category)
-    const levelUuid = Category.getUuid(level)
+    const levelUuid = CategoryLevel.getUuid(level)
 
     for (const collectItem of collectItems) {
       if (this.isCanceled())
@@ -104,10 +113,13 @@ class CategoriesImportJob extends Job {
       const labels = CollectSurvey.toLabels('label', defaultLanguage)(collectItem)
 
       const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
-      const item = CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
-        [CategoryItem.props.code]: itemCode,
-        [ObjectUtils.keysProps.labels]: labels
-      })
+      const item = {
+        ...CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
+          [CategoryItem.props.code]: itemCode,
+          [ObjectUtils.keysProps.labels]: labels,
+        }),
+        categoryUuid: Category.getUuid(category) //used to revalidate categories after items import
+      }
       await this.itemBatchPersister.addItem(item, tx)
 
       // insert child items recursively

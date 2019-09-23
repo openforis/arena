@@ -71,6 +71,16 @@ const fetchCategoriesBySurveyId = async (surveyId, draft = false, client = db) =
     def => dbTransformCallback(def, draft, true)
   )
 
+const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, client = db) =>
+  await client.map(`
+    SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.category
+    WHERE uuid = $1
+    `,
+    [categoryUuid],
+    def => dbTransformCallback(def, draft, true)
+  )
+
 const fetchLevelsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.category_level
@@ -166,6 +176,15 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
 const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
 
+const updateCategoryValidation = async (surveyId, categoryUuid, validation, client = db) =>
+  await client.none(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.category 
+      SET validation = $1::jsonb 
+      WHERE uuid = $2
+    `,
+    [validation, categoryUuid]
+  )
+
 const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 
@@ -203,6 +222,7 @@ module.exports = {
 
   //READ
   fetchCategoriesBySurveyId,
+  fetchCategoryByUuid,
   fetchLevelsByCategoryUuid,
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
@@ -212,6 +232,7 @@ module.exports = {
 
   //UPDATE
   updateCategoryProp,
+  updateCategoryValidation,
   updateLevelProp,
   updateItemProp,
 

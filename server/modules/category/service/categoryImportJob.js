@@ -206,11 +206,14 @@ class CategoryImportJob extends Job {
         //override already inserted item props
         [CategoryItem.keys.props]: itemProps
       }
-      : CategoryItem.newItem(
-        CategoryLevel.getUuid(level),
-        this._getParentItemUuid(codesLevel, levelIndex),
-        itemProps
-      )
+      : {
+        ...CategoryItem.newItem(
+          CategoryLevel.getUuid(level),
+          this._getParentItemUuid(codesLevel, levelIndex),
+          itemProps
+        ),
+        categoryUuid: Category.getUuid(this.category)
+      }
   }
 
   async _insertItems () {

@@ -1,5 +1,5 @@
-const {getContextSurveyId, getContextUser} = require('./../../testContext')
-const {expect} = require('chai')
+const { getContextSurveyId, getContextUser } = require('./../../testContext')
+const { expect } = require('chai')
 
 const CategoryManager = require('../../../server/modules/category/manager/categoryManager')
 const Category = require('../../../common/survey/category')
@@ -10,7 +10,7 @@ const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
-  const categoryReq = Category.newCategory({name: 'category_test'})
+  const categoryReq = Category.newCategory({ name: 'category_test' })
   const category = await CategoryManager.insertCategory(user, surveyId, categoryReq)
 
   expect(Category.getUuid(category)).to.exist
@@ -51,7 +51,10 @@ const createCategoryItemTest = async () => {
   const itemCode = '1'
   const itemLabel = 'Value 1'
 
-  const itemReq = CategoryItem.newItem(CategoryLevel.getUuid(level), null, {code: itemCode, labels: {en: itemLabel}})
+  const itemReq = CategoryItem.newItem(CategoryLevel.getUuid(level), null, {
+    code: itemCode,
+    labels: { en: itemLabel }
+  })
 
   const item = await CategoryManager.insertItem(user, surveyId, itemReq)
 
@@ -66,7 +69,7 @@ const updateCategoryTest = async () => {
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
   const newName = 'category_modified'
-  const updatedCategory = await CategoryManager.updateCategoryProp(user, surveyId, Category.getUuid(category), 'name', newName)
+  const { category: updatedCategory } = await CategoryManager.updateCategoryProp(user, surveyId, Category.getUuid(category), 'name', newName)
 
   expect(Category.getName(updatedCategory)).to.be.equal(newName)
 }

@@ -17,10 +17,9 @@ class CategoriesValidationJob extends Job {
     this.total = categories.length
 
     for (const category of categories) {
-      const validatedCategory = await CategoryManager.validateCategory(this.surveyId, categories, category, true)
-      const validation = Validation.getValidation(validatedCategory)
+      const validation = Validation.getValidation(category)
       if (!Validation.isValid(validation)) {
-        this.addError(Validation.getFieldValidations(validation), Category.getName(validatedCategory))
+        this.addError(Validation.getFieldValidations(validation), Category.getName(category))
       }
       this.incrementProcessedItems()
     }

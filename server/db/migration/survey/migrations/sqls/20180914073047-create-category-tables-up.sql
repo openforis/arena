@@ -5,6 +5,7 @@ CREATE TABLE
   uuid        uuid      NOT NULL DEFAULT uuid_generate_v4(),
   props       jsonb              DEFAULT '{}'::jsonb,
   props_draft jsonb              DEFAULT '{}'::jsonb,
+  validation  jsonb     NOT NULL DEFAULT '{}'::jsonb,
 
   PRIMARY KEY (id),
   CONSTRAINT category_uuid_idx UNIQUE (uuid)
