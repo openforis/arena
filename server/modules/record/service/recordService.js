@@ -33,7 +33,7 @@ const createRecord = async (user, surveyId, recordToCreate) => {
   const record = await RecordManager.insertRecord(surveyId, recordToCreate)
 
   // create record thread and initialize record
-  RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), Record.isPreview(recordToCreate), false, true)
+  RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), false, true)
 
   return record
 }
@@ -66,7 +66,7 @@ const checkIn = async (user, surveyId, recordUuid, draft) => {
     if (RecordThreads.isZombie(recordUuid)) {
       RecordThreads.reviveZombie(recordUuid)
     }
-    RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, preview, false)
+    RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, false)
   }
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
@@ -112,12 +112,12 @@ const persistNode = async (user, surveyId, node, file) => {
 
     await FileManager.insertFile(surveyId, fileObj)
   }
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), false, true)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), true)
   thread.postMessage({ type: recordThreadMessageTypes.nodePersist, node, user })
 }
 
 const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, false, true)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, true)
   thread.postMessage({ type: recordThreadMessageTypes.nodeDelete, nodeUuid, user })
 }
 

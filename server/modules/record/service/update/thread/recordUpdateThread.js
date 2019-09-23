@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const Log = require('../../../../../log/log').getLogger('RecordUpdateThread')
+const Log = require('../../../../../log/log').getLogger('RecordUpdateThreadParams')
 
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../../../threads/thread')

@@ -2,19 +2,19 @@ const R = require('ramda')
 const path = require('path')
 
 const ThreadManager = require('../../../../threads/threadManager')
-const RecordUpdateThreadParams = require('../update/thread/recordUpdateThreadParams')
+const RecordUpdateThreadParams = require('./thread/recordUpdateThreadParams')
 const ThreadParams = require('../../../../threads/threadParams')
 
 const WebSocket = require('../../../../utils/webSocket')
 
 const RecordUsersMap = require('../update/recordUsersMap')
-const RecordThreads = require('../update/recordThreadsMap')
-const recordThreadMessageTypes = require('../update/thread/recordThreadMessageTypes')
+const RecordThreadsMap = require('../update/recordThreadsMap')
+const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordThreadTimeouts = {}
 
-const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageHandling = false, initRecord) => {
-  const filePath = path.resolve(__dirname, 'update', 'thread', 'recordUpdateThread.js')
+const _createRecordThread = (user, surveyId, recordUuid, singleMessageHandling = false, initRecord) => {
+  const filePath = path.resolve(__dirname, 'thread', 'recordUpdateThread.js')
 
   const data = {
     [ThreadParams.keys.user]: user,
@@ -26,8 +26,8 @@ const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageH
   const messageHandler = msg => {
 
     if (msg.type === recordThreadMessageTypes.threadKill) {
-      if (RecordThreads.isZombie(recordUuid)) {
-        const thread = RecordThreads.get(recordUuid)
+      if (RecordThreadsMap.isZombie(recordUuid)) {
+        const thread = RecordThreadsMap.get(recordUuid)
         thread.terminate()
 
         delete recordThreadTimeouts[recordUuid]
@@ -43,24 +43,24 @@ const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageH
 
   const exitHandler = () => {
     RecordUsersMap.dissocUsers(recordUuid)
-    RecordThreads.remove(recordUuid)
+    RecordThreadsMap.remove(recordUuid)
   }
 
   const thread = new ThreadManager(filePath, data, messageHandler, exitHandler, singleMessageHandling)
 
-  return RecordThreads.put(recordUuid, thread)
+  return RecordThreadsMap.put(recordUuid, thread)
 }
 
 const killRecordThread = recordUuid => {
-  const thread = RecordThreads.get(recordUuid)
+  const thread = RecordThreadsMap.get(recordUuid)
 
-  RecordThreads.markZombie(recordUuid)
+  RecordThreadsMap.markZombie(recordUuid)
   thread.postMessage({ type: recordThreadMessageTypes.threadKill })
 }
 
-const getOrCreatedRecordThread = (user, surveyId, recordUuid, preview = false, singleMessageHandling = false, initRecord = false) => {
-  const thread = RecordThreads.get(recordUuid) ||
-    _createRecordThread(user, surveyId, recordUuid, preview, singleMessageHandling, initRecord)
+const getOrCreatedRecordThread = (user, surveyId, recordUuid, singleMessageHandling = false, initRecord = false) => {
+  const thread = RecordThreadsMap.get(recordUuid) ||
+    _createRecordThread(user, surveyId, recordUuid, singleMessageHandling, initRecord)
 
   clearTimeout(recordThreadTimeouts[recordUuid])
   recordThreadTimeouts[recordUuid] = setTimeout(() => killRecordThread(recordUuid), 60 * 60 * 1000)
