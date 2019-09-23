@@ -25,14 +25,13 @@ const _createRecordThread = (user, surveyId, recordUuid, singleMessageHandling =
   }
 
   const messageHandler = msg => {
-
     if (msg.type === recordThreadMessageTypes.threadKill) {
       if (RecordThreadsMap.isZombie(recordUuid)) {
+        clearTimeout(recordThreadTimeouts[recordUuid])
+        delete recordThreadTimeouts[recordUuid]
+
         const thread = RecordThreadsMap.get(recordUuid)
         thread.terminate()
-
-        delete recordThreadTimeouts[recordUuid]
-        clearTimeout(recordThreadTimeouts[recordUuid])
       }
     } else {
       const userUuids = RecordUsersMap.getUserUuids(recordUuid)

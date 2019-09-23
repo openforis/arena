@@ -32,7 +32,7 @@ export const recordNodesUpdate = nodes => dispatch =>
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-export const exitEdit = history => dispatch => {
+export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
   history.push(appModuleUri(appModules.data))
 }
@@ -134,7 +134,7 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
 
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
 
-  dispatch(exitEdit(history))
+  dispatch(recordDeleted(history))
 }
 
 /**

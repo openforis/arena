@@ -8,6 +8,8 @@ import { getUrlParam } from '../../../utils/routerUtils'
 
 import useI18n from '../../../commonComponents/useI18n'
 
+import { appModuleUri, appModules } from '../../appModules'
+
 import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'
 
@@ -27,7 +29,7 @@ import {
   checkOutRecord,
   recordNodesUpdate,
   nodeValidationsUpdate,
-  exitEdit
+  recordDeleted
 } from './actions'
 
 const RecordView = props => {
@@ -41,7 +43,7 @@ const RecordView = props => {
     const {
       recordUuidUrlParam, parentNodeUuidUrlParam, draftDefs,
       checkInRecord,
-      recordNodesUpdate, nodeValidationsUpdate, exitEdit, history
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, history
     } = props
 
     // check in record
@@ -52,11 +54,11 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       alert(i18n.t('recordView.justDeleted'))
-      exitEdit(history)
+      recordDeleted(history)
     })
     AppWebSocket.on(WebSocketEvents.recordEditTimeout, () => {
       alert(i18n.t('recordView.editTimeout'))
-      exitEdit(history)
+      history.push(appModuleUri(appModules.data))
     })
 
     // add beforeunload event listener
@@ -125,7 +127,7 @@ const enhance = compose(
     mapStateToProps,
     {
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, exitEdit
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted
     }
   )
 )
