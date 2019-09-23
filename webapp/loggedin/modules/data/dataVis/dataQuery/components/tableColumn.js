@@ -3,7 +3,7 @@ import camelize from 'camelize'
 
 import StringUtils from '../../../../../../../common/stringUtils'
 
-import useI18n from '../../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../../commonComponents/hooks'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
 import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
 

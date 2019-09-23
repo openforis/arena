@@ -6,9 +6,9 @@ import * as R from 'ramda'
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
 import Validation from '../../../../../../common/validation/validation'
 
+import { useI18n } from '../../../../../commonComponents/hooks'
 import { FormItem } from '../../../../../commonComponents/form/input'
 import ExpressionProp from './expressionProp'
-import useI18n from '../../../../../commonComponents/useI18n'
 
 const ExpressionsProp = props => {
 

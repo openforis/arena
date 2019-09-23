@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import { getUrlParam } from '../../../utils/routerUtils'
 
-import useI18n from '../../../commonComponents/useI18n'
+import { useI18n } from '../../../commonComponents/hooks'
 
 import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'

@@ -7,7 +7,7 @@ import Survey from '../../../../../common/survey/survey'
 
 import { getUrlParam } from '../../../../utils/routerUtils'
 
-import useI18n from '../../../../commonComponents/useI18n.js'
+import { useI18n } from '../../../../commonComponents/hooks'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import ProfilePicture from '../../../../commonComponents/profilePicture'
 import { FormItem, Input } from '../../../../commonComponents/form/input'

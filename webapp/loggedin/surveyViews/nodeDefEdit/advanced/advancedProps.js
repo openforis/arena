@@ -1,6 +1,6 @@
 import React from 'react'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import Validation from '../../../../../common/validation/validation'
 import NodeDef from '../../../../../common/survey/nodeDef'

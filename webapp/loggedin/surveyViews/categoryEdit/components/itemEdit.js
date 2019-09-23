@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import LabelsEditor from '../../labelsEditor/labelsEditor'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import { normalizeName } from '../../../../../common/stringUtils'
 

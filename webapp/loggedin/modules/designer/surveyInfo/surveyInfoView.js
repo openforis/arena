@@ -3,7 +3,7 @@ import './surveyInfoView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import { Input } from '../../../../commonComponents/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'

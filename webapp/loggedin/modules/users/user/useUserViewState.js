@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
-import useI18n from '../../../../commonComponents/useI18n'
-
 import User from '../../../../../common/user/user'
 import Survey from '../../../../../common/survey/survey'
 import UserValidator from '../../../../../common/user/userValidator'
@@ -12,6 +10,7 @@ import Authorizer from '../../../../../common/auth/authorizer'
 import * as AppState from '../../../../app/appState'
 
 import {
+  useI18n,
   useAsyncGetRequest,
   useAsyncPostRequest,
   useAsyncMultipartPutRequest,

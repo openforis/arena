@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import Tooltip from '../../../../../commonComponents/tooltip'
 import ExpressionEditor from '../../../../../commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../labelsEditor/labelsEditor'
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
 import * as ValidationUtils from '../../../../../utils/validationUtils'

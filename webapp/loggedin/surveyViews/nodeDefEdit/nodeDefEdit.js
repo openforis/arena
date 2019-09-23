@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import StringUtils from '../../../../common/stringUtils'
 
-import useI18n from '../../../commonComponents/useI18n'
+import { useI18n } from '../../../commonComponents/hooks'
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
 import AdvancedProps from './advanced/advancedProps'

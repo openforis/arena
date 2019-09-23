@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
 import { useProfilePicture, useFileDrop } from '../../../../../commonComponents/hooks'
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 
 import UploadButton from '../../../../../commonComponents/form/uploadButton'
 

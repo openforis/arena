@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
+import { useI18n } from '../../../commonComponents/hooks'
+
 import Survey from '../../../../common/survey/survey'
 
 import * as SurveyState from '../../../survey/surveyState'
 
 import { initSurveyDefs } from '../../../survey/actions'
-import useI18n from '../../../commonComponents/useI18n'
 
 const SurveyDefsLoader = (props) => {
 

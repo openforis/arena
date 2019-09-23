@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import Expression from '../../../../common/exprParser/expression'
 
-import useI18n from '../../useI18n'
+import { useI18n } from '../../hooks'
 
 import ExpressionNode from './expressionNode'
 

@@ -1,9 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import useI18n from '../../commonComponents/useI18n'
-
-import useFormObject from '../../commonComponents/hooks/useFormObject'
+import { useI18n, useFormObject } from '../../commonComponents/hooks'
 
 import * as LoginState from '../loginState'
 import { sendVerificationCode, setLoginError } from '../actions'

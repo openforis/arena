@@ -2,7 +2,7 @@ import './errorBadge.scss'
 
 import React from 'react'
 
-import useI18n from '../commonComponents/useI18n'
+import { useI18n } from './hooks'
 
 import Validation from '../../common/validation/validation'
 

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Header from '../../../../commonComponents/header'
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import Authorizer from '../../../../../common/auth/authorizer'
 import Survey from '../../../../../common/survey/survey'

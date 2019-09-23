@@ -2,11 +2,11 @@ import './nodeDefTableCellHeader.scss'
 
 import React from 'react'
 
+import { useI18n } from '../../../../../commonComponents/hooks'
+
 import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
-
-import useI18n from '../../../../../commonComponents/useI18n'
 
 const NodeDefTableCellHeader = props => {
   const { label, nodeDef } = props
