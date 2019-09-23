@@ -7,6 +7,7 @@ import LabelsEditor from '../../../labelsEditor/labelsEditor'
 import useI18n from '../../../../../commonComponents/useI18n'
 
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
+import ValidationResult from '../../../../../../common/validation/validationResult'
 import * as ValidationUtils from '../../../../../utils/validationUtils'
 import ButtonGroup from '../../../../../commonComponents/form/buttonGroup'
 
@@ -23,14 +24,13 @@ const ExpressionProp = (props) => {
 
   const severityItems = [
     {
-      key: NodeDefExpression.severities.error,
+      key: ValidationResult.severities.error,
       label: i18n.t('common.error')
     },
     {
-      key: NodeDefExpression.severities.warning,
+      key: ValidationResult.severities.warning,
       label: i18n.t('common.warning')
     }
-
   ]
 
   const errorMessages = ValidationUtils.getValidationFieldMessages(i18n, false)(validation)

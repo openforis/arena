@@ -1,9 +1,11 @@
 const R = require('ramda')
 
 const { uuidv4 } = require('./../uuid')
-const StringUtils = require('../stringUtils')
 
-const SurveyUtils = require('./surveyUtils')
+const ValidationResult = require('../validation/validationResult')
+
+const StringUtils = require('../stringUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
   placeholder: 'placeholder',
@@ -11,11 +13,6 @@ const keys = {
   applyIf: 'applyIf',
   messages: 'messages',
   severity: 'severity'
-}
-
-const severities = {
-  error: 'error',
-  warning: 'warning'
 }
 
 // ====== CREATE
@@ -35,7 +32,7 @@ const getApplyIf = R.prop(keys.applyIf)
 
 const getMessages = R.propOr({}, keys.messages)
 
-const getSeverity = R.propOr(severities.error, keys.severity)
+const getSeverity = R.propOr(ValidationResult.severities.error, keys.severity)
 
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
@@ -89,14 +86,13 @@ const findReferencedNodeDefs = nodeDefExpressions =>
 
 module.exports = {
   keys,
-  severities,
 
   //CREATE
   createExpression,
   createExpressionPlaceholder: () => createExpression('', '', true),
 
   //READ
-  getUuid: SurveyUtils.getUuid,
+  getUuid: ObjectUtils.getUuid,
   getExpression,
   getApplyIf,
   getMessages,

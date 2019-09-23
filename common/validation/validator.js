@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const Validation = require('./validation')
-const ValidationError = require('./validationError')
+const ValidationResult = require('./validationResult')
 const ValidatorFunctions = require('./_validator/validatorFunctions')
 
 const validateProp = async (obj, prop, validations = []) => {
@@ -11,10 +11,11 @@ const validateProp = async (obj, prop, validations = []) => {
 
   const errors = []
   const warnings = []
-  validationsEvaluated.forEach(validationError => {
-      if (validationError) {
-        const arr = ValidationError.isError(validationError) ? errors : warnings
-        arr.push(R.omit([ValidationError.keys.severity], validationError))
+  validationsEvaluated.forEach(validationResult => {
+      if (validationResult) {
+        // add validation result to errors or warnings
+        const arr = ValidationResult.isError(validationResult) ? errors : warnings
+        arr.push(R.omit([ValidationResult.keys.severity], validationResult))
       }
     }
   )

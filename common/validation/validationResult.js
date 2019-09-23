@@ -26,6 +26,8 @@ const getSeverity = R.propOr(severities.error, keys.severity)
 module.exports = {
   keys,
 
+  severities,
+
   newInstance,
 
   getKey,
