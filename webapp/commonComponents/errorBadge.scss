@@ -1,9 +1,13 @@
 @import "../style/vars";
 
 .error-badge {
-  background-color: $red;
   display: block;
+  background-color: $red;
   color: white;
+
+  &.warning {
+    background-color: $orange;
+  }
 }
 
 .error-badge-inverse {
@@ -13,5 +17,14 @@
   .icon-warning {
     font-weight: bold;
     color: $red;
+  }
+
+  &.warning {
+    background-color: transparent;
+    color: $orange;
+
+    .icon-warning {
+      color: $orange;
+    }
   }
 }

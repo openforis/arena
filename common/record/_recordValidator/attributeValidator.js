@@ -42,9 +42,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
     if (!valid) {
       const messages = _getCustomValidationMessages(survey, expression)
 
-      errorMessage = ValidationResult.newInstance(
-        Validation.keys.customErrorMessageKey,
-        null,
+      errorMessage = ValidationResult.newInstanceCustom(
         NodeDefExpression.getSeverity(expression),
         messages
       )

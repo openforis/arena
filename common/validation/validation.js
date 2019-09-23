@@ -28,8 +28,6 @@ const keys = {
   errors: 'errors',
   warnings: 'warnings',
 
-  customErrorMessageKey: 'custom',
-
   validation: 'validation',
 }
 
@@ -92,6 +90,7 @@ const getErrors = R.propOr([], keys.errors)
 const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
 const getWarnings = R.propOr([], keys.warnings)
 const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
+const hasWarningsInFields = R.pipe(getFieldValidations, R.values, R.any(hasWarnings))
 
 //====== UPDATE
 
@@ -138,6 +137,9 @@ module.exports = {
 
   getErrors,
   hasErrors,
+  getWarnings,
+  hasWarnings,
+  hasWarningsInFields,
 
   setValid,
   setField,
