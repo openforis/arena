@@ -1,15 +1,18 @@
 const R = require('ramda')
 
 const { uuidv4 } = require('./../uuid')
-const { isBlank } = require('../stringUtils')
 
-const SurveyUtils = require('./surveyUtils')
+const ValidationResult = require('../validation/validationResult')
+
+const StringUtils = require('../stringUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
   placeholder: 'placeholder',
   expression: 'expression',
   applyIf: 'applyIf',
   messages: 'messages',
+  severity: 'severity'
 }
 
 // ====== CREATE
@@ -29,9 +32,11 @@ const getApplyIf = R.prop(keys.applyIf)
 
 const getMessages = R.propOr({}, keys.messages)
 
+const getSeverity = R.propOr(ValidationResult.severities.error, keys.severity)
+
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
-const isEmpty = (expression = {}) => isBlank(getExpression(expression)) && isBlank(getApplyIf(expression))
+const isEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
 
 // ====== UPDATE
 
@@ -49,10 +54,12 @@ const assocMessage = message =>
     return assocMessages(messagesNew)(nodeDefExpression)
   }
 
+const assocSeverity = severity => assocProp(keys.severity, severity)
+
 // ====== UTILS
 
 const extractNodeDefNames = (jsExpr = '') => {
-  if (isBlank(jsExpr))
+  if (StringUtils.isBlank(jsExpr))
     return []
 
   const names = []
@@ -85,7 +92,7 @@ module.exports = {
   createExpressionPlaceholder: () => createExpression('', '', true),
 
   //READ
-  getUuid: SurveyUtils.getUuid,
+  getUuid: ObjectUtils.getUuid,
   getExpression,
   getApplyIf,
   getMessages,
@@ -93,6 +100,7 @@ module.exports = {
     getMessages,
     R.propOr(defaultValue, lang)
   ),
+  getSeverity,
   isEmpty,
   isPlaceholder,
 
@@ -101,6 +109,7 @@ module.exports = {
   assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
   assocMessage,
   assocMessages,
+  assocSeverity,
 
   //UTILS
   findReferencedNodeDefs

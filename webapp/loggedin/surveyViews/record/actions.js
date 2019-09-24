@@ -11,7 +11,7 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
-import { showAppLoader, hideAppLoader } from '../../../app/actions'
+import { showAppLoader, hideAppLoader, showNotificationMessage } from '../../../app/actions'
 
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
 
@@ -32,8 +32,14 @@ export const recordNodesUpdate = nodes => dispatch =>
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-export const recordDeleted = (history) => dispatch => {
+export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
+  dispatch(showNotificationMessage('recordView.justDeleted'))
+  history.push(appModuleUri(appModules.data))
+}
+
+export const sessionExpired = history => dispatch => {
+  dispatch(showNotificationMessage('recordView.sessionExpired'))
   history.push(appModuleUri(appModules.data))
 }
 

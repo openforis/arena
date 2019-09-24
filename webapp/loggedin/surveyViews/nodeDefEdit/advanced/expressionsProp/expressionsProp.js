@@ -78,6 +78,7 @@ ExpressionsProp.defaultProps = {
   label: '',
   applyIf: true,
   showLabels: false,
+  severity: false,
   multiple: true,
   readOnly: false,
   nodeDefUuidContext: null,

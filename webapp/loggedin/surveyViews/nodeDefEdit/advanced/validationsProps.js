@@ -84,6 +84,7 @@ const ValidationsProps = props => {
                          readOnly={readOnly}
                          applyIf={true}
                          showLabels={true}
+                         severity={true}
                          values={NodeDefValidations.getExpressions(nodeDefValidations)}
                          validation={R.pipe(
                            Validation.getFieldValidation(NodeDef.propKeys.validations),
