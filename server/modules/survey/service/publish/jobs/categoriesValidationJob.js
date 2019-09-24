@@ -14,9 +14,11 @@ class CategoriesValidationJob extends Job {
   async execute (tx) {
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId, true, true, tx)
 
-    this.total = categories.length
+    const categoriesArr = Object.values(categories)
 
-    for (const category of categories) {
+    this.total = categoriesArr.length
+
+    for (const category of categoriesArr) {
       const validation = Validation.getValidation(category)
       if (!Validation.isValid(validation)) {
         this.addError(Validation.getFieldValidations(validation), Category.getName(category))
