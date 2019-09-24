@@ -1,7 +1,8 @@
 import React from 'react'
 import camelize from 'camelize'
 
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
+
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'

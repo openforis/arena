@@ -1,8 +1,6 @@
 @import "../../../../../style/vars";
 
-
 .node-def-edit__expressions {
-  max-height: 350px;
   overflow-y: auto;
 
   //custom tooltip error
@@ -26,6 +24,29 @@
 
 }
 
+.node-def-edit__expression-grid-item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+
+  .labels-editor-label, .label {
+    text-align: center;
+    align-self: center;
+    font-weight: 600;
+    font-size: .65rem;
+    text-transform: uppercase;
+    background-color: rgba($blueLight, 0.3);
+    padding: .15rem .3rem;
+
+    .form-label {
+      text-align: center;
+      align-self: center;
+      font-weight: 600;
+      font-size: .65rem;
+      text-transform: uppercase;
+    }
+  }
+}
+
 .node-def-edit__expression {
   position: relative;
   padding: 1rem;
@@ -39,19 +60,7 @@
 
   .expression-item {
     height: 35px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-
-    .label {
-      text-align: center;
-      align-self: center;
-      width: 100px;
-      font-weight: 600;
-      font-size: .65rem;
-      text-transform: uppercase;
-      background-color: rgba($blueLight, 0.3);
-      padding: .15rem .3rem;
-    }
+    @extend .node-def-edit__expression-grid-item;
 
     .expression-editor__query-container {
       .btn-edit {
@@ -63,6 +72,33 @@
         }
       }
     }
+  }
+
+  .expression-item.severity {
+
+    div:nth-child(2) {
+      display: flex;
+      align-items: center;
+    }
+
+    button {
+      margin-left: 1rem;
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+
+      &:nth-child(1).active {
+        background-color: rgba($red, .7);
+      }
+
+      &:nth-child(2).active {
+        background-color: rgba($orange, .7);
+      }
+    }
+  }
+
+  .labels-editor {
+    @extend .node-def-edit__expression-grid-item;
   }
 
   .btn-delete {

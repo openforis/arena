@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import useI18n from '../../commonComponents/useI18n'
+import { useI18n } from '../../commonComponents/hooks'
 
 import { acceptInvitation, setLoginError } from '../actions'
 import { useAcceptInvitationFormState } from './useAcceptInvitationFormState'

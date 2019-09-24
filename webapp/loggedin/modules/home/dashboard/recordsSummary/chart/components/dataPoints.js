@@ -4,7 +4,7 @@ import ReactDOMServer from 'react-dom/server'
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'
 
-import useI18n from '../../../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../../../commonComponents/hooks'
 
 import DateUtils from '../../../../../../../../common/dateUtils'
 

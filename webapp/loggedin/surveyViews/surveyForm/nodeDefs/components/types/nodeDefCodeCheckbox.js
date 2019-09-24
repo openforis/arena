@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import useI18n from '../../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../../commonComponents/hooks'
 
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
 

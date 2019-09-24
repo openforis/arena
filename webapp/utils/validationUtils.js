@@ -3,25 +3,29 @@ import * as R from 'ramda'
 import Markdown from 'react-remarkable'
 
 import Validation from '../../common/validation/validation'
+import ValidationResult from '../../common/validation/validationResult'
 
 const getErrorText = i18n => error =>
-  error.key === Validation.keys.customErrorMessageKey
-    ? R.propOr(R.pipe(R.values, R.head)(error.messages), i18n.lang)(error.messages) //default to first message
-    : i18n.t(error.key, error.params)
+  ValidationResult.hasMessages(error)
+    ? ValidationResult.getMessage(i18n.lang)(error)
+    : i18n.t(ValidationResult.getKey(error), ValidationResult.getParams(error))
 
-const getValidationErrorMessages = i18n => R.pipe(
+const getValidationErrorMessages = i18n => validation => R.pipe(
   Validation.getErrors,
+  R.concat(Validation.getWarnings(validation)),
   R.map(getErrorText(i18n)),
-)
+)(validation)
 
 const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
   getValidationErrorMessages(i18n),
   R.ifElse(
     R.isEmpty,
-    () => getErrorText(i18n)({
-      key: Validation.messageKeys.invalidField, //default error message
-      params: { field }
-    }),
+    () => getErrorText(i18n)(
+      ValidationResult.newInstance(
+        Validation.messageKeys.invalidField, //default error message
+        { field }
+      )
+    ),
     R.join(', ')
   )
 )

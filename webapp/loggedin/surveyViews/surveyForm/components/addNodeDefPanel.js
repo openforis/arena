@@ -4,7 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'

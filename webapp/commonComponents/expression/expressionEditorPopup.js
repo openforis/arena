@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import Popup from '../popup'
 import ExpressionNode from './nodes/expressionNode'
-import useI18n from '../useI18n'
+import { useI18n } from '../hooks'
 
 import Expression from '../../../common/exprParser/expression'
 

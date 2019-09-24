@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 import * as FileSaver from 'file-saver'
 
-import useI18n from '../useI18n'
+import { useI18n } from '../hooks'
 
 const DownloadButton = props => {
 

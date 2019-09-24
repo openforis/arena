@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
@@ -84,6 +84,7 @@ const ValidationsProps = props => {
                          readOnly={readOnly}
                          applyIf={true}
                          showLabels={true}
+                         severity={true}
                          values={NodeDefValidations.getExpressions(nodeDefValidations)}
                          validation={R.pipe(
                            Validation.getFieldValidation(NodeDef.propKeys.validations),

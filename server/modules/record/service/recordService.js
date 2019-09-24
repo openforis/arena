@@ -1,5 +1,4 @@
 const R = require('ramda')
-const path = require('path')
 const fs = require('fs')
 
 const Log = require('../../../log/log').getLogger('RecordService')
@@ -13,62 +12,14 @@ const User = require('../../../../common/user/user')
 
 const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
-const ThreadManager = require('../../../threads/threadManager')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const RecordManager = require('../manager/recordManager')
 const FileManager = require('../manager/fileManager')
 
 const RecordUsersMap = require('./update/recordUsersMap')
-const RecordThreads = require('./update/thread/recordThreads')
+const RecordServiceThreads = require('./update/recordServiceThreads')
 const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
-const RecordUpdateThreadParams = require('./update/thread/recordUpdateThreadParams')
-const ThreadParams = require('../../../threads/threadParams')
-
-/**
- * ======
- * THREAD
- * ======
- */
-const _createRecordThread = (user, surveyId, recordUuid, preview, singleMessageHandling = false, initRecord = false) => {
-  const filePath = path.resolve(__dirname, 'update', 'thread', 'recordUpdateThread.js')
-
-  const data = {
-    [ThreadParams.keys.user]: user,
-    [ThreadParams.keys.surveyId]: surveyId,
-    [RecordUpdateThreadParams.keys.recordUuid]: recordUuid,
-    [RecordUpdateThreadParams.keys.initRecord]: initRecord
-  }
-
-  const messageHandler = msg => {
-
-    if (msg.type === recordThreadMessageTypes.threadKill) {
-      if (RecordThreads.isZombie(recordUuid)) {
-        const thread = RecordThreads.get(recordUuid)
-        thread.terminate()
-      }
-    } else {
-      const userUuids = RecordUsersMap.getUserUuids(recordUuid)
-      userUuids.forEach(userUuid =>
-        WebSocket.notifyUser(userUuid, msg.type, R.prop('content', msg))
-      )
-    }
-  }
-
-  const exitHandler = () => {
-    RecordUsersMap.dissocUsers(recordUuid)
-    RecordThreads.remove(recordUuid)
-  }
-
-  const thread = new ThreadManager(filePath, data, messageHandler, exitHandler, singleMessageHandling)
-
-  return RecordThreads.put(recordUuid, thread)
-}
-
-const _getOrCreatedRecordThread = (user, surveyId, recordUuid, preview = false, singleMessageHandling = false) => {
-  const thread = RecordThreads.get(recordUuid)
-  return thread || _createRecordThread(user, surveyId, recordUuid, preview, singleMessageHandling)
-}
 
 /**
  * ======
@@ -81,7 +32,7 @@ const createRecord = async (user, surveyId, recordToCreate) => {
   const record = await RecordManager.insertRecord(surveyId, recordToCreate)
 
   // create record thread and initialize record
-  _createRecordThread(user, surveyId, Record.getUuid(recordToCreate), Record.isPreview(recordToCreate), false, true)
+  RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), false, true)
 
   return record
 }
@@ -90,16 +41,18 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   Log.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   await RecordManager.deleteRecord(user, surveyId, recordUuid)
+  const userUuid = User.getUuid(user)
 
-  //notify users that record has been deleted
+  // notify other users viewing or editing the record that it has been deleted
   const recordUsersIds = RecordUsersMap.getUserUuids(recordUuid)
   recordUsersIds.forEach(userUuidRecord => {
-    if (userUuidRecord !== User.getUuid(user)) {
+    if (userUuidRecord !== userUuid) {
       WebSocket.notifyUser(userUuidRecord, WebSocketEvents.recordDelete, recordUuid)
       RecordUsersMap.dissocUsers(recordUuid)
     }
   })
 
+  dissocUserFromRecordThread(userUuid)
 }
 
 const checkIn = async (user, surveyId, recordUuid, draft) => {
@@ -109,10 +62,7 @@ const checkIn = async (user, surveyId, recordUuid, draft) => {
   const preview = Record.isPreview(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    if (RecordThreads.isZombie(recordUuid)) {
-      RecordThreads.reviveZombie(recordUuid)
-    }
-    _getOrCreatedRecordThread(user, surveyId, recordUuid, preview, false)
+    RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, false)
   }
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
@@ -135,12 +85,11 @@ const dissocUserFromRecordThread = userUuid => {
     RecordUsersMap.dissocUser(recordUuid, userUuid)
 
     // terminate thread if there are no more users editing the record
-    const thread = RecordThreads.get(recordUuid)
+    const thread = RecordServiceThreads.getRecordThread(recordUuid)
     if (thread) {
       const userUuids = RecordUsersMap.getUserUuids(recordUuid)
       if (R.isEmpty(userUuids)) {
-        RecordThreads.markZombie(recordUuid)
-        thread.postMessage({ type: recordThreadMessageTypes.threadKill })
+        RecordServiceThreads.killRecordThread(recordUuid)
       }
     }
   }
@@ -159,22 +108,24 @@ const persistNode = async (user, surveyId, node, file) => {
 
     await FileManager.insertFile(surveyId, fileObj)
   }
-  const thread = _getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), false, true)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), true)
   thread.postMessage({ type: recordThreadMessageTypes.nodePersist, node, user })
 }
 
 const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
-  const thread = _getOrCreatedRecordThread(user, surveyId, recordUuid, false, true)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, true)
   thread.postMessage({ type: recordThreadMessageTypes.nodeDelete, nodeUuid, user })
 }
 
 const deleteRecordsPreview = async () => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  await Promise.all(
+  const countDeletedRecordsBySurvey = await Promise.all(
     surveyIds.map(surveyId =>
       RecordManager.deleteRecordsPreview(surveyId)
     )
   )
+
+  return countDeletedRecordsBySurvey.reduce((sum, n) => sum + n, 0)
 }
 
 module.exports = {

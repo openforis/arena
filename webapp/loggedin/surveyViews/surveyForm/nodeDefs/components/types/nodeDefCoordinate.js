@@ -3,7 +3,7 @@ import './nodeDefCoordinate.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import useI18n from '../../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../../commonComponents/hooks'
 
 import { FormItem, Input } from '../../../../../../commonComponents/form/input'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'

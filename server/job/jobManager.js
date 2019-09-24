@@ -1,7 +1,5 @@
 const path = require('path')
 
-const logger = require('../log/log').getLogger('JobManager')
-
 const { jobThreadMessageTypes } = require('./jobUtils')
 const ThreadsCache = require('../threads/threadsCache')
 const ThreadManager = require('../threads/threadManager')

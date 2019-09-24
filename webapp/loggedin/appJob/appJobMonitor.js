@@ -3,10 +3,10 @@ import './appJobMonitor.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { useI18n } from '../../commonComponents/hooks'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../commonComponents/modal'
 import ProgressBar from '../../commonComponents/progressBar'
 import AppJobErrors from './appJobErrors'
-import useI18n from '../../commonComponents/useI18n'
 
 import * as AppState from '../../app/appState'
 

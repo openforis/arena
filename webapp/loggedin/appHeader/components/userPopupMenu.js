@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import useI18n from '../../../commonComponents/useI18n'
+import { useI18n } from '../../../commonComponents/hooks'
 import ProfilePicture from '../../../commonComponents/profilePicture'
 
 import User from '../../../../common/user/user'

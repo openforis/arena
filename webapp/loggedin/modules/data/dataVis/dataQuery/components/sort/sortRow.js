@@ -2,8 +2,7 @@ import './sortEditor.scss'
 
 import React from 'react'
 
-import useI18n from '../../../../../../../commonComponents/useI18n'
-
+import { useI18n } from '../../../../../../../commonComponents/hooks'
 import Dropdown from '../../../../../../../commonComponents/form/dropdown'
 
 const SortRow = (props) => {

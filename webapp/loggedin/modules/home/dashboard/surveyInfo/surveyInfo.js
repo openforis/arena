@@ -4,9 +4,10 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import { useI18n } from '../../../../../commonComponents/hooks'
 import Header from '../../../../../commonComponents/header'
+
 import DeleteSurveyDialog from './deleteSurveyDialog'
-import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import Authorizer from '../../../../../../common/auth/authorizer'
@@ -16,7 +17,7 @@ import * as SurveyState from '../../../../../survey/surveyState'
 
 import { deleteSurvey, publishSurvey } from '../../../../../survey/actions'
 
-import { appModuleUri, designerModules, homeModules } from '../../../../appModules'
+import { appModuleUri, homeModules } from '../../../../appModules'
 
 const SurveyInfo = props => {
 
