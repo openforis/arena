@@ -11,12 +11,15 @@ import ValidationTooltip from './validationTooltip'
 const ErrorBadge = props => {
 
   const {
-    validation, children, className,
+    validation, children, className: classNameProps,
     showLabel, labelKey, showKeys,
   } = props
 
   const i18n = useI18n()
   const invalid = !Validation.isValid(validation)
+
+  // when there are warnings add 'warning' class to className
+  const className = classNameProps + (Validation.isWarning(validation) ? ' warning': '')
 
   return invalid
     ? (
