@@ -14,7 +14,7 @@ export default ({ validation, className, showKeys, children }) => {
 
   const type = isValid
     ? ''
-    : Validation.hasWarnings(validation) || Validation.hasWarningsInFields(validation)
+    : Validation.isWarning(validation)
       ? 'warning'
       : 'error'
 

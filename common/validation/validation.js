@@ -91,6 +91,7 @@ const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
 const getWarnings = R.propOr([], keys.warnings)
 const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
 const hasWarningsInFields = R.pipe(getFieldValidations, R.values, R.any(hasWarnings))
+const isWarning = validation => hasWarnings(validation) || hasWarningsInFields(validation)
 
 //====== UPDATE
 
@@ -139,7 +140,7 @@ module.exports = {
   hasErrors,
   getWarnings,
   hasWarnings,
-  hasWarningsInFields,
+  isWarning,
 
   setValid,
   setField,
