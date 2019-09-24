@@ -8,6 +8,7 @@ const webSocketEvents = {
   nodeValidationsUpdate: 'nodeValidationsUpdate',
   recordDelete: 'recordDelete',
   error: 'threadError',
+  recordSessionExpired: 'recordSessionExpired',
 }
 
 module.exports = webSocketEvents
