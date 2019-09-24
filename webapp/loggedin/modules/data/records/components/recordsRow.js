@@ -1,9 +1,8 @@
 import React from 'react'
 import camelize from 'camelize'
 
-import { Link } from 'react-router-dom'
-
 import { useI18n } from '../../../../../commonComponents/hooks'
+
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'
@@ -12,8 +11,6 @@ import Record from '../../../../../../common/record/record'
 import Validation from '../../../../../../common/validation/validation'
 import Authorizer from '../../../../../../common/auth/authorizer'
 import Date from '../../../../../../common/dateUtils'
-
-import { appModuleUri, dataModules } from '../../../../appModules'
 
 const RecordsRow = props => {
   const {
@@ -54,9 +51,7 @@ const RecordsRow = props => {
         {Record.getStep(record)}
       </div>
       <div>
-        <Link to={appModuleUri(dataModules.record) + Record.getUuid(record)} className="btn-edit">
-          <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
-        </Link>
+        <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
       </div>
     </>
   )
