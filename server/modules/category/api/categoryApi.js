@@ -82,9 +82,9 @@ module.exports.init = app => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
 
-      const categories = await CategoryService.fetchCategoriesBySurveyId(surveyId, draft, validate)
+      const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId(surveyId, draft, validate)
 
-      sendCategories(res, categories)
+      res.json({ categories })
     } catch (err) {
       next(err)
     }

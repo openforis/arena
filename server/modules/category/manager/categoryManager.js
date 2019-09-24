@@ -31,12 +31,12 @@ const validateCategoryFromCategories = async (surveyId, categories, categoryUuid
 
 // ====== VALIDATION
 const validateCategory = async (surveyId, categoryUuid, client = db) => {
-  const categories = await fetchCategoriesAndLevels(surveyId, true, client)
+  const categories = await _fetchCategoriesAndLevels(surveyId, true, client)
   return await validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
 }
 
 const validateCategories = async (surveyId, client = db) => {
-  const categories = await fetchCategoriesAndLevels(surveyId, true, client)
+  const categories = await _fetchCategoriesAndLevels(surveyId, true, client)
   const categoriesValidated = []
   for (const category of categories) {
     categoriesValidated.push(await validateCategoryFromCategories(surveyId, categories, Category.getUuid(category), client))
@@ -48,15 +48,12 @@ const validateCategories = async (surveyId, client = db) => {
 
 const insertCategory = async (user, surveyId, category, client = db) =>
   await client.tx(async t => {
-    const categoryDb = await CategoryRepository.insertCategory(surveyId, category, t)
-
-    //insert levels
-    await Promise.all(
-      Category.getLevelsArray(category).map(level => CategoryRepository.insertLevel(surveyId, level, t))
-    )
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryInsert, category, t)
+    const [categoryDb] = await Promise.all([
+      CategoryRepository.insertCategory(surveyId, category, t),
+      ...Category.getLevelsArray(category).map(level => CategoryRepository.insertLevel(surveyId, level, t)),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryInsert, category, t)
+    ])
 
     return validateCategory(surveyId, Category.getUuid(categoryDb), t)
   })
@@ -84,30 +81,27 @@ const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) 
     }
   })
 
+/**
+ * Bulk insert of category items.
+ * Items can belong to different categories and validation is not performed.
+ *
+ */
 const insertItems = async (user, surveyId, items, client = db) =>
   await client.tx(async t => {
-    await CategoryRepository.insertItems(surveyId, items, t)
-    await markSurveyDraft(surveyId, t)
-    const activities = items.map(item => ({
+    const activityLogs = items.map(item => ({
         type: ActivityLog.type.categoryItemInsert,
         params: item
       })
     )
-    await ActivityLog.logMany(user, surveyId, activities, t)
-
-    // validate updated categories
-    const categories = await fetchCategoriesAndLevels(surveyId, true, t)
-    const categoryUuids = R.pipe(
-      R.pluck('categoryUuid'),
-      R.uniq
-    )(items)
-    for (const categoryUuid of categoryUuids) {
-      await validateCategoryFromCategories(surveyId, categories, categoryUuid, t)
-    }
+    await Promise.all([
+      CategoryRepository.insertItems(surveyId, items, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.logMany(user, surveyId, activityLogs, t)
+    ])
   })
 
 // ====== READ
-const fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
+const _fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
   const categoriesDb = await CategoryRepository.fetchCategoriesBySurveyId(surveyId, draft, client)
 
   return await Promise.all(
@@ -127,7 +121,7 @@ const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, valida
 }
 
 const fetchCategoriesBySurveyId = async (surveyId, draft = false, validate = true, client = db) => {
-  const categories = await fetchCategoriesAndLevels(surveyId, draft, client)
+  const categories = await _fetchCategoriesAndLevels(surveyId, draft, client)
   return validate
     ? categories
     : R.map(R.omit([Validation.keys.validation]))(categories)
@@ -281,6 +275,7 @@ module.exports = {
   //READ
   fetchCategoryByUuid,
   fetchCategoriesBySurveyId,
+  fetchCategoriesAndLevelsBySurveyId: CategoryRepository.fetchCategoriesAndLevelsBySurveyId,
   fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemByUuid: CategoryRepository.fetchItemByUuid,

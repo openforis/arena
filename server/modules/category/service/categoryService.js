@@ -26,6 +26,7 @@ module.exports = {
 
   fetchCategoryByUuid: CategoryManager.fetchCategoryByUuid,
   fetchCategoriesBySurveyId: CategoryManager.fetchCategoriesBySurveyId,
+  fetchCategoriesAndLevelsBySurveyId: CategoryManager.fetchCategoriesAndLevelsBySurveyId,
   fetchItemsByParentUuid: CategoryManager.fetchItemsByParentUuid,
   fetchItemByUuid: CategoryManager.fetchItemByUuid,
 

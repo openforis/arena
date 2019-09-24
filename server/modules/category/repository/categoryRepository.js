@@ -62,6 +62,43 @@ const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
+const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  const { categories } = await client.one(`
+    WITH
+      levels AS
+      (
+        SELECT
+          l.category_uuid,
+          json_object_agg(l.index::text, json_build_object(
+            'id', l.id, 
+            'uuid', l.uuid, 
+            'index', l.index, 
+            'props', l.props${draft ? ` || l.props_draft` : ''}
+          )) AS levels
+        FROM
+          ${schema}.category_level l
+        GROUP BY
+          l.category_uuid
+      )
+    SELECT
+      json_object_agg(c.uuid, json_build_object( 
+      'id', c.id,
+      'uuid', c.uuid,
+      'props', c.props${draft ? ` || c.props_draft` : ''}, 
+      'levels', l.levels
+      ${includeValidation ? `, 'validation', c.validation` : ''}
+      )) AS categories
+    FROM
+      ${schema}.category c
+    JOIN
+      levels l
+    ON
+      c.uuid = l.category_uuid
+  `)
+  return categories
+}
+
 const fetchCategoriesBySurveyId = async (surveyId, draft = false, client = db) =>
   await client.map(`
     SELECT * 
@@ -119,7 +156,7 @@ const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null,
       parentUuid
         ? `= '${parentUuid}'`
         : 'IS NULL'
-      }
+    }
     ORDER BY i.id
   `,
     [categoryUuid],
@@ -221,6 +258,7 @@ module.exports = {
   insertItems,
 
   //READ
+  fetchCategoriesAndLevelsBySurveyId,
   fetchCategoriesBySurveyId,
   fetchCategoryByUuid,
   fetchLevelsByCategoryUuid,
