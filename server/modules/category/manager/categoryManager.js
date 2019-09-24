@@ -21,27 +21,28 @@ const assocLevels = (surveyId, draft, client) =>
       await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, Category.getUuid(category), draft, client)
     )(category)
 
-const validateCategoryFromCategories = async (surveyId, categories, categoryUuid, client = db) => {
-  const category = ObjectUtils.findByUuid(categoryUuid)(categories)
+// ====== VALIDATION
+
+const _validateCategoryFromCategories = async (surveyId, categories, categoryUuid, client = db) => {
+  const category = R.prop(categoryUuid, categories)
   const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, categoryUuid, true, client)
   const validation = await CategoryValidator.validateCategory(categories, category, items)
   await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
   return Validation.assocValidation(validation)(category)
 }
 
-// ====== VALIDATION
 const validateCategory = async (surveyId, categoryUuid, client = db) => {
-  const categories = await _fetchCategoriesAndLevels(surveyId, true, client)
-  return await validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
+  const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(surveyId, true, true, client)
+  return await _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
 }
 
 const validateCategories = async (surveyId, client = db) => {
-  const categories = await _fetchCategoriesAndLevels(surveyId, true, client)
-  const categoriesValidated = []
-  for (const category of categories) {
-    categoriesValidated.push(await validateCategoryFromCategories(surveyId, categories, Category.getUuid(category), client))
-  }
-  return categoriesValidated
+  const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(surveyId, true, true, client)
+
+  const categoriesValidated = await Promise.all(Object.entries(categories).map(
+    ([categoryUuid, category]) => _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
+  ))
+  return ObjectUtils.toUuidIndexedObj(categoriesValidated)
 }
 
 // ====== CREATE
@@ -60,21 +61,24 @@ const insertCategory = async (user, surveyId, category, client = db) =>
 
 const insertLevel = async (user, surveyId, levelParam, client = db) =>
   await client.tx(async t => {
-    const level = await CategoryRepository.insertLevel(surveyId, levelParam, t)
-    await markSurveyDraft(surveyId, t)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, t)
-    const category = await validateCategory(surveyId, CategoryLevel.getCategoryUuid(level), t)
+    const [level] = await Promise.all([
+      CategoryRepository.insertLevel(surveyId, levelParam, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, t)
+    ])
     return {
-      category,
-      level
+      level,
+      category: await validateCategory(surveyId, CategoryLevel.getCategoryUuid(level), t)
     }
   })
 
 const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
   await client.tx(async t => {
-    const item = await CategoryRepository.insertItem(surveyId, itemParam, t)
-    await markSurveyDraft(surveyId, t)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemInsert, itemParam, t)
+    const [item] = await Promise.all([
+      CategoryRepository.insertItem(surveyId, itemParam, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemInsert, itemParam, t)
+    ])
     return {
       category: await validateCategory(surveyId, categoryUuid, t),
       item
@@ -278,7 +282,6 @@ module.exports = {
   fetchCategoriesAndLevelsBySurveyId: CategoryRepository.fetchCategoriesAndLevelsBySurveyId,
   fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
-  fetchItemByUuid: CategoryRepository.fetchItemByUuid,
   fetchItemsByLevelIndex: CategoryRepository.fetchItemsByLevelIndex,
 
   //UPDATE

@@ -4,9 +4,6 @@ const ObjectUtils = require('../../../../common/objectUtils')
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const CategoryService = require('../service/categoryService')
 
-const sendCategories = (res, categories) =>
-  res.json({ categories: ObjectUtils.toUuidIndexedObj(categories) })
-
 module.exports.init = app => {
 
   // ==== CREATE
@@ -103,18 +100,6 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/categories/items/:itemUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, itemUuid, draft } = Request.getParams(req)
-
-      const item = await CategoryService.fetchItemByUuid(surveyId, itemUuid, draft)
-
-      res.json({ item })
-    } catch (err) {
-      next(err)
-    }
-  })
-
   // ==== UPDATE
 
   app.put('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -124,7 +109,7 @@ module.exports.init = app => {
 
       const { categories } = await CategoryService.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
-      sendCategories(res, categories)
+      res.json({ categories })
     } catch (err) {
       next(err)
     }
@@ -165,7 +150,7 @@ module.exports.init = app => {
 
       const categories = await CategoryService.deleteCategory(user, surveyId, categoryUuid)
 
-      sendCategories(res, categories)
+      res.json({ categories })
     } catch (err) {
       next(err)
     }

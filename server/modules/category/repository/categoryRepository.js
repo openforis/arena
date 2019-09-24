@@ -168,14 +168,6 @@ const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null,
     : R.filter(item => item.published)(items)
 }
 
-const fetchItemByUuid = async (surveyId, itemUuid, draft = false, client = db) =>
-  await client.one(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.category_item
-     WHERE uuid = $1`,
-    [itemUuid],
-    item => dbTransformCallback(item, draft, true)
-  )
-
 const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
   await client.map(
     `SELECT i.* 
@@ -264,7 +256,6 @@ module.exports = {
   fetchLevelsByCategoryUuid,
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
-  fetchItemByUuid,
   fetchItemsByLevelIndex,
   fetchIndex,
 
