@@ -36,10 +36,16 @@ class SamplingPointDataImportJob extends CategoryImportJob {
   }
 
   async beforeSuccess () {
-    await super.beforeSuccess()
+    //delete unused levels
+    const levelIndexToDeleteFrom = this.levelIndexDeepest + 1
+    const levelsUnusedCount = Category.getLevelsArray(this.category).length - levelIndexToDeleteFrom
+    if (levelsUnusedCount > 0) {
+      this.logDebug(`Deleting ${levelsUnusedCount} unused level(s) starting from index ${levelIndexToDeleteFrom}`)
+      this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, levelIndexToDeleteFrom, this.tx)
+      this.logDebug(`${levelsUnusedCount} levels deleted`)
+    }
 
-    // 6. delete unused levels
-    this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, this.levelIndexDeepest, this.tx)
+    await super.beforeSuccess()
   }
 
   //start of overridden methods from CategoryImportJob

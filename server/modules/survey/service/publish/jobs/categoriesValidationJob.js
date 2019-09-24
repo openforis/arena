@@ -12,7 +12,7 @@ class CategoriesValidationJob extends Job {
   }
 
   async execute (tx) {
-    const categories = await CategoryManager.fetchCategoriesBySurveyId(this.surveyId, true, false, tx)
+    const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId, true, true, tx)
 
     this.total = categories.length
 

@@ -62,8 +62,8 @@ class CategoryImportJob extends Job {
   async beforeSuccess () {
     await super.beforeSuccess()
 
-    // fetch and validate category
-    this.category = await CategoryManager.fetchCategoryByUuid(this.surveyId, Category.getUuid(this.category), true, true, this.tx)
+    // validate category
+    this.category = await CategoryManager.validateCategory(this.surveyId, Category.getUuid(this.category), this.tx)
 
     this.setResult({
       category: this.category
@@ -104,7 +104,7 @@ class CategoryImportJob extends Job {
   async _fetchOrCreateCategory () {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
-      return await CategoryManager.fetchCategoryByUuid(this.surveyId, categoryUuid, true, false, this.tx)
+      return await CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
     } else {
       const category = Category.newCategory({
         [Category.props.name]: CategoryImportJobParams.getCategoryName(this.params)
@@ -118,7 +118,7 @@ class CategoryImportJob extends Job {
 
     const levelNames = CategoryImportSummary.getLevelNames(this.summary)
     // delete existing levels and insert new ones using level names from summary
-    this.category = await CategoryManager.replaceLevels(this.user, this.surveyId, Category.getUuid(this.category), levelNames, this.tx)
+    this.category = await CategoryManager.replaceLevels(this.user, this.surveyId, this.category, levelNames, this.tx)
 
     this.logDebug(`levels imported: ${levelNames}`)
   }

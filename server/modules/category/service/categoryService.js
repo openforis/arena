@@ -24,7 +24,6 @@ module.exports = {
   insertLevel: CategoryManager.insertLevel,
   insertItem: CategoryManager.insertItem,
 
-  fetchCategoryByUuid: CategoryManager.fetchCategoryByUuid,
   fetchCategoriesAndLevelsBySurveyId: CategoryManager.fetchCategoriesAndLevelsBySurveyId,
   fetchItemsByParentUuid: CategoryManager.fetchItemsByParentUuid,
 

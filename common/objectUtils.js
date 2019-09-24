@@ -84,8 +84,6 @@ const toIndexedObj = (array, prop) => array.reduce(
 
 const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
-const findByUuid = uuid => R.find(R.propEq(keys.uuid, uuid))
-
 module.exports = {
   keys,
   keysProps,
@@ -107,6 +105,5 @@ module.exports = {
   // UTILS
   isEqual,
   toIndexedObj,
-  toUuidIndexedObj,
-  findByUuid,
+  toUuidIndexedObj
 }
