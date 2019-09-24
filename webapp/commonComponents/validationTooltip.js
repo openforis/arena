@@ -5,7 +5,7 @@ import Validation from '../../common/validation/validation'
 
 import Tooltip from './tooltip'
 
-import useI18n from '../commonComponents/useI18n'
+import { useI18n } from './hooks'
 
 export default ({ validation, className, showKeys, children }) => {
   const i18n = useI18n()

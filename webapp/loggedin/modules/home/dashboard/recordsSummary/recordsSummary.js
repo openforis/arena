@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 import RecordsSummaryChart from './chart/recordsSummaryChart'
 import Dropdown from '../../../../../commonComponents/form/dropdown'
 

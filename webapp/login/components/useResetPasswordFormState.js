@@ -1,6 +1,6 @@
 import React from 'react'
 
-import useFormObject from '../../commonComponents/hooks/useFormObject'
+import { useFormObject } from '../../commonComponents/hooks'
 
 import { validateResetPasswordObj, getFirstError } from './loginValidator'
 

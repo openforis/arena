@@ -3,13 +3,14 @@ import './formHeader.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { useI18n } from '../../../../commonComponents/hooks'
+
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import { uuidv4 } from '../../../../../common/uuid'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
-import useI18n from '../../../../commonComponents/useI18n'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'

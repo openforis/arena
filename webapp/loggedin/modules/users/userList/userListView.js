@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 import TableView from '../../../tableViews/tableView'
 import ProfilePicture from '../../../../commonComponents/profilePicture'
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 
 import Authorizer from '../../../../../common/auth/authorizer'
 

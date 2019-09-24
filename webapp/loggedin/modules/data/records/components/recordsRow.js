@@ -3,7 +3,7 @@ import camelize from 'camelize'
 
 import { Link } from 'react-router-dom'
 
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'

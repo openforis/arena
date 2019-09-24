@@ -8,7 +8,7 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'

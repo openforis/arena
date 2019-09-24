@@ -3,7 +3,7 @@ import './categoryImportSummary.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import { Modal, ModalBody, ModalFooter } from '../../../../commonComponents/modal'
 

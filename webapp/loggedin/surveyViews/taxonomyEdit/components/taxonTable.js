@@ -1,11 +1,12 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { useI18n } from '../../../../commonComponents/hooks'
+
 import Taxonomy from '../../../../../common/survey/taxonomy'
 import Taxon from '../../../../../common/survey/taxon'
 import { languages } from '../../../../../common/app/languages'
 
-import useI18n from '../../../../commonComponents/useI18n'
 import TablePaginator from '../../../tableViews/components/tablePaginator'
 
 const TaxonTable = props => {

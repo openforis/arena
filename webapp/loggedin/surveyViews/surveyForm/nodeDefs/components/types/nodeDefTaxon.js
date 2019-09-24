@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { FormItem } from '../../../../../../commonComponents/form/input'
-import useI18n from '../../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../../commonComponents/hooks'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 import Taxon from '../../../../../../../common/survey/taxon'

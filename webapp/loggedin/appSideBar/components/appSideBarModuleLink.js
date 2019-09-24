@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import useI18n from '../../../commonComponents/useI18n'
+import { useI18n } from '../../../commonComponents/hooks'
 
 import * as SideBarModule from '../sidebarModule'
 

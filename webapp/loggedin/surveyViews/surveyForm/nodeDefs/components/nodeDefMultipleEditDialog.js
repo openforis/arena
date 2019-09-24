@@ -2,7 +2,7 @@ import './nodeDefMultipleEditDialog.scss'
 
 import React from 'react'
 
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../../../../commonComponents/modal'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
