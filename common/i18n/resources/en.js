@@ -49,6 +49,7 @@ module.exports = {
     undefinedName: 'Undefined name',
     upload: 'Upload',
     view: 'View',
+    warning: 'Warning',
     yes: 'Yes',
     date: {
       aMomentAgo: 'A moment ago',
@@ -238,10 +239,20 @@ module.exports = {
       defaultValues: 'Default values',
       applicableIf: 'Applicable if',
     },
+    codeProps: {
+      category: 'Category',
+      displayAs: 'Display As',
+      displayAsTypes: {
+        checkbox: 'Checkbox',
+        dropdown: 'Dropdown',
+      },
+      parentCode: 'Parent Code'
+    },
     expressionsProp: {
       expression: 'Expression',
       applyIf: 'Apply If',
       confirmDelete: 'Delete this expression?',
+      severity: 'Severity'
     },
     validationsProps: {
       minCount: 'Min count',

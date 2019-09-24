@@ -1,16 +1,26 @@
 const R = require('ramda')
 
 const Validation = require('./validation')
-const ValidatorFunctions = require('./_validator/validatorFunctions.js')
+const ValidationResult = require('./validationResult')
+const ValidatorFunctions = require('./_validator/validatorFunctions')
 
 const validateProp = async (obj, prop, validations = []) => {
-  const errors = R.reject(
-    R.isNil,
-    await Promise.all(
-      validations.map(validationFn => validationFn(prop, obj))
-    )
+  const validationsEvaluated = await Promise.all(
+    validations.map(validationFn => validationFn(prop, obj))
   )
-  return Validation.newInstance(R.isEmpty(errors), {}, errors)
+
+  const errors = []
+  const warnings = []
+  validationsEvaluated.forEach(validationResult => {
+      if (validationResult) {
+        // add validation result to errors or warnings
+        const arr = ValidationResult.isError(validationResult) ? errors : warnings
+        arr.push(R.omit([ValidationResult.keys.severity], validationResult))
+      }
+    }
+  )
+
+  return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
 }
 
 const validate = async (obj, propsValidations, removeValidFields = true) => {

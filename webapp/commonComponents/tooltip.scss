@@ -1,6 +1,5 @@
 @import "../style/vars";
 
-
 .tooltip {
   &:hover {
     cursor: pointer;
@@ -45,15 +44,33 @@
 
 }
 
-.tooltip__message-error {
+.tooltip__message-error,
+.tooltip__message-warning {
   @extend .tooltip__message;
-  background-color: $red;
 
   color: white;
-  border: 1px solid $red;
+  border: 1px solid;
   opacity: .97;
 
   &:after {
-    border-color: transparent transparent $red transparent;
+    border-color: transparent;
+  }
+}
+
+.tooltip__message-error {
+  background-color: $red;
+  border-color: $red;
+
+  &:after {
+    border-bottom-color: $red;
+  }
+}
+
+.tooltip__message-warning {
+  background-color: $orange;
+  border-color: $orange;
+
+  &:after {
+    border-bottom-color: $orange;
   }
 }
