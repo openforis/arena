@@ -45,7 +45,7 @@ const newCategory = (props = {}) => {
  * LEVELS
  */
 // ==== CREATE
-const newLevel = (category, props = {}, index = getLevelsArray(category).length) => ({
+const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
   [CategoryLevel.keys.uuid]: uuidv4(),
   [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
   [CategoryLevel.keys.index]: index,
