@@ -2,6 +2,7 @@ const fs = require('fs')
 
 const passwordGenerator = require('generate-password')
 
+const db = require('../../../db/db')
 const aws = require('../../../system/aws')
 
 const UserManager = require('../manager/userManager')
@@ -27,12 +28,11 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
     throw new UnauthorizedError(User.getName(user))
   }
 
-  // If the survey is not published, only survey admins and system admins can be invited
   const survey = await SurveyManager.fetchSurveyById(surveyId, true)
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const isPublished = Survey.isPublished(surveyInfo)
 
-  if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
+  // If the survey is not published, only survey admins and system admins can be invited
+  if (!Survey.isPublished(surveyInfo) && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
     throw new UnauthorizedError(User.getName(user))
   }
 
@@ -53,19 +53,33 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
       throw new SystemError('appErrors.userIsAdmin')
     }
 
-    await Promise.all([
-      UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser),
-      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, lang),
-    ])
+    await db.tx(async t => {
+      await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser, t)
+      await Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, lang)
+    })
   } else {
-    const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
-    const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
-
-    const msgParams = { serverUrl, email, password, surveyLabel, groupLabel, temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)' }
-    await Promise.all([
-      Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang),
-      UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
-    ])
+    await db.tx(async t => {
+      try {
+        const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
+        // add user to cognito pool
+        const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
+        // add user to db
+        await UserManager.insertUser(user, surveyId, userUuid, email, groupUuid, t)
+        // send email
+        const msgParams = {
+          serverUrl,
+          email,
+          password,
+          surveyLabel,
+          groupLabel,
+          temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)'
+        }
+        await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
+      } catch (e) {
+        await aws.deleteUser(email)
+        throw e
+      }
+    })
   }
 }
 
