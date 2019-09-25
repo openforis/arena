@@ -3,7 +3,7 @@ import './nodeDefEditButtons.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 
 import Layout from '../../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../../common/survey/nodeDef'

@@ -8,15 +8,13 @@ import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
 
 import Popup from '../../../../../../../commonComponents/popup'
 import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
-import { usePrevious } from '../../../../../../../commonComponents/hooks'
+import { useI18n, usePrevious } from '../../../../../../../commonComponents/hooks'
 
 import SortRow from './sortRow'
 
 import Survey from '../../../../../../../../common/survey/survey'
 
 import * as SurveyState from '../../../../../../../survey/surveyState'
-
-import useI18n from '../../../../../../../commonComponents/useI18n'
 
 const SortExpressionComponent = props => {
 

@@ -2,7 +2,7 @@ import React from 'react'
 
 import Expression from '../../../../common/exprParser/expression'
 
-import useI18n from '../../useI18n'
+import { useI18n } from '../../hooks'
 
 const EditButtons = (props) => {
 

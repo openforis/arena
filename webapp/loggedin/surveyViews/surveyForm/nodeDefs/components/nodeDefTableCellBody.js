@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
 
-import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
-import useI18n from '../../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../../commonComponents/hooks'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
@@ -14,6 +13,7 @@ import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Node from '../../../../../../common/record/node'
 import NodeRefData from '../../../../../../common/record/nodeRefData'
 
+import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 

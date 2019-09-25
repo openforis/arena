@@ -64,25 +64,26 @@ const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
 }
 
 //==== DELETE
-const deleteRecord = async (user, surveyId, recordUuid) => {
+const deleteRecord = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
     await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { recordUuid }, t)
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
   })
-}
 
 const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async t => {
-      await RecordRepository.deleteRecord(surveyId, recordUuid, t)
-      await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
-    }
-  )
+    await RecordRepository.deleteRecord(surveyId, recordUuid, t)
+    await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
+  })
 
-const deleteRecordsPreview = async (surveyId) =>
+const deleteRecordsPreview = async surveyId =>
   await db.tx(async t => {
     const deletedRecordUuids = await RecordRepository.deleteRecordsPreview(surveyId, t)
-    if (!R.isEmpty(deletedRecordUuids))
+    if (!R.isEmpty(deletedRecordUuids)) {
       await FileManager.deleteFilesByRecordUuids(surveyId, deletedRecordUuids, t)
+    }
+
+    return deletedRecordUuids.length
   })
 
 /**

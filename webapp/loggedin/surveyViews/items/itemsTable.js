@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import ErrorBadge from '../../../commonComponents/errorBadge'
 import WarningBadge from '../../../commonComponents/warningBadge'
-import useI18n from '../../../commonComponents/useI18n'
+import { useI18n } from '../../../commonComponents/hooks'
 
 const TableRow = props => {
 

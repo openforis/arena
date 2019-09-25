@@ -1,8 +1,8 @@
 import React from 'react'
 
-import NodeDef from '../../../../../../common/survey/nodeDef'
+import { useI18n } from '../../../../../commonComponents/hooks'
 
-import useI18n from '../../../../../commonComponents/useI18n'
+import NodeDef from '../../../../../../common/survey/nodeDef'
 
 const RecordsRowHeader = ({ nodeDefKeys, lang }) => {
   const i18n = useI18n()

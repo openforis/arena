@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import StringUtils from '../../../../common/stringUtils'
 
-import useI18n from '../../../commonComponents/useI18n'
+import { useI18n } from '../../../commonComponents/hooks'
 import { FormItem, Input } from '../../../commonComponents/form/input'
 import UploadButton from '../../../commonComponents/form/uploadButton'
 import LevelEdit from './components/levelEdit'

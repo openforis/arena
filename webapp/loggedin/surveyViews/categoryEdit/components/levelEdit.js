@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
-import useI18n from '../../../../commonComponents/useI18n'
+import { useI18n } from '../../../../commonComponents/hooks'
 import ItemEdit from './itemEdit'
 
 import { normalizeName } from '../../../../../common/stringUtils'
