@@ -96,7 +96,7 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
 
 const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
   const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
-  return categories
+  return categories || {}
 }
 
 const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = false, includeValidation = false, client = db) => {

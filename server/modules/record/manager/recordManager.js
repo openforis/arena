@@ -13,6 +13,26 @@ const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
 const NodeRepository = require('../repository/nodeRepository')
 
+const ActivityLog = require('../../activityLog/activityLogger')
+
+//CREATE
+const insertRecord = async (user, surveyId, record, client = db) =>
+  await client.tx(async t => {
+      const [recordDb] = await Promise.all([
+        RecordRepository.insertRecord(surveyId, record, t),
+        ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, record, t)
+      ])
+      return recordDb
+    }
+  )
+
+const insertAndInitRecord = async (user, survey, record, client = db) =>
+  await client.tx(async t => {
+    const recordDb = await insertRecord(user, Survey.getId(survey), record, t)
+    return await RecordUpdateManager.initNewRecord(user, survey, recordDb, null, null, t)
+  })
+
+//READ
 const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
@@ -40,7 +60,8 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, cli
 
 module.exports = {
   // ==== CREATE
-  insertRecord: RecordRepository.insertRecord,
+  insertRecord,
+  insertAndInitRecord,
   insertNodesFromValues: NodeRepository.insertNodesFromValues,
   insertNode: RecordUpdateManager.insertNode,
 

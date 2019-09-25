@@ -78,7 +78,7 @@ const _getOrCreatedRecordThread = (user, surveyId, recordUuid, preview = false, 
 const createRecord = async (user, surveyId, recordToCreate) => {
   Log.debug('create record: ', recordToCreate)
 
-  const record = await RecordManager.insertRecord(surveyId, recordToCreate)
+  const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
   // create record thread and initialize record
   _createRecordThread(user, surveyId, Record.getUuid(recordToCreate), Record.isPreview(recordToCreate), false, true)

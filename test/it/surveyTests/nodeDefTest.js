@@ -1,4 +1,4 @@
-const {getContextSurvey} = require('./../../testContext')
+const {getContextSurvey} = require('../../testContext')
 const {expect} = require('chai')
 const R = require('ramda')
 

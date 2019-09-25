@@ -112,7 +112,7 @@ class RecordBuilder {
     return await client.tx(async t => {
       const recordToCreate = Record.newRecord(this.user)
 
-      const record = await RecordManager.createRecord(this.user, this.survey, recordToCreate, t)
+      const record = await RecordManager.insertAndInitRecord(this.user, this.survey, recordToCreate, t)
 
       return await this.rootEntityBuilder.buildAndStore(this.user, this.survey, record, null, t)
     })

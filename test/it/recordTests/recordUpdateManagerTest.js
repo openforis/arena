@@ -29,7 +29,7 @@ const recordCreationTest = async () => {
 
   const recordNew = newRecordPreview()
 
-  const record = await RecordManager.createRecord(user, survey, recordNew)
+  const record = await RecordManager.insertAndInitRecord(user, survey, recordNew)
 
   const nodes = Record.getNodes(record)
 
@@ -55,14 +55,12 @@ const defaultValueAppliedTest = async () => {
 
   survey = await fetchFullContextSurvey()
 
-  const surveyId = Survey.getId(survey)
-
   //create record
 
   const recordToCreate = newRecordPreview()
 
   await db.tx(async t => {
-    const record = await RecordManager.createRecord(user, survey, recordToCreate, t)
+    const record = await RecordManager.insertAndInitRecord(user, survey, recordToCreate, t)
 
     const root = Record.getRootNode(record)
 

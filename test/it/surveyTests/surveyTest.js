@@ -1,4 +1,4 @@
-const { setContextSurvey, getContextUser } = require('./../../testContext')
+const { setContextSurvey, getContextUser } = require('../../testContext')
 const { assert } = require('chai')
 const { uuidv4 } = require('../../../common/uuid')
 

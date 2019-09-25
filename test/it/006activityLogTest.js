@@ -51,7 +51,7 @@ describe('Activity Log Test', async () => {
 
     const recordToCreate = Record.newRecord(user)
 
-    const record = await RecordManager.createRecord(user, survey, recordToCreate)
+    const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
     const logs = await ActivityLogger.fetchLogs(surveyId)
     expect(logs.length).to.be.at.least(1)
