@@ -105,6 +105,7 @@ const publishProps = async (surveyId, langsDeleted, client = db) =>
       publishSurveySchemaTableProps(surveyId, 'category', t),
       publishSurveySchemaTableProps(surveyId, 'category_level', t),
       publishSurveySchemaTableProps(surveyId, 'category_item', t),
+      CategoryRepository.markCategoriesPublished(surveyId, t),
       ...langsDeleted.map(langDeleted => CategoryRepository.deleteItemLabels(surveyId, langDeleted, t))
     ])
   )
