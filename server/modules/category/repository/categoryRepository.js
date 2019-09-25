@@ -83,7 +83,8 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
       'uuid', c.uuid,
-      'props', c.props${draft ? ` || c.props_draft` : ''}, 
+      'props', c.props${draft ? ` || c.props_draft` : ''},
+      'published', c.published, 
       'levels', l.levels
       ${includeValidation ? `, 'validation', c.validation` : ''}
       )) AS categories
@@ -194,6 +195,12 @@ const updateCategoryValidation = async (surveyId, categoryUuid, validation, clie
     [validation, categoryUuid]
   )
 
+const markCategoriesPublished = async (surveyId, client = db) =>
+  await client.any(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.category
+      SET published = true
+  `)
+
 const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 
@@ -240,6 +247,7 @@ module.exports = {
   //UPDATE
   updateCategoryProp,
   updateCategoryValidation,
+  markCategoriesPublished,
   updateLevelProp,
   updateItemProp,
 
