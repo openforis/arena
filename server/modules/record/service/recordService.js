@@ -29,7 +29,7 @@ const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTyp
 const createRecord = async (user, surveyId, recordToCreate) => {
   Log.debug('create record: ', recordToCreate)
 
-  const record = await RecordManager.insertRecord(surveyId, recordToCreate)
+  const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
   // create record thread and initialize record
   RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), false, true)

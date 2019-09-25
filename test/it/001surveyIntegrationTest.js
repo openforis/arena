@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const {initTestContext, destroyTestContext} = require('./../testContext')
+const {initTestContext, destroyTestContext} = require('../testContext')
 
 const SurveyIntegrationTest = require('./surveyTests/surveyTest')
 const CategoryTest = require('./surveyTests/categoryTest')

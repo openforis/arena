@@ -1,4 +1,3 @@
-const R = require('ramda')
 const { expect } = require('chai')
 
 const db = require('../../server/db/db')

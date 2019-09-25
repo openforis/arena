@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const { getContextSurveyId, getContextUser } = require('./../../testContext')
+const { getContextSurveyId, getContextUser } = require('../../testContext')
 const { expect } = require('chai')
 
 const CategoryManager = require('../../../server/modules/category/manager/categoryManager')
@@ -46,8 +46,7 @@ const createCategoryItemTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
-  const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(surveyId, true, false)
-  const category = R.pipe(R.values, R.head)(categories)
+  const category = await _fetchFirstCategory(surveyId)
 
   const level = Category.getLevelByIndex(0)(category)
 
@@ -59,7 +58,7 @@ const createCategoryItemTest = async () => {
     labels: { en: itemLabel }
   })
 
-  const { item } = await CategoryManager.insertItem(user, surveyId, itemReq)
+  const { item } = await CategoryManager.insertItem(user, surveyId, Category.getUuid(category), itemReq)
 
   expect(CategoryItem.getCode(item)).to.be.equal(itemCode)
   expect(CategoryItem.getLabel('en')(item)).to.be.equal(itemLabel)
