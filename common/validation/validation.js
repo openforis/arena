@@ -27,6 +27,7 @@ const keys = {
   valid: 'valid',
   errors: 'errors',
   warnings: 'warnings',
+  counts: 'counts',
 
   validation: 'validation',
 }
@@ -70,6 +71,43 @@ const recalculateValidity = validation => R.pipe(
     return newInstance(valid, fields, errors, warnings)
   }
 )(validation)
+
+const updateCounts = validation => {
+  let totalErrors = 0
+  let totalWarnings = 0
+
+  const stack = []
+  stack.push(validation)
+
+  while (!R.isEmpty(stack)) {
+    const validationCurrent = stack.pop()
+
+    // update total errors
+    totalErrors += R.pipe(
+      getErrors,
+      R.length
+    )(validationCurrent)
+
+    // update total warnings
+    totalWarnings += R.pipe(
+      getWarnings,
+      R.length
+    )(validationCurrent)
+
+    // add field validations to stack
+    const validationFields = getFieldValidations(validationCurrent)
+    if (!R.isEmpty(validationFields))
+      stack.push(...R.values(validationFields))
+  }
+
+  return {
+    ...validation,
+    [keys.counts]: {
+      [keys.errors]: totalErrors,
+      [keys.warnings]: totalWarnings,
+    }
+  }
+}
 
 //====== CREATE
 
@@ -150,6 +188,7 @@ module.exports = {
   dissocFieldValidation,
   mergeValidation,
   recalculateValidity,
+  updateCounts,
 
   // Object
   getValidation,
