@@ -1,5 +1,6 @@
 import React from 'react'
 import camelize from 'camelize'
+import * as R from 'ramda'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 
@@ -49,6 +50,18 @@ const RecordsRow = props => {
       </div>
       <div>
         {Record.getStep(record)}
+      </div>
+      <div>
+        {R.pipe(
+          Validation.getValidation,
+          Validation.getErrorsCount
+        )(record)}
+      </div>
+      <div>
+        {R.pipe(
+          Validation.getValidation,
+          Validation.getWarningsCount
+        )(record)}
       </div>
       <div>
         <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>

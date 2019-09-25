@@ -26,7 +26,7 @@ const RecordsView = props => {
   } = props
 
   const noCols = 3 + nodeDefKeys.length
-  const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 50px`
+  const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
   const onRowClick = record => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 

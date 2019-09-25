@@ -25,7 +25,10 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
       Validation.keys.validation,
       includeValidationFields
         ? validation
-        : Validation.newInstance(Validation.isValid(validation)),
+        : {
+          ...Validation.newInstance(Validation.isValid(validation)),
+          [Validation.keys.counts]: Validation.getCounts(validation)
+        },
     ),
   )(record)
 }

@@ -50,6 +50,7 @@ module.exports = {
     upload: 'Upload',
     view: 'View',
     warning: 'Warning',
+    warning_plural: 'Warnings',
     yes: 'Yes',
     date: {
       aMomentAgo: 'A moment ago',
