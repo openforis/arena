@@ -13,6 +13,7 @@ const keys = {
   levels: 'levels',
   props: 'props',
   items: 'items',
+  published: 'published',
 }
 
 const props = {
@@ -126,6 +127,7 @@ module.exports = {
   getName: ObjectUtils.getProp(props.name, ''),
   getLevelsArray,
   getLevelByIndex,
+  isPublished: R.propOr(false, keys.published),
 
   // UPDATE
   assocLevelsArray,

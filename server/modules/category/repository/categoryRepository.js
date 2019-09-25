@@ -108,6 +108,17 @@ const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = fals
   return R.pipe(R.values, R.head)(categories)
 }
 
+const isCategoryPublished = async (surveyId, categoryUuid, client = db) => {
+  const { published } = await client.one(`
+      SELECT published
+      FROM ${getSurveyDBSchema(surveyId)}.category
+      WHERE uuid = $1
+      `,
+    [categoryUuid]
+  )
+  return published
+}
+
 const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
   const items = await client.map(`
       SELECT i.* 
@@ -239,6 +250,7 @@ module.exports = {
   //READ
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
+  isCategoryPublished,
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,

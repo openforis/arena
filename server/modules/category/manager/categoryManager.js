@@ -252,6 +252,7 @@ module.exports = {
   //READ
   fetchCategoriesAndLevelsBySurveyId: CategoryRepository.fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid: CategoryRepository.fetchCategoryAndLevelsByUuid,
+  isCategoryPublished: CategoryRepository.isCategoryPublished,
   fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemsByLevelIndex: CategoryRepository.fetchItemsByLevelIndex,

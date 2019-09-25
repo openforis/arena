@@ -77,7 +77,7 @@ const ItemEdit = (props) => {
                 <button className="btn btn-delete"
                         aria-disabled={disabled}
                         onClick={() => {
-                          if (confirm(i18n.t('categoryEdit.confirmDelete'))) {
+                          if (confirm(i18n.t('categoryEdit.confirmDeleteItem'))) {
                             deleteCategoryItem(category, level, item)
                           }
                         }}>
