@@ -26,12 +26,6 @@ const insertRecord = async (user, surveyId, record, client = db) =>
     }
   )
 
-const insertAndInitRecord = async (user, survey, record, client = db) =>
-  await client.tx(async t => {
-    const recordDb = await insertRecord(user, Survey.getId(survey), record, t)
-    return await RecordUpdateManager.initNewRecord(user, survey, recordDb, null, null, t)
-  })
-
 //READ
 const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
@@ -61,7 +55,6 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, cli
 module.exports = {
   // ==== CREATE
   insertRecord,
-  insertAndInitRecord,
   insertNodesFromValues: NodeRepository.insertNodesFromValues,
   insertNode: RecordUpdateManager.insertNode,
 

@@ -15,6 +15,8 @@ const RecordManager = require('../../../server/modules/record/manager/recordMana
 
 const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 
+const RecordUtils = require('../utils/recordUtils')
+
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
     [NodeDef.propKeys.defaultValues]: defaultValueExpressions
@@ -29,7 +31,7 @@ const recordCreationTest = async () => {
 
   const recordNew = newRecordPreview()
 
-  const record = await RecordManager.insertAndInitRecord(user, survey, recordNew)
+  const record = await RecordUtils.insertAndInitRecord(user, survey, recordNew)
 
   const nodes = Record.getNodes(record)
 
@@ -60,7 +62,7 @@ const defaultValueAppliedTest = async () => {
   const recordToCreate = newRecordPreview()
 
   await db.tx(async t => {
-    const record = await RecordManager.insertAndInitRecord(user, survey, recordToCreate, t)
+    const record = await RecordUtils.insertAndInitRecord(user, survey, recordToCreate, t)
 
     const root = Record.getRootNode(record)
 

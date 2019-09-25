@@ -1,12 +1,21 @@
 const R = require('ramda')
 
+const db = require('../../../server/db/db')
+
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const RecordValidation = require('../../../common/record/recordValidation')
 const Validation = require('../../../common/validation/validation')
+const RecordManager = require('../../../server/modules/record/manager/recordManager')
 
 const Queue = require('../../../common/queue')
+
+const insertAndInitRecord = async (user, survey, record, client = db) =>
+  await client.tx(async t => {
+    const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, t)
+    return await RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
+  })
 
 const getNodePath = node => (survey, record) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
@@ -97,6 +106,8 @@ const getValidationMaxCount = (parentNode, childDef) => R.pipe(
 )
 
 module.exports = {
+  insertAndInitRecord,
+
   getNodePath,
   getValidationMinCount,
   getValidationMaxCount,
