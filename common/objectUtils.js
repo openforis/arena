@@ -105,5 +105,5 @@ module.exports = {
   // UTILS
   isEqual,
   toIndexedObj,
-  toUuidIndexedObj,
+  toUuidIndexedObj
 }

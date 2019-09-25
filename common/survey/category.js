@@ -45,19 +45,15 @@ const newCategory = (props = {}) => {
  * LEVELS
  */
 // ==== CREATE
-const newLevel = (category, props = {}) => {
-  const index = getLevelsArray(category).length
-
-  return {
-    [CategoryLevel.keys.uuid]: uuidv4(),
-    [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
-    [CategoryLevel.keys.index]: index,
-    [CategoryLevel.keys.props]: {
-      [CategoryLevel.props.name]: 'level_' + (index + 1),
-      ...props
-    }
+const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
+  [CategoryLevel.keys.uuid]: uuidv4(),
+  [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
+  [CategoryLevel.keys.index]: index,
+  [CategoryLevel.keys.props]: {
+    [CategoryLevel.props.name]: 'level_' + (index + 1),
+    ...props
   }
-}
+})
 
 // ====== READ
 const getLevels = R.propOr([], keys.levels)

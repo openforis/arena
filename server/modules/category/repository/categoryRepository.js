@@ -62,23 +62,50 @@ const insertItems = async (surveyId, items, client = db) => {
 
 // ============== READ
 
-const fetchCategoriesBySurveyId = async (surveyId, draft = false, client = db) =>
-  await client.map(`
-    SELECT * 
-    FROM ${getSurveyDBSchema(surveyId)}.category
-    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}, id`,
-    [],
-    def => dbTransformCallback(def, draft, true)
-  )
+const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) => `
+    WITH
+      levels AS
+      (
+        SELECT
+          l.category_uuid,
+          json_object_agg(l.index::text, json_build_object(
+            'id', l.id, 
+            'uuid', l.uuid, 
+            'index', l.index, 
+            'props', l.props${draft ? ` || l.props_draft` : ''}
+          )) AS levels
+        FROM
+          ${getSurveyDBSchema(surveyId)}.category_level l
+        GROUP BY
+          l.category_uuid
+      )
+    SELECT
+      json_object_agg(c.uuid, json_build_object( 
+      'id', c.id,
+      'uuid', c.uuid,
+      'props', c.props${draft ? ` || c.props_draft` : ''}, 
+      'levels', l.levels
+      ${includeValidation ? `, 'validation', c.validation` : ''}
+      )) AS categories
+    FROM
+      ${getSurveyDBSchema(surveyId)}.category c
+    JOIN
+      levels l
+    ON
+      c.uuid = l.category_uuid`
 
-const fetchLevelsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) =>
-  await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.category_level
-     WHERE category_uuid = $1
-     ORDER BY index`,
-    [categoryUuid],
-    def => dbTransformCallback(def, draft, true)
+const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
+  const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
+  return categories
+}
+
+const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = false, includeValidation = false, client = db) => {
+  const { categories } = await client.one(
+    `${_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation)} WHERE c.uuid = $1`,
+    [categoryUuid]
   )
+  return R.pipe(R.values, R.head)(categories)
+}
 
 const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
   const items = await client.map(`
@@ -121,14 +148,6 @@ const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null,
     : R.filter(item => item.published)(items)
 }
 
-const fetchItemByUuid = async (surveyId, itemUuid, draft = false, client = db) =>
-  await client.one(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.category_item
-     WHERE uuid = $1`,
-    [itemUuid],
-    item => dbTransformCallback(item, draft, true)
-  )
-
 const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
   await client.map(
     `SELECT i.* 
@@ -166,6 +185,15 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
 const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
 
+const updateCategoryValidation = async (surveyId, categoryUuid, validation, client = db) =>
+  await client.none(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.category 
+      SET validation = $1::jsonb 
+      WHERE uuid = $2
+    `,
+    [validation, categoryUuid]
+  )
+
 const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 
@@ -202,16 +230,16 @@ module.exports = {
   insertItems,
 
   //READ
-  fetchCategoriesBySurveyId,
-  fetchLevelsByCategoryUuid,
+  fetchCategoriesAndLevelsBySurveyId,
+  fetchCategoryAndLevelsByUuid,
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
-  fetchItemByUuid,
   fetchItemsByLevelIndex,
   fetchIndex,
 
   //UPDATE
   updateCategoryProp,
+  updateCategoryValidation,
   updateLevelProp,
   updateItemProp,
 
