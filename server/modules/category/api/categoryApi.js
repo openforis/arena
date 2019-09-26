@@ -1,6 +1,7 @@
 const Request = require('../../../utils/request')
+const SystemError = require('../../../utils/systemError')
 
-const ObjectUtils = require('../../../../common/objectUtils')
+const Category = require('../../../../common/survey/category')
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const CategoryService = require('../service/categoryService')
 
@@ -22,6 +23,14 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/categories/:categoryUuid/upload', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
+      const { surveyId, categoryUuid } = Request.getParams(req)
+
+      const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid)
+
+      if (Category.isPublished(category)) {
+        throw new SystemError('categoryEdit.cantImportCsvIntoPublishedCategory')
+      }
+
       const file = Request.getFile(req)
 
       const summary = await CategoryService.createImportSummary(file.tempFilePath)

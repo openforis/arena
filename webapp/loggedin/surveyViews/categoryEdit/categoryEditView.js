@@ -47,9 +47,12 @@ const CategoryEditView = props => {
           </FormItem>
 
           {!readOnly &&
-          <UploadButton label={i18n.t('common.csvImport')}
-                        accept=".csv"
-                        onChange={(files) => uploadCategory(Category.getUuid(category), files[0])}/>
+          <UploadButton
+            label={i18n.t('common.csvImport')}
+            accept=".csv"
+            onChange={(files) => uploadCategory(Category.getUuid(category), files[0])}
+            disabled={Category.isPublished(category)}
+          />
           }
         </div>
 

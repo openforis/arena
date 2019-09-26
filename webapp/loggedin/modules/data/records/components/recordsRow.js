@@ -64,7 +64,7 @@ const RecordsRow = props => {
         )(record)}
       </div>
       <div>
-        <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
+        <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
       </div>
     </>
   )

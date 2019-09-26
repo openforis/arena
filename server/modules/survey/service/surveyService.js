@@ -18,6 +18,7 @@ module.exports = {
 
   // READ
   fetchUserSurveysInfo: SurveyManager.fetchUserSurveysInfo,
+  countUserSurveys: SurveyManager.countUserSurveys,
   fetchSurveyById: SurveyManager.fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId: SurveyManager.fetchSurveyAndNodeDefsBySurveyId,
 

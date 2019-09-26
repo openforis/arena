@@ -6,6 +6,7 @@ CREATE TABLE
   props       jsonb              DEFAULT '{}'::jsonb,
   props_draft jsonb              DEFAULT '{}'::jsonb,
   validation  jsonb     NOT NULL DEFAULT '{}'::jsonb,
+  published   boolean   NOT NULL DEFAULT false,
 
   PRIMARY KEY (id),
   CONSTRAINT category_uuid_idx UNIQUE (uuid)

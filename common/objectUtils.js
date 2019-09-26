@@ -7,6 +7,8 @@ const keys = {
   uuid: 'uuid',
   parentUuid: 'parentUuid',
   props: 'props',
+  dateCreated: 'dateCreated',
+  dateModified: 'dateModified',
 }
 
 const keysProps = {
@@ -42,6 +44,10 @@ const getDescription = (lang, defaultTo = null) => R.pipe(
   getDescriptions,
   R.propOr(defaultTo, lang)
 )
+
+const getDateCreated = R.propOr(null, keys.dateCreated)
+
+const getDateModified = R.propOr(null, keys.dateModified)
 
 // ===== UPDATE
 
@@ -97,6 +103,8 @@ module.exports = {
   getLabel,
   getDescriptions,
   getDescription,
+  getDateCreated,
+  getDateModified,
 
   // UPDATE
   setProp,

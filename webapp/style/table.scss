@@ -43,21 +43,8 @@
   position: relative;
   font-size: .9rem;
 
-  &.active {
-    background-color: $yellowHighlight;
-  }
-
   &:last-child {
     border-bottom: none;
-  }
-
-  &.hoverable {
-    cursor: pointer;
-    transition: .2s all;
-
-    &:hover {
-      background-color: rgba($blueLight, 0.3);
-    }
   }
 
   > div {
@@ -74,6 +61,32 @@
     &.active {
       background-color: $orangeLight;
     }
+  }
+}
+
+.table__row.hoverable {
+  cursor: pointer;
+  transition: .2s all;
+
+  .icon-action {
+    transition: .2s all;
+  }
+
+  &:hover {
+    background-color: rgba($blueLight, 0.3);
+
+    .icon-action {
+      color: $orange;
+    }
+  }
+}
+
+.table__row.active {
+  background-color: $yellowHighlight;
+  pointer-events: none;
+
+  .icon-action {
+    color: $orange;
   }
 }
 

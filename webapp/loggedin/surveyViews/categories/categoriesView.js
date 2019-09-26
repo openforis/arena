@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+
+import { useI18n } from '../../../commonComponents/hooks'
 
 import ItemsView from '../items/itemsView'
 import CategoryEditView from '../categoryEdit/categoryEditView'
@@ -19,46 +21,49 @@ import {
   setCategoryForEdit,
 } from '../categoryEdit/actions'
 
-class CategoriesView extends React.Component {
+const CategoriesView = props => {
 
-  componentWillUnmount () {
-    const { category, setCategoryForEdit } = this.props
-    if (category)
-      setCategoryForEdit(null)
-  }
+  const {
+    categories, category, selectedItemUuid,
+    createCategory, deleteCategory, setCategoryForEdit,
+    onSelect, onClose, canSelect,
+    readOnly
+  } = props
 
-  render () {
+  useEffect(() =>
+    () => {
+      if (category) {
+        setCategoryForEdit(null)
+      }
+    }, [Category.getUuid(category)]
+  )
 
-    const {
-      categories, category, selectedItemUuid,
-      createCategory, deleteCategory, setCategoryForEdit,
-      onSelect, onClose, canSelect,
-      readOnly
-    } = this.props
+  const i18n = useI18n()
 
-    const canDeleteCategory = category => category.usedByNodeDefs
-      ? alert('This category is used by some node definitions and cannot be removed')
-      : window.confirm(`Delete the category ${Category.getName(category)}? This operation cannot be undone.`)
+  const canDeleteCategory = category => category.usedByNodeDefs
+    ? alert(i18n.t('categoryEdit.cantBeDeleted'))
+    : window.confirm(i18n.t('categoryEdit.confirmDelete', {
+      categoryName: Category.getName(category) || i18n.t('common.undefinedName')
+    }))
 
-    return (
-      <ItemsView
-        headerText="Categories"
-        itemEditComponent={CategoryEditView}
-        itemEditProp="category"
-        itemLabelFunction={category => Category.getName(category)}
-        editedItem={category}
-        items={categories}
-        selectedItemUuid={selectedItemUuid}
-        onAdd={createCategory}
-        onEdit={setCategoryForEdit}
-        canDelete={canDeleteCategory}
-        onDelete={deleteCategory}
-        canSelect={canSelect}
-        onSelect={onSelect}
-        onClose={onClose}
-        readOnly={readOnly}/>
-    )
-  }
+  return (
+    <ItemsView
+      headerText="Categories"
+      itemEditComponent={CategoryEditView}
+      itemEditProp="category"
+      itemLabelFunction={category => Category.getName(category)}
+      editedItem={category}
+      items={categories}
+      selectedItemUuid={selectedItemUuid}
+      onAdd={createCategory}
+      onEdit={setCategoryForEdit}
+      canDelete={canDeleteCategory}
+      onDelete={deleteCategory}
+      canSelect={canSelect}
+      onSelect={onSelect}
+      onClose={onClose}
+      readOnly={readOnly}/>
+  )
 }
 
 const mapStateToProps = (state) => {

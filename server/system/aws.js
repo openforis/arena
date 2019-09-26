@@ -68,8 +68,16 @@ const updateUser = (oldEmail, email, name) => {
   return _sendAwsRequest(_getAwsClient().adminUpdateUserAttributes(params))
 }
 
+const deleteUser = email => {
+  const params = {
+    UserPoolId: ProcessUtils.ENV.cognitoUserPoolId,
+    Username: email
+  }
+  return _sendAwsRequest(_getAwsClient().adminDeleteUser(params))
+}
+
 const sendEmail = (from, to, subject, body) => {
-  // Create sendEmail params 
+  // Create sendEmail params
   const params = {
     Destination: {
       ToAddresses: [to]
@@ -100,5 +108,7 @@ const sendEmail = (from, to, subject, body) => {
 module.exports = {
   inviteUser,
   updateUser,
+  deleteUser,
+
   sendEmail,
 }
