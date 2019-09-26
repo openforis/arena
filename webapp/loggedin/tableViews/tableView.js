@@ -6,13 +6,14 @@ import { useI18n } from '../../commonComponents/hooks'
 
 import TablePaginator from './components/tablePaginator'
 
+import * as SurveyState from '../../survey/surveyState'
 import * as TableViewsState from './tableViewsState'
 
 import { initList, fetchListItems } from './actions'
 
 const TableView = props => {
   const {
-    module, className,
+    module, moduleApiUri, className,
     headerLeftComponent, gridTemplateColumns,
     rowHeaderComponent, rowComponent, noItemsLabelKey,
     list, offset, limit, count,
@@ -21,7 +22,7 @@ const TableView = props => {
   } = props
 
   useEffect(() => {
-    initList(module)
+    initList(moduleApiUri, module)
   }, [])
 
   const hasItems = !R.isEmpty(list)
@@ -38,10 +39,11 @@ const TableView = props => {
         {
           hasItems &&
           <TablePaginator
+            moduleApiUri={moduleApiUri}
             offset={offset}
             limit={limit}
             count={count}
-            fetchFn={fetchListItems}
+            fetchFn={offset => fetchListItems(moduleApiUri, offset)}
           />
         }
 
@@ -90,6 +92,7 @@ const TableView = props => {
 
 TableView.defaultProps = {
   module: '',
+  moduleApiUri: null,
   className: '',
   gridTemplateColumns: '1fr',
   headerLeftComponent: () => <div></div>,
@@ -100,9 +103,11 @@ TableView.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const { module } = props
+  let { module, moduleApiUri } = props
+  moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
 
   return {
+    moduleApiUri,
     offset: TableViewsState.getOffset(module)(state),
     limit: TableViewsState.getLimit(module)(state),
     count: TableViewsState.getCount(module)(state),

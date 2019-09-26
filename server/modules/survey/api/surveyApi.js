@@ -37,9 +37,9 @@ module.exports.init = app => {
       const user = Request.getUser(req)
       const { offset, limit } = Request.getParams(req)
 
-      const surveys = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
+      const list = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
 
-      res.json({ surveys })
+      res.json({ list })
     } catch (err) {
       next(err)
     }

@@ -5,8 +5,12 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import Survey from '../../../../../common/survey/survey'
+import Authorizer from '../../../../../common/auth/authorizer'
 
-import SurveyListTable from './surveyListTable'
+import TableView from '../../../tableViews/tableView'
+import SurveyListHeaderLeft from './components/surveyListHeaderLeft'
+import SurveyListRowHeader from './components/surveyListRowHeader'
+import SurveyListRow from './components/surveyListRow'
 import { useOnUpdate } from '../../../../commonComponents/hooks'
 
 import * as AppState from '../../../../app/appState'
@@ -14,33 +18,37 @@ import * as SurveyListState from './surveyListState'
 import * as SurveyState from '../../../../survey/surveyState'
 import { appModuleUri, homeModules } from '../../../appModules'
 
-import { fetchSurveys } from './actions'
 import { setActiveSurvey } from '../../../../survey/actions'
 
 const SurveyListView = props => {
 
   const {
-    user, surveyInfo, surveys, history,
-    setActiveSurvey, fetchSurveys
+    user, surveyInfo, history,
+    setActiveSurvey,
   } = props
-
-  //onMount fetch surveys
-  useEffect(() => {
-    fetchSurveys()
-  }, [])
 
   // redirect to dashboard on survey change
   useOnUpdate(() => {
     history.push(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
-  return !R.isEmpty(surveys) &&
-    <SurveyListTable
-      user={user}
-      surveys={surveys}
-      surveyInfo={surveyInfo}
-      setActiveSurvey={setActiveSurvey}
+  const onRowClick = surveyRow => {
+    const canEdit = Authorizer.canEditSurvey(user, surveyRow)
+    setActiveSurvey(Survey.getId(surveyRow), canEdit)
+  }
+
+  return (
+    <TableView
+      module="surveys"
+      gridTemplateColumns="repeat(5, 1.5fr) 1fr"
+      headerLeftComponent={SurveyListHeaderLeft}
+      rowHeaderComponent={SurveyListRowHeader}
+      rowComponent={SurveyListRow}
+      onRowClick={onRowClick}
+      moduleApiUri="/api/surveys"
     />
+  )
+
 }
 
 const mapStateToProps = state => ({
@@ -49,7 +57,4 @@ const mapStateToProps = state => ({
   surveys: SurveyListState.getSurveys(state),
 })
 
-export default connect(
-  mapStateToProps,
-  { fetchSurveys, setActiveSurvey }
-)(SurveyListView)
+export default connect(mapStateToProps, { setActiveSurvey })(SurveyListView)
