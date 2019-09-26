@@ -25,7 +25,7 @@ module.exports = {
   insertItem: CategoryManager.insertItem,
 
   fetchCategoriesAndLevelsBySurveyId: CategoryManager.fetchCategoriesAndLevelsBySurveyId,
-  isCategoryPublished: CategoryManager.isCategoryPublished,
+  fetchCategoryAndLevelsByUuid: CategoryManager.fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid: CategoryManager.fetchItemsByParentUuid,
 
   updateCategoryProp: CategoryManager.updateCategoryProp,

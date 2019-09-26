@@ -105,7 +105,7 @@ const publishProps = async (surveyId, langsDeleted, client = db) =>
       publishSurveySchemaTableProps(surveyId, 'category', t),
       publishSurveySchemaTableProps(surveyId, 'category_level', t),
       publishSurveySchemaTableProps(surveyId, 'category_item', t),
-      CategoryRepository.markCategoriesPublished(surveyId, t),
+      CategoryRepository.markCategoriesPublishedBySurveyId(surveyId, t),
       ...langsDeleted.map(langDeleted => CategoryRepository.deleteItemLabels(surveyId, langDeleted, t))
     ])
   )
@@ -252,7 +252,6 @@ module.exports = {
   //READ
   fetchCategoriesAndLevelsBySurveyId: CategoryRepository.fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid: CategoryRepository.fetchCategoryAndLevelsByUuid,
-  isCategoryPublished: CategoryRepository.isCategoryPublished,
   fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemsByLevelIndex: CategoryRepository.fetchItemsByLevelIndex,

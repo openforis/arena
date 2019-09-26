@@ -108,17 +108,6 @@ const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = fals
   return R.pipe(R.values, R.head)(categories)
 }
 
-const isCategoryPublished = async (surveyId, categoryUuid, client = db) => {
-  const { published } = await client.one(`
-      SELECT published
-      FROM ${getSurveyDBSchema(surveyId)}.category
-      WHERE uuid = $1
-      `,
-    [categoryUuid]
-  )
-  return published
-}
-
 const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
   const items = await client.map(`
       SELECT i.* 
@@ -206,7 +195,7 @@ const updateCategoryValidation = async (surveyId, categoryUuid, validation, clie
     [validation, categoryUuid]
   )
 
-const markCategoriesPublished = async (surveyId, client = db) =>
+const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =>
   await client.any(`
       UPDATE ${getSurveyDBSchema(surveyId)}.category
       SET published = true
@@ -250,7 +239,6 @@ module.exports = {
   //READ
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
-  isCategoryPublished,
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
   fetchItemsByLevelIndex,
@@ -259,7 +247,7 @@ module.exports = {
   //UPDATE
   updateCategoryProp,
   updateCategoryValidation,
-  markCategoriesPublished,
+  markCategoriesPublishedBySurveyId,
   updateLevelProp,
   updateItemProp,
 

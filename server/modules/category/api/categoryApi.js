@@ -1,6 +1,7 @@
 const Request = require('../../../utils/request')
 const SystemError = require('../../../utils/systemError')
 
+const Category = require('../../../../common/survey/category')
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const CategoryService = require('../service/categoryService')
 
@@ -24,7 +25,9 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
 
-      if (await CategoryService.isCategoryPublished(surveyId, categoryUuid)) {
+      const category = await CategoryService.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid)
+
+      if (Category.isPublished(category)) {
         throw new SystemError('categoryEdit.cantImportCsvIntoPublishedCategory')
       }
 
