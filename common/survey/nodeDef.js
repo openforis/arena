@@ -1,7 +1,7 @@
 const R = require('ramda')
 const { uuidv4 } = require('../uuid')
 
-const SurveyUtils = require('./surveyUtils')
+const ObjectUtils = require('../objectUtils')
 const NodeDefValidations = require('./nodeDefValidations')
 
 const StringUtils = require('../stringUtils')
@@ -23,24 +23,24 @@ const nodeDefType = {
 }
 
 const keys = {
-  uuid: 'uuid',
-  props: 'props',
+  uuid: ObjectUtils.keys.uuid,
+  props: ObjectUtils.keys.props,
   meta: 'meta',
   draftAdvanced: 'draftAdvanced',
   type: 'type',
+  deleted: 'deleted',
+  published: 'published',
 }
 
 const propKeys = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
-  deleted: 'deleted',
   descriptions: 'descriptions',
   key: 'key',
   labels: 'labels',
   multiple: 'multiple',
   name: 'name',
   parentUuid: 'parentUuid',
-  published: 'published',
   readOnly: 'readOnly',
   validations: 'validations',
 
@@ -69,12 +69,12 @@ const newNodeDef = (parentUuid, type, props) => ({
 // ==== READ
 
 const getType = R.prop(keys.type)
-const getName = SurveyUtils.getProp(propKeys.name, '')
-const getParentUuid = SurveyUtils.getParentUuid
+const getName = ObjectUtils.getProp(propKeys.name, '')
+const getParentUuid = ObjectUtils.getParentUuid
 
-const isKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
+const isKey = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
 const isRoot = R.pipe(getParentUuid, R.isNil)
-const isMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
+const isMultiple = R.pipe(ObjectUtils.getProp(propKeys.multiple), R.equals(true))
 const isSingle = R.pipe(isMultiple, R.not)
 
 const isType = type => R.pipe(getType, R.equals(type))
@@ -96,8 +96,8 @@ const isFile = isType(nodeDefType.file)
 const isInteger = isType(nodeDefType.integer)
 const isTaxon = isType(nodeDefType.taxon)
 
-const isPublished = R.propEq(propKeys.published, true)
-const isDeleted = R.propEq(propKeys.deleted, true)
+const isPublished = R.propEq(keys.published, true)
+const isDeleted = R.propEq(keys.deleted, true)
 
 const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
@@ -106,15 +106,15 @@ const getLabel = (nodeDef, lang) => {
     : label
 }
 
-const getDefaultValues = SurveyUtils.getProp(propKeys.defaultValues, [])
+const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
 const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 
-const getValidations = SurveyUtils.getProp(propKeys.validations, {})
+const getValidations = ObjectUtils.getProp(propKeys.validations, {})
 
 // ==== READ meta
 const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
-const getParentCodeDefUuid = SurveyUtils.getProp(propKeys.parentCodeDefUuid)
+const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
@@ -175,19 +175,19 @@ module.exports = {
   newNodeDef,
 
   //READ
-  getUuid: SurveyUtils.getUuid,
-  getProp: SurveyUtils.getProp,
-  isEqual: SurveyUtils.isEqual,
+  getUuid: ObjectUtils.getUuid,
+  getProp: ObjectUtils.getProp,
+  isEqual: ObjectUtils.isEqual,
 
   getType,
   getName,
   getParentUuid,
-  getLabels: SurveyUtils.getLabels,
+  getLabels: ObjectUtils.getLabels,
   getLabel,
-  getDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
-  getCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
+  getDescriptions: ObjectUtils.getProp(propKeys.descriptions, {}),
+  getCategoryUuid: ObjectUtils.getProp(propKeys.categoryUuid),
   getParentCodeDefUuid,
-  getTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
+  getTaxonomyUuid: ObjectUtils.getProp(propKeys.taxonomyUuid),
 
   isKey,
   isMultiple,
@@ -200,7 +200,7 @@ module.exports = {
   isMultipleEntity,
   isSingleAttribute,
   isMultipleAttribute,
-  isReadOnly: SurveyUtils.getProp(propKeys.readOnly, false),
+  isReadOnly: ObjectUtils.getProp(propKeys.readOnly, false),
 
   isBoolean,
   isCode,
@@ -216,7 +216,7 @@ module.exports = {
   //advanced props
   getDefaultValues,
   hasDefaultValues,
-  getApplicable: SurveyUtils.getProp(propKeys.applicable, []),
+  getApplicable: ObjectUtils.getProp(propKeys.applicable, []),
   getValidations,
   getValidationExpressions: R.pipe(
     getValidations,
