@@ -55,7 +55,7 @@ class RecordCheckJob extends Job {
   async _checkRecord (survey, nodeDefsNew, nodeDefsUpdated, nodeDefsDeleted, record, tx) {
     // 1. remove deleted nodes
     if (!R.isEmpty(nodeDefsDeleted)) {
-      const recordDeletedNodes = await RecordManager.deleteNodes(this.surveyId, nodeDefsDeleted.map(NodeDef.getUuid), record, tx)
+      const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(this.surveyId, nodeDefsDeleted.map(NodeDef.getUuid), record, tx)
       record = recordDeletedNodes || record
     }
 

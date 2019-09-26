@@ -52,12 +52,6 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, cli
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
-//DELETE
-const deleteNodes = async (surveyId, nodeDefsUuids, record, client = db) => {
-  const nodesDeleted = await NodeRepository.deleteNodes(surveyId, nodeDefsUuids, client)
-  return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
-}
-
 module.exports = {
   // ==== CREATE
   insertRecord,
@@ -87,7 +81,7 @@ module.exports = {
   deleteRecordPreview: RecordUpdateManager.deleteRecordPreview,
   deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
   deleteNode: RecordUpdateManager.deleteNode,
-  deleteNodes,
+  deleteNodesByNodeDefUuids: RecordUpdateManager.deleteNodesByNodeDefUuids,
 
   // ==== VALIDATION
   persistValidation: RecordValidationManager.persistValidation,

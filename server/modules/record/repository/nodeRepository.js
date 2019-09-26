@@ -165,7 +165,7 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
     dbTransformCallback
   )
 
-const deleteNodes = async (surveyId, nodeDefUuids, client = db) =>
+const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
   await client.many(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE node_def_uuid IN ($1:csv)
@@ -212,7 +212,7 @@ module.exports = {
 
   //DELETE
   deleteNode,
-  deleteNodes,
+  deleteNodesByNodeDefUuids,
 
   //UTILS
   disableTriggers: async (surveyId, client = db) => await disableSurveySchemaTableTriggers(surveyId, 'node', client),
