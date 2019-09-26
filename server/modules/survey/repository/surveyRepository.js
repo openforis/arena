@@ -31,7 +31,7 @@ const insertSurvey = async (survey, client = db) =>
 const fetchAllSurveyIds = async (client = db) =>
   await client.map(`SELECT id FROM survey`, [], R.prop('id'))
 
-const fetchSurveys = async (user, offset = 0, limit = null, client = db) => {
+const fetchUserSurveys = async (user, offset = 0, limit = null, client = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return await client.map(`
@@ -54,8 +54,10 @@ const fetchSurveys = async (user, offset = 0, limit = null, client = db) => {
   )
 }
 
-const countSurveys = async (user, checkAccess = true, client = db) => {
-  const res = await client.one(`
+const countUserSurveys = async (user, client = db) => {
+  const checkAccess = !User.isSystemAdmin(user)
+
+  return await client.one(`
     SELECT count(s.id)
     FROM survey s
     ${checkAccess ? `
@@ -68,7 +70,6 @@ const countSurveys = async (user, checkAccess = true, client = db) => {
     `,
     [User.getUuid(user)]
   )
-  return res.count
 }
 
 const fetchSurveysByName = async (surveyName, client = db) =>
@@ -161,8 +162,8 @@ module.exports = {
 
   // READ
   fetchAllSurveyIds,
-  fetchSurveys,
-  countSurveys,
+  fetchUserSurveys,
+  countUserSurveys,
   fetchSurveysByName,
   fetchSurveyById,
   fetchDependencies,

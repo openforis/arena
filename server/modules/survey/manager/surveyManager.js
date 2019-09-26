@@ -122,7 +122,7 @@ const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = fals
 
 const fetchUserSurveysInfo = async (user, offset, limit) => R.map(
   assocSurveyInfo,
-  await SurveyRepository.fetchSurveys(user, offset, limit)
+  await SurveyRepository.fetchUserSurveys(user, offset, limit)
 )
 
 // ====== UPDATE
@@ -200,6 +200,7 @@ module.exports = {
   fetchSurveyAndNodeDefsBySurveyId,
   fetchSurveyAndNodeDefsAndRefDataBySurveyId,
   fetchUserSurveysInfo,
+  countUserSurveys: SurveyRepository.countUserSurveys,
   fetchDependencies: SurveyRepository.fetchDependencies,
 
   // ====== UPDATE

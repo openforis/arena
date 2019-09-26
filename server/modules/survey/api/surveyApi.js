@@ -45,6 +45,18 @@ module.exports.init = app => {
     }
   })
 
+  app.get('/surveys/count', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+
+      const count = await SurveyService.countUserSurveys(user)
+
+      res.json(count)
+    } catch (err) {
+      next(err)
+    }
+  })
+
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
