@@ -35,10 +35,23 @@ module.exports.init = app => {
   app.get('/surveys', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const { offset, limit } = Request.getParams(req)
 
-      const surveys = await SurveyService.fetchUserSurveysInfo(user)
+      const list = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
 
-      res.json({ surveys })
+      res.json({ list })
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.get('/surveys/count', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+
+      const count = await SurveyService.countUserSurveys(user)
+
+      res.json(count)
     } catch (err) {
       next(err)
     }

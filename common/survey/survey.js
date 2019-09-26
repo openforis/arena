@@ -55,6 +55,8 @@ module.exports = {
   getSRS: SurveyInfo.getSRS,
   getDefaultSRS: SurveyInfo.getDefaultSRS,
   getStatus: SurveyInfo.getStatus,
+  getDateCreated: SurveyInfo.getDateCreated,
+  getDateModified: SurveyInfo.getDateModified,
   isPublished: SurveyInfo.isPublished,
   isDraft: SurveyInfo.isDraft,
   isValid: SurveyInfo.isValid,

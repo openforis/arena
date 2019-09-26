@@ -31,8 +31,10 @@ const insertSurvey = async (survey, client = db) =>
 const fetchAllSurveyIds = async (client = db) =>
   await client.map(`SELECT id FROM survey`, [], R.prop('id'))
 
-const fetchSurveys = async (user, checkAccess = true, client = db) =>
-  await client.map(`
+const fetchUserSurveys = async (user, offset = 0, limit = null, client = db) => {
+  const checkAccess = !User.isSystemAdmin(user)
+
+  return await client.map(`
     SELECT ${surveySelectFields('s')} 
       ${checkAccess ? `, json_build_array(row_to_json(g.*)) AS auth_groups` : ''}
     FROM survey s
@@ -44,10 +46,31 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
     :
     ''}
     ORDER BY s.date_modified DESC
-    `,
+    LIMIT ${limit ? limit : 'ALL'}
+    OFFSET ${offset}
+  `,
     [User.getUuid(user)],
     def => dbTransformCallback(def, true)
   )
+}
+
+const countUserSurveys = async (user, client = db) => {
+  const checkAccess = !User.isSystemAdmin(user)
+
+  return await client.one(`
+    SELECT count(s.id)
+    FROM survey s
+    ${checkAccess ? `
+    JOIN auth_group g
+      ON s.uuid = g.survey_uuid
+    JOIN auth_group_user gu
+      ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
+    :
+    ''}
+    `,
+    [User.getUuid(user)]
+  )
+}
 
 const fetchSurveysByName = async (surveyName, client = db) =>
   await client.map(
@@ -139,7 +162,8 @@ module.exports = {
 
   // READ
   fetchAllSurveyIds,
-  fetchSurveys,
+  fetchUserSurveys,
+  countUserSurveys,
   fetchSurveysByName,
   fetchSurveyById,
   fetchDependencies,

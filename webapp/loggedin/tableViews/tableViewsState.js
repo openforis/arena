@@ -18,22 +18,16 @@ export const defaults = {
   [keys.list]: [],
 }
 
-// ====== Active module
-
-export const assocModuleActive = module => R.assoc(keys.module, module)
-
-export const getModuleActive = R.pipe(getState, R.prop(keys.module))
-
 // ====== Module props
 
 export const assocListUpdateProps = props => state => {
-  const module = R.prop(keys.module, state)
+  const module = R.prop(keys.module, props)
 
   return {
     ...state,
     [module]: {
       ...state[module],
-      ...props
+      ...R.omit([keys.module], props)
     }
   }
 }

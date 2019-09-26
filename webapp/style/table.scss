@@ -43,10 +43,6 @@
   position: relative;
   font-size: .9rem;
 
-  &.active {
-    background-color: $yellowHighlight;
-  }
-
   &:last-child {
     border-bottom: none;
   }
@@ -82,6 +78,15 @@
     .icon-action {
       color: $orange;
     }
+  }
+}
+
+.table__row.active {
+  background-color: $yellowHighlight;
+  pointer-events: none;
+
+  .icon-action {
+    color: $orange;
   }
 }
 

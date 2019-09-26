@@ -133,6 +133,8 @@ module.exports = {
   getDefaultLabel,
   getLabel,
   getStatus,
+  getDateCreated: ObjectUtils.getDateCreated,
+  getDateModified: ObjectUtils.getDateModified,
   getCollectUri,
   isFromCollect,
   getCollectReport,
