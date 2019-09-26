@@ -66,5 +66,5 @@ export const validateEmail = async obj => await Validator.validate(
 export const getFirstError = (validation, order) => {
   const firstMatch = order.map(field => Validation.getFieldValidation(field)(validation))
     .find(v => !Validation.isValid(v))
-  return Validator.getErrors(firstMatch)[0].key
+  return Validation.getErrors(firstMatch)[0].key
 }
