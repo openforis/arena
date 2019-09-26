@@ -33,6 +33,7 @@ const keys = {
 const propKeys = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
+  deleted: 'deleted',
   descriptions: 'descriptions',
   key: 'key',
   labels: 'labels',
@@ -96,6 +97,7 @@ const isInteger = isType(nodeDefType.integer)
 const isTaxon = isType(nodeDefType.taxon)
 
 const isPublished = R.propEq(propKeys.published, true)
+const isDeleted = R.propEq(propKeys.deleted, true)
 
 const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
@@ -209,6 +211,7 @@ module.exports = {
   isTaxon,
 
   isPublished,
+  isDeleted,
 
   //advanced props
   getDefaultValues,

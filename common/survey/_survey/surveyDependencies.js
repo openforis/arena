@@ -54,7 +54,17 @@ const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) =>
     //return all node def dependents
     R.pipe(
       R.values,
-      R.map(R.values),
+      R.reduce((accDependents, graph) =>
+          R.pipe(
+            R.propOr([], nodeDefUuid),
+            R.ifElse(
+              R.isEmpty,
+              R.always(accDependents),
+              R.concat(accDependents)
+            )
+          )(graph),
+        []
+      ),
       R.flatten,
       R.uniq
     ),

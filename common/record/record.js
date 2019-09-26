@@ -68,7 +68,6 @@ module.exports = {
   assocNode: RecordUpdater.assocNode,
 
   // ====== DELETE
-
   deleteNode: RecordUpdater.deleteNode,
 
   // ====== VALIDATION

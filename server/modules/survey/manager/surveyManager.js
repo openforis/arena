@@ -101,8 +101,8 @@ const fetchSurveyById = async (surveyId, draft = false, validate = false, client
   return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
 
-const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
-  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
+const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, includeDeleted, client)
   const survey = Survey.assocNodeDefs(nodeDefs)(await fetchSurveyById(surveyId, draft, validate, client))
 
   return validate
@@ -110,8 +110,8 @@ const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advance
     : survey
 }
 
-const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
-  const survey = await fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, validate, client)
+const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
+  const survey = await fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, validate, includeDeleted, client)
   const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
     CategoryRepository.fetchIndex(surveyId, draft, client),
     TaxonomyRepository.fetchIndex(surveyId, draft, client)
