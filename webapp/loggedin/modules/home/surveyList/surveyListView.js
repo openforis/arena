@@ -1,8 +1,5 @@
-import './surveyListView.scss'
-
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import Survey from '../../../../../common/survey/survey'
 import Authorizer from '../../../../../common/auth/authorizer'
@@ -14,7 +11,6 @@ import SurveyListRow from './components/surveyListRow'
 import { useOnUpdate } from '../../../../commonComponents/hooks'
 
 import * as AppState from '../../../../app/appState'
-import * as SurveyListState from './surveyListState'
 import * as SurveyState from '../../../../survey/surveyState'
 import { appModuleUri, homeModules } from '../../../appModules'
 
@@ -54,7 +50,6 @@ const SurveyListView = props => {
 const mapStateToProps = state => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
-  surveys: SurveyListState.getSurveys(state),
 })
 
 export default connect(mapStateToProps, { setActiveSurvey })(SurveyListView)
