@@ -22,10 +22,10 @@ const SurveyListRow = props => {
         {Survey.getDefaultLabel(surveyInfoRow)}
       </div>
       <div>
-        {DateUtils.getRelativeDate(i18n, surveyInfoRow.dateCreated)}
+        {DateUtils.getRelativeDate(i18n, Survey.getDateCreated(surveyInfoRow))}
       </div>
       <div>
-        {DateUtils.getRelativeDate(i18n, surveyInfoRow.dateModified)}
+        {DateUtils.getRelativeDate(i18n, Survey.getDateModified(surveyInfoRow))}
       </div>
       <div>
         {Survey.getStatus(surveyInfoRow)}

@@ -1,17 +1,19 @@
 const R = require('ramda')
 
+const ObjectUtils = require('../objectUtils')
+const StringUtils = require('../stringUtils')
 const { uuidv4 } = require('./../uuid')
-const { isBlank, trim } = require('../stringUtils')
 
 const Validation = require('../validation/validation')
 const NodeDef = require('../survey/nodeDef')
-const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
-  id: SurveyUtils.keys.id,
-  uuid: SurveyUtils.keys.uuid,
+  id: ObjectUtils.keys.id,
+  uuid: ObjectUtils.keys.uuid,
+  parentUuid: ObjectUtils.keys.parentUuid,
+  dateCreated: ObjectUtils.keys.dateCreated,
+  dateModified: ObjectUtils.keys.dateModified,
   recordUuid: 'recordUuid',
-  parentUuid: 'parentUuid',
   nodeDefUuid: 'nodeDefUuid',
   value: 'value',
   meta: 'meta',
@@ -84,9 +86,9 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
  * ======
  */
 
-const getUuid = SurveyUtils.getUuid
+const getUuid = ObjectUtils.getUuid
 
-const getParentUuid = SurveyUtils.getParentUuid
+const getParentUuid = ObjectUtils.getParentUuid
 
 const getRecordUuid = R.prop(keys.recordUuid)
 
@@ -139,7 +141,7 @@ const isValueBlank = node => {
     return true
 
   if (R.is(String, value))
-    return isBlank(value)
+    return StringUtils.isBlank(value)
 
   return R.isEmpty(value)
 }
@@ -196,19 +198,19 @@ module.exports = {
     R.partialRight(getValue, ['//']),
     R.split('/'),
     R.prop(2),
-    trim,
+    StringUtils.trim,
   ),
   getDateMonth: R.pipe(
     R.partialRight(getValue, ['//']),
     R.split('/'),
     R.prop(1),
-    trim
+    StringUtils.trim
   ),
   getDateDay: R.pipe(
     R.partialRight(getValue, ['//']),
     R.split('/'),
     R.prop(0),
-    trim
+    StringUtils.trim
   ),
 
   // time
@@ -216,13 +218,13 @@ module.exports = {
     R.partialRight(getValue, [':']),
     R.split(':'),
     R.prop(0),
-    trim
+    StringUtils.trim
   ),
   getTimeMinute: R.pipe(
     R.partialRight(getValue, [':']),
     R.split(':'),
     R.prop(1),
-    trim
+    StringUtils.trim
   ),
 
   // coordinate

@@ -1,7 +1,8 @@
 const R = require('ramda')
+
+const ObjectUtils = require('../objectUtils')
 const { uuidv4 } = require('./../uuid')
 
-const SurveyUtils = require('../survey/surveyUtils')
 const Validation = require('../validation/validation')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
@@ -29,13 +30,13 @@ module.exports = {
   // ====== READ
   getSurveyUuid: R.prop(keys.surveyUuid),
 
-  getUuid: SurveyUtils.getUuid,
+  getUuid: ObjectUtils.getUuid,
   isPreview: R.propEq(keys.preview, true),
   getOwnerUuid: R.prop(keys.ownerUuid),
   getOwnerName: R.prop(keys.ownerName),
   getStep: R.prop(keys.step),
-  getDateCreated: R.prop(keys.dateCreated),
-  getDateModified: R.prop(keys.dateModified),
+  getDateCreated: ObjectUtils.getDateCreated,
+  getDateModified: ObjectUtils.getDateModified,
 
   getNodes: RecordReader.getNodes,
   getNodeByUuid: RecordReader.getNodeByUuid,

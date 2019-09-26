@@ -1,3 +1,5 @@
+const ObjectUtils = require('../../objectUtils')
+
 const keys = {
   surveyUuid: 'surveyUuid',
   uuid: 'uuid',
@@ -6,8 +8,8 @@ const keys = {
   ownerName: 'ownerName',
   step: 'step',
   preview: 'preview',
-  dateCreated: 'dateCreated',
-  dateModified: 'dateModified',
+  dateCreated: ObjectUtils.keys.dateCreated,
+  dateModified: ObjectUtils.keys.dateModified,
 }
 
 module.exports = keys
