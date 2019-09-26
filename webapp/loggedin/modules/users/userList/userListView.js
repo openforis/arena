@@ -75,7 +75,7 @@ const UsersRow = props => {
         }
       </div>
       <div>
-        <span className={`icon icon-12px ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/>
+        <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/>
       </div>
     </>
   )
