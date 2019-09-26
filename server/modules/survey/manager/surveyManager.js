@@ -120,9 +120,9 @@ const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = fals
   return Survey.assocRefData(categoryIndexRS, taxonomyIndexRS)(survey)
 }
 
-const fetchUserSurveysInfo = async (user) => R.map(
+const fetchUserSurveysInfo = async (user, offset, limit) => R.map(
   assocSurveyInfo,
-  await SurveyRepository.fetchSurveys(user, !User.isSystemAdmin(user))
+  await SurveyRepository.fetchSurveys(user, offset, limit)
 )
 
 // ====== UPDATE

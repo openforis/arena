@@ -35,8 +35,9 @@ module.exports.init = app => {
   app.get('/surveys', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const { offset, limit } = Request.getParams(req)
 
-      const surveys = await SurveyService.fetchUserSurveysInfo(user)
+      const surveys = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
 
       res.json({ surveys })
     } catch (err) {
