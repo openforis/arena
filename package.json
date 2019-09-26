@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@esri/proj-codes": "^2.2.0",
+    "@sendgrid/mail": "^6.4.0",
     "amazon-cognito-identity-js": "^3.0.15",
     "aws-sdk": "^2.529.0",
     "axios": "^0.19.0",

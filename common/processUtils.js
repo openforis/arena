@@ -11,7 +11,6 @@ const ENV = {
   port: getEnvVariable('PORT', '9090'),
   nodeEnv: getEnvVariable('NODE_ENV', environments.development),
   tempFolder: getEnvVariable('TEMP_FOLDER', '/tmp/arena_upload'),
-  adminEmail: getEnvVariable('ADMIN_EMAIL'),
   buildReport: getEnvVariable('BUILD_REPORT') === 'true',
   sourceVersion: getEnvVariable('SOURCE_VERSION', 'N/A'),
   //COGNITO
@@ -26,7 +25,10 @@ const ENV = {
   pgSchema: getEnvVariable('PGSCHEMA'),
   pgHost: getEnvVariable('PGHOST'),
   pgPort: getEnvVariable('PGPORT'),
-  pgSsl: getEnvVariable('PGSSL') === 'true'
+  pgSsl: getEnvVariable('PGSSL') === 'true',
+  //EMAIL
+  adminEmail: getEnvVariable('ADMIN_EMAIL'),
+  sendGridApiKey: getEnvVariable('SENDGRID_API_KEY'),
 }
 
 const envDevelopment = ENV.nodeEnv === environments.development

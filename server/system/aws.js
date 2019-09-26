@@ -76,39 +76,8 @@ const deleteUser = email => {
   return _sendAwsRequest(_getAwsClient().adminDeleteUser(params))
 }
 
-const sendEmail = (from, to, subject, body) => {
-  // Create sendEmail params
-  const params = {
-    Destination: {
-      ToAddresses: [to]
-    },
-    Message: {
-      Body: {
-        Html: {
-          Charset: 'UTF-8',
-          Data: body
-        },
-      },
-      Subject: {
-        Charset: 'UTF-8',
-        Data: subject
-      }
-    },
-    Source: from,
-    ReplyToAddresses: [from],
-  }
-
-  // Returns a promise
-  return new aws.SES({
-    apiVersion: '2010-12-01',
-    region: ProcessUtils.ENV.cognitoRegion,
-  }).sendEmail(params).promise()
-}
-
 module.exports = {
   inviteUser,
   updateUser,
   deleteUser,
-
-  sendEmail,
 }
