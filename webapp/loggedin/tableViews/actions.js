@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import * as TableViewsState from './tableViewsState'
 
-export const tableViewsModuleActiveUpdate = 'tableViews/moduleActive/update'
 export const tableViewsListUpdate = 'tableViews/list/update'
 
 const getItems = (moduleApiUri, offset, limit) => axios.get(
@@ -10,11 +9,8 @@ const getItems = (moduleApiUri, offset, limit) => axios.get(
   { params: { offset, limit } }
 )
 
-export const initList = (moduleApiUri, module) => async (dispatch, getState) => {
-  dispatch({ type: tableViewsModuleActiveUpdate, module })
-
+export const initList = (module, moduleApiUri) => async (dispatch, getState) => {
   const state = getState()
-
   const offset = TableViewsState.getOffset(module)(state)
   const limit = TableViewsState.getLimit(module)(state)
 
@@ -25,6 +21,7 @@ export const initList = (moduleApiUri, module) => async (dispatch, getState) => 
 
   dispatch({
     type: tableViewsListUpdate,
+    module,
     offset,
     limit,
     ...countResp.data,
@@ -32,10 +29,9 @@ export const initList = (moduleApiUri, module) => async (dispatch, getState) => 
   })
 }
 
-export const fetchListItems = (moduleApiUri, offset) => async (dispatch, getState) => {
+export const fetchListItems = (module, moduleApiUri, offset) => async (dispatch, getState) => {
   const state = getState()
 
-  const module = TableViewsState.getModuleActive(state)
   const limit = TableViewsState.getLimit(module)(state)
 
   const { data } = await getItems(moduleApiUri, offset, limit)

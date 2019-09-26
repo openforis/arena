@@ -22,7 +22,7 @@ const TableView = props => {
   } = props
 
   useEffect(() => {
-    initList(moduleApiUri, module)
+    initList(module, moduleApiUri)
   }, [])
 
   const hasItems = !R.isEmpty(list)
@@ -39,11 +39,10 @@ const TableView = props => {
         {
           hasItems &&
           <TablePaginator
-            moduleApiUri={moduleApiUri}
             offset={offset}
             limit={limit}
             count={count}
-            fetchFn={offset => fetchListItems(moduleApiUri, offset)}
+            fetchFn={offset => fetchListItems(module, moduleApiUri, offset)}
           />
         }
 

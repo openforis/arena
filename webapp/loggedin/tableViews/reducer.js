@@ -4,7 +4,7 @@ import * as TableViewsState from './tableViewsState'
 
 import { appUserLogout } from '../../app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '../../survey/actions'
-import { tableViewsListUpdate, tableViewsModuleActiveUpdate } from './actions'
+import { tableViewsListUpdate } from './actions'
 
 const actionHandlers = {
 
@@ -15,9 +15,6 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   [tableViewsListUpdate]: (state, { type, ...actionProps }) => TableViewsState.assocListUpdateProps(actionProps)(state),
-
-  [tableViewsModuleActiveUpdate]: (state, { module }) => TableViewsState.assocModuleActive(module)(state),
-
 }
 
 export default exportReducer(actionHandlers)
