@@ -327,11 +327,14 @@ module.exports = {
   },
 
   categoryEdit: {
-    categoryName: 'Category name',
     addLevel: 'Add level',
-    level: 'Level',
-    confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
+    categoryName: 'Category name',
+    cantBeDeleted: 'This category is used by some node definitions and cannot be removed',
+    cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
+    confirmDelete: 'Delete the category {{categoryName}}? This operation cannot be undone.',
+    confirmDeleteItem: 'Delete the item with all children? $t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
+    level: 'Level',
 
     importSummary: {
       column: 'Column',
