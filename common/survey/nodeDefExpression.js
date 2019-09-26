@@ -108,7 +108,6 @@ module.exports = {
   assocExpression: expression => assocProp(keys.expression, expression),
   assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
   assocMessage,
-  assocMessages,
   assocSeverity,
 
   //UTILS
