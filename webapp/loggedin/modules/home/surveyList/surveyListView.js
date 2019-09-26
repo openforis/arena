@@ -33,15 +33,18 @@ const SurveyListView = props => {
     setActiveSurvey(Survey.getId(surveyRow), canEdit)
   }
 
+  const isRowActive = surveyRow => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
+
   return (
     <TableView
       module="surveys"
-      gridTemplateColumns="repeat(5, 1.5fr) 1fr"
+      moduleApiUri="/api/surveys"
+      gridTemplateColumns="50px repeat(5, 1.5fr)"
       headerLeftComponent={SurveyListHeaderLeft}
       rowHeaderComponent={SurveyListRowHeader}
       rowComponent={SurveyListRow}
       onRowClick={onRowClick}
-      moduleApiUri="/api/surveys"
+      isRowActive={isRowActive}
     />
   )
 
