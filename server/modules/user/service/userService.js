@@ -39,7 +39,7 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
   const dbUser = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
-  const groupName = AuthGroups.getName(Authorizer.getSurveyUserGroup(user, surveyInfo))
+  const groupName = AuthGroups.getName(group)
   const groupLabel = `$t(authGroups.${groupName}.label)`
 
   if (dbUser) {
