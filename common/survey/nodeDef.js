@@ -34,6 +34,7 @@ const keys = {
 
 const propKeys = {
   applicable: 'applicable',
+  cycles: 'cycles',
   defaultValues: 'defaultValues',
   descriptions: 'descriptions',
   key: 'key',
@@ -60,10 +61,10 @@ const maxKeyAttributes = 3
 // ==== CREATE
 
 const newNodeDef = (parentUuid, type, props) => ({
-  uuid: uuidv4(),
-  parentUuid,
-  type,
-  props,
+  [keys.uuid]: uuidv4(),
+  [keys.parentUuid]: parentUuid,
+  [keys.type]: type,
+  [keys.props]: props,
 })
 
 // ==== READ
@@ -188,6 +189,7 @@ module.exports = {
   getCategoryUuid: ObjectUtils.getProp(propKeys.categoryUuid),
   getParentCodeDefUuid,
   getTaxonomyUuid: ObjectUtils.getProp(propKeys.taxonomyUuid),
+  getCycles: ObjectUtils.getProp(propKeys.cycles, []),
 
   isKey,
   isMultiple,
