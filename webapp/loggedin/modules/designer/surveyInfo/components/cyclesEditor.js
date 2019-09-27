@@ -21,9 +21,9 @@ const DateEditor = ({ date, onChange }) => {
 
   return (
     <span className="date">
-    <input type="text" ref={yearRef} size="4" maxlength="4" value={year} onChange={onChangeDate}/>-
-    <input type="text" ref={monthRef} size="2" maxlength="2" value={month} onChange={onChangeDate}/>-
-    <input type="text" ref={dayRef} size="2" maxlength="2" value={day} onChange={onChangeDate}/>
+    <input type="text" ref={yearRef} size="4" maxLength="4" value={year} onChange={onChangeDate}/>-
+    <input type="text" ref={monthRef} size="2" maxLength="2" value={month} onChange={onChangeDate}/>-
+    <input type="text" ref={dayRef} size="2" maxLength="2" value={day} onChange={onChangeDate}/>
   </span>
   )
 }
@@ -47,7 +47,7 @@ const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
 )
 
 const CycleEditor = props => {
-  const { step, cycle, i18n, readOnly, onChange } = props
+  const { step, cycle, i18n, readOnly, onChange, onDelete } = props
 
   return (
     <div key={step} className="cycle">
@@ -71,6 +71,17 @@ const CycleEditor = props => {
           onChange={date => onChange(SurveyCycle.setDateEnd(date)(cycle))}
         />
       }
+
+      {
+        !readOnly && step !== '0' &&
+        <button className="btn-s btn-transparent btn-delete"
+                onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: step + 1 }))
+                  ? onDelete(step)
+                  : null
+                }>
+          <span className="icon icon-bin2 icon-12px"/>
+        </button>
+      }
     </div>
   )
 }
@@ -78,29 +89,50 @@ const CycleEditor = props => {
 const CyclesEditor = props => {
 
   const { cycles, readOnly, setCycles } = props
+  const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
+
+  const onDelete = stepToDelete => {
+    const cyclesUpdate = cycleEntries.reduce(
+      (accCycles, [step, cycle]) => {
+        if (stepToDelete !== step) {
+          const stepUpdate = Object.keys(accCycles).length
+          accCycles[stepUpdate + ''] = cycle
+        }
+        return accCycles
+      },
+      {}
+    )
+    setCycles(cyclesUpdate)
+  }
 
   return (
     <div className="home-survey-info__cycles-editor">
 
       <div className="cycles">
         {
-          Object.entries(cycles).map(([step, cycle]) =>
+          cycleEntries.map(([step, cycle]) =>
             <CycleEditor
               key={step}
               step={step}
               cycle={cycle}
               i18n={i18n}
               readOnly={readOnly}
-              onChange={cycleUpdate => setCycles(R.assoc(step, cycleUpdate)(cycles))}
+              onChange={cycleUpdate => setCycles(
+                R.assoc(step, cycleUpdate)(cycles)
+              )}
+              onDelete={onDelete}
             />
           )
         }
 
         {
           !readOnly &&
-          <button className="btn-s btn-add">
+          <button className="btn-s btn-add"
+                  onClick={() => setCycles(
+                    R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
+                  )}>
             <span className="icon icon-plus icon-10px"/>
           </button>
         }
