@@ -38,6 +38,7 @@ export const fetchListItems = (module, moduleApiUri, offset) => async (dispatch,
 
   dispatch({
     type: tableViewsListUpdate,
+    module,
     offset,
     ...data,
   })
