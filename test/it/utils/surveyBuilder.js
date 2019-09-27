@@ -22,6 +22,20 @@ class NodeDefBuilder {
     }
   }
 
+  _createNodeDef (survey, parentDefUuid) {
+    const cycle = R.pipe(
+      Survey.getSurveyInfo,
+      Survey.getCycles,
+      R.keys,
+      R.head
+    )(survey)
+
+    return NodeDef.newNodeDef(parentDefUuid, this.type, {
+      ...this.props,
+      [NodeDef.propKeys.cycles]: [cycle]
+    })
+  }
+
   applyIf (expr) {
     this.props[NodeDef.propKeys.applicable] = [NodeDefExpression.createExpression(expr)]
     return this
@@ -64,8 +78,8 @@ class EntityDefBuilder extends NodeDefBuilder {
     this.childBuilders = childBuilders
   }
 
-  build (survey, parentDefUUid = null) {
-    const def = NodeDef.newNodeDef(parentDefUUid, this.type, this.props)
+  build (survey, parentDefUuid = null) {
+    const def = this._createNodeDef(survey, parentDefUuid)
 
     const defUuid = NodeDef.getUuid(def)
 
@@ -106,7 +120,7 @@ class AttributeDefBuilder extends NodeDefBuilder {
   }
 
   build (survey, parentDefUuid = null) {
-    const def = NodeDef.newNodeDef(parentDefUuid, this.type, this.props)
+    const def = this._createNodeDef(survey, parentDefUuid)
 
     return {
       [NodeDef.getUuid(def)]: def

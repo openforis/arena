@@ -5,6 +5,7 @@ const DbUtils = require('../../../db/dbUtils')
 const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
+const ObjectUtils = require('../../../../common/objectUtils')
 
 const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 
@@ -47,7 +48,7 @@ const insertNodeDef = async (surveyId, nodeDef, client = db) => {
         VALUES ($1, $2, $3, $4, $5::jsonb)
         RETURNING *
     `,
-    [parentUuid, NodeDef.getUuid(nodeDef), NodeDef.getType(nodeDef), nodeDef.props, meta],
+    [parentUuid, NodeDef.getUuid(nodeDef), NodeDef.getType(nodeDef), ObjectUtils.getProps(nodeDef), meta],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }

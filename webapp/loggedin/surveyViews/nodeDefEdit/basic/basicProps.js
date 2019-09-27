@@ -168,6 +168,7 @@ const BasicProps = props => {
             label: Number(cycle) + 1,
             disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0]
           }))}
+          disabled={NodeDef.isRoot(nodeDef)}
         />
       </FormItem>
     </div>

@@ -24,6 +24,7 @@ const nodeDefType = {
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
+  parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
   meta: 'meta',
   draftAdvanced: 'draftAdvanced',
@@ -41,7 +42,6 @@ const propKeys = {
   labels: 'labels',
   multiple: 'multiple',
   name: 'name',
-  parentUuid: 'parentUuid',
   readOnly: 'readOnly',
   validations: 'validations',
 

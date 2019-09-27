@@ -152,7 +152,7 @@ class NodeDefsImportJob extends Job {
       props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = pageUuid
 
     // 3. insert node def into db
-    const nodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, props)
+    const nodeDefParam = this._createNodeDef(parentNodeDef, type, props)
     let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
@@ -381,7 +381,7 @@ class NodeDefsImportJob extends Job {
         [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, `${nodeDefName}_${itemCode}`),
         [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)(NodeDef.getLabels())
       }
-      const qualifierNodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), nodeDefType.text, props)
+      const qualifierNodeDefParam = this._createNodeDef(parentNodeDef, nodeDefType.text, props)
       const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, tx)
       const propsAdvanced = {
         [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(util.format(qualifiableItemApplicableExpressionFormat, nodeDefName, itemCode))]
@@ -448,6 +448,21 @@ class NodeDefsImportJob extends Job {
     } else {
       return null
     }
+  }
+
+  _createNodeDef (parentNodeDef, type, props) {
+    const cycle = R.pipe(
+      CollectImportJobContext.getSurvey,
+      Survey.getSurveyInfo,
+      Survey.getCycles,
+      R.keys,
+      R.head
+    )(this.context)
+
+    return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, {
+      ...props,
+      [NodeDef.propKeys.cycles]: [cycle]
+    })
   }
 }
 
