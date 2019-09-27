@@ -2,7 +2,6 @@ const { parentPort, workerData, isMainThread } = require('worker_threads')
 
 const Log = require('../log/log')
 
-const threadMessageTypes = require('./threadMessageTypes')
 const ThreadParams = require('./threadParams')
 
 /**
@@ -19,15 +18,12 @@ class Thread {
       parentPort.on('message', this.messageHandler.bind(this))
   }
 
-  async messageHandler (msg) {
-    try {
-      await this.onMessage(msg)
-      this.postMessage({ type: threadMessageTypes.messageProcessComplete })
-    } catch (e) {
-      const error = e.toString()
-      this.logger.error(`Error in thread:  ${error}`)
-      this.postMessage({ type: threadMessageTypes.error, error })
-    }
+  get user () {
+    return this.params[ThreadParams.keys.user]
+  }
+
+  get surveyId () {
+    return this.params[ThreadParams.keys.surveyId]
   }
 
   /**
@@ -38,6 +34,16 @@ class Thread {
     parentPort.postMessage({ user: this.user, surveyId: this.surveyId, msg })
   }
 
+  async messageHandler (msg) {
+    try {
+      await this.onMessage(msg)
+    } catch (e) {
+      const error = e.toString()
+      this.logger.error(`Error in thread:  ${error}`)
+      this.postMessage({ type: Thread.messageTypes.error, error })
+    }
+  }
+
   /**
    * receive message from main event loop
    * @param msg
@@ -46,18 +52,10 @@ class Thread {
     //TO OVERRIDE
   }
 
-  _getParam (name) {
-    return this.params[name]
-  }
+}
 
-  get user () {
-    return this._getParam(ThreadParams.keys.user)
-  }
-
-  get surveyId () {
-    return this._getParam(ThreadParams.keys.surveyId)
-  }
-
+Thread.messageTypes = {
+  error: 'error',
 }
 
 module.exports = Thread

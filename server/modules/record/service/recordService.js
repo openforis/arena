@@ -32,7 +32,8 @@ const createRecord = async (user, surveyId, recordToCreate) => {
   const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
   // create record thread and initialize record
-  RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), false, true)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate))
+  thread.postMessage({ type: recordThreadMessageTypes.recordInit })
 
   return record
 }
@@ -62,7 +63,7 @@ const checkIn = async (user, surveyId, recordUuid, draft) => {
   const preview = Record.isPreview(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, false)
+    RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid)
   }
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
@@ -100,6 +101,17 @@ const dissocUserFromRecordThread = userUuid => {
  * NODE
  * ======
  */
+const _sendNodeUpdateMessage = (user, surveyId, recordUuid, msg) => {
+  const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
+
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid)
+  thread.postMessage(msg, user)
+
+  if (singleMessage) {
+    RecordServiceThreads.killRecordThread(recordUuid)
+  }
+}
+
 const persistNode = async (user, surveyId, node, file) => {
   if (file) {
     //save file to "file" table and set fileUuid and fileName into node value
@@ -108,14 +120,22 @@ const persistNode = async (user, surveyId, node, file) => {
 
     await FileManager.insertFile(surveyId, fileObj)
   }
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), true)
-  thread.postMessage({ type: recordThreadMessageTypes.nodePersist, node, user })
+
+  _sendNodeUpdateMessage(
+    user,
+    surveyId,
+    Node.getRecordUuid(node),
+    { type: recordThreadMessageTypes.nodePersist, node, user }
+  )
 }
 
-const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid, true)
-  thread.postMessage({ type: recordThreadMessageTypes.nodeDelete, nodeUuid, user })
-}
+const deleteNode = (user, surveyId, recordUuid, nodeUuid) =>
+  _sendNodeUpdateMessage(
+    user,
+    surveyId,
+    recordUuid,
+    { type: recordThreadMessageTypes.nodeDelete, nodeUuid, user }
+  )
 
 const deleteRecordsPreview = async () => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()

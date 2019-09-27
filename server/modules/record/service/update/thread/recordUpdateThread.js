@@ -23,52 +23,17 @@ class RecordUpdateThread extends Thread {
     super(paramsObj)
 
     this.queue = new Queue()
-
     this.survey = null
     this.record = null
-    this.processing = true
+    this.processing = false
 
-    this._init()
-      .then(() => {
-        this.processing = false
-      })
-
+    this.sendThreadInitMsg()
   }
 
-  async _init () {
-    await this._fetchRecord()
-    await this._fetchSurvey()
-
-    if (RecordUpdateThreadParams.getInitRecord(this.params)) {
-      await this._initRecord()
-    }
-  }
-
-  async _fetchRecord () {
-    const recordUuid = RecordUpdateThreadParams.getRecordUuid(this.params)
-    this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid)
-  }
-
-  async _fetchSurvey () {
-    const preview = Record.isPreview(this.record)
-    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true)
-
-    // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
-    const dependencyGraph = preview
-      ? Survey.buildDependencyGraph(surveyDb)
-      : await SurveyManager.fetchDependencies(this.surveyId)
-
-    this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
-  }
-
-  async _initRecord () {
-    this.record = await RecordManager.initNewRecord(
-      this.user,
-      this.survey,
-      this.record,
-      this.handleNodesUpdated.bind(this),
-      this.handleNodesValidationUpdated.bind(this)
-    )
+  sendThreadInitMsg () {
+    (async () => {
+      await this.messageHandler({ type: messageTypes.threadInit })
+    })()
   }
 
   async handleNodesUpdated (updatedNodes) {
@@ -110,10 +75,39 @@ class RecordUpdateThread extends Thread {
     }
   }
 
+  async initRecordAndSurvey () {
+    // init record
+    this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, RecordUpdateThreadParams.getRecordUuid(this.params))
+
+    // init survey
+    const preview = Record.isPreview(this.record)
+    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true)
+
+    // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
+    const dependencyGraph = preview
+      ? Survey.buildDependencyGraph(surveyDb)
+      : await SurveyManager.fetchDependencies(this.surveyId)
+
+    this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
+  }
+
   async processMessage (msg) {
     Log.debug('process message', msg)
 
     switch (msg.type) {
+      case messageTypes.threadInit:
+        await this.initRecordAndSurvey()
+        break
+
+      case messageTypes.recordInit:
+        this.record = await RecordManager.initNewRecord(
+          this.user,
+          this.survey,
+          this.record,
+          this.handleNodesUpdated.bind(this),
+          this.handleNodesValidationUpdated.bind(this)
+        )
+        break
 
       case messageTypes.nodePersist:
         this.record = await RecordManager.persistNode(
