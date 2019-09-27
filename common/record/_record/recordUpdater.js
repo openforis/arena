@@ -11,7 +11,7 @@ const RecordReader = require('./recordReader')
 
 const assocNodes = nodes => record => {
   let recordUpdated = { ...record }
-  if (!recordUpdated[keys.nodes])
+  if (!(keys.nodes in recordUpdated))
     recordUpdated[keys.nodes] = {}
 
   R.forEachObjIndexed((n, nodeUuid) => {
@@ -56,23 +56,24 @@ const deleteNode = node => record => {
   // 1. remove entity children recursively
   const children = RecordReader.getNodeChildren(node)(record)
 
-  let recordUpdated = R.reduce(
+  // 2. remove node from index
+  let recordUpdated = NodesIndex.removeNode(node)(record)
+
+  // 3. delete children
+  recordUpdated = R.reduce(
     (recordAcc, child) => deleteNode(child)(recordAcc),
     record,
     children
   )
 
-  // 2. update validation
+  // 4. update validation
   recordUpdated = R.pipe(
     Validation.getValidation,
     Validation.dissocFieldValidation(nodeUuid),
     newValidation => Validation.assocValidation(newValidation)(recordUpdated)
   )(recordUpdated)
 
-  // 3. remove node from index
-  recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
-
-  // 4. remove node from record
+  // 5. remove node from record
   delete recordUpdated[keys.nodes][nodeUuid]
 
   return recordUpdated

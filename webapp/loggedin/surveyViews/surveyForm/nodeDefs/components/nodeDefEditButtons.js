@@ -60,13 +60,9 @@ const NodeDefEditButtons = (props) => {
       }
 
       {
-        !(isRoot || NodeDef.isPublished(nodeDef)) &&
+        !isRoot &&
         <button className="btn btn-s btn-transparent"
-                onClick={() => {
-                  window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
-                    ? removeNodeDef(nodeDef)
-                    : null
-                }}
+                onClick={() => removeNodeDef(nodeDef)}
                 onMouseDown={e => {
                   e.stopPropagation()
                 }}>

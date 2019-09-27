@@ -1,9 +1,6 @@
-const R = require('ramda')
 const db = require('../../../db/db')
 
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
-const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
+const ObjectUtils = require('../../../../common/objectUtils')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
@@ -25,21 +22,9 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
 
 // ======= READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, client = db) => {
-  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
-
-  return R.reduce(
-    (acc, nodeDef) => {
-      // remove draft and unpublished nodeDef
-      if (draft || NodeDef.isPublished(nodeDef)) {
-        acc[NodeDef.getUuid(nodeDef)] = nodeDef
-      }
-
-      return acc
-    },
-    {},
-    nodeDefsDB
-  )
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, includeDeleted = false, client = db) => {
+  const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, includeDeleted, client)
+  return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 }
 
 // ======= UPDATE

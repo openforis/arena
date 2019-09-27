@@ -217,4 +217,5 @@ module.exports = {
   persistNode,
   updateNodesDependents: NodeUpdateManager.updateNodesDependents,
   deleteNode,
+  deleteNodesByNodeDefUuids: NodeUpdateManager.deleteNodesByNodeDefUuids
 }

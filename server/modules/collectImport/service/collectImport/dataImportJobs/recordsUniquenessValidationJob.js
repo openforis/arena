@@ -26,7 +26,7 @@ class RecordsUniquenessValidationJob extends Job {
     this.total = 2
 
     // 1. fetch survey and node defs
-    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, true, true, false, this.tx)
+    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, true, true, false, false, this.tx)
     this.incrementProcessedItems()
 
     const nodeDefRoot = Survey.getRootNodeDef(this.survey)

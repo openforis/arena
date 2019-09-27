@@ -121,12 +121,38 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
 }
 
 // ==== DELETE
-export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
-  dispatch({ type: nodeDefDelete, nodeDef })
+export const removeNodeDef = nodeDef => async (dispatch, getState) => {
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
 
-  const surveyId = SurveyState.getSurveyId(getState())
-  const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`)
-  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+  //check if nodeDef is referenced by other node definitions
+  //dependency graph is not associated to the survey in UI, it's built every time it's needed
+  const dependencyGraph = Survey.buildDependencyGraph(survey)
+  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(NodeDef.getUuid(nodeDef))(dependencyGraph)
+  const i18n = AppState.getI18n(state)
 
-  dispatch(_updateParentLayout(nodeDef, true))
+  if (!R.isEmpty(nodeDefDependentsUuids)) {
+    const nodeDefDependents = R.pipe(
+      R.map(R.pipe(
+        nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+        nodeDef => NodeDef.getLabel(nodeDef, i18n.lang)
+      )),
+      R.join(', ')
+    )(nodeDefDependentsUuids)
+
+    dispatch(showNotificationMessage('nodeDefEdit.cannotDeleteNodeDefReferenced', {
+      nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
+      nodeDefDependents
+    }, AppState.notificationSeverity.warning))
+
+  } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
+    // delete confirmed
+    dispatch({ type: nodeDefDelete, nodeDef })
+
+    const surveyId = Survey.getId(survey)
+    const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`)
+    dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+    dispatch(_updateParentLayout(nodeDef, true))
+  }
 }
