@@ -51,7 +51,7 @@ class RecordUpdateThread extends Thread {
 
   async _fetchSurvey () {
     const preview = Record.isPreview(this.record)
-    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true, false)
+    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true)
 
     // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
     const dependencyGraph = preview

@@ -3,7 +3,7 @@ const db = require('../../../db/db')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
+const ObjectUtils = require('../../../../common/objectUtils')
 
 const RecordUpdateManager = require('./_recordManager/recordUpdateManager')
 const RecordValidationManager = require('./_recordManager/recordValidationManager')
@@ -49,7 +49,7 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, cli
   const record = await fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, draft, client)
 
-  return Record.assocNodes(SurveyUtils.toUuidIndexedObj(nodes))(record)
+  return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
 module.exports = {
@@ -81,6 +81,7 @@ module.exports = {
   deleteRecordPreview: RecordUpdateManager.deleteRecordPreview,
   deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
   deleteNode: RecordUpdateManager.deleteNode,
+  deleteNodesByNodeDefUuids: RecordUpdateManager.deleteNodesByNodeDefUuids,
 
   // ==== VALIDATION
   persistValidation: RecordValidationManager.persistValidation,

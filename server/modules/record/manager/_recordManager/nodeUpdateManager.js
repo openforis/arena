@@ -3,6 +3,7 @@ const R = require('ramda')
 const Queue = require('../../../../../common/queue')
 
 const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const ObjectUtils = require('../../../../../common/objectUtils')
 const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const Node = require('../../../../../common/record/node')
@@ -156,6 +157,11 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   return await _onNodeUpdate(survey, record, node, t)
 }
 
+const deleteNodesByNodeDefUuids = async (surveyId, nodeDefsUuids, record, client = db) => {
+  const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, client)
+  return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
+}
+
 const _onNodeUpdate = async (survey, record, node, t) => {
   // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
@@ -206,4 +212,5 @@ module.exports = {
   persistNode,
   updateNodesDependents,
   deleteNode,
+  deleteNodesByNodeDefUuids
 }
