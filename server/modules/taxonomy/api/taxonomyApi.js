@@ -93,7 +93,7 @@ module.exports.init = app => {
         taxa = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
       }
 
-      res.json({ taxa })
+      res.json({ list: taxa })
     } catch (err) {
       next(err)
     }

@@ -21,6 +21,7 @@ import * as TaxonomyEditState from '../taxonomyEditState'
 
 import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from '../actions'
 import Authorizer from '../../../../../common/auth/authorizer'
+// import Taxon from '../../../../../common/survey/taxon'
 
 const TaxonomyEdit = props => {
 
@@ -29,13 +30,6 @@ const TaxonomyEdit = props => {
     loadTaxa, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
     readOnly,
   } = props
-
-  useEffect(() => {
-    const { initTaxaList } = props
-    if (Taxonomy.getUuid(taxonomy)) {
-      initTaxaList(taxonomy)
-    }
-  }, [Taxonomy.getUuid(taxonomy)])
 
   const validation = Validation.getValidation(taxonomy)
 
@@ -72,17 +66,16 @@ const TaxonomyEdit = props => {
         </div>
       </div>
 
-
       {
-        R.isEmpty(taxa)
-          ? <div className="taxonomy-edit__empty-taxa">{i18n.t('taxonomy.edit.taxaNotImported')}</div>
-          : <TaxonTable taxonomy={taxonomy}
-                        taxa={taxa}
-                        currentPage={taxaCurrentPage}
-                        totalPages={taxaTotalPages}
-                        taxaTotal={taxaTotal}
-                        rowsPerPage={taxaPerPage}
-                        onPageChange={(offset) => loadTaxa(taxonomy, offset)}/>
+        <TaxonTable
+          surveyId={surveyId}
+          taxonomy={taxonomy}
+          taxa={taxa}
+          currentPage={taxaCurrentPage}
+          totalPages={taxaTotalPages}
+          taxaTotal={taxaTotal}
+          rowsPerPage={taxaPerPage}
+          onPageChange={(offset) => loadTaxa(taxonomy, offset)}/>
       }
 
       <div style={{ justifySelf: 'center' }}>
