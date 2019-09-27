@@ -261,7 +261,8 @@ module.exports = {
       maxCount: 'Max count',
       expressions: 'Expressions',
     },
-    cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.'
+    cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.',
+    cannotDeleteNodeDefReferenced: 'Cannot delete "{{nodeDef}}": it\'s referenced by these node definitions: {{nodeDefDependents}}'
   },
 
   languagesEditor: {

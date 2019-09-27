@@ -59,7 +59,7 @@ class SurveyRdbGeneratorJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, fetchDraft, false, false, tx)
+    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, fetchDraft, false, false, false, tx)
   }
 
 }

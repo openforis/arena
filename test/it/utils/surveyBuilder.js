@@ -159,7 +159,7 @@ class SurveyBuilder {
           throw new Error(`Test survey buildAndStore failed: ${JSON.stringify(publishJob)}`)
       }
 
-      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, t)
+      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, false, t)
       return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)
     })
   }

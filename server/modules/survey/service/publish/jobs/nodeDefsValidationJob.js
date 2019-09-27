@@ -15,7 +15,7 @@ class NodeDefsValidationJob extends Job {
   }
 
   async execute (tx) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, true, true, true, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, true, true, true, false, tx)
 
     R.pipe(
       Survey.getNodeDefsValidation,

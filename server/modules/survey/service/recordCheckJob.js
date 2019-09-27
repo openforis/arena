@@ -18,13 +18,16 @@ class RecordCheckJob extends Job {
 
   async execute (tx) {
     //1. determine new or updated node defs
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, true, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, true, true, false, true, tx)
 
     const nodeDefsNew = []
     const nodeDefsUpdated = []
+    const nodeDefsDeleted = []
 
     Survey.getNodeDefsArray(survey).forEach(def => {
-      if (!NodeDef.isPublished(def)) {
+      if (NodeDef.isDeleted(def)) {
+        nodeDefsDeleted.push(def)
+      } else if (!NodeDef.isPublished(def)) {
         // new node def
         nodeDefsNew.push(def)
       } else if (NodeDef.hasAdvancedPropsDraft(def)) {
@@ -42,23 +45,29 @@ class RecordCheckJob extends Job {
 
       for (const recordUuid of recordUuids) {
         const record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, true, tx)
-        await this._checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
+        await this._checkRecord(survey, nodeDefsNew, nodeDefsUpdated, nodeDefsDeleted, record, tx)
 
         this.incrementProcessedItems()
       }
     }
   }
 
-  async _checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
-    // 1. insert missing nodes
+  async _checkRecord (survey, nodeDefsNew, nodeDefsUpdated, nodeDefsDeleted, record, tx) {
+    // 1. remove deleted nodes
+    if (!R.isEmpty(nodeDefsDeleted)) {
+      const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(this.surveyId, nodeDefsDeleted.map(NodeDef.getUuid), record, tx)
+      record = recordDeletedNodes || record
+    }
+
+    // 2. insert missing nodes
     const { record: recordUpdateInsert, nodes: missingNodes = {} } = await _insertMissingSingleNodes(survey, nodeDefsNew, record, this.user, tx)
     record = recordUpdateInsert || record
 
-    // 2. apply default values and recalculate applicability
+    // 3. apply default values and recalculate applicability
     const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(survey, nodeDefsUpdated, record, missingNodes, tx)
     record = recordUpdate || record
 
-    // 3. validate nodes
+    // 4. validate nodes
     const nodesToValidate = {
       ...missingNodes,
       ...nodesUpdatedDefaultValues
