@@ -3,6 +3,7 @@ import * as R from 'ramda'
 
 import { useFormObject } from '../../../../../commonComponents/hooks'
 
+import Survey from '../../../../../../common/survey/survey'
 import StringUtils from '../../../../../../common/stringUtils'
 import ObjectUtils from '../../../../../../common/objectUtils'
 import Validation from '../../../../../../common/validation/validation'
@@ -21,16 +22,17 @@ export const useSurveyInfoViewState = props => {
   }, [surveyInfo])
 
   // setter methods
-  const setName = value => setObjectField('name', StringUtils.normalizeName(value))
-  const setLanguages = value => setObjectField('languages', value)
-  const setSrs = value => setObjectField('srs', value)
+  const setName = value => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
+  const setLanguages = value => setObjectField(Survey.infoKeys.languages, value)
+  const setSrs = value => setObjectField(Survey.infoKeys.srs, value)
+  const setCycles = value => setObjectField(Survey.infoKeys.cycles, value)
 
   const setFieldLabel = (field, items) => item => {
     const itemsUpdate = R.assoc(item.lang, item.label, items)
     setObjectField(field, itemsUpdate)
   }
-  const setLabel = setFieldLabel('labels', object.labels)
-  const setDescription = setFieldLabel('descriptions', object.descriptions)
+  const setLabel = setFieldLabel(Survey.infoKeys.labels, object.labels)
+  const setDescription = setFieldLabel(Survey.infoKeys.descriptions, object.descriptions)
 
   const saveProps = () => {
     enableValidation()
@@ -44,6 +46,7 @@ export const useSurveyInfoViewState = props => {
     setSrs,
     setLabel,
     setDescription,
+    setCycles,
     getFieldValidation,
     saveProps,
   }

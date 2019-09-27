@@ -9,6 +9,7 @@ import { Input } from '../../../../commonComponents/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'
+import CyclesEditor from './components/cyclesEditor'
 import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
 import Authorizer from '../../../../../common/auth/authorizer'
@@ -24,14 +25,15 @@ const SurveyInfoView = (props) => {
   const i18n = useI18n()
 
   const {
-    name, languages, srs, labels, descriptions,
-    setName, setLanguages, setSrs, setLabel, setDescription,
+    name, languages, srs, labels, descriptions, cycles,
+    setName, setLanguages, setSrs, setLabel, setDescription, setCycles,
     getFieldValidation, saveProps,
   } = useSurveyInfoViewState(props)
 
   return (
     <div className="home-survey-info">
       <div className="form">
+
         <div className="form-item">
           <label className="form-label">{i18n.t('common.name')}</label>
           <Input
@@ -41,6 +43,21 @@ const SurveyInfoView = (props) => {
             readOnly={readOnly}/>
 
         </div>
+
+        <LabelsEditor
+          readOnly={readOnly}
+          languages={languages}
+          labels={labels}
+          onChange={setLabel}
+        />
+
+        <LabelsEditor
+          readOnly={readOnly}
+          formLabelKey="common.description"
+          languages={languages}
+          labels={descriptions}
+          onChange={setDescription}
+        />
 
         <LanguagesEditor
           readOnly={readOnly}
@@ -58,20 +75,14 @@ const SurveyInfoView = (props) => {
           />
         </div>
 
-        <LabelsEditor
-          readOnly={readOnly}
-          languages={languages}
-          labels={labels}
-          onChange={setLabel}
-        />
-
-        <LabelsEditor
-          readOnly={readOnly}
-          formLabelKey="common.description"
-          languages={languages}
-          labels={descriptions}
-          onChange={setDescription}
-        />
+        <div className="form-item">
+          <label className="form-label">{i18n.t('common.cycle_plural')}</label>
+          <CyclesEditor
+            readOnly={readOnly}
+            cycles={cycles}
+            setCycles={setCycles}
+          />
+        </div>
 
         {
           !readOnly &&

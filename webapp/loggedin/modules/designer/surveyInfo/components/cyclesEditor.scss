@@ -1,0 +1,40 @@
+@import "../../../../../style/vars";
+
+
+.home-survey-info__cycles-editor {
+  .cycles {
+    display: flex;
+
+    .cycle {
+      display: flex;
+      margin-right: 10px;
+      padding: .15rem .5rem;
+      border: 1px solid $greyBorder;
+      font-size: .9rem;
+
+      .step {
+        font-weight: 600;
+        color: lighten($black, 15%);
+      }
+
+      .date-container {
+        margin-left: 10px;
+      }
+
+      .date-label {
+        font-size: .7rem;
+        text-transform: uppercase;
+        color: lighten($black, 15%);
+        font-weight: 600;
+      }
+
+      .date {
+        margin-left: 5px;
+
+        input {
+          padding: 0;
+        }
+      }
+    }
+  }
+}
