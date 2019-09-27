@@ -1,5 +1,3 @@
-import './buttonGroup.scss'
-
 import React from 'react'
 
 import * as R from 'ramda'
@@ -12,7 +10,7 @@ const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, des
           return (
             <button key={item.key}
                     type="button"
-                    className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable': ''}`}
+                    className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
                     onClick={() => onChange(
                       multiple
                         ? R.ifElse(
@@ -33,10 +31,10 @@ const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, des
 
 ButtonGroup.defaultProps = {
   items: [],
-  multiple: false,
   selectedItemKey: null, //array of values if multiple=true
   onChange: () => {},
   disabled: false,
+  multiple: false,
   deselectable: false,
 }
 
