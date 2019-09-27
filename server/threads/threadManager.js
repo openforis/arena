@@ -7,17 +7,16 @@ const WebSocket = require('../utils/webSocket')
 const User = require('../../common/user/user')
 const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
-const threadMessageTypes = require('./threadMessageTypes')
+const Thread = require('./thread')
 
 /**
  * Base class for managing communication between EventLoop and Thread in worker pool
  */
 class ThreadManager {
 
-  constructor (filePath, data, messageHandler, exitHandler = null, singleMessageHandling = false) {
+  constructor (filePath, data, messageHandler, exitHandler = null) {
     this.worker = new Worker(filePath, { workerData: data })
     this.threadId = this.worker.threadId
-    this.singleMessageHandling = singleMessageHandling
 
     this.worker.on('message', this.messageHandlerWrapper.bind(this)(messageHandler))
 
@@ -34,16 +33,10 @@ class ThreadManager {
 
   messageHandlerWrapper (messageHandler) {
     return ({ user, msg }) => {
-      switch (msg.type) {
-        case threadMessageTypes.error:
-          WebSocket.notifyUser(User.getUuid(user), WebSocketEvents.error, msg.error)
-          break
-        case threadMessageTypes.messageProcessComplete:
-          if (this.singleMessageHandling)
-            this.worker.terminate()
-          break
-        default:
-          messageHandler(msg)
+      if (msg.type === Thread.messageTypes.error) {
+        WebSocket.notifyUser(User.getUuid(user), WebSocketEvents.error, msg.error)
+      } else {
+        messageHandler(msg)
       }
     }
   }
