@@ -140,7 +140,7 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
     const validation = await validateSurveyInfo({ id: surveyId, props })
     if (Validation.isValid(validation)) {
 
-      const surveyInfoPrev = await fetchSurveyById(surveyId, true, false, t)
+      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById(surveyId, true, false, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
       let updated = false
@@ -151,6 +151,11 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
           await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
           await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
           updated = true
+
+          // TODO - add cycle to nodeDef
+          // if(key === Survey.infoKeys.cycles){
+          //   const cyclesNew = R.difference(Object.keys(value), Object.keys(valuePrev))
+          // }
         }
       }
 
