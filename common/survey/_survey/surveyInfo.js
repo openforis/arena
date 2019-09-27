@@ -6,20 +6,24 @@ const ObjectUtils = require('../../objectUtils')
 const StringUtils = require('../../stringUtils')
 
 const keys = {
+  id: ObjectUtils.keys.id,
+  uuid: ObjectUtils.keys.uuid,
   info: 'info',
-  id: 'id',
   ownerUuid: 'ownerUuid',
-  name: 'name',
-  descriptions: 'descriptions',
-  published: 'published',
   draft: 'draft',
-  languages: 'languages',
-  srs: 'srs',
-  labels: 'labels',
-  steps: 'steps',
+  published: 'published',
   authGroups: 'authGroups',
+  props: ObjectUtils.keys.props,
+  //props
   collectUri: 'collectUri',
   collectReport: 'collectReport',
+  cycles: 'cycles',
+  descriptions: ObjectUtils.keysProps.descriptions,
+  name: 'name',
+  labels: ObjectUtils.keysProps.labels,
+  languages: 'languages',
+  srs: 'srs',
+  steps: 'steps',
 }
 
 const collectReportKeys = {

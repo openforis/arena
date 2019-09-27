@@ -3,6 +3,7 @@ const R = require('ramda')
 const { uuidv4 } = require('../../common/uuid')
 
 const SurveyInfo = require('./_survey/surveyInfo')
+const SurveyCycle = require('./_survey/surveyCycle')
 const SurveyNodeDefs = require('./_survey/surveyNodeDefs')
 const SurveyNodeDefsValidation = require('./_survey/surveyNodeDefsValidation')
 const SurveyCategories = require('./_survey/surveyCategories')
@@ -14,17 +15,20 @@ const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
 const Srs = require('../geo/srs')
 
 const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
-  uuid: uuidv4(),
-  props: {
-    name,
-    labels: { [lang]: label },
-    languages: [lang],
-    srs: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
+  [SurveyInfo.keys.uuid]: uuidv4(),
+  [SurveyInfo.keys.props]: {
+    [SurveyInfo.keys.name]: name,
+    [SurveyInfo.keys.labels]: { [lang]: label },
+    [SurveyInfo.keys.languages]: [lang],
+    [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
     ...collectUri
       ? { collectUri }
-      : {}
+      : {},
+    [SurveyInfo.keys.cycles]: {
+      '0': SurveyCycle.newCycle()
+    }
   },
-  ownerUuid
+  [SurveyInfo.keys.ownerUuid]: ownerUuid,
 })
 
 module.exports = {
