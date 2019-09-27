@@ -32,7 +32,8 @@ const createRecord = async (user, surveyId, recordToCreate) => {
   const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
   // create record thread and initialize record
-  RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), false, true)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate), false)
+  thread.postMessage({ type: recordThreadMessageTypes.recordInit })
 
   return record
 }
