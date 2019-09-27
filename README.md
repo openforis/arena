@@ -71,8 +71,11 @@ PGPASSWORD=arena
 COGNITO_REGION=cognito_region
 COGNITO_USER_POOL_ID=cognito_user_pool_id
 COGNITO_CLIENT_ID=cognito_client_id
-ADMIN_EMAIL=administrator_email_address
 
 # temp folder
 TEMP_FOLDER=/tmp/arena_upload
+
+#Email
+ADMIN_EMAIL=administrator_email_address
+SENDGRID_API_KEY=your_sendgrid_api_key
 ```
