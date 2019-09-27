@@ -26,6 +26,7 @@ const BasicProps = props => {
     nodeDef, validation,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
 
+    cyclesSurvey,
     displayAsEnabled, displayInEnabled,
     displayAsFormDisabled, displayAsTableDisabled,
     displayInParentPageDisabled, displayInOwnPageDisabled,
@@ -42,6 +43,7 @@ const BasicProps = props => {
 
   const renderType = NodeDefLayout.getRenderType(nodeDef)
   const displayIn = NodeDefLayout.getDisplayIn(nodeDef)
+  const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
   return (
     <div className="form">
@@ -151,6 +153,23 @@ const BasicProps = props => {
         </FormItem>
       }
 
+      <FormItem label={i18n.t('common.cycle_plural')}>
+        <ButtonGroup
+          multiple={true}
+          deselectable={true}
+          selectedItemKey={cyclesNodeDef}
+          onChange={cycles => putNodeDefProp(
+            nodeDef,
+            NodeDef.propKeys.cycles,
+            cycles
+          )}
+          items={cyclesSurvey.map(cycle => ({
+            key: cycle,
+            label: Number(cycle) + 1,
+            disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0]
+          }))}
+        />
+      </FormItem>
     </div>
   )
 }
@@ -174,6 +193,8 @@ const mapStateToProps = state => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
+
+    cyclesSurvey: R.keys(Survey.getCycles(Survey.getSurveyInfo(survey))),
   }
 }
 

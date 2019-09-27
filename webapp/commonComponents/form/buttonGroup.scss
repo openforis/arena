@@ -1,0 +1,7 @@
+button.active.deselectable {
+  pointer-events: all;
+
+  &[aria-disabled="true"] {
+    pointer-events: none;
+  }
+}
