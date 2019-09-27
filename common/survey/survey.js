@@ -3,7 +3,7 @@ const R = require('ramda')
 const { uuidv4 } = require('../../common/uuid')
 
 const SurveyInfo = require('./_survey/surveyInfo')
-const SurveyCycle = require('./_survey/surveyCycle')
+const SurveyCycle = require('./surveyCycle')
 const SurveyNodeDefs = require('./_survey/surveyNodeDefs')
 const SurveyNodeDefsValidation = require('./_survey/surveyNodeDefsValidation')
 const SurveyCategories = require('./_survey/surveyCategories')
@@ -59,6 +59,7 @@ module.exports = {
   getSRS: SurveyInfo.getSRS,
   getDefaultSRS: SurveyInfo.getDefaultSRS,
   getStatus: SurveyInfo.getStatus,
+  getCycles: SurveyInfo.getCycles,
   getDateCreated: SurveyInfo.getDateCreated,
   getDateModified: SurveyInfo.getDateModified,
   isPublished: SurveyInfo.isPublished,

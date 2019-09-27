@@ -78,6 +78,8 @@ const getStatus = surveyInfo =>
       ? 'DRAFT'
       : ''
 
+const getCycles = ObjectUtils.getProp(keys.cycles)
+
 const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
 const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
@@ -137,6 +139,7 @@ module.exports = {
   getDefaultLabel,
   getLabel,
   getStatus,
+  getCycles,
   getDateCreated: ObjectUtils.getDateCreated,
   getDateModified: ObjectUtils.getDateModified,
   getCollectUri,
