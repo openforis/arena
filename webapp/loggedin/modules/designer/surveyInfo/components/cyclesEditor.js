@@ -47,7 +47,10 @@ const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
 )
 
 const CycleEditor = props => {
-  const { step, cycle, i18n, readOnly, onChange, onDelete } = props
+  const {
+    step, cycle, i18n, readOnly, canDelete,
+    onChange, onDelete
+  } = props
 
   return (
     <div key={step} className="cycle">
@@ -73,7 +76,7 @@ const CycleEditor = props => {
       }
 
       {
-        !readOnly && step !== '0' &&
+        canDelete &&
         <button className="btn-s btn-transparent btn-delete"
                 onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: step + 1 }))
                   ? onDelete(step)
@@ -94,17 +97,8 @@ const CyclesEditor = props => {
   const i18n = useI18n()
 
   const onDelete = stepToDelete => {
-    const cyclesUpdate = cycleEntries.reduce(
-      (accCycles, [step, cycle]) => {
-        if (stepToDelete !== step) {
-          const stepUpdate = Object.keys(accCycles).length
-          accCycles[stepUpdate + ''] = cycle
-        }
-        return accCycles
-      },
-      {}
-    )
-    setCycles(cyclesUpdate)
+    delete cycles[stepToDelete]
+    setCycles(cycles)
   }
 
   return (
@@ -112,7 +106,7 @@ const CyclesEditor = props => {
 
       <div className="cycles">
         {
-          cycleEntries.map(([step, cycle]) =>
+          cycleEntries.map(([step, cycle], i) =>
             <CycleEditor
               key={step}
               step={step}
@@ -122,6 +116,7 @@ const CyclesEditor = props => {
               onChange={cycleUpdate => setCycles(
                 R.assoc(step, cycleUpdate)(cycles)
               )}
+              canDelete={!readOnly && i === cycleEntries.length - 1}
               onDelete={onDelete}
             />
           )

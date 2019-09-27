@@ -10,7 +10,7 @@
     .cycle {
       display: flex;
       align-items: center;
-      min-width: 310px;
+      min-width: 315px;
       margin: 2px 10px 2px 0;
       padding: .15rem .5rem;
       border: 1px solid $greyBorder;
@@ -36,8 +36,12 @@
         margin-left: 5px;
 
         input {
-          padding: .25rem 0;
+          padding: .25rem .1rem;
         }
+      }
+
+      .btn-delete {
+        padding: .1rem;
       }
     }
   }
