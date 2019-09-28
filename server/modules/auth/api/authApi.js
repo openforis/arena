@@ -1,60 +1,46 @@
+const Log = require('../../../log/log').getLogger('AuthAPI')
 const Request = require('../../../utils/request')
-const { sendOk } = require('../../../utils/response')
-
-const Log = require('../../../log/log')
-const logger = Log.getLogger('AuthAPI')
+const Response = require('../../../utils/response')
 
 const Survey = require('../../../../common/survey/survey')
 const User = require('../../../../common/user/user')
-const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
 const Authorizer = require('../../../../common/auth/authorizer')
 
-const SurveyManager = require('../../survey/manager/surveyManager')
+const SurveyService = require('../../survey/service/surveyService')
 const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
-
 const AuthService = require('../service/authService')
+
 const Jwt = require('../jwt')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
-    let survey = await SurveyManager.fetchSurveyById(surveyId, false, false)
-
+    let survey = await SurveyService.fetchSurveyById(surveyId, false, false)
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
-      survey = await SurveyManager.fetchSurveyById(surveyId, true, true)
+      survey = await SurveyService.fetchSurveyById(surveyId, true, true)
     }
-
-    sendResponse(
-      res,
-      user,
-      survey,
-    )
+    sendResponse(res, user, survey)
   } catch (e) {
-    logger.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
+    Log.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
     // survey not found with user pref
     // removing user pref
-    sendResponse(
-      res,
-      await UserService.deleteUserPref(user, userPrefNames.survey)
-    )
+    user = User.deletePrefSurvey(surveyId)(user)
+    sendResponse(res, await UserService.updateUserPrefs(user))
   }
-}
-
-const sendUser = async (res, user) => {
-  const surveyId = getUserPrefSurveyId(user)
-
-  surveyId
-    ? await sendUserSurvey(res, user, surveyId)
-    : sendResponse(res, user)
 }
 
 module.exports.init = app => {
 
   app.get('/auth/user', async (req, res, next) => {
     try {
-      await sendUser(res, Request.getUser(req))
+      const user = Request.getUser(req)
+      const surveyId = User.getPrefSurveyCurrent(user)
+
+      surveyId
+        ? await sendUserSurvey(res, user, surveyId)
+        : sendResponse(res, user)
     } catch (err) {
       next(err)
     }
@@ -70,9 +56,10 @@ module.exports.init = app => {
 
       await AuthService.blacklistToken(token)
 
-      sendOk(res)
+      Response.sendOk(res)
     } catch (err) {
       next(err)
     }
   })
+
 }

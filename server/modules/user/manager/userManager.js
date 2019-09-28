@@ -98,6 +98,11 @@ const deleteUserPref = async (user, name) => ({
   authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
 })
 
+const updateUserPrefs = async user => ({
+  ...await UserRepository.updateUserPrefs(user),
+  [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
+})
+
 module.exports = {
   // CREATE
   insertUser,
@@ -105,20 +110,15 @@ module.exports = {
 
   // READ
   fetchUsersBySurveyId,
-
   countUsersBySurveyId: UserRepository.countUsersBySurveyId,
-
   fetchUserByUuid,
-
-  fetchUserProfilePicture: UserRepository.fetchUserProfilePicture,
-
   fetchUserByEmail,
+  fetchUserProfilePicture: UserRepository.fetchUserProfilePicture,
 
   // UPDATE
   updateUser,
-
   updateUsername: UserRepository.updateUsername,
-
+  updateUserPrefs,
   updateUserPref: UserRepository.updateUserPref,
 
   // DELETE

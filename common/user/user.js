@@ -38,12 +38,27 @@ const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAu
 const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
 //====== PREFS
-const setPrefSurveyCurrent = surveyId => ObjectUtils.setInPath([keys.prefs, keysPrefs.surveys, keysPrefs.current], surveyId)
+const prefPathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
+
+const getPrefSurveyCurrent = R.path(prefPathSurveyCurrent)
+
+const setPrefSurveyCurrent = surveyId => ObjectUtils.setInPath(prefPathSurveyCurrent, surveyId)
 const setPrefSurveyCycle = (surveyId, cycle) => ObjectUtils.setInPath([keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle], cycle)
 const setPrefSurveyCurrentAndCycle = (surveyId, cycle) => R.pipe(
   setPrefSurveyCurrent(surveyId),
   setPrefSurveyCycle(surveyId, cycle)
 )
+
+const deletePrefSurvey = surveyId => user => {
+  const surveyIdPref = getPrefSurveyCurrent(user)
+  return R.pipe(
+    R.when(
+      R.always(String(surveyIdPref) === String(surveyId)),
+      setPrefSurveyCurrent(null)
+    ),
+    R.dissocPath([keys.prefs, keysPrefs.surveys, String(surveyId)])
+  )(user)
+}
 
 module.exports = {
   keys,
@@ -66,7 +81,11 @@ module.exports = {
   hasAccepted,
 
   //PREFS
+  getPrefSurveyCurrent,
+
   setPrefSurveyCurrent,
   setPrefSurveyCycle,
   setPrefSurveyCurrentAndCycle,
+
+  deletePrefSurvey,
 }
