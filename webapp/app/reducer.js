@@ -37,7 +37,7 @@ const actionHandlers = {
 
   [appUserLogout]: (state) => AppState.logoutUser(state),
 
-  [surveyCreate]: (state, { survey: { info } }) => AppState.assocSurveyAdminGroup(info)(state),
+  [surveyCreate]: (state, { survey: { info } }) => AppState.assocUserPropsOnSurveyCreate(info)(state),
 
   [surveyDelete]: (state, { surveyId }) => AppState.dissocSurveyGroups(surveyId)(state),
 

@@ -31,18 +31,15 @@ const assocSurveyInfo = info => ({ info })
 // ====== CREATE
 
 const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntityDef = true, client = db) => {
-
   const surveyParam = Survey.newSurvey(User.getUuid(user), name, label, lang, collectUri)
-
   return await insertSurvey(user, surveyParam, createRootEntityDef, client)
 }
 
 const insertSurvey = async (user, surveyParam, createRootEntityDef = true, client = db) => {
   const survey = await client.tx(
     async t => {
-
-      const surveyDb = await SurveyRepository.insertSurvey(surveyParam, t)
-      const { id: surveyId } = surveyDb
+      const surveyInfo = await SurveyRepository.insertSurvey(surveyParam, t)
+      const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
       //create survey data schema
       await migrateSurveySchema(surveyId)
@@ -62,19 +59,19 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       }
 
       // update user prefs
-      await UserRepository.updateUserPref(user, userPrefNames.survey, surveyId, t)
+      user = User.setPrefSurveyCurrentAndCycle(surveyId, Survey.getCycleOneKey(surveyInfo))(user)
+      await UserRepository.updateUserPrefs(user, t)
 
       // create default groups for this survey
-
-      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
+      surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
       if (!User.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyDb)), User.getUuid(user), t)
+        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), User.getUuid(user), t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)
 
-      return surveyDb
+      return surveyInfo
     }
   )
 

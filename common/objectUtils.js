@@ -46,6 +46,7 @@ const getDateModified = R.propOr(null, keys.dateModified)
 
 //===== UPDATE
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
+
 const setInPath = (pathArray, value, includeEmpty = true) => obj => {
   if (!includeEmpty && isBlank(value)) {
     return obj

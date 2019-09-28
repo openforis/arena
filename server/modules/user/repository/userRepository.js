@@ -98,6 +98,16 @@ const updateUsername = async (user, name, client = db) =>
     [name, User.getUuid(user)],
     camelize)
 
+const updateUserPrefs = async (user, client = db) => await client.one(`
+    UPDATE "user" u
+    SET prefs = prefs || $1::jsonb
+    WHERE u.uuid = $2
+    RETURNING ${selectFieldsCommaSep}`,
+  [User.getPrefs(user), User.getUuid(user)],
+  camelize
+)
+
+//TODO - remove it
 const updateUserPref = async (user, name, value, client = db) => {
   const userPref = JSON.stringify(
     { [name]: value }
@@ -142,6 +152,7 @@ module.exports = {
   // UPDATE
   updateUser,
   updateUsername,
+  updateUserPrefs,
   updateUserPref,
 
   // DELETE

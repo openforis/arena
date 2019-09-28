@@ -48,23 +48,17 @@ export const getUser = R.pipe(getState, R.prop(keys.user))
 
 export const logoutUser = R.dissoc(keys.user)
 
-// On survey create, add current user to new survey's surveyAdmin group
-export const assocSurveyAdminGroup = surveyInfo =>
-  appState => {
-    const user = R.prop(keys.user, appState)
-
-    if (User.isSystemAdmin(user)) {
-      return appState
-    } else {
-
-      const userGroups = R.pipe(
-        R.prop(User.keys.authGroups),
-        R.append(Survey.getAuthGroupAdmin(surveyInfo))
-      )(user)
-
-      return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
-    }
-  }
+export const assocUserPropsOnSurveyCreate = surveyInfo => appState => {
+  const user = R.pipe(
+    R.prop(keys.user),
+    User.setPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.getCycleOneKey(surveyInfo)),
+    R.unless(
+      User.isSystemAdmin,
+      User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo))
+    )
+  )(appState)
+  return R.assoc(keys.user, user, appState)
+}
 
 // On survey delete, dissoc survey from user
 export const dissocSurveyGroups = surveyId =>
