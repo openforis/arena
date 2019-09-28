@@ -100,9 +100,8 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
 
-      await SurveyService.deleteSurvey(surveyId, user)
+      await SurveyService.deleteSurvey(surveyId)
 
       Response.sendOk(res)
     } catch (err) {

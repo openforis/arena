@@ -62,6 +62,7 @@ const deletePrefSurvey = surveyId => user => {
 
 module.exports = {
   keys,
+  keysPrefs,
 
   // READ
   isEqual: ObjectUtils.isEqual,

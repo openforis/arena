@@ -1,11 +1,9 @@
-const { deleteSurvey } = require('../server/modules/survey/manager/surveyManager')
-
-const UserManager = require('../server/modules/user/manager/userManager')
-const { setUserPref, userPrefNames } = require('../common/user/userPrefs')
-
 const Survey = require('../common/survey/survey')
 
 const SurveyManager = require('../server/modules/survey/manager/surveyManager')
+const UserManager = require('../server/modules/user/manager/userManager')
+
+const { setUserPref, userPrefNames } = require('../common/user/userPrefs')
 
 let user = null
 let survey = null
@@ -20,7 +18,7 @@ const initTestContext = async () => {
 
 const destroyTestContext = async () => {
   if (survey)
-    await deleteSurvey(Survey.getId(survey), user)
+    await SurveyManager.deleteSurvey(Survey.getId(survey))
 }
 
 const setContextSurvey = s => {

@@ -93,11 +93,6 @@ const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
     )
   ])
 
-const deleteUserPref = async (user, name) => ({
-  ...(await UserRepository.deleteUserPref(user, name)),
-  authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
-})
-
 const updateUserPrefs = async user => ({
   ...await UserRepository.updateUserPrefs(user),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
@@ -122,6 +117,5 @@ module.exports = {
   updateUserPref: UserRepository.updateUserPref,
 
   // DELETE
-  deleteUserPref,
   deleteUser,
 }

@@ -124,18 +124,22 @@ const updateUserPref = async (user, name, value, client = db) => {
   return userRes
 }
 
-// ==== DELETE
-
-const deleteUserPref = async (user, name, client = db) => {
-  const userRes = await client.one(`
-    UPDATE "user" u
-    SET prefs = prefs - $1
-    WHERE u.uuid = $2
-    RETURNING ${selectFieldsCommaSep}`,
-    [name, User.getUuid(user)],
-    camelize)
-
-  return userRes
+// ==== PREFS
+const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
+  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+  // remove from surveys current pref
+  await client.query(`
+    UPDATE "user"
+    SET prefs = jsonb_set(prefs, ${surveyCurrentJsonbPath}, 'null')
+    WHERE prefs #>> ${surveyCurrentJsonbPath} = $1
+  `,
+    [surveyId]
+  )
+  // remove from surveys pref
+  await client.query(`
+    UPDATE "user"
+    SET prefs = prefs #- '{${User.keysPrefs.surveys},${surveyId}}'
+`)
 }
 
 module.exports = {
@@ -155,6 +159,6 @@ module.exports = {
   updateUserPrefs,
   updateUserPref,
 
-  // DELETE
-  deleteUserPref,
+  // PREFS
+  deleteUsersPrefsSurvey,
 }

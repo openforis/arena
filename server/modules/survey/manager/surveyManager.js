@@ -176,19 +176,14 @@ const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
 }
 
 // ====== DELETE
-const deleteSurvey = async (id, user) => {
-  await db.tx(async t => {
-
-    const userPrefSurveyId = getUserPrefSurveyId(user)
-    if (userPrefSurveyId === id)
-      await UserRepository.deleteUserPref(user, userPrefNames.survey, t)
-
-    await SurveyRepository.dropSurveySchema(id, t)
-    await SurveyRdbManager.dropSchema(id, t)
-
-    await SurveyRepository.deleteSurvey(id, t)
-  })
-}
+const deleteSurvey = async surveyId => await db.tx(async t => {
+  await Promise.all([
+    UserRepository.deleteUsersPrefsSurvey(surveyId, t),
+    SurveyRepository.dropSurveySchema(surveyId, t),
+    SurveyRdbManager.dropSchema(surveyId, t),
+    SurveyRepository.deleteSurvey(surveyId, t),
+  ])
+})
 
 module.exports = {
   // ====== CREATE
