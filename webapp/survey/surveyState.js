@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import Survey from '../../common/survey/survey'
 import NodeDef from '../../common/survey/nodeDef'
+import User from '../../common/user/user'
 
 import * as AppState from '../app/appState'
 
@@ -19,6 +20,11 @@ export const getSurvey = R.prop(survey)
 export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
+
+export const getSurveyCycleKey = state => R.pipe(
+  AppState.getUser,
+  User.getPrefSurveyCycle(getSurveyId(state)),
+)(state)
 
 export const getNodeDefLabel = nodeDef => state => {
   const surveyInfo = getSurveyInfo(state)

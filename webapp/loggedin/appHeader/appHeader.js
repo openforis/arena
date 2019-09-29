@@ -17,7 +17,7 @@ import * as SurveyState from '../../survey/surveyState'
 import { updateUserPrefs } from '../../app/actions'
 
 const AppHeader = props => {
-  const { user, surveyInfo, lang, updateUserPrefs } = props
+  const { user, surveyInfo, surveyCycle, lang, updateUserPrefs } = props
   const [showUserPopup, setShowUserPopup] = useState(false)
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
@@ -35,7 +35,7 @@ const AppHeader = props => {
         <div>{Survey.getLabel(surveyInfo, lang)}</div>
         <CycleSelector
           surveyInfo={surveyInfo}
-          user={user}
+          surveyCycle={surveyCycle}
           onChange={cycle => {
             const surveyId = Survey.getIdSurveyInfo(surveyInfo)
             const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
@@ -75,6 +75,7 @@ const mapStateToProps = state => ({
   user: AppState.getUser(state),
   lang: AppState.getLang(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
+  surveyCycle: SurveyState.getSurveyCycleKey(state),
 })
 
 export default connect(mapStateToProps, { updateUserPrefs })(AppHeader)
