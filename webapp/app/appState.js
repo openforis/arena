@@ -53,7 +53,7 @@ export const assocUserPropsOnSurveyCreate = survey => appState => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(
     R.prop(keys.user),
-    User.setPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.getCycleOneKey(surveyInfo)),
+    User.assocPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.getCycleOneKey(surveyInfo)),
     R.unless(
       User.isSystemAdmin,
       User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo))
@@ -66,7 +66,7 @@ export const assocUserPropsOnSurveyUpdate = survey => appState => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(
     R.prop(keys.user),
-    User.setPrefSurveyCurrent(Survey.getIdSurveyInfo(surveyInfo))
+    User.assocPrefSurveyCurrent(Survey.getIdSurveyInfo(surveyInfo))
   )(appState)
   return R.assoc(keys.user, user, appState)
 }

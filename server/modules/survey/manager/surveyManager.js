@@ -9,7 +9,6 @@ const SurveyValidator = require('../../../../common/survey/surveyValidator')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
-const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 const ObjectUtils = require('../../../../common/objectUtils')
 const Validation = require('../../../../common/validation/validation')
 
@@ -59,7 +58,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       }
 
       // update user prefs
-      user = User.setPrefSurveyCurrentAndCycle(surveyId, Survey.getCycleOneKey(surveyInfo))(user)
+      user = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.getCycleOneKey(surveyInfo))(user)
       await UserRepository.updateUserPrefs(user, t)
 
       // create default groups for this survey

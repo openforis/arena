@@ -5,10 +5,12 @@ const StringUtils = require('./stringUtils')
 const keys = {
   id: 'id',
   uuid: 'uuid',
-  parentUuid: 'parentUuid',
-  props: 'props',
+  authGroups: 'authGroups',
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
+  name: 'name',
+  parentUuid: 'parentUuid',
+  props: 'props',
 }
 
 const keysProps = {

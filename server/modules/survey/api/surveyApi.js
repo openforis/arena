@@ -64,7 +64,7 @@ module.exports.init = app => {
       const { surveyId, draft, validate } = Request.getParams(req)
       const user = R.pipe(
         Request.getUser,
-        User.setPrefSurveyCurrent(surveyId)
+        User.assocPrefSurveyCurrent(surveyId)
       )(req)
 
       const [survey] = await Promise.all([

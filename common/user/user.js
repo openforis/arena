@@ -4,20 +4,8 @@ const ObjectUtils = require('../objectUtils')
 const StringUtils = require('../stringUtils')
 const AuthGroups = require('../auth/authGroups')
 
-const keys = {
-  uuid: 'uuid',
-  name: 'name',
-  email: 'email',
-  lang: 'lang',
-  authGroups: 'authGroups',
-  hasProfilePicture: 'hasProfilePicture',
-  prefs: 'prefs',
-}
-const keysPrefs = {
-  surveys: 'surveys',
-  current: 'current',
-  cycle: 'cycle',
-}
+const keys = require('./_user/userKeys')
+const UserPrefs = require('./_user/userPrefs')
 
 //====== READ
 const getName = R.propOr('', keys.name)
@@ -45,32 +33,9 @@ const dissocAuthGroup = authGroup => user => {
   return R.assoc(keys.authGroups, authGroups, user)
 }
 
-//====== PREFS
-const prefPathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
-
-const getPrefSurveyCurrent = R.path(prefPathSurveyCurrent)
-
-const setPrefSurveyCurrent = surveyId => ObjectUtils.setInPath(prefPathSurveyCurrent, surveyId)
-const setPrefSurveyCycle = (surveyId, cycle) => ObjectUtils.setInPath([keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle], cycle)
-const setPrefSurveyCurrentAndCycle = (surveyId, cycle) => R.pipe(
-  setPrefSurveyCurrent(surveyId),
-  setPrefSurveyCycle(surveyId, cycle)
-)
-
-const deletePrefSurvey = surveyId => user => {
-  const surveyIdPref = getPrefSurveyCurrent(user)
-  return R.pipe(
-    R.when(
-      R.always(String(surveyIdPref) === String(surveyId)),
-      setPrefSurveyCurrent(null)
-    ),
-    R.dissocPath([keys.prefs, keysPrefs.surveys, String(surveyId)])
-  )(user)
-}
-
 module.exports = {
   keys,
-  keysPrefs,
+  keysPrefs: UserPrefs.keysPrefs,
 
   // READ
   isEqual: ObjectUtils.isEqual,
@@ -91,11 +56,12 @@ module.exports = {
   dissocAuthGroup,
 
   //PREFS
-  getPrefSurveyCurrent,
+  getPrefSurveyCurrent: UserPrefs.getPrefSurveyCurrent,
+  getPrefSurveyCycle: UserPrefs.getPrefSurveyCycle,
 
-  setPrefSurveyCurrent,
-  setPrefSurveyCycle,
-  setPrefSurveyCurrentAndCycle,
+  assocPrefSurveyCurrent: UserPrefs.assocPrefSurveyCurrent,
+  assocPrefSurveyCycle: UserPrefs.assocPrefSurveyCycle,
+  assocPrefSurveyCurrentAndCycle: UserPrefs.assocPrefSurveyCurrentAndCycle,
 
-  deletePrefSurvey,
+  deletePrefSurvey: UserPrefs.deletePrefSurvey,
 }
