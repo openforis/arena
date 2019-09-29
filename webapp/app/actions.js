@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import User from '../../common/user/user'
+
 import i18nFactory from '../../common/i18n/i18nFactory'
 import * as CognitoAuth from './cognitoAuth'
 
@@ -45,6 +47,11 @@ export const initUser = () => async dispatch => {
 
 export const setUser = user => async dispatch => {
   dispatch({ type: appPropsChange, user })
+}
+
+export const updateUserPrefs = user => async dispatch => {
+  dispatch(setUser(user))
+  await axios.post(`/api/user/${User.getUuid(user)}/prefs`, user)
 }
 
 export const logout = () => async dispatch => {

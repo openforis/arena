@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 
 import { usePrevious } from '../../commonComponents/hooks'
 import ProfilePicture from '../../commonComponents/profilePicture'
-
 import UserPopupMenu from './components/userPopupMenu'
+import CycleSelector from './components/cycleSelector'
 
 import User from '../../../common/user/user'
 import Survey from '../../../common/survey/survey'
@@ -14,8 +14,10 @@ import Survey from '../../../common/survey/survey'
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../../survey/surveyState'
 
+import { updateUserPrefs } from '../../app/actions'
+
 const AppHeader = props => {
-  const { user, surveyInfo, lang } = props
+  const { user, surveyInfo, lang, updateUserPrefs } = props
   const [showUserPopup, setShowUserPopup] = useState(false)
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
@@ -30,7 +32,16 @@ const AppHeader = props => {
       </div>
 
       <div className="app-header__survey">
-        {Survey.getLabel(surveyInfo, lang)}
+        <div>{Survey.getLabel(surveyInfo, lang)}</div>
+        <CycleSelector
+          surveyInfo={surveyInfo}
+          user={user}
+          onChange={cycle => {
+            const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+            const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
+            updateUserPrefs(userUpdated)
+          }}
+        />
       </div>
 
       <div className="app-header__user"
@@ -66,4 +77,4 @@ const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
-export default connect(mapStateToProps)(AppHeader)
+export default connect(mapStateToProps, { updateUserPrefs })(AppHeader)

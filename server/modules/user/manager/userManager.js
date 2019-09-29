@@ -114,7 +114,6 @@ module.exports = {
   updateUser,
   updateUsername: UserRepository.updateUsername,
   updateUserPrefs,
-  updateUserPref: UserRepository.updateUserPref,
 
   // DELETE
   deleteUser,
