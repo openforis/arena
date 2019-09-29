@@ -3,12 +3,8 @@ import axios from 'axios'
 import Survey from '../../common/survey/survey'
 
 import * as SurveyState from './surveyState'
-import * as AppState from '../app/appState'
 
-import User from '../../common/user/user'
-import { userPrefNames } from '../../common/user/userPrefs'
-
-import { appUserPrefUpdate, showAppJobMonitor, showNotificationMessage } from '../app/actions'
+import { showAppJobMonitor, showNotificationMessage } from '../app/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
@@ -44,18 +40,12 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
 }
 
 // ====== SET ACTIVE SURVEY
-export const setActiveSurvey = (surveyId, canEdit = true) =>
-  async (dispatch, getState) => {
-    //load survey
-    const params = { draft: canEdit, validate: canEdit }
-    const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params })
-    dispatch({ type: surveyUpdate, survey })
-
-    //update userPref
-    const user = AppState.getUser(getState())
-    await axios.post(`/api/user/${User.getUuid(user)}/pref/${userPrefNames.survey}/${surveyId}`)
-    dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
-  }
+export const setActiveSurvey = (surveyId, canEdit = true) => async dispatch => {
+  //load survey
+  const params = { draft: canEdit, validate: canEdit }
+  const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params })
+  dispatch({ type: surveyUpdate, survey })
+}
 
 // ====== UPDATE
 
@@ -80,7 +70,7 @@ export const deleteSurvey = () => async (dispatch, getState) => {
 
   await axios.delete(`/api/survey/${surveyId}`)
 
-  dispatch({ type: surveyDelete, surveyId })
+  dispatch({ type: surveyDelete, surveyInfo })
   dispatch(showNotificationMessage('homeView.surveyDeleted', { surveyName: Survey.getName(surveyInfo) }))
 }
 

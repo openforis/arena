@@ -27,15 +27,23 @@ const getAuthGroups = R.prop(keys.authGroups)
 const getPrefs = R.propOr({}, keys.prefs)
 const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
-//====== UPDATE
+//====== CHECK
+const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
+
+//====== AUTH GROUP
 const assocAuthGroup = authGroup => user => {
   const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
   return R.assoc(keys.authGroups, authGroups, user)
 }
 
-//====== CHECK
-const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
-const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
+const dissocAuthGroup = authGroup => user => {
+  const authGroups = R.pipe(
+    getAuthGroups,
+    R.reject(R.propEq(AuthGroups.keys.uuid, AuthGroups.getUuid(authGroup))),
+  )(user)
+  return R.assoc(keys.authGroups, authGroups, user)
+}
 
 //====== PREFS
 const prefPathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
@@ -74,12 +82,13 @@ module.exports = {
   getPrefs,
   hasProfilePicture,
 
-  //UPDATE
-  assocAuthGroup,
-
   //CHECK
   isSystemAdmin,
   hasAccepted,
+
+  //AUTH GROUP
+  assocAuthGroup,
+  dissocAuthGroup,
 
   //PREFS
   getPrefSurveyCurrent,

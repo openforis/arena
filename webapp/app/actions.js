@@ -8,32 +8,27 @@ import { cancelDebouncedAction, debounceAction } from '../utils/reduxUtils'
 
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
-export const appUserPrefUpdate = 'app/user/pref/update'
 
 // ====== INIT
 
 export const initApp = () => async dispatch => {
   const i18n = await i18nFactory.createI18nPromise('en')
-
   let user = null
   let survey = null
 
   //get jwt token to check if user is already logged in
   try {
-
     const token = await CognitoAuth.getJwtToken()
     if (token) {
       const userSurvey = await getUserSurvey()
       user = userSurvey.user
       survey = userSurvey.survey
     }
-
     dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
   } catch (e) {
     dispatch({ type: appPropsChange, i18n })
     dispatch(throwSystemError(e.message))
   }
-
 }
 
 // ====== USER
@@ -50,11 +45,6 @@ export const initUser = () => async dispatch => {
 
 export const setUser = user => async dispatch => {
   dispatch({ type: appPropsChange, user })
-}
-
-export const setLanguage = languageCode => async (dispatch) => {
-  const i18n = await i18nFactory.createI18nPromise(languageCode)
-  dispatch({ type: appPropsChange, i18n })
 }
 
 export const logout = () => async dispatch => {

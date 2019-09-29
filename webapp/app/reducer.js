@@ -1,14 +1,8 @@
-import * as R from 'ramda'
-
 import { assocActionProps, exportReducer } from '../utils/reduxUtils'
-import { setUserPref } from '../../common/user/userPrefs'
-
-import * as AppState from './appState'
 
 import {
   appPropsChange,
   appUserLogout,
-  appUserPrefUpdate,
   appErrorCreate,
   appErrorDelete,
   appSideBarOpenedUpdate,
@@ -18,7 +12,10 @@ import {
   appNotificationShow,
   appNotificationHide,
 } from './actions'
-import { surveyCreate, surveyDelete } from '../survey/actions'
+
+import { surveyCreate, surveyDelete, surveyUpdate } from '../survey/actions'
+
+import * as AppState from './appState'
 
 const actionHandlers = {
 
@@ -26,20 +23,13 @@ const actionHandlers = {
 
   // ====== user
 
-  [appUserPrefUpdate]: (state, { name, value }) => {
-    const user = R.pipe(
-      R.prop('user'),
-      setUserPref(name, value)
-    )(state)
-
-    return assocActionProps(state, { user })
-  },
-
   [appUserLogout]: (state) => AppState.logoutUser(state),
 
-  [surveyCreate]: (state, { survey: { info } }) => AppState.assocUserPropsOnSurveyCreate(info)(state),
+  [surveyCreate]: (state, { survey }) => AppState.assocUserPropsOnSurveyCreate(survey)(state),
 
-  [surveyDelete]: (state, { surveyId }) => AppState.dissocSurveyGroups(surveyId)(state),
+  [surveyUpdate]: (state, { survey }) => AppState.assocUserPropsOnSurveyUpdate(survey)(state),
+
+  [surveyDelete]: (state, { surveyInfo }) => AppState.dissocUserPropsOnSurveyDelete(surveyInfo)(state),
 
   // ====== sideBar
   [appSideBarOpenedUpdate]: (state, { sideBarOpened }) => AppState.assocSideBarOpened(sideBarOpened)(state),
