@@ -178,6 +178,7 @@ module.exports = {
   //READ
   getUuid: ObjectUtils.getUuid,
   getProp: ObjectUtils.getProp,
+  getProps: ObjectUtils.getProps,
   isEqual: ObjectUtils.isEqual,
 
   getType,
