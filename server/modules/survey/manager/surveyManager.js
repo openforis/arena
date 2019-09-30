@@ -152,10 +152,15 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
           if (key === Survey.infoKeys.cycles) {
             const cycles = Object.keys(value)
             const cyclesPrev = Object.keys(valuePrev)
-            const cyclesNew = R.difference(cycles, cyclesPrev)
             // add new cycles to nodeDefs
-            if (!R.isEmpty(cyclesNew)) {
-              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesNew, t)
+            const cyclesAdded = R.difference(cycles, cyclesPrev)
+            if (!R.isEmpty(cyclesAdded)) {
+              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, t)
+            }
+            // remove delete cycles from nodeDefs
+            const cyclesRemoved = R.difference(cyclesPrev, cycles)
+            if (!R.isEmpty(cyclesRemoved)) {
+              await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, t)
             }
           }
         }
