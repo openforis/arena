@@ -73,6 +73,7 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProps,
+  addNodeDefsCycles: NodeDefRepository.addNodeDefsCycles,
   publishNodeDefsProps,
 
   //DELETE
