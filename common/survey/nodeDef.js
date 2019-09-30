@@ -24,6 +24,7 @@ const nodeDefType = {
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
+  parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
   meta: 'meta',
   draftAdvanced: 'draftAdvanced',
@@ -34,13 +35,13 @@ const keys = {
 
 const propKeys = {
   applicable: 'applicable',
+  cycles: 'cycles',
   defaultValues: 'defaultValues',
   descriptions: 'descriptions',
   key: 'key',
   labels: 'labels',
   multiple: 'multiple',
   name: 'name',
-  parentUuid: 'parentUuid',
   readOnly: 'readOnly',
   validations: 'validations',
 
@@ -60,10 +61,10 @@ const maxKeyAttributes = 3
 // ==== CREATE
 
 const newNodeDef = (parentUuid, type, props) => ({
-  uuid: uuidv4(),
-  parentUuid,
-  type,
-  props,
+  [keys.uuid]: uuidv4(),
+  [keys.parentUuid]: parentUuid,
+  [keys.type]: type,
+  [keys.props]: props,
 })
 
 // ==== READ
@@ -177,6 +178,7 @@ module.exports = {
   //READ
   getUuid: ObjectUtils.getUuid,
   getProp: ObjectUtils.getProp,
+  getProps: ObjectUtils.getProps,
   isEqual: ObjectUtils.isEqual,
 
   getType,
@@ -188,6 +190,7 @@ module.exports = {
   getCategoryUuid: ObjectUtils.getProp(propKeys.categoryUuid),
   getParentCodeDefUuid,
   getTaxonomyUuid: ObjectUtils.getProp(propKeys.taxonomyUuid),
+  getCycles: ObjectUtils.getProp(propKeys.cycles, []),
 
   isKey,
   isMultiple,
