@@ -176,14 +176,14 @@ const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
 }
 
 // ====== DELETE
-const deleteSurvey = async surveyId => await db.tx(async t => {
+const deleteSurvey = async surveyId => await db.tx(async t =>
   await Promise.all([
     UserRepository.deleteUsersPrefsSurvey(surveyId, t),
     SurveyRepository.dropSurveySchema(surveyId, t),
     SurveyRdbManager.dropSchema(surveyId, t),
     SurveyRepository.deleteSurvey(surveyId, t),
   ])
-})
+)
 
 module.exports = {
   // ====== CREATE
