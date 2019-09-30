@@ -9,6 +9,7 @@ import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
+import User from '../../../common/user/user'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
@@ -56,14 +57,13 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 // ==== CREATE
 
 export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
-  const survey = SurveyState.getSurvey(getState())
-  const surveyId = Survey.getId(survey)
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const lastSurveyCycle = R.pipe(Survey.getCycles, R.keys, R.head)(surveyInfo)
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const user = AppState.getUser(state)
+  const cycle = User.getPrefSurveyCycle(surveyId)(user)
 
   //assoc current cycle
-  //TODO get current cycle from user prefs
-  props[NodeDef.propKeys.cycles] = [lastSurveyCycle]
+  props[NodeDef.propKeys.cycles] = [cycle]
 
   const nodeDef = NodeDef.newNodeDef(parentUuid, type, props)
 

@@ -50,7 +50,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
           {
             [NodeDef.propKeys.name]: 'root_entity',
             [NodeDef.propKeys.multiple]: false,
-            [NodeDef.propKeys.cycles]: [R.pipe(Survey.getCycles, R.keys, R.head)(surveyDb)], //first (and only) cycle
+            [NodeDef.propKeys.cycles]: [Survey.getCycleOneKey(surveyInfo)], //use first (and only) cycle
             [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
             [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
           }

@@ -454,9 +454,7 @@ class NodeDefsImportJob extends Job {
     const cycle = R.pipe(
       CollectImportJobContext.getSurvey,
       Survey.getSurveyInfo,
-      Survey.getCycles,
-      R.keys,
-      R.head
+      Survey.getCycleOneKey
     )(this.context)
 
     return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, {

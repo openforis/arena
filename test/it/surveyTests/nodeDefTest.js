@@ -1,5 +1,5 @@
-const {getContextSurvey} = require('../../testContext')
-const {expect} = require('chai')
+const { getContextSurvey } = require('../../testContext')
+const { expect } = require('chai')
 const R = require('ramda')
 
 const Survey = require('../../../common/survey/survey')
@@ -12,9 +12,21 @@ const fetchRootNodeDef = async () => {
   return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
-const createNodeDef = async (parentNodeUuid, type, name) => {
+function createNodeDef (parentNodeUuid, type, name) {
+  const cycle = R.pipe(
+    Survey.getSurveyInfo,
+    Survey.getCycleOneKey
+  )(getContextSurvey())
+
+  return NodeDef.newNodeDef(parentNodeUuid, type, {
+    [NodeDef.propKeys.name]: name,
+    [NodeDef.propKeys.cycles]: [cycle],
+  })
+}
+
+const createAndStoreNodeDef = async (parentNodeUuid, type, name) => {
   const survey = getContextSurvey()
-  const nodeDef = NodeDef.newNodeDef(parentNodeUuid, type, {name})
+  const nodeDef = createNodeDef(parentNodeUuid, type, name)
   return await NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
 }
 
@@ -26,7 +38,7 @@ const createNodeDefsTest = async () => {
   const rootDefUuid = NodeDef.getUuid(rootDef)
 
   const type = NodeDef.nodeDefType.text
-  const nodeDefReq = NodeDef.newNodeDef(rootDefUuid, type, {name: 'node_def_' + type})
+  const nodeDefReq = createNodeDef(rootDefUuid, type, `node_def_${type}`)
   const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
   expect(nodeDefDb.id).to.not.be.undefined
@@ -43,8 +55,8 @@ const updateNodeDefTest = async () => {
   const rootDef = await fetchRootNodeDef()
   const rootDefUuid = NodeDef.getUuid(rootDef)
 
-  const nodeDef1 = await createNodeDef(rootDefUuid, NodeDef.nodeDefType.text, 'node_def_1')
-  const nodeDef2 = await createNodeDef(rootDefUuid, NodeDef.nodeDefType.boolean, 'node_def_2')
+  const nodeDef1 = await createAndStoreNodeDef(rootDefUuid, NodeDef.nodeDefType.text, 'node_def_1')
+  const nodeDef2 = await createAndStoreNodeDef(rootDefUuid, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
   const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, NodeDef.getUuid(nodeDef1), {
