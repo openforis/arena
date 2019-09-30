@@ -3,12 +3,14 @@ import './recordsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import Survey from '../../../../../common/survey/survey'
 import Record from '../../../../../common/record/record'
 
 import TableView from '../../../tableViews/tableView'
 import RecordsHeaderLeft from './components/recordsHeaderLeft'
 import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
+import { useOnUpdate } from '../../../../commonComponents/hooks'
 
 import { appModuleUri, dataModules } from '../../../appModules'
 
@@ -17,18 +19,24 @@ import * as RecordsState from './recordsState'
 import * as SurveyState from '../../../../survey/surveyState'
 
 import { createRecord } from '../../../surveyViews/record/actions'
+import { initList } from '../../../tableViews/actions'
 
 const RecordsView = props => {
 
   const {
-    surveyInfo, user, nodeDefKeys, lang,
-    createRecord, history,
+    surveyInfo, surveyCycleKey, user, nodeDefKeys, lang,
+    createRecord, initList, history
   } = props
 
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
   const onRowClick = record => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
+
+  useOnUpdate(() => {
+    const moduleApiUri = `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/${RecordsState.keys.records}`
+    initList(RecordsState.keys.records, moduleApiUri)
+  }, [surveyCycleKey])
 
   return (
     <TableView
@@ -56,7 +64,8 @@ const mapStateToProps = state => ({
   lang: AppState.getLang(state),
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
-  nodeDefKeys: RecordsState.getNodeDefKeys(state),
+  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
+  nodeDefKeys: RecordsState.getNodeDefKeys(state)
 })
 
-export default connect(mapStateToProps, { createRecord })(RecordsView)
+export default connect(mapStateToProps, { createRecord, initList })(RecordsView)

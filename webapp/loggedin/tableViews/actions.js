@@ -1,22 +1,24 @@
 import axios from 'axios'
 
 import * as TableViewsState from './tableViewsState'
+import * as SurveyState from '../../survey/surveyState'
 
 export const tableViewsListUpdate = 'tableViews/list/update'
 
-const getItems = (moduleApiUri, offset, limit) => axios.get(
+const getItems = (moduleApiUri, cycle, offset, limit) => axios.get(
   moduleApiUri,
-  { params: { offset, limit } }
+  { params: { cycle, offset, limit } }
 )
 
 export const initList = (module, moduleApiUri) => async (dispatch, getState) => {
   const state = getState()
   const offset = TableViewsState.getOffset(module)(state)
   const limit = TableViewsState.getLimit(module)(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
   const [countResp, itemsResp] = await Promise.all([
     axios.get(`${moduleApiUri}/count`),
-    getItems(moduleApiUri, offset, limit)
+    getItems(moduleApiUri, cycle, offset, limit)
   ])
 
   dispatch({
@@ -33,8 +35,9 @@ export const fetchListItems = (module, moduleApiUri, offset) => async (dispatch,
   const state = getState()
 
   const limit = TableViewsState.getLimit(module)(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const { data } = await getItems(moduleApiUri, offset, limit)
+  const { data } = await getItems(moduleApiUri, cycle, offset, limit)
 
   dispatch({
     type: tableViewsListUpdate,

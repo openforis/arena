@@ -27,14 +27,14 @@ const insertRecord = async (user, surveyId, record, client = db) =>
   )
 
 //READ
-const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
+const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
   const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, NodeDef.getUuid(nodeDefRoot), nodeDefsDraft, client)
 
-  const list = await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefRoot, nodeDefKeys, offset, limit, client)
+  const list = await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, client)
 
   return {
     nodeDefKeys,
