@@ -32,16 +32,21 @@ const AppHeader = props => {
       </div>
 
       <div className="app-header__survey">
-        <div>{Survey.getLabel(surveyInfo, lang)}</div>
-        <CycleSelector
-          surveyInfo={surveyInfo}
-          surveyCycleKey={surveyCycleKey}
-          onChange={cycle => {
-            const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-            const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
-            updateUserPrefs(userUpdated)
-          }}
-        />
+        {
+          Survey.isValid(surveyInfo) &&
+          <>
+            <div>{Survey.getLabel(surveyInfo, lang)}</div>
+            <CycleSelector
+              surveyInfo={surveyInfo}
+              surveyCycleKey={surveyCycleKey}
+              onChange={cycle => {
+                const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+                const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
+                updateUserPrefs(userUpdated)
+              }}
+            />
+          </>
+        }
       </div>
 
       <div className="app-header__user"
