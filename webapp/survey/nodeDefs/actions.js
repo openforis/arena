@@ -56,16 +56,11 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 // ==== CREATE
 
 export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
-  const survey = SurveyState.getSurvey(getState())
-  const surveyId = Survey.getId(survey)
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const lastSurveyCycle = R.pipe(Survey.getCycles, R.keys, R.head)(surveyInfo)
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
-  //assoc current cycle
-  //TODO get current cycle from user prefs
-  props[NodeDef.propKeys.cycles] = [lastSurveyCycle]
-
-  const nodeDef = NodeDef.newNodeDef(parentUuid, type, props)
+  const nodeDef = NodeDef.newNodeDef(parentUuid, type, cycle, props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 

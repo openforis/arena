@@ -25,15 +25,10 @@ class NodeDefBuilder {
   _createNodeDef (survey, parentDefUuid) {
     const cycle = R.pipe(
       Survey.getSurveyInfo,
-      Survey.getCycles,
-      R.keys,
-      R.head
+      Survey.getCycleOneKey
     )(survey)
 
-    return NodeDef.newNodeDef(parentDefUuid, this.type, {
-      ...this.props,
-      [NodeDef.propKeys.cycles]: [cycle]
-    })
+    return NodeDef.newNodeDef(parentDefUuid, this.type, cycle, this.props)
   }
 
   applyIf (expr) {
@@ -164,7 +159,7 @@ class SurveyBuilder {
 
       await Survey.traverseHierarchyItem(root, async nodeDef =>
         await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
-       )
+      )
 
       if (publish) {
         const publishJob = new SurveyPublishJob({ user: this.user, surveyId })
