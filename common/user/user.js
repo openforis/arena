@@ -58,6 +58,7 @@ module.exports = {
   //PREFS
   getPrefSurveyCurrent: UserPrefs.getPrefSurveyCurrent,
   getPrefSurveyCycle: UserPrefs.getPrefSurveyCycle,
+  getPrefSurveyCurrentCycle: UserPrefs.getPrefSurveyCurrentCycle,
 
   assocPrefSurveyCurrent: UserPrefs.assocPrefSurveyCurrent,
   assocPrefSurveyCycle: UserPrefs.assocPrefSurveyCycle,

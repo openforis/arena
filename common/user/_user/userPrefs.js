@@ -16,6 +16,11 @@ const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
 
 const getPrefSurveyCycle = surveyId => R.path(pathSurveyCycle(surveyId))
 
+const getPrefSurveyCurrentCycle = user => R.pipe(
+  getPrefSurveyCurrent,
+  surveyId => getPrefSurveyCycle(surveyId)(user)
+)(user)
+
 //====== UPDATE
 const assocPrefSurveyCurrent = surveyId => R.assocPath(pathSurveyCurrent, surveyId)
 
@@ -44,6 +49,7 @@ module.exports = {
   //READ
   getPrefSurveyCurrent,
   getPrefSurveyCycle,
+  getPrefSurveyCurrentCycle,
 
   //UPDATE
   assocPrefSurveyCurrent,
