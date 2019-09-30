@@ -63,7 +63,8 @@ class RecordsImportJob extends Job {
       // this.logDebug(`${entryName} parseToJson done`)
 
       // this.logDebug(`${entryName} recordToCreate start`)
-      const recordToCreate = Record.newRecord(user, false, CollectRecord.getDateCreated(collectRecordJson))
+      const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
+      const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson))
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)
       await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)

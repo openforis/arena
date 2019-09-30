@@ -105,16 +105,14 @@ class RecordBuilder {
   }
 
   build () {
-    const record = Record.newRecord(this.user)
+    const record = RecordUtils.newRecord(this.user, this.survey)
     const nodes = this.rootEntityBuilder.build(this.survey, null, Record.getUuid(record), null)
     return Record.assocNodes(nodes)(record)
   }
 
   async buildAndStore (client = db) {
     return await client.tx(async t => {
-      const recordToCreate = Record.newRecord(this.user)
-
-      const record = await RecordUtils.insertAndInitRecord(this.user, this.survey, recordToCreate, t)
+      const record = await RecordUtils.insertAndInitRecord(this.user, this.survey, false, t)
 
       return await this.rootEntityBuilder.buildAndStore(this.user, this.survey, record, null, t)
     })

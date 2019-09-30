@@ -11,8 +11,14 @@ const RecordManager = require('../../../server/modules/record/manager/recordMana
 
 const Queue = require('../../../common/queue')
 
-const insertAndInitRecord = async (user, survey, record, client = db) =>
+const newRecord = (user, survey, preview = false) => {
+  const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
+  return Record.newRecord(user, cycle, preview)
+}
+
+const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
   await client.tx(async t => {
+    const record = newRecord(user, survey, preview)
     const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, t)
     return await RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
   })
@@ -106,6 +112,7 @@ const getValidationMaxCount = (parentNode, childDef) => R.pipe(
 )
 
 module.exports = {
+  newRecord,
   insertAndInitRecord,
 
   getNodePath,
