@@ -8,7 +8,6 @@ import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 import NodeRefData from '../../../../common/record/nodeRefData'
-import User from '../../../../common/user/user'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
@@ -54,7 +53,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   const state = getState()
   const user = AppState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
-  const cycle = User.getPrefSurveyCycle(surveyId)(user)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
   const record = Record.newRecord(user, cycle, preview)
 

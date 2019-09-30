@@ -10,7 +10,7 @@ const keys = {
   preview: 'preview',
   step: 'step',
   surveyUuid: 'surveyUuid',
-  uuid: 'uuid',
+  uuid: ObjectUtils.keys.uuid,
 }
 
 module.exports = keys
