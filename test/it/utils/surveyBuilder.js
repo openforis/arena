@@ -28,10 +28,7 @@ class NodeDefBuilder {
       Survey.getCycleOneKey
     )(survey)
 
-    return NodeDef.newNodeDef(parentDefUuid, this.type, {
-      ...this.props,
-      [NodeDef.propKeys.cycles]: [cycle]
-    })
+    return NodeDef.newNodeDef(parentDefUuid, this.type, cycle, this.props)
   }
 
   applyIf (expr) {

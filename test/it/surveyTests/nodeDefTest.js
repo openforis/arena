@@ -18,9 +18,8 @@ const createNodeDef = (parentNodeUuid, type, name) => {
     Survey.getCycleOneKey
   )(getContextSurvey())
 
-  return NodeDef.newNodeDef(parentNodeUuid, type, {
+  return NodeDef.newNodeDef(parentNodeUuid, type, cycle, {
     [NodeDef.propKeys.name]: name,
-    [NodeDef.propKeys.cycles]: [cycle],
   })
 }
 

@@ -47,10 +47,10 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
         const rootEntityDef = NodeDef.newNodeDef(
           null,
           NodeDef.nodeDefType.entity,
+          Survey.getCycleOneKey(surveyInfo), //use first (and only) cycle
           {
             [NodeDef.propKeys.name]: 'root_entity',
             [NodeDef.propKeys.multiple]: false,
-            [NodeDef.propKeys.cycles]: [Survey.getCycleOneKey(surveyInfo)], //use first (and only) cycle
             [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
             [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
           }

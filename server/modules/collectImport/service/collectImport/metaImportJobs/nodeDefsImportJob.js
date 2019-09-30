@@ -457,10 +457,7 @@ class NodeDefsImportJob extends Job {
       Survey.getCycleOneKey
     )(this.context)
 
-    return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, {
-      ...props,
-      [NodeDef.propKeys.cycles]: [cycle]
-    })
+    return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, cycle, props)
   }
 }
 

@@ -61,10 +61,7 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
 
-  //assoc current cycle
-  props[NodeDef.propKeys.cycles] = [cycle]
-
-  const nodeDef = NodeDef.newNodeDef(parentUuid, type, props)
+  const nodeDef = NodeDef.newNodeDef(parentUuid, type, cycle, props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
