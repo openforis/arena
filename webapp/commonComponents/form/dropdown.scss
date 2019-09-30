@@ -17,8 +17,8 @@
     }
   }
 
-  .form-input {
-    border-bottom: none !important;
+  .form-input, .form-input[readonly] {
+    border-bottom: none;
   }
 
   &:focus-within {

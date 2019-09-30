@@ -1,4 +1,4 @@
-const Log = require('../../../log/log').getLogger('AuthAPI')
+const Loggger = require('../../../log/log').getLogger('AuthAPI')
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
 
@@ -23,7 +23,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     }
     sendResponse(res, user, survey)
   } catch (e) {
-    Log.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
+    Loggger.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
     // survey not found with user pref
     // removing user pref
     user = User.deletePrefSurvey(surveyId)(user)
