@@ -166,7 +166,7 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
   )
 
 const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
-  await client.many(`
+  await client.manyOrNone(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE node_def_uuid IN ($1:csv)
     RETURNING *, true as ${Node.keys.deleted}
