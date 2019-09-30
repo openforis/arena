@@ -150,6 +150,12 @@ const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) =>
     [JSON.stringify(cycles), JSON.stringify(cycleStart)]
   )
 
+const deleteNodeDefsCycles = async (surveyId, cycles, client = db) =>
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{"cycles"}', ((props || props_draft)->'cycles') ${cycles.map(c => `- '${c}'`).join(' ')})
+  `)
+
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
     UPDATE
@@ -258,6 +264,7 @@ module.exports = {
   updateNodeDefProps,
   updateNodeDefPropsPublished,
   addNodeDefsCycles,
+  deleteNodeDefsCycles,
   publishNodeDefsProps,
 
   //DELETE
