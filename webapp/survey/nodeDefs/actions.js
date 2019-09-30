@@ -59,8 +59,7 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
-  const user = AppState.getUser(state)
-  const cycle = User.getPrefSurveyCycle(surveyId)(user)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
   //assoc current cycle
   props[NodeDef.propKeys.cycles] = [cycle]
