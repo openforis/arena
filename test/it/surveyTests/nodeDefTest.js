@@ -12,7 +12,7 @@ const fetchRootNodeDef = async () => {
   return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
-function createNodeDef (parentNodeUuid, type, name) {
+const createNodeDef = (parentNodeUuid, type, name) => {
   const cycle = R.pipe(
     Survey.getSurveyInfo,
     Survey.getCycleOneKey
