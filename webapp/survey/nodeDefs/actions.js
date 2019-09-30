@@ -9,7 +9,6 @@ import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
-import User from '../../../common/user/user'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
