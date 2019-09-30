@@ -6,6 +6,7 @@ const Taxonomy = require('../../../../../common/survey/taxonomy')
 const keys = {
   collectSurveyFileZip: 'collectSurveyFileZip',
   categories: 'categories',
+  survey: 'survey',
   taxonomies: 'taxonomies',
 }
 
@@ -20,6 +21,8 @@ const getCategoryByName = name => R.pipe(
   R.find(c => name === Category.getName(c))
 )
 
+const getSurvey = R.prop(keys.survey)
+
 const getTaxonomies = R.propOr([], keys.taxonomies)
 
 const getTaxonomyByName = name => R.pipe(
@@ -28,6 +31,8 @@ const getTaxonomyByName = name => R.pipe(
 )
 
 // ===== UPDATE
+
+const assocSurvey = R.assoc(keys.survey)
 
 const assocCategories = R.assoc(keys.categories)
 
@@ -38,10 +43,15 @@ const assocCategory = category => context => R.pipe(
 )(context)
 
 module.exports = {
+  //READ
   getCollectSurveyFileZip,
   getCategories,
   getCategoryByName,
+  getSurvey,
   getTaxonomies,
   getTaxonomyByName,
+
+  //UPDATE
+  assocSurvey,
   assocCategory,
 }

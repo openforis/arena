@@ -42,7 +42,7 @@ class SurveyCreatorJob extends Job {
 
     await SurveyManager.updateSurveyProp(this.user, surveyId, Survey.infoKeys.languages, languages, tx)
 
-    this.setContext({ surveyId, defaultLanguage })
+    this.setContext({ survey, surveyId, defaultLanguage })
   }
 }
 

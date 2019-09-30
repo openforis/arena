@@ -77,7 +77,10 @@ button, .btn {
 
   &.active {
     background-color: $blueLightActive;
-    pointer-events: none;
+
+    &:not(.deselectable) {
+      pointer-events: none;
+    }
   }
 }
 
