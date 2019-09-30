@@ -98,34 +98,32 @@ const updateUsername = async (user, name, client = db) =>
     [name, User.getUuid(user)],
     camelize)
 
-const updateUserPref = async (user, name, value, client = db) => {
-  const userPref = JSON.stringify(
-    { [name]: value }
+// ==== PREFS
+
+const updateUserPrefs = async (user, client = db) => await client.one(`
+    UPDATE "user" u
+    SET prefs = prefs || $1::jsonb
+    WHERE u.uuid = $2
+    RETURNING ${selectFieldsCommaSep}`,
+  [User.getPrefs(user), User.getUuid(user)],
+  camelize
+)
+
+const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
+  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+  // remove from surveys current pref
+  await client.query(`
+    UPDATE "user"
+    SET prefs = jsonb_set(prefs, ${surveyCurrentJsonbPath}, 'null')
+    WHERE prefs #>> ${surveyCurrentJsonbPath} = $1
+  `,
+    [surveyId]
   )
-
-  const userRes = await client.one(`
-    UPDATE "user" u
-    SET prefs = prefs || $1
-    WHERE u.uuid = $2
-    RETURNING ${selectFieldsCommaSep}`,
-    [userPref, User.getUuid(user)],
-    camelize)
-
-  return userRes
-}
-
-// ==== DELETE
-
-const deleteUserPref = async (user, name, client = db) => {
-  const userRes = await client.one(`
-    UPDATE "user" u
-    SET prefs = prefs - $1
-    WHERE u.uuid = $2
-    RETURNING ${selectFieldsCommaSep}`,
-    [name, User.getUuid(user)],
-    camelize)
-
-  return userRes
+  // remove from surveys pref
+  await client.query(`
+    UPDATE "user"
+    SET prefs = prefs #- '{${User.keysPrefs.surveys},${surveyId}}'
+`)
 }
 
 module.exports = {
@@ -142,8 +140,8 @@ module.exports = {
   // UPDATE
   updateUser,
   updateUsername,
-  updateUserPref,
+  updateUserPrefs,
 
-  // DELETE
-  deleteUserPref,
+  // PREFS
+  deleteUsersPrefsSurvey,
 }

@@ -17,7 +17,7 @@
     }
   }
 
-  .form-input {
+  .form-input, .form-input[readonly] {
     border-bottom: none;
   }
 

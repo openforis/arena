@@ -5,10 +5,12 @@ const StringUtils = require('./stringUtils')
 const keys = {
   id: 'id',
   uuid: 'uuid',
-  parentUuid: 'parentUuid',
-  props: 'props',
+  authGroups: 'authGroups',
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
+  name: 'name',
+  parentUuid: 'parentUuid',
+  props: 'props',
 }
 
 const keysProps = {
@@ -16,41 +18,35 @@ const keysProps = {
   labels: 'labels',
 }
 
-// CHECK
-
+//====== CHECK
 const isBlank = value => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
+const isEqual = other => self => getUuid(other) === getUuid(self)
 
-// READ
-
+//====== READ
 const getUuid = R.propOr(null, keys.uuid)
 
 const getProps = R.propOr({}, keys.props)
-
 const getProp = (prop, defaultTo = null) => R.pipe(
   getProps,
   R.pathOr(defaultTo, prop.split('.'))
 )
 
 const getLabels = getProp(keysProps.labels, {})
-
 const getLabel = (lang, defaultTo = null) => R.pipe(
   getLabels,
   R.propOr(defaultTo, lang)
 )
 
 const getDescriptions = getProp(keysProps.descriptions, {})
-
 const getDescription = (lang, defaultTo = null) => R.pipe(
   getDescriptions,
   R.propOr(defaultTo, lang)
 )
 
 const getDateCreated = R.propOr(null, keys.dateCreated)
-
 const getDateModified = R.propOr(null, keys.dateModified)
 
-// ===== UPDATE
-
+//===== UPDATE
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
 const setInPath = (pathArray, value, includeEmpty = true) => obj => {
@@ -59,9 +55,7 @@ const setInPath = (pathArray, value, includeEmpty = true) => obj => {
   }
 
   let objCurrent = obj
-
   pathArray.forEach((pathPart, i) => {
-
     if (i === pathArray.length - 1) {
       objCurrent[pathPart] = value
     } else {
@@ -70,16 +64,11 @@ const setInPath = (pathArray, value, includeEmpty = true) => obj => {
       }
       objCurrent = objCurrent[pathPart]
     }
-
   })
-
   return obj
 }
 
-// UTILS / uuid
-
-const isEqual = other => self => getUuid(other) === getUuid(self)
-
+//====== UTILS / uuid
 const toIndexedObj = (array, prop) => array.reduce(
   (acc, item) => {
     acc[item[prop]] = item

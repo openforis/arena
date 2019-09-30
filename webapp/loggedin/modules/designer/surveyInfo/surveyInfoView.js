@@ -20,7 +20,7 @@ import * as AppState from '../../../../app/appState'
 import { updateSurveyInfoProps } from '../../../../survey/surveyInfo/actions'
 
 const SurveyInfoView = (props) => {
-  const { readOnly } = props
+  const { surveyInfo, readOnly } = props
 
   const i18n = useI18n()
 
@@ -81,6 +81,7 @@ const SurveyInfoView = (props) => {
             readOnly={readOnly}
             cycles={cycles}
             setCycles={setCycles}
+            surveyInfo={surveyInfo}
           />
         </div>
 

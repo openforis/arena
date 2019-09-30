@@ -6,8 +6,7 @@ import { Link } from 'react-router-dom'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 import Header from '../../../../../commonComponents/header'
-
-import DeleteSurveyDialog from './deleteSurveyDialog'
+import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 import Survey from '../../../../../../common/survey/survey'
 import Authorizer from '../../../../../../common/auth/authorizer'

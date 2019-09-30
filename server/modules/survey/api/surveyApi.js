@@ -1,13 +1,15 @@
+const R = require('ramda')
+
 const Response = require('../../../utils/response')
 const Request = require('../../../utils/request')
+const JobUtils = require('../../../job/jobUtils')
 
 const Validation = require('../../../../common/validation/validation')
-
-const SurveyService = require('../service/surveyService')
+const User = require('../../../../common/user/user')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
-
-const JobUtils = require('../../../job/jobUtils')
+const SurveyService = require('../service/surveyService')
+const UserService = require('../../user/service/userService')
 
 module.exports.init = app => {
 
@@ -60,8 +62,15 @@ module.exports.init = app => {
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
+      const user = R.pipe(
+        Request.getUser,
+        User.assocPrefSurveyCurrent(surveyId)
+      )(req)
 
-      const survey = await SurveyService.fetchSurveyById(surveyId, draft, validate)
+      const [survey] = await Promise.all([
+        SurveyService.fetchSurveyById(surveyId, draft, validate),
+        UserService.updateUserPrefs(user)
+      ])
 
       res.json({ survey })
     } catch (err) {
@@ -100,9 +109,8 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
 
-      await SurveyService.deleteSurvey(surveyId, user)
+      await SurveyService.deleteSurvey(surveyId)
 
       Response.sendOk(res)
     } catch (err) {

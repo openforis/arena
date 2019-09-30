@@ -21,24 +21,19 @@ export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 }
 
 export const createSurvey = surveyProps => async (dispatch, getState) => {
+  const { data: { survey, validation } } = await axios.post('/api/survey', surveyProps)
 
-  const { data } = await axios.post('/api/survey', surveyProps)
-
-  const { survey } = data
-  const valid = !!survey
-
-  if (valid) {
+  if (survey) {
     dispatch({ type: surveyCreate, survey })
   } else {
     dispatch({
       type: surveyCreateNewSurveyUpdate,
       [SurveyCreateState.keys.newSurvey]: {
         ...SurveyCreateState.getNewSurvey(getState()),
-        ...data,
+        validation,
       }
     })
   }
-
 }
 
 export const resetNewSurvey = () => dispatch => {

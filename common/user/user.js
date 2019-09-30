@@ -1,52 +1,67 @@
 const R = require('ramda')
-const StringUtils = require('../stringUtils')
 
+const ObjectUtils = require('../objectUtils')
+const StringUtils = require('../stringUtils')
 const AuthGroups = require('../auth/authGroups')
 
-const keys = {
-  uuid: 'uuid',
-  name: 'name',
-  email: 'email',
-  lang: 'lang',
-  authGroups: 'authGroups',
-  hasProfilePicture: 'hasProfilePicture',
-  groupName: 'groupName',
-}
+const keys = require('./_user/userKeys')
+const UserPrefs = require('./_user/userPrefs')
 
-// ==== User properties
-const isEqual = user1 => user2 => getUuid(user1) === getUuid(user2)
-
-const getUuid = R.prop(keys.uuid)
-
-const getName = R.prop(keys.name)
-
+//====== READ
+const getName = R.propOr('', keys.name)
 const getEmail = R.prop(keys.email)
-
 const getLang = R.propOr('en', keys.lang)
-
 const getAuthGroups = R.prop(keys.authGroups)
-
+const getPrefs = R.propOr({}, keys.prefs)
 const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
-const isSystemAdmin = user =>
-  user &&
-  R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+//====== CHECK
+const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
-const hasAccepted = R.pipe(
-  R.propOr('', keys.name),
-  StringUtils.isNotBlank
-)
+//====== AUTH GROUP
+const assocAuthGroup = authGroup => user => {
+  const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
+  return R.assoc(keys.authGroups, authGroups, user)
+}
+
+const dissocAuthGroup = authGroup => user => {
+  const authGroups = R.pipe(
+    getAuthGroups,
+    R.reject(R.propEq(AuthGroups.keys.uuid, AuthGroups.getUuid(authGroup))),
+  )(user)
+  return R.assoc(keys.authGroups, authGroups, user)
+}
 
 module.exports = {
   keys,
+  keysPrefs: UserPrefs.keysPrefs,
 
-  isEqual,
-  getUuid,
+  // READ
+  isEqual: ObjectUtils.isEqual,
+  getUuid: ObjectUtils.getUuid,
   getName,
   getEmail,
   getLang,
   getAuthGroups,
+  getPrefs,
   hasProfilePicture,
+
+  //CHECK
   isSystemAdmin,
   hasAccepted,
+
+  //AUTH GROUP
+  assocAuthGroup,
+  dissocAuthGroup,
+
+  //PREFS
+  getPrefSurveyCurrent: UserPrefs.getPrefSurveyCurrent,
+  getPrefSurveyCycle: UserPrefs.getPrefSurveyCycle,
+
+  assocPrefSurveyCurrent: UserPrefs.assocPrefSurveyCurrent,
+  assocPrefSurveyCycle: UserPrefs.assocPrefSurveyCycle,
+  assocPrefSurveyCurrentAndCycle: UserPrefs.assocPrefSurveyCurrentAndCycle,
+
+  deletePrefSurvey: UserPrefs.deletePrefSurvey,
 }

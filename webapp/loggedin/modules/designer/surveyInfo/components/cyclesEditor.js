@@ -3,6 +3,7 @@ import './cyclesEditor.scss'
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
+import Survey from '../../../../../../common/survey/survey'
 import SurveyCycle from '../../../../../../common/survey/surveyCycle'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
@@ -91,7 +92,7 @@ const CycleEditor = props => {
 
 const CyclesEditor = props => {
 
-  const { cycles, readOnly, setCycles } = props
+  const { surveyInfo, cycles, readOnly, setCycles } = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
@@ -116,7 +117,7 @@ const CyclesEditor = props => {
               onChange={cycleUpdate => setCycles(
                 R.assoc(step, cycleUpdate)(cycles)
               )}
-              canDelete={!readOnly && i === cycleEntries.length - 1}
+              canDelete={!readOnly && step !== Survey.getCycleOneKey(surveyInfo) && i === cycleEntries.length - 1}
               onDelete={onDelete}
             />
           )

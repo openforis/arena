@@ -156,6 +156,5 @@ module.exports = {
   deleteUser: UserManager.deleteUser,
 
   // ==== User prefs
-  updateUserPref: UserManager.updateUserPref,
-  deleteUserPref: UserManager.deleteUserPref,
+  updateUserPrefs: UserManager.updateUserPrefs,
 }
