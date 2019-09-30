@@ -3,6 +3,8 @@ import axios from 'axios'
 
 import { debounceAction } from '../../../utils/reduxUtils'
 
+import Survey from '../../../../common/survey/survey'
+import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 import NodeRefData from '../../../../common/record/nodeRefData'
@@ -14,9 +16,6 @@ import * as RecordState from './recordState'
 import { showAppLoader, hideAppLoader, showNotificationMessage } from '../../../app/actions'
 
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
-
-import Survey from '../../../../common/survey/survey'
-import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
@@ -54,8 +53,9 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   const state = getState()
   const user = AppState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const record = Record.newRecord(user, preview)
+  const record = Record.newRecord(user, cycle, preview)
 
   await axios.post(`/api/survey/${surveyId}/record`, record)
 

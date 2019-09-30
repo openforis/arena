@@ -29,13 +29,11 @@ const recordCreationTest = async () => {
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
 
-  const recordNew = newRecordPreview()
-
-  const record = await RecordUtils.insertAndInitRecord(user, survey, recordNew)
+  const record = await RecordUtils.insertAndInitRecord(user, survey, true)
 
   const nodes = Record.getNodes(record)
 
-  const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(recordNew))
+  const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(record))
 
   expect(reloadedRecord).to.not.be.undefined
 
@@ -59,10 +57,8 @@ const defaultValueAppliedTest = async () => {
 
   //create record
 
-  const recordToCreate = newRecordPreview()
-
   await db.tx(async t => {
-    const record = await RecordUtils.insertAndInitRecord(user, survey, recordToCreate, t)
+    const record = await RecordUtils.insertAndInitRecord(user, survey, true, t)
 
     const root = Record.getRootNode(record)
 
@@ -77,8 +73,6 @@ const defaultValueAppliedTest = async () => {
 
 //==== helper methods
 const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
-
-const newRecordPreview = () => Record.newRecord(getContextUser(), true)
 
 module.exports = {
   recordCreationTest,

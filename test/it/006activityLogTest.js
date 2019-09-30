@@ -12,6 +12,7 @@ const SurveyManager = require('../../server/modules/survey/manager/surveyManager
 const RecordManager = require('../../server/modules/record/manager/recordManager')
 
 const SB = require('./utils/surveyBuilder')
+const RecordUtils = require('./utils/recordUtils')
 
 describe('Activity Log Test', async () => {
 
@@ -49,7 +50,7 @@ describe('Activity Log Test', async () => {
 
     const surveyId = Survey.getId(survey)
 
-    const recordToCreate = Record.newRecord(user)
+    const recordToCreate = RecordUtils.newRecord(user, survey)
 
     const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
