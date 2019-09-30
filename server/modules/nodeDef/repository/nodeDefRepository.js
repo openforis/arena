@@ -141,15 +141,30 @@ const updateNodeDefPropsPublished = async (surveyId, nodeDefUuid, props, propsAd
     def => dbTransformCallback(def, false, true) //always loading draft when creating or updating a nodeDef
   )
 
+const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) =>
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{"cycles"}', (props || props_draft)->'cycles' || $1)
+    WHERE (props || props_draft)->'cycles' @> $2
+  `,
+    [JSON.stringify(cycles), JSON.stringify(cycleStart)]
+  )
+
+const deleteNodeDefsCycles = async (surveyId, cycles, client = db) =>
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{"cycles"}', ((props || props_draft)->'cycles') ${cycles.map(c => `- '${c}'`).join(' ')})
+  `)
+
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
-        UPDATE
-          ${getSurveyDBSchema(surveyId)}.node_def
-        SET
-          props = props || props_draft,
-          props_draft = '{}'::jsonb,
-          props_advanced = props_advanced || props_advanced_draft,
-          props_advanced_draft = '{}'::jsonb
+    UPDATE
+      ${getSurveyDBSchema(surveyId)}.node_def
+    SET
+      props = props || props_draft,
+      props_draft = '{}'::jsonb,
+      props_advanced = props_advanced || props_advanced_draft,
+      props_advanced_draft = '{}'::jsonb
     `)
 
 // ============== DELETE
@@ -248,6 +263,8 @@ module.exports = {
   //UPDATE
   updateNodeDefProps,
   updateNodeDefPropsPublished,
+  addNodeDefsCycles,
+  deleteNodeDefsCycles,
   publishNodeDefsProps,
 
   //DELETE

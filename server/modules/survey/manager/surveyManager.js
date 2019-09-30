@@ -149,10 +149,20 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
           await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
           updated = true
 
-          // TODO - add cycle to nodeDef
-          // if(key === Survey.infoKeys.cycles){
-          //   const cyclesNew = R.difference(Object.keys(value), Object.keys(valuePrev))
-          // }
+          if (key === Survey.infoKeys.cycles) {
+            const cycles = Object.keys(value)
+            const cyclesPrev = Object.keys(valuePrev)
+            // add new cycles to nodeDefs
+            const cyclesAdded = R.difference(cycles, cyclesPrev)
+            if (!R.isEmpty(cyclesAdded)) {
+              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, t)
+            }
+            // remove delete cycles from nodeDefs
+            const cyclesRemoved = R.difference(cyclesPrev, cycles)
+            if (!R.isEmpty(cyclesRemoved)) {
+              await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, t)
+            }
+          }
         }
       }
 
