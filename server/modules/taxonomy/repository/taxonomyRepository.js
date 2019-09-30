@@ -156,11 +156,11 @@ const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, cli
 }
 
 const findTaxaByPropLike = async (surveyId,
-                                   taxonomyUuid,
-                                   filterProp,
-                                   filterValue,
-                                   draft = false,
-                                   client = db) => {
+                                  taxonomyUuid,
+                                  filterProp,
+                                  filterValue,
+                                  draft = false,
+                                  client = db) => {
   const searchValue = toSearchValue(filterValue)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(filterProp, draft) : ''
   return await findTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, filterProp, draft, client)
@@ -245,6 +245,11 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
       v.vernacular_names
     FROM
       ${getSurveyDBSchema(surveyId)}.taxon t
+    
+    ${draft ? '' : `--exclude not published taxonomies if not draft
+      JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
+        ON t.taxonomy_uuid = taxonomy.uuid 
+        AND taxonomy.props <> '{}'::jsonb`}
     LEFT OUTER JOIN
       (
         SELECT
@@ -252,6 +257,9 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
           json_agg( json_build_object(${DbUtils.getPropColCombined('name', draft, 'v.')}, v.uuid::text) ) AS vernacular_names
         FROM
           ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
+            
+        ${draft ? '' : `--exclude not published vernacular names if not draft
+          WHERE v.props <> '{}'::jsonb`}  
         GROUP BY
           v.taxon_uuid ) v
     ON
