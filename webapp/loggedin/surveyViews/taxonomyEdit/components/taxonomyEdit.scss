@@ -1,36 +1,40 @@
 @import "../../../../style/vars";
 
 .taxonomy-edit {
-  display: grid;
-  grid-template-rows: 5rem 1fr 5rem;
-  align-items: center;
-  height: 100%;
+  height: calc(100% - 50px);
 
   .taxa-table {
     align-self: start;
     height: 100%;
   }
-}
 
-.taxonomy-edit__empty-taxa {
-  justify-self: center;
-  align-self: start;
-  padding-top: 1rem;
-  font-style: italic;
-}
+  .table__header {
+    display: grid;
+    grid-template-columns: .8fr .2fr;
 
-.taxonomy-edit__header {
-  display: grid;
-  grid-template-columns: .75fr .25fr;
-  position: relative;
+    .table__paginator {
+      justify-self: right;
+    }
 
-  .button-bar {
-    display: flex;
-    align-items: center;
+    .taxonomy-edit__header {
+      display: grid;
+      grid-template-columns: .6fr .4fr;
+      position: relative;
 
-    button {
-      margin: 0 .5rem;
+      .button-bar {
+        display: flex;
+        align-items: center;
+
+        button {
+          margin: 0 .5rem;
+        }
+      }
     }
   }
-}
 
+  .table__content {
+    height: calc(100% - 70px);
+  }
+
+
+}

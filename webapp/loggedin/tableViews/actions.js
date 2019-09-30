@@ -9,13 +9,13 @@ const getItems = (moduleApiUri, offset, limit) => axios.get(
   { params: { offset, limit } }
 )
 
-export const initList = (module, moduleApiUri) => async (dispatch, getState) => {
+export const initList = (module, moduleApiUri, moduleApiCountUri) => async (dispatch, getState) => {
   const state = getState()
   const offset = TableViewsState.getOffset(module)(state)
   const limit = TableViewsState.getLimit(module)(state)
 
   const [countResp, itemsResp] = await Promise.all([
-    axios.get(`${moduleApiUri}/count`),
+    axios.get(moduleApiCountUri),
     getItems(moduleApiUri, offset, limit)
   ])
 
