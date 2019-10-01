@@ -83,6 +83,7 @@ module.exports = {
   colNameUuuid,
   colNameParentUuuid,
   colNameRecordUuuid,
+  colNameRecordCycle,
 
   getNodeDefColumns,
 
