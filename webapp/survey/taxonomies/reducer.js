@@ -4,7 +4,7 @@ import * as TaxonomiesState from './taxonomiesState'
 
 import { appUserLogout } from '../../app/actions'
 
-import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
+import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
 
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate, taxonomiesUpdate } from './actions'
 
@@ -15,6 +15,8 @@ const actionHandlers = {
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
+
+  [surveyDefsReset]: () => ({}),
 
   // taxonomies
   [surveyDefsLoad]: (state, { taxonomies }) => taxonomies,

@@ -54,3 +54,8 @@ export const assocDefsFetched = draft => R.pipe(
   R.assoc(statusKeys.defsFetched, true),
   R.assoc(statusKeys.defsDraftFetched, draft),
 )
+
+export const resetDefsFetched = R.pipe(
+  R.assoc(statusKeys.defsFetched, false),
+  R.assoc(statusKeys.defsDraftFetched, false),
+)
