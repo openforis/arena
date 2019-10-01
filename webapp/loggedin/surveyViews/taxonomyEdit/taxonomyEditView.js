@@ -10,7 +10,7 @@ import TableView from '../../tableViews/tableView'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
-import { useI18n, useOnUpdate } from '../../../commonComponents/hooks'
+import { useI18n } from '../../../commonComponents/hooks'
 
 import Taxonomy from '../../../../common/survey/taxonomy'
 import Taxon from '../../../../common/survey/taxon'
@@ -26,11 +26,8 @@ const TaxonomyEditView = props => {
 
   const {
     surveyId, taxonomy, taxa,
-    setTaxonomyForEdit,
-    readOnly,
-    putTaxonomyProp,
-    uploadTaxonomyFile,
-    activeJob,
+    canEdit,
+    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile,
   } = props
 
   const i18n = useI18n()
@@ -43,15 +40,7 @@ const TaxonomyEditView = props => {
     taxa
   )
 
-  // useOnUpdate(() => {
-  //   if (!activeJob) {
-  //     initList(TaxonomyEditState.keys.taxa, moduleApiUri, moduleApiCountUri)
-  //   }
-  // }, [activeJob])
-
   const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`}`
-  const moduleApiUri = `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa?draft=true&validate=true`
-  const moduleApiCountUri = `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa/count`
 
   return (
     <div className="taxonomy-edit">
@@ -60,8 +49,8 @@ const TaxonomyEditView = props => {
 
       <TableView
         module={TaxonomyEditState.keys.taxa}
-        moduleApiUri={moduleApiUri}
-        moduleApiCountUri={moduleApiCountUri}
+        moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
+        restParams={{ draft: canEdit }}
         gridTemplateColumns={gridTemplateColumns}
         rowHeaderComponent={TaxaTableRowHeader}
         rowComponent={TaxaTableRow}
@@ -72,7 +61,7 @@ const TaxonomyEditView = props => {
         uploadTaxonomyFile={uploadTaxonomyFile}
         vernacularLanguageCodes={vernacularLanguageCodes}
         taxonomy={taxonomy}
-        readOnly={readOnly}
+        readOnly={!canEdit}
       />
 
       <div style={{ justifySelf: 'center' }}>
@@ -95,8 +84,7 @@ const mapStateToProps = state => {
     surveyId: SurveyState.getSurveyId(state),
     taxonomy: TaxonomyEditState.getTaxonomy(state),
     taxa: TableViewState.getList('taxa')(state),
-    activeJob,
-    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
+    canEdit: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 

@@ -4,6 +4,7 @@ import { debounceAction } from '../../../utils/reduxUtils'
 import Taxonomy from '../../../../common/survey/taxonomy'
 
 import * as SurveyState from '../../../survey/surveyState'
+import * as TaxonomyEditState from './taxonomyEditState'
 
 import { showAppJobMonitor } from '../../../app/actions'
 import {
@@ -13,6 +14,7 @@ import {
   taxonomyUpdate,
   taxonomiesUpdate
 } from '../../../survey/taxonomies/actions'
+import { reloadListItems } from '../../tableViews/actions'
 
 // taxonomy editor actions
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
@@ -65,6 +67,7 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
   dispatch(showAppJobMonitor(data.job, () => {
     //on import complete validate taxonomy and reload taxa
     dispatch(fetchTaxonomy(surveyId, Taxonomy.getUuid(taxonomy)))
+    dispatch(reloadListItems(TaxonomyEditState.keys.taxa, { draft: true }))
   }))
 }
 
