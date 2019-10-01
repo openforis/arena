@@ -60,7 +60,7 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft, advanced =
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE TRUE
       ${cycle ? `--filter by cycle
-          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', true)} @> $1` : ''} 
+          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1` : ''} 
       ${!draft ? ` AND props <> '{}'::jsonb` : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
