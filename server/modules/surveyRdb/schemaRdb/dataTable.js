@@ -11,6 +11,7 @@ const SurveyRepositoryUtils = require('../../survey/repository/surveySchemaRepos
 const colNameUuuid = 'uuid'
 const colNameParentUuuid = 'parent_uuid'
 const colNameRecordUuuid = 'record_uuid'
+const colNameRecordCycle = 'record_cycle'
 
 const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
@@ -29,6 +30,7 @@ const getName = NodeDefTable.getTableName
 const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,
   colNameRecordUuuid,
+  colNameRecordCycle,
   colNameParentUuuid,
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames))
 ]
@@ -36,6 +38,7 @@ const getColumnNames = (survey, nodeDef) => [
 const getColumnNamesAndType = (survey, nodeDef) => [
   colNameUuuid + ' uuid NOT NULL',
   colNameRecordUuuid + ' uuid NOT NULL',
+  colNameRecordCycle + ' integer NOT NULL',
   colNameParentUuuid + ' uuid',
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]
@@ -64,6 +67,7 @@ const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
   return [
     Node.getUuid(nodeRow),
     nodeRow[colNameRecordUuuid],
+    nodeRow[colNameRecordCycle],
     nodeRow[colNameParentUuuid],
     ...rowValues
   ]
