@@ -14,12 +14,11 @@ import {
   taxonomyUpdate,
   taxonomiesUpdate
 } from '../../../survey/taxonomies/actions'
+import { reloadListItems } from '../../tableViews/actions'
 
 // taxonomy editor actions
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
 export const taxonomyEditPropsUpdate = 'survey/taxonomyEdit/props/update'
-
-const dispatchTaxonomyEditPropsUpdate = (dispatch, props) => dispatch({ type: taxonomyEditPropsUpdate, ...props })
 
 // ====== SET TAXONOMY FOR EDIT
 
@@ -41,56 +40,9 @@ export const createTaxonomy = () => async (dispatch, getState) => {
 
 // ====== READ
 
-const countTaxa = async (surveyId, taxonomyUuid) => {
-  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa/count?draft=true`)
-  return data.count
-}
-
-const fetchTaxa = async (surveyId, taxonomyUuid, offset, limit) => {
-  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, {
-    params: {
-      draft: true,
-      limit,
-      offset
-    }
-  })
-  return data.taxa
-}
-
 const fetchTaxonomy = (surveyId, taxonomyUuid) => async dispatch => {
   const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}?draft=true&validate=true`)
   dispatch({ type: taxonomyUpdate, taxonomy: data.taxonomy })
-}
-
-const ROWS_PER_PAGE = 15
-
-export const initTaxaList = taxonomy => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
-  const taxonomyUuid = Taxonomy.getUuid(taxonomy)
-
-  const [count, taxa] = await Promise.all([
-    await countTaxa(surveyId, taxonomyUuid),
-    await fetchTaxa(surveyId, taxonomyUuid, 0, ROWS_PER_PAGE)
-  ])
-
-  dispatchTaxonomyEditPropsUpdate(dispatch, {
-    taxaTotalPages: Math.ceil(count / ROWS_PER_PAGE),
-    taxaTotal: count,
-    taxa,
-  })
-}
-
-export const loadTaxa = (taxonomy, offset) => async (dispatch, getState) => {
-
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const rowsPerPage = TaxonomyEditState.getTaxaPerPage(state)
-
-  dispatchTaxonomyEditPropsUpdate(dispatch, { taxaCurrentPage: Math.floor(offset / rowsPerPage), taxa: [] })
-
-  const taxa = await fetchTaxa(surveyId, Taxonomy.getUuid(taxonomy), offset, rowsPerPage)
-
-  dispatchTaxonomyEditPropsUpdate(dispatch, { taxa })
 }
 
 // ====== UPDATE
@@ -115,7 +67,7 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
   dispatch(showAppJobMonitor(data.job, () => {
     //on import complete validate taxonomy and reload taxa
     dispatch(fetchTaxonomy(surveyId, Taxonomy.getUuid(taxonomy)))
-    dispatch(initTaxaList(taxonomy))
+    dispatch(reloadListItems(TaxonomyEditState.keys.taxa, { draft: true }))
   }))
 }
 

@@ -18,13 +18,13 @@ import * as RecordsState from './recordsState'
 import * as SurveyState from '../../../../survey/surveyState'
 
 import { createRecord } from '../../../surveyViews/record/actions'
-import { resetList } from '../../../tableViews/actions'
+import { reloadListItems } from '../../../tableViews/actions'
 
 const RecordsView = props => {
 
   const {
     surveyInfo, surveyCycleKey, user, nodeDefKeys, lang,
-    createRecord, resetList, history
+    createRecord, reloadListItems, history
   } = props
 
   const noCols = 3 + nodeDefKeys.length
@@ -35,7 +35,7 @@ const RecordsView = props => {
   const onRowClick = record => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
   useOnUpdate(() => {
-    resetList(RecordsState.keys.records, restParams)
+    reloadListItems(RecordsState.keys.records, restParams)
   }, [surveyCycleKey])
 
   return (
@@ -69,4 +69,4 @@ const mapStateToProps = state => ({
   nodeDefKeys: RecordsState.getNodeDefKeys(state),
 })
 
-export default connect(mapStateToProps, { createRecord, resetList })(RecordsView)
+export default connect(mapStateToProps, { createRecord, reloadListItems })(RecordsView)

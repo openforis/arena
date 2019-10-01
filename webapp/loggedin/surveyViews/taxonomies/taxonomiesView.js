@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import { useI18n } from '../../../commonComponents/hooks'
 
 import ItemsView from '../items/itemsView'
-import TaxonomyEdit from '../taxonomyEdit/components/taxonomyEdit'
+import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
 
 import Survey from '../../../../common/survey/survey'
 import Taxonomy from '../../../../common/survey/taxonomy'

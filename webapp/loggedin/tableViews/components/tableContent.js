@@ -22,13 +22,13 @@ const TableContent = props => {
     )
     : (
       <div className="table__content">
+        <div className="table__row-header" style={{ gridTemplateColumns }}>
+          {
+            React.createElement(rowHeaderComponent, props)
+          }
+        </div>
         <div className="table__rows">
 
-          <div className="table__row-header" style={{ gridTemplateColumns }}>
-            {
-              React.createElement(rowHeaderComponent, props)
-            }
-          </div>
 
           {
             list.map((row, i) => {

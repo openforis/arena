@@ -7,16 +7,16 @@ import TableContent from './components/tableContent'
 import * as SurveyState from '../../survey/surveyState'
 import * as TableViewsState from './tableViewsState'
 
-import { initList, fetchListItems } from './actions'
+import { initListItems, fetchListItems } from './actions'
 
 const TableView = props => {
   const {
     module, moduleApiUri, restParams, className,
-    initList
+    initListItems
   } = props
 
   useEffect(() => {
-    initList(module, moduleApiUri, restParams)
+    initListItems(module, moduleApiUri, restParams)
   }, [])
 
   return (
@@ -59,5 +59,5 @@ const mapStateToProps = (state, props) => {
 
 export default connect(
   mapStateToProps,
-  { initList, fetchListItems }
+  { initListItems, fetchListItems }
 )(TableView)

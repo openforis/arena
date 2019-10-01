@@ -5,24 +5,9 @@ import Survey from '../../../../common/survey/survey'
 import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '../../../survey/surveyState'
 
-// DOCS
-const stateDoc = {
-  taxonomyEdit: {
-    taxonomyUuid: '',
-    taxa: [],
-    taxaCurrentPage: 0,
-    taxaTotalPages: 0,
-    taxaPerPage: 15,
-  },
-}
-
-const keys = {
-  taxonomyUuid: 'taxonomyUuid',
+export const keys = {
   taxa: 'taxa',
-  taxaCurrentPage: 'taxaCurrentPage',
-  taxaTotalPages: 'taxaTotalPages',
-  taxaTotal: 'taxaTotal',
-  taxaPerPage: 'taxaPerPage',
+  taxonomyUuid: 'taxonomyUuid',
 }
 
 export const stateKey = 'taxonomyEdit'
@@ -42,13 +27,3 @@ export const getTaxonomy = state => {
 // ==== taxonomyEdit Props
 
 export const mergeTaxonomyEditProps = props => R.mergeDeepLeft(props)
-
-export const getTaxaCurrentPage = getStateProp(keys.taxaCurrentPage, 0)
-
-export const getTaxaPerPage = getStateProp(keys.taxaPerPage, 15)
-
-export const getTaxaTotalPages = getStateProp(keys.taxaTotalPages, 0)
-
-export const getTaxaTotal = getStateProp(keys.taxaTotal, 0)
-
-export const getTaxa = getStateProp(keys.taxa, [])

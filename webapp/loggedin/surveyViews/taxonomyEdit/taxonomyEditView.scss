@@ -1,22 +1,16 @@
-@import "../../../../style/vars";
+@import "../../../style/vars";
 
 .taxonomy-edit {
   display: grid;
-  grid-template-rows: 5rem 1fr 5rem;
+  grid-template-rows: 3rem 1fr 3rem;
   align-items: center;
   height: 100%;
 
-  .taxa-table {
+  .table {
     align-self: start;
     height: 100%;
   }
-}
 
-.taxonomy-edit__empty-taxa {
-  justify-self: center;
-  align-self: start;
-  padding-top: 1rem;
-  font-style: italic;
 }
 
 .taxonomy-edit__header {
@@ -33,4 +27,3 @@
     }
   }
 }
-
