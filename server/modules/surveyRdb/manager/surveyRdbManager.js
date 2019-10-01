@@ -25,9 +25,6 @@ const createTable = async (survey, nodeDef, client = db) =>
 const insertIntoTable = async (survey, nodeDef, client = db) =>
   await NodesInsert.run(survey, nodeDef, client)
 
-const updateTableNodes = async (survey, nodeDefs, nodes, client = db) =>
-  await NodesUpdate.run(survey, nodeDefs, nodes, client)
-
 const queryTable = async (surveyId, tableName, cols = [],
                           offset, limit, filterExpr, sort, client = db) =>
   await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filterExpr, sort, client)
@@ -44,7 +41,7 @@ module.exports = {
   createTable,
 
   insertIntoTable,
-  updateTableNodes,
+  updateTableNodes: NodesUpdate.run,
 
   queryTable,
   countTable,
