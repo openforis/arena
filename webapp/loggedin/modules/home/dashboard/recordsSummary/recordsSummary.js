@@ -44,7 +44,7 @@ const RecordsSummary = props => {
     if (surveyInfoValid) {
       fetchRecordsSummary(surveyCycleKey, timeRange)
     }
-  }, [surveyInfo])
+  }, [surveyInfo, surveyCycleKey])
 
   return surveyInfoValid
     ? (
