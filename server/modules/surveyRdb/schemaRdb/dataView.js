@@ -31,6 +31,7 @@ const getSelectFields = (survey, nodeDef) => {
   // add record_uuid, date_created, date_modified
   fields.unshift(
     `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${DataTable.colNameRecordUuuid}`,
+    `${alias}.${DataTable.colNameRecordCycle}`,
     `${alias}.date_created`,
     `${alias}.date_modified`
   )

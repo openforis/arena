@@ -35,6 +35,7 @@ const getColNames = (nodeDef, type) =>
     ? [
       DataTable.colNameUuuid,
       DataTable.colNameRecordUuuid,
+      DataTable.colNameRecordCycle,
       DataTable.colNameParentUuuid,
       ...NodeDef.isMultipleAttribute(nodeDef)
         ? DataCol.getNames(nodeDef)
@@ -43,11 +44,12 @@ const getColNames = (nodeDef, type) =>
     ]
     : DataCol.getNames(nodeDef)
 
-const getColValues = async (survey, nodeDef, node, type, client) =>
+const getColValues = async (survey, cycle, nodeDef, node, type, client) =>
   type === types.insert
     ? [
       Node.getUuid(node),
       Node.getRecordUuid(node),
+      cycle,
       Node.getParentUuid(node),
       ...NodeDef.isMultipleAttribute(nodeDef)
         ? await Promise.all(DataCol.getValues(survey, nodeDef, node, client))
@@ -61,7 +63,7 @@ const getRowUuid = (nodeDef, node, nodeParent) =>
     ? Node.getUuid(node)
     : Node.getUuid(nodeParent)
 
-const toUpdates = async (survey, nodeDefs, nodes, client) => {
+const toUpdates = async (survey, cycle, nodeDefs, nodes, client) => {
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
       const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
@@ -73,7 +75,7 @@ const toUpdates = async (survey, nodeDefs, nodes, client) => {
           schemaName: SchemaRdb.getName(Survey.getId(survey)),
           tableName: DataTable.getName(nodeDef, nodeDefParent),
           colNames: getColNames(nodeDef, type),
-          colValues: await getColValues(survey, nodeDef, node, type, client),
+          colValues: await getColValues(survey, cycle, nodeDef, node, type, client),
           rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
         }
         : null
@@ -109,8 +111,8 @@ const runDelete = (update, client) =>
     update.rowUuid
   )
 
-const run = async (survey, nodeDefs, nodes, client) => {
-  const updates = await toUpdates(survey, nodeDefs, nodes, client)
+const run = async (survey, cycle, nodeDefs, nodes, client) => {
+  const updates = await toUpdates(survey, cycle, nodeDefs, nodes, client)
   await client.batch(
     updates.map(update =>
       isType(types.update)(update)

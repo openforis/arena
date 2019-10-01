@@ -12,11 +12,16 @@ const DataTable = require('../schemaRdb/dataTable')
 const getSelectQuery = (surveySchema, nodeDef) => {
   const selectNodeRows = `
     SELECT
-      n.id, n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value
+      n.id, n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value, r.cycle AS record_cycle
     FROM
       ${surveySchema}.node n
-      WHERE n.node_def_uuid = $1
-      ORDER BY n.id`
+    JOIN
+      ${surveySchema}.record r 
+    ON 
+      r.uuid = n.record_uuid
+    WHERE 
+      n.node_def_uuid = $1
+    ORDER BY n.id`
 
   return NodeDef.isEntity(nodeDef)
     ? `
