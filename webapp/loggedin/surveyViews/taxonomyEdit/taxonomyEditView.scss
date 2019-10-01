@@ -1,0 +1,29 @@
+@import "../../../style/vars";
+
+.taxonomy-edit {
+  display: grid;
+  grid-template-rows: 5rem 1fr 5rem;
+  align-items: center;
+  height: 100%;
+
+  .table {
+    align-self: start;
+    height: 100%;
+  }
+
+}
+
+.taxonomy-edit__header {
+  display: grid;
+  grid-template-columns: .75fr .25fr;
+  position: relative;
+
+  .button-bar {
+    display: flex;
+    align-items: center;
+
+    button {
+      margin: 0 .5rem;
+    }
+  }
+}
