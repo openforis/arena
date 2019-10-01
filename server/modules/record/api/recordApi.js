@@ -79,9 +79,9 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, from, to } = Request.getParams(req)
+      const { surveyId, cycle, from, to } = Request.getParams(req)
 
-      const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, from, to)
+      const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
 
       res.json(counts)
     } catch (err) {
