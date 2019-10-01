@@ -4,24 +4,30 @@ import * as TableViewsState from './tableViewsState'
 
 export const tableViewsListUpdate = 'tableViews/list/update'
 
-const getItems = (moduleApiUri, offset, limit) => axios.get(
+const _getItems = (moduleApiUri, restParams, offset, limit) => axios.get(
   moduleApiUri,
-  { params: { offset, limit } }
+  {
+    params: { offset, limit, ...restParams }
+  }
 )
 
-export const initList = (module, moduleApiUri, moduleApiCountUri) => async (dispatch, getState) => {
+const _initList = (module, moduleApiUri, restParams, offset) => async (dispatch, getState) => {
   const state = getState()
-  const offset = TableViewsState.getOffset(module)(state)
+
   const limit = TableViewsState.getLimit(module)(state)
 
   const [countResp, itemsResp] = await Promise.all([
-    axios.get(moduleApiCountUri),
-    getItems(moduleApiUri, offset, limit)
+    axios.get(
+      `${moduleApiUri}/count`,
+      { params: restParams }
+    ),
+    _getItems(moduleApiUri, restParams, offset, limit)
   ])
 
   dispatch({
     type: tableViewsListUpdate,
     module,
+    moduleApiUri,
     offset,
     limit,
     ...countResp.data,
@@ -29,12 +35,16 @@ export const initList = (module, moduleApiUri, moduleApiCountUri) => async (disp
   })
 }
 
-export const fetchListItems = (module, moduleApiUri, offset) => async (dispatch, getState) => {
+export const initListItems = (module, moduleApiUri, restParams) => async (dispatch, getState) => {
   const state = getState()
+  const offset = TableViewsState.getOffset(module)(state)
+  await dispatch(_initList(module, moduleApiUri, restParams, offset))
+}
 
-  const limit = TableViewsState.getLimit(module)(state)
+export const fetchListItems = (module, moduleApiUri, offset, restParams) => async (dispatch, getState) => {
+  const limit = TableViewsState.getLimit(module)(getState())
 
-  const { data } = await getItems(moduleApiUri, offset, limit)
+  const { data } = await _getItems(moduleApiUri, restParams, offset, limit)
 
   dispatch({
     type: tableViewsListUpdate,
@@ -43,4 +53,10 @@ export const fetchListItems = (module, moduleApiUri, offset) => async (dispatch,
     ...data,
   })
 
+}
+
+export const reloadListItems = (module, restParams) => async (dispatch, getState) => {
+  const state = getState()
+  const moduleApiUri = TableViewsState.getModuleApiUri(module)(state)
+  await dispatch(_initList(module, moduleApiUri, restParams, 0))
 }

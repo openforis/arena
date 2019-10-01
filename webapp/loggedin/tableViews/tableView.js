@@ -7,16 +7,16 @@ import TableContent from './components/tableContent'
 import * as SurveyState from '../../survey/surveyState'
 import * as TableViewsState from './tableViewsState'
 
-import { initList, fetchListItems } from './actions'
+import { initListItems, fetchListItems } from './actions'
 
 const TableView = props => {
   const {
-    module, moduleApiUri, moduleApiCountUri, className,
-    initList
+    module, moduleApiUri, restParams, className,
+    initListItems
   } = props
 
   useEffect(() => {
-    initList(module, moduleApiUri, moduleApiCountUri)
+    initListItems(module, moduleApiUri, restParams)
   }, [])
 
   return (
@@ -33,7 +33,7 @@ const TableView = props => {
 TableView.defaultProps = {
   module: '',
   moduleApiUri: null,
-  moduleApiCountUri: null,
+  restParams: {},
   className: '',
   gridTemplateColumns: '1fr',
   headerLeftComponent: () => <div></div>,
@@ -45,13 +45,11 @@ TableView.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  let { module, moduleApiUri, moduleApiCountUri } = props
+  let { module, moduleApiUri } = props
   moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
-  moduleApiCountUri = moduleApiCountUri || `${moduleApiUri}/count`
 
   return {
     moduleApiUri,
-    moduleApiCountUri,
     offset: TableViewsState.getOffset(module)(state),
     limit: TableViewsState.getLimit(module)(state),
     count: TableViewsState.getCount(module)(state),
@@ -61,5 +59,5 @@ const mapStateToProps = (state, props) => {
 
 export default connect(
   mapStateToProps,
-  { initList, fetchListItems }
+  { initListItems, fetchListItems }
 )(TableView)

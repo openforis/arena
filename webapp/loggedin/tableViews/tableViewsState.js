@@ -9,6 +9,7 @@ const keys = {
   count: 'count',
   list: 'list',
   module: 'module',
+  moduleApiUri: 'moduleApiUri',
 }
 
 export const defaults = {
@@ -16,6 +17,7 @@ export const defaults = {
   [keys.limit]: 15,
   [keys.count]: 0,
   [keys.list]: [],
+  [keys.moduleApiUri]: null,
 }
 
 // ====== Module props
@@ -44,3 +46,5 @@ export const getOffset = module => getModuleProp(module, keys.offset, defaults[k
 export const getCount = module => getModuleProp(module, keys.count, defaults[keys.count])
 
 export const getList = module => getModuleProp(module, keys.list, defaults[keys.list])
+
+export const getModuleApiUri = module => getModuleProp(module, keys.moduleApiUri, defaults[keys.moduleApiUri])

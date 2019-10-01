@@ -21,7 +21,6 @@ import * as TaxonomyEditState from './taxonomyEditState'
 import * as TableViewState from '../../tableViews/tableViewsState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
-import { initList } from '../../tableViews/actions'
 
 const TaxonomyEditView = props => {
 
@@ -31,7 +30,6 @@ const TaxonomyEditView = props => {
     readOnly,
     putTaxonomyProp,
     uploadTaxonomyFile,
-    initList,
     activeJob,
   } = props
 
@@ -45,11 +43,11 @@ const TaxonomyEditView = props => {
     taxa
   )
 
-  useOnUpdate(() => {
-    if (!activeJob) {
-      initList(TaxonomyEditState.keys.taxa, moduleApiUri, moduleApiCountUri)
-    }
-  }, [activeJob])
+  // useOnUpdate(() => {
+  //   if (!activeJob) {
+  //     initList(TaxonomyEditState.keys.taxa, moduleApiUri, moduleApiCountUri)
+  //   }
+  // }, [activeJob])
 
   const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`}`
   const moduleApiUri = `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa?draft=true&validate=true`
@@ -105,6 +103,6 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   {
-    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, initList,
+    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile,
   }
 )(TaxonomyEditView)
