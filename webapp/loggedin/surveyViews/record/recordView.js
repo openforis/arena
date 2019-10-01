@@ -6,6 +6,8 @@ import * as R from 'ramda'
 
 import { getUrlParam } from '../../../utils/routerUtils'
 
+import { useOnUpdate } from '../../../commonComponents/hooks'
+
 import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'
 
@@ -27,10 +29,14 @@ import {
   nodeValidationsUpdate,
   recordDeleted,
   sessionExpired,
+  cycleChanged
 } from './actions'
 
 const RecordView = props => {
-  const { recordLoaded, sessionExpired, preview, canEditRecord } = props
+  const {
+    recordLoaded, preview, canEditRecord, surveyCycleKey,
+    sessionExpired, cycleChanged, history
+  } = props
 
   const recordLoadedRef = useRef(false)
 
@@ -38,7 +44,7 @@ const RecordView = props => {
     const {
       recordUuidUrlParam, parentNodeUuidUrlParam, draftDefs,
       checkInRecord,
-      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, history
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted
     } = props
 
     // check in record
@@ -87,6 +93,10 @@ const RecordView = props => {
     return componentUnload
   }, [])
 
+  useOnUpdate(() => {
+    cycleChanged(history)
+  }, surveyCycleKey)
+
   return recordLoaded
     ? (
       <SurveyFormView
@@ -103,6 +113,7 @@ const RecordView = props => {
 const mapStateToProps = (state, { match, location }) => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const record = RecordState.getRecord(state)
   const urlSearchParams = new URLSearchParams(location.search)
 
@@ -111,6 +122,7 @@ const mapStateToProps = (state, { match, location }) => {
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: getUrlParam('recordUuid')(match),
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
+    surveyCycleKey
   }
 }
 
@@ -120,7 +132,7 @@ const enhance = compose(
     mapStateToProps,
     {
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, sessionExpired,
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, sessionExpired, cycleChanged
     }
   )
 )

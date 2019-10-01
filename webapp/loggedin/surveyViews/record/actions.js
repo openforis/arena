@@ -31,16 +31,22 @@ export const recordNodesUpdate = nodes => dispatch =>
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
+const _navigateToModuleDataHome = history =>
+  history.push(appModuleUri(appModules.data))
+
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
   dispatch(showNotificationMessage('recordView.justDeleted'))
-  history.push(appModuleUri(appModules.data))
+  _navigateToModuleDataHome(history)
 }
 
 export const sessionExpired = history => dispatch => {
   dispatch(showNotificationMessage('recordView.sessionExpired'))
-  history.push(appModuleUri(appModules.data))
+  _navigateToModuleDataHome(history)
 }
+
+export const cycleChanged = history => () =>
+  _navigateToModuleDataHome(history)
 
 /**
  * ============
