@@ -15,8 +15,8 @@ class NodeDefsValidationJob extends Job {
   }
 
   async execute (tx) {
-    const survey = SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
-    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycles, R.keys)(survey)
+    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
+    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
     for (const cycle of cycleKeys) {
       const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, cycle, true, true, true, false, tx)
 

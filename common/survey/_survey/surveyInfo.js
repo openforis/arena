@@ -143,6 +143,7 @@ module.exports = {
   getLabel,
   getStatus,
   getCycles,
+  getCycleKeys: R.pipe(getCycles, R.keys),
   getDateCreated: ObjectUtils.getDateCreated,
   getDateModified: ObjectUtils.getDateModified,
   getCollectUri,
