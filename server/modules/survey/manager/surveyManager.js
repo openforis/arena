@@ -47,7 +47,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
         const rootEntityDef = NodeDef.newNodeDef(
           null,
           NodeDef.nodeDefType.entity,
-          Survey.getCycleOneKey(surveyInfo), //use first (and only) cycle
+          Survey.cycleOneKey, //use first (and only) cycle
           {
             [NodeDef.propKeys.name]: 'root_entity',
             [NodeDef.propKeys.multiple]: false,
@@ -59,7 +59,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       }
 
       // update user prefs
-      user = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.getCycleOneKey(surveyInfo))(user)
+      user = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
       await UserRepository.updateUserPrefs(user, t)
 
       // create default groups for this survey
@@ -98,8 +98,8 @@ const fetchSurveyById = async (surveyId, draft = false, validate = false, client
   return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
 
-const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
-  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, includeDeleted, client)
+const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client)
   const survey = Survey.assocNodeDefs(nodeDefs)(await fetchSurveyById(surveyId, draft, validate, client))
 
   return validate
@@ -107,8 +107,8 @@ const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advance
     : survey
 }
 
-const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
-  const survey = await fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, validate, includeDeleted, client)
+const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
+  const survey = await fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate, includeDeleted, client)
   const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
     CategoryRepository.fetchIndex(surveyId, draft, client),
     TaxonomyRepository.fetchIndex(surveyId, draft, client)

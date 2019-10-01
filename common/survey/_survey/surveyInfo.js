@@ -31,6 +31,8 @@ const collectReportKeys = {
   issuesResolved: 'issuesResolved'
 }
 
+const cycleOneKey = '0'
+
 const getInfo = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
@@ -120,6 +122,7 @@ const isAuthGroupAdmin = group => surveyInfo => AuthGroups.isEqual(group)(getAut
 module.exports = {
   keys,
   collectReportKeys,
+  cycleOneKey,
 
   // ====== READ
   getInfo,
@@ -140,6 +143,7 @@ module.exports = {
   getLabel,
   getStatus,
   getCycles,
+  getCycleKeys: R.pipe(getCycles, R.keys),
   getDateCreated: ObjectUtils.getDateCreated,
   getDateModified: ObjectUtils.getDateModified,
   getCollectUri,

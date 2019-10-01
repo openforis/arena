@@ -27,9 +27,10 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = null) =>
+const queryTable = (surveyId, cycle, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = null) =>
   axios.post(
     `/api/surveyRdb/${surveyId}/${tableName}/query`, {
+      cycle,
       nodeDefUuidTable,
       cols: JSON.stringify(cols),
       nodeDefUuidCols: JSON.stringify(nodeDefUuidCols),
@@ -44,6 +45,7 @@ const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuid
 const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = null, sort = null) => {
   if (DataQueryState.hasTableAndCols(state)) {
     const surveyId = SurveyState.getSurveyId(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
     const editMode = DataQueryState.getTableEditMode(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
     const nodeDefUuidColsParam = R.defaultTo(DataQueryState.getTableNodeDefUuidCols(state), nodeDefUuidCols)
@@ -52,7 +54,7 @@ const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = 
     const offsetParam = R.defaultTo(DataQueryState.getTableOffset(state), offset)
     const filterParam = R.defaultTo(DataQueryState.getTableFilter(state), filter)
     const sortParam = R.defaultTo(DataQueryState.getTableSort(state), sort)
-    const { data } = await queryTable(surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidColsParam, colsParam, offsetParam, filterParam, sortParam)
+    const { data } = await queryTable(surveyId, cycle, editMode, nodeDefUuidTable, tableName, nodeDefUuidColsParam, colsParam, offsetParam, filterParam, sortParam)
     return data
   }
 }
@@ -102,7 +104,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
     const surveyId = SurveyState.getSurveyId(state)
 
     if (DataQueryState.hasTableAndCols(state)) {
-
+      const cycle = SurveyState.getSurveyCycleKey(state)
       const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
       const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
       const filter = R.defaultTo(DataQueryState.getTableFilter(state), queryFilter)
@@ -119,7 +121,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
             filter: filter && JSON.stringify(filter),
           }
         ),
-        queryTable(surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, filter, sort)
+        queryTable(surveyId, cycle, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, filter, sort)
       ])
 
       dispatch({

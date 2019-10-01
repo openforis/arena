@@ -23,12 +23,7 @@ class NodeDefBuilder {
   }
 
   _createNodeDef (survey, parentDefUuid) {
-    const cycle = R.pipe(
-      Survey.getSurveyInfo,
-      Survey.getCycleOneKey
-    )(survey)
-
-    return NodeDef.newNodeDef(parentDefUuid, this.type, cycle, this.props)
+    return NodeDef.newNodeDef(parentDefUuid, this.type, Survey.cycleOneKey, this.props)
   }
 
   applyIf (expr) {
@@ -167,8 +162,7 @@ class SurveyBuilder {
         if (publishJob.isFailed())
           throw new Error(`Test survey buildAndStore failed: ${JSON.stringify(publishJob)}`)
       }
-
-      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, false, t)
+      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, !publish, true, false, false, t)
       return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)
     })
   }

@@ -11,14 +11,12 @@ const RecordManager = require('../../../server/modules/record/manager/recordMana
 
 const Queue = require('../../../common/queue')
 
-const newRecord = (user, survey, preview = false) => {
-  const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
-  return Record.newRecord(user, cycle, preview)
-}
+const newRecord = (user, preview = false) =>
+  Record.newRecord(user, Survey.cycleOneKey, preview)
 
 const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
   await client.tx(async t => {
-    const record = newRecord(user, survey, preview)
+    const record = newRecord(user, preview)
     const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, t)
     return await RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
   })

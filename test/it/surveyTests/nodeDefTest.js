@@ -12,16 +12,10 @@ const fetchRootNodeDef = async () => {
   return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
-const createNodeDef = (parentNodeUuid, type, name) => {
-  const cycle = R.pipe(
-    Survey.getSurveyInfo,
-    Survey.getCycleOneKey
-  )(getContextSurvey())
-
-  return NodeDef.newNodeDef(parentNodeUuid, type, cycle, {
+const createNodeDef = (parentNodeUuid, type, name) =>
+  NodeDef.newNodeDef(parentNodeUuid, type, Survey.cycleOneKey, {
     [NodeDef.propKeys.name]: name,
   })
-}
 
 const createAndStoreNodeDef = async (parentNodeUuid, type, name) => {
   const survey = getContextSurvey()
@@ -64,7 +58,7 @@ const updateNodeDefTest = async () => {
 
   expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 
-  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, true)
+  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, true)
 
   //only one node def with that name
   expect(R.filter(n => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)

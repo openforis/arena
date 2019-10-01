@@ -195,7 +195,7 @@ const mapStateToProps = state => {
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
 
-    cyclesSurvey: R.pipe(Survey.getSurveyInfo, Survey.getCycles, R.keys)(survey),
+    cyclesSurvey: R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey),
   }
 }
 

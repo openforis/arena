@@ -25,7 +25,7 @@ const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
       ? { collectUri }
       : {},
     [SurveyInfo.keys.cycles]: {
-      '0': SurveyCycle.newCycle()
+      [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle()
     }
   },
   [SurveyInfo.keys.ownerUuid]: ownerUuid,
@@ -37,6 +37,7 @@ module.exports = {
   infoKeys: SurveyInfo.keys,
   dependencyTypes: SurveyDependencies.dependencyTypes,
   collectReportKeys: SurveyInfo.collectReportKeys,
+  cycleOneKey: SurveyInfo.cycleOneKey,
 
   // ====== DEFAULTS
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
@@ -60,7 +61,7 @@ module.exports = {
   getDefaultSRS: SurveyInfo.getDefaultSRS,
   getStatus: SurveyInfo.getStatus,
   getCycles: SurveyInfo.getCycles,
-  getCycleOneKey: R.pipe(SurveyInfo.getCycles, R.keys, R.head),
+  getCycleKeys: SurveyInfo.getCycleKeys,
   getDateCreated: SurveyInfo.getDateCreated,
   getDateModified: SurveyInfo.getDateModified,
   isPublished: SurveyInfo.isPublished,

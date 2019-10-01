@@ -25,9 +25,9 @@ const createTable = async (survey, nodeDef, client = db) =>
 const insertIntoTable = async (survey, nodeDef, client = db) =>
   await NodesInsert.run(survey, nodeDef, client)
 
-const queryTable = async (surveyId, tableName, cols = [],
+const queryTable = async (surveyId, cycle, tableName, cols = [],
                           offset, limit, filterExpr, sort, client = db) =>
-  await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filterExpr, sort, client)
+  await TableViewQuery.runSelect(surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort, client)
 
 const countTable = async (surveyId, tableName, filter, client = db) =>
   await TableViewQuery.runCount(surveyId, tableName, filter, client)

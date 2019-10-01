@@ -8,7 +8,7 @@ import Dropdown from '../../../commonComponents/form/dropdown'
 
 const CycleSelector = props => {
   const { surveyInfo, surveyCycleKey, onChange } = props
-  const cycleKeys = R.pipe(Survey.getCycles, R.keys)(surveyInfo)
+  const cycleKeys = Survey.getCycleKeys(surveyInfo)
 
   if (cycleKeys.length === 1)
     return null

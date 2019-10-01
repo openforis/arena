@@ -11,7 +11,7 @@ const SurveyManager = require('../../survey/manager/surveyManager')
 const SurveyRdbManager = require('../manager/surveyRdbManager')
 const RecordManager = require('../../record/manager/recordManager')
 
-const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output) => {
+const exportTableToCSV = async (surveyId, cycle, tableName, cols, filter, sort, output) => {
   const csvStream = fastcsv.format({ headers: true })
   csvStream.pipe(output)
 
@@ -25,7 +25,7 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output)
   // 2. write rows
   while (!complete) {
 
-    const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter, sort)
+    const rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, cols, offset, limit, filter, sort)
 
     rows.forEach(row => {
       csvStream.write(R.values(row))
@@ -40,13 +40,13 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output)
   csvStream.end()
 }
 
-const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
+const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
                           offset, limit, filterExpr, sort, editMode = false) => {
   const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true)
   const surveyInfo = Survey.getSurveyInfo(surveySummary)
   const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, loadDraftDefs)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
 
   // 1. find ancestor defs of table def
   const tableNodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
@@ -67,7 +67,7 @@ const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols
     R.append(DataTable.colNameRecordUuuid)
   )(cols)
 
-  const rows = await SurveyRdbManager.queryTable(surveyId, tableName, queryCols, offset, limit, filterExpr, sort)
+  const rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, queryCols, offset, limit, filterExpr, sort)
 
   return editMode
     ? await Promise.all(rows.map(

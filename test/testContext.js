@@ -27,7 +27,7 @@ const setContextSurvey = s => {
 }
 
 const fetchFullContextSurvey = async (draft = true, advanced = true) =>
-  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), draft, advanced)
+  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), Survey.cycleOneKey, draft, advanced)
 
 module.exports = {
   initTestContext,

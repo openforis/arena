@@ -50,7 +50,7 @@ describe('Activity Log Test', async () => {
 
     const surveyId = Survey.getId(survey)
 
-    const recordToCreate = RecordUtils.newRecord(user, survey)
+    const recordToCreate = RecordUtils.newRecord(user)
 
     const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 

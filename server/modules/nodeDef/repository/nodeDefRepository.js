@@ -54,15 +54,17 @@ const insertNodeDef = async (surveyId, nodeDef, client = db) => {
 
 // ============== READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft, advanced = false, includeDeleted = false, client = db) =>
+const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft, advanced = false, includeDeleted = false, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE TRUE
+      ${cycle ? `--filter by cycle
+          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1` : ''} 
       ${!draft ? ` AND props <> '{}'::jsonb` : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
-    [],
+    [JSON.stringify(cycle)],
     res => dbTransformCallback(res, draft, advanced)
   )
 
