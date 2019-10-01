@@ -3,7 +3,6 @@ import './recordsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../common/survey/survey'
 import Record from '../../../../../common/record/record'
 
 import TableView from '../../../tableViews/tableView'
@@ -19,25 +18,24 @@ import * as RecordsState from './recordsState'
 import * as SurveyState from '../../../../survey/surveyState'
 
 import { createRecord } from '../../../surveyViews/record/actions'
-import { initList } from '../../../tableViews/actions'
+import { resetList } from '../../../tableViews/actions'
 
 const RecordsView = props => {
 
   const {
     surveyInfo, surveyCycleKey, user, nodeDefKeys, lang,
-    createRecord, initList, history
+    createRecord, resetList, history
   } = props
 
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
-  const restParams = {cycle: surveyCycleKey}
+  const restParams = { cycle: surveyCycleKey }
 
   const onRowClick = record => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
   useOnUpdate(() => {
-    const moduleApiUri = `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/${RecordsState.keys.records}`
-    initList(RecordsState.keys.records, moduleApiUri, restParams)
+    resetList(RecordsState.keys.records, restParams)
   }, [surveyCycleKey])
 
   return (
@@ -68,7 +66,7 @@ const mapStateToProps = state => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-  nodeDefKeys: RecordsState.getNodeDefKeys(state)
+  nodeDefKeys: RecordsState.getNodeDefKeys(state),
 })
 
-export default connect(mapStateToProps, { createRecord, initList })(RecordsView)
+export default connect(mapStateToProps, { createRecord, resetList })(RecordsView)
