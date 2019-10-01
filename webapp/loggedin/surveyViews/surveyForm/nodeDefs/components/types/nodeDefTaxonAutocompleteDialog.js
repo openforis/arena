@@ -46,7 +46,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
     draft,
   }
 
-  const { data: { taxa = [] } = { taxa: [] }, dispatch } = useAsyncGetRequest(
+  const { data: { list = [] } = { list: [] }, dispatch } = useAsyncGetRequest(
     `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
     { params }
   )
@@ -56,7 +56,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
   return ReactDOM.createPortal(
     <AutocompleteDialog
       className="survey-form__node-def-taxon-autocomplete-list"
-      items={taxa}
+      items={list}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
       itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
       inputField={inputRef.current}

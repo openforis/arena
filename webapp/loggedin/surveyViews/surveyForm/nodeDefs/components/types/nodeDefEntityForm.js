@@ -80,12 +80,13 @@ class EntityForm extends React.Component {
       nodeDef,
       childDefs,
       edit,
+      entry,
+      preview,
       canEditDef,
       canEditRecord,
       canAddNode,
       locked,
       node,
-      entry,
       recordUuid,
       surveyInfo,
     } = this.props
@@ -124,6 +125,7 @@ class EntityForm extends React.Component {
                     key={i}
                     edit={edit}
                     entry={entry}
+                    preview={preview}
                     recordUuid={recordUuid}
                     surveyInfo={surveyInfo}
                     nodeDef={childDef}

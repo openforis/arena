@@ -153,14 +153,13 @@ const NodeDefTaxon = props => {
 }
 
 const mapStateToProps = (state, props) => {
-  const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyId = SurveyState.getSurveyId(state)
-  const { nodeDef, edit, nodes } = props
+  const { nodeDef, edit, preview, nodes } = props
 
   return {
     taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
     surveyId,
-    draft: edit,
+    draft: preview,
     node: edit ? null : nodes[0]
   }
 }
