@@ -20,7 +20,8 @@ const formatDate = dateStr => dateStr ? DateUtils.format(DateUtils.parseISO(date
 
 const RecordsSummary = props => {
   const {
-    surveyInfo, timeRange, from, to, counts,
+    surveyInfo, surveyCycleKey,
+    timeRange, from, to, counts,
     fetchRecordsSummary
   } = props
 
@@ -41,9 +42,9 @@ const RecordsSummary = props => {
 
   useEffect(() => {
     if (surveyInfoValid) {
-      fetchRecordsSummary(timeRange)
+      fetchRecordsSummary(surveyCycleKey, timeRange)
     }
-  }, [surveyInfo])
+  }, [surveyInfo, surveyCycleKey])
 
   return surveyInfoValid
     ? (
@@ -59,7 +60,7 @@ const RecordsSummary = props => {
             <Dropdown
               items={timeRangeItems}
               selection={timeRangeSelection}
-              onChange={item => fetchRecordsSummary(item.key)}
+              onChange={item => fetchRecordsSummary(surveyCycleKey, item.key)}
               sourceElement={timeRangeElementRef.current}
               readOnlyInput={true}
             />
@@ -81,6 +82,7 @@ const RecordsSummary = props => {
 
 const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
+  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   timeRange: RecordsSummaryState.getTimeRange(state),
   from: RecordsSummaryState.getFrom(state),
   to: RecordsSummaryState.getTo(state),

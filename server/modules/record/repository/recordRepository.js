@@ -142,7 +142,7 @@ const fetchRecordUuids = async (surveyId, client = db) => await client.map(
   R.prop('uuid')
 )
 
-const fetchRecordCreatedCountsByDates = async (surveyId, from, to, client = db) => await client.any(`
+const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) => await client.any(`
     SELECT
       COUNT(r.uuid),
       to_char(date_trunc('day', r.date_created), 'YYYY-MM-DD') AS date
@@ -151,13 +151,15 @@ const fetchRecordCreatedCountsByDates = async (surveyId, from, to, client = db) 
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
     AND 
+      r.cycle = $3     
+    AND 
       r.preview = FALSE
     GROUP BY
       date_trunc('day', r.date_created)
     ORDER BY
       date_trunc('day', r.date_created)
   `,
-  [from, to]
+  [from, to, cycle]
 )
 
 // ============== UPDATE
