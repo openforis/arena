@@ -7,6 +7,7 @@ import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
 
 import { hideAppLoader, showAppLoader, showNotificationMessage } from '../../app/actions'
+import { resetSurveyDefs } from '../actions'
 
 export const surveyInfoUpdate = 'survey/info/update'
 export const surveyInfoValidationUpdate = 'survey/info/validation/update'
@@ -21,6 +22,7 @@ export const updateSurveyInfoProps = props => async (dispatch, getState) => {
   if (Validation.isObjValid(surveyInfo)) {
     dispatch(showNotificationMessage('common.saved'))
     dispatch({ type: surveyInfoUpdate, surveyInfo })
+    dispatch(resetSurveyDefs())
   } else {
     dispatch(showNotificationMessage('common.formContainsErrors', null, AppState.notificationSeverity.error))
     dispatch({ type: surveyInfoValidationUpdate, validation: Validation.getValidation(surveyInfo) })

@@ -10,6 +10,7 @@ export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
 export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
+export const surveyDefsReset = 'survey/defs/reset'
 
 const fetchDefs = (surveyId, defs, draft = false, validate = false) =>
   axios.get(
@@ -38,6 +39,8 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   }
 
 }
+
+export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
 
 // ====== SET ACTIVE SURVEY
 export const setActiveSurvey = (surveyId, canEdit = true) => async dispatch => {

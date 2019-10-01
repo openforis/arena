@@ -3,7 +3,7 @@ import * as CategoriesState from './categoriesState'
 import { exportReducer } from '../../utils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
-import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
+import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
 
 import {
   categoryCreate,
@@ -23,6 +23,8 @@ const actionHandlers = {
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
+
+  [surveyDefsReset]: () => ({}),
 
   // categories
   [surveyDefsLoad]: (state, { categories }) => categories,
