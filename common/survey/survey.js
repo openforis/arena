@@ -61,7 +61,6 @@ module.exports = {
   getDefaultSRS: SurveyInfo.getDefaultSRS,
   getStatus: SurveyInfo.getStatus,
   getCycles: SurveyInfo.getCycles,
-  getCycleOneKey: R.pipe(SurveyInfo.getCycles, R.keys, R.head),
   getDateCreated: SurveyInfo.getDateCreated,
   getDateModified: SurveyInfo.getDateModified,
   isPublished: SurveyInfo.isPublished,

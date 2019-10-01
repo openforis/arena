@@ -15,16 +15,12 @@ class SurveyDependencyGraphsGenerationJob extends Job {
   }
 
   async execute (tx) {
-    const survey = this.contextSurvey || await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, await this.determineCycle(), false, true, false, false, tx)
+    //TODO build a new graph for each survey cycle
+    const survey = this.contextSurvey || await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, Survey.cycleOneKey, false, true, false, false, tx)
 
     const graph = Survey.buildDependencyGraph(survey)
 
     await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, tx)
-  }
-
-  async determineCycle () {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
-    return R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
   }
 
 }

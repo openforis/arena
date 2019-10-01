@@ -105,7 +105,7 @@ class RecordBuilder {
   }
 
   build () {
-    const record = RecordUtils.newRecord(this.user, this.survey)
+    const record = RecordUtils.newRecord(this.user)
     const nodes = this.rootEntityBuilder.build(this.survey, null, Record.getUuid(record), null)
     return Record.assocNodes(nodes)(record)
   }
