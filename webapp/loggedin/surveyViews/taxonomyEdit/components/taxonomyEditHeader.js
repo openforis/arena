@@ -11,7 +11,7 @@ import Validation from '../../../../../common/validation/validation'
 import StringUtils from '../../../../../common/stringUtils'
 
 const TaxonomyEditHeader = props => {
-  const { surveyId, taxonomy, taxa, readOnly, putTaxonomyProp, uploadTaxonomyFile } = props
+  const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props
   const i18n = useI18n()
   const validation = Validation.getValidation(taxonomy)
 
@@ -24,13 +24,13 @@ const TaxonomyEditHeader = props => {
             value={Taxonomy.getName(taxonomy)}
             validation={Validation.getFieldValidation('name')(validation)}
             onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
-            readOnly={readOnly}/>
+            readOnly={!canEdit}/>
         </div>
       </FormItem>
 
       <div className="button-bar">
         {
-          !readOnly &&
+          canEdit &&
           <UploadButton
             label={i18n.t('common.csvImport')}
             disabled={Taxonomy.isPublished(taxonomy)}
@@ -39,7 +39,7 @@ const TaxonomyEditHeader = props => {
 
         }
         <DownloadButton
-          href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=true`}
+          href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=${canEdit}`}
           disabled={R.isEmpty(taxa)}
           label={i18n.t('common.csvExport')}/>
       </div>
