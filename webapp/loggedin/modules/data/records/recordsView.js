@@ -31,16 +31,19 @@ const RecordsView = props => {
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
+  const restParams = {cycle: surveyCycleKey}
+
   const onRowClick = record => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
   useOnUpdate(() => {
     const moduleApiUri = `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/${RecordsState.keys.records}`
-    initList(RecordsState.keys.records, moduleApiUri)
+    initList(RecordsState.keys.records, moduleApiUri, restParams)
   }, [surveyCycleKey])
 
   return (
     <TableView
       module={RecordsState.keys.records}
+      restParams={restParams}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={RecordsHeaderLeft}
