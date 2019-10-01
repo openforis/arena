@@ -117,7 +117,7 @@ const CyclesEditor = props => {
               onChange={cycleUpdate => setCycles(
                 R.assoc(step, cycleUpdate)(cycles)
               )}
-              canDelete={!readOnly && step !== Survey.getCycleOneKey(surveyInfo) && i === cycleEntries.length - 1}
+              canDelete={!readOnly && step !== Survey.cycleOneKey && i === cycleEntries.length - 1}
               onDelete={onDelete}
             />
           )

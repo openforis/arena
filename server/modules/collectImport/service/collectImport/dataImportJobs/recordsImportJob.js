@@ -41,7 +41,8 @@ class RecordsImportJob extends Job {
   async execute () {
     const { surveyId, user, tx } = this
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, false, tx)
+    const cycle = Survey.cycleOneKey
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, cycle, true, true, false, false, tx)
 
     const entryNames = this.getEntryNames()
 
@@ -63,7 +64,6 @@ class RecordsImportJob extends Job {
       // this.logDebug(`${entryName} parseToJson done`)
 
       // this.logDebug(`${entryName} recordToCreate start`)
-      const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
       const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson))
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)

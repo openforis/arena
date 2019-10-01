@@ -92,7 +92,7 @@ class NodeDefsImportJob extends Job {
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, tx)
 
     //fetch survey and store it in context
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, false, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, Survey.cycleOneKey, true, true, false, false, tx)
 
     this.setContext({
       nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
@@ -451,13 +451,7 @@ class NodeDefsImportJob extends Job {
   }
 
   _createNodeDef (parentNodeDef, type, props) {
-    const cycle = R.pipe(
-      CollectImportJobContext.getSurvey,
-      Survey.getSurveyInfo,
-      Survey.getCycleOneKey
-    )(this.context)
-
-    return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, cycle, props)
+    return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, Survey.cycleOneKey, props)
   }
 }
 

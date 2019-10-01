@@ -64,7 +64,8 @@ const updateNodeDefTest = async () => {
 
   expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 
-  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, true)
+  const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
+  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, cycle, true)
 
   //only one node def with that name
   expect(R.filter(n => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)

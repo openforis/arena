@@ -11,12 +11,16 @@ export const surveyUpdate = 'survey/update'
 export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
 export const surveyDefsReset = 'survey/defs/reset'
+export const surveyNodeDefsLoad = 'survey/nodeDefs/load'
 
-const fetchDefs = (surveyId, defs, draft = false, validate = false) =>
-  axios.get(
-    `/api/survey/${surveyId}/${defs}`,
-    { params: { draft, validate } }
-  )
+const defs = {
+  nodeDefs: 'nodeDefs',
+  categories: 'categories',
+  taxonomies: 'taxonomies',
+}
+
+const _fetchDefs = (surveyId, defs, params = {}) =>
+  axios.get(`/api/survey/${surveyId}/${defs}`, { params })
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
@@ -24,20 +28,39 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   if (!SurveyState.areDefsFetched(draft)(state)) {
 
     const surveyId = SurveyState.getSurveyId(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
+    const params = {
+      draft,
+      validate,
+      cycle
+    }
 
     const [
       { data: { nodeDefs, nodeDefsValidation } },
       { data: { categories } },
       { data: { taxonomies } }
     ] = await Promise.all([
-      fetchDefs(surveyId, 'nodeDefs', draft, validate),
-      fetchDefs(surveyId, 'categories', draft, validate),
-      fetchDefs(surveyId, 'taxonomies', draft, validate),
+      _fetchDefs(surveyId, defs.nodeDefs, params),
+      _fetchDefs(surveyId, defs.categories, params),
+      _fetchDefs(surveyId, defs.taxonomies, params),
     ])
 
     dispatch({ type: surveyDefsLoad, nodeDefs, nodeDefsValidation, categories, taxonomies, draft })
   }
+}
 
+export const reloadNodeDefs = (surveyCycleKey, draft = false, validate = false) => async (dispatch, getState) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+
+  const params = {
+    cycle: surveyCycleKey,
+    draft,
+    validate
+  }
+  const { data: { nodeDefs, nodeDefsValidation } } = await _fetchDefs(surveyId, defs.nodeDefs, params)
+
+  dispatch({ type: surveyNodeDefsLoad, nodeDefs, nodeDefsValidation, draft })
 }
 
 export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })

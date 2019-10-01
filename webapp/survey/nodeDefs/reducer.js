@@ -2,11 +2,17 @@ import { exportReducer } from '../../utils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
 
-import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
+import {
+  surveyCreate,
+  surveyDefsLoad,
+  surveyDefsReset,
+  surveyNodeDefsLoad,
+  surveyDelete,
+  surveyUpdate
+} from '../actions'
 
 import {
   nodeDefCreate,
-  nodeDefUpdate,
   nodeDefPropsUpdate,
   nodeDefDelete,
 } from './actions'
@@ -24,6 +30,7 @@ const actionHandlers = {
   [surveyDefsReset]: () => ({}),
 
   [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
+  [surveyNodeDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   // single nodeDef actions
   [nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),

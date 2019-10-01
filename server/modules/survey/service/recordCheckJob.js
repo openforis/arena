@@ -18,7 +18,7 @@ class RecordCheckJob extends Job {
 
   async execute (tx) {
     //1. determine new or updated node defs
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, true, true, false, true, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, null, true, true, false, true, tx)
 
     const nodeDefsNew = []
     const nodeDefsUpdated = []

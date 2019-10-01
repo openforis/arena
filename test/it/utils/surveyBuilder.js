@@ -167,8 +167,8 @@ class SurveyBuilder {
         if (publishJob.isFailed())
           throw new Error(`Test survey buildAndStore failed: ${JSON.stringify(publishJob)}`)
       }
-
-      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, false, t)
+      const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
+      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, !publish, true, false, false, t)
       return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)
     })
   }

@@ -30,8 +30,7 @@ export const getNodeDefLabel = nodeDef => state => {
   const surveyInfo = getSurveyInfo(state)
   const langApp = AppState.getLang(state)
   const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
-  const label = NodeDef.getLabel(nodeDef, langSurvey)
-  return label
+  return NodeDef.getLabel(nodeDef, langSurvey)
 }
 
 // STATUS

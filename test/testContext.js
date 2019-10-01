@@ -26,8 +26,10 @@ const setContextSurvey = s => {
   user = User.assocPrefSurveyCurrent(Survey.getId(survey))(user)
 }
 
-const fetchFullContextSurvey = async (draft = true, advanced = true) =>
-  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), draft, advanced)
+const fetchFullContextSurvey = async (draft = true, advanced = true) => {
+  const cycle = R.pipe(Survey.getSurveyInfo, Survey.getCycleOneKey)(survey)
+  return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), cycle, draft, advanced)
+}
 
 module.exports = {
   initTestContext,

@@ -21,8 +21,8 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
 
 // ======= READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, includeDeleted = false, client = db) => {
-  const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, includeDeleted, client)
+const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, client = db) => {
+  const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client)
   return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 }
 
