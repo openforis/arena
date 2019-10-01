@@ -20,10 +20,11 @@ const TaxonomyEditHeader = props => {
 
       <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
         <div>
-          <Input value={Taxonomy.getName(taxonomy)}
-                 validation={Validation.getFieldValidation('name')(validation)}
-                 onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
-                 readOnly={readOnly}/>
+          <Input
+            value={Taxonomy.getName(taxonomy)}
+            validation={Validation.getFieldValidation('name')(validation)}
+            onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
+            readOnly={readOnly}/>
         </div>
       </FormItem>
 
@@ -32,15 +33,15 @@ const TaxonomyEditHeader = props => {
           !readOnly &&
           <UploadButton
             label={i18n.t('common.csvImport')}
-                        disabled={Taxonomy.isPublished(taxonomy)}
-                        accept=".csv"
-                        onChange={async ([file]) => { await uploadTaxonomyFile(taxonomy, file) }}/>
+            disabled={Taxonomy.isPublished(taxonomy)}
+            accept=".csv"
+            onChange={async ([file]) => { await uploadTaxonomyFile(taxonomy, file) }}/>
 
         }
         <DownloadButton
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=true`}
-                        disabled={R.isEmpty(taxa)}
-                        label={i18n.t('common.csvExport')}/>
+          disabled={R.isEmpty(taxa)}
+          label={i18n.t('common.csvExport')}/>
       </div>
     </div>
   )
