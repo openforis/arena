@@ -59,18 +59,12 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft, advanced =
     SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE TRUE
-      ${cycle ? `
-        --filter by cycle
-        AND EXISTS (
-          SELECT 1 
-          FROM jsonb_array_elements_text(${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', true)}) as cycles 
-          WHERE cycles = $1
-        )
-        ` : ''} 
+      ${cycle ? `--filter by cycle
+          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', true)} @> $1` : ''} 
       ${!draft ? ` AND props <> '{}'::jsonb` : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
-    [cycle],
+    [JSON.stringify(cycle)],
     res => dbTransformCallback(res, draft, advanced)
   )
 
