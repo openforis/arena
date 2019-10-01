@@ -56,9 +56,9 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, cycle } = Request.getParams(req)
 
-      const count = await RecordService.countRecordsBySurveyId(surveyId)
+      const count = await RecordService.countRecordsBySurveyId(surveyId, cycle)
       res.json(count)
 
     } catch (err) {
@@ -68,9 +68,9 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, limit, offset } = Request.getParams(req)
+      const { surveyId, cycle, limit, offset } = Request.getParams(req)
 
-      const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(surveyId, offset, limit)
+      const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(surveyId, cycle, offset, limit)
       res.json(recordsSummary)
     } catch (err) {
       next(err)

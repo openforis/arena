@@ -56,10 +56,16 @@ const insertRecord = async (surveyId, record, client = db) =>
 
 // ============== READ
 
-const countRecordsBySurveyId = async (surveyId, client = db) =>
-  await client.one(`SELECT count(*) FROM ${getSurveyDBSchema(surveyId)}.record WHERE preview = FALSE`)
+const countRecordsBySurveyId = async (surveyId, cycle, client = db) =>
+  await client.one(`
+      SELECT count(*) 
+      FROM ${getSurveyDBSchema(surveyId)}.record 
+      WHERE preview = FALSE AND cycle = $1
+    `,
+    [cycle]
+  )
 
-const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, client = db) => {
+const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, client = db) => {
 
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColName = NodeDefTable.getColName
@@ -76,7 +82,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 
         r.validation
     FROM ${getSurveyDBSchema(surveyId)}.record r
-    WHERE r.preview = FALSE
+    WHERE r.preview = FALSE AND r.cycle = ${cycle}
     ORDER BY r.date_created DESC
     LIMIT ${limit ? limit : 'ALL'}
     OFFSET ${offset}

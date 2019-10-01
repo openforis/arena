@@ -11,12 +11,12 @@ import { initList, fetchListItems } from './actions'
 
 const TableView = props => {
   const {
-    module, moduleApiUri, className,
+    module, moduleApiUri, restParams, className,
     initList
   } = props
 
   useEffect(() => {
-    initList(module, moduleApiUri)
+    initList(module, moduleApiUri, restParams)
   }, [])
 
   return (
@@ -33,6 +33,7 @@ const TableView = props => {
 TableView.defaultProps = {
   module: '',
   moduleApiUri: null,
+  restParams: {},
   className: '',
   gridTemplateColumns: '1fr',
   headerLeftComponent: () => <div></div>,

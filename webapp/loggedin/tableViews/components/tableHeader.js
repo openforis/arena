@@ -6,7 +6,7 @@ import TablePaginator from './tablePaginator'
 const TableHeader = props => {
 
   const {
-    module, moduleApiUri,
+    module, moduleApiUri, restParams,
     headerLeftComponent,
     list, offset, limit, count,
     fetchListItems,
@@ -25,7 +25,7 @@ const TableHeader = props => {
           offset={offset}
           limit={limit}
           count={count}
-          fetchFn={offset => fetchListItems(module, moduleApiUri, offset)}
+          fetchFn={offset => fetchListItems(module, moduleApiUri, offset, restParams)}
         />
       }
 
