@@ -136,6 +136,7 @@ module.exports = {
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
+      confirmDeleteCycle:`Are you sure you want to delete the cycle {{cycle}}?n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',
       viewInfo: 'View info',

@@ -1,15 +1,16 @@
 const ObjectUtils = require('../../objectUtils')
 
 const keys = {
-  surveyUuid: 'surveyUuid',
-  uuid: 'uuid',
-  nodes: 'nodes',
-  ownerUuid: 'ownerUuid',
-  ownerName: 'ownerName',
-  step: 'step',
-  preview: 'preview',
+  cycle: 'cycle',
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
+  nodes: 'nodes',
+  ownerName: 'ownerName',
+  ownerUuid: 'ownerUuid',
+  preview: 'preview',
+  step: 'step',
+  surveyUuid: 'surveyUuid',
+  uuid: ObjectUtils.keys.uuid,
 }
 
 module.exports = keys

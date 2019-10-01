@@ -124,17 +124,16 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/user/:userUuid/pref/:name/:value', async (req, res, next) => {
+  app.post('/user/:userUuid/prefs', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const userToUpdate = Request.getBody(req)
 
-      const { userUuid, name, value } = Request.getParams(req)
-
-      if (User.getUuid(user) !== userUuid) {
+      if (!User.isEqual(userToUpdate)(user)) {
         throw new SystemError('userNotAllowedToChangePref')
       }
 
-      await UserService.updateUserPref(user, name, value)
+      await UserService.updateUserPrefs(userToUpdate)
 
       Response.sendOk(res)
     } catch (err) {

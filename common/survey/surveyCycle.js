@@ -18,10 +18,14 @@ const newCycle = () => ({
 })
 
 //====== READ
-const getDateStart = R.propOr('', keys.dateStart)
-const getDateEnd = R.propOr('', keys.dateEnd)
+const getDateStart = R.propOr(null, keys.dateStart)
+const getDateEnd = R.propOr(null, keys.dateEnd)
 const getDescriptions = R.propOr({}, keys.descriptions)
 const getLabels = R.propOr({}, keys.labels)
+
+//====== UPDATE
+const setDateStart = R.assoc(keys.dateStart)
+const setDateEnd = R.assoc(keys.dateEnd)
 
 module.exports = {
   //CREATE
@@ -32,4 +36,8 @@ module.exports = {
   getDateEnd,
   getDescriptions,
   getLabels,
+
+  //UPDATE
+  setDateStart,
+  setDateEnd,
 }

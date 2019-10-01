@@ -13,10 +13,11 @@ const RecordUpdater = require('./_record/recordUpdater')
 
 // ====== CREATE
 
-const newRecord = (user, preview = false, dateCreated = null) => ({
+const newRecord = (user, cycle, preview = false, dateCreated = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
   [keys.step]: RecordStep.getDefaultStep(),
+  [keys.cycle]: cycle,
   [keys.preview]: preview,
   [keys.dateCreated]: dateCreated,
 })
@@ -35,6 +36,7 @@ module.exports = {
   getOwnerUuid: R.prop(keys.ownerUuid),
   getOwnerName: R.prop(keys.ownerName),
   getStep: R.prop(keys.step),
+  getCycle: R.prop(keys.cycle),
   getDateCreated: ObjectUtils.getDateCreated,
   getDateModified: ObjectUtils.getDateModified,
 

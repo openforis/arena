@@ -9,7 +9,6 @@ const SurveyValidator = require('../../../../common/survey/surveyValidator')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
-const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 const ObjectUtils = require('../../../../common/objectUtils')
 const Validation = require('../../../../common/validation/validation')
 
@@ -31,18 +30,15 @@ const assocSurveyInfo = info => ({ info })
 // ====== CREATE
 
 const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntityDef = true, client = db) => {
-
   const surveyParam = Survey.newSurvey(User.getUuid(user), name, label, lang, collectUri)
-
   return await insertSurvey(user, surveyParam, createRootEntityDef, client)
 }
 
 const insertSurvey = async (user, surveyParam, createRootEntityDef = true, client = db) => {
   const survey = await client.tx(
     async t => {
-
-      const surveyDb = await SurveyRepository.insertSurvey(surveyParam, t)
-      const { id: surveyId } = surveyDb
+      const surveyInfo = await SurveyRepository.insertSurvey(surveyParam, t)
+      const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
       //create survey data schema
       await migrateSurveySchema(surveyId)
@@ -51,9 +47,10 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
         const rootEntityDef = NodeDef.newNodeDef(
           null,
           NodeDef.nodeDefType.entity,
+          Survey.getCycleOneKey(surveyInfo), //use first (and only) cycle
           {
-            name: 'root_entity',
-            multiple: false,
+            [NodeDef.propKeys.name]: 'root_entity',
+            [NodeDef.propKeys.multiple]: false,
             [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
             [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
           }
@@ -62,19 +59,19 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       }
 
       // update user prefs
-      await UserRepository.updateUserPref(user, userPrefNames.survey, surveyId, t)
+      user = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.getCycleOneKey(surveyInfo))(user)
+      await UserRepository.updateUserPrefs(user, t)
 
       // create default groups for this survey
-
-      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
+      surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
       if (!User.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyDb)), User.getUuid(user), t)
+        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), User.getUuid(user), t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)
 
-      return surveyDb
+      return surveyInfo
     }
   )
 
@@ -140,7 +137,7 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
     const validation = await validateSurveyInfo({ id: surveyId, props })
     if (Validation.isValid(validation)) {
 
-      const surveyInfoPrev = await fetchSurveyById(surveyId, true, false, t)
+      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById(surveyId, true, false, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
       let updated = false
@@ -151,6 +148,21 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
           await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
           await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
           updated = true
+
+          if (key === Survey.infoKeys.cycles) {
+            const cycles = Object.keys(value)
+            const cyclesPrev = Object.keys(valuePrev)
+            // add new cycles to nodeDefs
+            const cyclesAdded = R.difference(cycles, cyclesPrev)
+            if (!R.isEmpty(cyclesAdded)) {
+              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, t)
+            }
+            // remove delete cycles from nodeDefs
+            const cyclesRemoved = R.difference(cyclesPrev, cycles)
+            if (!R.isEmpty(cyclesRemoved)) {
+              await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, t)
+            }
+          }
         }
       }
 
@@ -174,19 +186,14 @@ const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
 }
 
 // ====== DELETE
-const deleteSurvey = async (id, user) => {
-  await db.tx(async t => {
-
-    const userPrefSurveyId = getUserPrefSurveyId(user)
-    if (userPrefSurveyId === id)
-      await UserRepository.deleteUserPref(user, userPrefNames.survey, t)
-
-    await SurveyRepository.dropSurveySchema(id, t)
-    await SurveyRdbManager.dropSchema(id, t)
-
-    await SurveyRepository.deleteSurvey(id, t)
-  })
-}
+const deleteSurvey = async surveyId => await db.tx(async t =>
+  await Promise.all([
+    UserRepository.deleteUsersPrefsSurvey(surveyId, t),
+    SurveyRepository.dropSurveySchema(surveyId, t),
+    SurveyRdbManager.dropSchema(surveyId, t),
+    SurveyRepository.deleteSurvey(surveyId, t),
+  ])
+)
 
 module.exports = {
   // ====== CREATE

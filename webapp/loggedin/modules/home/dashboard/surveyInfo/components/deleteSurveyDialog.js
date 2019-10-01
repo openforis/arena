@@ -3,14 +3,14 @@ import './deleteSurveyDialog.scss'
 import React, { useState } from 'react'
 import Markdown from 'react-remarkable'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '../../../../../../commonComponents/hooks'
 
 import {
   Modal,
   ModalBody,
   ModalHeader,
   ModalFooter,
-} from '../../../../../commonComponents/modal'
+} from '../../../../../../commonComponents/modal'
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const i18n = useI18n()

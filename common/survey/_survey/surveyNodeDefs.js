@@ -13,7 +13,7 @@ const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
 const getNodeDefsByParentUuid = parentUuid => R.pipe(
   getNodeDefsArray,
-  R.filter(R.propEq(NodeDef.propKeys.parentUuid, parentUuid)),
+  R.filter(R.propEq(NodeDef.keys.parentUuid, parentUuid)),
 )
 
 const getRootNodeDef = R.pipe(getNodeDefsByParentUuid(null), R.head)

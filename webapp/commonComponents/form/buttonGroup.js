@@ -1,15 +1,29 @@
 import React from 'react'
 
-const ButtonGroup = ({ items, selectedItemKey, onChange, disabled }) => (
+import * as R from 'ramda'
+
+const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, deselectable }) => (
   <div>
     {
-      items.map(item =>
-        <button key={item.key}
-                className={`btn btn-s${selectedItemKey === item.key ? ' active' : ''}`}
-                onClick={() => onChange(item.key)}
-                aria-disabled={!!item.disabled || disabled}>
-          {item.label}
-        </button>
+      items.map(item => {
+          const selected = selectedItemKey === item.key || multiple && R.includes(item.key, selectedItemKey)
+          return (
+            <button key={item.key}
+                    type="button"
+                    className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
+                    onClick={() => onChange(
+                      multiple
+                        ? R.ifElse(
+                        R.always(selected),
+                        R.without(item.key),
+                        R.append(item.key)
+                        )(selectedItemKey)
+                        : item.key)}
+                    aria-disabled={!!item.disabled || disabled}>
+              {item.label}
+            </button>
+          )
+        }
       )
     }
   </div>
@@ -17,9 +31,11 @@ const ButtonGroup = ({ items, selectedItemKey, onChange, disabled }) => (
 
 ButtonGroup.defaultProps = {
   items: [],
-  selectedItemKey: null,
+  selectedItemKey: null, //array of values if multiple=true
   onChange: () => {},
   disabled: false,
+  multiple: false,
+  deselectable: false,
 }
 
 export default ButtonGroup

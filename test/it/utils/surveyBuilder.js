@@ -22,6 +22,15 @@ class NodeDefBuilder {
     }
   }
 
+  _createNodeDef (survey, parentDefUuid) {
+    const cycle = R.pipe(
+      Survey.getSurveyInfo,
+      Survey.getCycleOneKey
+    )(survey)
+
+    return NodeDef.newNodeDef(parentDefUuid, this.type, cycle, this.props)
+  }
+
   applyIf (expr) {
     this.props[NodeDef.propKeys.applicable] = [NodeDefExpression.createExpression(expr)]
     return this
@@ -64,8 +73,8 @@ class EntityDefBuilder extends NodeDefBuilder {
     this.childBuilders = childBuilders
   }
 
-  build (survey, parentDefUUid = null) {
-    const def = NodeDef.newNodeDef(parentDefUUid, this.type, this.props)
+  build (survey, parentDefUuid = null) {
+    const def = this._createNodeDef(survey, parentDefUuid)
 
     const defUuid = NodeDef.getUuid(def)
 
@@ -106,7 +115,7 @@ class AttributeDefBuilder extends NodeDefBuilder {
   }
 
   build (survey, parentDefUuid = null) {
-    const def = NodeDef.newNodeDef(parentDefUuid, this.type, this.props)
+    const def = this._createNodeDef(survey, parentDefUuid)
 
     return {
       [NodeDef.getUuid(def)]: def
@@ -150,7 +159,7 @@ class SurveyBuilder {
 
       await Survey.traverseHierarchyItem(root, async nodeDef =>
         await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
-       )
+      )
 
       if (publish) {
         const publishJob = new SurveyPublishJob({ user: this.user, surveyId })

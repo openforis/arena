@@ -13,7 +13,7 @@ const Validation = require('../../../../common/validation/validation')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `uuid, owner_uuid, step, ${DbUtils.selectDate('date_created')}, preview, validation`
+const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
@@ -38,14 +38,15 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
 const insertRecord = async (surveyId, record, client = db) =>
   await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
-    (owner_uuid, uuid, step, preview, date_created)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $6)
+    (owner_uuid, uuid, step, cycle, preview, date_created)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $7)
     `,
     [
       Record.getOwnerUuid(record),
       Record.getUuid(record),
       Record.getStep(record),
+      Record.getCycle(record),
       Record.isPreview(record),
       Record.getDateCreated(record) || new Date(),
       surveyId

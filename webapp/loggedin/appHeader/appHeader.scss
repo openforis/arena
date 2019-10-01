@@ -19,10 +19,23 @@
 }
 
 .app-header__survey {
+  display: flex;
+  align-items: center;
   text-transform: uppercase;
   font-size: .9rem;
   font-weight: 600;
   color: lighten($black, 20%);
+
+  .dropdown {
+    margin-left: 10px;
+    grid-template-columns: 60px 40px;
+    border-bottom: none;
+
+    input {
+      font-size: .85rem;
+      color: lighten($black, 20%);
+    }
+  }
 }
 
 .app-header__user {

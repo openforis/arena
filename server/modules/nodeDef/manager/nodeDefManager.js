@@ -11,12 +11,11 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
   await client.tx(async t => {
-    const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
-
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, t)
-
+    const [nodeDef] = await Promise.all([
+      NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, t)
+    ])
     return nodeDef
   })
 
@@ -74,6 +73,8 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProps,
+  addNodeDefsCycles: NodeDefRepository.addNodeDefsCycles,
+  deleteNodeDefsCycles: NodeDefRepository.deleteNodeDefsCycles,
   publishNodeDefsProps,
 
   //DELETE

@@ -56,8 +56,11 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 // ==== CREATE
 
 export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
-  const nodeDef = NodeDef.newNodeDef(parentUuid, type, props)
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
+
+  const nodeDef = NodeDef.newNodeDef(parentUuid, type, cycle, props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 

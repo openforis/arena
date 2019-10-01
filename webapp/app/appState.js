@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import Survey from '../../common/survey/survey'
 import User from '../../common/user/user'
+import AuthGroups from '../../common/auth/authGroups'
 
 export const keys = {
   status: 'status',
@@ -48,36 +49,43 @@ export const getUser = R.pipe(getState, R.prop(keys.user))
 
 export const logoutUser = R.dissoc(keys.user)
 
-// On survey create, add current user to new survey's surveyAdmin group
-export const assocSurveyAdminGroup = surveyInfo =>
-  appState => {
-    const user = R.prop(keys.user, appState)
-
-    if (User.isSystemAdmin(user)) {
-      return appState
-    } else {
-
-      const userGroups = R.pipe(
-        R.prop(User.keys.authGroups),
-        R.append(Survey.getAuthGroupAdmin(surveyInfo))
-      )(user)
-
-      return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
-    }
-  }
-
-// On survey delete, dissoc survey from user
-export const dissocSurveyGroups = surveyId =>
-  appState => {
-    const user = R.prop(keys.user, appState)
-    // removing survey auth groups from user group
-    const userGroups = R.reject(
-      g => g.surveyId === surveyId,
-      R.prop(User.keys.authGroups, user)
+export const assocUserPropsOnSurveyCreate = survey => appState => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const user = R.pipe(
+    R.prop(keys.user),
+    User.assocPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.getCycleOneKey(surveyInfo)),
+    R.unless(
+      User.isSystemAdmin,
+      User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo))
     )
+  )(appState)
+  return R.assoc(keys.user, user, appState)
+}
 
-    return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
-  }
+export const assocUserPropsOnSurveyUpdate = survey => appState => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const user = R.pipe(
+    R.prop(keys.user),
+    User.assocPrefSurveyCurrent(Survey.getIdSurveyInfo(surveyInfo))
+  )(appState)
+  return R.assoc(keys.user, user, appState)
+}
+
+export const dissocUserPropsOnSurveyDelete = surveyInfo => appState => {
+  const authGroup = R.pipe(
+    R.prop(keys.user),
+    User.getAuthGroups,
+    R.find(
+      R.propEq(AuthGroups.keys.surveyUuid, Survey.getUuid(surveyInfo))
+    )
+  )(appState)
+  const user = R.pipe(
+    R.prop(keys.user),
+    User.dissocAuthGroup(authGroup),
+    User.deletePrefSurvey(Survey.getIdSurveyInfo(surveyInfo)),
+  )(appState)
+  return R.assoc(keys.user, user, appState)
+}
 
 // ==== APP SIDE BAR
 export const isSideBarOpened = R.pipe(getState, R.propEq(keys.sideBarOpened, true))

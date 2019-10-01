@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const User = require('../../common/user/user')
+
 const getServerUrl = req => `${req.protocol}://${req.get('host')}`
 
 const getParams = req => R.pipe(
@@ -31,6 +33,7 @@ const getBody = R.propOr(null, 'body')
 
 const getUser = R.prop('user')
 const getUserUuid = R.pipe(getUser, R.prop('uuid'))
+const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
 // i18n
 
@@ -46,6 +49,7 @@ module.exports = {
   // User
   getUserUuid,
   getUser,
+  getSurveyCycleKey,
 
   // i18n
   getI18n,
