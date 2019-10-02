@@ -54,7 +54,7 @@ const actionHandlers = {
   [dataQueryTableSortUpdate]: (state, { sort }) => DataQueryState.assocTableSort(sort)(state),
 
   // data vis
-  [dataVisReset]: state => DataQueryState.resetTable(state),
+  [dataVisReset]: () => ({}),
 
   // record nodes update
   [nodesUpdate]: (state, { nodes }) => DataQueryState.assocTableDataRecordNodes(nodes)(state),
