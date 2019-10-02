@@ -14,9 +14,10 @@ import {
   dataQueryTableDataUpdate,
   dataQueryTableFilterUpdate,
   dataQueryTableSortUpdate,
-  dataQueryTableReset,
   dataQueryNodeDefSelectorsShowUpdate,
 } from './actions'
+
+import { dataVisReset } from '../actions'
 
 import { nodesUpdate, validationsUpdate } from '../../../../surveyViews/record/actions'
 
@@ -52,7 +53,8 @@ const actionHandlers = {
 
   [dataQueryTableSortUpdate]: (state, { sort }) => DataQueryState.assocTableSort(sort)(state),
 
-  [dataQueryTableReset]: state => DataQueryState.resetTable(state),
+  // data vis
+  [dataVisReset]: state => DataQueryState.resetTable(state),
 
   // record nodes update
   [nodesUpdate]: (state, { nodes }) => DataQueryState.assocTableDataRecordNodes(nodes)(state),

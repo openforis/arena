@@ -3,8 +3,6 @@ import './components/dataQueryView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import { useOnUpdate } from '../../../../../commonComponents/hooks'
-
 import Table from './components/table'
 
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
@@ -18,17 +16,12 @@ const DataQueryView = props => {
 
   const {
     nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
-    surveyCycleKey,
-    initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols, resetTableData,
+    initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols,
   } = props
 
   useEffect(() => {
     initTableData()
   }, [])
-
-  useOnUpdate(() => {
-    resetTableData()
-  }, [surveyCycleKey])
 
   return (
     <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
@@ -64,5 +57,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols, resetTableData }
+  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols }
 )(DataQueryView)
