@@ -21,21 +21,21 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from '../record/recordState'
 
-import { setFormNodeDefAddChildTo } from './actions'
+import { setFormNodeDefAddChildTo, resetForm } from './actions'
 
 import { dispatchWindowResize } from '../../../utils/domUtils'
 
 const SurveyFormView = (props) => {
 
   const {
-    surveyInfo, nodeDef,
+    surveyInfo, surveyCycleKey, nodeDef,
     edit, entry, preview,
     hasNodeDefAddChildTo, showPageNavigation,
     canEditDef, canEditRecord,
     recordUuid, parentNode,
     isSideBarOpened,
     history,
-    setFormNodeDefAddChildTo,
+    setFormNodeDefAddChildTo, resetForm,
   } = props
 
   const editAllowed = edit && canEditDef
@@ -59,6 +59,11 @@ const SurveyFormView = (props) => {
     },
     [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened]
   )
+
+  // on cycle update, reset form
+  useOnUpdate(() => {
+    resetForm()
+  }, [surveyCycleKey])
 
   useEffect(() => {
     // onUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
@@ -155,6 +160,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     surveyInfo,
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
     nodeDef,
     hasNodeDefAddChildTo,
     showPageNavigation,
@@ -168,6 +174,6 @@ const mapStateToProps = (state, props) => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps, { setFormNodeDefAddChildTo })
+  connect(mapStateToProps, { setFormNodeDefAddChildTo, resetForm })
 )
 export default enhance(SurveyFormView)

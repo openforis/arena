@@ -54,18 +54,18 @@ const BasicProps = props => {
       <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
-          validation={Validation.getFieldValidation('name')(validation)}
-          onChange={value => putNodeDefProp(nodeDef, 'name', normalizeName(value))}/>
+          validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+          onChange={value => putNodeDefProp(nodeDef, NodeDef.propKeys.name, normalizeName(value))}/>
       </FormItem>
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
+        onChange={(labelItem) => onPropLabelsChange(labelItem, NodeDef.propKeys.labels, NodeDef.getLabels(nodeDef))}/>
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
+        onChange={(labelItem) => onPropLabelsChange(labelItem, NodeDef.propKeys.descriptions, NodeDef.getDescriptions(nodeDef))}/>
 
       {
         NodeDef.isCode(nodeDef) &&
@@ -91,7 +91,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
-            onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
+            onChange={(checked) => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}/>
         </FormItem>
       }
 
@@ -101,7 +101,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
-            onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
+            onChange={(checked) => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}/>
         </FormItem>
       }
 
