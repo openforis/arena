@@ -20,7 +20,7 @@ import { createNodeDef } from '../../../../survey/nodeDefs/actions'
 const FormHeader = props => {
 
   const {
-    edit, entry, preview,
+    surveyCycleKey, edit, entry, preview,
     history, canEditDef,
     nodeDefPage, nodeDefPageLabel,
     createNodeDef,
@@ -41,8 +41,11 @@ const FormHeader = props => {
                     NodeDef.getUuid(nodeDefPage),
                     NodeDef.nodeDefType.entity,
                     {
-                      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.form,
-                      [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
+                      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+                        surveyCycleKey,
+                        NodeDefLayout.renderType.form,
+                        uuidv4()
+                      )
                     }
                   )}>
             <span className="icon icon-plus icon-10px icon-left"/>

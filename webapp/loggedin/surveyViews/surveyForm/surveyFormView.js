@@ -84,6 +84,7 @@ const SurveyFormView = (props) => {
         }
 
         <FormHeader
+          surveyCycleKey={surveyCycleKey}
           edit={edit}
           entry={entry && canEditRecord}
           preview={preview}
