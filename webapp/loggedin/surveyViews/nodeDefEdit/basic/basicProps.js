@@ -113,12 +113,12 @@ const BasicProps = props => {
             onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
             items={[
               {
-                key: NodeDefLayout.nodeDefRenderType.form,
+                key: NodeDefLayout.renderType.form,
                 label: i18n.t('nodeDefEdit.basicProps.form'),
                 disabled: displayAsFormDisabled,
               },
               {
-                key: NodeDefLayout.nodeDefRenderType.table,
+                key: NodeDefLayout.renderType.table,
                 label: i18n.t('nodeDefEdit.basicProps.table'),
                 disabled: displayAsTableDisabled,
               },

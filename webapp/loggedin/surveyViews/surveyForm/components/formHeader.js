@@ -41,7 +41,7 @@ const FormHeader = props => {
                     NodeDef.getUuid(nodeDefPage),
                     NodeDef.nodeDefType.entity,
                     {
-                      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
+                      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.form,
                       [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
                     }
                   )}>

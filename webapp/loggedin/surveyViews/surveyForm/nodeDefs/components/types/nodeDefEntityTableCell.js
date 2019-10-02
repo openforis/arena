@@ -21,7 +21,7 @@ const NodeDefEntityTableCell = props => {
   const elementRef = useRef(null)
 
   // table cell header is always visible
-  const isHeader = renderType === NodeDefLayout.nodeDefRenderType.tableHeader
+  const isHeader = renderType === NodeDefLayout.renderType.tableHeader
   const [visible, setVisible] = useState(isHeader || !windowed)
 
   if (!isHeader && windowed) {

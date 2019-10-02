@@ -109,7 +109,7 @@ const NodeDefTaxon = props => {
     )
   }
 
-  const isTableBody = renderType === NodeDefLayout.nodeDefRenderType.tableBody
+  const isTableBody = renderType === NodeDefLayout.renderType.tableBody
   const className = isTableBody
     ? 'survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite'
     : 'survey-form__node-def-taxon'

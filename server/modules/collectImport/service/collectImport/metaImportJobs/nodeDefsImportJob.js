@@ -133,8 +133,8 @@ class NodeDefsImportJob extends Job {
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:
             tableLayout
-              ? NodeDefLayout.nodeDefRenderType.table
-              : NodeDefLayout.nodeDefRenderType.form
+              ? NodeDefLayout.renderType.table
+              : NodeDefLayout.renderType.form
         }
         // calculated
         : {
@@ -268,7 +268,7 @@ class NodeDefsImportJob extends Job {
 
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
-          [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.dropdown
+          [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.dropdown
         }
       case nodeDefType.taxon:
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)

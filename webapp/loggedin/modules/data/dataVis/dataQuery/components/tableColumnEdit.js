@@ -39,7 +39,7 @@ class TableColumnEdit extends React.Component {
           nodes={nodesArray}
           entry={true}
           edit={false}
-          renderType={NodeDefLayout.nodeDefRenderType.tableBody}
+          renderType={NodeDefLayout.renderType.tableBody}
           canEditRecord={canEditRecord}
           updateNode={updateNode}
           removeNode={removeNode}

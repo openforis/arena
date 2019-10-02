@@ -7,8 +7,8 @@ const { uuidv4 } = require('../../../../common/uuid')
 const Survey = require('../../../../common/survey/survey')
 const SurveyValidator = require('../../../../common/survey/surveyValidator')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
+const User = require('../../../../common/user/user')
 const ObjectUtils = require('../../../../common/objectUtils')
 const Validation = require('../../../../common/validation/validation')
 
@@ -52,7 +52,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
             [NodeDef.propKeys.name]: 'root_entity',
             [NodeDef.propKeys.multiple]: false,
             [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
-            [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
+            [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.form,
           }
         )
         await NodeDefManager.insertNodeDef(user, surveyId, rootEntityDef, t)

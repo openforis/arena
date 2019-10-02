@@ -1,7 +1,19 @@
 const R = require('ramda')
+
 const ObjectUtils = require('../../common/objectUtils')
 
-const nodeDefRenderType = {
+const NodeDef = require('./nodeDef')
+
+const keys = {
+  layout: 'layout',
+  // layout keys
+  pageUuid: 'pageUuid', // page uuid
+  renderType: 'renderType', // renderType
+  columnsNo: 'columnsNo', // number of columns
+  layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
+}
+
+const renderType = {
   // entity
   form: 'form',
   table: 'table',
@@ -14,6 +26,17 @@ const nodeDefRenderType = {
   tableBody: 'tableBody',
 }
 
+// ====== CREATE
+const newLayout = (cycle, renderType, pageUuid = null) => ({
+  [cycle]: {
+    [keys.renderType]: renderType,
+    [keys.pageUuid]: pageUuid,
+  }
+})
+
+// ====== READ
+
+//========================================= OLD
 const nodeDefLayoutProps = {
   pageUuid: 'layoutPageUuid', // uuid
   render: 'layoutRender', // nodeDefRenderType
@@ -33,10 +56,10 @@ const isRenderType = type => R.pipe(
   R.equals(type),
 )
 
-const isRenderTable = isRenderType(nodeDefRenderType.table)
-const isRenderForm = isRenderType(nodeDefRenderType.form)
-const isRenderDropdown = isRenderType(nodeDefRenderType.dropdown)
-const isRenderCheckbox = isRenderType(nodeDefRenderType.checkbox)
+const isRenderTable = isRenderType(renderType.table)
+const isRenderForm = isRenderType(renderType.form)
+const isRenderDropdown = isRenderType(renderType.dropdown)
+const isRenderCheckbox = isRenderType(renderType.checkbox)
 
 const getPageUuid = ObjectUtils.getProp(nodeDefLayoutProps.pageUuid)
 
@@ -63,7 +86,12 @@ const isDisplayInParentPage = R.pipe(
 )
 
 module.exports = {
-  nodeDefRenderType,
+  keys,
+  renderType,
+
+  //CREATE
+  newLayout,
+
   nodeDefLayoutProps,
   nodeDefDisplayIn,
 

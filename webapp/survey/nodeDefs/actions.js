@@ -90,8 +90,8 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
 
   if (key === NodeDefLayout.nodeDefLayoutProps.render) {
     // If setting layout render mode (table | form), set the the proper layout
-    const isRenderTable = value === NodeDefLayout.nodeDefRenderType.table
-    const isRenderForm = value === NodeDefLayout.nodeDefRenderType.form
+    const isRenderTable = value === NodeDefLayout.renderType.table
+    const isRenderForm = value === NodeDefLayout.renderType.form
 
     props[NodeDefLayout.nodeDefLayoutProps.layout] = isRenderTable
       ? Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))

@@ -36,11 +36,11 @@ const CodeProps = (props) => {
 
   const displayAsItems = [
     {
-      key: NodeDefLayout.nodeDefRenderType.checkbox,
+      key: NodeDefLayout.renderType.checkbox,
       label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox')
     },
     {
-      key: NodeDefLayout.nodeDefRenderType.dropdown,
+      key: NodeDefLayout.renderType.dropdown,
       label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown')
     }
   ]
