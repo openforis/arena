@@ -15,6 +15,7 @@ import {
   nodeDefCreate,
   nodeDefPropsUpdate,
   nodeDefDelete,
+  nodeDefsUpdate,
 } from './actions'
 
 import * as NodeDefsState from './nodeDefsState'
@@ -38,6 +39,8 @@ const actionHandlers = {
   [nodeDefPropsUpdate]: (state, { nodeDefUuid, props, propsAdvanced }) => NodeDefsState.assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
 
   [nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
+
+  [nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
 }
 

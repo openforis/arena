@@ -200,7 +200,7 @@ class NodeDefsImportJob extends Job {
     // 5. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)
 
-    nodeDef = await NodeDefManager.updateNodeDefProps(this.user, surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx)
+    nodeDef = (await NodeDefManager.updateNodeDefProps(this.user, surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx))[nodeDefUuid]
 
     // 6. store nodeDef in cache
     let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]

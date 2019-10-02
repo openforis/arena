@@ -20,6 +20,7 @@ export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
+export const nodeDefsUpdate = 'survey/nodeDefs/update'
 
 // ==== Internal update nodeDefs actions
 
@@ -29,12 +30,15 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
   const cycle = SurveyState.getSurveyCycleKey(state)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const { data: { nodeDefsValidation } } = await axios.put(
+  const { data: { nodeDefsValidation, nodeDefsUpdated } } = await axios.put(
     `/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`,
     { cycle, props, propsAdvanced }
   )
 
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+  if (!!nodeDefsUpdated)
+    dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
 }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) => debounceAction(

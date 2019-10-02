@@ -52,10 +52,8 @@ const updateNodeDefTest = async () => {
   const nodeDef2 = await createAndStoreNodeDef(rootDefUuid, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, NodeDef.getUuid(nodeDef1), {
-    name: newName
-  })
-
+  const nodeDef1Uuid = NodeDef.getUuid(nodeDef1)
+  const updatedNodeDef = (await NodeDefRepository.updateNodeDefProps(surveyId, nodeDef1Uuid, { name: newName }))[nodeDef1Uuid]
   expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, true)
