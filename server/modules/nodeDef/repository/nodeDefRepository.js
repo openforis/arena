@@ -214,6 +214,14 @@ const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
           deleted = true
     `)
 
+const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = db) =>
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET deleted = true
+    WHERE
+      jsonb_array_length(${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, true, '', false)}) = 0
+  `)
+
 const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
   await _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
 
@@ -287,6 +295,7 @@ module.exports = {
 
   //DELETE
   markNodeDefDeleted,
+  markNodeDefsWithoutCyclesDeleted,
   permanentlyDeleteNodeDefs,
   deleteNodeDefsLabels,
   deleteNodeDefsDescriptions,

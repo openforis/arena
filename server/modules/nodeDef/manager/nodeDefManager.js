@@ -99,4 +99,5 @@ module.exports = {
   //DELETE
   markNodeDefDeleted,
   permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
+  markNodeDefsWithoutCyclesDeleted: NodeDefRepository.markNodeDefsWithoutCyclesDeleted,
 }
