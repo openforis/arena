@@ -93,7 +93,9 @@ export const nodeDefUIProps = {
     component: NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: { [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.checkbox },
+    defaultLayoutProps: {
+      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.checkbox
+    },
   },
 
   [nodeDefType.coordinate]: {
@@ -131,7 +133,7 @@ export const nodeDefUIProps = {
     icon: <span className="icon icon-table2 icon-left"/>,
     defaultLayoutProps: {
       [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.table,
-      multiple: true
+      [NodeDef.propKeys.multiple]: true
     },
   },
 
