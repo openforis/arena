@@ -57,21 +57,20 @@ class NodeDefSwitch extends React.Component {
 
   render () {
     const {
-      nodeDef, label,
+      surveyCycleKey, nodeDef, label,
       edit, canEditDef,
       renderType, applicable,
     } = this.props
 
-    const isPage = !!NodeDefLayout.getPageUuid(nodeDef)
-
     const className = 'survey-form__node-def-page'
-      + (isPage ? '' : '-item')
+      + (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item')
       + (applicable ? '' : ' not-applicable')
 
     return (
       <div className={className} ref={this.element}>
 
         <NodeDefEditButtons
+          surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           edit={edit}
           canEditDef={canEditDef}

@@ -51,8 +51,11 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
           {
             [NodeDef.propKeys.name]: 'root_entity',
             [NodeDef.propKeys.multiple]: false,
-            [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
-            [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.form,
+            [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+              Survey.cycleOneKey,
+              NodeDefLayout.renderType.form,
+              uuidv4()
+            )
           }
         )
         await NodeDefManager.insertNodeDef(user, surveyId, rootEntityDef, t)

@@ -27,6 +27,7 @@ const renderType = {
 }
 
 // ====== CREATE
+
 const newLayout = (cycle, renderType, pageUuid = null) => ({
   [cycle]: {
     [keys.renderType]: renderType,
@@ -35,6 +36,29 @@ const newLayout = (cycle, renderType, pageUuid = null) => ({
 })
 
 // ====== READ
+
+const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(
+  NodeDef.getProps,
+  R.pathOr(defaultTo, [keys.layout, cycle, prop])
+)
+
+const getRenderType = cycle => _getPropLayout(cycle, keys.renderType)
+
+const getLayoutChildren = cycle => _getPropLayout(cycle, keys.layoutChildren, [])
+
+const getColumnsNo = cycle => _getPropLayout(cycle, keys.columnsNo, 3)
+
+const getPageUuid = cycle => _getPropLayout(cycle, keys.pageUuid)
+
+// ====== CHECK
+
+const hasPage = cycle => R.pipe(getPageUuid(cycle), R.isNil, R.not)
+
+// ====== UTILS
+
+const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))
+
+const filterNodeDefsWithPage = cycle => R.filter(hasPage(cycle))
 
 //========================================= OLD
 const nodeDefLayoutProps = {
@@ -49,8 +73,6 @@ const nodeDefDisplayIn = {
   ownPage: 'ownPage',
 }
 
-const getRenderType = ObjectUtils.getProp(nodeDefLayoutProps.render)
-
 const isRenderType = type => R.pipe(
   getRenderType,
   R.equals(type),
@@ -60,19 +82,6 @@ const isRenderTable = isRenderType(renderType.table)
 const isRenderForm = isRenderType(renderType.form)
 const isRenderDropdown = isRenderType(renderType.dropdown)
 const isRenderCheckbox = isRenderType(renderType.checkbox)
-
-const getPageUuid = ObjectUtils.getProp(nodeDefLayoutProps.pageUuid)
-
-const getNoColumns = R.pipe(
-  ObjectUtils.getProp(nodeDefLayoutProps.columns, '3'),
-  parseInt
-)
-
-const getLayout = ObjectUtils.getProp(nodeDefLayoutProps.layout, [])
-
-const hasPage = R.pipe(getPageUuid, R.isNil, R.not)
-const filterInnerPageChildren = R.reject(hasPage)
-const filterOuterPageChildren = R.filter(hasPage)
 
 const getDisplayIn = R.ifElse(
   hasPage,
@@ -92,6 +101,21 @@ module.exports = {
   //CREATE
   newLayout,
 
+  //READ
+  getRenderType,
+  getLayoutChildren,
+  getColumnsNo,
+  getPageUuid,
+
+  //CHECK
+  hasPage,
+
+  //UTILS
+  rejectNodeDefsWithPage,
+  filterNodeDefsWithPage,
+
+  // ==== OLD
+
   nodeDefLayoutProps,
   nodeDefDisplayIn,
 
@@ -99,13 +123,6 @@ module.exports = {
   isRenderForm,
   isRenderDropdown,
   isRenderCheckbox,
-  getRenderType,
-  getNoColumns,
-  getLayout,
-  getPageUuid,
-  hasPage,
   getDisplayIn,
   isDisplayInParentPage,
-  filterInnerPageChildren,
-  filterOuterPageChildren,
 }

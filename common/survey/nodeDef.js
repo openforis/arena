@@ -75,6 +75,7 @@ const newNodeDef = (parentUuid, type, cycle, props = {}) => ({
 const getType = R.prop(keys.type)
 const getName = ObjectUtils.getProp(propKeys.name, '')
 const getParentUuid = ObjectUtils.getParentUuid
+const getCycles = ObjectUtils.getProp(propKeys.cycles, [])
 
 const isKey = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
 const isRoot = R.pipe(getParentUuid, R.isNil)
@@ -193,7 +194,8 @@ module.exports = {
   getCategoryUuid: ObjectUtils.getProp(propKeys.categoryUuid),
   getParentCodeDefUuid,
   getTaxonomyUuid: ObjectUtils.getProp(propKeys.taxonomyUuid),
-  getCycles: ObjectUtils.getProp(propKeys.cycles, []),
+  getCycles,
+  getCycleFirst: R.pipe(getCycles, R.head),
 
   isKey,
   isMultiple,

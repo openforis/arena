@@ -51,7 +51,7 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
   if (NodeDef.isEntity(nodeDefParent) && NodeDefLayout.isRenderTable(nodeDefParent)) {
-    const nodeDefParentLayout = NodeDefLayout.getLayout(nodeDefParent)
+    const nodeDefParentLayout = NodeDefLayout.getLayoutChildren(nodeDefParent)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
     const newLayout = deleted ? R.without([nodeDefUuid])(nodeDefParentLayout) : R.append(nodeDefUuid)(nodeDefParentLayout)

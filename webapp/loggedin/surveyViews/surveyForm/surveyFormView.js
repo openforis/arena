@@ -96,6 +96,7 @@ const SurveyFormView = (props) => {
           {
             <FormPageNavigation
               surveyInfo={surveyInfo}
+              surveyCycleKey={surveyCycleKey}
               edit={edit}
               entry={entry}
               canEditDef={canEditDef}
@@ -106,6 +107,7 @@ const SurveyFormView = (props) => {
 
           <NodeDefSwitch
             surveyInfo={surveyInfo}
+            surveyCycleKey={surveyCycleKey}
             nodeDef={nodeDef}
             edit={edit}
             entry={entry}

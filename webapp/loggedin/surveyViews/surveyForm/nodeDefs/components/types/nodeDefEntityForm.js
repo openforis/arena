@@ -70,32 +70,25 @@ class EntityForm extends React.Component {
     const { nodeDef, putNodeDefProp } = this.props
 
     if (window.innerWidth >= 480 && layout.length > 0) {
-      putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, layout)
+      // putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, layout)
     }
   }
 
   render () {
 
     const {
-      nodeDef,
-      childDefs,
-      edit,
-      entry,
-      preview,
-      canEditDef,
-      canEditRecord,
-      canAddNode,
+      surveyInfo, surveyCycleKey, nodeDef, childDefs,
+      recordUuid, node,
+      edit, entry, preview,
+      canEditDef, canEditRecord, canAddNode,
       locked,
-      node,
-      recordUuid,
-      surveyInfo,
     } = this.props
 
     const { onChangeLayout, mounted } = this.state
 
-    const columns = NodeDefLayout.getNoColumns(nodeDef)
-    const rdgLayout = NodeDefLayout.getLayout(nodeDef)
-    const innerPageChildren = NodeDefLayout.filterInnerPageChildren(childDefs)
+    const columns = NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)
+    const rdgLayout = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+    const innerPageChildren = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
 
     return innerPageChildren.length > 0
       ? (
@@ -113,8 +106,7 @@ class EntityForm extends React.Component {
           compactType={null}
           useCSSTransforms={true}
           preventCollision={true}
-          className={mounted ? 'mounted' : ''}
-        >
+          className={mounted ? 'mounted' : ''}>
 
           {
             innerPageChildren
@@ -128,6 +120,7 @@ class EntityForm extends React.Component {
                     preview={preview}
                     recordUuid={recordUuid}
                     surveyInfo={surveyInfo}
+                    surveyCycleKey={surveyCycleKey}
                     nodeDef={childDef}
                     parentNode={node}
                     canEditDef={canEditDef}
