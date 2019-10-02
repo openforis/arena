@@ -26,7 +26,7 @@ const BasicProps = props => {
     nodeDef, validation,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
 
-    cyclesSurvey,
+    cyclesKeysSurvey, cyclesKeysParent,
     displayAsEnabled, displayInEnabled,
     displayAsFormDisabled, displayAsTableDisabled,
     displayInParentPageDisabled, displayInOwnPageDisabled,
@@ -153,24 +153,27 @@ const BasicProps = props => {
         </FormItem>
       }
 
-      <FormItem label={i18n.t('common.cycle_plural')}>
-        <ButtonGroup
-          multiple={true}
-          deselectable={true}
-          selectedItemKey={cyclesNodeDef}
-          onChange={cycles => putNodeDefProp(
-            nodeDef,
-            NodeDef.propKeys.cycles,
-            cycles
-          )}
-          items={cyclesSurvey.map(cycle => ({
-            key: cycle,
-            label: Number(cycle) + 1,
-            disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0]
-          }))}
-          disabled={NodeDef.isRoot(nodeDef)}
-        />
-      </FormItem>
+      {
+        cyclesKeysSurvey.length > 1 &&
+        <FormItem label={i18n.t('common.cycle_plural')}>
+          <ButtonGroup
+            multiple={true}
+            deselectable={true}
+            selectedItemKey={cyclesNodeDef}
+            onChange={cycles => putNodeDefProp(
+              nodeDef,
+              NodeDef.propKeys.cycles,
+              cycles
+            )}
+            items={cyclesKeysParent.map(cycle => ({
+              key: cycle,
+              label: Number(cycle) + 1,
+              disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] // disabled if current cycle is the only one selected in nodeDef
+            }))}
+            disabled={NodeDef.isRoot(nodeDef)}
+          />
+        </FormItem>
+      }
     </div>
   )
 }
@@ -186,6 +189,8 @@ const mapStateToProps = state => {
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(nodeDef)
   const displayInOwnPageDisabled = false
 
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const cyclesKeysParent = NodeDef.getCycles(nodeDefParent)
   return {
     displayAsEnabled: isEntityAndNotRoot,
     displayInEnabled: isEntityAndNotRoot,
@@ -195,7 +200,8 @@ const mapStateToProps = state => {
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
 
-    cyclesSurvey: R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey),
+    cyclesKeysSurvey: R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey),
+    cyclesKeysParent,
   }
 }
 
