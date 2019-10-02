@@ -122,7 +122,7 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
   dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
 }
 
-const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
+export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
   const surveyCycleKey = SurveyState.getSurveyCycleKey(getState())
   const layoutUpdate = R.pipe(
     NodeDefLayout.getLayout,

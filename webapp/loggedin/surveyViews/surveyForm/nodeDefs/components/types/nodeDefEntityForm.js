@@ -67,10 +67,10 @@ class EntityForm extends React.Component {
   }
 
   onChangeLayout (layout) {
-    const { nodeDef, putNodeDefProp } = this.props
+    const { nodeDef, putNodeDefLayoutProp } = this.props
 
     if (window.innerWidth >= 480 && layout.length > 0) {
-      // putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, layout)
+      putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, layout)
     }
   }
 

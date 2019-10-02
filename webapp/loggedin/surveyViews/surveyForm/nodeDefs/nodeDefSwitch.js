@@ -22,7 +22,7 @@ import * as RecordState from '../../record/recordState'
 import * as NodeDefUiProps from './nodeDefUIProps'
 
 // edit actions
-import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from '../../../../survey/nodeDefs/actions'
 // entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 
@@ -155,7 +155,7 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    putNodeDefProp,
+    putNodeDefProp, putNodeDefLayoutProp,
     updateNode, removeNode, createNodePlaceholder
   }
 )(NodeDefSwitch)
