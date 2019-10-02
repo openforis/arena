@@ -26,10 +26,10 @@ module.exports.init = app => {
 
   app.post('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, tableName } = Request.getParams(req)
+      const { surveyId, cycle, tableName } = Request.getParams(req)
       const filter = Request.getJsonParam(req, 'filter', null)
 
-      const count = await SurveyRdbService.countTable(surveyId, tableName, filter)
+      const count = await SurveyRdbService.countTable(surveyId, cycle, tableName, filter)
 
       res.json(count)
     } catch (err) {

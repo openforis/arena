@@ -20,7 +20,7 @@ const DataFilter = require('../../../../common/surveyRdb/dataFilter')
 const DataCol = require('../schemaRdb/dataCol')
 const DataTable = require('../schemaRdb/dataTable')
 
-const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort, client) => {
+const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
 
   // columns
@@ -38,16 +38,27 @@ const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filter
         ${colParamNames.join(', ')}
     FROM 
         $/schemaName:name/.$/tableName:name/
-    ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
+    WHERE 
+      ${DataTable.colNameRecordCycle} = $/cycle/
+      ${R.isNil(filterClause) ? '' : `AND ${filterClause}`}
     ORDER BY 
         ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}date_modified DESC NULLS LAST
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/`,
-    { ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset }
+    {
+      cycle,
+      ...filterParams,
+      ...colParams,
+      ...sortParams,
+      schemaName,
+      tableName,
+      limit,
+      offset
+    }
   )
 }
 
-const runCount = async (surveyId, tableName, filterExpr, client) => {
+const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
 
@@ -56,15 +67,22 @@ const runCount = async (surveyId, tableName, filterExpr, client) => {
         count(*)
     FROM 
         $/schemaName:name/.$/tableName:name/
-    ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
+    WHERE 
+      ${DataTable.colNameRecordCycle} = $/cycle/
+      ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
-    { ...filterParams, schemaName, tableName }
+    {
+      cycle,
+      ...filterParams,
+      schemaName,
+      tableName
+    }
   )
 
   return Number(countRS.count)
 }
 
-const countDuplicateRecords = async (survey, record, client) => {
+const countDuplicateRecords = async (survey, record, client = db) => {
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getRootNodeDef(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
@@ -93,7 +111,7 @@ const countDuplicateRecords = async (survey, record, client) => {
     nodeDefKeys
   )
 
-  return await runCount(surveyId, tableName, whereExpr, client)
+  return await runCount(surveyId, Record.getCycle(record), tableName, whereExpr, client)
 }
 
 const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
@@ -111,7 +129,6 @@ const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, exc
     const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
     return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
   })
-
 
   return await client.map(`
     WITH count_records AS (
