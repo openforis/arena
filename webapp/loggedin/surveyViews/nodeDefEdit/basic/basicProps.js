@@ -195,7 +195,8 @@ const mapStateToProps = state => {
   const displayInOwnPageDisabled = false
 
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const cyclesKeysParent = NodeDef.getCycles(nodeDefParent)
+  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
+  const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
   return {
     displayAsEnabled: isEntityAndNotRoot,
     displayInEnabled: isEntityAndNotRoot,
@@ -205,7 +206,7 @@ const mapStateToProps = state => {
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
 
-    cyclesKeysSurvey: R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey),
+    cyclesKeysSurvey,
     cyclesKeysParent,
   }
 }
