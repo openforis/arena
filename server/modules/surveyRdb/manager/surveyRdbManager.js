@@ -25,16 +25,6 @@ const createTable = async (survey, nodeDef, client = db) =>
 const insertIntoTable = async (survey, nodeDef, client = db) =>
   await NodesInsert.run(survey, nodeDef, client)
 
-const queryTable = async (surveyId, cycle, tableName, cols = [],
-                          offset, limit, filterExpr, sort, client = db) =>
-  await TableViewQuery.runSelect(surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort, client)
-
-const countTable = async (surveyId, tableName, filter, client = db) =>
-  await TableViewQuery.runCount(surveyId, tableName, filter, client)
-
-const countDuplicateRecords = async (survey, record, client = db) =>
-  await TableViewQuery.countDuplicateRecords(survey, record, client)
-
 module.exports = {
   dropSchema,
   createSchema,
@@ -43,9 +33,9 @@ module.exports = {
   insertIntoTable,
   updateTableNodes: NodesUpdate.run,
 
-  queryTable,
-  countTable,
-  countDuplicateRecords,
+  queryTable: TableViewQuery.runSelect,
+  countTable: TableViewQuery.runCount,
+  countDuplicateRecords: TableViewQuery.countDuplicateRecords,
   fetchRecordsCountByKeys: TableViewQuery.fetchRecordsCountByKeys,
   fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
 }

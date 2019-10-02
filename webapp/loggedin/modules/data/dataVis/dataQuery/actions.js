@@ -118,6 +118,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
       const [countResp, dataResp] = await Promise.all([
         axios.post(
           `/api/surveyRdb/${surveyId}/${tableName}/query/count`, {
+            cycle,
             filter: filter && JSON.stringify(filter),
           }
         ),
