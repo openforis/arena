@@ -210,6 +210,16 @@ const deleteRecordsPreview = async (surveyId, client = db) =>
     R.prop('uuid')
   )
 
+const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
+  await client.map(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
+    WHERE cycle IN ($1:csv)
+    RETURNING uuid
+  `,
+    [cycles],
+    R.prop('uuid')
+  )
+
 module.exports = {
   // CREATE
   insertRecord,
@@ -229,4 +239,5 @@ module.exports = {
   // DELETE
   deleteRecord,
   deleteRecordsPreview,
+  deleteRecordsByCycles,
 }

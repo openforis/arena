@@ -205,6 +205,7 @@ module.exports = {
   deleteRecord,
   deleteRecordPreview,
   deleteRecordsPreview,
+  deleteRecordsByCycles: RecordRepository.deleteRecordsByCycles,
 
   // NODE
   insertNode: NodeUpdateManager.insertNode,

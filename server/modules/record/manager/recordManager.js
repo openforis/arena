@@ -81,6 +81,7 @@ module.exports = {
   deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
   deleteNode: RecordUpdateManager.deleteNode,
   deleteNodesByNodeDefUuids: RecordUpdateManager.deleteNodesByNodeDefUuids,
+  deleteRecordsByCycles: RecordUpdateManager.deleteRecordsByCycles,
 
   // ==== VALIDATION
   persistValidation: RecordValidationManager.persistValidation,
