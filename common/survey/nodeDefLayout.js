@@ -57,6 +57,12 @@ const getColumnsNo = cycle => _getPropLayout(cycle, keys.columnsNo, 3)
 
 const getPageUuid = cycle => _getPropLayout(cycle, keys.pageUuid)
 
+const getDisplayIn = cycle => R.ifElse(
+  hasPage(cycle),
+  R.always(nodeDefDisplayIn.ownPage),
+  R.always(nodeDefDisplayIn.parentPage)
+)
+
 // ====== CHECK
 
 const hasPage = cycle => R.pipe(getPageUuid(cycle), R.isNil, R.not)
@@ -65,12 +71,15 @@ const isRenderType = (cycle, type) => R.pipe(
   getRenderType(cycle),
   R.equals(type),
 )
-
 const isRenderTable = cycle => isRenderType(cycle, renderType.table)
 const isRenderForm = cycle => isRenderType(cycle, renderType.form)
 const isRenderDropdown = cycle => isRenderType(cycle, renderType.dropdown)
 const isRenderCheckbox = cycle => isRenderType(cycle, renderType.checkbox)
 
+const isDisplayInParentPage = cycle => R.pipe(
+  getDisplayIn(cycle),
+  R.propEq(nodeDefDisplayIn.parentPage)
+)
 // ====== UTILS
 
 const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))
@@ -90,16 +99,9 @@ const nodeDefDisplayIn = {
   ownPage: 'ownPage',
 }
 
-const getDisplayIn = R.ifElse(
-  hasPage,
-  R.always(nodeDefDisplayIn.ownPage),
-  R.always(nodeDefDisplayIn.parentPage)
-)
 
-const isDisplayInParentPage = R.pipe(
-  getDisplayIn,
-  R.propEq(nodeDefDisplayIn.parentPage)
-)
+
+
 
 module.exports = {
   keys,

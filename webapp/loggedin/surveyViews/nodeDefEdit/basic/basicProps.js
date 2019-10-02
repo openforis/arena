@@ -23,7 +23,7 @@ import * as NodeDefEditState from '../nodeDefEditState'
 
 const BasicProps = props => {
   const {
-    nodeDef, validation,
+    surveyCycleKey, nodeDef, validation,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
 
     cyclesKeysSurvey, cyclesKeysParent,
@@ -31,7 +31,7 @@ const BasicProps = props => {
     displayAsFormDisabled, displayAsTableDisabled,
     displayInParentPageDisabled, displayInOwnPageDisabled,
 
-    putNodeDefProp,
+    putNodeDefProp, putNodeDefLayoutProp,
     toggleTaxonomyEdit, toggleCategoryEdit
   } = props
 
@@ -41,8 +41,8 @@ const BasicProps = props => {
     putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
   }
 
-  const renderType = NodeDefLayout.getRenderType(nodeDef)
-  const displayIn = NodeDefLayout.getDisplayIn(nodeDef)
+  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
+  const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
   return (
@@ -70,10 +70,12 @@ const BasicProps = props => {
       {
         NodeDef.isCode(nodeDef) &&
         <CodeProps
+          surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           validation={validation}
           toggleCategoryEdit={toggleCategoryEdit}
-          putNodeDefProp={putNodeDefProp}/>
+          putNodeDefProp={putNodeDefProp}
+          putNodeDefLayoutProp={putNodeDefLayoutProp}/>
       }
 
       {
@@ -110,7 +112,7 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
+            onChange={renderType => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, renderType)}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
@@ -132,9 +134,9 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={displayIn}
-            onChange={displayIn => putNodeDefProp(
+            onChange={displayIn => putNodeDefLayoutProp(
               nodeDef,
-              NodeDefLayout.nodeDefLayoutProps.pageUuid,
+              NodeDefLayout.keys.pageUuid,
               displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4()
             )}
             items={[
@@ -185,19 +187,23 @@ const BasicProps = props => {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
   const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
 
   const displayAsFormDisabled = false
   const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
 
-  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(nodeDef)
+  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
   const displayInOwnPageDisabled = false
 
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
   const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
+
   return {
+    surveyCycleKey,
+
     displayAsEnabled: isEntityAndNotRoot,
     displayInEnabled: isEntityAndNotRoot,
 

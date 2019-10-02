@@ -80,30 +80,28 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 
 // ==== UPDATE
 
-export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => async (dispatch, getState) => {
+const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
+  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
+    // nodeDef has default values, cannot change into multiple
+    dispatch(showNotificationMessage('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, AppState.notificationSeverity.warning))
+    return false
+  }
+  return true
+}
+
+export const putNodeDefProp = (nodeDef, key, value = null, advanced = false, checkFormPageUuid = false) => async (dispatch, getState) => {
   if (!_checkCanChangeProp(dispatch, nodeDef, key, value))
     return
 
-  const survey = SurveyState.getSurvey(getState())
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
   const props = advanced ? {} : { [key]: value }
   const propsAdvanced = advanced ? { [key]: value } : {}
 
-  if (key === NodeDefLayout.nodeDefLayoutProps.render) {
-    // If setting layout render mode (table | form), set the the proper layout
-    const isRenderTable = value === NodeDefLayout.renderType.table
-    const isRenderForm = value === NodeDefLayout.renderType.form
-
-    props[NodeDefLayout.nodeDefLayoutProps.layout] = isRenderTable
-      ? Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
-      : null
-
-    // entity rendered as form can only exists in its own page
-    if (isRenderForm && NodeDefLayout.isDisplayInParentPage(nodeDef)) {
-      props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = uuidv4()
-    }
-  } else if (key === NodeDef.propKeys.multiple) {
+  if (key === NodeDef.propKeys.multiple) {
     // If setting "multiple", reset validations required or count
     propsAdvanced[NodeDef.propKeys.validations] = value
       ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
@@ -116,28 +114,47 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
     parentNodeDef,
     nodeDefUuid: NodeDef.getUuid(nodeDef),
     props,
-    propsAdvanced
+    propsAdvanced,
+    surveyCycleKey,
+    checkFormPageUuid,
   })
 
   dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
 }
 
 export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(getState())
+  const state = getState()
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+
   const layoutUpdate = R.pipe(
     NodeDefLayout.getLayout,
-    R.assocPath([surveyCycleKey, key], value)
-  )(nodeDef)
-  dispatch(putNodeDefProp(nodeDef, NodeDefLayout.keys.layout, layoutUpdate))
-}
+    R.assocPath([surveyCycleKey, key], value),
+    R.when(
+      R.always(key === NodeDefLayout.keys.renderType),
+      layout => {
+        const survey = SurveyState.getSurvey(state)
+        const layoutCycle = layout[surveyCycleKey]
 
-const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
-  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
-    // nodeDef has default values, cannot change into multiple
-    dispatch(showNotificationMessage('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, AppState.notificationSeverity.warning))
-    return false
-  }
-  return true
+        // If setting layout render mode (table | form), set the the proper layout
+        const isRenderTable = value === NodeDefLayout.renderType.table
+        const isRenderForm = value === NodeDefLayout.renderType.form
+
+        layoutCycle[NodeDefLayout.keys.layoutChildren] = isRenderTable
+          ? Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
+          : null
+
+        // entity rendered as form can only exists in its own page
+        if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+          layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
+        }
+
+        return layout
+      }
+    )
+  )(nodeDef)
+
+  const checkFormPageUuid = R.includes(key, [NodeDefLayout.keys.renderType, NodeDefLayout.keys.pageUuid])
+  dispatch(putNodeDefProp(nodeDef, NodeDefLayout.keys.layout, layoutUpdate, false, checkFormPageUuid))
 }
 
 // ==== DELETE

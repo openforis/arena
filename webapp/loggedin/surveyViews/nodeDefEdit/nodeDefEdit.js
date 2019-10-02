@@ -22,14 +22,14 @@ import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
 
-import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from './../../../survey/nodeDefs/actions'
 import { closeNodeDefEdit } from './actions'
 
 const NodeDefEdit = props => {
   const {
     nodeDef, nodeDefParent, validation,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
-    putNodeDefProp,
+    putNodeDefProp, putNodeDefLayoutProp,
     canUpdateCategory,
     closeNodeDefEdit,
   } = props
@@ -73,6 +73,7 @@ const NodeDefEdit = props => {
                       nodeDefKeyEditDisabled,
                       nodeDefMultipleEditDisabled,
                       putNodeDefProp,
+                      putNodeDefLayoutProp,
                       toggleCategoryEdit: editing => setEditingCategory(editing),
                       toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
                     },
@@ -155,5 +156,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { putNodeDefProp, closeNodeDefEdit }
+  { putNodeDefProp, putNodeDefLayoutProp, closeNodeDefEdit }
 )(NodeDefEdit)
