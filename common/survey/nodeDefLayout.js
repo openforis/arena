@@ -28,18 +28,25 @@ const renderType = {
 
 // ====== CREATE
 
-const newLayout = (cycle, renderType, pageUuid = null) => ({
-  [cycle]: {
-    [keys.renderType]: renderType,
-    [keys.pageUuid]: pageUuid,
+const newLayout = (cycle, renderType, pageUuid = null) => {
+  const layout = {
+    [cycle]: {
+      [keys.renderType]: renderType
+    }
   }
-})
+  return R.when(
+    R.always(pageUuid),
+    R.assocPath([cycle, keys.pageUuid], pageUuid)
+  )(layout)
+}
 
 // ====== READ
 
+const getLayout = ObjectUtils.getProp(keys.layout, {})
+
 const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(
-  NodeDef.getProps,
-  R.pathOr(defaultTo, [keys.layout, cycle, prop])
+  getLayout,
+  R.pathOr(defaultTo, [cycle, prop])
 )
 
 const getRenderType = cycle => _getPropLayout(cycle, keys.renderType)
@@ -53,6 +60,16 @@ const getPageUuid = cycle => _getPropLayout(cycle, keys.pageUuid)
 // ====== CHECK
 
 const hasPage = cycle => R.pipe(getPageUuid(cycle), R.isNil, R.not)
+
+const isRenderType = (cycle, type) => R.pipe(
+  getRenderType(cycle),
+  R.equals(type),
+)
+
+const isRenderTable = cycle => isRenderType(cycle, renderType.table)
+const isRenderForm = cycle => isRenderType(cycle, renderType.form)
+const isRenderDropdown = cycle => isRenderType(cycle, renderType.dropdown)
+const isRenderCheckbox = cycle => isRenderType(cycle, renderType.checkbox)
 
 // ====== UTILS
 
@@ -73,16 +90,6 @@ const nodeDefDisplayIn = {
   ownPage: 'ownPage',
 }
 
-const isRenderType = type => R.pipe(
-  getRenderType,
-  R.equals(type),
-)
-
-const isRenderTable = isRenderType(renderType.table)
-const isRenderForm = isRenderType(renderType.form)
-const isRenderDropdown = isRenderType(renderType.dropdown)
-const isRenderCheckbox = isRenderType(renderType.checkbox)
-
 const getDisplayIn = R.ifElse(
   hasPage,
   R.always(nodeDefDisplayIn.ownPage),
@@ -102,6 +109,7 @@ module.exports = {
   newLayout,
 
   //READ
+  getLayout,
   getRenderType,
   getLayoutChildren,
   getColumnsNo,

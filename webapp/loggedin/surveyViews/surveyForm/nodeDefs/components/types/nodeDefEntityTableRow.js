@@ -68,7 +68,7 @@ class NodeDefEntityTableRow extends React.Component {
     const childNodes = this.rowRef.current.childNodes
     const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
 
-    putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, uuids)
+    // putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, uuids)
   }
 
   render () {

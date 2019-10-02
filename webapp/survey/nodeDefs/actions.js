@@ -47,15 +47,17 @@ const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) => deboun
 )
 
 const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
-  const survey = SurveyState.getSurvey(getState())
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
-  if (NodeDef.isEntity(nodeDefParent) && NodeDefLayout.isRenderTable(nodeDefParent)) {
-    const nodeDefParentLayout = NodeDefLayout.getLayoutChildren(nodeDefParent)
+  if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefParent)) {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDefParent)
 
-    const newLayout = deleted ? R.without([nodeDefUuid])(nodeDefParentLayout) : R.append(nodeDefUuid)(nodeDefParentLayout)
-    dispatch(putNodeDefProp(nodeDefParent, NodeDefLayout.nodeDefLayoutProps.layout, newLayout))
+    const layoutChildrenUpdate = deleted ? R.without([nodeDefUuid])(layoutChildren) : R.append(nodeDefUuid)(layoutChildren)
+    dispatch(putNodeDefLayoutProp(nodeDefParent, NodeDefLayout.keys.layoutChildren, layoutChildrenUpdate))
   }
 }
 
@@ -118,6 +120,15 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
   })
 
   dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
+}
+
+const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(getState())
+  const layoutUpdate = R.pipe(
+    NodeDefLayout.getLayout,
+    R.assocPath([surveyCycleKey, key], value)
+  )(nodeDef)
+  dispatch(putNodeDefProp(nodeDef, NodeDefLayout.keys.layout, layoutUpdate))
 }
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
