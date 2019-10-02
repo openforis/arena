@@ -17,6 +17,8 @@ import {
   dataQueryNodeDefSelectorsShowUpdate,
 } from './actions'
 
+import { dataVisReset } from '../actions'
+
 import { nodesUpdate, validationsUpdate } from '../../../../surveyViews/record/actions'
 
 const actionHandlers = {
@@ -50,6 +52,9 @@ const actionHandlers = {
   [dataQueryTableFilterUpdate]: (state, { filter }) => DataQueryState.assocTableFilter(filter)(state),
 
   [dataQueryTableSortUpdate]: (state, { sort }) => DataQueryState.assocTableSort(sort)(state),
+
+  // data vis
+  [dataVisReset]: () => ({}),
 
   // record nodes update
   [nodesUpdate]: (state, { nodes }) => DataQueryState.assocTableDataRecordNodes(nodes)(state),
