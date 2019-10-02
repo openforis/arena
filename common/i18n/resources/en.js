@@ -473,6 +473,7 @@ module.exports = {
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
     RecordsImportJob: 'Records Import',
+    RecordsRemovedCyclesDeleteJob: 'Delete records of removed cycles',
     RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
     SamplingPointDataImportJob: 'Sampling Point Data Import',
     SurveyCreatorJob: 'Survey Create',
