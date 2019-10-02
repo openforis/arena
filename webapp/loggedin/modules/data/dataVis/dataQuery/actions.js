@@ -16,6 +16,7 @@ export const dataQueryTableDataColUpdate = 'dataQuery/table/data/col/update'
 export const dataQueryTableDataColDelete = 'dataQuery/table/data/col/delete'
 export const dataQueryTableFilterUpdate = 'dataQuery/table/filter/update'
 export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
+export const dataQueryTableReset = 'dataQuery/table/reset'
 
 const getTableName = (state, nodeDefUuidTable) => {
   const survey = SurveyState.getSurvey(state)
@@ -148,6 +149,10 @@ export const updateTableOffset = (offset = 0) => async (dispatch, getState) => {
 export const resetTableFilter = () => dispatch => {
   dispatch({ type: dataQueryTableFilterUpdate, filter: null })
   dispatch(initTableData())
+}
+
+export const resetTableData = () => dispatch => {
+  dispatch({ type: dataQueryTableReset })
 }
 
 export const updateTableFilter = (filter) => dispatch => dispatch(initTableData(filter))

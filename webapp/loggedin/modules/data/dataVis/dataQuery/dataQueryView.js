@@ -1,47 +1,53 @@
 import './components/dataQueryView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import { useOnUpdate } from '../../../../../commonComponents/hooks'
 
 import Table from './components/table'
 
-import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
+import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+
+import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols, resetTableData } from './actions'
+
 import * as DataQueryState from './dataQueryState'
+import * as SurveyState from '../../../../../survey/surveyState'
 
-class DataQueryView extends React.PureComponent {
+const DataQueryView = props => {
 
-  componentDidMount () {
-    this.props.initTableData()
-  }
+  const {
+    nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
+    surveyCycleKey,
+    initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols, resetTableData,
+  } = props
 
-  render () {
-    const {
-      nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
-      updateTableNodeDefUuid, updateTableNodeDefUuidCols
-    } = this.props
+  useEffect(() => {
+    initTableData()
+  }, [])
 
-    return (
-      <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
+  useOnUpdate(() => {
+    resetTableData()
+  }, [surveyCycleKey])
 
-        {
-          nodeDefSelectorsVisible &&
-          <NodeDefsSelectorView
-            nodeDefUuidEntity={nodeDefUuidEntity}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            onChangeEntity={updateTableNodeDefUuid}
-            onChangeAttributes={updateTableNodeDefUuidCols}
-            showMultipleAttributes={false}
-          />
-        }
+  return (
+    <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
 
-        <Table/>
+      {
+        nodeDefSelectorsVisible &&
+        <NodeDefsSelectorView
+          nodeDefUuidEntity={nodeDefUuidEntity}
+          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          onChangeEntity={updateTableNodeDefUuid}
+          onChangeAttributes={updateTableNodeDefUuidCols}
+          showMultipleAttributes={false}
+        />
+      }
 
-      </div>
-    )
-  }
+      <Table/>
 
+    </div>
+  )
 }
 
 DataQueryView.defaultProps = {
@@ -50,6 +56,7 @@ DataQueryView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
+  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   nodeDefUuidEntity: DataQueryState.getTableNodeDefUuidTable(state),
   nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state),
   nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
@@ -57,5 +64,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols }
+  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols, resetTableData }
 )(DataQueryView)

@@ -144,6 +144,8 @@ export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) =>
     data => R.assocPath([keys.table, tableKeys.data], data)(state)
   )(state)
 
+export const resetTable = R.assoc(keys.table, {})
+
 // ====== nodeDefSelectors
 export const isNodeDefSelectorsVisible = R.pipe(getState, R.propOr(true, keys.showNodeDefSelectors))
 export const assocShowNodeDefSelectors = R.assoc(keys.showNodeDefSelectors)

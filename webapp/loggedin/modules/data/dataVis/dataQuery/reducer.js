@@ -14,6 +14,7 @@ import {
   dataQueryTableDataUpdate,
   dataQueryTableFilterUpdate,
   dataQueryTableSortUpdate,
+  dataQueryTableReset,
   dataQueryNodeDefSelectorsShowUpdate,
 } from './actions'
 
@@ -50,6 +51,8 @@ const actionHandlers = {
   [dataQueryTableFilterUpdate]: (state, { filter }) => DataQueryState.assocTableFilter(filter)(state),
 
   [dataQueryTableSortUpdate]: (state, { sort }) => DataQueryState.assocTableSort(sort)(state),
+
+  [dataQueryTableReset]: state => DataQueryState.resetTable(state),
 
   // record nodes update
   [nodesUpdate]: (state, { nodes }) => DataQueryState.assocTableDataRecordNodes(nodes)(state),
