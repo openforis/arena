@@ -469,6 +469,7 @@ module.exports = {
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
     NodeDefsImportJob: 'Node Defs Import',
+    NodeDefWithoutCyclesDeleteJob: 'Delete Node Definitions without cycles',
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
     RecordsImportJob: 'Records Import',
