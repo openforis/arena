@@ -18,13 +18,12 @@ const ActivityLog = require('../../activityLog/activityLogger')
 //CREATE
 const insertRecord = async (user, surveyId, record, client = db) =>
   await client.tx(async t => {
-      const [recordDb] = await Promise.all([
-        RecordRepository.insertRecord(surveyId, record, t),
-        ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, record, t)
-      ])
-      return recordDb
+    const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
+    if (!Record.isPreview(record)) {
+      await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, record, t)
     }
-  )
+    return recordDb
+  })
 
 //READ
 const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client = db) => {
