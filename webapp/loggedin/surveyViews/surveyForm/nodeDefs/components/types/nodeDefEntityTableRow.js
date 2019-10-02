@@ -83,7 +83,7 @@ class NodeDefEntityTableRow extends React.Component {
     const { dragged } = this.state
 
     const className = `survey-form__node-def-entity-table-row` +
-      (renderType === NodeDefLayout.nodeDefRenderType.tableHeader ? '-header' : '') +
+      (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
       (dragged ? ' drag-in-progress' : '')
 
     return (
@@ -118,7 +118,7 @@ class NodeDefEntityTableRow extends React.Component {
         }
 
         {
-          renderType === NodeDefLayout.nodeDefRenderType.tableBody && canEditRecord &&
+          renderType === NodeDefLayout.renderType.tableBody && canEditRecord &&
           <NodeDeleteButton
             nodeDef={nodeDef}
             node={node}

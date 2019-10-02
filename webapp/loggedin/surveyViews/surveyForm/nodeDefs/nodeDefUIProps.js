@@ -94,7 +94,7 @@ export const nodeDefUIProps = {
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
     defaultLayoutProps: {
-      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.checkbox
+      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.checkbox
     },
   },
 
@@ -132,7 +132,7 @@ export const nodeDefUIProps = {
     component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
     defaultLayoutProps: {
-      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.table,
+      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.table,
       [NodeDef.propKeys.multiple]: true
     },
   },

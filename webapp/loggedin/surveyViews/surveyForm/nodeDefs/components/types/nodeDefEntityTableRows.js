@@ -92,7 +92,7 @@ const NodeDefEntityTableRows = props => {
         <NodeDefEntityTableRow
           {...props}
           node={null}
-          renderType={NodeDefLayout.nodeDefRenderType.tableHeader}
+          renderType={NodeDefLayout.renderType.tableHeader}
           gridSize={gridSize}
           nodeDefColumns={nodeDefColumns}/>
       }
@@ -111,7 +111,7 @@ const NodeDefEntityTableRows = props => {
                 {...props}
                 node={node}
                 nodes={null}
-                renderType={NodeDefLayout.nodeDefRenderType.tableBody}
+                renderType={NodeDefLayout.renderType.tableBody}
                 gridSize={gridSize}
                 nodeDefColumns={nodeDefColumns}
               />
