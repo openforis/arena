@@ -140,8 +140,23 @@ const updateNodeDefPropsPublished = async (surveyId, nodeDefUuid, props, propsAd
     WHERE uuid = $3
     RETURNING ${nodeDefSelectFields}
   `, [props, propsAdvanced, nodeDefUuid],
-    def => dbTransformCallback(def, false, true) //always loading draft when creating or updating a nodeDef
+    def => dbTransformCallback(def, false, true)
   )
+
+const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add, client = db) => {
+  const op = add
+    ? `|| '[${cycles.map(JSON.stringify).join(',')}]'`
+    : cycles.map(c => `- '${c}'`).join(' ')
+
+  return await client.map(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{"cycles"}', ((props||props_draft)->'cycles') ${op})
+    WHERE meta->'h' @> $1
+    RETURNING ${nodeDefSelectFields}`,
+    [JSON.stringify(nodeDefUuid)],
+    def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
+  )
+}
 
 const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) =>
   await client.query(`
@@ -265,6 +280,7 @@ module.exports = {
   //UPDATE
   updateNodeDefProps,
   updateNodeDefPropsPublished,
+  updateNodeDefDescendantsCycles,
   addNodeDefsCycles,
   deleteNodeDefsCycles,
   publishNodeDefsProps,

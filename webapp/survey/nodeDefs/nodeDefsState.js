@@ -20,6 +20,9 @@ export const assocNodeDefProps = (nodeDefUuid, props, propsAdvanced) => state =>
     R.keys(allProps)
   )
 }
+
+export const mergeNodeDefs = R.mergeLeft
+
 // ====== DELETE
 
 export const dissocNodeDef = nodeDef =>

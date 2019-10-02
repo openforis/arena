@@ -1,5 +1,7 @@
+const R = require('ramda')
 const db = require('../../../db/db')
 
+const NodeDef = require('../../../../common/survey/nodeDef')
 const ObjectUtils = require('../../../../common/objectUtils')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
@@ -28,15 +30,32 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, ad
 
 // ======= UPDATE
 
+const _updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, client) => {
+  const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, true, false, client)
+  const cyclesPrev = NodeDef.getCycles(nodeDef)
+  const cyclesAdded = R.difference(cycles, cyclesPrev)
+  const cyclesDeleted = R.difference(cyclesPrev, cycles)
+
+  const add = !R.isEmpty(cyclesAdded)
+  const cyclesUpdate = add ? cyclesAdded : cyclesDeleted
+  return await NodeDefRepository.updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, cyclesUpdate, add, client)
+}
+
 const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
   await client.tx(async t => {
-    const nodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t)
-
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, { nodeDefUuid, props, propsAdvanced }, t)
-
-    return nodeDef
+    // update descendants cycle when updating entity cycle
+    const nodeDefsUpdated = NodeDef.propKeys.cycles in props
+      ? await _updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, props[NodeDef.propKeys.cycles], t)
+      : []
+    const [nodeDef] = await Promise.all([
+      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, { nodeDefUuid, props, propsAdvanced }, t)
+    ])
+    return {
+      [nodeDefUuid]: nodeDef,
+      ...ObjectUtils.toUuidIndexedObj(nodeDefsUpdated)
+    }
   })
 
 const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {

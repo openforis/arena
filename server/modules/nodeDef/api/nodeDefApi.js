@@ -9,12 +9,13 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const SurveyService = require('../../survey/service/surveyService')
 const NodeDefService = require('../service/nodeDefService')
 
-const sendRespNodeDefs = async (res, surveyId, cycle, sendNodeDefs = false, draft = true, advanced = true, validate = true) => {
+const sendRespNodeDefs = async (res, surveyId, cycle, sendNodeDefs = false, draft = true, advanced = true, validate = true, nodeDefsUpdated = null) => {
   const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate)
 
   res.json({
     nodeDefs: sendNodeDefs ? Survey.getNodeDefs(survey) : null,
-    nodeDefsValidation: Survey.getNodeDefsValidation(survey)
+    nodeDefsValidation: Survey.getNodeDefsValidation(survey),
+    nodeDefsUpdated,
   })
 }
 
@@ -61,9 +62,10 @@ module.exports.init = app => {
       const { props, propsAdvanced } = Request.getBody(req)
       const { surveyId, cycle, nodeDefUuid } = Request.getParams(req)
 
-      await NodeDefService.updateNodeDefProps(user, surveyId, nodeDefUuid, props, propsAdvanced)
+      const nodeDefsUpdated = await NodeDefService.updateNodeDefProps(user, surveyId, nodeDefUuid, props, propsAdvanced)
+      delete nodeDefsUpdated[nodeDefUuid]
 
-      await sendRespNodeDefs(res, surveyId, cycle)
+      await sendRespNodeDefs(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
 
     } catch (err) {
       next(err)

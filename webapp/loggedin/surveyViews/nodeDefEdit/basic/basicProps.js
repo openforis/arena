@@ -165,11 +165,16 @@ const BasicProps = props => {
               NodeDef.propKeys.cycles,
               cycles
             )}
-            items={cyclesKeysParent.map(cycle => ({
-              key: cycle,
-              label: Number(cycle) + 1,
-              disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] // disabled if current cycle is the only one selected in nodeDef
-            }))}
+            items={
+              R.pipe(
+                R.sort((a, b) => Number(a) - Number(b)),
+                R.map(cycle => ({
+                  key: cycle,
+                  label: Number(cycle) + 1,
+                  disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] // disabled if current cycle is the only one selected in nodeDef
+                }))
+              )(cyclesKeysParent)
+            }
             disabled={NodeDef.isRoot(nodeDef)}
           />
         </FormItem>

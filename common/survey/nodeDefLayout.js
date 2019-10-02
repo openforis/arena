@@ -1,4 +1,5 @@
 const R = require('ramda')
+const ObjectUtils = require('../../common/objectUtils')
 
 const nodeDefRenderType = {
   // entity
@@ -13,7 +14,6 @@ const nodeDefRenderType = {
   tableBody: 'tableBody',
 }
 
-const nodeDefLayoutPropertyName = 'props'
 const nodeDefLayoutProps = {
   pageUuid: 'layoutPageUuid', // uuid
   render: 'layoutRender', // nodeDefRenderType
@@ -26,12 +26,7 @@ const nodeDefDisplayIn = {
   ownPage: 'ownPage',
 }
 
-const getProp = (prop, defaultTo = null) => R.pipe(
-  R.path([nodeDefLayoutPropertyName, prop]),
-  R.defaultTo(defaultTo),
-)
-
-const getRenderType = getProp(nodeDefLayoutProps.render)
+const getRenderType = ObjectUtils.getProp(nodeDefLayoutProps.render)
 
 const isRenderType = type => R.pipe(
   getRenderType,
@@ -43,14 +38,14 @@ const isRenderForm = isRenderType(nodeDefRenderType.form)
 const isRenderDropdown = isRenderType(nodeDefRenderType.dropdown)
 const isRenderCheckbox = isRenderType(nodeDefRenderType.checkbox)
 
-const getPageUuid = getProp(nodeDefLayoutProps.pageUuid)
+const getPageUuid = ObjectUtils.getProp(nodeDefLayoutProps.pageUuid)
 
 const getNoColumns = R.pipe(
-  getProp(nodeDefLayoutProps.columns, '3'),
+  ObjectUtils.getProp(nodeDefLayoutProps.columns, '3'),
   parseInt
 )
 
-const getLayout = getProp(nodeDefLayoutProps.layout, [])
+const getLayout = ObjectUtils.getProp(nodeDefLayoutProps.layout, [])
 
 const hasPage = R.pipe(getPageUuid, R.isNil, R.not)
 const filterInnerPageChildren = R.reject(hasPage)
