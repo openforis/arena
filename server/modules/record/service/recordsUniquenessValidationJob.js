@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../../common/survey/survey')
+const Survey = require('../../../../common/survey/survey')
 
-const RecordValidation = require('../../../../../../common/record/recordValidation')
-const Validation = require('../../../../../../common/validation/validation')
+const RecordValidation = require('../../../../common/record/recordValidation')
+const Validation = require('../../../../common/validation/validation')
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const RecordManager = require('../../../../record/manager/recordManager')
-const SurveyRdbManager = require('../../../../surveyRdb/manager/surveyRdbManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
+const RecordManager = require('../manager/recordManager')
+const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 
-const Job = require('../../../../../job/job')
+const Job = require('../../../job/job')
 
 const recordValidationUpdateBatchSize = 1000
 

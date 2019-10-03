@@ -160,7 +160,7 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
   }
 
   // 3. update node validations
-  const validations = await RecordValidationManager.validateNodesAndPersistValidation(survey, record, updatedNodesAndDependents, t)
+  const validations = await RecordValidationManager.validateNodesAndPersistValidation(survey, record, updatedNodesAndDependents, true, t)
   if (nodesValidationListener)
     nodesValidationListener(validations)
   record = Record.mergeNodeValidations(validations)(record)

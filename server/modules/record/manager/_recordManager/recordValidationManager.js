@@ -12,16 +12,16 @@ const RecordRepository = require('../../repository/recordRepository')
 
 const RecordUniquenessValidator = require('./recordUniquenessValidator')
 
-const validateNodesAndPersistValidation = async (survey, record, nodes, tx) => {
+const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordKeysUniqueness, tx) => {
 
   // 1. validate nodes
   const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
 
   // 2. validate record keys uniqueness
-  const nodesKeyUpdated = !Record.isPreview(record) && isRootNodeKeysUpdated(survey, nodes)
-  const recordKeysValidation = nodesKeyUpdated
-    ? await RecordUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
-    : {}
+  const recordKeysValidation =
+    validateRecordKeysUniqueness && !Record.isPreview(record) && isRootNodeKeysUpdated(survey, nodes)
+      ? await RecordUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
+      : {}
 
   // 3. merge validations
   const validation = Validation.recalculateValidity(

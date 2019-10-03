@@ -107,7 +107,8 @@ const _validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
     }
   }
 
-  await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, tx)
+  // record keys uniqueness must be validated after RDB generation
+  await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
 }
 
 /**
