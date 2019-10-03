@@ -29,8 +29,15 @@ const getSeverity = R.propOr(severities.error, keys.severity)
 const getMessages = R.propOr({}, keys.messages)
 const getMessage = lang => R.pipe(
   getMessages,
-  // default to first message
-  messages => R.propOr(R.pipe(R.values, R.head), lang)(messages)
+  R.ifElse(
+    R.has(lang),
+    R.prop(lang),
+    //default to first message
+    R.pipe(
+      R.values,
+      R.head
+    )
+  )
 )
 const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
 

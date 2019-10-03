@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const Validator = require('../../validation/validator')
 const Validation = require('../../validation/validation')
+const ValidationResult = require('../../validation/validationResult')
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
@@ -19,26 +20,26 @@ const bindNode = (survey, nodeDef) => ({
     const def = Survey.getNodeDefParent(nodeDef)(survey)
     if (!def) {
       const name = NodeDef.getName(nodeDef)
-      throw new SystemError('unableToFindParent', { name })
+      throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeParent, { name })
     }
     return bindNode(survey, def)
   },
-  node: name => {
+  node: childName => {
     if (NodeDef.isEntity(nodeDef)) {
-      const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
+      const def = Survey.getNodeDefChildByName(nodeDef, childName)(survey)
       if (!def) {
-        throw new SystemError('unableToFindNode', { name })
+        throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeChild, { name: childName })
       }
       return bindNode(survey, def)
     } else {
-      const attributeName = NodeDef.getName(nodeDef)
-      throw new SystemError('cannotGetChild', { childName: name, name: attributeName })
+      const parentName = NodeDef.getName(nodeDef)
+      throw new SystemError(Validation.messageKeys.expressions.cannotGetChildOfAttribute, { childName, parentName })
     }
   },
   sibling: name => {
     const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
     if (!def) {
-      throw new SystemError('unableToFindSibling', { name })
+      throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeSibling, { name })
     }
     return bindNode(survey, def)
   },
@@ -57,7 +58,8 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
     )
     return null
   } catch (e) {
-    return e.toString()
+    const details = R.is(SystemError, e) ? `$t(${e.key})` : e.toString()
+    return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, { details, ...e.params })
   }
 }
 
