@@ -27,6 +27,18 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 const assocSurveyInfo = info => ({ info })
 
+// ====== VALIDATION
+
+const validateNewSurvey = async newSurvey => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)//TODO add object model for newSurvey
+  return await SurveyValidator.validateNewSurvey(newSurvey, surveyInfos)
+}
+
+const validateSurveyInfo = async surveyInfo => await SurveyValidator.validateSurveyInfo(
+  surveyInfo,
+  await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo))
+)
+
 // ====== CREATE
 
 const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntityDef = true, client = db) => {
@@ -81,29 +93,23 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
   return assocSurveyInfo(survey)
 }
 
-const validateNewSurvey = async newSurvey => {
-  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)//TODO add object model for newSurvey
-  return await SurveyValidator.validateNewSurvey(newSurvey, surveyInfos)
-}
-
-const validateSurveyInfo = async surveyInfo => await SurveyValidator.validateSurveyInfo(
-  surveyInfo,
-  await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo))
-)
-
 // ====== READ
 const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, draft, client)
-  const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
-
+  const [surveyInfo, authGroups] = await Promise.all([
+    SurveyRepository.fetchSurveyById(surveyId, draft, client),
+    AuthGroupRepository.fetchSurveyGroups(surveyId, client)
+  ])
   const validation = validate ? await validateSurveyInfo(surveyInfo) : null
 
   return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
 
 const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
-  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client)
-  const survey = Survey.assocNodeDefs(nodeDefs)(await fetchSurveyById(surveyId, draft, validate, client))
+  const [surveyDb, nodeDefs] = await Promise.all([
+    fetchSurveyById(surveyId, draft, validate, client),
+    NodeDefManager.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client)
+  ])
+  const survey = Survey.assocNodeDefs(nodeDefs)(surveyDb)
 
   return validate
     ? Survey.assocNodeDefsValidation(await SurveyValidator.validateNodeDefs(survey))(survey)
@@ -111,8 +117,8 @@ const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, cycle = null, draft = 
 }
 
 const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, client = db) => {
-  const survey = await fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate, includeDeleted, client)
-  const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
+  const [survey, categoryIndexRS, taxonomyIndexRS] = await Promise.all([
+    fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate, includeDeleted, client),
     CategoryRepository.fetchIndex(surveyId, draft, client),
     TaxonomyRepository.fetchIndex(surveyId, draft, client)
   ])
@@ -128,9 +134,11 @@ const fetchUserSurveysInfo = async (user, offset, limit) => R.map(
 // ====== UPDATE
 const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
   await client.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
-    await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
-    await SurveyRepositoryUtils.markSurveyDraft(surveyId, t)
+    await Promise.all([
+      SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+      SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t),
+    ])
 
     return await fetchSurveyById(surveyId, true, true, t)
   })
@@ -143,14 +151,16 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById(surveyId, true, false, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-      let updated = false
       for (const key of Object.keys(props)) {
         const value = props[key]
         const valuePrev = propsPrev[key]
+
         if (!R.equals(value, valuePrev)) {
-          await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
-          await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
-          updated = true
+          await Promise.all([
+            SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+            SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+            ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
+          ])
 
           if (key === Survey.infoKeys.cycles) {
             const cycles = Object.keys(value)
@@ -169,10 +179,6 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
         }
       }
 
-      if (updated) {
-        await SurveyRepositoryUtils.markSurveyDraft(surveyId, t)
-      }
-
       return await fetchSurveyById(surveyId, true, true, t)
     } else {
       return assocSurveyInfo({ validation })
@@ -183,8 +189,10 @@ const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
   await SurveyRepository.publishSurveyProps(surveyId, client)
 
   for (const langDeleted of langsDeleted) {
-    await SurveyRepository.deleteSurveyLabel(surveyId, langDeleted, client)
-    await SurveyRepository.deleteSurveyDescription(surveyId, langDeleted, client)
+    await Promise.all([
+      SurveyRepository.deleteSurveyLabel(surveyId, langDeleted, client),
+      SurveyRepository.deleteSurveyDescription(surveyId, langDeleted, client),
+    ])
   }
 }
 
@@ -199,10 +207,12 @@ const deleteSurvey = async surveyId => await db.tx(async t =>
 )
 
 module.exports = {
+  // ====== VALIDATION
+  validateNewSurvey,
+
   // ====== CREATE
   createSurvey,
   insertSurvey,
-  validateNewSurvey,
 
   // ====== READ
   fetchAllSurveyIds: SurveyRepository.fetchAllSurveyIds,
