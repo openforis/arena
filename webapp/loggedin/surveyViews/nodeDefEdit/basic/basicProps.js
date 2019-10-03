@@ -173,7 +173,10 @@ const BasicProps = props => {
                 R.map(cycle => ({
                   key: cycle,
                   label: Number(cycle) + 1,
-                  disabled: cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] // disabled if current cycle is the only one selected in nodeDef
+                  disabled: (
+                    cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] || // disabled if current cycle is the only one selected in nodeDef
+                    cycle === surveyCycleKey // cannot remove nodeDef from current cycle
+                  )
                 }))
               )(cyclesKeysParent)
             }
