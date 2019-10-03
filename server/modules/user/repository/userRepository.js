@@ -130,11 +130,11 @@ const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 /**
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
  */
-const deleteUsersPrefsCycleDeleted = async (surveyId, cycleKeysDeleted, client = db) => {
+const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
   const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysPrefs.cycle}}'`
   await client.query(`
       UPDATE "user" u
-      SET prefs = jsonb_set(prefs, ${surveyCyclePath}, '${Survey.cycleOneKey}')
+      SET prefs = jsonb_set(prefs, ${surveyCyclePath}, '"${Survey.cycleOneKey}"')
       WHERE prefs #>>  ${surveyCyclePath} IN ($1:csv)
     `,
     [cycleKeysDeleted])
@@ -158,5 +158,5 @@ module.exports = {
 
   // PREFS
   deleteUsersPrefsSurvey,
-  deleteUsersPrefsCycleDeleted,
+  resetUsersPrefsSurveyCycle,
 }

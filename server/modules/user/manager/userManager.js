@@ -114,7 +114,7 @@ module.exports = {
   updateUser,
   updateUsername: UserRepository.updateUsername,
   updateUserPrefs,
-  deleteUsersPrefsCycleDeleted: UserRepository.deleteUsersPrefsCycleDeleted,
+  resetUsersPrefsSurveyCycle: UserRepository.resetUsersPrefsSurveyCycle,
 
   // DELETE
   deleteUser,
