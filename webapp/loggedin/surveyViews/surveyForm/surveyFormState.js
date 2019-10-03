@@ -109,7 +109,7 @@ export const setShowPageNavigation = showPageNavigation => R.assoc(keys.showPage
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   // if is entity and renders in its own page, assoc active page
   R.ifElse(
-    () => NodeDef.isEntity(nodeDef) && !!NodeDefLayout.getPageUuid(nodeDef),
+    () => NodeDef.isEntity(nodeDef) && NodeDefLayout.hasPage(NodeDef.getCycleFirst(nodeDef))(nodeDef),
     assocFormActivePage(nodeDef),
     R.identity,
   ),

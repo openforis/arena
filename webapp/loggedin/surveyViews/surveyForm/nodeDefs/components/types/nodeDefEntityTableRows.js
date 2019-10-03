@@ -129,7 +129,8 @@ const mapStateToProps = (state, props) => {
   const { nodeDef } = props
 
   const survey = SurveyState.getSurvey(state)
-  const nodeDefColumnUuids = NodeDefLayout.getLayout(nodeDef)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
 
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {

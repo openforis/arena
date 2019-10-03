@@ -5,36 +5,34 @@ import { connect } from 'react-redux'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 
-import Layout from '../../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../../common/survey/nodeDefLayout'
 
 import { setFormNodeDefAddChildTo } from '../../actions'
-import { putNodeDefProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
+import { putNodeDefLayoutProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
 import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditButtons = (props) => {
 
   const {
-    nodeDef,
+    surveyCycleKey, nodeDef,
     edit, canEditDef,
-    putNodeDefProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
+    putNodeDefLayoutProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
   const i18n = useI18n()
 
-  const isRoot = NodeDef.isRoot(nodeDef)
-  const isPage = !!Layout.getPageUuid(nodeDef)
-
   return edit && canEditDef && (
     <div className="survey-form__node-def-edit-buttons">
+
       {
-        isPage &&
+        NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) &&
         <div className="survey-form__node-def-edit-page-props">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
-          <input value={Layout.getNoColumns(nodeDef)}
+          <input value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
                  type="number" min="1" max="12"
                  onChange={e => e.target.value > 0 ?
-                   putNodeDefProp(nodeDef, Layout.nodeDefLayoutProps.columns, e.target.value)
+                   putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
                    : null
                  }/>
         </div>
@@ -60,7 +58,7 @@ const NodeDefEditButtons = (props) => {
       }
 
       {
-        !isRoot &&
+        !NodeDef.isRoot(nodeDef) &&
         <button className="btn btn-s btn-transparent"
                 onClick={() => removeNodeDef(nodeDef)}
                 onMouseDown={e => {
@@ -78,6 +76,6 @@ const NodeDefEditButtons = (props) => {
 export default connect(null, {
   setNodeDefForEdit,
   setFormNodeDefAddChildTo,
-  putNodeDefProp,
+  putNodeDefLayoutProp,
   removeNodeDef,
 })(NodeDefEditButtons)

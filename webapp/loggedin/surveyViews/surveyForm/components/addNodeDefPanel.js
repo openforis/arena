@@ -16,7 +16,8 @@ import * as SurveyState from '../../../../survey/surveyState'
 import { createNodeDef } from '../../../../survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../actions'
 
-const AddNodeDefButtons = ({ nodeDef, addNodeDef, setFormNodeDefAddChildTo }) => {
+const AddNodeDefButtons = props => {
+  const { surveyCycleKey, nodeDef, addNodeDef, setFormNodeDefAddChildTo } = props
 
   return (
     <React.Fragment>
@@ -24,7 +25,7 @@ const AddNodeDefButtons = ({ nodeDef, addNodeDef, setFormNodeDefAddChildTo }) =>
       {
         R.values(NodeDef.nodeDefType)
           .map(type => {
-            const nodeDefProps = NodeDefUIProps.getNodeDefDefaultLayoutPropsByType(type)
+            const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
             // cannot add entities when entity is rendered as table
             const disabled = type === NodeDef.nodeDefType.entity && NodeDefLayout.isRenderTable(nodeDef)
@@ -51,7 +52,7 @@ const AddNodeDefButtons = ({ nodeDef, addNodeDef, setFormNodeDefAddChildTo }) =>
 const AddNodeDefPanel = props => {
 
   const {
-    nodeDef, nodeDefLabel,
+    surveyCycleKey, nodeDef, nodeDefLabel,
     createNodeDef, setFormNodeDefAddChildTo
   } = props
 
@@ -71,6 +72,7 @@ const AddNodeDefPanel = props => {
       </div>
 
       <AddNodeDefButtons
+        surveyCycleKey={surveyCycleKey}
         nodeDef={nodeDef}
         addNodeDef={(type, props) => {
           createNodeDef(NodeDef.getUuid(nodeDef), type, props)
@@ -87,6 +89,7 @@ const AddNodeDefPanel = props => {
 const mapStateToProps = state => {
   const nodeDef = SurveyFormState.getNodeDefAddChildTo(state)
   return {
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
     nodeDef,
     nodeDefLabel: SurveyState.getNodeDefLabel(nodeDef)(state)
   }

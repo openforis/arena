@@ -1,5 +1,3 @@
-const R = require('ramda')
-
 const Request = require('../../../utils/request')
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
@@ -31,7 +29,7 @@ module.exports.init = app => {
 
       await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
 
-      const cycle = R.pipe(NodeDef.getCycles, R.head)(nodeDefRequest)
+      const cycle = NodeDef.getCycleFirst(nodeDefRequest)
       await sendRespNodeDefs(res, surveyId, cycle)
 
     } catch (err) {

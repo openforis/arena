@@ -93,9 +93,9 @@ export const nodeDefUIProps = {
     component: NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: {
-      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.checkbox
-    },
+    defaultProps: cycle => ({
+      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox)
+    }),
   },
 
   [nodeDefType.coordinate]: {
@@ -131,10 +131,10 @@ export const nodeDefUIProps = {
   [nodeDefType.entity]: {
     component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
-    defaultLayoutProps: {
-      [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.table,
-      [NodeDef.propKeys.multiple]: true
-    },
+    defaultProps: cycle => ({
+      [NodeDef.propKeys.multiple]: true,
+      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table)
+    }),
   },
 
 }
@@ -172,9 +172,7 @@ export const getNodeDefDefaultValue = nodeDef =>
     'defaultValue',
   )(nodeDefUIProps)
 
-export const getNodeDefDefaultLayoutPropsByType = type =>
-  getProp(
-    type,
-    'defaultLayoutProps',
-    {}
-  )(nodeDefUIProps)
+export const getDefaultPropsByType = (type, cycle) => R.pipe(
+  getProp(type, 'defaultProps', () => ({})),
+  fn => fn(cycle)
+)(nodeDefUIProps)

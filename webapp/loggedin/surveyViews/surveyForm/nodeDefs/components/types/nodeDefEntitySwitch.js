@@ -9,78 +9,21 @@ import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../../../../survey/surveyState'
 
-import { putNodeDefProp } from '../../../../../../survey/nodeDefs/actions'
+const componentsByRenderType = {
+  [NodeDefLayout.renderType.form]: NodeDefEntityForm,
+  [NodeDefLayout.renderType.table]: NodeDefEntityTable,
+}
 
-class NodeDefEntitySwitch extends React.Component {
+const NodeDefEntitySwitch = props => {
 
-  render () {
-    const {
-      edit,
-      entry,
-      preview,
-      surveyInfo,
-      nodeDef,
-      childDefs,
-      nodes,
-      parentNode,
-      label,
-      updateNode,
-      setFormPageNode,
-      selectedNodeUuid,
-      putNodeDefProp,
-      removeNode,
-      locked,
-      canEditDef,
-      canEditRecord,
-      canAddNode,
-    } = this.props
+  const { surveyCycleKey, nodeDef } = props
+  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 
-    if (NodeDefLayout.isRenderForm(nodeDef))
-      return <NodeDefEntityForm label={label}
-                                surveyInfo={surveyInfo}
-                                nodeDef={nodeDef}
-                                childDefs={childDefs}
-                                edit={edit}
-                                entry={entry}
-                                preview={preview}
-                                nodes={nodes}
-                                parentNode={parentNode}
-                                updateNode={updateNode}
-                                putNodeDefProp={putNodeDefProp}
-                                locked={locked}
-                                canEditDef={canEditDef}
-                                canEditRecord={canEditRecord}
-                                canAddNode={canAddNode}
-                                removeNode={removeNode}/>
-    else if (NodeDefLayout.isRenderTable(nodeDef))
-      return <NodeDefEntityTable label={label}
-                                 surveyInfo={surveyInfo}
-                                 nodeDef={nodeDef}
-                                 childDefs={childDefs}
-                                 edit={edit}
-                                 entry={entry}
-                                 preview={preview}
-                                 nodes={nodes}
-                                 parentNode={parentNode}
-                                 setFormPageNode={setFormPageNode}
-                                 selectedNodeUuid={selectedNodeUuid}
-                                 updateNode={updateNode}
-                                 putNodeDefProp={putNodeDefProp}
-                                 removeNode={removeNode}
-                                 locked={locked}
-                                 canEditDef={canEditDef}
-                                 canEditRecord={canEditRecord}
-                                 canAddNode={canAddNode}/>
-
-    return null
-  }
+  return React.createElement(componentsByRenderType[renderType], props)
 }
 
 const mapStateToProps = (state, props) => ({
   childDefs: Survey.getNodeDefChildren(props.nodeDef)(SurveyState.getSurvey(state)),
 })
 
-export default connect(
-  mapStateToProps,
-  { putNodeDefProp }
-)(NodeDefEntitySwitch)
+export default connect(mapStateToProps)(NodeDefEntitySwitch)

@@ -54,7 +54,7 @@ class NodeDefEntityTableRow extends React.Component {
   }
 
   dragEnd () {
-    const { nodeDef, putNodeDefProp } = this.props
+    const { nodeDef, putNodeDefLayoutProp } = this.props
 
     const { dragged } = this.state
     const placeholder = this.placeholderRef.current
@@ -68,7 +68,7 @@ class NodeDefEntityTableRow extends React.Component {
     const childNodes = this.rowRef.current.childNodes
     const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
 
-    putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, uuids)
+    putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, uuids)
   }
 
   render () {

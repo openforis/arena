@@ -95,7 +95,7 @@ const RecordView = props => {
 
   useOnUpdate(() => {
     cycleChanged(history)
-  }, surveyCycleKey)
+  }, [surveyCycleKey])
 
   return recordLoaded
     ? (

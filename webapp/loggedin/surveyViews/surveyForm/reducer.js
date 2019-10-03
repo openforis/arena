@@ -1,8 +1,10 @@
 import * as R from 'ramda'
 
 import { exportReducer } from '../../../utils/reduxUtils'
-import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
+
 import NodeDef from '../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
+
 import * as SurveyFormState from './surveyFormState'
 
 import { appUserLogout } from '../../../app/actions'
@@ -45,14 +47,9 @@ const actionHandlers = {
 
   [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
-  [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props }) => {
-    const hasPageUuid = R.pipe(
-      R.keys,
-      R.includes(NodeDefLayout.nodeDefLayoutProps.pageUuid)
-    )(props)
-
-    if (hasPageUuid) {
-      const pageUuid = props[NodeDefLayout.nodeDefLayoutProps.pageUuid]
+  [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props, surveyCycleKey, checkFormPageUuid }) => {
+    if (checkFormPageUuid) {
+      const pageUuid = R.path([NodeDefLayout.keys.layout, surveyCycleKey, NodeDefLayout.keys.pageUuid], props)
       // when changing displayIn (pageUuid) change form active page
       const activePageNodeDef = pageUuid ? nodeDef : parentNodeDef
       return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)

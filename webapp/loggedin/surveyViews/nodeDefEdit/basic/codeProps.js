@@ -21,8 +21,8 @@ import { createCategory, deleteCategory } from '../../categoryEdit/actions'
 
 const CodeProps = (props) => {
   const {
-    nodeDef, validation,
-    putNodeDefProp,
+    surveyCycleKey, nodeDef, validation,
+    putNodeDefProp, putNodeDefLayoutProp,
     categories,
     canUpdateCategory,
     category,
@@ -51,7 +51,6 @@ const CodeProps = (props) => {
     putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) //reset parent code
     putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
-
 
   return (
     <React.Fragment>
@@ -102,8 +101,8 @@ const CodeProps = (props) => {
       </FormItem>
 
       <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
-        <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
-                     onChange={render => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, render)}
+        <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
+                     onChange={render => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)}
                      items={displayAsItems}
         />
       </FormItem>

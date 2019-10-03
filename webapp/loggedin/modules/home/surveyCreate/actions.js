@@ -51,6 +51,6 @@ export const importCollectSurvey = file => async dispatch => {
 
   dispatch(showAppJobMonitor(data.job, async (job) => {
     const surveyId = job.result.surveyId
-    dispatch(setActiveSurvey(surveyId, true))
+    dispatch(setActiveSurvey(surveyId, true, true))
   }))
 }

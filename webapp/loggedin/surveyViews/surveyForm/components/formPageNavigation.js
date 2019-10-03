@@ -14,7 +14,7 @@ import { setFormActivePage, toggleFormPageNavigation } from '../../surveyForm/ac
 
 const NavigationButton = (props) => {
   const {
-    nodeDef, label, childDefs,
+    surveyCycleKey, nodeDef, label, childDefs,
     edit, canEditDef,
     level, active, enabled,
     showPageNavigation,
@@ -23,7 +23,7 @@ const NavigationButton = (props) => {
 
   const [showChildren, setShowChildren] = useState(level === 0)
 
-  const outerPageChildDefs = childDefs ? NodeDefLayout.filterOuterPageChildren(childDefs) : []
+  const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   return (
     showPageNavigation
@@ -65,6 +65,7 @@ const NavigationButton = (props) => {
             showChildren && outerPageChildDefs.map(child =>
               <FormPageNavigation
                 key={NodeDef.getUuid(child)}
+                surveyCycleKey={surveyCycleKey}
                 level={level + 1}
                 nodeDef={child}
                 edit={edit}

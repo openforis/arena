@@ -22,7 +22,7 @@ import * as RecordState from '../../record/recordState'
 import * as NodeDefUiProps from './nodeDefUIProps'
 
 // edit actions
-import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from '../../../../survey/nodeDefs/actions'
 // entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 
@@ -57,21 +57,20 @@ class NodeDefSwitch extends React.Component {
 
   render () {
     const {
-      nodeDef, label,
+      surveyCycleKey, nodeDef, label,
       edit, canEditDef,
       renderType, applicable,
     } = this.props
 
-    const isPage = !!NodeDefLayout.getPageUuid(nodeDef)
-
     const className = 'survey-form__node-def-page'
-      + (isPage ? '' : '-item')
+      + (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item')
       + (applicable ? '' : ' not-applicable')
 
     return (
       <div className={className} ref={this.element}>
 
         <NodeDefEditButtons
+          surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           edit={edit}
           canEditDef={canEditDef}
@@ -156,7 +155,7 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    putNodeDefProp,
+    putNodeDefProp, putNodeDefLayoutProp,
     updateNode, removeNode, createNodePlaceholder
   }
 )(NodeDefSwitch)
