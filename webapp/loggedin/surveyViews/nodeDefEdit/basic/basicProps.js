@@ -137,16 +137,16 @@ const BasicProps = props => {
             onChange={displayIn => putNodeDefLayoutProp(
               nodeDef,
               NodeDefLayout.keys.pageUuid,
-              displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4()
+              displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4()
             )}
             items={[
               {
-                key: NodeDefLayout.nodeDefDisplayIn.parentPage,
+                key: NodeDefLayout.displayIn.parentPage,
                 label: i18n.t('nodeDefEdit.basicProps.parentPage'),
                 disabled: displayInParentPageDisabled,
               },
               {
-                key: NodeDefLayout.nodeDefDisplayIn.ownPage,
+                key: NodeDefLayout.displayIn.ownPage,
                 label: i18n.t('nodeDefEdit.basicProps.ownPage'),
                 disabled: displayInOwnPageDisabled,
               },

@@ -66,11 +66,11 @@ export const reloadNodeDefs = (surveyCycleKey, draft = false, validate = false) 
 export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
 
 // ====== SET ACTIVE SURVEY
-export const setActiveSurvey = (surveyId, canEdit = true) => async dispatch => {
+export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate = false) => async dispatch => {
   //load survey
   const params = { draft: canEdit, validate: canEdit }
   const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params })
-  dispatch({ type: surveyUpdate, survey })
+  dispatch({ type: dispatchSurveyCreate ? surveyCreate : surveyUpdate, survey })
 }
 
 // ====== UPDATE

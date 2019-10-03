@@ -2,8 +2,6 @@ const R = require('ramda')
 
 const ObjectUtils = require('../../common/objectUtils')
 
-const NodeDef = require('./nodeDef')
-
 const keys = {
   layout: 'layout',
   // layout keys
@@ -24,6 +22,11 @@ const renderType = {
   // only components render
   tableHeader: 'tableHeader',
   tableBody: 'tableBody',
+}
+
+const displayIn = {
+  parentPage: 'parentPage',
+  ownPage: 'ownPage',
 }
 
 // ====== CREATE
@@ -59,8 +62,8 @@ const getPageUuid = cycle => _getPropLayout(cycle, keys.pageUuid)
 
 const getDisplayIn = cycle => R.ifElse(
   hasPage(cycle),
-  R.always(nodeDefDisplayIn.ownPage),
-  R.always(nodeDefDisplayIn.parentPage)
+  R.always(displayIn.ownPage),
+  R.always(displayIn.parentPage)
 )
 
 // ====== CHECK
@@ -78,7 +81,7 @@ const isRenderCheckbox = cycle => isRenderType(cycle, renderType.checkbox)
 
 const isDisplayInParentPage = cycle => R.pipe(
   getDisplayIn(cycle),
-  R.propEq(nodeDefDisplayIn.parentPage)
+  R.propEq(displayIn.parentPage)
 )
 // ====== UTILS
 
@@ -86,26 +89,10 @@ const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))
 
 const filterNodeDefsWithPage = cycle => R.filter(hasPage(cycle))
 
-//========================================= OLD
-const nodeDefLayoutProps = {
-  pageUuid: 'layoutPageUuid', // uuid
-  render: 'layoutRender', // nodeDefRenderType
-  columns: 'layoutColumns', // number of columns
-  layout: 'layout', // React Data Grid layout (form layout) or sorted children uuids (table layout)
-}
-
-const nodeDefDisplayIn = {
-  parentPage: 'parentPage',
-  ownPage: 'ownPage',
-}
-
-
-
-
-
 module.exports = {
   keys,
   renderType,
+  displayIn,
 
   //CREATE
   newLayout,
@@ -116,23 +103,17 @@ module.exports = {
   getLayoutChildren,
   getColumnsNo,
   getPageUuid,
+  getDisplayIn,
 
   //CHECK
   hasPage,
-
-  //UTILS
-  rejectNodeDefsWithPage,
-  filterNodeDefsWithPage,
-
-  // ==== OLD
-
-  nodeDefLayoutProps,
-  nodeDefDisplayIn,
-
   isRenderTable,
   isRenderForm,
   isRenderDropdown,
   isRenderCheckbox,
-  getDisplayIn,
   isDisplayInParentPage,
+
+  //UTILS
+  rejectNodeDefsWithPage,
+  filterNodeDefsWithPage,
 }

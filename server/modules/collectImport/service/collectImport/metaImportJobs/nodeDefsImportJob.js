@@ -131,39 +131,33 @@ class NodeDefsImportJob extends Job {
       //layout props (render)
       ...type === NodeDef.nodeDefType.entity
         ? {
-          [NodeDefLayout.nodeDefLayoutProps.render]:
-            tableLayout
-              ? NodeDefLayout.renderType.table
-              : NodeDefLayout.renderType.form
+          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+            Survey.cycleOneKey,
+            tableLayout ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form,
+            determineNodeDefPageUuid(type, collectNodeDef)
+          )
         }
         // calculated
         : {
           [NodeDef.propKeys.readOnly]: calculated
         },
-      // layout props (layout)
-      [NodeDefLayout.nodeDefLayoutProps.layout]: tableLayout ? [] : null,
       // extra props
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
 
-    // 2. determine page
-    const pageUuid = determineNodeDefPageUuid(type, collectNodeDef)
-    if (pageUuid)
-      props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = pageUuid
-
-    // 3. insert node def into db
+    // 2. insert node def into db
     const nodeDefParam = this._createNodeDef(parentNodeDef, type, props)
     let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-    // 3a. increment processed items before recursive call to insertNodeDef
+    // 2a. increment processed items before recursive call to insertNodeDef
     this.incrementProcessedItems()
 
-    // 4. insert children and updated layout props
+    // 3. insert children and updated layout props
     const propsUpdated = {}
 
     if (type === nodeDefType.entity) {
-      // 4a. insert child definitions
+      // 3a. insert child definitions
 
       const childrenUuids = []
 
@@ -185,7 +179,10 @@ class NodeDefsImportJob extends Job {
       }
       if (tableLayout) {
         // update layout prop
-        propsUpdated[NodeDefLayout.nodeDefLayoutProps.layout] = childrenUuids
+        propsUpdated[NodeDefLayout.keys.layout] = R.pipe(
+          NodeDefLayout.getLayout,
+          R.assocPath([Survey.cycleOneKey, NodeDefLayout.keys.layoutChildren], childrenUuids)
+        )(nodeDef)
       }
     } else if (type === nodeDefType.code) {
       // add parent code def uuid
@@ -193,16 +190,16 @@ class NodeDefsImportJob extends Job {
       if (parentCodeDefUuid) {
         propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
       }
-      // 4b. add specify text attribute def
+      // 3b. add specify text attribute def
       await this.addSpecifyTextAttribute(surveyId, parentNodeDef, nodeDef, tx)
     }
 
-    // 5. update node def with other props
+    // 4. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)
 
     nodeDef = (await NodeDefManager.updateNodeDefProps(this.user, surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx))[nodeDefUuid]
 
-    // 6. store nodeDef in cache
+    // 5. store nodeDef in cache
     let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
     if (!nodeDefsInfo) {
       nodeDefsInfo = []
@@ -268,7 +265,7 @@ class NodeDefsImportJob extends Job {
 
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
-          [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.renderType.dropdown
+          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, NodeDefLayout.renderType.dropdown)
         }
       case nodeDefType.taxon:
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
