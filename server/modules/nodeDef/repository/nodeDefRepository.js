@@ -162,7 +162,7 @@ const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) => {
   // add cycle to prop cycles
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{"cycles"}', (props || props_draft)->'cycles' || $1)
+    SET props_draft = jsonb_set(props_draft, '{cycles}', (props || props_draft)->'cycles' || $1)
     WHERE (props || props_draft)->'cycles' @> $2
   `,
     [JSON.stringify(cycles), JSON.stringify(cycleStart)]
@@ -174,14 +174,21 @@ const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) => {
     SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || jsonb_build_object(${cycles.map(c => `'${c}', ${layoutCycleStartPath}`).join(', ')}), TRUE)
     WHERE ${layoutCycleStartPath} IS NOT NULL
   `)
-
 }
 
-const deleteNodeDefsCycles = async (surveyId, cycles, client = db) =>
+const deleteNodeDefsCycles = async (surveyId, cycles, client = db) => {
+  // delete cycles from props
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{"cycles"}', ((props || props_draft)->'cycles') ${cycles.map(c => `- '${c}'`).join(' ')})
+    SET props_draft = jsonb_set(props_draft, '{cycles}', ((props || props_draft)->'cycles') ${cycles.map(c => `- '${c}'`).join(' ')})
   `)
+  // delete cycles layouts
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') ${cycles.map(c => `- '${c}'`).join(' ')})
+    WHERE (props || props_draft) -> 'layout' IS NOT NULL
+  `)
+}
 
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
