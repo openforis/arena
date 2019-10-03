@@ -2,7 +2,9 @@ const R = require('ramda')
 const db = require('../../../db/db')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
 const ObjectUtils = require('../../../../common/objectUtils')
+const { uuidv4 } = require('../../../../common/uuid')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
@@ -30,14 +32,41 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, ad
 
 // ======= UPDATE
 
-const _updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, client) => {
+const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, client) => {
   const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, true, false, client)
   if (NodeDef.isEntity(nodeDef)) {
     const cyclesPrev = NodeDef.getCycles(nodeDef)
     const cyclesAdded = R.difference(cycles, cyclesPrev)
     const cyclesDeleted = R.difference(cyclesPrev, cycles)
-
     const add = !R.isEmpty(cyclesAdded)
+
+    // update nodeDef cycles layout
+    if (add) {
+      for (let i = 0; i < cycles.length; i++) {
+        const cycle = cycles[i]
+        const cyclePrev = cycles[i - 1]
+        // if cycle is new, update layout
+        if (R.includes(cycle, cyclesAdded)) {
+          if (cyclePrev) {
+            // if cycle prev exists, copy layout from previous cycle
+            await NodeDefRepository.copyNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclePrev, [cycle], client)
+          } else {
+            // otherwise set the default layout
+            const props = {
+              [NodeDefLayout.keys.layout]: R.pipe(
+                NodeDefLayout.getLayout,
+                R.mergeLeft(NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4()))
+              )(nodeDef)
+            }
+            await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, {}, client)
+          }
+        }
+      }
+    } else {
+      await NodeDefRepository.deleteNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclesDeleted, client)
+    }
+
+    // update nodeDef descendants cycles
     const cyclesUpdate = add ? cyclesAdded : cyclesDeleted
     return await NodeDefRepository.updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, cyclesUpdate, add, client)
   }
@@ -48,7 +77,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
   await client.tx(async t => {
     // update descendants cycle when updating entity cycle
     const nodeDefsUpdated = NodeDef.propKeys.cycles in props
-      ? await _updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, props[NodeDef.propKeys.cycles], t)
+      ? await _updateNodeDefOnCyclesUpdate(surveyId, nodeDefUuid, props[NodeDef.propKeys.cycles], t)
       : []
     const [nodeDef] = await Promise.all([
       NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),

@@ -19,7 +19,7 @@ const NodeDefEntitySwitch = props => {
   const { surveyCycleKey, nodeDef } = props
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 
-  return React.createElement(componentsByRenderType[renderType], props)
+  return renderType && React.createElement(componentsByRenderType[renderType], props)
 }
 
 const mapStateToProps = (state, props) => ({
