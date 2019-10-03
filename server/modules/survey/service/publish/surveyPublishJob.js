@@ -8,9 +8,9 @@ const NodeDefWithoutCyclesDeleteJob = require('./jobs/nodeDefWithoutCyclesDelete
 const RecordsRemovedCyclesDeleteJob = require('./jobs/recordsRemovedCyclesDeleteJob')
 const RecordCheckJob = require('../recordCheckJob')
 const SurveyPropsPublishJob = require('./jobs/surveyPropsPublishJob')
+const UserPrefsCycleResetJob = require('./jobs/userPrefsCycleResetJob')
 const SurveyDependencyGraphsGenerationJob = require('../surveyDependencyGraphsGenerationJob')
 const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
-
 class SurveyPublishJob extends Job {
 
   constructor (params) {
@@ -23,6 +23,7 @@ class SurveyPublishJob extends Job {
       new RecordsRemovedCyclesDeleteJob(),
       // record check must be executed before publishing survey props
       new RecordCheckJob(),
+      new UserPrefsCycleResetJob(),
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new SurveyRdbGeneratorJob(),

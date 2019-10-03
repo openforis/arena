@@ -487,6 +487,7 @@ module.exports = {
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    UserPrefsCycleResetJob: 'Reset deleted cycles user prefs',
   },
 
   // ====== App Errors

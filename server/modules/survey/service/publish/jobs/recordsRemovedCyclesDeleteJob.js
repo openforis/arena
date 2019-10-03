@@ -2,10 +2,8 @@ const R = require('ramda')
 
 const Job = require('../../../../../job/job')
 
-const Survey = require('../../../../../../common/survey/survey')
-
 const RecordManager = require('../../../../record/manager/recordManager')
-const SurveyManager = require('../../../../survey/manager/surveyManager')
+const SurveyPublishJobUtils = require('../surveyPublishJobUtils')
 
 class RecordsRemovedCyclesDeleteJob extends Job {
 
@@ -17,7 +15,7 @@ class RecordsRemovedCyclesDeleteJob extends Job {
     this.total = 2
 
     // 1. find deleted cycles
-    const cycleKeysDeleted = await this._findDeletedCycleKeys()
+    const cycleKeysDeleted = await SurveyPublishJobUtils.findDeletedCycleKeys(this.surveyId, this.tx)
     this.logDebug(`deleted cycles: ${cycleKeysDeleted}`)
     this.incrementProcessedItems()
 
@@ -28,18 +26,6 @@ class RecordsRemovedCyclesDeleteJob extends Job {
       this.logDebug(`deleted ${R.length(recordsDeletedUuids)} records`)
     }
     this.incrementProcessedItems()
-  }
-
-  async _findDeletedCycleKeys () {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, this.tx)
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    if (Survey.isPublished(surveyInfo)) {
-      const surveyPrev = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
-      const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
-      return R.difference(Survey.getCycleKeys(surveyInfoPrev), Survey.getCycleKeys(surveyInfo))
-    } else {
-      return []
-    }
   }
 
 }
