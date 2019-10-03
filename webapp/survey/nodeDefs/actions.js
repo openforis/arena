@@ -56,8 +56,8 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDefParent)
 
-    const layoutChildrenUpdate = deleted ? R.without([nodeDefUuid])(layoutChildren) : R.append(nodeDefUuid)(layoutChildren)
-    dispatch(putNodeDefLayoutProp(nodeDefParent, NodeDefLayout.keys.layoutChildren, layoutChildrenUpdate))
+    const layoutChildrenUpdated = deleted ? R.without([nodeDefUuid])(layoutChildren) : R.append(nodeDefUuid)(layoutChildren)
+    dispatch(putNodeDefLayoutProp(nodeDefParent, NodeDefLayout.keys.layoutChildren, layoutChildrenUpdated))
   }
 }
 
