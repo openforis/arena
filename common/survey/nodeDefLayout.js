@@ -31,17 +31,13 @@ const displayIn = {
 
 // ====== CREATE
 
-const newLayout = (cycle, renderType, pageUuid = null) => {
-  const layout = {
-    [cycle]: {
-      [keys.renderType]: renderType
-    }
-  }
-  return R.when(
+const newLayout = (cycle, renderType, pageUuid = null) => R.pipe(
+  R.assocPath([cycle, keys.renderType], renderType),
+  R.when(
     R.always(pageUuid),
     R.assocPath([cycle, keys.pageUuid], pageUuid)
-  )(layout)
-}
+  )
+)({})
 
 // ====== READ
 
