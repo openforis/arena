@@ -150,7 +150,7 @@ const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add
 
   return await client.map(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{"cycles"}', ((props||props_draft)->'cycles') ${op})
+    SET props_draft = jsonb_set(props_draft, '{"cycles"}', (SELECT jsonb_agg( value order by value::int ) FROM jsonb_array_elements_text((((props||props_draft)->'cycles') ${op}))))
     WHERE meta->'h' @> $1
     RETURNING ${nodeDefSelectFields}`,
     [JSON.stringify(nodeDefUuid)],

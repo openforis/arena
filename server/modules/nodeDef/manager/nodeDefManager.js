@@ -32,13 +32,16 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, ad
 
 const _updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, client) => {
   const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, true, false, client)
-  const cyclesPrev = NodeDef.getCycles(nodeDef)
-  const cyclesAdded = R.difference(cycles, cyclesPrev)
-  const cyclesDeleted = R.difference(cyclesPrev, cycles)
+  if (NodeDef.isEntity(nodeDef)) {
+    const cyclesPrev = NodeDef.getCycles(nodeDef)
+    const cyclesAdded = R.difference(cycles, cyclesPrev)
+    const cyclesDeleted = R.difference(cyclesPrev, cycles)
 
-  const add = !R.isEmpty(cyclesAdded)
-  const cyclesUpdate = add ? cyclesAdded : cyclesDeleted
-  return await NodeDefRepository.updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, cyclesUpdate, add, client)
+    const add = !R.isEmpty(cyclesAdded)
+    const cyclesUpdate = add ? cyclesAdded : cyclesDeleted
+    return await NodeDefRepository.updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, cyclesUpdate, add, client)
+  }
+  return []
 }
 
 const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>

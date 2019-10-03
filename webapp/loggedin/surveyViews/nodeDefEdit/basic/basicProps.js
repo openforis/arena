@@ -165,21 +165,15 @@ const BasicProps = props => {
             onChange={cycles => putNodeDefProp(
               nodeDef,
               NodeDef.propKeys.cycles,
-              cycles
+              cycles.sort((a, b) => Number(a) - Number(b)),
             )}
-            items={
-              R.pipe(
-                R.sort((a, b) => Number(a) - Number(b)),
-                R.map(cycle => ({
-                  key: cycle,
-                  label: Number(cycle) + 1,
-                  disabled: (
-                    cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] || // disabled if current cycle is the only one selected in nodeDef
-                    cycle === surveyCycleKey // cannot remove nodeDef from current cycle
-                  )
-                }))
-              )(cyclesKeysParent)
-            }
+            items={cyclesKeysParent.map(cycle => ({
+              key: cycle,
+              label: Number(cycle) + 1,
+              disabled:
+                cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] || // disabled if current cycle is the only one selected in nodeDef
+                cycle === surveyCycleKey // cannot remove nodeDef from current cycle
+            }))}
             disabled={NodeDef.isRoot(nodeDef)}
           />
         </FormItem>
