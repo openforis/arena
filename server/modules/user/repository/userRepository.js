@@ -3,6 +3,7 @@ const db = require('../../../db/db')
 const camelize = require('camelize')
 
 const User = require('../../../../common/user/user')
+const Survey = require('../../../../common/survey/survey')
 const AuthGroups = require('../../../../common/auth/authGroups')
 
 const selectFields = ['uuid', 'name', 'email', 'prefs']
@@ -126,6 +127,19 @@ const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 `)
 }
 
+/**
+ * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
+ */
+const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
+  const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysPrefs.cycle}}'`
+  await client.query(`
+      UPDATE "user" u
+      SET prefs = jsonb_set(prefs, ${surveyCyclePath}, '"${Survey.cycleOneKey}"')
+      WHERE prefs #>>  ${surveyCyclePath} IN ($1:csv)
+    `,
+    [cycleKeysDeleted])
+}
+
 module.exports = {
   // CREATE
   insertUser,
@@ -144,4 +158,5 @@ module.exports = {
 
   // PREFS
   deleteUsersPrefsSurvey,
+  resetUsersPrefsSurveyCycle,
 }
