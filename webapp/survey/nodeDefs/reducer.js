@@ -6,7 +6,6 @@ import {
   surveyCreate,
   surveyDefsLoad,
   surveyDefsReset,
-  surveyNodeDefsLoad,
   surveyDelete,
   surveyUpdate
 } from '../actions'
@@ -31,7 +30,6 @@ const actionHandlers = {
   [surveyDefsReset]: () => ({}),
 
   [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
-  [surveyNodeDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   // single nodeDef actions
   [nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),

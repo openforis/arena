@@ -6,7 +6,6 @@ import {
   surveyCreate,
   surveyDefsLoad,
   surveyDefsReset,
-  surveyNodeDefsLoad,
   surveyDelete,
   surveyUpdate
 } from '../actions'
@@ -24,7 +23,6 @@ const actionHandlers = {
 
   // nodeDefsValidation load
   [surveyDefsLoad]: (state = {}, { nodeDefsValidation }) => nodeDefsValidation,
-  [surveyNodeDefsLoad]: (state = {}, { nodeDefsValidation }) => nodeDefsValidation,
   [nodeDefsValidationUpdate]: (state = {}, { nodeDefsValidation }) => nodeDefsValidation,
 }
 
