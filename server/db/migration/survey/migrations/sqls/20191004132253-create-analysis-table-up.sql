@@ -2,6 +2,7 @@ CREATE TABLE
   processing_chain
   (
     uuid uuid DEFAULT uuid_generate_v4() NOT NULL,
+    cycle INTEGER NOT NULL,
     date_created TIME without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
     date_modified TIME without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
     date_executed TIME without TIME zone,
