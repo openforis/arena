@@ -65,7 +65,7 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
 const validateRecordsUniquenessAndPersistValidation = async (survey, record, excludeRecordFromCount, t) => {
   const recordKeyNodes = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
 
-  const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(survey, recordKeyNodes, Record.getUuid(record), excludeRecordFromCount, t)
+  const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(survey, Record.getCycle(record), recordKeyNodes, Record.getUuid(record), excludeRecordFromCount, t)
 
   for (const [recordUuid, nodesKeyValidation] of Object.entries(validationByRecord)) {
     const recordToUpdate = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
