@@ -114,7 +114,7 @@ const countDuplicateRecords = async (survey, record, client = db) => {
   return await runCount(surveyId, Record.getCycle(record), tableName, whereExpr, client)
 }
 
-const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
+const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
   const nodeDefRoot = Survey.getRootNodeDef(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
@@ -137,7 +137,8 @@ const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, exc
               COUNT(*) AS count
           FROM
               ${rootTable}
-          ${excludeRecordFromCount ? `WHERE ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
+          WHERE ${DataTable.colNameRecordCycle} = ${cycle}
+          ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
           GROUP BY 
               ${keyColumnsString}
       )
@@ -158,7 +159,8 @@ const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, exc
         AND n.node_def_uuid IN (${nodeDefKeys.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     
     WHERE
-      ${keysCondition}
+      ${rootTableAlias}.${DataTable.colNameRecordCycle} = ${cycle}
+      AND ${keysCondition}
       AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
           
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count

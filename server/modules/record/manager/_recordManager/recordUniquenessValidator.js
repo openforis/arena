@@ -28,9 +28,9 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
 /**
  * Returns an indexed object with recordUuid as key and validation as value
  */
-const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx) => {
+const validateRecordsUniqueness = async (survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx) => {
   const result = {}
-  const recordsCountRows = await SurveyRdbManager.fetchRecordsCountByKeys(survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx)
+  const recordsCountRows = await SurveyRdbManager.fetchRecordsCountByKeys(survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx)
 
   if (!R.isEmpty(recordsCountRows)) {
     for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
