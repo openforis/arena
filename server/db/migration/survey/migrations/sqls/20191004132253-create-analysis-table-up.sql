@@ -24,7 +24,7 @@ CREATE TABLE
   );
 
 CREATE TABLE
-  calculation_step
+  processing_step_calculation
   (
     uuid uuid DEFAULT uuid_generate_v4() NOT NULL,
     processing_step_uuid uuid NOT NULL,
@@ -32,6 +32,6 @@ CREATE TABLE
     index INTEGER DEFAULT 0 NOT NULL,
     props jsonb DEFAULT '{}'::jsonb NOT NULL,
     PRIMARY KEY (uuid),
-    CONSTRAINT calculationstep_processingstep_fk FOREIGN KEY (processing_step_uuid) REFERENCES "processing_step" ("uuid") ON DELETE CASCADE,
-    CONSTRAINT calculationstep_index_idx UNIQUE (processing_step_uuid, index)
+    CONSTRAINT processingstepcalculation_processingstep_fk FOREIGN KEY (processing_step_uuid) REFERENCES "processing_step" ("uuid") ON DELETE CASCADE,
+    CONSTRAINT processingstepcalculation_index_idx UNIQUE (processing_step_uuid, index)
   );
