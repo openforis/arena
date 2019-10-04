@@ -3,6 +3,8 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 
+import User from '../../common/user/user'
+
 import DynamicImport from '../commonComponents/dynamicImport'
 import LoginView from '../login/loginView'
 import AppLoaderView from './appLoader/appLoaderView'
@@ -52,7 +54,7 @@ const AppRouterSwitch = props => {
         closeSocket()
       }
     }
-  }, [isReady, user])
+  }, [isReady, User.getUuid(user)])
 
   return systemError
     ? (
