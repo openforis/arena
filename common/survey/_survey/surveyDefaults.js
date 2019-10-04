@@ -6,10 +6,12 @@ const getDefaultAuthGroups = () => [
     permissions: [
       AuthGroups.permissions.permissionsEdit,
       AuthGroups.permissions.surveyEdit,
+      AuthGroups.permissions.userInvite,
       AuthGroups.permissions.recordView,
       AuthGroups.permissions.recordCreate,
       AuthGroups.permissions.recordEdit,
-      AuthGroups.permissions.userInvite,
+      AuthGroups.permissions.recordCleanse,
+      AuthGroups.permissions.recordAnalyse,
     ],
     recordSteps: {
       '1': AuthGroups.keys.all,
@@ -24,6 +26,8 @@ const getDefaultAuthGroups = () => [
       AuthGroups.permissions.recordView,
       AuthGroups.permissions.recordCreate,
       AuthGroups.permissions.recordEdit,
+      AuthGroups.permissions.recordCleanse,
+      AuthGroups.permissions.recordAnalyse,
     ],
     recordSteps: {
       '1': AuthGroups.keys.all,
@@ -37,6 +41,8 @@ const getDefaultAuthGroups = () => [
       AuthGroups.permissions.recordView,
       AuthGroups.permissions.recordCreate,
       AuthGroups.permissions.recordEdit,
+      AuthGroups.permissions.recordCleanse,
+      AuthGroups.permissions.recordAnalyse,
     ],
     recordSteps: {
       '1': AuthGroups.keys.all,
@@ -50,6 +56,7 @@ const getDefaultAuthGroups = () => [
       AuthGroups.permissions.recordView,
       AuthGroups.permissions.recordCreate,
       AuthGroups.permissions.recordEdit,
+      AuthGroups.permissions.recordCleanse,
     ],
     recordSteps: {
       '1': AuthGroups.keys.all,

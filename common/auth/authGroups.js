@@ -24,6 +24,8 @@ const permissions = {
   recordCreate: 'recordCreate',
   recordEdit: 'recordEdit',
   recordView: 'recordView',
+  recordCleanse: 'recordCleanse',
+  recordAnalyse: 'recordAnalyse',
 
   // users
   userInvite: 'userInvite',
