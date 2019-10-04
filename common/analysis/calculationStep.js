@@ -4,18 +4,18 @@ const ObjectUtils = require('../objectUtils')
 
 const keys = {
   index: ObjectUtils.keys.index,
-  uuid: ObjectUtils.keys.uuid
+  uuid: ObjectUtils.keys.uuid,
+  nodeDefUuid: 'nodeDefUuid',
 }
 
 const keysProps = {
-  nodeDefUuid: 'nodeDefUuid',
   formula: 'formula',
   aggregateFn: 'aggregateFn',
 }
 
 const aggregateFn = {
   avg: 'avg',
-  count:'count',
+  count: 'count',
   max: 'max',
   min: 'min',
   sum: 'sum',
@@ -24,7 +24,7 @@ const aggregateFn = {
 
 const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, aggregateFn.sum)
 const getFormula = ObjectUtils.getProp(keysProps.formula)
-const getNodeDefUuid = ObjectUtils.getProp(keysProps.nodeDefUuid)
+const getNodeDefUuid = R.prop(keysProps.nodeDefUuid)
 
 module.exports = {
   //READ
@@ -33,5 +33,4 @@ module.exports = {
   getIndex: ObjectUtils.getIndex,
   getNodeDefUuid,
   getUuid: ObjectUtils.getUuid,
-
 }
