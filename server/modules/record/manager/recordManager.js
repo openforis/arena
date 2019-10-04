@@ -61,7 +61,7 @@ module.exports = {
   fetchRecordByUuid,
   fetchRecordAndNodesByUuid,
   fetchRecordsSummaryBySurveyId,
-  fetchRecordUuids: RecordRepository.fetchRecordUuids,
+  fetchRecordsUuidAndCycle: RecordRepository.fetchRecordsUuidAndCycle,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordCreatedCountsByDates: RecordRepository.fetchRecordCreatedCountsByDates,
 
