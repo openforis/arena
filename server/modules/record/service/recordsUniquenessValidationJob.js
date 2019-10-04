@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../../common/survey/survey')
+const Survey = require('../../../../common/survey/survey')
 
-const RecordValidation = require('../../../../../../common/record/recordValidation')
-const Validation = require('../../../../../../common/validation/validation')
+const RecordValidation = require('../../../../common/record/recordValidation')
+const Validation = require('../../../../common/validation/validation')
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const RecordManager = require('../../../../record/manager/recordManager')
-const SurveyRdbManager = require('../../../../surveyRdb/manager/surveyRdbManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
+const RecordManager = require('../manager/recordManager')
+const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 
-const Job = require('../../../../../job/job')
+const Job = require('../../../job/job')
 
 const recordValidationUpdateBatchSize = 1000
 
@@ -23,20 +23,28 @@ class RecordsUniquenessValidationJob extends Job {
   }
 
   async execute (tx) {
-    this.total = 2
+    const survey = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
+    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
 
+    this.total = R.length(cycleKeys) * 2
+
+    for (const cycle of cycleKeys)
+      await this.validateRecordsUniquenessByCycle(cycle)
+  }
+
+  async validateRecordsUniquenessByCycle (cycle) {
     // 1. fetch survey and node defs
-    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, Survey.cycleOneKey, true, true, false, false, this.tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, cycle, true, true, false, false, this.tx)
     this.incrementProcessedItems()
 
-    const nodeDefRoot = Survey.getRootNodeDef(this.survey)
-    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(this.survey)
+    const nodeDefRoot = Survey.getRootNodeDef(survey)
+    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
     if (R.isEmpty(nodeDefKeys)) {
       return
     }
 
     // 2. find duplicate records
-    const rowsRecordsDuplicate = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefRoot, nodeDefKeys, this.tx)
+    const rowsRecordsDuplicate = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(survey, cycle, nodeDefRoot, nodeDefKeys, this.tx)
 
     if (!R.isEmpty(rowsRecordsDuplicate)) {
       // 3. update records validation

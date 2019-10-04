@@ -165,7 +165,8 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   //check if nodeDef is referenced by other node definitions
   //dependency graph is not associated to the survey in UI, it's built every time it's needed
   const dependencyGraph = Survey.buildDependencyGraph(survey)
-  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(NodeDef.getUuid(nodeDef))(dependencyGraph)
+  const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(survey)
+  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(NodeDef.getUuid(nodeDef))(surveyWithDependencies)
   const i18n = AppState.getI18n(state)
 
   if (!R.isEmpty(nodeDefDependentsUuids)) {

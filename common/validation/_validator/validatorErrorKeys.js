@@ -26,6 +26,14 @@ module.exports = {
     emptyFile: 'validationErrors.categoryImport.emptyFile',
   },
 
+  expressions: {
+    expressionInvalid: 'validationErrors.expressions.expressionInvalid',
+    cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
+    unableToFindNodeChild: 'validationErrors.expressions.unableToFindNodeChild',
+    unableToFindNodeParent: 'validationErrors.expressions.unableToFindNodeParent',
+    unableToFindNodeSibling: 'validationErrors.expressions.unableToFindNodeSibling',
+  },
+
   nodeDefEdit: {
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',

@@ -48,7 +48,8 @@ const buildGraph = survey =>
 
 const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
 
-const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) =>
+const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
+  getDependencyGraph,
   R.ifElse(
     R.always(R.isNil(dependencyType)),
     //return all node def dependents
@@ -69,8 +70,9 @@ const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) =>
       R.uniq
     ),
     //return dependents by dependency Type
-    R.path([keys.dependencyGraph, dependencyType, nodeDefUuid])
+    R.pathOr([], [dependencyType, nodeDefUuid])
   )
+)
 
 const getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
 

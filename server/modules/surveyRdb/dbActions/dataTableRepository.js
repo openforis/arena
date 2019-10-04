@@ -19,7 +19,7 @@ const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchem
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  */
-const fetchRecordsWithDuplicateEntities = async (survey, nodeDefEntity, nodeDefKeys, client) => {
+const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
   const surveyId = Survey.getId(survey)
 
   const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
@@ -48,7 +48,9 @@ const fetchRecordsWithDuplicateEntities = async (survey, nodeDefEntity, nodeDefK
     FROM ${tableName} ${aliasA}
       JOIN ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r 
         ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid} 
-    WHERE EXISTS (
+    WHERE
+      ${DataTable.colNameRecordCycle} = $1 
+      AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
       SELECT ${aliasB}.${DataTable.colNameUuuid}
       FROM ${tableName} ${aliasB}
@@ -60,7 +62,9 @@ const fetchRecordsWithDuplicateEntities = async (survey, nodeDefEntity, nodeDefK
         AND (${equalKeysCondition})
       )
     GROUP BY r.uuid, r.validation
-  `)
+    `,
+    [cycle]
+  )
 }
 
 module.exports = {

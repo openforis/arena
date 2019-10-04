@@ -394,6 +394,14 @@ module.exports = {
       emptyFile: 'The file you are trying to import is empty'
     },
 
+    expressions: {
+      expressionInvalid: "Invalid expression: {{details}}",
+      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
+      unableToFindNodeChild: 'unable to find child node: {{name}}',
+      unableToFindNodeParent: 'unable to find parent node: {{name}}',
+      unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
+    },
+
     nodeDefEdit: {
       applyIfDuplicate: '"Apply if" condition is duplicate',
       applyIfInvalid: 'Invalid "Apply if" condition',

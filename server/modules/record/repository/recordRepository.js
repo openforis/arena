@@ -133,14 +133,12 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-const fetchRecordUuids = async (surveyId, client = db) => await client.map(
-  `SELECT uuid 
-  FROM ${getSurveyDBSchema(surveyId)}.record 
-  WHERE preview = FALSE
-  `,
-  [],
-  R.prop('uuid')
-)
+const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
+  await client.any(`
+    SELECT uuid, cycle 
+    FROM ${getSurveyDBSchema(surveyId)}.record 
+    WHERE preview = FALSE
+  `)
 
 const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) => await client.any(`
     SELECT
@@ -228,7 +226,7 @@ module.exports = {
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchRecordByUuid,
-  fetchRecordUuids,
+  fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,
 
   // UPDATE

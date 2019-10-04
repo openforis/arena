@@ -9,6 +9,8 @@ const SurveyPropsPublishJob = require('./jobs/surveyPropsPublishJob')
 const CyclesDeletedCheckJob = require('./jobs/cyclesDeletedCheckJob')
 const SurveyDependencyGraphsGenerationJob = require('../surveyDependencyGraphsGenerationJob')
 const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
+const RecordsUniquenessValidationJob = require('../../../record/service/recordsUniquenessValidationJob')
+
 class SurveyPublishJob extends Job {
 
   constructor (params) {
@@ -23,6 +25,7 @@ class SurveyPublishJob extends Job {
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new SurveyRdbGeneratorJob(),
+      new RecordsUniquenessValidationJob(),
     ])
   }
 }
