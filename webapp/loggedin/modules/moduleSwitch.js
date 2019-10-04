@@ -5,6 +5,7 @@ import DesignerView from './designer/designerView'
 import HomeView from './home/homeView'
 import DataView from './data/dataView'
 import UsersView from './users/usersView'
+import AnalysisView from './analysis/analysisView'
 
 import { appModules, appModuleUri } from '../appModules'
 
@@ -16,6 +17,7 @@ const ModuleSwitch = (props) => (
       <Route path={appModuleUri(appModules.designer)} component={DesignerView}/>
       <Route path={appModuleUri(appModules.data)} component={DataView}/>
       <Route path={appModuleUri(appModules.users)} component={UsersView}/>
+      <Route path={appModuleUri(appModules.analysis)} component={AnalysisView}/>
     </Switch>
 
   </div>

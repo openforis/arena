@@ -112,6 +112,9 @@ module.exports = {
 
     users: 'Users',
     userList: 'User list',
+
+    analysis: 'Analysis',
+    processingChainList: 'Processing Chains',
   },
 
   surveyDefsLoader: {
@@ -218,6 +221,13 @@ module.exports = {
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  analysis: {
+    processingChain: {
+      dateExecuted: 'Date executed',
+      status: 'Status'
+    }
   },
 
   itemsTable: {

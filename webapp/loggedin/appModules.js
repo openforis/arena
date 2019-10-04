@@ -24,7 +24,11 @@ export const appModules = {
     path: 'users',
     icon: 'users'
   },
-  // analysis: 'analysis',
+  analysis: {
+    key: 'analysis',
+    path: 'analysis',
+    icon: 'pie-chart'
+  },
 }
 
 //==== Inner modules
@@ -99,4 +103,11 @@ export const userModules = {
     key: 'view',
     path: `${appModules.users.path}/user`,
   }
+}
+
+export const analysisModules = {
+  processingChains: {
+    key: 'processingChainList',
+    path: `${appModules.analysis.path}/processingChains`,
+  },
 }

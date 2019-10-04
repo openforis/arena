@@ -1,7 +1,15 @@
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
-import { appModules, appModuleUri, dataModules, designerModules, homeModules, userModules } from '../appModules'
+import {
+  analysisModules,
+  appModules,
+  appModuleUri,
+  dataModules,
+  designerModules,
+  homeModules,
+  userModules
+} from '../appModules'
 
 const keys = {
   key: 'key',
@@ -38,6 +46,10 @@ export const getModulesHierarchy = () => [
     appModules.users,
     [userModules.users]
   ),
+  getModule(
+    appModules.analysis,
+    [analysisModules.processingChains]
+  )
 ]
 
 export const getKey = R.prop(keys.key)
