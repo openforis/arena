@@ -4,14 +4,13 @@ import Survey from '../../common/survey/survey'
 
 import * as SurveyState from './surveyState'
 
-import { showAppJobMonitor, showNotificationMessage } from '../app/actions'
+import { hideAppLoader, showAppJobMonitor, showAppLoader, showNotificationMessage } from '../app/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
 export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
 export const surveyDefsReset = 'survey/defs/reset'
-export const surveyNodeDefsLoad = 'survey/nodeDefs/load'
 
 const defs = {
   nodeDefs: 'nodeDefs',
@@ -26,6 +25,7 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   const state = getState()
 
   if (!SurveyState.areDefsFetched(draft)(state)) {
+    dispatch(showAppLoader())
 
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
@@ -46,24 +46,16 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
     ])
 
     dispatch({ type: surveyDefsLoad, nodeDefs, nodeDefsValidation, categories, taxonomies, draft })
+    dispatch(hideAppLoader())
   }
-}
-
-export const reloadNodeDefs = (surveyCycleKey, draft = false, validate = false) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-
-  const params = {
-    cycle: surveyCycleKey,
-    draft,
-    validate
-  }
-  const { data: { nodeDefs, nodeDefsValidation } } = await _fetchDefs(surveyId, defs.nodeDefs, params)
-
-  dispatch({ type: surveyNodeDefsLoad, nodeDefs, nodeDefsValidation, draft })
 }
 
 export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
+
+export const reloadSurveyDefs = (draft = false, validate = false) => dispatch => {
+  dispatch(resetSurveyDefs())
+  dispatch(initSurveyDefs(draft, validate))
+}
 
 // ====== SET ACTIVE SURVEY
 export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate = false) => async dispatch => {

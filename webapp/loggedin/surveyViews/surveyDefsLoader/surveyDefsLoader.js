@@ -7,14 +7,14 @@ import Survey from '../../../../common/survey/survey'
 
 import * as SurveyState from '../../../survey/surveyState'
 
-import { initSurveyDefs, reloadNodeDefs } from '../../../survey/actions'
+import { initSurveyDefs, reloadSurveyDefs } from '../../../survey/actions'
 
 const SurveyDefsLoader = (props) => {
 
   const {
     surveyInfo, surveyCycleKey, draft, validate,
     ready, requirePublish, children,
-    initSurveyDefs, reloadNodeDefs
+    initSurveyDefs, reloadSurveyDefs
   } = props
 
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -26,7 +26,7 @@ const SurveyDefsLoader = (props) => {
   }, [surveyUuid])
 
   useOnUpdate(() => {
-    reloadNodeDefs(surveyCycleKey, draft, validate)
+    reloadSurveyDefs(draft, validate)
   }, [surveyCycleKey])
 
   const i18n = useI18n()
@@ -57,4 +57,4 @@ SurveyDefsLoader.defaultProps = {
   requirePublish: false,
 }
 
-export default connect(mapStateToProps, { initSurveyDefs, reloadNodeDefs })(SurveyDefsLoader)
+export default connect(mapStateToProps, { initSurveyDefs, reloadSurveyDefs })(SurveyDefsLoader)
