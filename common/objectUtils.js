@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const StringUtils = require('./stringUtils')
+const DateUtils = require('./dateUtils')
 
 const keys = {
   id: 'id',
@@ -8,6 +9,7 @@ const keys = {
   authGroups: 'authGroups',
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
+  index: 'index',
   name: 'name',
   parentUuid: 'parentUuid',
   props: 'props',
@@ -43,8 +45,17 @@ const getDescription = (lang, defaultTo = null) => R.pipe(
   R.propOr(defaultTo, lang)
 )
 
-const getDateCreated = R.propOr(null, keys.dateCreated)
-const getDateModified = R.propOr(null, keys.dateModified)
+const getDate = prop => R.pipe(
+  R.propOr(null, prop),
+  R.unless(
+    R.isNil,
+    DateUtils.parseISO
+  )
+)
+const getDateCreated = getDate(keys.dateCreated)
+const getDateModified = getDate(keys.dateModified)
+
+const getIndex = R.propOr(0, keys.index)
 
 //===== UPDATE
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
@@ -92,8 +103,10 @@ module.exports = {
   getLabel,
   getDescriptions,
   getDescription,
+  getDate,
   getDateCreated,
   getDateModified,
+  getIndex,
 
   // UPDATE
   setProp,

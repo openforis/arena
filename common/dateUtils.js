@@ -7,6 +7,7 @@ const {
   differenceInDays,
   differenceInHours,
   isBefore,
+  isAfter,
   format,
 
   isValid: fnsIsValid,
@@ -33,30 +34,28 @@ const getRelativeDate = (i18n, date) => {
   if (R.isNil(date))
     return null
 
-  const timestamp = parseISO(date)
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
-    const count = fn(now, timestamp)
+    const count = fn(now, date)
     return i18n.t('common.date.timeDiff', { count, unit })
   }
 
-  if (differenceInMonths(now, timestamp) > 0)
-    return format(timestamp, 'dd MMM yyyy')
+  if (differenceInMonths(now, date) > 0)
+    return format(date, 'dd MMM yyyy')
 
-  if (differenceInWeeks(now, timestamp) > 0)
+  if (differenceInWeeks(now, date) > 0)
     return formatDiff(differenceInWeeks, 'week')
 
-  if (differenceInDays(now, timestamp) > 0)
+  if (differenceInDays(now, date) > 0)
     return formatDiff(differenceInDays, 'day')
 
-  if (differenceInHours(now, timestamp) > 0)
+  if (differenceInHours(now, date) > 0)
     return formatDiff(differenceInHours, 'hour')
 
   return i18n.t('common.date.aMomentAgo')
 }
 
-const isDateBefore = isBefore
 /**
  * Checks if the date is valid. Takes into account leap years
  * (i.e. 2015/2/29 is not valid).
@@ -93,7 +92,8 @@ const formatTime = (hour, minute) =>
 
 module.exports = {
   getRelativeDate,
-  isDateBefore,
+  isBefore,
+  isAfter,
 
   isValidDate,
   isValidTime,
