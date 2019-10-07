@@ -25,8 +25,10 @@ export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 export const validationsUpdate = 'survey/record/validation/update'
 
-export const recordNodesUpdate = nodes => dispatch =>
+export const recordNodesUpdate = nodes => dispatch => {
   dispatch({ type: nodesUpdate, nodes })
+  dispatch(hideAppLoader())
+}
 
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
@@ -193,8 +195,6 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
   } else {
     dispatch({ type: recordLoad, record })
   }
-
-  dispatch(hideAppLoader())
 }
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {
