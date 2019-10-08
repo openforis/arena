@@ -25,9 +25,13 @@ export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 export const validationsUpdate = 'survey/record/validation/update'
 
-export const recordNodesUpdate = nodes => dispatch => {
+export const recordNodesUpdate = nodes => (dispatch, getState) => {
+  const record = RecordState.getRecord(getState())
+  if (R.isEmpty(Record.getNodes(record))) {
+    dispatch(hideAppLoader())
+  }
+
   dispatch({ type: nodesUpdate, nodes })
-  dispatch(hideAppLoader())
 }
 
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
