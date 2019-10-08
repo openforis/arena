@@ -39,6 +39,12 @@ const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
 const getI18n = R.prop('i18n')
 
+// Cookies
+
+const getCookie = name => R.path(['cookies', name])
+
+const getSocketId = getCookie('io')
+
 module.exports = {
   getServerUrl,
   getParams,
@@ -53,4 +59,7 @@ module.exports = {
 
   // i18n
   getI18n,
+
+  // Cookies
+  getSocketId
 }

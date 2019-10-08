@@ -2,8 +2,8 @@ const axios = require('axios')
 const jwkToPem = require('jwk-to-pem')
 const jsonwebtoken = require('jsonwebtoken')
 
-const JwtConstants = require('../../../common/auth/jwtConstants')
-const ProcessUtils = require('../../../common/processUtils')
+const JwtConstants = require('../../common/auth/jwtConstants')
+const ProcessUtils = require('../../common/processUtils')
 
 const region = ProcessUtils.ENV.cognitoRegion
 const poolId = ProcessUtils.ENV.cognitoUserPoolId

@@ -1,25 +1,47 @@
 const io = require('socket.io')()
 const R = require('ramda')
 
+const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+
+const Logger = require('../log/log').getLogger('WebSocket')
 const Request = require('./request')
-const Jwt = require('../modules/auth/jwt')
+const Jwt = require('./jwt')
 
-// ==== USER SOCKETS
+const socketsById = new Map() //Map(<[socketId]:socket>)
+const socketIdsByUserUuid = new Map() //Map(<[userUuid]>:Set(socketIds))
 
-let userSockets = {}
+const addSocket = (userUuid, socket) => {
+  const socketId = socket.id
+  socketsById.set(socketId, socket)
 
-const getUserSockets = userUuid => R.propOr({}, userUuid, userSockets)
+  if (!socketIdsByUserUuid.has(userUuid)) {
+    socketIdsByUserUuid.set(userUuid, new Set())
+  }
+  socketIdsByUserUuid.get(userUuid).add(socketId)
+}
 
-const addUserSocket = (userUuid, socket) => { userSockets = R.assocPath([userUuid, socket.id], socket, userSockets) }
+const deleteSocket = (userUuid, socketId) => {
+  socketsById.delete(socketId)
 
-const deleteUserSocket = (userUuid, socketId) => { userSockets = R.dissocPath([userUuid, socketId], userSockets) }
+  const userSocketIds = socketIdsByUserUuid.get(userUuid)
+  userSocketIds.delete(socketId)
 
-const notifyUser = (userUuid, eventType, message) => R.pipe(
-  getUserSockets,
-  R.forEachObjIndexed(
-    socket => socket.emit(eventType, message),
-  )
-)(userUuid)
+  if (userSocketIds.size === 0) {
+    socketIdsByUserUuid.delete(userUuid)
+  }
+}
+
+const notifySocket = (socketId, eventType, message) => {
+  const socket = socketsById.get(socketId)
+  socket.emit(eventType, message)
+}
+
+const notifyUser = (userUuid, eventType, message) => {
+  const socketIds = socketIdsByUserUuid.get(userUuid)
+  for (const socketId of socketIds) {
+    notifySocket(socketId, eventType, message)
+  }
+}
 
 const init = (server, jwtMiddleware) => {
 
@@ -34,17 +56,19 @@ const init = (server, jwtMiddleware) => {
     jwtMiddleware(socket.request, {}, next)
   })
 
-  io.on('connection', async socket => {
+  io.on(WebSocketEvents.connection, async socket => {
     const userUuid = R.pipe(
       R.prop('request'),
       Request.getUserUuid,
     )(socket)
 
-    if (userUuid) {
-      addUserSocket(userUuid, socket)
+    Logger.debug(`socket connection with id: ${socket.id} for userUuid ${userUuid}`)
 
-      socket.on('disconnect', () => {
-        deleteUserSocket(userUuid, socket.id)
+    if (userUuid) {
+      addSocket(userUuid, socket)
+
+      socket.on(WebSocketEvents.disconnect, () => {
+        deleteSocket(userUuid, socket.id)
       })
     }
   })
@@ -53,5 +77,6 @@ const init = (server, jwtMiddleware) => {
 
 module.exports = {
   init,
+  notifySocket,
   notifyUser,
 }
