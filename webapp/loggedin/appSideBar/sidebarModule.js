@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
+import Authorizer from '../../../common/auth/authorizer'
+
 import {
   analysisModules,
   appModules,
@@ -32,7 +34,7 @@ const getModule = (module, children = null, root = true) => ({
     : []
 })
 
-export const getModulesHierarchy = () => [
+export const getModulesHierarchy = (user, surveyInfo) => [
   getModule(appModules.home),
   getModule(
     appModules.designer,
@@ -42,13 +44,15 @@ export const getModulesHierarchy = () => [
     appModules.data,
     [dataModules.records, dataModules.dataVis]
   ),
+  ...Authorizer.canAnalyzeRecords(user, surveyInfo)
+    ? [getModule(
+      appModules.analysis,
+      [analysisModules.processingChains]
+    )]
+    : [],
   getModule(
     appModules.users,
     [userModules.users]
-  ),
-  getModule(
-    appModules.analysis,
-    [analysisModules.processingChains]
   )
 ]
 

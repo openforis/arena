@@ -6,6 +6,7 @@ const {
   differenceInWeeks,
   differenceInDays,
   differenceInHours,
+  differenceInMinutes,
   isBefore,
   isAfter,
   format,
@@ -52,6 +53,9 @@ const getRelativeDate = (i18n, date) => {
 
   if (differenceInHours(now, date) > 0)
     return formatDiff(differenceInHours, 'hour')
+
+  if (differenceInMinutes(now, date) > 10)
+    return formatDiff(differenceInMinutes, 'minute')
 
   return i18n.t('common.date.aMomentAgo')
 }

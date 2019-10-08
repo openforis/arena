@@ -7,7 +7,7 @@ import * as SideBarModule from '../sidebarModule'
 
 const AppSideBarModules = props => {
 
-  const { surveyInfo, pathname, sideBarOpened } = props
+  const { user, surveyInfo, pathname, sideBarOpened } = props
 
   // popup menu module
   const [modulePopupMenu, setModulePopupMenu] = useState(null)
@@ -17,7 +17,7 @@ const AppSideBarModules = props => {
 
       <div className="app-sidebar__module-placeholder"/>
       {
-        SideBarModule.getModulesHierarchy().map(module => (
+        SideBarModule.getModulesHierarchy(user, surveyInfo).map(module => (
           <AppSideBarModule
             key={SideBarModule.getKey(module)}
             surveyInfo={surveyInfo}
@@ -49,6 +49,7 @@ const AppSideBarModules = props => {
 }
 
 AppSideBarModules.defaultProps = {
+  user: null,
   surveyInfo: null,
   pathname: '',
   sideBarOpened: false,

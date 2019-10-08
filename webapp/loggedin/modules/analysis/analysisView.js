@@ -3,7 +3,7 @@ import React from 'react'
 import { appModules, appModuleUri, analysisModules } from '../../appModules'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
-import ProcessingChainsListView from './processingChainsList/processingChainsListView'
+import ProcessingChainsView from './processingChains/processingChainsView'
 
 const AnalysisView = () => (
   <InnerModuleSwitch
@@ -11,7 +11,7 @@ const AnalysisView = () => (
     moduleDefault={analysisModules.processingChains}
     modules={[
       {
-        component: ProcessingChainsListView,
+        component: ProcessingChainsView,
         path: appModuleUri(analysisModules.processingChains),
       },
     ]}

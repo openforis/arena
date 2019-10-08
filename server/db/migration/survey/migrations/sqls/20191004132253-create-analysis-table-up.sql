@@ -3,9 +3,9 @@ CREATE TABLE
   (
     uuid uuid DEFAULT uuid_generate_v4() NOT NULL,
     cycle INTEGER NOT NULL,
-    date_created TIME without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
-    date_modified TIME without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
-    date_executed TIME without TIME zone,
+    date_created TIMESTAMP without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
+    date_modified TIMESTAMP without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
+    date_executed TIMESTAMP without TIME zone,
     props jsonb DEFAULT '{}'::jsonb NOT NULL,
     status_exec VARCHAR(15),
     PRIMARY KEY (uuid)

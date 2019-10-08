@@ -27,7 +27,7 @@ export const appModules = {
   analysis: {
     key: 'analysis',
     path: 'analysis',
-    icon: 'pie-chart'
+    icon: 'stats-dots'
   },
 }
 
@@ -107,7 +107,7 @@ export const userModules = {
 
 export const analysisModules = {
   processingChains: {
-    key: 'processingChainList',
+    key: 'processingChains',
     path: `${appModules.analysis.path}/processingChains`,
   },
 }

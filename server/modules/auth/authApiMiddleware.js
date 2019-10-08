@@ -67,6 +67,7 @@ module.exports = {
   requireRecordCreatePermission: requireSurveyPermission(Authorizer.canCreateRecord),
   requireRecordEditPermission: requireRecordPermission(Authorizer.canEditRecord),
   requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
+  requireRecordAnalysisPermission: requireSurveyPermission(Authorizer.canAnalyzeRecords),
 
   // User
   requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),

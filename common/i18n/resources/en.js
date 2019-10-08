@@ -19,6 +19,7 @@ module.exports = {
     description_plural: 'Descriptions',
     done: 'Done',
     download: 'Download',
+    draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
     empty: 'Empty',
@@ -62,6 +63,8 @@ module.exports = {
       hour_plural: 'hours',
       day: 'day',
       day_plural: 'days',
+      minute: 'minute',
+      minute_plural: 'minutes',
       week: 'week',
       week_plural: 'weeks',
       timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
@@ -114,7 +117,7 @@ module.exports = {
     userList: 'User list',
 
     analysis: 'Analysis',
-    processingChainList: 'Processing Chains',
+    processingChains: 'Processing Chains',
   },
 
   surveyDefsLoader: {

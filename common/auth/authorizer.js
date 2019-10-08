@@ -82,6 +82,8 @@ const canEditRecordsInDataQuery = R.pipe(
   )
 )
 
+const canAnalyzeRecords = hasSurveyPermission(permissions.recordAnalyse)
+
 // ======
 // ====== Users
 // ======
@@ -131,9 +133,10 @@ module.exports = {
 
   // Record permissions
   canCreateRecord,
+  canViewRecord,
   canEditRecord,
   canEditRecordsInDataQuery,
-  canViewRecord,
+  canAnalyzeRecords,
 
   // User permissions
   canInviteUsers,
