@@ -27,18 +27,17 @@ export const validationsUpdate = 'survey/record/validation/update'
 
 export const recordNodesUpdate = nodes => (dispatch, getState) => {
   const record = RecordState.getRecord(getState())
+  // hide app loader on record create
   if (R.isEmpty(Record.getNodes(record))) {
     dispatch(hideAppLoader())
   }
-
   dispatch({ type: nodesUpdate, nodes })
 }
 
 export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-const _navigateToModuleDataHome = history =>
-  history.push(appModuleUri(appModules.data))
+const _navigateToModuleDataHome = history => history.push(appModuleUri(appModules.data))
 
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
@@ -51,8 +50,7 @@ export const sessionExpired = history => dispatch => {
   _navigateToModuleDataHome(history)
 }
 
-export const cycleChanged = history => () =>
-  _navigateToModuleDataHome(history)
+export const cycleChanged = history => () => _navigateToModuleDataHome(history)
 
 /**
  * ============
@@ -198,6 +196,11 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
     dispatch({ type: recordLoad, record, nodeDefActivePage, formPageNodeUuidByNodeDefUuid })
   } else {
     dispatch({ type: recordLoad, record })
+  }
+
+  // hide app loader on record edit
+  if (!R.isEmpty(Record.getNodes(record))) {
+    dispatch(hideAppLoader())
   }
 }
 
