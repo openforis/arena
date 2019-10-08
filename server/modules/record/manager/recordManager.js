@@ -68,6 +68,7 @@ module.exports = {
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
+  fetchChildNodesByNodeDefUuids: NodeRepository.fetchChildNodesByNodeDefUuids,
 
   // ==== UPDATE
   initNewRecord: RecordUpdateManager.initNewRecord,

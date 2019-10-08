@@ -45,18 +45,20 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
 
   return await client.any(`
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
-    FROM ${tableName} ${aliasA}
-      JOIN ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r 
+    FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
+      JOIN ${tableName} ${aliasA}
         ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid} 
     WHERE
-      ${DataTable.colNameRecordCycle} = $1 
+      r.cycle = $1 
       AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
       SELECT ${aliasB}.${DataTable.colNameUuuid}
       FROM ${tableName} ${aliasB}
-        WHERE
+      WHERE
+        --same cycle
+        ${aliasB}.${DataTable.colNameRecordCycle} = $1
         --different node uuid 
-        ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
+        AND ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
         ${recordAndParentEqualCondition}
         --same key node(s) values
         AND (${equalKeysCondition})
