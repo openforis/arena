@@ -1,4 +1,5 @@
-const Jwt = require('../jwt')
+const Jwt = require('../../../utils/jwt')
+
 const AuthManager = require('../manager/authManager')
 
 const blacklistToken = async token => {

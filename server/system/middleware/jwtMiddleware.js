@@ -1,4 +1,4 @@
-const Jwt = require('../../modules/auth/jwt')
+const Jwt = require('../../utils/jwt')
 
 const UserService = require('../../modules/user/service/userService')
 const AuthService = require('../../modules/auth/service/authService')

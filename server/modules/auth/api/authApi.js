@@ -1,6 +1,7 @@
 const Loggger = require('../../../log/log').getLogger('AuthAPI')
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
+const Jwt = require('../../../utils/jwt')
 
 const Survey = require('../../../../common/survey/survey')
 const User = require('../../../../common/user/user')
@@ -10,8 +11,6 @@ const SurveyService = require('../../survey/service/surveyService')
 const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
 const AuthService = require('../service/authService')
-
-const Jwt = require('../jwt')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 

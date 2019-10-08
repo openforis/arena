@@ -18,7 +18,7 @@ export const openSocket = async (throwErrorFn) => {
     query: { token: token },
   })
 
-  on('reconnect_attempt', async () => {
+  on(WebSocketEvents.reconnectAttempt, async () => {
     const token = await CognitoAuth.getJwtToken()
     socket.io.opts.query = { token: token }
   })

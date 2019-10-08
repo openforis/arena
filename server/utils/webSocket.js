@@ -1,8 +1,11 @@
 const io = require('socket.io')()
 const R = require('ramda')
 
+const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+
+const Logger = require('../log/log').getLogger('WebSocket')
 const Request = require('./request')
-const Jwt = require('../modules/auth/jwt')
+const Jwt = require('./jwt')
 
 // ==== USER SOCKETS
 
@@ -34,16 +37,18 @@ const init = (server, jwtMiddleware) => {
     jwtMiddleware(socket.request, {}, next)
   })
 
-  io.on('connection', async socket => {
+  io.on(WebSocketEvents.connection, async socket => {
     const userUuid = R.pipe(
       R.prop('request'),
       Request.getUserUuid,
     )(socket)
 
+    Logger.debug(`socket connection with id: ${socket.id} for userUuid ${userUuid}`)
+
     if (userUuid) {
       addUserSocket(userUuid, socket)
 
-      socket.on('disconnect', () => {
+      socket.on(WebSocketEvents.disconnect, () => {
         deleteUserSocket(userUuid, socket.id)
       })
     }
