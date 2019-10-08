@@ -1,0 +1,25 @@
+@import "../../../../style/vars";
+
+.processing-chains {
+
+  .column-draft {
+    .icon {
+      color: lighten($black, 30%);
+    }
+  }
+
+  .column-status {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+
+    &.success .icon {
+      color: $green;
+    }
+
+    &.error .icon {
+      color: $red;
+    }
+  }
+
+}

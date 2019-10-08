@@ -39,6 +39,8 @@ const isDraft = R.ifElse(
 const assocProcessingSteps = R.assoc(keys.processingSteps)
 
 module.exports = {
+  statusExec,
+
   //READ
   getDateCreated,
   getDateExecuted,

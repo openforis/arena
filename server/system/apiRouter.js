@@ -17,6 +17,8 @@ require('../modules/record/api/recordApi').init(router)
 
 require('../modules/surveyRdb/api/surveyRdbApi').init(router)
 
+require('../modules/analysis/api/processingChainApi').init(router)
+
 require('../job/jobApi').init(router)
 
 require('../modules/expression/api/expressionApi').init(router)

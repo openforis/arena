@@ -19,6 +19,7 @@ module.exports = {
     description_plural: 'Descriptions',
     done: 'Done',
     download: 'Download',
+    draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
     empty: 'Empty',
@@ -62,6 +63,8 @@ module.exports = {
       hour_plural: 'hours',
       day: 'day',
       day_plural: 'days',
+      minute: 'minute',
+      minute_plural: 'minutes',
       week: 'week',
       week_plural: 'weeks',
       timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
@@ -112,6 +115,9 @@ module.exports = {
 
     users: 'Users',
     userList: 'User list',
+
+    analysis: 'Analysis',
+    processingChains: 'Processing Chains',
   },
 
   surveyDefsLoader: {
@@ -218,6 +224,13 @@ module.exports = {
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  analysis: {
+    processingChain: {
+      dateExecuted: 'Date executed',
+      status: 'Status'
+    }
   },
 
   itemsTable: {

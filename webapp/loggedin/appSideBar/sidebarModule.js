@@ -1,7 +1,17 @@
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
-import { appModules, appModuleUri, dataModules, designerModules, homeModules, userModules } from '../appModules'
+import Authorizer from '../../../common/auth/authorizer'
+
+import {
+  analysisModules,
+  appModules,
+  appModuleUri,
+  dataModules,
+  designerModules,
+  homeModules,
+  userModules
+} from '../appModules'
 
 const keys = {
   key: 'key',
@@ -24,7 +34,7 @@ const getModule = (module, children = null, root = true) => ({
     : []
 })
 
-export const getModulesHierarchy = () => [
+export const getModulesHierarchy = (user, surveyInfo) => [
   getModule(appModules.home),
   getModule(
     appModules.designer,
@@ -34,10 +44,16 @@ export const getModulesHierarchy = () => [
     appModules.data,
     [dataModules.records, dataModules.dataVis]
   ),
+  ...Authorizer.canAnalyzeRecords(user, surveyInfo)
+    ? [getModule(
+      appModules.analysis,
+      [analysisModules.processingChains]
+    )]
+    : [],
   getModule(
     appModules.users,
     [userModules.users]
-  ),
+  )
 ]
 
 export const getKey = R.prop(keys.key)

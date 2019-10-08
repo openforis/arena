@@ -13,7 +13,8 @@ import { toggleSideBar } from '../../app/actions'
 const AppSideBar = (props) => {
 
   const {
-    pathname, surveyInfo, isSideBarOpened,
+    pathname,
+    user, surveyInfo, isSideBarOpened,
     toggleSideBar
   } = props
 
@@ -31,6 +32,7 @@ const AppSideBar = (props) => {
       </a>
 
       <AppSideBarModules
+        user={user}
         surveyInfo={surveyInfo}
         pathname={pathname}
         sideBarOpened={isSideBarOpened}/>
@@ -41,6 +43,7 @@ const AppSideBar = (props) => {
 }
 
 const mapStateToProps = state => ({
+  user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   isSideBarOpened: AppState.isSideBarOpened(state),
 })
