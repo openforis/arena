@@ -1,7 +1,9 @@
 const R = require('ramda')
 
 const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
 
+const Node = require('../../../../common/record/node')
 const RecordValidation = require('../../../../common/record/recordValidation')
 const Validation = require('../../../../common/validation/validation')
 
@@ -55,18 +57,19 @@ class RecordsUniquenessValidationJob extends Job {
           return
 
         //2. for each duplicate node entity, update record validation
-        const { uuid, validation, node_duplicate_uuids } = rowRecordDuplicate
+        const { uuid: recordUuid, validation, node_duplicate_uuids } = rowRecordDuplicate
+        const nodeRootUuid = node_duplicate_uuids[0]
+        const nodesKeyDuplicate = await RecordManager.fetchChildNodesByNodeDefUuids(this.surveyId, recordUuid, nodeRootUuid, nodeDefKeys.map(NodeDef.getUuid), this.tx)
+        const validationRecord = this.validationByRecordUuid[recordUuid] || validation
 
-        const validationRecord = this.validationByRecordUuid[uuid] || validation
-
-        const validationUpdated = node_duplicate_uuids.reduce(
-          (validationRecord, nodeEntityDuplicateUuid) =>
-            _updateNodeValidation(validationRecord, nodeEntityDuplicateUuid, validationDuplicate)
+        const validationUpdated = nodesKeyDuplicate.reduce(
+          (validationRecord, nodeKeyDuplicate) =>
+            _updateNodeValidation(validationRecord, Node.getUuid(nodeKeyDuplicate), validationDuplicate)
           , validationRecord
         )
 
         //3. add record validation to batch update
-        await this.addRecordValidationToBatchUpdate(uuid, validationUpdated)
+        await this.addRecordValidationToBatchUpdate(recordUuid, validationUpdated)
       }
     }
 

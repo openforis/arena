@@ -204,6 +204,7 @@ module.exports = {
   fetchNodesByRecordUuid,
   fetchNodeByUuid,
   fetchChildNodesByNodeDefUuid,
+  fetchChildNodesByNodeDefUuids,
   fetchChildNodeByNodeDefUuid,
 
   //UPDATE
