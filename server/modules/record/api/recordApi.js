@@ -24,12 +24,13 @@ module.exports.init = app => {
       const user = Request.getUser(req)
       const { surveyId } = Request.getParams(req)
       const record = Request.getBody(req)
+      const socketId = Request.getSocketId(req)
 
       if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
         throw new Error('Error record create. User is different')
       }
 
-      await RecordService.createRecord(user, surveyId, record)
+      await RecordService.createRecord(socketId, user, surveyId, record)
 
       sendOk(res)
     } catch (err) {
@@ -43,8 +44,9 @@ module.exports.init = app => {
       const { surveyId } = Request.getParams(req)
       const node = Request.getJsonParam(req, 'node')
       const file = Request.getFile(req)
+      const socketId = Request.getSocketId(req)
 
-      await RecordService.persistNode(user, surveyId, node, file)
+      await RecordService.persistNode(socketId, user, surveyId, node, file)
 
       sendOk(res)
     } catch (err) {
@@ -122,8 +124,9 @@ module.exports.init = app => {
     try {
       const { surveyId, recordUuid, draft } = Request.getParams(req)
       const user = Request.getUser(req)
+      const socketId = Request.getSocketId(req)
 
-      const record = await RecordService.checkIn(user, surveyId, recordUuid, draft)
+      const record = await RecordService.checkIn(socketId, user, surveyId, recordUuid, draft)
 
       res.json({ record })
     } catch (err) {
@@ -135,8 +138,9 @@ module.exports.init = app => {
     try {
       const user = Request.getUser(req)
       const { surveyId, recordUuid } = Request.getParams(req)
+      const socketId = Request.getSocketId(req)
 
-      await RecordService.checkOut(user, surveyId, recordUuid)
+      await RecordService.checkOut(socketId, user, surveyId, recordUuid)
 
       sendOk(res)
     } catch (err) {
@@ -149,8 +153,9 @@ module.exports.init = app => {
     try {
       const { surveyId, recordUuid } = Request.getParams(req)
       const user = Request.getUser(req)
+      const socketId = Request.getSocketId(req)
 
-      await RecordService.deleteRecord(user, surveyId, recordUuid)
+      await RecordService.deleteRecord(socketId, user, surveyId, recordUuid)
 
       sendOk(res)
     } catch (err) {
@@ -161,8 +166,9 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
     const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
     const user = Request.getUser(req)
+    const socketId = Request.getSocketId(req)
 
-    RecordService.deleteNode(user, surveyId, recordUuid, nodeUuid)
+    RecordService.deleteNode(socketId, user, surveyId, recordUuid, nodeUuid)
     sendOk(res)
   })
 

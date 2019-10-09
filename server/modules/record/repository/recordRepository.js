@@ -198,10 +198,11 @@ const deleteRecord = async (surveyId, recordUuid, client = db) =>
     [recordUuid]
   )
 
-const deleteRecordsPreview = async (surveyId, client = db) =>
+const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, client = db) =>
   await client.map(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
     WHERE preview = $1
+    ${olderThan24Hours ? `AND date_created <= NOW() - INTERVAL '24 HOURS'` : ''}
     RETURNING uuid
     `,
     [true],

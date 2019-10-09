@@ -1,99 +1,78 @@
 const R = require('ramda')
 const fs = require('fs')
 
-const Log = require('../../../log/log').getLogger('RecordService')
+const Logger = require('../../../log/log').getLogger('RecordService')
 
 const Survey = require('../../../../common/survey/survey')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 const RecordFile = require('../../../../common/record/recordFile')
 const Authorizer = require('../../../../common/auth/authorizer')
-const User = require('../../../../common/user/user')
 
-const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
+const WebSocket = require('../../../utils/webSocket')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const RecordManager = require('../manager/recordManager')
 const FileManager = require('../manager/fileManager')
 
-const RecordUsersMap = require('./update/recordUsersMap')
 const RecordServiceThreads = require('./update/recordServiceThreads')
-const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
+const RecordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
 
 /**
  * ======
  * RECORD
  * ======
  */
-const createRecord = async (user, surveyId, recordToCreate) => {
-  Log.debug('create record: ', recordToCreate)
+const createRecord = async (socketId, user, surveyId, recordToCreate) => {
+  Logger.debug('create record: ', recordToCreate)
 
   const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
   // create record thread and initialize record
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, Record.getUuid(recordToCreate))
-  thread.postMessage({ type: recordThreadMessageTypes.recordInit })
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, Record.getUuid(recordToCreate))
+  thread.postMessage({ type: RecordThreadMessageTypes.recordInit })
 
   return record
 }
 
-const deleteRecord = async (user, surveyId, recordUuid) => {
-  Log.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
+const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
+  Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   await RecordManager.deleteRecord(user, surveyId, recordUuid)
-  const userUuid = User.getUuid(user)
 
-  // notify other users viewing or editing the record that it has been deleted
-  const recordUsersIds = RecordUsersMap.getUserUuids(recordUuid)
-  recordUsersIds.forEach(userUuidRecord => {
-    if (userUuidRecord !== userUuid) {
-      WebSocket.notifyUser(userUuidRecord, WebSocketEvents.recordDelete, recordUuid)
-      RecordUsersMap.dissocUsers(recordUuid)
+  // notify other users viewing or editing the record it has been deleted
+  const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
+  socketIds.forEach(socketIdCurrent => {
+    if (socketIdCurrent !== socketId) {
+      WebSocket.notifyUser(socketIdCurrent, WebSocketEvents.recordDelete, recordUuid)
     }
   })
-
-  dissocUserFromRecordThread(userUuid)
+  RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
 }
 
-const checkIn = async (user, surveyId, recordUuid, draft) => {
+const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, draft)
   const preview = Record.isPreview(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid)
+    RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, recordUuid)
   }
-  RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
+  RecordServiceThreads.assocSocket(recordUuid, socketId)
 
   return record
 }
 
-const checkOut = async (user, surveyId, recordUuid) => {
+const checkOut = async (socketId, user, surveyId, recordUuid) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
 
   if (Record.isPreview(record)) {
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
   }
 
-  dissocUserFromRecordThread(User.getUuid(user))
-}
-
-const dissocUserFromRecordThread = userUuid => {
-  const recordUuid = RecordUsersMap.getRecordUuid(userUuid)
-  if (recordUuid) {
-    RecordUsersMap.dissocUser(recordUuid, userUuid)
-
-    // terminate thread if there are no more users editing the record
-    const thread = RecordServiceThreads.getRecordThread(recordUuid)
-    if (thread) {
-      const userUuids = RecordUsersMap.getUserUuids(recordUuid)
-      if (R.isEmpty(userUuids)) {
-        RecordServiceThreads.killRecordThread(recordUuid)
-      }
-    }
-  }
+  RecordServiceThreads.dissocSocket(socketId)
 }
 
 /**
@@ -101,10 +80,10 @@ const dissocUserFromRecordThread = userUuid => {
  * NODE
  * ======
  */
-const _sendNodeUpdateMessage = (user, surveyId, recordUuid, msg) => {
+const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
   const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
 
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(user, surveyId, recordUuid)
+  const thread = RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, recordUuid)
   thread.postMessage(msg, user)
 
   if (singleMessage) {
@@ -112,7 +91,7 @@ const _sendNodeUpdateMessage = (user, surveyId, recordUuid, msg) => {
   }
 }
 
-const persistNode = async (user, surveyId, node, file) => {
+const persistNode = async (socketId, user, surveyId, node, file) => {
   if (file) {
     //save file to "file" table and set fileUuid and fileName into node value
     const fileObj = RecordFile.createFile(Node.getFileUuid(node), file.name, file.size, fs.readFileSync(file.tempFilePath),
@@ -122,30 +101,20 @@ const persistNode = async (user, surveyId, node, file) => {
   }
 
   _sendNodeUpdateMessage(
-    user,
-    surveyId,
-    Node.getRecordUuid(node),
-    { type: recordThreadMessageTypes.nodePersist, node, user }
+    socketId, user, surveyId, Node.getRecordUuid(node), { type: RecordThreadMessageTypes.nodePersist, node, user }
   )
 }
 
-const deleteNode = (user, surveyId, recordUuid, nodeUuid) =>
-  _sendNodeUpdateMessage(
-    user,
-    surveyId,
-    recordUuid,
-    { type: recordThreadMessageTypes.nodeDelete, nodeUuid, user }
-  )
+const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) => _sendNodeUpdateMessage(
+  socketId, user, surveyId, recordUuid, { type: RecordThreadMessageTypes.nodeDelete, nodeUuid, user }
+)
 
-const deleteRecordsPreview = async () => {
+const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const countDeletedRecordsBySurvey = await Promise.all(
-    surveyIds.map(surveyId =>
-      RecordManager.deleteRecordsPreview(surveyId)
-    )
-  )
-
-  return countDeletedRecordsBySurvey.reduce((sum, n) => sum + n, 0)
+  const counts = await Promise.all(surveyIds.map(
+    surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
+  ))
+  return R.sum(counts)
 }
 
 module.exports = {
@@ -169,13 +138,10 @@ module.exports = {
 
   checkIn,
   checkOut,
-  dissocUserFromRecordThread,
+  dissocSocketFromRecordThread: RecordServiceThreads.dissocSocket,
 
   // ======  NODE
   fetchNodeByUuid: RecordManager.fetchNodeByUuid,
   persistNode,
   deleteNode,
-
-  //==== UTILS
-  getStalePreviewRecordUuids: RecordUsersMap.getStalePreviewRecordUuids,
 }

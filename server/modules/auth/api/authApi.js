@@ -48,8 +48,8 @@ module.exports.init = app => {
   app.post('/auth/logout', async (req, res, next) => {
     try {
       // before logout checkOut record if there's an opened thread
-      const user = Request.getUser(req)
-      RecordService.dissocUserFromRecordThread(User.getUuid(user))
+      const socketId = Request.getSocketId(req)
+      RecordService.dissocSocketFromRecordThread(socketId)
 
       const token = req.headers.authorization.substring(Jwt.bearerPrefix.length)
 

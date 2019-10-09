@@ -9,7 +9,6 @@ const Record = require('../../../../../common/record/record')
 const RecordStep = require('../../../../../common/record/recordStep')
 const Node = require('../../../../../common/record/node')
 
-const RecordUsersMap = require('../../service/update/recordUsersMap')
 const RecordRepository = require('../../repository/recordRepository')
 const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
@@ -70,14 +69,14 @@ const deleteRecordPreview = async (surveyId, recordUuid) =>
     await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
-const deleteRecordsPreview = async surveyId =>
+const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   await db.tx(async t => {
-    const deletedRecordUuids = await RecordRepository.deleteRecordsPreview(surveyId, t)
-    if (!R.isEmpty(deletedRecordUuids)) {
-      await FileManager.deleteFilesByRecordUuids(surveyId, deletedRecordUuids, t)
+    const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
+    if (!R.isEmpty(recordUuids)) {
+      await FileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
 
-    return deletedRecordUuids.length
+    return recordUuids.length
   })
 
 /**
@@ -165,11 +164,8 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
     nodesValidationListener(validations)
   record = Record.mergeNodeValidations(validations)(record)
 
-  if (Record.isPreview(record)) {
-    // 4. touch preview record
-    RecordUsersMap.touchPreviewRecord(Record.getUuid(record))
-  } else {
-    // 4. OR update survey rdb
+  // 4. update survey rdb
+  if (!Record.isPreview(record)) {
     const nodeDefs = SurveyUtils.toUuidIndexedObj(
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
