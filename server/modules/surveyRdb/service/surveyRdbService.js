@@ -51,26 +51,25 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
   // 1. find ancestor defs of table def
   const tableNodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
 
-  const ancestorAndSelfDefs = []
+  // 2. get hierarchy entities uuid col names
   const ancestorUuidColNames = []
-
   Survey.visitAncestorsAndSelf(
     tableNodeDef,
-    nodeDefCurrent => {
-      ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
-      ancestorAndSelfDefs.push(nodeDefCurrent)
-    }
+    nodeDefCurrent => ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
   )(survey)
 
+  // 3. prepare cols to fetch
   const queryCols = R.pipe(
     R.concat(ancestorUuidColNames),
     R.append(DataTable.colNameRecordUuuid)
   )(cols)
 
-  const rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, queryCols, offset, limit, filterExpr, sort)
+  // 4. fetch data
+  let rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, queryCols, offset, limit, filterExpr, sort)
 
-  return editMode
-    ? await Promise.all(rows.map(
+  // 5. in edit mode, assoc nodes to columns
+  if (editMode) {
+    rows = await Promise.all(rows.map(
       async row => {
         const { record_uuid: recordUuid } = row
 
@@ -83,34 +82,31 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
           parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
         }
 
-        for (const ancestorDef of ancestorAndSelfDefs) {
-          const childDefs = Survey.getNodeDefChildren(ancestorDef)(survey)
-          const childDefsFiltered = R.filter(childDef => R.includes(NodeDef.getUuid(childDef), nodeDefUuidCols), childDefs)
+        //assoc nodes to each columns
+        for (const nodeDefUuidCol of nodeDefUuidCols) {
+          const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
+          const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
+          const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
+          const parentUuid = R.prop(parentUuidColName, row)
 
-          for (const childDef of childDefsFiltered) {
-            const ancestorUuidColName = `${NodeDef.getName(ancestorDef)}_uuid`
-            const ancestorUuid = R.prop(ancestorUuidColName, row)
-            const childDefUuid = NodeDef.getUuid(childDef)
+          const nodes = await RecordManager.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
 
-            const nodes = await RecordManager.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, ancestorUuid, childDefUuid)
-
-            resultRow.cols[childDefUuid] = {
-              parentUuid: ancestorUuid,
-              nodes: toUuidIndexedObj(nodes)
-            }
+          resultRow.cols[nodeDefUuidCol] = {
+            parentUuid,
+            nodes: toUuidIndexedObj(nodes)
           }
         }
+
         return resultRow
       }
     ))
-    : rows
+  }
+
+  return rows
 }
 
 module.exports = {
-
   queryTable,
-
   countTable: SurveyRdbManager.countTable,
-
   exportTableToCSV,
 }

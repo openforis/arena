@@ -116,13 +116,6 @@ const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, chi
     dbTransformCallback
   )
 
-const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
-  await fetchChildNodesByNodeDefUuids(surveyId, recordUuid, nodeUuid, [childDefUUid], client)
-
-const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
-  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
-  return R.head(nodes)
-}
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
@@ -202,9 +195,7 @@ module.exports = {
   //READ
   fetchNodesByRecordUuid,
   fetchNodeByUuid,
-  fetchChildNodesByNodeDefUuid,
   fetchChildNodesByNodeDefUuids,
-  fetchChildNodeByNodeDefUuid,
 
   //UPDATE
   updateNode,
