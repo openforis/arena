@@ -32,7 +32,7 @@ const Table = props => {
 
   const tableRef = useRef(null)
   const { width = defaultColWidth } = elementOffset(tableRef.current)
-  const widthMax = width - defaultColWidth - 5
+  const widthMax = width - defaultColWidth - 35
   const colWidthMin = 150
 
   const colsTot = editMode ? nodeDefUuidCols.length : colNames.length
