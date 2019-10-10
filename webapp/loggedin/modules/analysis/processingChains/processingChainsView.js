@@ -20,9 +20,15 @@ import { createProcessingChain, navigateToProcessingChainView } from './actions'
 
 const processingChainsModule = 'processing-chains'
 
-const ProcessingChainsView = ({ surveyCycleKey, reloadListItems, history, createProcessingChain, navigateToProcessingChainView }) => {
+const ProcessingChainsView = props => {
 
-  const restParams = { cycle: surveyCycleKey }
+  const {
+    surveyCycleKey,
+    history,
+    reloadListItems, createProcessingChain, navigateToProcessingChainView
+  } = props
+
+  const restParams = { surveyCycleKey }
 
   useOnUpdate(() => {
     reloadListItems(processingChainsModule, restParams)

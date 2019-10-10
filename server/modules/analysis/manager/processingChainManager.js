@@ -9,7 +9,7 @@ const ProcessingChainRepository = require('../repository/processingChainReposito
 const createChain = async (user, surveyId, cycle, client = db) =>
   await client.tx(async t => {
     const processingChain = await ProcessingChainRepository.insertChain(surveyId, cycle, t)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.processingChainInsert, { processingChain }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.processingChainCreate, { processingChain }, t)
     return ProcessingChain.getUuid(processingChain)
   })
 
