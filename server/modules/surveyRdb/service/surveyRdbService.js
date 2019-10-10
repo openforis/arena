@@ -88,8 +88,8 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
           const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
           const parentUuid = R.prop(parentUuidColName, row)
 
-          const node = NodeDef.isMultiple(nodeDefTable)
-            ? await RecordManager.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefTable)}_uuid`])
+          const node = NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // column is the multiple attribute
+            ? await RecordManager.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefCol)}_uuid`])
             : (await RecordManager.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol]))[0]
 
           resultRow.cols[nodeDefUuidCol] = { parentUuid, node }

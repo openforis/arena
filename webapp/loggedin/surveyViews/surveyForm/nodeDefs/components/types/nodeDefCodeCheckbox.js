@@ -17,7 +17,7 @@ const Checkbox = props => {
 
   return (
     <button
-      className={`btn btn-s btn-checkbox ${selected ? 'active' : ''}`}
+      className={`btn btn-s deselectable${selected ? ' active' : ''}`}
       aria-disabled={edit || !canEditRecord || readOnly}
       onClick={() => {
         selected

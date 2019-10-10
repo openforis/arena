@@ -6,15 +6,6 @@
   flex-wrap: wrap;
   align-items: flex-start;
 
-  .btn-checkbox {
-    pointer-events: all;
-    border: $formBorder;
-
-    &[aria-disabled="true"] {
-      pointer-events: none;
-    }
-  }
-
   .form-input-chip {
     .form-input {
       width: auto;

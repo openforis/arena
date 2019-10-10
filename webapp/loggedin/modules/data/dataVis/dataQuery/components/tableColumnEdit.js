@@ -16,7 +16,7 @@ class TableColumnEdit extends React.Component {
 
   render () {
     const {
-      surveyInfo, canEditRecord,
+      surveyInfo, surveyCycleKey, canEditRecord,
       nodeDef, record, cell,
       updateNode, removeNode, createNodePlaceholder
     } = this.props
@@ -32,6 +32,7 @@ class TableColumnEdit extends React.Component {
       return (
         <NodeDefTableCellBody
           surveyInfo={surveyInfo}
+          surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           parentNode={parentNode}
           nodes={[node]}
@@ -59,6 +60,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     surveyInfo,
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
     canEditRecord: Authorizer.canEditRecord(user, record),
   }
 }

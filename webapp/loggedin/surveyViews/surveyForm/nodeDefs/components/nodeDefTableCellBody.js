@@ -77,7 +77,7 @@ const NodeDefMultipleTableCell = props => {
 
 const NodeDefTableCellBody = props => {
   const {
-    surveyInfo, nodeDef,
+    surveyInfo, surveyCycleKey, nodeDef,
     parentNode, nodes, edit, entryDataQuery,
   } = props
   const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
@@ -90,7 +90,7 @@ const NodeDefTableCellBody = props => {
       edit={edit}>
 
       {
-        (NodeDef.isMultiple(nodeDef) || (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(nodeDef))) && !entryDataQuery
+        (NodeDef.isMultiple(nodeDef) || (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(surveyCycleKey)(nodeDef))) && !entryDataQuery
           ? (
             <NodeDefMultipleTableCell
               {...props}
