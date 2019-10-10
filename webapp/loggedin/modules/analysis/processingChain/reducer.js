@@ -1,5 +1,7 @@
 import { exportReducer } from '../../../../utils/reduxUtils'
 
+import ProcessingChain from '../../../../../common/analysis/processingChain'
+
 import {
   processingChainUpdate,
   processingChainPropUpdate,
@@ -7,7 +9,6 @@ import {
 
 import { appUserLogout } from '../../../../app/actions'
 
-import * as ProcessingChainState from './processingChainState'
 import { surveyCreate, surveyDelete, surveyUpdate } from '../../../../survey/actions'
 
 const actionHandlers = {
@@ -17,8 +18,8 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [processingChainUpdate]: (state, { processingChain }) => ProcessingChainState.assocProcessingChain(processingChain)(state),
-  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainState.assocProcessingChainProp(key, value)(state),
+  [processingChainUpdate]: (state, { processingChain }) => processingChain,
+  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChain.assocProp(key, value)(state),
 }
 
 export default exportReducer(actionHandlers)
