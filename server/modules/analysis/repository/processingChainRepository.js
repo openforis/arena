@@ -43,7 +43,8 @@ const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
 const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
   await client.one(`
       UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-      SET props = jsonb_set("props", '{${key}}', $2::jsonb)
+      SET props = jsonb_set("props", '{${key}}', $2::jsonb),
+          date_modified = ${DbUtils.now}
       WHERE uuid = $1
       RETURNING ${selectFields}
     `,
