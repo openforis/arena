@@ -1,9 +1,13 @@
 .processing-chain {
 
+  padding-top: 2rem;
+  position: relative;
+
   .btn-delete {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    width: 80px;
+    bottom: 1rem;
+    left: calc(50% - 40px);
   }
 
 }
