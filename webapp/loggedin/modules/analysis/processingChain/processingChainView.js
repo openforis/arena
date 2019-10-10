@@ -9,22 +9,30 @@ import ObjectUtils from '../../../../../common/objectUtils'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 
 import { getUrlParam } from '../../../../utils/routerUtils'
+import { useOnUpdate } from '../../../../commonComponents/hooks'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
 
 import { fetchProcessingChain, putProcessingChainProp } from './actions'
+import { analysisModules, appModuleUri } from '../../../appModules'
 
 const ProcessingChainView = props => {
 
   const {
-    surveyInfo, processingChainUuid, processingChain,
+    surveyInfo, surveyCycleKey,
+    processingChainUuid, processingChain,
+    history,
     fetchProcessingChain, putProcessingChainProp,
   } = props
 
   useEffect(() => {
     fetchProcessingChain(processingChainUuid)
   }, [])
+
+  useOnUpdate(() => {
+    history.push(appModuleUri(analysisModules.processingChains))
+  }, [surveyCycleKey])
 
   const onPropLabelsChange = key => labelItem => {
     const labelsUpdated = R.pipe(
@@ -60,6 +68,7 @@ const ProcessingChainView = props => {
 
 const mapStateToProps = (state, { match }) => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
+  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   processingChainUuid: getUrlParam('processingChainUuid')(match),
   processingChain: ProcessingChainState.getProcessingChain(state)
 })
