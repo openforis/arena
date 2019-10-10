@@ -3,11 +3,13 @@ import './components/dataQueryView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Table from './components/table'
+import Survey from '../../../../../../common/survey/survey'
+import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import Table from './components/table'
 
-import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols, resetTableData } from './actions'
+import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
 
 import * as DataQueryState from './dataQueryState'
 import * as SurveyState from '../../../../../survey/surveyState'
@@ -15,7 +17,7 @@ import * as SurveyState from '../../../../../survey/surveyState'
 const DataQueryView = props => {
 
   const {
-    nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
+    hierarchy, nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
     initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols,
   } = props
 
@@ -29,6 +31,7 @@ const DataQueryView = props => {
       {
         nodeDefSelectorsVisible &&
         <NodeDefsSelectorView
+          hierarchy={hierarchy}
           nodeDefUuidEntity={nodeDefUuidEntity}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onChangeEntity={updateTableNodeDefUuid}
@@ -48,12 +51,18 @@ DataQueryView.defaultProps = {
   nodeDefUuidsAttributes: [],
 }
 
-const mapStateToProps = state => ({
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-  nodeDefUuidEntity: DataQueryState.getTableNodeDefUuidTable(state),
-  nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state),
-  nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
-})
+const mapStateToProps = state => {
+  const survey = SurveyState.getSurvey(state)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
+
+  return {
+    hierarchy,
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
+    nodeDefUuidEntity: DataQueryState.getTableNodeDefUuidTable(state),
+    nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state),
+    nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
+  }
+}
 
 export default connect(
   mapStateToProps,
