@@ -73,7 +73,7 @@ const NodeDefsSelectorView = props => {
                               const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
                               setFilterTypes(fn(filterTypes))
                             }}>
-                    {NodeDefUiProps.getNodeDefIconByType(type)} {i18n.t(type)}</button>
+                    {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}</button>
                   : null
               )
             }

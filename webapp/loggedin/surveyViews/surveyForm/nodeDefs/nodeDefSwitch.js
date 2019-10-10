@@ -38,7 +38,7 @@ class NodeDefSwitch extends React.Component {
     const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
 
     if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
-      createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getNodeDefDefaultValue(nodeDef))
+      createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getDefaultValue(nodeDef))
     }
   }
 

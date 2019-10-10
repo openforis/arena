@@ -39,7 +39,7 @@ const AddNodeDefButtons = props => {
                       }}
                       aria-disabled={disabled}>
                 {type}
-                {NodeDefUIProps.getNodeDefIconByType(type)}
+                {NodeDefUIProps.getIconByType(type)}
               </button>
             )
           })

@@ -76,7 +76,7 @@ const Literal = props => {
             BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent))
               ?
               <Input
-                {...NodeDefUIProps.getNodeDefInputTextProps(nodeDefCurrent)}
+                {...NodeDefUIProps.getInputTextProps(nodeDefCurrent)}
                 value={nodeValue}
                 onChange={value => onChangeValue(value)}
               />

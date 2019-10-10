@@ -29,7 +29,7 @@ const AttributeSelector = (props) => {
             onClick={() => onToggleAttribute(nodeDefUuid)}
             disabled={!canSelectAttributes}>
       {NodeDef.getLabel(nodeDef, lang)}
-      {NodeDefUiProps.getNodeDefIconByType(nodeDefType)}
+      {NodeDefUiProps.getIconByType(nodeDefType)}
     </button>
 
 }

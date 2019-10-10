@@ -17,7 +17,7 @@ const NodeDefEntityTableCell = props => {
   } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const { length } = NodeDefUiProps.getNodeDefFormFields(nodeDef)
+  const { length } = NodeDefUiProps.getFormFields(nodeDef)
   const elementRef = useRef(null)
 
   // table cell header is always visible

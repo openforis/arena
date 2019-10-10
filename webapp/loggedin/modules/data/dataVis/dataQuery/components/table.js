@@ -97,7 +97,7 @@ const mapStateToProps = state => {
   const editMode = DataQueryState.getTableEditMode(state)
 
   const colsNumber = editMode
-    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getNodeDefFormFields(nodeDefCol).length, 0)
+    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
     : colNames.length
 
   return {
