@@ -29,11 +29,7 @@ const cols = {
   [NodeDef.nodeDefType.file]: ['file_uuid', 'file_name'],
 }
 
-const getCols = nodeDef => R.propOr(
-  [],
-  NodeDef.getType(nodeDef),
-  cols
-)
+const getCols = nodeDef => R.propOr([], NodeDef.getType(nodeDef), cols)
 
 const getDefaultColumnName = nodeDef => NodeDef.isEntity(nodeDef)
   ? `${NodeDef.getName(nodeDef)}_uuid`
@@ -48,21 +44,17 @@ const getColNames = nodeDef => {
     )
 }
 
-const getColName = R.pipe(
-  getColNames,
-  R.head
-)
+const getColName = R.pipe(getColNames, R.head)
 
-const getColNamesByUuids = nodeDefUuidCols =>
-  survey => R.reduce(
-    (cols, uuid) => R.pipe(
-      Survey.getNodeDefByUuid(uuid),
-      getColNames,
-      R.concat(cols)
-    )(survey),
-    [],
-    nodeDefUuidCols
-  )
+const getColNamesByUuids = nodeDefUuidCols => survey => R.reduce(
+  (cols, uuid) => R.pipe(
+    Survey.getNodeDefByUuid(uuid),
+    getColNames,
+    R.concat(cols)
+  )(survey),
+  [],
+  nodeDefUuidCols
+)
 
 const extractColName = (nodeDef, col) => R.replace(
   //TODO check if toSnakeCase is necessary : if col names are snaked when creating tables

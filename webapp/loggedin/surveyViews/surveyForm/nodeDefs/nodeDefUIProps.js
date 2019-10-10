@@ -153,6 +153,6 @@ export const getFormFields = getProp('formFields', ['field'])
 export const getDefaultValue = getProp('defaultValue')
 
 export const getDefaultPropsByType = (type, cycle) => {
-  const fn = getPropByType(type, 'defaultProps')
+  const fn = getPropByType('defaultProps')(type)
   return fn ? fn(cycle) : {}
 }

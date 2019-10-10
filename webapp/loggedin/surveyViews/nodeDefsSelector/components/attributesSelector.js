@@ -11,13 +11,13 @@ import * as SurveyState from '../../../../survey/surveyState'
 const AttributeSelector = (props) => {
 
   const {
-    nodeDef, lang, nodeDefUuidsAttributes,
+    nodeDefContext, nodeDef, lang, nodeDefUuidsAttributes,
     onToggleAttribute,
     filterTypes, canSelectAttributes, showMultipleAttributes
   } = props
 
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
-  const isVisible = isAttributeFn(nodeDef) &&
+  const isVisible = (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -37,7 +37,7 @@ const AttributeSelector = (props) => {
 const AttributesSelector = (props) => {
 
   const {
-    nodeDefParent, childDefs, lang,
+    nodeDefContext, nodeDefParent, childDefs, lang,
     nodeDefUuidsAttributes, onToggleAttribute,
     filterTypes, canSelectAttributes, showAncestors, showMultipleAttributes,
   } = props
@@ -48,6 +48,7 @@ const AttributesSelector = (props) => {
         childDefs.map((childDef, i) => (
           <AttributeSelector
             key={i}
+            nodeDefContext={nodeDefContext}
             nodeDef={childDef}
             lang={lang}
             nodeDefUuidsAttributes={nodeDefUuidsAttributes}
@@ -94,13 +95,16 @@ const mapStateToProps = (state, props) => {
   const { nodeDefUuidEntity } = props
 
   const survey = SurveyState.getSurvey(state)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const childDefs = nodeDefUuidEntity
-    ? Survey.getNodeDefChildren(nodeDef)(survey)
+  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
+  const childDefs = nodeDefContext
+    ? NodeDef.isEntity(nodeDefContext)
+      ? Survey.getNodeDefChildren(nodeDefContext)(survey)
+      : [nodeDefContext] // multiple attribute
     : []
 
   return {
+    nodeDefContext,
     nodeDefParent,
     childDefs,
   }
