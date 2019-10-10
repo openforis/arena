@@ -1,24 +1,19 @@
 import * as R from 'ramda'
 
-import ObjectUtils from '../../../../../common/objectUtils'
+import ProcessingChain from '../../../../../common/analysis/processingChain'
 
 import * as AnalysisState from '../analysisState'
 
-export const stateKey = 'processingChainView'
+export const stateKey = 'processingChain'
 
 export const keys = {
   processingChain: 'processingChain'
 }
 
-export const getState = R.pipe(
+export const getProcessingChain = R.pipe(
   AnalysisState.getState,
   R.prop(stateKey)
 )
 
-export const getProcessingChain = R.pipe(
-  getState,
-  R.prop(keys.processingChain)
-)
-
-export const assocProcessingChain = R.assoc(keys.processingChain)
-export const assocProcessingChainProp = (key, value) => R.assocPath([keys.processingChain, ObjectUtils.keys.props, key], value)
+export const assocProcessingChain = processingChain => () => processingChain
+export const assocProcessingChainProp = (key, value) => ProcessingChain.assocProp(key, value)

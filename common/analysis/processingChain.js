@@ -63,5 +63,6 @@ module.exports = {
   isDraft,
 
   //UPDATE
+  assocProp: ObjectUtils.setProp,
   assocProcessingSteps,
 }
