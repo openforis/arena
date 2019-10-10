@@ -11,7 +11,7 @@ import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import { getUrlParam } from '../../../../utils/routerUtils'
 
 import * as SurveyState from '../../../../survey/surveyState'
-import * as ProcessingChainViewState from './processingChainViewState'
+import * as ProcessingChainState from './processingChainState'
 
 import { fetchProcessingChain, putProcessingChainProp } from './actions'
 
@@ -61,7 +61,7 @@ const ProcessingChainView = props => {
 const mapStateToProps = (state, { match }) => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
   processingChainUuid: getUrlParam('processingChainUuid')(match),
-  processingChain: ProcessingChainViewState.getProcessingChain(state)
+  processingChain: ProcessingChainState.getProcessingChain(state)
 })
 
 export default connect(

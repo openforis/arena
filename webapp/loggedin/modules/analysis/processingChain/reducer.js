@@ -7,7 +7,7 @@ import {
 
 import { appUserLogout } from '../../../../app/actions'
 
-import * as ProcessingChainViewState from './processingChainViewState'
+import * as ProcessingChainState from './processingChainState'
 import { surveyCreate, surveyDelete, surveyUpdate } from '../../../../survey/actions'
 
 const actionHandlers = {
@@ -17,8 +17,8 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [processingChainUpdate]: (state, { processingChain }) => ProcessingChainViewState.assocProcessingChain(processingChain)(state),
-  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainViewState.assocProcessingChainProp(key, value)(state),
+  [processingChainUpdate]: (state, { processingChain }) => ProcessingChainState.assocProcessingChain(processingChain)(state),
+  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainState.assocProcessingChainProp(key, value)(state),
 }
 
 export default exportReducer(actionHandlers)

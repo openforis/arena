@@ -6,7 +6,7 @@ import * as SurveyState from '../../../../survey/surveyState'
 
 import { debounceAction } from '../../../../utils/reduxUtils'
 
-import * as ProcessingChainViewState from './processingChainViewState'
+import * as ProcessingChainState from './processingChainState'
 
 export const processingChainUpdate = '/analysis/processingChain/update'
 export const processingChainPropUpdate = '/analysis/processingChain/prop/update'
@@ -25,7 +25,7 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 export const putProcessingChainProp = (key, value) => async (dispatch, getState) => {
   const state = getState()
 
-  const processingChain = ProcessingChainViewState.getProcessingChain(state)
+  const processingChain = ProcessingChainState.getProcessingChain(state)
 
   dispatch({ type: processingChainPropUpdate, key, value })
 
