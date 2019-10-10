@@ -1,5 +1,4 @@
 const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
@@ -29,4 +28,30 @@ module.exports.init = app => {
       next(err)
     }
   })
+
+  app.get('/survey/:surveyId/processing-chain/:processingChainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingChainUuid } = Request.getParams(req)
+
+      const processingChain = await ProcessingChainService.fetchChainByUuid(surveyId, processingChainUuid)
+
+      res.json({ processingChain })
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.put('/survey/:surveyId/processing-chain/:processingChainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingChainUuid, key, value } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const processingChain = await ProcessingChainService.updateChainProp(user, surveyId, processingChainUuid, key, value)
+
+      res.json({ processingChain })
+    } catch (err) {
+      next(err)
+    }
+  })
+
 }

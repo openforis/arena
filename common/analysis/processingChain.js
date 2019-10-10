@@ -12,6 +12,11 @@ const keys = {
   uuid: ObjectUtils.keys.uuid,
 }
 
+const keysProps = {
+  labels: ObjectUtils.keysProps.labels,
+  descriptions: ObjectUtils.keysProps.descriptions,
+}
+
 const statusExec = {
   error: 'error',
   success: 'success',
@@ -40,6 +45,7 @@ const assocProcessingSteps = R.assoc(keys.processingSteps)
 
 module.exports = {
   statusExec,
+  keysProps,
 
   //READ
   getDateCreated,
@@ -57,5 +63,6 @@ module.exports = {
   isDraft,
 
   //UPDATE
+  assocProp: ObjectUtils.setProp,
   assocProcessingSteps,
 }

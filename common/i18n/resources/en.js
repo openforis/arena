@@ -117,7 +117,8 @@ module.exports = {
     userList: 'User list',
 
     analysis: 'Analysis',
-    processingChains: 'Processing Chains',
+    processingChain: 'Processing Chain',
+    processingChain_plural: 'Processing Chains',
   },
 
   surveyDefsLoader: {
