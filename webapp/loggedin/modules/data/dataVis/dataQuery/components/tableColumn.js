@@ -23,8 +23,8 @@ const TableColumn = (props) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
   const isHeader = !row
   const isData = !!row
-  const noCols = editMode ? 1 : colNames.length
-  const widthOuter = colWidth * noCols// (editMode ? NodeDefUIProps.getNodeDefFormFields(nodeDef).length : colNames.length)
+  const noCols = editMode ? NodeDefUIProps.getNodeDefFormFields(nodeDef).length : colNames.length
+  const widthOuter = colWidth * noCols
   const widthInner = (1 / noCols * 100) + '%'
 
   const getColKey = (nodeDef, col) => {

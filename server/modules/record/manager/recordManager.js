@@ -66,8 +66,6 @@ module.exports = {
   fetchRecordCreatedCountsByDates: RecordRepository.fetchRecordCreatedCountsByDates,
 
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
-  fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
-  fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
   fetchChildNodesByNodeDefUuids: NodeRepository.fetchChildNodesByNodeDefUuids,
 
   // ==== UPDATE

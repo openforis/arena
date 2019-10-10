@@ -9,6 +9,7 @@ import { elementOffset } from '../../../../../../utils/domUtils'
 import Survey from '../../../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
 import Authorizer from '../../../../../../../common/auth/authorizer'
+import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import TableHeader from './tableHeader'
 import TableRows from './tableRows'
@@ -23,7 +24,7 @@ const Table = props => {
 
   const {
     lang, surveyId, data, showTable,
-    nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
+    nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, colsNumber,
     tableName, offset, limit, filter, sort, count,
     nodeDefSelectorsVisible,
     editMode, canEdit,
@@ -32,13 +33,11 @@ const Table = props => {
 
   const tableRef = useRef(null)
   const { width = defaultColWidth } = elementOffset(tableRef.current)
-  const widthMax = width - defaultColWidth - 5
+  const widthMax = width - defaultColWidth - 35
   const colWidthMin = 150
 
-  const colsTot = editMode ? nodeDefUuidCols.length : colNames.length
-
-  const colWidth = widthMax > colsTot * colWidthMin
-    ? Math.floor(widthMax / colsTot)
+  const colWidth = widthMax > colsNumber * colWidthMin
+    ? Math.floor(widthMax / colsNumber)
     : colWidthMin
 
   const hasData = !R.isEmpty(data)
@@ -97,6 +96,10 @@ const mapStateToProps = state => {
   const tableName = NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey)
   const editMode = DataQueryState.getTableEditMode(state)
 
+  const colsNumber = editMode
+    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getNodeDefFormFields(nodeDefCol).length, 0)
+    : colNames.length
+
   return {
     lang,
     surveyId: Survey.getId(survey),
@@ -105,6 +108,7 @@ const mapStateToProps = state => {
     nodeDefUuidCols,
     nodeDefCols,
     colNames,
+    colsNumber,
     data: DataQueryState.getTableData(state),
     offset: DataQueryState.getTableOffset(state),
     limit: DataQueryState.getTableLimit(state),

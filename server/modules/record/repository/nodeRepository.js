@@ -19,7 +19,7 @@ const dbTransformCallback = node =>
     )(node)
     : null
 
-const getNodeSelectQuery = (surveyId, draft) => {
+const _getNodeSelectQuery = (surveyId, draft) => {
   const schema = getSurveyDBSchema(surveyId)
 
   const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
@@ -70,7 +70,7 @@ const insertNode = async (surveyId, node, draft, client = db) => {
   )
 
   const nodeAdded = await client.one(`
-    ${getNodeSelectQuery(surveyId, draft)}
+    ${_getNodeSelectQuery(surveyId, draft)}
     WHERE n.uuid = $1
   `,
     Node.getUuid(node),
@@ -91,7 +91,7 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
 
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
   await client.map(`
-    ${getNodeSelectQuery(surveyId, draft)}
+    ${_getNodeSelectQuery(surveyId, draft)}
     WHERE n.record_uuid = $1
     `,
     [recordUuid],
@@ -108,22 +108,14 @@ const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
 
 const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   await client.map(`
-    SELECT * 
-    FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $1
-      AND parent_uuid ${nodeUuid ? '= $2' : 'is null'}
-      AND node_def_uuid IN ($3:csv)`,
+    ${_getNodeSelectQuery(surveyId, false)}
+    WHERE n.record_uuid = $1
+      AND n.parent_uuid ${nodeUuid ? '= $2' : 'is null'}
+      AND n.node_def_uuid IN ($3:csv)`,
     [recordUuid, nodeUuid, childDefUUids],
     dbTransformCallback
   )
 
-const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
-  await fetchChildNodesByNodeDefUuids(surveyId, recordUuid, nodeUuid, [childDefUUid], client)
-
-const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
-  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
-  return R.head(nodes)
-}
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
@@ -136,7 +128,7 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = 
     `, [stringifyValue(value), meta, nodeUuid]
   )
   const node = await client.one(`
-    ${getNodeSelectQuery(surveyId, draft)}
+    ${_getNodeSelectQuery(surveyId, draft)}
     WHERE n.uuid = $1
   `,
     nodeUuid,
@@ -203,9 +195,7 @@ module.exports = {
   //READ
   fetchNodesByRecordUuid,
   fetchNodeByUuid,
-  fetchChildNodesByNodeDefUuid,
   fetchChildNodesByNodeDefUuids,
-  fetchChildNodeByNodeDefUuid,
 
   //UPDATE
   updateNode,
