@@ -81,6 +81,8 @@ const checkOut = async (socketId, user, surveyId, recordUuid) => {
  * ======
  */
 const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
+  RecordServiceThreads.assocSocket(recordUuid, socketId)
+
   const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
 
   const thread = RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, recordUuid)
@@ -92,16 +94,16 @@ const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
 }
 
 const persistNode = async (socketId, user, surveyId, node, file) => {
+  const recordUuid = Node.getRecordUuid(node)
+
   if (file) {
     //save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile(Node.getFileUuid(node), file.name, file.size, fs.readFileSync(file.tempFilePath),
-      Node.getRecordUuid(node), Node.getUuid(node))
-
+    const fileObj = RecordFile.createFile(Node.getFileUuid(node), file.name, file.size, fs.readFileSync(file.tempFilePath), recordUuid, Node.getUuid(node))
     await FileManager.insertFile(surveyId, fileObj)
   }
 
   _sendNodeUpdateMessage(
-    socketId, user, surveyId, Node.getRecordUuid(node), { type: RecordThreadMessageTypes.nodePersist, node, user }
+    socketId, user, surveyId, recordUuid, { type: RecordThreadMessageTypes.nodePersist, node, user }
   )
 }
 

@@ -37,7 +37,7 @@ const TableHeader = props => {
   }
 
   const {
-    surveyId, nodeDefUuidContext, nodeDefUuidCols,
+    appSaving, surveyId, nodeDefUuidContext, nodeDefUuidCols,
     tableName, colNames, filter, sort, limit, offset, count,
     nodeDefSelectorsVisible, toggleNodeDefsSelector,
     showPaginator, editMode, canEdit,
@@ -116,7 +116,8 @@ const TableHeader = props => {
           canEdit &&
           <div>
             <button className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
-                    onClick={() => updateTableEditMode(!editMode)}>
+                    onClick={() => updateTableEditMode(!editMode)}
+                    aria-disabled={appSaving}>
               <span className="icon icon-pencil2 icon-14px"/>
             </button>
           </div>
@@ -139,6 +140,7 @@ const TableHeader = props => {
 }
 
 TableHeader.defaultProps = {
+  appSaving: false,
   nodeDefUuidContext: null,
   nodeDefUuidCols: null,
   filter: null,
