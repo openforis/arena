@@ -135,6 +135,10 @@ class RecordUpdateThread extends Thread {
         this.postMessage(msg)
         break
     }
+
+    if (R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])) {
+      this.postMessage({ type: WebSocketEvents.nodesUpdateCompleted })
+    }
   }
 
 }
