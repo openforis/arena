@@ -10,6 +10,7 @@ export const keys = {
   activeJob: 'activeJob',
   errors: 'errors',
   systemError: 'systemError',
+  saving: 'saving',
   sideBarOpened: 'sideBarOpened',
   loaderVisible: 'loaderVisible',
   notification: 'notification',
@@ -86,6 +87,11 @@ export const dissocUserPropsOnSurveyDelete = surveyInfo => appState => {
   )(appState)
   return R.assoc(keys.user, user, appState)
 }
+
+// ==== SAVING
+export const assocSaving = R.assoc(keys.saving)
+
+export const isSaving = R.pipe(getState, R.propEq(keys.saving, true))
 
 // ==== APP SIDE BAR
 export const isSideBarOpened = R.pipe(getState, R.propEq(keys.sideBarOpened, true))

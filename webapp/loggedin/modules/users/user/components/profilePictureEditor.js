@@ -50,7 +50,7 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
   const onImageChange = () => {
     if (avatarRef.current) {
       const canvas = avatarRef.current.getImageScaledToCanvas()
-      canvas.toBlob(onPictureUpdate, 'image/jpeg', 0.6)
+      canvas.toBlob(onPictureUpdate, 'image/webp', 0.6)
     }
   }
 

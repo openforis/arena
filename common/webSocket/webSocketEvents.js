@@ -8,6 +8,7 @@ const webSocketEvents = {
   // app events
   jobUpdate: 'jobUpdate',
   nodesUpdate: 'nodesUpdate',
+  nodesUpdateCompleted: 'nodesUpdateCompleted',
   nodeValidationsUpdate: 'nodeValidationsUpdate',
   recordDelete: 'recordDelete',
   error: 'threadError',

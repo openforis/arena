@@ -1,19 +1,25 @@
 import * as R from 'ramda'
 import axios from 'axios'
 
-import { debounceAction } from '../../../utils/reduxUtils'
-
 import Survey from '../../../../common/survey/survey'
 import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 import NodeRefData from '../../../../common/record/nodeRefData'
 
+import { debounceAction } from '../../../utils/reduxUtils'
+
 import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
-import { showAppLoader, hideAppLoader, showNotificationMessage } from '../../../app/actions'
+import {
+  showAppLoader,
+  hideAppLoader,
+  showNotificationMessage,
+  showAppSaving,
+  hideAppSaving
+} from '../../../app/actions'
 
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
 
@@ -78,11 +84,6 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
     const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
     recordNodesUpdate({ [Node.getUuid(node)]: node })(dispatch)
   }
-/**
- * ============
- * READ
- * ============
- */
 
 /**
  * ============
@@ -91,7 +92,6 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  */
 
 export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => dispatch => {
-
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
     Node.assocValue(value),
@@ -106,6 +106,8 @@ export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData
 
 const _updateNodeDebounced = (node, file, delay) => {
   const action = async (dispatch, getState) => {
+    dispatch(showAppSaving())
+
     const formData = new FormData()
     formData.append('node', JSON.stringify(node))
 
@@ -130,12 +132,15 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
   history.push(appModuleUri(appModules.data))
 }
 
+export const nodesUpdateCompleted = () => dispatch => dispatch(hideAppSaving())
+
 /**
  * ============
  * DELETE
  * ============
  */
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
+  dispatch(showAppSaving())
   dispatch({ type: nodeDelete, node })
 
   const surveyId = SurveyState.getSurveyId(getState())

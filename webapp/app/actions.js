@@ -1,8 +1,9 @@
 import axios from 'axios'
 
 import User from '../../common/user/user'
-
 import i18nFactory from '../../common/i18n/i18nFactory'
+import Counter from '../../common/counter'
+
 import * as CognitoAuth from './cognitoAuth'
 
 import * as AppState from './appState'
@@ -62,6 +63,25 @@ export const logout = () => async dispatch => {
 
   dispatch({ type: appUserLogout })
   dispatch(hideAppLoader())
+}
+
+// ====== SAVING
+export const appSavingUpdate = 'app/saving/update'
+
+const appSavingCounter = new Counter()
+
+export const showAppSaving = () => dispatch => {
+  if (appSavingCounter.count === 0) {
+    dispatch({ type: appSavingUpdate, saving: true })
+  }
+  appSavingCounter.increment()
+}
+
+export const hideAppSaving = () => dispatch => {
+  appSavingCounter.decrement()
+  if (appSavingCounter.count === 0) {
+    dispatch({ type: appSavingUpdate, saving: false })
+  }
 }
 
 // ====== SIDEBAR

@@ -9,8 +9,12 @@ import { elementOffset } from '../../../../../../utils/domUtils'
 import Survey from '../../../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
 import Authorizer from '../../../../../../../common/auth/authorizer'
+import WebSocketEvents from '../../../../../../../common/webSocket/webSocketEvents'
+
+import * as AppWebSocket from '../../../../../../app/appWebSocket'
 import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
+import { useOnUpdate } from '../../../../../../commonComponents/hooks'
 import TableHeader from './tableHeader'
 import TableRows from './tableRows'
 
@@ -18,17 +22,20 @@ import * as AppState from '../../../../../../app/appState'
 import * as DataQueryState from '../dataQueryState'
 import * as SurveyState from '../../../../../../survey/surveyState'
 
+import { nodesUpdateCompleted } from '../../../../../surveyViews/record/actions'
+
 const defaultColWidth = 80
 
 const Table = props => {
 
   const {
-    lang, surveyId, data, showTable,
+    appSaving, lang, surveyId, data, showTable,
     nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, colsNumber,
     tableName, offset, limit, filter, sort, count,
     nodeDefSelectorsVisible,
     editMode, canEdit,
-    history
+    history,
+    nodesUpdateCompleted
   } = props
 
   const tableRef = useRef(null)
@@ -42,6 +49,15 @@ const Table = props => {
 
   const hasData = !R.isEmpty(data)
 
+  useOnUpdate(() => {
+    if (editMode) {
+      AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
+    }
+    return () => {
+      AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
+    }
+  }, [editMode])
+
   return (
     <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={tableRef}>
       {
@@ -49,6 +65,7 @@ const Table = props => {
         <React.Fragment>
 
           <TableHeader
+            appSaving={appSaving}
             surveyId={surveyId}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCols={nodeDefUuidCols}
@@ -86,14 +103,12 @@ const Table = props => {
 
 const mapStateToProps = state => {
   const user = AppState.getUser(state)
-  const lang = AppState.getLang(state)
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDefUuidContext = DataQueryState.getTableNodeDefUuidTable(state)
   const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
-  const tableName = NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey)
   const editMode = DataQueryState.getTableEditMode(state)
 
   const colsNumber = editMode
@@ -101,9 +116,10 @@ const mapStateToProps = state => {
     : colNames.length
 
   return {
-    lang,
+    lang: AppState.getLang(state),
+    appSaving: AppState.isSaving(state),
     surveyId: Survey.getId(survey),
-    tableName,
+    tableName: NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey),
     nodeDefUuidContext,
     nodeDefUuidCols,
     nodeDefCols,
@@ -124,6 +140,6 @@ const mapStateToProps = state => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps)
+  connect(mapStateToProps, { nodesUpdateCompleted })
 )
 export default enhance(Table)

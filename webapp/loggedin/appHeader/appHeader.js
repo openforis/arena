@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import { usePrevious } from '../../commonComponents/hooks'
 import ProfilePicture from '../../commonComponents/profilePicture'
+import ProgressBar from '../../commonComponents/progressBar'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
 
@@ -17,12 +18,16 @@ import * as SurveyState from '../../survey/surveyState'
 import { updateUserPrefs } from '../../app/actions'
 
 const AppHeader = props => {
-  const { user, surveyInfo, surveyCycleKey, lang, updateUserPrefs } = props
+  const {
+    appSaving, user, lang,
+    surveyInfo, surveyCycleKey,
+    updateUserPrefs
+  } = props
   const [showUserPopup, setShowUserPopup] = useState(false)
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
 
-  pictureUpdateKeyRef.current += !!(prevUser !== user)
+  pictureUpdateKeyRef.current += prevUser !== user
 
   return (
     <div className="app-header">
@@ -33,19 +38,26 @@ const AppHeader = props => {
 
       <div className="app-header__survey">
         {
-          Survey.isValid(surveyInfo) &&
-          <>
-            <div>{Survey.getLabel(surveyInfo, lang)}</div>
-            <CycleSelector
-              surveyInfo={surveyInfo}
-              surveyCycleKey={surveyCycleKey}
-              onChange={cycle => {
-                const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-                const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
-                updateUserPrefs(userUpdated)
-              }}
-            />
-          </>
+          Survey.isValid(surveyInfo) && (
+            appSaving
+              ? (
+                <ProgressBar className="running progress-bar-striped" progress={100} showText={false}/>
+              )
+              : (
+                <>
+                  <div>{Survey.getLabel(surveyInfo, lang)}</div>
+                  <CycleSelector
+                    surveyInfo={surveyInfo}
+                    surveyCycleKey={surveyCycleKey}
+                    onChange={cycle => {
+                      const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+                      const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
+                      updateUserPrefs(userUpdated)
+                    }}
+                  />
+                </>
+              )
+          )
         }
       </div>
 
@@ -79,6 +91,7 @@ const AppHeader = props => {
 const mapStateToProps = state => ({
   user: AppState.getUser(state),
   lang: AppState.getLang(state),
+  appSaving: AppState.isSaving(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })

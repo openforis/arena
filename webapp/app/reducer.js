@@ -11,6 +11,7 @@ import {
   systemErrorThrow,
   appNotificationShow,
   appNotificationHide,
+  appSavingUpdate,
 } from './actions'
 
 import { surveyCreate, surveyDelete, surveyUpdate } from '../survey/actions'
@@ -30,6 +31,9 @@ const actionHandlers = {
   [surveyUpdate]: (state, { survey }) => AppState.assocUserPropsOnSurveyUpdate(survey)(state),
 
   [surveyDelete]: (state, { surveyInfo }) => AppState.dissocUserPropsOnSurveyDelete(surveyInfo)(state),
+
+  // ====== saving
+  [appSavingUpdate]: (state, { saving }) => AppState.assocSaving(saving)(state),
 
   // ====== sideBar
   [appSideBarOpenedUpdate]: (state, { sideBarOpened }) => AppState.assocSideBarOpened(sideBarOpened)(state),
