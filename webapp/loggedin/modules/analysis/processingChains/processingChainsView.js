@@ -11,15 +11,16 @@ import TableView from '../../../tableViews/tableView'
 
 import ProcessingChainsRow from './components/processingChainsRow'
 import ProcessingChainsRowHeader from './components/processingChainsRowHeader'
+import ProcessingChainsHeaderLeft from './components/processingChainsHeaderLeft'
 
 import * as SurveyState from '../../../../survey/surveyState'
 
 import { reloadListItems } from '../../../tableViews/actions'
-import { appModuleUri, analysisModules } from '../../../appModules'
+import { createProcessingChain, navigateToProcessingChainView } from './actions'
 
 const processingChainsModule = 'processing-chains'
 
-const ProcessingChainsView = ({ surveyCycleKey, reloadListItems, history }) => {
+const ProcessingChainsView = ({ surveyCycleKey, reloadListItems, history, createProcessingChain, navigateToProcessingChainView }) => {
 
   const restParams = { cycle: surveyCycleKey }
 
@@ -34,10 +35,12 @@ const ProcessingChainsView = ({ surveyCycleKey, reloadListItems, history }) => {
       className="processing-chains"
       gridTemplateColumns={'repeat(3, 1fr) repeat(2, 80px)'}
       rowHeaderComponent={ProcessingChainsRowHeader}
+      headerLeftComponent={ProcessingChainsHeaderLeft}
       rowComponent={ProcessingChainsRow}
-      onRowClick={processingChain => history.push(
-        `${appModuleUri(analysisModules.processingChain)}${ProcessingChain.getUuid(processingChain)}`
-      )}
+      onRowClick={processingChain => navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain))}
+
+      history={history}
+      createProcessingChain={createProcessingChain}
     />
   )
 }
@@ -46,4 +49,11 @@ const mapStateToProps = state => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(mapStateToProps, { reloadListItems })(ProcessingChainsView)
+export default connect(
+  mapStateToProps,
+  {
+    reloadListItems,
+    createProcessingChain,
+    navigateToProcessingChainView
+  }
+)(ProcessingChainsView)
