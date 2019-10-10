@@ -1,5 +1,4 @@
 import React from 'react'
-import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
@@ -23,8 +22,7 @@ class TableColumnEdit extends React.Component {
     } = this.props
 
     if (cell) {
-      const { parentUuid, nodes } = cell
-      const nodesArray = R.values(nodes)
+      const { parentUuid, node } = cell
 
       const parentNode = {
         [Node.keys.recordUuid]: Record.getUuid(record),
@@ -36,8 +34,9 @@ class TableColumnEdit extends React.Component {
           surveyInfo={surveyInfo}
           nodeDef={nodeDef}
           parentNode={parentNode}
-          nodes={nodesArray}
+          nodes={[node]}
           entry={true}
+          entryDataQuery={true}
           edit={false}
           renderType={NodeDefLayout.renderType.tableBody}
           canEditRecord={canEditRecord}

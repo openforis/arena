@@ -58,11 +58,20 @@ const MultipleTextInput = props => {
   )
 }
 
-const NodeDefText = props =>
-  props.edit
-    ? <TextInput {...props}/>
-    : NodeDef.isMultiple(props.nodeDef)
-    ? <MultipleTextInput {...props} />
-    : <TextInput {...props} node={props.nodes[0]}/>
+const NodeDefText = props => {
+  const { edit, entryDataQuery, nodeDef, nodes } = props
+
+  return edit
+    ? (
+      <TextInput {...props}/>
+    )
+    : NodeDef.isMultiple(nodeDef) && !entryDataQuery
+      ? (
+        <MultipleTextInput {...props} />
+      )
+      : (
+        <TextInput {...props} node={nodes[0]}/>
+      )
+}
 
 export default NodeDefText
