@@ -1,3 +1,5 @@
+import './processingChainView.scss'
+
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
@@ -9,13 +11,17 @@ import ObjectUtils from '../../../../../common/objectUtils'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 
 import { getUrlParam } from '../../../../utils/routerUtils'
-import { useOnUpdate } from '../../../../commonComponents/hooks'
+import { useI18n, useOnUpdate } from '../../../../commonComponents/hooks'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
 
-import { fetchProcessingChain, putProcessingChainProp } from './actions'
-import { analysisModules, appModuleUri } from '../../../appModules'
+import {
+  fetchProcessingChain,
+  navigateToProcessingChainsView,
+  putProcessingChainProp,
+  deleteProcessingChain
+} from './actions'
 
 const ProcessingChainView = props => {
 
@@ -23,15 +29,17 @@ const ProcessingChainView = props => {
     surveyInfo, surveyCycleKey,
     processingChainUuid, processingChain,
     history,
-    fetchProcessingChain, putProcessingChainProp,
+    fetchProcessingChain, navigateToProcessingChainsView, putProcessingChainProp, deleteProcessingChain,
   } = props
+
+  const i18n = useI18n()
 
   useEffect(() => {
     fetchProcessingChain(processingChainUuid)
   }, [])
 
   useOnUpdate(() => {
-    history.push(appModuleUri(analysisModules.processingChains))
+    navigateToProcessingChainsView(history)
   }, [surveyCycleKey])
 
   const onPropLabelsChange = key => labelItem => {
@@ -61,6 +69,13 @@ const ProcessingChainView = props => {
             onChange={onPropLabelsChange(ProcessingChain.keysProps.descriptions)}
           />
         </div>
+
+        <button className="btn-s btn-danger btn-delete"
+                onClick={() => window.confirm(i18n.t('analysis.processingChain.deleteConfirm')) &&
+                  deleteProcessingChain(history)}>
+          <span className="icon icon-bin icon-12px icon-left"/>
+          {i18n.t('common.delete')}
+        </button>
       </div>
     )
     : null
@@ -75,5 +90,5 @@ const mapStateToProps = (state, { match }) => ({
 
 export default connect(
   mapStateToProps,
-  { fetchProcessingChain, putProcessingChainProp, },
+  { fetchProcessingChain, navigateToProcessingChainsView, putProcessingChainProp, deleteProcessingChain },
 )(ProcessingChainView)

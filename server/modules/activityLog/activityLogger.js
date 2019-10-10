@@ -50,6 +50,7 @@ const type = {
   // analysis
   processingChainCreate: 'processingChainCreate',
   processingChainPropUpdate: 'processingChainPropUpdate',
+  processingChainDelete: 'processingChainDelete',
 }
 
 const keys = {

@@ -230,7 +230,9 @@ module.exports = {
   analysis: {
     processingChain: {
       dateExecuted: 'Date executed',
-      status: 'Status'
+      status: 'Status',
+      deleteConfirm: 'Delete this processing chain? $t(common.cantUndoWarning)',
+      deleteComplete: 'Processing chain deleted',
     }
   },
 

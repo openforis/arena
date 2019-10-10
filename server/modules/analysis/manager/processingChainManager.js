@@ -19,6 +19,12 @@ const updateChainProp = async (user, surveyId, processingChainUuid, key, value, 
     ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate, { processingChainUuid, key, value }, t)
   ]))
 
+const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
+  await client.tx(async t => await Promise.all([
+    ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t),
+    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainDelete, { processingChainUuid }, t)
+  ]))
+
 module.exports = {
   // CREATE
   createChain,
@@ -27,6 +33,10 @@ module.exports = {
   countChainsBySurveyId: ProcessingChainRepository.countChainsBySurveyId,
   fetchChainsBySurveyId: ProcessingChainRepository.fetchChainsBySurveyId,
   fetchChainByUuid: ProcessingChainRepository.fetchChainByUuid,
+
   // UPDATE
   updateChainProp,
+
+  // DELETE
+  deleteChain,
 }

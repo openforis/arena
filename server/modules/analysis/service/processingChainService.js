@@ -11,4 +11,7 @@ module.exports = {
 
   // UPDATE
   updateChainProp: ProcessingChainManager.updateChainProp,
+
+  // DELETE
+  deleteChain: ProcessingChainManager.deleteChain,
 }
