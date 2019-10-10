@@ -2,20 +2,11 @@ const db = require('../../../db/db')
 const ActivityLog = require('../../activityLog/activityLogger')
 const ProcessingChainRepository = require('../repository/processingChainRepository')
 
-const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) => {
-  client.tx(t => {
-    Promise.all([
-      ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-      ActivityLog.log(
-        user,
-        surveyId,
-        ActivityLog.type.processingChainPropUpdate,
-        { processingChainUuid, key, value },
-        t
-      )
-    ])
-  })
-}
+const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
+  await client.tx(async t => await Promise.all([
+    ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
+    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate, { processingChainUuid, key, value }, t)
+  ]))
 
 module.exports = {
   // READ
