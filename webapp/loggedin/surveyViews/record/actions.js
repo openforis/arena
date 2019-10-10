@@ -145,7 +145,6 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
 
   const surveyId = SurveyState.getSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
-  dispatch(hideAppSaving())
 }
 
 export const deleteRecord = (history) => async (dispatch, getState) => {
