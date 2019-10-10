@@ -8,6 +8,18 @@ const {
 
 const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, ${DbUtils.selectDate('date_executed')}`
 
+// CREATE
+const insertChain = async (surveyId, cycle, client = db) =>
+  await client.one(`
+      INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (cycle)
+      VALUES ($1)
+      RETURNING ${selectFields}
+    `,
+    [cycle],
+    dbTransformCallback
+  )
+
+// READ
 const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
   await client.one(`
       SELECT COUNT(*) 
@@ -53,6 +65,9 @@ const updateChainProp = async (surveyId, processingChainUuid, key, value, client
   )
 
 module.exports = {
+  // CREATE
+  insertChain,
+
   // READ
   countChainsBySurveyId,
   fetchChainsBySurveyId,

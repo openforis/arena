@@ -48,6 +48,7 @@ const type = {
   userRemove: 'userRemove',
 
   // analysis
+  processingChainCreate: 'processingChainCreate',
   processingChainPropUpdate: 'processingChainPropUpdate',
 }
 
