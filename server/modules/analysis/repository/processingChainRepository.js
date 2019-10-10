@@ -19,18 +19,44 @@ const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
 
 const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
   await client.map(`
-    SELECT ${selectFields}
-    FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE cycle = $1
-    ORDER BY date_modified DESC
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}
+      SELECT ${selectFields}
+      FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+      WHERE cycle = $1
+      ORDER BY date_modified DESC
+      LIMIT ${limit || 'ALL'}
+      OFFSET ${offset}
     `,
     [cycle],
     dbTransformCallback
   )
 
+const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
+  await client.one(`
+      SELECT ${selectFields}
+      FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+      WHERE uuid = $1
+    `,
+    [processingChainUuid]
+  )
+
+// UPDATE
+const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
+  await client.one(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+      SET props = jsonb_set("props", '{${key}}', $2::jsonb)
+      WHERE uuid = $1
+      RETURNING ${selectFields}
+    `,
+    [processingChainUuid, value],
+    dbTransformCallback
+  )
+
 module.exports = {
+  // READ
   countChainsBySurveyId,
   fetchChainsBySurveyId,
+  fetchChainByUuid,
+
+  // UPDATE
+  updateChainProp,
 }

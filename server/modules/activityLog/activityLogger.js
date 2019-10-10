@@ -46,6 +46,9 @@ const type = {
   userInvite: 'userInvite',
   userUpdate: 'userUpdate',
   userRemove: 'userRemove',
+
+  // analysis
+  processingChainPropUpdate: 'processingChainPropUpdate',
 }
 
 const keys = {

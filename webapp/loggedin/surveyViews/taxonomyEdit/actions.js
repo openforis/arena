@@ -40,9 +40,12 @@ export const createTaxonomy = () => async (dispatch, getState) => {
 
 // ====== READ
 
-const fetchTaxonomy = (surveyId, taxonomyUuid) => async dispatch => {
-  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}?draft=true&validate=true`)
-  dispatch({ type: taxonomyUpdate, taxonomy: data.taxonomy })
+const fetchTaxonomy = taxonomyUuid => async (dispatch, getState) => {
+  const surveyId = SurveyState.getSurveyId(getState())
+
+  const { data: {taxonomy} } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}?draft=true&validate=true`)
+
+  dispatch({ type: taxonomyUpdate, taxonomy })
 }
 
 // ====== UPDATE
@@ -66,7 +69,7 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
 
   dispatch(showAppJobMonitor(data.job, () => {
     //on import complete validate taxonomy and reload taxa
-    dispatch(fetchTaxonomy(surveyId, Taxonomy.getUuid(taxonomy)))
+    dispatch(fetchTaxonomy(Taxonomy.getUuid(taxonomy)))
     dispatch(reloadListItems(TaxonomyEditState.keys.taxa, { draft: true }))
   }))
 }

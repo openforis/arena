@@ -3,20 +3,23 @@ import './processingChainsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import ProcessingChain from '../../../../../common/analysis/processingChain'
+
+import { useOnUpdate } from '../../../../commonComponents/hooks'
+
 import TableView from '../../../tableViews/tableView'
 
 import ProcessingChainsRow from './components/processingChainsRow'
 import ProcessingChainsRowHeader from './components/processingChainsRowHeader'
 
-import { useOnUpdate } from '../../../../commonComponents/hooks'
-
 import * as SurveyState from '../../../../survey/surveyState'
 
 import { reloadListItems } from '../../../tableViews/actions'
+import { appModuleUri, analysisModules } from '../../../appModules'
 
 const processingChainsModule = 'processing-chains'
 
-const ProcessingChainsView = ({ surveyCycleKey, reloadListItems }) => {
+const ProcessingChainsView = ({ surveyCycleKey, reloadListItems, history }) => {
 
   const restParams = { cycle: surveyCycleKey }
 
@@ -32,6 +35,9 @@ const ProcessingChainsView = ({ surveyCycleKey, reloadListItems }) => {
       gridTemplateColumns={'repeat(3, 1fr) repeat(2, 80px)'}
       rowHeaderComponent={ProcessingChainsRowHeader}
       rowComponent={ProcessingChainsRow}
+      onRowClick={processingChain => history.push(
+        `${appModuleUri(analysisModules.processingChain)}${ProcessingChain.getUuid(processingChain)}`
+      )}
     />
   )
 }
