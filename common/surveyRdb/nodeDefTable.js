@@ -23,16 +23,10 @@ const getTableName = (nodeDef, nodeDefParent) => {
 
 const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
-const getViewNameByUuid = nodeDefUuid => R.pipe(
-  Survey.getNodeDefByUuid(nodeDefUuid),
-  nodeDef => tablePrefix + NodeDef.getName(nodeDef) + viewSuffix
-)
-
-const { nodeDefType } = NodeDef
 const cols = {
-  [nodeDefType.code]: ['code', 'label'],
-  [nodeDefType.taxon]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
-  [nodeDefType.file]: ['file_uuid', 'file_name'],
+  [NodeDef.nodeDefType.code]: ['code', 'label'],
+  [NodeDef.nodeDefType.taxon]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
+  [NodeDef.nodeDefType.file]: ['file_uuid', 'file_name'],
 }
 
 const getCols = nodeDef => R.propOr(
@@ -90,7 +84,6 @@ const extractNodeDefNameFromViewName = R.pipe(
 module.exports = {
   getTableName,
   getViewName,
-  getViewNameByUuid,
 
   getColNames,
   getColName,

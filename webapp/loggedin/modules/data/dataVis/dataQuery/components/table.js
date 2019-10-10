@@ -106,6 +106,7 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDefUuidContext = DataQueryState.getTableNodeDefUuidTable(state)
+  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
@@ -119,7 +120,7 @@ const mapStateToProps = state => {
     lang: AppState.getLang(state),
     appSaving: AppState.isSaving(state),
     surveyId: Survey.getId(survey),
-    tableName: NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey),
+    tableName: NodeDefTable.getViewName(nodeDefContext, Survey.getNodeDefParent(nodeDefContext)(survey)),
     nodeDefUuidContext,
     nodeDefUuidCols,
     nodeDefCols,
