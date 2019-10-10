@@ -13,10 +13,10 @@ import NodeDefCode from './components/types/nodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 
-const { nodeDefType } = NodeDef
+const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
 
-export const nodeDefUIProps = {
-  [nodeDefType.integer]: {
+const propsUI = {
+  [integer]: {
     icon: <span className="icon-left node_def__icon">923</span>,
     inputText: {
       mask: createNumberMask({
@@ -36,7 +36,7 @@ export const nodeDefUIProps = {
     defaultValue: '',
   },
 
-  [nodeDefType.decimal]: {
+  [decimal]: {
     icon: <span className="icon-left node_def__icon">923,4</span>,
     inputText: {
       mask: createNumberMask({
@@ -56,14 +56,14 @@ export const nodeDefUIProps = {
     defaultValue: '',
   },
 
-  [nodeDefType.text]: {
+  [text]: {
     icon: <span className="icon-left display-flex">{R.range(0, 3).map(i =>
       <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }}/>
     )}</span>,
     defaultValue: '',
   },
 
-  [nodeDefType.date]: {
+  [date]: {
     icon: <span className="icon icon-calendar icon-left"/>,
     inputText: {
       mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
@@ -73,7 +73,7 @@ export const nodeDefUIProps = {
     defaultValue: '',
   },
 
-  [nodeDefType.time]: {
+  [time]: {
     icon: <span className="icon icon-clock icon-left"/>,
     inputText: {
       mask: [/\d/, /\d/, ':', /\d/, /\d/],
@@ -83,13 +83,13 @@ export const nodeDefUIProps = {
     defaultValue: '',
   },
 
-  [nodeDefType.boolean]: {
+  [boolean]: {
     component: NodeDefBoolean,
     icon: <span className="icon icon-radio-checked2 icon-left"/>,
     defaultValue: '',
   },
 
-  [nodeDefType.code]: {
+  [code]: {
     component: NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
@@ -98,7 +98,7 @@ export const nodeDefUIProps = {
     }),
   },
 
-  [nodeDefType.coordinate]: {
+  [coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
     defaultValue: { x: '', y: '', srs: '' },
@@ -109,7 +109,7 @@ export const nodeDefUIProps = {
     ],
   },
 
-  [nodeDefType.taxon]: {
+  [taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
     defaultValue: {
@@ -123,12 +123,12 @@ export const nodeDefUIProps = {
     ],
   },
 
-  [nodeDefType.file]: {
+  [file]: {
     component: NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left"/>,
   },
 
-  [nodeDefType.entity]: {
+  [entity]: {
     component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
     defaultProps: cycle => ({
@@ -136,43 +136,23 @@ export const nodeDefUIProps = {
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table)
     }),
   },
-
 }
 
-const getProp = (nodeDefType, prop, defaultValue = null) => R.pathOr(defaultValue, [nodeDefType, prop])
+const getPropByType = (prop, defaultValue = null) => nodeDefType => R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
-export const getNodeDefIconByType = nodeDefType => R.pipe(
-  getProp(nodeDefType, 'icon'),
-)(nodeDefUIProps)
+const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
-export const getNodeDefInputTextProps = nodeDef =>
-  getProp(
-    nodeDef.type,
-    'inputText',
-    { mask: false }
-  )(nodeDefUIProps)
+export const getIconByType = getPropByType('icon')
 
-export const getNodeDefComponent = nodeDef =>
-  getProp(
-    nodeDef.type,
-    'component',
-    NodeDefText
-  )(nodeDefUIProps)
+export const getInputTextProps = getProp('inputText', { mask: false })
 
-export const getNodeDefFormFields = nodeDef =>
-  getProp(
-    nodeDef.type,
-    'formFields',
-    ['field']
-  )(nodeDefUIProps)
+export const getComponent = getProp('component', NodeDefText)
 
-export const getNodeDefDefaultValue = nodeDef =>
-  getProp(
-    nodeDef.type,
-    'defaultValue',
-  )(nodeDefUIProps)
+export const getFormFields = getProp('formFields', ['field'])
 
-export const getDefaultPropsByType = (type, cycle) => R.pipe(
-  getProp(type, 'defaultProps', () => ({})),
-  fn => fn(cycle)
-)(nodeDefUIProps)
+export const getDefaultValue = getProp('defaultValue')
+
+export const getDefaultPropsByType = (type, cycle) => {
+  const fn = getPropByType(type, 'defaultProps')
+  return fn ? fn(cycle) : {}
+}

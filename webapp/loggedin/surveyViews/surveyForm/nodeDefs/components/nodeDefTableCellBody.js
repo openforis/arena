@@ -98,7 +98,7 @@ const NodeDefTableCellBody = props => {
             />
           )
           : (
-            React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
+            React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
           )
       }
 

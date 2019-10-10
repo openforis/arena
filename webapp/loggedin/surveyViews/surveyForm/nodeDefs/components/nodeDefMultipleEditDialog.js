@@ -21,7 +21,7 @@ const NodeDefMultipleEditDialog = props => {
 
       <ModalBody>
         {
-          React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
+          React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
         }
       </ModalBody>
 

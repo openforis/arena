@@ -35,7 +35,7 @@ const NodeDefFormItemLabel = props => {
 const NodeDefFormItem = props => {
   const { nodeDef, entry } = props
 
-  const nodeDefComponent = React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
+  const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
 
   return NodeDef.isEntity(nodeDef)
     ? (

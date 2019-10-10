@@ -11,7 +11,7 @@ import * as NodeDefUiProps from '../nodeDefUIProps'
 const NodeDefTableCellHeader = props => {
   const { label, nodeDef } = props
 
-  const fields = NodeDefUiProps.getNodeDefFormFields(nodeDef)
+  const fields = NodeDefUiProps.getFormFields(nodeDef)
 
   const i18n = useI18n()
 
