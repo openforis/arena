@@ -7,16 +7,15 @@ const { requireRecordListViewPermission } = require('../../auth/authApiMiddlewar
 
 module.exports.init = app => {
 
-  app.post('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res, next) => {
+  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, nodeDefUuidTable, tableName, offset, limit, editMode = false } = Request.getParams(req)
+      const { surveyId, nodeDefUuidTable, cycle, offset, limit, editMode = false } = Request.getParams(req)
 
-      const cols = Request.getJsonParam(req, 'cols', [])
       const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
       const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getJsonParam(req, 'sort')
 
-      const rows = await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort, editMode)
+      const rows = await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode)
 
       res.json(rows)
     } catch (err) {

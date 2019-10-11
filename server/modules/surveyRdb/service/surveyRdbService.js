@@ -3,6 +3,7 @@ const fastcsv = require('fast-csv')
 
 const Survey = require('../../../../core/survey/survey')
 const NodeDef = require('../../../../core/survey/nodeDef')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 
 const DataTable = require('../schemaRdb/dataTable')
 
@@ -39,8 +40,8 @@ const exportTableToCSV = async (surveyId, cycle, tableName, cols, filter, sort, 
   csvStream.end()
 }
 
-const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
-                          offset, limit, filterExpr, sort, editMode = false) => {
+const queryTable = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
+                          offset = 0, limit = null, filterExpr = null, sort = null, editMode = false) => {
   const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true)
   const surveyInfo = Survey.getSurveyInfo(surveySummary)
   const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
@@ -58,10 +59,12 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
   )(survey)
 
   // 3. prepare cols to fetch
-  const queryCols = R.pipe(
-    R.concat(ancestorUuidColNames),
-    R.append(DataTable.colNameRecordUuuid)
-  )(cols)
+  const queryCols = [
+    DataTable.colNameRecordUuuid,
+    ...ancestorUuidColNames,
+    ...NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+  ]
+  const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
 
   // 4. fetch data
   let rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, queryCols, offset, limit, filterExpr, sort)
