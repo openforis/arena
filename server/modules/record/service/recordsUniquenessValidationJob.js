@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
+const Survey = require('../../../../core/survey/survey')
+const NodeDef = require('../../../../core/survey/nodeDef')
 
-const Node = require('../../../../common/record/node')
-const RecordValidation = require('../../../../common/record/recordValidation')
-const Validation = require('../../../../common/validation/validation')
+const Node = require('../../../../core/record/node')
+const RecordValidation = require('../../../../core/record/recordValidation')
+const Validation = require('../../../../core/validation/validation')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const RecordManager = require('../manager/recordManager')

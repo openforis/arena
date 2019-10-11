@@ -12,7 +12,7 @@ import SrsEditor from './components/srsEditor'
 import CyclesEditor from './components/cyclesEditor'
 import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
-import Authorizer from '../../../../../common/auth/authorizer'
+import Authorizer from '../../../../../core/auth/authorizer'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'

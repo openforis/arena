@@ -19,7 +19,7 @@ const {
   subYears,
 } = require('date-fns')
 
-const { isBlank } = require('../common/stringUtils')
+const { isBlank } = require('.//stringUtils')
 
 const normalizeDateTimeValue = length => value => R.pipe(
   R.ifElse(

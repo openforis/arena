@@ -1,8 +1,8 @@
 const R = require('ramda')
 const fastcsv = require('fast-csv')
 
-const Taxonomy = require('../../../../common/survey/taxonomy')
-const Taxon = require('../../../../common/survey/taxon')
+const Taxonomy = require('../../../../core/survey/taxonomy')
+const Taxon = require('../../../../core/survey/taxon')
 
 const TaxonomyManager = require('../manager/taxonomyManager')
 const JobManager = require('../../../job/jobManager')

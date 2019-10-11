@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const Validator = require('../../../common/validation/validator')
-const Validation = require('../../../common/validation/validation')
+const Validator = require('../../validation/validator')
+const Validation = require('../../validation/validation')
 
 const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
   return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)

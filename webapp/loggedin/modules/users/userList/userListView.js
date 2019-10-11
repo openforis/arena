@@ -8,10 +8,10 @@ import TableView from '../../../tableViews/tableView'
 import ProfilePicture from '../../../../commonComponents/profilePicture'
 import { useI18n } from '../../../../commonComponents/hooks'
 
-import Authorizer from '../../../../../common/auth/authorizer'
+import Authorizer from '../../../../../core/auth/authorizer'
 
-import User from '../../../../../common/user/user'
-import AuthGroups from '../../../../../common/auth/authGroups'
+import User from '../../../../../core/user/user'
+import AuthGroups from '../../../../../core/auth/authGroups'
 
 import { appModuleUri, userModules } from '../../../appModules'
 

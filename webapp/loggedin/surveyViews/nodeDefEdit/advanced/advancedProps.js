@@ -2,8 +2,8 @@ import React from 'react'
 
 import { useI18n } from '../../../../commonComponents/hooks'
 
-import Validation from '../../../../../common/validation/validation'
-import NodeDef from '../../../../../common/survey/nodeDef'
+import Validation from '../../../../../core/validation/validation'
+import NodeDef from '../../../../../core/survey/nodeDef'
 import { FormItem } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'

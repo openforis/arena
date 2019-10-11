@@ -8,13 +8,13 @@ import { getUrlParam } from '../../../utils/routerUtils'
 
 import { useOnUpdate } from '../../../commonComponents/hooks'
 
-import Survey from '../../../../common/survey/survey'
-import Record from '../../../../common/record/record'
+import Survey from '../../../../core/survey/survey'
+import Record from '../../../../core/record/record'
 
 import SurveyFormView from '../surveyForm/surveyFormView'
 
-import Authorizer from '../../../../common/auth/authorizer'
-import WebSocketEvents from '../../../../common/webSocket/webSocketEvents'
+import Authorizer from '../../../../core/auth/authorizer'
+import WebSocketEvents from '../../../../core/webSocket/webSocketEvents'
 import * as AppWebSocket from '../../../app/appWebSocket'
 
 import * as AppState from '../../../app/appState'

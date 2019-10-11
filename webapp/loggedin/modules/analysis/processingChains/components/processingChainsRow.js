@@ -1,7 +1,7 @@
 import React from 'react'
 
-import ProcessingChain from '../../../../../../common/analysis/processingChain'
-import DateUtils from '../../../../../../common/dateUtils'
+import ProcessingChain from '../../../../../../core/analysis/processingChain'
+import DateUtils from '../../../../../../core/dateUtils'
 
 import ProgressBar from '../../../../../commonComponents/progressBar'
 import { useI18n } from '../../../../../commonComponents/hooks'

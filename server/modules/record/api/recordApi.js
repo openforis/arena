@@ -1,10 +1,10 @@
 const Request = require('../../../utils/request')
 const { sendOk, sendFile } = require('../../../utils/response')
 
-const User = require('../../../../common/user/user')
-const Record = require('../../../../common/record/record')
-const RecordFile = require('../../../../common/record/recordFile')
-const Node = require('../../../../common/record/node')
+const User = require('../../../../core/user/user')
+const Record = require('../../../../core/record/record')
+const RecordFile = require('../../../../core/record/recordFile')
+const Node = require('../../../../core/record/node')
 
 const RecordService = require('../service/recordService')
 const FileService = require('../service/fileService')

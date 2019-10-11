@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Authorizer from '../../../../common/auth/authorizer'
+import Authorizer from '../../../../core/auth/authorizer'
 
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import InnerModuleSwitch from '../components/innerModuleSwitch'

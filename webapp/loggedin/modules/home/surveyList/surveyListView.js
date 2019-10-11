@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../common/survey/survey'
-import Authorizer from '../../../../../common/auth/authorizer'
+import Survey from '../../../../../core/survey/survey'
+import Authorizer from '../../../../../core/auth/authorizer'
 
 import TableView from '../../../tableViews/tableView'
 import SurveyListHeaderLeft from './components/surveyListHeaderLeft'

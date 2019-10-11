@@ -3,9 +3,9 @@ const R = require('ramda')
 const db = require('../../../db/db')
 const DbUtils = require('../../../db/dbUtils')
 
-const Category = require('../../../../common/survey/category')
-const CategoryLevel = require('../../../../common/survey/categoryLevel')
-const CategoryItem = require('../../../../common/survey/categoryItem')
+const Category = require('../../../../core/survey/category')
+const CategoryLevel = require('../../../../core/survey/categoryLevel')
+const CategoryItem = require('../../../../core/survey/categoryItem')
 
 const {
   getSurveyDBSchema,

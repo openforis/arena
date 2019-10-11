@@ -1,6 +1,6 @@
 import { exportReducer } from '../../../utils/reduxUtils'
 
-import Record from '../../../../common/record/record'
+import Record from '../../../../core/record/record'
 import { appUserLogout } from '../../../app/actions'
 
 import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'

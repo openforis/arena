@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { useI18n } from '../../../../../commonComponents/hooks'
 import InputChips from '../../../../../commonComponents/form/inputChips'
 
-import { getLanguageLabel, languages as appLanguages } from '../../../../../../common/app/languages'
+import { getLanguageLabel, languages as appLanguages } from '../../../../../../core/app/languages'
 
 const LanguagesEditor = props => {
 

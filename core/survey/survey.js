@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('../../common/uuid')
+const { uuidv4 } = require('../uuid')
 
 const SurveyInfo = require('./_survey/surveyInfo')
 const SurveyCycle = require('./surveyCycle')

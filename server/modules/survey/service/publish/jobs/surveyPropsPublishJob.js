@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const Job = require('../../../../../job/job')
 
-const Survey = require('../../../../../../common/survey/survey')
+const Survey = require('../../../../../../core/survey/survey')
 
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const SurveyManager = require('../../../manager/surveyManager')

@@ -8,9 +8,9 @@ import Checkbox from '../../../../commonComponents/form/checkbox'
 
 import ExpressionsProp from './expressionsProp/expressionsProp'
 
-import NodeDef from '../../../../../common/survey/nodeDef'
-import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
-import Validation from '../../../../../common/validation/validation'
+import NodeDef from '../../../../../core/survey/nodeDef'
+import NodeDefValidations from '../../../../../core/survey/nodeDefValidations'
+import Validation from '../../../../../core/validation/validation'
 
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 

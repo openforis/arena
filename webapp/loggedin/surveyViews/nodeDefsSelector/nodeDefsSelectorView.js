@@ -9,8 +9,8 @@ import { useI18n } from '../../../commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 import AttributesSelector from './components/attributesSelector'
 
-import Survey from '../../../../common/survey/survey'
-import NodeDef from '../../../../common/survey/nodeDef'
+import Survey from '../../../../core/survey/survey'
+import NodeDef from '../../../../core/survey/nodeDef'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
 import * as SurveyState from '../../../survey/surveyState'

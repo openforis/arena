@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Taxonomy from '../../../common/survey/taxonomy'
-import Validation from '../../../common/validation/validation'
-import ObjectUtils from '../../../common/objectUtils'
+import Taxonomy from '../../../core/survey/taxonomy'
+import Validation from '../../../core/validation/validation'
+import ObjectUtils from '../../../core/objectUtils'
 
 export const assocTaxonomy = taxonomy => R.assoc(Taxonomy.getUuid(taxonomy), taxonomy)
 

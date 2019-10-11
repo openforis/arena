@@ -1,9 +1,9 @@
 const {expect} = require('chai')
 
-const SurveyValidator = require('../../common/survey/surveyValidator')
-const Survey = require('../../common/survey/survey')
-const Validation = require('../../common/validation/validation')
-const NodeDefExpression = require('../../common/survey/nodeDefExpression')
+const SurveyValidator = require('../../core/survey/surveyValidator')
+const Survey = require('../../core/survey/survey')
+const Validation = require('../../core/validation/validation')
+const NodeDefExpression = require('../../core/survey/nodeDefExpression')
 
 const {fetchFullContextSurvey} = require('../testContext')
 

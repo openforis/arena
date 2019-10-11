@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail')
 
-const ProcessUtils = require('../../common/processUtils')
-const i18nFactory = require('../../common/i18n/i18nFactory')
+const ProcessUtils = require('../../core/processUtils')
+const i18nFactory = require('../../core/i18n/i18nFactory')
 
 sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
 

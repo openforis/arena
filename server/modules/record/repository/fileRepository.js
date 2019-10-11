@@ -1,6 +1,6 @@
 const db = require('../../../db/db')
 
-const RecordFile = require('../../../../common/record/recordFile')
+const RecordFile = require('../../../../core/record/recordFile')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 

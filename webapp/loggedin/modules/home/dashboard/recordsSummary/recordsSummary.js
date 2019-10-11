@@ -8,8 +8,8 @@ import { useI18n } from '../../../../../commonComponents/hooks'
 import RecordsSummaryChart from './chart/recordsSummaryChart'
 import Dropdown from '../../../../../commonComponents/form/dropdown'
 
-import DateUtils from '../../../../../../common/dateUtils'
-import Survey from '../../../../../../common/survey/survey'
+import DateUtils from '../../../../../../core/dateUtils'
+import Survey from '../../../../../../core/survey/survey'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 import * as RecordsSummaryState from './recordsSummaryState'

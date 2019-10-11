@@ -5,7 +5,7 @@ const ThreadsCache = require('../threads/threadsCache')
 const ThreadManager = require('../threads/threadManager')
 
 const WebSocket = require('../utils/webSocket')
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+const WebSocketEvents = require('../../core/webSocket/webSocketEvents')
 
 // USER JOB WORKERS
 

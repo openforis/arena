@@ -1,10 +1,10 @@
 const { expect } = require('chai')
 
-const Survey = require('../../common/survey/survey')
-const NodeDef = require('../../common/survey/nodeDef')
-const NodeDefExpression = require('../../common/survey/nodeDefExpression')
-const Record = require('../../common/record/record')
-const Node = require('../../common/record/node')
+const Survey = require('../../core/survey/survey')
+const NodeDef = require('../../core/survey/nodeDef')
+const NodeDefExpression = require('../../core/survey/nodeDefExpression')
+const Record = require('../../core/record/record')
+const Node = require('../../core/record/node')
 
 const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
 const RecordManager = require('../../server/modules/record/manager/recordManager')

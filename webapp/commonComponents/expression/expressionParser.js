@@ -1,8 +1,8 @@
-import Survey from '../../../common/survey/survey'
-import NodeDef from '../../../common/survey/nodeDef'
-import Expression from '../../../common/exprParser/expression'
+import Survey from '../../../core/survey/survey'
+import NodeDef from '../../../core/survey/nodeDef'
+import Expression from '../../../core/exprParser/expression'
 
-import { isNotBlank } from '../../../common/stringUtils'
+import { isNotBlank } from '../../../core/stringUtils'
 
 export const parseQuery = (query, mode, canBeConstant) => {
   const exprQuery = Expression.fromString(query, mode)

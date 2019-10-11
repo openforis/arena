@@ -1,8 +1,8 @@
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
 
-const ObjectUtils = require('../../../../common/objectUtils')
-const Taxon = require('../../../../common/survey/taxon')
+const ObjectUtils = require('../../../../core/objectUtils')
+const Taxon = require('../../../../core/survey/taxon')
 
 const { jobToJSON } = require('../../../job/jobUtils')
 const TaxonomyService = require('../service/taxonomyService')

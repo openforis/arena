@@ -2,11 +2,11 @@ const R = require('ramda')
 
 const db = require('../../../server/db/db')
 
-const Survey = require('../../../common/survey/survey')
-const NodeDef = require('../../../common/survey/nodeDef')
-const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
-const NodeDefValidations = require('../../../common/survey/nodeDefValidations')
-const User = require('../../../common/user/user')
+const Survey = require('../../../core/survey/survey')
+const NodeDef = require('../../../core/survey/nodeDef')
+const NodeDefExpression = require('../../../core/survey/nodeDefExpression')
+const NodeDefValidations = require('../../../core/survey/nodeDefValidations')
+const User = require('../../../core/user/user')
 
 const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
 const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')

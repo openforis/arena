@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Validator from '../../../common/validation/validator'
-import Validation from '../../../common/validation/validation'
-import UserValidator from '../../../common/user/userValidator'
+import Validator from '../../../core/validation/validator'
+import Validation from '../../../core/validation/validation'
+import UserValidator from '../../../core/user/userValidator'
 
 const validPasswordRe = new RegExp(/^[\S]+.*[\S]+$/)
 const passwordStrengthRe = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)

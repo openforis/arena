@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 
-import Survey from '../../../../../../common/survey/survey'
+import Survey from '../../../../../../core/survey/survey'
 
 const RecordsHeaderLeft = props => {
   const { surveyInfo, createRecord, history } = props

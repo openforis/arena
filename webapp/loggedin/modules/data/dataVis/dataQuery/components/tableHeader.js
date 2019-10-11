@@ -9,8 +9,8 @@ import SortEditor from './sort/sortEditor'
 import DownloadButton from '../../../../../../commonComponents/form/downloadButton'
 import Tooltip from '../../../../../../commonComponents/tooltip'
 
-import Expression from '../../../../../../../common/exprParser/expression'
-import * as DataSort from '../../../../../../../common/surveyRdb/dataSort'
+import Expression from '../../../../../../../core/exprParser/expression'
+import * as DataSort from '../../../../../../../core/surveyRdb/dataSort'
 
 import {
   updateTableFilter,

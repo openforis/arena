@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const Category = require('../../../../../../common/survey/category')
-const CategoryItem = require('../../../../../../common/survey/categoryItem')
-const CategoryLevel = require('../../../../../../common/survey/categoryLevel')
-const ObjectUtils = require('../../../../../../common/objectUtils')
+const Category = require('../../../../../../core/survey/category')
+const CategoryItem = require('../../../../../../core/survey/categoryItem')
+const CategoryLevel = require('../../../../../../core/survey/categoryLevel')
+const ObjectUtils = require('../../../../../../core/objectUtils')
 
 const Job = require('../../../../../job/job')
 const BatchPersister = require('../../../../../db/batchPersister')

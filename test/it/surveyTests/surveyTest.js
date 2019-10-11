@@ -1,9 +1,9 @@
 const { setContextSurvey, getContextUser } = require('../../testContext')
 const { assert } = require('chai')
-const { uuidv4 } = require('../../../common/uuid')
+const { uuidv4 } = require('../../../core/uuid')
 
 const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
-const Survey = require('../../../common/survey/survey')
+const Survey = require('../../../core/survey/survey')
 
 const testSurvey = {
   name: 'test_survey_' + uuidv4(),

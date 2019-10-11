@@ -6,8 +6,8 @@ import { Input } from '../../../../../../commonComponents/form/input'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import Node from '../../../../../../../common/record/node'
+import NodeDef from '../../../../../../../core/survey/nodeDef'
+import Node from '../../../../../../../core/record/node'
 import * as NodeDefUIProps from '../../nodeDefUIProps'
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (

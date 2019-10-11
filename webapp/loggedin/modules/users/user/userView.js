@@ -3,7 +3,7 @@ import './userView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../common/survey/survey'
+import Survey from '../../../../../core/survey/survey'
 
 import { getUrlParam } from '../../../../utils/routerUtils'
 

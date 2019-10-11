@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const NumberUtils = require('../../common/numberUtils')
+const NumberUtils = require('../numberUtils')
 
 const keys = {
   required: 'required',

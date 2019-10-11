@@ -2,8 +2,8 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../../utils/reduxUtils'
 
-import NodeDef from '../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../../core/survey/nodeDef'
+import NodeDefLayout from '../../../../core/survey/nodeDefLayout'
 
 import * as SurveyFormState from './surveyFormState'
 

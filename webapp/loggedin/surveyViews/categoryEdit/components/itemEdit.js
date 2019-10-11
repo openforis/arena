@@ -6,11 +6,11 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
 import { useI18n } from '../../../../commonComponents/hooks'
 
-import { normalizeName } from '../../../../../common/stringUtils'
+import { normalizeName } from '../../../../../core/stringUtils'
 
-import Category from '../../../../../common/survey/category'
-import CategoryItem from '../../../../../common/survey/categoryItem'
-import Validation from '../../../../../common/validation/validation'
+import Category from '../../../../../core/survey/category'
+import CategoryItem from '../../../../../core/survey/categoryItem'
+import Validation from '../../../../../core/validation/validation'
 
 const ItemEdit = (props) => {
 

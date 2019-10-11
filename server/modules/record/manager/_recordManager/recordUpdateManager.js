@@ -2,12 +2,12 @@ const R = require('ramda')
 
 const db = require('../../../../db/db')
 
-const ObjectUtils = require('../../../../../common/objectUtils')
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const Record = require('../../../../../common/record/record')
-const RecordStep = require('../../../../../common/record/recordStep')
-const Node = require('../../../../../common/record/node')
+const ObjectUtils = require('../../../../../core/objectUtils')
+const Survey = require('../../../../../core/survey/survey')
+const NodeDef = require('../../../../../core/survey/nodeDef')
+const Record = require('../../../../../core/record/record')
+const RecordStep = require('../../../../../core/record/recordStep')
+const Node = require('../../../../../core/record/node')
 
 const RecordRepository = require('../../repository/recordRepository')
 const RecordValidationManager = require('./recordValidationManager')

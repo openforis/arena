@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const DateUtils = require('../../../../../../common/dateUtils')
+const DateUtils = require('../../../../../../core/dateUtils')
 
 const getRootEntityName = R.pipe(
   R.keys,

@@ -3,8 +3,8 @@ import React, { useRef, useState } from 'react'
 import { Input } from '../../../../../../commonComponents/form/input'
 import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
-import Node from '../../../../../../../common/record/node'
-import StringUtils from '../../../../../../../common/stringUtils'
+import Node from '../../../../../../../core/record/node'
+import StringUtils from '../../../../../../../core/stringUtils'
 
 const NodeDefTaxonInputField = props => {
 

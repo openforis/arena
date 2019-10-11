@@ -4,7 +4,7 @@ const db = require('../../../db/db')
 const DbUtils = require('../../../db/dbUtils')
 const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDef = require('../../../../core/survey/nodeDef')
 
 const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 

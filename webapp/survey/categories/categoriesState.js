@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 
-import Category from '../../../common/survey/category'
-import CategoryLevel from '../../../common/survey/categoryLevel'
-import CategoryItem from '../../../common/survey/categoryItem'
+import Category from '../../../core/survey/category'
+import CategoryLevel from '../../../core/survey/categoryLevel'
+import CategoryItem from '../../../core/survey/categoryItem'
 
-import Validation from '../../../common/validation/validation'
-import ObjectUtils from '../../../common/objectUtils'
+import Validation from '../../../core/validation/validation'
+import ObjectUtils from '../../../core/objectUtils'
 
 // category
 

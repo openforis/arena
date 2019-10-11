@@ -2,13 +2,13 @@ const R = require('ramda')
 
 const Job = require('../../../job/job')
 
-const { languageCodes } = require('../../../../common/app/languages')
-const { isNotBlank } = require('../../../../common/stringUtils')
+const { languageCodes } = require('../../../../core/app/languages')
+const { isNotBlank } = require('../../../../core/stringUtils')
 const CSVParser = require('../../../utils/file/csvParser')
 
-const Taxonomy = require('../../../../common/survey/taxonomy')
-const Taxon = require('../../../../common/survey/taxon')
-const Validation = require('../../../../common/validation/validation')
+const Taxonomy = require('../../../../core/survey/taxonomy')
+const Taxon = require('../../../../core/survey/taxon')
+const Validation = require('../../../../core/validation/validation')
 
 const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')

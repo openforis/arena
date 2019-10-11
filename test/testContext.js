@@ -1,9 +1,9 @@
-const Survey = require('../common/survey/survey')
+const Survey = require('../core/survey/survey')
 
 const SurveyManager = require('../server/modules/survey/manager/surveyManager')
 const UserManager = require('../server/modules/user/manager/userManager')
 
-const User = require('../common/user/user')
+const User = require('../core/user/user')
 
 let user = null
 let survey = null

@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+const NodeDefTable = require('../../../../core/surveyRdb/nodeDefTable')
 const ColProps = require('./dataColProps')
 
 const getNames = NodeDefTable.getColNames

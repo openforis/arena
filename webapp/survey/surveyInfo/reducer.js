@@ -1,6 +1,6 @@
 import { exportReducer } from '../../utils/reduxUtils'
 
-import Survey from '../../../common/survey/survey'
+import Survey from '../../../core/survey/survey'
 
 import * as SurveyInfoState from './surveyInfoState'
 

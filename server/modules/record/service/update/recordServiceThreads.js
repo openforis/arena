@@ -6,7 +6,7 @@ const RecordUpdateThreadParams = require('./thread/recordUpdateThreadParams')
 const ThreadParams = require('../../../../threads/threadParams')
 
 const WebSocket = require('../../../../utils/webSocket')
-const WebSocketEvents = require('../../../../../common/webSocket/webSocketEvents')
+const WebSocketEvents = require('../../../../../core/webSocket/webSocketEvents')
 
 const RecordSocketsMap = require('./recordSocketsMap')
 const RecordThreadsMap = require('../update/recordThreadsMap')

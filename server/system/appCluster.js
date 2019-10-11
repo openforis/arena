@@ -15,7 +15,7 @@ const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
 const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
-const ProcessUtils = require('../../common/processUtils')
+const ProcessUtils = require('../../core/processUtils')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')

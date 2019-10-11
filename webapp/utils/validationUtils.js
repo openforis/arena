@@ -2,8 +2,8 @@ import React from 'react'
 import * as R from 'ramda'
 import Markdown from 'react-remarkable'
 
-import Validation from '../../common/validation/validation'
-import ValidationResult from '../../common/validation/validationResult'
+import Validation from '../../core/validation/validation'
+import ValidationResult from '../../core/validation/validationResult'
 
 const getErrorText = i18n => error =>
   ValidationResult.hasMessages(error)

@@ -1,9 +1,9 @@
 const R = require('ramda')
 
 const CollectImportJobContext = require('../collectImportJobContext')
-const Category = require('../../../../../../common/survey/category')
-const CategoryItem = require('../../../../../../common/survey/categoryItem')
-const Point = require('../../../../../../common/geo/point')
+const Category = require('../../../../../../core/survey/category')
+const CategoryItem = require('../../../../../../core/survey/categoryItem')
+const Point = require('../../../../../../core/geo/point')
 
 const CategoryManager = require('../../../../category/manager/categoryManager')
 const CategoryImportJob = require('../../../../category/service/categoryImportJob')

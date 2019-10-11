@@ -1,11 +1,11 @@
 const fs = require('fs')
 const R = require('ramda')
 
-const Category = require('../../../../common/survey/category')
-const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
-const Validation = require('../../../../common/validation/validation')
-const ObjectUtils = require('../../../../common/objectUtils')
-const StringUtils = require('../../../../common/stringUtils')
+const Category = require('../../../../core/survey/category')
+const CategoryImportSummary = require('../../../../core/survey/categoryImportSummary')
+const Validation = require('../../../../core/validation/validation')
+const ObjectUtils = require('../../../../core/objectUtils')
+const StringUtils = require('../../../../core/stringUtils')
 const SystemError = require('../../../utils/systemError')
 
 const CSVReader = require('../../../utils/file/csvReader')

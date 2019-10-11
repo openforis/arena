@@ -1,12 +1,12 @@
 const R = require('ramda')
 
-const Queue = require('../../../../../common/queue')
+const Queue = require('../../../../../core/queue')
 
-const ObjectUtils = require('../../../../../common/objectUtils')
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const Node = require('../../../../../common/record/node')
-const Record = require('../../../../../common/record/record')
+const ObjectUtils = require('../../../../../core/objectUtils')
+const Survey = require('../../../../../core/survey/survey')
+const NodeDef = require('../../../../../core/survey/nodeDef')
+const Node = require('../../../../../core/record/node')
+const Record = require('../../../../../core/record/record')
 
 const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
 const NodeRepository = require('../../repository/nodeRepository')

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import ProcessingChain from '../../../../../common/analysis/processingChain'
+import ProcessingChain from '../../../../../core/analysis/processingChain'
 
 import * as SurveyState from '../../../../survey/surveyState'
 

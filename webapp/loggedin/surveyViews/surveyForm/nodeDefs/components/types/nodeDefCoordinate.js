@@ -10,9 +10,9 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
-import Survey from '../../../../../../../common/survey/survey'
-import Node from '../../../../../../../common/record/node'
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import Survey from '../../../../../../../core/survey/survey'
+import Node from '../../../../../../../core/record/node'
+import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 

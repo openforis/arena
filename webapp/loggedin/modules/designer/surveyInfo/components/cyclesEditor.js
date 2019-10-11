@@ -3,8 +3,8 @@ import './cyclesEditor.scss'
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
-import Survey from '../../../../../../common/survey/survey'
-import SurveyCycle from '../../../../../../common/survey/surveyCycle'
+import Survey from '../../../../../../core/survey/survey'
+import SurveyCycle from '../../../../../../core/survey/surveyCycle'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 

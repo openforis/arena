@@ -6,9 +6,9 @@ import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import { useI18n } from '../../../../commonComponents/hooks'
 
-import Taxonomy from '../../../../../common/survey/taxonomy'
-import Validation from '../../../../../common/validation/validation'
-import StringUtils from '../../../../../common/stringUtils'
+import Taxonomy from '../../../../../core/survey/taxonomy'
+import Validation from '../../../../../core/validation/validation'
+import StringUtils from '../../../../../core/stringUtils'
 
 const TaxonomyEditHeader = props => {
   const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props

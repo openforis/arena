@@ -6,10 +6,10 @@ import * as R from 'ramda'
 
 import { elementOffset } from '../../../../../../utils/domUtils'
 
-import Survey from '../../../../../../../common/survey/survey'
-import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
-import Authorizer from '../../../../../../../common/auth/authorizer'
-import WebSocketEvents from '../../../../../../../common/webSocket/webSocketEvents'
+import Survey from '../../../../../../../core/survey/survey'
+import NodeDefTable from '../../../../../../../core/surveyRdb/nodeDefTable'
+import Authorizer from '../../../../../../../core/auth/authorizer'
+import WebSocketEvents from '../../../../../../../core/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '../../../../../../app/appWebSocket'
 import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'

@@ -1,6 +1,6 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
 
-import ProcessUtils from '../../common/processUtils'
+import ProcessUtils from '../../core/processUtils'
 
 export const keysAction = {
   success: 'success',

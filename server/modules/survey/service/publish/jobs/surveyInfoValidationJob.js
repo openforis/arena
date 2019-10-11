@@ -1,7 +1,7 @@
 const Job = require('../../../../../job/job')
 
-const Validation = require('../../../../../../common/validation/validation')
-const Survey = require('../../../../../../common/survey/survey')
+const Validation = require('../../../../../../core/validation/validation')
+const Survey = require('../../../../../../core/survey/survey')
 
 const SurveyManager = require('../../../manager/surveyManager')
 

@@ -1,6 +1,6 @@
 const Job = require('../../../job/job')
 
-const Survey = require('../../../../common/survey/survey')
+const Survey = require('../../../../core/survey/survey')
 
 const SurveyManager = require('../manager/surveyManager')
 

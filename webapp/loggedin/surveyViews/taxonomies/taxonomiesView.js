@@ -7,9 +7,9 @@ import { useI18n } from '../../../commonComponents/hooks'
 import ItemsView from '../items/itemsView'
 import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
 
-import Survey from '../../../../common/survey/survey'
-import Taxonomy from '../../../../common/survey/taxonomy'
-import Authorizer from '../../../../common/auth/authorizer'
+import Survey from '../../../../core/survey/survey'
+import Taxonomy from '../../../../core/survey/taxonomy'
+import Authorizer from '../../../../core/auth/authorizer'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'

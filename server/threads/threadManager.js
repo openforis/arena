@@ -4,8 +4,8 @@ const Log = require('../log/log')
 
 const WebSocket = require('../utils/webSocket')
 
-const User = require('../../common/user/user')
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+const User = require('../../core/user/user')
+const WebSocketEvents = require('../../core/webSocket/webSocketEvents')
 
 const Thread = require('./thread')
 const ThreadParams = require('./threadParams')

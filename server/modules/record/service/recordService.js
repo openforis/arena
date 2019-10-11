@@ -3,13 +3,13 @@ const fs = require('fs')
 
 const Logger = require('../../../log/log').getLogger('RecordService')
 
-const Survey = require('../../../../common/survey/survey')
-const Record = require('../../../../common/record/record')
-const Node = require('../../../../common/record/node')
-const RecordFile = require('../../../../common/record/recordFile')
-const Authorizer = require('../../../../common/auth/authorizer')
+const Survey = require('../../../../core/survey/survey')
+const Record = require('../../../../core/record/record')
+const Node = require('../../../../core/record/node')
+const RecordFile = require('../../../../core/record/recordFile')
+const Authorizer = require('../../../../core/auth/authorizer')
 
-const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
+const WebSocketEvents = require('../../../../core/webSocket/webSocketEvents')
 const WebSocket = require('../../../utils/webSocket')
 
 const SurveyManager = require('../../survey/manager/surveyManager')

@@ -3,7 +3,7 @@ import './processingChainsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import ProcessingChain from '../../../../../common/analysis/processingChain'
+import ProcessingChain from '../../../../../core/analysis/processingChain'
 
 import { useOnUpdate } from '../../../../commonComponents/hooks'
 

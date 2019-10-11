@@ -10,7 +10,7 @@ import * as LoginState from '../login/loginState'
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from './appErrorsMiddleware'
-import ProcessUtils from '../../common/processUtils'
+import ProcessUtils from '../../core/processUtils'
 
 const appReducer = {
   app,

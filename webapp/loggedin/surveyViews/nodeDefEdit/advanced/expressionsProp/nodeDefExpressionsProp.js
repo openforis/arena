@@ -1,9 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import NodeDef from '../../../../../../common/survey/nodeDef'
-import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
-import Validation from '../../../../../../common/validation/validation'
+import NodeDef from '../../../../../../core/survey/nodeDef'
+import NodeDefExpression from '../../../../../../core/survey/nodeDefExpression'
+import Validation from '../../../../../../core/validation/validation'
 
 import ExpressionsProp from './expressionsProp'
 

@@ -1,7 +1,7 @@
 const db = require('../../../db/db')
 //surveyRdbManger cannot use SurveyManager - circular dependency
 
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
+const SchemaRdb = require('../../../../core/surveyRdb/schemaRdb')
 
 const NodesInsert = require('../dbActions/nodesInsert')
 const NodesUpdate = require('../dbActions/nodesUpdate')

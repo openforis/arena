@@ -6,12 +6,12 @@ import * as R from 'ramda'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 
-import Survey from '../../../../../../common/survey/survey'
-import NodeDef from '../../../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../../../common/survey/nodeDefLayout'
-import CategoryItem from '../../../../../../common/survey/categoryItem'
-import Node from '../../../../../../common/record/node'
-import NodeRefData from '../../../../../../common/record/nodeRefData'
+import Survey from '../../../../../../core/survey/survey'
+import NodeDef from '../../../../../../core/survey/nodeDef'
+import NodeDefLayout from '../../../../../../core/survey/nodeDefLayout'
+import CategoryItem from '../../../../../../core/survey/categoryItem'
+import Node from '../../../../../../core/record/node'
+import NodeRefData from '../../../../../../core/record/nodeRefData'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import * as NodeDefUiProps from '../nodeDefUIProps'

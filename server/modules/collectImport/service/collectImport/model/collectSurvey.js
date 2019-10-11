@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const NodeDef = require('../../../../../../common/survey/nodeDef')
+const NodeDef = require('../../../../../../core/survey/nodeDef')
 const { nodeDefType } = NodeDef
 
 const keys = {

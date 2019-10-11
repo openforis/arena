@@ -3,8 +3,8 @@ import './sortEditor.scss'
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Expression from '../../../../../../../../common/exprParser/expression'
-import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
+import Expression from '../../../../../../../../core/exprParser/expression'
+import * as DataSort from '../../../../../../../../core/surveyRdb/dataSort'
 
 import Popup from '../../../../../../../commonComponents/popup'
 import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
@@ -12,7 +12,7 @@ import { useI18n, usePrevious } from '../../../../../../../commonComponents/hook
 
 import SortRow from './sortRow'
 
-import Survey from '../../../../../../../../common/survey/survey'
+import Survey from '../../../../../../../../core/survey/survey'
 
 import * as SurveyState from '../../../../../../../survey/surveyState'
 
