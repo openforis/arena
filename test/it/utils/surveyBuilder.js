@@ -22,6 +22,11 @@ class NodeDefBuilder {
     }
   }
 
+  _setProp (prop, value) {
+    this.props[prop] = value
+    return this
+  }
+
   _createNodeDef (survey, parentDefUuid) {
     return NodeDef.newNodeDef(parentDefUuid, this.type, Survey.cycleOneKey, this.props)
   }
@@ -85,11 +90,11 @@ class AttributeDefBuilder extends NodeDefBuilder {
 
   constructor (name, type = NodeDef.nodeDefType.text) {
     super(name, type)
+    this._analysis = false
   }
 
   key () {
-    this.props[NodeDef.propKeys.key] = true
-    return this
+    return this._setProp(NodeDef.propKeys.key, true)
   }
 
   readOnly () {
@@ -98,19 +103,23 @@ class AttributeDefBuilder extends NodeDefBuilder {
   }
 
   defaultValues (...defaultValues) {
-    this.props[NodeDef.propKeys.defaultValues] = defaultValues
-    return this
+    return this._setProp(NodeDef.propKeys.defaultValues, defaultValues)
   }
 
   required (required = true) {
     const validations = NodeDef.getValidations(this)
     const validationsUpdated = NodeDefValidations.assocRequired(required)(validations)
-    this.props[NodeDef.propKeys.validations] = validationsUpdated
+    return this._setProp(NodeDef.propKeys.validations, validationsUpdated)
+  }
+
+  analysis () {
+    this._analysis = true
     return this
   }
 
   build (survey, parentDefUuid = null) {
     const def = this._createNodeDef(survey, parentDefUuid)
+    def[NodeDef.keys.analysis] = this._analysis
 
     return {
       [NodeDef.getUuid(def)]: def
@@ -146,6 +155,7 @@ class SurveyBuilder {
     const surveyParam = this.build()
 
     return await client.tx(async t => {
+      console.log("====== " , JSON.stringify(this.user))
       const survey = await SurveyManager.insertSurvey(this.user, surveyParam, false, t)
 
       const surveyId = Survey.getId(survey)

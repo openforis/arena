@@ -1,7 +1,7 @@
 const ObjectUtils = require('../../objectUtils')
 
 const keys = {
-  cycle: 'cycle',
+  cycle: ObjectUtils.keys.cycle,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   nodes: 'nodes',
