@@ -3,13 +3,13 @@ const R = require('ramda')
 
 const { uuidv4 } = require('../../../../../../common/uuid')
 const StringUtils = require('../../../../../../common/stringUtils')
+const ObjectUtils = require('../../../../../../common/objectUtils')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
 const NodeDefExpression = require('../../../../../../common/survey/nodeDefExpression')
 const NodeDefLayout = require('../../../../../../common/survey/nodeDefLayout')
-const SurveyUtils = require('../../../../../../common/survey/surveyUtils')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../../../common/survey/category')
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
@@ -293,7 +293,7 @@ class NodeDefsImportJob extends Job {
         await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expr, applyIf, messages, tx)
       } else if (StringUtils.isNotBlank(value)) {
         defaultValues.push({
-          [SurveyUtils.keys.uuid]: uuidv4(),
+          [ObjectUtils.keys.uuid]: uuidv4(),
           [NodeDefExpression.keys.expression]: value
         })
       } else {

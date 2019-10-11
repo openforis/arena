@@ -1,8 +1,8 @@
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
 
+const ObjectUtils = require('../../../../common/objectUtils')
 const Taxon = require('../../../../common/survey/taxon')
-const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const { jobToJSON } = require('../../../job/jobUtils')
 const TaxonomyService = require('../service/taxonomyService')
@@ -11,7 +11,7 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
-  res.json({ taxonomies: toUuidIndexedObj(taxonomies) })
+  res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
 module.exports.init = app => {

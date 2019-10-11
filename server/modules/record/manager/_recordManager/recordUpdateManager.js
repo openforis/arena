@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const db = require('../../../../db/db')
 
-const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const ObjectUtils = require('../../../../../common/objectUtils')
 const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const Record = require('../../../../../common/record/record')
@@ -166,7 +166,7 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
 
   // 4. update survey rdb
   if (!Record.isPreview(record)) {
-    const nodeDefs = SurveyUtils.toUuidIndexedObj(
+    const nodeDefs = ObjectUtils.toUuidIndexedObj(
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
     await SurveyRdbManager.updateTableNodes(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)

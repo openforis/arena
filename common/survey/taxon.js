@@ -1,12 +1,12 @@
 const R = require('ramda')
 
 const { uuidv4 } = require('../uuid')
-const SurveyUtils = require('./surveyUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
-  uuid: SurveyUtils.keys.uuid,
+  uuid: ObjectUtils.keys.uuid,
   taxonomyUuid: 'taxonomyUuid',
-  props: SurveyUtils.keys.props,
+  props: ObjectUtils.keys.props,
   vernacularNames: 'vernacularNames',
   vernacularNameUuid: 'vernacularNameUuid',
   vernacularName: 'vernacularName',
@@ -37,7 +37,7 @@ const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularN
 })
 
 // ====== READ
-const getCode = SurveyUtils.getProp(propKeys.code, '')
+const getCode = ObjectUtils.getProp(propKeys.code, '')
 
 const getVernacularNames = R.propOr({}, keys.vernacularNames)
 
@@ -61,12 +61,12 @@ module.exports = {
   newTaxon,
 
   //READ
-  getUuid: SurveyUtils.getUuid,
+  getUuid: ObjectUtils.getUuid,
   getTaxonomyUuid: R.prop(keys.taxonomyUuid),
   getCode,
-  getFamily: SurveyUtils.getProp(propKeys.family, ''),
-  getGenus: SurveyUtils.getProp(propKeys.genus, ''),
-  getScientificName: SurveyUtils.getProp(propKeys.scientificName, ''),
+  getFamily: ObjectUtils.getProp(propKeys.family, ''),
+  getGenus: ObjectUtils.getProp(propKeys.genus, ''),
+  getScientificName: ObjectUtils.getProp(propKeys.scientificName, ''),
   getVernacularNames,
   getVernacularName,
   getVernacularLanguage,
@@ -74,5 +74,5 @@ module.exports = {
   isUnlistedTaxon: R.pipe(getCode, R.equals(unlistedCode)),
   isUnknownTaxon: R.pipe(getCode, R.equals(unknownCode)),
 
-  isEqual: SurveyUtils.isEqual,
+  isEqual: ObjectUtils.isEqual,
 }

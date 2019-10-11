@@ -1,26 +1,26 @@
 const R = require('ramda')
 
-const { getProp, getUuid } = require('./surveyUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
-  uuid: 'uuid',
+  uuid: ObjectUtils.keys.uuid,
   categoryUuid: 'categoryUuid',
-  index: 'index',
-  props: 'props',
+  index: ObjectUtils.keys.index,
   items: 'items',
+  props: ObjectUtils.keys.props,
 }
 
-const props = {
+const keysProps = {
   name: 'name'
 }
 
 module.exports = {
   keys,
-  props,
+  keysProps,
 
   //READ
-  getUuid,
+  getUuid: ObjectUtils.getUuid,
   getIndex: R.prop(keys.index),
-  getName: getProp(props.name),
+  getName: ObjectUtils.getProp(keysProps.name),
   getCategoryUuid: R.prop(keys.categoryUuid),
 }

@@ -2,6 +2,8 @@ const Request = require('../../../utils/request')
 const SystemError = require('../../../utils/systemError')
 
 const Category = require('../../../../common/survey/category')
+const ObjectUtils = require('../../../../common/objectUtils')
+
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const CategoryService = require('../service/categoryService')
 
@@ -101,7 +103,7 @@ module.exports.init = app => {
     try {
       const { surveyId, categoryUuid, parentUuid, draft } = Request.getParams(req)
 
-      const items = await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
+      const items = ObjectUtils.toUuidIndexedObj(await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft))
 
       res.json({ items })
     } catch (err) {
