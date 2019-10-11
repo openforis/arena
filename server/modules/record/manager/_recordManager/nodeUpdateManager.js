@@ -2,7 +2,6 @@ const R = require('ramda')
 
 const Queue = require('../../../../../common/queue')
 
-const SurveyUtils = require('../../../../../common/survey/surveyUtils')
 const ObjectUtils = require('../../../../../common/objectUtils')
 const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
@@ -181,7 +180,7 @@ const _onNodeUpdate = async (survey, record, node, t) => {
       )
       updatedNodes = {
         ...updatedNodes,
-        ...SurveyUtils.toUuidIndexedObj(deletedNodesArray)
+        ...ObjectUtils.toUuidIndexedObj(deletedNodesArray)
       }
     }
   }

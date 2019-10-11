@@ -1,8 +1,8 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
+const ObjectUtils = require('../../../../common/objectUtils')
 const Survey = require('../../../../common/survey/survey')
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Taxon = require('../../../../common/survey/taxon')
 const Node = require('../../../../common/record/node')
@@ -72,7 +72,7 @@ const props = {
       return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
         //'label'
-        : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+        : ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     },
   },
 
