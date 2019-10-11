@@ -15,7 +15,7 @@ const keys = {
 // ====== LEVELS
 
 const levelValidators = (levels, itemsByParentUuid) => ({
-  [`${CategoryLevel.keys.props}.${CategoryLevel.props.name}`]: [
+  [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels)

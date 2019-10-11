@@ -80,7 +80,7 @@ class CategoriesImportJob extends Job {
         this.surveyId,
         Category.getUuid(category),
         Category.getUuid(firstLevel),
-        CategoryLevel.props.name,
+        CategoryLevel.keysProps.name,
         collectFirstLevel.attributes.name,
         tx
       )

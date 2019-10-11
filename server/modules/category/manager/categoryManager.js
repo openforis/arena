@@ -223,7 +223,7 @@ const replaceLevels = async (user, surveyId, category, levelNamesNew, client = d
 
     const levelsAndCategoryNew = await Promise.all(levelNamesNew.map(
       (levelName, index) => insertLevel(user, surveyId,
-        Category.newLevel(category, { [CategoryLevel.props.name]: levelName }, index), t
+        Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index), t
       )
     ))
     return Category.assocLevelsArray(R.map(R.prop('level'))(levelsAndCategoryNew))(category)

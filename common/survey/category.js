@@ -51,7 +51,7 @@ const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.leng
   [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
   [CategoryLevel.keys.index]: index,
   [CategoryLevel.keys.props]: {
-    [CategoryLevel.props.name]: 'level_' + (index + 1),
+    [CategoryLevel.keysProps.name]: 'level_' + (index + 1),
     ...props
   }
 })
@@ -144,7 +144,7 @@ module.exports = {
     Validation.getFieldValidation(levelIndex),
   ),
   //UPDATE
-  assocLevelName: name => ObjectUtils.setProp(CategoryLevel.props.name, name),
+  assocLevelName: name => ObjectUtils.setProp(CategoryLevel.keysProps.name, name),
 
   // ====== ITEMS
 
