@@ -11,12 +11,17 @@ const SurveyManager = require('../../survey/manager/surveyManager')
 const SurveyRdbManager = require('../manager/surveyRdbManager')
 const RecordManager = require('../../record/manager/recordManager')
 
-const exportTableToCSV = async (surveyId, cycle, tableName, cols, filter, sort, output) => {
+const exportTableToCSV = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, filter, sort, output) => {
+  const survey = await _fetchSurveyAndNodeDefs(surveyId, cycle)
+  const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
+  const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
+  const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+
   const csvStream = fastcsv.format({ headers: true })
   csvStream.pipe(output)
 
   // 1. write headers
-  csvStream.write(cols)
+  csvStream.write(colNames)
 
   let offset = 0
   const limit = 500
@@ -25,7 +30,7 @@ const exportTableToCSV = async (surveyId, cycle, tableName, cols, filter, sort, 
   // 2. write rows
   while (!complete) {
 
-    const rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, cols, offset, limit, filter, sort)
+    const rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, colNames, offset, limit, filter, sort)
 
     rows.forEach(row => {
       csvStream.write(R.values(row))
@@ -40,13 +45,17 @@ const exportTableToCSV = async (surveyId, cycle, tableName, cols, filter, sort, 
   csvStream.end()
 }
 
-const queryTable = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
-                          offset = 0, limit = null, filterExpr = null, sort = null, editMode = false) => {
+const _fetchSurveyAndNodeDefs = async (surveyId, cycle) => {
   const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true)
   const surveyInfo = Survey.getSurveyInfo(surveySummary)
   const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
+  return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
+}
+
+const queryTable = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
+                          offset = 0, limit = null, filterExpr = null, sort = null, editMode = false) => {
+  const survey = await _fetchSurveyAndNodeDefs(surveyId, cycle)
 
   // 1. find ancestor defs of table def
   const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
@@ -106,8 +115,15 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [
   return rows
 }
 
+const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {
+  const survey = await _fetchSurveyAndNodeDefs(surveyId, cycle)
+  const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
+  const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
+  return await SurveyRdbManager.countTable(surveyId, cycle, tableName, filter)
+}
+
 module.exports = {
   queryTable,
-  countTable: SurveyRdbManager.countTable,
+  countTable,
   exportTableToCSV,
 }

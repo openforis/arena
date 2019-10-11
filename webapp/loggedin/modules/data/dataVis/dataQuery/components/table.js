@@ -70,8 +70,6 @@ const Table = props => {
             surveyCycleKey={surveyCycleKey}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCols={nodeDefUuidCols}
-            tableName={tableName}
-            colNames={colNames}
             filter={filter}
             sort={sort}
             limit={limit}

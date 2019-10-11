@@ -1,7 +1,6 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import Survey from '../../../../../../core/survey/survey'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 import DataSort from '../../../../../../common/surveyRdb/dataSort'
 
@@ -17,12 +16,6 @@ export const dataQueryTableDataColUpdate = 'dataQuery/table/data/col/update'
 export const dataQueryTableDataColDelete = 'dataQuery/table/data/col/delete'
 export const dataQueryTableFilterUpdate = 'dataQuery/table/filter/update'
 export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
-
-const getTableName = (state, nodeDefUuidTable) => {
-  const survey = SurveyState.getSurvey(state)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
-  return NodeDefTable.getViewName(nodeDef, Survey.getNodeDefParent(nodeDef)(survey))
-}
 
 const getColNames = (state, nodeDefUuidCols) => {
   const survey = SurveyState.getSurvey(state)
@@ -108,13 +101,12 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
       const filter = R.defaultTo(DataQueryState.getTableFilter(state), queryFilter)
       const sort = R.defaultTo(DataQueryState.getTableSort(state), querySort)
       const editMode = R.defaultTo(DataQueryState.getTableEditMode(state), editModeParam)
-      const tableName = getTableName(state, nodeDefUuidTable)
 
       const { offset, limit } = DataQueryState.defaults
 
       const [countResp, dataResp] = await Promise.all([
         axios.post(
-          `/api/surveyRdb/${surveyId}/${tableName}/query/count`,
+          `/api/surveyRdb/${surveyId}/${nodeDefUuidTable}/query/count`,
           { cycle, filter: filter && JSON.stringify(filter) }
         ),
         queryTable(surveyId, cycle, editMode, nodeDefUuidTable, nodeDefUuidCols, offset, filter, sort)
