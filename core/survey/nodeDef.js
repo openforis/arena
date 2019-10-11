@@ -61,10 +61,11 @@ const maxKeyAttributes = 3
 
 // ==== CREATE
 
-const newNodeDef = (parentUuid, type, cycle, props = {}) => ({
+const newNodeDef = (parentUuid, type, cycle, props, analysis = false) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: parentUuid,
   [keys.type]: type,
+  [keys.analysis]: analysis,
   [keys.props]: {
     ...props,
     [propKeys.cycles]: [cycle]

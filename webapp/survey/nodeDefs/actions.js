@@ -139,12 +139,10 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, ge
         const isRenderTable = value === NodeDefLayout.renderType.table
         const isRenderForm = value === NodeDefLayout.renderType.form
 
-        layoutCycle[NodeDefLayout.keys.layoutChildren] = isRenderTable
-          ? Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
-          : null
-
-        // entity rendered as form can only exists in its own page
-        if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+        if (isRenderTable){
+          layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
+        } else if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+          // entity rendered as form can only exists in its own page
           layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
         }
 
