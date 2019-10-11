@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const SurveyUtils = require('./surveyUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
-  props: 'props',
+  props: ObjectUtils.keys.props,
   resolved: 'resolved',
   nodeDefUuid: 'nodeDefUuid'
 }
@@ -39,8 +39,8 @@ module.exports = {
   getNodeDefUuid: R.prop(keys.nodeDefUuid),
   getProps: R.prop(keys.props),
 
-  getExpressionType: SurveyUtils.getProp(propKeys.expressionType),
-  getExpression: SurveyUtils.getProp(propKeys.expression, ''),
-  getApplyIf: SurveyUtils.getProp(propKeys.applyIf, ''),
-  getMessages: SurveyUtils.getProp(propKeys.messages, ''),
+  getExpressionType: ObjectUtils.getProp(propKeys.expressionType),
+  getExpression: ObjectUtils.getProp(propKeys.expression, ''),
+  getApplyIf: ObjectUtils.getProp(propKeys.applyIf, ''),
+  getMessages: ObjectUtils.getProp(propKeys.messages, ''),
 }
