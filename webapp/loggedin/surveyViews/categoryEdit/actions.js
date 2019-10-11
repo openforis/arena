@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-import { toUuidIndexedObj } from '../../../../common/survey/surveyUtils'
 import { debounceAction } from '../../../utils/reduxUtils'
 
 import * as SurveyState from '../../../survey/surveyState'
@@ -136,11 +135,10 @@ const loadLevelItems = (categoryUuid, levelIndex = 0, parentUuid = null) =>
     dispatch({ type: categoryItemsUpdate, levelIndex, items: null })
 
     const surveyId = SurveyState.getSurveyId(getState())
-    const { data } = await axios.get(
+    const { data: { items } } = await axios.get(
       `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
       { params: { draft: true, parentUuid } }
     )
-    const items = toUuidIndexedObj(data.items)
     dispatch({ type: categoryItemsUpdate, levelIndex, items })
   }
 
