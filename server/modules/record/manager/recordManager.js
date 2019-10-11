@@ -1,9 +1,9 @@
 const db = require('../../../db/db')
 
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Record = require('../../../../common/record/record')
-const ObjectUtils = require('../../../../common/objectUtils')
+const Survey = require('../../../../core/survey/survey')
+const NodeDef = require('../../../../core/survey/nodeDef')
+const Record = require('../../../../core/record/record')
+const ObjectUtils = require('../../../../core/objectUtils')
 
 const RecordUpdateManager = require('./_recordManager/recordUpdateManager')
 const RecordValidationManager = require('./_recordManager/recordValidationManager')

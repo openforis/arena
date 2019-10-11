@@ -4,9 +4,9 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import Survey from '../../../../../common/survey/survey'
+import Survey from '../../../../../core/survey/survey'
 import ProcessingChain from '../../../../../common/analysis/processingChain'
-import ObjectUtils from '../../../../../common/objectUtils'
+import ObjectUtils from '../../../../../core/objectUtils'
 
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 

@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Survey from '../../../../common/survey/survey'
-import CategoryItem from '../../../../common/survey/categoryItem'
-import CategoryImportSummary from '../../../../common/survey/categoryImportSummary'
+import Survey from '../../../../core/survey/survey'
+import CategoryItem from '../../../../core/survey/categoryItem'
+import CategoryImportSummary from '../../../../core/survey/categoryImportSummary'
 
 import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '../../../survey/surveyState'

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import Survey from '../../../common/survey/survey'
-import Validation from '../../../common/validation/validation'
+import Survey from '../../../core/survey/survey'
+import Validation from '../../../core/validation/validation'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'

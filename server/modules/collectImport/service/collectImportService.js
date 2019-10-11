@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const db = require('../../../db/db')
 
-const Survey = require('../../../../common/survey/survey')
+const Survey = require('../../../../core/survey/survey')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const CollectImportReportManager = require('../manager/collectImportReportManager')

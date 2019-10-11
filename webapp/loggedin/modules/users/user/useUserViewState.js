@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
-import User from '../../../../../common/user/user'
-import Survey from '../../../../../common/survey/survey'
-import UserValidator from '../../../../../common/user/userValidator'
-import AuthGroups from '../../../../../common/auth/authGroups'
-import Authorizer from '../../../../../common/auth/authorizer'
+import User from '../../../../../core/user/user'
+import Survey from '../../../../../core/survey/survey'
+import UserValidator from '../../../../../core/user/userValidator'
+import AuthGroups from '../../../../../core/auth/authGroups'
+import Authorizer from '../../../../../core/auth/authorizer'
 
 import * as AppState from '../../../../app/appState'
 

@@ -1,7 +1,7 @@
 import './nodeDefEntityTable.scss'
 
 import React from 'react'
-import Node from '../../../../../../../common/record/node'
+import Node from '../../../../../../../core/record/node'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'

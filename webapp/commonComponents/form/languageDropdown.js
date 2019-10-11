@@ -2,7 +2,7 @@ import React from 'react'
 
 import Dropdown from './dropdown'
 
-import { getLanguageLabel, languages } from '../../../common/app/languages'
+import { getLanguageLabel, languages } from '../../../core/app/languages'
 
 import { useI18n } from '../hooks'
 

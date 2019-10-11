@@ -4,8 +4,8 @@ const schedule = require('node-schedule')
 
 const Logger = require('../../log/log').getLogger('TempFilesCleanup')
 
-const DateUtils = require('../../../common/dateUtils')
-const ProcessUtils = require('../../../common/processUtils')
+const DateUtils = require('../../../core/dateUtils')
+const ProcessUtils = require('../../../core/processUtils')
 
 const initSchedule = () =>
   // execute the cron job every day at 2AM

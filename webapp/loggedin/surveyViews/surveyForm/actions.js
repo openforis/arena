@@ -1,7 +1,7 @@
-import Survey from '../../../../common/survey/survey'
-import NodeDef from '../../../../common/survey/nodeDef'
-import Record from '../../../../common/record/record'
-import Node from '../../../../common/record/node'
+import Survey from '../../../../core/survey/survey'
+import NodeDef from '../../../../core/survey/nodeDef'
+import Record from '../../../../core/record/record'
+import Node from '../../../../core/record/node'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../record/recordState'

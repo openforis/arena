@@ -1,8 +1,8 @@
 const Request = require('../../../utils/request')
 const SystemError = require('../../../utils/systemError')
 
-const Category = require('../../../../common/survey/category')
-const ObjectUtils = require('../../../../common/objectUtils')
+const Category = require('../../../../core/survey/category')
+const ObjectUtils = require('../../../../core/objectUtils')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const CategoryService = require('../service/categoryService')

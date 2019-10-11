@@ -1,8 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Taxonomy from '../../../../../common/survey/taxonomy'
-import { languages } from '../../../../../common/app/languages'
+import Taxonomy from '../../../../../core/survey/taxonomy'
+import { languages } from '../../../../../core/app/languages'
 
 import useI18n from '../../../../commonComponents/hooks/useI18n'
 

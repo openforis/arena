@@ -4,8 +4,8 @@ import * as R from 'ramda'
 import InputChips from '../../../../../../commonComponents/form/inputChips'
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import CategoryItem from '../../../../../../../common/survey/categoryItem'
+import NodeDef from '../../../../../../../core/survey/nodeDef'
+import CategoryItem from '../../../../../../../core/survey/categoryItem'
 
 const NodeDefCodeDropdown = props => {
   const {

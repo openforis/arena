@@ -3,7 +3,7 @@ import './recordsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Record from '../../../../../common/record/record'
+import Record from '../../../../../core/record/record'
 
 import TableView from '../../../tableViews/tableView'
 import RecordsHeaderLeft from './components/recordsHeaderLeft'

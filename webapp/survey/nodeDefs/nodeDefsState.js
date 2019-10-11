@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
-import Survey from '../../../common/survey/survey'
-import NodeDef from '../../../common/survey/nodeDef'
+import Survey from '../../../core/survey/survey'
+import NodeDef from '../../../core/survey/nodeDef'
 
 // ====== UPDATE
 

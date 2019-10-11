@@ -5,9 +5,9 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const UserService = require('../service/userService')
 
-const User = require('../../../../common/user/user')
-const UserValidator = require('../../../../common/user/userValidator')
-const Validation = require('../../../../common/validation/validation')
+const User = require('../../../../core/user/user')
+const UserValidator = require('../../../../core/user/userValidator')
+const Validation = require('../../../../core/validation/validation')
 
 const SystemError = require('../../../../server/utils/systemError')
 

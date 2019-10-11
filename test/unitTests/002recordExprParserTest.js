@@ -1,16 +1,16 @@
 const R = require('ramda')
 const { assert } = require('chai')
 
-const NodeDef = require('../../common/survey/nodeDef')
-const Node = require('../../common/record/node')
-const Record = require('../../common/record/record')
+const NodeDef = require('../../core/survey/nodeDef')
+const Node = require('../../core/record/node')
+const Record = require('../../core/record/record')
 
 const SB = require('../it/utils/surveyBuilder')
 const RB = require('../it/utils/recordBuilder')
 const RecordUtils = require('../it/utils/recordUtils')
 const { getContextUser } = require('../testContext')
 
-const RecordExprParser = require('../../common/record/recordExprParser')
+const RecordExprParser = require('../../core/record/recordExprParser')
 
 let survey = {}
 let record = {}

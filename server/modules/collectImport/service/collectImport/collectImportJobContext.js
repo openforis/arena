@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const Category = require('../../../../../common/survey/category')
-const Taxonomy = require('../../../../../common/survey/taxonomy')
+const Category = require('../../../../../core/survey/category')
+const Taxonomy = require('../../../../../core/survey/taxonomy')
 
 const keys = {
   collectSurveyFileZip: 'collectSurveyFileZip',

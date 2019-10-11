@@ -3,7 +3,7 @@ const db = require('../../../db/db')
 
 const dbTransformCallback = camelize
 
-const AuthGroups = require('../../../../common/auth/authGroups')
+const AuthGroups = require('../../../../core/auth/authGroups')
 
 // ==== CREATE
 

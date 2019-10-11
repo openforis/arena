@@ -7,19 +7,19 @@ import ErrorBadge from '../../../../commonComponents/errorBadge'
 import { useI18n } from '../../../../commonComponents/hooks'
 import ItemEdit from './itemEdit'
 
-import { normalizeName } from '../../../../../common/stringUtils'
+import { normalizeName } from '../../../../../core/stringUtils'
 
-import Survey from '../../../../../common/survey/survey'
-import Category from '../../../../../common/survey/category'
-import CategoryLevel from '../../../../../common/survey/categoryLevel'
-import CategoryItem from '../../../../../common/survey/categoryItem'
-import Validation from '../../../../../common/validation/validation'
+import Survey from '../../../../../core/survey/survey'
+import Category from '../../../../../core/survey/category'
+import CategoryLevel from '../../../../../core/survey/categoryLevel'
+import CategoryItem from '../../../../../core/survey/categoryItem'
+import Validation from '../../../../../core/validation/validation'
 
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as CategoryEditState from '../categoryEditState'
 
-import Authorizer from '../../../../../common/auth/authorizer'
+import Authorizer from '../../../../../core/auth/authorizer'
 
 import {
   createCategoryLevelItem,

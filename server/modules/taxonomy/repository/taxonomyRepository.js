@@ -11,8 +11,8 @@ const {
   dbTransformCallback,
 } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const Taxonomy = require('../../../../common/survey/taxonomy')
-const Taxon = require('../../../../common/survey/taxon')
+const Taxonomy = require('../../../../core/survey/taxonomy')
+const Taxon = require('../../../../core/survey/taxon')
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,

@@ -8,10 +8,10 @@ const Thread = require('../../../../../threads/thread')
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../manager/recordManager')
 
-const Survey = require('../../../../../../common/survey/survey')
-const Record = require('../../../../../../common/record/record')
-const Validation = require('../../../../../../common/validation/validation')
-const Queue = require('../../../../../../common/queue')
+const Survey = require('../../../../../../core/survey/survey')
+const Record = require('../../../../../../core/record/record')
+const Validation = require('../../../../../../core/validation/validation')
+const Queue = require('../../../../../../core/queue')
 
 const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
 

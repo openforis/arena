@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import * as JwtConstants from '../../common/auth/jwtConstants'
+import * as JwtConstants from '../../core/auth/jwtConstants'
 
 import * as CognitoAuth from './cognitoAuth'
 

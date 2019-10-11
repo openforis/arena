@@ -9,7 +9,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 require('dotenv').config()
 const uuidv4 = require('uuid/v4')
 
-const ProcessUtils = require('./common/processUtils')
+const ProcessUtils = require('./core/processUtils')
 
 const buildReport = ProcessUtils.ENV.buildReport
 

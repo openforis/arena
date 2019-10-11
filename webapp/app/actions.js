@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-import User from '../../common/user/user'
-import i18nFactory from '../../common/i18n/i18nFactory'
-import Counter from '../../common/counter'
+import User from '../../core/user/user'
+import i18nFactory from '../../core/i18n/i18nFactory'
+import Counter from '../../core/counter'
 
 import * as CognitoAuth from './cognitoAuth'
 

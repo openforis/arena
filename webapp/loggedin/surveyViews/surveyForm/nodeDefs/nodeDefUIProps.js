@@ -2,8 +2,8 @@ import React from 'react'
 import * as R from 'ramda'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
-import NodeDef from '../../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../../../core/survey/nodeDef'
+import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
 
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'

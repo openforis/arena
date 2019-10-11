@@ -8,10 +8,10 @@ import { useI18n } from '../../../commonComponents/hooks'
 
 import { Input } from '../../../commonComponents/form/input'
 
-import Survey from '../../../../common/survey/survey'
+import Survey from '../../../../core/survey/survey'
 import * as SurveyState from '../../../survey/surveyState'
 
-import { getLanguageLabel } from '../../../../common/app/languages'
+import { getLanguageLabel } from '../../../../core/app/languages'
 
 const LanguageBadge = ({ lang, compact }) => (
   <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>

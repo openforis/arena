@@ -1,4 +1,4 @@
-const ProcessUtils = require('../../../common/processUtils')
+const ProcessUtils = require('../../../core/processUtils')
 
 module.exports = {
 

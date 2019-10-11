@@ -2,7 +2,7 @@ import React from 'react'
 
 import { FormItem } from '../../../../../commonComponents/form/input'
 
-import NodeDef from '../../../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../../core/survey/nodeDef'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'

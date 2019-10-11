@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Survey from '../../../../../../common/survey/survey'
-import DateUtils from '../../../../../../common/dateUtils'
+import Survey from '../../../../../../core/survey/survey'
+import DateUtils from '../../../../../../core/dateUtils'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 

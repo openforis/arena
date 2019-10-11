@@ -6,9 +6,9 @@ const DbUtils = require('../../../db/dbUtils')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Record = require('../../../../common/record/record')
-const Validation = require('../../../../common/validation/validation')
+const NodeDef = require('../../../../core/survey/nodeDef')
+const Record = require('../../../../core/record/record')
+const Validation = require('../../../../core/validation/validation')
 
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')

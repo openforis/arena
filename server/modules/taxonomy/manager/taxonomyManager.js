@@ -4,8 +4,8 @@ const db = require('../../../db/db')
 
 const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const Taxonomy = require('../../../../common/survey/taxonomy')
-const Taxon = require('../../../../common/survey/taxon')
+const Taxonomy = require('../../../../core/survey/taxonomy')
+const Taxon = require('../../../../core/survey/taxon')
 
 const TaxonomyRepository = require('../repository/taxonomyRepository')
 const TaxonomyValidator = require('../taxonomyValidator')

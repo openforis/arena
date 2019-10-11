@@ -7,9 +7,9 @@ import { useI18n } from '../../../../commonComponents/hooks'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import { Modal, ModalBody, ModalFooter } from '../../../../commonComponents/modal'
 
-import Category from '../../../../../common/survey/category'
-import CategoryImportSummary from '../../../../../common/survey/categoryImportSummary'
-import Languages from '../../../../../common/app/languages'
+import Category from '../../../../../core/survey/category'
+import CategoryImportSummary from '../../../../../core/survey/categoryImportSummary'
+import Languages from '../../../../../core/app/languages'
 
 import { importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType } from '../actions'
 

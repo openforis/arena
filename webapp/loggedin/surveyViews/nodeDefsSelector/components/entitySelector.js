@@ -1,10 +1,10 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
+import Survey from '../../../../../core/survey/survey'
+import NodeDef from '../../../../../core/survey/nodeDef'
 
-import { nbsp } from '../../../../../common/stringUtils'
+import { nbsp } from '../../../../../core/stringUtils'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
 

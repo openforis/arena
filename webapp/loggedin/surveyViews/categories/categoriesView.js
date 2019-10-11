@@ -7,9 +7,9 @@ import { useI18n } from '../../../commonComponents/hooks'
 import ItemsView from '../items/itemsView'
 import CategoryEditView from '../categoryEdit/categoryEditView'
 
-import Survey from '../../../../common/survey/survey'
-import Category from '../../../../common/survey/category'
-import Authorizer from '../../../../common/auth/authorizer'
+import Survey from '../../../../core/survey/survey'
+import Category from '../../../../core/survey/category'
+import Authorizer from '../../../../core/auth/authorizer'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'

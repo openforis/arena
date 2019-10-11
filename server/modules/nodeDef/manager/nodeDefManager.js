@@ -1,10 +1,10 @@
 const R = require('ramda')
 const db = require('../../../db/db')
 
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
-const ObjectUtils = require('../../../../common/objectUtils')
-const { uuidv4 } = require('../../../../common/uuid')
+const NodeDef = require('../../../../core/survey/nodeDef')
+const NodeDefLayout = require('../../../../core/survey/nodeDefLayout')
+const ObjectUtils = require('../../../../core/objectUtils')
+const { uuidv4 } = require('../../../../core/uuid')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')

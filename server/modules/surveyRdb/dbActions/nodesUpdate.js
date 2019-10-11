@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Node = require('../../../../common/record/node')
+const Survey = require('../../../../core/survey/survey')
+const NodeDef = require('../../../../core/survey/nodeDef')
+const Node = require('../../../../core/record/node')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')

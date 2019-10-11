@@ -4,8 +4,8 @@ const Response = require('../../../utils/response')
 const Request = require('../../../utils/request')
 const JobUtils = require('../../../job/jobUtils')
 
-const Validation = require('../../../../common/validation/validation')
-const User = require('../../../../common/user/user')
+const Validation = require('../../../../core/validation/validation')
+const User = require('../../../../core/user/user')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const SurveyService = require('../service/surveyService')

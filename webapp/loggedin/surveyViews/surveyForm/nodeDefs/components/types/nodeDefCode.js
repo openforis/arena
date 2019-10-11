@@ -8,14 +8,14 @@ import NodeDefCodeDropdown from './nodeDefCodeDropdown'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import Survey from '../../../../../../../common/survey/survey'
-import Category from '../../../../../../../common/survey/category'
-import CategoryItem from '../../../../../../../common/survey/categoryItem'
-import Record from '../../../../../../../common/record/record'
-import Node from '../../../../../../../common/record/node'
-import NodeRefData from '../../../../../../../common/record/nodeRefData'
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../../../../../core/survey/nodeDef'
+import Survey from '../../../../../../../core/survey/survey'
+import Category from '../../../../../../../core/survey/category'
+import CategoryItem from '../../../../../../../core/survey/categoryItem'
+import Record from '../../../../../../../core/record/record'
+import Node from '../../../../../../../core/record/node'
+import NodeRefData from '../../../../../../../core/record/nodeRefData'
+import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
 
 import * as AppState from '../../../../../../app/appState'
 import * as SurveyState from '../../../../../../survey/surveyState'
@@ -35,6 +35,7 @@ const NodeDefCode = props => {
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
     { params: { draft, parentUuid: nodeParentCodeUuid } }
   )
+  const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
 
   if (!edit) {
@@ -50,7 +51,7 @@ const NodeDefCode = props => {
     // on items or nodes change, update selectedItems
     useEffect(() => {
       const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = items.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
+      const selectedItemsUpdate = itemsArray.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
       setSelectedItems(selectedItemsUpdate)
     }, [items, nodes])
 
@@ -81,7 +82,7 @@ const NodeDefCode = props => {
     ? (
       <NodeDefCodeDropdown
         {...props}
-        items={items}
+        items={itemsArray}
         selectedItems={selectedItems}
         onItemAdd={onItemAdd}
         onItemRemove={onItemRemove}
@@ -90,7 +91,7 @@ const NodeDefCode = props => {
     : (
       <NodeDefCodeCheckbox
         {...props}
-        items={items}
+        items={itemsArray}
         selectedItems={selectedItems}
         onItemAdd={onItemAdd}
         onItemRemove={onItemRemove}

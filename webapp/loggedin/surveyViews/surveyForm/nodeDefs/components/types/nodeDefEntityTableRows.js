@@ -4,13 +4,13 @@ import * as R from 'ramda'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
-import Survey from '../../../../../../../common/survey/survey'
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import Survey from '../../../../../../../core/survey/survey'
+import NodeDef from '../../../../../../../core/survey/nodeDef'
+import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
 import * as SurveyState from '../../../../../../survey/surveyState'
 
 import { elementOffset } from '../../../../../../utils/domUtils'
-import { debounce } from '../../../../../../../common/functionsDefer'
+import { debounce } from '../../../../../../../core/functionsDefer'
 
 const NodeDefEntityTableRows = props => {
 

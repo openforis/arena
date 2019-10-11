@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { debounceAction } from '../../../utils/reduxUtils'
-import Taxonomy from '../../../../common/survey/taxonomy'
+import Taxonomy from '../../../../core/survey/taxonomy'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as TaxonomyEditState from './taxonomyEditState'

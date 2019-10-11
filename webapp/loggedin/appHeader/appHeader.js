@@ -9,8 +9,8 @@ import ProgressBar from '../../commonComponents/progressBar'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
 
-import User from '../../../common/user/user'
-import Survey from '../../../common/survey/survey'
+import User from '../../../core/user/user'
+import Survey from '../../../core/survey/survey'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../../survey/surveyState'

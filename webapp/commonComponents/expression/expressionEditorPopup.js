@@ -8,7 +8,7 @@ import Popup from '../popup'
 import ExpressionNode from './nodes/expressionNode'
 import { useI18n } from '../hooks'
 
-import Expression from '../../../common/exprParser/expression'
+import Expression from '../../../core/exprParser/expression'
 
 import { useExpressionEditorPopupState, mapStateToProps } from './expressionEditorPopupState'
 

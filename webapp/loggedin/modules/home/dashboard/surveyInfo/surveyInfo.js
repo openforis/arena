@@ -8,8 +8,8 @@ import { useI18n } from '../../../../../commonComponents/hooks'
 import Header from '../../../../../commonComponents/header'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
-import Survey from '../../../../../../common/survey/survey'
-import Authorizer from '../../../../../../common/auth/authorizer'
+import Survey from '../../../../../../core/survey/survey'
+import Authorizer from '../../../../../../core/auth/authorizer'
 
 import * as AppState from '../../../../../app/appState'
 import * as SurveyState from '../../../../../survey/surveyState'

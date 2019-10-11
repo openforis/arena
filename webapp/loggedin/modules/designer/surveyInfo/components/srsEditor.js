@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import InputChips from '../../../../../commonComponents/form/inputChips'
 
-import Srs from '../../../../../../common/geo/srs'
+import Srs from '../../../../../../core/geo/srs'
 
 const SrsEditor = props => {
 

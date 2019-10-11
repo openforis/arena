@@ -1,7 +1,7 @@
 const Job = require('../../../../../job/job')
 
-const Category = require('../../../../../../common/survey/category')
-const Validation = require('../../../../../../common/validation/validation')
+const Category = require('../../../../../../core/survey/category')
+const Validation = require('../../../../../../core/validation/validation')
 
 const CategoryManager = require('../../../../category/manager/categoryManager')
 

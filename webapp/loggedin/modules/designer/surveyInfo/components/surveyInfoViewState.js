@@ -3,10 +3,10 @@ import * as R from 'ramda'
 
 import { useFormObject } from '../../../../../commonComponents/hooks'
 
-import Survey from '../../../../../../common/survey/survey'
-import StringUtils from '../../../../../../common/stringUtils'
-import ObjectUtils from '../../../../../../common/objectUtils'
-import Validation from '../../../../../../common/validation/validation'
+import Survey from '../../../../../../core/survey/survey'
+import StringUtils from '../../../../../../core/stringUtils'
+import ObjectUtils from '../../../../../../core/objectUtils'
+import Validation from '../../../../../../core/validation/validation'
 
 export const useSurveyInfoViewState = props => {
 

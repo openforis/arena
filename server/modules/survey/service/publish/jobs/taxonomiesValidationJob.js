@@ -2,8 +2,8 @@ const R = require('ramda')
 
 const Job = require('../../../../../job/job')
 
-const Taxonomy = require('../../../../../../common/survey/taxonomy')
-const Validation = require('../../../../../../common/validation/validation')
+const Taxonomy = require('../../../../../../core/survey/taxonomy')
+const Validation = require('../../../../../../core/validation/validation')
 
 const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 

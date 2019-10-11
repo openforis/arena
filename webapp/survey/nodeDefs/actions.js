@@ -1,14 +1,14 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../../common/uuid'
+import { uuidv4 } from '../../../core/uuid'
 
 import { debounceAction } from '../../utils/reduxUtils'
 
-import Survey from '../../../common/survey/survey'
-import NodeDef from '../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../common/survey/nodeDefLayout'
-import NodeDefValidations from '../../../common/survey/nodeDefValidations'
+import Survey from '../../../core/survey/survey'
+import NodeDef from '../../../core/survey/nodeDef'
+import NodeDefLayout from '../../../core/survey/nodeDefLayout'
+import NodeDefValidations from '../../../core/survey/nodeDefValidations'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'

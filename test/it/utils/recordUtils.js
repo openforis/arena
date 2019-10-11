@@ -2,14 +2,14 @@ const R = require('ramda')
 
 const db = require('../../../server/db/db')
 
-const Survey = require('../../../common/survey/survey')
-const NodeDef = require('../../../common/survey/nodeDef')
-const Record = require('../../../common/record/record')
-const RecordValidation = require('../../../common/record/recordValidation')
-const Validation = require('../../../common/validation/validation')
+const Survey = require('../../../core/survey/survey')
+const NodeDef = require('../../../core/survey/nodeDef')
+const Record = require('../../../core/record/record')
+const RecordValidation = require('../../../core/record/recordValidation')
+const Validation = require('../../../core/validation/validation')
 const RecordManager = require('../../../server/modules/record/manager/recordManager')
 
-const Queue = require('../../../common/queue')
+const Queue = require('../../../core/queue')
 
 const newRecord = (user, preview = false) =>
   Record.newRecord(user, Survey.cycleOneKey, preview)

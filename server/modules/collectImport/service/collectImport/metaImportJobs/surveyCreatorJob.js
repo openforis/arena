@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../../common/survey/survey')
+const Survey = require('../../../../../../core/survey/survey')
 
 const Job = require('../../../../../job/job')
 

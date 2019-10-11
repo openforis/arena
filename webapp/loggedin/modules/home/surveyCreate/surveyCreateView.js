@@ -3,15 +3,15 @@ import './surveyCreateView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../common/survey/survey'
+import Survey from '../../../../../core/survey/survey'
 
 import { Input } from '../../../../commonComponents/form/input'
 import LanguageDropdown from '../../../../commonComponents/form/languageDropdown'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import { useI18n, useOnUpdate } from '../../../../commonComponents/hooks'
 
-import Validation from '../../../../../common/validation/validation'
-import StringUtils from '../../../../../common/stringUtils'
+import Validation from '../../../../../core/validation/validation'
+import StringUtils from '../../../../../core/stringUtils'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyCreateState from './surveyCreateState'

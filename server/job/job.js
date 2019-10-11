@@ -1,12 +1,12 @@
 const db = require('../db/db')
 const Log = require('../log/log')
 
-const { uuidv4 } = require('../../common/uuid')
+const { uuidv4 } = require('../../core/uuid')
 
 const { jobEvents, jobStatus } = require('./jobUtils')
 
-const User = require('../../common/user/user.js')
-const { throttle, cancelThrottle } = require('../../common/functionsDefer')
+const User = require('../../core/user/user.js')
+const { throttle, cancelThrottle } = require('../../core/functionsDefer')
 
 const SystemError = require('../utils/systemError')
 

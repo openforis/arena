@@ -1,9 +1,9 @@
 import React from 'react'
 import camelize from 'camelize'
 
-import NodeDef from '../../../../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../../../core/survey/nodeDef'
 import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
-import StringUtils from '../../../../../../../common/stringUtils'
+import StringUtils from '../../../../../../../core/stringUtils'
 import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { useI18n } from '../../../../../../commonComponents/hooks'

@@ -8,12 +8,12 @@ import { FormItem } from '../../../../../../commonComponents/form/input'
 import { useI18n } from '../../../../../../commonComponents/hooks'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-import Taxon from '../../../../../../../common/survey/taxon'
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import Node from '../../../../../../../common/record/node'
-import NodeRefData from '../../../../../../../common/record/nodeRefData'
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
-import StringUtils from '../../../../../../../common/stringUtils'
+import Taxon from '../../../../../../../core/survey/taxon'
+import NodeDef from '../../../../../../../core/survey/nodeDef'
+import Node from '../../../../../../../core/record/node'
+import NodeRefData from '../../../../../../../core/record/nodeRefData'
+import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
+import StringUtils from '../../../../../../../core/stringUtils'
 
 import * as SurveyState from '../../../../../../survey/surveyState'
 

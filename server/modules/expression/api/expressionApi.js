@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const NodeDef = require('../../../../common/survey/nodeDef')
-const CategoryItem = require('../../../../common/survey/categoryItem')
-const Taxon = require('../../../../common/survey/taxon')
-const { isBlank, contains } = require('../../../../common/stringUtils')
+const NodeDef = require('../../../../core/survey/nodeDef')
+const CategoryItem = require('../../../../core/survey/categoryItem')
+const Taxon = require('../../../../core/survey/taxon')
+const { isBlank, contains } = require('../../../../core/stringUtils')
 
 const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')

@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
+import Survey from '../../../../../core/survey/survey'
+import NodeDef from '../../../../../core/survey/nodeDef'
 import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefUIProps'
 
 import * as SurveyState from '../../../../survey/surveyState'

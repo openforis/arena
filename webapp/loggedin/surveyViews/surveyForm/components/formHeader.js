@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 
 import { useI18n } from '../../../../commonComponents/hooks'
 
-import NodeDef from '../../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
-import { uuidv4 } from '../../../../../common/uuid'
+import NodeDef from '../../../../../core/survey/nodeDef'
+import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
+import { uuidv4 } from '../../../../../core/uuid'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'

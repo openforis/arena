@@ -3,7 +3,7 @@ import './components/categoryEditView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import StringUtils from '../../../../common/stringUtils'
+import StringUtils from '../../../../core/stringUtils'
 
 import { useI18n } from '../../../commonComponents/hooks'
 import { FormItem, Input } from '../../../commonComponents/form/input'
@@ -11,10 +11,10 @@ import UploadButton from '../../../commonComponents/form/uploadButton'
 import LevelEdit from './components/levelEdit'
 import CategoryImportSummary from './components/categoryImportSummary'
 
-import Category from '../../../../common/survey/category'
-import CategoryLevel from '../../../../common/survey/categoryLevel'
-import Validation from '../../../../common/validation/validation'
-import Authorizer from '../../../../common/auth/authorizer'
+import Category from '../../../../core/survey/category'
+import CategoryLevel from '../../../../core/survey/categoryLevel'
+import Validation from '../../../../core/validation/validation'
+import Authorizer from '../../../../core/auth/authorizer'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'

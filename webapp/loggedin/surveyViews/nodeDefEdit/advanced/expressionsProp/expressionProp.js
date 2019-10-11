@@ -6,8 +6,8 @@ import ExpressionEditor from '../../../../../commonComponents/expression/express
 import LabelsEditor from '../../../labelsEditor/labelsEditor'
 import { useI18n } from '../../../../../commonComponents/hooks'
 
-import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
-import ValidationResult from '../../../../../../common/validation/validationResult'
+import NodeDefExpression from '../../../../../../core/survey/nodeDefExpression'
+import ValidationResult from '../../../../../../core/validation/validationResult'
 import * as ValidationUtils from '../../../../../utils/validationUtils'
 import ButtonGroup from '../../../../../commonComponents/form/buttonGroup'
 

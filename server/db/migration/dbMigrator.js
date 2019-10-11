@@ -8,7 +8,7 @@ const logger = Log.getLogger('DBMigrator')
 const db = require('../db')
 const config = require('./migrationConfig')
 
-const ProcessUtils = require('../../../common/processUtils')
+const ProcessUtils = require('../../../core/processUtils')
 const { getSurveyDBSchema } = require('../../modules/survey/repository/surveySchemaRepositoryUtils')
 
 const { fetchAllSurveyIds } = require('../../modules/survey/repository/surveyRepository')

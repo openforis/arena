@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 import * as DataVisState from '../dataVisState'
 
-import Record from '../../../../../../common/record/record'
-import Node from '../../../../../../common/record/node'
-import Validation from '../../../../../../common/validation/validation'
+import Record from '../../../../../../core/record/record'
+import Node from '../../../../../../core/record/node'
+import Validation from '../../../../../../core/validation/validation'
 
 export const defaults = {
   offset: 0,

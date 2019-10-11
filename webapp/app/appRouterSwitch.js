@@ -3,7 +3,7 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 
-import User from '../../common/user/user'
+import User from '../../core/user/user'
 
 import DynamicImport from '../commonComponents/dynamicImport'
 import LoginView from '../login/loginView'

@@ -1,8 +1,8 @@
 import { exportReducer } from '../../../utils/reduxUtils'
 
-import Category from '../../../../common/survey/category'
-import CategoryLevel from '../../../../common/survey/categoryLevel'
-import CategoryItem from '../../../../common/survey/categoryItem'
+import Category from '../../../../core/survey/category'
+import CategoryLevel from '../../../../core/survey/categoryLevel'
+import CategoryItem from '../../../../core/survey/categoryItem'
 import * as CategoryEditState from './categoryEditState'
 
 import { appUserLogout } from '../../../app/actions'

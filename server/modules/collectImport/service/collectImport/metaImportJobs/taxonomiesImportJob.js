@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const Taxonomy = require('../../../../../../common/survey/taxonomy')
-const Taxon = require('../../../../../../common/survey/taxon')
-const Validation = require('../../../../../../common/validation/validation')
-const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
+const Taxonomy = require('../../../../../../core/survey/taxonomy')
+const Taxon = require('../../../../../../core/survey/taxon')
+const Validation = require('../../../../../../core/validation/validation')
+const { languageCodesISO636_2 } = require('../../../../../../core/app/languages')
 
 const Job = require('../../../../../job/job')
 

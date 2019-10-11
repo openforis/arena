@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import Survey from '../../../../../../common/survey/survey'
+import Survey from '../../../../../../core/survey/survey'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 import DataSort from '../../../../../../common/surveyRdb/dataSort'
 

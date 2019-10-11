@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../../common/objectUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
   layout: 'layout',

@@ -4,7 +4,7 @@ const db = require('../../server/db/db')
 
 const { getContextUser } = require('../testContext')
 
-const Survey = require('../../common/survey/survey')
+const Survey = require('../../core/survey/survey')
 const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
 
 const SurveyManager = require('../../server/modules/survey/manager/surveyManager')

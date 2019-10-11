@@ -6,8 +6,8 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import Survey from '../../../../common/survey/survey'
-import Record from '../../../../common/record/record'
+import Survey from '../../../../core/survey/survey'
+import Record from '../../../../core/record/record'
 
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'

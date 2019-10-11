@@ -6,7 +6,7 @@ import d3Tip from 'd3-tip'
 
 import { useI18n } from '../../../../../../../commonComponents/hooks'
 
-import DateUtils from '../../../../../../../../common/dateUtils'
+import DateUtils from '../../../../../../../../core/dateUtils'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>

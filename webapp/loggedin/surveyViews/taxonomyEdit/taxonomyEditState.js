@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import Survey from '../../../../common/survey/survey'
+import Survey from '../../../../core/survey/survey'
 
 import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '../../../survey/surveyState'
