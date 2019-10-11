@@ -14,7 +14,7 @@ import Record from '../../../../core/record/record'
 import SurveyFormView from '../surveyForm/surveyFormView'
 
 import Authorizer from '../../../../core/auth/authorizer'
-import WebSocketEvents from '../../../../core/webSocket/webSocketEvents'
+import WebSocketEvents from '../../../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from '../../../app/appWebSocket'
 
 import * as AppState from '../../../app/appState'

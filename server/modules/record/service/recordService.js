@@ -9,7 +9,7 @@ const Node = require('../../../../core/record/node')
 const RecordFile = require('../../../../core/record/recordFile')
 const Authorizer = require('../../../../core/auth/authorizer')
 
-const WebSocketEvents = require('../../../../core/webSocket/webSocketEvents')
+const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 const WebSocket = require('../../../utils/webSocket')
 
 const SurveyManager = require('../../survey/manager/surveyManager')

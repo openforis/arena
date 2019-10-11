@@ -13,7 +13,7 @@ const Record = require('../../../../../../core/record/record')
 const Validation = require('../../../../../../core/validation/validation')
 const Queue = require('../../../../../../core/queue')
 
-const WebSocketEvents = require('../../../../../../core/webSocket/webSocketEvents')
+const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
 
 const RecordUpdateThreadParams = require('./recordUpdateThreadParams')
 

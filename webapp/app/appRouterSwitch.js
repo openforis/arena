@@ -13,7 +13,7 @@ import AppNotificationView from './appNotification/appNotificationView'
 import { useOnUpdate } from '../commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
-import WebSocketEvents from '../../core/webSocket/webSocketEvents'
+import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 
 import AppContext from './appContext'
 

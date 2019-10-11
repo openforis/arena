@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 
-import WebSocketEvents from '../../core/webSocket/webSocketEvents'
+import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 
 import * as CognitoAuth from './cognitoAuth'
 

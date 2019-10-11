@@ -35,6 +35,7 @@ const NodeDefCode = props => {
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
     { params: { draft, parentUuid: nodeParentCodeUuid } }
   )
+  const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
 
   if (!edit) {
@@ -50,7 +51,7 @@ const NodeDefCode = props => {
     // on items or nodes change, update selectedItems
     useEffect(() => {
       const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = items.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
+      const selectedItemsUpdate = itemsArray.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
       setSelectedItems(selectedItemsUpdate)
     }, [items, nodes])
 
@@ -81,7 +82,7 @@ const NodeDefCode = props => {
     ? (
       <NodeDefCodeDropdown
         {...props}
-        items={items}
+        items={itemsArray}
         selectedItems={selectedItems}
         onItemAdd={onItemAdd}
         onItemRemove={onItemRemove}
@@ -90,7 +91,7 @@ const NodeDefCode = props => {
     : (
       <NodeDefCodeCheckbox
         {...props}
-        items={items}
+        items={itemsArray}
         selectedItems={selectedItems}
         onItemAdd={onItemAdd}
         onItemRemove={onItemRemove}
