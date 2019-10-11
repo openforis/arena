@@ -11,12 +11,7 @@ const getNodeDefs = R.propOr({}, nodeDefsKey)
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-const getNodeDefsByParentUuid = parentUuid => R.pipe(
-  getNodeDefsArray,
-  R.filter(R.propEq(NodeDef.keys.parentUuid, parentUuid)),
-)
-
-const getRootNodeDef = R.pipe(getNodeDefsByParentUuid(null), R.head)
+const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(R.propEq(NodeDef.keys.parentUuid, null)))
 
 const getNodeDefByUuid = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
@@ -25,7 +20,13 @@ const getNodeDefsByUuids = (uuids = []) => R.pipe(
   R.filter(nodeDef => R.includes(NodeDef.getUuid(nodeDef), uuids))
 )
 
-const getNodeDefChildren = nodeDef => getNodeDefsByParentUuid(NodeDef.getUuid(nodeDef))
+const getNodeDefChildren = (nodeDef, includeAnalysis = false) => R.pipe(
+  getNodeDefsArray,
+  R.filter(nodeDefCurrent =>
+    R.propEq(NodeDef.keys.parentUuid, NodeDef.getUuid(nodeDef), nodeDefCurrent) &&
+    (includeAnalysis || !NodeDef.isAnalysis(nodeDefCurrent))
+  ),
+)
 
 const hasNodeDefChildrenEntities = nodeDef => survey => {
   if (NodeDef.isAttribute(nodeDef))
@@ -120,7 +121,7 @@ const getHierarchy = (filterFn = NodeDef.isEntity) =>
     }
 
     return {
-      root: h([], getRootNodeDef(survey))[0],
+      root: h([], getNodeDefRoot(survey))[0],
       length
     }
 
@@ -201,11 +202,11 @@ const canUpdateCategory = nodeDef =>
 const canUpdateTaxonomy = nodeDef => () => !NodeDef.isPublished(nodeDef)
 
 module.exports = {
+  // ====== READ
   getNodeDefs,
   getNodeDefsArray,
 
-  // getNodeDefById,
-  getRootNodeDef,
+  getNodeDefRoot,
   getNodeDefByUuid,
   getNodeDefsByUuids,
   getNodeDefChildren,

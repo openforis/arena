@@ -29,7 +29,7 @@ class EntityBuilder extends NodeBuilder {
   build (survey, parentNodeDef, recordUuid, parentNode) {
     const nodeDef = parentNodeDef
       ? Survey.getNodeDefChildByName(parentNodeDef, this.nodeDefName)(survey)
-      : Survey.getRootNodeDef(survey)
+      : Survey.getNodeDefRoot(survey)
 
     const entity = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode)
 

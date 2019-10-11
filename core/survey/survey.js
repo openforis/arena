@@ -82,10 +82,9 @@ module.exports = {
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,
   getNodeDefsArray: SurveyNodeDefs.getNodeDefsArray,
-  getNodeDefByUuid: SurveyNodeDefs.getNodeDefByUuid,
   getNodeDefsByUuids: SurveyNodeDefs.getNodeDefsByUuids,
-  // getNodeDefById: SurveyNodeDefs.getNodeDefById,
-  getRootNodeDef: SurveyNodeDefs.getRootNodeDef,
+  getNodeDefRoot: SurveyNodeDefs.getNodeDefRoot,
+  getNodeDefByUuid: SurveyNodeDefs.getNodeDefByUuid,
   getNodeDefChildren: SurveyNodeDefs.getNodeDefChildren,
   hasNodeDefChildrenEntities: SurveyNodeDefs.hasNodeDefChildrenEntities,
   getNodeDefChildByName: SurveyNodeDefs.getNodeDefChildByName,

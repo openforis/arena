@@ -34,42 +34,49 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, ad
 
 const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, client) => {
   const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, true, false, client)
-  if (NodeDef.isEntity(nodeDef)) {
-    const cyclesPrev = NodeDef.getCycles(nodeDef)
-    const cyclesAdded = R.difference(cycles, cyclesPrev)
-    const cyclesDeleted = R.difference(cyclesPrev, cycles)
-    const add = !R.isEmpty(cyclesAdded)
 
-    // update nodeDef cycles layout
-    if (add) {
-      for (let i = 0; i < cycles.length; i++) {
-        const cycle = cycles[i]
-        const cyclePrev = cycles[i - 1]
-        // if cycle is new, update layout
-        if (R.includes(cycle, cyclesAdded)) {
-          if (cyclePrev) {
-            // if cycle prev exists, copy layout from previous cycle
-            await NodeDefRepository.copyNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclePrev, [cycle], client)
-          } else {
-            // otherwise set the default layout
-            const props = {
-              [NodeDefLayout.keys.layout]: R.pipe(
-                NodeDefLayout.getLayout,
-                R.mergeLeft(NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4()))
-              )(nodeDef)
-            }
-            await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, {}, client)
+  const cyclesPrev = NodeDef.getCycles(nodeDef)
+  const cyclesAdded = R.difference(cycles, cyclesPrev)
+  const cyclesDeleted = R.difference(cyclesPrev, cycles)
+  const add = !R.isEmpty(cyclesAdded)
+
+  // update nodeDef cycles layout
+  if (add) {
+    for (let i = 0; i < cycles.length; i++) {
+      const cycle = cycles[i]
+      const cyclePrev = cycles[i - 1]
+      // if cycle is new, update layout
+      if (R.includes(cycle, cyclesAdded)) {
+        if (cyclePrev) {
+          // if cycle prev exists, copy layout from previous cycle
+          await NodeDefRepository.copyNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclePrev, [cycle], client)
+        } else {
+          // otherwise set the default layout
+          const props = {
+            [NodeDefLayout.keys.layout]: R.pipe(
+              NodeDefLayout.getLayout,
+              R.mergeLeft(
+                //TODO use NodeDefLayout default props layout
+                NodeDef.isEntity(nodeDef)
+                  ? NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4())
+                  : NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox)
+              )
+            )(nodeDef)
           }
+          await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, {}, client)
         }
       }
-    } else {
-      await NodeDefRepository.deleteNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclesDeleted, client)
     }
+  } else {
+    await NodeDefRepository.deleteNodeDefsCyclesLayout(surveyId, nodeDefUuid, cyclesDeleted, client)
+  }
 
+  if (NodeDef.isEntity(nodeDef)) {
     // update nodeDef descendants cycles
     const cyclesUpdate = add ? cyclesAdded : cyclesDeleted
     return await NodeDefRepository.updateNodeDefDescendantsCycles(surveyId, nodeDefUuid, cyclesUpdate, add, client)
   }
+
   return []
 }
 

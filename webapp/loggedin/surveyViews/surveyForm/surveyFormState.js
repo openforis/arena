@@ -30,7 +30,7 @@ export const getFormActivePageNodeDef = state => {
 
   return nodeDefUuidPage
     ? Survey.getNodeDefByUuid(nodeDefUuidPage)(survey)
-    : Survey.getRootNodeDef(survey)
+    : Survey.getNodeDefRoot(survey)
 
 }
 

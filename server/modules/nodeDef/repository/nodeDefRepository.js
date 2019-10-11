@@ -24,7 +24,7 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 }
 
 const nodeDefSelectFields =
-  `id, uuid, parent_uuid, type, deleted, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
+  `id, uuid, parent_uuid, type, deleted, analysis, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
   props, props_advanced, props_draft, props_advanced_draft, meta`
 
 // ============== CREATE
@@ -177,7 +177,8 @@ const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid = null, cycleStart
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || jsonb_build_object(${cycles.map(c => `'${c}', ${layoutCycleStartPath}`).join(', ')}), TRUE)
-    WHERE ${nodeDefUuid ? `uuid = $1` : `${layoutCycleStartPath} IS NOT NULL`}
+    WHERE ${layoutCycleStartPath} IS NOT NULL
+    ${nodeDefUuid ? ` AND uuid = $1` : ''} 
   `, [nodeDefUuid])
 }
 
@@ -195,7 +196,8 @@ const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid = null, cycles, 
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') ${cycles.map(c => `- '${c}'`).join(' ')})
-    WHERE ${nodeDefUuid ? `uuid = $1` : `(props || props_draft) -> 'layout' IS NOT NULL`}
+    WHERE (props || props_draft) -> 'layout' IS NOT NULL
+    ${nodeDefUuid ? ` AND uuid = $1` : ''}
   `, [nodeDefUuid])
 
 //PUBLISH
