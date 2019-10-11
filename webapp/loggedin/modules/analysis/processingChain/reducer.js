@@ -1,6 +1,6 @@
 import { exportReducer } from '../../../../utils/reduxUtils'
 
-import ProcessingChain from '../../../../../core/analysis/processingChain'
+import ProcessingChain from '../../../../../common/analysis/processingChain'
 
 import {
   processingChainUpdate,

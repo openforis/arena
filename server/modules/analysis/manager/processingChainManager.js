@@ -2,7 +2,7 @@ const db = require('../../../db/db')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
-const ProcessingChain = require('../../../../core/analysis/processingChain')
+const ProcessingChain = require('../../../../common/analysis/processingChain')
 
 const ProcessingChainRepository = require('../repository/processingChainRepository')
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ProcessingChain from '../../../../../../core/analysis/processingChain'
+import ProcessingChain from '../../../../../../common/analysis/processingChain'
 import DateUtils from '../../../../../../core/dateUtils'
 
 import ProgressBar from '../../../../../commonComponents/progressBar'

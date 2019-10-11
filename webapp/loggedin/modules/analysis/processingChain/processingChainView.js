@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import Survey from '../../../../../core/survey/survey'
-import ProcessingChain from '../../../../../core/analysis/processingChain'
+import ProcessingChain from '../../../../../common/analysis/processingChain'
 import ObjectUtils from '../../../../../core/objectUtils'
 
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
