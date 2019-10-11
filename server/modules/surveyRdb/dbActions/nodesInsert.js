@@ -2,8 +2,8 @@ const { insertAllQuery } = require('../../../db/dbUtils')
 
 const Survey = require('../../../../core/survey/survey')
 const NodeDef = require('../../../../core/survey/nodeDef')
-const SchemaRdb = require('../../../../core/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../core/surveyRdb/nodeDefTable')
+const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 
 const SurveySchemaRepository = require('../../survey/repository/surveySchemaRepositoryUtils')
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import Expression from '../../../../../../../../core/exprParser/expression'
-import * as DataSort from '../../../../../../../../core/surveyRdb/dataSort'
+import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
 
 import Popup from '../../../../../../../commonComponents/popup'
 import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'

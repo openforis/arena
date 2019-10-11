@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import { elementOffset } from '../../../../../../utils/domUtils'
 
 import Survey from '../../../../../../../core/survey/survey'
-import NodeDefTable from '../../../../../../../core/surveyRdb/nodeDefTable'
+import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
 import Authorizer from '../../../../../../../core/auth/authorizer'
 import WebSocketEvents from '../../../../../../../core/webSocket/webSocketEvents'
 

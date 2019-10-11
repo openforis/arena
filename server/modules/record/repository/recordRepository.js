@@ -10,8 +10,8 @@ const NodeDef = require('../../../../core/survey/nodeDef')
 const Record = require('../../../../core/record/record')
 const Validation = require('../../../../core/validation/validation')
 
-const NodeDefTable = require('../../../../core/surveyRdb/nodeDefTable')
-const SchemaRdb = require('../../../../core/surveyRdb/schemaRdb')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
 const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 

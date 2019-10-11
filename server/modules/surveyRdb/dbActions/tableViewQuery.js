@@ -10,12 +10,12 @@ const NodeDef = require('../../../../core/survey/nodeDef')
 
 const Record = require('../../../../core/record/record')
 
-const SchemaRdb = require('../../../../core/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../core/surveyRdb/nodeDefTable')
+const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 
 const Expression = require('../../../../core/exprParser/expression.js')
-const DataSort = require('../../../../core/surveyRdb/dataSort')
-const DataFilter = require('../../../../core/surveyRdb/dataFilter')
+const DataSort = require('../../../../common/surveyRdb/dataSort')
+const DataFilter = require('../../../../common/surveyRdb/dataFilter')
 
 const DataCol = require('../schemaRdb/dataCol')
 const DataTable = require('../schemaRdb/dataTable')

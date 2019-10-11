@@ -2,7 +2,7 @@ import React from 'react'
 import camelize from 'camelize'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
-import NodeDefTable from '../../../../../../../core/surveyRdb/nodeDefTable'
+import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
 import StringUtils from '../../../../../../../core/stringUtils'
 import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 

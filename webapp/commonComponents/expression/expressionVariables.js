@@ -2,8 +2,8 @@ import * as R from 'ramda'
 
 import Survey from '../../../core/survey/survey'
 import NodeDef from '../../../core/survey/nodeDef'
-import NodeDefTable from '../../../core/surveyRdb/nodeDefTable'
-import sqlTypes from '../../../core/surveyRdb/sqlTypes'
+import NodeDefTable from '../../../common/surveyRdb/nodeDefTable'
+import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 
 import Expression from '../../../core/exprParser/expression'
 

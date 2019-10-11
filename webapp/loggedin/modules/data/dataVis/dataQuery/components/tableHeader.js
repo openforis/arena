@@ -10,7 +10,7 @@ import DownloadButton from '../../../../../../commonComponents/form/downloadButt
 import Tooltip from '../../../../../../commonComponents/tooltip'
 
 import Expression from '../../../../../../../core/exprParser/expression'
-import * as DataSort from '../../../../../../../core/surveyRdb/dataSort'
+import * as DataSort from '../../../../../../../common/surveyRdb/dataSort'
 
 import {
   updateTableFilter,

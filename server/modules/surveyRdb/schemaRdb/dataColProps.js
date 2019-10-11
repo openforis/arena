@@ -7,8 +7,8 @@ const NodeDef = require('../../../../core/survey/nodeDef')
 const Taxon = require('../../../../core/survey/taxon')
 const Node = require('../../../../core/record/node')
 
-const NodeDefTable = require('../../../../core/surveyRdb/nodeDefTable')
-const sqlTypes = require('../../../../core/surveyRdb/sqlTypes')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
 
 const Point = require('../../../../core/geo/point')
