@@ -7,16 +7,14 @@ const { requireRecordListViewPermission } = require('../../auth/authApiMiddlewar
 
 module.exports.init = app => {
 
-  app.post('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res, next) => {
+  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, nodeDefUuidTable, tableName, offset, limit, editMode = false } = Request.getParams(req)
-
-      const cols = Request.getJsonParam(req, 'cols', [])
+      const { surveyId, nodeDefUuidTable, cycle, offset, limit, editMode = false } = Request.getParams(req)
       const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
       const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getJsonParam(req, 'sort')
 
-      const rows = await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort, editMode)
+      const rows = await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode)
 
       res.json(rows)
     } catch (err) {
@@ -24,12 +22,12 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res, next) => {
+  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, tableName } = Request.getParams(req)
+      const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
       const filter = Request.getJsonParam(req, 'filter', null)
 
-      const count = await SurveyRdbService.countTable(surveyId, cycle, tableName, filter)
+      const count = await SurveyRdbService.countTable(surveyId, cycle, nodeDefUuidTable, filter)
 
       res.json(count)
     } catch (err) {
@@ -37,16 +35,16 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/surveyRdb/:surveyId/:tableName/export', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, tableName } = Request.getParams(req)
-      const cols = Request.getJsonParam(req, 'cols', [])
+      const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
+      const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
       const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getJsonParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
 
-      await SurveyRdbService.exportTableToCSV(surveyId, cycle, tableName, cols, filter, sort, res)
+      await SurveyRdbService.exportTableToCSV(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, filter, sort, res)
 
       res.end()
     } catch (err) {

@@ -30,8 +30,8 @@ const Table = props => {
 
   const {
     appSaving, lang, surveyId, surveyCycleKey, data, showTable,
-    nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, colsNumber,
-    tableName, offset, limit, filter, sort, count,
+    nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colsNumber,
+    offset, limit, filter, sort, count,
     nodeDefSelectorsVisible,
     editMode, canEdit,
     history,
@@ -70,8 +70,6 @@ const Table = props => {
             surveyCycleKey={surveyCycleKey}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCols={nodeDefUuidCols}
-            tableName={tableName}
-            colNames={colNames}
             filter={filter}
             sort={sort}
             limit={limit}
@@ -88,7 +86,6 @@ const Table = props => {
             <TableRows
               lang={lang}
               nodeDefCols={nodeDefCols}
-              colNames={colNames}
               data={data}
               offset={offset}
               colWidth={colWidth}
@@ -107,7 +104,6 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDefUuidContext = DataQueryState.getTableNodeDefUuidTable(state)
-  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
@@ -122,11 +118,9 @@ const mapStateToProps = state => {
     appSaving: AppState.isSaving(state),
     surveyId: Survey.getId(survey),
     surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-    tableName: NodeDefTable.getViewName(nodeDefContext, Survey.getNodeDefParent(nodeDefContext)(survey)),
     nodeDefUuidContext,
     nodeDefUuidCols,
     nodeDefCols,
-    colNames,
     colsNumber,
     data: DataQueryState.getTableData(state),
     offset: DataQueryState.getTableOffset(state),
