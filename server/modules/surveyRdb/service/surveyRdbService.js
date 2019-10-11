@@ -11,11 +11,24 @@ const SurveyManager = require('../../survey/manager/surveyManager')
 const SurveyRdbManager = require('../manager/surveyRdbManager')
 const RecordManager = require('../../record/manager/recordManager')
 
-const exportTableToCSV = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, filter, sort, output) => {
-  const survey = await _fetchSurveyAndNodeDefs(surveyId, cycle)
+const _getQueryData = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
+  const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true)
+  const surveyInfo = Survey.getSurveyInfo(surveySummary)
+  const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
   const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
-  const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
-  const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+
+  return {
+    survey,
+    nodeDefTable,
+    tableName: NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey)),
+    colNames: NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+  }
+}
+
+const exportTableToCSV = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, filter, sort, output) => {
+  const { tableName, colNames } = await _getQueryData(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols)
 
   const csvStream = fastcsv.format({ headers: true })
   csvStream.pipe(output)
@@ -45,40 +58,25 @@ const exportTableToCSV = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCo
   csvStream.end()
 }
 
-const _fetchSurveyAndNodeDefs = async (surveyId, cycle) => {
-  const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true)
-  const surveyInfo = Survey.getSurveyInfo(surveySummary)
-  const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
-
-  return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
-}
-
 const queryTable = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
                           offset = 0, limit = null, filterExpr = null, sort = null, editMode = false) => {
-  const survey = await _fetchSurveyAndNodeDefs(surveyId, cycle)
 
-  // 1. find ancestor defs of table def
-  const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
+  const { survey, nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols)
 
-  // 2. get hierarchy entities uuid col names
+  // get hierarchy entities uuid col names
   const ancestorUuidColNames = []
   Survey.visitAncestorsAndSelf(
     nodeDefTable,
     nodeDefCurrent => ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
   )(survey)
 
-  // 3. prepare cols to fetch
-  const queryCols = [
-    DataTable.colNameRecordUuuid,
-    ...ancestorUuidColNames,
-    ...NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
-  ]
-  const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
+  // get cols to fetch
+  const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
 
-  // 4. fetch data
-  let rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, queryCols, offset, limit, filterExpr, sort)
+  // fetch data
+  let rows = await SurveyRdbManager.queryTable(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort)
 
-  // 5. in edit mode, assoc nodes to columns
+  // edit mode, assoc nodes to columns
   if (editMode) {
     rows = await Promise.all(rows.map(
       async row => {
@@ -116,9 +114,7 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [
 }
 
 const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {
-  const survey = await _fetchSurveyAndNodeDefs(surveyId, cycle)
-  const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
-  const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
+  const { tableName } = await _getQueryData(surveyId, cycle, nodeDefUuidTable)
   return await SurveyRdbManager.countTable(surveyId, cycle, tableName, filter)
 }
 
