@@ -30,6 +30,7 @@ const keys = {
   draftAdvanced: 'draftAdvanced',
   type: 'type',
   deleted: 'deleted',
+  analysis: 'analysis',
   published: 'published',
 }
 
@@ -103,6 +104,7 @@ const isTaxon = isType(nodeDefType.taxon)
 
 const isPublished = R.propEq(keys.published, true)
 const isDeleted = R.propEq(keys.deleted, true)
+const isAnalysis = R.propEq(keys.analysis, true)
 
 const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
@@ -220,6 +222,7 @@ module.exports = {
 
   isPublished,
   isDeleted,
+  isAnalysis,
 
   //advanced props
   getDefaultValues,

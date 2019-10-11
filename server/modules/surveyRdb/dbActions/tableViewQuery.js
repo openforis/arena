@@ -84,7 +84,7 @@ const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => 
 
 const countDuplicateRecords = async (survey, record, client = db) => {
   const surveyId = Survey.getId(survey)
-  const nodeDefRoot = Survey.getRootNodeDef(survey)
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const nodeRoot = Record.getRootNode(record)
 
@@ -115,7 +115,7 @@ const countDuplicateRecords = async (survey, record, client = db) => {
 }
 
 const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
-  const nodeDefRoot = Survey.getRootNodeDef(survey)
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
   const schemaRdb = SchemaRdb.getName(surveyId)

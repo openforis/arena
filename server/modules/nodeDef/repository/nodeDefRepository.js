@@ -24,7 +24,7 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 }
 
 const nodeDefSelectFields =
-  `id, uuid, parent_uuid, type, deleted, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
+  `id, uuid, parent_uuid, type, deleted, analysis, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
   props, props_advanced, props_draft, props_advanced_draft, meta`
 
 // ============== CREATE

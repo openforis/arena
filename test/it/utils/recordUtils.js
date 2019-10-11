@@ -71,7 +71,7 @@ const findNodeByPath = path => (survey, record) => {
       else
         return null
     } else {
-      currentNodeDef = Survey.getRootNodeDef(survey)
+      currentNodeDef = Survey.getNodeDefRoot(survey)
       currentNode = Record.getRootNode(record)
     }
     currentParentDef = currentNodeDef

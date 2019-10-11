@@ -30,7 +30,7 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 
 const initNewRecord = async (user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, client = db) =>
   await client.tx(async t => {
-    const rootNodeDef = Survey.getRootNodeDef(survey)
+    const rootNodeDef = Survey.getNodeDefRoot(survey)
 
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
