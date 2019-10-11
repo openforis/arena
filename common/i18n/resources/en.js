@@ -230,7 +230,9 @@ module.exports = {
   analysis: {
     processingChain: {
       dateExecuted: 'Date executed',
-      status: 'Status'
+      status: 'Status',
+      deleteConfirm: 'Delete this processing chain?\n$t(common.cantUndoWarning)',
+      deleteComplete: 'Processing chain deleted',
     }
   },
 
@@ -337,7 +339,7 @@ module.exports = {
 
   taxonomy: {
     cantBeDeleted: 'This taxonomy is used by some node definitions and cannot be deleted',
-    confirmDelete: 'Delete the taxonomy {{taxonomyName}}? This operation cannot be undone.',
+    confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     edit: {
       taxonomyName: 'Taxonomy name',
       taxaNotImported: 'Taxa not imported',
@@ -352,8 +354,8 @@ module.exports = {
     categoryName: 'Category name',
     cantBeDeleted: 'This category is used by some node definitions and cannot be removed',
     cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
-    confirmDelete: 'Delete the category {{categoryName}}? This operation cannot be undone.',
-    confirmDeleteItem: 'Delete the item with all children? $t(common.cantUndoWarning)',
+    confirmDelete: 'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
+    confirmDeleteItem: 'Delete the item with all children?\n$t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
     level: 'Level',
 

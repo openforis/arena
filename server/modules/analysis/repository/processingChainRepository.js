@@ -64,6 +64,15 @@ const updateChainProp = async (surveyId, processingChainUuid, key, value, client
     dbTransformCallback
   )
 
+// DELETE
+const deleteChain = async (surveyId, processingChainUuid, client = db) =>
+  await client.none(`
+      DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+      WHERE uuid = $1
+    `,
+    [processingChainUuid]
+  )
+
 module.exports = {
   // CREATE
   insertChain,
@@ -75,4 +84,7 @@ module.exports = {
 
   // UPDATE
   updateChainProp,
+
+  // DELETE
+  deleteChain,
 }
