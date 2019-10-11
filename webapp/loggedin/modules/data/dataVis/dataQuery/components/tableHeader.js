@@ -37,7 +37,7 @@ const TableHeader = props => {
   }
 
   const {
-    appSaving, surveyId, nodeDefUuidContext, nodeDefUuidCols,
+    appSaving, surveyId, surveyCycleKey, nodeDefUuidContext, nodeDefUuidCols,
     tableName, colNames, filter, sort, limit, offset, count,
     nodeDefSelectorsVisible, toggleNodeDefsSelector,
     showPaginator, editMode, canEdit,
@@ -46,7 +46,7 @@ const TableHeader = props => {
     updateTableSort,
   } = props
 
-  const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&cols=${JSON.stringify(colNames)}`
+  const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&cols=${JSON.stringify(colNames)}&cycle=${surveyCycleKey}`
 
   const i18n = useI18n()
   const sortMsg = DataSort.getViewExpr(i18n.t('dataView.dataVis.dataSort.ascending'), i18n.t('dataView.dataVis.dataSort.descending'))(sort)

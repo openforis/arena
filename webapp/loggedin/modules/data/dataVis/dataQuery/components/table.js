@@ -29,7 +29,7 @@ const defaultColWidth = 80
 const Table = props => {
 
   const {
-    appSaving, lang, surveyId, data, showTable,
+    appSaving, lang, surveyId, surveyCycleKey, data, showTable,
     nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, colsNumber,
     tableName, offset, limit, filter, sort, count,
     nodeDefSelectorsVisible,
@@ -67,6 +67,7 @@ const Table = props => {
           <TableHeader
             appSaving={appSaving}
             surveyId={surveyId}
+            surveyCycleKey={surveyCycleKey}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCols={nodeDefUuidCols}
             tableName={tableName}
@@ -120,6 +121,7 @@ const mapStateToProps = state => {
     lang: AppState.getLang(state),
     appSaving: AppState.isSaving(state),
     surveyId: Survey.getId(survey),
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
     tableName: NodeDefTable.getViewName(nodeDefContext, Survey.getNodeDefParent(nodeDefContext)(survey)),
     nodeDefUuidContext,
     nodeDefUuidCols,
