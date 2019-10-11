@@ -3,7 +3,6 @@ const fastcsv = require('fast-csv')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DataTable = require('../schemaRdb/dataTable')
 
@@ -49,12 +48,12 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
 
   // 1. find ancestor defs of table def
-  const tableNodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
+  const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
 
   // 2. get hierarchy entities uuid col names
   const ancestorUuidColNames = []
   Survey.visitAncestorsAndSelf(
-    tableNodeDef,
+    nodeDefTable,
     nodeDefCurrent => ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
   )(survey)
 
@@ -79,7 +78,7 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
           ...row,
           cols: {},
           record,
-          parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
+          parentNodeUuid: R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
         }
 
         //assoc nodes to each columns
@@ -89,12 +88,11 @@ const queryTable = async (surveyId, cycle, nodeDefUuidTable, tableName, nodeDefU
           const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
           const parentUuid = R.prop(parentUuidColName, row)
 
-          const nodes = await RecordManager.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
+          const node = NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // column is the multiple attribute
+            ? await RecordManager.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefCol)}_uuid`])
+            : (await RecordManager.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol]))[0]
 
-          resultRow.cols[nodeDefUuidCol] = {
-            parentUuid,
-            nodes: toUuidIndexedObj(nodes)
-          }
+          resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
         }
 
         return resultRow

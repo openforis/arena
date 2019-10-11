@@ -79,11 +79,10 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   history.push(moduleUri + Record.getUuid(record))
 }
 
-export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
-  dispatch => {
-    const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
-    recordNodesUpdate({ [Node.getUuid(node)]: node })(dispatch)
-  }
+export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => dispatch => {
+  const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
+  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
+}
 
 /**
  * ============

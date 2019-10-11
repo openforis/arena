@@ -1,5 +1,4 @@
 import React from 'react'
-import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
@@ -17,14 +16,13 @@ class TableColumnEdit extends React.Component {
 
   render () {
     const {
-      surveyInfo, canEditRecord,
+      surveyInfo, surveyCycleKey, canEditRecord,
       nodeDef, record, cell,
       updateNode, removeNode, createNodePlaceholder
     } = this.props
 
     if (cell) {
-      const { parentUuid, nodes } = cell
-      const nodesArray = R.values(nodes)
+      const { parentUuid, node } = cell
 
       const parentNode = {
         [Node.keys.recordUuid]: Record.getUuid(record),
@@ -34,10 +32,12 @@ class TableColumnEdit extends React.Component {
       return (
         <NodeDefTableCellBody
           surveyInfo={surveyInfo}
+          surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           parentNode={parentNode}
-          nodes={nodesArray}
+          nodes={[node]}
           entry={true}
+          entryDataQuery={true}
           edit={false}
           renderType={NodeDefLayout.renderType.tableBody}
           canEditRecord={canEditRecord}
@@ -60,6 +60,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     surveyInfo,
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
     canEditRecord: Authorizer.canEditRecord(user, record),
   }
 }

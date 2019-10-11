@@ -1,11 +1,12 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import Survey from '../../../../../../common/survey/survey'
+import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
+import DataSort from '../../../../../../common/surveyRdb/dataSort'
+
 import * as SurveyState from '../../../../../survey/surveyState'
 import * as DataQueryState from './dataQueryState'
-import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
-
-import * as DataSort from '../../../../../../common/surveyRdb/dataSort'
 
 // ====== table
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
@@ -19,7 +20,8 @@ export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
 
 const getTableName = (state, nodeDefUuidTable) => {
   const survey = SurveyState.getSurvey(state)
-  return NodeDefTable.getViewNameByUuid(nodeDefUuidTable)(survey)
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
+  return NodeDefTable.getViewName(nodeDef, Survey.getNodeDefParent(nodeDef)(survey))
 }
 
 const getColNames = (state, nodeDefUuidCols) => {

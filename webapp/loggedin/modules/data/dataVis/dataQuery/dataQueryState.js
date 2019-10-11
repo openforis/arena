@@ -99,51 +99,47 @@ export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.fil
 
 export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)
 
-export const assocTableDataRecordNodes = nodes =>
-  state => {
-    const editMode = R.pathOr(false, [keys.table, tableKeys.editMode], state)
-    if (editMode) {
-      // replace nodes in table rows
-      const data = R.pathOr([], [keys.table, tableKeys.data], state)
+// ===== Edit mode
 
-      for (const node of R.values(nodes)) {
-        const nodeUuid = Node.getUuid(node)
-        const nodeDefUuid = Node.getNodeDefUuid(node)
-        const nodeParentUuid = Node.getParentUuid(node)
-        const nodeRecordUuid = Node.getRecordUuid(node)
+export const assocTableDataRecordNodes = nodes => state => {
+  // replace nodes in table rows
+  const data = R.pathOr([], [keys.table, tableKeys.data], state)
 
-        for (const row of data) {
-          if (Record.getUuid(row.record) === nodeRecordUuid) {
-            const cell = row.cols[nodeDefUuid]
-            if (cell && cell.parentUuid === nodeParentUuid) {
-              const cellData = Node.isDeleted(node)
-                ? R.dissocPath(['nodes', nodeUuid], cell)
-                : R.assocPath(['nodes', nodeUuid], node, cell)
+  for (const node of R.values(nodes)) {
+    const nodeDefUuid = Node.getNodeDefUuid(node)
+    const nodeRecordUuid = Node.getRecordUuid(node)
 
-              row.cols[nodeDefUuid] = cellData
-            }
-          }
+    for (const row of data) {
+      if (Record.getUuid(row.record) === nodeRecordUuid) {
+        const cell = row.cols[nodeDefUuid]
+
+        if (cell && Node.isEqual(node)(cell.node)) {
+          row.cols[nodeDefUuid] = R.ifElse(
+            R.always(Node.isDeleted(node)),
+            R.dissoc('node'),
+            R.assoc('node', node)
+          )(cell)
+
         }
       }
-      return R.assocPath([keys.table, tableKeys.data], data, state)
-    } else {
-      return state
     }
   }
+  return R.assocPath([keys.table, tableKeys.data], data, state)
+}
 
-export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) =>
-  state => R.pipe(
-    R.pathOr([], [keys.table, tableKeys.data]),
-    R.map(row =>
-      R.ifElse(
-        R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
-        R.assocPath([rowKeys.record, Validation.keys.validation, Validation.keys.valid], recordValid),
-        R.identity
-      )(row)
-    ),
-    data => R.assocPath([keys.table, tableKeys.data], data)(state)
-  )(state)
+export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) => state => R.pipe(
+  R.pathOr([], [keys.table, tableKeys.data]),
+  R.map(row =>
+    R.ifElse(
+      R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
+      R.assocPath([rowKeys.record, Validation.keys.validation, Validation.keys.valid], recordValid),
+      R.identity
+    )(row)
+  ),
+  data => R.assocPath([keys.table, tableKeys.data], data)(state)
+)(state)
 
 // ====== nodeDefSelectors
+
 export const isNodeDefSelectorsVisible = R.pipe(getState, R.propOr(true, keys.showNodeDefSelectors))
 export const assocShowNodeDefSelectors = R.assoc(keys.showNodeDefSelectors)

@@ -170,6 +170,7 @@ module.exports = {
   isDeleted: R.propEq(keys.deleted, true),
   isDirty: R.propEq(keys.dirty, true),
   isRoot: R.pipe(getParentUuid, R.isNil),
+  isEqual: ObjectUtils.isEqual,
 
   getValidation: Validation.getValidation,
 

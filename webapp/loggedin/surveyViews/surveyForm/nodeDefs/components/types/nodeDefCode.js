@@ -24,10 +24,10 @@ import * as RecordState from '../../../../record/recordState'
 const NodeDefCode = props => {
 
   const {
-    surveyId, nodeDef,
+    surveyId, surveyCycleKey, nodeDef,
     categoryUuid, categoryLevelIndex, nodeParentCodeUuid, codeUuidsHierarchy,
     parentNode, nodes,
-    edit, draft,
+    edit, draft, entryDataQuery,
     updateNode, removeNode,
   } = props
 
@@ -57,7 +57,7 @@ const NodeDefCode = props => {
   }
 
   const onItemAdd = item => {
-    const node = NodeDef.isSingle(nodeDef)
+    const node = NodeDef.isSingle(nodeDef) || entryDataQuery
       ? nodes[0]
       : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
@@ -69,7 +69,7 @@ const NodeDefCode = props => {
   }
 
   const onItemRemove = item => {
-    if (NodeDef.isSingle(nodeDef)) {
+    if (NodeDef.isSingle(nodeDef) || entryDataQuery) {
       updateNode(nodeDef, nodes[0], {}, null, {}, {})
     } else {
       const nodeToRemove = nodes.find(node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
@@ -77,7 +77,7 @@ const NodeDefCode = props => {
     }
   }
 
-  return NodeDefLayout.isRenderDropdown(nodeDef)
+  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery
     ? (
       <NodeDefCodeDropdown
         {...props}
@@ -120,6 +120,7 @@ const mapStateToProps = (state, props) => {
     lang,
 
     surveyId: Survey.getId(survey),
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
     draft: Survey.isDraft(surveyInfo),
 
     parentCodeDefUuid: NodeDef.getParentCodeDefUuid(nodeDef),

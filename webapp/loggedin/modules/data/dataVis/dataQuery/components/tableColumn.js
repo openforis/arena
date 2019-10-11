@@ -1,15 +1,14 @@
 import React from 'react'
 import camelize from 'camelize'
 
+import NodeDef from '../../../../../../../common/survey/nodeDef'
+import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
 import StringUtils from '../../../../../../../common/stringUtils'
+import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { useI18n } from '../../../../../../commonComponents/hooks'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
 import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
-
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
-import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import TableColumnEdit from './tableColumnEdit'
 

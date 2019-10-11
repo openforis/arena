@@ -11,7 +11,7 @@ const NodeDefCodeDropdown = props => {
   const {
     lang, nodeDef,
     items, selectedItems,
-    edit, canEditRecord, readOnly,
+    edit, entryDataQuery, canEditRecord, readOnly,
     onItemAdd, onItemRemove
   } = props
 
@@ -22,7 +22,7 @@ const NodeDefCodeDropdown = props => {
   return (
     <div className="survey-form__node-def-code">
       {
-        NodeDef.isMultiple(nodeDef)
+        NodeDef.isMultiple(nodeDef) && !entryDataQuery
           ? (
             <InputChips
               readOnly={entryDisabled}
