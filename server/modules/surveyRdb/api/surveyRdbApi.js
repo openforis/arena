@@ -43,8 +43,7 @@ module.exports.init = app => {
       const sort = Request.getJsonParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
-
-      await SurveyRdbService.exportTableToCSV(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, filter, sort, res)
+      await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, 0, null, filter, sort, false, res)
 
       res.end()
     } catch (err) {

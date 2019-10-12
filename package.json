@@ -85,6 +85,7 @@
     "node-stream-zip": "^1.8.2",
     "pg": "^7.12.1",
     "pg-promise": "^9.3.3",
+    "pg-query-stream": "^2.0.0",
     "proj4": "^2.5.0",
     "ramda": "^0.26.1",
     "react": "^16.10.2",
