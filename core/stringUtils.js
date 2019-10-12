@@ -10,9 +10,8 @@ const leftTrim = R.replace(/^\s+/, '')
 
 const toLower = R.pipe(trim, R.toLower)
 
-const truncate = maxLength =>
-  text =>
-    text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+const truncate = maxLength => text =>
+  text.length > maxLength ? text.substring(0, maxLength) + '...' : text
 
 const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
 
@@ -33,6 +32,14 @@ const normalizeName = R.pipe(
 
 const capitalizeFirstLetter = text => text.charAt(0).toUpperCase() + text.slice(1)
 
+const removeNewLines = R.when(
+  isString,
+  R.pipe(
+    R.split(/\r\n|\r|\n/g),
+    R.join(' ')
+  )
+)
+
 module.exports = {
   nbsp,
 
@@ -43,9 +50,9 @@ module.exports = {
 
   isBlank,
   isNotBlank,
-
   isString,
 
   normalizeName,
   capitalizeFirstLetter,
+  removeNewLines,
 }
