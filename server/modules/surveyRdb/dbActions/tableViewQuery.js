@@ -125,10 +125,13 @@ const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExclud
 
   const keyColumns = nodeDefKeys.map(NodeDefTable.getColName)
   const keyColumnsString = keyColumns.join(', ')
-  const keysCondition = nodeDefKeys.map((nodeDefKey, idx) => {
-    const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
-    return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
-  })
+  const keysCondition = R.pipe(
+    R.addIndex(R.map)((nodeDefKey, idx) => {
+      const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
+      return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
+    }),
+    R.join(' AND ')
+  )(nodeDefKeys)
 
   return await client.map(`
     WITH count_records AS (
