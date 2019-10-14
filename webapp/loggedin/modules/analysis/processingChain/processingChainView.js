@@ -2,11 +2,9 @@ import './processingChainView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import Survey from '../../../../../core/survey/survey'
 import ProcessingChain from '../../../../../common/analysis/processingChain'
-import ObjectUtils from '../../../../../core/objectUtils'
 
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 
@@ -42,15 +40,6 @@ const ProcessingChainView = props => {
     navigateToProcessingChainsView(history)
   }, [surveyCycleKey])
 
-  const onPropLabelsChange = key => labelItem => {
-    const labelsUpdated = R.pipe(
-      ObjectUtils.getProp(key),
-      R.assoc(labelItem.lang, labelItem.label),
-    )(processingChain)
-
-    putProcessingChainProp(key, labelsUpdated)
-  }
-
   return processingChain
     ? (
       <div className="processing-chain">
@@ -59,14 +48,14 @@ const ProcessingChainView = props => {
           <LabelsEditor
             languages={Survey.getLanguages(surveyInfo)}
             labels={ProcessingChain.getLabels(processingChain)}
-            onChange={onPropLabelsChange(ProcessingChain.keysProps.labels)}
+            onChange={labels => putProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
           />
 
           <LabelsEditor
             formLabelKey="common.description"
             languages={Survey.getLanguages(surveyInfo)}
             labels={ProcessingChain.getDescriptions(processingChain)}
-            onChange={onPropLabelsChange(ProcessingChain.keysProps.descriptions)}
+            onChange={descriptions => putProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
           />
         </div>
 

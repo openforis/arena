@@ -21,7 +21,7 @@ const LanguageBadge = ({ lang, compact }) => (
   </div>
 )
 
-const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = true, compactLanguage }) => (
+const LabelRow = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
   <div className="labels-editor__label">
 
     {
@@ -29,11 +29,14 @@ const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = tr
       <LanguageBadge lang={lang} compact={compactLanguage}/>
     }
 
-    <Input value={label}
-           onChange={value => onChange({
-             lang,
-             label: value,
-           })}
+    <Input value={R.propOr('', lang, labels)}
+           onChange={value => onChange(
+             R.ifElse(
+               R.always(R.isEmpty(value)),
+               R.dissoc(lang),
+               R.assoc(lang, value)
+             )(labels)
+           )}
            readOnly={readOnly}/>
   </div>
 )
@@ -90,7 +93,7 @@ const LabelsEditor = props => {
           displayLangs.map(lang =>
             <LabelRow key={lang}
                       lang={lang}
-                      label={R.prop(lang)(labels)}
+                      labels={labels}
                       onChange={onChange}
                       readOnly={readOnly}
                       showLanguageBadge={languages.length > 1}
@@ -105,7 +108,7 @@ const LabelsEditor = props => {
 
 LabelsEditor.defaultProps = {
   languages: [],
-  labels: [],
+  labels: {},
   showFormLabel: true,
   formLabelKey: 'common.label',
   maxPreview: 2,

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-import * as R from 'ramda'
 
 import LabelsEditor from '../../labelsEditor/labelsEditor'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
@@ -21,18 +20,6 @@ const ItemEdit = (props) => {
       elemRef.current.scrollIntoView(false)
     }
   }, [props.active])
-
-  const onPropLabelsChange = (labelItem) => {
-    const { category, level, item, putCategoryItemProp } = props
-
-    putCategoryItemProp(
-      category,
-      level,
-      item,
-      'labels',
-      R.assoc(labelItem.lang, labelItem.label, CategoryItem.getLabels(item))
-    )
-  }
 
   const {
     category, level, item, active,
@@ -68,9 +55,16 @@ const ItemEdit = (props) => {
                        readOnly={readOnly}/>
               </FormItem>
 
-              <LabelsEditor labels={CategoryItem.getLabels(item)}
-                            onChange={(labelItem) => onPropLabelsChange(labelItem)}
-                            readOnly={readOnly}/>
+              <LabelsEditor
+                labels={CategoryItem.getLabels(item)}
+                onChange={labels => putCategoryItemProp(
+                  category,
+                  level,
+                  item,
+                  'labels',
+                  labels
+                )}
+                readOnly={readOnly}/>
 
               {
                 !readOnly &&

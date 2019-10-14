@@ -27,12 +27,8 @@ export const useSurveyInfoViewState = props => {
   const setSrs = value => setObjectField(Survey.infoKeys.srs, value)
   const setCycles = value => setObjectField(Survey.infoKeys.cycles, value)
 
-  const setFieldLabel = (field, items) => item => {
-    const itemsUpdate = R.assoc(item.lang, item.label, items)
-    setObjectField(field, itemsUpdate)
-  }
-  const setLabel = setFieldLabel(Survey.infoKeys.labels, object.labels)
-  const setDescription = setFieldLabel(Survey.infoKeys.descriptions, object.descriptions)
+  const setLabels = labels => setObjectField(Survey.infoKeys.labels, labels)
+  const setDescriptions = descriptions => setObjectField(Survey.infoKeys.descriptions, descriptions)
 
   const saveProps = () => {
     enableValidation()
@@ -44,8 +40,8 @@ export const useSurveyInfoViewState = props => {
     setName,
     setLanguages,
     setSrs,
-    setLabel,
-    setDescription,
+    setLabels,
+    setDescriptions,
     setCycles,
     getFieldValidation,
     saveProps,
