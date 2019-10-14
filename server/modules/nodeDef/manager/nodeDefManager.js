@@ -89,7 +89,11 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     const [nodeDef] = await Promise.all([
       NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
       markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, { nodeDefUuid, props, propsAdvanced }, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {
+        nodeDefUuid,
+        ...(R.isEmpty(props) ? {} : { props }),
+        ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced })
+      }, t)
     ])
     return {
       [nodeDefUuid]: nodeDef,
