@@ -34,8 +34,8 @@ class TaxonomyImportJob extends Job {
     this.filePath = filePath
 
     this.rowsByField = {
-      code: {}, //maps codes to csv file rows
-      scientificName: {} //maps scientific names to csv file rows
+      [Taxon.propKeys.code]: {}, //maps codes to csv file rows
+      [Taxon.propKeys.scientificName]: {} //maps scientific names to csv file rows
     }
 
     this.taxonomyImportManager = null //to be initialized before starting the import
@@ -180,17 +180,19 @@ class TaxonomyImportJob extends Job {
   _addValueToIndex (field, value, errorKeyDuplicate, validation) {
     const duplicateRow = this.rowsByField[field][value]
     if (duplicateRow) {
-      Validation.setValid(false)
-      Validation.setField(
-        field,
-        Validation.newInstance(
-          false,
-          {},
-          [{
-            key: errorKeyDuplicate,
-            params: { row: this.processed + 1, duplicateRow }
-          }]
-        ))(validation)
+      R.pipe(
+        Validation.setValid(false),
+        Validation.setField(
+          field,
+          Validation.newInstance(
+            false,
+            {},
+            [{
+              key: errorKeyDuplicate,
+              params: { row: this.processed + 1, duplicateRow }
+            }]
+          ))
+      )(validation)
     } else {
       this.rowsByField[field][value] = this.processed + 1
     }
