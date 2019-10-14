@@ -26,7 +26,7 @@ const SurveyInfoView = (props) => {
 
   const {
     name, languages, srs, labels, descriptions, cycles,
-    setName, setLanguages, setSrs, setLabel, setDescription, setCycles,
+    setName, setLanguages, setSrs, setLabels, setDescriptions, setCycles,
     getFieldValidation, saveProps,
   } = useSurveyInfoViewState(props)
 
@@ -48,7 +48,7 @@ const SurveyInfoView = (props) => {
           readOnly={readOnly}
           languages={languages}
           labels={labels}
-          onChange={setLabel}
+          onChange={setLabels}
         />
 
         <LabelsEditor
@@ -56,7 +56,7 @@ const SurveyInfoView = (props) => {
           formLabelKey="common.description"
           languages={languages}
           labels={descriptions}
-          onChange={setDescription}
+          onChange={setDescriptions}
         />
 
         <LanguagesEditor

@@ -37,10 +37,6 @@ const BasicProps = props => {
 
   const i18n = useI18n()
 
-  const onPropLabelsChange = (labelItem, key, currentValue) => {
-    putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
-  }
-
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
   const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
@@ -60,12 +56,12 @@ const BasicProps = props => {
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(labelItem, NodeDef.propKeys.labels, NodeDef.getLabels(nodeDef))}/>
+        onChange={labels => putNodeDefProp(nodeDef, NodeDef.propKeys.labels, labels)}/>
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(labelItem, NodeDef.propKeys.descriptions, NodeDef.getDescriptions(nodeDef))}/>
+        onChange={descriptions => putNodeDefProp(nodeDef, NodeDef.propKeys.descriptions, descriptions)}/>
 
       {
         NodeDef.isCode(nodeDef) &&
