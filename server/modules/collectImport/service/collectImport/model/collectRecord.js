@@ -31,7 +31,6 @@ const getAttribute = attrName => R.path(['_attributes', attrName])
 const getDateCreated = R.pipe(
   getRootEntity,
   getAttribute('created'),
-  DateUtils.parseISO,
 )
 
 module.exports = {
