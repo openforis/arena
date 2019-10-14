@@ -21,7 +21,7 @@ const LanguageBadge = ({ lang, compact }) => (
   </div>
 )
 
-const LabelRow = ({ labels = {}, lang, onChange, readOnly, showLanguageBadge = true, compactLanguage }) => (
+const LabelRow = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
   <div className="labels-editor__label">
 
     {
@@ -108,7 +108,7 @@ const LabelsEditor = props => {
 
 LabelsEditor.defaultProps = {
   languages: [],
-  labels: [],
+  labels: {},
   showFormLabel: true,
   formLabelKey: 'common.label',
   maxPreview: 2,
