@@ -11,10 +11,11 @@ const _getSurvey = async (surveyId, cycle) => {
 
 const queryTable = async (
   surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
-  offset = 0, limit = null, filter = null, sort = null, editMode = false
+  offset = 0, limit = null, filter = null, sort = [],
+  editMode = false, streamOutput = null
 ) => {
   const survey = await _getSurvey(surveyId, cycle)
-  return await SurveyRdbManager.queryTable(survey, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode)
+  return await SurveyRdbManager.queryTable(survey, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode, streamOutput)
 }
 
 const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {

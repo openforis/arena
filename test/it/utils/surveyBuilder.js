@@ -155,12 +155,11 @@ class SurveyBuilder {
     const surveyParam = this.build()
 
     return await client.tx(async t => {
-      console.log("====== " , JSON.stringify(this.user))
       const survey = await SurveyManager.insertSurvey(this.user, surveyParam, false, t)
 
       const surveyId = Survey.getId(survey)
 
-      const { root } = Survey.getHierarchy(R.always)(surveyParam)
+      const { root } = Survey.getHierarchy(R.always, true)(surveyParam)
 
       await Survey.traverseHierarchyItem(root, async nodeDef =>
         await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)

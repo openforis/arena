@@ -38,7 +38,7 @@ const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = 
 
 const queryTable = async (
   survey, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
-  offset = 0, limit = null, filterExpr = null, sort = null,
+  offset = 0, limit = null, filterExpr = null, sort = [],
   editMode = false, streamOutput = null
 ) => {
   const surveyId = Survey.getId(survey)

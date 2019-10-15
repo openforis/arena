@@ -21,7 +21,7 @@ const DataFilter = require('../../../../common/surveyRdb/dataFilter')
 const DataCol = require('../schemaRdb/dataCol')
 const DataTable = require('../schemaRdb/dataTable')
 
-const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort, queryStream = false, client = db) => {
+const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort = [], queryStream = false, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
   // columns
   const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})

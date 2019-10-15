@@ -106,13 +106,13 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
-const getHierarchy = (filterFn = NodeDef.isEntity) =>
+const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = false) =>
   survey => {
 
     let length = 1
     const h = (array, nodeDef) => {
       const childDefs = NodeDef.isEntity(nodeDef)
-        ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
+        ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
         : []
 
       length += childDefs.length
