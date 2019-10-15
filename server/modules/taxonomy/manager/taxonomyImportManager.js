@@ -48,9 +48,8 @@ class TaxonomyImportManager {
     }
 
     //set vernacular lang codes in taxonomy
-    //set log to false temporarily; set user to null as it's only needed for logging
     await TaxonomyManager.updateTaxonomyProp(user, surveyId, Taxonomy.getUuid(taxonomy),
-      'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
+      Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, t)
   }
 }
 
