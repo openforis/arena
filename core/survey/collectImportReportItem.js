@@ -5,7 +5,7 @@ const ObjectUtils = require('../objectUtils')
 const keys = {
   props: ObjectUtils.keys.props,
   resolved: 'resolved',
-  nodeDefUuid: 'nodeDefUuid'
+  nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
 }
 
 const propKeys = {

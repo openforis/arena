@@ -2,6 +2,7 @@ const R = require('ramda')
 const camelize = require('camelize')
 
 const db = require('../../../db/db')
+const dbUtils = require('../../../db/dbUtils')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
@@ -20,20 +21,17 @@ const DataFilter = require('../../../../common/surveyRdb/dataFilter')
 const DataCol = require('../schemaRdb/dataCol')
 const DataTable = require('../schemaRdb/dataTable')
 
-const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort, client = db) => {
+const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort = [], queryStream = false, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
-
   // columns
   const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
-
   // WHERE clause
   const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
-
   // SORT clause
   const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
 
-  return await client.any(`
+  const select = `
     SELECT 
         ${colParamNames.join(', ')}
     FROM 
@@ -44,18 +42,13 @@ const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filter
     ORDER BY 
         ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}date_modified DESC NULLS LAST
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    OFFSET $/offset/`,
-    {
-      cycle,
-      ...filterParams,
-      ...colParams,
-      ...sortParams,
-      schemaName,
-      tableName,
-      limit,
-      offset
-    }
-  )
+    OFFSET $/offset/`
+
+  const params = { cycle, ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset }
+
+  return queryStream
+    ? new dbUtils.QueryStream(dbUtils.formatQuery(select, params))
+    : await client.any(select, params)
 }
 
 const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
@@ -135,37 +128,29 @@ const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExclud
 
   return await client.map(`
     WITH count_records AS (
-          SELECT
-              ${keyColumnsString},
-              COUNT(*) AS count
-          FROM
-              ${rootTable}
-          WHERE ${DataTable.colNameRecordCycle} = ${cycle}
-          ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
-          GROUP BY 
-              ${keyColumnsString}
-      )
+      SELECT
+        ${keyColumnsString}, COUNT(*) AS count
+      FROM
+        ${rootTable}
+      WHERE 
+        ${DataTable.colNameRecordCycle} = ${cycle}
+        ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
+      GROUP BY 
+        ${keyColumnsString}
+    )
     SELECT
-        ${rootTableAlias}.${DataTable.colNameRecordUuuid},
-        jsonb_agg(n.uuid) as nodes_key_uuids,
-        cr.count
+      ${rootTableAlias}.${DataTable.colNameRecordUuuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
-
-    JOIN
-        count_records cr
-        ON
-            ${keyColumns.map(keyCol => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
-
+    JOIN count_records cr
+      ON ${keyColumns.map(keyCol => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
-        ON n.record_uuid = r.record_uuid
-        AND n.node_def_uuid IN (${nodeDefKeys.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
-    
+      ON n.record_uuid = r.record_uuid
+      AND n.node_def_uuid IN (${nodeDefKeys.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     WHERE
       ${rootTableAlias}.${DataTable.colNameRecordCycle} = ${cycle}
       AND ${keysCondition}
       AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
-          
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
     `,
     [recordUuidExcluded],

@@ -14,7 +14,7 @@ const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   recordUuid: 'recordUuid',
-  nodeDefUuid: 'nodeDefUuid',
+  nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
   value: 'value',
   meta: 'meta',
   placeholder: 'placeholder',
@@ -100,7 +100,7 @@ const getValueProp = (prop, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, prop),
 )
 
-const getNodeDefUuid = R.prop(keys.nodeDefUuid)
+const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 
 const getNodeDefUuids = nodes => R.pipe(
   R.keys,

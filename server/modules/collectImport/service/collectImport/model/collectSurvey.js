@@ -163,7 +163,6 @@ const getNodeDefByPath = collectNodeDefPath => collectSurvey => {
     if (collectChildNodeDef)
       currentCollectNode = collectChildNodeDef
     else {
-      console.log(`child node def ${collectAncestorNodeName} not found in node def ${currentCollectNode}`)
       return null //node def not found
     }
   }
