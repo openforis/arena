@@ -66,10 +66,26 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
   return { start, cancel }
 }
 
-const createReader = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
+const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
   createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
 
+const readHeadersFromStream = async stream => {
+  let result = []
+
+  const reader = createReaderFromStream(
+    stream,
+    headers => {
+      reader.cancel()
+      result = headers
+    }
+  )
+  await reader.start()
+
+  return result
+}
+
 module.exports = {
-  createReader,
-  createReaderFromStream
+  createReaderFromFile,
+  createReaderFromStream,
+  readHeadersFromStream,
 }
