@@ -83,8 +83,8 @@ before(async () => {
 })
 
 const simpleTest = async () => {
-  console.log(JSON.stringify(survey))
-  console.log(JSON.stringify(records))
+  // console.log(JSON.stringify(survey))
+  // console.log(JSON.stringify(records))
 
   await ProcessingChainService.generateScript(Survey.getId(survey), processingChain)
 }
