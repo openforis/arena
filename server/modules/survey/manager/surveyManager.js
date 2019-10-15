@@ -191,8 +191,8 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
   })
 
 const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
-  client.tx(async t => {
-    const surveyUpdated = SurveyRepository.publishSurveyProps(surveyId, t)
+  await client.tx(async t => {
+    const surveyUpdated = await SurveyRepository.publishSurveyProps(surveyId, t)
     if (!R.isEmpty(langsDeleted))
       await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
     return surveyUpdated
