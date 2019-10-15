@@ -73,7 +73,7 @@ class TaxonomyImportJob extends Job {
     }
 
     // 4. delete old draft taxa
-    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
+    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(this.user, surveyId, taxonomyUuid, tx)
 
     // 5. start CSV row parsing
     await this._parseCSVRows(taxonomy)

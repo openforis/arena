@@ -17,10 +17,26 @@ const ActivityLog = require('../../activityLog/activityLogger')
  */
 const insertTaxonomy = async (user, surveyId, taxonomy, client = db) =>
   await client.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, t)
-
-    return await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
+    const [taxonomyInserted] = await Promise.all([
+      TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
+      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, t)
+    ])
+    return await validateTaxonomy(surveyId, [], taxonomyInserted)
   })
+
+const insertTaxa = async (surveyId, taxa, user, client = db) =>
+  await client.tx(async t => await Promise.all([
+    TaxonomyRepository.insertTaxa(surveyId, taxa, t),
+    ActivityLog.logMany(
+      user,
+      surveyId,
+      taxa.map(taxon => ({
+        type: ActivityLog.type.taxonInsert,
+        params: taxon,
+      })),
+      t
+    )
+  ]))
 
 /**
  * ====== READ
@@ -63,7 +79,6 @@ const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, include
     ]
     : taxa
 
-
 const findTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
   includeUnknownUnlistedItems(
     surveyId,
@@ -105,36 +120,27 @@ const publishTaxonomiesProps = async (surveyId, client = db) => {
 }
 
 const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, client = db) =>
-  await client.tx(async t => {
-    const updatedTaxonomy = await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value)
-
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { taxonomyUuid, key, value }, t)
-
-    return updatedTaxonomy
-  })
+  await client.tx(async t => (await Promise.all([
+      TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { taxonomyUuid, key, value }, t)
+    ]))[0]
+  )
 
 // ============== DELETE
 
-const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
-  await db.tx(async t => {
-    await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid)
+const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
+  await client.tx(async t => await Promise.all([
+    TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t),
+    markSurveyDraft(surveyId, t),
+    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { taxonomyUuid }, t)
+  ]))
 
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { taxonomyUuid }, t)
-  })
-
-const insertTaxa = async (surveyId, taxa, user, client = db) => {
-  await TaxonomyRepository.insertTaxa(surveyId, taxa, client)
-
-  const activities = taxa.map(taxon => ({
-    type: ActivityLog.type.taxonInsert,
-    params: taxon,
-  }))
-  await ActivityLog.logMany(user, surveyId, activities, client)
-}
+const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, client = db) =>
+  await client.tx(async t => await Promise.all([
+    TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
+    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { taxonomyUuid }, t)
+  ]))
 
 module.exports = {
   //CREATE
@@ -160,5 +166,5 @@ module.exports = {
 
   //DELETE
   deleteTaxonomy,
-  deleteDraftTaxaByTaxonomyUuid: TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid,
+  deleteDraftTaxaByTaxonomyUuid,
 }

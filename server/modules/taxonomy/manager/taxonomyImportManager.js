@@ -37,11 +37,6 @@ class TaxonomyImportManager {
 
     await this.batchPersister.flush(t)
 
-    //set vernacular lang codes in taxonomy
-    //set log to false temporarily; set user to null as it's only needed for logging
-    await TaxonomyManager.updateTaxonomyProp(user, surveyId, Taxonomy.getUuid(taxonomy),
-      'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
-
     //insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
       createPredefinedTaxa,
@@ -51,6 +46,10 @@ class TaxonomyImportManager {
     if (!R.isEmpty(predefinedTaxaToInsert)) {
       await TaxonomyManager.insertTaxa(surveyId, predefinedTaxaToInsert, user, t)
     }
+
+    //set vernacular lang codes in taxonomy
+    await TaxonomyManager.updateTaxonomyProp(user, surveyId, Taxonomy.getUuid(taxonomy),
+      Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, t)
   }
 }
 

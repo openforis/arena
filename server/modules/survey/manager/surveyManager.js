@@ -14,6 +14,7 @@ const Validation = require('../../../../core/validation/validation')
 
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
+const UserManager = require('../../user/manager/userManager')
 const AuthGroups = require('../../../../core/auth/authGroups')
 
 const SurveyRepository = require('../repository/surveyRepository')
@@ -49,13 +50,18 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
 const insertSurvey = async (user, surveyParam, createRootEntityDef = true, client = db) => {
   const survey = await client.tx(
     async t => {
+      // insert survey into db
       const surveyInfo = await SurveyRepository.insertSurvey(surveyParam, t)
       const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-      //create survey data schema
+      // create survey data schema
       await migrateSurveySchema(surveyId)
 
+      // log survey create activity
+      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)
+
       if (createRootEntityDef) {
+        // insert root entity def
         const rootEntityDef = NodeDef.newNodeDef(
           null,
           NodeDef.nodeDefType.entity,
@@ -80,11 +86,10 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       // create default groups for this survey
       surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
+      // add user to survey admins group (if not system admin)
       if (!User.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), User.getUuid(user), t)
+        await UserManager.addUserToGroup(user, surveyId, AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), User.getUuid(user), t)
       }
-
-      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)
 
       return surveyInfo
     }
@@ -185,16 +190,13 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
     }
   })
 
-const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
-  await SurveyRepository.publishSurveyProps(surveyId, client)
-
-  for (const langDeleted of langsDeleted) {
-    await Promise.all([
-      SurveyRepository.deleteSurveyLabel(surveyId, langDeleted, client),
-      SurveyRepository.deleteSurveyDescription(surveyId, langDeleted, client),
-    ])
-  }
-}
+const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
+  await client.tx(async t => {
+    const surveyUpdated = await SurveyRepository.publishSurveyProps(surveyId, t)
+    if (!R.isEmpty(langsDeleted))
+      await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
+    return surveyUpdated
+  })
 
 // ====== DELETE
 const deleteSurvey = async surveyId => await db.tx(async t =>

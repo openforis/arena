@@ -13,7 +13,7 @@ const Validation = require('../../../../core/validation/validation')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
-const CategoryImportCSVParser = require('./categoryImportCSVParser')
+const CategoryImportSummaryGenerator = require('./categoryImportSummaryGenerator')
 
 // ====== VALIDATION
 
@@ -190,27 +190,20 @@ const deleteLevelsByCategory = async (user, surveyId, category, client = db) =>
   })
 
 /**
- * Deletes all levels in the category starting from the specified index.
+ * Deletes all levels without items.
  * Category validation is not performed
  */
-const deleteLevelsFromIndex = async (user, surveyId, category, fromIndex, client = db) =>
+const deleteLevelsEmptyByCategory = async (user, surveyId, category, client = db) =>
   await client.tx(async t => {
     const levels = Category.getLevelsArray(category)
+    const levelUuidsDeleted = await CategoryRepository.deleteLevelsEmptyByCategory(surveyId, Category.getUuid(category), t)
 
     await Promise.all([
-      ...levels.slice(fromIndex).reduce((acc, level) => {
-          const levelUuid = CategoryLevel.getUuid(level)
-          acc.push(
-            CategoryRepository.deleteLevel(surveyId, levelUuid, t),
-            ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
-          )
-          return acc
-        },
-        []
-      ),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelsDelete, { levelUuidsDeleted }, t),
       markSurveyDraft(surveyId, t)
     ])
-    return Category.assocLevelsArray(levels.slice(0, fromIndex))(category)
+    const levelsUpdated = R.reject(level => R.includes(CategoryLevel.getUuid(level), levelUuidsDeleted))(levels)
+    return Category.assocLevelsArray(levelsUpdated)(category)
   })
 
 /**
@@ -246,8 +239,8 @@ module.exports = {
   insertLevel,
   insertItem,
   insertItems,
-  createImportSummary: CategoryImportCSVParser.createImportSummary,
-  createImportSummaryFromStream: CategoryImportCSVParser.createImportSummaryFromStream,
+  createImportSummary: CategoryImportSummaryGenerator.createImportSummary,
+  createImportSummaryFromStream: CategoryImportSummaryGenerator.createImportSummaryFromStream,
 
   //READ
   fetchCategoriesAndLevelsBySurveyId: CategoryRepository.fetchCategoriesAndLevelsBySurveyId,
@@ -265,7 +258,7 @@ module.exports = {
   //DELETE
   deleteCategory,
   deleteLevel,
-  deleteLevelsFromIndex,
+  deleteLevelsEmptyByCategory,
   deleteItem,
 
   //UTILS

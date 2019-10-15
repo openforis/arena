@@ -6,6 +6,7 @@ const { selectDate } = require('../../../db/dbUtils')
 
 const User = require('../../../../core/user/user')
 const Survey = require('../../../../core/survey/survey')
+const NodeDef = require('../../../../core/survey/nodeDef')
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? alias + '.' : ''
@@ -140,18 +141,20 @@ const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client =
 const deleteSurvey = async (id, client = db) =>
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
 
-const deleteSurveyLabel = async (id, langCode, client = db) =>
-  await deleteSurveyProp(id, ['labels', langCode], client)
+const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
+  const propsUpdateCond = R.pipe(
+    R.map(langCode => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'` ),
+    R.join(' ')
+  )(langCodes)
 
-const deleteSurveyDescription = async (id, langCode, client = db) =>
-  await deleteSurveyProp(id, ['descriptions', langCode], client)
-
-const deleteSurveyProp = async (id, deletePath, client = db) =>
   await client.none(`
     UPDATE survey 
-    SET props = props #- '{${deletePath.join(',')}}'
-    WHERE id = $1`,
-    [id])
+    SET props = props ${propsUpdateCond}
+    WHERE id = $1
+  `,
+    [id]
+  )
+}
 
 const dropSurveySchema = async (id, client = db) =>
   await client.query(`DROP SCHEMA IF EXISTS ${getSurveyDBSchema(id)} CASCADE`)
@@ -175,7 +178,6 @@ module.exports = {
 
   //DELETE
   deleteSurvey,
-  deleteSurveyLabel,
-  deleteSurveyDescription,
+  deleteSurveyLabelsAndDescriptions,
   dropSurveySchema
 }
