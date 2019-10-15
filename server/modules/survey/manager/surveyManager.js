@@ -191,16 +191,12 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
   })
 
 const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
-  await client.tx(async t => (await Promise.all([
-    SurveyRepository.publishSurveyProps(surveyId, t),
-    ...R.pipe(
-      R.map(langDeleted => ([
-        SurveyRepository.deleteSurveyLabel(surveyId, langDeleted, t),
-        SurveyRepository.deleteSurveyDescription(surveyId, langDeleted, t)
-      ])),
-      R.flatten
-    )(langsDeleted)
-  ]))[0])
+  client.tx(async t => {
+    const surveyUpdated = SurveyRepository.publishSurveyProps(surveyId, t)
+    if (!R.isEmpty(langsDeleted))
+      await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
+    return surveyUpdated
+  })
 
 // ====== DELETE
 const deleteSurvey = async surveyId => await db.tx(async t =>
