@@ -204,7 +204,7 @@ class CategoryImportJob extends Job {
       }
       : CategoryItem.newItem(
         CategoryLevel.getUuid(level),
-        this._getParentItemUuid(itemCodes, CategoryLevel.getIndex(level)),
+        this._getParentItemUuid(itemCodes),
         itemProps
       )
   }
@@ -255,9 +255,9 @@ class CategoryImportJob extends Job {
     return this.itemsByCodes[String(itemCodes)]
   }
 
-  _getParentItemUuid (codes, levelIndex) {
-    if (levelIndex > 0) {
-      const itemParent = this._getItemCachedByCodes(codes.slice(0, levelIndex))
+  _getParentItemUuid (itemCodes) {
+    if (itemCodes.length > 1) {
+      const itemParent = this._getItemCachedByCodes(itemCodes.slice(0, itemCodes.length - 1))
       return CategoryItem.getUuid(itemParent)
     } else {
       return null
