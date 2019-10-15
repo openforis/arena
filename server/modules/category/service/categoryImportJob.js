@@ -21,10 +21,8 @@ class CategoryImportJob extends Job {
     super(type, params)
 
     this.itemsByCodes = {} // cache of category items by ancestor codes
-    this.itemInMostSpecificLevelByCodes = {} // indexed object of booleans (true if item is in the deepest level)
     this.summary = null
     this.category = null
-    this.levelIndexDeepest = 0 // used to remove unused levels
   }
 
   async onStart () {
@@ -164,49 +162,49 @@ class CategoryImportJob extends Job {
     const levels = Category.getLevelsArray(this.category)
 
     if (this._checkCodesNotEmpty(codes)) {
-      this.levelIndexDeepest = Math.max(this.levelIndexDeepest, levelIndexItem)
-
       // for each level insert an item or replace its props if already parsed
       for (let levelIndex = 0; levelIndex <= levelIndexItem; levelIndex++) {
         const level = levels[levelIndex]
+        const lastLevel = levelIndex === levelIndexItem
+        const itemCodes = codes.slice(0, levelIndex + 1)
+        const itemCodeKey = String(itemCodes)
+        const itemCached = this._getItemCachedByCodes(itemCodes)
 
-        const codesLevel = codes.slice(0, levelIndex + 1)
-
-        const itemAlreadyParsed = this.itemsByCodes[codesLevel]
-
-        const mostSpecificLevel = levelIndex === levelIndexItem
-
-        if (itemAlreadyParsed && this.itemInMostSpecificLevelByCodes[codesLevel] && mostSpecificLevel) {
-          this._addErrorCodeDuplicate(levelIndex, codesLevel)
+        if (itemCached && lastLevel && !itemCached.placeholder) {
+          this._addErrorCodeDuplicate(levelIndex, itemCodeKey)
         } else {
-          this.itemsByCodes[codesLevel] = this._getOrCreateItem(level, levelIndex, codesLevel, labelsByLevel, descriptionsByLevel, extra, itemAlreadyParsed)
-          if (mostSpecificLevel)
-            this.itemInMostSpecificLevelByCodes[codesLevel] = true
+          const item = this._getOrCreateItem(level, itemCodes, labelsByLevel, descriptionsByLevel, extra)
+          if (!lastLevel) {
+            item.placeholder = true
+          }
+          this.itemsByCodes[itemCodeKey] = item
         }
       }
     }
     this.incrementProcessedItems()
   }
 
-  _getOrCreateItem (level, levelIndex, codesLevel, labelsByLevel, descriptionsByLevel, extra, itemAlreadyParsed) {
+  _getOrCreateItem (level, itemCodes, labelsByLevel, descriptionsByLevel, extra) {
     const levelName = CategoryLevel.getName(level)
 
     const itemProps = {
-      [CategoryItem.props.code]: codesLevel[codesLevel.length - 1]
+      [CategoryItem.props.code]: itemCodes[itemCodes.length - 1]
     }
     ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
     ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
     ObjectUtils.setInPath([CategoryItem.props.extra], this.extractItemExtraProps(extra), false)(itemProps)
 
-    return itemAlreadyParsed
+    const itemCached = this._getItemCachedByCodes(itemCodes)
+
+    return itemCached
       ? {
-        ...itemAlreadyParsed,
+        ...itemCached,
         //override already inserted item props
         [CategoryItem.keys.props]: itemProps
       }
       : CategoryItem.newItem(
         CategoryLevel.getUuid(level),
-        this._getParentItemUuid(codesLevel, levelIndex),
+        this._getParentItemUuid(itemCodes, CategoryLevel.getIndex(level)),
         itemProps
       )
   }
@@ -253,10 +251,13 @@ class CategoryImportJob extends Job {
     })
   }
 
+  _getItemCachedByCodes (itemCodes) {
+    return this.itemsByCodes[String(itemCodes)]
+  }
+
   _getParentItemUuid (codes, levelIndex) {
     if (levelIndex > 0) {
-      const codesParent = codes.slice(0, levelIndex)
-      const itemParent = this.itemsByCodes[codesParent]
+      const itemParent = this._getItemCachedByCodes(codes.slice(0, levelIndex))
       return CategoryItem.getUuid(itemParent)
     } else {
       return null

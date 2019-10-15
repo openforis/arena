@@ -223,6 +223,22 @@ const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
     [categoryUuid]
   )
 
+const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) =>
+  await client.map(`
+      DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level l
+      WHERE 
+        l.category_uuid = $1
+        AND NOT EXISTS (
+          SELECT i.uuid 
+          FROM ${getSurveyDBSchema(surveyId)}.category_item i
+          WHERE i.level_uuid = l.uuid
+        )
+      RETURNING l.uuid
+    `,
+    [categoryUuid],
+    R.prop('uuid')
+  )
+
 const deleteItem = async (surveyId, itemUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
 
@@ -255,6 +271,7 @@ module.exports = {
   deleteCategory,
   deleteLevel,
   deleteLevelsByCategory,
+  deleteLevelsEmptyByCategory,
   deleteItem,
 
   deleteItemLabels,
