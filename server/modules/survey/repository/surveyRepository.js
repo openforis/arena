@@ -142,10 +142,8 @@ const deleteSurvey = async (id, client = db) =>
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
 
 const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
-  const propsToDelete = [NodeDef.propKeys.labels, NodeDef.propKeys.descriptions]
   const propsUpdateCond = R.pipe(
-    R.map(langCode => R.map(propName => `#- '{${propName},${langCode}}'`)(propsToDelete)),
-    R.flatten,
+    R.map(langCode => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'` ),
     R.join(' ')
   )(langCodes)
 
