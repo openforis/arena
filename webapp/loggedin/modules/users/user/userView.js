@@ -123,6 +123,7 @@ const UserView = props => {
 const mapStateToProps = (state, { match }) => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
+  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   lang: AppState.getLang(state),
   userUuid: getUrlParam('userUuid')(match),
 })

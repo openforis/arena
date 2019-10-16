@@ -20,7 +20,7 @@ const Mailer = require('../../../utils/mailer')
 
 // ====== CREATE
 
-const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
+const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serverUrl) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -64,7 +64,7 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
         // add user to cognito pool
         const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
         // add user to db
-        await UserManager.insertUser(user, surveyId, userUuid, email, groupUuid, t)
+        await UserManager.insertUser(user, surveyId, surveyCycleKey, userUuid, email, groupUuid, t)
         // send email
         const msgParams = {
           serverUrl,

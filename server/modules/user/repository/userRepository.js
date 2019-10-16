@@ -13,12 +13,12 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // CREATE
 
-const insertUser = async (surveyId, uuid, email, client = db) =>
+const insertUser = async (surveyId, surveyCycleKey, uuid, email, client = db) =>
   await client.one(`
     INSERT INTO "user" AS u (uuid, email, prefs)
     VALUES ($1, $2, $3::jsonb)
     RETURNING ${selectFieldsCommaSep}`,
-    [uuid, email, { survey: surveyId }],
+    [uuid, email, User.newPrefs(surveyId, surveyCycleKey)],
     camelize)
 
 // READ
