@@ -45,6 +45,7 @@ const type = {
 
   // user
   userInvite: 'userInvite',
+  userInviteAccept: 'userInviteAccept',
   userUpdate: 'userUpdate',
   userRemove: 'userRemove',
 

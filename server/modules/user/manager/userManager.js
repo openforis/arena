@@ -98,6 +98,18 @@ const updateUserPrefs = async user => ({
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
 })
 
+const acceptInvitation = async (user, name, client = db) =>
+  await client.tx(async t => {
+    const userUpdated = await UserRepository.updateUsername(user, name, t)
+    const groups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
+    await Promise.all(
+      groups.map(group =>
+        ActivityLog.log(user, AuthGroups.getSurveyId(group), ActivityLog.type.userInviteAccept, { groupUuid: AuthGroups.getUuid(group) }, t)
+      )
+    )
+    return userUpdated
+  })
+
 module.exports = {
   // CREATE
   insertUser,
@@ -113,6 +125,7 @@ module.exports = {
   // UPDATE
   updateUser,
   updateUsername: UserRepository.updateUsername,
+  acceptInvitation,
   updateUserPrefs,
   resetUsersPrefsSurveyCycle: UserRepository.resetUsersPrefsSurveyCycle,
 
