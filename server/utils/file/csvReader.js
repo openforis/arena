@@ -5,25 +5,38 @@ const Queue = require('../../../core/queue')
 
 const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
-  let headers = null
-  let total = 0
   let canceled = false
   const queue = new Queue()
 
   const start = () => new Promise((resolve, reject) => {
     let started = false
     let ended = false
+    let headers = null
+    let total = 0
+    let processingRow = false //prevents the call to processNext when a row is already being processed
 
     const processNext = () => {
-      (async () => {
-        if (queue.isEmpty()) {
-          if (ended)
-            resolve()
-        } else if (!canceled) {
-          onRow && await onRow(queue.dequeue())
+      if (queue.isEmpty()) {
+        if (ended)
+          resolve()
+      } else if (!canceled) {
+        if (onRow) {
+          processingRow = true
+          onRow(queue.dequeue())
+            .then(() => {
+              processNext()
+            })
+            .catch(e => {
+              cancel()
+              reject(e)
+            })
+            .finally(() => {
+              processingRow = false
+            })
+        } else {
           processNext()
         }
-      })()
+      }
     }
 
     const onData = data => {
@@ -35,7 +48,7 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
         queue.enqueue(data)
         onTotalChange && onTotalChange(++total)
 
-        if (!started || wasEmpty) {
+        if (!started || wasEmpty && !processingRow) {
           started = true
           processNext()
         }
