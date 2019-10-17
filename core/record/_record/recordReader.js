@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Queue = require('../../queue')
+const ObjectUtils = require('../../objectUtils')
 
 const SurveyNodeDefs = require('../../survey/_survey/surveyNodeDefs')
 const SurveyDependencies = require('../../survey/_survey/surveyDependencies')
@@ -54,6 +55,11 @@ const getNodeSiblingsAndSelf = node => record => R.pipe(
   getParentNode(node),
   parentNode => getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
 )(record)
+
+const getNodeSiblings = node => R.pipe(
+  getNodeSiblingsAndSelf(node),
+  R.reject(ObjectUtils.isEqual(node))
+)
 
 // descendants
 const getNodeChildren = node => record => R.pipe(
@@ -227,6 +233,7 @@ module.exports = {
   getAncestorByNodeDefUuid,
 
   // siblings
+  getNodeSiblings,
   getNodeSiblingsAndSelf,
 
   // descendants
