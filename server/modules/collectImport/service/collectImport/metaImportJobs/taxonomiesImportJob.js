@@ -3,6 +3,7 @@ const R = require('ramda')
 const Taxonomy = require('../../../../../../core/survey/taxonomy')
 const Taxon = require('../../../../../../core/survey/taxon')
 const Validation = require('../../../../../../core/validation/validation')
+const ObjectUtils = require('../../../../../../core/objectUtils')
 const { languageCodesISO636_2 } = require('../../../../../../core/app/languages')
 
 const Job = require('../../../../../job/job')
@@ -101,7 +102,7 @@ class TaxonomiesImportJob extends Job {
   }
 
   async onRow (speciesFileName, taxonomyUuid, row, tx) {
-    const rowIndexed = this._indexRowByHeaders(row)
+    const rowIndexed = ObjectUtils.indexByProps(this.headers)(row)
 
     if (this.validateRow(speciesFileName, rowIndexed)) {
       const { code, family, scientific_name: scientificName } = rowIndexed
@@ -164,15 +165,6 @@ class TaxonomiesImportJob extends Job {
     }
 
     return !(rowDuplicateCode || rowDuplicateScientificName)
-  }
-
-  _indexRowByHeaders (row) {
-    return this.headers.reduce((acc, header, index) => {
-        acc[header] = row[index]
-        return acc
-      },
-      {}
-    )
   }
 }
 
