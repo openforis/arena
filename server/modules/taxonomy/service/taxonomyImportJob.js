@@ -78,11 +78,11 @@ class TaxonomyImportJob extends Job {
     // 4. finalize import
     if (this.isRunning()) {
       if (this.hasErrors()) {
-        this.logDebug('no errors found, finalizing import')
-        await this.taxonomyImportManager.finalizeImport(this.taxonomy, this.tx)
-      } else {
         this.logDebug(`${R.keys(this.errors).length} errors found`)
         await this.setStatusFailed()
+      } else {
+        this.logDebug('no errors found, finalizing import')
+        await this.taxonomyImportManager.finalizeImport(this.taxonomy, this.tx)
       }
     }
   }
