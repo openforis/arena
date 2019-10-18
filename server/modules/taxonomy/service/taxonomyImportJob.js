@@ -47,7 +47,7 @@ class TaxonomyImportJob extends Job {
   async execute (tx) {
     const { surveyId, taxonomyUuid } = this
 
-    this.logDebug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
+    this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
     // 1. load taxonomy and check it has not published
 
@@ -63,8 +63,6 @@ class TaxonomyImportJob extends Job {
 
     // 3. start CSV row parsing
     this.logDebug('start CSV file parsing')
-
-    this.processed = 0
 
     this.csvReader = await (CSVReader.createReaderFromFile(
       this.filePath,

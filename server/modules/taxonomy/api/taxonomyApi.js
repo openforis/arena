@@ -80,20 +80,21 @@ module.exports.init = app => {
         includeUnlUnk = false
       } = Request.getParams(req)
 
-      let taxa
+      let list
       if (filterProp) {
         if (filterProp === Taxon.keys.vernacularName) {
-          taxa = await TaxonomyService.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+          list = await TaxonomyService.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         } else if (filterProp === Taxon.propKeys.code) {
-          taxa = await TaxonomyService.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+          list = await TaxonomyService.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         } else {
-          taxa = await TaxonomyService.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+          list = await TaxonomyService.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         }
       } else {
-        taxa = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
+        const { taxa } = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
+        list = taxa
       }
 
-      res.json({ list: taxa })
+      res.json({ list })
     } catch (err) {
       next(err)
     }
