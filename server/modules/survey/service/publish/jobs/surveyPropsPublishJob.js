@@ -52,7 +52,7 @@ class SurveyPropsPublishJob extends Job {
     const surveyInfo = await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
     this.incrementProcessedItems()
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPublish, { surveyUuid: Survey.getUuid(surveyInfo) }, tx)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPublish, { uuid: Survey.getUuid(surveyInfo) }, tx)
     this.incrementProcessedItems()
   }
 

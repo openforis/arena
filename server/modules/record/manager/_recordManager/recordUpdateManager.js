@@ -59,7 +59,7 @@ const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
 //==== DELETE
 const deleteRecord = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { recordUuid }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { uuid: recordUuid }, t)
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
   })
 

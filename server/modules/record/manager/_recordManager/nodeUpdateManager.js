@@ -151,7 +151,7 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   record = Record.assocNode(node)(record)
 
   if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { uuid: nodeUuid }, t)
 
   return await _onNodeUpdate(survey, record, node, t)
 }

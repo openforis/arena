@@ -88,7 +88,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
       : []
 
     const logContent = {
-      nodeDefUuid,
+      uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced })
     }
@@ -124,7 +124,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { nodeDefUuid }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { uuid: nodeDefUuid }, t)
 
     return nodeDef
   })

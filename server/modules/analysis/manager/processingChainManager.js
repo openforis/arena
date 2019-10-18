@@ -16,13 +16,13 @@ const createChain = async (user, surveyId, cycle, client = db) =>
 const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate, { processingChainUuid, key, value }, t)
+    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate, { uuid: processingChainUuid, key, value }, t)
   ]))
 
 const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainDelete, { processingChainUuid }, t)
+    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainDelete, { uuid: processingChainUuid }, t)
   ]))
 
 module.exports = {

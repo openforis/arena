@@ -22,7 +22,7 @@ const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db)
       user,
       surveyId,
       ActivityLog.type.userInvite,
-      { groupUuid, uuid: User.getUuid(userToAdd) },
+      { uuid: User.getUuid(userToAdd), groupUuid },
       t
     )
   })
@@ -74,7 +74,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
       user,
       surveyId,
       ActivityLog.type.userUpdate,
-      { userUuid, name, email, groupUuid },
+      { uuid: userUuid, name, email, groupUuid },
       t
     )
 
@@ -89,7 +89,7 @@ const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await Promise.all([
     AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
     ActivityLog.log(
-      user, surveyId, ActivityLog.type.userRemove, { userUuid: userUuidToRemove }, client
+      user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, client
     )
   ])
 
@@ -104,7 +104,13 @@ const acceptInvitation = async (user, name, client = db) =>
     const groups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
     await Promise.all(
       groups.map(group =>
-        ActivityLog.log(user, AuthGroups.getSurveyId(group), ActivityLog.type.userInviteAccept, { groupUuid: AuthGroups.getUuid(group) }, t)
+        ActivityLog.log(
+          user,
+          AuthGroups.getSurveyId(group),
+          ActivityLog.type.userInviteAccept,
+          { uuid: User.getUuid(user), groupUuid: AuthGroups.getUuid(group) },
+          t
+        )
       )
     )
     return userUpdated

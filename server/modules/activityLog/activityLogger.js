@@ -60,7 +60,7 @@ const keys = {
   content: 'content'
 }
 
-const newItem = (type, content) => ({
+const newActivity = (type, content) => ({
   [keys.type]: type,
   [keys.content]: content
 })
@@ -84,7 +84,7 @@ module.exports = {
   keys,
 
   // CREATE
-  newItem,
+  newActivity,
   log,
   logMany,
 
