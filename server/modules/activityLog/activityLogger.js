@@ -60,6 +60,11 @@ const keys = {
   content: 'content'
 }
 
+const newItem = (type, content) => ({
+  [keys.type]: type,
+  [keys.content]: content
+})
+
 const log = async (user, surveyId, type, content, client) =>
   client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content)
@@ -79,6 +84,7 @@ module.exports = {
   keys,
 
   // CREATE
+  newItem,
   log,
   logMany,
 

@@ -85,10 +85,8 @@ const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) 
  */
 const insertItems = async (user, surveyId, items, client = db) =>
   await client.tx(async t => {
-    const activityLogs = items.map(item => ({
-        type: ActivityLog.type.categoryItemInsert,
-        params: item
-      })
+    const activityLogs = items.map(
+      item => ActivityLog.newItem(ActivityLog.type.categoryItemInsert, item)
     )
     await Promise.all([
       CategoryRepository.insertItems(surveyId, items, t),

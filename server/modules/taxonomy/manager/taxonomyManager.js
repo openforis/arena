@@ -30,10 +30,7 @@ const insertTaxa = async (surveyId, taxa, user, client = db) =>
     ActivityLog.logMany(
       user,
       surveyId,
-      taxa.map(taxon => ({
-        type: ActivityLog.type.taxonInsert,
-        params: taxon,
-      })),
+      taxa.map(taxon => ActivityLog.newItem(ActivityLog.type.taxonInsert, taxon)),
       t
     )
   ]))
