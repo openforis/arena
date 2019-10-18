@@ -57,18 +57,18 @@ const type = {
 
 const keys = {
   type: 'type',
-  params: 'params'
+  content: 'content'
 }
 
-const log = async (user, surveyId, type, params, client) =>
+const log = async (user, surveyId, type, content, client) =>
   client.none(`
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, params)
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content)
     VALUES ($1, $2, $3::jsonb)`,
-    [type, User.getUuid(user), params])
+    [type, User.getUuid(user), content])
 
 const logMany = async (user, surveyId, activities, client) =>
   await client.batch([
-    activities.map(activity => log(user, surveyId, activity.type, activity.params, client))
+    activities.map(activity => log(user, surveyId, activity[keys.type], activity[keys.content], client))
   ])
 
 const fetchLogs = async (surveyId, client = db) =>
