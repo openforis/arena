@@ -10,7 +10,7 @@ const TaxaTableRow = props => {
       <div>{row.code}</div>
       <div>{row.family}</div>
       <div>{row.genus}</div>
-      <div>{row.scientificName}</div>
+      <div>{row.scientific_name}</div>
       {
         vernacularLanguageCodes.map(lang =>
           <div key={`vernacular_name_${row.uuid}_${lang}`}>

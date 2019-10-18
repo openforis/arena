@@ -139,7 +139,7 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, vernacularLa
 
   return queryStream
     ? new DbUtils.QueryStream(DbUtils.formatQuery(select, params))
-    : await client.map(select, params, record => dbTransformCallback(record, draft, true))
+    : await client.any(select, params)
 }
 
 const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
