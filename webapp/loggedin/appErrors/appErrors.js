@@ -3,6 +3,7 @@ import './appErrors.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
+import { i18nMarkdownToText } from '../../utils/markdown'
 
 import * as R from 'ramda'
 
@@ -11,8 +12,6 @@ import { useI18n } from '../../commonComponents/hooks'
 import * as AppState from '../../app/appState'
 
 import { closeAppError } from '../../app/actions'
-
-import Markdown from 'react-remarkable'
 
 const AppError = ({ error, closeAppError }) => {
 
@@ -31,9 +30,7 @@ const AppError = ({ error, closeAppError }) => {
         ERROR {R.path(['response', 'status'], error)}
       </div>
       <div className="message">
-        <Markdown options={{ html: false }}>
-          {i18n.t(key, params)}
-        </Markdown>
+        {i18nMarkdownToText(i18n, key, params)}
       </div>
     </div>
   )
