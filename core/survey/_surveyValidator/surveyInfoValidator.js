@@ -9,6 +9,43 @@ const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
     : null
 }
 
+const validateCycles = (propName, nodeDef) => {
+  const cycles = R.path(propName.split('.'), nodeDef)
+  if (cycles.length === 0 )
+    return { key: Validation.messageKeys.surveyInfoEdit.cyclesRequired }
+  if (cycles.length > 10 )
+    return { key: Validation.messageKeys.surveyInfoEdit.tooManyCycles }
+
+  for (const [_key, {dateStart, dateEnd}] of Object.entries(cycles)) {
+    // Maybe use `_key` to indicate which cycle is invalid?
+    if (dateStart && isNaN(Date.parse(dateStart)))
+      return { key: Validation.messageKeys.invalidDate }
+    if (dateEnd && isNaN(Date.parse(dateEnd)))
+      return { key: Validation.messageKeys.invalidDate }
+    if (!dateStart)
+      return { key: Validation.messageKeys.surveyInfoEdit.startDateRequired }
+    if (dateEnd && dateStart > dateEnd)
+      return { key: Validation.messageKeys.surveyInfoEdit.startDateAfterEndDate }
+  }
+
+  const cs = Object.values(cycles)
+
+  // Cycles must have an end date unless it's the last cycle:
+  const missingEndDates = cs.slice(0, -1).filter(x => !x.dateEnd)
+  if (missingEndDates.length > 0)
+    return { key: Validation.messageKeys.surveyInfoEdit.endDateRequiredExceptForLastCycle }
+
+  // Cycles must not overlap
+  const overlappingDates =
+    R.zip(cs, cs.slice(1))
+    .filter(([prev, cur]) => !prev.dateEnd || (cur.dateStart <= prev.dateEnd))
+
+  if (overlappingDates.length > 0)
+    return { key: Validation.messageKeys.surveyInfoEdit.previousCycleMustEndBeforeNextCycle }
+
+  return null
+}
+
 const validateNewSurvey = async (survey, surveyInfos) => await Validator.validate(
   survey,
   {
@@ -29,6 +66,7 @@ const validateSurveyInfo = async (surveyInfo, surveyInfos) => await Validator.va
       Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       validateSurveyNameUniqueness(surveyInfos)
     ],
+    'props.cycles': [validateCycles],
     'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
     'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
   }

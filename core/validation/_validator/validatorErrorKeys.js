@@ -1,6 +1,7 @@
 module.exports = {
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
+  invalidDate: 'validationErrors.invalidDate',
   nameDuplicate: 'validationErrors.nameDuplicate',
   nameCannotBeKeyword: 'validationErrors.nameCannotBeKeyword',
   nameRequired: 'validationErrors.nameRequired',
@@ -66,6 +67,12 @@ module.exports = {
   surveyInfoEdit: {
     langRequired: 'validationErrors.surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors.surveyInfoEdit.srsRequired',
+    cyclesRequired: 'validationErrors.surveyInfoEdit.cyclesRequired',
+    tooManyCycles: 'validationErrors.surveyInfoEdit.tooManyCycles',
+    startDateRequired: 'validationErrors.surveyInfoEdit.startDateRequired',
+    startDateAfterEndDate: 'validationErrors.surveyInfoEdit.startDateAfterEndDate',
+    endDateRequiredExceptForLastCycle: 'validationErrors.surveyInfoEdit.endDateRequiredExceptForLastCycle',
+    previousCycleMustEndBeforeNextCycle: 'validationErrors.surveyInfoEdit.previousCycleMustEndBeforeNextCycle',
   },
 
   taxonomyEdit: {
