@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const { uuidv4 } = require('../uuid')
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import { uuidv4 } from '../uuid';
+import ObjectUtils from '../objectUtils';
 
 const keys = {
   published: 'published'
@@ -18,7 +17,7 @@ const newTaxonomy = (props = {}) => ({
   [ObjectUtils.keys.props]: props,
 })
 
-module.exports = {
+export default {
   keysProps,
 
   //CREATE
@@ -29,4 +28,4 @@ module.exports = {
   getName: ObjectUtils.getProp(keysProps.name, ''),
   getVernacularLanguageCodes: ObjectUtils.getProp(keysProps.vernacularLanguageCodes, []),
   isPublished: R.propOr(false, keys.published)
-}
+};

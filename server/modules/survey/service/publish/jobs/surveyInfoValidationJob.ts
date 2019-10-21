@@ -1,13 +1,14 @@
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job';
 
-const Validation = require('../../../../../../core/validation/validation')
-const Survey = require('../../../../../../core/survey/survey')
+import Validation from '../../../../../../core/validation/validation';
+import Survey from '../../../../../../core/survey/survey';
 
-const SurveyManager = require('../../../manager/surveyManager')
+import SurveyManager from '../../../manager/surveyManager';
 
-class SurveyInfoValidationJob extends Job {
+export default class SurveyInfoValidationJob extends Job {
+  static type: string = 'SurveyInfoValidationJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(SurveyInfoValidationJob.type, params)
   }
 
@@ -22,7 +23,3 @@ class SurveyInfoValidationJob extends Job {
     }
   }
 }
-
-SurveyInfoValidationJob.type = 'SurveyInfoValidationJob'
-
-module.exports = SurveyInfoValidationJob

@@ -1,29 +1,29 @@
-const util = require('util')
-const R = require('ramda')
+import util from 'util'
+import * as R from 'ramda'
 
-const { uuidv4 } = require('../../../../../../core/uuid')
-const StringUtils = require('../../../../../../core/stringUtils')
-const ObjectUtils = require('../../../../../../core/objectUtils')
+import {uuidv4} from '../../../../../../core/uuid'
+import StringUtils from '../../../../../../core/stringUtils'
+import ObjectUtils from '../../../../../../core/objectUtils'
 
-const Survey = require('../../../../../../core/survey/survey')
-const NodeDef = require('../../../../../../core/survey/nodeDef')
-const NodeDefValidations = require('../../../../../../core/survey/nodeDefValidations')
-const NodeDefExpression = require('../../../../../../core/survey/nodeDefExpression')
-const NodeDefLayout = require('../../../../../../core/survey/nodeDefLayout')
+import Survey from '../../../../../../core/survey/survey'
+import NodeDef from '../../../../../../core/survey/nodeDef'
+import NodeDefValidations from '../../../../../../core/survey/nodeDefValidations'
+import NodeDefExpression from '../../../../../../core/survey/nodeDefExpression'
+import NodeDefLayout from '../../../../../../core/survey/nodeDefLayout'
 const { nodeDefType } = NodeDef
-const Category = require('../../../../../../core/survey/category')
-const Taxonomy = require('../../../../../../core/survey/taxonomy')
-const CollectImportReportItem = require('../../../../../../core/survey/collectImportReportItem')
-const Validator = require('../../../../../../core/validation/validator')
+import Category from '../../../../../../core/survey/category'
+import Taxonomy from '../../../../../../core/survey/taxonomy'
+import CollectImportReportItem from '../../../../../../core/survey/collectImportReportItem'
+import Validator from '../../../../../../core/validation/validator'
 
-const Job = require('../../../../../job/job')
-const SamplingPointDataImportJob = require('./samplingPointDataImportJob')
-const CollectImportJobContext = require('../collectImportJobContext')
+import Job from '../../../../../job/job'
+import SamplingPointDataImportJob from './samplingPointDataImportJob'
+import CollectImportJobContext from '../collectImportJobContext'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
-const CollectImportReportManager = require('../../../manager/collectImportReportManager')
-const CollectSurvey = require('../model/collectSurvey')
+import SurveyManager from '../../../../survey/manager/surveyManager'
+import NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
+import CollectImportReportManager from '../../../manager/collectImportReportManager'
+import CollectSurvey from '../model/collectSurvey'
 
 const qualifiableItemApplicableExpressionFormat = `this.node('%s').getValue().props.code === '%s'`
 const specifyAttributeSuffix = 'specify'
@@ -64,9 +64,15 @@ const checkExpressionParserByType = {
   }
 }
 
-class NodeDefsImportJob extends Job {
+export default class NodeDefsImportJob extends Job {
+	nodeDefs: {};
+  static type: string = 'NodeDefsImportJob'
+  nodeDefNames: any[]
+  nodeDefsInfoByCollectPath: {}
+  issuesCount: number
+  context: any
 
-  constructor (params) {
+  constructor (params?) {
     super(NodeDefsImportJob.type, params)
 
     this.nodeDefs = {} //node definitions by uuid
@@ -290,7 +296,10 @@ class NodeDefsImportJob extends Job {
       const { value, expr, applyIf } = CollectSurvey.getAttributes(collectDefaultValue)
       if (StringUtils.isNotBlank(expr) || StringUtils.isNotBlank(applyIf)) {
         const messages = CollectSurvey.toLabels('messages', defaultLanguage)(collectDefaultValue)
-        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expr, applyIf, messages, tx)
+        // XXX: defaultValue does not exist! This was here previously:
+        // const defaultValue = CollectImportReportItem.exprTypes.defaultValue
+        const defaultValue = null
+        await this.addNodeDefImportIssue(nodeDefUuid, defaultValue, expr, applyIf, messages, tx)
       } else if (StringUtils.isNotBlank(value)) {
         defaultValues.push({
           [ObjectUtils.keys.uuid]: uuidv4(),
@@ -376,7 +385,9 @@ class NodeDefsImportJob extends Job {
       const nodeDefName = NodeDef.getName(nodeDef)
       const props = {
         [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, `${nodeDefName}_${itemCode}`),
-        [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)(NodeDef.getLabels())
+        // XXX: The last expression in place of {} was NodeDef.getLabels().
+        // But getLabels requires labels, so it always returned {}!
+        [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)({})
       }
       const qualifierNodeDefParam = this._createNodeDef(parentNodeDef, nodeDefType.text, props)
       const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, tx)
@@ -420,7 +431,10 @@ class NodeDefsImportJob extends Job {
   }
 
   async _getCodeParentUuid (nodeDef, parentPath, collectNodeDef) {
-    const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
+    const collectCodeParentExpr: string | null = NodeDef.nodeDefType.code
+      ? CollectSurvey.getAttribute('parent')(collectNodeDef) as string
+      : null
+
     if (collectCodeParentExpr) {
       const collectNodeDefParentPathParts = parentPath.split('/')
       const codeParentExprParts = collectCodeParentExpr.split('/')
@@ -474,7 +488,3 @@ const determineNodeDefPageUuid = (type, collectNodeDef) => {
     return null
   }
 }
-
-NodeDefsImportJob.type = 'NodeDefsImportJob'
-
-module.exports = NodeDefsImportJob

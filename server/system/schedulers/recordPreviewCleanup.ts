@@ -1,8 +1,10 @@
-const schedule = require('node-schedule')
+import schedule from 'node-schedule';
 
-const Logger = require('../../log/log').getLogger('RecordPreviewCleanup')
+import {getLogger} from '../../log/log'
 
-const RecordService = require('../../modules/record/service/recordService')
+import RecordService from '../../modules/record/service/recordService';
+
+const Logger = getLogger('RecordPreviewCleanup')
 
 const initSchedule = () =>
   schedule.scheduleJob('0 0 * * *', async () => {
@@ -29,6 +31,6 @@ const init = async () => {
   initSchedule()
 }
 
-module.exports = {
+export default {
   init
-}
+};

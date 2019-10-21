@@ -1,13 +1,12 @@
-const Request = require('../../../utils/request')
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import Request from '../../../utils/request';
+import * as AuthMiddleware from '../../auth/authApiMiddleware';
+import Survey from '../../../../core/survey/survey';
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef';
+import SurveyService from '../../survey/service/surveyService';
+import NodeDefService from '../service/nodeDefService';
+import {SurveyCycleKey} from '../../../../core/survey/_survey/surveyInfo'
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-
-const SurveyService = require('../../survey/service/surveyService')
-const NodeDefService = require('../service/nodeDefService')
-
-const sendRespNodeDefs = async (res, surveyId, cycle, sendNodeDefs = false, draft = true, advanced = true, validate = true, nodeDefsUpdated = null) => {
+const sendRespNodeDefs = async (res, surveyId, cycle: SurveyCycleKey, sendNodeDefs = false, draft = true, advanced = true, validate = true, nodeDefsUpdated = null) => {
   const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate)
 
   res.json({
@@ -17,13 +16,13 @@ const sendRespNodeDefs = async (res, surveyId, cycle, sendNodeDefs = false, draf
   })
 }
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== CREATE
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const nodeDefRequest = Request.getBody(req)
+      const nodeDefRequest = Request.getBody(req) as INodeDef
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
@@ -85,4 +84,4 @@ module.exports.init = app => {
       next(err)
     }
   })
-}
+};

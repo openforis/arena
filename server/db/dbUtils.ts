@@ -1,13 +1,14 @@
-const R = require('ramda')
-const pgp = require('pg-promise')()
-const QueryStream = require('pg-query-stream')
+import * as R from 'ramda';
+import pgpFactory from 'pg-promise';
+const pgp = pgpFactory();
+import QueryStream from 'pg-query-stream';
 
-const selectDate = (field, fieldAlias = null) =>
+export const selectDate = (field, fieldAlias?: string) =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias ? fieldAlias : field}`
 
-const now = `timezone('UTC', now())`
+export const now = `timezone('UTC', now())`
 
-const insertAllQuery = (schema, table, cols, itemsValues) => {
+export const insertAllQuery = (schema, table, cols, itemsValues) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
@@ -31,8 +32,8 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
  *        The first value in every array of values must be the value of the identifier column
  * @returns Generated query string
  */
-const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColName = col => R.propOr(col, 'name', col)
+export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
+  const getColName: (col: string) => string = col => R.propOr(col, 'name', col)
 
   const idColName = getColName(idCol)
   const idColCast = R.propOr('text', 'cast', idCol)
@@ -58,7 +59,7 @@ const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
 /**
  * Combines draft and published props
  */
-const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
+export const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
   draft
     ? `${columnPrefix}props || ${columnPrefix}props_draft${alias ? ` AS ${alias}` : ''}`
     : `${columnPrefix}props${alias ? ` AS ${alias}` : ''}`
@@ -66,17 +67,17 @@ const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
 /**
  * Combines a draft and a published column prop, if needed
  */
-const getPropColCombined = (propName, draft, columnPrefix = '', asText = true) =>
+export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true) =>
   `(${columnPrefix}props${draft ? ` || ${columnPrefix}props_draft` : ''})${asText ? '->>' : '->'}'${propName}'`
 
 /**
  * Generates a filter condition (LIKE) with a named parameter.
  * E.g. "lower(col) LIKE $/searchValue/ where "col" is a json prop column
  */
-const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
+export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
   `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`
 
-module.exports = {
+export default {
   selectDate,
   now,
   insertAllQuery,
@@ -88,5 +89,5 @@ module.exports = {
   getPropFilterCondition,
 
   formatQuery: pgp.as.format,
-  QueryStream
-}
+  QueryStream,
+};

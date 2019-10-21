@@ -1,13 +1,11 @@
-const R = require('ramda')
-
-const StringUtils = require('../stringUtils')
-
-const Survey = require('../survey/survey')
-const NodeDef = require('../survey/nodeDef')
-const NodeDefExpression = require('../survey/nodeDefExpression')
-const Record = require('./record')
-const Node = require('./node')
-const Expression = require('../exprParser/expression')
+import * as R from 'ramda';
+import StringUtils from '../stringUtils';
+import Survey from '../survey/survey';
+import NodeDef from '../survey/nodeDef';
+import NodeDefExpression, { IExpression } from '../survey/nodeDefExpression';
+import Record from './record';
+import Node from './node';
+import Expression from '../exprParser/expression';
 
 const evalNodeQuery = async (survey, record, node, query) => {
   const ctx = {
@@ -94,7 +92,7 @@ const evalApplicableExpressions = async (survey, record, node, expressions, stop
 }
 
 const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = []
+  const applicableExpressions: IExpression[] = []
   for (const expression of expressions) {
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
 
@@ -108,8 +106,8 @@ const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, s
   return applicableExpressions
 }
 
-module.exports = {
+export default {
   evalNodeQuery,
   evalApplicableExpression,
   evalApplicableExpressions,
-}
+};

@@ -14,7 +14,7 @@ export const defaults = {
   sort: [],
 }
 
-const getState = R.pipe(DataVisState.getState, R.prop('query'))
+const getState: (x: any) => any = R.pipe(DataVisState.getState, R.prop('query'))
 
 const keys = {
   table: 'table',
@@ -43,18 +43,18 @@ const getTableProp = (tableProp, defaultValue = null) => R.pipe(
   R.pathOr(defaultValue, [keys.table, tableProp])
 )
 
-export const getTableData = getTableProp(tableKeys.data, [])
-export const getTableOffset = getTableProp(tableKeys.offset)
-export const getTableLimit = getTableProp(tableKeys.limit)
-export const getTableCount = getTableProp(tableKeys.count)
-export const getTableFilter = getTableProp(tableKeys.filter)
-export const getTableSort = getTableProp(tableKeys.sort, [])
-export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
-export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, [])
-export const getTableEditMode = getTableProp(tableKeys.editMode, false)
+export const getTableData: (x: any) => any[] = getTableProp(tableKeys.data, [])
+export const getTableOffset: (x: any) => any = getTableProp(tableKeys.offset)
+export const getTableLimit: (x: any) => any = getTableProp(tableKeys.limit)
+export const getTableCount: (x: any) => any = getTableProp(tableKeys.count)
+export const getTableFilter: (x: any) => any = getTableProp(tableKeys.filter)
+export const getTableSort: (x: any) => any[] = getTableProp(tableKeys.sort, [])
+export const getTableNodeDefUuidTable: (x: any) => any = getTableProp(tableKeys.nodeDefUuidTable)
+export const getTableNodeDefUuidCols: (x: any) => any[] = getTableProp(tableKeys.nodeDefUuidCols, [])
+export const getTableEditMode: (x: any) => boolean = getTableProp(tableKeys.editMode, false)
 
-const hasTable = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
-const hasCols = R.pipe(getTableNodeDefUuidCols, R.isEmpty, R.not)
+const hasTable: (x: any) => boolean = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
+const hasCols: (x: any) => boolean = R.pipe(getTableNodeDefUuidCols, R.isEmpty, R.not)
 export const hasTableAndCols = state => hasTable(state) && hasCols(state)
 
 // on nodeDefUuid table change, reset table data, sort and filter
@@ -141,5 +141,6 @@ export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) => 
 
 // ====== nodeDefSelectors
 
-export const isNodeDefSelectorsVisible = R.pipe(getState, R.propOr(true, keys.showNodeDefSelectors))
-export const assocShowNodeDefSelectors = R.assoc(keys.showNodeDefSelectors)
+export const isNodeDefSelectorsVisible: (x: any) => boolean
+  = R.pipe(getState, R.propOr(true, keys.showNodeDefSelectors)) as (x: any) => boolean
+export const assocShowNodeDefSelectors: (x: any) => any = R.assoc(keys.showNodeDefSelectors)

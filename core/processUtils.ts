@@ -1,13 +1,13 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
 const environments = {
   development: 'development',
   production: 'production',
 }
 
-const getEnvVariable = (variable, defaultValue = null) => R.pathOr(defaultValue, ['env', variable])(process)
+const getEnvVariable = (variable: string, defaultValue?: string) => R.pathOr(defaultValue, ['env', variable])(process)
 
-const ENV = {
+export const ENV = {
   port: getEnvVariable('PORT', '9090'),
   nodeEnv: getEnvVariable('NODE_ENV', environments.development),
   tempFolder: getEnvVariable('TEMP_FOLDER', '/tmp/arena_upload'),
@@ -33,9 +33,9 @@ const ENV = {
   analysisOutputDir: getEnvVariable('ANALYSIS_OUTPUT_DIR'),
 }
 
-const envDevelopment = ENV.nodeEnv === environments.development
+export const envDevelopment = ENV.nodeEnv === environments.development
 
-module.exports = {
+export default {
   ENV,
-  envDevelopment
+  envDevelopment,
 }

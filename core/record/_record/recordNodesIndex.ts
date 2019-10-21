@@ -1,7 +1,7 @@
-const R = require('ramda')
-
-const Node = require('../node')
-const ObjectUtils = require('../../objectUtils')
+import * as R from 'ramda';
+import Node from '../node';
+import ObjectUtils from '../../objectUtils';
+import { IRecord } from '../../../test/it/utils/recordBuilder';
 
 /**
  * Record nodes index.
@@ -53,7 +53,7 @@ const keys = {
 /**
  * Returns the root node uuid
  */
-const getNodeRootUuid = R.prop(keys.nodeRootUuid)
+const getNodeRootUuid: (x: any) => string = R.prop(keys.nodeRootUuid)
 
 /**
  * Returns the list of node uuids having the specified nodeDefUuid
@@ -80,10 +80,10 @@ const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDepende
 /**
  * Adds the specified nodes to the cache
  */
-const addNodes = nodes => record =>
+const addNodes:  <T>(nodes: T[]) => (record: IRecord) => any = <T>(nodes: T[]) => record =>
   R.pipe(
-    R.values,
-    R.reject(Node.isDeleted),
+    R.values as (x: any) => T[],
+    R.reject(Node.isDeleted) as (x: T[]) => T[],
     R.reduce(
       (recordAcc, node) => addNode(node)(recordAcc),
       record
@@ -157,7 +157,7 @@ const _dissocFromIndexPath = (path, value) => record => R.pipe(
   valuesArray => ObjectUtils.setInPath(path, valuesArray)(record)
 )(record)
 
-module.exports = {
+export default {
   //ADD
   addNodes,
   addNode,
@@ -169,4 +169,4 @@ module.exports = {
   getNodeCodeDependentUuids,
   //REMOVE
   removeNode
-}
+};

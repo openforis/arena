@@ -1,19 +1,17 @@
-const R = require('ramda')
-
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
-const NodeDefExpression = require('../../survey/nodeDefExpression')
-const NodeDefValidations = require('../../survey/nodeDefValidations')
-const Record = require('../record')
-const Node = require('../node')
-const RecordExprParser = require('../recordExprParser')
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
-const ValidationResult = require('../../validation/validationResult')
-const StringUtils = require('../../stringUtils')
-
-const AttributeTypeValidator = require('./attributeTypeValidator')
-const AttributeKeyValidator = require('./attributeKeyValidator')
+import * as R from 'ramda';
+import Survey from '../../survey/survey';
+import NodeDef from '../../survey/nodeDef';
+import NodeDefExpression from '../../survey/nodeDefExpression';
+import NodeDefValidations from '../../survey/nodeDefValidations';
+import Record from '../record';
+import Node from '../node';
+import RecordExprParser from '../recordExprParser';
+import Validator from '../../validation/validator';
+import Validation from '../../validation/validation';
+import ValidationResult from '../../validation/validationResult';
+import StringUtils from '../../stringUtils';
+import AttributeTypeValidator from './attributeTypeValidator';
+import AttributeKeyValidator from './attributeKeyValidator';
 
 const _validateRequired = (survey, nodeDef) => (propName, node) =>
   (
@@ -84,9 +82,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 
       const nodesToValidate = [
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
-        ...NodeDef.isKey(nodeDef)
-          ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record))
-          : []
+        ...((NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record)) : []))
       ]
 
       // call validateAttribute for each attribute
@@ -132,7 +128,7 @@ const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
 
 const _nodePointersToNodes = R.pluck('nodeCtx')
 
-module.exports = {
+export default {
   validateAttribute,
   validateSelfAndDependentAttributes
-}
+};

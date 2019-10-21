@@ -1,24 +1,20 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import db from '../../../db/db';
+import DbUtils from '../../../db/dbUtils';
+import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils';
 
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
-
-const {
-  getSurveyDBSchema,
-  dbTransformCallback
-} = require('../../survey/repository/surveySchemaRepositoryUtils')
-
-const fetchItems = async (surveyId, client = db) =>
+const fetchItems = async (surveyId, client: any = db) =>
   await client.map(`
-      SELECT * 
+      SELECT *
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
       ORDER BY id
     `,
     [],
+    // @ts-ignore TODO
     dbTransformCallback
   )
 
-const countItems = async (surveyId, client = db) =>
+const countItems = async (surveyId, client: any = db) =>
   await client.one(`
       SELECT COUNT(*) as tot
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
@@ -27,7 +23,7 @@ const countItems = async (surveyId, client = db) =>
     R.prop('tot')
   )
 
-const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
+const insertItem = async (surveyId, nodeDefUuid, props, client: any = db) =>
   await client.one(`
       INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props)
       VALUES ($1, $2)
@@ -37,10 +33,10 @@ const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
     dbTransformCallback
   )
 
-const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
+const updateItem = async (surveyId, itemId, props, resolved, client: any = db) =>
   await client.one(`
       UPDATE ${getSurveyDBSchema(surveyId)}.collect_import_report
-      SET 
+      SET
         props = props || $2::jsonb,
         resolved = $3,
         date_modified = ${DbUtils.now}
@@ -51,7 +47,7 @@ const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
     dbTransformCallback
   )
 
-module.exports = {
+export default {
   // CREATE
   insertItem,
 
@@ -61,4 +57,4 @@ module.exports = {
 
   // UPDATE
   updateItem
-}
+};

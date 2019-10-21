@@ -1,11 +1,9 @@
-const R = require('ramda')
-
-const Record = require('../../../../../core/record/record')
-const RecordValidation = require('../../../../../core/record/recordValidation')
-const Node = require('../../../../../core/record/node')
-const Validation = require('../../../../../core/validation/validation')
-
-const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
+import * as R from 'ramda';
+import Record from '../../../../../core/record/record';
+import RecordValidation from '../../../../../core/record/recordValidation';
+import Node from '../../../../../core/record/node';
+import Validation from '../../../../../core/validation/validation';
+import SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager';
 
 const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
@@ -59,7 +57,7 @@ const _newValidationRecordDuplicate = isUnique => Validation.newInstance(
   }
 )
 
-module.exports = {
+export default {
   validateRecordKeysUniqueness,
   validateRecordsUniqueness
-}
+};

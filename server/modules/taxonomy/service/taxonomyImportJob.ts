@@ -1,20 +1,20 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Job = require('../../../job/job')
+import Job from '../../../job/job'
 
-const { languageCodes } = require('../../../../core/app/languages')
-const { isNotBlank } = require('../../../../core/stringUtils')
-const CSVParser = require('../../../utils/file/csvParser')
+import { languageCodes } from '../../../../core/app/languages'
+import { isNotBlank } from '../../../../core/stringUtils'
+import CSVParser from '../../../utils/file/csvParser'
 
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
-const Validation = require('../../../../core/validation/validation')
+import Taxonomy from '../../../../core/survey/taxonomy'
+import Taxon from '../../../../core/survey/taxon'
+import Validation from '../../../../core/validation/validation'
 
-const TaxonomyValidator = require('../taxonomyValidator')
-const TaxonomyManager = require('../manager/taxonomyManager')
-const TaxonomyImportManager = require('../manager/taxonomyImportManager')
+import TaxonomyValidator from '../taxonomyValidator'
+import TaxonomyManager from '../manager/taxonomyManager'
+import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
-const SystemError = require('../../../../server/utils/systemError')
+import SystemError from '../../../../server/utils/systemError'
 
 const requiredColumns = [
   'code',
@@ -23,7 +23,15 @@ const requiredColumns = [
   'scientific_name',
 ]
 
-class TaxonomyImportJob extends Job {
+export default class TaxonomyImportJob extends Job {
+	public taxonomyUuid: any;
+	public filePath: any;
+	public rowsByField: any;
+	public taxonomyImportManager: any;
+	public csvParser: any;
+  static type: string = 'TaxonomyImportJob'
+  vernacularLanguageCodes: any
+
 
   constructor (params) {
     super(TaxonomyImportJob.type, params)
@@ -198,14 +206,10 @@ class TaxonomyImportJob extends Job {
     }
   }
 
-  parseVernacularNames (vernacularNames) {
-    return R.reduce((acc, langCode) => {
+  parseVernacularNames (vernacularNames: { [lang: string]: any; }) {
+    return R.reduce((acc, langCode: string) => {
       const vernacularName = vernacularNames[langCode]
       return isNotBlank(vernacularName) ? R.assoc(langCode, vernacularName, acc) : acc
     }, {}, this.vernacularLanguageCodes)
   }
 }
-
-TaxonomyImportJob.type = 'TaxonomyImportJob'
-
-module.exports = TaxonomyImportJob

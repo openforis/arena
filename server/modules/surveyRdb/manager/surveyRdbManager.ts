@@ -1,33 +1,36 @@
-const R = require('ramda')
-const db = require('../../../db/db')
-const CSVWriter = require('../../../utils/file/csvWriter')
+import * as R from 'ramda';
+import db from '../../../db/db';
+import CSVWriter from '../../../utils/file/csvWriter';
+
 //surveyRdbManger cannot use SurveyManager - circular dependency
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-const DataTable = require('../schemaRdb/dataTable')
+import Survey from '../../../../core/survey/survey';
 
-const RecordRepository = require('../../record/repository/recordRepository')
-const NodeRepository = require('../../record/repository/nodeRepository')
-
-const NodesInsert = require('../dbActions/nodesInsert')
-const NodesUpdate = require('../dbActions/nodesUpdate')
-const TableViewCreate = require('../dbActions/tableViewCreate')
-const TableViewQuery = require('../dbActions/tableViewQuery')
-const DataTableRepository = require('../dbActions/dataTableRepository')
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef';
+import SchemaRdb from '../../../../common/surveyRdb/schemaRdb';
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable';
+import DataTable from '../schemaRdb/dataTable';
+import RecordRepository from '../../record/repository/recordRepository';
+import NodeRepository from '../../record/repository/nodeRepository';
+import NodesInsert from '../dbActions/nodesInsert';
+import NodesUpdate from '../dbActions/nodesUpdate';
+import TableViewCreate from '../dbActions/tableViewCreate';
+import TableViewQuery from '../dbActions/tableViewQuery';
+import DataTableRepository from '../dbActions/dataTableRepository';
+import { ISortCriteria } from '../../../../common/surveyRdb/dataSort';
+import { INodeDefs } from '../../../../core/survey/_survey/surveyNodeDefs';
+import { SurveyCycleKey } from '../../../../core/survey/_survey/surveyInfo';
 
 // ==== DDL
 
-const dropSchema = async (surveyId, client = db) => await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)
+const dropSchema = async (surveyId: any, client: any = db) => await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)
 
-const createSchema = async (surveyId, client = db) => await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
+const createSchema = async (surveyId: any, client: any = db) => await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
-const createTable = async (survey, nodeDef, client = db) => await TableViewCreate.run(survey, nodeDef, client)
+const createTable = async (survey: any, nodeDef: any, client: any = db) => await TableViewCreate.run(survey, nodeDef, client)
 
 // ==== DML
-const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
+const _getQueryData = async (survey: INodeDefs, cycle: SurveyCycleKey, nodeDefUuidTable: string, nodeDefUuidCols: string[] = []) => {
   const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
   return {
     nodeDefTable,
@@ -36,7 +39,12 @@ const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = 
   }
 }
 
-const queryTable = async (
+const queryTable: (
+  survey: INodeDefs, cycle: SurveyCycleKey, nodeDefUuidTable: any, nodeDefUuidCols?: string[],
+  offset?: number, limit?: any, filterExpr?: any, sort?: ISortCriteria[],
+  editMode?: boolean, streamOutput?: any
+) => Promise<any>
+= async (
   survey, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
   offset = 0, limit = null, filterExpr = null, sort = [],
   editMode = false, streamOutput = null
@@ -45,10 +53,10 @@ const queryTable = async (
   const { nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(survey, cycle, nodeDefUuidTable, nodeDefUuidCols)
 
   // get hierarchy entities uuid col names
-  const ancestorUuidColNames = []
+  const ancestorUuidColNames: string[] = []
   Survey.visitAncestorsAndSelf(
     nodeDefTable,
-    nodeDefCurrent => ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
+    (nodeDefCurrent: INodeDef) => ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
   )(survey)
 
   // fetch data
@@ -58,7 +66,7 @@ const queryTable = async (
   // edit mode, assoc nodes to columns
   if (editMode) {
     rows = await Promise.all(rows.map(
-      async row => {
+      async (row: { [x: string]: any; }) => {
         const recordUuid = row[DataTable.colNameRecordUuuid]
         const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
         const parentNodeUuid = R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
@@ -67,7 +75,9 @@ const queryTable = async (
         //assoc nodes to each columns
         for (const nodeDefUuidCol of nodeDefUuidCols) {
           const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
+          if (!nodeDefCol) continue;
           const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
+          if (!nodeDefColParent) continue;
           const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
           const parentUuid = R.prop(parentUuidColName, row)
 
@@ -81,10 +91,10 @@ const queryTable = async (
         return resultRow
       }
     ))
-  } else if (!!streamOutput) {
+  } else if (streamOutput) {
     await db.stream(
       rows,
-      stream => {
+      (      stream: { pipe: (arg0: any) => void; }) => {
         stream.pipe(CSVWriter.transformToStream(streamOutput, colNames))
       })
   }
@@ -92,13 +102,13 @@ const queryTable = async (
   return rows
 }
 
-const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
+const countTable = async (survey: any, cycle: SurveyCycleKey, nodeDefUuidTable: any, filter: any) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
   return await TableViewQuery.runCount(surveyId, cycle, tableName, filter)
 }
 
-module.exports = {
+export default {
   dropSchema,
   createSchema,
   createTable,
@@ -111,4 +121,4 @@ module.exports = {
   countDuplicateRecords: TableViewQuery.countDuplicateRecords,
   fetchRecordsCountByKeys: TableViewQuery.fetchRecordsCountByKeys,
   fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
-}
+};

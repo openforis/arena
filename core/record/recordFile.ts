@@ -1,6 +1,5 @@
-const R = require('ramda')
-
-const {truncate} = require('../stringUtils')
+import * as R from 'ramda';
+import { truncate } from '../stringUtils';
 
 const getProp = prop => R.path(['props', prop])
 
@@ -47,7 +46,7 @@ const truncateFileName = (fileName, maxLength = 10) => {
   }
 }
 
-module.exports = {
+export default {
   propKeys,
 
   //CREATE
@@ -60,4 +59,4 @@ module.exports = {
 
   // UTILS
   truncateFileName,
-}
+};

@@ -3,10 +3,10 @@ import './nodeDefEntityTable.scss'
 import React from 'react'
 import Node from '../../../../../../../core/record/node'
 
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
-import NodeDefEntityTableRows from './nodeDefEntityTableRows'
+import { NodeDefErrorBadge } from '../../internal'
+import { NodeDefEntityTableRows } from '../../internal'
 
-const NodeDefEntityTable = props => {
+export const NodeDefEntityTable = props => {
 
   const {
     entry, edit,

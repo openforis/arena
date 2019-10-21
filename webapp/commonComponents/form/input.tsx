@@ -12,7 +12,19 @@ export const FormItem = ({ label, children, className = '' }) => (
   </div>
 )
 
-export const Input = React.forwardRef((props, ref) => {
+interface IProps {
+  validation?: any;
+  disabled?: any;
+  mask?: any;
+  onChange: (value: any) => void;
+  value: any;
+
+  placeholder?: any;
+  readOnly?: boolean;
+  maxLength?: number;
+  onFocus?: (value: any) => void;
+}
+export const Input = React.forwardRef((props: IProps, ref: any) => {
 
   const {
     validation = {},
@@ -32,6 +44,7 @@ export const Input = React.forwardRef((props, ref) => {
   return (
     <ValidationTooltip
       validation={validation}
+      showKeys={true}
       className="form-input-container">
 
       {

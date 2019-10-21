@@ -38,10 +38,13 @@ const store = createStore(
   applyMiddleware(...middlewares)
 )
 
+// @ts-ignore TODO
 store.asyncReducers = {}
 
 export const injectReducers = (name, asyncReducer) => {
+  // @ts-ignore TODO
   store.asyncReducers[name] = asyncReducer
+  // @ts-ignore TODO
   store.replaceReducer(createReducer(store.asyncReducers))
 }
 

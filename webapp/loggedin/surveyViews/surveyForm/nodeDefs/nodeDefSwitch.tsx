@@ -4,10 +4,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefFormItem from './components/nodeDefFormItem'
-import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
-import NodeDefTableCellBody from './components/nodeDefTableCellBody'
-import NodeDefEditButtons from './components/nodeDefEditButtons'
+import { NodeDefFormItem } from './internal'
+import { NodeDefTableCellHeader } from './internal'
+import { NodeDefTableCellBody } from './internal'
+import { NodeDefEditButtons } from './internal'
 
 import NodeDef from '../../../../../core/survey/nodeDef'
 import NodeDefValidations from '../../../../../core/survey/nodeDefValidations'
@@ -19,14 +19,25 @@ import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as RecordState from '../../record/recordState'
 
-import * as NodeDefUiProps from './nodeDefUIProps'
+import * as NodeDefUiProps from './internal'
 
 // edit actions
 import { putNodeDefProp, putNodeDefLayoutProp } from '../../../../survey/nodeDefs/actions'
 // entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 
-class NodeDefSwitch extends React.Component {
+class _NodeDefSwitch extends React.Component {
+	public element: React.RefObject<any>;
+
+  static defaultProps = {
+    // specified when can edit node definition
+    canEditDef: false,
+    valid: true,
+
+    // entry default props
+    nodes: [],
+    canAddNode: false,
+  }
 
   constructor (props) {
     super(props)
@@ -90,16 +101,6 @@ class NodeDefSwitch extends React.Component {
   }
 }
 
-NodeDefSwitch.defaultProps = {
-  // specified when can edit node definition
-  canEditDef: false,
-  valid: true,
-
-  // entry default props
-  nodes: [],
-  canAddNode: false,
-}
-
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, entry, canEditRecord } = props
 
@@ -152,10 +153,11 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(
+export const NodeDefSwitch = connect(
   mapStateToProps,
   {
     putNodeDefProp, putNodeDefLayoutProp,
     updateNode, removeNode, createNodePlaceholder
   }
-)(NodeDefSwitch)
+)(_NodeDefSwitch)
+export default NodeDefSwitch

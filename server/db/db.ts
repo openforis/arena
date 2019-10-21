@@ -1,8 +1,8 @@
-const Log = require('../log/log')
+import Log from '../log/log';
 
 const logger = Log.getLogger('DB')
 
-const ProcessUtils = require('../../core/processUtils')
+import ProcessUtils from '../../core/processUtils';
 
 const debugOptions = {
   query: (e) => {
@@ -14,7 +14,11 @@ const debugOptions = {
 }
 
 // const pgp = require('pg-promise')(debugOptions)
-const pgp = require('pg-promise')({})
+import pgpFactory from 'pg-promise';
+const pgp = pgpFactory({});
+
+import { IConnectionParameters } from 'pg-promise/typescript/pg-subset';
+
 
 const configCommon = {
   // how long a client is allowed to remain idle before being closed
@@ -25,7 +29,7 @@ const configCommon = {
   ssl: ProcessUtils.ENV.pgSsl
 }
 
-const config = ProcessUtils.ENV.dbUrl
+const config: IConnectionParameters = ProcessUtils.ENV.dbUrl
   ? {
     connectionString: ProcessUtils.ENV.dbUrl,
     ...configCommon
@@ -35,10 +39,10 @@ const config = ProcessUtils.ENV.dbUrl
     database: ProcessUtils.ENV.pgDatabase,
     password: ProcessUtils.ENV.pgPassword,
     host: ProcessUtils.ENV.pgHost,
-    port: ProcessUtils.ENV.pgPort,
+    port: (port => port ? +port : undefined)(ProcessUtils.ENV.pgPort),
     ...configCommon
   }
 
 const db = pgp(config)
 
-module.exports = db
+export default db;

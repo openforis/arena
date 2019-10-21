@@ -1,11 +1,9 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
-const StringUtils = require('../stringUtils')
-const { uuidv4 } = require('./../uuid')
-
-const Validation = require('../validation/validation')
-const NodeDef = require('../survey/nodeDef')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
+import StringUtils from '../stringUtils';
+import { uuidv4 } from './../uuid';
+import Validation from '../validation/validation';
+import NodeDef from '../survey/nodeDef';
 
 const keys = {
   id: ObjectUtils.keys.id,
@@ -31,6 +29,33 @@ const metaKeys = {
   defaultValue: 'defaultValue', //true if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', //hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
+
+export interface INodeMeta {
+  h: INode[]; // hierarchy
+  childApplicability?: any;
+  defaultValue?: any;
+  hCode?: any; // hierarchyCode
+}
+export interface INode {
+  uuid: string;
+  nodeDefUuid: string;
+  recordUuid: string;
+  parentUuid: string;
+  value: string;
+  meta: INodeMeta;
+
+  id?: string;
+  dateCreated?: string;
+  dateModified?: string;
+  placeholder?: boolean;
+
+  created?: string;
+  updated?: string;
+  deleted?: string
+  dirty?: boolean;
+}
+
+
 
 const valuePropKeys = {
   // generic code (can be used by taxon or categoryItem)
@@ -62,22 +87,26 @@ const valuePropKeys = {
  * ======
  */
 
-const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.nodeDefUuid]: nodeDefUuid,
-  [keys.recordUuid]: recordUuid,
-  [keys.parentUuid]: getUuid(parentNode),
-  [keys.value]: value,
-  [keys.meta]: {
-    [metaKeys.hierarchy]: parentNode
+
+const newNode: (nodeDefUuid: string, recordUuid: string, parentNode?: INode | null, value?: any) => INode
+= (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
+  uuid: uuidv4(),
+  nodeDefUuid: nodeDefUuid,
+  recordUuid: recordUuid,
+  parentUuid: getUuid(parentNode),
+  value: value,
+  meta: {
+    // hierarchy:
+    h: parentNode
       ? R.append(getUuid(parentNode), getHierarchy(parentNode))
       : []
   }
 })
 
-const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
+const newNodePlaceholder: (nodeDef: INode, parentNode: INode, value?: any) => INode
+= (nodeDef, parentNode, value = null) => ({
   ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
-  [keys.placeholder]: true
+  placeholder: true
 })
 
 /**
@@ -90,25 +119,27 @@ const getUuid = ObjectUtils.getUuid
 
 const getParentUuid = ObjectUtils.getParentUuid
 
-const getRecordUuid = R.prop(keys.recordUuid)
+const getRecordUuid: (obj: INode) => string = R.prop(keys.recordUuid) as (obj: INode) => string
 
-const getValue = (node = {}, defaultValue = {}) =>
+const getValue: (node?: any, defaultValue?: any) => any
+= (node = {}, defaultValue = {}) =>
   R.propOr(defaultValue, keys.value, node)
 
-const getValueProp = (prop, defaultValue = null) => R.pipe(
+const getValueProp: (prop: string, defaultValue?: any) => any
+= (prop, defaultValue = null) => R.pipe(
   getValue,
   R.propOr(defaultValue, prop),
 )
 
-const getNodeDefUuid = ObjectUtils.getNodeDefUuid
+export const getNodeDefUuid: (x: any) => string = ObjectUtils.getNodeDefUuid
 
-const getNodeDefUuids = nodes => R.pipe(
+const getNodeDefUuids: (nodes: any) => string[] = nodes => R.pipe(
   R.keys,
   R.map(key => getNodeDefUuid(nodes[key])),
   R.uniq
 )(nodes)
 
-const getMeta = R.propOr({}, keys.meta)
+const getMeta: (obj: INode) => INodeMeta | {} = R.propOr({}, keys.meta)
 
 const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
 
@@ -146,7 +177,7 @@ const isValueBlank = node => {
   return R.isEmpty(value)
 }
 
-module.exports = {
+export default {
   keys,
   valuePropKeys,
   metaKeys,
@@ -198,19 +229,19 @@ module.exports = {
   getDateYear: R.pipe(
     R.partialRight(getValue, ['//']),
     R.split('/'),
-    R.prop(2),
+    x => x[2] || '',
     StringUtils.trim,
   ),
   getDateMonth: R.pipe(
     R.partialRight(getValue, ['//']),
     R.split('/'),
-    R.prop(1),
+    x => x[1] || '',
     StringUtils.trim
   ),
   getDateDay: R.pipe(
     R.partialRight(getValue, ['//']),
     R.split('/'),
-    R.prop(0),
+    x => x[0] || '',
     StringUtils.trim
   ),
 
@@ -218,13 +249,13 @@ module.exports = {
   getTimeHour: R.pipe(
     R.partialRight(getValue, [':']),
     R.split(':'),
-    R.prop(0),
+    x => x[0] || '',
     StringUtils.trim
   ),
   getTimeMinute: R.pipe(
     R.partialRight(getValue, [':']),
     R.split(':'),
-    R.prop(1),
+    x => x[1] || '',
     StringUtils.trim
   ),
 
@@ -245,4 +276,4 @@ module.exports = {
   getVernacularNameUuid: getValueProp(valuePropKeys.vernacularNameUuid),
   getScientificName: getValueProp(valuePropKeys.scientificName, ''),
   getVernacularName: getValueProp(valuePropKeys.vernacularName, ''),
-}
+};

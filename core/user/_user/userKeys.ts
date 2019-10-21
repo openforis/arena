@@ -1,4 +1,4 @@
-const ObjectUtils = require('../../objectUtils')
+import ObjectUtils from '../../objectUtils';
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -10,4 +10,14 @@ const keys = {
   prefs: 'prefs',
 }
 
-module.exports = keys
+export interface IUser {
+  uuid: string;
+  name: string;
+  email: string;
+  lang: string;
+  authGroups: any[];
+  hasProfilePicture: boolean;
+  prefs: any;
+}
+
+export default keys;

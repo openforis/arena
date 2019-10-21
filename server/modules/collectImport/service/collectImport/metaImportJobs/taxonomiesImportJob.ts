@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Taxonomy = require('../../../../../../core/survey/taxonomy')
-const Taxon = require('../../../../../../core/survey/taxon')
-const Validation = require('../../../../../../core/validation/validation')
-const { languageCodesISO636_2 } = require('../../../../../../core/app/languages')
+import Taxonomy from '../../../../../../core/survey/taxonomy'
+import Taxon from '../../../../../../core/survey/taxon'
+import Validation from '../../../../../../core/validation/validation'
+import { languageCodesISO636_2 } from '../../../../../../core/app/languages'
 
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job'
 
-const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
-const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImportManager')
+import TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
+import TaxonomyImportManager from '../../../../taxonomy/manager/taxonomyImportManager'
 
-const CSVReader = require('../../../../../utils/file/csvReader')
+import CSVReader from '../../../../../utils/file/csvReader'
 
 const speciesFilesPath = 'species/'
 
@@ -18,9 +18,17 @@ const speciesFilesPath = 'species/'
  * Inserts a taxonomy for each taxonomy in the Collect survey.
  * Saves the list of inserted taxonomies in the "taxonomies" context property
  */
-class TaxonomiesImportJob extends Job {
+export default class TaxonomiesImportJob extends Job {
+	taxonomyImportManager: any;
+	rowsByCode: any;
+	rowsByScientificName: any;
+	currentRow: any;
+	context: any;
 
-  constructor (params) {
+  headers: any;
+	vernacularLangCodes: any;
+
+  constructor (params?) {
     super('TaxonomiesImportJob', params)
 
     this.taxonomyImportManager = null
@@ -100,14 +108,14 @@ class TaxonomiesImportJob extends Job {
     this.incrementProcessedItems()
   }
 
-  async onRow (speciesFileName, taxonomyUuid, row, tx) {
+  async onRow (speciesFileName, taxonomyUuid, row: { [lang: string]: any }, tx) {
     const rowIndexed = this._indexRowByHeaders(row)
 
     if (this.validateRow(speciesFileName, rowIndexed)) {
       const { code, family, scientific_name: scientificName } = rowIndexed
 
       const genus = R.pipe(R.split(' '), R.head)(scientificName)
-      const vernacularNames = R.reduce((acc, lang) => {
+      const vernacularNames = R.reduce((acc, lang: string) => {
         const vernacularName = row[lang]
         return vernacularName
           ? R.assoc(lang, vernacularName, acc)
@@ -175,5 +183,3 @@ class TaxonomiesImportJob extends Job {
     )
   }
 }
-
-module.exports = TaxonomiesImportJob

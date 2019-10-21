@@ -1,13 +1,14 @@
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job';
 
-const Category = require('../../../../../../core/survey/category')
-const Validation = require('../../../../../../core/validation/validation')
+import Category from '../../../../../../core/survey/category';
+import Validation from '../../../../../../core/validation/validation';
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
+import CategoryManager from '../../../../category/manager/categoryManager';
 
-class CategoriesValidationJob extends Job {
+export default class CategoriesValidationJob extends Job {
+  static type: string = 'CategoriesValidationJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(CategoriesValidationJob.type, params)
   }
 
@@ -31,7 +32,3 @@ class CategoriesValidationJob extends Job {
     }
   }
 }
-
-CategoriesValidationJob.type = 'CategoriesValidationJob'
-
-module.exports = CategoriesValidationJob

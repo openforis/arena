@@ -14,7 +14,7 @@ import StringUtils from '../../../../core/stringUtils'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
-import * as NodeDefUIProps from '../../../loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import {NodeDefUIProps} from '../../../loggedin/surveyViews/surveyForm/nodeDefs'
 
 const isValueText = (nodeDef, value) => nodeDef
   ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value))
@@ -29,7 +29,7 @@ const loadItems = async params => {
   return items
 }
 
-const Literal = props => {
+const _Literal = props => {
 
   const { node, nodeDefCurrent, literalSearchParams, onChange, type } = props
   const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
@@ -109,4 +109,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(Literal)
+export const Literal = connect(mapStateToProps)(_Literal)
+export default Literal

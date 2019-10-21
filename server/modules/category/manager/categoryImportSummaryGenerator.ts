@@ -1,13 +1,11 @@
-const fs = require('fs')
-const R = require('ramda')
-
-const Category = require('../../../../core/survey/category')
-const CategoryImportSummary = require('../../../../core/survey/categoryImportSummary')
-const Validation = require('../../../../core/validation/validation')
-const StringUtils = require('../../../../core/stringUtils')
-const SystemError = require('../../../utils/systemError')
-
-const CSVReader = require('../../../utils/file/csvReader')
+import fs from 'fs';
+import * as R from 'ramda';
+import Category from '../../../../core/survey/category';
+import CategoryImportSummary from '../../../../core/survey/categoryImportSummary';
+import Validation from '../../../../core/validation/validation';
+import StringUtils from '../../../../core/stringUtils';
+import SystemError from '../../../utils/systemError';
+import CSVReader from '../../../utils/file/csvReader';
 
 const columnProps = {
   [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
@@ -116,7 +114,7 @@ const _validateSummary = summary => {
   }
 }
 
-module.exports = {
+export default {
   createImportSummaryFromStream,
   createImportSummary,
-}
+};

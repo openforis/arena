@@ -1,4 +1,4 @@
-const types = {
+export const types = {
   Compound: 'Compound',
   Identifier: 'Identifier',
   MemberExpression: 'MemberExpression',
@@ -14,6 +14,6 @@ const types = {
   GroupExpression: 'GroupExpression',
 }
 
-module.exports = {
+export default {
   types
-}
+};

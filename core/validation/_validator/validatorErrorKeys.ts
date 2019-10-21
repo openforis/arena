@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
   nameDuplicate: 'validationErrors.nameDuplicate',
@@ -98,4 +98,4 @@ module.exports = {
     NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
     CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
   }
-}
+};

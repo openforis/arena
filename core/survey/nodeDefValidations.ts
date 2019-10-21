@@ -1,6 +1,5 @@
-const R = require('ramda')
-
-const NumberUtils = require('../numberUtils')
+import * as R from 'ramda';
+import NumberUtils from '../numberUtils';
 
 const keys = {
   required: 'required',
@@ -39,7 +38,7 @@ const assocCountProp = key =>
     )
   )
 
-module.exports = {
+export default {
   keys,
 
   //REQUIRED
@@ -60,4 +59,4 @@ module.exports = {
   //EXPRESSIONS
   getExpressions: R.propOr([], (keys.expressions)),
   assocExpressions: expressions => R.assoc(keys.expressions, expressions),
-}
+};

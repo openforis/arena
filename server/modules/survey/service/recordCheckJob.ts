@@ -1,18 +1,20 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Record = require('../../../../core/record/record')
-const Node = require('../../../../core/record/node')
+import Survey from '../../../../core/survey/survey'
+import NodeDef from '../../../../core/survey/nodeDef'
+import Record from '../../../../core/record/record'
+import Node from '../../../../core/record/node'
 
-const SurveyManager = require('../manager/surveyManager')
-const RecordManager = require('../../record/manager/recordManager')
+import SurveyManager from '../manager/surveyManager'
+import RecordManager from '../../record/manager/recordManager'
 
-const Job = require('../../../job/job')
+import Job from '../../../job/job'
 
-class RecordCheckJob extends Job {
+export default class RecordCheckJob extends Job {
+	public surveyAndNodeDefsByCycle: any;
+  static type: string = 'RecordCheckJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(RecordCheckJob.type, params)
 
     this.surveyAndNodeDefsByCycle = {} //cache of surveys and updated node defs by cycle
@@ -121,8 +123,9 @@ const _insertMissingSingleNode = async (survey, childDef, record, parentNode, us
  *
  * Returns an indexed object with all the inserted nodes.
  */
-const _insertMissingSingleNodes = async (survey, nodeDefAddedUuids, record, user, tx) => {
-  const nodesAdded = {}
+const _insertMissingSingleNodes: (survey, nodeDefAddedUuids, record, user, tx) => Promise<{record: any; nodes: any}>
+= async (survey, nodeDefAddedUuids, record, user, tx) => {
+  const nodesAdded: {record: any; nodes: any} = {record: null, nodes: {}}
   for (const nodeDefUuid of nodeDefAddedUuids) {
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
@@ -166,7 +169,3 @@ const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, t
   // record keys uniqueness must be validated after RDB generation
   await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
 }
-
-RecordCheckJob.type = 'RecordCheckJob'
-
-module.exports = RecordCheckJob

@@ -1,19 +1,25 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('../../../server/db/db')
+import db from '../../../server/db/db'
 
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const NodeDefExpression = require('../../../core/survey/nodeDefExpression')
-const NodeDefValidations = require('../../../core/survey/nodeDefValidations')
-const User = require('../../../core/user/user')
+import Survey from '../../../core/survey/survey'
+import NodeDef, { INodeDef } from '../../../core/survey/nodeDef'
+import NodeDefExpression from '../../../core/survey/nodeDefExpression'
+import NodeDefValidations from '../../../core/survey/nodeDefValidations'
+import User from '../../../core/user/user'
 
-const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
-const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
+import SurveyManager from '../../../server/modules/survey/manager/surveyManager'
+import NodeDefRepository from '../../../server/modules/nodeDef/repository/nodeDefRepository'
 
-const SurveyPublishJob = require('../../../server/modules/survey/service/publish/surveyPublishJob')
+import SurveyPublishJob from '../../../server/modules/survey/service/publish/surveyPublishJob'
+
+interface IBuilder {
+  build (survey: string, parentDefUuid?: string): { [uuid: string]: INodeDef };
+}
 
 class NodeDefBuilder {
+	public type: any;
+	public props: any;
 
   constructor (name, type) {
     this.type = type
@@ -66,7 +72,8 @@ class NodeDefBuilder {
   }
 }
 
-class EntityDefBuilder extends NodeDefBuilder {
+class EntityDefBuilder extends NodeDefBuilder implements IBuilder {
+	public childBuilders: IBuilder[];
 
   constructor (name, ...childBuilders) {
     super(name, NodeDef.nodeDefType.entity)
@@ -79,14 +86,15 @@ class EntityDefBuilder extends NodeDefBuilder {
     const defUuid = NodeDef.getUuid(def)
 
     return R.pipe(
-      R.map(childBuilder => childBuilder.build(survey, defUuid)),
+      R.map((childBuilder: IBuilder) => childBuilder.build(survey, defUuid)),
       R.mergeAll,
       R.assoc(defUuid, def),
     )(this.childBuilders)
   }
 }
 
-class AttributeDefBuilder extends NodeDefBuilder {
+class AttributeDefBuilder extends NodeDefBuilder implements IBuilder {
+	public _analysis: any;
 
   constructor (name, type = NodeDef.nodeDefType.text) {
     super(name, type)
@@ -128,6 +136,12 @@ class AttributeDefBuilder extends NodeDefBuilder {
 }
 
 class SurveyBuilder {
+	public user: any;
+	public name: string;
+	public label: string;
+	public lang: string;
+	public rootDefBuilder: any;
+	public root: any;
 
   constructor (user, rootDefBuilder) {
     this.user = user
@@ -151,7 +165,7 @@ class SurveyBuilder {
    * Builds the survey and saves it as draft.
    * If 'publish' is true, publishes the survey.
    */
-  async buildAndStore (publish = true, client = db) {
+  async buildAndStore (publish = true, client: any = db) {
     const surveyParam = this.build()
 
     return await client.tx(async t => {
@@ -159,7 +173,7 @@ class SurveyBuilder {
 
       const surveyId = Survey.getId(survey)
 
-      const { root } = Survey.getHierarchy(R.always, true)(surveyParam)
+      const { root } = Survey.getHierarchy(_ => true)(surveyParam)
 
       await Survey.traverseHierarchyItem(root, async nodeDef =>
         await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
@@ -177,8 +191,6 @@ class SurveyBuilder {
   }
 }
 
-module.exports = {
-  survey: (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder),
-  entity: (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders),
-  attribute: (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)
-}
+export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder)
+export const entity = (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders)
+export const attribute = (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)

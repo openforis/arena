@@ -1,6 +1,5 @@
-const aws = require('aws-sdk')
-
-const ProcessUtils = require('../../core/processUtils')
+import aws from 'aws-sdk';
+import ProcessUtils from '../../core/processUtils';
 
 const _getAwsClient = () =>
   new aws.CognitoIdentityServiceProvider({
@@ -34,7 +33,7 @@ const inviteUser = (email, temporaryPassword) => {
     }]
   }
 
-  return _sendAwsRequest(_getAwsClient().adminCreateUser(params))
+  return _sendAwsRequest(_getAwsClient().adminCreateUser(params)) as Promise<{User: any}>
 }
 
 const updateUser = (oldEmail, email, name) => {
@@ -76,8 +75,8 @@ const deleteUser = email => {
   return _sendAwsRequest(_getAwsClient().adminDeleteUser(params))
 }
 
-module.exports = {
+export default {
   inviteUser,
   updateUser,
   deleteUser,
-}
+};

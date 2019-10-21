@@ -1,13 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Binary from './binary'
-import Call from './call'
-import Group from './group'
-import Identifier from './identifier'
-import Literal from './literal'
-import Logical from './logical'
-import Member from './member'
+import { Binary } from './internal'
+import { Call } from './internal'
+import { Group } from './internal'
+import { Identifier } from './internal'
+import { Literal } from './internal'
+import { Logical } from './internal'
+import { Member } from './internal'
 
 import Expression from '../../../../core/exprParser/expression'
 
@@ -23,7 +23,9 @@ const components = {
   [Expression.types.GroupExpression]: Group,
 }
 
-const ExpressionNode = (props) => {
+// TODO: make exprsesion types inherit from a common interface
+export const ExpressionNode = (props: { [s: string]: any; }) => {
+  // @ts-ignore
   const component = components[R.path(['node', 'type'], props)]
   return React.createElement(component, props)
 }

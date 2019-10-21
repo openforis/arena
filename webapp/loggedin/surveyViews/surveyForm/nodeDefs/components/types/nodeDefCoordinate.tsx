@@ -16,11 +16,17 @@ import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
-const NodeDefCoordinate = props => {
+export interface ICoordinateValue {
+  srs: string;
+  x: number;
+  y: number;
+}
+
+export const NodeDefCoordinate = props => {
 
   const i18n = useI18n()
 
-  const numberMask = createNumberMask({
+  const numberMask: (s: string) => string = createNumberMask({
     prefix: '',
     includeThousandsSeparator: false,
     allowDecimal: true,
@@ -28,7 +34,7 @@ const NodeDefCoordinate = props => {
     allowNegative: true,
   })
 
-  const handleInputChange = (node, field, value) => {
+  const handleInputChange = (node, field: string, value) => {
     const { nodeDef, updateNode } = props
 
     const newValue = R.assoc(field, value)(node.value)
@@ -38,10 +44,10 @@ const NodeDefCoordinate = props => {
 
   const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly } = props
 
-  const entryDisabled = edit || !canEditRecord || readOnly
+  const entryDisabled: boolean = edit || !canEditRecord || readOnly
 
   const node = entry ? nodes[0] : null
-  const value = Node.getValue(node, NodeDefUiProps.getDefaultValue(nodeDef))
+  const value = Node.getValue(node, NodeDefUiProps.getDefaultValue(nodeDef)) as ICoordinateValue
 
   const surveySrs = Survey.getSRS(surveyInfo)
   const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)

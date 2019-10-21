@@ -1,7 +1,6 @@
-const csvParser = require('csv').parse
-const fs = require('fs')
-
-const Queue = require('../../../core/queue')
+import { parse as csvParser } from 'csv';
+import fs from 'fs';
+import Queue from '../../../core/queue';
 
 const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
@@ -52,6 +51,7 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
     }
 
     stream
+      // @ts-ignore TODO
       .pipe(csvParser())
       .on('data', onData)
       .on('end', onEnd)
@@ -84,8 +84,8 @@ const readHeadersFromStream = async stream => {
   return result
 }
 
-module.exports = {
+export default {
   createReaderFromFile,
   createReaderFromStream,
   readHeadersFromStream,
-}
+};

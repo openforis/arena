@@ -1,24 +1,18 @@
-const R = require('ramda')
-
-const db = require('../../../../db/db')
-
-const ObjectUtils = require('../../../../../core/objectUtils')
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
-const Record = require('../../../../../core/record/record')
-const RecordStep = require('../../../../../core/record/recordStep')
-const Node = require('../../../../../core/record/node')
-
-const RecordRepository = require('../../repository/recordRepository')
-const RecordValidationManager = require('./recordValidationManager')
-const NodeUpdateManager = require('./nodeUpdateManager')
-
-const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
-const FileManager = require('../fileManager')
-
-const SystemError = require('../../../../../server/utils/systemError')
-
-const ActivityLog = require('../../../activityLog/activityLogger')
+import * as R from 'ramda';
+import db from '../../../../db/db';
+import ObjectUtils from '../../../../../core/objectUtils';
+import Survey from '../../../../../core/survey/survey';
+import NodeDef from '../../../../../core/survey/nodeDef';
+import Record from '../../../../../core/record/record';
+import RecordStep from '../../../../../core/record/recordStep';
+import Node from '../../../../../core/record/node';
+import RecordRepository from '../../repository/recordRepository';
+import RecordValidationManager from './recordValidationManager';
+import NodeUpdateManager from './nodeUpdateManager';
+import SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager';
+import FileManager from '../fileManager';
+import SystemError from '../../../../../server/utils/systemError';
+import ActivityLog from '../../../activityLog/activityLogger';
 
 /**
  * =======
@@ -28,7 +22,7 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 
 //==== CREATE
 
-const initNewRecord = async (user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, client = db) =>
+const initNewRecord = async (user, survey, record, nodesUpdateListener?: () => Promise<void>, nodesValidationListener?: () => Promise<void>, client: any = db) =>
   await client.tx(async t => {
     const rootNodeDef = Survey.getNodeDefRoot(survey)
 
@@ -39,7 +33,7 @@ const initNewRecord = async (user, survey, record, nodesUpdateListener = null, n
 
 //==== UPDATE
 
-const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
+const updateRecordStep = async (surveyId, recordUuid, stepId, client: any = db) => {
   await client.tx(async t => {
     const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, t)
 
@@ -85,7 +79,7 @@ const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
  * ======
  */
 const persistNode = async (user, survey, record, node,
-                           nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                           nodesUpdateListener?: () => Promise<void>, nodesValidationListener?: () => Promise<void>, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
@@ -98,7 +92,7 @@ const persistNode = async (user, survey, record, node,
   )
 
 const deleteNode = async (user, survey, record, nodeUuid,
-                          nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                          nodesUpdateListener?: () => Promise<void>, nodesValidationListener?: () => Promise<void>, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
@@ -111,7 +105,7 @@ const deleteNode = async (user, survey, record, nodeUuid,
   )
 
 const _updateNodeAndValidateRecordUniqueness = async (user, survey, record, node, nodesUpdateFn,
-                                                      nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                                                      nodesUpdateListener?: () => Promise<void>, nodesValidationListener?: () => Promise<void>, t = db) =>
   await t.tx(async t => {
     await _beforeNodeUpdate(user, survey, record, node, t)
 
@@ -145,12 +139,12 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
                               nodesUpdateListener, nodesValidationListener, t) => {
   // 1. update record and notify
   if (nodesUpdateListener)
-    nodesUpdateListener(updatedNodes)
+    await nodesUpdateListener(updatedNodes)
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
   if (nodesUpdateListener)
-    nodesUpdateListener(updatedDependentNodes)
+    await nodesUpdateListener(updatedDependentNodes)
   record = recordUpdatedDependentNodes
 
   const updatedNodesAndDependents = {
@@ -161,7 +155,7 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
   // 3. update node validations
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(survey, record, updatedNodesAndDependents, true, t)
   if (nodesValidationListener)
-    nodesValidationListener(validations)
+    await nodesValidationListener(validations)
   record = Record.mergeNodeValidations(validations)(record)
 
   // 4. update survey rdb
@@ -193,7 +187,7 @@ const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
   }
 }
 
-module.exports = {
+export default {
   // RECORD
   initNewRecord,
   updateRecordStep,
@@ -209,4 +203,4 @@ module.exports = {
   updateNodesDependents: NodeUpdateManager.updateNodesDependents,
   deleteNode,
   deleteNodesByNodeDefUuids: NodeUpdateManager.deleteNodesByNodeDefUuids
-}
+};

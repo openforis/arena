@@ -14,7 +14,7 @@ import Validation from '../../../../../../core/validation/validation'
 import * as SurveyState from '../../../../../survey/surveyState'
 import * as RecordState from '../../../record/recordState'
 
-const NodeDefErrorBadge = props => {
+const _NodeDefErrorBadge = props => {
   const { validation, children } = props
 
   const valid = Validation.isValid(validation)
@@ -36,7 +36,7 @@ const NodeDefErrorBadge = props => {
       : null
 }
 
-NodeDefErrorBadge.defaultProps = {
+_NodeDefErrorBadge.defaultProps = {
   nodeDef: null,
   parentNode: null,
   nodes: null,
@@ -78,4 +78,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(NodeDefErrorBadge)
+export const NodeDefErrorBadge = connect(mapStateToProps)(_NodeDefErrorBadge)
+export default NodeDefErrorBadge

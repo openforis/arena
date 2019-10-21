@@ -1,16 +1,16 @@
-const R = require('ramda')
-const toSnakeCase = require('to-snake-case')
-
-const Survey = require('../../core/survey/survey')
-const NodeDef = require('../../core/survey/nodeDef')
+import * as R from 'ramda';
+import toSnakeCase from 'to-snake-case';
+import Survey from '../../core/survey/survey';
+import NodeDef, { INodeDef } from '../../core/survey/nodeDef';
+import { INodeDefs } from '../../core/survey/_survey/surveyNodeDefs';
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'
 const parentTablePrefix = '_$parent$_'
 
-const composeTableName = (nodeDefName, nodeDefParentName = '') => `${tablePrefix}${nodeDefParentName}${nodeDefName}`
+const composeTableName = (nodeDefName: string, nodeDefParentName = '') => `${tablePrefix}${nodeDefParentName}${nodeDefName}`
 
-const getTableName = (nodeDef, nodeDefParent) => {
+const getTableName = (nodeDef: INodeDef, nodeDefParent?: INodeDef) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefParentName = NodeDef.getName(nodeDefParent)
 
@@ -21,7 +21,7 @@ const getTableName = (nodeDef, nodeDefParent) => {
       : composeTableName(nodeDefParentName)
 }
 
-const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
+const getViewName = (nodeDef: INodeDef, nodeDefParent?: INodeDef) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
 const cols = {
   [NodeDef.nodeDefType.code]: ['code', 'label'],
@@ -29,41 +29,39 @@ const cols = {
   [NodeDef.nodeDefType.file]: ['file_uuid', 'file_name'],
 }
 
-const getCols = nodeDef => R.propOr([], NodeDef.getType(nodeDef), cols)
+const getCols: (nodeDef: INodeDef) => any[] = nodeDef => R.propOr([], NodeDef.getType(nodeDef), cols)
 
-const getDefaultColumnName = nodeDef => NodeDef.isEntity(nodeDef)
+const getDefaultColumnName = (nodeDef: INodeDef) => NodeDef.isEntity(nodeDef)
   ? `${NodeDef.getName(nodeDef)}_uuid`
   : `${NodeDef.getName(nodeDef)}`
 
-const getColNames = nodeDef => {
+const getColNames = (nodeDef: INodeDef) => {
   const cols = getCols(nodeDef)
   return R.isEmpty(cols)
     ? [getDefaultColumnName(nodeDef)]
-    : cols.map(
-      col => NodeDef.getName(nodeDef) + '_' + col
-    )
+    : cols.map( (col: string) => NodeDef.getName(nodeDef) + '_' + col )
 }
 
-const getColName = R.pipe(getColNames, R.head)
+const getColName: (x: any) => string = R.pipe(getColNames, R.head)
 
-const getColNamesByUuids = nodeDefUuidCols => survey => R.reduce(
-  (cols, uuid) => R.pipe(
+const getColNamesByUuids = (nodeDefUuidCols: readonly string[]) => (survey: INodeDefs) => R.reduce(
+  (cols: string[], uuid: string) => R.pipe(
     Survey.getNodeDefByUuid(uuid),
     getColNames,
-    R.concat(cols)
+    R.concat(cols),
   )(survey),
   [],
   nodeDefUuidCols
 )
 
-const extractColName = (nodeDef, col) => R.replace(
+const extractColName = (nodeDef: INodeDef, col: string) => R.replace(
   //TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
   toSnakeCase(NodeDef.getName(nodeDef)) + '_',
   '',
   col
 )
 
-const extractNodeDefNameFromViewName = R.pipe(
+const extractNodeDefNameFromViewName: (s: string) => string = R.pipe(
   R.defaultTo(''),
   R.split(tablePrefix),
   R.last,
@@ -73,7 +71,7 @@ const extractNodeDefNameFromViewName = R.pipe(
   R.last
 )
 
-module.exports = {
+export default {
   getTableName,
   getViewName,
 
@@ -83,4 +81,4 @@ module.exports = {
 
   extractColName,
   extractNodeDefNameFromViewName,
-}
+};

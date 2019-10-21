@@ -15,4 +15,4 @@ const webSocketEvents = {
   recordSessionExpired: 'recordSessionExpired',
 }
 
-module.exports = webSocketEvents
+export default webSocketEvents;

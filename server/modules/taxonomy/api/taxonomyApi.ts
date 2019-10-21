@@ -1,20 +1,17 @@
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
-
-const ObjectUtils = require('../../../../core/objectUtils')
-const Taxon = require('../../../../core/survey/taxon')
-
-const { jobToJSON } = require('../../../job/jobUtils')
-const TaxonomyService = require('../service/taxonomyService')
-
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import Request from '../../../utils/request';
+import Response from '../../../utils/response';
+import ObjectUtils from '../../../../core/objectUtils';
+import Taxon from '../../../../core/survey/taxon';
+import { jobToJSON } from '../../../job/jobUtils';
+import TaxonomyService from '../service/taxonomyService';
+import * as AuthMiddleware from '../../auth/authApiMiddleware';
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
-module.exports.init = app => {
+export const init = app => {
 
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -167,4 +164,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

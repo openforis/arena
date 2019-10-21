@@ -1,23 +1,21 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const compression = require('compression')
-const cookieParser = require('cookie-parser')
-const fileUpload = require('express-fileupload')
+import express from 'express';
+import bodyParser from 'body-parser';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
+import Log from '../log/log';
+import * as headerMiddleware from './middleware/headerMiddleware';
+import jwtMiddleware from './middleware/jwtMiddleware';
+import * as errorMiddleware from './middleware/errorMiddleware';
+import * as authApi from '../modules/auth/api/authApi';
+import apiRouter from './apiRouter';
+import WebSocket from '../utils/webSocket';
+import RecordPreviewCleanup from './schedulers/recordPreviewCleanup';
+import ExpiredJwtTokensCleanup from './schedulers/expiredJwtTokensCleanup';
+import TempFilesCleanup from './schedulers/tempFilesCleanup';
+import ProcessUtils from '../../core/processUtils';
 
-const Log = require('../log/log')
-
-const headerMiddleware = require('./middleware/headerMiddleware')
-const jwtMiddleware = require('./middleware/jwtMiddleware')
-const errorMiddleware = require('./middleware/errorMiddleware')
-const authApi = require('../modules/auth/api/authApi')
-const apiRouter = require('./apiRouter')
-const WebSocket = require('../utils/webSocket')
-const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
-const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
-const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
-const ProcessUtils = require('../../core/processUtils')
-
-module.exports = async () => {
+export default async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info(`server initialization start`)
@@ -67,4 +65,4 @@ module.exports = async () => {
   await RecordPreviewCleanup.init()
   await ExpiredJwtTokensCleanup.init()
   await TempFilesCleanup.init()
-}
+};

@@ -1,17 +1,14 @@
-const DBMigrate = require('db-migrate')
-const path = require('path')
-const R = require('ramda')
-
-const Log = require('../../log/log')
+import DBMigrate from 'db-migrate';
+import path from 'path';
+import * as R from 'ramda';
+import Log from '../../log/log';
 const logger = Log.getLogger('DBMigrator')
 
-const db = require('../db')
-const config = require('./migrationConfig')
-
-const ProcessUtils = require('../../../core/processUtils')
-const { getSurveyDBSchema } = require('../../modules/survey/repository/surveySchemaRepositoryUtils')
-
-const { fetchAllSurveyIds } = require('../../modules/survey/repository/surveyRepository')
+import db from '../db';
+import config from './migrationConfig';
+import ProcessUtils from '../../../core/processUtils';
+import { getSurveyDBSchema } from '../../modules/survey/repository/surveySchemaRepositoryUtils';
+import { fetchAllSurveyIds } from '../../modules/survey/repository/surveyRepository';
 
 const env = ProcessUtils.ENV.nodeEnv
 
@@ -46,7 +43,7 @@ const migrateSchema = async (schema = publicSchema) => {
   await dbm.up()
 }
 
-const migrateSurveySchema = async (surveyId) => {
+export const migrateSurveySchema = async (surveyId) => {
   logger.info(`starting db migrations for survey ${surveyId}`)
 
   const schema = getSurveyDBSchema(surveyId)
@@ -65,7 +62,7 @@ const migrateSurveySchemas = async () => {
   logger.info(`data schemas migrations completed`)
 }
 
-const migrateAll = async () => {
+export const migrateAll = async () => {
   try {
     logger.info('running database migrations')
 
@@ -79,7 +76,7 @@ const migrateAll = async () => {
   }
 }
 
-module.exports = {
+export default {
   migrateAll,
   migrateSurveySchema,
-}
+};

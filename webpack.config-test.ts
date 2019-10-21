@@ -1,19 +1,27 @@
 require('core-js/stable')
 require('regenerator-runtime/runtime')
-const webpack = require('webpack')
-const path = require('path')
-const nodeExternals = require('webpack-node-externals')
 
-require('dotenv').config()
+import webpack from 'webpack'
+import nodeExternals from 'webpack-node-externals'
+import { config as dotEnvConfig } from "dotenv"
+
+dotEnvConfig();
 
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
 // const config = require("./webpack.config.js")
 // config.target = "node"
 // config.mode= 'development'
 // module.exports = config
-module.exports = {
+const config: webpack.Configuration = {
   // plugins: [new ExtractTextPlugin({filename: 'test-style.css'})],
   entry: ['core-js/stable', 'regenerator-runtime/runtime'],
+  resolve: {
+    modules: [
+      "node_modules",
+      // resolve(__dirname, "webapp")
+    ],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  },
   target: 'node', // in order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   mode: 'development',
@@ -21,16 +29,21 @@ module.exports = {
     __filename: true,
     __dirname: true
   },
+  devtool: 'source-map',
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
-        exclude: /(node_modules)/,
+        test: /\.(ts|tsx|js|jsx)$/,
+        exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/env', '@babel/react'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
+            presets: ['@babel/env', '@babel/react', '@babel/typescript'],
+            plugins: [
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-syntax-dynamic-import',
+              '@babel/plugin-proposal-class-properties'
+            ]
           }
         }
       },
@@ -49,3 +62,5 @@ module.exports = {
   //   })
   // ]
 }
+
+export default config

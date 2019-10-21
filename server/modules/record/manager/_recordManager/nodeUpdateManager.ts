@@ -1,17 +1,15 @@
-const R = require('ramda')
-
-const Queue = require('../../../../../core/queue')
-
-const ObjectUtils = require('../../../../../core/objectUtils')
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
-const Node = require('../../../../../core/record/node')
-const Record = require('../../../../../core/record/record')
-
-const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
-const NodeRepository = require('../../repository/nodeRepository')
-
-const ActivityLog = require('../../../activityLog/activityLogger')
+import * as R from 'ramda';
+import Queue from '../../../../../core/queue';
+import ObjectUtils from '../../../../../core/objectUtils';
+import Survey, { ISurvey } from '../../../../../core/survey/survey';
+import NodeDef from '../../../../../core/survey/nodeDef';
+import Node from '../../../../../core/record/node';
+import Record from '../../../../../core/record/record';
+import NodeUpdateDependentManager from './nodeUpdateDependentManager';
+import NodeRepository from '../../repository/nodeRepository';
+import ActivityLog from '../../../activityLog/activityLogger';
+import db from '../../../../db/db';
+import { IRecord } from '../../../../../test/it/utils/recordBuilder';
 
 //==== UPDATE
 
@@ -43,7 +41,7 @@ const persistNode = async (user, survey, record, node, t) => {
   }
 }
 
-const updateNodesDependents = async (survey, record, nodes, tx) => {
+const updateNodesDependents = async (survey: ISurvey, record: IRecord, nodes: { [uuid: string]: any; }, tx) => {
   // output
   let nodesUpdated = { ...nodes }
 
@@ -156,7 +154,7 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   return await _onNodeUpdate(survey, record, node, t)
 }
 
-const deleteNodesByNodeDefUuids = async (surveyId, nodeDefsUuids, record, client = db) => {
+const deleteNodesByNodeDefUuids = async (surveyId, nodeDefsUuids, record, client: any = db) => {
   const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, client)
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
 }
@@ -206,10 +204,10 @@ const _assocParentNode = (surveyId, record, node, nodes) => {
   }
 }
 
-module.exports = {
+export default {
   insertNode,
   persistNode,
   updateNodesDependents,
   deleteNode,
   deleteNodesByNodeDefUuids
-}
+};

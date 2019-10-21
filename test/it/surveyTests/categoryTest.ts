@@ -1,12 +1,10 @@
-const R = require('ramda')
-
-const { getContextSurveyId, getContextUser } = require('../../testContext')
-const { expect } = require('chai')
-
-const CategoryManager = require('../../../server/modules/category/manager/categoryManager')
-const Category = require('../../../core/survey/category')
-const CategoryLevel = require('../../../core/survey/categoryLevel')
-const CategoryItem = require('../../../core/survey/categoryItem')
+import * as R from 'ramda';
+import { getContextSurveyId, getContextUser } from '../../testContext';
+import { expect } from 'chai';
+import CategoryManager from '../../../server/modules/category/manager/categoryManager';
+import Category from '../../../core/survey/category';
+import CategoryLevel from '../../../core/survey/categoryLevel';
+import CategoryItem from '../../../core/survey/categoryItem';
 
 const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
@@ -81,7 +79,7 @@ const _fetchFirstCategory = async surveyId => {
   return R.pipe(R.values, R.head)(categories)
 }
 
-module.exports = {
+export default {
   //category
   createCategoryTest,
   updateCategoryTest,
@@ -91,4 +89,4 @@ module.exports = {
 
   //item
   createCategoryItemTest,
-}
+};

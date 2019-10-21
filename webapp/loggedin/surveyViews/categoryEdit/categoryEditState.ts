@@ -32,8 +32,9 @@ const keys = {
 }
 
 export const stateKey = 'categoryEdit'
-const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
+const getState: (x: any) => any = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
+const getStateProp: (prop: any, defaultValue?: any) => (x: any) => any
+= (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ==== current editing category
 
@@ -56,11 +57,12 @@ export const dissocLevel = levelIndex => R.pipe(
 
 export const assocLevelItems = (levelIndex, items) => R.assocPath([keys.levelItems, levelIndex], items)
 
+interface IWithId { id: number | string; }
 export const getLevelItemsArray = levelIndex => R.pipe(
   SurveyViewsState.getState,
   R.pathOr({}, [stateKey, keys.levelItems, levelIndex]),
   R.values,
-  R.sort((a, b) => Number(a.id) - Number(b.id)),
+  R.sort((a: IWithId, b: IWithId) => Number(a.id) - Number(b.id)),
 )
 
 // ==== level item
@@ -85,15 +87,16 @@ export const dissocLevelItem = (levelIndex, itemUuid) => R.pipe(
 
 const getLevelActiveItems = getStateProp(keys.levelActiveItems, {})
 
-const getLevelActiveItemUuid = levelIndex => R.pipe(
+export const getLevelActiveItemUuid: (levelIndex: number) => (state: any) => any
+= levelIndex => R.pipe(
   getLevelActiveItems,
-  R.prop(levelIndex),
+  x => x[levelIndex],
 )
 
-export const getLevelActiveItem = levelIndex =>
-  state => R.pipe(
+export const getLevelActiveItem: (levelIndex: number) => (state: any) => IWithId
+= levelIndex => state => R.pipe(
     getLevelActiveItemUuid(levelIndex),
-    activeItemUuid => {
+    (activeItemUuid: string) => {
       const levelItems = getLevelItemsArray(levelIndex)(state)
       return R.find(item => CategoryItem.getUuid(item) === activeItemUuid, levelItems)
     },

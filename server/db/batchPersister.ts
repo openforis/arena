@@ -1,4 +1,7 @@
-class BatchPersister {
+export default class BatchPersister {
+	private insertHandler: any;
+	private bufferSize: any;
+	private insertBuffer: any;
 
   constructor (insertHandler, bufferSize = 1000) {
     this.insertHandler = insertHandler
@@ -21,5 +24,3 @@ class BatchPersister {
     }
   }
 }
-
-module.exports = BatchPersister

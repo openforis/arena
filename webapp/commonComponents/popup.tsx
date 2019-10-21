@@ -4,6 +4,12 @@ import React from 'react'
 import { elementOffset } from '../utils/domUtils'
 
 class Popup extends React.PureComponent {
+  static defaultProps = {
+    padding: 0,
+    className: '',
+    onClose: () => {},
+  }
+  elementRef: React.RefObject<any>
 
   constructor (props) {
     super(props)
@@ -47,12 +53,6 @@ class Popup extends React.PureComponent {
     )
 
   }
-}
-
-Popup.defaultProps = {
-  padding: 0,
-  className: '',
-  onClose: () => {},
 }
 
 export default Popup

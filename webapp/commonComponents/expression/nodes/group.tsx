@@ -1,10 +1,10 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import ExpressionNode from './expressionNode'
-import EditButtons from './editButtons'
+import { ExpressionNode } from './internal'
+import { EditButtons } from './internal'
 
-const Group = (props) => {
+export const Group = (props) => {
   const {
     node, onChange,
     level = 0

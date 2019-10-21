@@ -1,8 +1,7 @@
-const R = require('ramda')
-
-const NodeDefExpression = require('../nodeDefExpression')
-const SurveyNodeDefs = require('./surveyNodeDefs')
-const NodeDef = require('../nodeDef')
+import * as R from 'ramda';
+import NodeDefExpression from '../nodeDefExpression';
+import SurveyNodeDefs from './surveyNodeDefs';
+import NodeDef from '../nodeDef';
 
 const keys = {
   dependencyGraph: 'dependencyGraph'
@@ -76,7 +75,7 @@ const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
 
 const getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
 
-module.exports = {
+export default {
   dependencyTypes,
 
   buildGraph,
@@ -87,4 +86,4 @@ module.exports = {
 
   // UPDATE
   assocDependencyGraph: dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)
-}
+};

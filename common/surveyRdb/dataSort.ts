@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda';
 
 const keys = {
   order: {
@@ -7,13 +7,18 @@ const keys = {
   },
 }
 
-const toHttpParams = R.pipe(
+export const toHttpParams = R.pipe(
   R.map(R.pick(['variable', 'order'])),
   JSON.stringify
 )
 
-const getSortPreparedStatement = sortCriteria => {
-  return sortCriteria.reduce((prev, curr, i) => {
+export interface ISortCriteria {
+  order: string;
+  variable: string;
+}
+
+const getSortPreparedStatement = (sortCriteria: ISortCriteria[]) => {
+  return sortCriteria.reduce((prev, curr: ISortCriteria, i) => {
     const paramName = `sort_${i}`
     const order = keys.order[curr.order] || keys.order.asc
 
@@ -24,11 +29,11 @@ const getSortPreparedStatement = sortCriteria => {
   }, { clause: '', params: {} })
 }
 
-const findVariableByValue = (value) =>
-  R.find(v => v.value === value)
+const findVariableByValue = (value: any) =>
+  R.find((v: any) => v.value === value)
 
-const getViewExpr = (ascLabel, descLabel) => R.pipe(
-  R.map(c => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
+export const getViewExpr = (ascLabel, descLabel) => R.pipe(
+  R.map((c: any) => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
   R.join(', ')
 )
 
@@ -38,7 +43,7 @@ const toString = R.pipe(
 )
 
 const getNewCriteria = availableVariables =>
-  R.filter(c => R.any(v => v.value === c.variable, availableVariables))
+  R.filter((c: ISortCriteria) => R.any((v: any) => v.value === c.variable, availableVariables))
 
 const updateOrder = (pos, order) => R.assocPath([pos, 'order'], order)
 
@@ -47,17 +52,18 @@ const updateVariable = (pos, variable) => R.update(pos, {
   label: R.prop('label', variable),
 })
 
-const getUnchosenVariables = availableVariables => sortCriteria =>
-  R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(availableVariables)
+const getUnchosenVariables: (availableVariables: any[]) => (sortCriteria: any[]) => any[]
+= availableVariables => sortCriteria =>
+  R.reject((v: any) => R.any((s: any) => s.variable === v.value)(sortCriteria))(availableVariables)
 
 const addCriteria = (variable, label, order) => R.append({ variable, label, order })
 
 const deleteCriteria = pos => R.remove(pos, 1)
 
 const retainVariables = variables =>
-  R.reject(c => R.none(v => c.variable === v, variables))
+  R.reject((c: any) => R.none((v: any) => c.variable === v, variables))
 
-module.exports = {
+export default {
   keys,
   toHttpParams,
   getSortPreparedStatement,
@@ -71,4 +77,4 @@ module.exports = {
   addCriteria,
   deleteCriteria,
   retainVariables,
-}
+};

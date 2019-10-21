@@ -5,9 +5,9 @@ import Expression from '../../../../core/exprParser/expression'
 
 import { useI18n } from '../../hooks'
 
-import ExpressionNode from './expressionNode'
+import { ExpressionNode } from './internal'
 
-const Logical = (props) => {
+export const Logical = (props) => {
   const { node, onChange, canDelete = false } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators

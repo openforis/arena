@@ -1,10 +1,9 @@
-const R = require('ramda')
-
-const NodeDefValidations = require('../nodeDefValidations')
-const NodeDef = require('../nodeDef')
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
-const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
+import * as R from 'ramda';
+import NodeDefValidations from '../nodeDefValidations';
+import NodeDef from '../nodeDef';
+import Validator from '../../validation/validator';
+import Validation from '../../validation/validation';
+import NodeDefExpressionsValidator from './nodeDefExpressionsValidator';
 
 const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) => {
   const validation = NodeDef.isMultiple(nodeDef)
@@ -28,6 +27,6 @@ const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) =>
   )(validation)
 }
 
-module.exports = {
+export default {
   validate
-}
+};

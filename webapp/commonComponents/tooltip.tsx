@@ -7,6 +7,12 @@ import * as R from 'ramda'
 import { elementOffset } from '../utils/domUtils'
 
 class Tooltip extends React.Component {
+  static defaultProps = {
+    messages: [],
+    className: null,
+    type: null,
+  }
+  tooltipRef: React.RefObject<any>
 
   constructor (props) {
     super(props)
@@ -72,12 +78,6 @@ class Tooltip extends React.Component {
       </div>
     )
   }
-}
-
-Tooltip.defaultProps = {
-  messages: [],
-  className: null,
-  type: null,
 }
 
 export default Tooltip

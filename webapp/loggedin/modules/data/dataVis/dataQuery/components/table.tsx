@@ -12,7 +12,7 @@ import Authorizer from '../../../../../../../core/auth/authorizer'
 import WebSocketEvents from '../../../../../../../common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '../../../../../../app/appWebSocket'
-import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import {NodeDefUIProps} from '../../../../../surveyViews/surveyForm/nodeDefs'
 
 import { useOnUpdate } from '../../../../../../commonComponents/hooks'
 import TableHeader from './tableHeader'

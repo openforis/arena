@@ -1,16 +1,16 @@
-const SystemError = require('./systemError')
-const UnauthorizedError = require('./unauthorizedError')
+import SystemError from './systemError';
+import UnauthorizedError from './unauthorizedError';
 
 const status = {
   ok: 'ok',
   error: 'error'
 }
 
-const contentTypes = {
+export const contentTypes = {
   csv: 'text/csv'
 }
 
-const sendOk = res => res.json({ status: status.ok })
+export const sendOk = res => res.json({ status: status.ok })
 
 const _getErr = ({ key, params }) => ({
   status: status.error,
@@ -18,7 +18,7 @@ const _getErr = ({ key, params }) => ({
   params,
 })
 
-const sendErr = (res, err) => {
+export const sendErr = (res, err) => {
   if (err instanceof UnauthorizedError) {
     res.status(403).json(_getErr(err))
   } else if (err instanceof SystemError) {
@@ -31,13 +31,13 @@ const sendErr = (res, err) => {
   }
 }
 
-const sendFile = (res, name, content, size) => {
+export const sendFile = (res, name, content, size) => {
   setContentTypeFile(res, name, size)
   res.write(content, 'binary')
   res.end(null, 'binary')
 }
 
-const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
+export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize)
     res.setHeader('Content-Length', fileSize)
@@ -45,11 +45,11 @@ const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) 
     res.set('Content-Type', contentType)
 }
 
-module.exports = {
+export default {
   contentTypes,
 
   sendOk,
   sendErr,
   sendFile,
   setContentTypeFile
-}
+};

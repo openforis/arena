@@ -48,6 +48,15 @@ const AppSideBarPopupMenu = props => {
     }
   }, [key])
 
+  const subModules =
+  // @ts-ignore TODO make this type-check
+  <AppSideBarSubModules
+    module={module}
+    pathname={pathname}
+    sideBarOpened={true}
+    disabled={false}
+  />
+
   return (
     ReactDOM.createPortal(
       <div
@@ -60,12 +69,7 @@ const AppSideBarPopupMenu = props => {
           inPopupMenu.current = false
           closePopupMenuHandler()
         }}>
-        <AppSideBarSubModules
-          module={module}
-          pathname={pathname}
-          sideBarOpened={true}
-          disabled={false}
-        />
+        {subModules}
       </div>,
       document.body
     )

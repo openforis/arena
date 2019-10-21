@@ -1,18 +1,15 @@
-const { expect } = require('chai')
-
-const Survey = require('../../core/survey/survey')
-const NodeDef = require('../../core/survey/nodeDef')
-const Record = require('../../core/record/record')
-const Node = require('../../core/record/node')
-
-const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-const RecordManager = require('../../server/modules/record/manager/recordManager')
-
-const { getContextUser } = require('../testContext')
-
-const SB = require('./utils/surveyBuilder')
-const RB = require('./utils/recordBuilder')
-const RecordUtils = require('./utils/recordUtils')
+import { expect } from 'chai';
+import Survey from '../../core/survey/survey';
+import NodeDef from '../../core/survey/nodeDef';
+import Record from '../../core/record/record';
+import Node from '../../core/record/node';
+import SurveyManager from '../../server/modules/survey/manager/surveyManager';
+import RecordManager from '../../server/modules/record/manager/recordManager';
+import { getContextUser } from '../testContext';
+import * as SB from './utils/surveyBuilder';
+import * as RB from './utils/recordBuilder';
+import RecordUtils from './utils/recordUtils';
+import db from '../../server/db/db';
 
 let survey
 let record
@@ -70,7 +67,7 @@ describe('Applicable Test', async () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // update dependent nodes
-      const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+      const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated, db)
       record = recordUpdate
 
       const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)

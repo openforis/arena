@@ -1,17 +1,13 @@
-const R = require('ramda')
-
-const DateTimeUtils = require('../../dateUtils')
-const NumberUtils = require('../../numberUtils')
-
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
+import * as R from 'ramda';
+import DateTimeUtils from '../../dateUtils';
+import NumberUtils from '../../numberUtils';
+import Survey from '../../survey/survey';
+import NodeDef from '../../survey/nodeDef';
 const { nodeDefType } = NodeDef
-const Taxon = require('../../survey/taxon')
-
-const Node = require('../node')
-const GeoUtils = require('../../geo/geoUtils')
-
-const Validation = require('../../validation/validation')
+import Taxon from '../../survey/taxon';
+import Node from '../node';
+import GeoUtils from '../../geo/geoUtils';
+import Validation from '../../validation/validation';
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
@@ -90,6 +86,6 @@ const validateValueType = (survey, nodeDef) => (propName, node) => {
   return valid ? null : { key: Validation.messageKeys.record.valueInvalid }
 }
 
-module.exports = {
+export default {
   validateValueType
-}
+};

@@ -1,21 +1,19 @@
-const R = require('ramda')
-const { assert, expect } = require('chai')
-
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const ProcessingChain = require('../../../common/analysis/processingChain')
-const ProcessingStep = require('../../../common/analysis/processingStep')
-const ProcessingStepCalculation = require('../../../common/analysis/processingStepCalculation')
-
-const ProcessingChainService = require('../../../server/modules/analysis/service/processingChainService')
-
-const { getContextUser } = require('../../testContext')
-const SB = require('../utils/surveyBuilder')
-const RB = require('../utils/recordBuilder')
+import * as R from 'ramda';
+import { assert, expect } from 'chai';
+import Survey from '../../../core/survey/survey';
+import NodeDef from '../../../core/survey/nodeDef';
+import ProcessingChain from '../../../common/analysis/processingChain';
+import ProcessingStep from '../../../common/analysis/processingStep';
+import ProcessingStepCalculation from '../../../common/analysis/processingStepCalculation';
+import ProcessingChainService from '../../../server/modules/analysis/service/processingChainService';
+import { getContextUser } from '../../testContext';
+import * as SB from '../utils/surveyBuilder';
+import * as RB from '../utils/recordBuilder';
+import { IProcessingChain } from '../../../common/analysis/common';
 
 let survey = null
 let records = []
-let processingChain = null
+let processingChain: IProcessingChain | null = null
 
 before(async () => {
   const user = getContextUser()
@@ -89,6 +87,6 @@ const simpleTest = async () => {
   await ProcessingChainService.generateScript(Survey.getId(survey), processingChain)
 }
 
-module.exports = {
+export default {
   simpleTest
-}
+};

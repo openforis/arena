@@ -1,4 +1,4 @@
-const AuthGroups = require('../../auth/authGroups')
+import AuthGroups from '../../auth/authGroups';
 
 const getDefaultAuthGroups = () => [
   {
@@ -82,6 +82,6 @@ const getDefaultAuthGroups = () => [
   // },
 ]
 
-module.exports = {
+export default {
   getDefaultAuthGroups,
-}
+};

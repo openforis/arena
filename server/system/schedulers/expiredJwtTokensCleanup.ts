@@ -1,8 +1,6 @@
-const schedule = require('node-schedule')
-
-const Log = require('../../log/log')
-
-const AuthService = require('../../modules/auth/service/authService')
+import schedule from 'node-schedule';
+import Log from '../../log/log';
+import AuthService from '../../modules/auth/service/authService';
 
 const init = () => {
   const logger = Log.getLogger('ExpiredJwtTokensCleanup')
@@ -22,6 +20,6 @@ const init = () => {
   })
 }
 
-module.exports = {
+export default {
   init
-}
+};

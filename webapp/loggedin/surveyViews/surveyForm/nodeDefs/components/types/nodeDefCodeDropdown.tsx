@@ -7,7 +7,7 @@ import Dropdown from '../../../../../../commonComponents/form/dropdown'
 import NodeDef from '../../../../../../../core/survey/nodeDef'
 import CategoryItem from '../../../../../../../core/survey/categoryItem'
 
-const NodeDefCodeDropdown = props => {
+export const NodeDefCodeDropdown = props => {
   const {
     lang, nodeDef,
     items, selectedItems,

@@ -10,8 +10,9 @@ const keys = {
 }
 
 export const stateKey = 'nodeDefEdit'
-const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = prop => R.pipe(getState, R.prop(prop))
+const getState: (x: any) => any = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
+const getStateProp: (prop: any) => (x: any) => any
+= prop => R.pipe(getState, R.prop(prop))
 
 export const assocNodeDef = nodeDef => R.assoc(keys.nodeDefUuid, NodeDef.getUuid(nodeDef))
 

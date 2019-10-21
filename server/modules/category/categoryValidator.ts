@@ -1,10 +1,9 @@
-const R = require('ramda')
-
-const Category = require('../../../core/survey/category')
-const CategoryLevel = require('../../../core/survey/categoryLevel')
-const CategoryItem = require('../../../core/survey/categoryItem')
-const Validator = require('../../../core/validation/validator')
-const Validation = require('../../../core/validation/validation')
+import * as R from 'ramda';
+import Category from '../../../core/survey/category';
+import CategoryLevel from '../../../core/survey/categoryLevel';
+import CategoryItem, { ICategoryItem } from '../../../core/survey/categoryItem';
+import Validator from '../../../core/validation/validator';
+import Validation from '../../../core/validation/validation';
 
 const keys = {
   children: 'children',
@@ -64,7 +63,8 @@ const itemValidators = (isLeaf, itemsByParentUuid, siblingsByCode) => ({
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemsByParentUuid)],
 })
 
-const getChildrenItems = (itemsByParentUuid, parentItemUuid) =>
+const getChildrenItems: (itemsByParentUuid: any[], parentItemUuid: string) => ICategoryItem[]
+= (itemsByParentUuid, parentItemUuid) =>
   R.propOr([], parentItemUuid)(itemsByParentUuid)
 
 const validateNotEmptyChildrenItems = (isLeaf, itemsByParentUuid) =>
@@ -116,10 +116,11 @@ const validateItem = (category, siblings, siblingsByUuid, siblingsByCode, itemsB
 const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItemUuid) => {
   const children = getChildrenItems(itemsByParentUuid, parentItemUuid)
   const childrenByCode = R.groupBy(CategoryItem.getCode)(children)
-  const childrenByUuid = R.groupBy(R.prop(CategoryItem.keys.uuid))(children)
+  const childrenByUuid = R.groupBy(R.prop(CategoryItem.keys.uuid) as (x: any) => string)(children)
 
   const childrenValidationsArr = await Promise.all(children.map(
-    validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid, parentItemUuid)
+    // XXX: this had an unused argument: parentItemUuid
+    validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid)
   ))
 
   //merge children validations
@@ -157,8 +158,8 @@ const categoryValidators = (categories) => ({
 const validateCategoryProps = async (categories, category) =>
   await Validator.validate(category, categoryValidators(categories))
 
-const validateCategory = async (categories, category, items) => {
-  const itemsByParentUuid = R.groupBy(R.prop(CategoryItem.keys.parentUuid))(items)
+const validateCategory = async (categories, category, items: { parentUuid?: string; }[]) => {
+  const itemsByParentUuid = R.groupBy(R.prop(CategoryItem.keys.parentUuid) as (x: any) => string)(items)
 
   const categoryValidation = await validateCategoryProps(categories, category)
   const levelsValidation = await validateLevels(category, itemsByParentUuid)
@@ -177,6 +178,6 @@ const validateCategory = async (categories, category, items) => {
   )(categoryValidation)
 }
 
-module.exports = {
+export default {
   validateCategory,
-}
+};

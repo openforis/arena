@@ -1,4 +1,4 @@
-const RecordUpdateManagerTest = require('./recordTests/recordUpdateManagerTest')
+import RecordUpdateManagerTest from './recordTests/recordUpdateManagerTest';
 
 describe('RecordUpdateManager Test', async () => {
   it('Record creation', RecordUpdateManagerTest.recordCreationTest)

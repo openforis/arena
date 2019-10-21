@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const StringUtils = require('./stringUtils')
-const DateUtils = require('./dateUtils')
+import * as R from 'ramda';
+import StringUtils from './stringUtils';
+import DateUtils from './dateUtils';
 
 const keys = {
   authGroups: 'authGroups',
@@ -27,18 +26,21 @@ const isBlank = value => value === null || value === undefined || R.isEmpty(valu
 const isEqual = other => self => getUuid(other) === getUuid(self)
 
 //====== READ
-const getUuid = R.propOr(null, keys.uuid)
+// TODO: Make the return type into: string | null
+// Currently it's not, since doing so would require large changes everywhere...
+const getUuid: (x: any) => string = R.propOr(null, keys.uuid)
 
 const getProps = R.propOr({}, keys.props)
-const getProp = (prop, defaultTo = null) => R.pipe(
+const getProp = (prop, defaultTo: any = null) => R.pipe(
   getProps,
   R.pathOr(defaultTo, prop.split('.'))
 )
 
-const getLabels = getProp(keysProps.labels, {})
-const getLabel = (lang, defaultTo = null) => R.pipe(
-  getLabels,
-  R.propOr(defaultTo, lang)
+const getLabels: (x: any) => ({ [lang: string]: string; })[] = getProp(keysProps.labels, {})
+const getLabel: (lang: string, defaultTo?: string | null) => any
+= (lang, defaultTo = null) => R.pipe(
+  getLabels as (x: any) => any,
+  R.propOr(defaultTo, lang) as (x: any) => any,
 )
 
 const getDescriptions = getProp(keysProps.descriptions, {})
@@ -94,7 +96,7 @@ const toIndexedObj = (array, prop) => array.reduce(
 
 const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
-module.exports = {
+export default {
   keys,
   keysProps,
 
@@ -102,7 +104,7 @@ module.exports = {
   getProps,
   getProp,
   getUuid,
-  getParentUuid: R.propOr(null, keys.parentUuid),
+  getParentUuid: R.propOr(null, keys.parentUuid) as (x: any) => string,
   getLabels,
   getLabel,
   getDescriptions,
@@ -122,4 +124,4 @@ module.exports = {
   isEqual,
   toIndexedObj,
   toUuidIndexedObj
-}
+};

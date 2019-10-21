@@ -1,24 +1,20 @@
-const R = require('ramda')
-const fs = require('fs')
+import * as R from 'ramda';
+import fs from 'fs';
+import {getLogger} from '../../../log/log'
+import Survey from '../../../../core/survey/survey';
+import Record from '../../../../core/record/record';
+import Node from '../../../../core/record/node';
+import RecordFile from '../../../../core/record/recordFile';
+import Authorizer from '../../../../core/auth/authorizer';
+import WebSocketEvents from '../../../../common/webSocket/webSocketEvents';
+import WebSocket from '../../../utils/webSocket';
+import SurveyManager from '../../survey/manager/surveyManager';
+import RecordManager from '../manager/recordManager';
+import FileManager from '../manager/fileManager';
+import * as RecordServiceThreads from './update/recordServiceThreads';
+import RecordThreadMessageTypes from './update/thread/recordThreadMessageTypes';
 
-const Logger = require('../../../log/log').getLogger('RecordService')
-
-const Survey = require('../../../../core/survey/survey')
-const Record = require('../../../../core/record/record')
-const Node = require('../../../../core/record/node')
-const RecordFile = require('../../../../core/record/recordFile')
-const Authorizer = require('../../../../core/auth/authorizer')
-
-const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
-const WebSocket = require('../../../utils/webSocket')
-
-const SurveyManager = require('../../survey/manager/surveyManager')
-const RecordManager = require('../manager/recordManager')
-const FileManager = require('../manager/fileManager')
-
-const RecordServiceThreads = require('./update/recordServiceThreads')
-const RecordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
-
+const Logger = getLogger('RecordService')
 /**
  * ======
  * RECORD
@@ -111,7 +107,7 @@ const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) => _sendNode
   socketId, user, surveyId, recordUuid, { type: RecordThreadMessageTypes.nodeDelete, nodeUuid, user }
 )
 
-const deleteRecordsPreview = async (olderThan24Hours = false) => {
+const deleteRecordsPreview = async (olderThan24Hours: boolean = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
   const counts = await Promise.all(surveyIds.map(
     surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
@@ -119,7 +115,7 @@ const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return R.sum(counts)
 }
 
-module.exports = {
+export default {
   // ====== RECORD
 
   //create
@@ -146,4 +142,4 @@ module.exports = {
   fetchNodeByUuid: RecordManager.fetchNodeByUuid,
   persistNode,
   deleteNode,
-}
+};

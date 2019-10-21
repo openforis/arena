@@ -1,8 +1,7 @@
-const R = require('ramda')
-
-const Validation = require('./validation')
-const ValidationResult = require('./validationResult')
-const ValidatorFunctions = require('./_validator/validatorFunctions')
+import * as R from 'ramda';
+import Validation from './validation';
+import ValidationResult from './validationResult';
+import ValidatorFunctions from './_validator/validatorFunctions';
 
 const validateProp = async (obj, prop, validations = []) => {
   const validationsEvaluated = await Promise.all(
@@ -23,7 +22,7 @@ const validateProp = async (obj, prop, validations = []) => {
   return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
 }
 
-const validate = async (obj, propsValidations, removeValidFields = true) => {
+const validate = async (obj, propsValidations: { [s: string]: any[]; }, removeValidFields = true) => {
   const validation = Validation.newInstance()
 
   for (const [prop, propValidations] of Object.entries(propsValidations)) {
@@ -43,7 +42,7 @@ const validate = async (obj, propsValidations, removeValidFields = true) => {
   return validation
 }
 
-module.exports = {
+export default {
   validate,
 
   // validator functions
@@ -53,4 +52,4 @@ module.exports = {
   validateName: ValidatorFunctions.validateName,
   validatePositiveNumber: ValidatorFunctions.validatePositiveNumber,
   isKeyword: ValidatorFunctions.isKeyword,
-}
+};

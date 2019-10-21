@@ -63,9 +63,9 @@ const jobToJSON = job => ({
 
 })
 
-module.exports = {
+export {
   jobStatus,
   jobEvents,
   jobThreadMessageTypes,
   jobToJSON,
-}
+};

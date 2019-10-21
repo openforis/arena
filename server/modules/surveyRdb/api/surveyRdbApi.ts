@@ -1,11 +1,9 @@
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
+import Request from '../../../utils/request';
+import Response from '../../../utils/response';
+import SurveyRdbService from '../service/surveyRdbService';
+import { requireRecordListViewPermission } from '../../auth/authApiMiddleware';
 
-const SurveyRdbService = require('../service/surveyRdbService')
-
-const { requireRecordListViewPermission } = require('../../auth/authApiMiddleware')
-
-module.exports.init = app => {
+export const init = app => {
 
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
@@ -51,4 +49,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

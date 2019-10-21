@@ -1,8 +1,6 @@
-const i18next = require('i18next')
-
-const ProcessUtils = require('../processUtils')
-
-const enTranslation = require('./resources/en')
+import i18next from 'i18next';
+import ProcessUtils from '../processUtils';
+import enTranslation from './resources/en';
 
 const createParams = lang => ({
   fallbackLng: 'en',
@@ -21,9 +19,14 @@ const createParams = lang => ({
   },
 })
 
-const createI18nPromise = lang => {
+interface AppI18n {
+  lang: string;
+  t: any;
+}
+export const createI18nPromise: (lang: string) => Promise<AppI18n>
+= lang => {
   // import and require return different objects
-  const createInstance = i18next.createInstance || i18next.default.createInstance
+  const createInstance = i18next.createInstance || (i18next as any).default.createInstance
 
   return new Promise((resolve, reject) => {
     createInstance(
@@ -35,4 +38,4 @@ const createI18nPromise = lang => {
   })
 }
 
-module.exports.createI18nPromise = createI18nPromise
+export default { createI18nPromise };

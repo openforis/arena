@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 
-export default ({ nodeDef, node, disabled = false, showConfirm = true, removeNode }) => {
+export const NodeDeleteButton = ({ nodeDef, node, disabled = false, showConfirm = true, removeNode }) => {
   const i18n = useI18n()
 
   return (
@@ -20,3 +20,4 @@ export default ({ nodeDef, node, disabled = false, showConfirm = true, removeNod
     </button>
   )
 }
+export default NodeDeleteButton

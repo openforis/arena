@@ -1,20 +1,15 @@
-const { expect } = require('chai')
-
-const db = require('../../server/db/db')
-
-const { getContextUser } = require('../testContext')
-
-const Survey = require('../../core/survey/survey')
-const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
-
-const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-
-const SB = require('./utils/surveyBuilder')
+import { expect } from 'chai';
+import db from '../../server/db/db';
+import { getContextUser } from '../testContext';
+import Survey from '../../core/survey/survey';
+import SchemaRdb from '../../common/surveyRdb/schemaRdb';
+import SurveyManager from '../../server/modules/survey/manager/surveyManager';
+import * as SB from './utils/surveyBuilder';
 
 const expectSchemaToExist = async (schemaName, exists = true) => {
   const result = await db.one(`
-     SELECT COUNT(*) = 1 as res 
-     FROM information_schema.schemata 
+     SELECT COUNT(*) = 1 as res
+     FROM information_schema.schemata
      WHERE schema_name = $1
     `,
     [schemaName]

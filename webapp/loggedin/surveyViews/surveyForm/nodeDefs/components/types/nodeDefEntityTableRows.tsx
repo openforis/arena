@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefEntityTableRow from './nodeDefEntityTableRow'
+import { NodeDefEntityTableRow } from '../../internal'
 
 import Survey from '../../../../../../../core/survey/survey'
 import NodeDef from '../../../../../../../core/survey/nodeDef'
@@ -12,7 +12,7 @@ import * as SurveyState from '../../../../../../survey/surveyState'
 import { elementOffset } from '../../../../../../utils/domUtils'
 import { debounce } from '../../../../../../../core/functionsDefer'
 
-const NodeDefEntityTableRows = props => {
+const _NodeDefEntityTableRows = props => {
 
   const {
     entry, edit,
@@ -130,7 +130,7 @@ const mapStateToProps = (state, props) => {
 
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+  const nodeDefColumnUuids: string[] = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
 
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
@@ -147,4 +147,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(NodeDefEntityTableRows)
+export const NodeDefEntityTableRows = connect(mapStateToProps)(_NodeDefEntityTableRows)
+export default NodeDefEntityTableRows

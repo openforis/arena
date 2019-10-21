@@ -1,20 +1,26 @@
-const { parentPort, workerData, isMainThread } = require('worker_threads')
+import { parentPort, workerData, isMainThread } from 'worker_threads'
 
-const Log = require('../log/log')
+import Log from '../log/log';
 
-const ThreadParams = require('./threadParams')
+import ThreadParams from './threadParams';
 
 /**
  * Base class for thread execution in Worker Pool
  */
-class Thread {
+export default class Thread {
+	public params: any;
+  public logger: any;
 
-  constructor (params) {
+  static messageTypes = {
+    error: 'error',
+  }
+
+  constructor (params?) {
     this.params = params ? params : { ...workerData }
 
     this.logger = Log.getLogger('Thread')
 
-    if (!isMainThread)
+    if (!isMainThread && parentPort)
       parentPort.on('message', this.messageHandler.bind(this))
   }
 
@@ -31,7 +37,8 @@ class Thread {
    * @param msg
    */
   postMessage (msg) {
-    parentPort.postMessage({ user: this.user, surveyId: this.surveyId, msg })
+    if (parentPort)
+      parentPort.postMessage({ user: this.user, surveyId: this.surveyId, msg })
   }
 
   async messageHandler (msg) {
@@ -53,9 +60,3 @@ class Thread {
   }
 
 }
-
-Thread.messageTypes = {
-  error: 'error',
-}
-
-module.exports = Thread

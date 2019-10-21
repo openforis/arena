@@ -1,6 +1,5 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
 
 const keys = {
   props: ObjectUtils.keys.props,
@@ -28,7 +27,7 @@ const createItem = (expressionType, expression, applyIf = null, messages = null)
   [propKeys.messages]: messages,
 })
 
-module.exports = {
+export default {
   keys,
   propKeys,
   exprTypes,
@@ -36,11 +35,11 @@ module.exports = {
   createItem,
 
   isResolved: R.propOr(false, keys.resolved),
-  getNodeDefUuid: R.prop(keys.nodeDefUuid),
+  getNodeDefUuid: R.prop(keys.nodeDefUuid) as (x: any) => string,
   getProps: R.prop(keys.props),
 
   getExpressionType: ObjectUtils.getProp(propKeys.expressionType),
   getExpression: ObjectUtils.getProp(propKeys.expression, ''),
   getApplyIf: ObjectUtils.getProp(propKeys.applyIf, ''),
   getMessages: ObjectUtils.getProp(propKeys.messages, ''),
-}
+};

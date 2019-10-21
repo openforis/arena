@@ -13,9 +13,7 @@ import CategoryItem from '../../../../../../core/survey/categoryItem'
 import Node from '../../../../../../core/record/node'
 import NodeRefData from '../../../../../../core/record/nodeRefData'
 
-import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
-import * as NodeDefUiProps from '../nodeDefUIProps'
-import NodeDefErrorBadge from './nodeDefErrorBadge'
+import { NodeDefMultipleEditDialog, NodeDefUIProps, NodeDefErrorBadge } from '../internal'
 
 const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
   const getNodeValue = node => {
@@ -49,6 +47,7 @@ const NodeDefMultipleTableCell = props => {
 
   useEffect(() => {
     const nodeValuesUpdate = getNodeValues(surveyInfo, nodeDef, nodes, lang)
+    // @ts-ignore TODO
     setNodeValues(nodeValuesUpdate)
   }, [nodes])
 
@@ -75,7 +74,7 @@ const NodeDefMultipleTableCell = props => {
     )
 }
 
-const NodeDefTableCellBody = props => {
+export const NodeDefTableCellBody = props => {
   const {
     surveyInfo, surveyCycleKey, nodeDef,
     parentNode, nodes, edit, entryDataQuery,
@@ -98,7 +97,7 @@ const NodeDefTableCellBody = props => {
             />
           )
           : (
-            React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
+            React.createElement(NodeDefUIProps.getComponent(nodeDef), { ...props })
           )
       }
 

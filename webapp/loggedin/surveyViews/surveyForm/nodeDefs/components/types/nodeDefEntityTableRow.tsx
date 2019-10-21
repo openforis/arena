@@ -1,16 +1,18 @@
 import React from 'react'
 
-import NodeDefEntityTableCell from './nodeDefEntityTableCell'
-import NodeDeleteButton from '../nodeDeleteButton'
+import { NodeDefEntityTableCell } from '../../internal'
+import { NodeDeleteButton } from '../../internal'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
 import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
 
 import { elementOffset } from '../../../../../../../webapp/utils/domUtils'
 
-class NodeDefEntityTableRow extends React.Component {
+export class NodeDefEntityTableRow extends React.Component {
+	public placeholderRef: React.RefObject<any>;
+	public rowRef: React.RefObject<any>;
 
-  constructor (props) {
+  constructor (props: Readonly<{}>) {
     super(props)
 
     this.placeholderRef = React.createRef()
@@ -18,7 +20,7 @@ class NodeDefEntityTableRow extends React.Component {
     this.state = { dragged: null }
   }
 
-  dragStart (evt) {
+  dragStart (evt: React.DragEvent<Element>) {
     this.setState({ dragged: evt.currentTarget }, () => {
       const { dragged } = this.state
       const placeholder = this.placeholderRef.current
@@ -29,10 +31,10 @@ class NodeDefEntityTableRow extends React.Component {
 
     evt.dataTransfer.effectAllowed = 'move'
     // Firefox requires dataTransfer data to be set
-    evt.dataTransfer.setData('text/html', evt.currentTarget)
+    evt.dataTransfer.setData('text/html', evt.currentTarget as any)
   }
 
-  dragOver (evt) {
+  dragOver (evt: React.DragEvent<Element>) {
     const { dragged } = this.state
     const placeholder = this.placeholderRef.current
 
@@ -42,18 +44,18 @@ class NodeDefEntityTableRow extends React.Component {
     placeholder.style.display = 'block'
 
     if (evt.target !== placeholder) {
-      const overElement = evt.target
+      const overElement = evt.target as HTMLElement
 
       const { left } = elementOffset(overElement)
       const relX = evt.clientX - left
       const width = overElement.offsetWidth / 2
-      const parent = evt.target.parentNode
+      const parent = overElement.parentNode
 
-      parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
+      parent.insertBefore(placeholder, relX > width ? overElement.nextElementSibling : overElement)
     }
   }
 
-  dragEnd () {
+  dragEnd (_evt: React.DragEvent<Element>) {
     const { nodeDef, putNodeDefLayoutProp } = this.props
 
     const { dragged } = this.state
@@ -93,7 +95,7 @@ class NodeDefEntityTableRow extends React.Component {
 
         {
           nodeDefColumns
-            .map(nodeDefChild => (
+            .map((nodeDefChild: any) => (
               <NodeDefEntityTableCell
                 key={NodeDef.getUuid(nodeDefChild)}
                 {...this.props}
@@ -101,9 +103,9 @@ class NodeDefEntityTableRow extends React.Component {
                 parentNode={node}
                 canEditDef={canEditDef}
                 renderType={renderType}
-                onDragStart={e => this.dragStart(e)}
-                onDragOver={e => this.dragOver(e)}
-                onDragEnd={e => this.dragEnd(e)}
+                onDragStart={(e: React.DragEvent<Element>) => this.dragStart(e)}
+                onDragOver={(e: React.DragEvent<Element>) => this.dragOver(e)}
+                onDragEnd={(e: React.DragEvent<Element>) => this.dragEnd(e)}
               />
             ))
         }

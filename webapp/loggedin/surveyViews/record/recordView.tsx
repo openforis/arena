@@ -100,17 +100,15 @@ const RecordView = props => {
     cycleChanged(history)
   }, [surveyCycleKey])
 
-  return recordLoaded
-    ? (
-      <SurveyFormView
-        draft={preview}
-        preview={preview}
-        edit={false}
-        entry={true}
-        canEditRecord={canEditRecord}
-      />
-    )
-    : null
+  if (!recordLoaded) return null
+
+  // @ts-ignore TODO
+  return <SurveyFormView
+    preview={preview}
+    edit={false}
+    entry={true}
+    canEditRecord={canEditRecord}
+  />
 }
 
 const mapStateToProps = (state, { match, location }) => {

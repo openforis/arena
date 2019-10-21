@@ -1,22 +1,17 @@
-const fs = require('fs')
-
-const passwordGenerator = require('generate-password')
-
-const db = require('../../../db/db')
-const aws = require('../../../system/aws')
-
-const UserManager = require('../manager/userManager')
-const AuthManager = require('../../auth/manager/authManager')
-const SurveyManager = require('../../survey/manager/surveyManager')
-
-const Survey = require('../../../../core/survey/survey')
-const User = require('../../../../core/user/user')
-const AuthGroups = require('../../../../core/auth/authGroups')
-const Authorizer = require('../../../../core/auth/authorizer')
-
-const SystemError = require('../../../utils/systemError')
-const UnauthorizedError = require('../../../utils/unauthorizedError')
-const Mailer = require('../../../utils/mailer')
+import fs from 'fs';
+import passwordGenerator from 'generate-password';
+import db from '../../../db/db';
+import aws from '../../../system/aws';
+import UserManager from '../manager/userManager';
+import AuthManager from '../../auth/manager/authManager';
+import SurveyManager from '../../survey/manager/surveyManager';
+import Survey from '../../../../core/survey/survey';
+import User from '../../../../core/user/user';
+import AuthGroups from '../../../../core/auth/authGroups';
+import Authorizer from '../../../../core/auth/authorizer';
+import SystemError from '../../../utils/systemError';
+import UnauthorizedError from '../../../utils/unauthorizedError';
+import Mailer from '../../../utils/mailer';
 
 // ====== CREATE
 
@@ -137,7 +132,7 @@ const updateUsername = async (user, userUuid, name) => {
   await UserManager.updateUsername(user, name)
 }
 
-module.exports = {
+export default {
   // ==== User
   // CREATE
   inviteUser,
@@ -157,4 +152,4 @@ module.exports = {
 
   // ==== User prefs
   updateUserPrefs: UserManager.updateUserPrefs,
-}
+};

@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda';
 
 const keys = {
   key: 'key',
@@ -16,9 +16,9 @@ const severities = {
 
 const newInstance = (key, params = null, severity = null, messages = null) => ({
   [keys.key]: key,
-  ...params ? { [keys.params]: params } : {},
-  ...severity ? { [keys.severity]: severity } : {},
-  ...messages ? { [keys.messages]: messages } : {},
+  ...((params ? { [keys.params]: params } : {})),
+  ...((severity ? { [keys.severity]: severity } : {})),
+  ...((messages ? { [keys.messages]: messages } : {})),
 })
 
 const getKey = R.prop(keys.key)
@@ -41,7 +41,7 @@ const getMessage = lang => R.pipe(
 )
 const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
 
-module.exports = {
+export default {
   keys,
 
   severities,
@@ -55,4 +55,4 @@ module.exports = {
   getMessage,
   isError: R.pipe(getSeverity, R.equals(severities.error)),
   hasMessages,
-}
+};

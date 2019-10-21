@@ -4,24 +4,55 @@
  * This module uses @esri/proj-codes library and stores all the Spatial Reference Systems (with code, name and wkt)
  * into an array that can be huge.
  */
-const R = require('ramda')
+import * as R from 'ramda';
+
 /**
  * Projected coordinate reference systems
  * format: {wkid: id, name:"CRS name", wkt: "Well Know Text"}
  */
-const projected = require('@esri/proj-codes/pe_list_projcs.json')
+import _projected from '@esri/proj-codes/pe_list_projcs.json';
+const projected: IProjectedCoordinateSystems = _projected as IProjectedCoordinateSystems;
+
 /**
  * Geographic coordinate reference systems
  * format: same as projected
  */
-const geographic = require('@esri/proj-codes/pe_list_geogcs.json')
-const proj4 = require('proj4')
-const isValidCoordinates = require('is-valid-coordinates')
+import _geographic from '@esri/proj-codes/pe_list_geogcs.json';
+const geographic: IGeographicCoordinateSystems = _geographic as IGeographicCoordinateSystems;
 
-const Srs = require('./srs')
-const ObjectUtils = require('../objectUtils')
-const NumberUtils = require('../numberUtils')
-const StringUtils = require('../stringUtils')
+
+interface IProjectedCoordinateSystems {
+  ProjectedCoordinateSystems: ICoordinateSystem[];
+}
+interface IGeographicCoordinateSystems {
+  GeographicCoordinateSystems: ICoordinateSystem[];
+}
+interface ICoordinateSystem {
+  wkid: number,
+  latestWkid: number,
+  macro: string;
+  name: string;
+  wkt: string;
+  description: string;
+  authority: string;
+  version: string;
+  deprecated: string;
+  areaname: string;
+  extent: {
+    slat: number;
+    nlat: number;
+    llon: number;
+    rlon: number;
+  }
+}
+
+import proj4 from 'proj4';
+import isValidCoordinates from 'is-valid-coordinates';
+import Srs, { ISRS } from './srs';
+import ObjectUtils from '../objectUtils';
+import NumberUtils from '../numberUtils';
+import StringUtils from '../stringUtils';
+import { number } from 'prop-types';
 
 const invalidLonLatCoordinates = [0, 90] //proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 
@@ -43,12 +74,12 @@ const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
 /**
  * Finds a list of srs whose name or code matches the specified parameter
  */
-const findSrsByCodeOrName = (codeOrName, limit = 200) =>
+const findSrsByCodeOrName = (codeOrName: string, limit = 200) =>
   R.pipe(
-    R.filter(item =>
+    R.filter((item: ISRS) =>
       StringUtils.contains(codeOrName, item.code) ||
       StringUtils.contains(codeOrName, item.name)
-    ),
+    ) as (items: ISRS[]) => ISRS[],
     R.take(limit)
   )(srsArray)
 
@@ -78,8 +109,8 @@ const isCoordinateValid = (srsCode, x, y) => {
   }
 }
 
-module.exports = {
+export default {
   findSrsByCodeOrName,
 
   isCoordinateValid,
-}
+};

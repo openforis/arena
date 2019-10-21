@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 
   common: {
     add: 'Add',
@@ -604,4 +604,4 @@ module.exports = {
       temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
     }
   }
-}
+};

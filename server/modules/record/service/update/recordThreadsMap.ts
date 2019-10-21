@@ -1,4 +1,4 @@
-const ThreadsCache = require('../../../../threads/threadsCache')
+import ThreadsCache from '../../../../threads/threadsCache';
 
 const threads = new ThreadsCache()
 const threadZombies = new Set() // set of threads marked to be killed
@@ -20,7 +20,7 @@ const reviveZombie = recordUuid => threadZombies.delete(recordUuid)
 
 const isZombie = recordUuid => threadZombies.has(recordUuid)
 
-module.exports = {
+export default {
   get,
   remove,
   put,
@@ -28,4 +28,4 @@ module.exports = {
   markZombie,
   reviveZombie,
   isZombie,
-}
+};

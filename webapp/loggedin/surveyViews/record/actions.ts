@@ -47,12 +47,12 @@ const _navigateToModuleDataHome = history => history.push(appModuleUri(appModule
 
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
-  dispatch(showNotificationMessage('recordView.justDeleted'))
+  dispatch(showNotificationMessage('recordView.justDeleted', {}, AppState.notificationSeverity.info))
   _navigateToModuleDataHome(history)
 }
 
 export const sessionExpired = history => dispatch => {
-  dispatch(showNotificationMessage('recordView.sessionExpired'))
+  dispatch(showNotificationMessage('recordView.sessionExpired', {}, AppState.notificationSeverity.info))
   _navigateToModuleDataHome(history)
 }
 

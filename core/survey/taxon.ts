@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const { uuidv4 } = require('../uuid')
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import { uuidv4 } from '../uuid';
+import ObjectUtils from '../objectUtils';
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -24,16 +23,33 @@ const unlistedCode = 'UNL'
 const unknownCode = 'UNK'
 
 // ===== CREATE
-const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
+export interface ILocalizedDict { [s: string]: string; }
+export interface ITaxonProps {
+  code: string,
+  family: string,
+  genus: string,
+  scientificName: string;
+}
+export interface ITaxon {
+  uuid: string,
+  taxonomyUuid: string;
+  props: ITaxonProps,
+  vernacularNames: ILocalizedDict;
+  vernacularNameUuid?: unknown;
+  vernacularName?: unknown;
+  vernacularLanguage?: unknown;
+}
+const newTaxon: (taxonomyUuid: string, code: string, family: string, genus: string, scientificName: string, vernacularNames?: ILocalizedDict) => ITaxon
+= (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
   uuid: uuidv4(),
-  [keys.taxonomyUuid]: taxonomyUuid,
+  taxonomyUuid,
   props: {
-    [propKeys.code]: code,
-    [propKeys.family]: family,
-    [propKeys.genus]: genus,
-    [propKeys.scientificName]: scientificName,
+    code,
+    family,
+    genus,
+    scientificName,
   },
-  [keys.vernacularNames]: vernacularNames
+  vernacularNames,
 })
 
 // ====== READ
@@ -41,8 +57,8 @@ const getCode = ObjectUtils.getProp(propKeys.code, '')
 
 const getVernacularNames = R.propOr({}, keys.vernacularNames)
 
-const getVernacularName = lang => taxon => R.pipe(
-  getVernacularNames,
+const getVernacularName = (lang?: string) => (taxon: ITaxon) => R.pipe(
+  getVernacularNames as (obj: ITaxon) => ILocalizedDict,
   R.prop(lang),
   R.defaultTo(
     R.propOr('', keys.vernacularName, taxon)
@@ -51,7 +67,7 @@ const getVernacularName = lang => taxon => R.pipe(
 
 const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
 
-module.exports = {
+export default {
   keys,
   propKeys,
   unlistedCode,
@@ -75,4 +91,4 @@ module.exports = {
   isUnknownTaxon: R.pipe(getCode, R.equals(unknownCode)),
 
   isEqual: ObjectUtils.isEqual,
-}
+};

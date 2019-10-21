@@ -1,25 +1,37 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Log = require('../../../../../log/log').getLogger('RecordUpdateThread')
+import {getLogger} from '../../../../../log/log'
 
-const messageTypes = require('./recordThreadMessageTypes')
-const Thread = require('../../../../../threads/thread')
+import messageTypes from './recordThreadMessageTypes'
+import Thread from '../../../../../threads/thread'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const RecordManager = require('../../../manager/recordManager')
+import SurveyManager from '../../../../survey/manager/surveyManager'
+import RecordManager from '../../../manager/recordManager'
 
-const Survey = require('../../../../../../core/survey/survey')
-const Record = require('../../../../../../core/record/record')
-const Validation = require('../../../../../../core/validation/validation')
-const Queue = require('../../../../../../core/queue')
+import Survey from '../../../../../../core/survey/survey'
+import Record from '../../../../../../core/record/record'
+import Validation from '../../../../../../core/validation/validation'
+import Queue from '../../../../../../core/queue'
 
-const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
+import WebSocketEvents from '../../../../../../common/webSocket/webSocketEvents'
 
-const RecordUpdateThreadParams = require('./recordUpdateThreadParams')
+import RecordUpdateThreadParams from './recordUpdateThreadParams'
 
+const Log = getLogger('RecordUpdateThread')
+
+interface IMessage {
+  type: string;
+  user?: string;
+  node?: any;
+  nodeUuid?: string;
+}
 class RecordUpdateThread extends Thread {
+	public queue: Queue<IMessage>
+	public survey: any;
+	public record: any;
+	public processing: boolean;
 
-  constructor (paramsObj) {
+  constructor (paramsObj?) {
     super(paramsObj)
 
     this.queue = new Queue()
@@ -58,7 +70,7 @@ class RecordUpdateThread extends Thread {
     })
   }
 
-  async onMessage (msg) {
+  async onMessage (msg: IMessage) {
     this.queue.enqueue(msg)
     await this.processNext()
   }
@@ -91,7 +103,7 @@ class RecordUpdateThread extends Thread {
     this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
   }
 
-  async processMessage (msg) {
+  async processMessage (msg: IMessage) {
     Log.debug('process message', msg)
 
     switch (msg.type) {
@@ -144,4 +156,3 @@ class RecordUpdateThread extends Thread {
 }
 
 new RecordUpdateThread()
-

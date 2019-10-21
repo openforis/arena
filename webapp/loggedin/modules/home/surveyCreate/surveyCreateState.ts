@@ -8,14 +8,14 @@ export const keys = {
   newSurvey: 'newSurvey'
 }
 
-export const getState = R.pipe(
+export const getState: (x: any) => any = R.pipe(
   HomeState.getState,
   R.prop(stateKey)
 )
 
 export const newSurveyDefault = { name: '', label: '', lang: 'en', validation: {} }
 
-export const getNewSurvey = R.pipe(
+export const getNewSurvey: (x: any) => any = R.pipe(
   getState,
   R.propOr(newSurveyDefault, keys.newSurvey)
 )

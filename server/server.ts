@@ -1,8 +1,10 @@
-require('dotenv').config()
+import { config as dotEnvConfig } from "dotenv"
+dotEnvConfig();
 
 // const cluster = require('cluster')
-const dbMigrator = require('./db/migration/dbMigrator')
-const appCluster = require('./system/appCluster')
+import dbMigrator from './db/migration/dbMigrator';
+
+import appCluster from './system/appCluster';
 
 const initialize = async () => {
   await dbMigrator.migrateAll()

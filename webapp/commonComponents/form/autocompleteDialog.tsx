@@ -6,6 +6,16 @@ import KeyboardMap from '../../utils/keyboardMap'
 import { clickedOutside, elementOffset } from '../../utils/domUtils'
 
 class AutocompleteDialog extends React.Component {
+	public list: React.RefObject<any>;
+
+  static defaultProps = {
+    items: [],
+    itemRenderer: null,
+    itemKeyFunction: null,
+    inputField: null,
+    sourceElement: null, // used to calculate the size of the dialog if available, otherwise the input field is used
+    className: '',
+  }
 
   constructor (props) {
     super(props)
@@ -162,15 +172,6 @@ class AutocompleteDialog extends React.Component {
       </div>
     )
   }
-}
-
-AutocompleteDialog.defaultProps = {
-  items: [],
-  itemRenderer: null,
-  itemKeyFunction: null,
-  inputField: null,
-  sourceElement: null, // used to calculate the size of the dialog if available, otherwise the input field is used
-  className: '',
 }
 
 export default AutocompleteDialog

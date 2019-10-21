@@ -1,21 +1,25 @@
-const fs = require('fs')
-const R = require('ramda')
+import fs from 'fs'
+import * as R from 'ramda'
 
-const Job = require('../../../job/job')
+import Job from '../../../job/job'
 
-const Category = require('../../../../core/survey/category')
-const CategoryImportSummary = require('../../../../core/survey/categoryImportSummary')
-const CategoryLevel = require('../../../../core/survey/categoryLevel')
-const CategoryItem = require('../../../../core/survey/categoryItem')
-const Validation = require('../../../../core/validation/validation')
-const StringUtils = require('../../../../core/stringUtils')
-const ObjectUtils = require('../../../../core/objectUtils')
+import Category from '../../../../core/survey/category'
+import CategoryImportSummary from '../../../../core/survey/categoryImportSummary'
+import CategoryLevel from '../../../../core/survey/categoryLevel'
+import CategoryItem from '../../../../core/survey/categoryItem'
+import Validation from '../../../../core/validation/validation'
+import StringUtils from '../../../../core/stringUtils'
+import ObjectUtils from '../../../../core/objectUtils'
 
-const CategoryManager = require('../manager/categoryManager')
-const CategoryImportCSVParser = require('../manager/categoryImportCSVParser')
-const CategoryImportJobParams = require('./categoryImportJobParams')
+import CategoryManager from '../manager/categoryManager'
+import CategoryImportCSVParser from '../manager/categoryImportCSVParser'
+import CategoryImportJobParams from './categoryImportJobParams'
 
-class CategoryImportJob extends Job {
+export default class CategoryImportJob extends Job {
+  static type: string = 'CategoryImportJob';
+  itemsByCodes: {}
+  summary: any
+  category: any
 
   constructor (params, type = CategoryImportJob.type) {
     super(type, params)
@@ -265,8 +269,3 @@ class CategoryImportJob extends Job {
   }
 
 }
-
-CategoryImportJob.type = 'CategoryImportJob'
-
-module.exports = CategoryImportJob
-

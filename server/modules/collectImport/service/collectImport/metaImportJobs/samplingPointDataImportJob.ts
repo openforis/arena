@@ -1,13 +1,13 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const CollectImportJobContext = require('../collectImportJobContext')
-const Category = require('../../../../../../core/survey/category')
-const CategoryItem = require('../../../../../../core/survey/categoryItem')
-const Point = require('../../../../../../core/geo/point')
+import CollectImportJobContext from '../collectImportJobContext'
+import Category from '../../../../../../core/survey/category'
+import CategoryItem from '../../../../../../core/survey/categoryItem'
+import Point from '../../../../../../core/geo/point'
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
-const CategoryImportJob = require('../../../../category/service/categoryImportJob')
-const CategoryImportJobParams = require('../../../../category/service/categoryImportJobParams')
+import CategoryManager from '../../../../category/manager/categoryManager'
+import CategoryImportJob from '../../../../category/service/categoryImportJob'
+import CategoryImportJobParams from '../../../../category/service/categoryImportJobParams'
 
 const keysExtra = {
   x: 'x',
@@ -21,13 +21,15 @@ const keysItem = {
 
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
-class SamplingPointDataImportJob extends CategoryImportJob {
+export default class SamplingPointDataImportJob extends CategoryImportJob {
+  static categoryName: string = 'sampling_point_data'
+  static type: string = 'SamplingPointDataImportJob'
 
-  constructor (params) {
+  constructor (params?) {
     super({
       ...params,
       [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName
-    }, 'SamplingPointDataImportJob')
+    }, SamplingPointDataImportJob.type)
   }
 
   async shouldExecute () {
@@ -47,7 +49,7 @@ class SamplingPointDataImportJob extends CategoryImportJob {
 
   //start of overridden methods from CategoryImportJob
   async createReadStream () {
-    const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
+    const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context) as any
     return await collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
   }
 
@@ -85,7 +87,3 @@ class SamplingPointDataImportJob extends CategoryImportJob {
     this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))
   }
 }
-
-SamplingPointDataImportJob.categoryName = 'sampling_point_data'
-
-module.exports = SamplingPointDataImportJob

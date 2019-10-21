@@ -12,7 +12,7 @@ const getErrorText = i18n => error =>
 
 const getValidationErrorMessages = i18n => validation => R.pipe(
   Validation.getErrors,
-  R.concat(Validation.getWarnings(validation)),
+  R.concat(Validation.getWarnings(validation)) as (x: any[]) => any[],
   R.map(getErrorText(i18n)),
 )(validation)
 

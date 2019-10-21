@@ -1,13 +1,10 @@
-const { insertAllQuery } = require('../../../db/dbUtils')
-
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-
-const SurveySchemaRepository = require('../../survey/repository/surveySchemaRepositoryUtils')
-
-const DataTable = require('../schemaRdb/dataTable')
+import { insertAllQuery } from '../../../db/dbUtils';
+import Survey from '../../../../core/survey/survey';
+import NodeDef from '../../../../core/survey/nodeDef';
+import SchemaRdb from '../../../../common/surveyRdb/schemaRdb';
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable';
+import SurveySchemaRepository from '../../survey/repository/surveySchemaRepositoryUtils';
+import DataTable from '../schemaRdb/dataTable';
 
 const getSelectQuery = (surveySchema, nodeDef) => {
   const selectNodeRows = `
@@ -16,10 +13,10 @@ const getSelectQuery = (surveySchema, nodeDef) => {
     FROM
       ${surveySchema}.node n
     JOIN
-      ${surveySchema}.record r 
-    ON 
+      ${surveySchema}.record r
+    ON
       r.uuid = n.record_uuid
-    WHERE 
+    WHERE
       n.node_def_uuid = $1
     ORDER BY n.id`
 
@@ -92,6 +89,6 @@ const run = async (survey, nodeDef, client) => {
   await client.none(`DROP MATERIALIZED VIEW ${viewName}`)
 }
 
-module.exports = {
+export default {
   run
-}
+};

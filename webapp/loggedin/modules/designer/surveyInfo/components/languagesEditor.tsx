@@ -26,6 +26,7 @@ const LanguagesEditor = props => {
         itemKeyProp="key"
         selection={selection}
         onChange={items => {
+          // @ts-ignore TODO
           setLanguages(R.pluck('key', items))
         }}
         requiredItems={1}

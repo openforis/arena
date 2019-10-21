@@ -1,19 +1,16 @@
-const R = require('ramda')
-const db = require('../../../db/db')
-
-const NodeDef = require('../../../../core/survey/nodeDef')
-const NodeDefLayout = require('../../../../core/survey/nodeDefLayout')
-const ObjectUtils = require('../../../../core/objectUtils')
-const { uuidv4 } = require('../../../../core/uuid')
-
-const NodeDefRepository = require('../repository/nodeDefRepository')
-const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
-
-const ActivityLog = require('../../activityLog/activityLogger')
+import * as R from 'ramda';
+import db from '../../../db/db';
+import NodeDef from '../../../../core/survey/nodeDef';
+import NodeDefLayout from '../../../../core/survey/nodeDefLayout';
+import ObjectUtils from '../../../../core/objectUtils';
+import { uuidv4 } from '../../../../core/uuid';
+import NodeDefRepository from '../repository/nodeDefRepository';
+import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils';
+import ActivityLog from '../../activityLog/activityLogger';
 
 // ======= CREATE
 
-const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
+const insertNodeDef = async (user, surveyId, nodeDefParam, client: any = db) =>
   await client.tx(async t => {
     const [nodeDef] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
@@ -25,7 +22,7 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
 
 // ======= READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, client = db) => {
+const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, client: any = db) => {
   const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client)
   return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 }
@@ -80,7 +77,7 @@ const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, clien
   return []
 }
 
-const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, client: any = db) =>
   await client.tx(async t => {
     // update descendants cycle when updating entity cycle
     const nodeDefsUpdated = NodeDef.propKeys.cycles in props
@@ -105,7 +102,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     }
   })
 
-const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
+const publishNodeDefsProps = async (surveyId, langsDeleted, client: any = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
   for (const langDeleted of langsDeleted) {
@@ -129,7 +126,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
     return nodeDef
   })
 
-module.exports = {
+export default {
   //CREATE
   insertNodeDef,
 
@@ -147,4 +144,4 @@ module.exports = {
   markNodeDefDeleted,
   permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
   markNodeDefsWithoutCyclesDeleted: NodeDefRepository.markNodeDefsWithoutCyclesDeleted,
-}
+};

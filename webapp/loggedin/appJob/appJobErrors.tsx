@@ -12,7 +12,7 @@ const validationWrapper = fields => ({
 
 const AppJobErrors = ({ job }) => {
 
-  const errors = R.propOr([], 'errors', job)
+  const errors: any[] = R.propOr([], 'errors', job)
 
   const i18n = useI18n()
 

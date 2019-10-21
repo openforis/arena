@@ -1,8 +1,8 @@
-const Taxonomy = require('../../../core/survey/taxonomy')
-const Taxon = require('../../../core/survey/taxon')
-const Validator = require('../../../core/validation/validator')
-const Validation = require('../../../core/validation/validation')
-const ObjectUtils = require('../../../core/objectUtils')
+import Taxonomy from '../../../core/survey/taxonomy';
+import Taxon from '../../../core/survey/taxon';
+import Validator from '../../../core/validation/validator';
+import Validation from '../../../core/validation/validation';
+import ObjectUtils from '../../../core/objectUtils';
 
 /**
  * ====== TAXONOMY
@@ -41,7 +41,7 @@ const taxonValidators = (taxa) => ({
 const validateTaxon = async (taxa, taxon) =>
   await Validator.validate(taxon, taxonValidators(taxa))
 
-module.exports = {
+export default {
   validateTaxonomy,
   validateTaxon,
-}
+};

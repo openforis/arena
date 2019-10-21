@@ -60,6 +60,7 @@ const CategoryEditView = props => {
           {
             levels.map(level =>
               <LevelEdit key={CategoryLevel.getUuid(level)}
+              // @ts-ignore TODO
                          level={level}/>
             )
           }

@@ -1,16 +1,21 @@
-const db = require('../db/db')
-const Log = require('../log/log')
+import db from '../db/db'
+import { getLogger, Logger } from '../log/log'
 
-const { uuidv4 } = require('../../core/uuid')
+import { uuidv4 } from '../../core/uuid'
 
-const { jobEvents, jobStatus } = require('./jobUtils')
+import { jobEvents, jobStatus } from './jobUtils'
 
-const User = require('../../core/user/user.js')
-const { throttle, cancelThrottle } = require('../../core/functionsDefer')
+import { getUuid } from '../../core/user/user'
+import { throttle, cancelThrottle } from '../../core/functionsDefer'
 
-const SystemError = require('../utils/systemError')
+import SystemError from '../utils/systemError'
 
 class JobEvent {
+  type: any
+  status: any
+  total: any
+  processed: any
+  errors: any
 
   constructor (type, status, total, processed) {
     this.type = type
@@ -36,9 +41,26 @@ class JobEvent {
  * - beforeEnd
  * - onEnd
  */
-class Job {
+export default class Job {
+  static keysContext: any
+  params: {}
+  context: {}
+  uuid: string
+  type: string
+  status: any
+  startTime: Date | null
+  endTime: Date | null
+  total: number
+  processed: number
+  result: {}
+  errors: {}
+  innerJobs: Job[]
+  currentInnerJobIndex: number
+  eventListener: ((event: JobEvent) => void) | null
+  _logger: Logger
+  tx?: any
 
-  constructor (type, params = {}, innerJobs = []) {
+  constructor (type: string, params = {}, innerJobs: Job[] = []) {
     this.params = params
 
     // context object (shared among nested jobs)
@@ -60,7 +82,7 @@ class Job {
 
     this.eventListener = null
 
-    this._logger = Log.getLogger(`Job ${this.constructor.name}`)
+    this._logger = getLogger(`Job ${this.constructor.name}`)
   }
 
   /**
@@ -71,7 +93,7 @@ class Job {
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
    */
-  async start (client = db) {
+  async start (client: any = db) {
     this.logDebug('start')
 
     // 1. crates a db transaction and run '_executeInTransaction' into it
@@ -83,6 +105,7 @@ class Job {
         await this._setStatusSucceeded()
       }
     } catch (e) {
+      console.error('EEDED',e, JSON.stringify(e));
       if (this.isRunning()) {
         // error found, change status only if not changed already
         this.logError(`${e.stack || e}`)
@@ -142,7 +165,7 @@ class Job {
     }
   }
 
-  addError (error, errorKey = null) {
+  addError (error, errorKey: string | null = null) {
     if (!errorKey)
       errorKey = '' + (this.processed + 1)
     this.errors[errorKey] = error
@@ -160,7 +183,7 @@ class Job {
    */
   async execute (tx) {}
 
-  onEvent (listener) {
+  onEvent (listener: (event: JobEvent) => void) {
     this.eventListener = listener
     return this
   }
@@ -279,7 +302,7 @@ class Job {
   }
 
   get userUuid () {
-    return User.getUuid(this.user)
+    return getUuid(this.user)
   }
 
   getCurrentInnerJob () {
@@ -316,7 +339,7 @@ class Job {
     this.logDebug(`- ${this.processed} inner jobs processed successfully`)
   }
 
-  async _handleInnerJobEvent (event) {
+  async _handleInnerJobEvent (event: { status: any; }) {
     switch (event.status) {
       case jobStatus.failed:
       case jobStatus.canceled:
@@ -353,7 +376,7 @@ class Job {
     await this._setStatus(jobStatus.succeeded)
   }
 
-  async _notifyEvent (event) {
+  async _notifyEvent (event: JobEvent) {
     if (this.eventListener) {
       this.eventListener(event)
     }
@@ -383,5 +406,3 @@ Job.keysContext = {
   survey: 'survey',
   user: 'user',
 }
-
-module.exports = Job

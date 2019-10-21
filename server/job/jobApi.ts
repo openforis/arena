@@ -1,9 +1,8 @@
-const Request = require('../utils/request')
-const Response = require('../utils/response')
+import Request from '../utils/request';
+import Response from '../utils/response';
+import JobManager from './jobManager';
 
-const JobManager = require('./jobManager')
-
-module.exports.init = app => {
+export const init = app => {
 
   /**
    * ====== DELETE
@@ -14,4 +13,4 @@ module.exports.init = app => {
     Response.sendOk(res)
   })
 
-}
+};

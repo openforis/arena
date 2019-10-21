@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react'
 
 import { Input } from '../../../../../../commonComponents/form/input'
-import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
+import { NodeDefTaxonAutocompleteDialog } from '../../internal'
 
 import Node from '../../../../../../../core/record/node'
 import StringUtils from '../../../../../../../core/stringUtils'
 
-const NodeDefTaxonInputField = props => {
+export const NodeDefTaxonInputField = props => {
 
   const {
     surveyId, taxonomyUuid, edit, draft,

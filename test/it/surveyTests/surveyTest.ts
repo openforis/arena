@@ -1,9 +1,8 @@
-const { setContextSurvey, getContextUser } = require('../../testContext')
-const { assert } = require('chai')
-const { uuidv4 } = require('../../../core/uuid')
-
-const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
-const Survey = require('../../../core/survey/survey')
+import { setContextSurvey, getContextUser } from '../../testContext';
+import { assert } from 'chai';
+import { uuidv4 } from '../../../core/uuid';
+import SurveyManager from '../../../server/modules/survey/manager/surveyManager';
+import Survey from '../../../core/survey/survey';
 
 const testSurvey = {
   name: 'test_survey_' + uuidv4(),
@@ -11,7 +10,7 @@ const testSurvey = {
   lang: 'en'
 }
 
-const createSurveyTest = async () => {
+export const createSurveyTest = async () => {
   const survey = await SurveyManager.createSurvey(getContextUser(), testSurvey)
 
   setContextSurvey(survey)
@@ -27,6 +26,6 @@ const createSurveyTest = async () => {
 //   const survey = getContextSurvey()
 // }
 
-module.exports = {
+export default {
   createSurveyTest,
-}
+};

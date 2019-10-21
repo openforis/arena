@@ -8,8 +8,8 @@ import { useI18n } from '../../../../../../commonComponents/hooks'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 
-import NodeDefSwitch from '../../nodeDefSwitch'
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import { NodeDefSwitch } from '../../internal'
+import { NodeDefErrorBadge } from '../../internal'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
 import Record from '../../../../../../../core/record/record'
@@ -154,7 +154,15 @@ const NodeSelect = props => {
   )
 }
 
-class NodeDefEntityForm extends React.Component {
+class _NodeDefEntityForm extends React.Component {
+  static defaultProps = {
+    nodeDef: null,
+    // entry props
+    entry: false,
+    entryMultiple: false,
+    nodes: null,
+    selectedNode: null,
+  }
 
   checkNodePage () {
     const { nodeDef, setFormPageNode, nodes, entry } = this.props
@@ -224,15 +232,6 @@ class NodeDefEntityForm extends React.Component {
   }
 }
 
-NodeDefEntityForm.defaultProps = {
-  nodeDef: null,
-  // entry props
-  entry: false,
-  entryMultiple: false,
-  nodes: null,
-  selectedNode: null,
-}
-
 const mapStateToProps = (state, props) => {
   const { nodeDef, nodes, entry } = props
 
@@ -259,7 +258,8 @@ const mapStateToProps = (state, props) => {
     : {}
 }
 
-export default connect(
+export const NodeDefEntityForm = connect(
   mapStateToProps,
   { setFormPageNode, getNodeKeyLabelValues }
-)(NodeDefEntityForm)
+)(_NodeDefEntityForm)
+export default NodeDefEntityForm

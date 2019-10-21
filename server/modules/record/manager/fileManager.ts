@@ -1,6 +1,6 @@
-const FileRepository = require('../repository/fileRepository')
+import FileRepository from '../repository/fileRepository';
 
-module.exports = {
+export default {
   //CREATE
   insertFile: FileRepository.insertFile,
 
@@ -11,4 +11,4 @@ module.exports = {
   //DELETE
   deleteFileByUuid: FileRepository.deleteFileByUuid,
   deleteFilesByRecordUuids: FileRepository.deleteFilesByRecordUuids
-}
+};

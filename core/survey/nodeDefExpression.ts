@@ -1,11 +1,8 @@
-const R = require('ramda')
-
-const { uuidv4 } = require('./../uuid')
-
-const ValidationResult = require('../validation/validationResult')
-
-const StringUtils = require('../stringUtils')
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import { uuidv4 } from './../uuid';
+import ValidationResult from '../validation/validationResult';
+import StringUtils from '../stringUtils';
+import ObjectUtils from '../objectUtils';
 
 const keys = {
   placeholder: 'placeholder',
@@ -16,6 +13,13 @@ const keys = {
 }
 
 // ====== CREATE
+export interface IExpression {
+  uuid: string;
+  expression: string;
+  applyIf: string;
+  placeholder: boolean;
+  messages?: any[];
+}
 
 const createExpression = (expression = '', applyIf = '', placeholder = false) => ({
   uuid: uuidv4(),
@@ -26,9 +30,9 @@ const createExpression = (expression = '', applyIf = '', placeholder = false) =>
 
 // ====== READ
 
-const getExpression = R.prop(keys.expression)
+const getExpression: (obj: IExpression) => string = R.prop(keys.expression) as (obj: IExpression) => string
 
-const getApplyIf = R.prop(keys.applyIf)
+const getApplyIf: (obj: IExpression) => string = R.prop(keys.applyIf) as (obj: IExpression) => string
 
 const getMessages = R.propOr({}, keys.messages)
 
@@ -36,18 +40,23 @@ const getSeverity = R.propOr(ValidationResult.severities.error, keys.severity)
 
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
-const isEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
+const isEmpty: (expression?: IExpression) => boolean
+= (expression = {} as IExpression) => StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
 
 // ====== UPDATE
 
-const assocProp = (propName, value) => R.pipe(
+const assocProp = (propName: string, value) => R.pipe(
   R.assoc(propName, value),
   R.dissoc(keys.placeholder),
 )
 
 const assocMessages = messages => assocProp(keys.messages, messages)
 
-const assocMessage = message =>
+export interface IMessage {
+  lang: string;
+  label: string;
+}
+const assocMessage = (message: IMessage) =>
   nodeDefExpression => {
     const messagesOld = getMessages(nodeDefExpression)
     const messagesNew = R.assoc(message.lang, message.label, messagesOld)
@@ -58,33 +67,33 @@ const assocSeverity = severity => assocProp(keys.severity, severity)
 
 // ====== UTILS
 
-const extractNodeDefNames = (jsExpr = '') => {
+const extractNodeDefNames: (jsExpr: string) => string[] = (jsExpr = '') => {
   if (StringUtils.isBlank(jsExpr))
     return []
 
-  const names = []
+  const names: string[] = []
   const regex = /(node|sibling)\(['"](\w+)['"]\)/g
 
-  let matches
-  while (matches = regex.exec(jsExpr)) {
+  let matches: any[]
+  while (matches = regex.exec(jsExpr) as any[]) {
     names.push(matches[2])
   }
   return names
 }
 
-const findReferencedNodeDefs = nodeDefExpressions =>
+const findReferencedNodeDefs = (nodeDefExpressions: IExpression[]) =>
   R.pipe(
-    R.reduce((acc, nodeDefExpr) =>
+    R.reduce((acc, nodeDefExpr: IExpression) =>
         R.pipe(
           R.concat(extractNodeDefNames(getExpression(nodeDefExpr))),
           R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr))),
         )(acc),
-      []
+      [] as string[]
     ),
     R.uniq
   )(nodeDefExpressions)
 
-module.exports = {
+export default {
   keys,
 
   //CREATE
@@ -112,4 +121,4 @@ module.exports = {
 
   //UTILS
   findReferencedNodeDefs
-}
+};

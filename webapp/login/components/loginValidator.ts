@@ -7,7 +7,7 @@ import UserValidator from '../../../core/user/userValidator'
 const validPasswordRe = new RegExp(/^[\S]+.*[\S]+$/)
 const passwordStrengthRe = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)
 
-const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
+const getProp = (propName, defaultValue?) => R.pathOr(defaultValue, propName.split('.'))
 
 const _validatePassword = (propName, item) => {
   const password = getProp(propName)(item)

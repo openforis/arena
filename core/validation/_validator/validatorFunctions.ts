@@ -1,8 +1,7 @@
-const R = require('ramda')
-
-const ValidatorErrorKeys = require('./validatorErrorKeys')
-const ValidatorNameKeywords = require('./validatorNameKeywords')
-const ObjectUtils = require('../../objectUtils')
+import * as R from 'ramda';
+import ValidatorErrorKeys from './validatorErrorKeys';
+import ValidatorNameKeywords from './validatorNameKeywords';
+import ObjectUtils from '../../objectUtils';
 
 /**
  * Internal names must contain only lowercase letters, numbers and underscores starting with a letter
@@ -59,7 +58,7 @@ const validatePositiveNumber = errorKey => (propName, item) => {
   }
 }
 
-module.exports = {
+export default {
   validateRequired,
   validateItemPropUniqueness,
   validateNotKeyword,
@@ -67,4 +66,4 @@ module.exports = {
   validatePositiveNumber,
 
   isKeyword: ValidatorNameKeywords.isKeyword
-}
+};

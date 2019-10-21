@@ -1,19 +1,25 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const BatchPersister = require('../../../db/batchPersister')
+import BatchPersister from '../../../db/batchPersister'
 
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
-const Validation = require('../../../../core/validation/validation')
+import Taxonomy from '../../../../core/survey/taxonomy'
+import Taxon from '../../../../core/survey/taxon'
+import Validation from '../../../../core/validation/validation'
 
-const TaxonomyManager = require('./taxonomyManager')
+import TaxonomyManager from './taxonomyManager'
 
 const createPredefinedTaxa = (taxonomy) => [
   Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
   Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted')
 ]
 
-class TaxonomyImportManager {
+export default class TaxonomyImportManager {
+	public user: any;
+	public surveyId: any;
+	public vernacularLanguageCodes: any;
+	public batchPersister: any;
+	public insertedCodes: any;
+
   constructor (user, surveyId, vernacularLanguageCodes) {
     this.user = user
     this.surveyId = surveyId
@@ -28,7 +34,7 @@ class TaxonomyImportManager {
     this.insertedCodes[Taxon.getCode(taxon)] = true
   }
 
-  async taxaInsertHandler (items, t) {
+  async taxaInsertHandler (items, t?) {
     await TaxonomyManager.insertTaxa(this.surveyId, items, this.user, t)
   }
 
@@ -52,5 +58,3 @@ class TaxonomyImportManager {
       Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, t)
   }
 }
-
-module.exports = TaxonomyImportManager

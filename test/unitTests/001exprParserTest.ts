@@ -1,6 +1,5 @@
-const {assert} = require('chai')
-
-const {evalString} = require('../../core/exprParser/expression')
+import { assert } from 'chai';
+import { evalString } from '../../core/exprParser/expression';
 
 const queries = [
   {q: '1 + 1', r: 2},
@@ -17,7 +16,7 @@ describe('ExprParser test', () => {
 
   queries.forEach(query =>
     it(query.q, async () => {
-      const res = await evalString(query.q)
+      const res = await evalString(query.q, {}) // TODO: ctx was missing
       assert.equal(res, query.r)
     })
   )

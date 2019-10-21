@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const Category = require('../../../../../core/survey/category')
-const Taxonomy = require('../../../../../core/survey/taxonomy')
+import * as R from 'ramda';
+import Category, { ICategory } from '../../../../../core/survey/category';
+import Taxonomy from '../../../../../core/survey/taxonomy';
 
 const keys = {
   collectSurveyFileZip: 'collectSurveyFileZip',
@@ -14,7 +13,7 @@ const keys = {
 
 const getCollectSurveyFileZip = R.prop(keys.collectSurveyFileZip)
 
-const getCategories = R.propOr([], keys.categories)
+const getCategories: (x: any) => ICategory[] = R.propOr([], keys.categories)
 
 const getCategoryByName = name => R.pipe(
   getCategories,
@@ -42,7 +41,7 @@ const assocCategory = category => context => R.pipe(
   categories => assocCategories(categories)(context)
 )(context)
 
-module.exports = {
+export default {
   //READ
   getCollectSurveyFileZip,
   getCategories,
@@ -54,4 +53,4 @@ module.exports = {
   //UPDATE
   assocSurvey,
   assocCategory,
-}
+};

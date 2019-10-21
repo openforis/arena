@@ -1,16 +1,13 @@
-const R = require('ramda')
-const { assert } = require('chai')
-
-const NodeDef = require('../../core/survey/nodeDef')
-const Node = require('../../core/record/node')
-const Record = require('../../core/record/record')
-
-const SB = require('../it/utils/surveyBuilder')
-const RB = require('../it/utils/recordBuilder')
-const RecordUtils = require('../it/utils/recordUtils')
-const { getContextUser } = require('../testContext')
-
-const RecordExprParser = require('../../core/record/recordExprParser')
+import * as R from 'ramda';
+import { assert } from 'chai';
+import NodeDef from '../../core/survey/nodeDef';
+import Node from '../../core/record/node';
+import Record from '../../core/record/record';
+import * as SB from '../it/utils/surveyBuilder';
+import * as RB from '../it/utils/recordBuilder';
+import RecordUtils from '../it/utils/recordUtils';
+import { getContextUser } from '../testContext';
+import RecordExprParser from '../../core/record/recordExprParser';
 
 let survey = {}
 let record = {}

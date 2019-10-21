@@ -1,26 +1,26 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
-const StringUtils = require('../stringUtils')
-const AuthGroups = require('../auth/authGroups')
-
-const keys = require('./_user/userKeys')
-const UserPrefs = require('./_user/userPrefs')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
+import StringUtils from '../stringUtils';
+import AuthGroups from '../auth/authGroups';
+import keys from './_user/userKeys';
+import UserPrefs from './_user/userPrefs';
 
 //====== READ
-const getName = R.propOr('', keys.name)
-const getEmail = R.prop(keys.email)
-const getLang = R.propOr('en', keys.lang)
-const getAuthGroups = R.prop(keys.authGroups)
-const getPrefs = R.propOr({}, keys.prefs)
-const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
+const getName: (x: any) => string = R.propOr('', keys.name)
+const getEmail: (x: any) => string = R.prop(keys.email)
+const getLang: (x: any) => string = R.propOr('en', keys.lang)
+const getAuthGroups: (x: any) => any[] = R.prop(keys.authGroups)
+const getPrefs: (x: any) => string = R.propOr({}, keys.prefs)
+const hasProfilePicture: (x: any) => boolean = R.propEq(keys.hasProfilePicture, true)
 
 //====== CHECK
-const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+const isSystemAdmin: (user: any) => boolean
+= user => user && R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+
 const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
 //====== AUTH GROUP
-const assocAuthGroup = authGroup => user => {
+const assocAuthGroup = <T>(authGroup: T) => (user: any) => {
   const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
   return R.assoc(keys.authGroups, authGroups, user)
 }
@@ -33,7 +33,9 @@ const dissocAuthGroup = authGroup => user => {
   return R.assoc(keys.authGroups, authGroups, user)
 }
 
-module.exports = {
+export const getUuid = ObjectUtils.getUuid
+
+export default {
   keys,
   keysPrefs: UserPrefs.keysPrefs,
 
@@ -65,4 +67,4 @@ module.exports = {
   assocPrefSurveyCurrentAndCycle: UserPrefs.assocPrefSurveyCurrentAndCycle,
 
   deletePrefSurvey: UserPrefs.deletePrefSurvey,
-}
+};

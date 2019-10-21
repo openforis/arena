@@ -1,24 +1,22 @@
-const R = require('ramda')
-const camelize = require('camelize')
-
-const ObjectUtils = require('../../../../core/objectUtils')
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Taxon = require('../../../../core/survey/taxon')
-const Node = require('../../../../core/record/node')
-
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
+import * as R from 'ramda';
+import camelize from 'camelize';
+import ObjectUtils from '../../../../core/objectUtils';
+import Survey from '../../../../core/survey/survey';
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef';
+import Taxon from '../../../../core/survey/taxon';
+import Node from '../../../../core/record/node';
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable';
+import sqlTypes from '../../../../common/surveyRdb/sqlTypes';
 const { nodeDefType } = NodeDef
 
-const Point = require('../../../../core/geo/point')
-const GeoUtils = require('../../../../core/geo/geoUtils')
-const DateTimeUtils = require('../../../../core/dateUtils')
+import Point from '../../../../core/geo/point';
+import GeoUtils from '../../../../core/geo/geoUtils';
+import DateTimeUtils from '../../../../core/dateUtils';
 
-const colValueProcessor = 'colValueProcessor'
-const colTypeProcessor = 'colTypeProcessor'
+const COL_VALUE_PROCESSOR = 'colValueProcessor'
+const COL_TYPE_PROCESSOR = 'colTypeProcessor'
 
-const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
+const getValueFromItem = (nodeDefCol: INodeDef, colName: string, item = {}, isInProps = false) => {
   //remove nodeDefName from col name
   const prop = camelize(NodeDefTable.extractColName(nodeDefCol, colName))
 
@@ -27,44 +25,52 @@ const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => 
     : R.propOr(null, prop, item)
 }
 
-const nodeValuePropProcessor = (survey, nodeDefCol, nodeCol) =>
-  (node, colName) => {
+const nodeValuePropProcessor = (survey: any, nodeDefCol: any, nodeCol: any) =>
+  (node: {}, colName: any) => {
     const nodeValue = Node.getValue(node)
     return getValueFromItem(nodeDefCol, colName, nodeValue)
   }
 
-const props = {
+
+type ProcessorFn = (survey?: any, nodeDefCol?: any, nodeCol?: any) => (node?: any, colName?: any) => string;
+interface IProps {
+  [type: string]: {
+    colValueProcessor?: ProcessorFn;
+    colTypeProcessor?: ProcessorFn;
+  }
+}
+const props: IProps = {
   [nodeDefType.entity]: {
-    [colValueProcessor]: () => () => Node.getUuid,
-    [colTypeProcessor]: () => () => sqlTypes.uuid,
+    colValueProcessor: () => () => Node.getUuid,
+    colTypeProcessor: () => () => sqlTypes.uuid,
   },
 
   [nodeDefType.integer]: {
-    [colTypeProcessor]: () => () => sqlTypes.integer,
+    colTypeProcessor: () => () => sqlTypes.integer,
   },
 
   [nodeDefType.decimal]: {
-    [colTypeProcessor]: () => () => sqlTypes.decimal,
+    colTypeProcessor: () => () => sqlTypes.decimal,
   },
 
   [nodeDefType.date]: {
-    [colTypeProcessor]: () => () => sqlTypes.date,
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    colTypeProcessor: () => () => sqlTypes.date,
+    colValueProcessor: (survey, nodeDefCol, nodeCol) => {
       const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
       return () => DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null
     }
   },
 
   [nodeDefType.time]: {
-    [colTypeProcessor]: () => () => sqlTypes.time,
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    colTypeProcessor: () => () => sqlTypes.time,
+    colValueProcessor: (survey, nodeDefCol, nodeCol) => {
       const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
       return () => DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null
     }
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    colValueProcessor: (survey, nodeDefCol, nodeCol) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
@@ -77,7 +83,7 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    colValueProcessor: (survey, nodeDefCol, nodeCol) => {
       // return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
@@ -93,39 +99,42 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    colValueProcessor: (survey, nodeDefCol, nodeCol) => {
       const [x, y, srsCode] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
 
       return () => GeoUtils.isCoordinateValid(srsCode, x, y)
         ? Point.newPoint(srsCode, x, y)
         : null
     },
-    [colTypeProcessor]: () => () => sqlTypes.point,
+    colTypeProcessor: () => () => sqlTypes.point,
   },
 
   [nodeDefType.file]: {
-    [colValueProcessor]: nodeValuePropProcessor,
-    [colTypeProcessor]: () => colName => R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar,
+    colValueProcessor: nodeValuePropProcessor,
+    colTypeProcessor: () => colName => R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar,
   },
 }
 
-const getColValueProcessor = nodeDef => R.propOr(
-  () => (node) => {
+const getColValueProcessor: (nodeDef: INodeDef) => ProcessorFn
+= (nodeDef: INodeDef) => R.propOr(
+  () => (node: {}) => {
     return Node.isValueBlank(node)
       ? null
       : Node.getValue(node)
   },
-  colValueProcessor,
+  COL_VALUE_PROCESSOR,
   props[NodeDef.getType(nodeDef)]
 )
 
-const getColTypeProcessor = nodeDef => R.propOr(
-  nodeDef => colName => `VARCHAR`,
-  colTypeProcessor,
-  props[NodeDef.getType(nodeDef)]
+const getColTypeProcessor: (nodeDef: INodeDef) => ProcessorFn
+// @ts-ignore TODO wasn't able to typecheck the last line.
+= nodeDef => R.propOr(
+  (_nodeDef: any) => (_colName: any) => 'VARCHAR',
+  COL_TYPE_PROCESSOR,
+  props[NodeDef.getType(nodeDef)],
 )(nodeDef)
 
-module.exports = {
+export default {
   getColValueProcessor,
   getColTypeProcessor,
-}
+};

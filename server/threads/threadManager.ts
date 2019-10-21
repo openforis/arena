@@ -1,21 +1,30 @@
-const { Worker } = require('worker_threads')
+import { Worker } from 'worker_threads'
 
-const Log = require('../log/log')
+import Log, { Logger } from '../log/log'
 
-const WebSocket = require('../utils/webSocket')
+import WebSocket from '../utils/webSocket'
 
-const User = require('../../core/user/user')
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+import User from '../../core/user/user'
+import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 
-const Thread = require('./thread')
-const ThreadParams = require('./threadParams')
+import Thread from './thread'
+import ThreadParams from './threadParams'
 
 /**
  * Base class for managing communication between EventLoop and Thread in worker pool
  */
-class ThreadManager {
+export default class ThreadManager {
+	public worker: Worker;
+	public socketId: any;
+	public threadId: number;
+	public logger: Logger;
 
-  constructor (filePath, data, messageHandler, exitHandler = null) {
+  constructor (
+    filePath: string,
+    data: any,
+    messageHandler: (msg: any) => Promise<void>,
+    exitHandler?: () => void,
+  ) {
     this.worker = new Worker(filePath, { workerData: data })
     this.socketId = ThreadParams.getSocketId(data)
     this.threadId = this.worker.threadId
@@ -25,15 +34,15 @@ class ThreadManager {
 
     this.worker.on('exit', () => {
       this.logger.debug('thread ended')
-      if (exitHandler)
-        exitHandler()
+      if (exitHandler) exitHandler()
+      // TODO: notify websocket that there's nothing to wait for, anymore.
     })
 
     this.logger.debug('thread created')
   }
 
-  messageHandlerWrapper (messageHandler) {
-    return ({ user, msg }) => {
+  messageHandlerWrapper (messageHandler: (msg: any) => Promise<void>) {
+    return async ({ user, msg }) => {
       if (msg.type === Thread.messageTypes.error) {
         if (this.socketId) {
           WebSocket.notifySocket(this.socketId, WebSocketEvents.error, msg.error)
@@ -41,7 +50,7 @@ class ThreadManager {
           WebSocket.notifyUser(User.getUuid(user), WebSocketEvents.error, msg.error)
         }
       } else {
-        messageHandler(msg)
+        await messageHandler(msg)
       }
     }
   }
@@ -59,5 +68,3 @@ class ThreadManager {
   }
 
 }
-
-module.exports = ThreadManager

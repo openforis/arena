@@ -1,11 +1,9 @@
-const Jwt = require('../../utils/jwt')
+import Jwt from '../../utils/jwt';
+import UserService from '../../modules/user/service/userService';
+import AuthService from '../../modules/auth/service/authService';
+import UnauthorizedError from '../../utils/unauthorizedError';
 
-const UserService = require('../../modules/user/service/userService')
-const AuthService = require('../../modules/auth/service/authService')
-
-const UnauthorizedError = require('../../utils/unauthorizedError')
-
-module.exports = async (req, res, next) => {
+export default async (req, res, next) => {
   const authorizationHeader = req.headers && req.headers.authorization
 
   if (!authorizationHeader) {
@@ -30,4 +28,4 @@ module.exports = async (req, res, next) => {
       next(new UnauthorizedError())
     }
   }
-}
+};

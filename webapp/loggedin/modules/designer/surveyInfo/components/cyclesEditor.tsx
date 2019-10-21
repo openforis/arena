@@ -22,9 +22,9 @@ const DateEditor = ({ date, onChange }) => {
 
   return (
     <span className="date">
-    <input type="text" ref={yearRef} size="4" maxLength="4" value={year} onChange={onChangeDate}/>-
-    <input type="text" ref={monthRef} size="2" maxLength="2" value={month} onChange={onChangeDate}/>-
-    <input type="text" ref={dayRef} size="2" maxLength="2" value={day} onChange={onChangeDate}/>
+    <input type="text" ref={yearRef} size={4} maxLength={4} value={year} onChange={onChangeDate}/>-
+    <input type="text" ref={monthRef} size={2} maxLength={2} value={month} onChange={onChangeDate}/>-
+    <input type="text" ref={dayRef} size={2} maxLength={2} value={day} onChange={onChangeDate}/>
   </span>
   )
 }
@@ -127,6 +127,7 @@ const CyclesEditor = props => {
           !readOnly &&
           <button className="btn-s btn-add"
                   onClick={() => setCycles(
+                    // @ts-ignore TODO
                     R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
                   )}>
             <span className="icon icon-plus icon-10px"/>

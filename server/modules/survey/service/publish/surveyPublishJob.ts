@@ -1,17 +1,17 @@
-const Job = require('../../../../job/job')
-
-const NodeDefsValidationJob = require('./jobs/nodeDefsValidationJob')
-const CategoriesValidationJob = require('./jobs/categoriesValidationJob')
-const TaxonomiesValidationJob = require('./jobs/taxonomiesValidationJob')
-const SurveyInfoValidationJob = require('./jobs/surveyInfoValidationJob')
-const RecordCheckJob = require('../recordCheckJob')
-const SurveyPropsPublishJob = require('./jobs/surveyPropsPublishJob')
-const CyclesDeletedCheckJob = require('./jobs/cyclesDeletedCheckJob')
-const SurveyDependencyGraphsGenerationJob = require('../surveyDependencyGraphsGenerationJob')
-const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
-const RecordsUniquenessValidationJob = require('../../../record/service/recordsUniquenessValidationJob')
+import Job from '../../../../job/job';
+import NodeDefsValidationJob from './jobs/nodeDefsValidationJob';
+import CategoriesValidationJob from './jobs/categoriesValidationJob';
+import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob';
+import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob';
+import RecordCheckJob from '../recordCheckJob';
+import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob';
+import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob';
+import SurveyDependencyGraphsGenerationJob from '../surveyDependencyGraphsGenerationJob';
+import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob';
+import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob';
 
 class SurveyPublishJob extends Job {
+  static type: string = 'SurveyPublishJob'
 
   constructor (params) {
     super(SurveyPublishJob.type, params, [
@@ -30,6 +30,4 @@ class SurveyPublishJob extends Job {
   }
 }
 
-SurveyPublishJob.type = 'SurveyPublishJob'
-
-module.exports = SurveyPublishJob
+export default SurveyPublishJob;

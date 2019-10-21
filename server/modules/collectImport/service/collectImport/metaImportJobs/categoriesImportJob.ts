@@ -1,24 +1,27 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Category = require('../../../../../../core/survey/category')
-const CategoryItem = require('../../../../../../core/survey/categoryItem')
-const CategoryLevel = require('../../../../../../core/survey/categoryLevel')
-const ObjectUtils = require('../../../../../../core/objectUtils')
+import Category, {ICategory} from '../../../../../../core/survey/category'
+import CategoryItem from '../../../../../../core/survey/categoryItem'
+import CategoryLevel from '../../../../../../core/survey/categoryLevel'
+import ObjectUtils from '../../../../../../core/objectUtils'
 
-const Job = require('../../../../../job/job')
-const BatchPersister = require('../../../../../db/batchPersister')
+import Job from '../../../../../job/job'
+import BatchPersister from '../../../../../db/batchPersister'
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
+import CategoryManager from '../../../../category/manager/categoryManager'
 
-const CollectSurvey = require('../model/collectSurvey')
+import CollectSurvey from '../model/collectSurvey'
 
 /**
  * Inserts a category for each code list in the Collect survey.
  * Saves the list of inserted categories in the "categories" context property
  */
-class CategoriesImportJob extends Job {
+export default class CategoriesImportJob extends Job {
+  itemBatchPersister: BatchPersister
+  qualifiableItemCodesByCategoryAndLevel: {}
+  context: any
 
-  constructor (params) {
+  constructor (params?) {
     super('CategoriesImportJob', params)
 
     this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))
@@ -28,7 +31,7 @@ class CategoriesImportJob extends Job {
   async execute (tx) {
     const { collectSurvey, surveyId, defaultLanguage } = this.context
 
-    const categories = []
+    const categories: ICategory[] = []
 
     const collectCodeLists = CollectSurvey.getElementsByPath(['codeLists', 'list'])(collectSurvey)
 
@@ -146,10 +149,8 @@ class CategoriesImportJob extends Job {
     }
   }
 
-  async itemsInsertHandler (items, tx) {
+  async itemsInsertHandler (items, tx?) {
     await CategoryManager.insertItems(this.user, this.surveyId, items, tx)
   }
 
 }
-
-module.exports = CategoriesImportJob

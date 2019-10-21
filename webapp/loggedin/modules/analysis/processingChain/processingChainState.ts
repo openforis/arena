@@ -8,7 +8,7 @@ export const keys = {
   processingChain: 'processingChain'
 }
 
-export const getProcessingChain = R.pipe(
+export const getProcessingChain: (x: any) => any = R.pipe(
   AnalysisState.getState,
   R.prop(stateKey)
 )

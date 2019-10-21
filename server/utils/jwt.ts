@@ -1,9 +1,8 @@
-const axios = require('axios')
-const jwkToPem = require('jwk-to-pem')
-const jsonwebtoken = require('jsonwebtoken')
-
-const JwtConstants = require('../../core/auth/jwtConstants')
-const ProcessUtils = require('../../core/processUtils')
+import axios from 'axios';
+import jwkToPem from 'jwk-to-pem';
+import jsonwebtoken from 'jsonwebtoken';
+import JwtConstants from '../../core/auth/jwtConstants';
+import ProcessUtils from '../../core/processUtils';
 
 const region = ProcessUtils.ENV.cognitoRegion
 const poolId = ProcessUtils.ENV.cognitoUserPoolId
@@ -57,10 +56,10 @@ const getExpiration = token => _decode(token).payload.exp
 
 const getJti = token => _decode(token).payload.jti
 
-module.exports = {
+export default {
   bearerPrefix: JwtConstants.bearer,
 
   validate,
   getExpiration,
   getJti,
-}
+};

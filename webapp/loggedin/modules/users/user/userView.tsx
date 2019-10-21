@@ -62,7 +62,7 @@ const UserView = props => {
               placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
               value={name}
               validation={canEditName ? getFieldValidation('name') : {}}
-              maxLength="128"
+              maxLength={128}
               onChange={setName}/>
           </FormItem>
         )

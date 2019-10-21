@@ -1,18 +1,9 @@
-const R = require('ramda')
-
-const db = require('../../../db/db')
-
-const DbUtils = require('../../../db/dbUtils')
-
-const {
-  getSurveyDBSchema,
-  updateSurveySchemaTableProp,
-  deleteSurveySchemaTableRecord,
-  dbTransformCallback,
-} = require('../../survey/repository/surveySchemaRepositoryUtils')
-
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
+import * as R from 'ramda';
+import db from '../../../db/db';
+import DbUtils from '../../../db/dbUtils';
+import { getSurveyDBSchema, updateSurveySchemaTableProp, deleteSurveySchemaTableRecord, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils';
+import Taxonomy from '../../../../core/survey/taxonomy';
+import Taxon from '../../../../core/survey/taxon';
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
@@ -22,7 +13,7 @@ const getTaxonVernacularNameSelectFields = draft => `
 
 // ============== CREATE
 
-const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
+const insertTaxonomy = async (surveyId, taxonomy, client: any = db) =>
   await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props_draft)
         VALUES ($1, $2)
@@ -31,7 +22,7 @@ const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
     record => dbTransformCallback(record, true, true)
   )
 
-const insertTaxa = async (surveyId, taxa, client = db) =>
+const insertTaxa = async (surveyId, taxa, client: any = db) =>
   await client.batch(R.reduce((acc, taxon) => {
       const taxonInsertPromise = insertOrUpdateTaxon(surveyId, taxon, client)
 
@@ -45,7 +36,7 @@ const insertTaxa = async (surveyId, taxa, client = db) =>
     }, [], taxa)
   )
 
-const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
+const insertOrUpdateTaxon = (surveyId, taxon, client: any = db) =>
   client.one(
     `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_uuid, props_draft)
       VALUES ($1, $2, $3)
@@ -56,7 +47,7 @@ const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
     record => dbTransformCallback(record, true, true)
   )
 
-const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
+const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client: any = db) =>
   R.keys(vernacularNames).map(lang => {
     const vn = R.prop(lang, vernacularNames)
     return client.one(
@@ -72,7 +63,7 @@ const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, cli
 
 // ============== READ
 
-const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =>
+const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client: any = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy
      WHERE uuid = $1`,
@@ -80,25 +71,25 @@ const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =
     record => dbTransformCallback(record, draft, true)
   )
 
-const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client = db) =>
+const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client: any = db) =>
   await client.map(
-    `SELECT * 
-     FROM ${getSurveyDBSchema(surveyId)}.taxonomy 
+    `SELECT *
+     FROM ${getSurveyDBSchema(surveyId)}.taxonomy
      ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id`,
     [],
     record => dbTransformCallback(record, draft, true)
   )
 
-const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) =>
+const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client: any = db) =>
   await client.one(`
-      SELECT COUNT(*) 
+      SELECT COUNT(*)
       FROM ${getSurveyDBSchema(surveyId)}.taxon
       WHERE taxonomy_uuid = $1`,
     [taxonomyUuid],
     r => parseInt(r.count)
   )
 
-const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) => {
+const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client: any = db) => {
   const schema = getSurveyDBSchema(surveyId)
 
   return await client.map(`
@@ -110,10 +101,10 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
           AS names
       FROM
           ${schema}.taxon_vernacular_name vn
-      GROUP BY 
+      GROUP BY
           vn.taxon_uuid
       )
-      
+
       SELECT
           t.*,
           vn.names as vernacular_names
@@ -126,8 +117,8 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
       WHERE
           t.taxonomy_uuid = $1
       ORDER BY
-          (t.props || t.props_draft)->>'scientificName' ASC 
-      LIMIT ${limit ? limit : 'ALL'} 
+          (t.props || t.props_draft)->>'scientificName' ASC
+      LIMIT ${limit ? limit : 'ALL'}
       OFFSET $2
     `,
     [taxonomyUuid, offset],
@@ -139,7 +130,7 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
   await client.map(
     `SELECT *
        FROM ${getSurveyDBSchema(surveyId)}.taxon
-       WHERE taxonomy_uuid = $/taxonomyUuid/ 
+       WHERE taxonomy_uuid = $/taxonomyUuid/
          ${whereCondition ? ` AND (${whereCondition})` : ''}
        ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
        LIMIT 25`,
@@ -147,7 +138,7 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
     taxon => dbTransformCallback(taxon, draft, true)
   )
 
-const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
+const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client: any = db) => {
   const searchValue = toSearchValue(code)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft) : ''
 
@@ -160,7 +151,7 @@ const findTaxaByPropLike = async (surveyId,
                                   filterProp,
                                   filterValue,
                                   draft = false,
-                                  client = db) => {
+                                  client: any = db) => {
   const searchValue = toSearchValue(filterValue)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(filterProp, draft) : ''
   return await findTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, filterProp, draft, client)
@@ -170,22 +161,22 @@ const findTaxaByCode = async (surveyId,
                               taxonomyUuid,
                               filterValue,
                               draft = false,
-                              client = db) =>
+                              client: any = db) =>
   await findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, `${filterValue}*`, draft, client)
 
 const findTaxaByScientificName = async (surveyId,
                                         taxonomyUuid,
                                         filterValue,
                                         draft = false,
-                                        client = db) =>
+                                        client: any = db) =>
   await findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.scientificName, `*${filterValue}*`, draft, client)
 
-const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
+const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client: any = db) => {
 
   const searchValue = toSearchValue(`*${filterValue}*`)
   const whereCondition = `
-    ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
-     OR  
+    ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)}
+     OR
     ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft)}
     `
 
@@ -196,16 +187,16 @@ const findTaxaByVernacularName = async (surveyId,
                                         taxonomyUuid,
                                         filterValue,
                                         draft = false,
-                                        client = db) => {
+                                        client: any = db) => {
   const searchValue = toSearchValue(`*${filterValue}*`)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition('name', draft, 'vn.') : ''
 
   return await client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
-       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
        ON vn.taxon_uuid = t.uuid
-     WHERE t.taxonomy_uuid = $/taxonomyUuid/ 
+     WHERE t.taxonomy_uuid = $/taxonomyUuid/
       AND ${filterCondition}
      ORDER BY ${DbUtils.getPropColCombined('name', draft, 'vn.')} ASC
      LIMIT 20`,
@@ -214,18 +205,18 @@ const findTaxaByVernacularName = async (surveyId,
   )
 }
 
-const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) =>
+const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client: any = db) =>
   await client.one(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
-       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
        ON vn.taxon_uuid = t.uuid
      WHERE vn.uuid = $1`,
     [uuid],
     record => dbTransformCallback(record, draft, true)
   )
 
-const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
+const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client: any = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE uuid = $1
@@ -235,7 +226,7 @@ const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   )
 
 // ============== Index
-const fetchIndex = async (surveyId, draft = false, client = db) =>
+const fetchIndex = async (surveyId, draft = false, client: any = db) =>
   await client.map(`
     SELECT
       t.taxonomy_uuid,
@@ -245,10 +236,10 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
       v.vernacular_names
     FROM
       ${getSurveyDBSchema(surveyId)}.taxon t
-    
+
     ${draft ? '' : `--exclude not published taxonomies if not draft
       JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
-        ON t.taxonomy_uuid = taxonomy.uuid 
+        ON t.taxonomy_uuid = taxonomy.uuid
         AND taxonomy.props <> '{}'::jsonb`}
     LEFT OUTER JOIN
       (
@@ -257,9 +248,9 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
           json_agg( json_build_object(${DbUtils.getPropColCombined('name', draft, 'v.')}, v.uuid::text) ) AS vernacular_names
         FROM
           ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
-            
+
         ${draft ? '' : `--exclude not published vernacular names if not draft
-          WHERE v.props <> '{}'::jsonb`}  
+          WHERE v.props <> '{}'::jsonb`}
         GROUP BY
           v.taxon_uuid ) v
     ON
@@ -271,15 +262,15 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
 
 // ============== UPDATE
 
-const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = db) =>
+const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client: any = db) =>
   await updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyUuid, key, value, client)
 
 // ============== DELETE
 
-const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
+const deleteTaxonomy = async (surveyId, taxonomyUuid, client: any = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'taxonomy', taxonomyUuid, client)
 
-const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db) =>
+const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client: any = db) =>
   await client.none(
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE taxonomy_uuid = $1
@@ -302,7 +293,7 @@ const toSearchValue = filterValue =>
     )(filterValue)
     : null
 
-module.exports = {
+export default {
   //CREATE
   insertTaxonomy,
   insertTaxa,
@@ -335,4 +326,4 @@ module.exports = {
   //DELETE
   deleteTaxonomy,
   deleteDraftTaxaByTaxonomyUuid,
-}
+};

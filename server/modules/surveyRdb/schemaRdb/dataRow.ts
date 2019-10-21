@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const NodeDef = require('../../../../core/survey/nodeDef')
-const DataCol = require('./dataCol')
+import * as R from 'ramda';
+import NodeDef from '../../../../core/survey/nodeDef';
+import DataCol from './dataCol';
 
 const getNodeCol = (nodeDefCol, nodeRow) => {
 
@@ -28,6 +27,6 @@ const getValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
   return R.flatten(values)
 }
 
-module.exports = {
+export default {
   getValues,
-}
+};

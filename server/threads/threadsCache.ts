@@ -1,4 +1,5 @@
-class ThreadsCache {
+export default class ThreadsCache {
+	private threads: {};
 
   constructor () {
     this.threads = {}
@@ -18,5 +19,3 @@ class ThreadsCache {
   }
 
 }
-
-module.exports = ThreadsCache

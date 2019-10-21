@@ -1,6 +1,6 @@
-const ObjectUtils = require('../../objectUtils')
+import ObjectUtils from '../../objectUtils';
 
-const keys = {
+export const keys = {
   cycle: ObjectUtils.keys.cycle,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
@@ -13,4 +13,4 @@ const keys = {
   uuid: ObjectUtils.keys.uuid,
 }
 
-module.exports = keys
+export default keys;

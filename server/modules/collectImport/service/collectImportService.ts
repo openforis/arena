@@ -1,13 +1,10 @@
-const R = require('ramda')
-
-const db = require('../../../db/db')
-
-const Survey = require('../../../../core/survey/survey')
-
-const SurveyManager = require('../../survey/manager/surveyManager')
-const CollectImportReportManager = require('../manager/collectImportReportManager')
-const JobManager = require('../../../job/jobManager')
-const CollectImportJob = require('./collectImport/collectImportJob')
+import * as R from 'ramda';
+import db from '../../../db/db';
+import Survey from '../../../../core/survey/survey';
+import SurveyManager from '../../survey/manager/surveyManager';
+import CollectImportReportManager from '../manager/collectImportReportManager';
+import JobManager from '../../../job/jobManager';
+import CollectImportJob from './collectImport/collectImportJob';
 
 const startCollectImportJob = (user, filePath) => {
   const job = new CollectImportJob({ user, filePath })
@@ -17,7 +14,7 @@ const startCollectImportJob = (user, filePath) => {
   return job
 }
 
-const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
+const updateReportItem = async (user, surveyId, itemId, props, resolved, client: any = db) =>
   await client.tx(async tx => {
     //1. update import report item
     const itemUpdated = await CollectImportReportManager.updateItem(surveyId, itemId, props, resolved, tx)
@@ -26,7 +23,7 @@ const updateReportItem = async (user, surveyId, itemId, props, resolved, client 
     const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const collectReport = Survey.getCollectReport(surveyInfo)
-    const issuesResolved = R.propOr(0, Survey.collectReportKeys.issuesResolved)(collectReport)
+    const issuesResolved: number = R.propOr(0, Survey.collectReportKeys.issuesResolved)(collectReport)
     const issuesResolvedUpdated = issuesResolved + (resolved ? 1 : -1)
 
     const collectReportUpdated = {
@@ -38,7 +35,7 @@ const updateReportItem = async (user, surveyId, itemId, props, resolved, client 
     return itemUpdated
   })
 
-module.exports = {
+export default {
   // COLLECT SURVEY IMPORT
   startCollectImportJob,
 
@@ -50,4 +47,4 @@ module.exports = {
   countReportItems: CollectImportReportManager.countItems,
   // UPDATE
   updateReportItem
-}
+};

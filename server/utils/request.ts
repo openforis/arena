@@ -1,10 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import User from '../../core/user/user';
+import express from 'express';
+import { IUser } from '../../core/user/_user/userKeys';
 
-const User = require('../../core/user/user')
+export const getServerUrl = (req: express.Request) => `${req.protocol}://${req.get('host')}`
 
-const getServerUrl = req => `${req.protocol}://${req.get('host')}`
-
-const getParams = req => R.pipe(
+export const getParams = (req: express.Request) => R.pipe(
   R.mergeLeft(R.prop('query', req)),
   R.mergeLeft(R.prop('params', req)),
   R.mergeLeft(R.prop('body', req)),
@@ -18,34 +19,33 @@ const getParams = req => R.pipe(
   )
 )({})
 
-const getJsonParam = (req, param, defaultValue = null) => {
+export const getJsonParam = (req: express.Request, param: string, defaultValue = null) => {
   const jsonStr = R.prop(param, getParams(req))
   return jsonStr
     ? JSON.parse(jsonStr)
     : defaultValue
 }
 
-const getFile = R.pathOr(null, ['files', 'file'])
+export const getFile: (x: any) => any | null = R.pathOr(null, ['files', 'file'])
 
-const getBody = R.propOr(null, 'body')
+export const getBody: (x: any) => any | null = R.propOr(null, 'body')
 
 // User
-
-const getUser = R.prop('user')
-const getUserUuid = R.pipe(getUser, R.prop('uuid'))
-const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
+export const getUser: (x: any) => IUser = R.prop('user')
+export const getUserUuid: (x: any) => string = R.pipe(getUser, R.prop('uuid'))
+export const getSurveyCycleKey: (x: any) => string = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
 // i18n
 
-const getI18n = R.prop('i18n')
+export const getI18n = R.prop('i18n')
 
 // Cookies
 
-const getCookie = name => R.path(['cookies', name])
+export const getCookie = name => R.path(['cookies', name])
 
-const getSocketId = getCookie('io')
+export const getSocketId = getCookie('io')
 
-module.exports = {
+export default {
   getServerUrl,
   getParams,
   getJsonParam,
@@ -62,4 +62,4 @@ module.exports = {
 
   // Cookies
   getSocketId
-}
+};

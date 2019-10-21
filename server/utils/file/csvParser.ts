@@ -1,7 +1,15 @@
-const fastcsv = require('fast-csv')
-const R = require('ramda')
+import { parseFile, parseStream } from 'fast-csv'
+import { is } from 'ramda'
 
-class CSVParser {
+export default class CSVParser {
+  _filePathOrStream: any
+  _csvStream: any
+  _error: any
+  _initialized: boolean = false
+  _csvStreamEnded: boolean = false
+  _rowReadyListener: ((row: any) => void) | null = null
+  _destroyed: any
+  _headers: any
 
   constructor (filePathOrStream) {
     this._reset()
@@ -73,9 +81,9 @@ class CSVParser {
   }
 
   _createCsvStream (options) {
-    return R.is(String, this._filePathOrStream)
-      ? fastcsv.parseFile(this._filePathOrStream, options)
-      : fastcsv.parseStream(this._filePathOrStream, options)
+    return is(String, this._filePathOrStream)
+      ? parseFile(this._filePathOrStream, options)
+      : parseStream(this._filePathOrStream, options)
   }
 
   _onData (data) {
@@ -118,5 +126,3 @@ class CSVParser {
   }
 
 }
-
-module.exports = CSVParser

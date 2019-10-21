@@ -1,18 +1,40 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import jsep from './helpers/jsep';
+import { evalExpression } from './helpers/evaluator';
+import { toString as toStringUtils, isValid } from './helpers/utils';
+import { types } from './helpers/types';
+import operators from './helpers/operators';
 
-const jsep = require('./helpers/jsep')
-const { evalExpression } = require('./helpers/evaluator')
-const { toString: toStringUtils, isValid } = require('./helpers/utils')
-const { types } = require('./helpers/types')
+interface ICallExpression {
+  type: 'CallExpression',
+  arguments: any[],
+  callee: {
+    type: 'MemberExpression',
+    computed: false,
+    object: [Object],
+    property: [Object]
+  }
+}
+interface ILiteralExpression {
+  type: 'Literal';
+  value: any;
+  raw: string;
+}
+type JSEPOperand = ICallExpression | ILiteralExpression
 
-const operators = require('./helpers/operators')
+export interface IJSEPExpression {
+  type: string; // 'BinaryExpression',
+  operator: string; // '>',
+  left: JSEPOperand;
+  right: JSEPOperand;
+}
 
-const modes = {
+export const modes = {
   json: 'json',
   sql: 'sql',
 }
 
-const toString = (expr, exprMode = modes.json) => {
+export const toString = (expr, exprMode = modes.json) => {
   const string = toStringUtils(expr)
 
   return exprMode === modes.sql
@@ -25,7 +47,8 @@ const toString = (expr, exprMode = modes.json) => {
     : string
 }
 
-const fromString = (string, exprMode = modes.json) => {
+export const fromString: (string: string, exprMode?: string) => IJSEPExpression
+= (string: string, exprMode = modes.json) => {
   const exprString = exprMode === modes.json ?
     string :
     R.pipe(
@@ -40,34 +63,54 @@ const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-const evalString = async (query, ctx) =>
+export const evalString = async (query, ctx) =>
   await evalExpression(fromString(query), ctx)
 
 // ====== Type checking
 
-const isType = type => R.propEq('type', type)
+export const isType = type => R.propEq('type', type)
 
 // ====== Instance creators
 
-const newLiteral = (value = null) => ({
+
+export interface ILiteral {
+  type: string;
+  value: any;
+  raw: any | string;
+}
+export interface IIdentifier {
+  type: string;
+  name: any;
+}
+export interface IBinary {
+  type: string;
+  operator: string;
+  left: any;
+  right: any;
+}
+
+export const newLiteral: (value?: any) => ILiteral = (value = null) => ({
   type: types.Literal,
   value: value,
   raw: value || '',
 })
 
-const newIdentifier = (value = '') => ({
+export const newIdentifier: (value?: any) => IIdentifier = (value = '') => ({
   type: types.Identifier,
   name: value,
 })
 
-const newBinary = (left, right, operator = '') => ({
+export const newBinary: (left: any, right: any, operator?: string) => IBinary
+= (left, right, operator = '') => ({
   type: types.BinaryExpression,
   operator,
   left,
   right,
 })
 
-module.exports = {
+export { types };
+
+export default {
   types,
   modes,
 
@@ -90,4 +133,4 @@ module.exports = {
 
   // operators
   operators,
-}
+};

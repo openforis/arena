@@ -1,23 +1,25 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
+import Survey from '../../../../core/survey/survey'
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef'
 
-const Node = require('../../../../core/record/node')
-const RecordValidation = require('../../../../core/record/recordValidation')
-const Validation = require('../../../../core/validation/validation')
+import Node from '../../../../core/record/node'
+import RecordValidation from '../../../../core/record/recordValidation'
+import Validation from '../../../../core/validation/validation'
 
-const SurveyManager = require('../../survey/manager/surveyManager')
-const RecordManager = require('../manager/recordManager')
-const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
+import SurveyManager from '../../survey/manager/surveyManager'
+import RecordManager from '../manager/recordManager'
+import SurveyRdbManager from '../../surveyRdb/manager/surveyRdbManager'
 
-const Job = require('../../../job/job')
+import Job from '../../../job/job'
 
 const recordValidationUpdateBatchSize = 1000
 
-class RecordsUniquenessValidationJob extends Job {
+export default class RecordsUniquenessValidationJob extends Job {
+	public validationByRecordUuid: any;
+  static type: string = 'RecordsUniquenessValidationJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(RecordsUniquenessValidationJob.type, params)
 
     //cache of record validations
@@ -50,6 +52,8 @@ class RecordsUniquenessValidationJob extends Job {
 
     if (!R.isEmpty(rowsRecordsDuplicate)) {
       // 3. update records validation
+
+      // TODO: this function takes no arguments!!
       const validationDuplicate = _createValidationRecordDuplicate(nodeDefRoot)
 
       for (const rowRecordDuplicate of rowsRecordsDuplicate) {
@@ -100,9 +104,7 @@ class RecordsUniquenessValidationJob extends Job {
 
 }
 
-RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
-
-const _createValidationRecordDuplicate = () => Validation.newInstance(
+const _createValidationRecordDuplicate = (_: INodeDef) => Validation.newInstance(
   false,
   {
     [RecordValidation.keys.recordKeys]: Validation.newInstance(
@@ -124,5 +126,3 @@ const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
     Validation.setField(nodeUuid, nodeValidationUpdated),
   )(validationRecord)
 }
-
-module.exports = RecordsUniquenessValidationJob

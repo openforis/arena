@@ -29,7 +29,7 @@ const Checkbox = props => {
   )
 }
 
-const NodeDefCodeCheckbox = props => {
+export const NodeDefCodeCheckbox = props => {
   const { items = [], edit, lang } = props
 
   const i18n = useI18n()

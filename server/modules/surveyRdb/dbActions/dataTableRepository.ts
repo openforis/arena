@@ -1,14 +1,10 @@
-const R = require('ramda')
-
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-
-const DataTable = require('../schemaRdb/dataTable')
-
-const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchemaRepositoryUtils')
+import * as R from 'ramda';
+import Survey from '../../../../core/survey/survey';
+import NodeDef from '../../../../core/survey/nodeDef';
+import SchemaRdb from '../../../../common/surveyRdb/schemaRdb';
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable';
+import DataTable from '../schemaRdb/dataTable';
+import SurveySchemaRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils';
 
 /**
  * Returns a list of items for each record containing duplicate entities.
@@ -47,9 +43,9 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
     FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
-        ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid} 
+        ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid}
     WHERE
-      r.cycle = $1 
+      r.cycle = $1
       AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
       SELECT ${aliasB}.${DataTable.colNameUuuid}
@@ -57,7 +53,7 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
       WHERE
         --same cycle
         ${aliasB}.${DataTable.colNameRecordCycle} = $1
-        --different node uuid 
+        --different node uuid
         AND ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
         ${recordAndParentEqualCondition}
         --same key node(s) values
@@ -69,6 +65,6 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
   )
 }
 
-module.exports = {
+export default {
   fetchRecordsWithDuplicateEntities
-}
+};

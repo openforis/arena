@@ -10,7 +10,7 @@ import ItemEdit from './itemEdit'
 import { normalizeName } from '../../../../../core/stringUtils'
 
 import Survey from '../../../../../core/survey/survey'
-import Category from '../../../../../core/survey/category'
+import Category, { ICategoryLevel } from '../../../../../core/survey/category'
 import CategoryLevel from '../../../../../core/survey/categoryLevel'
 import CategoryItem from '../../../../../core/survey/categoryItem'
 import Validation from '../../../../../core/validation/validation'
@@ -29,6 +29,7 @@ import {
   deleteCategoryLevel,
   setCategoryItemForEdit,
 } from '../actions'
+import { INodeDef } from '../../../../../core/survey/nodeDef'
 
 const LevelEdit = props => {
 
@@ -36,7 +37,7 @@ const LevelEdit = props => {
     const { survey, category, level, deleteCategoryLevel } = props
 
     const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
-    if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
+    if (R.any((def: INodeDef) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
       alert('This category level is used by some node definitions and cannot be removed')
     } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
       deleteCategoryLevel(category, level)
@@ -112,7 +113,10 @@ const LevelEdit = props => {
   </div>
 }
 
-const mapStateToProps = (state, props) => {
+interface IProps {
+  level: ICategoryLevel;
+}
+const mapStateToProps = (state, props: IProps) => {
   const { level } = props
   const { index } = level
 

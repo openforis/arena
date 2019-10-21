@@ -1,22 +1,19 @@
-const { expect } = require('chai')
+import { expect } from 'chai';
+import Survey, { ISurvey } from '../../core/survey/survey';
+import NodeDef from '../../core/survey/nodeDef';
+import NodeDefExpression from '../../core/survey/nodeDefExpression';
+import Record from '../../core/record/record';
+import Node from '../../core/record/node';
+import SurveyManager from '../../server/modules/survey/manager/surveyManager';
+import RecordManager from '../../server/modules/record/manager/recordManager';
+import { getContextUser } from '../testContext';
+import * as SB from './utils/surveyBuilder';
+import * as RB from './utils/recordBuilder';
+import RecordUtils from './utils/recordUtils';
+import db from '../../server/db/db';
 
-const Survey = require('../../core/survey/survey')
-const NodeDef = require('../../core/survey/nodeDef')
-const NodeDefExpression = require('../../core/survey/nodeDefExpression')
-const Record = require('../../core/record/record')
-const Node = require('../../core/record/node')
-
-const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-const RecordManager = require('../../server/modules/record/manager/recordManager')
-
-const { getContextUser } = require('../testContext')
-
-const SB = require('./utils/surveyBuilder')
-const RB = require('./utils/recordBuilder')
-const RecordUtils = require('./utils/recordUtils')
-
-let survey
-let record
+let survey: ISurvey
+let record: RB.IRecord
 
 before(async () => {
   const user = getContextUser()
@@ -56,7 +53,11 @@ after(async () => {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
 })
 
-const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourcePath, sourceValue, dependentPath, dependentExpectedValue) => {
+const updateNodeAndExpectDependentNodeValueToBe = async (
+  survey: ISurvey, record: RB.IRecord,
+  sourcePath: string, sourceValue: any,
+  dependentPath: string, dependentExpectedValue: any,
+) => {
   // update source node value
   const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
 
@@ -66,7 +67,8 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
   record = Record.assocNodes(nodesUpdated)(record)
 
   // update dependent nodes
-  const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+  // TODO: added missing parameter db. Is this correct?
+  const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated, db)
   record = recordUpdate
 
   const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
@@ -92,10 +94,9 @@ describe('Calculated value test', async () => {
       [99, 'z'],
     ]
 
-    for (const testValue of testValues) {
-      const [sourceValue, expectedValue] = testValue
-
-      record = await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', sourceValue, 'root/num_range', expectedValue)
+    for (const [sourceValue, expectedValue] of testValues) {
+      record = await updateNodeAndExpectDependentNodeValueToBe(
+        survey, record, 'root/num', sourceValue, 'root/num_range', expectedValue)
     }
   })
 

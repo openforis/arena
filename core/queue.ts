@@ -1,15 +1,16 @@
-class Queue {
+export default class Queue<T> {
+	private data: T[] = [];
 
-  constructor (items = []) {
+  constructor (items: T[] = []) {
     this.data = []
     this.enqueueItems(items)
   }
 
-  enqueue (item) {
+  enqueue (item: T) {
     this.data.unshift(item)
   }
 
-  enqueueItems (items) {
+  enqueueItems (items: T[]) {
     for (const item of items) {
       this.enqueue(item)
     }
@@ -36,5 +37,3 @@ class Queue {
   }
 
 }
-
-module.exports = Queue

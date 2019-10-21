@@ -7,4 +7,4 @@ const types = {
   nodeDelete: 'nodeDelete',
 }
 
-module.exports = types
+export default types;

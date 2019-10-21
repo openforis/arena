@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefEntityTable from './nodeDefEntityTable'
-import NodeDefEntityForm from './nodeDefEntityForm'
+import { NodeDefEntityTable } from '../../internal'
+import { NodeDefEntityForm } from '../../internal'
 
 import Survey from '../../../../../../../core/survey/survey'
 import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
@@ -14,7 +14,7 @@ const componentsByRenderType = {
   [NodeDefLayout.renderType.table]: NodeDefEntityTable,
 }
 
-const NodeDefEntitySwitch = props => {
+const _NodeDefEntitySwitch = props => {
 
   const { surveyCycleKey, nodeDef } = props
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
@@ -26,4 +26,5 @@ const mapStateToProps = (state, props) => ({
   childDefs: Survey.getNodeDefChildren(props.nodeDef)(SurveyState.getSurvey(state)),
 })
 
-export default connect(mapStateToProps)(NodeDefEntitySwitch)
+export const NodeDefEntitySwitch = connect(mapStateToProps)(_NodeDefEntitySwitch)
+export default NodeDefEntitySwitch

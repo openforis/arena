@@ -1,15 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job'
 
-const Survey = require('../../../../../../core/survey/survey')
+import Survey from '../../../../../../core/survey/survey'
 
-const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
-const SurveyManager = require('../../../manager/surveyManager')
-const CategoryManager = require('../../../../category/manager/categoryManager')
-const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
+import NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
+import SurveyManager from '../../../manager/surveyManager'
+import CategoryManager from '../../../../category/manager/categoryManager'
+import TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 
-const ActivityLog = require('../../../../activityLog/activityLogger')
+import ActivityLog from '../../../../activityLog/activityLogger'
 
 const findDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
@@ -23,9 +23,10 @@ const findDeletedLanguages = async (surveyId, t) => {
   }
 }
 
-class SurveyPropsPublishJob extends Job {
+export default class SurveyPropsPublishJob extends Job {
+  static type: string = 'SurveyPropsPublishJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(SurveyPropsPublishJob.type, params)
   }
 
@@ -57,7 +58,3 @@ class SurveyPropsPublishJob extends Job {
   }
 
 }
-
-SurveyPropsPublishJob.type = 'SurveyPropsPublishJob'
-
-module.exports = SurveyPropsPublishJob

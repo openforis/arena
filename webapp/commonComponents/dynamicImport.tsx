@@ -2,9 +2,8 @@ import React from 'react'
 import { injectReducers } from '../app/store'
 
 export default class DynamicImport extends React.Component {
-
-  constructor () {
-    super()
+  constructor (props?) {
+    super(props)
     this.state = { component: null }
   }
 

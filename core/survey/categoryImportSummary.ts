@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda';
 
 const keys = {
   columns: 'columns',
@@ -22,43 +22,61 @@ const columnTypes = {
 }
 
 // ===== SUMMARY
-
-const newSummary = (columns, filePath = null) => ({
-  [keys.columns]: columns,
-  [keys.filePath]: filePath
+export interface ISummary {
+  columns: any[];
+  filePath: string | null;
+}
+const newSummary: (columns: any[], filePath?: string | null) => ISummary
+= (columns, filePath = null) => ({
+  columns: columns,
+  filePath: filePath,
 })
 
-const getColumns = R.propOr({}, keys.columns)
+const getColumns: (x: any) => {} = R.propOr({}, keys.columns)
 
 // ===== COLUMN
+export interface IColumn {
+  type: string;
+  levelName: string | null;
+  levelIndex: number;
+  lang: string | null;
+  dataType: string | null;
+}
 
-const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
-  [keysColumn.type]: type,
-  [keysColumn.levelName]: levelName,
-  [keysColumn.levelIndex]: levelIndex,
-  [keysColumn.lang]: lang,
-  [keysColumn.dataType]: dataType,
+const newColumn: (
+  type: string,
+  levelName?: string | null,
+  levelIndex?: number,
+  lang?: string | null,
+  dataType?: string | null,
+) => IColumn
+= (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
+  type,
+  levelName,
+  levelIndex,
+  lang,
+  dataType,
 })
 
-const getColumnType = R.prop(keysColumn.type)
+const getColumnType: (x: any) => string = R.prop(keysColumn.type)
 
-const getColumnLevelName = R.prop(keysColumn.levelName)
+const getColumnLevelName: (x: any) => string = R.prop(keysColumn.levelName)
 
-const getColumnLevelIndex = R.prop(keysColumn.levelIndex)
+const getColumnLevelIndex: (x: any) => number = R.prop(keysColumn.levelIndex)
 
-const getColumnLang = R.prop(keysColumn.lang)
+const getColumnLang: (x: any) => string = R.prop(keysColumn.lang)
 
-const getColumnDataType = R.prop(keysColumn.dataType)
+const getColumnDataType: (x: any) => string = R.prop(keysColumn.dataType)
 
 const isColumnType = type => R.pipe(
   getColumnType,
   R.equals(type)
 )
 
-const isColumnCode = isColumnType(columnTypes.code)
-const isColumnExtra = isColumnType(columnTypes.extra)
-const isColumnLabel = isColumnType(columnTypes.label)
-const isColumnDescription = isColumnType(columnTypes.description)
+const isColumnCode: (x: any) => boolean = isColumnType(columnTypes.code)
+const isColumnExtra: (x: any) => boolean = isColumnType(columnTypes.extra)
+const isColumnLabel: (x: any) => boolean = isColumnType(columnTypes.label)
+const isColumnDescription: (x: any) => boolean = isColumnType(columnTypes.description)
 
 // ===== UTILS
 
@@ -84,7 +102,7 @@ const hasColumn = (type, levelIndex) => R.pipe(
   R.not
 )
 
-module.exports = {
+export default {
   columnTypes,
 
   keys,
@@ -119,4 +137,4 @@ module.exports = {
   getLevelNames,
   getColumnName,
   hasColumn,
-}
+};

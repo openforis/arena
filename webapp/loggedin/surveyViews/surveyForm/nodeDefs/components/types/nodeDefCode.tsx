@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import NodeDefCodeDropdown from './nodeDefCodeDropdown'
-import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
+import { NodeDefCodeDropdown } from '../../internal'
+import { NodeDefCodeCheckbox } from '../../internal'
 import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
@@ -21,7 +21,7 @@ import * as AppState from '../../../../../../app/appState'
 import * as SurveyState from '../../../../../../survey/surveyState'
 import * as RecordState from '../../../../record/recordState'
 
-const NodeDefCode = props => {
+const _NodeDefCode = props => {
 
   const {
     surveyId, surveyCycleKey, nodeDef,
@@ -132,4 +132,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(NodeDefCode)
+export const NodeDefCode = connect(mapStateToProps)(_NodeDefCode)
+export default NodeDefCode

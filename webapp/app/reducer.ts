@@ -18,9 +18,15 @@ import { surveyCreate, surveyDelete, surveyUpdate } from '../survey/actions'
 
 import * as AppState from './appState'
 
+interface IProps {
+  survey: any;
+  type: any;
+  [s: string]: any;
+}
+
 const actionHandlers = {
 
-  [appPropsChange]: (state, { survey, ...props }) => assocActionProps(state, props),
+  [appPropsChange]: (state, { survey, ...props }: IProps ) => assocActionProps(state, props),
 
   // ====== user
 

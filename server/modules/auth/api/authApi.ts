@@ -1,16 +1,16 @@
-const Loggger = require('../../../log/log').getLogger('AuthAPI')
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
-const Jwt = require('../../../utils/jwt')
+import { getLogger } from '../../../log/log'
+import Request from '../../../utils/request';
+import Response from '../../../utils/response';
+import Jwt from '../../../utils/jwt';
+import Survey from '../../../../core/survey/survey';
+import User from '../../../../core/user/user';
+import Authorizer from '../../../../core/auth/authorizer';
+import SurveyService from '../../survey/service/surveyService';
+import UserService from '../../user/service/userService';
+import RecordService from '../../record/service/recordService';
+import AuthService from '../service/authService';
 
-const Survey = require('../../../../core/survey/survey')
-const User = require('../../../../core/user/user')
-const Authorizer = require('../../../../core/auth/authorizer')
-
-const SurveyService = require('../../survey/service/surveyService')
-const UserService = require('../../user/service/userService')
-const RecordService = require('../../record/service/recordService')
-const AuthService = require('../service/authService')
+const Logger = getLogger('AuthAPI')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
@@ -22,7 +22,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     }
     sendResponse(res, user, survey)
   } catch (e) {
-    Loggger.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
+    Logger.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
     // survey not found with user pref
     // removing user pref
     user = User.deletePrefSurvey(surveyId)(user)
@@ -30,7 +30,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
   }
 }
 
-module.exports.init = app => {
+export const init = app => {
 
   app.get('/auth/user', async (req, res, next) => {
     try {
@@ -61,4 +61,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

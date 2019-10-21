@@ -1,11 +1,9 @@
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
+import Request from '../../../utils/request';
+import Response from '../../../utils/response';
+import * as AuthMiddleware from '../../auth/authApiMiddleware';
+import ProcessingChainService from '../service/processingChainService';
 
-const AuthMiddleware = require('../../auth/authApiMiddleware')
-
-const ProcessingChainService = require('../service/processingChainService')
-
-module.exports.init = app => {
+export const init = app => {
 
   //====== CREATE
 
@@ -90,4 +88,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

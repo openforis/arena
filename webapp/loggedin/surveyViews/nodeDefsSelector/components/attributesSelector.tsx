@@ -4,7 +4,7 @@ import * as R from 'ramda'
 
 import Survey from '../../../../../core/survey/survey'
 import NodeDef from '../../../../../core/survey/nodeDef'
-import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefUIProps'
+import {NodeDefUIProps} from '../../surveyForm/nodeDefs'
 
 import * as SurveyState from '../../../../survey/surveyState'
 
@@ -29,7 +29,7 @@ const AttributeSelector = (props) => {
             onClick={() => onToggleAttribute(nodeDefUuid)}
             disabled={!canSelectAttributes}>
       {NodeDef.getLabel(nodeDef, lang)}
-      {NodeDefUiProps.getIconByType(nodeDefType)}
+      {NodeDefUIProps.getIconByType(nodeDefType)}
     </button>
 
 }

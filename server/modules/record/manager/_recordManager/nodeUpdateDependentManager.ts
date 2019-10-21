@@ -1,19 +1,17 @@
-const R = require('ramda')
-
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
-
-const Record = require('../../../../../core/record/record')
-const Node = require('../../../../../core/record/node')
-const RecordExprParser = require('../../../../../core/record/recordExprParser')
-
-const NodeRepository = require('../../repository/nodeRepository')
+import * as R from 'ramda';
+import Survey, { ISurvey } from '../../../../../core/survey/survey';
+import NodeDef from '../../../../../core/survey/nodeDef';
+import Record from '../../../../../core/record/record';
+import Node from '../../../../../core/record/node';
+import RecordExprParser from '../../../../../core/record/recordExprParser';
+import NodeRepository from '../../repository/nodeRepository';
+import { IRecord } from '../../../../../test/it/utils/recordBuilder';
 
 /**
  * Module responsible for updating applicable and default values
  */
 
-const updateDependentsApplicable = async (survey, record, node, tx) => {
+const updateDependentsApplicable = async (survey: ISurvey, record: IRecord, node, tx) => {
   //output
   const nodesUpdated = {} //updated nodes indexed by uuid
 
@@ -125,7 +123,9 @@ const toNodeValue = async (survey, record, node, valueExpr) => {
       const code = '' + valueExpr
       const parentNode = Record.getParentNode(node)(record)
 
-      const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey) || {}
+      const { itemUuid } =
+        Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
+        || { itemUuid: null }
 
       return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
 
@@ -142,7 +142,7 @@ const toNodeValue = async (survey, record, node, valueExpr) => {
   return valueExpr
 }
 
-module.exports = {
+export default {
   updateDependentsDefaultValues,
   updateDependentsApplicable,
-}
+};

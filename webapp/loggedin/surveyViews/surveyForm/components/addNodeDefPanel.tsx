@@ -8,7 +8,7 @@ import { useI18n } from '../../../../commonComponents/hooks'
 
 import NodeDef from '../../../../../core/survey/nodeDef'
 import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
-import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
+import {NodeDefUIProps} from '../nodeDefs'
 
 import * as SurveyFormState from '../surveyFormState'
 import * as SurveyState from '../../../../survey/surveyState'
@@ -29,6 +29,7 @@ const AddNodeDefButtons = props => {
 
             // cannot add entities when entity is rendered as table
             const disabled = type === NodeDef.nodeDefType.entity && NodeDefLayout.isRenderTable(nodeDef)
+            // XXX: isRenderTable always returns a function, not a bool!!
 
             return (
               <button key={type}
@@ -37,6 +38,7 @@ const AddNodeDefButtons = props => {
                         addNodeDef(type, nodeDefProps)
                         setFormNodeDefAddChildTo(null)
                       }}
+                      // @ts-ignore TODO
                       aria-disabled={disabled}>
                 {type}
                 {NodeDefUIProps.getIconByType(type)}

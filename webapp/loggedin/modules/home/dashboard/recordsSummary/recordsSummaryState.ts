@@ -3,7 +3,7 @@ import * as HomeState from '../../homeState'
 
 export const stateKey = 'recordsSummary'
 
-export const getState = R.pipe(HomeState.getState, R.prop(stateKey))
+export const getState: (x: any) => any = R.pipe(HomeState.getState, R.prop(stateKey))
 
 export const timeRanges = {
   _2Weeks: '2Weeks',
@@ -28,7 +28,7 @@ export const assocSummary = (timeRange, from, to, counts) => R.pipe(
   R.assoc(keys.counts, counts),
 )
 
-export const getFrom = R.pipe(getState, R.prop(keys.from))
-export const getTo = R.pipe(getState, R.prop(keys.to))
-export const getCounts = R.pipe(getState, R.propOr([], keys.counts))
-export const getTimeRange = R.pipe(getState, R.propOr(timeRanges._2Weeks, keys.timeRange))
+export const getFrom: (x: any) => any = R.pipe(getState, R.prop(keys.from))
+export const getTo: (x: any) => any = R.pipe(getState, R.prop(keys.to))
+export const getCounts: (x: any) => any = R.pipe(getState, R.propOr([], keys.counts))
+export const getTimeRange: (x: any) => any = R.pipe(getState, R.propOr(timeRanges._2Weeks, keys.timeRange))

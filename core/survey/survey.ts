@@ -1,37 +1,70 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import { uuidv4 } from '../uuid';
+import SurveyInfo from './_survey/surveyInfo';
+import SurveyCycle from './surveyCycle';
+import SurveyNodeDefs, { INodeDefs } from './_survey/surveyNodeDefs';
+import SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation';
+import SurveyCategories from './_survey/surveyCategories';
+import SurveyTaxonomies from './_survey/surveyTaxonomies';
+import SurveyDefaults from './_survey/surveyDefaults';
+import SurveyDependencies from './_survey/surveyDependencies';
+import SurveyRefDataIndex from './_survey/surveyRefDataIndex';
+import Srs, { ISRS } from '../geo/srs';
 
-const { uuidv4 } = require('../uuid')
+export interface IValidation {
+  valid: boolean;
+  fields: {};
+  errors: any[];
+  warnings: any[];
+}
+export interface ISurveyLabels { [s: string]: string; }
+export interface ISurveyCycles { cycleOneKey: string; }
+export interface ISurveyProps {
+  name: string;
+  labels: ISurveyLabels;
+  languages: string[];
+  srs: ISRS[];
+  cycles: ISurveyCycles
+}
+export interface ISurveyInfo {
+  uuid: string
+  props: ISurveyProps;
 
-const SurveyInfo = require('./_survey/surveyInfo')
-const SurveyCycle = require('./surveyCycle')
-const SurveyNodeDefs = require('./_survey/surveyNodeDefs')
-const SurveyNodeDefsValidation = require('./_survey/surveyNodeDefsValidation')
-const SurveyCategories = require('./_survey/surveyCategories')
-const SurveyTaxonomies = require('./_survey/surveyTaxonomies')
-const SurveyDefaults = require('./_survey/surveyDefaults')
-const SurveyDependencies = require('./_survey/surveyDependencies')
-const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
+  id?: string;
+  published?: boolean;
+  draft?: boolean;
+  ownerUuid?: string;
+  dateCreated?: string;
+  dateModified?: string;
+  authGroups?: Object[];
+  validation?: IValidation | null
+}
 
-const Srs = require('../geo/srs')
+export interface ISurvey extends INodeDefs {
+  info: ISurveyInfo;
+  dependencyGraph: {
+   defaultValues: {
+     [uuid: string]: any[][];
+   }
+  }
+}
 
 const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
-  [SurveyInfo.keys.uuid]: uuidv4(),
-  [SurveyInfo.keys.props]: {
-    [SurveyInfo.keys.name]: name,
-    [SurveyInfo.keys.labels]: { [lang]: label },
-    [SurveyInfo.keys.languages]: [lang],
-    [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    ...collectUri
-      ? { collectUri }
-      : {},
-    [SurveyInfo.keys.cycles]: {
+  uuid: uuidv4(),
+  props: {
+    name: name,
+    labels: { [lang]: label },
+    languages: [lang],
+    srs: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
+    ...((collectUri ? { collectUri } : {})),
+    cycles: {
       [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle()
     }
   },
-  [SurveyInfo.keys.ownerUuid]: ownerUuid,
+  ownerUuid: ownerUuid,
 })
 
-module.exports = {
+export default {
   newSurvey,
 
   infoKeys: SurveyInfo.keys,
@@ -149,4 +182,4 @@ module.exports = {
   includesTaxonVernacularName: SurveyRefDataIndex.includesTaxonVernacularName,
 
   assocRefData: SurveyRefDataIndex.assocRefData,
-}
+};

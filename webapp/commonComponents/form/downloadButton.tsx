@@ -22,7 +22,7 @@ const DownloadButton = props => {
       onClick={async () => {
         const response = await axios({ url: href, method: 'GET', responseType: 'blob' })
         const blob = new Blob([response.data])
-        const contentDisposition = R.path(['headers', 'content-disposition'], response)
+        const contentDisposition = R.path(['headers', 'content-disposition'], response) as string;
         const fileName = contentDisposition.substring('attachment; filename='.length)
         FileSaver.saveAs(blob, fileName)
       }}>

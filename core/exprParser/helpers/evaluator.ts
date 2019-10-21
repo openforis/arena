@@ -1,9 +1,8 @@
-const R = require('ramda')
-
-const { types } = require('./types')
-const { isString } = require('../../stringUtils')
-
-const SystemError = require('../../../server/utils/systemError')
+import * as R from 'ramda';
+import { types } from './types';
+import { isString } from '../../stringUtils';
+import SystemError from '../../../server/utils/systemError';
+import { IJSEPExpression } from '../expression';
 
 const unaryEval = async (expr, ctx) => {
   const { argument, operator } = expr
@@ -105,9 +104,10 @@ const typeFns = {
   [types.GroupExpression]: groupEval,
 }
 
-const evalExpression = async (expr, ctx) => {
+export const evalExpression = async (expr: IJSEPExpression, ctx) => {
   const functions = R.pipe(
     R.prop('functions'),
+    // @ts-ignore TODO
     R.mergeRight(typeFns)
   )(ctx)
 
@@ -118,6 +118,6 @@ const evalExpression = async (expr, ctx) => {
     throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
 }
 
-module.exports = {
+export default {
   evalExpression,
-}
+};

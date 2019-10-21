@@ -1,7 +1,6 @@
-const sgMail = require('@sendgrid/mail')
-
-const ProcessUtils = require('../../core/processUtils')
-const i18nFactory = require('../../core/i18n/i18nFactory')
+import sgMail from '@sendgrid/mail';
+import ProcessUtils from '../../core/processUtils';
+import i18nFactory from '../../core/i18n/i18nFactory';
 
 sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
 
@@ -20,6 +19,6 @@ const sendEmail = async (to, msgKey, msgParams = {}, lang) => {
   })
 }
 
-module.exports = {
+export default {
   sendEmail,
-}
+};

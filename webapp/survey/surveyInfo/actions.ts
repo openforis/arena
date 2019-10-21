@@ -20,7 +20,7 @@ export const updateSurveyInfoProps = props => async (dispatch, getState) => {
 
   const surveyInfo = Survey.getSurveyInfo(data)
   if (Validation.isObjValid(surveyInfo)) {
-    dispatch(showNotificationMessage('common.saved'))
+    dispatch(showNotificationMessage('common.saved', {}, AppState.notificationSeverity.info))
     dispatch({ type: surveyInfoUpdate, surveyInfo })
     dispatch(resetSurveyDefs())
   } else {

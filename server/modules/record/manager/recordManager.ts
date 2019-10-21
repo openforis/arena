@@ -1,22 +1,18 @@
-const db = require('../../../db/db')
-
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Record = require('../../../../core/record/record')
-const ObjectUtils = require('../../../../core/objectUtils')
-
-const RecordUpdateManager = require('./_recordManager/recordUpdateManager')
-const RecordValidationManager = require('./_recordManager/recordValidationManager')
-
-const SurveyRepository = require('../../survey/repository/surveyRepository')
-const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
-const RecordRepository = require('../repository/recordRepository')
-const NodeRepository = require('../repository/nodeRepository')
-
-const ActivityLog = require('../../activityLog/activityLogger')
+import db from '../../../db/db';
+import Survey from '../../../../core/survey/survey';
+import NodeDef from '../../../../core/survey/nodeDef';
+import Record from '../../../../core/record/record';
+import ObjectUtils from '../../../../core/objectUtils';
+import RecordUpdateManager from './_recordManager/recordUpdateManager';
+import RecordValidationManager from './_recordManager/recordValidationManager';
+import SurveyRepository from '../../survey/repository/surveyRepository';
+import NodeDefRepository from '../../nodeDef/repository/nodeDefRepository';
+import RecordRepository from '../repository/recordRepository';
+import NodeRepository from '../repository/nodeRepository';
+import ActivityLog from '../../activityLog/activityLogger';
 
 //CREATE
-const insertRecord = async (user, surveyId, record, client = db) =>
+const insertRecord = async (user, surveyId, record, client: any = db) =>
   await client.tx(async t => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
     if (!Record.isPreview(record)) {
@@ -26,7 +22,7 @@ const insertRecord = async (user, surveyId, record, client = db) =>
   })
 
 //READ
-const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client = db) => {
+const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client: any = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
@@ -41,17 +37,17 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, cli
   }
 }
 
-const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
+const fetchRecordByUuid = async (surveyId, recordUuid, client: any = db) =>
   await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
 
-const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client = db) => {
+const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client: any = db) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, draft, client)
 
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
-module.exports = {
+export default {
   // ==== CREATE
   insertRecord,
   insertNodesFromValues: NodeRepository.insertNodesFromValues,
@@ -90,4 +86,4 @@ module.exports = {
   // ====  UTILS
   disableTriggers: NodeRepository.disableTriggers,
   enableTriggers: NodeRepository.enableTriggers
-}
+};

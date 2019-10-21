@@ -1,12 +1,10 @@
-const db = require('../../../db/db')
-
-const RecordFile = require('../../../../core/record/recordFile')
-
-const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
+import db from '../../../db/db';
+import RecordFile from '../../../../core/record/recordFile';
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils';
 
 // ============== CREATE
 
-const insertFile = async (surveyId, file, client = db) => {
+const insertFile = async (surveyId, file, client: any = db) => {
   const { uuid, props, content } = file
 
   return await client.one(`
@@ -19,14 +17,14 @@ const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-const fetchFileByUuid = async (surveyId, uuid, client = db) =>
+const fetchFileByUuid = async (surveyId, uuid, client: any = db) =>
   await client.one(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
 
-const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
+const fetchFileByNodeUuid = async (surveyId, nodeUuid, client: any = db) =>
   await client.one(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.nodeUuid}' = $1`,
@@ -34,21 +32,21 @@ const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
   )
 
 // ============== DELETE
-const deleteFileByUuid = async (surveyId, uuid, client = db) =>
+const deleteFileByUuid = async (surveyId, uuid, client: any = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
 
-const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
+const deleteFilesByRecordUuids = async (surveyId, uuids, client: any = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
     [uuids]
   )
 
-module.exports = {
+export default {
   //CREATE
   insertFile,
 
@@ -59,4 +57,4 @@ module.exports = {
   //DELETE
   deleteFileByUuid,
   deleteFilesByRecordUuids
-}
+};

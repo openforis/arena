@@ -1,7 +1,7 @@
-const R = require('ramda')
-const { uuidv4 } = require('../uuid')
-
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import { uuidv4 } from '../uuid';
+import ObjectUtils from '../objectUtils';
+import { ILocalizedDict } from './taxon';
 
 const keys = {
   uuid: 'uuid',
@@ -19,20 +19,34 @@ const keysExtraDef = {
   dataType: 'dataType'
 }
 
+export interface ICategoryItemProps {
+  code?: string;
+  extra?: any;
+
+  labels?: ILocalizedDict; // TODO should this be here
+}
+export interface ICategoryItem {
+  uuid: string;
+  levelUuid: string;
+  parentUuid: string | null;
+  props: ICategoryItemProps;
+}
 // ====== CREATE
-const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.levelUuid]: levelUuid,
-  [keys.parentUuid]: parentItemUuid,
-  [keys.props]: props,
+const newItem: (levelUuid: string, parentItemUuid?: string | null, props?: ICategoryItemProps) => ICategoryItem
+= (levelUuid, parentItemUuid = null, props = {}) => ({
+  uuid: uuidv4(),
+  levelUuid,
+  parentUuid: parentItemUuid,
+  props,
 })
 
 // ====== READ
-const getCode = ObjectUtils.getProp(props.code, '')
+const getCode: (x: ICategoryItem) => string = ObjectUtils.getProp(props.code, '')
 
-const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item))(item)
+const getLabel: (language: string) => (item: ICategoryItem) => string
+= language => item => ObjectUtils.getLabel(language, getCode(item))(item)
 
-module.exports = {
+export default {
   keys,
   props,
   keysExtraDef,
@@ -42,8 +56,8 @@ module.exports = {
 
   //READ
   getUuid: ObjectUtils.getUuid,
-  getLevelUuid: R.prop(keys.levelUuid),
-  getParentUuid: R.prop(keys.parentUuid),
+  getLevelUuid: R.prop(keys.levelUuid) as (x: any) => string,
+  getParentUuid: R.prop(keys.parentUuid) as (x: any) => string,
   getCode,
   getLabels: ObjectUtils.getLabels,
   getLabel ,
@@ -54,8 +68,9 @@ module.exports = {
 
   // NOT USED YET
   getExtraProp: prop => R.pipe(
+    // @ts-ignore TODO 'extra' does not exist yet
     ObjectUtils.getProp(keys.extra),
     R.propOr('', prop)
   ),
 
-}
+};

@@ -1,11 +1,9 @@
-const R = require('ramda')
-
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-
-const DataTable = require('./dataTable')
-const DataCol = require('./dataCol')
+import * as R from 'ramda';
+import Survey from '../../../../core/survey/survey';
+import NodeDef from '../../../../core/survey/nodeDef';
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable';
+import DataTable from './dataTable';
+import DataCol from './dataCol';
 
 const getName = NodeDefTable.getViewName
 
@@ -39,7 +37,7 @@ const getSelectFields = (survey, nodeDef) => {
   return fields
 }
 
-const getCols = (survey, nodeDef, isSelf) => {
+const getCols = (survey: any, nodeDef: any, isSelf: boolean) => {
   const fields = R.pipe(
     R.map(DataCol.getNames),
     R.flatten,
@@ -59,16 +57,16 @@ const getCols = (survey, nodeDef, isSelf) => {
 
 const getJoin = (schemaName, nodeDefParent) =>
   nodeDefParent
-    ? `JOIN 
+    ? `JOIN
        ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
       `
     : ''
 
-module.exports = {
+export default {
   alias,
   aliasParent,
   getName,
   getSelectFields,
   getJoin,
-}
+};

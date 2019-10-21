@@ -1,9 +1,8 @@
-const R = require('ramda')
-
-const Survey = require('../survey/survey')
-const Record = require('../record/record')
-const User = require('../user/user')
-const AuthGroups = require('./authGroups')
+import * as R from 'ramda';
+import Survey from '../survey/survey';
+import Record from '../record/record';
+import User from '../user/user';
+import AuthGroups from './authGroups';
 
 const {
   permissions,
@@ -24,7 +23,8 @@ const getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) => {
   return AuthGroups.getAuthGroups(user).find(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 }
 
-const getSurveyUserPermissions = (user, surveyInfo) =>
+const getSurveyUserPermissions: (user: any, surveyInfo: any) => any[]
+= (user, surveyInfo) =>
   R.propOr([], keys.permissions, getSurveyUserGroup(user, surveyInfo))
 
 const hasSurveyPermission = permission => (user, surveyInfo) =>
@@ -124,7 +124,7 @@ const canRemoveUser = (user, surveyInfo, userToRemove) => (
   _hasUserEditAccess(user, surveyInfo, userToRemove)
 )
 
-module.exports = {
+export default {
   getSurveyUserGroup,
 
   // Survey permissions
@@ -145,4 +145,4 @@ module.exports = {
   canEditUserEmail,
   canEditUserGroup,
   canRemoveUser,
-}
+};

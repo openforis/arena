@@ -1,6 +1,6 @@
-const CollectImportReportRepository = require('../repository/collectImportReportRepository')
+import CollectImportReportRepository from '../repository/collectImportReportRepository';
 
-module.exports = {
+export default {
   insertItem: CollectImportReportRepository.insertItem,
 
   // READ
@@ -9,4 +9,4 @@ module.exports = {
 
   // UPDATE
   updateItem: CollectImportReportRepository.updateItem
-}
+};

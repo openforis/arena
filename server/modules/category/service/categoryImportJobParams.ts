@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda';
 
 const keys = {
   categoryUuid: 'categoryUuid', //if category already exists
@@ -6,10 +6,10 @@ const keys = {
   summary: 'summary',
 }
 
-module.exports = {
+export default {
   keys,
 
   getCategoryUuid: R.prop(keys.categoryUuid),
   getCategoryName: R.prop(keys.categoryName),
   getSummary: R.propOr({}, keys.summary),
-}
+};

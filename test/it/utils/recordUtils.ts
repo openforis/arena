@@ -1,20 +1,18 @@
-const R = require('ramda')
-
-const db = require('../../../server/db/db')
-
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const Record = require('../../../core/record/record')
-const RecordValidation = require('../../../core/record/recordValidation')
-const Validation = require('../../../core/validation/validation')
-const RecordManager = require('../../../server/modules/record/manager/recordManager')
-
-const Queue = require('../../../core/queue')
+import * as R from 'ramda';
+import db from '../../../server/db/db';
+import Survey from '../../../core/survey/survey';
+import NodeDef from '../../../core/survey/nodeDef';
+import Record from '../../../core/record/record';
+import RecordValidation from '../../../core/record/recordValidation';
+import Validation from '../../../core/validation/validation';
+import RecordManager from '../../../server/modules/record/manager/recordManager';
+import Queue from '../../../core/queue';
+import Node from '../../../core/record/node';
 
 const newRecord = (user, preview = false) =>
   Record.newRecord(user, Survey.cycleOneKey, preview)
 
-const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
+const insertAndInitRecord = async (user, survey, preview = false, client: any = db) =>
   await client.tx(async t => {
     const record = newRecord(user, preview)
     const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, t)
@@ -60,7 +58,7 @@ const findNodeByPath = path => (survey, record) => {
       //extract node name and position from path part
       const partMatch = /(\w+)(\[(\d+)\])?/.exec(part)
       const childName = partMatch[1]
-      const childPosition = R.defaultTo(1, partMatch[3])
+      const childPosition: number = R.defaultTo(1, +partMatch[3])
 
       currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, childName)(survey)
 
@@ -109,7 +107,7 @@ const getValidationMaxCount = (parentNode, childDef) => R.pipe(
   Validation.getFieldValidation(RecordValidation.keys.maxCount)
 )
 
-module.exports = {
+export default {
   newRecord,
   insertAndInitRecord,
 
@@ -119,4 +117,4 @@ module.exports = {
 
   findNodeByPath,
   traverse,
-}
+};

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import ResizeObserver from '../../utils/polyfill/resizeObserver'
 
 export default (callback, elementRef) => {
   useEffect(() => {

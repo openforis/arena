@@ -1,8 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import ObjectUtils from '../../core/objectUtils';
+import { IProcessingStepCalculation, IProcessingStep } from './common';
 
-const ObjectUtils = require('../../core/objectUtils')
-
-const keys = {
+export const keys = {
   calculationSteps: 'calculationSteps',
   index: ObjectUtils.keys.index,
   processingChainUuid: 'processingChainUuid',
@@ -10,7 +10,7 @@ const keys = {
   uuid: ObjectUtils.keys.uuid,
 }
 
-const keysProps = {
+export const keysProps = {
   entityUuid: 'entityUuid', // OR
   categoryUuid: 'categoryUuid', // OR
   virtual: 'virtual', //true|false
@@ -18,20 +18,23 @@ const keysProps = {
 
 // ====== READ
 
-const getCalculationSteps = R.propOr([], keys.calculationSteps)
-const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
-const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
-const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
+export const getCalculationSteps: (obj: IProcessingStep) => IProcessingStepCalculation[] = R.propOr([], keys.calculationSteps)
+export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
+export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
+export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
 
 // ====== UPDATE
 
-const assocCalculation = processingStepCalculation => processingStep => R.pipe(
+export const assocCalculation = processingStepCalculation => processingStep => R.pipe(
   getCalculationSteps,
   R.append(processingStepCalculation),
   calculationSteps => R.assoc(keys.calculationSteps, calculationSteps, processingStep)
 )(processingStep)
 
-module.exports = {
+export const getIndex = ObjectUtils.getIndex
+export const getUuid = ObjectUtils.getUuid
+
+export default {
   keys,
   keysProps,
 
@@ -39,10 +42,10 @@ module.exports = {
   getCalculationSteps,
   getCategoryUuid,
   getEntityUuid,
-  getIndex: ObjectUtils.getIndex,
-  getUuid: ObjectUtils.getUuid,
+  getIndex,
+  getUuid,
   isVirtual,
 
   //UPDATE
   assocCalculation,
-}
+};

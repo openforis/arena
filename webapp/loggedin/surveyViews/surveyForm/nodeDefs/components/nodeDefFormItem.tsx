@@ -4,8 +4,7 @@ import { FormItem } from '../../../../../commonComponents/form/input'
 
 import NodeDef from '../../../../../../core/survey/nodeDef'
 
-import * as NodeDefUiProps from '../nodeDefUIProps'
-import NodeDefErrorBadge from './nodeDefErrorBadge'
+import { NodeDefUIProps, NodeDefErrorBadge } from '../internal'
 
 const NodeDefFormItemLabel = props => {
   const {
@@ -32,10 +31,10 @@ const NodeDefFormItemLabel = props => {
   )
 }
 
-const NodeDefFormItem = props => {
+export const NodeDefFormItem = props => {
   const { nodeDef, entry } = props
 
-  const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
+  const nodeDefComponent = React.createElement(NodeDefUIProps.getComponent(nodeDef), { ...props })
 
   return NodeDef.isEntity(nodeDef)
     ? (

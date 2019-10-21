@@ -1,5 +1,5 @@
-const R = require('ramda')
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
 
 const keys = {
   uuid: 'uuid',
@@ -45,20 +45,20 @@ const groupNames = {
   surveyGuest: 'surveyGuest',
 }
 
-const getAuthGroups = R.propOr([], keys.authGroups)
+const getAuthGroups: (x: any) => any[] = R.propOr([], keys.authGroups)
 
-const getUuid = R.prop(keys.uuid)
+const getUuid: (x: any) => string = R.prop(keys.uuid)
 
-const getName = R.prop(keys.name)
+const getName: (x: any) => string = R.prop(keys.name)
 
-const getSurveyUuid = R.prop(keys.surveyUuid)
+const getSurveyUuid: (x: any) => string = R.prop(keys.surveyUuid)
 
-const isSystemAdminGroup = R.pipe(
+const isSystemAdminGroup: (x: any) => boolean = R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
 )
 
-module.exports = {
+export default {
   keys,
   permissions,
   groupNames,
@@ -70,4 +70,4 @@ module.exports = {
   getSurveyUuid,
   isSystemAdminGroup,
   isEqual: ObjectUtils.isEqual,
-}
+};

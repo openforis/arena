@@ -1,12 +1,10 @@
-const R = require('ramda')
-const fastcsv = require('fast-csv')
-
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
-
-const TaxonomyManager = require('../manager/taxonomyManager')
-const JobManager = require('../../../job/jobManager')
-const TaxonomyImportJob = require('./taxonomyImportJob')
+import * as R from 'ramda';
+import fastcsv from 'fast-csv';
+import Taxonomy from '../../../../core/survey/taxonomy';
+import Taxon from '../../../../core/survey/taxon';
+import TaxonomyManager from '../manager/taxonomyManager';
+import JobManager from '../../../job/jobManager';
+import TaxonomyImportJob from './taxonomyImportJob';
 
 const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
@@ -56,7 +54,7 @@ const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
   return job
 }
 
-module.exports = {
+export default {
   insertTaxonomy: TaxonomyManager.insertTaxonomy,
 
   fetchTaxonomyByUuid: TaxonomyManager.fetchTaxonomyByUuid,
@@ -80,4 +78,4 @@ module.exports = {
 
   exportTaxa,
   importTaxonomy,
-}
+};

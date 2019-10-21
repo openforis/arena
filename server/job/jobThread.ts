@@ -1,9 +1,10 @@
-const Thread = require('../threads/thread')
+import Thread from '../threads/thread';
 
-const {jobThreadMessageTypes, jobToJSON} = require('./jobUtils')
-const JobCreator = require('./jobCreator')
+import {jobThreadMessageTypes, jobToJSON} from './jobUtils'
+import JobCreator from './jobCreator';
 
 class JobThread extends Thread {
+	private job: any;
 
   constructor () {
     super()

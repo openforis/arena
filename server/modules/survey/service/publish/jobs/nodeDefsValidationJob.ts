@@ -1,16 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job'
 
-const Survey = require('../../../../../../core/survey/survey')
-const NodeDef = require('../../../../../../core/survey/nodeDef')
-const Validation = require('../../../../../../core/validation/validation')
+import Survey from '../../../../../../core/survey/survey'
+import NodeDef from '../../../../../../core/survey/nodeDef'
+import Validation from '../../../../../../core/validation/validation'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
+import SurveyManager from '../../../../survey/manager/surveyManager'
 
-class NodeDefsValidationJob extends Job {
+export default class NodeDefsValidationJob extends Job {
+  static type: string = 'NodeDefsValidationJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(NodeDefsValidationJob.type, params)
   }
 
@@ -34,7 +35,3 @@ class NodeDefsValidationJob extends Job {
     }
   }
 }
-
-NodeDefsValidationJob.type = 'NodeDefsValidationJob'
-
-module.exports = NodeDefsValidationJob

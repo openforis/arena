@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import NodeDefSwitch from '../../nodeDefSwitch'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
 import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
-import * as NodeDefUiProps from '../../nodeDefUIProps'
+import { NodeDefUIProps, NodeDefSwitch } from '../../internal'
 
-const NodeDefEntityTableCell = props => {
+export const NodeDefEntityTableCell = props => {
 
   const {
     nodeDef, parentNode,
@@ -17,7 +16,7 @@ const NodeDefEntityTableCell = props => {
   } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const { length } = NodeDefUiProps.getFormFields(nodeDef)
+  const { length } = NodeDefUIProps.getFormFields(nodeDef)
   const elementRef = useRef(null)
 
   // table cell header is always visible

@@ -5,7 +5,7 @@ import { uuidv4 } from '../../../../../../../core/uuid'
 
 import UploadButton from '../../../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../../../commonComponents/form/downloadButton'
-import NodeDeleteButton from '../nodeDeleteButton'
+import { NodeDeleteButton } from '../../internal'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
 import Node from '../../../../../../../core/record/node'
@@ -85,7 +85,7 @@ const MultipleFileInput = props => {
   )
 }
 
-const NodeDefFile = props =>
+export const NodeDefFile = props =>
   props.edit
     ? <FileInput {...props}/>
     : <MultipleFileInput {...props}/>

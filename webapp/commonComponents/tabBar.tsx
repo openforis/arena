@@ -28,6 +28,13 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
 )
 
 class TabBar extends React.Component {
+  static defaultProps = {
+    className: '',
+    selection: 0,
+    tabs: [],
+    renderer: null,
+    onClick: null,
+  }
 
   constructor (props) {
     super(props)
@@ -74,14 +81,6 @@ class TabBar extends React.Component {
     )
   }
 
-}
-
-TabBar.defaultProps = {
-  className: '',
-  selection: 0,
-  tabs: [],
-  renderer: null,
-  onClick: null,
 }
 
 export default TabBar

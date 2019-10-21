@@ -5,6 +5,7 @@ import NodeDef from '../../core/survey/nodeDef'
 import User from '../../core/user/user'
 
 import * as AppState from '../app/appState'
+import { INodeDefs } from '../../core/survey/_survey/surveyNodeDefs'
 
 const survey = 'survey'
 
@@ -15,13 +16,16 @@ const survey = 'survey'
  */
 
 // READ
-export const getSurvey = R.prop(survey)
+export const getSurvey: (x: any) => INodeDefs = R.prop(survey)
 
 export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 
-export const getSurveyCycleKey = state => R.pipe(
+// TODO: is cycle key a string?
+export const getSurveyCycleKey: (state: any) => string
+// @ts-ignore TODO
+= state => R.pipe(
   AppState.getUser,
   User.getPrefSurveyCycle(getSurveyId(state)),
 )(state)
@@ -58,3 +62,14 @@ export const resetDefsFetched = R.pipe(
   R.assoc(statusKeys.defsFetched, false),
   R.assoc(statusKeys.defsDraftFetched, false),
 )
+
+export default {
+  getSurvey,
+  getSurveyInfo,
+  getSurveyId,
+  getSurveyCycleKey,
+  getNodeDefLabel,
+  areDefsFetched,
+  assocDefsFetched,
+  resetDefsFetched,
+}

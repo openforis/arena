@@ -27,7 +27,7 @@ const AppHeader = props => {
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
 
-  pictureUpdateKeyRef.current += prevUser !== user
+  pictureUpdateKeyRef.current += (prevUser !== user ? 1: 0)
 
   return (
     <div className="app-header">

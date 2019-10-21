@@ -6,7 +6,7 @@ import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
 import Taxon from '../../../../../../../core/survey/taxon'
 
-const NodeDefTaxonAutocompleteItemRenderer = props => {
+export const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props
 
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
@@ -31,7 +31,7 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
   )
 }
 
-const NodeDefTaxonAutocompleteDialog = props => {
+export const NodeDefTaxonAutocompleteDialog = props => {
   const {
     surveyId, taxonomyUuid, draft,
     inputRef, field, fieldValue,

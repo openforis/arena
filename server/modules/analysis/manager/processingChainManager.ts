@@ -1,31 +1,28 @@
-const db = require('../../../db/db')
+import db from '../../../db/db';
+import ActivityLog from '../../activityLog/activityLogger';
+import ProcessingChain from '../../../../common/analysis/processingChain';
+import ProcessingChainRepository from '../repository/processingChainRepository';
 
-const ActivityLog = require('../../activityLog/activityLogger')
-
-const ProcessingChain = require('../../../../common/analysis/processingChain')
-
-const ProcessingChainRepository = require('../repository/processingChainRepository')
-
-const createChain = async (user, surveyId, cycle, client = db) =>
+const createChain = async (user, surveyId, cycle, client: any = db) =>
   await client.tx(async t => {
     const processingChain = await ProcessingChainRepository.insertChain(surveyId, cycle, t)
     await ActivityLog.log(user, surveyId, ActivityLog.type.processingChainCreate, { processingChain }, t)
     return ProcessingChain.getUuid(processingChain)
   })
 
-const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
+const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client: any = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
     ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate, { processingChainUuid, key, value }, t)
   ]))
 
-const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
+const deleteChain = async (user, surveyId, processingChainUuid, client: any = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t),
     ActivityLog.log(user, surveyId, ActivityLog.type.processingChainDelete, { processingChainUuid }, t)
   ]))
 
-module.exports = {
+export default {
   // CREATE
   createChain,
 
@@ -39,4 +36,4 @@ module.exports = {
 
   // DELETE
   deleteChain,
-}
+};

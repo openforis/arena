@@ -1,11 +1,9 @@
-const {expect} = require('chai')
-
-const SurveyValidator = require('../../core/survey/surveyValidator')
-const Survey = require('../../core/survey/survey')
-const Validation = require('../../core/validation/validation')
-const NodeDefExpression = require('../../core/survey/nodeDefExpression')
-
-const {fetchFullContextSurvey} = require('../testContext')
+import { expect } from 'chai';
+import SurveyValidator from '../../core/survey/surveyValidator';
+import Survey from '../../core/survey/survey';
+import Validation from '../../core/validation/validation';
+import NodeDefExpression from '../../core/survey/nodeDefExpression';
+import { fetchFullContextSurvey } from '../testContext';
 
 const validateExpression = async (survey, nodeDefName, expression) => {
   const nodeDef = Survey.getNodeDefByName(nodeDefName)(survey)

@@ -1,11 +1,12 @@
-const io = require('socket.io')()
-const R = require('ramda')
+import ioFactory from 'socket.io';
+const io = ioFactory();
+import * as R from 'ramda';
+import WebSocketEvents from '../../common/webSocket/webSocketEvents';
+import {getLogger} from '../log/log'
+import * as Request from './request';
+import Jwt from './jwt';
 
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
-
-const Logger = require('../log/log').getLogger('WebSocket')
-const Request = require('./request')
-const Jwt = require('./jwt')
+const Logger = getLogger('WebSocket')
 
 const socketsById = new Map() //Map(<[socketId]:socket>)
 const socketIdsByUserUuid = new Map() //Map(<[userUuid]>:Set(socketIds))
@@ -75,8 +76,8 @@ const init = (server, jwtMiddleware) => {
 
 }
 
-module.exports = {
+export default {
   init,
   notifySocket,
   notifyUser,
-}
+};

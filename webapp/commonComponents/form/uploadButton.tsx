@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 import * as R from 'ramda'
 import { useI18n } from '../hooks'
 
-const checkFilesSize = (files, maxSizeMB) =>
+const checkFilesSize = (files: { size: number; }[], maxSizeMB: number) =>
   R.find(file => file.size > maxSizeMB * 1024 * 1024, files)
     ? alert(`File exceeds maximum size (${maxSizeMB}MB)`)
     : true

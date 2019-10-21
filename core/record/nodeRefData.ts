@@ -1,4 +1,6 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import { ITaxon } from '../survey/taxon';
+import { ICategoryItem } from '../survey/categoryItem';
 
 const keys = {
   refData: 'refData',
@@ -6,19 +8,21 @@ const keys = {
   categoryItem: 'categoryItem',
 }
 
-const getRefData = R.propOr({}, keys.refData)
-const getRefDataProp = key => R.pipe(getRefData, R.prop(key))
+interface IRefData {}
 
-const getTaxon = getRefDataProp(keys.taxon)
-const getCategoryItem = getRefDataProp(keys.categoryItem)
+const getRefData: (x: any) => IRefData = R.propOr({}, keys.refData)
+const getRefDataProp: (key: string) => (x: any) => any = key => R.pipe(getRefData, R.prop(key))
+
+const getTaxon: (x: IRefData) => ITaxon = getRefDataProp(keys.taxon)
+const getCategoryItem: (x: IRefData) => ICategoryItem = getRefDataProp(keys.categoryItem)
 
 const assocRefData = R.assoc(keys.refData)
 
-module.exports = {
+export default {
   keys,
 
   getTaxon,
   getCategoryItem,
 
   assocRefData,
-}
+};

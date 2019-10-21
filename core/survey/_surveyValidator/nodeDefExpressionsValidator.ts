@@ -1,15 +1,13 @@
-const R = require('ramda')
-
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
-const ValidationResult = require('../../validation/validationResult')
-const Survey = require('../survey')
-const NodeDef = require('../nodeDef')
-const NodeDefExpression = require('../nodeDefExpression')
-const Expression = require('../../exprParser/expression')
-const ObjectUtils = require('../../objectUtils')
-
-const SystemError = require('../../../server/utils/systemError')
+import * as R from 'ramda';
+import Validator from '../../validation/validator';
+import Validation from '../../validation/validation';
+import ValidationResult from '../../validation/validationResult';
+import Survey from '../survey';
+import NodeDef from '../nodeDef';
+import NodeDefExpression, { IExpression } from '../nodeDefExpression';
+import Expression from '../../exprParser/expression';
+import ObjectUtils from '../../objectUtils';
+import SystemError from '../../../server/utils/systemError';
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
@@ -78,7 +76,7 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   }
 
 const validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
-  R.any(nodeDefExpr => !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
+  R.any((nodeDefExpr: IExpression) => !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
     NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
     NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
   )(nodeDefExpressions)
@@ -96,12 +94,10 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
       ],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
-        ...validateApplyIfUniqueness
-          ? [
+        ...((validateApplyIfUniqueness ? [
             Validator.validateItemPropUniqueness(Validation.messageKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
             validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
-          ]
-          : []
+          ] : []))
       ]
     }
   )
@@ -130,6 +126,6 @@ const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniq
   return result
 }
 
-module.exports = {
+export default {
   validate,
-}
+};

@@ -124,7 +124,7 @@ export const cancelActiveJob = () => async dispatch => {
   dispatch(hideAppJobMonitor())
 }
 
-export const activeJobUpdate = job => (dispatch, getState) => {
+export const activeJobUpdate = (job: { succeeded: boolean; }) => (dispatch, getState) => {
   if (job && job.succeeded) {
     const onComplete = AppState.getActiveJobOnCompleteCallback(getState())
     if (onComplete) {
@@ -138,14 +138,14 @@ export const activeJobUpdate = job => (dispatch, getState) => {
 export const appNotificationShow = 'app/notification/show'
 export const appNotificationHide = 'app/notification/hide'
 
-export const showNotificationMessage = (messageKey, messageParams, severity) => dispatch => {
+export const showNotificationMessage = (messageKey: string, messageParams, severity) => dispatch => {
   dispatch({
     type: appNotificationShow,
     notification: {
-      [AppState.keysNotification.messageKey]: messageKey,
-      [AppState.keysNotification.messageParams]: messageParams,
-      [AppState.keysNotification.severity]: severity,
-    }
+      messageKey,
+      messageParams,
+      severity,
+    } as AppState.INotification
   })
 
   dispatch(debounceAction({ type: appNotificationHide }, appNotificationHide, 10000))

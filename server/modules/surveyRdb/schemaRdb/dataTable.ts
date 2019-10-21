@@ -1,25 +1,26 @@
-const R = require('ramda')
-
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-const Node = require('../../../../core/record/node')
-const DataRow = require('./dataRow')
-const DataCol = require('./dataCol')
-const SurveyRepositoryUtils = require('../../survey/repository/surveySchemaRepositoryUtils')
+import * as R from 'ramda';
+import Survey from '../../../../core/survey/survey';
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef';
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable';
+import Node from '../../../../core/record/node';
+import DataRow from './dataRow';
+import DataCol from './dataCol';
+import SurveyRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils';
+import { INodeDefs } from '../../../../core/survey/_survey/surveyNodeDefs';
 
 const colNameUuuid = 'uuid'
 const colNameParentUuuid = 'parent_uuid'
 const colNameRecordUuuid = 'record_uuid'
 const colNameRecordCycle = 'record_cycle'
 
-const getNodeDefColumns = (survey, nodeDef) =>
+const getNodeDefColumns: (survey: INodeDefs, nodeDef: INodeDef) => INodeDef[]
+= (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
     ? (
       R.pipe(
         Survey.getNodeDefChildren(nodeDef),
         R.filter(NodeDef.isSingleAttribute),
-        R.sortBy(R.ascend(R.prop('id')))
+        R.sortBy(R.ascend(R.prop('id')) as any) as (x: INodeDef[]) => INodeDef[],
       )(survey)
     )
     // multiple attr table
@@ -74,12 +75,12 @@ const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
 }
 
 const _getConstraintFk = (schemaName, referencedTableName, constraint, foreignKey) => `
-    CONSTRAINT ${constraint}_fk 
-    FOREIGN KEY (${foreignKey}) 
-    REFERENCES ${schemaName}.${referencedTableName} (uuid) 
+    CONSTRAINT ${constraint}_fk
+    FOREIGN KEY (${foreignKey})
+    REFERENCES ${schemaName}.${referencedTableName} (uuid)
     ON DELETE CASCADE`
 
-module.exports = {
+export default {
   colNameUuuid,
   colNameParentUuuid,
   colNameRecordUuuid,
@@ -95,4 +96,4 @@ module.exports = {
   getUuidUniqueConstraint,
 
   getRowValues,
-}
+};

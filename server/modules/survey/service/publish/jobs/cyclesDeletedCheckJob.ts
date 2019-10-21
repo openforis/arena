@@ -1,17 +1,18 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job'
 
-const Survey = require('../../../../../../core/survey/survey')
+import Survey from '../../../../../../core/survey/survey'
 
-const SurveyManager = require('../../../manager/surveyManager')
-const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
-const RecordManager = require('../../../../record/manager/recordManager')
-const UserManager = require('../../../../user/manager/userManager')
+import SurveyManager from '../../../manager/surveyManager'
+import NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
+import RecordManager from '../../../../record/manager/recordManager'
+import UserManager from '../../../../user/manager/userManager'
 
-class CyclesDeletedCheckJob extends Job {
+export default class CyclesDeletedCheckJob extends Job {
+  static type: string = 'CyclesDeletedCheckJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(CyclesDeletedCheckJob.type, params)
   }
 
@@ -57,7 +58,3 @@ class CyclesDeletedCheckJob extends Job {
     }
   }
 }
-
-CyclesDeletedCheckJob.type = 'CyclesDeletedCheckJob'
-
-module.exports = CyclesDeletedCheckJob

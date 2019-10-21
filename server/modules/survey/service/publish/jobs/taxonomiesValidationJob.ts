@@ -1,25 +1,32 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job'
 
-const Taxonomy = require('../../../../../../core/survey/taxonomy')
-const Validation = require('../../../../../../core/validation/validation')
+import Taxonomy from '../../../../../../core/survey/taxonomy'
+import Validation from '../../../../../../core/validation/validation'
 
-const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
+import TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
+import { IValidation } from '../../../../../../core/survey/survey'
 
-class TaxonomiesValidationJob extends Job {
-  constructor (params) {
+interface ITaxonomy {
+  validation: IValidation;
+}
+
+export default class TaxonomiesValidationJob extends Job {
+  static type: string = 'TaxonomiesValidationJob'
+
+  constructor (params?) {
     super(TaxonomiesValidationJob.type, params)
   }
 
   async execute (tx) {
     const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, tx)
 
-    const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)
+    const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies) as ITaxonomy[]
 
     if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
-        (acc, taxonomy) => R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
+        (acc, taxonomy: ITaxonomy) => R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
         {},
         invalidTaxonomies
       )
@@ -27,7 +34,3 @@ class TaxonomiesValidationJob extends Job {
     }
   }
 }
-
-TaxonomiesValidationJob.type = 'TaxonomiesValidationJob'
-
-module.exports = TaxonomiesValidationJob

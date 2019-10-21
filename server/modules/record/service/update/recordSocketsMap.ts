@@ -27,7 +27,7 @@ const dissocSocket = (recordUuid, socketId) => {
 
 const dissocSockets = recordUuid => socketIdsByRecordUuid.delete(recordUuid)
 
-module.exports = {
+export default {
   getSocketIds,
   hasSockets,
   getRecordUuid,
@@ -35,4 +35,4 @@ module.exports = {
   assocSocket,
   dissocSocket,
   dissocSockets,
-}
+};

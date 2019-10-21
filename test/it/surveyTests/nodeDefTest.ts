@@ -1,11 +1,9 @@
-const { getContextSurvey } = require('../../testContext')
-const { expect } = require('chai')
-const R = require('ramda')
-
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-
-const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
+import { getContextSurvey } from '../../testContext';
+import { expect } from 'chai';
+import * as R from 'ramda';
+import Survey from '../../../core/survey/survey';
+import NodeDef, { INodeDef } from '../../../core/survey/nodeDef';
+import NodeDefRepository from '../../../server/modules/nodeDef/repository/nodeDefRepository';
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
@@ -62,12 +60,12 @@ const updateNodeDefTest = async () => {
   expect(R.filter(n => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)
 
   //do not modify existing nodes
-  const reloadedNodeDef2 = R.find(n => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
+  const reloadedNodeDef2: INodeDef = R.find(n => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs) as INodeDef
   expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
   expect(NodeDef.getName(reloadedNodeDef2)).to.equal(NodeDef.getName(nodeDef2))
 }
 
-module.exports = {
+export default {
   createNodeDefsTest,
   updateNodeDefTest,
-}
+};

@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import Survey from '../../../core/survey/survey'
-import NodeDef from '../../../core/survey/nodeDef'
+import NodeDef, {INodeDef} from '../../../core/survey/nodeDef'
 import NodeDefTable from '../../../common/surveyRdb/nodeDefTable'
 import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 
@@ -62,7 +62,7 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, dept
 
   return R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
-    R.map(childDef => {
+    R.map((childDef: INodeDef) => {
       if (NodeDef.isEntity(childDef) || NodeDef.isCoordinate(childDef) || NodeDef.isFile(childDef))
         return null
       else if (mode === Expression.modes.sql)
@@ -75,7 +75,9 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, dept
   )(survey)
 }
 
-export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1, preferredLang) => {
+// TODO: find out return type
+export const getVariables: (survey, nodeDefContext, nodeDefCurrent, mode, depth: number | undefined, preferredLang) => any[]
+= (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1, preferredLang) => {
 
   const lang = Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey))
   const variables = getChildDefVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
@@ -89,7 +91,10 @@ export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth
         Survey.getNodeDefParent(nodeDefContext)(survey),
         null,
         mode,
-        depth + 1
+        depth + 1,
+        preferredLang,
       )
     )
 }
+
+export default { getVariables }

@@ -1,33 +1,43 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const BatchPersister = require('../../../../../db/batchPersister')
+import BatchPersister from '../../../../../db/batchPersister'
 
-const FileXml = require('../../../../../utils/file/fileXml')
-const Queue = require('../../../../../../core/queue')
+import FileXml from '../../../../../utils/file/fileXml'
+import Queue from '../../../../../../core/queue'
 
-const Survey = require('../../../../../../core/survey/survey')
-const NodeDef = require('../../../../../../core/survey/nodeDef')
-const NodeDefValidations = require('../../../../../../core/survey/nodeDefValidations')
-const Record = require('../../../../../../core/record/record')
-const Node = require('../../../../../../core/record/node')
-const RecordValidator = require('../../../../../../core/record/recordValidator')
-const Validation = require('../../../../../../core/validation/validation')
+import Survey from '../../../../../../core/survey/survey'
+import NodeDef, { INodeDef } from '../../../../../../core/survey/nodeDef'
+import NodeDefValidations from '../../../../../../core/survey/nodeDefValidations'
+import Record from '../../../../../../core/record/record'
+import Node from '../../../../../../core/record/node'
+import RecordValidator from '../../../../../../core/record/recordValidator'
+import Validation from '../../../../../../core/validation/validation'
 
-const SystemError = require('../../../../../utils/systemError')
+import SystemError from '../../../../../utils/systemError'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const RecordManager = require('../../../../record/manager/recordManager')
+import SurveyManager from '../../../../survey/manager/surveyManager'
+import RecordManager from '../../../../record/manager/recordManager'
 
-const Job = require('../../../../../job/job')
+import Job from '../../../../../job/job'
 
-const CollectRecord = require('../model/collectRecord')
-const CollectAttributeValueExtractor = require('./collectAttributeValueExtractor')
+import CollectRecord from '../model/collectRecord'
+import CollectAttributeValueExtractor from './collectAttributeValueExtractor'
 
-const CollectSurvey = require('../model/collectSurvey')
+import CollectSurvey from '../model/collectSurvey'
 
-class RecordsImportJob extends Job {
+interface IQueueItemType {
+  nodeParent: any | null;
+  collectNodeDef: INodeDef;
+  collectNodeDefPath: string;
+  collectNode: {};
+}
 
-  constructor (params) {
+export default class RecordsImportJob extends Job {
+  static type: string = 'RecordsImportJob'
+  batchPersister: BatchPersister
+  context: any
+
+  constructor (params?) {
     super(RecordsImportJob.type, params)
 
     this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
@@ -133,7 +143,7 @@ class RecordsImportJob extends Job {
     const collectRootEntityDef = CollectSurvey.getNodeDefByPath(collectRootEntityDefPath)(collectSurvey)
     const collectRootEntity = CollectRecord.getRootEntity(collectRecordJson, collectRootEntityName)
 
-    const queue = new Queue([{
+    const queue = new Queue<IQueueItemType>([{
       nodeParent: null,
       collectNodeDef: collectRootEntityDef,
       collectNodeDefPath: collectRootEntityDefPath,
@@ -159,6 +169,8 @@ class RecordsImportJob extends Job {
             this.tx
           )
           : {}
+
+        // @ts-ignore TODO
         const { value = null, meta = {} } = valueAndMeta || {}
 
         nodeToInsert = R.pipe(
@@ -171,12 +183,15 @@ class RecordsImportJob extends Job {
         if (NodeDef.isEntity(nodeDef)) {
 
           // create child nodes to insert
-          const { nodesToInsert, validation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
-          recordValidation = validation
+          const { nodesToInsert, recordValidation: _recordValidation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
+          recordValidation = _recordValidation
           queue.enqueueItems(nodesToInsert)
 
         } else {
-          const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
+          // TODO: Need to pass 3 more parameters??
+          // XXX: This is actually a promise!!
+          // @ts-ignore TODO This requires some thought
+          const validationAttribute = await RecordValidator.validateAttribute(nodeToInsert)
           if (!Validation.isValid(validationAttribute)) {
             Validation.setValid(false)(recordValidation)
             Validation.setField(Node.getUuid(nodeToInsert), validationAttribute)(recordValidation)
@@ -193,7 +208,7 @@ class RecordsImportJob extends Job {
     const { nodeDefsInfoByCollectPath } = this.context
 
     //output
-    const nodesToInsert = []
+    const nodesToInsert: IQueueItemType[] = []
 
     const nodeUuid = Node.getUuid(node)
     let nodeValidation = Validation.getFieldValidation(nodeUuid)(recordValidation)
@@ -283,12 +298,8 @@ class RecordsImportJob extends Job {
     await this.batchPersister.addItem(nodeValueInsert, this.tx)
   }
 
-  async nodesBatchInsertHandler (nodeValues, tx) {
+  async nodesBatchInsertHandler (nodeValues, tx?) {
     await RecordManager.insertNodesFromValues(this.surveyId, nodeValues, tx)
   }
 
 }
-
-RecordsImportJob.type = 'RecordsImportJob'
-
-module.exports = RecordsImportJob

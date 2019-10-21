@@ -6,41 +6,50 @@ import Record from '../../../../../../../core/record/record'
 import Node from '../../../../../../../core/record/node'
 import Authorizer from '../../../../../../../core/auth/authorizer'
 
-import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
+import {NodeDefTableCellBody} from '../../../../../surveyViews/surveyForm/nodeDefs'
 
 import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
 import * as SurveyState from '../../../../../../survey/surveyState'
 import * as AppState from '../../../../../../app/appState'
 
+interface IProps {
+  surveyInfo: any;
+  surveyCycleKey: any;
+  canEditRecord: any;
+  nodeDef: any;
+  record: any;
+  cell?: { parentUuid: string, node: any };
+  updateNode: any;
+  removeNode: any;
+  createNodePlaceholder: any;
+}
+
 class TableColumnEdit extends React.Component {
+  props: IProps;
 
   render () {
-    const {
-      surveyInfo, surveyCycleKey, canEditRecord,
-      nodeDef, record, cell,
-      updateNode, removeNode, createNodePlaceholder
-    } = this.props
+    const props = this.props
 
-    if (cell) {
-      const { parentUuid, node } = cell
+    if (props.cell) {
+      const { parentUuid, node } = props.cell
 
       const parentNode = {
-        [Node.keys.recordUuid]: Record.getUuid(record),
+        [Node.keys.recordUuid]: Record.getUuid(props.record),
         [Node.keys.parentUuid]: parentUuid
       }
 
       return (
         <NodeDefTableCellBody
-          surveyInfo={surveyInfo}
-          surveyCycleKey={surveyCycleKey}
-          nodeDef={nodeDef}
+          surveyInfo={props.surveyInfo}
+          surveyCycleKey={props.surveyCycleKey}
+          nodeDef={props.nodeDef}
           parentNode={parentNode}
           nodes={[node]}
           entry={true}
           entryDataQuery={true}
           edit={false}
           renderType={NodeDefLayout.renderType.tableBody}
-          canEditRecord={canEditRecord}
+          canEditRecord={props.canEditRecord}
           updateNode={updateNode}
           removeNode={removeNode}
           createNodePlaceholder={createNodePlaceholder}

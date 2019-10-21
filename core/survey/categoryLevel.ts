@@ -1,6 +1,5 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -14,13 +13,13 @@ const keysProps = {
   name: 'name'
 }
 
-module.exports = {
+export default {
   keys,
   keysProps,
 
   //READ
   getUuid: ObjectUtils.getUuid,
-  getIndex: R.prop(keys.index),
-  getName: ObjectUtils.getProp(keysProps.name),
-  getCategoryUuid: R.prop(keys.categoryUuid),
-}
+  getIndex: R.prop(keys.index) as (x: any) => number,
+  getName: ObjectUtils.getProp(keysProps.name) as (x: any) => string,
+  getCategoryUuid: R.prop(keys.categoryUuid) as (x: any) => string,
+};

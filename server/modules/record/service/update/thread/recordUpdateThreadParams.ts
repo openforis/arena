@@ -1,11 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda';
 
 const keys = {
   recordUuid: 'recordUuid',
 }
 
-module.exports = {
+export default {
   keys,
 
   getRecordUuid: R.prop(keys.recordUuid),
-}
+};

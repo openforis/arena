@@ -1,9 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda';
+import Validator from '../../validation/validator';
+import Validation from '../../validation/validation';
 
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
-
-const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
+const validateSurveyNameUniqueness = (surveyInfos: { id: string; }[]) => (_propName, survey) => {
   return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)
     ? { key: Validation.messageKeys.nameDuplicate }
     : null
@@ -34,7 +33,7 @@ const validateSurveyInfo = async (surveyInfo, surveyInfos) => await Validator.va
   }
 )
 
-module.exports = {
+export default {
   validateNewSurvey,
   validateSurveyInfo,
-}
+};

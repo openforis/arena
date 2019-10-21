@@ -1,15 +1,12 @@
-const R = require('ramda')
-
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
-const NodeDefValidations = require('../../survey/nodeDefValidations')
-
-const Record = require('../record')
-const Node = require('../node')
-const RecordValidation = require('../recordValidation')
-
-const Validation = require('../../validation/validation')
-const NumberUtils = require('../../numberUtils')
+import * as R from 'ramda';
+import Survey from '../../survey/survey';
+import NodeDef from '../../survey/nodeDef';
+import NodeDefValidations from '../../survey/nodeDefValidations';
+import Record from '../record';
+import Node from '../node';
+import RecordValidation from '../recordValidation';
+import Validation from '../../validation/validation';
+import NumberUtils from '../../numberUtils';
 
 const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
   const validations = NodeDef.getValidations(nodeDefChild)
@@ -94,12 +91,12 @@ const _countChildren = (record, parentNode, childDef) => {
   return NodeDef.isEntity(childDef)
     ? nodes.length
     : R.pipe(
-      R.reject(Node.isValueBlank),
+      R.reject(Node.isValueBlank) as (x: any[]) => any[],
       R.length
     )(nodes)
 }
 
-const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, minCount, maxCount) => Validation.newInstance(
+const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, minCount?, maxCount?) => Validation.newInstance(
   true,
   {
     [RecordValidation.keys.childrenCount]: Validation.newInstance(
@@ -135,7 +132,7 @@ const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, min
   }
 )
 
-module.exports = {
+export default {
   validateChildrenCountNodes,
   validateChildrenCount
-}
+};

@@ -1,12 +1,10 @@
-const R = require('ramda')
-
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Node = require('../../../../core/record/node')
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
-
-const DataTable = require('../schemaRdb/dataTable')
-const DataCol = require('../schemaRdb/dataCol')
+import * as R from 'ramda';
+import Survey from '../../../../core/survey/survey';
+import NodeDef from '../../../../core/survey/nodeDef';
+import Node from '../../../../core/record/node';
+import SchemaRdb from '../../../../common/surveyRdb/schemaRdb';
+import DataTable from '../schemaRdb/dataTable';
+import DataCol from '../schemaRdb/dataCol';
 
 const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
@@ -37,26 +35,23 @@ const getColNames = (nodeDef, type) =>
       DataTable.colNameRecordUuuid,
       DataTable.colNameRecordCycle,
       DataTable.colNameParentUuuid,
-      ...NodeDef.isMultipleAttribute(nodeDef)
-        ? DataCol.getNames(nodeDef)
-        //entity
-        : []
+      ...((NodeDef.isMultipleAttribute(nodeDef) ? //entity
+      DataCol.getNames(nodeDef) : []))
     ]
     : DataCol.getNames(nodeDef)
 
-const getColValues = async (survey, cycle, nodeDef, node, type, client) =>
+const getColValues = async (survey, cycle, nodeDef, node, type, client?) =>
   type === types.insert
     ? [
       Node.getUuid(node),
       Node.getRecordUuid(node),
       cycle,
       Node.getParentUuid(node),
-      ...NodeDef.isMultipleAttribute(nodeDef)
-        ? await Promise.all(DataCol.getValues(survey, nodeDef, node, client))
-        //entity
-        : []
+      ...((NodeDef.isMultipleAttribute(nodeDef) ? //entity
+      // XXX: these had another unused parameter: client
+      await Promise.all(DataCol.getValues(survey, nodeDef, node)) : []))
     ]
-    : await DataCol.getValues(survey, nodeDef, node, client)
+    : await DataCol.getValues(survey, nodeDef, node)
 
 const getRowUuid = (nodeDef, node, nodeParent) =>
   hasTable(nodeDef)
@@ -100,7 +95,7 @@ const runInsert = (update, client) =>
   client.query(
     `INSERT INTO ${update.schemaName}.${update.tableName}
       (${update.colNames.join(',')})
-      VALUES 
+      VALUES
       (${update.colNames.map((col, i) => `$${i + 1}`).join(',')})`,
     update.colValues
   )
@@ -123,6 +118,6 @@ const run = async (survey, cycle, nodeDefs, nodes, client) => {
   )
 }
 
-module.exports = {
+export default {
   run,
-}
+};

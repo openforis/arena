@@ -1,15 +1,12 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../../objectUtils')
-
-const SurveyNodeDefs = require('./surveyNodeDefs')
-const NodeDef = require('../../survey/nodeDef')
-const RecordReader = require('../../record/_record/recordReader')
-const Node = require('../../record/node')
-
-const CategoryItem = require('../../survey/categoryItem')
-const CategoryLevel = require('../../survey/categoryLevel')
-const Taxon = require('../../survey/taxon')
+import * as R from 'ramda';
+import ObjectUtils from '../../objectUtils';
+import SurveyNodeDefs from './surveyNodeDefs';
+import NodeDef from '../../survey/nodeDef';
+import RecordReader from '../../record/_record/recordReader';
+import Node from '../../record/node';
+import CategoryItem, { ICategoryItem } from '../../survey/categoryItem';
+import CategoryLevel from '../../survey/categoryLevel';
+import Taxon from '../../survey/taxon';
 
 /**
  * categoryItemUuidIndex : {
@@ -125,7 +122,7 @@ const assocRefData = (categoryItemsRefData, taxaIndexRefData) => survey => {
 }
 
 const _getCategoryIndex = R.reduce(
-  (accIndex, row) => {
+  (accIndex, row: ICategoryItem) => {
     ObjectUtils.setInPath(
       [
         keys.categoryItemUuidIndex,
@@ -144,7 +141,7 @@ const _getCategoryIndex = R.reduce(
 )
 
 const _getTaxonomyIndex = R.reduce(
-  (accIndex, row) => {
+  (accIndex, row: any) => {
     ObjectUtils.setInPath(
       [
         keys.taxonUuidIndex,
@@ -154,7 +151,7 @@ const _getTaxonomyIndex = R.reduce(
       {
         [Taxon.keys.uuid]: Taxon.getUuid(row),
         [Taxon.keys.vernacularNames]: R.pipe(
-          R.prop(Taxon.keys.vernacularNames),
+          R.prop(Taxon.keys.vernacularNames) as (x: any) => any[],
           R.mergeAll
         )(row),
       }
@@ -167,7 +164,7 @@ const _getTaxonomyIndex = R.reduce(
   {}
 )
 
-module.exports = {
+export default {
   // ==== category index
   getCategoryItemUuidAndCodeHierarchy,
   getCategoryItemByUuid,
@@ -179,4 +176,4 @@ module.exports = {
   includesTaxonVernacularName,
 
   assocRefData,
-}
+};

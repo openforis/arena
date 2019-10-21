@@ -10,11 +10,11 @@ export const surveyCreateNewSurveyUpdate = 'surveyCreate/newSurvey/update'
 
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 
-  const newSurvey = R.pipe(
+  const newSurvey = (R.pipe(
     SurveyCreateState.getNewSurvey,
     R.dissocPath(['validation', 'fields', name]),
     R.assoc(name, value),
-  )(getState())
+  ) as (x: any) => any)(getState())
 
   dispatch({ type: surveyCreateNewSurveyUpdate, [SurveyCreateState.keys.newSurvey]: newSurvey })
 

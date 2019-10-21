@@ -1,10 +1,8 @@
-const ProcessUtils = require('../../../../core/processUtils')
-const ProcessingChain = require('../../../../common/analysis/processingChain')
-
-const ProcessingChainManager = require('../manager/processingChainManager')
-const SurveyManager = require('../../survey/manager/surveyManager')
-
-const ProcessingStepScriptGenerator = require('./_processingChainScriptGenerator/processingStepScriptGenerator')
+import ProcessUtils from '../../../../core/processUtils';
+import ProcessingChain from '../../../../common/analysis/processingChain';
+import ProcessingChainManager from '../manager/processingChainManager';
+import SurveyManager from '../../survey/manager/surveyManager';
+import ProcessingStepScriptGenerator from './_processingChainScriptGenerator/processingStepScriptGenerator';
 
 const generateScript = async (surveyId, processingChain) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, ProcessingChain.getCycle(processingChain))
@@ -16,7 +14,7 @@ const generateScript = async (surveyId, processingChain) => {
 
 }
 
-module.exports = {
+export default {
   // CREATE
   createChain: ProcessingChainManager.createChain,
 
@@ -32,4 +30,4 @@ module.exports = {
   deleteChain: ProcessingChainManager.deleteChain,
 
   generateScript,
-}
+};

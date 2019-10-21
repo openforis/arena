@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import Survey from '../../../../core/survey/survey'
-import NodeDef from '../../../../core/survey/nodeDef'
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef'
 import Record from '../../../../core/record/record'
 import NodeDefLayout from '../../../../core/survey/nodeDefLayout'
 
@@ -10,8 +10,9 @@ import * as RecordState from '../record/recordState'
 import * as SurveyState from '../../../survey/surveyState'
 
 export const stateKey = 'surveyForm'
-const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
+const getState: (x: any) => any = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
+const getStateProp: (prop: any, defaultTo?: any) => (x: any) => any
+= (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
 
 const keys = {
   nodeDefUuidPage: 'nodeDefUuidPage', // current page nodeDef
@@ -72,7 +73,8 @@ export const assocFormPageNodes = formPageNodeUuidByNodeDefUuid => state =>
     )
   )(formPageNodeUuidByNodeDefUuid)
 
-export const getFormPageNodeUuid = nodeDef => R.pipe(
+export const getFormPageNodeUuid: (nodeDef: INodeDef) => (x: any) => any
+= nodeDef => R.pipe(
   getStateProp(keys.nodeDefUuidPageNodeUuid),
   R.prop(NodeDef.getUuid(nodeDef))
 )
@@ -99,7 +101,7 @@ export const getFormPageParentNode = nodeDef =>
 
 // ====== Page navigation
 
-export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
+export const showPageNavigation: (x: any) => any = getStateProp(keys.showPageNavigation, true)
 
 export const setShowPageNavigation = showPageNavigation => R.assoc(keys.showPageNavigation, showPageNavigation)
 

@@ -1,19 +1,20 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import ExpressionNode from './expressionNode'
+import { ExpressionNode } from './internal'
 import { useI18n } from '../../hooks'
 
 import Expression from '../../../../core/exprParser/expression'
 
+const left = 'left', right = 'right';
 export const BinaryOperandType = {
-  left: 'left',
-  right: 'right',
+  left,
+  right,
+  isLeft: R.equals(left),
+  isRight: R.equals(right),
 }
-BinaryOperandType.isLeft = R.equals(BinaryOperandType.left)
-BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 
-const BinaryOperand = props => {
+export const BinaryOperand = props => {
   const { node, type, isBoolean, onChange } = props
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)

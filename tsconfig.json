@@ -1,0 +1,52 @@
+{
+	"compilerOptions": {
+		// Target latest version of ECMAScript.
+    "target": "esnext",
+    // "target": "es6",
+
+    // Search under node_modules for non-relative imports.
+    "moduleResolution": "node",
+    "module": "esNext",
+    // "module": "commonjs",
+
+    // Process & infer types from .js files.
+		"allowJs": true,
+		// Don't emit; allow Babel to transform files.
+		"noEmit": true,
+
+    // Enable strictest settings like strictNullChecks & noImplicitAny.
+		// "strict": true, // TODO: apply this later when noImplicitAny can be enabled also
+
+    "noImplicitAny": false, // Too many of these atm
+
+    // "noImplicitThis": true,
+    // "alwaysStrict": true,
+    // "strictBindCallApply": true,
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "strictPropertyInitialization": true,
+
+    // Allow .tsx files
+    "jsx": "react",
+
+    "allowSyntheticDefaultImports": true,
+
+    "resolveJsonModule": true,
+
+    // Disallow features that require cross-file information for emit.
+		"isolatedModules": true,
+		// Import non-ES modules as default imports.
+		"esModuleInterop": true
+	},
+	"include": [
+    "common",
+    "core",
+    "webapp",
+    "server",
+    "temp",
+    "test"
+  ],
+  "exclude": [
+    "temp"
+  ]
+}

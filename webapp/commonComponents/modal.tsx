@@ -25,7 +25,6 @@ export const ModalFooter = ({children}) =>
   </div>
 
 export class Modal extends React.Component {
-
   constructor (props) {
     super(props)
 
@@ -58,7 +57,7 @@ export class Modal extends React.Component {
       ? null
       : (
         <div className={`modal ${className}`}
-             tabIndex="-1"
+             tabIndex={-1}
              role="dialog"
              style={{display: isOpen ? 'block' : 'none'}}>
           <div className="modal-content">

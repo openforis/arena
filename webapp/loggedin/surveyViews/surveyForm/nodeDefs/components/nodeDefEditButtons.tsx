@@ -12,7 +12,7 @@ import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefLayoutProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
 import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
-const NodeDefEditButtons = (props) => {
+const _NodeDefEditButtons = (props) => {
 
   const {
     surveyCycleKey, nodeDef,
@@ -31,7 +31,7 @@ const NodeDefEditButtons = (props) => {
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
                  type="number" min="1" max="12"
-                 onChange={e => e.target.value > 0 ?
+                 onChange={e => +e.target.value > 0 ?
                    putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
                    : null
                  }/>
@@ -73,9 +73,10 @@ const NodeDefEditButtons = (props) => {
 
 }
 
-export default connect(null, {
+export const NodeDefEditButtons = connect(null, {
   setNodeDefForEdit,
   setFormNodeDefAddChildTo,
   putNodeDefLayoutProp,
   removeNodeDef,
-})(NodeDefEditButtons)
+})(_NodeDefEditButtons)
+export default NodeDefEditButtons

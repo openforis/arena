@@ -3,6 +3,9 @@ import * as R from 'ramda'
 import Survey from '../../core/survey/survey'
 import User from '../../core/user/user'
 import AuthGroups from '../../core/auth/authGroups'
+import { IUser } from '../../core/user/_user/userKeys'
+import { IValidationError } from '../../core/validation/validation'
+import { i18n } from 'i18next'
 
 export const keys = {
   status: 'status',
@@ -30,13 +33,20 @@ export const keysNotification = {
   severity: 'severity',
 }
 
+export interface INotification {
+  messageKey: string;
+  messageParams: {};
+  visible?: boolean;
+  severity: string;
+}
+
 export const notificationSeverity = {
   info: 'info',
   warning: 'warning',
   error: 'error',
 }
 
-export const getState = R.prop('app')
+export const getState: (x: any) => any = R.prop('app')
 
 export const appStatus = {
   ready: 'ready',
@@ -46,7 +56,7 @@ export const isReady = R.pipe(getState, R.propEq(keys.status, appStatus.ready))
 
 // ==== APP USER
 
-export const getUser = R.pipe(getState, R.prop(keys.user))
+export const getUser: (x: any) => any = R.pipe(getState, R.prop(keys.user))
 
 export const logoutUser = R.dissoc(keys.user)
 
@@ -112,23 +122,30 @@ export const updateActiveJob = job =>
   state => job
     ? R.assoc(
       keys.activeJob,
+      // @ts-ignore TODO
       R.mergeRight(R.prop(keys.activeJob)(state), job)
     )(state)
     : R.dissoc(keys.activeJob)(state)
 
-export const getActiveJobOnCompleteCallback = R.pipe(getActiveJob, R.defaultTo({}), R.propOr(null, keys.onComplete))
+type Callback = (job: { succeeded: boolean; }) => void;
+export const getActiveJobOnCompleteCallback: (x: any) => Callback | null
+= R.pipe(getActiveJob, R.defaultTo({}), R.propOr(null, keys.onComplete)) as (x: any) => Callback | null
 
 // ==== APP I18N
-export const getI18n = R.pipe(getState, R.prop(keys.i18n))
+export interface AppI18n extends i18n {
+  lang: string;
+}
+export const getI18n: (x: any) => AppI18n = R.pipe(getState, R.prop(keys.i18n)) as (x: any) => AppI18n
 
-export const getLang = R.pipe(getI18n, R.prop(keys.lang))
+export const getLang: (x: any) => string = R.pipe(getI18n, R.prop(keys.lang) as (x: any) => string)
 
 // ==== APP ERRORS
 
-const _getAppErrors = R.pipe(
+type AppError = { id: string | number; }
+const _getAppErrors: (x: { errors: AppError[] }) => any[] = R.pipe(
   R.prop(keys.errors),
-  R.values,
-  R.sort((a, b) => +b.id - +a.id)
+  R.values as (x: any) => AppError[],
+  R.sort((a: AppError, b: AppError) => +b.id - +a.id)
 )
 
 export const getAppErrors = R.pipe(getState, _getAppErrors)

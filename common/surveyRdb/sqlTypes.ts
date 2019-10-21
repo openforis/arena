@@ -8,4 +8,4 @@ const sqlTypes = {
   point: 'geometry(Point)',
 }
 
-module.exports = sqlTypes
+export default sqlTypes;

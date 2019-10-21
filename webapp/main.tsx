@@ -1,6 +1,6 @@
 import './utils/polyfill/polyfill'
-// import 'core-js/stable'
 import 'regenerator-runtime/runtime'
+// import 'core-js/stable'
 
 import './style/main.scss'
 

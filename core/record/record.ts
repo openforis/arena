@@ -1,28 +1,34 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
-const { uuidv4 } = require('./../uuid')
-
-const Validation = require('../validation/validation')
-const User = require('../user/user')
-const RecordStep = require('./recordStep')
-
-const keys = require('./_record/recordKeys')
-const RecordReader = require('./_record/recordReader')
-const RecordUpdater = require('./_record/recordUpdater')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
+import { uuidv4 } from './../uuid';
+import Validation from '../validation/validation';
+import User from '../user/user';
+import RecordStep from './recordStep';
+import keys from './_record/recordKeys';
+import RecordReader from './_record/recordReader';
+import RecordUpdater from './_record/recordUpdater';
 
 // ====== CREATE
 
-const newRecord = (user, cycle, preview = false, dateCreated = null) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.ownerUuid]: User.getUuid(user),
-  [keys.step]: RecordStep.getDefaultStep(),
-  [keys.cycle]: cycle,
-  [keys.preview]: preview,
-  [keys.dateCreated]: dateCreated,
+export interface IRecord {
+  uuid: string;
+  ownerUuid: string;
+  step: string; // step id really?
+  cycle: string;
+  preview: boolean;
+  dateCreated: string | null; // TODO
+}
+const newRecord: (user: any, cycle: string, preview?: boolean, dateCreated?: string | null) => IRecord
+= (user, cycle, preview = false, dateCreated = null) => ({
+    uuid: uuidv4(),
+  ownerUuid: User.getUuid(user),
+  step: RecordStep.getDefaultStep(),
+  cycle: cycle,
+  preview: preview,
+  dateCreated: dateCreated,
 })
 
-module.exports = {
+export default {
   keys,
 
   // ====== CREATE
@@ -32,11 +38,11 @@ module.exports = {
   getSurveyUuid: R.prop(keys.surveyUuid),
 
   getUuid: ObjectUtils.getUuid,
-  isPreview: R.propEq(keys.preview, true),
-  getOwnerUuid: R.prop(keys.ownerUuid),
-  getOwnerName: R.prop(keys.ownerName),
-  getStep: R.prop(keys.step),
-  getCycle: R.prop(keys.cycle),
+  isPreview: R.propEq(keys.preview, true) as (x: any) => boolean,
+  getOwnerUuid: R.prop(keys.ownerUuid) as (x: any) => string,
+  getOwnerName: R.prop(keys.ownerName) as (x: any) => string, // TODO: add ownerName to IRecord?
+  getStep: R.prop(keys.step) as (x: any) => string,
+  getCycle: R.prop(keys.cycle) as (x: any) => string,
   getDateCreated: ObjectUtils.getDateCreated,
   getDateModified: ObjectUtils.getDateModified,
 
@@ -76,4 +82,4 @@ module.exports = {
   // ====== VALIDATION
   mergeNodeValidations: RecordUpdater.mergeNodeValidations,
   getValidation: Validation.getValidation,
-}
+};

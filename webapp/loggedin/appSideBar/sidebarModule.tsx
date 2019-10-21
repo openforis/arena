@@ -44,24 +44,22 @@ export const getModulesHierarchy = (user, surveyInfo) => [
     appModules.data,
     [dataModules.records, dataModules.dataVis]
   ),
-  ...Authorizer.canAnalyzeRecords(user, surveyInfo)
-    ? [getModule(
+  ...((Authorizer.canAnalyzeRecords(user, surveyInfo) ? [getModule(
       appModules.analysis,
       [analysisModules.processingChains]
-    )]
-    : [],
+    )] : [])),
   getModule(
     appModules.users,
     [userModules.users]
   )
 ]
 
-export const getKey = R.prop(keys.key)
-export const getUri = R.prop(keys.uri)
-export const getIcon = R.prop(keys.icon)
-export const getChildren = R.prop(keys.children)
+export const getKey: (x: any) => string = R.prop(keys.key)
+export const getUri: (x: any) => string = R.prop(keys.uri)
+export const getIcon: (x: any) => string = R.prop(keys.icon)
+export const getChildren: (x: any) => any[] = R.prop(keys.children)
 
-export const isRoot = R.propEq(keys.root, true)
+export const isRoot: (x: any) => boolean = R.propEq(keys.root, true)
 export const isHome = module => getKey(module) === appModules.home.key
 export const isActive = pathname => module => {
   // module home is active when page is on dashboard
@@ -70,5 +68,5 @@ export const isActive = pathname => module => {
     : R.startsWith(module.uri, pathname)
 }
 
-export const getElementRef = R.prop(keys.elementRef)
-export const getDomElement = R.pipe(getElementRef, R.prop('current'))
+export const getElementRef: (x: any) => any = R.prop(keys.elementRef)
+export const getDomElement: (x: any) => any = R.pipe(getElementRef, R.prop('current'))

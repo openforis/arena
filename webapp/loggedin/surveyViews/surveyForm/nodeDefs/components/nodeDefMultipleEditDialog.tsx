@@ -5,9 +5,9 @@ import React from 'react'
 import { useI18n } from '../../../../../commonComponents/hooks'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../../../../commonComponents/modal'
 
-import * as NodeDefUiProps from '../nodeDefUIProps'
+import {NodeDefUIProps} from '../internal'
 
-const NodeDefMultipleEditDialog = props => {
+export const NodeDefMultipleEditDialog = props => {
   const { nodeDef, label, onClose } = props
 
   const i18n = useI18n()
@@ -21,7 +21,7 @@ const NodeDefMultipleEditDialog = props => {
 
       <ModalBody>
         {
-          React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
+          React.createElement(NodeDefUIProps.getComponent(nodeDef), { ...props })
         }
       </ModalBody>
 

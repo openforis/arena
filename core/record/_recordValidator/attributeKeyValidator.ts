@@ -1,10 +1,9 @@
-const R = require('ramda')
-
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
-const Record = require('../record')
-const Node = require('../node')
-const Validation = require('../../validation/validation')
+import * as R from 'ramda';
+import Survey from '../../survey/survey';
+import NodeDef from '../../survey/nodeDef';
+import Record from '../record';
+import Node from '../node';
+import Validation from '../../validation/validation';
 
 const validateAttributeKey = (survey, record, attributeDef) => async (propName, node) => {
   const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
@@ -34,6 +33,6 @@ const _isEntityDuplicate = (survey, record, entity) => {
   return false
 }
 
-module.exports = {
+export default {
   validateAttributeKey
-}
+};

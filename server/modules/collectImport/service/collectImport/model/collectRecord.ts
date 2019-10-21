@@ -1,6 +1,5 @@
-const R = require('ramda')
-
-const DateUtils = require('../../../../../../core/dateUtils')
+import * as R from 'ramda';
+import DateUtils from '../../../../../../core/dateUtils';
 
 const getRootEntityName = R.pipe(
   R.keys,
@@ -28,12 +27,13 @@ const getTextValues = valObj => R.pipe(
 
 const getAttribute = attrName => R.path(['_attributes', attrName])
 
-const getDateCreated = R.pipe(
+// TODO: is date a string here?
+const getDateCreated: (x: any) => string = R.pipe(
   getRootEntity,
-  getAttribute('created'),
+  getAttribute('created') as (x: any) => string,
 )
 
-module.exports = {
+export default {
   getRootEntityName,
   getRootEntity,
   getDateCreated,
@@ -42,4 +42,4 @@ module.exports = {
   getTextValue,
   getTextValues,
 
-}
+};

@@ -1,14 +1,15 @@
-const Job = require('../../../job/job')
+import Job from '../../../job/job'
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const SurveyManager = require('../../survey/manager/surveyManager')
+import Survey from '../../../../core/survey/survey'
+import NodeDef from '../../../../core/survey/nodeDef'
+import SurveyManager from '../../survey/manager/surveyManager'
 
-const SurveyRdbManager = require('../manager/surveyRdbManager')
+import SurveyRdbManager from '../manager/surveyRdbManager'
 
-class SurveyRdbGeneratorJob extends Job {
+export default class SurveyRdbGeneratorJob extends Job {
+  static type: string = 'SurveyRdbGeneratorJob'
 
-  constructor (params) {
+  constructor (params?) {
     super(SurveyRdbGeneratorJob.type, params)
   }
 
@@ -63,7 +64,3 @@ class SurveyRdbGeneratorJob extends Job {
   }
 
 }
-
-SurveyRdbGeneratorJob.type = 'SurveyRdbGeneratorJob'
-
-module.exports = SurveyRdbGeneratorJob

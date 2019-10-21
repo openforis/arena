@@ -1,13 +1,11 @@
-const Request = require('../../../utils/request')
-const SystemError = require('../../../utils/systemError')
+import Request from '../../../utils/request';
+import SystemError from '../../../utils/systemError';
+import Category from '../../../../core/survey/category';
+import ObjectUtils from '../../../../core/objectUtils';
+import * as AuthMiddleware from '../../auth/authApiMiddleware';
+import CategoryService from '../service/categoryService';
 
-const Category = require('../../../../core/survey/category')
-const ObjectUtils = require('../../../../core/objectUtils')
-
-const AuthMiddleware = require('../../auth/authApiMiddleware')
-const CategoryService = require('../service/categoryService')
-
-module.exports.init = app => {
+export const init = app => {
 
   // ==== CREATE
   app.post('/survey/:surveyId/categories', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -193,4 +191,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

@@ -1,8 +1,7 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../../objectUtils')
-
-const keys = require('./userKeys')
+import * as R from 'ramda';
+import ObjectUtils from '../../objectUtils';
+import keys, { IUser } from './userKeys';
+import { SurveyId, SurveyCycleKey } from '../../survey/_survey/surveyInfo';
 
 const keysPrefs = {
   surveys: 'surveys',
@@ -11,30 +10,31 @@ const keysPrefs = {
 }
 
 const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
-const pathSurveyCycle = surveyId => [keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle]
+const pathSurveyCycle = (surveyId: SurveyId) => [keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle]
 
 //====== READ
-const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
+const getPrefSurveyCurrent: (user: IUser) => any = R.path(pathSurveyCurrent)
 
-const getPrefSurveyCycle = surveyId => R.path(pathSurveyCycle(surveyId))
+const getPrefSurveyCycle: (surveyId: SurveyId) => any
+= surveyId => R.path(pathSurveyCycle(surveyId)) as any
 
-const getPrefSurveyCurrentCycle = user => R.pipe(
+const getPrefSurveyCurrentCycle = (user: IUser) => R.pipe(
   getPrefSurveyCurrent,
   surveyId => getPrefSurveyCycle(surveyId)(user)
 )(user)
 
 //====== UPDATE
-const assocPrefSurveyCurrent = surveyId => R.assocPath(pathSurveyCurrent, surveyId)
+const assocPrefSurveyCurrent = (surveyId: SurveyId | null) => R.assocPath(pathSurveyCurrent, surveyId)
 
-const assocPrefSurveyCycle = (surveyId, cycle) => R.assocPath(pathSurveyCycle(surveyId), cycle)
+const assocPrefSurveyCycle = (surveyId: SurveyId, cycle: SurveyCycleKey) => R.assocPath(pathSurveyCycle(surveyId), cycle)
 
-const assocPrefSurveyCurrentAndCycle = (surveyId, cycle) => R.pipe(
+const assocPrefSurveyCurrentAndCycle = (surveyId: SurveyId, cycle: SurveyCycleKey) => R.pipe(
   assocPrefSurveyCurrent(surveyId),
   assocPrefSurveyCycle(surveyId, cycle)
 )
 
 //====== DELETE
-const deletePrefSurvey = surveyId => user => {
+const deletePrefSurvey = (surveyId: SurveyId) => (user: IUser) => {
   const surveyIdPref = getPrefSurveyCurrent(user)
   return R.pipe(
     R.when(
@@ -45,7 +45,7 @@ const deletePrefSurvey = surveyId => user => {
   )(user)
 }
 
-module.exports = {
+export default {
   keysPrefs,
 
   //READ
@@ -60,4 +60,4 @@ module.exports = {
 
   //DELETE
   deletePrefSurvey,
-}
+};

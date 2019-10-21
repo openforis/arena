@@ -1,7 +1,6 @@
-const { assert, expect } = require('chai')
-
-const jsep = require('../../core/exprParser/helpers/jsep')
-const { getWherePreparedStatement } = require('../../common/surveyRdb/dataFilter')
+import { assert, expect } from 'chai';
+import jsep from '../../core/exprParser/helpers/jsep';
+import { getWherePreparedStatement } from '../../common/surveyRdb/dataFilter';
 
 const goodExpressions = [
   { q: '1', r: { clause: '$/_0/', params: { _0: '1' } } },

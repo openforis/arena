@@ -1,4 +1,4 @@
-const express = require('express')
+import express from 'express';
 
 const router = express.Router()
 
@@ -23,6 +23,6 @@ require('../job/jobApi').init(router)
 
 require('../modules/expression/api/expressionApi').init(router)
 
-module.exports = {
+export default {
   router
-}
+};

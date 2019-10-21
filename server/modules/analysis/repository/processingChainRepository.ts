@@ -1,15 +1,11 @@
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
-
-const {
-  getSurveyDBSchema,
-  dbTransformCallback,
-} = require('../../survey/repository/surveySchemaRepositoryUtils')
+import db from '../../../db/db';
+import DbUtils from '../../../db/dbUtils';
+import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils';
 
 const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, ${DbUtils.selectDate('date_executed')}`
 
 // CREATE
-const insertChain = async (surveyId, cycle, client = db) =>
+const insertChain = async (surveyId, cycle, client: any = db) =>
   await client.one(`
       INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (cycle)
       VALUES ($1)
@@ -20,16 +16,16 @@ const insertChain = async (surveyId, cycle, client = db) =>
   )
 
 // READ
-const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
+const countChainsBySurveyId = async (surveyId, cycle, client: any = db) =>
   await client.one(`
-      SELECT COUNT(*) 
+      SELECT COUNT(*)
       FROM ${getSurveyDBSchema(surveyId)}.processing_chain
       WHERE cycle = $1
     `,
     [cycle]
   )
 
-const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
+const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client: any = db) =>
   await client.map(`
       SELECT ${selectFields}
       FROM ${getSurveyDBSchema(surveyId)}.processing_chain
@@ -42,7 +38,7 @@ const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, 
     dbTransformCallback
   )
 
-const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
+const fetchChainByUuid = async (surveyId, processingChainUuid, client: any = db) =>
   await client.one(`
       SELECT ${selectFields}
       FROM ${getSurveyDBSchema(surveyId)}.processing_chain
@@ -52,7 +48,7 @@ const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
   )
 
 // UPDATE
-const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
+const updateChainProp = async (surveyId, processingChainUuid, key, value, client: any = db) =>
   await client.one(`
       UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
       SET props = jsonb_set("props", '{${key}}', $2::jsonb),
@@ -65,7 +61,7 @@ const updateChainProp = async (surveyId, processingChainUuid, key, value, client
   )
 
 // DELETE
-const deleteChain = async (surveyId, processingChainUuid, client = db) =>
+const deleteChain = async (surveyId, processingChainUuid, client: any = db) =>
   await client.none(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
       WHERE uuid = $1
@@ -73,7 +69,7 @@ const deleteChain = async (surveyId, processingChainUuid, client = db) =>
     [processingChainUuid]
   )
 
-module.exports = {
+export default {
   // CREATE
   insertChain,
 
@@ -87,4 +83,4 @@ module.exports = {
 
   // DELETE
   deleteChain,
-}
+};

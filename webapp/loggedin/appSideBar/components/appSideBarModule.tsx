@@ -9,7 +9,7 @@ import * as SideBarModule from '../sidebarModule'
 const AppSideBarModule = props => {
   const { surveyInfo, module, pathname, sideBarOpened, isOver, onMouseEnter } = props
 
-  const elementRef = SideBarModule.getElementRef(module)
+  const elementRef: any = SideBarModule.getElementRef(module)
   const isModuleHome = SideBarModule.isHome(module)
 
   const active = SideBarModule.isActive(pathname)(module)
@@ -41,6 +41,7 @@ const AppSideBarModule = props => {
 
       {
         sideBarOpened &&
+        // @ts-ignore TODO
         <AppSideBarSubModules
           module={module}
           pathname={pathname}

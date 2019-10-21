@@ -6,12 +6,12 @@ import { useI18n } from '../../../../../commonComponents/hooks'
 
 import NodeDef from '../../../../../../core/survey/nodeDef'
 
-import * as NodeDefUiProps from '../nodeDefUIProps'
+import {NodeDefUIProps} from '../internal'
 
-const NodeDefTableCellHeader = props => {
+export const NodeDefTableCellHeader = props => {
   const { label, nodeDef } = props
 
-  const fields = NodeDefUiProps.getFormFields(nodeDef)
+  const fields = NodeDefUIProps.getFormFields(nodeDef)
 
   const i18n = useI18n()
 

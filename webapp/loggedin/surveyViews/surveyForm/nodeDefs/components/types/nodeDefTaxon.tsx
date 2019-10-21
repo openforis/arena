@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import { FormItem } from '../../../../../../commonComponents/form/input'
 import { useI18n } from '../../../../../../commonComponents/hooks'
-import NodeDefTaxonInputField from './nodeDefTaxonInputField'
+import { NodeDefTaxonInputField } from '../../internal'
 
 import Taxon from '../../../../../../../core/survey/taxon'
 import NodeDef from '../../../../../../../core/survey/nodeDef'
@@ -29,7 +29,7 @@ const selectionDefault = {
   [vernacularName]: '',
 }
 
-const NodeDefTaxon = props => {
+const _NodeDefTaxon = props => {
   const {
     surveyId, nodeDef, taxonomyUuid, node,
     edit, draft, renderType,
@@ -164,4 +164,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(NodeDefTaxon)
+export const NodeDefTaxon = connect(mapStateToProps)(_NodeDefTaxon)
+export default NodeDefTaxon

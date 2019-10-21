@@ -1,15 +1,12 @@
-const R = require('ramda')
-
-const NodeDef = require('../../../../core/survey/nodeDef')
-const CategoryItem = require('../../../../core/survey/categoryItem')
-const Taxon = require('../../../../core/survey/taxon')
-const { isBlank, contains } = require('../../../../core/stringUtils')
-
-const CategoryManager = require('../../category/manager/categoryManager')
-const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
-
-const SystemError = require('../../../utils/systemError')
-const Request = require('../../../utils/request')
+import * as R from 'ramda';
+import NodeDef from '../../../../core/survey/nodeDef';
+import CategoryItem, { ICategoryItem } from '../../../../core/survey/categoryItem';
+import Taxon from '../../../../core/survey/taxon';
+import { isBlank, contains } from '../../../../core/stringUtils';
+import CategoryManager from '../../category/manager/categoryManager';
+import TaxonomyManager from '../../taxonomy/manager/taxonomyManager';
+import SystemError from '../../../utils/systemError';
+import * as Request from '../../../utils/request';
 
 const toItem = (type, lang = null) =>
   item => item
@@ -27,7 +24,7 @@ const toItem = (type, lang = null) =>
     )
     : null
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
@@ -68,13 +65,13 @@ module.exports.init = app => {
       if (NodeDef.nodeDefType.code === type) {
         const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
+        const itemsDb: ICategoryItem[] = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
 
         const items = R.pipe(
           R.ifElse(
             R.always(isBlank(value)),
             R.identity,
-            R.filter(item => {
+            R.filter((item: ICategoryItem) => {
               const code = CategoryItem.getCode(item)
               const label = CategoryItem.getLabel(lang)(item)
               return contains(value, code) || contains(value, label)
@@ -103,4 +100,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

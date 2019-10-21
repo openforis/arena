@@ -1,10 +1,9 @@
-const R = require('ramda')
-
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
-const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/repository/surveySchemaRepositoryUtils')
-
-const NodeDef = require('../../../../core/survey/nodeDef')
+import * as R from 'ramda';
+import db from '../../../db/db';
+import DbUtils from '../../../db/dbUtils';
+import { getSurveyDBSchema, dbTransformCallback as dbTransformCallbackCommon } from '../../survey/repository/surveySchemaRepositoryUtils';
+import NodeDef, { INodeDef } from '../../../../core/survey/nodeDef';
+import { SurveyId } from '../../../../core/survey/_survey/surveyInfo';
 
 const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 
@@ -24,12 +23,12 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 }
 
 const nodeDefSelectFields =
-  `id, uuid, parent_uuid, type, deleted, analysis, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
+  `id, uuid, parent_uuid, type, deleted, analysis, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')},
   props, props_advanced, props_draft, props_advanced_draft, meta`
 
 // ============== CREATE
 
-const insertNodeDef = async (surveyId, nodeDef, client = db) => {
+const insertNodeDef = async (surveyId: SurveyId, nodeDef, client: any = db) => {
   const parentUuid = NodeDef.getParentUuid(nodeDef)
   const parentH = parentUuid ?
     await client.one(
@@ -42,7 +41,7 @@ const insertNodeDef = async (surveyId, nodeDef, client = db) => {
   }
 
   return await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def
           (parent_uuid, uuid, type, props_draft, meta)
         VALUES ($1, $2, $3, $4, $5::jsonb)
         RETURNING *
@@ -54,51 +53,51 @@ const insertNodeDef = async (surveyId, nodeDef, client = db) => {
 
 // ============== READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft, advanced = false, includeDeleted = false, client = db) =>
+const fetchNodeDefsBySurveyId = async (surveyId: SurveyId, cycle = null, draft: boolean, advanced: boolean = false, includeDeleted: boolean = false, client: any = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
-    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    FROM ${getSurveyDBSchema(surveyId)}.node_def
     WHERE TRUE
       ${cycle ? `--filter by cycle
-          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1` : ''} 
+          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1` : ''}
       ${!draft ? ` AND props <> '{}'::jsonb` : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
     [JSON.stringify(String(cycle))],
     res => dbTransformCallback(res, draft, advanced)
-  )
+  ) as Promise<INodeDef[]>
 
-const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+const fetchRootNodeDef = async (surveyId: SurveyId, draft, client: any = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields}
-     FROM ${getSurveyDBSchema(surveyId)}.node_def 
+     FROM ${getSurveyDBSchema(surveyId)}.node_def
      WHERE parent_uuid IS NULL`,
     [],
     res => dbTransformCallback(res, draft, false)
   )
 
-const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = db) =>
+const fetchNodeDefByUuid = async (surveyId: SurveyId, nodeDefUuid, draft, advanced = false, client: any = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields}
-     FROM ${getSurveyDBSchema(surveyId)}.node_def 
+     FROM ${getSurveyDBSchema(surveyId)}.node_def
      WHERE uuid = $1`,
     [nodeDefUuid],
     res => dbTransformCallback(res, draft, advanced)
   )
 
-const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, advanced = false, client = db) =>
+const fetchNodeDefsByUuid = async (surveyId: SurveyId, nodeDefUuids = [], draft = false, advanced = false, client: any = db) =>
   await client.map(
     `SELECT ${nodeDefSelectFields}
-     FROM ${getSurveyDBSchema(surveyId)}.node_def 
+     FROM ${getSurveyDBSchema(surveyId)}.node_def
      WHERE uuid in (${nodeDefUuids.map((uuid, i) => `$${i + 1}`).join(',')})`,
     [...nodeDefUuids],
     res => dbTransformCallback(res, draft, advanced)
   )
 
-const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
+const fetchNodeDefsByParentUuid = async (surveyId: SurveyId, parentUuid, draft, client: any = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
-    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    FROM ${getSurveyDBSchema(surveyId)}.node_def
     WHERE parent_uuid = $1
     AND deleted IS NOT TRUE
     ORDER BY id`,
@@ -106,10 +105,10 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = d
     res => dbTransformCallback(res, draft, false)
   )
 
-const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = db) =>
+const fetchRootNodeDefKeysBySurveyId = async (surveyId: SurveyId, nodeDefRootUuid, draft, client: any = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
-    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    FROM ${getSurveyDBSchema(surveyId)}.node_def
     WHERE deleted IS NOT TRUE
     AND parent_uuid = $1
     AND ${DbUtils.getPropColCombined('key', draft)} = $2
@@ -120,9 +119,9 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, 
 
 // ============== UPDATE
 
-const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+const updateNodeDefProps = async (surveyId: SurveyId, nodeDefUuid, props, propsAdvanced = {}, client: any = db) =>
   await client.one(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props_draft = props_draft || $1::jsonb,
         props_advanced_draft = props_advanced_draft || $2::jsonb,
         date_modified = ${DbUtils.now}
@@ -132,9 +131,9 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = 
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 
-const updateNodeDefPropsPublished = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+const updateNodeDefPropsPublished = async (surveyId: SurveyId, nodeDefUuid, props, propsAdvanced = {}, client: any = db) =>
   await client.one(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props = props || $1::jsonb,
         props_advanced = props_advanced || $2::jsonb
     WHERE uuid = $3
@@ -144,7 +143,7 @@ const updateNodeDefPropsPublished = async (surveyId, nodeDefUuid, props, propsAd
   )
 
 // CYCLES
-const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add, client = db) => {
+const updateNodeDefDescendantsCycles = async (surveyId: SurveyId, nodeDefUuid, cycles, add, client: any = db) => {
   const op = add
     ? `|| '[${cycles.map(JSON.stringify).join(',')}]'`
     : cycles.map(c => `- '${c}'`).join(' ')
@@ -159,7 +158,7 @@ const updateNodeDefDescendantsCycles = async (surveyId, nodeDefUuid, cycles, add
   )
 }
 
-const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) => {
+const addNodeDefsCycles = async (surveyId: SurveyId, cycleStart, cycles, client: any = db) => {
   // add cycle to prop cycles
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
@@ -172,17 +171,17 @@ const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = db) => {
   await copyNodeDefsCyclesLayout(surveyId, null, cycleStart, cycles, client)
 }
 
-const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid = null, cycleStart, cycles, client = db) => {
+const copyNodeDefsCyclesLayout = async (surveyId: SurveyId, nodeDefUuid = null, cycleStart, cycles, client: any = db) => {
   const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || jsonb_build_object(${cycles.map(c => `'${c}', ${layoutCycleStartPath}`).join(', ')}), TRUE)
     WHERE ${layoutCycleStartPath} IS NOT NULL
-    ${nodeDefUuid ? ` AND uuid = $1` : ''} 
+    ${nodeDefUuid ? ` AND uuid = $1` : ''}
   `, [nodeDefUuid])
 }
 
-const deleteNodeDefsCycles = async (surveyId, cycles, client = db) => {
+const deleteNodeDefsCycles = async (surveyId: SurveyId, cycles, client: any = db) => {
   // delete cycles from props
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
@@ -192,7 +191,7 @@ const deleteNodeDefsCycles = async (surveyId, cycles, client = db) => {
   await deleteNodeDefsCyclesLayout(surveyId, null, cycles, client)
 }
 
-const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid = null, cycles, client = db) =>
+const deleteNodeDefsCyclesLayout = async (surveyId: SurveyId, nodeDefUuid = null, cycles, client: any = db) =>
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') ${cycles.map(c => `- '${c}'`).join(' ')})
@@ -201,7 +200,7 @@ const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid = null, cycles, 
   `, [nodeDefUuid])
 
 //PUBLISH
-const publishNodeDefsProps = async (surveyId, client = db) =>
+const publishNodeDefsProps = async (surveyId: SurveyId, client: any = db) =>
   await client.query(`
     UPDATE
       ${getSurveyDBSchema(surveyId)}.node_def
@@ -214,9 +213,9 @@ const publishNodeDefsProps = async (surveyId, client = db) =>
 
 // ============== DELETE
 
-const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => {
+const markNodeDefDeleted = async (surveyId: SurveyId, nodeDefUuid, client: any = db) => {
   const nodeDef = await client.one(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET deleted = true
     WHERE uuid = $1
     RETURNING ${nodeDefSelectFields}
@@ -233,7 +232,7 @@ const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => {
   return nodeDef
 }
 
-const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
+const permanentlyDeleteNodeDefs = async (surveyId: SurveyId, client: any = db) =>
   await client.query(`
         DELETE
         FROM
@@ -242,7 +241,7 @@ const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
           deleted = true
     `)
 
-const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = db) =>
+const markNodeDefsWithoutCyclesDeleted = async (surveyId: SurveyId, client: any = db) =>
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET deleted = true
@@ -250,19 +249,19 @@ const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = db) =>
       jsonb_array_length(${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, true, '', false)}) = 0
   `)
 
-const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
+const deleteNodeDefsLabels = async (surveyId: SurveyId, langCode, client: any = db) =>
   await _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
 
-const deleteNodeDefsDescriptions = async (surveyId, langCode, client = db) =>
+const deleteNodeDefsDescriptions = async (surveyId: SurveyId, langCode, client: any = db) =>
   await _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
-const _deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
+const _deleteNodeDefsProp = async (surveyId: SurveyId, deletePath, client: any = db) =>
   await client.none(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
     SET props = props #- '{${deletePath.join(',')}}'
     `)
 
-const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = db) => {
+const deleteNodeDefsValidationMessageLabels = async (surveyId: SurveyId, langs, client: any = db) => {
   const schema = getSurveyDBSchema(surveyId)
 
   await client.query(`
@@ -300,7 +299,7 @@ const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = d
   `)
 }
 
-module.exports = {
+export default {
 
   //CREATE
   insertNodeDef,
@@ -330,4 +329,4 @@ module.exports = {
   deleteNodeDefsLabels,
   deleteNodeDefsDescriptions,
   deleteNodeDefsValidationMessageLabels,
-}
+};

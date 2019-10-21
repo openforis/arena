@@ -29,7 +29,7 @@ const Button = (props) => {
 
 }
 
-const NodeDefBoolean = props => (
+export const NodeDefBoolean = props => (
   <div className="survey-form__node-def-boolean">
 
     <Button {...props}

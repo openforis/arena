@@ -1,20 +1,18 @@
-const R = require('ramda')
-
-const Node = require('../node')
-const Validation = require('../../validation/validation')
-
-const keys = require('./recordKeys')
-const NodesIndex = require('./recordNodesIndex')
-const RecordReader = require('./recordReader')
+import * as R from 'ramda';
+import Node from '../node';
+import Validation from '../../validation/validation';
+import keys from './recordKeys';
+import NodesIndex from './recordNodesIndex';
+import RecordReader from './recordReader';
 
 // ====== UPDATE
 
-const assocNodes = nodes => record => {
+export const assocNodes = nodes => record => {
   let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated))
     recordUpdated[keys.nodes] = {}
 
-  R.forEachObjIndexed((n, nodeUuid) => {
+  R.forEachObjIndexed((n, nodeUuid: string) => {
 
     // remove deleted node
     if (Node.isDeleted(n)) {
@@ -40,9 +38,9 @@ const assocNodes = nodes => record => {
   return recordUpdated
 }
 
-const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
+export const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
-const mergeNodeValidations = nodeValidations => record => R.pipe(
+export const mergeNodeValidations = nodeValidations => record => R.pipe(
   Validation.getValidation,
   Validation.mergeValidation(nodeValidations),
   validationMerged => Validation.assocValidation(validationMerged)(record)
@@ -50,7 +48,7 @@ const mergeNodeValidations = nodeValidations => record => R.pipe(
 
 // ====== DELETE
 
-const deleteNode = node => record => {
+export const deleteNode = node => record => {
   const nodeUuid = Node.getUuid(node)
 
   // 1. remove entity children recursively
@@ -79,10 +77,10 @@ const deleteNode = node => record => {
   return recordUpdated
 }
 
-module.exports = {
+export default {
   assocNodes,
   assocNode,
   mergeNodeValidations,
 
   deleteNode,
-}
+};

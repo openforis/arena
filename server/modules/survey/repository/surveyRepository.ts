@@ -1,23 +1,21 @@
-const db = require('../../../db/db')
-const R = require('ramda')
-
-const { dbTransformCallback, getSurveyDBSchema } = require('./surveySchemaRepositoryUtils')
-const { selectDate } = require('../../../db/dbUtils')
-
-const User = require('../../../../core/user/user')
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
+import db from '../../../db/db';
+import * as R from 'ramda';
+import { dbTransformCallback, getSurveyDBSchema } from './surveySchemaRepositoryUtils';
+import { selectDate } from '../../../db/dbUtils';
+import User from '../../../../core/user/user';
+import Survey from '../../../../core/survey/survey';
+import NodeDef from '../../../../core/survey/nodeDef';
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? alias + '.' : ''
   return `${prefix}id, ${prefix}uuid, ${prefix}published, ${prefix}draft, ${prefix}props, ${prefix}props_draft, ${prefix}owner_uuid,
-  ${selectDate(`${prefix}date_created`, 'date_created')}, 
+  ${selectDate(`${prefix}date_created`, 'date_created')},
   ${selectDate(`${prefix}date_modified`, 'date_modified')}`
 }
 
 // ============== CREATE
 
-const insertSurvey = async (survey, client = db) =>
+export const insertSurvey = async (survey, client: any = db) =>
   await client.one(`
       INSERT INTO survey (uuid, props_draft, owner_uuid)
       VALUES ($1, $2, $3)
@@ -29,14 +27,14 @@ const insertSurvey = async (survey, client = db) =>
 
 // ============== READ
 
-const fetchAllSurveyIds = async (client = db) =>
-  await client.map(`SELECT id FROM survey`, [], R.prop('id'))
+export const fetchAllSurveyIds = async (client: any = db) =>
+  await client.map(`SELECT id FROM survey`, [], R.prop('id')) as Promise<any[]>
 
-const fetchUserSurveys = async (user, offset = 0, limit = null, client = db) => {
+export const fetchUserSurveys = async (user, offset = 0, limit = null, client: any = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return await client.map(`
-    SELECT ${surveySelectFields('s')} 
+    SELECT ${surveySelectFields('s')}
       ${checkAccess ? `, json_build_array(row_to_json(g.*)) AS auth_groups` : ''}
     FROM survey s
     ${checkAccess ? `
@@ -52,10 +50,10 @@ const fetchUserSurveys = async (user, offset = 0, limit = null, client = db) => 
   `,
     [User.getUuid(user)],
     def => dbTransformCallback(def, true)
-  )
+  ) as Promise<any[]>
 }
 
-const countUserSurveys = async (user, client = db) => {
+export const countUserSurveys = async (user, client: any = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return await client.one(`
@@ -73,21 +71,21 @@ const countUserSurveys = async (user, client = db) => {
   )
 }
 
-const fetchSurveysByName = async (surveyName, client = db) =>
+export const fetchSurveysByName = async (surveyName, client: any = db) =>
   await client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)
   )
 
-const fetchSurveyById = async (surveyId, draft = false, client = db) =>
+export const fetchSurveyById = async (surveyId, draft = false, client: any = db) =>
   await client.one(
     `SELECT ${surveySelectFields()} FROM survey WHERE id = $1`,
     [surveyId],
     def => dbTransformCallback(def, draft)
   )
 
-const fetchDependencies = async (surveyId, client = db) =>
+export const fetchDependencies = async (surveyId, client: any = db) =>
   await client.oneOrNone(
       `SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1`,
     [surveyId],
@@ -95,7 +93,7 @@ const fetchDependencies = async (surveyId, client = db) =>
   )
 
 // ============== UPDATE
-const updateSurveyProp = async (surveyId, key, value, client = db) => {
+export const updateSurveyProp = async (surveyId, key, value, client: any = db) => {
   const prop = { [key]: value }
 
   return await client.one(`
@@ -109,7 +107,7 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
   )
 }
 
-const publishSurveyProps = async (surveyId, client = db) =>
+export const publishSurveyProps = async (surveyId, client: any = db) =>
   await client.one(`
     UPDATE
         survey
@@ -124,7 +122,7 @@ const publishSurveyProps = async (surveyId, client = db) =>
     `, [surveyId]
   )
 
-const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
+export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client: any = db) => {
   const meta = {
     dependencyGraphs
   }
@@ -138,17 +136,17 @@ const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client =
 }
 
 // ============== DELETE
-const deleteSurvey = async (id, client = db) =>
+export const deleteSurvey = async (id, client: any = db) =>
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
 
-const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
+export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client: any = db) => {
   const propsUpdateCond = R.pipe(
     R.map(langCode => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'` ),
     R.join(' ')
   )(langCodes)
 
   await client.none(`
-    UPDATE survey 
+    UPDATE survey
     SET props = props ${propsUpdateCond}
     WHERE id = $1
   `,
@@ -156,10 +154,10 @@ const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => 
   )
 }
 
-const dropSurveySchema = async (id, client = db) =>
+export const dropSurveySchema = async (id, client: any = db) =>
   await client.query(`DROP SCHEMA IF EXISTS ${getSurveyDBSchema(id)} CASCADE`)
 
-module.exports = {
+export default {
   // CREATE
   insertSurvey,
 
@@ -179,5 +177,5 @@ module.exports = {
   //DELETE
   deleteSurvey,
   deleteSurveyLabelsAndDescriptions,
-  dropSurveySchema
-}
+  dropSurveySchema,
+};

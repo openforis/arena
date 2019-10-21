@@ -1,20 +1,16 @@
-const { expect } = require('chai')
-
-const { getContextUser } = require('../testContext')
-
-const Survey = require('../../core/survey/survey')
-const NodeDef = require('../../core/survey/nodeDef')
-const NodeDefExpression = require('../../core/survey/nodeDefExpression')
-const Record = require('../../core/record/record')
-const Node = require('../../core/record/node')
-const Validation = require('../../core/validation/validation')
-
-const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-const RecordManager = require('../../server/modules/record/manager/recordManager')
-
-const SB = require('./utils/surveyBuilder')
-const RB = require('./utils/recordBuilder')
-const RecordUtils = require('./utils/recordUtils')
+import { expect } from 'chai';
+import { getContextUser } from '../testContext';
+import Survey from '../../core/survey/survey';
+import NodeDef from '../../core/survey/nodeDef';
+import NodeDefExpression from '../../core/survey/nodeDefExpression';
+import Record from '../../core/record/record';
+import Node from '../../core/record/node';
+import Validation from '../../core/validation/validation';
+import SurveyManager from '../../server/modules/survey/manager/surveyManager';
+import RecordManager from '../../server/modules/record/manager/recordManager';
+import * as SB from './utils/surveyBuilder';
+import * as RB from './utils/recordBuilder';
+import RecordUtils from './utils/recordUtils';
 
 let survey = null
 let record = null

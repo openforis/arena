@@ -4,7 +4,7 @@ import Expression from '../../../../core/exprParser/expression'
 
 import Identifier from './identifier'
 
-const Call = ({ node, variables, onChange }) => {
+export const Call = ({ node, variables, onChange }) => {
 
   const nodeIdentifier = {
     type: Expression.types.Identifier,

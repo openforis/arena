@@ -1,7 +1,6 @@
-const SurveyManager = require('../manager/surveyManager')
-
-const JobManager = require('../../../job/jobManager')
-const SurveyPublishJob = require('./publish/surveyPublishJob')
+import SurveyManager from '../manager/surveyManager';
+import JobManager from '../../../job/jobManager';
+import SurveyPublishJob from './publish/surveyPublishJob';
 
 const startPublishJob = (user, surveyId) => {
   const job = new SurveyPublishJob({ user, surveyId })
@@ -11,7 +10,7 @@ const startPublishJob = (user, surveyId) => {
   return job
 }
 
-module.exports = {
+export default {
   // CREATE
   createSurvey: SurveyManager.createSurvey,
   validateNewSurvey: SurveyManager.validateNewSurvey,
@@ -30,4 +29,4 @@ module.exports = {
 
   // JOBS
   startPublishJob,
-}
+};

@@ -1,6 +1,9 @@
-class SystemError extends Error {
+export default class SystemError extends Error {
+	public name: any;
+	public _key: any;
+	public _params: any;
 
-  constructor (key, params) {
+  constructor (key, params?) {
     super(key)
 
     this.name = 'SystemError'
@@ -23,5 +26,3 @@ class SystemError extends Error {
   }
 
 }
-
-module.exports = SystemError

@@ -1,21 +1,19 @@
-const db = require('../../../db/db')
-
-const User = require('../../../../core/user/user')
-const AuthGroups = require('../../../../core/auth/authGroups')
-const UserRepository = require('../repository/userRepository')
-
-const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
-const ActivityLog = require('../../activityLog/activityLogger')
+import db from '../../../db/db';
+import User from '../../../../core/user/user';
+import AuthGroups from '../../../../core/auth/authGroups';
+import UserRepository from '../repository/userRepository';
+import AuthGroupRepository from '../../auth/repository/authGroupRepository';
+import ActivityLog from '../../activityLog/activityLogger';
 
 // ==== CREATE
 
-const insertUser = async (user, surveyId, uuid, email, groupUuid, client = db) =>
+const insertUser = async (user, surveyId, uuid, email, groupUuid, client: any = db) =>
   await client.tx(async t => {
     const newUser = await UserRepository.insertUser(surveyId, uuid, email, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
-const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
+const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client: any = db) =>
   await client.tx(async t => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
     await ActivityLog.log(
@@ -44,7 +42,7 @@ const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
-const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
+const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client: any = db) =>
   await client.tx(async t => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
 
@@ -58,7 +56,7 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
 
 // ==== UPDATE
 
-const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, profilePicture, client = db) =>
+const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, profilePicture, client: any = db) =>
   await client.tx(async t => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
 
@@ -85,7 +83,7 @@ const updateUser = _userFetcher(_updateUser)
 
 // ==== DELETE
 
-const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
+const deleteUser = async (user, surveyId, userUuidToRemove, client: any = db) =>
   await Promise.all([
     AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
     ActivityLog.log(
@@ -98,7 +96,7 @@ const updateUserPrefs = async user => ({
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
 })
 
-module.exports = {
+export default {
   // CREATE
   insertUser,
   addUserToGroup,
@@ -118,4 +116,4 @@ module.exports = {
 
   // DELETE
   deleteUser,
-}
+};

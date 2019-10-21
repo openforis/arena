@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
-const DateUtils = require('../dateUtils')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
+import DateUtils from '../dateUtils';
 
 const dateFormat = 'yyyy-MM-dd'
 
@@ -13,8 +12,14 @@ const keys = {
 }
 
 //====== CREATE
-const newCycle = () => ({
-  [keys.dateStart]: DateUtils.format(Date.now(), dateFormat)
+export interface ICycle {
+  dateStart: string;
+  dateEnd?: string;
+  // descriptions?: IDescriptions;
+  // labels?: ILabels;
+}
+const newCycle: () => ICycle = () => ({
+  dateStart: DateUtils.format(Date.now(), dateFormat)
 })
 
 //====== READ
@@ -27,7 +32,7 @@ const getLabels = R.propOr({}, keys.labels)
 const setDateStart = R.assoc(keys.dateStart)
 const setDateEnd = R.assoc(keys.dateEnd)
 
-module.exports = {
+export default {
   //CREATE
   newCycle,
 
@@ -40,4 +45,4 @@ module.exports = {
   //UPDATE
   setDateStart,
   setDateEnd,
-}
+};

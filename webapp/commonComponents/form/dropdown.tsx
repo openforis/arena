@@ -13,6 +13,26 @@ import { contains, trim } from '../../../core/stringUtils'
 const dropdownListItemClassName = 'dropdown__list-item'
 
 class Dropdown extends React.Component {
+	public dropdown: React.RefObject<any>;
+	public input: React.RefObject<any>;
+
+  static defaultProps = {
+    clearOnSelection: false,
+    autocompleteMinChars: 0,
+    readOnly: false,
+    readOnlyInput: false,
+    disabled: false,
+    items: [],
+    itemsLookupFunction: null,
+    selection: null,
+    onChange: null,
+    itemKeyProp: null,
+    itemKeyFunction: null,
+    itemLabelProp: null,
+    itemLabelFunction: null,
+    autocompleteDialogClassName: null,
+    sourceElement: null, // used to calculate the size of the autocomplete-dialog if available, otherwise the this.dropdown.current is used
+  }
 
   constructor (props) {
     super(props)
@@ -109,7 +129,7 @@ class Dropdown extends React.Component {
     onChange(null)
   }
 
-  onInputFocus () {
+  onInputFocus (evt) {
     if (!this.isOpened() && !R.isEmpty(this.state.items)) {
       this.toggleOpened()
     }
@@ -144,7 +164,7 @@ class Dropdown extends React.Component {
         : R.is(Object, item)
           ? prop ?
             R.prop(prop)(item)
-            : R.has(defaultProp)(item) ?
+            : R.has(defaultProp, item) ?
               R.prop(defaultProp)(item)
               : item
           : item //primitive
@@ -219,24 +239,6 @@ class Dropdown extends React.Component {
       </div>
     )
   }
-}
-
-Dropdown.defaultProps = {
-  clearOnSelection: false,
-  autocompleteMinChars: 0,
-  readOnly: false,
-  readOnlyInput: false,
-  disabled: false,
-  items: [],
-  itemsLookupFunction: null,
-  selection: null,
-  onChange: null,
-  itemKeyProp: null,
-  itemKeyFunction: null,
-  itemLabelProp: null,
-  itemLabelFunction: null,
-  autocompleteDialogClassName: null,
-  sourceElement: null, // used to calculate the size of the autocomplete-dialog if available, otherwise the this.dropdown.current is used
 }
 
 export default Dropdown

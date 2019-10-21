@@ -11,7 +11,7 @@ const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
       func(item)
       : prop ?
       R.prop(prop)(item)
-      : R.has(defaultProp)(item) ?
+      : R.has(defaultProp, item) ?
         R.prop(defaultProp)(item)
         : item
     : item //primitive

@@ -1,14 +1,11 @@
-const R = require('ramda')
-
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
-
-const Survey = require('../survey')
-const NodeDef = require('../nodeDef')
-const NodeDefLayout = require('../nodeDefLayout')
-
-const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
-const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
+import * as R from 'ramda';
+import Validator from '../../validation/validator';
+import Validation from '../../validation/validation';
+import Survey from '../survey';
+import NodeDef from '../nodeDef';
+import NodeDefLayout from '../nodeDefLayout';
+import NodeDefExpressionsValidator from './nodeDefExpressionsValidator';
+import NodeDefValidationsValidator from './nodeDefValidationsValidator';
 
 const { keys, propKeys } = NodeDef
 
@@ -145,7 +142,7 @@ const validateNodeDefs = async survey => {
   return validation
 }
 
-module.exports = {
+export default {
   validateNodeDefs,
-}
+};
 

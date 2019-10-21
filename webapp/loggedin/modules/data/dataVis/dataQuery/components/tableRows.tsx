@@ -34,6 +34,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
           <div style={{ width: defaultColWidth }}>{i18n.t('dataView.rowNum')}</div>
           <TableColumns
             nodeDefCols={nodeDefCols}
+            row={null}
             lang={lang}
             colWidth={colWidth}
             editMode={editMode}/>
@@ -71,6 +72,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
                   <TableColumns
                     nodeDefCols={nodeDefCols}
                     row={row}
+                    lang={null}
                     colWidth={colWidth}
                     editMode={editMode}/>
                 </div>

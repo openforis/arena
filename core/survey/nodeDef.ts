@@ -1,14 +1,70 @@
-const R = require('ramda')
-const { uuidv4 } = require('../uuid')
-
-const ObjectUtils = require('../objectUtils')
-const NodeDefValidations = require('./nodeDefValidations')
-
-const StringUtils = require('../stringUtils')
+import * as R from 'ramda';
+import { uuidv4 } from '../uuid';
+import ObjectUtils from '../objectUtils';
+import NodeDefValidations from './nodeDefValidations';
+import StringUtils from '../stringUtils';
+import { ILocalizedDict } from './taxon';
+import { ILayout } from './nodeDefLayout';
+import {Maybe} from '../../common/types'
+import { SurveyCycleKey } from './_survey/surveyInfo';
 
 // ======== NODE DEF PROPERTIES
 
-const nodeDefType = {
+export interface INodeProps {
+  cycles?: string[];
+
+  applicable?: string;
+  defaultValues?: any; // TODO
+  descriptions?: ILocalizedDict;
+  key?: any;
+  labels?: ILocalizedDict;
+  multiple?: boolean;
+  name?: string;
+  readOnly?: any;
+  validations?: any;
+
+  //code
+  categoryUuid?: any;
+  parentCodeDefUuid?: any;
+  //taxon
+  taxonomyUuid?: any;
+
+  layout?: ILayout; // TODO: should this be here?
+}
+type UUID = string
+export interface INodeDef {
+  id?: number | string; // TODO what is id
+
+  uuid: UUID;
+  parentUuid?: UUID;
+  type: string; // TODO are types always strings?
+  analysis: string | boolean; // TODO should probably be only string or only boolean
+  props: INodeProps;
+
+  meta?: {};
+  draftAdvanced?: boolean;
+  deleted?: boolean;
+  published?: boolean;
+  draft?: boolean
+
+  dateCreated?: string;
+  dateModified?: string;
+}
+
+export type NodeDefType
+= 'integer'
+| 'decimal'
+| 'text'
+| 'date'
+| 'time'
+| 'boolean'
+| 'code'
+| 'coordinate'
+| 'taxon'
+| 'file'
+| 'entity'
+
+export const nodeDefType = {
   integer: 'integer',
   decimal: 'decimal',
   text: 'text',
@@ -61,60 +117,63 @@ const maxKeyAttributes = 3
 
 // ==== CREATE
 
-const newNodeDef = (parentUuid, type, cycle, props, analysis = false) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.parentUuid]: parentUuid,
-  [keys.type]: type,
-  [keys.analysis]: analysis,
-  [keys.props]: {
+const newNodeDef: (parentUuid: UUID, type: string, cycle: string, props: INodeProps, analysis?: boolean) => INodeDef
+= (parentUuid, type, cycle, props, analysis = false) => ({
+  uuid: uuidv4(),
+  parentUuid,
+  type,
+  analysis,
+  props: {
     ...props,
-    [propKeys.cycles]: [cycle]
+    cycles: [cycle]
   },
 })
 
 // ==== READ
+// export type NodeDef = Record<string, string>
+export type NodeDefPredicate = (obj?: INodeDef) => boolean
 
-const getType = R.prop(keys.type)
-const getName = ObjectUtils.getProp(propKeys.name, '')
-const getParentUuid = ObjectUtils.getParentUuid
-const getCycles = ObjectUtils.getProp(propKeys.cycles, [])
+const getType: (obj?: INodeDef) => string = R.prop(keys.type) as (obj?: INodeDef) => string
+const getName: (obj?: INodeDef) => string = ObjectUtils.getProp(propKeys.name, '')
+const getParentUuid: (obj?: INodeDef) => Maybe<string> = ObjectUtils.getParentUuid
+const getCycles: (obj?: INodeDef) => string[] = ObjectUtils.getProp(propKeys.cycles, [])
 
-const isKey = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
-const isRoot = R.pipe(getParentUuid, R.isNil)
-const isMultiple = R.pipe(ObjectUtils.getProp(propKeys.multiple), R.equals(true))
-const isSingle = R.pipe(isMultiple, R.not)
+const isKey: NodeDefPredicate = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
+const isRoot: NodeDefPredicate = R.pipe(getParentUuid, R.isNil)
+const isMultiple: NodeDefPredicate = R.pipe(ObjectUtils.getProp(propKeys.multiple), R.equals(true))
+const isSingle: NodeDefPredicate = R.pipe(isMultiple, R.not)
 
-const isType = type => R.pipe(getType, R.equals(type))
+const isType: (type: string) => NodeDefPredicate = (type) => R.pipe(getType, R.equals(type))
 
-const isEntity = isType(nodeDefType.entity)
-const isSingleEntity = nodeDef => isEntity(nodeDef) && isSingle(nodeDef)
-const isMultipleEntity = nodeDef => isEntity(nodeDef) && isMultiple(nodeDef)
-const isEntityOrMultiple = nodeDef => isEntity(nodeDef) || isMultiple(nodeDef)
+const isEntity: NodeDefPredicate = isType(nodeDefType.entity)
+const isSingleEntity: NodeDefPredicate = (nodeDef) => isEntity(nodeDef) && isSingle(nodeDef)
+const isMultipleEntity: NodeDefPredicate = (nodeDef) => isEntity(nodeDef) && isMultiple(nodeDef)
+const isEntityOrMultiple: NodeDefPredicate = (nodeDef) => isEntity(nodeDef) || isMultiple(nodeDef)
 
-const isAttribute = R.pipe(isEntity, R.not)
-const isSingleAttribute = nodeDef => isAttribute(nodeDef) && isSingle(nodeDef)
-const isMultipleAttribute = nodeDef => isAttribute(nodeDef) && isMultiple(nodeDef)
+const isAttribute: NodeDefPredicate = R.pipe(isEntity, R.not)
+const isSingleAttribute: NodeDefPredicate = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
+const isMultipleAttribute: NodeDefPredicate = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 
-const isBoolean = isType(nodeDefType.boolean)
-const isCode = isType(nodeDefType.code)
-const isCoordinate = isType(nodeDefType.coordinate)
-const isDecimal = isType(nodeDefType.decimal)
-const isFile = isType(nodeDefType.file)
-const isInteger = isType(nodeDefType.integer)
-const isTaxon = isType(nodeDefType.taxon)
+const isBoolean: NodeDefPredicate = isType(nodeDefType.boolean)
+const isCode: NodeDefPredicate = isType(nodeDefType.code)
+const isCoordinate: NodeDefPredicate = isType(nodeDefType.coordinate)
+const isDecimal: NodeDefPredicate = isType(nodeDefType.decimal)
+const isFile: NodeDefPredicate = isType(nodeDefType.file)
+const isInteger: NodeDefPredicate = isType(nodeDefType.integer)
+const isTaxon: NodeDefPredicate = isType(nodeDefType.taxon)
 
-const isPublished = R.propEq(keys.published, true)
-const isDeleted = R.propEq(keys.deleted, true)
-const isAnalysis = R.propEq(keys.analysis, true)
+const isPublished:  NodeDefPredicate = R.propEq(keys.published, true)
+const isDeleted: NodeDefPredicate= R.propEq(keys.deleted, true)
+const isAnalysis: NodeDefPredicate = R.propEq(keys.analysis, true)
 
-const getLabel = (nodeDef, lang) => {
+const getLabel = (nodeDef, lang: string | number) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
   return StringUtils.isBlank(label)
     ? getName(nodeDef)
     : label
 }
 
-const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
+const getDefaultValues: (nodeDef) => any[] = ObjectUtils.getProp(propKeys.defaultValues, [])
 const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 
 const getValidations = ObjectUtils.getProp(propKeys.validations, {})
@@ -127,7 +186,7 @@ const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)
 // ==== UPDATE
 
 // ==== UTILS
-const canNodeDefBeMultiple = nodeDef =>
+const canNodeDefBeMultiple = (nodeDef) =>
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
   R.includes(
     getType(nodeDef),
@@ -140,9 +199,9 @@ const canNodeDefBeMultiple = nodeDef =>
     ]
   )
 
-const canNodeDefBeKey = nodeDef => canNodeDefTypeBeKey(getType(nodeDef))
+const canNodeDefBeKey = (nodeDef: INodeDef) => canNodeDefTypeBeKey(getType(nodeDef))
 
-const canNodeDefTypeBeKey = type =>
+const canNodeDefTypeBeKey = (type: any) =>
   R.includes(type,
     [
       nodeDefType.date,
@@ -155,7 +214,7 @@ const canNodeDefTypeBeKey = type =>
     ]
   )
 
-const canHaveDefaultValue = nodeDef =>
+const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&
   R.includes(
     getType(nodeDef),
@@ -173,7 +232,10 @@ const canHaveDefaultValue = nodeDef =>
   // allow default value when parent code is null (for node def code)
   && !getParentCodeDefUuid(nodeDef)
 
-module.exports = {
+const getDraftAdvanced: (obj: INodeDef) => string = R.prop(keys.draftAdvanced) as (obj: INodeDef) => string
+export const hasAdvancedPropsDraft = R.pipe(getDraftAdvanced, R.isEmpty, R.not)
+
+export default {
   nodeDefType,
   keys,
   propKeys,
@@ -198,7 +260,7 @@ module.exports = {
   getParentCodeDefUuid,
   getTaxonomyUuid: ObjectUtils.getProp(propKeys.taxonomyUuid),
   getCycles,
-  getCycleFirst: R.pipe(getCycles, R.head),
+  getCycleFirst: R.pipe(getCycles, R.head) as (x: INodeDef) => SurveyCycleKey,
 
   isKey,
   isMultiple,
@@ -234,7 +296,7 @@ module.exports = {
     getValidations,
     NodeDefValidations.getExpressions,
   ),
-  hasAdvancedPropsDraft: R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not),
+  hasAdvancedPropsDraft,
 
   // meta
   getMetaHierarchy,
@@ -244,4 +306,4 @@ module.exports = {
   canNodeDefBeKey,
   canNodeDefTypeBeKey,
   canHaveDefaultValue,
-}
+};

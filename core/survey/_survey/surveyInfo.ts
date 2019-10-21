@@ -1,9 +1,7 @@
-const R = require('ramda')
-
-const AuthGroups = require('../../auth/authGroups')
-
-const ObjectUtils = require('../../objectUtils')
-const StringUtils = require('../../stringUtils')
+import * as R from 'ramda';
+import AuthGroups from '../../auth/authGroups';
+import ObjectUtils from '../../objectUtils';
+import StringUtils from '../../stringUtils';
 
 const keys = {
   id: ObjectUtils.keys.id,
@@ -33,10 +31,14 @@ const collectReportKeys = {
 
 const cycleOneKey = '0'
 
-const getInfo = R.propOr({}, keys.info)
+const getInfo: (x: any) => { id?: any; } = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
-const getId = R.prop(keys.id)
+
+export type SurveyId = string;
+export type SurveyCycleKey = number | string;
+
+const getId: (x: any) => SurveyId = R.prop(keys.id)
 
 const getUuid = ObjectUtils.getUuid
 
@@ -88,7 +90,7 @@ const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
 
 const hasCollectReportIssues = R.pipe(
   getCollectReport,
-  R.propSatisfies(total => total > 0, collectReportKeys.issuesTotal)
+  R.propSatisfies((total: number) => total > 0, collectReportKeys.issuesTotal)
 )
 
 const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
@@ -108,18 +110,18 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-const getAuthGroups = R.prop(keys.authGroups)
+const getAuthGroups: (x: any) => any[] = R.prop(keys.authGroups)
 
 const _getAuthGroupByName = name => R.pipe(
   getAuthGroups,
   R.find(R.propEq(AuthGroups.keys.name, name))
 )
 
-const getAuthGroupAdmin = _getAuthGroupByName(AuthGroups.groupNames.surveyAdmin)
+const getAuthGroupAdmin: (x: any) => any[] = _getAuthGroupByName(AuthGroups.groupNames.surveyAdmin)
 
 const isAuthGroupAdmin = group => surveyInfo => AuthGroups.isEqual(group)(getAuthGroupAdmin(surveyInfo))
 
-module.exports = {
+export default {
   keys,
   collectReportKeys,
   cycleOneKey,
@@ -161,4 +163,4 @@ module.exports = {
 
   // ====== UTILS
   isValid,
-}
+};

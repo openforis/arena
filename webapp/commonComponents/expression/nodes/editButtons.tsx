@@ -4,7 +4,7 @@ import Expression from '../../../../core/exprParser/expression'
 
 import { useI18n } from '../../hooks'
 
-const EditButtons = (props) => {
+export const EditButtons = (props) => {
 
   const {
     node, onChange,

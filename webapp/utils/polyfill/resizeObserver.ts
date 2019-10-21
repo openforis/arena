@@ -3,8 +3,13 @@ import { elementOffset } from '../domUtils'
 // ResizeObserver polyfill
 
 // if (typeof ResizeObserver === 'undefined') {
-window.ResizeObserver = class ResizeObserver {
-  constructor (callback) {
+
+// @ts-ignore
+export default class ResizeObserver {
+  observables: any[]
+  callback: (x: any[]) => void
+  af?: number
+  constructor (callback: (x: any[]) => void) {
     this.observables = []
     // Array of observed elements that looks like this:
     // [{
@@ -17,14 +22,14 @@ window.ResizeObserver = class ResizeObserver {
     this.checkSize()
   }
 
-  getElementSize (el) {
+  getElementSize (el: SVGGraphicsElement) {
     const { width, height, x, y } = el.getBBox
       ? el.getBBox()
       : elementOffset(el)
     return { width, height, x, y }
   }
 
-  observe (el) {
+  observe (el: SVGGraphicsElement) {
     if (!this.observables.some(observable => observable.el === el)) {
       this.observables.push({
         el: el,
@@ -33,13 +38,13 @@ window.ResizeObserver = class ResizeObserver {
     }
   }
 
-  unobserve (el) {
+  unobserve (el: SVGGraphicsElement) {
     this.observables = this.observables.filter(obj => obj.el !== el)
   }
 
   disconnect () {
     this.observables = []
-    window.cancelAnimationFrame(this.af)
+    if (this.af !== undefined) window.cancelAnimationFrame(this.af)
   }
 
   checkSize () {

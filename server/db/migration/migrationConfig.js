@@ -1,6 +1,6 @@
-const ProcessUtils = require('../../../core/processUtils')
+import ProcessUtils from '../../../core/processUtils';
 
-module.exports = {
+export default {
 
   development: {
     driver: 'pg',
@@ -15,4 +15,4 @@ module.exports = {
     ssl: true,
   }
 
-}
+};

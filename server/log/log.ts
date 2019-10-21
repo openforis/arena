@@ -1,4 +1,4 @@
-const log4js = require('log4js')
+import log4js from 'log4js'
 
 const logger = log4js.getLogger('arena')
 
@@ -33,7 +33,8 @@ const _stringifyMsgs = msgs => msgs
 /**
  * Logger class with custom prefix
  */
-class Logger {
+export class Logger {
+	public prefix: any;
 
   constructor (prefix) {
     this.prefix = prefix
@@ -80,7 +81,6 @@ class Logger {
   }
 }
 
-module.exports = {
-  getLogger: prefix => new Logger(prefix)
-}
+export const getLogger = (prefix) => new Logger(prefix)
 
+export default { getLogger }

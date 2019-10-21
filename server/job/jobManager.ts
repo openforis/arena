@@ -1,17 +1,15 @@
-const path = require('path')
-
-const { jobThreadMessageTypes } = require('./jobUtils')
-const ThreadsCache = require('../threads/threadsCache')
-const ThreadManager = require('../threads/threadManager')
-
-const WebSocket = require('../utils/webSocket')
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+import path from 'path';
+import { jobThreadMessageTypes } from './jobUtils';
+import ThreadsCache from '../threads/threadsCache';
+import ThreadManager from '../threads/threadManager';
+import WebSocket from '../utils/webSocket';
+import WebSocketEvents from '../../common/webSocket/webSocketEvents';
 
 // USER JOB WORKERS
 
 const userJobThreads = new ThreadsCache()
 
-const notifyJobUpdate = jobSerialized => {
+const notifyJobUpdate = async jobSerialized => {
   const userUuid = jobSerialized.userUuid
 
   WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
@@ -44,14 +42,16 @@ const executeJobThread = job => {
   const thread = new ThreadManager(
     path.resolve(__dirname, 'jobThread.js'),
     { jobType: job.type, jobParams: job.params },
-    async job => await notifyJobUpdate(job)
+    async job => await notifyJobUpdate(job), // XXX: this is not a Promise
   )
 
+  // XXX: was invalid:
+  // userJobThreads.putThread({ key: job.userUuid, worker: thread })
   userJobThreads.putThread(job.userUuid, thread)
 }
 
-module.exports = {
+export default {
   executeJobThread,
 
   cancelActiveJobByUserUuid,
-}
+};

@@ -1,22 +1,33 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import * as R from 'ramda'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
-import NodeDef from '../../../../../core/survey/nodeDef'
+import NodeDef, { INodeDef, NodeDefType } from '../../../../../core/survey/nodeDef'
 import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
 
-import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
-import NodeDefFile from './components/types/nodeDefFile'
-import NodeDefTaxon from './components/types/nodeDefTaxon'
-import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCode from './components/types/nodeDefCode'
-import NodeDefBoolean from './components/types/nodeDefBoolean'
-import NodeDefText from './components/types/nodeDefText'
+import { NodeDefEntitySwitch } from './internal'
+import { NodeDefFile } from './internal'
+import { NodeDefTaxon } from './internal'
+import { NodeDefCoordinate } from './internal'
+import { NodeDefCode } from './internal'
+import { NodeDefBoolean } from './internal'
+import { NodeDefText } from './internal'
 
-const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
 
-const propsUI = {
-  [integer]: {
+type PropDef = {
+  icon: ReactElement;
+  inputText?: any;
+  component?: () => any; // This gets around the problem of cyclic dependencies
+  defaultValue?: string | { [s: string]: any; }
+  defaultProps?: (x: any) => { [s: string]: any; }
+  formFields?: { field: string; labelKey: string; }[];
+}
+type PropsUI = {
+  [K in NodeDefType]: PropDef;
+}
+
+const propsUI: PropsUI = {
+  integer: {
     icon: <span className="icon-left node_def__icon">923</span>,
     inputText: {
       mask: createNumberMask({
@@ -36,7 +47,7 @@ const propsUI = {
     defaultValue: '',
   },
 
-  [decimal]: {
+  decimal: {
     icon: <span className="icon-left node_def__icon">923,4</span>,
     inputText: {
       mask: createNumberMask({
@@ -56,14 +67,14 @@ const propsUI = {
     defaultValue: '',
   },
 
-  [text]: {
+  text: {
     icon: <span className="icon-left display-flex">{R.range(0, 3).map(i =>
       <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }}/>
     )}</span>,
     defaultValue: '',
   },
 
-  [date]: {
+  date: {
     icon: <span className="icon icon-calendar icon-left"/>,
     inputText: {
       mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
@@ -73,7 +84,7 @@ const propsUI = {
     defaultValue: '',
   },
 
-  [time]: {
+  time: {
     icon: <span className="icon icon-clock icon-left"/>,
     inputText: {
       mask: [/\d/, /\d/, ':', /\d/, /\d/],
@@ -83,14 +94,14 @@ const propsUI = {
     defaultValue: '',
   },
 
-  [boolean]: {
-    component: NodeDefBoolean,
+  boolean: {
+    component: () => NodeDefBoolean,
     icon: <span className="icon icon-radio-checked2 icon-left"/>,
     defaultValue: '',
   },
 
-  [code]: {
-    component: NodeDefCode,
+  code: {
+    component: () => NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
     defaultProps: cycle => ({
@@ -98,8 +109,8 @@ const propsUI = {
     }),
   },
 
-  [coordinate]: {
-    component: NodeDefCoordinate,
+  coordinate: {
+    component: () => NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
     defaultValue: { x: '', y: '', srs: '' },
     formFields: [
@@ -109,8 +120,8 @@ const propsUI = {
     ],
   },
 
-  [taxon]: {
-    component: NodeDefTaxon,
+  taxon: {
+    component: () => NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
     defaultValue: {
       taxonUuid: null,
@@ -123,13 +134,13 @@ const propsUI = {
     ],
   },
 
-  [file]: {
-    component: NodeDefFile,
+  file: {
+    component: () => NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left"/>,
   },
 
-  [entity]: {
-    component: NodeDefEntitySwitch,
+  entity: {
+    component: () => NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
     defaultProps: cycle => ({
       [NodeDef.propKeys.multiple]: true,
@@ -138,15 +149,19 @@ const propsUI = {
   },
 }
 
-const getPropByType = (prop, defaultValue = null) => nodeDefType => R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+const getPropByType = (prop, defaultValue?) => nodeDefType => R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
-const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
+const getProp = (prop, defaultValue?) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
 export const getIconByType = getPropByType('icon')
 
 export const getInputTextProps = getProp('inputText', { mask: false })
 
-export const getComponent = getProp('component', NodeDefText)
+export const getComponent: (nodeDef: INodeDef) => any
+= nodeDef => {
+  const propDef: PropDef = propsUI[nodeDef.type];
+  return propDef.component ? propDef.component() : NodeDefText;
+}
 
 export const getFormFields = getProp('formFields', ['field'])
 
@@ -155,4 +170,13 @@ export const getDefaultValue = getProp('defaultValue')
 export const getDefaultPropsByType = (type, cycle) => {
   const fn = getPropByType('defaultProps')(type)
   return fn ? fn(cycle) : {}
+}
+
+export const NodeDefUIProps = {
+  getIconByType,
+  getInputTextProps,
+  getComponent,
+  getFormFields,
+  getDefaultValue,
+  getDefaultPropsByType,
 }

@@ -3,12 +3,10 @@ import './nodeDefText.scss'
 import React from 'react'
 
 import { Input } from '../../../../../../commonComponents/form/input'
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
-import NodeDeleteButton from '../nodeDeleteButton'
+import { NodeDeleteButton, NodeDefErrorBadge, NodeDefUIProps} from '../../internal'
 
 import NodeDef from '../../../../../../../core/survey/nodeDef'
 import Node from '../../../../../../../core/record/node'
-import * as NodeDefUIProps from '../../nodeDefUIProps'
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
@@ -58,7 +56,7 @@ const MultipleTextInput = props => {
   )
 }
 
-const NodeDefText = props => {
+export const NodeDefText = props => {
   const { edit, entryDataQuery, nodeDef, nodes } = props
 
   return edit

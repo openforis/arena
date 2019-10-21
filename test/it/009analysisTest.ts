@@ -1,4 +1,4 @@
-const SimpleProcessingChainTest = require('./analysisTest/simpleProcessingChainTest')
+import SimpleProcessingChainTest from './analysisTest/simpleProcessingChainTest';
 
 describe('Processing chains test', () => {
   it('Simple processing chain test', SimpleProcessingChainTest.simpleTest)

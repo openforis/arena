@@ -1,19 +1,21 @@
-const path = require('path')
-const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const GoogleFontsPlugin = require('google-fonts-plugin')
+import { resolve } from 'path'
+import { DefinePlugin, Configuration } from 'webpack'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import MiniCssExtractPlugin, { loader as _loader } from 'mini-css-extract-plugin'
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
+import GoogleFontsPlugin from 'google-fonts-plugin'
 
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-require('dotenv').config()
-const uuidv4 = require('uuid/v4')
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 
-const ProcessUtils = require('./core/processUtils')
+import { config as dotEnvConfig } from "dotenv"
+import uuidv4 from 'uuid/v4'
 
-const buildReport = ProcessUtils.ENV.buildReport
+dotEnvConfig();
+import { ENV } from './core/processUtils'
 
-const lastCommit = ProcessUtils.ENV.sourceVersion
+const buildReport = ENV.buildReport
+
+const lastCommit = ENV.sourceVersion
 const versionString = lastCommit + '_' + new Date().toISOString()
 
 // ==== init plugins
@@ -24,15 +26,15 @@ const plugins = [
   new HtmlWebpackPlugin({
     template: './web-resources/index.html'
   }),
-  new webpack.DefinePlugin({
+  new DefinePlugin({
     __SYSTEM_VERSION__: `"${versionString}"`,
     __BUST__: `"${uuidv4()}"`,
     'process': {
       'env': {
-        'NODE_ENV': JSON.stringify(ProcessUtils.ENV.nodeEnv),
-        'COGNITO_REGION': JSON.stringify(ProcessUtils.ENV.cognitoRegion),
-        'COGNITO_USER_POOL_ID': JSON.stringify(ProcessUtils.ENV.cognitoUserPoolId),
-        'COGNITO_CLIENT_ID': JSON.stringify(ProcessUtils.ENV.cognitoClientId),
+        'NODE_ENV': JSON.stringify(ENV.nodeEnv),
+        'COGNITO_REGION': JSON.stringify(ENV.cognitoRegion),
+        'COGNITO_USER_POOL_ID': JSON.stringify(ENV.cognitoUserPoolId),
+        'COGNITO_CLIENT_ID': JSON.stringify(ENV.cognitoClientId),
       }
     }
   }),
@@ -51,25 +53,43 @@ if (buildReport) {
   plugins.push(new BundleAnalyzerPlugin())
 }
 
+let mode: "development" | "production" | "none" = 'development'
+if (ENV.nodeEnv === 'development' || ENV.nodeEnv === 'production' || ENV.nodeEnv === 'none') {
+  mode = ENV.nodeEnv
+} else {
+  throw new Error(`Unknown nodeEnv: ${ENV.nodeEnv}`)
+}
+
 // ====== webpack config
-const webPackConfig = {
-  entry: ['./webapp/main.js'],
-  mode: ProcessUtils.ENV.nodeEnv,
+const config: Configuration = {
+  entry: [ resolve(__dirname, './webapp/main.tsx') ],
+  mode,
+  resolve: {
+    modules: [
+      "node_modules",
+      // resolve(__dirname, "webapp")
+    ],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  },
   output: {
     filename: 'bundle-[hash].js',
-    path: path.resolve(__dirname, 'dist'),
+    path: resolve(__dirname, 'dist'),
     publicPath: '/'
   },
   module: {
     rules: [
-      {
-        test: /\.(js|jsx)$/,
+    {
+        test: /\.(ts|tsx|js|jsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/env', '@babel/react'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
+            presets: ['@babel/env', '@babel/react', '@babel/typescript'],
+            plugins: [
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-syntax-dynamic-import',
+              '@babel/plugin-proposal-class-properties'
+            ]
           }
         }
       },
@@ -77,7 +97,7 @@ const webPackConfig = {
         test: /\.(sa|sc|c)ss$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: _loader
           },
           'css-loader',
           'sass-loader',
@@ -85,30 +105,28 @@ const webPackConfig = {
       }
     ]
   },
-  plugins: plugins
+
+  // When importing a module whose path matches one of the following, just
+  // assume a corresponding global variable exists and use that instead.
+  // This is important because it allows us to avoid bundling all of our
+  // dependencies, which allows browsers to cache those libraries between builds.
+  externals: {
+    // "react": "React",
+    // "react-dom": "ReactDOM"
+  },
+
+  plugins,
+
+  devtool: 'source-map',
 }
 
 // if (prodBuild) {
 
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
-webpack.optimization = {
-  minimizer: [
-    new UglifyJsPlugin({
-      parallel: true,
-      uglifyOptions: {
-        compress: true,
-        output: { comments: false },
-      },
-      sourceMap: true
-    }),
-    new OptimizeCSSAssetsPlugin({})
-  ]
-}
 
 // }
 // else {
-webPackConfig.devtool = 'source-map'
 // }
 
-module.exports = webPackConfig
+export default config

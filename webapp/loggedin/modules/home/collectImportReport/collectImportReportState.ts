@@ -3,7 +3,7 @@ import * as HomeState from '../homeState'
 
 export const stateKey = 'collectImportReport'
 
-export const getState = R.pipe(HomeState.getState, R.prop(stateKey))
+export const getState: (x: any) => any = R.pipe(HomeState.getState, R.prop(stateKey))
 
 export const updateItem = item =>
   items => {

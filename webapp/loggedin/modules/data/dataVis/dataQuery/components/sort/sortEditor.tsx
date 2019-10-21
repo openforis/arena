@@ -4,17 +4,17 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import Expression from '../../../../../../../../core/exprParser/expression'
-import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
+import DataSort from '../../../../../../../../common/surveyRdb/dataSort'
 
 import Popup from '../../../../../../../commonComponents/popup'
-import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
+import ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
 import { useI18n, usePrevious } from '../../../../../../../commonComponents/hooks'
 
 import SortRow from './sortRow'
 
 import Survey from '../../../../../../../../core/survey/survey'
 
-import * as SurveyState from '../../../../../../../survey/surveyState'
+import SurveyState from '../../../../../../../survey/surveyState'
 
 const SortExpressionComponent = props => {
 
@@ -42,7 +42,7 @@ const SortExpressionComponent = props => {
   }
 
   const refreshUnchosenVariables = () => {
-    const availableVariables = getAvailableVariables(props, lang)
+    const availableVariables = getAvailableVariables()
     setUnchosenVariables(DataSort.getUnchosenVariables(availableVariables)(sortCriteria))
   }
 
@@ -73,7 +73,7 @@ const SortExpressionComponent = props => {
     applyAndClose([])
   }
 
-  const getAvailableVariables = () => {
+  const getAvailableVariables: () => any[] = () => {
     const {
       survey,
       nodeDefUuidCols,

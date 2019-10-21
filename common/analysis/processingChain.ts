@@ -1,11 +1,9 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../../core/objectUtils')
-const DateUtils = require('../../core/dateUtils')
-const { uuidv4 } = require('../../core/uuid')
-
-const ProcessingStep = require('./processingStep')
-const ProcessingStepCalculation = require('./processingStepCalculation')
+import * as R from 'ramda';
+import ObjectUtils from '../../core/objectUtils';
+import DateUtils from '../../core/dateUtils';
+import { uuidv4 } from '../../core/uuid';
+import ProcessingStep from './processingStep';
+import { IProcessingStepCalculation, IProcessingStep, IProcessingChainProps, IProcessingChain, IProcessingStepProps } from './common';
 
 const keys = {
   cycle: ObjectUtils.keys.cycle,
@@ -30,26 +28,28 @@ const statusExec = {
 }
 
 // ====== CREATE
-
-const newProcessingChain = (cycle, props = {}) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.cycle]: cycle,
-  [keys.props]: props,
+const newProcessingChain: (cycle: string, props?: IProcessingChainProps) => IProcessingChain
+= (cycle, props = {}) => ({
+  uuid: uuidv4(),
+  cycle,
+  props,
 })
 
-const newProcessingStep = (processingChain, props = {}) => ({
-  [ProcessingStep.keys.uuid]: uuidv4(),
-  [ProcessingStep.keys.processingChainUuid]: getUuid(processingChain),
-  [ProcessingStep.keys.index]: getProcessingSteps(processingChain).length,
-  [ProcessingStep.keys.props]: props,
+const newProcessingStep: (processingChain: IProcessingChain, props?: IProcessingStepProps) => IProcessingStep
+= (processingChain, props = {}) => ({
+  uuid: uuidv4(),
+  processingChainUuid: getUuid(processingChain),
+  index: getProcessingSteps(processingChain).length,
+  props: props,
 })
 
-const newProcessingStepCalculation = (processingStep, nodeDefUuid, props = {}) => ({
-  [ProcessingStepCalculation.keys.uuid]: uuidv4(),
-  [ProcessingStepCalculation.keys.processingStepUuid]: ProcessingStep.getUuid(processingStep),
-  [ProcessingStepCalculation.keys.index]: ProcessingStep.getCalculationSteps(processingStep).length,
-  [ProcessingStepCalculation.keys.nodeDefUuid]: nodeDefUuid,
-  [ProcessingStepCalculation.keys.props]: props,
+const newProcessingStepCalculation: (processingStep: IProcessingStep, nodeDefUuid: string, props?: IProcessingStepProps) => IProcessingStepCalculation
+= (processingStep, nodeDefUuid, props = {}) => ({
+  uuid: uuidv4(),
+  processingStepUuid: ProcessingStep.getUuid(processingStep),
+  index: ProcessingStep.getCalculationSteps(processingStep).length,
+  nodeDefUuid,
+  props,
 })
 
 // ====== READ
@@ -59,8 +59,8 @@ const getCycle = ObjectUtils.getCycle
 const getDateCreated = ObjectUtils.getDateCreated
 const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 const getDateModified = ObjectUtils.getDateModified
-const getProcessingSteps = R.propOr([], keys.processingSteps)
-const getStatusExec = R.propOr(null, keys.statusExec)
+const getProcessingSteps: <O>(obj: O) => unknown[] = R.propOr([], keys.processingSteps)
+const getStatusExec: (x: any) => string | null = R.propOr(null, keys.statusExec)
 
 // ====== CHECK
 
@@ -78,7 +78,13 @@ const assocProcessingStep = step => chain => R.pipe(
   steps => R.assoc(keys.processingSteps, steps, chain)
 )(chain)
 
-module.exports = {
+const getDescriptions = ObjectUtils.getDescriptions
+const getDescription = ObjectUtils.getDescription
+const getLabels = ObjectUtils.getLabels
+const getLabel = ObjectUtils.getLabel
+const assocProp = ObjectUtils.setProp
+
+export default {
   statusExec,
   keysProps,
 
@@ -92,10 +98,10 @@ module.exports = {
   getDateCreated,
   getDateExecuted,
   getDateModified,
-  getDescriptions: ObjectUtils.getDescriptions,
-  getDescription: ObjectUtils.getDescription,
-  getLabels: ObjectUtils.getLabels,
-  getLabel: ObjectUtils.getLabel,
+  getDescriptions,
+  getDescription,
+  getLabels,
+  getLabel,
   getProcessingSteps,
   getStatusExec,
   getUuid,
@@ -104,6 +110,6 @@ module.exports = {
   isDraft,
 
   //UPDATE
-  assocProp: ObjectUtils.setProp,
+  assocProp,
   assocProcessingStep,
-}
+};

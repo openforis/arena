@@ -1,16 +1,14 @@
-const fs = require('fs')
-const path = require('path')
-const R = require('ramda')
-
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
-const ProcessingStep = require('../../../../../common/analysis/processingStep')
-
-const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
+import fs from 'fs';
+import path from 'path';
+import * as R from 'ramda';
+import Survey from '../../../../../core/survey/survey';
+import NodeDef from '../../../../../core/survey/nodeDef';
+import ProcessingStep from '../../../../../common/analysis/processingStep';
+import SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager';
 
 const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
 
-  const nodeDefUuidCols = []
+  const nodeDefUuidCols: string[] = []
 
   Survey.visitAncestorsAndSelf(
     nodeDef,
@@ -18,10 +16,10 @@ const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
       const nodeDefChildren = Survey.getNodeDefChildren(nodeDefCurrent)(survey)
       const nodeDefChildrenUuidCols = nodeDefChildren.reduce(
         (uuidsAcc, nodeDef) => NodeDef.isSingleAttribute(nodeDef)
-          ? R.append(NodeDef.getUuid(nodeDef), uuidsAcc)
+          ? R.append(NodeDef.getUuid(nodeDef) as string, uuidsAcc) // TODO handle nulls from getUuid
           : uuidsAcc
         ,
-        []
+        [] as string[]
       )
       nodeDefUuidCols.push(...nodeDefChildrenUuidCols)
     }
@@ -52,6 +50,6 @@ const generateScript = async (survey, cycle, processingStep, outputDir) => {
 
 }
 
-module.exports = {
+export default {
   generateScript
-}
+};

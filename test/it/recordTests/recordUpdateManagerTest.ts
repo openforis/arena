@@ -1,21 +1,15 @@
-const { expect } = require('chai')
-
-const R = require('ramda')
-
-const db = require('../../../server/db/db')
-
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const NodeDefExpression = require('../../../core/survey/nodeDefExpression')
-const Record = require('../../../core/record/record')
-const Node = require('../../../core/record/node')
-
-const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
-const RecordManager = require('../../../server/modules/record/manager/recordManager')
-
-const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
-
-const RecordUtils = require('../utils/recordUtils')
+import { expect } from 'chai';
+import * as R from 'ramda';
+import db from '../../../server/db/db';
+import Survey from '../../../core/survey/survey';
+import NodeDef from '../../../core/survey/nodeDef';
+import NodeDefExpression from '../../../core/survey/nodeDefExpression';
+import Record from '../../../core/record/record';
+import Node from '../../../core/record/node';
+import NodeDefRepository from '../../../server/modules/nodeDef/repository/nodeDefRepository';
+import RecordManager from '../../../server/modules/record/manager/recordManager';
+import { getContextUser, fetchFullContextSurvey } from '../../testContext';
+import RecordUtils from '../utils/recordUtils';
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
@@ -74,8 +68,8 @@ const defaultValueAppliedTest = async () => {
 //==== helper methods
 const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
 
-module.exports = {
+export default {
   recordCreationTest,
   defaultValueAppliedTest
-}
+};
 

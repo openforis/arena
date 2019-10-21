@@ -1,6 +1,6 @@
-const R = require('ramda')
-
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import ObjectUtils from '../objectUtils';
+import { SurveyCycleKey } from './_survey/surveyInfo';
 
 const keys = {
   layout: 'layout',
@@ -30,18 +30,20 @@ const displayIn = {
 }
 
 // ====== CREATE
+export interface ILayout { [cycleKey: string]: any; }
 
-const newLayout = (cycle, renderType, pageUuid = null) => R.pipe(
+const newLayout: (cycle: SurveyCycleKey, renderType: any, pageUuid?: string) => ILayout
+= (cycle, renderType, pageUuid = null) => R.pipe(
   R.assocPath([cycle, keys.renderType], renderType),
   R.when(
-    R.always(pageUuid),
+    _ => !!pageUuid,
     R.assocPath([cycle, keys.pageUuid], pageUuid)
   )
 )({})
 
 // ====== READ
 
-const getLayout = ObjectUtils.getProp(keys.layout, {})
+const getLayout: (x: any) => ILayout = ObjectUtils.getProp(keys.layout, {})
 
 const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(
   getLayout,
@@ -81,11 +83,11 @@ const isDisplayInParentPage = cycle => R.pipe(
 )
 // ====== UTILS
 
-const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))
+const rejectNodeDefsWithPage: (cycle: SurveyCycleKey) => (x: any[]) => any[] = cycle => R.reject(hasPage(cycle))
 
-const filterNodeDefsWithPage = cycle => R.filter(hasPage(cycle))
+const filterNodeDefsWithPage: (cycle: SurveyCycleKey) => (x: any[]) => any[] = cycle => R.filter(hasPage(cycle))
 
-module.exports = {
+export default {
   keys,
   renderType,
   displayIn,
@@ -112,4 +114,4 @@ module.exports = {
   //UTILS
   rejectNodeDefsWithPage,
   filterNodeDefsWithPage,
-}
+};

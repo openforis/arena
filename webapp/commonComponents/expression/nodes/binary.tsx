@@ -3,11 +3,10 @@ import * as R from 'ramda'
 
 import Expression from '../../../../core/exprParser/expression'
 
-import BinaryOperand, { BinaryOperandType } from './binaryOperand'
-import EditButtons from './editButtons'
 import Dropdown from '../../form/dropdown'
+import { BinaryOperandType, BinaryOperand, EditButtons } from './internal'
 
-const Binary = (props) => {
+export const Binary = (props) => {
   const {
     node, onChange,
     canDelete = false, onDelete,

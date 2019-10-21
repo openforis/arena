@@ -11,7 +11,7 @@ import AttributesSelector from './components/attributesSelector'
 
 import Survey from '../../../../core/survey/survey'
 import NodeDef from '../../../../core/survey/nodeDef'
-import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
+import {NodeDefUIProps} from '../surveyForm/nodeDefs'
 
 import * as SurveyState from '../../../survey/surveyState'
 
@@ -73,7 +73,7 @@ const NodeDefsSelectorView = props => {
                               const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
                               setFilterTypes(fn(filterTypes))
                             }}>
-                    {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}</button>
+                    {NodeDefUIProps.getIconByType(type)} {i18n.t(type)}</button>
                   : null
               )
             }

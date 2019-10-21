@@ -13,7 +13,7 @@ import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
-import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
+import {NodeDefSwitch} from './nodeDefs'
 import { useOnUpdate } from '../../../commonComponents/hooks'
 
 import * as AppState from '../../../app/appState'
@@ -74,8 +74,9 @@ const SurveyFormView = (props) => {
     }
   }, [])
 
-  return nodeDef
-    ? (
+  if (!nodeDef) return null
+
+  return (
       <div>
 
         {
@@ -127,7 +128,6 @@ const SurveyFormView = (props) => {
 
       </div>
     )
-    : null
 
 }
 
@@ -168,10 +168,8 @@ const mapStateToProps = (state, props) => {
     hasNodeDefAddChildTo,
     showPageNavigation,
     isSideBarOpened,
-    ...props.entry
-      ? mapEntryProps()
-      : {},
-  }
+    ...((props.entry ? mapEntryProps() : {})),
+  };
 
 }
 

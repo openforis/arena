@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 
 import NodeDef from '../../../../../core/survey/nodeDef'
 import { elementOffset } from '../../../../utils/domUtils'
+import ResizeObserver from '../../../../utils/polyfill/resizeObserver'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 
@@ -15,6 +16,16 @@ const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
 
 export default class SurveyHierarchyTree {
+	public nodesByUuidMap: any;
+	public lang: any;
+	public data: any;
+	public domElement: any;
+	public onEntityClick: any;
+	public svg: any;
+	public tree: any;
+	public root: any;
+	public rootG: any;
+	public resizeObserver?: ResizeObserver;
 
   constructor (domElement, data, lang, onEntityClick) {
     this.nodesByUuidMap = {}
@@ -31,7 +42,6 @@ export default class SurveyHierarchyTree {
     this.root = null
 
     this.rootG = null
-    this.resizeObserver = null
 
     this.initSvg()
   }
@@ -145,7 +155,7 @@ export default class SurveyHierarchyTree {
   }
 
   disconnect () {
-    this.resizeObserver.disconnect()
+    if (this.resizeObserver) this.resizeObserver.disconnect()
   }
 
   updateNodes (treeData, source) {

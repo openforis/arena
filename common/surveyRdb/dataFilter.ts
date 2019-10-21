@@ -1,4 +1,4 @@
-const { types } = require('../../core/exprParser/expression')
+import { types } from '../../core/exprParser/expression';
 
 const js2sqlOperators = {
   '&&': 'AND',
@@ -74,13 +74,11 @@ const converters = {
 
 const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
-const getWherePreparedStatement = expr => {
+export const getWherePreparedStatement = expr => {
   const prepStatement = toPreparedStatement(expr, [])
   const params = prepStatement.paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
   return { clause: prepStatement.clause, params }
 }
 
-module.exports = {
-  getWherePreparedStatement,
-}
+export default { getWherePreparedStatement }

@@ -46,10 +46,16 @@ const TableHeader = props => {
     updateTableSort,
   } = props
 
-  const csvDownloadLink = `/api/surveyRdb/${surveyId}/${nodeDefUuidContext}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&nodeDefUuidCols=${JSON.stringify(nodeDefUuidCols)}&cycle=${surveyCycleKey}`
+  const csvDownloadLink = `/api/surveyRdb/${surveyId}/${nodeDefUuidContext}/export`
+  + `?filter=${JSON.stringify(filter)}`
+  + `&sort=${DataSort.toHttpParams(sort)}`
+  + `&nodeDefUuidCols=${JSON.stringify(nodeDefUuidCols)}`
+  + `&cycle=${surveyCycleKey}`
 
   const i18n = useI18n()
-  const sortMsg = DataSort.getViewExpr(i18n.t('dataView.dataVis.dataSort.ascending'), i18n.t('dataView.dataVis.dataSort.descending'))(sort)
+  const sortMsg = DataSort.getViewExpr(
+    i18n.t('dataView.dataVis.dataSort.ascending'),
+    i18n.t('dataView.dataVis.dataSort.descending'))(sort)
 
   return (
     <div className="table__header">
@@ -61,7 +67,8 @@ const TableHeader = props => {
           <span className="icon icon-list icon-14px"/>
         </button>
 
-        <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
+        <Tooltip messages={filter `
+        + `&& [Expression.toString(filter, Expression.modes.sql)]}>
           <button className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
                   onClick={toggleExpressionEditor}>
             <span className="icon icon-filter icon-14px"/>

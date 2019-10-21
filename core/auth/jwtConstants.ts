@@ -1,5 +1,5 @@
-const bearer = 'Bearer '
+export const bearer = 'Bearer '
 
-module.exports = {
+export default {
   bearer
-}
+};

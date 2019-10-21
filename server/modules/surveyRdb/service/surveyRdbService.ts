@@ -1,7 +1,6 @@
-const Survey = require('../../../../core/survey/survey')
-
-const SurveyManager = require('../../survey/manager/surveyManager')
-const SurveyRdbManager = require('../manager/surveyRdbManager')
+import Survey from '../../../../core/survey/survey';
+import SurveyManager from '../../survey/manager/surveyManager';
+import SurveyRdbManager from '../manager/surveyRdbManager';
 
 const _fetchSurvey = async (surveyId, cycle) => {
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId, true))
@@ -23,7 +22,7 @@ const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {
   return await SurveyRdbManager.countTable(survey, cycle, nodeDefUuidTable, filter)
 }
 
-module.exports = {
+export default {
   queryTable,
   countTable,
-}
+};

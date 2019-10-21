@@ -1,8 +1,7 @@
-const R = require('ramda')
-
-const Validation = require('../validation/validation')
-const Node = require('./node')
-const NodeDef = require('../survey/nodeDef')
+import * as R from 'ramda';
+import Validation from '../validation/validation';
+import Node from './node';
+import NodeDef from '../survey/nodeDef';
 
 const keys = {
   recordKeys: 'recordKeys',
@@ -24,11 +23,11 @@ const getNodeValidation = node =>
     Validation.dissocFieldValidation(keys.childrenCount)
   )
 
-module.exports = {
+export default {
   keys,
 
   // READ
   getNodeValidation,
 
   getValidationChildrenCount,
-}
+};

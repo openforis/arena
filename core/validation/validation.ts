@@ -1,7 +1,6 @@
-const R = require('ramda')
-
-const ValidatorErrorKeys = require('./_validator/validatorErrorKeys')
-const ObjectUtils = require('../objectUtils')
+import * as R from 'ramda';
+import ValidatorErrorKeys from './_validator/validatorErrorKeys';
+import ObjectUtils from '../objectUtils';
 
 // const objectInvalid = {
 //   [keys.valid]: false,
@@ -72,11 +71,11 @@ const recalculateValidity = validation => R.pipe(
   }
 )(validation)
 
-const updateCounts = validation => {
+const updateCounts = (validation: any) => {
   let totalErrors = 0
   let totalWarnings = 0
 
-  const stack = []
+  const stack: any[] = []
   stack.push(validation)
 
   while (!R.isEmpty(stack)) {
@@ -110,23 +109,37 @@ const updateCounts = validation => {
 }
 
 //====== CREATE
+export interface IValidationError {
+  key: string;
+  params?: {}; // ?
+}
+export interface IValidationInstance {
+  fields: {};
+  valid: boolean;
+  errors: IValidationError[]; // [ {key; params; }] ??
+  warnings: string[];
 
-const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
-  [keys.valid]: valid,
-  [keys.fields]: fields,
-  [keys.errors]: errors,
-  [keys.warnings]: warnings,
+  counts?: {}
+  validation?: {};
+}
+const newInstance: (valid?: boolean, fields?: {}, errors?: IValidationError[], warnings?: string[]) => IValidationInstance
+= (valid = true, fields = {}, errors = [], warnings = []) => ({
+  valid,
+  fields,
+  errors,
+  warnings,
 })
 
 //====== READ
+interface IFields {}
 
-const isValid = R.propOr(true, keys.valid)
-const getFieldValidations = R.propOr({}, keys.fields)
+const isValid: (x: any) => boolean = R.propOr(true, keys.valid)
+const getFieldValidations: (x: any) => IFields = R.propOr({}, keys.fields)
 const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
 
-const getErrors = R.propOr([], keys.errors)
+const getErrors: (x: any) => IValidationError[] = R.propOr([], keys.errors)
 const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
-const getWarnings = R.propOr([], keys.warnings)
+const getWarnings: (x: any) => string[] = R.propOr([], keys.warnings)
 const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
 const hasWarningsInFields = R.pipe(getFieldValidations, R.values, R.any(hasWarnings))
 const isWarning = validation => hasWarnings(validation) || hasWarningsInFields(validation)
@@ -166,7 +179,7 @@ const getValidation = R.propOr(newInstance(), keys.validation)
 const isObjValid = R.pipe(getValidation, isValid)
 const assocValidation = R.assoc(keys.validation)
 
-module.exports = {
+export default {
   keys,
 
   messageKeys: ValidatorErrorKeys,
@@ -200,4 +213,4 @@ module.exports = {
   getValidation,
   isObjValid,
   assocValidation,
-}
+};

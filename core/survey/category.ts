@@ -1,12 +1,9 @@
-const R = require('ramda')
-const { uuidv4 } = require('../uuid')
-
-const ObjectUtils = require('../objectUtils')
-
-const Validation = require('../validation/validation')
-
-const CategoryLevel = require('./categoryLevel')
-const CategoryItem = require('./categoryItem')
+import * as R from 'ramda';
+import { uuidv4 } from '../uuid';
+import ObjectUtils from '../objectUtils';
+import Validation from '../validation/validation';
+import CategoryLevel from './categoryLevel';
+import CategoryItem from './categoryItem';
 
 const keys = {
   uuid: 'uuid',
@@ -31,14 +28,26 @@ const itemExtraDefDataTypes = {
  * CATEGORY
  */
 // ====== CREATE
-const newCategory = (props = {}) => {
+export interface ICategoryProps {}
+export interface ICategory {
+  uuid: string;
+  levels?: ICategoryLevel[];
+  props: ICategoryProps;
+  items?: any[];
+  published?: boolean;
+
+  parentUuid?: string; // TODO can this really exist here??
+}
+const newCategory: (props?: ICategoryProps) => ICategory
+= (props = {}) => {
   const category = {
-    [keys.uuid]: uuidv4(),
+    uuid: uuidv4(),
     props,
   }
   return {
-    ...category,
-    [keys.levels]: [newLevel(category)]
+    uuid: category.uuid,
+    props,
+    levels: [newLevel(category)]
   }
 }
 
@@ -46,35 +55,43 @@ const newCategory = (props = {}) => {
  * LEVELS
  */
 // ==== CREATE
-const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
-  [CategoryLevel.keys.uuid]: uuidv4(),
-  [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
-  [CategoryLevel.keys.index]: index,
-  [CategoryLevel.keys.props]: {
-    [CategoryLevel.keysProps.name]: 'level_' + (index + 1),
+export interface ICategoryLevelProps { name: string; }
+export interface ICategoryLevel {
+  uuid: string;
+  categoryUuid: string;
+  index: number;
+  props: ICategoryLevelProps;
+}
+const newLevel: (category: ICategory, props?: {}, index?: number) => ICategoryLevel
+= (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
+  uuid: uuidv4(),
+  categoryUuid: ObjectUtils.getUuid(category),
+  index,
+  props: {
+    name: `level_${index + 1}`,
     ...props
   }
 })
 
 // ====== READ
-const getLevels = R.propOr([], keys.levels)
+const getLevels: (obj: any) => ICategoryLevel[] = R.propOr([], keys.levels)
 const getLevelsArray = R.pipe(
   getLevels,
   R.values,
   R.sortBy(R.prop('index'))
 )
 
-const getLevelByUuid = uuid => R.pipe(
+const getLevelByUuid = (uuid: string) => R.pipe(
   getLevelsArray,
   R.find(R.propEq('uuid', uuid)),
 )
-const getLevelByIndex = idx => R.path([keys.levels, idx])
+const getLevelByIndex = (idx: number) => R.path([keys.levels, idx])
 
 // ====== UPDATE
-const assocLevelsArray = array => R.assoc(keys.levels, ObjectUtils.toIndexedObj(array, 'index'))
+const assocLevelsArray = (array: unknown[]) => R.assoc(keys.levels, ObjectUtils.toIndexedObj(array, 'index'))
 
-const assocLevel = level =>
-  category =>
+const assocLevel = (level: any) =>
+  (category: any) =>
     R.pipe(
       getLevelsArray,
       R.append(level),
@@ -84,18 +101,18 @@ const assocLevel = level =>
 /**
  * ITEMS
  */
-const getItemLevelIndex = item =>
-  category => R.pipe(
+const getItemLevelIndex = (item: any) =>
+  (  category: any) => R.pipe(
     CategoryItem.getLevelUuid,
     levelUuid => getLevelByUuid(levelUuid)(category),
     CategoryLevel.getIndex,
   )(item)
 
-const isItemLeaf = item =>
-  category =>
+const isItemLeaf = (item: any) =>
+  (  category: any) =>
     getItemLevelIndex(item)(category) === getLevelsArray(category).length - 1
 
-const getItemValidation = item => R.pipe(
+const getItemValidation = (item: any) => R.pipe(
   Validation.getValidation,
   Validation.getFieldValidation(keys.items),
   Validation.getFieldValidation(CategoryItem.getUuid(item)),
@@ -104,7 +121,7 @@ const getItemValidation = item => R.pipe(
 // ======= UPDATE
 
 // UTILS
-const isLevelDeleteAllowed = level => R.pipe(
+const isLevelDeleteAllowed = (level: ICategoryLevel) => R.pipe(
   getLevelsArray,
   R.length,
   levelsCount => R.and(
@@ -113,7 +130,7 @@ const isLevelDeleteAllowed = level => R.pipe(
   )
 )
 
-module.exports = {
+export default {
   props,
   keys,
   itemExtraDefDataTypes,
@@ -138,13 +155,13 @@ module.exports = {
   newLevel,
 
   //READ
-  getLevelValidation: levelIndex => R.pipe(
+  getLevelValidation: (levelIndex: any) => R.pipe(
     Validation.getValidation,
     Validation.getFieldValidation(keys.levels),
     Validation.getFieldValidation(levelIndex),
   ),
   //UPDATE
-  assocLevelName: name => ObjectUtils.setProp(CategoryLevel.keysProps.name, name),
+  assocLevelName: (name: any) => ObjectUtils.setProp(CategoryLevel.keysProps.name, name),
 
   // ====== ITEMS
 
@@ -153,8 +170,8 @@ module.exports = {
 
   // ====== ITEMS extra def
   getItemExtraDef: ObjectUtils.getProp(props.itemExtraDef, {}),
-  assocItemExtraDef: extraDef => ObjectUtils.setProp(props.itemExtraDef, extraDef),
+  assocItemExtraDef: (extraDef: any) => ObjectUtils.setProp(props.itemExtraDef, extraDef),
 
   //UTILS
   isLevelDeleteAllowed,
-}
+};

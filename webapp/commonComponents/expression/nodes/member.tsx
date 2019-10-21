@@ -2,9 +2,9 @@ import React from 'react'
 
 import Expression from '../../../../core/exprParser/expression'
 
-import Identifier from './identifier'
+import { Identifier } from './internal'
 
-const Member = ({ node, variables, onChange }) => {
+export const Member = ({ node, variables, onChange }) => {
 
   const nodeIdentifier = {
     type: Expression.types.Identifier,

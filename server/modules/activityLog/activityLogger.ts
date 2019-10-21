@@ -1,8 +1,7 @@
-const db = require('../../db/db')
-
-const { getSurveyDBSchema } = require('../survey/repository/surveySchemaRepositoryUtils')
-
-const User = require('../../../core/user/user')
+import db from '../../db/db';
+import { getSurveyDBSchema } from '../survey/repository/surveySchemaRepositoryUtils';
+import User from '../../../core/user/user';
+import { SurveyId } from '../../../core/survey/_survey/surveyInfo';
 
 const type = {
   //survey
@@ -59,21 +58,21 @@ const keys = {
   params: 'params'
 }
 
-const log = async (user, surveyId, type, params, client) =>
+const log = async (user, surveyId: SurveyId, type, params, client) =>
   client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, params)
     VALUES ($1, $2, $3::jsonb)`,
     [type, User.getUuid(user), params])
 
-const logMany = async (user, surveyId, activities, client) =>
+const logMany = async (user, surveyId: SurveyId, activities, client) =>
   await client.batch([
     activities.map(activity => log(user, surveyId, activity.type, activity.params, client))
   ])
 
-const fetchLogs = async (surveyId, client = db) =>
+const fetchLogs = async (surveyId: SurveyId, client: any = db) =>
   await client.any(`SELECT * FROM ${getSurveyDBSchema(surveyId)}.activity_log`)
 
-module.exports = {
+export default {
   type,
   keys,
 
@@ -83,4 +82,4 @@ module.exports = {
 
   // READ
   fetchLogs
-}
+};

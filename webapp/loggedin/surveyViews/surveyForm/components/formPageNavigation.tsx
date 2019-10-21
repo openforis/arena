@@ -100,7 +100,7 @@ const mapStateToProps = (state, props) => {
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
 
     active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
-    enabled: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
+    enabled: edit || NodeDef.isRoot(nodeDef) || (rootNodeDef as any).id === nodeDef.parentId || parentNode,
   }
 }
 
