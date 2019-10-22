@@ -8,6 +8,7 @@ const keys = {
   recordSteps: 'recordSteps',
   all: 'all',
   own: 'own',
+  surveyId: 'surveyId',
   surveyUuid: 'surveyUuid',
   name: 'name',
 }
@@ -53,6 +54,8 @@ const getName = R.prop(keys.name)
 
 const getSurveyUuid = R.prop(keys.surveyUuid)
 
+const getSurveyId = R.prop(keys.surveyId)
+
 const isSystemAdminGroup = R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
@@ -67,6 +70,7 @@ module.exports = {
 
   getUuid,
   getName,
+  getSurveyId,
   getSurveyUuid,
   isSystemAdminGroup,
   isEqual: ObjectUtils.isEqual,

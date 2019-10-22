@@ -47,7 +47,7 @@ export const acceptInvitation = (name, password) => _createAction(
 
     if (responseType === CognitoAuth.keysAction.success) {
       const cognitoUser = CognitoAuth.getUser()
-      await axios.put(`/api/user/${cognitoUser.username}/name`, { name })
+      await axios.put(`/api/user/${cognitoUser.username}/accept-invitation`, { name })
       dispatch(setEmail(''))
       dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
       dispatch(initUser())

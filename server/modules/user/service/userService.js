@@ -126,15 +126,16 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
   return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 
-const updateUsername = async (user, userUuid, name) => {
+const acceptInvitation = async (user, userUuid, name, client = db) => {
   // For now a user can change only his own name
-  if (User.getUuid(user) !== userUuid) {
+  if (User.getUuid(user) !== userUuid)
     throw new UnauthorizedError(User.getName(user))
-  }
 
-  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-  await aws.updateUser(User.getEmail(userToUpdate), null, name)
-  await UserManager.updateUsername(user, name)
+  await client.tx(async t => {
+    const userUpdated = await UserManager.updateUsername(user, name, t)
+    // update user name in aws
+    await aws.updateUser(User.getEmail(userUpdated), null, name)
+  })
 }
 
 module.exports = {
@@ -150,7 +151,7 @@ module.exports = {
 
   // UPDATE
   updateUser,
-  updateUsername,
+  acceptInvitation,
 
   // DELETE
   deleteUser: UserManager.deleteUser,

@@ -90,12 +90,12 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/user/:userUuid/name', async (req, res, next) => {
+  app.put('/user/:userUuid/accept-invitation', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { userUuid, name } = Request.getParams(req)
 
-      await UserService.updateUsername(user, userUuid, name)
+      await UserService.acceptInvitation(user, userUuid, name)
 
       Response.sendOk(res)
     } catch (err) {

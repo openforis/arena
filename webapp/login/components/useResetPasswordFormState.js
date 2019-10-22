@@ -34,11 +34,11 @@ export const useResetPasswordFormState = props => {
   }
 
   return {
-    password: password,
+    password,
     setPassword: password => setObjectField('password', password),
-    passwordConfirm: passwordConfirm,
+    passwordConfirm,
     setPasswordConfirm: password => setObjectField('passwordConfirm', password),
-    verificationCode: verificationCode,
+    verificationCode,
     setVerificationCode: verificationCode => setObjectField('verificationCode', verificationCode),
     onClickReset,
   }
