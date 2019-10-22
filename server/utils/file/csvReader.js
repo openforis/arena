@@ -16,27 +16,25 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
     let processingRow = false //prevents the call to processNext when a row is already being processed
 
     const processNext = () => {
-      if (queue.isEmpty()) {
-        if (ended)
-          resolve()
-      } else if (!canceled) {
-        if (onRow) {
-          processingRow = true
-          onRow(queue.dequeue())
-            .then(() => {
-              processNext()
-            })
-            .catch(e => {
+      (async () => {
+        if (queue.isEmpty()) {
+          if (ended)
+            resolve()
+        } else if (!canceled) {
+          if (onRow) {
+            processingRow = true
+            try {
+              await onRow(queue.dequeue())
+              processingRow = false
+            } catch (e) {
               cancel()
               reject(e)
-            })
-            .finally(() => {
-              processingRow = false
-            })
-        } else {
+              return
+            }
+          }
           processNext()
         }
-      }
+      })()
     }
 
     const onData = data => {
