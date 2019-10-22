@@ -102,10 +102,8 @@ class TaxonomiesImportJob extends Job {
   }
 
   async onRow (speciesFileName, taxonomyUuid, row, tx) {
-    const rowIndexed = ObjectUtils.indexByProps(this.headers)(row)
-
-    if (this.validateRow(speciesFileName, rowIndexed)) {
-      const { code, family, scientific_name: scientificName } = rowIndexed
+    if (this.validateRow(speciesFileName, row)) {
+      const { code, family, scientific_name: scientificName } = row
 
       const genus = R.pipe(R.split(' '), R.head)(scientificName)
       const vernacularNames = R.reduce((acc, lang) => {

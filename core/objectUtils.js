@@ -94,13 +94,6 @@ const toIndexedObj = (array, prop) => array.reduce(
 
 const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
-const indexByProps = props => array => props.reduce((acc, item, index) => {
-    acc[item] = array[index]
-    return acc
-  },
-  {}
-)
-
 module.exports = {
   keys,
   keysProps,
@@ -129,5 +122,4 @@ module.exports = {
   isEqual,
   toIndexedObj,
   toUuidIndexedObj,
-  indexByProps,
 }

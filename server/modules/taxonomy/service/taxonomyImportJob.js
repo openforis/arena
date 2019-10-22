@@ -134,8 +134,7 @@ class TaxonomyImportJob extends Job {
     }
   }
 
-  async _parseTaxon (row) {
-    const data = ObjectUtils.indexByProps(this.headers)(row)
+  async _parseTaxon (data) {
     const { family, genus, scientific_name, code, ...vernacularNames } = data
 
     const taxon = Taxon.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this._parseVernacularNames(vernacularNames))

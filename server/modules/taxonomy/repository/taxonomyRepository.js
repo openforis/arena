@@ -100,6 +100,42 @@ const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, cl
     r => parseInt(r.count)
   )
 
+const fetchTaxaWithVernacularNamesStream = async(surveyId, taxonomyUuid, vernacularLangCodes, draft = false, client = db) => {
+  const vernacularNamesSubSelects = R.pipe(
+    R.map(langCode =>
+      `(
+          SELECT
+              (vn.props || vn.props_draft)->>'${TaxonVernacularName.keysProps.name}'
+          FROM
+               ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+          WHERE
+              vn.taxon_uuid = t.uuid
+          AND (vn.props || vn.props_draft)->>'${TaxonVernacularName.keysProps.lang}' = '${langCode}' 
+       ) AS ${langCode}`
+    ),
+    R.join(', ')
+  )(vernacularLangCodes)
+
+  const propsFields = R.pipe(
+    R.map(prop => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
+    R.join(', ')
+  )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
+
+  const select =
+    `SELECT
+          t.id, t.uuid, 
+          ${propsFields}
+          ${R.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
+      FROM
+          ${getSurveyDBSchema(surveyId)}.taxon t
+      WHERE
+          t.taxonomy_uuid = $1
+      ORDER BY
+          (t.props || t.props_draft)->>'${Taxon.propKeys.scientificName}'`
+
+  return new DbUtils.QueryStream(DbUtils.formatQuery(select, [taxonomyUuid]))
+}
+
 const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, vernacularLangCodes, draft = false, limit = null, offset = 0, queryStream = false, client = db) => {
   const vernacularNamesSubSelects = R.pipe(
     R.map(langCode =>
@@ -327,6 +363,7 @@ module.exports = {
   findTaxaByVernacularName,
 
   fetchTaxaWithVernacularNames,
+  fetchTaxaWithVernacularNamesStream,
 
   // taxon
   fetchTaxonByUuid,
