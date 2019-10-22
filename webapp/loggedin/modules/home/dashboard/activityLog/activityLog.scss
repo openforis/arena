@@ -21,3 +21,42 @@
   text-transform: uppercase;
   font-weight: 600;
 }
+
+.activity-log__content {
+  margin-top: 45px;
+  padding: 10px 0;
+  height: calc(100% - 45px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.activity-log__content-item {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  align-items: center;
+  font-size: .9rem;
+  grid-column-gap: 20px;
+
+  .activity {
+    display: flex;
+    align-items: center;
+
+    .profile-picture-thumbnail {
+      margin: 0 5px;
+    }
+  }
+
+  .date {
+    justify-self: right;
+    padding-right: 5px;
+    color: $blueDark;
+    font-size: .8rem;
+  }
+}
+
+.activity-log__content-item-sep {
+  width: 70%;
+  height: 1px;
+  margin: 8px 15%;
+  border-bottom: 1px dotted $greyBorder;
+}
