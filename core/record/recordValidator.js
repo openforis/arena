@@ -1,4 +1,4 @@
-const Validation = require('../validation/validation')
+const Validation = require('@core/validation/validation')
 
 const CountValidator = require('./_recordValidator/countValidator')
 const AttributeValidator = require('./_recordValidator/attributeValidator')

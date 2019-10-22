@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const NodeDef = require('../nodeDef')
-const Validation = require('../../validation/validation')
+const Validation = require('@core/validation/validation')
 
 const keys = {
   nodeDefsValidation: 'nodeDefsValidation'

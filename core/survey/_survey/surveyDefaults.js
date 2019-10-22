@@ -1,4 +1,4 @@
-const AuthGroups = require('../../auth/authGroups')
+const AuthGroups = require('@core/auth/authGroups')
 
 const getDefaultAuthGroups = () => [
   {

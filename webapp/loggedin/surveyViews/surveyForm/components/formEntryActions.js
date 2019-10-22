@@ -2,12 +2,12 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import { useI18n } from '../../../../commonComponents/hooks'
-import ErrorBadge from '../../../../commonComponents/errorBadge'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
-import Record from '../../../../../core/record/record'
-import RecordStep from '../../../../../core/record/recordStep'
-import Validation from '../../../../../core/validation/validation'
+import Record from '@core/record/record'
+import RecordStep from '@core/record/recordStep'
+import Validation from '@core/validation/validation'
 
 import { deleteRecord, updateRecordStep } from '../../record/actions'
 import { appModuleUri, designerModules } from '../../../appModules'

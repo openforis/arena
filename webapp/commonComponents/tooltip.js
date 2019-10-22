@@ -4,7 +4,7 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import * as R from 'ramda'
 
-import { elementOffset } from '../utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 class Tooltip extends React.Component {
 

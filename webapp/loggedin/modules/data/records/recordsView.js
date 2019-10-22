@@ -3,19 +3,19 @@ import './recordsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Record from '../../../../../core/record/record'
+import Record from '@core/record/record'
 
 import TableView from '../../../tableViews/tableView'
 import RecordsHeaderLeft from './components/recordsHeaderLeft'
 import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
-import { useOnUpdate } from '../../../../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import { appModuleUri, dataModules } from '../../../appModules'
 
-import * as AppState from '../../../../app/appState'
+import * as AppState from '@webapp/app/appState'
 import * as RecordsState from './recordsState'
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { createRecord } from '../../../surveyViews/record/actions'
 import { reloadListItems } from '../../../tableViews/actions'

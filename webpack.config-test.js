@@ -21,6 +21,15 @@ module.exports = {
     __filename: true,
     __dirname: true
   },
+  resolve: {
+    alias: {
+      '@common': path.resolve(__dirname, 'common/'),
+      '@core': path.resolve(__dirname, 'core/'),
+      '@server': path.resolve(__dirname, 'server/'),
+      '@webapp': path.resolve(__dirname, 'webapp/'),
+      '@test': path.resolve(__dirname, 'test/'),
+    },
+  },
   module: {
     rules: [
       {

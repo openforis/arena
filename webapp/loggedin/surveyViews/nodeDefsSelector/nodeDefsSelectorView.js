@@ -4,16 +4,16 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import EntitySelector from './components/entitySelector'
 import AttributesSelector from './components/attributesSelector'
 
-import Survey from '../../../../core/survey/survey'
-import NodeDef from '../../../../core/survey/nodeDef'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const NodeDefsSelectorView = props => {
 

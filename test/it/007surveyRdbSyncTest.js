@@ -1,13 +1,13 @@
 const { expect } = require('chai')
 
-const db = require('../../server/db/db')
+const db = require('@server/db/db')
 
 const { getContextUser } = require('../testContext')
 
-const Survey = require('../../core/survey/survey')
-const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
+const Survey = require('@core/survey/survey')
+const SchemaRdb = require('@common/surveyRdb/schemaRdb')
 
-const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
+const SurveyManager = require('@server/modules/survey/manager/surveyManager')
 
 const SB = require('./utils/surveyBuilder')
 

@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { useI18n } from '../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Validation from '../../../../../core/validation/validation'
-import NodeDef from '../../../../../core/survey/nodeDef'
-import { FormItem } from '../../../../commonComponents/form/input'
-import Checkbox from '../../../../commonComponents/form/checkbox'
+import Validation from '@core/validation/validation'
+import NodeDef from '@core/survey/nodeDef'
+import { FormItem } from '@webapp/commonComponents/form/input'
+import Checkbox from '@webapp/commonComponents/form/checkbox'
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 
 const AdvancedProps = props => {

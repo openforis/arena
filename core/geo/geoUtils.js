@@ -19,9 +19,9 @@ const proj4 = require('proj4')
 const isValidCoordinates = require('is-valid-coordinates')
 
 const Srs = require('./srs')
-const ObjectUtils = require('../objectUtils')
-const NumberUtils = require('../numberUtils')
-const StringUtils = require('../stringUtils')
+const ObjectUtils = require('@core/objectUtils')
+const NumberUtils = require('@core/numberUtils')
+const StringUtils = require('@core/stringUtils')
 
 const invalidLonLatCoordinates = [0, 90] //proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 

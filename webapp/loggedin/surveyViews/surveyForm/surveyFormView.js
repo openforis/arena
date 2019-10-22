@@ -6,24 +6,24 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import Survey from '../../../../core/survey/survey'
-import Record from '../../../../core/record/record'
+import Survey from '@core/survey/survey'
+import Record from '@core/record/record'
 
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
-import { useOnUpdate } from '../../../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import * as SideBarState from '../../appSideBar/appSidebarState'
-import * as SurveyState from '../../../survey/surveyState'
+import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from '../record/recordState'
 
 import { setFormNodeDefAddChildTo, resetForm } from './actions'
 
-import { dispatchWindowResize } from '../../../utils/domUtils'
+import { dispatchWindowResize } from '@webapp/utils/domUtils'
 
 const SurveyFormView = (props) => {
 

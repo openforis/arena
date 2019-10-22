@@ -1,20 +1,20 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../../core/uuid'
+import { uuidv4 } from '@core/uuid'
 
-import { debounceAction } from '../../utils/reduxUtils'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import Survey from '../../../core/survey/survey'
-import NodeDef from '../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../core/survey/nodeDefLayout'
-import NodeDefValidations from '../../../core/survey/nodeDefValidations'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
+import NodeDefValidations from '@core/survey/nodeDefValidations'
 
-import * as AppState from '../../app/appState'
+import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '../surveyState'
 
-import { showNotification } from '../../app/appNotification/actions'
-import * as NotificationState from '../../app/appNotification/appNotificationState'
+import { showNotification } from '@webapp/app/appNotification/actions'
+import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'

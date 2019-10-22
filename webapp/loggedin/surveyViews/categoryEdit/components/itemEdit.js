@@ -1,15 +1,15 @@
 import React, { useEffect, useRef } from 'react'
 
 import LabelsEditor from '../../labelsEditor/labelsEditor'
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import ErrorBadge from '../../../../commonComponents/errorBadge'
-import { useI18n } from '../../../../commonComponents/hooks'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { normalizeName } from '../../../../../core/stringUtils'
+import { normalizeName } from '@core/stringUtils'
 
-import Category from '../../../../../core/survey/category'
-import CategoryItem from '../../../../../core/survey/categoryItem'
-import Validation from '../../../../../core/validation/validation'
+import Category from '@core/survey/category'
+import CategoryItem from '@core/survey/categoryItem'
+import Validation from '@core/validation/validation'
 
 const ItemEdit = (props) => {
 

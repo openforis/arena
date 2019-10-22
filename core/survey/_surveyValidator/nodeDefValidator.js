@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
+const Validator = require('@core/validation/validator')
+const Validation = require('@core/validation/validation')
 
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')

@@ -1,16 +1,16 @@
 import * as R from 'ramda'
 import axios from 'axios'
 
-import Survey from '../../../../core/survey/survey'
-import NodeDefLayout from '../../../../core/survey/nodeDefLayout'
-import Record from '../../../../core/record/record'
-import Node from '../../../../core/record/node'
-import NodeRefData from '../../../../core/record/nodeRefData'
+import Survey from '@core/survey/survey'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
+import Record from '@core/record/record'
+import Node from '@core/record/node'
+import NodeRefData from '@core/record/nodeRefData'
 
-import { debounceAction } from '../../../utils/reduxUtils'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import * as SurveyState from '../../../survey/surveyState'
-import * as AppState from '../../../app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
+import * as AppState from '@webapp/app/appState'
 import * as RecordState from './recordState'
 
 import {
@@ -18,8 +18,8 @@ import {
   hideAppLoader,
   showAppSaving,
   hideAppSaving
-} from '../../../app/actions'
-import { showNotification } from '../../../app/appNotification/actions'
+} from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
 

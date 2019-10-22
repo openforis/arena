@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import Survey from '../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
 import * as SurveyState from './surveyState'
 

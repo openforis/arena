@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const SurveyListRowHeader = () => {
   const i18n = useI18n()

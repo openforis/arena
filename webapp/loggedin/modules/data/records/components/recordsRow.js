@@ -2,16 +2,16 @@ import React from 'react'
 import camelize from 'camelize'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import ErrorBadge from '../../../../../commonComponents/errorBadge'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
-import Survey from '../../../../../../core/survey/survey'
-import NodeDef from '../../../../../../core/survey/nodeDef'
-import Record from '../../../../../../core/record/record'
-import Validation from '../../../../../../core/validation/validation'
-import Authorizer from '../../../../../../core/auth/authorizer'
-import Date from '../../../../../../core/dateUtils'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Record from '@core/record/record'
+import Validation from '@core/validation/validation'
+import Authorizer from '@core/auth/authorizer'
+import Date from '@core/dateUtils'
 
 const RecordsRow = props => {
   const {

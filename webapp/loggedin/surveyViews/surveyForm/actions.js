@@ -1,9 +1,9 @@
-import Survey from '../../../../core/survey/survey'
-import NodeDef from '../../../../core/survey/nodeDef'
-import Record from '../../../../core/record/record'
-import Node from '../../../../core/record/node'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Record from '@core/record/record'
+import Node from '@core/record/node'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../record/recordState'
 import * as SurveyFormState from './surveyFormState'
 

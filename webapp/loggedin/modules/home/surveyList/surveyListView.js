@@ -1,20 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../core/survey/survey'
-import Authorizer from '../../../../../core/auth/authorizer'
+import Survey from '@core/survey/survey'
+import Authorizer from '@core/auth/authorizer'
 
 import TableView from '../../../tableViews/tableView'
 import SurveyListHeaderLeft from './components/surveyListHeaderLeft'
 import SurveyListRowHeader from './components/surveyListRowHeader'
 import SurveyListRow from './components/surveyListRow'
-import { useOnUpdate } from '../../../../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import * as AppState from '../../../../app/appState'
-import * as SurveyState from '../../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import { appModuleUri, homeModules } from '../../../appModules'
 
-import { setActiveSurvey } from '../../../../survey/actions'
+import { setActiveSurvey } from '@webapp/survey/actions'
 
 const SurveyListView = props => {
 

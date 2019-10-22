@@ -4,21 +4,21 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
-import { getUrlParam } from '../../../utils/routerUtils'
+import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import { useOnUpdate } from '../../../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import Survey from '../../../../core/survey/survey'
-import Record from '../../../../core/record/record'
+import Survey from '@core/survey/survey'
+import Record from '@core/record/record'
 
 import SurveyFormView from '../surveyForm/surveyFormView'
 
-import Authorizer from '../../../../core/auth/authorizer'
-import WebSocketEvents from '../../../../common/webSocket/webSocketEvents'
-import * as AppWebSocket from '../../../app/appWebSocket'
+import Authorizer from '@core/auth/authorizer'
+import WebSocketEvents from '@common/webSocket/webSocketEvents'
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import * as AppState from '../../../app/appState'
-import * as SurveyState from '../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from './recordState'
 
 import { resetForm } from '../surveyForm/actions'

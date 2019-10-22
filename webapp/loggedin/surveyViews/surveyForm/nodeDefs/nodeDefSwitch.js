@@ -9,20 +9,20 @@ import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefEditButtons from './components/nodeDefEditButtons'
 
-import NodeDef from '../../../../../core/survey/nodeDef'
-import NodeDefValidations from '../../../../../core/survey/nodeDefValidations'
-import Validation from '../../../../../core/validation/validation'
-import Record from '../../../../../core/record/record'
-import Node from '../../../../../core/record/node'
-import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefValidations from '@core/survey/nodeDefValidations'
+import Validation from '@core/validation/validation'
+import Record from '@core/record/record'
+import Node from '@core/record/node'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../../record/recordState'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
 
 // edit actions
-import { putNodeDefProp, putNodeDefLayoutProp } from '../../../../survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 // entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 

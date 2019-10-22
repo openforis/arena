@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const Node = require('../node')
-const ObjectUtils = require('../../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 /**
  * Record nodes index.

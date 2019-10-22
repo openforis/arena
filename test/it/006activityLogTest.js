@@ -2,14 +2,14 @@ const R = require('ramda')
 const { expect } = require('chai')
 
 const { getContextUser } = require('../testContext')
-const { uuidv4 } = require('../../core/uuid')
+const { uuidv4 } = require('@core/uuid')
 
-const Survey = require('../../core/survey/survey')
-const Record = require('../../core/record/record')
+const Survey = require('@core/survey/survey')
+const Record = require('@core/record/record')
 
-const ActivityLogger = require('../../server/modules/activityLog/activityLogger')
-const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-const RecordManager = require('../../server/modules/record/manager/recordManager')
+const ActivityLogger = require('@server/modules/activityLog/activityLogger')
+const SurveyManager = require('@server/modules/survey/manager/surveyManager')
+const RecordManager = require('@server/modules/record/manager/recordManager')
 
 const SB = require('./utils/surveyBuilder')
 const RecordUtils = require('./utils/recordUtils')

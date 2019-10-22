@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../../core/objectUtils')
-const DateUtils = require('../../core/dateUtils')
-const { uuidv4 } = require('../../core/uuid')
+const ObjectUtils = require('@core/objectUtils')
+const DateUtils = require('@core/dateUtils')
+const { uuidv4 } = require('@core/uuid')
 
 const ProcessingStep = require('./processingStep')
 const ProcessingStepCalculation = require('./processingStepCalculation')

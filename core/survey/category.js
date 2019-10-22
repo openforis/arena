@@ -1,9 +1,9 @@
 const R = require('ramda')
-const { uuidv4 } = require('../uuid')
+const { uuidv4 } = require('@core/uuid')
 
-const ObjectUtils = require('../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
-const Validation = require('../validation/validation')
+const Validation = require('@core/validation/validation')
 
 const CategoryLevel = require('./categoryLevel')
 const CategoryItem = require('./categoryItem')

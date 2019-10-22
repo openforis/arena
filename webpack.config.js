@@ -55,6 +55,15 @@ if (buildReport) {
 const webPackConfig = {
   entry: ['./webapp/main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
+  resolve: {
+    alias: {
+      '@common': path.resolve(__dirname, 'common/'),
+      '@core': path.resolve(__dirname, 'core/'),
+      '@server': path.resolve(__dirname, 'server/'),
+      '@webapp': path.resolve(__dirname, 'webapp/'),
+      '@test': path.resolve(__dirname, 'test/'),
+    },
+  },
   output: {
     filename: 'bundle-[hash].js',
     path: path.resolve(__dirname, 'dist'),

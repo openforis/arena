@@ -1,7 +1,7 @@
-import { exportReducer } from '../../../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appUserLogout } from '../../../../app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../../../survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 
 import { homeCollectImportReportUpdate, homeCollectImportReportItemUpdate } from './actions'
 

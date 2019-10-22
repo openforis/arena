@@ -2,16 +2,16 @@ const { expect } = require('chai')
 
 const R = require('ramda')
 
-const db = require('../../../server/db/db')
+const db = require('@server/db/db')
 
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const NodeDefExpression = require('../../../core/survey/nodeDefExpression')
-const Record = require('../../../core/record/record')
-const Node = require('../../../core/record/node')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefExpression = require('@core/survey/nodeDefExpression')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
 
-const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
-const RecordManager = require('../../../server/modules/record/manager/recordManager')
+const NodeDefRepository = require('@server/modules/nodeDef/repository/nodeDefRepository')
+const RecordManager = require('@server/modules/record/manager/recordManager')
 
 const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 

@@ -1,17 +1,17 @@
 const R = require('ramda')
 
-const db = require('../../../server/db/db')
+const db = require('@server/db/db')
 
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const NodeDefExpression = require('../../../core/survey/nodeDefExpression')
-const NodeDefValidations = require('../../../core/survey/nodeDefValidations')
-const User = require('../../../core/user/user')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefExpression = require('@core/survey/nodeDefExpression')
+const NodeDefValidations = require('@core/survey/nodeDefValidations')
+const User = require('@core/user/user')
 
-const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
-const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
+const SurveyManager = require('@server/modules/survey/manager/surveyManager')
+const NodeDefRepository = require('@server/modules/nodeDef/repository/nodeDefRepository')
 
-const SurveyPublishJob = require('../../../server/modules/survey/service/publish/surveyPublishJob')
+const SurveyPublishJob = require('@server/modules/survey/service/publish/surveyPublishJob')
 
 class NodeDefBuilder {
 

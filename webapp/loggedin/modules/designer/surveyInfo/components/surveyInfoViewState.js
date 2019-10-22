@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import * as R from 'ramda'
 
-import { useFormObject } from '../../../../../commonComponents/hooks'
+import { useFormObject } from '@webapp/commonComponents/hooks'
 
-import Survey from '../../../../../../core/survey/survey'
-import StringUtils from '../../../../../../core/stringUtils'
-import ObjectUtils from '../../../../../../core/objectUtils'
-import Validation from '../../../../../../core/validation/validation'
+import Survey from '@core/survey/survey'
+import StringUtils from '@core/stringUtils'
+import ObjectUtils from '@core/objectUtils'
+import Validation from '@core/validation/validation'
 
 export const useSurveyInfoViewState = props => {
 

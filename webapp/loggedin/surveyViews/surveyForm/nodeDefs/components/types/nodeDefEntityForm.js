@@ -4,17 +4,17 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 
 import NodeDefSwitch from '../../nodeDefSwitch'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
-import NodeDef from '../../../../../../../core/survey/nodeDef'
-import Record from '../../../../../../../core/record/record'
-import Node from '../../../../../../../core/record/node'
-import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
+import NodeDef from '@core/survey/nodeDef'
+import Record from '@core/record/record'
+import Node from '@core/record/node'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { setFormPageNode, getNodeKeyLabelValues } from '../../../../surveyForm/actions'
 

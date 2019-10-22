@@ -1,11 +1,11 @@
-import { exportReducer } from '../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import Survey from '../../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
 import * as SurveyInfoState from './surveyInfoState'
 
 // app actions
-import { appPropsChange, appUserLogout } from '../../app/actions'
+import { appPropsChange, appUserLogout } from '@webapp/app/actions'
 
 // survey actions
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'

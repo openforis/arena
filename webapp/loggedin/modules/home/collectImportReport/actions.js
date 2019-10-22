@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 export const homeCollectImportReportUpdate = 'home/collectImportReport/update'
 export const homeCollectImportReportItemUpdate = 'home/collectImportReport/item/update'

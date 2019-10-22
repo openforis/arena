@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const Validator = require('../validation/validator')
-const Validation = require('../validation/validation')
+const Validator = require('@core/validation/validator')
+const Validation = require('@core/validation/validation')
 
 const validEmailRe = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 

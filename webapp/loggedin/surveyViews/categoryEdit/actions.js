@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-import { debounceAction } from '../../../utils/reduxUtils'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import Category from '../../../../core/survey/category'
-import CategoryLevel from '../../../../core/survey/categoryLevel'
-import CategoryItem from '../../../../core/survey/categoryItem'
+import Category from '@core/survey/category'
+import CategoryLevel from '@core/survey/categoryLevel'
+import CategoryItem from '@core/survey/categoryItem'
 
 import {
   categoryCreate,
@@ -21,9 +21,9 @@ import {
   categoryPropUpdate,
   categoryUpdate,
   categoriesUpdate,
-} from '../../../survey/categories/actions'
+} from '@webapp/survey/categories/actions'
 
-import { showAppJobMonitor } from '../../appJob/actions'
+import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
 import * as CategoryEditState from './categoryEditState'
 

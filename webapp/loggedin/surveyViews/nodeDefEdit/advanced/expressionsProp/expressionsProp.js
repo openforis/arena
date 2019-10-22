@@ -3,11 +3,11 @@ import './expressionsProp.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import NodeDefExpression from '../../../../../../core/survey/nodeDefExpression'
-import Validation from '../../../../../../core/validation/validation'
+import NodeDefExpression from '@core/survey/nodeDefExpression'
+import Validation from '@core/validation/validation'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
-import { FormItem } from '../../../../../commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/commonComponents/form/input'
 import ExpressionProp from './expressionProp'
 
 const ExpressionsProp = props => {

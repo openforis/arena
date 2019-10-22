@@ -1,12 +1,12 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Survey from '../../../../../core/survey/survey'
-import NodeDef from '../../../../../core/survey/nodeDef'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
 
-import { nbsp } from '../../../../../core/stringUtils'
+import { nbsp } from '@core/stringUtils'
 
-import Dropdown from '../../../../commonComponents/form/dropdown'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
 
 const getEntities = (hierarchy, lang) => {
   const entities = []

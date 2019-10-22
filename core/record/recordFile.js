@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {truncate} = require('../stringUtils')
+const {truncate} = require('@core/stringUtils')
 
 const getProp = prop => R.path(['props', prop])
 

@@ -4,16 +4,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '../../../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
 import * as SurveyFormState from '../surveyFormState'
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import { createNodeDef } from '../../../../survey/nodeDefs/actions'
+import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../actions'
 
 const AddNodeDefButtons = props => {

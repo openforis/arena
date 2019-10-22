@@ -4,14 +4,14 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { Input } from '../../../commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 
-import Survey from '../../../../core/survey/survey'
-import * as SurveyState from '../../../survey/surveyState'
+import Survey from '@core/survey/survey'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import { getLanguageLabel } from '../../../../core/app/languages'
+import { getLanguageLabel } from '@core/app/languages'
 
 const LanguageBadge = ({ lang, compact }) => (
   <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>

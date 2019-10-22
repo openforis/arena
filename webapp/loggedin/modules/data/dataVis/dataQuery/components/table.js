@@ -4,23 +4,23 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import * as R from 'ramda'
 
-import { elementOffset } from '../../../../../../utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
-import Survey from '../../../../../../../core/survey/survey'
-import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
-import Authorizer from '../../../../../../../core/auth/authorizer'
-import WebSocketEvents from '../../../../../../../common/webSocket/webSocketEvents'
+import Survey from '@core/survey/survey'
+import NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import Authorizer from '@core/auth/authorizer'
+import WebSocketEvents from '@common/webSocket/webSocketEvents'
 
-import * as AppWebSocket from '../../../../../../app/appWebSocket'
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { useOnUpdate } from '../../../../../../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import TableHeader from './tableHeader'
 import TableRows from './tableRows'
 
-import * as AppState from '../../../../../../app/appState'
+import * as AppState from '@webapp/app/appState'
 import * as DataQueryState from '../dataQueryState'
-import * as SurveyState from '../../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { nodesUpdateCompleted } from '../../../../../surveyViews/record/actions'
 

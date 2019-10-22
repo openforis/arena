@@ -1,9 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import CategoryItem from '../../../../../../../core/survey/categoryItem'
+import CategoryItem from '@core/survey/categoryItem'
 
 const Checkbox = props => {
   const {

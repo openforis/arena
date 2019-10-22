@@ -1,14 +1,14 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import UploadButton from '../../../../commonComponents/form/uploadButton'
-import DownloadButton from '../../../../commonComponents/form/downloadButton'
-import { useI18n } from '../../../../commonComponents/hooks'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import UploadButton from '@webapp/commonComponents/form/uploadButton'
+import DownloadButton from '@webapp/commonComponents/form/downloadButton'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Taxonomy from '../../../../../core/survey/taxonomy'
-import Validation from '../../../../../core/validation/validation'
-import StringUtils from '../../../../../core/stringUtils'
+import Taxonomy from '@core/survey/taxonomy'
+import Validation from '@core/validation/validation'
+import StringUtils from '@core/stringUtils'
 
 const TaxonomyEditHeader = props => {
   const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props

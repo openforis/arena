@@ -1,8 +1,8 @@
 const R = require('ramda')
 const toSnakeCase = require('to-snake-case')
 
-const Survey = require('../../core/survey/survey')
-const NodeDef = require('../../core/survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'

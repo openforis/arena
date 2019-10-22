@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
-import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
-import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
+import AutocompleteDialog from '@webapp/commonComponents/form/autocompleteDialog'
+import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
 
-import Taxon from '../../../../../../../core/survey/taxon'
+import Taxon from '@core/survey/taxon'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props

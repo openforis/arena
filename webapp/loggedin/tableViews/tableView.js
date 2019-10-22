@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import TableHeader from './components/tableHeader'
 import TableContent from './components/tableContent'
 
-import * as SurveyState from '../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as TableViewsState from './tableViewsState'
 
 import { initListItems, fetchListItems } from './actions'

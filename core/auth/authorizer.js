@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const Survey = require('../survey/survey')
-const Record = require('../record/record')
-const User = require('../user/user')
+const Survey = require('@core/survey/survey')
+const Record = require('@core/record/record')
+const User = require('@core/user/user')
 const AuthGroups = require('./authGroups')
 
 const {

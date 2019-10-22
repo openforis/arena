@@ -1,15 +1,15 @@
 import './nodeDefFile.scss'
 
 import React from 'react'
-import { uuidv4 } from '../../../../../../../core/uuid'
+import { uuidv4 } from '@core/uuid'
 
-import UploadButton from '../../../../../../commonComponents/form/uploadButton'
-import DownloadButton from '../../../../../../commonComponents/form/downloadButton'
+import UploadButton from '@webapp/commonComponents/form/uploadButton'
+import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import NodeDef from '../../../../../../../core/survey/nodeDef'
-import Node from '../../../../../../../core/record/node'
-import RecordFile from '../../../../../../../core/record/recordFile'
+import NodeDef from '@core/survey/nodeDef'
+import Node from '@core/record/node'
+import RecordFile from '@core/record/recordFile'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
   const value = {

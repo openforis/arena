@@ -3,13 +3,13 @@ import './surveyHierarchy.scss'
 import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
 import Tree from './surveyHierarchyTree'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 
-import * as AppState from '../../../../app/appState'
-import * as SurveyState from '../../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const SurveyHierarchy = props => {
 

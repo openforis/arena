@@ -1,7 +1,7 @@
 import './modal.scss'
 
 import React from 'react'
-import KeyboardMap from '../utils/keyboardMap'
+import KeyboardMap from '@webapp/utils/keyboardMap'
 import * as R from 'ramda'
 
 export const ModalClose = ({children, onClose}) =>

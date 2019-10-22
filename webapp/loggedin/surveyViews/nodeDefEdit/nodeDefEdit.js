@@ -3,26 +3,26 @@ import './nodeDefEdit.scss'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import StringUtils from '../../../../core/stringUtils'
+import StringUtils from '@core/stringUtils'
 
-import { useI18n } from '../../../commonComponents/hooks'
-import TabBar from '../../../commonComponents/tabBar'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import TabBar from '@webapp/commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
 import AdvancedProps from './advanced/advancedProps'
 import ValidationsProps from './advanced/validationsProps'
 import CategoriesView from '../categories/categoriesView'
 import TaxonomiesView from '../taxonomies/taxonomiesView'
 
-import Survey from '../../../../core/survey/survey'
-import NodeDef from '../../../../core/survey/nodeDef'
-import Category from '../../../../core/survey/category'
-import Taxonomy from '../../../../core/survey/taxonomy'
-import NodeDefLayout from '../../../../core/survey/nodeDefLayout'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Category from '@core/survey/category'
+import Taxonomy from '@core/survey/taxonomy'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
 
-import { putNodeDefProp, putNodeDefLayoutProp } from './../../../survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from '../../../survey/nodeDefs/actions'
 import { closeNodeDefEdit } from './actions'
 
 const NodeDefEdit = props => {

@@ -1,9 +1,9 @@
 import React from 'react'
 
-import Survey from '../../../../../../core/survey/survey'
-import DateUtils from '../../../../../../core/dateUtils'
+import Survey from '@core/survey/survey'
+import DateUtils from '@core/dateUtils'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const SurveyListRow = props => {
 

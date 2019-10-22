@@ -1,9 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import ErrorBadge from '../../../commonComponents/errorBadge'
-import WarningBadge from '../../../commonComponents/warningBadge'
-import { useI18n } from '../../../commonComponents/hooks'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import WarningBadge from '@webapp/commonComponents/warningBadge'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const TableRow = props => {
 

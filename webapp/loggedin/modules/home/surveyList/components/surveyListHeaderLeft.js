@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Header from '../../../../../commonComponents/header'
-import { useI18n } from '../../../../../commonComponents/hooks'
+import Header from '@webapp/commonComponents/header'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const SurveyListHeaderLeft = () => {
 

@@ -5,18 +5,18 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import TableView from '../../../tableViews/tableView'
-import ProfilePicture from '../../../../commonComponents/profilePicture'
-import { useI18n } from '../../../../commonComponents/hooks'
+import ProfilePicture from '@webapp/commonComponents/profilePicture'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Authorizer from '../../../../../core/auth/authorizer'
+import Authorizer from '@core/auth/authorizer'
 
-import User from '../../../../../core/user/user'
-import AuthGroups from '../../../../../core/auth/authGroups'
+import User from '@core/user/user'
+import AuthGroups from '@core/auth/authGroups'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
-import * as AppState from '../../../../app/appState'
-import * as SurveyState from '../../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const UsersHeaderLeft = props => {
   const i18n = useI18n()

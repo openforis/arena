@@ -1,14 +1,14 @@
 import './profilePictureEditor.scss'
 
-import * as FileTypes from '../../../../../utils/fileTypes'
+import * as FileTypes from '@webapp/utils/fileTypes'
 
 import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
-import { useProfilePicture, useFileDrop } from '../../../../../commonComponents/hooks'
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useProfilePicture, useFileDrop } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import UploadButton from '../../../../../commonComponents/form/uploadButton'
+import UploadButton from '@webapp/commonComponents/form/uploadButton'
 
 const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
 

@@ -3,19 +3,19 @@ import './formHeader.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { useI18n } from '../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '../../../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
-import { uuidv4 } from '../../../../../core/uuid'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
+import { uuidv4 } from '@core/uuid'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'
 
-import { createNodeDef } from '../../../../survey/nodeDefs/actions'
+import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
 
 const FormHeader = props => {
 

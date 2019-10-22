@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
-const NodeDefValidations = require('../../survey/nodeDefValidations')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefValidations = require('@core/survey/nodeDefValidations')
 
 const Record = require('../record')
 const Node = require('../node')
 const RecordValidation = require('../recordValidation')
 
-const Validation = require('../../validation/validation')
-const NumberUtils = require('../../numberUtils')
+const Validation = require('@core/validation/validation')
+const NumberUtils = require('@core/numberUtils')
 
 const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
   const validations = NodeDef.getValidations(nodeDefChild)

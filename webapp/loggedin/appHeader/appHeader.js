@@ -3,19 +3,19 @@ import './appHeader.scss'
 import React, { useState, useRef } from 'react'
 import { connect } from 'react-redux'
 
-import { usePrevious } from '../../commonComponents/hooks'
-import ProfilePicture from '../../commonComponents/profilePicture'
-import ProgressBar from '../../commonComponents/progressBar'
+import { usePrevious } from '@webapp/commonComponents/hooks'
+import ProfilePicture from '@webapp/commonComponents/profilePicture'
+import ProgressBar from '@webapp/commonComponents/progressBar'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
 
-import User from '../../../core/user/user'
-import Survey from '../../../core/survey/survey'
+import User from '@core/user/user'
+import Survey from '@core/survey/survey'
 
-import * as AppState from '../../app/appState'
-import * as SurveyState from '../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import { updateUserPrefs } from '../../app/actions'
+import { updateUserPrefs } from '@webapp/app/actions'
 
 const AppHeader = props => {
   const {

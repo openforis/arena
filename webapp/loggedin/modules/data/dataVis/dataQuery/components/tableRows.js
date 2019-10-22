@@ -1,14 +1,14 @@
 import React from 'react'
 
-import { useI18n } from '../../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import TableColumn from './tableColumn'
 
-import NodeDef from '../../../../../../../core/survey/nodeDef'
-import Record from '../../../../../../../core/record/record'
+import NodeDef from '@core/survey/nodeDef'
+import Record from '@core/record/record'
 
 import { appModuleUri, dataModules } from '../../../../../appModules'
-import ErrorBadge from '../../../../../../commonComponents/errorBadge'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) => (
   nodeDefCols.map(nodeDef =>

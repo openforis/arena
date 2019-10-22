@@ -1,6 +1,6 @@
 const {assert} = require('chai')
 
-const {evalString} = require('../../core/exprParser/expression')
+const {evalString} = require('@core/exprParser/expression')
 
 const queries = [
   {q: '1 + 1', r: 2},

@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 
 import AppSideBarModules from './components/appSideBarModules'
 
-import * as AppState from '../../app/appState'
+import * as AppState from '@webapp/app/appState'
 import * as SideBarState from './appSidebarState'
-import * as SurveyState from '../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { toggleSideBar } from './actions'
 

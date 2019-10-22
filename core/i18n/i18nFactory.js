@@ -1,6 +1,6 @@
 const i18next = require('i18next')
 
-const ProcessUtils = require('../processUtils')
+const ProcessUtils = require('@core/processUtils')
 
 const enTranslation = require('./resources/en')
 

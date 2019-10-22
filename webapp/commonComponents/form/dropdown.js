@@ -8,7 +8,7 @@ import * as R from 'ramda'
 import { Input } from './input'
 import AutocompleteDialog from './autocompleteDialog'
 
-import { contains, trim } from '../../../core/stringUtils'
+import { contains, trim } from '@core/stringUtils'
 
 const dropdownListItemClassName = 'dropdown__list-item'
 

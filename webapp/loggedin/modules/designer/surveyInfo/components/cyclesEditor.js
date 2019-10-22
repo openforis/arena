@@ -3,12 +3,12 @@ import './cyclesEditor.scss'
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
-import Survey from '../../../../../../core/survey/survey'
-import SurveyCycle from '../../../../../../core/survey/surveyCycle'
-import Validation from '../../../../../../core/validation/validation'
+import Survey from '@core/survey/survey'
+import SurveyCycle from '@core/survey/surveyCycle'
+import Validation from '@core/validation/validation'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
-import ValidationTooltip from '../../../../../commonComponents/validationTooltip'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 
 const DateEditor = ({ date, onChange }) => {
   const [year, month, day] = R.pipe(

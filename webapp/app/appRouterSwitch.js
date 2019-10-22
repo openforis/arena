@@ -3,17 +3,17 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 
-import User from '../../core/user/user'
+import User from '@core/user/user'
 
-import DynamicImport from '../commonComponents/dynamicImport'
-import LoginView from '../login/loginView'
+import DynamicImport from '@webapp/commonComponents/dynamicImport'
+import LoginView from '@webapp/login/loginView'
 import AppLoaderView from './appLoader/appLoaderView'
 import AppNotificationView from './appNotification/appNotificationView'
 
-import { useOnUpdate } from '../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
-import WebSocketEvents from '../../common/webSocket/webSocketEvents'
+import WebSocketEvents from '@common/webSocket/webSocketEvents'
 
 import AppContext from './appContext'
 
@@ -77,7 +77,7 @@ const AppRouterSwitch = props => {
               <Route
                 path="/app"
                 render={props => (
-                  <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+                  <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')}/>
                 )}
               />
             )

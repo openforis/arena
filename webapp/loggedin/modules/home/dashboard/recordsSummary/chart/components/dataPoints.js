@@ -4,9 +4,9 @@ import ReactDOMServer from 'react-dom/server.browser'
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'
 
-import { useI18n } from '../../../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import DateUtils from '../../../../../../../../core/dateUtils'
+import DateUtils from '@core/dateUtils'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>

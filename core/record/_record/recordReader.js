@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const Queue = require('../../queue')
+const Queue = require('@core/queue')
 
-const SurveyNodeDefs = require('../../survey/_survey/surveyNodeDefs')
-const SurveyDependencies = require('../../survey/_survey/surveyDependencies')
-const NodeDef = require('../../survey/nodeDef')
+const SurveyNodeDefs = require('@core/survey/_survey/surveyNodeDefs')
+const SurveyDependencies = require('@core/survey/_survey/surveyDependencies')
+const NodeDef = require('@core/survey/nodeDef')
 const Node = require('../node')
 
 const keys = require('./recordKeys')

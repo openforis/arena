@@ -1,14 +1,14 @@
 import * as R from 'ramda'
 
-import { exportReducer } from '../../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import NodeDef from '../../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../../core/survey/nodeDefLayout'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyFormState from './surveyFormState'
 
-import { appUserLogout } from '../../../app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import {
   formActivePageNodeDefUpdate,
   formNodeDefAddChildToUpdate,
@@ -16,7 +16,7 @@ import {
   formReset,
   formShowPageNavigationUpdate,
 } from './actions'
-import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
+import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '@webapp/survey/nodeDefs/actions'
 import { recordLoad } from '../record/actions'
 
 const actionHandlers = {

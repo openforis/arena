@@ -2,18 +2,18 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import ItemsView from '../items/itemsView'
 import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
 
-import Survey from '../../../../core/survey/survey'
-import Taxonomy from '../../../../core/survey/taxonomy'
-import Authorizer from '../../../../core/auth/authorizer'
+import Survey from '@core/survey/survey'
+import Taxonomy from '@core/survey/taxonomy'
+import Authorizer from '@core/auth/authorizer'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
-import * as AppState from '../../../app/appState'
+import * as AppState from '@webapp/app/appState'
 
 import {
   createTaxonomy,

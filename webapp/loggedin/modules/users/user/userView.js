@@ -3,20 +3,20 @@ import './userView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
-import { getUrlParam } from '../../../../utils/routerUtils'
+import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import { useI18n } from '../../../../commonComponents/hooks'
-import Dropdown from '../../../../commonComponents/form/dropdown'
-import ProfilePicture from '../../../../commonComponents/profilePicture'
-import { FormItem, Input } from '../../../../commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
+import ProfilePicture from '@webapp/commonComponents/profilePicture'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
-import * as AppState from '../../../../app/appState'
-import * as SurveyState from '../../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import { showAppLoader, hideAppLoader, setUser } from '../../../../app/actions'
-import { showNotification } from '../../../../app/appNotification/actions'
+import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 
 import { useUserViewState } from './useUserViewState'
 

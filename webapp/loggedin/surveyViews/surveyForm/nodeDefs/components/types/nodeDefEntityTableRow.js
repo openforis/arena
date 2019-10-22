@@ -3,10 +3,10 @@ import React from 'react'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import NodeDef from '../../../../../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { elementOffset } from '../../../../../../../webapp/utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 class NodeDefEntityTableRow extends React.Component {
 

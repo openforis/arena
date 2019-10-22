@@ -3,15 +3,15 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import ErrorBadge from '../../../../../commonComponents/errorBadge'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
-import Survey from '../../../../../../core/survey/survey'
-import NodeDef from '../../../../../../core/survey/nodeDef'
-import Record from '../../../../../../core/record/record'
-import RecordValidation from '../../../../../../core/record/recordValidation'
-import Validation from '../../../../../../core/validation/validation'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Record from '@core/record/record'
+import RecordValidation from '@core/record/recordValidation'
+import Validation from '@core/validation/validation'
 
-import * as SurveyState from '../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {

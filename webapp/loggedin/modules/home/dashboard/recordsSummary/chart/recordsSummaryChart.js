@@ -2,16 +2,16 @@ import './recordsSummaryChart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 
-import DateUtils from '../../../../../../../core/dateUtils'
+import DateUtils from '@core/dateUtils'
 
 import YAxis, { getScale as getYScale } from './components/yAxis'
 import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
 
-import { useOnResize } from '../../../../../../commonComponents/hooks'
+import { useOnResize } from '@webapp/commonComponents/hooks'
 
-import { elementOffset } from '../../../../../../utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 const RecordsSummaryChart = props => {
   const { counts, from, to } = props

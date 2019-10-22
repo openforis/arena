@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 const Record = require('../record')
 const Node = require('../node')
-const Validation = require('../../validation/validation')
-const ObjectUtils = require('../../objectUtils')
+const Validation = require('@core/validation/validation')
+const ObjectUtils = require('@core/objectUtils')
 
 const validateAttributeKey = (survey, record, attributeDef) => async (propName, node) => {
   const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)

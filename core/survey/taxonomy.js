@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('../uuid')
-const ObjectUtils = require('../objectUtils')
+const { uuidv4 } = require('@core/uuid')
+const ObjectUtils = require('@core/objectUtils')
 
 const keys = {
   published: 'published'

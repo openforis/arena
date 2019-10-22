@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../objectUtils')
-const StringUtils = require('../stringUtils')
-const { uuidv4 } = require('./../uuid')
+const ObjectUtils = require('@core/objectUtils')
+const StringUtils = require('@core/stringUtils')
+const { uuidv4 } = require('@core/uuid')
 
-const Validation = require('../validation/validation')
-const NodeDef = require('../survey/nodeDef')
+const Validation = require('@core/validation/validation')
+const NodeDef = require('@core/survey/nodeDef')
 
 const keys = {
   id: ObjectUtils.keys.id,

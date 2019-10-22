@@ -1,19 +1,19 @@
 import axios from 'axios'
 
-import { debounceAction } from '../../../utils/reduxUtils'
-import Taxonomy from '../../../../core/survey/taxonomy'
+import { debounceAction } from '@webapp/utils/reduxUtils'
+import Taxonomy from '@core/survey/taxonomy'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as TaxonomyEditState from './taxonomyEditState'
 
-import { showAppJobMonitor } from '../../appJob/actions'
+import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 import {
   taxonomyCreate,
   taxonomyDelete,
   taxonomyPropUpdate,
   taxonomyUpdate,
   taxonomiesUpdate
-} from '../../../survey/taxonomies/actions'
+} from '@webapp/survey/taxonomies/actions'
 import { reloadListItems } from '../../tableViews/actions'
 
 // taxonomy editor actions

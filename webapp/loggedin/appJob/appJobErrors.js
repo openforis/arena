@@ -1,9 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { getValidationFieldMessagesHTML } from '../../utils/validationUtils'
+import { getValidationFieldMessagesHTML } from '@webapp/utils/validationUtils'
 
 const validationWrapper = fields => ({
   valid: false,

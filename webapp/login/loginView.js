@@ -3,7 +3,7 @@ import './loginView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { useI18n } from '../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from './loginState'
 

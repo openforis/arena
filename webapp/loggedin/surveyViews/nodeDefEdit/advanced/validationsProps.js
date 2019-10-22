@@ -1,16 +1,16 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import Checkbox from '../../../../commonComponents/form/checkbox'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import ExpressionsProp from './expressionsProp/expressionsProp'
 
-import NodeDef from '../../../../../core/survey/nodeDef'
-import NodeDefValidations from '../../../../../core/survey/nodeDefValidations'
-import Validation from '../../../../../core/validation/validation'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefValidations from '@core/survey/nodeDefValidations'
+import Validation from '@core/validation/validation'
 
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 

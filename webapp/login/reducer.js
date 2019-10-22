@@ -1,4 +1,4 @@
-import { exportReducer } from '../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as LoginState from './loginState'
 

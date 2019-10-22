@@ -2,7 +2,7 @@ import './nodeDefBoolean.scss'
 
 import React from 'react'
 
-import Node from '../../../../../../../core/record/node'
+import Node from '@core/record/node'
 
 const Button = (props) => {
 

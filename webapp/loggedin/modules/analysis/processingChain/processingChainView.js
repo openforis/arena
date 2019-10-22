@@ -3,15 +3,15 @@ import './processingChainView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../core/survey/survey'
-import ProcessingChain from '../../../../../common/analysis/processingChain'
+import Survey from '@core/survey/survey'
+import ProcessingChain from '@common/analysis/processingChain'
 
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 
-import { getUrlParam } from '../../../../utils/routerUtils'
-import { useI18n, useOnUpdate } from '../../../../commonComponents/hooks'
+import { getUrlParam } from '@webapp/utils/routerUtils'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
 
 import {

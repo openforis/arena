@@ -1,19 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { FormItem } from '../../../../commonComponents/form/input'
-import Dropdown from '../../../../commonComponents/form/dropdown'
-import { useI18n } from '../../../../commonComponents/hooks'
+import { FormItem } from '@webapp/commonComponents/form/input'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Survey from '../../../../../core/survey/survey'
-import NodeDef from '../../../../../core/survey/nodeDef'
-import Taxonomy from '../../../../../core/survey/taxonomy'
-import Validation from '../../../../../core/validation/validation'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Taxonomy from '@core/survey/taxonomy'
+import Validation from '@core/validation/validation'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
+import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
 const { propKeys } = NodeDef

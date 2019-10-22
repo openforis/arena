@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Survey from '../../../../core/survey/survey'
-import NodeDef from '../../../../core/survey/nodeDef'
-import * as SurveyState from '../../../survey/surveyState'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyViewsState from '../surveyViewsState'
 
 const keys = {
