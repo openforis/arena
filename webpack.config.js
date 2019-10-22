@@ -56,6 +56,7 @@ const webPackConfig = {
   entry: ['./webapp/main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
   resolve: {
+    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
     alias: {
       '@common': path.resolve(__dirname, 'common/'),
       '@core': path.resolve(__dirname, 'core/'),

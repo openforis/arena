@@ -1,5 +1,5 @@
-@import "../style/vars";
-@import "../style/layoutMixins";
+@import "~@webapp/style/vars";
+@import "~@webapp/style/layoutMixins";
 
 .app__container {
   background-color: lighten($grey, 5%);
