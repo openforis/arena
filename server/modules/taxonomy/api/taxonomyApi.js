@@ -90,8 +90,7 @@ module.exports.init = app => {
           list = await TaxonomyService.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         }
       } else {
-        const { taxa } = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
-        list = taxa
+        list = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
       }
 
       res.json({ list })
