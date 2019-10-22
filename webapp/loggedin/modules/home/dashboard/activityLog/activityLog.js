@@ -29,7 +29,7 @@ const ActivityLog = props => {
         {/*TODO: iterate over items*/}
         <div className="activity-log__content-item">
           <div className="activity">
-            <ProfilePicture userUuid={User.getUuid(user)} thumbnail={true}/> created the survey
+            <ProfilePicture userUuid={User.getUuid(user)} thumbnail={true}/> {User.getName(user)} created the survey
           </div>
           <div className="date">
             {DateUtils.getRelativeDate(i18n, new Date())}
@@ -39,7 +39,7 @@ const ActivityLog = props => {
         <div className="activity-log__content-item-sep"></div>
         <div className="activity-log__content-item">
           <div className="activity">
-            <ProfilePicture userUuid={User.getUuid(user)} thumbnail={true}/> created the survey
+            <ProfilePicture userUuid={User.getUuid(user)} thumbnail={true}/> {User.getName(user)} created the survey
           </div>
           <div className="date">
             {DateUtils.getRelativeDate(i18n, new Date())}
