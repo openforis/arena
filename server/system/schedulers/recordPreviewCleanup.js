@@ -1,8 +1,8 @@
 const schedule = require('node-schedule')
 
-const Logger = require('../../log/log').getLogger('RecordPreviewCleanup')
+const Logger = require('@server/log/log').getLogger('RecordPreviewCleanup')
 
-const RecordService = require('../../modules/record/service/recordService')
+const RecordService = require('@server/modules/record/service/recordService')
 
 const initSchedule = () =>
   schedule.scheduleJob('0 0 * * *', async () => {

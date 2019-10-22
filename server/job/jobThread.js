@@ -1,4 +1,4 @@
-const Thread = require('../threads/thread')
+const Thread = require('@server/threads/thread')
 
 const {jobThreadMessageTypes, jobToJSON} = require('./jobUtils')
 const JobCreator = require('./jobCreator')

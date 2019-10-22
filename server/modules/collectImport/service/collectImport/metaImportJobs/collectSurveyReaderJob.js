@@ -1,7 +1,7 @@
-const FileZip = require('../../../../../utils/file/fileZip')
-const FileXml = require('../../../../../utils/file/fileXml')
+const FileZip = require('@server/utils/file/fileZip')
+const FileXml = require('@server/utils/file/fileXml')
 
-const Job = require('../../../../../job/job')
+const Job = require('@server/job/job')
 
 const CollectSurvey = require('../model/collectSurvey')
 

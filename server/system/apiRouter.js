@@ -4,24 +4,24 @@ const router = express.Router()
 
 //init apis
 
-require('../modules/user/api/userApi').init(router)
+require('@server/modules/user/api/userApi').init(router)
 
-require('../modules/survey/api/surveyApi').init(router)
-require('../modules/nodeDef/api/nodeDefApi').init(router)
-require('../modules/category/api/categoryApi').init(router)
-require('../modules/taxonomy/api/taxonomyApi').init(router)
-require('../modules/geo/api/geoApi').init(router)
-require('../modules/collectImport/api/collectImportApi').init(router)
+require('@server/modules/survey/api/surveyApi').init(router)
+require('@server/modules/nodeDef/api/nodeDefApi').init(router)
+require('@server/modules/category/api/categoryApi').init(router)
+require('@server/modules/taxonomy/api/taxonomyApi').init(router)
+require('@server/modules/geo/api/geoApi').init(router)
+require('@server/modules/collectImport/api/collectImportApi').init(router)
 
-require('../modules/record/api/recordApi').init(router)
+require('@server/modules/record/api/recordApi').init(router)
 
-require('../modules/surveyRdb/api/surveyRdbApi').init(router)
+require('@server/modules/surveyRdb/api/surveyRdbApi').init(router)
 
-require('../modules/analysis/api/processingChainApi').init(router)
+require('@server/modules/analysis/api/processingChainApi').init(router)
 
-require('../job/jobApi').init(router)
+require('@server/job/jobApi').init(router)
 
-require('../modules/expression/api/expressionApi').init(router)
+require('@server/modules/expression/api/expressionApi').init(router)
 
 module.exports = {
   router

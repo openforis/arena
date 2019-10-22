@@ -1,10 +1,10 @@
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
 const camelize = require('camelize')
 
-const User = require('../../../../core/user/user')
-const Survey = require('../../../../core/survey/survey')
-const AuthGroups = require('../../../../core/auth/authGroups')
+const User = require('@core/user/user')
+const Survey = require('@core/survey/survey')
+const AuthGroups = require('@core/auth/authGroups')
 
 const selectFields = ['uuid', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')

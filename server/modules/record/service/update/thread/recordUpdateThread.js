@@ -1,19 +1,19 @@
 const R = require('ramda')
 
-const Log = require('../../../../../log/log').getLogger('RecordUpdateThread')
+const Log = require('@server/log/log').getLogger('RecordUpdateThread')
 
 const messageTypes = require('./recordThreadMessageTypes')
-const Thread = require('../../../../../threads/thread')
+const Thread = require('@server/threads/thread')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../manager/recordManager')
 
-const Survey = require('../../../../../../core/survey/survey')
-const Record = require('../../../../../../core/record/record')
-const Validation = require('../../../../../../core/validation/validation')
-const Queue = require('../../../../../../core/queue')
+const Survey = require('@core/survey/survey')
+const Record = require('@core/record/record')
+const Validation = require('@core/validation/validation')
+const Queue = require('@core/queue')
 
-const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
+const WebSocketEvents = require('@common/webSocket/webSocketEvents')
 
 const RecordUpdateThreadParams = require('./recordUpdateThreadParams')
 

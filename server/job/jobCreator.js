@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const CategoryImportJob = require('../modules/category/service/categoryImportJob')
-const CollectImportJob = require('../modules/collectImport/service/collectImport/collectImportJob')
-const SurveyPublishJob = require('../modules/survey/service/publish/surveyPublishJob')
-const TaxonomyImportJob = require('../modules/taxonomy/service/taxonomyImportJob')
+const CategoryImportJob = require('@server/modules/category/service/categoryImportJob')
+const CollectImportJob = require('@server/modules/collectImport/service/collectImport/collectImportJob')
+const SurveyPublishJob = require('@server/modules/survey/service/publish/surveyPublishJob')
+const TaxonomyImportJob = require('@server/modules/taxonomy/service/taxonomyImportJob')
 
 const jobClasses = [
   CategoryImportJob,

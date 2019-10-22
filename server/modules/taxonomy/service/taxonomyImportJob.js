@@ -1,21 +1,20 @@
 const R = require('ramda')
 
-const Job = require('../../../job/job')
+const Job = require('@server/job/job')
 
-const { languageCodes } = require('../../../../core/app/languages')
-const { isNotBlank } = require('../../../../core/stringUtils')
-const CSVReader = require('../../../utils/file/csvReader')
+const { languageCodes } = require('@core/app/languages')
+const { isNotBlank } = require('@core/stringUtils')
+const CSVReader = require('@server/utils/file/csvReader')
 
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
-const Validation = require('../../../../core/validation/validation')
-const ObjectUtils = require('../../../../core/objectUtils')
+const Taxonomy = require('@core/survey/taxonomy')
+const Taxon = require('@core/survey/taxon')
+const Validation = require('@core/validation/validation')
 
 const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')
 const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
-const SystemError = require('../../../../server/utils/systemError')
+const SystemError = require('@server/utils/systemError')
 
 const requiredColumns = [
   'code',

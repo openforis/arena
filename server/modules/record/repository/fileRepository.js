@@ -1,6 +1,6 @@
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
-const RecordFile = require('../../../../core/record/recordFile')
+const RecordFile = require('@core/record/recordFile')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 

@@ -1,7 +1,7 @@
-const Job = require('../../../job/job')
+const Job = require('@server/job/job')
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 const SurveyManager = require('../../survey/manager/surveyManager')
 
 const SurveyRdbManager = require('../manager/surveyRdbManager')

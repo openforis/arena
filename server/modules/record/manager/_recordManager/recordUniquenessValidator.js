@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const Record = require('../../../../../core/record/record')
-const RecordValidation = require('../../../../../core/record/recordValidation')
-const Node = require('../../../../../core/record/node')
-const Validation = require('../../../../../core/validation/validation')
+const Record = require('@core/record/record')
+const RecordValidation = require('@core/record/recordValidation')
+const Node = require('@core/record/node')
+const Validation = require('@core/validation/validation')
 
 const DataViewReadRepository = require('../../../surveyRdb/repository/dataViewReadRepository')
 

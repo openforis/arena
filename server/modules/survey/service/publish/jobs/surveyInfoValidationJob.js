@@ -1,7 +1,7 @@
-const Job = require('../../../../../job/job')
+const Job = require('@server/job/job')
 
-const Validation = require('../../../../../../core/validation/validation')
-const Survey = require('../../../../../../core/survey/survey')
+const Validation = require('@core/validation/validation')
+const Survey = require('@core/survey/survey')
 
 const SurveyManager = require('../../../manager/surveyManager')
 

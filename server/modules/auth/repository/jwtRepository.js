@@ -1,4 +1,4 @@
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
 const blacklistToken = async (tokenJti, expiration, client = db) =>
   await client.query(`

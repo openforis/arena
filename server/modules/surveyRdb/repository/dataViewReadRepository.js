@@ -1,22 +1,22 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-const db = require('../../../db/db')
-const dbUtils = require('../../../db/dbUtils')
+const db = require('@server/db/db')
+const dbUtils = require('@server/db/dbUtils')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 
-const Record = require('../../../../core/record/record')
+const Record = require('@core/record/record')
 
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+const SchemaRdb = require('@common/surveyRdb/schemaRdb')
+const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
 
-const Expression = require('../../../../core/exprParser/expression.js')
-const DataSort = require('../../../../common/surveyRdb/dataSort')
-const DataFilter = require('../../../../common/surveyRdb/dataFilter')
+const Expression = require('@core/exprParser/expression.js')
+const DataSort = require('@common/surveyRdb/dataSort')
+const DataFilter = require('@common/surveyRdb/dataFilter')
 
 const DataCol = require('../schemaRdb/dataCol')
 const DataTable = require('../schemaRdb/dataTable')

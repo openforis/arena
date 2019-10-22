@@ -1,6 +1,6 @@
-const Request = require('../../../utils/request')
+const Request = require('@server/utils/request')
 
-const GeoUtils = require('../../../../core/geo/geoUtils')
+const GeoUtils = require('@core/geo/geoUtils')
 
 module.exports.init = app => {
   // ==== READ

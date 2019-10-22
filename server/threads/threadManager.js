@@ -1,11 +1,11 @@
 const { Worker } = require('worker_threads')
 
-const Log = require('../log/log')
+const Log = require('@server/log/log')
 
-const WebSocket = require('../utils/webSocket')
+const WebSocket = require('@server/utils/webSocket')
 
-const User = require('../../core/user/user')
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+const User = require('@core/user/user')
+const WebSocketEvents = require('@common/webSocket/webSocketEvents')
 
 const Thread = require('./thread')
 const ThreadParams = require('./threadParams')

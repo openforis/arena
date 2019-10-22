@@ -1,16 +1,16 @@
 const R = require('ramda')
 const fs = require('fs')
 
-const Logger = require('../../../log/log').getLogger('RecordService')
+const Logger = require('@server/log/log').getLogger('RecordService')
 
-const Survey = require('../../../../core/survey/survey')
-const Record = require('../../../../core/record/record')
-const Node = require('../../../../core/record/node')
-const RecordFile = require('../../../../core/record/recordFile')
-const Authorizer = require('../../../../core/auth/authorizer')
+const Survey = require('@core/survey/survey')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
+const RecordFile = require('@core/record/recordFile')
+const Authorizer = require('@core/auth/authorizer')
 
-const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
-const WebSocket = require('../../../utils/webSocket')
+const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+const WebSocket = require('@server/utils/webSocket')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const RecordManager = require('../manager/recordManager')

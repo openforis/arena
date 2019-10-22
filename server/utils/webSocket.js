@@ -1,9 +1,9 @@
 const io = require('socket.io')()
 const R = require('ramda')
 
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+const WebSocketEvents = require('@common/webSocket/webSocketEvents')
 
-const Logger = require('../log/log').getLogger('WebSocket')
+const Logger = require('@server/log/log').getLogger('WebSocket')
 const Request = require('./request')
 const Jwt = require('./jwt')
 

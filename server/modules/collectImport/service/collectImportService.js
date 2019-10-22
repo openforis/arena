@@ -1,12 +1,12 @@
 const R = require('ramda')
 
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
-const Survey = require('../../../../core/survey/survey')
+const Survey = require('@core/survey/survey')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const CollectImportReportManager = require('../manager/collectImportReportManager')
-const JobManager = require('../../../job/jobManager')
+const JobManager = require('@server/job/jobManager')
 const CollectImportJob = require('./collectImport/collectImportJob')
 
 const startCollectImportJob = (user, filePath) => {

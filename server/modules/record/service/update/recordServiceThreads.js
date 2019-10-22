@@ -1,12 +1,12 @@
 const R = require('ramda')
 const path = require('path')
 
-const ThreadManager = require('../../../../threads/threadManager')
+const ThreadManager = require('@server/threads/threadManager')
 const RecordUpdateThreadParams = require('./thread/recordUpdateThreadParams')
-const ThreadParams = require('../../../../threads/threadParams')
+const ThreadParams = require('@server/threads/threadParams')
 
-const WebSocket = require('../../../../utils/webSocket')
-const WebSocketEvents = require('../../../../../common/webSocket/webSocketEvents')
+const WebSocket = require('@server/utils/webSocket')
+const WebSocketEvents = require('@common/webSocket/webSocketEvents')
 
 const RecordSocketsMap = require('./recordSocketsMap')
 const RecordThreadsMap = require('../update/recordThreadsMap')

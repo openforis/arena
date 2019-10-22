@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Response = require('../../../utils/response')
-const Request = require('../../../utils/request')
-const JobUtils = require('../../../job/jobUtils')
+const Response = require('@server/utils/response')
+const Request = require('@server/utils/request')
+const JobUtils = require('@server/job/jobUtils')
 
-const Validation = require('../../../../core/validation/validation')
-const User = require('../../../../core/user/user')
+const Validation = require('@core/validation/validation')
+const User = require('@core/user/user')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 const SurveyService = require('../service/surveyService')

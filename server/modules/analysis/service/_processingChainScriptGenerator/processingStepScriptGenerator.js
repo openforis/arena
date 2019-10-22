@@ -2,9 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const R = require('ramda')
 
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
-const ProcessingStep = require('../../../../../common/analysis/processingStep')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const ProcessingStep = require('@common/analysis/processingStep')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
 

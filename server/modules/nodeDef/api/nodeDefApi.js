@@ -1,8 +1,8 @@
-const Request = require('../../../utils/request')
+const Request = require('@server/utils/request')
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 
 const SurveyService = require('../../survey/service/surveyService')
 const NodeDefService = require('../service/nodeDefService')

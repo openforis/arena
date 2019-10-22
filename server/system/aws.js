@@ -1,6 +1,6 @@
 const aws = require('aws-sdk')
 
-const ProcessUtils = require('../../core/processUtils')
+const ProcessUtils = require('@core/processUtils')
 
 const _getAwsClient = () =>
   new aws.CognitoIdentityServiceProvider({

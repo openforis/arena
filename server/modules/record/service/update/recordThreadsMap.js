@@ -1,4 +1,4 @@
-const ThreadsCache = require('../../../../threads/threadsCache')
+const ThreadsCache = require('@server/threads/threadsCache')
 
 const threads = new ThreadsCache()
 const threadZombies = new Set() // set of threads marked to be killed

@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 
-const Record = require('../../../../../core/record/record')
-const Node = require('../../../../../core/record/node')
-const RecordExprParser = require('../../../../../core/record/recordExprParser')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
+const RecordExprParser = require('@core/record/recordExprParser')
 
 const NodeRepository = require('../../repository/nodeRepository')
 

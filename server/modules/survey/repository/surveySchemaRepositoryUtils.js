@@ -1,7 +1,7 @@
 const R = require('ramda')
 const camelize = require('camelize')
-const db = require('../../../db/db')
-const { now } = require('../../../db/dbUtils')
+const db = require('@server/db/db')
+const { now } = require('@server/db/dbUtils')
 
 const mergeProps = (def, draft) => {
   const { props, propsDraft } = def

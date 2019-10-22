@@ -1,4 +1,4 @@
-const Jwt = require('../../../utils/jwt')
+const Jwt = require('@server/utils/jwt')
 
 const AuthManager = require('../manager/authManager')
 

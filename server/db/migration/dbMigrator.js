@@ -2,16 +2,16 @@ const DBMigrate = require('db-migrate')
 const path = require('path')
 const R = require('ramda')
 
-const Log = require('../../log/log')
+const Log = require('@server/log/log')
 const logger = Log.getLogger('DBMigrator')
 
 const db = require('../db')
 const config = require('./migrationConfig')
 
-const ProcessUtils = require('../../../core/processUtils')
-const { getSurveyDBSchema } = require('../../modules/survey/repository/surveySchemaRepositoryUtils')
+const ProcessUtils = require('@core/processUtils')
+const { getSurveyDBSchema } = require('@server/modules/survey/repository/surveySchemaRepositoryUtils')
 
-const { fetchAllSurveyIds } = require('../../modules/survey/repository/surveyRepository')
+const { fetchAllSurveyIds } = require('@server/modules/survey/repository/surveyRepository')
 
 const env = ProcessUtils.ENV.nodeEnv
 

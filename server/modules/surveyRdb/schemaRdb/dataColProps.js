@@ -1,19 +1,19 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-const ObjectUtils = require('../../../../core/objectUtils')
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Taxon = require('../../../../core/survey/taxon')
-const Node = require('../../../../core/record/node')
+const ObjectUtils = require('@core/objectUtils')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const Taxon = require('@core/survey/taxon')
+const Node = require('@core/record/node')
 
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
+const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+const sqlTypes = require('@common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
 
-const Point = require('../../../../core/geo/point')
-const GeoUtils = require('../../../../core/geo/geoUtils')
-const DateTimeUtils = require('../../../../core/dateUtils')
+const Point = require('@core/geo/point')
+const GeoUtils = require('@core/geo/geoUtils')
+const DateTimeUtils = require('@core/dateUtils')
 
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'

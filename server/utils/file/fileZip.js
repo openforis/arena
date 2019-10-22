@@ -1,7 +1,7 @@
 const R = require('ramda')
 const StreamZip = require('node-stream-zip')
 
-const Log = require('../../log/log')
+const Log = require('@server/log/log')
 
 class FileZip {
 

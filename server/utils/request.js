@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const User = require('../../core/user/user')
+const User = require('@core/user/user')
 
 const getServerUrl = req => `${req.protocol}://${req.get('host')}`
 

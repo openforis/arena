@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../../core/survey/survey')
+const Survey = require('@core/survey/survey')
 
-const Job = require('../../../../../job/job')
+const Job = require('@server/job/job')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 

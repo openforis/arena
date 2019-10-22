@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const BatchPersister = require('../../../db/batchPersister')
+const BatchPersister = require('@server/db/batchPersister')
 
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
-const Validation = require('../../../../core/validation/validation')
+const Taxonomy = require('@core/survey/taxonomy')
+const Taxon = require('@core/survey/taxon')
+const Validation = require('@core/validation/validation')
 
 const TaxonomyManager = require('./taxonomyManager')
 

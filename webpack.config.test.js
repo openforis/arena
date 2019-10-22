@@ -3,6 +3,7 @@ require('regenerator-runtime/runtime')
 const webpack = require('webpack')
 const path = require('path')
 const nodeExternals = require('webpack-node-externals')
+const mainConfig = require('./webpack.config')
 
 require('dotenv').config()
 
@@ -22,13 +23,7 @@ module.exports = {
     __dirname: true
   },
   resolve: {
-    alias: {
-      '@common': path.resolve(__dirname, 'common/'),
-      '@core': path.resolve(__dirname, 'core/'),
-      '@server': path.resolve(__dirname, 'server/'),
-      '@webapp': path.resolve(__dirname, 'webapp/'),
-      '@test': path.resolve(__dirname, 'test/'),
-    },
+    alias: mainConfig.resolve.alias,
   },
   module: {
     rules: [
