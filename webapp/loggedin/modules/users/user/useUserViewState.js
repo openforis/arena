@@ -7,7 +7,7 @@ import UserValidator from '../../../../../core/user/userValidator'
 import AuthGroups from '../../../../../core/auth/authGroups'
 import Authorizer from '../../../../../core/auth/authorizer'
 
-import * as AppState from '../../../../app/appState'
+import { notificationSeverity } from '../../../../app/appNotification/appNotificationState'
 
 import {
   useI18n,
@@ -25,7 +25,7 @@ import { appModuleUri, userModules } from '../../../appModules'
 export const useUserViewState = props => {
   const {
     user, surveyInfo, surveyCycleKey, lang, userUuid,
-    showAppLoader, hideAppLoader, showNotificationMessage, setUser,
+    showAppLoader, hideAppLoader, showNotification, setUser,
     history,
   } = props
 
@@ -158,7 +158,7 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotificationMessage('appErrors.generic', { text: userSaveError }, AppState.notificationSeverity.error)
+      showNotification('appErrors.generic', { text: userSaveError }, notificationSeverity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -166,9 +166,9 @@ export const useUserViewState = props => {
       }
 
       if (isInvitation) {
-        showNotificationMessage('usersView.inviteUserConfirmation', { email: formObject.email })
+        showNotification('usersView.inviteUserConfirmation', { email: formObject.email })
       } else {
-        showNotificationMessage('usersView.updateUserConfirmation', { name: formObject.name })
+        showNotification('usersView.updateUserConfirmation', { name: formObject.name })
       }
 
       history.push(appModuleUri(userModules.users))
@@ -185,13 +185,13 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (removeUserLoaded) {
-      showNotificationMessage('userView.removeUserConfirmation', {
+      showNotification('userView.removeUserConfirmation', {
         user: formObject.name,
         survey: Survey.getLabel(surveyInfo, lang)
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotificationMessage('appErrors.generic', { text: removeUserError }, AppState.notificationSeverity.error)
+      showNotification('appErrors.generic', { text: removeUserError }, notificationSeverity.error)
     }
   }, [removeUserLoaded, removeUserError])
 

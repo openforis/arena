@@ -6,9 +6,10 @@ import { connect } from 'react-redux'
 import AppSideBarModules from './components/appSideBarModules'
 
 import * as AppState from '../../app/appState'
+import * as SideBarState from './appSidebarState'
 import * as SurveyState from '../../survey/surveyState'
 
-import { toggleSideBar } from '../../app/actions'
+import { toggleSideBar } from './actions'
 
 const AppSideBar = (props) => {
 
@@ -45,7 +46,7 @@ const AppSideBar = (props) => {
 const mapStateToProps = state => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
-  isSideBarOpened: AppState.isSideBarOpened(state),
+  isSideBarOpened: SideBarState.isSideBarOpened(state),
 })
 
 export default connect(mapStateToProps, { toggleSideBar })(AppSideBar)

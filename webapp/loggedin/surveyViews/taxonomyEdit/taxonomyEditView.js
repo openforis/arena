@@ -16,7 +16,7 @@ import Taxonomy from '../../../../core/survey/taxonomy'
 import Taxon from '../../../../core/survey/taxon'
 
 import * as SurveyState from '../../../survey/surveyState'
-import * as AppState from '../../../app/appState'
+import * as JobState from '../../appJob/appJobState'
 import * as TaxonomyEditState from './taxonomyEditState'
 import * as TableViewState from '../../tableViews/tableViewsState'
 
@@ -78,7 +78,7 @@ const TaxonomyEditView = props => {
 const mapStateToProps = state => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
-  const activeJob = AppState.getActiveJob(state)
+  const activeJob = JobState.getActiveJob(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),

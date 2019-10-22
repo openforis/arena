@@ -7,10 +7,13 @@ import Counter from '../../core/counter'
 import * as CognitoAuth from './cognitoAuth'
 
 import * as AppState from './appState'
-import { cancelDebouncedAction, debounceAction } from '../utils/reduxUtils'
 
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
+
+export const systemErrorThrow = 'system/error'
+
+export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
 
 // ====== INIT
 
@@ -84,74 +87,8 @@ export const hideAppSaving = () => dispatch => {
   }
 }
 
-// ====== SIDEBAR
-
-export const appSideBarOpenedUpdate = 'app/sideBar/opened/update'
-
-export const toggleSideBar = () => (dispatch, getState) => {
-  const sideBarOpened = !AppState.isSideBarOpened(getState())
-  dispatch({ type: appSideBarOpenedUpdate, [AppState.keys.sideBarOpened]: sideBarOpened })
-}
-
-// ====== ERRORS HANDLING
-
-export const appErrorCreate = 'app/error/create'
-export const appErrorDelete = 'app/error/delete'
-export const systemErrorThrow = 'system/error'
-
-export const closeAppError = error => dispatch => dispatch({ type: appErrorDelete, error })
-
-export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
-
 // ====== APP LOADER
 
 export const showAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
 
 export const hideAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })
-
-// ====== APP JOB
-
-export const appJobStart = 'app/job/start'
-export const appJobActiveUpdate = 'app/job/active/update'
-
-export const showAppJobMonitor = (job, onComplete = null, autoHide = false) => dispatch =>
-  dispatch({ type: appJobStart, job, onComplete, autoHide })
-
-export const hideAppJobMonitor = () => dispatch => dispatch(activeJobUpdate(null))
-
-export const cancelActiveJob = () => async dispatch => {
-  await axios.delete(`/api/jobs/active`)
-  dispatch(hideAppJobMonitor())
-}
-
-export const activeJobUpdate = job => (dispatch, getState) => {
-  if (job && job.succeeded) {
-    const onComplete = AppState.getActiveJobOnCompleteCallback(getState())
-    if (onComplete) {
-      onComplete(job)
-    }
-  }
-  dispatch({ type: appJobActiveUpdate, job })
-}
-
-// ====== APP Notification
-export const appNotificationShow = 'app/notification/show'
-export const appNotificationHide = 'app/notification/hide'
-
-export const showNotificationMessage = (messageKey, messageParams, severity) => dispatch => {
-  dispatch({
-    type: appNotificationShow,
-    notification: {
-      [AppState.keysNotification.messageKey]: messageKey,
-      [AppState.keysNotification.messageParams]: messageParams,
-      [AppState.keysNotification.severity]: severity,
-    }
-  })
-
-  dispatch(debounceAction({ type: appNotificationHide }, appNotificationHide, 10000))
-}
-
-export const hideNotification = () => dispatch => {
-  dispatch(cancelDebouncedAction(appNotificationHide))
-  dispatch({ type: appNotificationHide })
-}

@@ -19,7 +19,10 @@ import AppContext from './appContext'
 
 import * as AppState from './appState'
 
-import { throwSystemError, initApp, activeJobUpdate } from './actions'
+import { initApp } from './actions'
+
+import { throwSystemError } from '../app/actions'
+import { activeJobUpdate } from '../loggedin/appJob/actions'
 
 const AppRouterSwitch = props => {
 

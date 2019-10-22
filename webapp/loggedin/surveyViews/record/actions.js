@@ -16,10 +16,10 @@ import * as RecordState from './recordState'
 import {
   showAppLoader,
   hideAppLoader,
-  showNotificationMessage,
   showAppSaving,
   hideAppSaving
 } from '../../../app/actions'
+import { showNotification } from '../../../app/appNotification/actions'
 
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
 
@@ -47,12 +47,12 @@ const _navigateToModuleDataHome = history => history.push(appModuleUri(appModule
 
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
-  dispatch(showNotificationMessage('recordView.justDeleted'))
+  dispatch(showNotification('recordView.justDeleted'))
   _navigateToModuleDataHome(history)
 }
 
 export const sessionExpired = history => dispatch => {
-  dispatch(showNotificationMessage('recordView.sessionExpired'))
+  dispatch(showNotification('recordView.sessionExpired'))
   _navigateToModuleDataHome(history)
 }
 

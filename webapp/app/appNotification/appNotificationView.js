@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 
 import { CSSTransition } from 'react-transition-group'
 
-import * as AppState from '../appState'
+import * as NotificationState from './appNotificationState'
 
-import { hideNotification } from '../actions'
+import { hideNotification } from './actions'
 
 const AppNotificationView = props => {
   const {
@@ -40,11 +40,11 @@ const AppNotificationView = props => {
 }
 
 const mapStateToProps = state => ({
-  messageKey: AppState.getNotificationMessageKey(state),
-  messageParams: AppState.getNotificationMessageParams(state),
-  severity: AppState.getNotificationSeverity(state),
-  visible: AppState.isNotificationVisible(state),
-  i18n: AppState.getI18n(state),
+  messageKey: NotificationState.getNotificationMessageKey(state),
+  messageParams: NotificationState.getNotificationMessageParams(state),
+  severity: NotificationState.getNotificationSeverity(state),
+  visible: NotificationState.isNotificationVisible(state),
+  i18n: NotificationState.getI18n(state),
 })
 
 export default connect(mapStateToProps, { hideNotification })(AppNotificationView)

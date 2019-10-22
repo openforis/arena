@@ -3,14 +3,6 @@ import { assocActionProps, exportReducer } from '../utils/reduxUtils'
 import {
   appPropsChange,
   appUserLogout,
-  appErrorCreate,
-  appErrorDelete,
-  appSideBarOpenedUpdate,
-  appJobActiveUpdate,
-  appJobStart,
-  systemErrorThrow,
-  appNotificationShow,
-  appNotificationHide,
   appSavingUpdate,
 } from './actions'
 
@@ -34,26 +26,6 @@ const actionHandlers = {
 
   // ====== saving
   [appSavingUpdate]: (state, { saving }) => AppState.assocSaving(saving)(state),
-
-  // ====== sideBar
-  [appSideBarOpenedUpdate]: (state, { sideBarOpened }) => AppState.assocSideBarOpened(sideBarOpened)(state),
-
-  // ====== app job
-  [appJobStart]: (state, { job, onComplete, autoHide }) => AppState.startJob(job, onComplete, autoHide)(state),
-
-  [appJobActiveUpdate]: (state, { job }) => AppState.updateActiveJob(job)(state),
-
-  // ===== app errors
-  [appErrorCreate]: (state, { error }) => AppState.assocAppError(error)(state),
-
-  [appErrorDelete]: (state, { error }) => AppState.dissocAppError(error)(state),
-
-  [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),
-
-  // ===== app notification
-  [appNotificationShow]: (state, { notification }) => AppState.showNotification(notification)(state),
-
-  [appNotificationHide]: AppState.hideNotification,
 }
 
 export default exportReducer(actionHandlers)
