@@ -13,6 +13,16 @@ const keysPrefs = {
 const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
 const pathSurveyCycle = surveyId => [keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle]
 
+//====== CREATE
+const newPrefs = (surveyId, surveyCycleKey) => ({
+  [keysPrefs.surveys]: {
+    [keysPrefs.current]: surveyId,
+    [surveyId]: {
+      [keysPrefs.cycle]: surveyCycleKey
+    }
+  }
+})
+
 //====== READ
 const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
 
@@ -47,6 +57,9 @@ const deletePrefSurvey = surveyId => user => {
 
 module.exports = {
   keysPrefs,
+
+  //CREATE
+  newPrefs,
 
   //READ
   getPrefSurveyCurrent,

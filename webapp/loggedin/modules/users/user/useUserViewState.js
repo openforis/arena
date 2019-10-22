@@ -24,7 +24,7 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, lang, userUuid,
+    user, surveyInfo, surveyCycleKey, lang, userUuid,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
@@ -141,13 +141,18 @@ export const useUserViewState = props => {
   // SAVE
 
   // persist user/invitation actions
+  const userInviteParams = R.pipe(
+    R.omit(['name']),
+    R.assoc('surveyCycleKey', surveyCycleKey)
+  )(formObject)
+
   const {
     dispatch: saveUser,
     loaded: userSaved,
     data: userSaveResponse,
     error: userSaveError,
   } = isInvitation
-    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, R.omit(['name'], formObject))
+    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, userInviteParams)
     : useAsyncMultipartPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formData)
 
   useOnUpdate(() => {
