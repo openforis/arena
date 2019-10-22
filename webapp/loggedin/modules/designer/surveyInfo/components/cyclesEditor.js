@@ -53,10 +53,12 @@ const CycleEditor = props => {
     onChange, onDelete
   } = props
 
+  const stepNum = Number(step) + 1
+
   return (
     <div key={step} className="cycle">
       <div className="step">
-        {Number(step) + 1} -
+        {stepNum}
       </div>
       <DateContainer
         date={SurveyCycle.getDateStart(cycle)}
@@ -79,7 +81,7 @@ const CycleEditor = props => {
       {
         canDelete &&
         <button className="btn-s btn-transparent btn-delete"
-                onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: step + 1 }))
+                onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }))
                   ? onDelete(step)
                   : null
                 }>
