@@ -7,6 +7,7 @@ import Survey from '../../../../../../core/survey/survey'
 import SurveyCycle from '../../../../../../core/survey/surveyCycle'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
+import ValidationTooltip from '../../../../../commonComponents/validationTooltip'
 
 const DateEditor = ({ date, onChange }) => {
   const [year, month, day] = R.pipe(
@@ -49,52 +50,54 @@ const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
 
 const CycleEditor = props => {
   const {
-    step, cycle, i18n, readOnly, canDelete,
-    onChange, onDelete
+    step, cycle, i18n, readOnly, validation,
+    canDelete, onChange, onDelete
   } = props
 
   const stepNum = Number(step) + 1
 
   return (
-    <div key={step} className="cycle">
-      <div className="step">
-        {stepNum}
-      </div>
-      <DateContainer
-        date={SurveyCycle.getDateStart(cycle)}
-        keyLabel="common.from"
-        i18n={i18n}
-        readOnly={readOnly}
-        onChange={date => onChange(SurveyCycle.setDateStart(date)(cycle))}
-      />
-      {
-        (SurveyCycle.getDateEnd(cycle) || !readOnly) &&
+    <ValidationTooltip validation={validation}>
+      <div key={step} className="cycle">
+        <div className="step">
+          {stepNum}
+        </div>
         <DateContainer
-          date={SurveyCycle.getDateEnd(cycle)}
-          keyLabel="common.to"
+          date={SurveyCycle.getDateStart(cycle)}
+          keyLabel="common.from"
           i18n={i18n}
           readOnly={readOnly}
-          onChange={date => onChange(SurveyCycle.setDateEnd(date)(cycle))}
+          onChange={date => onChange(SurveyCycle.setDateStart(date)(cycle))}
         />
-      }
+        {
+          (SurveyCycle.getDateEnd(cycle) || !readOnly) &&
+          <DateContainer
+            date={SurveyCycle.getDateEnd(cycle)}
+            keyLabel="common.to"
+            i18n={i18n}
+            readOnly={readOnly}
+            onChange={date => onChange(SurveyCycle.setDateEnd(date)(cycle))}
+          />
+        }
 
-      {
-        canDelete &&
-        <button className="btn-s btn-transparent btn-delete"
-                onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }))
-                  ? onDelete(step)
-                  : null
-                }>
-          <span className="icon icon-bin2 icon-12px"/>
-        </button>
-      }
-    </div>
+        {
+          canDelete &&
+          <button className="btn-s btn-transparent btn-delete"
+                  onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }))
+                    ? onDelete(step)
+                    : null
+                  }>
+            <span className="icon icon-bin2 icon-12px"/>
+          </button>
+        }
+      </div>
+    </ValidationTooltip>
   )
 }
 
 const CyclesEditor = props => {
 
-  const { surveyInfo, cycles, readOnly, setCycles } = props
+  const { surveyInfo, cycles, readOnly, setCycles, validation } = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
@@ -116,6 +119,7 @@ const CyclesEditor = props => {
               cycle={cycle}
               i18n={i18n}
               readOnly={readOnly}
+              validation={validation && validation[step]}
               onChange={cycleUpdate => setCycles(
                 R.assoc(step, cycleUpdate)(cycles)
               )}
