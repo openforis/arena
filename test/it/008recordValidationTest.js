@@ -1,6 +1,6 @@
 const { expect } = require('chai')
 
-const { getContextUser } = require('../testContext')
+const { initTestContext, getContextUser } = require('../testContext')
 
 const Survey = require('../../core/survey/survey')
 const NodeDef = require('../../core/survey/nodeDef')
@@ -20,6 +20,7 @@ let survey = null
 let record = null
 
 before(async () => {
+  await initTestContext()
   const user = getContextUser()
 
   survey = await SB.survey(user,
@@ -47,7 +48,7 @@ before(async () => {
   ).buildAndStore()
 
   record = await RB.record(user, survey,
-    RB.entity('root',
+    RB.entity('cluster',
       RB.attribute('cluster_no', '1'),
       RB.attribute('required_attr', 'some value'),
       RB.attribute('not_required_attr', 'some other value'),
@@ -71,18 +72,20 @@ after(async () => {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
 })
 
-const deleteNode = async (parentNode, childNodeName, childNodePosition) => {
+const _persistNode = async node =>
+  record = await RecordManager.persistNode(getContextUser(), survey, record, node)
+
+const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
   const node = children[childNodePosition - 1]
   record = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
-  return record
 }
 
 const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
   const node = RecordUtils.findNodeByPath(nodePath)(survey, record)
 
-  record = await RecordManager.persistNode(getContextUser(), survey, record, Node.assocValue(value)(node))
+  await _persistNode(Node.assocValue(value)(node))
 
   const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
 
@@ -93,7 +96,7 @@ const deleteNodeAndExpectMinCountToBe = async (parentNodePath, childNodeName, ch
   const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
-  record = await deleteNode(parentNode, childNodeName, childNodePosition)
+  await _deleteNode(parentNode, childNodeName, childNodePosition)
 
   const minCountValidation = RecordUtils.getValidationMinCount(parentNode, childDef)(record)
 
@@ -106,13 +109,45 @@ const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = tr
 
   const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
 
-  record = await RecordManager.persistNode(getContextUser(), survey, record, node)
+  await _persistNode(node)
 
   const countValidation = min
     ? RecordUtils.getValidationMinCount(parentNode, childDef)(record)
     : RecordUtils.getValidationMaxCount(parentNode, childDef)(record)
 
   expect(Validation.isValid(countValidation)).to.equal(expectedValidation)
+}
+
+const addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
+  // add a new tree
+  const nodeRoot = Record.getRootNode(record)
+  const nodeDefTree = Survey.getNodeDefByName('tree')(survey)
+  const nodeTree = Node.newNode(NodeDef.getUuid(nodeDefTree), Record.getUuid(record), nodeRoot)
+  await _persistNode(nodeTree)
+
+  // update new tree num with a duplicate value
+  const nodeTreeNum = RecordUtils.findNodeByPath('cluster/tree[4]/tree_num')(survey, record)
+  const value = 2 //duplicate value
+  await _persistNode(Node.assocValue(value)(nodeTreeNum))
+
+  // expect validation to be invalid
+  const nodeTreeNumValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNum))(Record.getValidation(record))
+  expect(Validation.isValid(nodeTreeNumValidation)).to.equal(false)
+
+  // expect duplicate node validation to be invalid
+  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
+  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(Record.getValidation(record))
+  expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(false)
+}
+
+const removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () => {
+  await addNodeWithDuplicateKeyAndExpect2ValidationErrors()
+
+  await _deleteNode(Record.getRootNode(record), 'tree', 4)
+
+  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
+  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(Record.getValidation(record))
+  expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(true)
 }
 
 describe('Record Validation Test', async () => {
@@ -204,4 +239,14 @@ describe('Record Validation Test', async () => {
   it('Expressions : invalid value (higher than max)', async () => {
     await updateNodeAndExpectValidationToBe('cluster/percent_attr', 120, false)
   })
+
+  // ========== entity keys validation
+  it('Entity Keys Validator : add entity with duplicate key and expect 2 validation errors', async () => {
+    await addNodeWithDuplicateKeyAndExpect2ValidationErrors()
+  })
+
+  it('Entity Keys Validator : remove entity with duplicate key and expect duplicate node key to be valid', async () => {
+    await removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid()
+  })
+
 })
