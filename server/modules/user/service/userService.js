@@ -132,9 +132,9 @@ const acceptInvitation = async (user, userUuid, name, client = db) => {
     throw new UnauthorizedError(User.getName(user))
 
   await client.tx(async t => {
-    const userToUpdate = await UserManager.acceptInvitation(user, name, t)
+    const userUpdated = await UserManager.updateUsername(user, name, t)
     // update user name in aws
-    await aws.updateUser(User.getEmail(userToUpdate), null, name)
+    await aws.updateUser(User.getEmail(userUpdated), null, name)
   })
 }
 
