@@ -3,7 +3,9 @@ const R = require('ramda')
 const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
 const Record = require('../record')
+const Node = require('../node')
 const Validation = require('../../validation/validation')
+const ObjectUtils = require('../../objectUtils')
 
 const validateAttributeKey = (survey, record, attributeDef) => async (propName, node) => {
   const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
@@ -18,7 +20,12 @@ const validateAttributeKey = (survey, record, attributeDef) => async (propName, 
 
 const _isEntityDuplicate = (survey, record, entity) => {
   // 1. get sibling entities
-  const siblingEntities = Record.getNodeSiblings(entity)(record)
+  const nodeParent = Record.getParentNode(entity)(record)
+  const siblingEntities = R.pipe(
+    Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(entity)),
+    R.reject(ObjectUtils.isEqual(entity))
+  )(record)
+
   // 2. get key values
   const keyValues = Record.getEntityKeyValues(survey, entity)(record)
 

@@ -50,8 +50,6 @@ module.exports = {
   getAncestorsAndSelf: RecordReader.getAncestorsAndSelf,
   getAncestorByNodeDefUuid: RecordReader.getAncestorByNodeDefUuid,
 
-  getNodeSiblings: RecordReader.getNodeSiblings,
-  getNodeSiblingsAndSelf: RecordReader.getNodeSiblingsAndSelf,
   getNodeChildren: RecordReader.getNodeChildren,
   getNodeChildrenByDefUuid: RecordReader.getNodeChildrenByDefUuid,
   getNodeChildByDefUuid: RecordReader.getNodeChildByDefUuid,

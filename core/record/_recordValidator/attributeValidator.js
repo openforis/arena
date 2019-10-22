@@ -122,7 +122,10 @@ const _getCustomValidationMessages = (survey, expression) => {
 
 const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
   const siblingKeys = []
-  const siblings = Record.getNodeSiblingsAndSelf(node)(record)
+
+  const nodeParent = Record.getParentNode(node)(record)
+  const siblings = Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(node))(record)
+
   for (const sibling of siblings) {
     const nodesKey = Record.getEntityKeyNodes(survey, sibling)(record)
     siblingKeys.push.apply(siblingKeys, nodesKey)

@@ -96,7 +96,8 @@ const insertNode = async (survey, record, node, user, t) => {
 
   // If it's a code, don't insert if it has been inserted already (by another user)
   if (NodeDef.isCode(nodeDef)) {
-    const siblings = Record.getNodeSiblingsAndSelf(node)(record)
+    const nodeParent = Record.getParentNode(node)(record)
+    const siblings = Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(node))(record)
     if (R.any(sibling => R.equals(Node.getValue(sibling), Node.getValue(node)))(siblings)) {
       return {}
     }
@@ -211,7 +212,12 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
     //find sibling entities with same key values
     const nodeDeletedKeyValues = Record.getEntityKeyValues(survey, node)(record)
     if (!R.isEmpty(nodeDeletedKeyValues)) {
-      const nodeSiblings = Record.getNodeSiblings(node)(record)
+      const nodeParent = Record.getParentNode(node)(record)
+      const nodeSiblings = R.pipe(
+        Record.getNodeChildrenByDefUuid(nodeParent, NodeDef.getUuid(nodeDef)),
+        R.reject(ObjectUtils.isEqual(node))
+      )(record)
+
       nodeSiblings.forEach(nodeSibling => {
         const nodeKeys = Record.getEntityKeyNodes(survey, nodeSibling)(record)
         // if key nodes are the same as the ones of the deleted node,
