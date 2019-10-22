@@ -1,7 +1,9 @@
 @import "../../../../style/vars";
 
 .home-dashboard {
+  width: calc(100% + 25px);
   display: grid;
   grid-template-rows: 120px 500px 1fr;
   grid-template-columns: .6fr .4fr;
+  grid-column-gap: 10px;
 }

@@ -143,7 +143,7 @@ module.exports = {
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
-      confirmDeleteCycle:`Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
+      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',
       viewInfo: 'View info',
@@ -179,6 +179,9 @@ module.exports = {
       year: '{{count}} Year',
       year_plural: '{{count}} Years',
     },
+    activityLog: {
+      recentActivity: 'Recent activity',
+    }
   },
 
   designerView: {
@@ -411,7 +414,7 @@ module.exports = {
     },
 
     expressions: {
-      expressionInvalid: "Invalid expression: {{details}}",
+      expressionInvalid: 'Invalid expression: {{details}}',
       cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',

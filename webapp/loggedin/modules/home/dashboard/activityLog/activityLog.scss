@@ -1,0 +1,23 @@
+@import "../../../../../style/vars";
+
+.activity-log {
+  grid-row: 1/4;
+  grid-column-start: 2;
+  position: relative;
+  background-color: $white;
+}
+
+.activity-log__header {
+  position: absolute;
+  width: calc(100% + 50px);
+  height: 35px;
+  left: -25px;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $black;
+  color: $white;
+  text-transform: uppercase;
+  font-weight: 600;
+}
