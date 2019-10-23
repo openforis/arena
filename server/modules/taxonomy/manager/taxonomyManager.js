@@ -111,6 +111,15 @@ const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, dra
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
 }
 
+const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, draft) => {
+  const taxonomy = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
+  const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
+  return {
+    taxonomy,
+    taxa: await TaxonomyRepository.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, vernacularLangCodes, draft)
+  }
+}
+
 // ====== UPDATE
 
 const publishTaxonomiesProps = async (surveyId, client = db) => {
@@ -159,6 +168,7 @@ module.exports = {
   fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,
   fetchTaxaWithVernacularNames: TaxonomyRepository.fetchTaxaWithVernacularNames,
+  fetchTaxaWithVernacularNamesStream,
 
   //UPDATE
   publishTaxonomiesProps,
