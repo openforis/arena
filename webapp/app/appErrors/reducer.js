@@ -6,7 +6,7 @@ import {
   systemErrorThrow,
 } from './actions'
 
-import * as AppState from '../../app/appState'
+import * as AppState from '../appState'
 
 const actionHandlers = {
   [appErrorCreate]: (state, { error }) => AppState.assocAppError(error)(state),
