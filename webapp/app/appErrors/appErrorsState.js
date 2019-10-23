@@ -1,5 +1,9 @@
 import * as R from 'ramda'
 
+import * as AppState from '../appState'
+
+export const stateKey = 'errors'
+
 export const keys = {
   errors: 'errors',
 }
@@ -12,7 +16,7 @@ const _getAppErrors = R.pipe(
   R.sort((a, b) => +b.id - +a.id)
 )
 
-export const getAppErrors = R.pipe(getState, _getAppErrors)
+export const getAppErrors = R.pipe(AppState.getState, _getAppErrors)
 
 export const assocAppError = error => state => R.pipe(
   _getAppErrors,

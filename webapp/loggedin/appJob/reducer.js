@@ -6,12 +6,12 @@ import {
 } from './actions'
 
 
-import * as AppState from '../../app/appState'
+import * as JobState from './appJobState'
 
 const actionHandlers = {
-  [appJobStart]: (state, { job, onComplete, autoHide }) => AppState.startJob(job, onComplete, autoHide)(state),
+  [appJobStart]: (state, { job, onComplete, autoHide }) => JobState.startJob(job, onComplete, autoHide)(state),
 
-  [appJobActiveUpdate]: (state, { job }) => AppState.updateActiveJob(job)(state),
+  [appJobActiveUpdate]: (state, { job }) => JobState.updateActiveJob(job)(state),
 }
 
 export default exportReducer(actionHandlers)

@@ -8,10 +8,12 @@ import * as CognitoAuth from './cognitoAuth'
 
 import * as AppState from './appState'
 
-import { throwSystemError } from './appErrors/actions'
-
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
+
+export const systemErrorThrow = 'system/error'
+
+export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
 
 // ====== INIT
 

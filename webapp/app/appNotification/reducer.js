@@ -5,12 +5,12 @@ import {
   appNotificationHide,
 } from './actions'
 
-import * as AppState from '../appState'
+import * as NotificationState from './appNotificationState'
 
 const actionHandlers = {
-  [appNotificationShow]: (state, { notification }) => AppState.showNotification(notification)(state),
+  [appNotificationShow]: (state, { notification }) => NotificationState.showNotification(notification)(state),
 
-  [appNotificationHide]: AppState.hideNotification,
+  [appNotificationHide]: NotificationState.hideNotification,
 }
 
 export default exportReducer(actionHandlers)

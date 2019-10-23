@@ -10,7 +10,6 @@ export const keys = {
   systemError: 'systemError',
   saving: 'saving',
   loaderVisible: 'loaderVisible',
-  notification: 'notification',
 
   // i18n
   i18n: 'i18n',

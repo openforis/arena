@@ -8,9 +8,11 @@ import {
 
 import { surveyCreate, surveyDelete, surveyUpdate } from '../survey/actions'
 
-import * as AppState from './appState'
+import { systemErrorThrow } from './actions'
 
 const actionHandlers = {
+
+  [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),
 
   [appPropsChange]: (state, { survey, ...props }) => assocActionProps(state, props),
 

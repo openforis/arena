@@ -1,11 +1,15 @@
 import * as R from 'ramda'
 
+import * as AppState from '../../app/appState'
+
+export const stateKey = 'job'
+
 export const keys = {
   activeJob: 'activeJob',
   onComplete: 'onComplete',
 }
 
-export const getActiveJob = R.pipe(getState, R.propOr(null, keys.activeJob))
+export const getActiveJob = R.pipe(AppState.getState, R.propOr(null, keys.activeJob))
 
 export const startJob = (job, onComplete = null, autoHide = false) =>
   R.assoc(

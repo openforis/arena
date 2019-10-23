@@ -7,7 +7,7 @@ import UserValidator from '../../../../../core/user/userValidator'
 import AuthGroups from '../../../../../core/auth/authGroups'
 import Authorizer from '../../../../../core/auth/authorizer'
 
-import { notificationSeverity } from '../../../../app/appNotification/appNotificationState'
+import * as NotificationState from '../../../../app/appNotification/appNotificationState'
 
 import {
   useI18n,
@@ -158,7 +158,7 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotification('appErrors.generic', { text: userSaveError }, notificationSeverity.error)
+      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.notificationSeverity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -191,7 +191,7 @@ export const useUserViewState = props => {
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotification('appErrors.generic', { text: removeUserError }, notificationSeverity.error)
+      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.notificationSeverity.error)
     }
   }, [removeUserLoaded, removeUserError])
 

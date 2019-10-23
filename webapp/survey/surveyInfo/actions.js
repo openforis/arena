@@ -3,7 +3,7 @@ import axios from 'axios'
 import Survey from '../../../core/survey/survey'
 import Validation from '../../../core/validation/validation'
 
-import { notificationSeverity } from '../../app/appNotification/appNotificationState'
+import * as NotificationState from '../../app/appNotification/appNotificationState'
 import * as SurveyState from '../surveyState'
 
 import { hideAppLoader, showAppLoader } from '../../app/actions'
@@ -25,7 +25,7 @@ export const updateSurveyInfoProps = props => async (dispatch, getState) => {
     dispatch({ type: surveyInfoUpdate, surveyInfo })
     dispatch(resetSurveyDefs())
   } else {
-    dispatch(showNotification('common.formContainsErrors', null, notificationSeverity.error))
+    dispatch(showNotification('common.formContainsErrors', null, NotificationState.notificationSeverity.error))
     dispatch({ type: surveyInfoValidationUpdate, validation: Validation.getValidation(surveyInfo) })
   }
 

@@ -14,7 +14,7 @@ import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
 
 import { showNotification } from '../../app/appNotification/actions'
-import { notificationSeverity } from '../../app/appNotification/appNotificationState'
+import * as NotificationState from '../../app/appNotification/appNotificationState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
@@ -84,7 +84,7 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // nodeDef has default values, cannot change into multiple
-    dispatch(showNotification('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, notificationSeverity.warning))
+    dispatch(showNotification('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, NotificationState.notificationSeverity.warning))
     return false
   }
   return true
@@ -180,7 +180,7 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
     dispatch(showNotification('nodeDefEdit.cannotDeleteNodeDefReferenced', {
       nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
       nodeDefDependents
-    }, notificationSeverity.warning))
+    }, NotificationState.notificationSeverity.warning))
 
   } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
     // delete confirmed
