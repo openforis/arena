@@ -33,4 +33,4 @@ export const show = notification => ({
   [keys.visible]: true
 })
 
-export const hide = ({})
+export const hide = () => ({})
