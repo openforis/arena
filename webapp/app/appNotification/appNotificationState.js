@@ -2,6 +2,8 @@ import * as R from 'ramda'
 
 export const stateKey = 'appNotification'
 
+const getState = R.propOr({}, stateKey)
+
 const keys = {
   messageKey: 'messageKey',
   messageParams: 'messageParams',
@@ -21,10 +23,10 @@ export const newNotification = (key, params, severity) => ({
   [keys.severity]: severity,
 })
 
-export const getMessageKey = R.propOr(null, keys.messageKey)
-export const getMessageParams = R.propOr({}, keys.messageParams)
-export const getSeverity = R.propOr(severity.info, keys.severity)
-export const isVisible = R.propEq(keys.visible, true)
+export const getMessageKey = R.pipe(getState, R.propOr(null, keys.messageKey))
+export const getMessageParams = R.pipe(getState, R.propOr({}, keys.messageParams))
+export const getSeverity = R.pipe(getState, R.propOr(severity.info, keys.severity))
+export const isVisible = R.pipe(getState, R.propEq(keys.visible, true))
 
 export const show = notification => ({
   ...notification,
