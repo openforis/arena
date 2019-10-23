@@ -29,9 +29,7 @@ const AppError = ({ error, closeAppError }) => {
       <div className="status">
         ERROR {R.path(['response', 'status'], error)}
       </div>
-      <div className="message">
-        <Markdown options={{html: false}} source={i18n.t(key, params)} />
-      </div>
+      <Markdown className="message" source={i18n.t(key, params)}/>
     </div>
   )
 }
@@ -45,10 +43,10 @@ const AppErrors = ({ errors, closeAppError }) => (
         <CSSTransition
           key={error.id}
           timeout={500}
-          classNames="fade"
-        >
-          <AppError error={error}
-                    closeAppError={closeAppError}/>
+          classNames="fade">
+          <AppError
+            error={error}
+            closeAppError={closeAppError}/>
         </CSSTransition>
       )
     }

@@ -1,31 +1,23 @@
-import React from 'react'
-import Remarkable from 'remarkable'
+import React, { useState, useEffect } from 'react'
+import marked from 'marked'
 
-// Usage: <Markdown source={msg}  />
-// Props:
-// - source: markdown text to render
-// - options: Remarkable options (optional)
-// - container: the container element to use (defaults to 'div')
-export default class Markdown extends React.Component {
-  render() {
-    const Container = this.props.container;
-    const output = this.renderMarkdown(this.props.source)
-    if (this.props.options.html)
-        return <Container dangerouslySetInnerHTML={{ __html: output}} />
-    else
-        return <Container>{output}</Container>
- }
+const Markdown = props => {
+  const { container: Container, className, source } = props
+  const [output, setOutput] = useState('')
 
-  renderMarkdown(source) {
-    if (this.options !== this.props.options) {
-      this.md = new Remarkable(this.props.options)
-      this.options = this.props.options
-    }
-    return this.md.render(source)
-  }
+  useEffect(() => {
+    setOutput(marked(source))
+  }, [source])
+
+  return (
+    <Container className={className} dangerouslySetInnerHTML={{ __html: output }}/>
+  )
 }
 
 Markdown.defaultProps = {
-  container: 'div',
-  options: {},
+  source: '', // markdown text to render
+  container: 'div', // the container element to use
+  className: '', // the class name to apply to the container element
 }
+
+export default Markdown

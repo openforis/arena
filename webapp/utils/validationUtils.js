@@ -47,6 +47,6 @@ export const getValidationFieldMessagesHTML = (i18n, showKeys = true) =>
     R.pipe(
       getValidationFieldMessages(i18n, showKeys),
       R.addIndex(R.map)(
-        (msg, i) => <Markdown key={i} source={msg} options={{html: true}} />
+        (msg, i) => <Markdown key={i} source={msg}/>
       )
     )(validation)

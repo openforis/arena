@@ -25,9 +25,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
       <ModalBody>
         <div className="survey-delete-dialog__body">
           <div className="highlight">
-            <div>
-              <Markdown options={{html: false}} source={i18n.t('homeView.deleteSurveyDialog.deleteWarning', { surveyName })} />
-            </div>
+            <Markdown source={i18n.t('homeView.deleteSurveyDialog.deleteWarning', { surveyName })}/>
             <div>{i18n.t('common.cantUndoWarning')}</div>
           </div>
 
