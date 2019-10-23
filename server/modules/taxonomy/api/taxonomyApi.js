@@ -120,8 +120,6 @@ module.exports.init = app => {
       Response.setContentTypeFile(res, `taxonomy_${taxonomyUuid}.csv`, null, Response.contentTypes.csv)
 
       await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
-
-      res.end()
     } catch (err) {
       next(err)
     }
