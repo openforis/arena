@@ -14,8 +14,8 @@ import { useI18n } from '../../../commonComponents/hooks'
 
 import Taxonomy from '../../../../core/survey/taxonomy'
 
-import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
+import * as SurveyState from '../../../survey/surveyState'
 import * as TaxonomyEditState from './taxonomyEditState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'

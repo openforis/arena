@@ -15,7 +15,8 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '../../../../app/actions'
+import { showAppLoader, hideAppLoader, setUser } from '../../../../app/actions'
+import { showNotification } from '../../../../app/appNotification/actions'
 
 import { useUserViewState } from './useUserViewState'
 
@@ -130,5 +131,5 @@ const mapStateToProps = (state, { match }) => ({
 
 export default connect(
   mapStateToProps,
-  { showAppLoader, hideAppLoader, showNotificationMessage, setUser },
+  { showAppLoader, hideAppLoader, showNotification, setUser },
 )(UserView)

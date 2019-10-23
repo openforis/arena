@@ -7,33 +7,13 @@ import AuthGroups from '../../core/auth/authGroups'
 export const keys = {
   status: 'status',
   user: 'user',
-  activeJob: 'activeJob',
-  errors: 'errors',
   systemError: 'systemError',
   saving: 'saving',
-  sideBarOpened: 'sideBarOpened',
   loaderVisible: 'loaderVisible',
-  notification: 'notification',
-
-  // activeJob keys
-  onComplete: 'onComplete',
 
   // i18n
   i18n: 'i18n',
   lang: 'lang',
-}
-
-export const keysNotification = {
-  messageKey: 'messageKey',
-  messageParams: 'messageParams',
-  visible: 'visible',
-  severity: 'severity',
-}
-
-export const notificationSeverity = {
-  info: 'info',
-  warning: 'warning',
-  error: 'error',
 }
 
 export const getState = R.prop('app')
@@ -93,55 +73,10 @@ export const assocSaving = R.assoc(keys.saving)
 
 export const isSaving = R.pipe(getState, R.propEq(keys.saving, true))
 
-// ==== APP SIDE BAR
-export const isSideBarOpened = R.pipe(getState, R.propEq(keys.sideBarOpened, true))
-
-export const assocSideBarOpened = sideBarOpened => R.assoc(keys.sideBarOpened, sideBarOpened)
-
-// ==== APP CURRENT ACTIVE JOB
-
-export const getActiveJob = R.pipe(getState, R.propOr(null, keys.activeJob))
-
-export const startJob = (job, onComplete = null, autoHide = false) =>
-  R.assoc(
-    keys.activeJob,
-    { ...job, onComplete, autoHide }
-  )
-
-export const updateActiveJob = job =>
-  state => job
-    ? R.assoc(
-      keys.activeJob,
-      R.mergeRight(R.prop(keys.activeJob)(state), job)
-    )(state)
-    : R.dissoc(keys.activeJob)(state)
-
-export const getActiveJobOnCompleteCallback = R.pipe(getActiveJob, R.defaultTo({}), R.propOr(null, keys.onComplete))
-
 // ==== APP I18N
 export const getI18n = R.pipe(getState, R.prop(keys.i18n))
 
 export const getLang = R.pipe(getI18n, R.prop(keys.lang))
-
-// ==== APP ERRORS
-
-const _getAppErrors = R.pipe(
-  R.prop(keys.errors),
-  R.values,
-  R.sort((a, b) => +b.id - +a.id)
-)
-
-export const getAppErrors = R.pipe(getState, _getAppErrors)
-
-export const assocAppError = error => state => R.pipe(
-  _getAppErrors,
-  R.head,
-  R.defaultTo({ id: -1 }),
-  last => 1 + last.id,
-  id => R.assocPath([keys.errors, id + ''], { id, ...error })(state)
-)(state)
-
-export const dissocAppError = error => R.dissocPath([keys.errors, error.id + ''])
 
 // ==== System ERRORS
 
@@ -152,17 +87,3 @@ export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
 // ==== App Loader
 
 export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))
-
-// ==== App Notification
-
-export const getNotificationMessageKey = R.pipe(getState, R.pathOr(null, [keys.notification, keysNotification.messageKey]))
-export const getNotificationMessageParams = R.pipe(getState, R.pathOr({}, [keys.notification, keysNotification.messageParams]))
-export const getNotificationSeverity = R.pipe(getState, R.pathOr(notificationSeverity.info, [keys.notification, keysNotification.severity]))
-export const isNotificationVisible = R.pipe(getState, R.pathEq([keys.notification, keysNotification.visible], true))
-
-export const showNotification = notification => R.pipe(
-  R.assoc(keys.notification, notification),
-  R.assocPath([keys.notification, keysNotification.visible], true)
-)
-
-export const hideNotification = R.assocPath([keys.notification, keysNotification.visible], false)
