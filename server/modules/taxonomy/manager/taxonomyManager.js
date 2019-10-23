@@ -113,7 +113,7 @@ const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, draft)
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
   return {
     taxonomy,
-    taxa: await TaxonomyRepository.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, vernacularLangCodes, draft)
+    taxaStream: TaxonomyRepository.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, vernacularLangCodes, draft)
   }
 }
 

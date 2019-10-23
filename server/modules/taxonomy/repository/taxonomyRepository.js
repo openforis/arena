@@ -131,6 +131,7 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
       WHERE
           t.taxonomy_uuid = $1
       ORDER BY
+        ${DbUtils.getPropColCombined(Taxon.propKeys.family, draft, 't.')},
         ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')}
       LIMIT ${limit ? limit : 'ALL'} 
       OFFSET $2
@@ -140,7 +141,7 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
   )
 }
 
-const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
+const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
   const vernacularNamesSubSelects = R.pipe(
     R.map(langCode =>
       `(
@@ -163,7 +164,6 @@ const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, vernac
 
   const select =
     `SELECT
-          t.id, t.uuid, 
           ${propsFields}
           ${R.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
       FROM
@@ -171,6 +171,7 @@ const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, vernac
       WHERE
           t.taxonomy_uuid = $1
       ORDER BY
+          ${DbUtils.getPropColCombined(Taxon.propKeys.family, draft, 't.')},
           ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')}`
 
   return new DbUtils.QueryStream(DbUtils.formatQuery(select, [taxonomyUuid]))

@@ -44,8 +44,6 @@ module.exports.init = app => {
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
       await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, 0, null, filter, sort, false, res)
-
-      res.end()
     } catch (err) {
       next(err)
     }

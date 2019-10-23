@@ -8,7 +8,7 @@ const JobManager = require('../../../job/jobManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 
 const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
-  const { taxonomy, taxa: taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, draft)
+  const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, draft)
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
   const headers = [
