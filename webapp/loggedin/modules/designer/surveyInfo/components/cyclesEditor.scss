@@ -46,3 +46,8 @@
     }
   }
 }
+
+.tooltip-error .cycle {
+  /* Without !important, the default border declaration at cyclesEditor is more specific! */
+  border: 2px solid rgba($red, 0.6) !important;
+}

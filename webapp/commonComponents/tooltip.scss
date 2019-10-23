@@ -42,10 +42,6 @@
     border: 2px solid rgba($red, 0.6);
   }
 
-  .cycle {
-    /* Without !important, other border stuff is more specific! */
-    border: 2px solid rgba($red, 0.6) !important;
-  }
 }
 
 .tooltip__message-error,
