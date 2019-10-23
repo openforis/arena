@@ -19,7 +19,7 @@ module.exports.init = app => {
     try {
       const user = Request.getUser(req)
 
-      const { surveyId, email, groupUuid } = Request.getParams(req)
+      const { surveyId, email, groupUuid, surveyCycleKey } = Request.getParams(req)
       const validation = await UserValidator.validateInvitation(Request.getBody(req))
 
       if (!Validation.isValid(validation)) {
@@ -27,7 +27,7 @@ module.exports.init = app => {
       }
 
       const serverUrl = Request.getServerUrl(req)
-      await UserService.inviteUser(user, surveyId, email, groupUuid, serverUrl)
+      await UserService.inviteUser(user, surveyId, surveyCycleKey, email, groupUuid, serverUrl)
       Response.sendOk(res)
     } catch (err) {
       next(err)
@@ -90,12 +90,12 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/user/:userUuid/name', async (req, res, next) => {
+  app.put('/user/:userUuid/accept-invitation', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { userUuid, name } = Request.getParams(req)
 
-      await UserService.updateUsername(user, userUuid, name)
+      await UserService.acceptInvitation(user, userUuid, name)
 
       Response.sendOk(res)
     } catch (err) {

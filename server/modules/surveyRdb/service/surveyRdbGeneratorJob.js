@@ -39,13 +39,13 @@ class SurveyRdbGeneratorJob extends Job {
 
       // ===== create table
       this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createTable(survey, nodeDef, tx)
+      await SurveyRdbManager.createTableAndView(survey, nodeDef, tx)
       // await tx.none(`ALTER TABLE ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDef, nodeDefParent)} DISABLE TRIGGER ALL`)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table
       this.logDebug(`insert into table ${nodeDefName} - start`)
-      await SurveyRdbManager.insertIntoTable(survey, nodeDef, tx)
+      await SurveyRdbManager.populateTable(survey, nodeDef, tx)
       this.logDebug(`insert into table ${nodeDefName} - end`)
 
       this.incrementProcessedItems()

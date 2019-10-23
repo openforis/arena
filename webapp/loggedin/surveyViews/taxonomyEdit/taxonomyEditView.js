@@ -13,19 +13,17 @@ import TaxaTableRow from './components/taxaTableRow'
 import { useI18n } from '../../../commonComponents/hooks'
 
 import Taxonomy from '../../../../core/survey/taxonomy'
-import Taxon from '../../../../core/survey/taxon'
 
-import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
+import * as SurveyState from '../../../survey/surveyState'
 import * as TaxonomyEditState from './taxonomyEditState'
-import * as TableViewState from '../../tableViews/tableViewsState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
 
 const TaxonomyEditView = props => {
 
   const {
-    surveyId, taxonomy, taxa,
+    surveyId, taxonomy,
     canEdit,
     setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile,
   } = props
@@ -34,11 +32,7 @@ const TaxonomyEditView = props => {
 
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
-  const vernacularLanguageCodes = R.reduce(
-    (acc, taxon) => R.concat(acc, R.difference(R.keys(Taxon.getVernacularNames(taxon)), acc)),
-    [],
-    taxa
-  )
+  const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
   const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`}`
 
@@ -78,12 +72,10 @@ const TaxonomyEditView = props => {
 const mapStateToProps = state => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
-  const activeJob = AppState.getActiveJob(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),
     taxonomy: TaxonomyEditState.getTaxonomy(state),
-    taxa: TableViewState.getList('taxa')(state),
     canEdit: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }

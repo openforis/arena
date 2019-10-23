@@ -8,7 +8,7 @@ import { debounceAction } from '../../../../utils/reduxUtils'
 
 import * as ProcessingChainState from './processingChainState'
 import { analysisModules, appModuleUri } from '../../../appModules'
-import { showNotificationMessage } from '../../../../app/actions'
+import { showNotification } from '../../../../app/appNotification/actions'
 
 export const processingChainUpdate = '/analysis/processingChain/update'
 export const processingChainPropUpdate = '/analysis/processingChain/prop/update'
@@ -57,5 +57,5 @@ export const deleteProcessingChain = history => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`)
 
   dispatch(navigateToProcessingChainsView(history))
-  dispatch(showNotificationMessage('analysis.processingChain.deleteComplete'))
+  dispatch(showNotification('analysis.processingChain.deleteComplete'))
 }

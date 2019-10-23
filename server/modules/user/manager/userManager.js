@@ -9,9 +9,9 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 // ==== CREATE
 
-const insertUser = async (user, surveyId, uuid, email, groupUuid, client = db) =>
+const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid, client = db) =>
   await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(surveyId, uuid, email, t)
+    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, uuid, email, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 

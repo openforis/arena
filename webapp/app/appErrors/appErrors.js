@@ -9,9 +9,9 @@ import * as R from 'ramda'
 
 import { useI18n } from '../../commonComponents/hooks'
 
-import * as AppState from '../../app/appState'
+import * as ErrorsState from './appErrorsState'
 
-import { closeAppError } from '../../app/actions'
+import { closeAppError } from './actions'
 
 const AppError = ({ error, closeAppError }) => {
 
@@ -54,7 +54,7 @@ const AppErrors = ({ errors, closeAppError }) => (
 )
 
 const mapStateToProps = (state) => ({
-  errors: AppState.getAppErrors(state)
+  errors: ErrorsState.getAppErrors(state)
 })
 
 export default connect(

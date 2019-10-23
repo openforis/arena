@@ -5,7 +5,7 @@ import React from 'react'
 import AppHeader from './appHeader/appHeader'
 import AppSideBar from './appSideBar/appSideBar'
 import AppJobMonitor from './appJob/appJobMonitor'
-import AppErrors from './appErrors/appErrors'
+import AppErrors from '../app/appErrors/appErrors'
 import ModuleSwitch from './modules/moduleSwitch'
 
 const AppView = props => {

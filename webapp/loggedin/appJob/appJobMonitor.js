@@ -8,9 +8,9 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../commonComponen
 import ProgressBar from '../../commonComponents/progressBar'
 import AppJobErrors from './appJobErrors'
 
-import * as AppState from '../../app/appState'
+import * as JobState from './appJobState'
 
-import { cancelActiveJob, hideAppJobMonitor } from '../../app/actions'
+import { cancelActiveJob, hideAppJobMonitor } from './actions'
 
 const JobProgress = ({ job }) =>
   <ProgressBar progress={job.progressPercent} className={job.status}/>
@@ -72,7 +72,7 @@ const AppJobMonitor = props => {
 }
 
 const mapStateToProps = state => ({
-  job: AppState.getActiveJob(state),
+  job: JobState.getActiveJob(state),
 })
 
 export default connect(

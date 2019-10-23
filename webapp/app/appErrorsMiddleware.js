@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { appErrorCreate } from './actions'
+import { appErrorCreate } from './appErrors/actions'
 
 const createAxiosMiddleware = (axios) => ({ dispatch, getState }) => {
 

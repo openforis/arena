@@ -1,30 +1,21 @@
 const R = require('ramda')
 const db = require('../../../db/db')
 const CSVWriter = require('../../../utils/file/csvWriter')
-//surveyRdbManger cannot use SurveyManager - circular dependency
 
 const Survey = require('../../../../core/survey/survey')
 const NodeDef = require('../../../../core/survey/nodeDef')
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const DataTable = require('../schemaRdb/dataTable')
 
 const RecordRepository = require('../../record/repository/recordRepository')
 const NodeRepository = require('../../record/repository/nodeRepository')
 
-const NodesInsert = require('../dbActions/nodesInsert')
-const NodesUpdate = require('../dbActions/nodesUpdate')
-const TableViewCreate = require('../dbActions/tableViewCreate')
-const TableViewQuery = require('../dbActions/tableViewQuery')
-const DataTableRepository = require('../dbActions/dataTableRepository')
-
-// ==== DDL
-
-const dropSchema = async (surveyId, client = db) => await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)
-
-const createSchema = async (surveyId, client = db) => await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
-
-const createTable = async (survey, nodeDef, client = db) => await TableViewCreate.run(survey, nodeDef, client)
+const SchemaRdbRepository = require('../repository/schemaRdbRepository')
+const DataTableInsertRepository = require('../repository/dataTableInsertRepository')
+const DataTableUpdateRepository = require('../repository/dataTableUpdateRepository')
+const DataTableReadRepository = require('../repository/dataTableReadRepository')
+const DataViewCreateRepository = require('../repository/dataViewCreateRepository')
+const DataViewReadRepository = require('../repository/dataViewReadRepository')
 
 // ==== DML
 const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
@@ -53,7 +44,7 @@ const queryTable = async (
 
   // fetch data
   const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
-  let rows = await TableViewQuery.runSelect(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort, !!streamOutput)
+  let rows = await DataViewReadRepository.runSelect(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort, !!streamOutput)
 
   // edit mode, assoc nodes to columns
   if (editMode) {
@@ -95,20 +86,20 @@ const queryTable = async (
 const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
-  return await TableViewQuery.runCount(surveyId, cycle, tableName, filter)
+  return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
 
 module.exports = {
-  dropSchema,
-  createSchema,
-  createTable,
+  dropSchema: SchemaRdbRepository.dropSchema,
+  createSchema: SchemaRdbRepository.createSchema,
+  createTableAndView: DataViewCreateRepository.createTableAndView,
 
-  insertIntoTable: NodesInsert.run,
-  updateTableNodes: NodesUpdate.run,
+  populateTable: DataTableInsertRepository.populateTable,
+  updateTable: DataTableUpdateRepository.updateTable,
 
   queryTable,
   countTable,
-  countDuplicateRecords: TableViewQuery.countDuplicateRecords,
-  fetchRecordsCountByKeys: TableViewQuery.fetchRecordsCountByKeys,
-  fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
+  countDuplicateRecords: DataViewReadRepository.countDuplicateRecords,
+  fetchRecordsCountByKeys: DataViewReadRepository.fetchRecordsCountByKeys,
+  fetchRecordsWithDuplicateEntities: DataTableReadRepository.fetchRecordsWithDuplicateEntities,
 }
