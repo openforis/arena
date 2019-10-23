@@ -97,7 +97,7 @@ const CycleEditor = props => {
 
 const CyclesEditor = props => {
 
-  const { surveyInfo, cycles, readOnly, setCycles, validation } = props
+  const { surveyInfo, cycles, readOnly, setCycles, validation, cyclesValidation } = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
@@ -108,39 +108,41 @@ const CyclesEditor = props => {
   }
 
   return (
-    <div className="home-survey-info__cycles-editor">
+    <ValidationTooltip validation={validation}>
+      <div className="home-survey-info__cycles-editor">
 
-      <div className="cycles">
-        {
-          cycleEntries.map(([step, cycle], i) =>
-            <CycleEditor
-              key={step}
-              step={step}
-              cycle={cycle}
-              i18n={i18n}
-              readOnly={readOnly}
-              validation={validation && validation[step]}
-              onChange={cycleUpdate => setCycles(
-                R.assoc(step, cycleUpdate)(cycles)
-              )}
-              canDelete={!readOnly && step !== Survey.cycleOneKey && i === cycleEntries.length - 1}
-              onDelete={onDelete}
-            />
-          )
-        }
+        <div className="cycles">
+          {
+            cycleEntries.map(([step, cycle], i) =>
+              <CycleEditor
+                key={step}
+                step={step}
+                cycle={cycle}
+                i18n={i18n}
+                readOnly={readOnly}
+                validation={cyclesValidation[step]}
+                onChange={cycleUpdate => setCycles(
+                  R.assoc(step, cycleUpdate)(cycles)
+                )}
+                canDelete={!readOnly && step !== Survey.cycleOneKey && i === cycleEntries.length - 1}
+                onDelete={onDelete}
+              />
+            )
+          }
 
-        {
-          !readOnly &&
-          <button className="btn-s btn-add"
-                  onClick={() => setCycles(
-                    R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
-                  )}>
-            <span className="icon icon-plus icon-10px"/>
-          </button>
-        }
+          {
+            !readOnly &&
+            <button className="btn-s btn-add"
+                    onClick={() => setCycles(
+                      R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
+                    )}>
+              <span className="icon icon-plus icon-10px"/>
+            </button>
+          }
+        </div>
+
       </div>
-
-    </div>
+    </ValidationTooltip>
   )
 
 }

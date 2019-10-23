@@ -83,6 +83,7 @@ const SurveyInfoView = (props) => {
             setCycles={setCycles}
             surveyInfo={surveyInfo}
             validation={getFieldValidation('cycles')}
+            cyclesValidation={Object.keys(cycles).map(getFieldValidation)}
           />
         </div>
 

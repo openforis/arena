@@ -3,55 +3,76 @@ const R = require('ramda')
 const Validator = require('../../validation/validator')
 const Validation = require('../../validation/validation')
 
+const MAX_CYCLES = 10
+
 const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
   return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)
     ? { key: Validation.messageKeys.nameDuplicate }
     : null
 }
 
-const isInvalidDate = x => x && isNaN(Date.parse(x))
+const toErrorKey = key => key === null ? null : { key }
+const cycleProps = (propName, nodeDef) => R.path(propName.split('.'), nodeDef)
 
-function* _validateCyclesIter(cs) {
-  if (cs.length === 0 )
-    yield { cycle: 0, key: Validation.messageKeys.surveyInfoEdit.cyclesRequired }
-  if (cs.length > 10 )
-    yield { cycle: 10, key: Validation.messageKeys.surveyInfoEdit.tooManyCycles }
+const isValidDate = dateStr => !dateStr || !isNaN(Date.parse(dateStr))
 
-  yield* cs.filter( ([_,v]) => isInvalidDate(v.dateStart) || isInvalidDate(v.dateEnd) )
-    .map( ([cycle,_]) => ({ cycle, key: Validation.messageKeys.invalidDate }) )
-  yield* cs.filter( ([_,v]) => !v.dateStart)
-    .map( ([cycle,_]) => ({ cycle, key: Validation.messageKeys.surveyInfoEdit.startDateRequired }) )
-  yield* cs.filter( ([_,v]) => v.dateEnd && v.dateStart > v.dateEnd )
-    .map( ([cycle,_]) => ({ cycle, key: Validation.messageKeys.surveyInfoEdit.startDateAfterEndDate }) )
+const validateCycleMinLength = x =>
+  Object.keys(x).length > 0
+  ? null : Validation.messageKeys.surveyInfoEdit.cyclesRequired
 
-  // Cycles must have an end date unless it's the last cycle:
-  yield*
-    cs.slice(0, -1)
-    .filter(([_,v]) => !v.dateEnd)
-    .map( ([cycle,_]) => ({ cycle, key: Validation.messageKeys.surveyInfoEdit.endDateRequiredExceptForLastCycle }) )
+const validateCycleMaxLength = x =>
+  Object.keys(x).length <= MAX_CYCLES
+  ? null : Validation.messageKeys.surveyInfoEdit.tooManyCycles
 
-  // Cycles must not overlap
-  yield*
-    R.zip(cs, cs.slice(1))
-    .filter( ([[_k1,prev], [_k2,cur]]) => !prev.dateEnd || (cur.dateStart <= prev.dateEnd) )
-    .map( ([_, cur]) => cur )
-    .map( ([cycle,_]) => ({ cycle, key: Validation.messageKeys.surveyInfoEdit.previousCycleMustEndBeforeNextCycle }) )
+const validateCycleDates = ({dateStart, dateEnd}) =>
+  isValidDate(dateStart) && isValidDate(dateEnd)
+  ? null : Validation.messageKeys.invalidDate
+
+const validateCycleStartDate = ({dateStart}) =>
+  dateStart
+  ? null : Validation.messageKeys.surveyInfoEdit.startDateRequired
+
+const validateCycleStartDateBeforeEndDate = ({dateStart, dateEnd}) =>
+  !dateEnd || dateStart < dateEnd
+  ? null : Validation.messageKeys.surveyInfoEdit.startDateAfterEndDate
+
+const validateCycleEndDateForAllButLast = (propName, nodeDef) => {
+  const allCycles = R.path(propName.split('.').slice(0, -1), nodeDef)
+  const lastCycle = Object.keys(allCycles).length - 1
+  const cycleNum = +R.last( propName.split('.') )
+  const { dateEnd } = cycleProps(propName, nodeDef)
+  return (
+    cycleNum === lastCycle || dateEnd
+    ? null : Validation.messageKeys.surveyInfoEdit.endDateRequiredExceptForLastCycle
+  )
 }
 
-const validateCycles = (propName, nodeDef) => {
-  const cycles = R.path(propName.split('.'), nodeDef)
-  const cs = Object.entries(cycles)
-  const errors = {}, res = {}
-
-  for (const cycle in cycles)
-    errors[cycle] = []
-  for (const {cycle, key} of _validateCyclesIter(cs))
-    errors[cycle].push({key})
-  for (const [cycle, cycleErrors] of Object.entries(errors))
-    res[cycle] = Validation.newInstance(cycleErrors.length === 0, [], cycleErrors, [])
-
-  return res
+const validateCyclesMustNotOverlap = (propName, nodeDef) => {
+  const prefix = propName.replace(/\.[^.]+$/, '')
+  const cycleNum = +R.last( propName.split('.') )
+  const prev = cycleProps(`${prefix}.${cycleNum - 1}`, nodeDef)
+  const cur = cycleProps(propName, nodeDef)
+  return (
+    cycleNum === 0 || !prev.dateEnd || (cur.dateStart > prev.dateEnd)
+    ? null : Validation.messageKeys.surveyInfoEdit.previousCycleMustEndBeforeNextCycle
+  )
 }
+
+const cycleValidatorsGlobal = [
+  validateCycleMinLength,
+  validateCycleMaxLength,
+].map(fn => R.pipe(cycleProps, fn, toErrorKey))
+
+const cycleValidatorsIndividual = [
+  validateCycleDates,
+  validateCycleStartDate,
+  validateCycleStartDateBeforeEndDate,
+].map(fn => R.pipe(cycleProps, fn, toErrorKey))
+
+const cycleValidatorsContextual = [
+  validateCycleEndDateForAllButLast,
+  validateCyclesMustNotOverlap,
+].map(fn => R.pipe(fn, toErrorKey))
 
 const validateNewSurvey = async (survey, surveyInfos) => await Validator.validate(
   survey,
@@ -66,7 +87,16 @@ const validateNewSurvey = async (survey, surveyInfos) => await Validator.validat
 )
 
 const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
-  const surveyInfoValidation = await Validator.validate(
+  const cyclePropNames = R.pipe(
+    R.pathOr({}, ['props', 'cycles']),
+    Object.keys,
+  )(surveyInfo).map(x => `props.cycles.${x}`)
+
+  const cycles = {}
+  for (const name of cyclePropNames)
+    cycles[name] = cycleValidatorsIndividual.concat(cycleValidatorsContextual)
+
+  return await Validator.validate(
     surveyInfo,
     {
       'props.name': [
@@ -74,13 +104,12 @@ const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
         Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
         validateSurveyNameUniqueness(surveyInfos)
       ],
+      'props.cycles': cycleValidatorsGlobal,
       'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
       'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
+      ...cycles,
     }
   )
-
-  surveyInfoValidation.fields.cycles = validateCycles('props.cycles', surveyInfo)
-  return surveyInfoValidation
 }
 
 module.exports = {
