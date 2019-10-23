@@ -3,7 +3,7 @@ import './deleteSurveyDialog.scss'
 import React, { useState } from 'react'
 
 import { useI18n } from '../../../../../../commonComponents/hooks'
-import Markdown from '../../../../../../utils/markdown'
+import Markdown from '../../../../../../commonComponents/markdown'
 
 import {
   Modal,

@@ -3,7 +3,7 @@ import './appErrors.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
-import Markdown from '../../utils/markdown'
+import Markdown from '../../commonComponents/markdown'
 
 import * as R from 'ramda'
 

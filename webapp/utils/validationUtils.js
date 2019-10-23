@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import Validation from '../../core/validation/validation'
 import ValidationResult from '../../core/validation/validationResult'
-import Markdown from './markdown'
+import Markdown from '../commonComponents/markdown'
 
 const getErrorText = i18n => error =>
   ValidationResult.hasMessages(error)
