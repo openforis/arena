@@ -5,12 +5,12 @@ const RecordValidation = require('../../../../../core/record/recordValidation')
 const Node = require('../../../../../core/record/node')
 const Validation = require('../../../../../core/validation/validation')
 
-const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
+const DataViewReadRepository = require('../../../surveyRdb/repository/dataViewReadRepository')
 
 const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
   // 1. check if record is unique
-  const recordsCount = await SurveyRdbManager.countDuplicateRecords(survey, record, tx)
+  const recordsCount = await DataViewReadRepository.countDuplicateRecords(survey, record, tx)
   const isUnique = recordsCount === 0
 
   // 3. fetch key nodes
@@ -30,7 +30,7 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
  */
 const validateRecordsUniqueness = async (survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx) => {
   const result = {}
-  const recordsCountRows = await SurveyRdbManager.fetchRecordsCountByKeys(survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx)
+  const recordsCountRows = await DataViewReadRepository.fetchRecordsCountByKeys(survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx)
 
   if (!R.isEmpty(recordsCountRows)) {
     for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
