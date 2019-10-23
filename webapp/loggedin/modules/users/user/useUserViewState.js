@@ -7,7 +7,7 @@ import UserValidator from '../../../../../core/user/userValidator'
 import AuthGroups from '../../../../../core/auth/authGroups'
 import Authorizer from '../../../../../core/auth/authorizer'
 
-import * as AppState from '../../../../app/appState'
+import * as NotificationState from '../../../../app/appNotification/appNotificationState'
 
 import {
   useI18n,
@@ -24,8 +24,8 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, lang, userUuid,
-    showAppLoader, hideAppLoader, showNotificationMessage, setUser,
+    user, surveyInfo, surveyCycleKey, lang, userUuid,
+    showAppLoader, hideAppLoader, showNotification, setUser,
     history,
   } = props
 
@@ -141,19 +141,24 @@ export const useUserViewState = props => {
   // SAVE
 
   // persist user/invitation actions
+  const userInviteParams = R.pipe(
+    R.omit(['name']),
+    R.assoc('surveyCycleKey', surveyCycleKey)
+  )(formObject)
+
   const {
     dispatch: saveUser,
     loaded: userSaved,
     data: userSaveResponse,
     error: userSaveError,
   } = isInvitation
-    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, R.omit(['name'], formObject))
+    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, userInviteParams)
     : useAsyncMultipartPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formData)
 
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotificationMessage('appErrors.generic', { text: userSaveError }, AppState.notificationSeverity.error)
+      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.severity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -161,9 +166,9 @@ export const useUserViewState = props => {
       }
 
       if (isInvitation) {
-        showNotificationMessage('usersView.inviteUserConfirmation', { email: formObject.email })
+        showNotification('usersView.inviteUserConfirmation', { email: formObject.email })
       } else {
-        showNotificationMessage('usersView.updateUserConfirmation', { name: formObject.name })
+        showNotification('usersView.updateUserConfirmation', { name: formObject.name })
       }
 
       history.push(appModuleUri(userModules.users))
@@ -180,13 +185,13 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (removeUserLoaded) {
-      showNotificationMessage('userView.removeUserConfirmation', {
+      showNotification('userView.removeUserConfirmation', {
         user: formObject.name,
         survey: Survey.getLabel(surveyInfo, lang)
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotificationMessage('appErrors.generic', { text: removeUserError }, AppState.notificationSeverity.error)
+      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.severity.error)
     }
   }, [removeUserLoaded, removeUserError])
 

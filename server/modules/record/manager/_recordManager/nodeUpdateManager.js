@@ -35,7 +35,7 @@ const persistNode = async (user, survey, record, node, t) => {
 
     record = Record.assocNode(nodeUpdate)(record)
 
-    return await _onNodeUpdate(survey, record, nodeUpdate, t)
+    return await _onNodeUpdate(survey, record, nodeUpdate, {}, t)
 
   } else {
     // create
@@ -96,7 +96,8 @@ const insertNode = async (survey, record, node, user, t) => {
 
   // If it's a code, don't insert if it has been inserted already (by another user)
   if (NodeDef.isCode(nodeDef)) {
-    const siblings = Record.getNodeSiblingsAndSelf(node)(record)
+    const nodeParent = Record.getParentNode(node)(record)
+    const siblings = Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(node))(record)
     if (R.any(sibling => R.equals(Node.getValue(sibling), Node.getValue(node)))(siblings)) {
       return {}
     }
@@ -104,9 +105,7 @@ const insertNode = async (survey, record, node, user, t) => {
 
   const nodesToReturn = await _insertNodeRecursively(survey, nodeDef, record, node, user, t)
 
-  record = Record.assocNodes(nodesToReturn)(record)
-
-  return _assocParentNode(Survey.getId(survey), record, node, nodesToReturn)
+  return _createUpdateResult(record, node, nodesToReturn)
 }
 
 const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, user, t) => {
@@ -148,12 +147,16 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
 
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
-  record = Record.assocNode(node)(record)
-
   if (!Record.isPreview(record))
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { uuid: nodeUuid }, t)
 
-  return await _onNodeUpdate(survey, record, node, t)
+  // get dependent key attributes before node is removed from record
+  // and return them so they will be re-validated later on
+  const nodeDependentKeyAttributes = _getNodeDependentKeyAttributes(survey, record, node)
+
+  record = Record.assocNode(node)(record)
+
+  return await _onNodeUpdate(survey, record, node, nodeDependentKeyAttributes, t)
 }
 
 const deleteNodesByNodeDefUuids = async (surveyId, nodeDefsUuids, record, client = db) => {
@@ -161,13 +164,11 @@ const deleteNodesByNodeDefUuids = async (surveyId, nodeDefsUuids, record, client
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
 }
 
-const _onNodeUpdate = async (survey, record, node, t) => {
+const _onNodeUpdate = async (survey, record, node, nodeDependents = {}, t) => {
   // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
 
-  let updatedNodes = {
-    [Node.getUuid(node)]: node
-  }
+  let updatedNodes = nodeDependents
 
   // delete dependent code nodes
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
@@ -176,7 +177,7 @@ const _onNodeUpdate = async (survey, record, node, t) => {
 
     if (!R.isEmpty(dependentCodes)) {
       const deletedNodesArray = await Promise.all(
-        dependentCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
+        dependentCodes.map(nodeCode => NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
       )
       updatedNodes = {
         ...updatedNodes,
@@ -185,25 +186,51 @@ const _onNodeUpdate = async (survey, record, node, t) => {
     }
   }
 
-  record = Record.assocNodes(updatedNodes)(record)
-
-  return _assocParentNode(surveyId, record, node, updatedNodes)
+  return _createUpdateResult(record, node, updatedNodes)
 }
 
-//always assoc parentNode, used in surveyRdbManager.updateTableNodes
-const _assocParentNode = (surveyId, record, node, nodes) => {
+const _createUpdateResult = (record, node, nodes) => {
+  record = Record.assocNodes(nodes)(record)
+
   const parentNode = Record.getParentNode(node)(record)
-  const parentNodeObj = parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}
-  const nodeObj = { [Node.getUuid(node)]: node }
 
   return {
     record,
     nodes: {
-      ...nodeObj,
-      ...parentNodeObj,
+      [Node.getUuid(node)]: node,
+      //always assoc parentNode, used in surveyRdbManager.updateTableNodes
+      ...parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {},
       ...nodes
     }
   }
+}
+
+const _getNodeDependentKeyAttributes = (survey, record, node) => {
+  const nodeDependentKeyAttributes = {}
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  if (NodeDef.isMultipleEntity(nodeDef)) {
+    //find sibling entities with same key values
+    const nodeDeletedKeyValues = Record.getEntityKeyValues(survey, node)(record)
+    if (!R.isEmpty(nodeDeletedKeyValues)) {
+      const nodeParent = Record.getParentNode(node)(record)
+      const nodeSiblings = R.pipe(
+        Record.getNodeChildrenByDefUuid(nodeParent, NodeDef.getUuid(nodeDef)),
+        R.reject(ObjectUtils.isEqual(node))
+      )(record)
+
+      nodeSiblings.forEach(nodeSibling => {
+        const nodeKeys = Record.getEntityKeyNodes(survey, nodeSibling)(record)
+        // if key nodes are the same as the ones of the deleted node,
+        // add them to the accumulator
+        const nodeKeyValues = R.map(Node.getValue)(nodeKeys)
+
+        if (R.equals(nodeKeyValues, nodeDeletedKeyValues)) {
+          nodeKeys.forEach(nodeKey => nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey)
+        }
+      })
+    }
+  }
+  return nodeDependentKeyAttributes
 }
 
 module.exports = {

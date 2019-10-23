@@ -1,4 +1,5 @@
 const R = require('ramda')
+const toSnakeCase = require('to-snake-case')
 
 const db = require('../../../db/db')
 
@@ -13,12 +14,13 @@ const {
 
 const Taxonomy = require('../../../../core/survey/taxonomy')
 const Taxon = require('../../../../core/survey/taxon')
+const TaxonVernacularName = require('../../../../core/survey/taxonVernacularName')
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
-  ${DbUtils.getPropColCombined('name', draft, 'vn.')} AS vernacular_name,
-  ${DbUtils.getPropColCombined('lang', draft, 'vn.')} AS vernacular_language`
+  ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} AS vernacular_name,
+  ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} AS vernacular_language`
 
 // ============== CREATE
 
@@ -62,10 +64,10 @@ const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, cli
     return client.one(
       `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (taxon_uuid, props_draft)
         VALUES ($1, $2)
-        ON CONFLICT (taxon_uuid, (props_draft->>'lang')) DO
+        ON CONFLICT (taxon_uuid, (props_draft->>'${TaxonVernacularName.keysProps.lang}')) DO
          UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $2
         RETURNING *`,
-      [taxonUuid, { lang: lang, name: vn }],
+      [taxonUuid, { [TaxonVernacularName.keysProps.lang]: lang, [TaxonVernacularName.keysProps.name]: vn }],
       record => dbTransformCallback(record, true, true)
     )
   })
@@ -106,7 +108,10 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
       (
       SELECT
           vn.taxon_uuid,
-          json_object_agg(${DbUtils.getPropColCombined('lang', draft, 'vn.')}, ${DbUtils.getPropColCombined('name', draft, 'vn.')})
+          json_object_agg(
+            ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')}, 
+            ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}
+          )
           AS names
       FROM
           ${schema}.taxon_vernacular_name vn
@@ -126,13 +131,49 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
       WHERE
           t.taxonomy_uuid = $1
       ORDER BY
-          (t.props || t.props_draft)->>'scientificName' ASC 
+        ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')}
       LIMIT ${limit ? limit : 'ALL'} 
       OFFSET $2
     `,
     [taxonomyUuid, offset],
     record => dbTransformCallback(record, draft, true)
   )
+}
+
+const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
+  const vernacularNamesSubSelects = R.pipe(
+    R.map(langCode =>
+      `(
+          SELECT
+              ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}
+          FROM
+               ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+          WHERE
+              vn.taxon_uuid = t.uuid
+              AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}' 
+       ) AS ${langCode}`
+    ),
+    R.join(', ')
+  )(vernacularLangCodes)
+
+  const propsFields = R.pipe(
+    R.map(prop => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
+    R.join(', ')
+  )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
+
+  const select =
+    `SELECT
+          t.id, t.uuid, 
+          ${propsFields}
+          ${R.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
+      FROM
+          ${getSurveyDBSchema(surveyId)}.taxon t
+      WHERE
+          t.taxonomy_uuid = $1
+      ORDER BY
+          ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')}`
+
+  return new DbUtils.QueryStream(DbUtils.formatQuery(select, [taxonomyUuid]))
 }
 
 const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
@@ -198,7 +239,7 @@ const findTaxaByVernacularName = async (surveyId,
                                         draft = false,
                                         client = db) => {
   const searchValue = toSearchValue(`*${filterValue}*`)
-  const filterCondition = searchValue ? DbUtils.getPropFilterCondition('name', draft, 'vn.') : ''
+  const filterCondition = searchValue ? DbUtils.getPropFilterCondition(TaxonVernacularName.keysProps.name, draft, 'vn.') : ''
 
   return await client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
@@ -207,7 +248,7 @@ const findTaxaByVernacularName = async (surveyId,
        ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $/taxonomyUuid/ 
       AND ${filterCondition}
-     ORDER BY ${DbUtils.getPropColCombined('name', draft, 'vn.')} ASC
+     ORDER BY ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} ASC
      LIMIT 20`,
     { taxonomyUuid, searchValue },
     record => dbTransformCallback(record, draft, true)
@@ -254,7 +295,7 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
       (
         SELECT
           v.taxon_uuid,
-          json_agg( json_build_object(${DbUtils.getPropColCombined('name', draft, 'v.')}, v.uuid::text) ) AS vernacular_names
+          json_agg( json_build_object(${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'v.')}, v.uuid::text) ) AS vernacular_names
         FROM
           ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
             
@@ -320,6 +361,7 @@ module.exports = {
   findTaxaByVernacularName,
 
   fetchTaxaWithVernacularNames,
+  fetchTaxaWithVernacularNamesStream,
 
   // taxon
   fetchTaxonByUuid,

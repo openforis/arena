@@ -16,7 +16,7 @@ import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import { useOnUpdate } from '../../../commonComponents/hooks'
 
-import * as AppState from '../../../app/appState'
+import * as SideBarState from '../../appSideBar/appSidebarState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from '../record/recordState'
@@ -154,7 +154,7 @@ const mapStateToProps = (state, props) => {
   const hasNodeDefAddChildTo = !!SurveyFormState.getNodeDefAddChildTo(state)
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
-  const isSideBarOpened = AppState.isSideBarOpened(state)
+  const isSideBarOpened = SideBarState.isOpened(state)
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,

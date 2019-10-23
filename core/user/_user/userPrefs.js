@@ -1,15 +1,27 @@
 const R = require('ramda')
 
+const ObjectUtils = require('../../objectUtils')
+
 const keys = require('./userKeys')
 
 const keysPrefs = {
   surveys: 'surveys',
   current: 'current',
-  cycle: 'cycle',
+  cycle: ObjectUtils.keys.cycle,
 }
 
 const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
 const pathSurveyCycle = surveyId => [keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle]
+
+//====== CREATE
+const newPrefs = (surveyId, surveyCycleKey) => ({
+  [keysPrefs.surveys]: {
+    [keysPrefs.current]: surveyId,
+    [surveyId]: {
+      [keysPrefs.cycle]: surveyCycleKey
+    }
+  }
+})
 
 //====== READ
 const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
@@ -45,6 +57,9 @@ const deletePrefSurvey = surveyId => user => {
 
 module.exports = {
   keysPrefs,
+
+  //CREATE
+  newPrefs,
 
   //READ
   getPrefSurveyCurrent,

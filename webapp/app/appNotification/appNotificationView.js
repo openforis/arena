@@ -7,7 +7,9 @@ import { CSSTransition } from 'react-transition-group'
 
 import * as AppState from '../appState'
 
-import { hideNotification } from '../actions'
+import * as NotificationState from './appNotificationState'
+
+import { hideNotification } from './actions'
 
 const AppNotificationView = props => {
   const {
@@ -40,10 +42,10 @@ const AppNotificationView = props => {
 }
 
 const mapStateToProps = state => ({
-  messageKey: AppState.getNotificationMessageKey(state),
-  messageParams: AppState.getNotificationMessageParams(state),
-  severity: AppState.getNotificationSeverity(state),
-  visible: AppState.isNotificationVisible(state),
+  messageKey: NotificationState.getMessageKey(state),
+  messageParams: NotificationState.getMessageParams(state),
+  severity: NotificationState.getSeverity(state),
+  visible: NotificationState.isVisible(state),
   i18n: AppState.getI18n(state),
 })
 

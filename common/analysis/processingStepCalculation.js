@@ -5,7 +5,9 @@ const ObjectUtils = require('../../core/objectUtils')
 const keys = {
   index: ObjectUtils.keys.index,
   uuid: ObjectUtils.keys.uuid,
-  nodeDefUuid: 'nodeDefUuid',
+  nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
+  processingStepUuid: 'processingStepUuid',
+  props: ObjectUtils.keys.props,
 }
 
 const keysProps = {
@@ -24,9 +26,12 @@ const aggregateFn = {
 
 const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, aggregateFn.sum)
 const getFormula = ObjectUtils.getProp(keysProps.formula)
-const getNodeDefUuid = R.prop(keysProps.nodeDefUuid)
+const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 
 module.exports = {
+  keys,
+  keysProps,
+
   //READ
   getAggregateFunction,
   getFormula,

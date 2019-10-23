@@ -49,7 +49,7 @@ const getSelectQuery = (surveySchema, nodeDef) => {
     : selectNodeRows
 }
 
-const run = async (survey, nodeDef, client) => {
+const populateTable = async (survey, nodeDef, client) => {
 
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
@@ -93,5 +93,5 @@ const run = async (survey, nodeDef, client) => {
 }
 
 module.exports = {
-  run
+  populateTable
 }

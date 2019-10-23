@@ -4,15 +4,17 @@ const StringUtils = require('./stringUtils')
 const DateUtils = require('./dateUtils')
 
 const keys = {
-  id: 'id',
-  uuid: 'uuid',
   authGroups: 'authGroups',
+  cycle: 'cycle',
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
+  id: 'id',
   index: 'index',
   name: 'name',
+  nodeDefUuid: 'nodeDefUuid',
   parentUuid: 'parentUuid',
   props: 'props',
+  uuid: 'uuid',
 }
 
 const keysProps = {
@@ -55,7 +57,9 @@ const getDate = prop => R.pipe(
 const getDateCreated = getDate(keys.dateCreated)
 const getDateModified = getDate(keys.dateModified)
 
+const getCycle = R.prop(keys.cycle)
 const getIndex = R.propOr(0, keys.index)
+const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 
 //===== UPDATE
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
@@ -106,7 +110,9 @@ module.exports = {
   getDate,
   getDateCreated,
   getDateModified,
+  getCycle,
   getIndex,
+  getNodeDefUuid,
 
   // UPDATE
   setProp,
@@ -115,5 +121,5 @@ module.exports = {
   // UTILS
   isEqual,
   toIndexedObj,
-  toUuidIndexedObj
+  toUuidIndexedObj,
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import ReactDOMServer from 'react-dom/server'
+import ReactDOMServer from 'react-dom/server.browser'
 
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'

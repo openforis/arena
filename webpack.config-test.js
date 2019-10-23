@@ -4,6 +4,8 @@ const webpack = require('webpack')
 const path = require('path')
 const nodeExternals = require('webpack-node-externals')
 
+require('dotenv').config()
+
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
 // const config = require("./webpack.config.js")
 // config.target = "node"

@@ -106,7 +106,7 @@ button, .btn {
   border: none;
   background-color: transparent;
   font-weight: 600;
-  color: darken($blue, 20%);
+  color: $blueDark;
 
   &:hover {
     color: $orange;

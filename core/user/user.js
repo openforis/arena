@@ -56,6 +56,7 @@ module.exports = {
   dissocAuthGroup,
 
   //PREFS
+  newPrefs: UserPrefs.newPrefs,
   getPrefSurveyCurrent: UserPrefs.getPrefSurveyCurrent,
   getPrefSurveyCycle: UserPrefs.getPrefSurveyCycle,
   getPrefSurveyCurrentCycle: UserPrefs.getPrefSurveyCurrentCycle,

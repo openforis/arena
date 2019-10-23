@@ -1,5 +1,6 @@
 const R = require('ramda')
 const pgp = require('pg-promise')()
+const QueryStream = require('pg-query-stream')
 
 const selectDate = (field, fieldAlias = null) =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias ? fieldAlias : field}`
@@ -84,5 +85,8 @@ module.exports = {
   getPropsCombined,
   //props column
   getPropColCombined,
-  getPropFilterCondition
+  getPropFilterCondition,
+
+  formatQuery: pgp.as.format,
+  QueryStream
 }

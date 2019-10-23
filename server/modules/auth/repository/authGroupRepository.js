@@ -61,12 +61,10 @@ const fetchSurveyGroups = async (surveyId, client = db) =>
 
 const fetchUserGroups = async (userUuid, client = db) =>
   await client.map(`
-    SELECT g.*, s.id as survey_id
+    SELECT g.*
     FROM auth_group_user gu
-      JOIN auth_group g
-        ON g.uuid = gu.group_uuid
-      LEFT OUTER JOIN survey s
-        ON s.uuid = g.survey_uuid
+    JOIN auth_group g
+      ON g.uuid = gu.group_uuid
     WHERE
       gu.user_uuid = $1
     `,

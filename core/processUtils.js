@@ -29,6 +29,8 @@ const ENV = {
   //EMAIL
   adminEmail: getEnvVariable('ADMIN_EMAIL'),
   sendGridApiKey: getEnvVariable('SENDGRID_API_KEY'),
+  //ANALYSIS
+  analysisOutputDir: getEnvVariable('ANALYSIS_OUTPUT_DIR'),
 }
 
 const envDevelopment = ENV.nodeEnv === environments.development

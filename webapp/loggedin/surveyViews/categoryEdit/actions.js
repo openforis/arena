@@ -23,7 +23,7 @@ import {
   categoriesUpdate,
 } from '../../../survey/categories/actions'
 
-import { showAppJobMonitor } from '../../../app/actions'
+import { showAppJobMonitor } from '../../appJob/actions'
 
 import * as CategoryEditState from './categoryEditState'
 

@@ -12,17 +12,17 @@ const User = require('../../../../core/user/user')
 const ObjectUtils = require('../../../../core/objectUtils')
 const Validation = require('../../../../core/validation/validation')
 
-const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const UserManager = require('../../user/manager/userManager')
 const AuthGroups = require('../../../../core/auth/authGroups')
 
+const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
 const SurveyRepository = require('../repository/surveyRepository')
 const CategoryRepository = require('../../category/repository/categoryRepository')
 const TaxonomyRepository = require('../../taxonomy/repository/taxonomyRepository')
 const UserRepository = require('../../user/repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
-const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
+const SchemaRdbRepository = require('../../surveyRdb/repository/schemaRdbRepository')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
@@ -203,7 +203,7 @@ const deleteSurvey = async surveyId => await db.tx(async t =>
   await Promise.all([
     UserRepository.deleteUsersPrefsSurvey(surveyId, t),
     SurveyRepository.dropSurveySchema(surveyId, t),
-    SurveyRdbManager.dropSchema(surveyId, t),
+    SchemaRdbRepository.dropSchema(surveyId, t),
     SurveyRepository.deleteSurvey(surveyId, t),
   ])
 )

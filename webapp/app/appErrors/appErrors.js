@@ -3,16 +3,15 @@ import './appErrors.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
+import Markdown from '../../commonComponents/markdown'
 
 import * as R from 'ramda'
 
 import { useI18n } from '../../commonComponents/hooks'
 
-import * as AppState from '../../app/appState'
+import * as ErrorsState from './appErrorsState'
 
-import { closeAppError } from '../../app/actions'
-
-import Markdown from 'react-remarkable'
+import { closeAppError } from './actions'
 
 const AppError = ({ error, closeAppError }) => {
 
@@ -30,11 +29,7 @@ const AppError = ({ error, closeAppError }) => {
       <div className="status">
         ERROR {R.path(['response', 'status'], error)}
       </div>
-      <div className="message">
-        <Markdown options={{ html: false }}>
-          {i18n.t(key, params)}
-        </Markdown>
-      </div>
+      <Markdown className="message" source={i18n.t(key, params)}/>
     </div>
   )
 }
@@ -48,10 +43,10 @@ const AppErrors = ({ errors, closeAppError }) => (
         <CSSTransition
           key={error.id}
           timeout={500}
-          classNames="fade"
-        >
-          <AppError error={error}
-                    closeAppError={closeAppError}/>
+          classNames="fade">
+          <AppError
+            error={error}
+            closeAppError={closeAppError}/>
         </CSSTransition>
       )
     }
@@ -59,7 +54,7 @@ const AppErrors = ({ errors, closeAppError }) => (
 )
 
 const mapStateToProps = (state) => ({
-  errors: AppState.getAppErrors(state)
+  errors: ErrorsState.getAppErrors(state)
 })
 
 export default connect(

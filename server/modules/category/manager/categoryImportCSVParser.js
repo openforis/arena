@@ -20,8 +20,8 @@ const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalCha
       const descriptionsByLevel = {}
 
       Object.entries(columns).forEach(
-        ([columnName, column], index) => {
-          const columnValue = row[index]
+        ([columnName, column]) => {
+          const columnValue = row[columnName]
 
           if (CategoryImportSummary.isColumnCode(column)) {
             codes.push(columnValue)

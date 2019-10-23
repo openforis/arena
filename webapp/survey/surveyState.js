@@ -8,6 +8,8 @@ import * as AppState from '../app/appState'
 
 const survey = 'survey'
 
+export const stateKey = survey
+
 /**
  * ======================
  * Survey State
