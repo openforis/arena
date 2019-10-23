@@ -21,10 +21,11 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
           if (ended)
             resolve()
         } else if (!canceled) {
+          const row = queue.dequeue()
           if (onRow) {
             processingRow = true
             try {
-              await onRow(queue.dequeue())
+              await onRow(_indexRowByHeaders(row))
               processingRow = false
             } catch (e) {
               cancel()
@@ -61,6 +62,11 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
       if (queue.isEmpty())
         resolve()
     }
+
+    const _indexRowByHeaders = row =>
+      headers
+        ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: row[index] }), {})
+        : row
 
     stream
       .pipe(csvParser())
