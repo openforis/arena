@@ -46,7 +46,7 @@ const AppSideBar = (props) => {
 const mapStateToProps = state => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
-  isSideBarOpened: SideBarState.isSideBarOpened(state),
+  isSideBarOpened: SideBarState.isOpened(state),
 })
 
 export default connect(mapStateToProps, { toggleSideBar })(AppSideBar)

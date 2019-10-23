@@ -154,7 +154,7 @@ const mapStateToProps = (state, props) => {
   const hasNodeDefAddChildTo = !!SurveyFormState.getNodeDefAddChildTo(state)
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
-  const isSideBarOpened = SideBarState.isSideBarOpened(state)
+  const isSideBarOpened = SideBarState.isOpened(state)
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,

@@ -1,13 +1,13 @@
 import * as R from 'ramda'
 
-import * as AppState from '../../app/appState'
+export const stateKey = 'appSideBar'
 
-export const stateKey = 'sideBar'
+const getState = R.propOr({}, stateKey)
 
 export const keys = {
-    sideBarOpened: 'sideBarOpened',
+  opened: 'opened',
 }
 
-export const isSideBarOpened = R.pipe(AppState.getState, R.propEq(keys.sideBarOpened, true))
+export const isOpened = R.pipe(getState, R.propEq(keys.opened, true))
 
-export const assocSideBarOpened = sideBarOpened => R.assoc(keys.sideBarOpened, sideBarOpened)
+export const assocOpened = R.assoc(keys.opened)

@@ -7,7 +7,7 @@ import {
 import * as SideBarState from './appSidebarState'
 
 const actionHandlers = {
-  [appSideBarOpenedUpdate]: (state, { sideBarOpened }) => SideBarState.assocSideBarOpened(sideBarOpened)(state),
+  [appSideBarOpenedUpdate]: (state, { opened }) => SideBarState.assocOpened(opened)(state),
 }
 
 export default exportReducer(actionHandlers)
