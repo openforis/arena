@@ -528,7 +528,7 @@ module.exports = {
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
     undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
-    userHasPendingInvitation: 'User {{email}} has been already invited',
+    userHasPendingInvitation: `There\'s already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it\'s accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
