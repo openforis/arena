@@ -42,10 +42,10 @@ const AppNotificationView = props => {
 }
 
 const mapStateToProps = state => ({
-  messageKey: NotificationState.getNotificationMessageKey(state),
-  messageParams: NotificationState.getNotificationMessageParams(state),
-  severity: NotificationState.getNotificationSeverity(state),
-  visible: NotificationState.isNotificationVisible(state),
+  messageKey: NotificationState.getMessageKey(state),
+  messageParams: NotificationState.getMessageParams(state),
+  severity: NotificationState.getSeverity(state),
+  visible: NotificationState.isVisible(state),
   i18n: AppState.getI18n(state),
 })
 

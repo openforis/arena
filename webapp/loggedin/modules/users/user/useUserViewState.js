@@ -158,7 +158,7 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.notificationSeverity.error)
+      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.severity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -191,7 +191,7 @@ export const useUserViewState = props => {
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.notificationSeverity.error)
+      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.severity.error)
     }
   }, [removeUserLoaded, removeUserError])
 

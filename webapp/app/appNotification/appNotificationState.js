@@ -1,34 +1,34 @@
 import * as R from 'ramda'
 
-import * as AppState from '../appState'
-
-export const stateKey = 'notification'
+export const stateKey = 'appNotification'
 
 const keys = {
-  notification: 'notification',
-}
-
-export const keysNotification = {
   messageKey: 'messageKey',
   messageParams: 'messageParams',
-  visible: 'visible',
   severity: 'severity',
+  visible: 'visible',
 }
 
-export const notificationSeverity = {
+export const severity = {
   info: 'info',
   warning: 'warning',
   error: 'error',
 }
-  
-export const getNotificationMessageKey = R.pipe(AppState.getState, R.pathOr(null, [keys.notification, keysNotification.messageKey]))
-export const getNotificationMessageParams = R.pipe(AppState.getState, R.pathOr({}, [keys.notification, keysNotification.messageParams]))
-export const getNotificationSeverity = R.pipe(AppState.getState, R.pathOr(notificationSeverity.info, [keys.notification, keysNotification.severity]))
-export const isNotificationVisible = R.pipe(AppState.getState, R.pathEq([keys.notification, keysNotification.visible], true))
 
-export const showNotification = notification => R.pipe(
-  R.assoc(keys.notification, notification),
-  R.assocPath([keys.notification, keysNotification.visible], true)
-)
+export const newNotification = (key, params, severity) => ({
+  [keys.messageKey]: key,
+  [keys.messageParams]: params,
+  [keys.severity]: severity,
+})
 
-export const hideNotification = R.assocPath([keys.notification, keysNotification.visible], false)
+export const getMessageKey = R.propOr(null, keys.messageKey)
+export const getMessageParams = R.propOr({}, keys.messageParams)
+export const getSeverity = R.propOr(severity.info, keys.severity)
+export const isVisible = R.propEq(keys.visible, true)
+
+export const show = notification => ({
+  ...notification,
+  [keys.visible]: true
+})
+
+export const hide = ({})

@@ -8,9 +8,9 @@ import {
 import * as NotificationState from './appNotificationState'
 
 const actionHandlers = {
-  [appNotificationShow]: (state, { notification }) => NotificationState.showNotification(notification)(state),
+  [appNotificationShow]: (state, { notification }) => NotificationState.show(notification),
 
-  [appNotificationHide]: NotificationState.hideNotification,
+  [appNotificationHide]: NotificationState.hide,
 }
 
 export default exportReducer(actionHandlers)

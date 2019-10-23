@@ -4,14 +4,10 @@ import { cancelDebouncedAction, debounceAction } from '../../utils/reduxUtils'
 export const appNotificationShow = 'app/notification/show'
 export const appNotificationHide = 'app/notification/hide'
 
-export const showNotification = (messageKey, messageParams, severity) => dispatch => {
+export const showNotification = (key, params, severity) => dispatch => {
   dispatch({
     type: appNotificationShow,
-    notification: {
-      [NotificationState.keysNotification.messageKey]: messageKey,
-      [NotificationState.keysNotification.messageParams]: messageParams,
-      [NotificationState.keysNotification.severity]: severity,
-    }
+    notification: NotificationState.newNotification(key, params, severity)
   })
 
   dispatch(debounceAction({ type: appNotificationHide }, appNotificationHide, 10000))

@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as AppState from '../appState'
 
-export const stateKey = 'errors'
+export const stateKey = 'appErrors'
 
 export const keys = {
   errors: 'errors',

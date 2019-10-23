@@ -84,7 +84,7 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // nodeDef has default values, cannot change into multiple
-    dispatch(showNotification('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, NotificationState.notificationSeverity.warning))
+    dispatch(showNotification('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, NotificationState.severity.warning))
     return false
   }
   return true
@@ -180,7 +180,7 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
     dispatch(showNotification('nodeDefEdit.cannotDeleteNodeDefReferenced', {
       nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
       nodeDefDependents
-    }, NotificationState.notificationSeverity.warning))
+    }, NotificationState.severity.warning))
 
   } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
     // delete confirmed

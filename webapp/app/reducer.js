@@ -1,5 +1,7 @@
 import { assocActionProps, exportReducer } from '../utils/reduxUtils'
 
+import * as AppState from './appState'
+
 import {
   appPropsChange,
   appUserLogout,
