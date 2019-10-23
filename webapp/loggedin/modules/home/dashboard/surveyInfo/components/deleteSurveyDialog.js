@@ -3,7 +3,7 @@ import './deleteSurveyDialog.scss'
 import React, { useState } from 'react'
 
 import { useI18n } from '../../../../../../commonComponents/hooks'
-import { i18nMarkdownToText } from '../../../../../../utils/markdown'
+import Markdown from '../../../../../../utils/markdown'
 
 import {
   Modal,
@@ -26,7 +26,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
         <div className="survey-delete-dialog__body">
           <div className="highlight">
             <div>
-              {i18nMarkdownToText(i18n, 'homeView.deleteSurveyDialog.deleteWarning', { surveyName })}
+              <Markdown options={{html: false}} source={i18n.t('homeView.deleteSurveyDialog.deleteWarning', { surveyName })} />
             </div>
             <div>{i18n.t('common.cantUndoWarning')}</div>
           </div>

@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import Validation from '../../core/validation/validation'
 import ValidationResult from '../../core/validation/validationResult'
-import { renderMarkdownAsHTML } from './markdown'
+import Markdown from './markdown'
 
 const getErrorText = i18n => error =>
   ValidationResult.hasMessages(error)
@@ -47,6 +47,6 @@ export const getValidationFieldMessagesHTML = (i18n, showKeys = true) =>
     R.pipe(
       getValidationFieldMessages(i18n, showKeys),
       R.addIndex(R.map)(
-        (msg, i) => <div key={i} dangerouslySetInnerHTML={{__html: renderMarkdownAsHTML(msg)}} />
+        (msg, i) => <Markdown key={i} source={msg} options={{html: true}} />
       )
     )(validation)

@@ -3,7 +3,7 @@ import './appErrors.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
-import { i18nMarkdownToText } from '../../utils/markdown'
+import Markdown from '../../utils/markdown'
 
 import * as R from 'ramda'
 
@@ -30,7 +30,7 @@ const AppError = ({ error, closeAppError }) => {
         ERROR {R.path(['response', 'status'], error)}
       </div>
       <div className="message">
-        {i18nMarkdownToText(i18n, key, params)}
+        <Markdown options={{html: false}} source={i18n.t(key, params)} />
       </div>
     </div>
   )
