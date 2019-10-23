@@ -1,0 +1,63 @@
+@import "../../../../../style/vars";
+
+.activity-log {
+  grid-row: 1/4;
+  grid-column-start: 2;
+  position: relative;
+  background-color: $white;
+}
+
+.activity-log__header {
+  position: absolute;
+  width: calc(100% + 50px);
+  height: 35px;
+  left: -25px;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $black;
+  color: $white;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.activity-log__content {
+  margin-top: 45px;
+  padding: 10px 0;
+  height: calc(100% - 45px);
+  overflow-y: auto;
+  position: relative;
+}
+
+.activity-log__content-item {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  align-items: center;
+  font-size: .9rem;
+  grid-column-gap: 20px;
+
+  .activity {
+    display: flex;
+    align-items: center;
+
+    .profile-picture-thumbnail {
+      margin: 0 5px;
+    }
+  }
+
+  .date {
+    justify-self: right;
+    padding-right: 5px;
+    color: $blueDark;
+    font-size: .8rem;
+  }
+}
+
+.activity-log__content-item-sep {
+  width: 70%;
+  height: 1px;
+  margin: 8px 15%;
+  border-bottom: 1px dotted $greyBorder;
+}

@@ -4,7 +4,6 @@ $headerHeight: 45px;
 // colors
 
 $red: #ed5b46;
-$blueDark: #a8bdb6;
 $pink: #f7dfe3;
 $green: #84ac67;
 $greenLight: #f0f2e7;
@@ -15,6 +14,7 @@ $blue: #3885CA;
 $blueLight: lighten($blue, 35%);
 $blueLightFocus: lighten($blue, 45%);
 $blueLightActive: lighten($blue, 25%);
+$blueDark: darken($blue, 20%);
 $greyBorder: #D1D1DD;
 $orange: #EBA444;
 $orangeLight: #F9CCB2;
