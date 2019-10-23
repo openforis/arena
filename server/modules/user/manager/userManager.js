@@ -23,6 +23,7 @@ const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db)
       surveyId,
       ActivityLog.type.userInvite,
       { uuid: User.getUuid(userToAdd), groupUuid },
+      false,
       t
     )
   })
@@ -75,6 +76,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
       surveyId,
       ActivityLog.type.userUpdate,
       { uuid: userUuid, name, email, groupUuid },
+      false,
       t
     )
 
@@ -89,7 +91,7 @@ const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await Promise.all([
     AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
     ActivityLog.log(
-      user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, client
+      user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, false, client
     )
   ])
 

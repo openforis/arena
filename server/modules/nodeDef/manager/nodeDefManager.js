@@ -18,7 +18,7 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
     const [nodeDef] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
       markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, false, t)
     ])
     return nodeDef
   })
@@ -96,7 +96,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     const [nodeDef] = await Promise.all([
       NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
       markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, false, t)
     ])
 
     return {
@@ -124,7 +124,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { uuid: nodeDefUuid }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { uuid: nodeDefUuid }, false, t)
 
     return nodeDef
   })
