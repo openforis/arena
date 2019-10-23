@@ -81,7 +81,7 @@ module.exports.init = app => {
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
-        res.sendFile(`${__dirname}/avatar.png`)
+        res.sendFile(`${__dirname}/avatar.png`, { root: __ARENA_ROOT })
       }
     } catch (err) {
       next(err)

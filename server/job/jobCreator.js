@@ -15,9 +15,9 @@ const jobClasses = [
 const getJobClass = jobType => R.find(R.propEq('type', jobType), jobClasses)
 
 const createJob = (jobType, params) => {
-  const jobClass = getJobClass(jobType)
+  const JobClass = getJobClass(jobType)
 
-  return new jobClass(params)
+  return new JobClass(params)
 }
 
 module.exports = {

@@ -12,19 +12,21 @@ let plugins = [
         'process.env': {
             NODE_ENV: JSON.stringify(nodeEnv),
         },
+        '__ARENA_ROOT': JSON.stringify(__dirname),
+        '__ARENA_THREAD_PATH': JSON.stringify(path.resolve(path.join(__dirname), 'dist')),
     }),
     new webpack.NamedModulesPlugin()
 ];
 if (!isProduction) {
     plugins.push(new webpack.HotModuleReplacementPlugin())
 }
-const entry = isProduction ? [
+const entry = x => isProduction ? [
     'babel-polyfill',
-    path.resolve(path.join(__dirname, './server/server.js'))
+    path.resolve(path.join(__dirname, x))
 ] : [
     'webpack/hot/poll?1000',
     'babel-polyfill',
-    path.resolve(path.join(__dirname, './server/server.js'))
+    path.resolve(path.join(__dirname, x))
 ];
 
 module.exports = {
@@ -38,13 +40,17 @@ module.exports = {
     //     nodeExternals(), 
     // ],
     name: 'server',
-    plugins: plugins,
+    plugins,
     target: 'node',
-    entry: entry,
+    entry: {
+        server: entry('server/server.js'),
+        jobThread: entry('server/job/jobThread.js'),
+        recordUpdateThread: entry('server/modules/record/service/update/thread/recordUpdateThread.js'),
+    },
     output: {
         publicPath: 'dist/',
         path: path.resolve(__dirname, './'),
-        filename: 'dist/server.prod.js',
+        filename: 'dist/[id].js',
         libraryTarget: "commonjs2",
         hotUpdateChunkFilename: 'dist/hot-update.js',
         hotUpdateMainFilename: 'dist/hot-update.json'

@@ -17,7 +17,7 @@
     "build:server:once": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.js",
     "dev:server": "npm run build:server:once && npm-run-all --parallel nodemon:prod watch:server",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.js --watch",
-    "nodemon:prod": "cross-env NODE_ENV=development node-dev --experimental-worker --inspect -- dist/server.prod.js",
+    "nodemon:prod": "cross-env NODE_ENV=development node-dev --experimental-worker --inspect -- dist/server.js",
     "test": "mocha-webpack --timeout 30000 --display-error-details --webpack-config webpack.config.test.js \"test/*/*.js\""
   },
   "devDependencies": {
