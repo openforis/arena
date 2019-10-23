@@ -26,7 +26,7 @@ const toTableViewCreate = (survey, nodeDef) => {
   }
 }
 
-const run = async (survey, nodeDef, client) => {
+const createTableAndView = async (survey, nodeDef, client) => {
   const tableViewCreate = toTableViewCreate(survey, nodeDef)
 
   await client.query(`
@@ -54,5 +54,5 @@ const run = async (survey, nodeDef, client) => {
 }
 
 module.exports = {
-  run
+  createTableAndView
 }

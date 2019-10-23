@@ -24,8 +24,6 @@ const dropSchema = async (surveyId, client = db) => await client.query(`DROP SCH
 
 const createSchema = async (surveyId, client = db) => await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
-const createTable = async (survey, nodeDef, client = db) => await DataViewCreateRepository.run(survey, nodeDef, client)
-
 // ==== DML
 const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
   const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
@@ -101,10 +99,10 @@ const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
 module.exports = {
   dropSchema,
   createSchema,
-  createTable,
+  createTableAndView: DataViewCreateRepository.createTableAndView,
 
-  insertIntoTable: DataTableInsertRepository.run,
-  updateTableNodes: DataTableUpdateRepository.run,
+  populateTable: DataTableInsertRepository.populateTable,
+  updateTable: DataTableUpdateRepository.updateTable,
 
   queryTable,
   countTable,
