@@ -12,11 +12,11 @@ const DataTable = require('../schemaRdb/dataTable')
 const RecordRepository = require('../../record/repository/recordRepository')
 const NodeRepository = require('../../record/repository/nodeRepository')
 
-const NodesInsert = require('../dbActions/nodesInsert')
-const NodesUpdate = require('../dbActions/nodesUpdate')
-const TableViewCreate = require('../dbActions/tableViewCreate')
-const TableViewQuery = require('../dbActions/tableViewQuery')
-const DataTableRepository = require('../dbActions/dataTableRepository')
+const DataTableInsertRepository = require('../repository/dataTableInsertRepository')
+const DataTableUpdateRepository = require('../repository/dataTableUpdateRepository')
+const DataTableReadRepository = require('../repository/dataTableReadRepository')
+const DataViewCreateRepository = require('../repository/dataViewCreateRepository')
+const DataViewReadRepository = require('../repository/dataViewReadRepository')
 
 // ==== DDL
 
@@ -24,7 +24,7 @@ const dropSchema = async (surveyId, client = db) => await client.query(`DROP SCH
 
 const createSchema = async (surveyId, client = db) => await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
-const createTable = async (survey, nodeDef, client = db) => await TableViewCreate.run(survey, nodeDef, client)
+const createTable = async (survey, nodeDef, client = db) => await DataViewCreateRepository.run(survey, nodeDef, client)
 
 // ==== DML
 const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
@@ -53,7 +53,7 @@ const queryTable = async (
 
   // fetch data
   const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
-  let rows = await TableViewQuery.runSelect(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort, !!streamOutput)
+  let rows = await DataViewReadRepository.runSelect(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort, !!streamOutput)
 
   // edit mode, assoc nodes to columns
   if (editMode) {
@@ -95,7 +95,7 @@ const queryTable = async (
 const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
-  return await TableViewQuery.runCount(surveyId, cycle, tableName, filter)
+  return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
 
 module.exports = {
@@ -103,12 +103,12 @@ module.exports = {
   createSchema,
   createTable,
 
-  insertIntoTable: NodesInsert.run,
-  updateTableNodes: NodesUpdate.run,
+  insertIntoTable: DataTableInsertRepository.run,
+  updateTableNodes: DataTableUpdateRepository.run,
 
   queryTable,
   countTable,
-  countDuplicateRecords: TableViewQuery.countDuplicateRecords,
-  fetchRecordsCountByKeys: TableViewQuery.fetchRecordsCountByKeys,
-  fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
+  countDuplicateRecords: DataViewReadRepository.countDuplicateRecords,
+  fetchRecordsCountByKeys: DataViewReadRepository.fetchRecordsCountByKeys,
+  fetchRecordsWithDuplicateEntities: DataTableReadRepository.fetchRecordsWithDuplicateEntities,
 }
