@@ -24,7 +24,7 @@ const persistNode = async (user, survey, record, node, t) => {
     // update
     const surveyId = Survey.getId(survey)
     if (!Record.isPreview(record))
-      await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), false, t)
 
     const nodeValue = Node.getValue(node)
     const meta = {
@@ -112,7 +112,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
   const surveyId = Survey.getId(survey)
 
   if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, false, t)
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
@@ -148,7 +148,7 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
   if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { uuid: nodeUuid }, false, t)
 
   // get dependent key attributes before node is removed from record
   // and return them so they will be re-validated later on

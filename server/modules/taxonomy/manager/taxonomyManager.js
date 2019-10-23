@@ -19,7 +19,7 @@ const insertTaxonomy = async (user, surveyId, taxonomy, client = db) =>
   await client.tx(async t => {
     const [taxonomyInserted] = await Promise.all([
       TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
-      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, false, t)
     ])
     return await validateTaxonomy(surveyId, [], taxonomyInserted)
   })
@@ -30,10 +30,7 @@ const insertTaxa = async (surveyId, taxa, user, client = db) =>
     ActivityLog.logMany(
       user,
       surveyId,
-      taxa.map(taxon => ({
-        type: ActivityLog.type.taxonInsert,
-        params: taxon,
-      })),
+      taxa.map(taxon => ActivityLog.newActivity(ActivityLog.type.taxonInsert, taxon, true)),
       t
     )
   ]))
@@ -132,7 +129,7 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, clie
   await client.tx(async t => (await Promise.all([
       TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
       markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { taxonomyUuid, key, value }, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }, false, t)
     ]))[0]
   )
 
@@ -142,13 +139,13 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t),
     markSurveyDraft(surveyId, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { taxonomyUuid }, t)
+    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { uuid: taxonomyUuid }, false, t)
   ]))
 
 const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { taxonomyUuid }, t)
+    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { uuid: taxonomyUuid }, true, t)
   ]))
 
 module.exports = {

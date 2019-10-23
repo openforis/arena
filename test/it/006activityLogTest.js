@@ -59,7 +59,7 @@ describe('Activity Log Test', async () => {
 
     const recordCreateLogs = R.filter(log =>
       R.propEq(ActivityLogger.keys.type, ActivityLogger.type.recordCreate, log) &&
-      R.pathEq([ActivityLogger.keys.params, Record.keys.uuid], Record.getUuid(record), log)
+      R.pathEq([ActivityLogger.keys.content, Record.keys.uuid], Record.getUuid(record), log)
     )(logs)
 
     expect(recordCreateLogs).to.have.lengthOf(1)
