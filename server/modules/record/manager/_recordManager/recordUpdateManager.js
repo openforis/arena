@@ -1,6 +1,8 @@
 const R = require('ramda')
 
 const db = require('../../../../db/db')
+const ActivityLog = require('../../../activityLog/activityLogger')
+const SystemError = require('../../../../../server/utils/systemError')
 
 const ObjectUtils = require('../../../../../core/objectUtils')
 const Survey = require('../../../../../core/survey/survey')
@@ -9,16 +11,12 @@ const Record = require('../../../../../core/record/record')
 const RecordStep = require('../../../../../core/record/recordStep')
 const Node = require('../../../../../core/record/node')
 
-const RecordRepository = require('../../repository/recordRepository')
 const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
 
-const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
-const FileManager = require('../fileManager')
-
-const SystemError = require('../../../../../server/utils/systemError')
-
-const ActivityLog = require('../../../activityLog/activityLogger')
+const RecordRepository = require('../../repository/recordRepository')
+const FileRepository = require('../../repository/fileRepository')
+const DataTableUpdateRepository = require('../../../surveyRdb/repository/dataTableUpdateRepository')
 
 /**
  * =======
@@ -66,14 +64,14 @@ const deleteRecord = async (user, surveyId, recordUuid) =>
 const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async t => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
-    await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
+    await FileRepository.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
 const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   await db.tx(async t => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
-      await FileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
+      await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
 
     return recordUuids.length
@@ -169,7 +167,7 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
     const nodeDefs = ObjectUtils.toUuidIndexedObj(
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
-    await SurveyRdbManager.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
+    await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
   }
 
   return {

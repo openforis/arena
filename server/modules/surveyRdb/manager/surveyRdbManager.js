@@ -1,28 +1,21 @@
 const R = require('ramda')
 const db = require('../../../db/db')
 const CSVWriter = require('../../../utils/file/csvWriter')
-//surveyRdbManger cannot use SurveyManager - circular dependency
 
 const Survey = require('../../../../core/survey/survey')
 const NodeDef = require('../../../../core/survey/nodeDef')
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const DataTable = require('../schemaRdb/dataTable')
 
 const RecordRepository = require('../../record/repository/recordRepository')
 const NodeRepository = require('../../record/repository/nodeRepository')
 
+const SchemaRdbRepository = require('../repository/schemaRdbRepository')
 const DataTableInsertRepository = require('../repository/dataTableInsertRepository')
 const DataTableUpdateRepository = require('../repository/dataTableUpdateRepository')
 const DataTableReadRepository = require('../repository/dataTableReadRepository')
 const DataViewCreateRepository = require('../repository/dataViewCreateRepository')
 const DataViewReadRepository = require('../repository/dataViewReadRepository')
-
-// ==== DDL
-
-const dropSchema = async (surveyId, client = db) => await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)
-
-const createSchema = async (surveyId, client = db) => await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
 // ==== DML
 const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
@@ -97,8 +90,8 @@ const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
 }
 
 module.exports = {
-  dropSchema,
-  createSchema,
+  dropSchema: SchemaRdbRepository.dropSchema,
+  createSchema: SchemaRdbRepository.createSchema,
   createTableAndView: DataViewCreateRepository.createTableAndView,
 
   populateTable: DataTableInsertRepository.populateTable,
