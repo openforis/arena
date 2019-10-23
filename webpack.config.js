@@ -16,6 +16,26 @@ const buildReport = ProcessUtils.ENV.buildReport
 const lastCommit = ProcessUtils.ENV.sourceVersion
 const versionString = lastCommit + '_' + new Date().toISOString()
 
+// Remove mini-css-extract-plugin log spam
+// See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
+class CleanUpStatsPlugin {
+  shouldPickStatChild(child) {
+    return child.name.indexOf('mini-css-extract-plugin') !== 0;
+  }
+
+  apply(compiler) {
+    compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
+      const children = stats.compilation.children;
+      if (Array.isArray(children)) {
+        // eslint-disable-next-line no-param-reassign
+        stats.compilation.children = children
+          .filter(child => this.shouldPickStatChild(child));
+      }
+    });
+  }
+}
+
+
 // ==== init plugins
 const plugins = [
   new MiniCssExtractPlugin({
@@ -44,7 +64,8 @@ const plugins = [
     formats: [
       'woff2'
     ]
-  })
+  }),
+  new CleanUpStatsPlugin(),
 ]
 
 if (buildReport) {
