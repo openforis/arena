@@ -143,7 +143,7 @@ module.exports = {
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
-      confirmDeleteCycle:`Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
+      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',
       viewInfo: 'View info',
@@ -411,7 +411,7 @@ module.exports = {
     },
 
     expressions: {
-      expressionInvalid: "Invalid expression: {{details}}",
+      expressionInvalid: 'Invalid expression: {{details}}',
       cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
@@ -515,24 +515,25 @@ module.exports = {
   // ====== App Errors
 
   appErrors: {
-    generic: '{{text}}',
-    userNotAuthorized: 'User {{userName}} is not authorized',
-    undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
-    unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
-    jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+    cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
+    cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
+    cantUpdateStep: `Can't update step`,
     entryDataNotFound: 'Entry data not found: {{entryName}}',
+    generic: '{{text}}',
     invalidType: 'Invalid type {{type}}',
+    jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+    paramIsRequired: 'Param {{param}} is required',
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
-    cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
-    cantUpdateStep: `Can't update step`,
-    cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
-    userNotAllowedToChangePref: 'User not allowed to change pref',
-    paramIsRequired: 'Param {{param}} is required',
+    undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
+    unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
+    userHasPendingInvitation: 'User {{email}} has been already invited',
     userHasRole: 'The given user has already a role in this survey',
+    userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
-    invalidUser: 'Invalid user',
+    userNotAllowedToChangePref: 'User not allowed to change pref',
+    userNotAuthorized: 'User {{userName}} is not authorized',
   },
 
   systemErrors: {
