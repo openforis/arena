@@ -38,7 +38,7 @@ const getColumnNames = (survey, nodeDef) => [
 const getColumnNamesAndType = (survey, nodeDef) => [
   colNameUuuid + ' uuid NOT NULL',
   colNameRecordUuuid + ' uuid NOT NULL',
-  colNameRecordCycle + ' integer NOT NULL',
+  colNameRecordCycle + ' varchar(2) NOT NULL',
   colNameParentUuuid + ' uuid',
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]

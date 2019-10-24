@@ -82,7 +82,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, nodeDefRoot, nodeD
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 
         r.validation
     FROM ${getSurveyDBSchema(surveyId)}.record r
-    WHERE r.preview = FALSE AND r.cycle = ${cycle}
+    WHERE r.preview = FALSE AND r.cycle = $2
     ORDER BY r.date_created DESC
     LIMIT ${limit ? limit : 'ALL'}
     OFFSET ${offset}
@@ -119,7 +119,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, nodeDefRoot, nodeD
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
     ORDER BY r.date_created DESC
   `,
-    [surveyId],
+    [surveyId, cycle],
     dbTransformCallback(surveyId, false)
   )
 }

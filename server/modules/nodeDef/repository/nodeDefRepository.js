@@ -64,7 +64,7 @@ const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft, advanced =
       ${!draft ? ` AND props <> '{}'::jsonb` : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
-    [JSON.stringify(String(cycle))],
+    [JSON.stringify(cycle)],
     res => dbTransformCallback(res, draft, advanced)
   )
 

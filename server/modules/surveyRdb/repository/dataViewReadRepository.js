@@ -133,8 +133,8 @@ const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExclud
       FROM
         ${rootTable}
       WHERE 
-        ${DataTable.colNameRecordCycle} = ${cycle}
-        ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
+        ${DataTable.colNameRecordCycle} = $2
+        ${excludeRecordFromCount ? ` AND ${DataTable.colNameRecordUuuid} != $1` : ''} 
       GROUP BY 
         ${keyColumnsString}
     )
@@ -148,12 +148,12 @@ const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExclud
       ON n.record_uuid = r.record_uuid
       AND n.node_def_uuid IN (${nodeDefKeys.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     WHERE
-      ${rootTableAlias}.${DataTable.colNameRecordCycle} = ${cycle}
+      ${rootTableAlias}.${DataTable.colNameRecordCycle} = $2
       AND ${keysCondition}
       AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
     `,
-    [recordUuidExcluded],
+    [recordUuidExcluded, cycle],
     camelize
   )
 }

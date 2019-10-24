@@ -26,7 +26,7 @@ CREATE TABLE
     uuid         uuid        NOT NULL        DEFAULT uuid_generate_v4(),
     owner_uuid   uuid        NOT NULL,
     step         varchar(63) NOT NULL,
-    cycle        integer     NOT NULL,
+    cycle        varchar(2)     NOT NULL,
     date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
     preview      boolean                     DEFAULT FALSE,
     validation   jsonb       NOT NULL        DEFAULT '{}'::jsonb,
