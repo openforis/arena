@@ -13,7 +13,7 @@ let plugins = [
             NODE_ENV: JSON.stringify(nodeEnv),
         },
         '__ARENA_ROOT': JSON.stringify(__dirname),
-        '__ARENA_THREAD_PATH': JSON.stringify(path.resolve(path.join(__dirname), 'dist')),
+        '__ARENA_DIST': JSON.stringify(path.resolve(path.join(__dirname), 'dist')),
     }),
     new webpack.NamedModulesPlugin()
 ];

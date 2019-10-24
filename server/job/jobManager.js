@@ -42,7 +42,7 @@ const cancelActiveJobByUserUuid = async userUuid => {
 const executeJobThread = job => {
 
   const thread = new ThreadManager(
-    path.resolve(__ARENA_THREAD_PATH, 'jobThread.js'),
+    path.resolve(__ARENA_DIST, 'jobThread.js'),
     { jobType: job.type, jobParams: job.params },
     async job => await notifyJobUpdate(job)
   )

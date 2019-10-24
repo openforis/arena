@@ -20,7 +20,7 @@ const recordThreadTimeouts = {}
 
 // ====== CREATE
 const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
-  const filePath = path.resolve(__ARENA_THREAD_PATH, 'recordUpdateThread.js')
+  const filePath = path.resolve(__ARENA_DIST, 'recordUpdateThread.js')
 
   const data = {
     [ThreadParams.keys.socketId]: socketId,
