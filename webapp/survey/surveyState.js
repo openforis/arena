@@ -1,10 +1,10 @@
 import * as R from 'ramda'
 
-import Survey from '../../core/survey/survey'
-import NodeDef from '../../core/survey/nodeDef'
-import User from '../../core/user/user'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import User from '@core/user/user'
 
-import * as AppState from '../app/appState'
+import * as AppState from '@webapp/app/appState'
 
 const survey = 'survey'
 

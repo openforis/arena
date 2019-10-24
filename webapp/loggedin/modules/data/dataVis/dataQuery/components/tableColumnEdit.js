@@ -1,16 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
-import Record from '../../../../../../../core/record/record'
-import Node from '../../../../../../../core/record/node'
-import Authorizer from '../../../../../../../core/auth/authorizer'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
+import Record from '@core/record/record'
+import Node from '@core/record/node'
+import Authorizer from '@core/auth/authorizer'
 
 import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
 import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
-import * as SurveyState from '../../../../../../survey/surveyState'
-import * as AppState from '../../../../../../app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
+import * as AppState from '@webapp/app/appState'
 
 class TableColumnEdit extends React.Component {
 

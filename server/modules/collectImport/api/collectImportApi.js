@@ -1,10 +1,10 @@
-const Request = require('../../../utils/request')
+const Request = require('@server/utils/request')
 
 const CollectImportService = require('../service/collectImportService')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
-const JobUtils = require('../../../job/jobUtils')
+const JobUtils = require('@server/job/jobUtils')
 
 module.exports.init = app => {
 

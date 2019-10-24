@@ -3,16 +3,16 @@ import './nodeDefCoordinate.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { FormItem, Input } from '../../../../../../commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
-import Dropdown from '../../../../../../commonComponents/form/dropdown'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-import Survey from '../../../../../../../core/survey/survey'
-import Node from '../../../../../../../core/record/node'
-import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
+import Survey from '@core/survey/survey'
+import Node from '@core/record/node'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 

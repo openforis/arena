@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
-import Authorizer from '../../../core/auth/authorizer'
+import Authorizer from '@core/auth/authorizer'
 
 import {
   analysisModules,

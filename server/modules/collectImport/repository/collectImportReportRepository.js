@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
+const db = require('@server/db/db')
+const DbUtils = require('@server/db/dbUtils')
 
 const {
   getSurveyDBSchema,

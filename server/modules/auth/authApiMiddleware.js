@@ -1,13 +1,13 @@
-const Request = require('../../utils/request')
+const Request = require('@server/utils/request')
 
 const SurveyManager = require('../survey/manager/surveyManager')
 const RecordService = require('../record/service/recordService')
 const UserService = require('../user/service/userService')
 
-const Authorizer = require('../../../core/auth/authorizer')
-const Survey = require('../../../core/survey/survey')
+const Authorizer = require('@core/auth/authorizer')
+const Survey = require('@core/survey/survey')
 
-const UnauthorizedError = require('../../utils/unauthorizedError')
+const UnauthorizedError = require('@server/utils/unauthorizedError')
 
 const checkPermission = (req, next, permissionFn, ...args) => {
   const user = Request.getUser(req)

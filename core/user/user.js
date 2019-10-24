@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../objectUtils')
-const StringUtils = require('../stringUtils')
-const AuthGroups = require('../auth/authGroups')
+const ObjectUtils = require('@core/objectUtils')
+const StringUtils = require('@core/stringUtils')
+const AuthGroups = require('@core/auth/authGroups')
 
 const keys = require('./_user/userKeys')
 const UserPrefs = require('./_user/userPrefs')

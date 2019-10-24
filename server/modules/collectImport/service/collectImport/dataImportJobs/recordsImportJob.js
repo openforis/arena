@@ -1,24 +1,24 @@
 const R = require('ramda')
 
-const BatchPersister = require('../../../../../db/batchPersister')
+const BatchPersister = require('@server/db/batchPersister')
 
-const FileXml = require('../../../../../utils/file/fileXml')
-const Queue = require('../../../../../../core/queue')
+const FileXml = require('@server/utils/file/fileXml')
+const Queue = require('@core/queue')
 
-const Survey = require('../../../../../../core/survey/survey')
-const NodeDef = require('../../../../../../core/survey/nodeDef')
-const NodeDefValidations = require('../../../../../../core/survey/nodeDefValidations')
-const Record = require('../../../../../../core/record/record')
-const Node = require('../../../../../../core/record/node')
-const RecordValidator = require('../../../../../../core/record/recordValidator')
-const Validation = require('../../../../../../core/validation/validation')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefValidations = require('@core/survey/nodeDefValidations')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
+const RecordValidator = require('@core/record/recordValidator')
+const Validation = require('@core/validation/validation')
 
-const SystemError = require('../../../../../utils/systemError')
+const SystemError = require('@server/utils/systemError')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')
 
-const Job = require('../../../../../job/job')
+const Job = require('@server/job/job')
 
 const CollectRecord = require('../model/collectRecord')
 const CollectAttributeValueExtractor = require('./collectAttributeValueExtractor')

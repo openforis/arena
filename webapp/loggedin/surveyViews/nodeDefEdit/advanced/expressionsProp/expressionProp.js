@@ -1,15 +1,15 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Tooltip from '../../../../../commonComponents/tooltip'
-import ExpressionEditor from '../../../../../commonComponents/expression/expressionEditor'
+import Tooltip from '@webapp/commonComponents/tooltip'
+import ExpressionEditor from '@webapp/commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../labelsEditor/labelsEditor'
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDefExpression from '../../../../../../core/survey/nodeDefExpression'
-import ValidationResult from '../../../../../../core/validation/validationResult'
-import * as ValidationUtils from '../../../../../utils/validationUtils'
-import ButtonGroup from '../../../../../commonComponents/form/buttonGroup'
+import NodeDefExpression from '@core/survey/nodeDefExpression'
+import ValidationResult from '@core/validation/validationResult'
+import * as ValidationUtils from '@webapp/utils/validationUtils'
+import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 
 const ExpressionProp = (props) => {
 

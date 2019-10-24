@@ -1,11 +1,11 @@
-const Loggger = require('../../../log/log').getLogger('AuthAPI')
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
-const Jwt = require('../../../utils/jwt')
+const Loggger = require('@server/log/log').getLogger('AuthAPI')
+const Request = require('@server/utils/request')
+const Response = require('@server/utils/response')
+const Jwt = require('@server/utils/jwt')
 
-const Survey = require('../../../../core/survey/survey')
-const User = require('../../../../core/user/user')
-const Authorizer = require('../../../../core/auth/authorizer')
+const Survey = require('@core/survey/survey')
+const User = require('@core/user/user')
+const Authorizer = require('@core/auth/authorizer')
 
 const SurveyService = require('../../survey/service/surveyService')
 const UserService = require('../../user/service/userService')

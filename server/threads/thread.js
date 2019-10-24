@@ -1,6 +1,6 @@
 const { parentPort, workerData, isMainThread } = require('worker_threads')
 
-const Log = require('../log/log')
+const Log = require('@server/log/log')
 
 const ThreadParams = require('./threadParams')
 

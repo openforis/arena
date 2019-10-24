@@ -1,9 +1,9 @@
-const Jwt = require('../../utils/jwt')
+const Jwt = require('@server/utils/jwt')
 
-const UserService = require('../../modules/user/service/userService')
-const AuthService = require('../../modules/auth/service/authService')
+const UserService = require('@server/modules/user/service/userService')
+const AuthService = require('@server/modules/auth/service/authService')
 
-const UnauthorizedError = require('../../utils/unauthorizedError')
+const UnauthorizedError = require('@server/utils/unauthorizedError')
 
 module.exports = async (req, res, next) => {
   const authorizationHeader = req.headers && req.headers.authorization

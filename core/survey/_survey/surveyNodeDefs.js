@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const SurveyCategories = require('./surveyCategories')
-const NodeDef = require('./../nodeDef')
+const NodeDef = require('../nodeDef')
 const Category = require('../category')
 
 const nodeDefsKey = 'nodeDefs'

@@ -1,10 +1,10 @@
 const R = require('ramda')
-const db = require('../../../db/db')
-const CSVWriter = require('../../../utils/file/csvWriter')
+const db = require('@server/db/db')
+const CSVWriter = require('@server/utils/file/csvWriter')
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
 const DataTable = require('../schemaRdb/dataTable')
 
 const RecordRepository = require('../../record/repository/recordRepository')

@@ -5,7 +5,7 @@ import AppSideBarSubModules from './appSideBarSubModules'
 
 import * as SideBarModule from '../sidebarModule'
 
-import { elementOffset } from '../../../utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 const AppSideBarPopupMenu = props => {
   const { module, pathname, onClose } = props

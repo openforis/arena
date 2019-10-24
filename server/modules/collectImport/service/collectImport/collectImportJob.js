@@ -1,4 +1,4 @@
-const Job = require('../../../../job/job')
+const Job = require('@server/job/job')
 
 const SurveyManager = require('../../../survey/manager/surveyManager')
 

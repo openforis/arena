@@ -1,17 +1,17 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
+const db = require('@server/db/db')
+const DbUtils = require('@server/db/dbUtils')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Record = require('../../../../core/record/record')
-const Validation = require('../../../../core/validation/validation')
+const NodeDef = require('@core/survey/nodeDef')
+const Record = require('@core/record/record')
+const Validation = require('@core/validation/validation')
 
-const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
-const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
+const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+const SchemaRdb = require('@common/surveyRdb/schemaRdb')
 
 const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 

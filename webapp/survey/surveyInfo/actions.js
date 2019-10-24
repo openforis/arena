@@ -1,13 +1,13 @@
 import axios from 'axios'
 
-import Survey from '../../../core/survey/survey'
-import Validation from '../../../core/validation/validation'
+import Survey from '@core/survey/survey'
+import Validation from '@core/validation/validation'
 
-import * as NotificationState from '../../app/appNotification/appNotificationState'
+import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as SurveyState from '../surveyState'
 
-import { hideAppLoader, showAppLoader } from '../../app/actions'
-import { showNotification } from '../../app/appNotification/actions'
+import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 import { resetSurveyDefs } from '../actions'
 
 export const surveyInfoUpdate = 'survey/info/update'

@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('../uuid')
+const { uuidv4 } = require('@core/uuid')
 
 const SurveyInfo = require('./_survey/surveyInfo')
 const SurveyCycle = require('./surveyCycle')
@@ -12,7 +12,7 @@ const SurveyDefaults = require('./_survey/surveyDefaults')
 const SurveyDependencies = require('./_survey/surveyDependencies')
 const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
 
-const Srs = require('../geo/srs')
+const Srs = require('@core/geo/srs')
 
 const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
   [SurveyInfo.keys.uuid]: uuidv4(),

@@ -1,13 +1,13 @@
 const R = require('ramda')
 
-const db = require('../../../server/db/db')
+const db = require('@server/db/db')
 
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const Record = require('../../../core/record/record')
-const Node = require('../../../core/record/node')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
 
-const RecordManager = require('../../../server/modules/record/manager/recordManager')
+const RecordManager = require('@server/modules/record/manager/recordManager')
 
 const RecordUtils = require('../utils/recordUtils')
 

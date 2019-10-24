@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
 const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
-const ObjectUtils = require('../../../../core/objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 const CategoryRepository = require('../repository/categoryRepository')
 const CategoryValidator = require('../categoryValidator')
-const Category = require('../../../../core/survey/category')
-const CategoryLevel = require('../../../../core/survey/categoryLevel')
-const Validation = require('../../../../core/validation/validation')
+const Category = require('@core/survey/category')
+const CategoryLevel = require('@core/survey/categoryLevel')
+const Validation = require('@core/validation/validation')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 

@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const Category = require('../../../core/survey/category')
-const CategoryLevel = require('../../../core/survey/categoryLevel')
-const CategoryItem = require('../../../core/survey/categoryItem')
-const Validator = require('../../../core/validation/validator')
-const Validation = require('../../../core/validation/validation')
+const Category = require('@core/survey/category')
+const CategoryLevel = require('@core/survey/categoryLevel')
+const CategoryItem = require('@core/survey/categoryItem')
+const Validator = require('@core/validation/validator')
+const Validation = require('@core/validation/validation')
 
 const keys = {
   children: 'children',

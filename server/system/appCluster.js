@@ -4,18 +4,18 @@ const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 
-const Log = require('../log/log')
+const ProcessUtils = require('@core/processUtils')
+const Log = require('@server/log/log')
 
 const headerMiddleware = require('./middleware/headerMiddleware')
 const jwtMiddleware = require('./middleware/jwtMiddleware')
 const errorMiddleware = require('./middleware/errorMiddleware')
-const authApi = require('../modules/auth/api/authApi')
+const authApi = require('@server/modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
-const WebSocket = require('../utils/webSocket')
+const WebSocket = require('@server/utils/webSocket')
 const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
 const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
-const ProcessUtils = require('../../core/processUtils')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -46,7 +46,7 @@ module.exports = async () => {
   app.use('/', express.static(`${__dirname}/../../dist`))
   app.use('/app*', express.static(`${__dirname}/../../dist`))
   app.use('/img/', express.static(`${__dirname}/../../web-resources/img`))
-  // app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
+  // app.use('/css/', express.static(`${__dirname}/../../web-resources/css`))
 
   // ====== apis
   authApi.init(app)

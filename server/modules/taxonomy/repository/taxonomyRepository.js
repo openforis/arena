@@ -1,9 +1,9 @@
 const R = require('ramda')
 const toSnakeCase = require('to-snake-case')
 
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
-const DbUtils = require('../../../db/dbUtils')
+const DbUtils = require('@server/db/dbUtils')
 
 const {
   getSurveyDBSchema,
@@ -12,9 +12,9 @@ const {
   dbTransformCallback,
 } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const Taxonomy = require('../../../../core/survey/taxonomy')
-const Taxon = require('../../../../core/survey/taxon')
-const TaxonVernacularName = require('../../../../core/survey/taxonVernacularName')
+const Taxonomy = require('@core/survey/taxonomy')
+const Taxon = require('@core/survey/taxon')
+const TaxonVernacularName = require('@core/survey/taxonVernacularName')
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,

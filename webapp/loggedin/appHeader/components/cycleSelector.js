@@ -1,10 +1,10 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Survey from '../../../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
-import { useI18n } from '../../../commonComponents/hooks'
-import Dropdown from '../../../commonComponents/form/dropdown'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
 
 const CycleSelector = props => {
   const { surveyInfo, surveyCycleKey, onChange } = props

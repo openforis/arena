@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../objectUtils')
-const { uuidv4 } = require('./../uuid')
+const ObjectUtils = require('@core/objectUtils')
+const { uuidv4 } = require('@core/uuid')
 
-const Validation = require('../validation/validation')
-const User = require('../user/user')
+const Validation = require('@core/validation/validation')
+const User = require('@core/user/user')
 const RecordStep = require('./recordStep')
 
 const keys = require('./_record/recordKeys')

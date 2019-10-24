@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
+const db = require('@server/db/db')
+const DbUtils = require('@server/db/dbUtils')
 const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const NodeDef = require('../../../../core/survey/nodeDef')
+const NodeDef = require('@core/survey/nodeDef')
 
 const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 

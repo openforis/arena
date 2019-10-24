@@ -3,13 +3,13 @@ import './nodeDefEditButtons.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '../../../../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../../../../core/survey/nodeDefLayout'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { setFormNodeDefAddChildTo } from '../../actions'
-import { putNodeDefLayoutProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
+import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditButtons = (props) => {

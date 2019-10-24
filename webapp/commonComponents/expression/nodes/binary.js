@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Expression from '../../../../core/exprParser/expression'
+import Expression from '@core/exprParser/expression'
 
 import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'

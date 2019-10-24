@@ -2,21 +2,21 @@ const fs = require('fs')
 
 const passwordGenerator = require('generate-password')
 
-const db = require('../../../db/db')
-const aws = require('../../../system/aws')
+const db = require('@server/db/db')
+const aws = require('@server/system/aws')
 
 const UserManager = require('../manager/userManager')
 const AuthManager = require('../../auth/manager/authManager')
 const SurveyManager = require('../../survey/manager/surveyManager')
 
-const Survey = require('../../../../core/survey/survey')
-const User = require('../../../../core/user/user')
-const AuthGroups = require('../../../../core/auth/authGroups')
-const Authorizer = require('../../../../core/auth/authorizer')
+const Survey = require('@core/survey/survey')
+const User = require('@core/user/user')
+const AuthGroups = require('@core/auth/authGroups')
+const Authorizer = require('@core/auth/authorizer')
 
-const SystemError = require('../../../utils/systemError')
-const UnauthorizedError = require('../../../utils/unauthorizedError')
-const Mailer = require('../../../utils/mailer')
+const SystemError = require('@server/utils/systemError')
+const UnauthorizedError = require('@server/utils/unauthorizedError')
+const Mailer = require('@server/utils/mailer')
 
 // ====== CREATE
 

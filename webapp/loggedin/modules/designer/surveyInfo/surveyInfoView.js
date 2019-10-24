@@ -3,22 +3,22 @@ import './surveyInfoView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { useI18n } from '../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { Input } from '../../../../commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'
 import CyclesEditor from './components/cyclesEditor'
 import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
-import Authorizer from '../../../../../core/auth/authorizer'
-import Survey from '../../../../../core/survey/survey'
+import Authorizer from '@core/auth/authorizer'
+import Survey from '@core/survey/survey'
 
-import * as SurveyState from '../../../../survey/surveyState'
-import * as AppState from '../../../../app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
+import * as AppState from '@webapp/app/appState'
 
-import { updateSurveyInfoProps } from '../../../../survey/surveyInfo/actions'
+import { updateSurveyInfoProps } from '@webapp/survey/surveyInfo/actions'
 
 const SurveyInfoView = (props) => {
   const { surveyInfo, readOnly } = props

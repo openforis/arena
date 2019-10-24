@@ -4,17 +4,17 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
-import Header from '../../../../../commonComponents/header'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import Header from '@webapp/commonComponents/header'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
-import Survey from '../../../../../../core/survey/survey'
-import Authorizer from '../../../../../../core/auth/authorizer'
+import Survey from '@core/survey/survey'
+import Authorizer from '@core/auth/authorizer'
 
-import * as AppState from '../../../../../app/appState'
-import * as SurveyState from '../../../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import { deleteSurvey, publishSurvey } from '../../../../../survey/actions'
+import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
 import { appModuleUri, homeModules } from '../../../../appModules'
 

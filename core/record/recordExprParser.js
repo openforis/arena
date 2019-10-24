@@ -1,13 +1,13 @@
 const R = require('ramda')
 
-const StringUtils = require('../stringUtils')
+const StringUtils = require('@core/stringUtils')
 
-const Survey = require('../survey/survey')
-const NodeDef = require('../survey/nodeDef')
-const NodeDefExpression = require('../survey/nodeDefExpression')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Record = require('./record')
 const Node = require('./node')
-const Expression = require('../exprParser/expression')
+const Expression = require('@core/exprParser/expression')
 
 const evalNodeQuery = async (survey, record, node, query) => {
   const ctx = {

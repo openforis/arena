@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const ValidatorErrorKeys = require('./validatorErrorKeys')
 const ValidatorNameKeywords = require('./validatorNameKeywords')
-const ObjectUtils = require('../../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 /**
  * Internal names must contain only lowercase letters, numbers and underscores starting with a letter

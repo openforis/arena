@@ -1,4 +1,4 @@
-const Survey = require('../../../../core/survey/survey')
+const Survey = require('@core/survey/survey')
 
 const SurveyManager = require('../../survey/manager/surveyManager')
 const SurveyRdbManager = require('../manager/surveyRdbManager')

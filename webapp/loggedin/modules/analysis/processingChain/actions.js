@@ -1,14 +1,14 @@
 import axios from 'axios'
 
-import ProcessingChain from '../../../../../common/analysis/processingChain'
+import ProcessingChain from '@common/analysis/processingChain'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-import { debounceAction } from '../../../../utils/reduxUtils'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import * as ProcessingChainState from './processingChainState'
 import { analysisModules, appModuleUri } from '../../../appModules'
-import { showNotification } from '../../../../app/appNotification/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 
 export const processingChainUpdate = '/analysis/processingChain/update'
 export const processingChainPropUpdate = '/analysis/processingChain/prop/update'

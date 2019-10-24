@@ -1,6 +1,6 @@
-const Response = require('../../utils/response')
+const Response = require('@server/utils/response')
 
-const Log = require('../../log/log')
+const Log = require('@server/log/log')
 
 const logger = Log.getLogger('App error')
 

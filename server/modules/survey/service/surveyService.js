@@ -1,6 +1,6 @@
 const SurveyManager = require('../manager/surveyManager')
 
-const JobManager = require('../../../job/jobManager')
+const JobManager = require('@server/job/jobManager')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
 
 const startPublishJob = (user, surveyId) => {

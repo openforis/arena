@@ -4,16 +4,16 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '../../../commonComponents/hooks'
-import ProfilePicture from '../../../commonComponents/profilePicture'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
-import User from '../../../../core/user/user'
-import * as AppState from '../../../app/appState'
+import User from '@core/user/user'
+import * as AppState from '@webapp/app/appState'
 
-import { logout } from '../../../app/actions'
+import { logout } from '@webapp/app/actions'
 
 import { appModuleUri, homeModules, userModules } from '../../appModules'
-import { clickedOutside } from '../../../utils/domUtils'
+import { clickedOutside } from '@webapp/utils/domUtils'
 
 const UserPopupMenu = props => {
   const { user, logout, onClose } = props

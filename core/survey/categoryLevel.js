@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,

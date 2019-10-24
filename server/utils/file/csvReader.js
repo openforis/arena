@@ -1,7 +1,7 @@
 const csvParser = require('csv').parse
 const fs = require('fs')
 
-const Queue = require('../../../core/queue')
+const Queue = require('@core/queue')
 
 const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 

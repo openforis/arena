@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
-import User from '../../../../../core/user/user'
-import Survey from '../../../../../core/survey/survey'
-import UserValidator from '../../../../../core/user/userValidator'
-import AuthGroups from '../../../../../core/auth/authGroups'
-import Authorizer from '../../../../../core/auth/authorizer'
+import User from '@core/user/user'
+import Survey from '@core/survey/survey'
+import UserValidator from '@core/user/userValidator'
+import AuthGroups from '@core/auth/authGroups'
+import Authorizer from '@core/auth/authorizer'
 
-import * as NotificationState from '../../../../app/appNotification/appNotificationState'
+import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
 import {
   useI18n,
@@ -18,7 +18,7 @@ import {
   useFormObject,
   useOnUpdate,
   usePrevious,
-} from '../../../../commonComponents/hooks'
+} from '@webapp/commonComponents/hooks'
 
 import { appModuleUri, userModules } from '../../../appModules'
 

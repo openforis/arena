@@ -1,10 +1,10 @@
-const CSVWriter = require('../../../utils/file/csvWriter')
-const db = require('../../../db/db')
+const CSVWriter = require('@server/utils/file/csvWriter')
+const db = require('@server/db/db')
 
-const Taxonomy = require('../../../../core/survey/taxonomy')
+const Taxonomy = require('@core/survey/taxonomy')
 
 const TaxonomyManager = require('../manager/taxonomyManager')
-const JobManager = require('../../../job/jobManager')
+const JobManager = require('@server/job/jobManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 
 const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {

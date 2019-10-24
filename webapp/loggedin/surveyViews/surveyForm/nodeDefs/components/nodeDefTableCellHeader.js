@@ -2,9 +2,9 @@ import './nodeDefTableCellHeader.scss'
 
 import React from 'react'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '../../../../../../core/survey/nodeDef'
+import NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 

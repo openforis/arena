@@ -1,15 +1,15 @@
-import { exportReducer } from '../../../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import ProcessingChain from '../../../../../common/analysis/processingChain'
+import ProcessingChain from '@common/analysis/processingChain'
 
 import {
   processingChainUpdate,
   processingChainPropUpdate,
 } from './actions'
 
-import { appUserLogout } from '../../../../app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 
 const actionHandlers = {
   // reset state

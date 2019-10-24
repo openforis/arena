@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const AuthGroups = require('../../auth/authGroups')
+const AuthGroups = require('@core/auth/authGroups')
 
-const ObjectUtils = require('../../objectUtils')
-const StringUtils = require('../../stringUtils')
+const ObjectUtils = require('@core/objectUtils')
+const StringUtils = require('@core/stringUtils')
 
 const keys = {
   id: ObjectUtils.keys.id,

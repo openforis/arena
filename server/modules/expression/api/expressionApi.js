@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const NodeDef = require('../../../../core/survey/nodeDef')
-const CategoryItem = require('../../../../core/survey/categoryItem')
-const Taxon = require('../../../../core/survey/taxon')
-const { isBlank, contains } = require('../../../../core/stringUtils')
+const NodeDef = require('@core/survey/nodeDef')
+const CategoryItem = require('@core/survey/categoryItem')
+const Taxon = require('@core/survey/taxon')
+const { isBlank, contains } = require('@core/stringUtils')
 
 const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
-const SystemError = require('../../../utils/systemError')
-const Request = require('../../../utils/request')
+const SystemError = require('@server/utils/systemError')
+const Request = require('@server/utils/request')
 
 const toItem = (type, lang = null) =>
   item => item

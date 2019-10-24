@@ -1,7 +1,7 @@
-const db = require('../../../db/db')
+const db = require('@server/db/db')
 
-const User = require('../../../../core/user/user')
-const AuthGroups = require('../../../../core/auth/authGroups')
+const User = require('@core/user/user')
+const AuthGroups = require('@core/auth/authGroups')
 const UserRepository = require('../repository/userRepository')
 
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')

@@ -1,8 +1,8 @@
-const db = require('../../db/db')
+const db = require('@server/db/db')
 
 const { getSurveyDBSchema } = require('../survey/repository/surveySchemaRepositoryUtils')
 
-const User = require('../../../core/user/user')
+const User = require('@core/user/user')
 
 const type = {
   //survey

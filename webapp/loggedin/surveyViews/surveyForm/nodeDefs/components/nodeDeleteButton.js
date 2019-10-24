@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 export default ({ nodeDef, node, disabled = false, showConfirm = true, removeNode }) => {
   const i18n = useI18n()

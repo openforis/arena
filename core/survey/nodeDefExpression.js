@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('./../uuid')
+const { uuidv4 } = require('@core/uuid')
 
-const ValidationResult = require('../validation/validationResult')
+const ValidationResult = require('@core/validation/validationResult')
 
-const StringUtils = require('../stringUtils')
-const ObjectUtils = require('../objectUtils')
+const StringUtils = require('@core/stringUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 const keys = {
   placeholder: 'placeholder',

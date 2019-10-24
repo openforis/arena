@@ -3,8 +3,8 @@ import './components/dataQueryView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../../core/survey/survey'
-import NodeDef from '../../../../../../core/survey/nodeDef'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
 
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Table from './components/table'
@@ -12,7 +12,7 @@ import Table from './components/table'
 import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
 
 import * as DataQueryState from './dataQueryState'
-import * as SurveyState from '../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const DataQueryView = props => {
 

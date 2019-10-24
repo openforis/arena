@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Authorizer from '../../../../core/auth/authorizer'
+import Authorizer from '@core/auth/authorizer'
 
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import InnerModuleSwitch from '../components/innerModuleSwitch'
@@ -13,8 +13,8 @@ import TaxonomiesView from '../../surveyViews/taxonomies/taxonomiesView'
 
 import { appModules, appModuleUri, designerModules } from '../../appModules'
 
-import * as AppState from '../../../app/appState'
-import * as SurveyState from '../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { resetForm } from '../../surveyViews/surveyForm/actions'
 

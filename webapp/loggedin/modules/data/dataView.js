@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
@@ -9,7 +9,7 @@ import RecordsView from './records/recordsView'
 import RecordView from '../../surveyViews/record/recordView'
 import DataVisView from './dataVis/dataVisView'
 
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { appModules, appModuleUri, dataModules } from '../../appModules'
 

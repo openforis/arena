@@ -1,16 +1,16 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('../../../../../../core/uuid')
-const DateUtils = require('../../../../../../core/dateUtils')
+const { uuidv4 } = require('@core/uuid')
+const DateUtils = require('@core/dateUtils')
 
-const Survey = require('../../../../../../core/survey/survey')
-const NodeDef = require('../../../../../../core/survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 const { nodeDefType } = NodeDef
-const Taxon = require('../../../../../../core/survey/taxon')
+const Taxon = require('@core/survey/taxon')
 
-const Record = require('../../../../../../core/record/record')
-const Node = require('../../../../../../core/record/node')
-const RecordFile = require('../../../../../../core/record/recordFile')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
+const RecordFile = require('@core/record/recordFile')
 
 const FileManager = require('../../../../record/manager/fileManager')
 const CollectSurvey = require('../model/collectSurvey')

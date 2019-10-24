@@ -1,12 +1,12 @@
 const i18next = require('i18next')
 
-const ProcessUtils = require('../processUtils')
+const ProcessUtils = require('@core/processUtils')
 
 const enTranslation = require('./resources/en')
 
 const createParams = lang => ({
   fallbackLng: 'en',
-  debug: ProcessUtils.envDevelopment,
+  debug: ProcessUtils.isEnvDevelopment,
 
   // react i18next special options (optional)
   react: {

@@ -1,8 +1,8 @@
-const Taxonomy = require('../../../core/survey/taxonomy')
-const Taxon = require('../../../core/survey/taxon')
-const Validator = require('../../../core/validation/validator')
-const Validation = require('../../../core/validation/validation')
-const ObjectUtils = require('../../../core/objectUtils')
+const Taxonomy = require('@core/survey/taxonomy')
+const Taxon = require('@core/survey/taxon')
+const Validator = require('@core/validation/validator')
+const Validation = require('@core/validation/validation')
+const ObjectUtils = require('@core/objectUtils')
 
 /**
  * ====== TAXONOMY

@@ -1,13 +1,13 @@
 import * as R from 'ramda'
 
-import Survey from '../../../../core/survey/survey'
-import NodeDef from '../../../../core/survey/nodeDef'
-import Record from '../../../../core/record/record'
-import NodeDefLayout from '../../../../core/survey/nodeDefLayout'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Record from '@core/record/record'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyViewsState from '../surveyViewsState'
 import * as RecordState from '../record/recordState'
-import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))

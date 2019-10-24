@@ -3,9 +3,9 @@ import './processingChainsView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import ProcessingChain from '../../../../../common/analysis/processingChain'
+import ProcessingChain from '@common/analysis/processingChain'
 
-import { useOnUpdate } from '../../../../commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import TableView from '../../../tableViews/tableView'
 
@@ -13,7 +13,7 @@ import ProcessingChainsRow from './components/processingChainsRow'
 import ProcessingChainsRowHeader from './components/processingChainsRowHeader'
 import ProcessingChainsHeaderLeft from './components/processingChainsHeaderLeft'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { reloadListItems } from '../../../tableViews/actions'
 import { createProcessingChain, navigateToProcessingChainView } from './actions'

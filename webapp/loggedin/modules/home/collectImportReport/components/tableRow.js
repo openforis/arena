@@ -1,15 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../../core/survey/survey'
-import NodeDef from '../../../../../../core/survey/nodeDef'
-import CollectImportReportItem from '../../../../../../core/survey/collectImportReportItem'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import CollectImportReportItem from '@core/survey/collectImportReportItem'
 
 import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
-import Checkbox from '../../../../../commonComponents/form/checkbox'
+import Checkbox from '@webapp/commonComponents/form/checkbox'
 
-import * as AppState from '../../../../../app/appState'
-import * as SurveyState from '../../../../../survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import { updateCollectImportReportItem } from '../actions'
 import { setNodeDefForEdit } from '../../../../surveyViews/nodeDefEdit/actions'

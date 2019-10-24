@@ -4,18 +4,18 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { FormItem } from '../../../../../../commonComponents/form/input'
-import { useI18n } from '../../../../../../commonComponents/hooks'
+import { FormItem } from '@webapp/commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-import Taxon from '../../../../../../../core/survey/taxon'
-import NodeDef from '../../../../../../../core/survey/nodeDef'
-import Node from '../../../../../../../core/record/node'
-import NodeRefData from '../../../../../../../core/record/nodeRefData'
-import NodeDefLayout from '../../../../../../../core/survey/nodeDefLayout'
-import StringUtils from '../../../../../../../core/stringUtils'
+import Taxon from '@core/survey/taxon'
+import NodeDef from '@core/survey/nodeDef'
+import Node from '@core/record/node'
+import NodeRefData from '@core/record/nodeRefData'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
+import StringUtils from '@core/stringUtils'
 
-import * as SurveyState from '../../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const code = Node.valuePropKeys.code
 const scientificName = Node.valuePropKeys.scientificName

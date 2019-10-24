@@ -3,10 +3,10 @@ const R = require('ramda')
 const { getContextSurveyId, getContextUser } = require('../../testContext')
 const { expect } = require('chai')
 
-const CategoryManager = require('../../../server/modules/category/manager/categoryManager')
-const Category = require('../../../core/survey/category')
-const CategoryLevel = require('../../../core/survey/categoryLevel')
-const CategoryItem = require('../../../core/survey/categoryItem')
+const CategoryManager = require('@server/modules/category/manager/categoryManager')
+const Category = require('@core/survey/category')
+const CategoryLevel = require('@core/survey/categoryLevel')
+const CategoryItem = require('@core/survey/categoryItem')
 
 const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()

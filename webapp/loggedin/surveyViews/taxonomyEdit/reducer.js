@@ -1,14 +1,14 @@
-import { exportReducer } from '../../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import Taxonomy from '../../../../core/survey/taxonomy'
+import Taxonomy from '@core/survey/taxonomy'
 import * as TaxonomyEditState from './taxonomyEditState'
 
-import { appUserLogout } from '../../../app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { formReset } from '../surveyForm/actions'
 
 import { taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
-import { taxonomyCreate } from '../../../survey/taxonomies/actions'
+import { taxonomyCreate } from '@webapp/survey/taxonomies/actions'
 
 const actionHandlers = {
   // reset form

@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../objectUtils')
-const DateUtils = require('../dateUtils')
+const ObjectUtils = require('@core/objectUtils')
+const DateUtils = require('@core/dateUtils')
 
 const dateFormat = 'yyyy-MM-dd'
 

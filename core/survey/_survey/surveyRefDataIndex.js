@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const ObjectUtils = require('../../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 const SurveyNodeDefs = require('./surveyNodeDefs')
-const NodeDef = require('../../survey/nodeDef')
-const RecordReader = require('../../record/_record/recordReader')
-const Node = require('../../record/node')
+const NodeDef = require('@core/survey/nodeDef')
+const RecordReader = require('@core/record/_record/recordReader')
+const Node = require('@core/record/node')
 
-const CategoryItem = require('../../survey/categoryItem')
-const CategoryLevel = require('../../survey/categoryLevel')
-const Taxon = require('../../survey/taxon')
+const CategoryItem = require('@core/survey/categoryItem')
+const CategoryLevel = require('@core/survey/categoryLevel')
+const Taxon = require('@core/survey/taxon')
 
 /**
  * categoryItemUuidIndex : {

@@ -16,6 +16,26 @@ const buildReport = ProcessUtils.ENV.buildReport
 const lastCommit = ProcessUtils.ENV.sourceVersion
 const versionString = lastCommit + '_' + new Date().toISOString()
 
+// Remove mini-css-extract-plugin log spam
+// See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
+class CleanUpStatsPlugin {
+  shouldPickStatChild(child) {
+    return child.name.indexOf('mini-css-extract-plugin') !== 0;
+  }
+
+  apply(compiler) {
+    compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
+      const children = stats.compilation.children;
+      if (Array.isArray(children)) {
+        // eslint-disable-next-line no-param-reassign
+        stats.compilation.children = children
+          .filter(child => this.shouldPickStatChild(child));
+      }
+    });
+  }
+}
+
+
 // ==== init plugins
 const plugins = [
   new MiniCssExtractPlugin({
@@ -44,7 +64,8 @@ const plugins = [
     formats: [
       'woff2'
     ]
-  })
+  }),
+  new CleanUpStatsPlugin(),
 ]
 
 if (buildReport) {
@@ -55,6 +76,16 @@ if (buildReport) {
 const webPackConfig = {
   entry: ['./webapp/main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
+  resolve: {
+    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
+    alias: {
+      '@common': path.resolve(__dirname, 'common/'),
+      '@core': path.resolve(__dirname, 'core/'),
+      '@server': path.resolve(__dirname, 'server/'),
+      '@webapp': path.resolve(__dirname, 'webapp/'),
+      '@test': path.resolve(__dirname, 'test/'),
+    },
+  },
   output: {
     filename: 'bundle-[hash].js',
     path: path.resolve(__dirname, 'dist'),

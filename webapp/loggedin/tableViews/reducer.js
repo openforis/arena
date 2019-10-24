@@ -1,9 +1,9 @@
-import { exportReducer } from '../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as TableViewsState from './tableViewsState'
 
-import { appUserLogout } from '../../app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { tableViewsListUpdate } from './actions'
 
 const actionHandlers = {

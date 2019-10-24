@@ -1,12 +1,12 @@
-import { exportReducer } from '../../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import Category from '../../../../core/survey/category'
-import CategoryLevel from '../../../../core/survey/categoryLevel'
-import CategoryItem from '../../../../core/survey/categoryItem'
+import Category from '@core/survey/category'
+import CategoryLevel from '@core/survey/categoryLevel'
+import CategoryItem from '@core/survey/categoryItem'
 import * as CategoryEditState from './categoryEditState'
 
-import { appUserLogout } from '../../../app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { formReset } from '../surveyForm/actions'
 
 import {
@@ -25,7 +25,7 @@ import {
   categoryItemsUpdate,
   categoryItemUpdate,
   categoryLevelDelete,
-} from '../../../survey/categories/actions'
+} from '@webapp/survey/categories/actions'
 
 const actionHandlers = {
   // reset form

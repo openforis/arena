@@ -1,10 +1,10 @@
 const R = require('ramda')
-const { uuidv4 } = require('../uuid')
+const { uuidv4 } = require('@core/uuid')
 
-const ObjectUtils = require('../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 const NodeDefValidations = require('./nodeDefValidations')
 
-const StringUtils = require('../stringUtils')
+const StringUtils = require('@core/stringUtils')
 
 // ======== NODE DEF PROPERTIES
 

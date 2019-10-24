@@ -1,15 +1,15 @@
 const fs = require('fs')
 const R = require('ramda')
 
-const Job = require('../../../job/job')
+const Job = require('@server/job/job')
 
-const Category = require('../../../../core/survey/category')
-const CategoryImportSummary = require('../../../../core/survey/categoryImportSummary')
-const CategoryLevel = require('../../../../core/survey/categoryLevel')
-const CategoryItem = require('../../../../core/survey/categoryItem')
-const Validation = require('../../../../core/validation/validation')
-const StringUtils = require('../../../../core/stringUtils')
-const ObjectUtils = require('../../../../core/objectUtils')
+const Category = require('@core/survey/category')
+const CategoryImportSummary = require('@core/survey/categoryImportSummary')
+const CategoryLevel = require('@core/survey/categoryLevel')
+const CategoryItem = require('@core/survey/categoryItem')
+const Validation = require('@core/validation/validation')
+const StringUtils = require('@core/stringUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 const CategoryManager = require('../manager/categoryManager')
 const CategoryImportCSVParser = require('../manager/categoryImportCSVParser')

@@ -1,10 +1,10 @@
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
+const Request = require('@server/utils/request')
+const Response = require('@server/utils/response')
 
-const ObjectUtils = require('../../../../core/objectUtils')
-const Taxon = require('../../../../core/survey/taxon')
+const ObjectUtils = require('@core/objectUtils')
+const Taxon = require('@core/survey/taxon')
 
-const { jobToJSON } = require('../../../job/jobUtils')
+const { jobToJSON } = require('@server/job/jobUtils')
 const TaxonomyService = require('../service/taxonomyService')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')

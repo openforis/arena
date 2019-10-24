@@ -1,15 +1,16 @@
-const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
+const Request = require('@server/utils/request')
+const Response = require('@server/utils/response')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const UserService = require('../service/userService')
 
-const User = require('../../../../core/user/user')
-const UserValidator = require('../../../../core/user/userValidator')
-const Validation = require('../../../../core/validation/validation')
+const User = require('@core/user/user')
+const UserValidator = require('@core/user/userValidator')
+const Validation = require('@core/validation/validation')
+const ProcessUtils = require('@core/processUtils')
 
-const SystemError = require('../../../../server/utils/systemError')
+const SystemError = require('@server/utils/systemError')
 
 module.exports.init = app => {
 
@@ -81,7 +82,7 @@ module.exports.init = app => {
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
-        res.sendFile(`${__dirname}/avatar.png`)
+        res.sendFile(`${__dirname}/avatar.png`, { root: ProcessUtils.ENV.arenaRoot })
       }
     } catch (err) {
       next(err)

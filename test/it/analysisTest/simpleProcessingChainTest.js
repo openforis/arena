@@ -1,13 +1,13 @@
 const R = require('ramda')
 const { assert, expect } = require('chai')
 
-const Survey = require('../../../core/survey/survey')
-const NodeDef = require('../../../core/survey/nodeDef')
-const ProcessingChain = require('../../../common/analysis/processingChain')
-const ProcessingStep = require('../../../common/analysis/processingStep')
-const ProcessingStepCalculation = require('../../../common/analysis/processingStepCalculation')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const ProcessingChain = require('@common/analysis/processingChain')
+const ProcessingStep = require('@common/analysis/processingStep')
+const ProcessingStepCalculation = require('@common/analysis/processingStepCalculation')
 
-const ProcessingChainService = require('../../../server/modules/analysis/service/processingChainService')
+const ProcessingChainService = require('@server/modules/analysis/service/processingChainService')
 
 const { getContextUser } = require('../../testContext')
 const SB = require('../utils/surveyBuilder')

@@ -1,5 +1,5 @@
-const ProcessUtils = require('../../../../core/processUtils')
-const ProcessingChain = require('../../../../common/analysis/processingChain')
+const ProcessUtils = require('@core/processUtils')
+const ProcessingChain = require('@common/analysis/processingChain')
 
 const ProcessingChainManager = require('../manager/processingChainManager')
 const SurveyManager = require('../../survey/manager/surveyManager')

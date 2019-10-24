@@ -1,8 +1,8 @@
-import { exportReducer } from '../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as TaxonomiesState from './taxonomiesState'
 
-import { appUserLogout } from '../../app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 
 import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
 

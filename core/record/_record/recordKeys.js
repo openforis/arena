@@ -1,4 +1,4 @@
-const ObjectUtils = require('../../objectUtils')
+const ObjectUtils = require('@core/objectUtils')
 
 const keys = {
   cycle: ObjectUtils.keys.cycle,

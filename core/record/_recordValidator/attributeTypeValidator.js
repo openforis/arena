@@ -1,17 +1,17 @@
 const R = require('ramda')
 
-const DateTimeUtils = require('../../dateUtils')
-const NumberUtils = require('../../numberUtils')
+const DateTimeUtils = require('@core/dateUtils')
+const NumberUtils = require('@core/numberUtils')
 
-const Survey = require('../../survey/survey')
-const NodeDef = require('../../survey/nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
 const { nodeDefType } = NodeDef
-const Taxon = require('../../survey/taxon')
+const Taxon = require('@core/survey/taxon')
 
 const Node = require('../node')
-const GeoUtils = require('../../geo/geoUtils')
+const GeoUtils = require('@core/geo/geoUtils')
 
-const Validation = require('../../validation/validation')
+const Validation = require('@core/validation/validation')
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (survey, nodeDef, node, value) =>

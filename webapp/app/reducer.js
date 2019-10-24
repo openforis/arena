@@ -1,4 +1,4 @@
-import { assocActionProps, exportReducer } from '../utils/reduxUtils'
+import { assocActionProps, exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as AppState from './appState'
 
@@ -8,7 +8,7 @@ import {
   appSavingUpdate,
 } from './actions'
 
-import { surveyCreate, surveyDelete, surveyUpdate } from '../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 
 import { systemErrorThrow } from './actions'
 

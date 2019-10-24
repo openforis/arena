@@ -1,7 +1,7 @@
-import { assocActionProps, exportReducer } from '../../../../utils/reduxUtils'
+import { assocActionProps, exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appUserLogout } from '../../../../app/actions'
-import { surveyCreate } from '../../../../survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import { surveyCreate } from '@webapp/survey/actions'
 import { surveyCreateNewSurveyUpdate } from './actions'
 
 const actionHandlers = {

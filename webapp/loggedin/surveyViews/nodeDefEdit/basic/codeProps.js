@@ -2,21 +2,21 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { FormItem } from '../../../../commonComponents/form/input'
-import Dropdown from '../../../../commonComponents/form/dropdown'
-import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
-import { useI18n } from '../../../../commonComponents/hooks'
+import { FormItem } from '@webapp/commonComponents/form/input'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
+import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Survey from '../../../../../core/survey/survey'
-import NodeDef from '../../../../../core/survey/nodeDef'
-import Category from '../../../../../core/survey/category'
-import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
-import Validation from '../../../../../core/validation/validation'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import Category from '@core/survey/category'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
+import Validation from '@core/validation/validation'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
+import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
 
 const CodeProps = (props) => {

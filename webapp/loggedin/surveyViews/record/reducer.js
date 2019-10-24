@@ -1,9 +1,9 @@
-import { exportReducer } from '../../../utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import Record from '../../../../core/record/record'
-import { appUserLogout } from '../../../app/actions'
+import Record from '@core/record/record'
+import { appUserLogout } from '@webapp/app/actions'
 
-import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { formReset } from '../surveyForm/actions'
 
 import { nodeDelete, nodesUpdate, recordCreate, recordDelete, recordLoad, validationsUpdate } from './actions'

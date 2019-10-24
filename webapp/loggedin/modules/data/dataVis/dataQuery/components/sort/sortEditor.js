@@ -3,18 +3,18 @@ import './sortEditor.scss'
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Expression from '../../../../../../../../core/exprParser/expression'
-import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
+import Expression from '@core/exprParser/expression'
+import * as DataSort from '@common/surveyRdb/dataSort'
 
-import Popup from '../../../../../../../commonComponents/popup'
-import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
-import { useI18n, usePrevious } from '../../../../../../../commonComponents/hooks'
+import Popup from '@webapp/commonComponents/popup'
+import * as ExpressionVariables from '@webapp/commonComponents/expression/expressionVariables'
+import { useI18n, usePrevious } from '@webapp/commonComponents/hooks'
 
 import SortRow from './sortRow'
 
-import Survey from '../../../../../../../../core/survey/survey'
+import Survey from '@core/survey/survey'
 
-import * as SurveyState from '../../../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const SortExpressionComponent = props => {
 

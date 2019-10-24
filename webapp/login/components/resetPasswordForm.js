@@ -4,7 +4,7 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { useI18n } from '../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from '../loginState'
 import { resetPassword, setLoginError } from '../actions'

@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import { useI18n } from '../../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import ExpressionEditorPopup from '../../../../../../commonComponents/expression/expressionEditorPopup'
+import ExpressionEditorPopup from '@webapp/commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../tableViews/components/tablePaginator'
 import SortEditor from './sort/sortEditor'
-import DownloadButton from '../../../../../../commonComponents/form/downloadButton'
-import Tooltip from '../../../../../../commonComponents/tooltip'
+import DownloadButton from '@webapp/commonComponents/form/downloadButton'
+import Tooltip from '@webapp/commonComponents/tooltip'
 
-import Expression from '../../../../../../../core/exprParser/expression'
-import * as DataSort from '../../../../../../../common/surveyRdb/dataSort'
+import Expression from '@core/exprParser/expression'
+import * as DataSort from '@common/surveyRdb/dataSort'
 
 import {
   updateTableFilter,

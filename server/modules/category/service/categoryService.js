@@ -1,5 +1,5 @@
 const CategoryManager = require('../manager/categoryManager')
-const JobManager = require('../../../job/jobManager')
+const JobManager = require('@server/job/jobManager')
 const CategoryImportJob = require('./categoryImportJob')
 const CategoryImportJobParams = require('./categoryImportJobParams')
 

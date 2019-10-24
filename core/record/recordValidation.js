@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const Validation = require('../validation/validation')
+const Validation = require('@core/validation/validation')
 const Node = require('./node')
-const NodeDef = require('../survey/nodeDef')
+const NodeDef = require('@core/survey/nodeDef')
 
 const keys = {
   recordKeys: 'recordKeys',

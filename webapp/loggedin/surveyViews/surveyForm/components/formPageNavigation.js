@@ -3,11 +3,11 @@ import './formPageNavigation.scss'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '../../../../../core/survey/survey'
-import NodeDef from '../../../../../core/survey/nodeDef'
-import NodeDefLayout from '../../../../../core/survey/nodeDefLayout'
+import Survey from '@core/survey/survey'
+import NodeDef from '@core/survey/nodeDef'
+import NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
 import { setFormActivePage, toggleFormPageNavigation } from '../../surveyForm/actions'

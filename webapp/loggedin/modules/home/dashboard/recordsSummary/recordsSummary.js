@@ -4,14 +4,14 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '../../../../../commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import RecordsSummaryChart from './chart/recordsSummaryChart'
-import Dropdown from '../../../../../commonComponents/form/dropdown'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-import DateUtils from '../../../../../../core/dateUtils'
-import Survey from '../../../../../../core/survey/survey'
+import DateUtils from '@core/dateUtils'
+import Survey from '@core/survey/survey'
 
-import * as SurveyState from '../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordsSummaryState from './recordsSummaryState'
 
 import { fetchRecordsSummary } from './actions'

@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-import DateUtils from '../../../../../../core/dateUtils'
+import DateUtils from '@core/dateUtils'
 
-import * as SurveyState from '../../../../../survey/surveyState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordsSummaryState from './recordsSummaryState'
 
 export const recordsSummaryUpdate = 'home/recordsSummary/update'

@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const Job = require('../../../../../job/job')
+const Job = require('@server/job/job')
 
-const Survey = require('../../../../../../core/survey/survey')
-const NodeDef = require('../../../../../../core/survey/nodeDef')
-const Validation = require('../../../../../../core/validation/validation')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const Validation = require('@core/validation/validation')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 

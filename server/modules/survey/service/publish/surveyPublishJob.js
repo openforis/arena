@@ -1,4 +1,4 @@
-const Job = require('../../../../job/job')
+const Job = require('@server/job/job')
 
 const NodeDefsValidationJob = require('./jobs/nodeDefsValidationJob')
 const CategoriesValidationJob = require('./jobs/categoriesValidationJob')

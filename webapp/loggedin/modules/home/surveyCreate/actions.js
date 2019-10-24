@@ -1,8 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { surveyCreate, setActiveSurvey } from '../../../../survey/actions'
-import { showAppJobMonitor } from '../../../appJob/actions'
+import { surveyCreate, setActiveSurvey } from '@webapp/survey/actions'
+import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
 import * as SurveyCreateState from './surveyCreateState'
 

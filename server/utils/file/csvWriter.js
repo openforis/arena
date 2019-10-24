@@ -2,7 +2,7 @@ const R = require('ramda')
 const fs = require('fs')
 const { transform, stringify } = require('csv')
 
-const StringUtils = require('../../../core/stringUtils')
+const StringUtils = require('@core/stringUtils')
 
 const _transformObj = obj => Object.entries(obj).reduce(
   (objAcc, [key, value]) => Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),

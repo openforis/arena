@@ -1,22 +1,22 @@
 const R = require('ramda')
 
-const db = require('../../../../db/db')
-const ActivityLog = require('../../../activityLog/activityLogger')
-const SystemError = require('../../../../../server/utils/systemError')
+const db = require('@server/db/db')
+const ActivityLog = require('@server/modules/activityLog/activityLogger')
+const SystemError = require('@server/utils/systemError')
 
-const ObjectUtils = require('../../../../../core/objectUtils')
-const Survey = require('../../../../../core/survey/survey')
-const NodeDef = require('../../../../../core/survey/nodeDef')
-const Record = require('../../../../../core/record/record')
-const RecordStep = require('../../../../../core/record/recordStep')
-const Node = require('../../../../../core/record/node')
+const ObjectUtils = require('@core/objectUtils')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const Record = require('@core/record/record')
+const RecordStep = require('@core/record/recordStep')
+const Node = require('@core/record/node')
 
 const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
 
-const RecordRepository = require('../../repository/recordRepository')
-const FileRepository = require('../../repository/fileRepository')
-const DataTableUpdateRepository = require('../../../surveyRdb/repository/dataTableUpdateRepository')
+const RecordRepository = require('@server/modules/record/repository/recordRepository')
+const FileRepository = require('@server/modules/record/repository/fileRepository')
+const DataTableUpdateRepository = require('@server/modules/surveyRdb/repository/dataTableUpdateRepository')
 
 /**
  * =======

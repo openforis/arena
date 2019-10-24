@@ -1,8 +1,8 @@
 const schedule = require('node-schedule')
 
-const Log = require('../../log/log')
+const Log = require('@server/log/log')
 
-const AuthService = require('../../modules/auth/service/authService')
+const AuthService = require('@server/modules/auth/service/authService')
 
 const init = () => {
   const logger = Log.getLogger('ExpiredJwtTokensCleanup')

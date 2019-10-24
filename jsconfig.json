@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES6",
+    "baseUrl": "./",
+    "paths": {
+      "@common/*": [
+        "./common/*"
+      ],
+      "@core/*": [
+        "./core/*"
+      ],
+      "@server/*": [
+        "./server/*"
+      ],
+      "@webapp/*": [
+        "./webapp/*"
+      ]
+    }
+  },
+  "include": [
+    "common",
+    "core",
+    "server",
+    "webapp",
+    "test"
+  ]
+}

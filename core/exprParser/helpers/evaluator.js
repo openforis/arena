@@ -1,9 +1,9 @@
 const R = require('ramda')
 
 const { types } = require('./types')
-const { isString } = require('../../stringUtils')
+const { isString } = require('@core/stringUtils')
 
-const SystemError = require('../../../server/utils/systemError')
+const SystemError = require('@server/utils/systemError')
 
 const unaryEval = async (expr, ctx) => {
   const { argument, operator } = expr

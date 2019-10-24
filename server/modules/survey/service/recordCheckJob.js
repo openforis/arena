@@ -1,14 +1,14 @@
 const R = require('ramda')
 
-const Survey = require('../../../../core/survey/survey')
-const NodeDef = require('../../../../core/survey/nodeDef')
-const Record = require('../../../../core/record/record')
-const Node = require('../../../../core/record/node')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const Record = require('@core/record/record')
+const Node = require('@core/record/node')
 
 const SurveyManager = require('../manager/surveyManager')
 const RecordManager = require('../../record/manager/recordManager')
 
-const Job = require('../../../job/job')
+const Job = require('@server/job/job')
 
 class RecordCheckJob extends Job {
 

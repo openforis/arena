@@ -1,10 +1,10 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-const db = require('../../../db/db')
-const DbUtils = require('../../../db/dbUtils')
+const db = require('@server/db/db')
+const DbUtils = require('@server/db/dbUtils')
 
-const Node = require('../../../../core/record/node')
+const Node = require('@core/record/node')
 const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 // ============== UTILS
