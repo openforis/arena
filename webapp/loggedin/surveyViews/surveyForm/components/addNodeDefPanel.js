@@ -28,7 +28,7 @@ const AddNodeDefButtons = props => {
             const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
             // cannot add entities when entity is rendered as table
-            const disabled = type === NodeDef.nodeDefType.entity && NodeDefLayout.isRenderTable(nodeDef)
+            const disabled = type === NodeDef.nodeDefType.entity && NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
 
             return (
               <button key={type}
