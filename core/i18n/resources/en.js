@@ -387,6 +387,7 @@ module.exports = {
     // common
     invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
+    invalidDate: 'Invalid date',
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: 'Name "{{value}}" cannot be used: it\'s a reserved word',
     nameRequired: 'Name is required',
@@ -454,6 +455,14 @@ module.exports = {
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
+      cyclesRequired: 'At least one cycle must be defined',
+      cyclesExceedingMax: 'A survey can have at most 10 cycles',
+      cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
+      cycleDateStartAfterPrevDateEnd: `Cycle start date must be after previous cycle end date`,
+      cycleDateStartInvalid: 'Cycle start date is invalid',
+      cycleDateStartMandatory: 'Cycle start date is mandatory',
+      cycleDateEndInvalid: 'Cycle end date is invalid',
+      cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
     },
 
     taxonomyEdit: {

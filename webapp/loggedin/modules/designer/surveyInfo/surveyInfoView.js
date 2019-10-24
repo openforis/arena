@@ -13,6 +13,7 @@ import CyclesEditor from './components/cyclesEditor'
 import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
 import Authorizer from '../../../../../core/auth/authorizer'
+import Survey from '../../../../../core/survey/survey'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'
@@ -38,7 +39,7 @@ const SurveyInfoView = (props) => {
           <label className="form-label">{i18n.t('common.name')}</label>
           <Input
             value={name}
-            validation={getFieldValidation('name')}
+            validation={getFieldValidation(Survey.infoKeys.name)}
             onChange={setName}
             readOnly={readOnly}/>
 
@@ -82,6 +83,7 @@ const SurveyInfoView = (props) => {
             cycles={cycles}
             setCycles={setCycles}
             surveyInfo={surveyInfo}
+            validation={getFieldValidation(Survey.infoKeys.cycles)}
           />
         </div>
 

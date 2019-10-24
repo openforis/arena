@@ -7,6 +7,10 @@
     align-items: center;
     flex-wrap: wrap;
 
+    .tooltip-error .cycle {
+      border: 1px solid rgba($red, 0.6);
+    }
+
     .cycle {
       display: flex;
       align-items: center;
@@ -46,3 +50,4 @@
     }
   }
 }
+
