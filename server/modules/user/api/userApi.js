@@ -23,7 +23,7 @@ module.exports.init = app => {
       const validation = await UserValidator.validateInvitation(Request.getBody(req))
 
       if (!Validation.isValid(validation)) {
-        throw new SystemError('invalidUser')
+        throw new SystemError('appErrors.userInvalid')
       }
 
       const serverUrl = Request.getServerUrl(req)
@@ -108,7 +108,7 @@ module.exports.init = app => {
       const validation = await UserValidator.validateUser(Request.getBody(req))
 
       if (!Validation.isValid(validation)) {
-        throw new SystemError('invalidUser')
+        throw new SystemError('appErrors.userInvalid')
       }
 
       const user = Request.getUser(req)

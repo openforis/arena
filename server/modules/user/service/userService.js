@@ -46,10 +46,11 @@ const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serv
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 
-    if (hasRoleInSurvey) {
+    if (!User.hasAccepted(dbUser)) {
+      throw new SystemError('appErrors.userHasPendingInvitation', { email })
+    } else if (hasRoleInSurvey) {
       throw new SystemError('appErrors.userHasRole')
-    }
-    if (User.isSystemAdmin(dbUser)) {
+    } else if (User.isSystemAdmin(dbUser)) {
       throw new SystemError('appErrors.userIsAdmin')
     }
 
