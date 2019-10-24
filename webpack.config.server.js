@@ -52,8 +52,8 @@ module.exports = {
         path: path.resolve(__dirname, './'),
         filename: 'dist/[id].js',
         libraryTarget: "commonjs2",
-        hotUpdateChunkFilename: 'dist/hot-update.js',
-        hotUpdateMainFilename: 'dist/hot-update.json'
+        hotUpdateChunkFilename: 'dist/hot-update-[id].js',
+        hotUpdateMainFilename: 'dist/hot-update-[hash].json',
     },
     resolve: {
         extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
