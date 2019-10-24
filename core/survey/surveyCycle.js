@@ -28,6 +28,9 @@ const setDateStart = R.assoc(keys.dateStart)
 const setDateEnd = R.assoc(keys.dateEnd)
 
 module.exports = {
+  keys,
+  dateFormat,
+
   //CREATE
   newCycle,
 

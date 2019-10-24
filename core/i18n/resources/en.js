@@ -453,11 +453,13 @@ module.exports = {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
       cyclesRequired: 'At least one cycle must be defined',
-      tooManyCycles: 'A survey can have at most 10 cycles',
-      startDateRequired: 'Start date is required for all survey cycles',
-      startDateAfterEndDate: 'Cycle start date is after its end date',
-      endDateRequiredExceptForLastCycle: 'End date is required for all but the last cycle',
-      previousCycleMustEndBeforeNextCycle: 'All cycles must have an end date before the cycle\'s start date',
+      cyclesExceedingMax: 'A survey can have at most 10 cycles',
+      cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
+      cycleDateStartAfterPrevDateEnd: `Cycle start date must be after previous cycle end date`,
+      cycleDateStartInvalid: 'Cycle start date is invalid',
+      cycleDateStartMandatory: 'Cycle start date is mandatory',
+      cycleDateEndInvalid: 'Cycle end date is invalid',
+      cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
     },
 
     taxonomyEdit: {

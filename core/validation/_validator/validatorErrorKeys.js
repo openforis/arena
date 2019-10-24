@@ -68,11 +68,13 @@ module.exports = {
     langRequired: 'validationErrors.surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors.surveyInfoEdit.srsRequired',
     cyclesRequired: 'validationErrors.surveyInfoEdit.cyclesRequired',
-    tooManyCycles: 'validationErrors.surveyInfoEdit.tooManyCycles',
-    startDateRequired: 'validationErrors.surveyInfoEdit.startDateRequired',
-    startDateAfterEndDate: 'validationErrors.surveyInfoEdit.startDateAfterEndDate',
-    endDateRequiredExceptForLastCycle: 'validationErrors.surveyInfoEdit.endDateRequiredExceptForLastCycle',
-    previousCycleMustEndBeforeNextCycle: 'validationErrors.surveyInfoEdit.previousCycleMustEndBeforeNextCycle',
+    cyclesExceedingMax: 'validationErrors.surveyInfoEdit.cyclesExceedingMax',
+    cycleDateStartMandatory: 'validationErrors.surveyInfoEdit.cycleDateStartMandatory',
+    cycleDateStartInvalid: 'validationErrors.surveyInfoEdit.cycleDateStartInvalid',
+    cycleDateStartBeforeDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartBeforeDateEnd',
+    cycleDateEndInvalid: 'validationErrors.surveyInfoEdit.cycleDateEndInvalid',
+    cycleDateEndMandatoryExceptForLastCycle: 'validationErrors.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
+    cycleDateStartAfterPrevDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
   },
 
   taxonomyEdit: {

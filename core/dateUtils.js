@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const {
+  parse: dateFnsParse,
   parseISO,
   differenceInMonths,
   differenceInWeeks,
@@ -19,7 +20,7 @@ const {
   subYears,
 } = require('date-fns')
 
-const { isBlank } = require('.//stringUtils')
+const { isBlank } = require('./stringUtils')
 
 const normalizeDateTimeValue = length => value => R.pipe(
   R.ifElse(
@@ -88,11 +89,19 @@ const isValidTime = (hour = '', minutes = '') =>
     ? false
     : +hour >= 0 && +hour < 24 && +minutes >= 0 && +minutes < 60
 
+const isValidDateInFormat = (dateStr, format) => {
+  const parsed = parse(dateStr, format)
+  return !isNaN(parsed.getTime())
+}
+
 const formatDate = (day, month, year) =>
   `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
 
 const formatTime = (hour, minute) =>
   `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+
+const parse = (dateStr, format) =>
+  dateFnsParse(dateStr, format, new Date())
 
 module.exports = {
   getRelativeDate,
@@ -101,11 +110,13 @@ module.exports = {
 
   isValidDate,
   isValidTime,
+  isValidDateInFormat,
 
   format,
   formatTime,
   formatDate,
 
+  parse,
   parseISO,
   subDays,
   addDays,

@@ -5,6 +5,7 @@ import * as R from 'ramda'
 
 import Survey from '../../../../../../core/survey/survey'
 import SurveyCycle from '../../../../../../core/survey/surveyCycle'
+import Validation from '../../../../../../core/validation/validation'
 
 import { useI18n } from '../../../../../commonComponents/hooks'
 import ValidationTooltip from '../../../../../commonComponents/validationTooltip'
@@ -50,15 +51,15 @@ const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
 
 const CycleEditor = props => {
   const {
-    step, cycle, i18n, readOnly, validation,
+    cycleKey, cycle, i18n, readOnly, validation,
     canDelete, onChange, onDelete
   } = props
 
-  const stepNum = Number(step) + 1
+  const stepNum = Number(cycleKey) + 1
 
   return (
-    <ValidationTooltip validation={validation}>
-      <div key={step} className="cycle">
+    <ValidationTooltip validation={validation} showKeys={false}>
+      <div key={cycleKey} className="cycle">
         <div className="step">
           {stepNum}
         </div>
@@ -84,7 +85,7 @@ const CycleEditor = props => {
           canDelete &&
           <button className="btn-s btn-transparent btn-delete"
                   onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }))
-                    ? onDelete(step)
+                    ? onDelete(cycleKey)
                     : null
                   }>
             <span className="icon icon-bin2 icon-12px"/>
@@ -97,7 +98,7 @@ const CycleEditor = props => {
 
 const CyclesEditor = props => {
 
-  const { surveyInfo, cycles, readOnly, setCycles, validation, cyclesValidation } = props
+  const { cycles, readOnly, setCycles, validation } = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
@@ -108,41 +109,39 @@ const CyclesEditor = props => {
   }
 
   return (
-    <ValidationTooltip validation={validation}>
-      <div className="home-survey-info__cycles-editor">
+    <div className="home-survey-info__cycles-editor">
 
-        <div className="cycles">
-          {
-            cycleEntries.map(([step, cycle], i) =>
-              <CycleEditor
-                key={step}
-                step={step}
-                cycle={cycle}
-                i18n={i18n}
-                readOnly={readOnly}
-                validation={cyclesValidation[step]}
-                onChange={cycleUpdate => setCycles(
-                  R.assoc(step, cycleUpdate)(cycles)
-                )}
-                canDelete={!readOnly && step !== Survey.cycleOneKey && i === cycleEntries.length - 1}
-                onDelete={onDelete}
-              />
-            )
-          }
+      <div className="cycles">
+        {
+          cycleEntries.map(([cycleKey, cycle], i) =>
+            <CycleEditor
+              key={cycleKey}
+              cycleKey={cycleKey}
+              cycle={cycle}
+              i18n={i18n}
+              readOnly={readOnly}
+              validation={Validation.getFieldValidation(cycleKey)(validation)}
+              onChange={cycleUpdate => setCycles(
+                R.assoc(cycleKey, cycleUpdate)(cycles)
+              )}
+              canDelete={!readOnly && cycleKey !== Survey.cycleOneKey && i === cycleEntries.length - 1}
+              onDelete={onDelete}
+            />
+          )
+        }
 
-          {
-            !readOnly &&
-            <button className="btn-s btn-add"
-                    onClick={() => setCycles(
-                      R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
-                    )}>
-              <span className="icon icon-plus icon-10px"/>
-            </button>
-          }
-        </div>
-
+        {
+          !readOnly &&
+          <button className="btn-s btn-add"
+                  onClick={() => setCycles(
+                    R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
+                  )}>
+            <span className="icon icon-plus icon-10px"/>
+          </button>
+        }
       </div>
-    </ValidationTooltip>
+
+    </div>
   )
 
 }
