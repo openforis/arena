@@ -1,41 +1,41 @@
-const R = require('ramda')
-
 const environments = {
   development: 'development',
   production: 'production',
 }
 
-const getEnvVariable = (variable, defaultValue = null) => R.pathOr(defaultValue, ['env', variable])(process)
-
 const ENV = {
-  port: getEnvVariable('PORT', '9090'),
-  nodeEnv: getEnvVariable('NODE_ENV', environments.development),
-  tempFolder: getEnvVariable('TEMP_FOLDER', '/tmp/arena_upload'),
-  buildReport: getEnvVariable('BUILD_REPORT') === 'true',
-  sourceVersion: getEnvVariable('SOURCE_VERSION', 'N/A'),
+  arenaRoot: process.env['ARENA_ROOT'],
+  arenaDist: process.env['ARENA_DIST'],
+  port: process.env['PORT'] || '9090',
+  nodeEnv: process.env['NODE_ENV'] || environments.development,
+  tempFolder: process.env['TEMP_FOLDER'] || '/tmp/arena_upload',
+  buildReport: process.env['BUILD_REPORT'] === 'true',
+  sourceVersion: process.env['SOURCE_VERSION'] || 'N/A',
   //COGNITO
-  cognitoRegion: getEnvVariable('COGNITO_REGION'),
-  cognitoUserPoolId: getEnvVariable('COGNITO_USER_POOL_ID'),
-  cognitoClientId: getEnvVariable('COGNITO_CLIENT_ID'),
+  cognitoRegion: process.env['COGNITO_REGION'],
+  cognitoUserPoolId: process.env['COGNITO_USER_POOL_ID'],
+  cognitoClientId: process.env['COGNITO_CLIENT_ID'],
   //DB
-  dbUrl: getEnvVariable('DATABASE_URL'),
-  pgUser: getEnvVariable('PGUSER'),
-  pgPassword: getEnvVariable('PGPASSWORD'),
-  pgDatabase: getEnvVariable('PGDATABASE'),
-  pgSchema: getEnvVariable('PGSCHEMA'),
-  pgHost: getEnvVariable('PGHOST'),
-  pgPort: getEnvVariable('PGPORT'),
-  pgSsl: getEnvVariable('PGSSL') === 'true',
+  dbUrl: process.env['DATABASE_URL'],
+  pgUser: process.env['PGUSER'],
+  pgPassword: process.env['PGPASSWORD'],
+  pgDatabase: process.env['PGDATABASE'],
+  pgSchema: process.env['PGSCHEMA'],
+  pgHost: process.env['PGHOST'],
+  pgPort: process.env['PGPORT'],
+  pgSsl: process.env['PGSSL'] === 'true',
   //EMAIL
-  adminEmail: getEnvVariable('ADMIN_EMAIL'),
-  sendGridApiKey: getEnvVariable('SENDGRID_API_KEY'),
+  adminEmail: process.env['ADMIN_EMAIL'],
+  sendGridApiKey: process.env['SENDGRID_API_KEY'],
   //ANALYSIS
-  analysisOutputDir: getEnvVariable('ANALYSIS_OUTPUT_DIR'),
+  analysisOutputDir: process.env['ANALYSIS_OUTPUT_DIR'],
 }
 
-const envDevelopment = ENV.nodeEnv === environments.development
+const isEnvDevelopment = ENV.nodeEnv === environments.development
+const isEnvProduction = ENV.nodeEnv === environments.production
 
 module.exports = {
   ENV,
-  envDevelopment
+  isEnvDevelopment,
+  isEnvProduction,
 }

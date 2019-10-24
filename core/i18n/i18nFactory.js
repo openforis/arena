@@ -6,7 +6,7 @@ const enTranslation = require('./resources/en')
 
 const createParams = lang => ({
   fallbackLng: 'en',
-  debug: ProcessUtils.envDevelopment,
+  debug: ProcessUtils.isEnvDevelopment,
 
   // react i18next special options (optional)
   react: {

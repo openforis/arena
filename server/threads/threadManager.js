@@ -1,11 +1,13 @@
+const path = require('path')
 const { Worker } = require('worker_threads')
 
-const Log = require('@server/log/log')
-
-const WebSocket = require('@server/utils/webSocket')
-
+const ProcessUtils = require('@core/processUtils')
 const User = require('@core/user/user')
+
 const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+
+const Log = require('@server/log/log')
+const WebSocket = require('@server/utils/webSocket')
 
 const Thread = require('./thread')
 const ThreadParams = require('./threadParams')
@@ -15,7 +17,9 @@ const ThreadParams = require('./threadParams')
  */
 class ThreadManager {
 
-  constructor (filePath, data, messageHandler, exitHandler = null) {
+  constructor (fileName, data, messageHandler, exitHandler = null) {
+    const filePath = path.resolve(ProcessUtils.ENV.arenaDist, fileName)
+
     this.worker = new Worker(filePath, { workerData: data })
     this.socketId = ThreadParams.getSocketId(data)
     this.threadId = this.worker.threadId

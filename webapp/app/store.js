@@ -34,7 +34,7 @@ const createReducer = asyncReducers => (
 
 const middlewares = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
-if (ProcessUtils.envDevelopment) {
+if (ProcessUtils.isEnvDevelopment) {
   const { logger } = require('redux-logger')
 
   middlewares.push(logger)

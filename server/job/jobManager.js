@@ -1,5 +1,3 @@
-const path = require('path')
-
 const { jobThreadMessageTypes } = require('./jobUtils')
 const ThreadsCache = require('@server/threads/threadsCache')
 const ThreadManager = require('@server/threads/threadManager')
@@ -42,7 +40,7 @@ const cancelActiveJobByUserUuid = async userUuid => {
 const executeJobThread = job => {
 
   const thread = new ThreadManager(
-    path.resolve(__ARENA_DIST, 'jobThread.js'),
+    'jobThread.js',
     { jobType: job.type, jobParams: job.params },
     async job => await notifyJobUpdate(job)
   )

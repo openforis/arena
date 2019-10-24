@@ -4,6 +4,7 @@ const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 
+const ProcessUtils = require('@core/processUtils')
 const Log = require('@server/log/log')
 
 const headerMiddleware = require('./middleware/headerMiddleware')
@@ -15,7 +16,6 @@ const WebSocket = require('@server/utils/webSocket')
 const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
 const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
-const ProcessUtils = require('@core/processUtils')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')

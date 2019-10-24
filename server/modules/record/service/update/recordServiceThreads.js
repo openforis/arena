@@ -1,5 +1,4 @@
 const R = require('ramda')
-const path = require('path')
 
 const ThreadManager = require('@server/threads/threadManager')
 const RecordUpdateThreadParams = require('./thread/recordUpdateThreadParams')
@@ -20,8 +19,6 @@ const recordThreadTimeouts = {}
 
 // ====== CREATE
 const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
-  const filePath = path.resolve(__ARENA_DIST, 'recordUpdateThread.js')
-
   const data = {
     [ThreadParams.keys.socketId]: socketId,
     [ThreadParams.keys.user]: user,
@@ -52,7 +49,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
     RecordThreadsMap.remove(recordUuid)
   }
 
-  const thread = new ThreadManager(filePath, data, messageHandler, exitHandler)
+  const thread = new ThreadManager('recordUpdateThread.js', data, messageHandler, exitHandler)
 
   return RecordThreadsMap.put(recordUuid, thread)
 }
