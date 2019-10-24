@@ -52,11 +52,11 @@ const _getColValues = async (survey, cycle, nodeDef, node, type, client) =>
       cycle,
       Node.getParentUuid(node),
       ...NodeDef.isMultipleAttribute(nodeDef)
-        ? await Promise.all(DataCol.getValues(survey, nodeDef, node, client))
+        ? await Promise.all(DataCol.getValues(survey, nodeDef, node))
         //entity
         : []
     ]
-    : await DataCol.getValues(survey, nodeDef, node, client)
+    : await DataCol.getValues(survey, nodeDef, node)
 
 const _getRowUuid = (nodeDef, node, nodeParent) => _hasTable(nodeDef)
   ? Node.getUuid(node)
