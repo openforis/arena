@@ -67,7 +67,7 @@ class RecordsImportJob extends Job {
       const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson))
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       const recordUuid = Record.getUuid(record)
-      await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)
+      await RecordManager.updateRecordStep(user, surveyId, recordUuid, step, true, tx)
       // this.logDebug(`${entryName} recordToCreate end`)
 
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)

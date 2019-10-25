@@ -110,8 +110,9 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, step } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-      await RecordService.updateRecordStep(surveyId, recordUuid, step)
+      await RecordService.updateRecordStep(user, surveyId, recordUuid, step)
 
       sendOk(res)
     } catch (err) {

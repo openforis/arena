@@ -40,6 +40,7 @@ const type = {
   //record
   recordCreate: 'recordCreate',
   recordDelete: 'recordDelete',
+  recordStepUpdate: 'recordStepUpdate',
 
   //node
   nodeCreate: 'nodeCreate',
