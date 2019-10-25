@@ -7,7 +7,7 @@ const DbUtils = require('@server/db/dbUtils')
 const Node = require('@core/record/node')
 const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const nodeTableColumns = ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'] //used for node values batch insert
+const tableColumns = ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'] //used for node values batch insert
 
 // ============== UTILS
 
@@ -85,7 +85,7 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
   await client.none(DbUtils.insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
-    nodeTableColumns,
+    tableColumns,
     nodeValues
   ))
 
@@ -190,7 +190,7 @@ const stringifyValue = value => {
 }
 
 module.exports = {
-  nodeTableColumns,
+  tableColumns,
 
   //CREATE
   insertNode,

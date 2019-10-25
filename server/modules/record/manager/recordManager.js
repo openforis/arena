@@ -27,9 +27,13 @@ const insertRecord = async (user, surveyId, record, system = false, client = db)
   })
 
 const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) => {
-  const activities = nodeValues.map(nodeValues =>
-    ActivityLog.newActivity(ActivityLog.type.nodeCreate, _fromNodeValuesToNode(nodeValues), true)
-  )
+  const activities = nodeValues.map(nodeValues => {
+    const node = NodeRepository.tableColumns.reduce(
+      (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
+      {}
+    )
+    return ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true)
+  })
 
   await client.tx(async t => await Promise.all([
     NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
@@ -62,15 +66,6 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, cli
 
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
-
-/**
- * Creates a Node object given an array of values (used for nodes batch insert)
- */
-const _fromNodeValuesToNode = nodeValues =>
-  NodeRepository.nodeTableColumns.reduce(
-    (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
-    {}
-  )
 
 module.exports = {
   // ==== CREATE
