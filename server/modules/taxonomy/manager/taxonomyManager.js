@@ -15,11 +15,11 @@ const ActivityLog = require('../../activityLog/activityLogger')
 /**
  * ====== CREATE
  */
-const insertTaxonomy = async (user, surveyId, taxonomy, client = db) =>
+const insertTaxonomy = async (user, surveyId, taxonomy, system = false, client = db) =>
   await client.tx(async t => {
     const [taxonomyInserted] = await Promise.all([
       TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
-      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, false, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)
     ])
     return await validateTaxonomy(surveyId, [], taxonomyInserted)
   })
