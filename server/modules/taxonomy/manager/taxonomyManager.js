@@ -125,11 +125,11 @@ const publishTaxonomiesProps = async (surveyId, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'taxon_vernacular_name', client)
 }
 
-const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, client = db) =>
+const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) =>
   await client.tx(async t => (await Promise.all([
       TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
       markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }, false, t)
+      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }, system, t)
     ]))[0]
   )
 

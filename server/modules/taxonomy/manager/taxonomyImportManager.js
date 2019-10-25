@@ -49,7 +49,7 @@ class TaxonomyImportManager {
 
     //set vernacular lang codes in taxonomy
     await TaxonomyManager.updateTaxonomyProp(user, surveyId, Taxonomy.getUuid(taxonomy),
-      Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, t)
+      Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, true, t)
   }
 }
 
