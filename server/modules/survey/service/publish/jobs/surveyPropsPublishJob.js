@@ -9,8 +9,6 @@ const SurveyManager = require('../../../manager/surveyManager')
 const CategoryManager = require('../../../../category/manager/categoryManager')
 const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 
-const ActivityLog = require('../../../../activityLog/activityLogger')
-
 const findDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -30,9 +28,9 @@ class SurveyPropsPublishJob extends Job {
   }
 
   async execute () {
-    const { surveyId, user, tx } = this
+    const { surveyId, tx } = this
 
-    this.total = 7
+    this.total = 6
 
     const langsDeleted = await findDeletedLanguages(surveyId, tx)
     this.incrementProcessedItems()
@@ -49,10 +47,7 @@ class SurveyPropsPublishJob extends Job {
     await TaxonomyManager.publishTaxonomiesProps(surveyId, tx)
     this.incrementProcessedItems()
 
-    const surveyInfo = await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
-    this.incrementProcessedItems()
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPublish, { uuid: Survey.getUuid(surveyInfo) }, false, tx)
+    await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
     this.incrementProcessedItems()
   }
 

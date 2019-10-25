@@ -39,7 +39,7 @@ const persistNode = async (user, survey, record, node, t) => {
 
   } else {
     // create
-    return await insertNode(survey, record, node, user, t)
+    return await insertNode(user, survey, record, node, false, t)
   }
 }
 
@@ -90,7 +90,7 @@ const updateNodesDependents = async (survey, record, nodes, tx) => {
 }
 
 // ==== CREATE
-const insertNode = async (survey, record, node, user, t) => {
+const insertNode = async (user, survey, record, node, system, t) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -103,16 +103,16 @@ const insertNode = async (survey, record, node, user, t) => {
     }
   }
 
-  const nodesToReturn = await _insertNodeRecursively(survey, nodeDef, record, node, user, t)
+  const nodesToReturn = await _insertNodeRecursively(user, survey, nodeDef, record, node, system, t)
 
   return _createUpdateResult(record, node, nodesToReturn)
 }
 
-const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, user, t) => {
+const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInsert, system, t) => {
   const surveyId = Survey.getId(survey)
 
   if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, false, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
@@ -129,7 +129,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
   for (const childDef of childDefs) {
     if (NodeDef.isSingle(childDef)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-      const childNodesInserted = await _insertNodeRecursively(survey, childDef, record, childNode, user, t)
+      const childNodesInserted = await _insertNodeRecursively(user, survey, childDef, record, childNode, system, t)
       Object.assign(childNodes, childNodesInserted)
     }
   }
@@ -159,10 +159,13 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   return await _onNodeUpdate(survey, record, node, nodeDependentKeyAttributes, t)
 }
 
-const deleteNodesByNodeDefUuids = async (surveyId, nodeDefsUuids, record, client = db) => {
-  const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, client)
-  return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
-}
+const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>
+  await client.tx(async t => {
+    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, t)
+    const activities = nodesDeleted.map(node => ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true))
+    await ActivityLog.logMany(user, surveyId, activities, t)
+    return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
+  })
 
 const _onNodeUpdate = async (survey, record, node, nodeDependents = {}, t) => {
   // TODO check if it should be removed

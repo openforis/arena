@@ -80,7 +80,7 @@ const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, clien
   return []
 }
 
-const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, system, client = db) =>
+const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, system = false, client = db) =>
   await client.tx(async t => {
     // update descendants cycle when updating entity cycle
     const nodeDefsUpdated = NodeDef.propKeys.cycles in props

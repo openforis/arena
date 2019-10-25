@@ -38,7 +38,7 @@ class CategoryImportJob extends Job {
     // 2. fetch or create category
     this.category = await this._fetchOrCreateCategory()
 
-    await ActivityLog.log(this.user, this.surveyId, ActivityLog.type.categoryImport, {uuid: Category.getUuid(this.category)}, false, this.tx)
+    await this.logCategoryImportActivity()
 
     // 3. import levels
     await this._importLevels()
@@ -59,6 +59,10 @@ class CategoryImportJob extends Job {
       // 6. no errors found, insert items
       await this._insertItems()
     }
+  }
+
+  async logCategoryImportActivity () {
+    await ActivityLog.log(this.user, this.surveyId, ActivityLog.type.categoryImport, { uuid: Category.getUuid(this.category) }, false, this.tx)
   }
 
   async beforeSuccess () {

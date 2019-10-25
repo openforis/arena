@@ -30,6 +30,10 @@ class SamplingPointDataImportJob extends CategoryImportJob {
     }, 'SamplingPointDataImportJob')
   }
 
+  async logCategoryImportActivity () {
+    //do not log category import activity for sampling point data category
+  }
+
   async shouldExecute () {
     //skip import if summary is not specified (csv file not found)
     return !!this.summary

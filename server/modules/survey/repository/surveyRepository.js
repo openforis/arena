@@ -110,7 +110,7 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
 }
 
 const publishSurveyProps = async (surveyId, client = db) =>
-  await client.one(`
+  await client.none(`
     UPDATE
         survey
     SET
@@ -120,8 +120,8 @@ const publishSurveyProps = async (surveyId, client = db) =>
         published = true
     WHERE
         id = $1
-    RETURNING ${surveySelectFields()}
-    `, [surveyId]
+    `,
+    [surveyId]
   )
 
 const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
@@ -143,7 +143,7 @@ const deleteSurvey = async (id, client = db) =>
 
 const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
   const propsUpdateCond = R.pipe(
-    R.map(langCode => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'` ),
+    R.map(langCode => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'`),
     R.join(' ')
   )(langCodes)
 

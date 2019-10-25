@@ -37,7 +37,7 @@ const initNewRecord = async (user, survey, record, nodesUpdateListener = null, n
 
 //==== UPDATE
 
-const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
+const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = false, client = db) => {
   await client.tx(async t => {
     const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, t)
 
@@ -47,7 +47,10 @@ const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
     const stepUpdate = RecordStep.getStep(stepId)
 
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
-      await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t)
+      await Promise.all([
+        RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
+        ActivityLog.log(user, surveyId, ActivityLog.type.recordStepUpdate, {uuid: recordUuid, stepId}, system, t)
+      ])
     } else {
       throw new SystemError('cantUpdateStep')
     }
