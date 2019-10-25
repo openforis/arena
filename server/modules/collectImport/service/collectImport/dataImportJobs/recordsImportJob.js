@@ -65,7 +65,7 @@ class RecordsImportJob extends Job {
 
       // this.logDebug(`${entryName} recordToCreate start`)
       const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson))
-      const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, tx)
+      const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       const recordUuid = Record.getUuid(record)
       await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)
       // this.logDebug(`${entryName} recordToCreate end`)
@@ -284,7 +284,7 @@ class RecordsImportJob extends Job {
   }
 
   async nodesBatchInsertHandler (nodeValues, tx) {
-    await RecordManager.insertNodesFromValues(this.surveyId, nodeValues, tx)
+    await RecordManager.insertNodesFromValues(this.user, this.surveyId, nodeValues, tx)
   }
 
 }

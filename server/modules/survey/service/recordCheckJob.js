@@ -78,7 +78,7 @@ class RecordCheckJob extends Job {
 
     // 2. remove deleted nodes
     if (!R.isEmpty(nodeDefDeletedUuids)) {
-      const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(this.surveyId, nodeDefDeletedUuids, record, this.tx)
+      const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(this.user, this.surveyId, nodeDefDeletedUuids, record, this.tx)
       record = recordDeletedNodes || record
     }
 
@@ -110,7 +110,7 @@ const _insertMissingSingleNode = async (survey, childDef, record, parentNode, us
     const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
-      return await RecordManager.insertNode(survey, record, childNode, user, tx)
+      return await RecordManager.insertNode(user, survey, record, childNode, true, tx)
     }
   }
   return {}

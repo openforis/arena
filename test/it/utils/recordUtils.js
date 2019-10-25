@@ -17,7 +17,7 @@ const newRecord = (user, preview = false) =>
 const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
   await client.tx(async t => {
     const record = newRecord(user, preview)
-    const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, t)
+    const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, true, t)
     return await RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
   })
 
