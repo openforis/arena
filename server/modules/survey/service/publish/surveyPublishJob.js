@@ -1,4 +1,5 @@
 const Job = require('@server/job/job')
+const ActivityLog = require('@server/modules/activityLog/activityLogger')
 
 const NodeDefsValidationJob = require('./jobs/nodeDefsValidationJob')
 const CategoriesValidationJob = require('./jobs/categoriesValidationJob')
@@ -27,6 +28,12 @@ class SurveyPublishJob extends Job {
       new SurveyRdbGeneratorJob(),
       new RecordsUniquenessValidationJob(),
     ])
+  }
+
+  async onStart () {
+    await super.onStart()
+
+    await ActivityLog.log(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
   }
 }
 
