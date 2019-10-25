@@ -31,14 +31,14 @@ const itemExtraDefDataTypes = {
  * CATEGORY
  */
 // ====== CREATE
-const newCategory = (props = {}) => {
+const newCategory = (props = {}, levels = null) => {
   const category = {
     [keys.uuid]: uuidv4(),
     props,
   }
   return {
     ...category,
-    [keys.levels]: [newLevel(category)]
+    [keys.levels]: levels ? levels : [newLevel(category)]
   }
 }
 

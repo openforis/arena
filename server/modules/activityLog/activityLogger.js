@@ -26,6 +26,7 @@ const type = {
   categoryItemInsert: 'categoryItemInsert',
   categoryItemPropUpdate: 'categoryItemPropUpdate',
   categoryItemDelete: 'categoryItemDelete',
+  categoryImport: 'categoryImport',
 
   //taxonomy
   taxonomyCreate: 'taxonomyCreate',

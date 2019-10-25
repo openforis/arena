@@ -26,7 +26,7 @@ class CategoriesImportJob extends Job {
   }
 
   async execute (tx) {
-    const { collectSurvey, surveyId, defaultLanguage } = this.context
+    const { collectSurvey, defaultLanguage } = this.context
 
     const categories = []
 
@@ -44,13 +44,9 @@ class CategoriesImportJob extends Job {
       if (!R.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)) {
         // skip sampling_design (sampling point data) code list, imported by SamplingPointDataImportJob
 
-        const categoryToCreate = Category.newCategory({
-          [Category.props.name]: categoryName
-        })
-        let category = await CategoryManager.insertCategory(this.user, surveyId, categoryToCreate, tx)
+        const category = await this._insertCategory(collectCodeList)
 
-        category = await this.insertLevels(category, collectCodeList, tx)
-
+        // insert items
         const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
         await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
 
@@ -60,46 +56,37 @@ class CategoriesImportJob extends Job {
       this.incrementProcessedItems()
     }
 
+    // flush items batch persister
     await this.itemBatchPersister.flush(tx)
 
+    // validate categories (after all items have been persisted)
+    await CategoryManager.validateCategories(this.surveyId, this.tx)
+
+    // set categories in context
     this.setContext({
       categories,
       qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel
     })
   }
 
-  async insertLevels (category, codeList, tx) {
-    const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(codeList)
-    if (hierarchyLevels.length > 1) {
-      let firstLevel = Category.getLevelByIndex(0)(category)
-      const collectFirstLevel = hierarchyLevels[0]
+  async _insertCategory (collectCodeList) {
+    const categoryName = collectCodeList.attributes.name
 
-      // update first level name
-      const { level: levelUpdated } = await CategoryManager.updateLevelProp(
-        this.user,
-        this.surveyId,
-        Category.getUuid(category),
-        Category.getUuid(firstLevel),
-        CategoryLevel.keysProps.name,
-        collectFirstLevel.attributes.name,
-        tx
-      )
-      firstLevel = levelUpdated
-      category = Category.assocLevel(firstLevel)(category)
+    // create category
+    let categoryToCreate = Category.newCategory({
+      [Category.props.name]: categoryName
+    })
 
-      // insert other levels
-      for (let i = 1; i < hierarchyLevels.length; i++) {
-        if (this.isCanceled())
-          break
-
-        const hierarchyLevel = hierarchyLevels[i]
-        const levelToCreate = Category.assocLevelName(hierarchyLevel.attributes.name)(Category.newLevel(category))
-        const { level } = await CategoryManager.insertLevel(this.user, this.surveyId, levelToCreate, tx)
-
-        category = Category.assocLevel(level)(category)
-      }
+    // create levels
+    const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(collectCodeList)
+    if (!R.isEmpty(hierarchyLevels)) {
+      const levels = hierarchyLevels.map((hierarchyLevel, index) =>
+        Category.newLevel(categoryToCreate, { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name }, index))
+      categoryToCreate = Category.assocLevelsArray(levels)(categoryToCreate)
     }
-    return category
+
+    // insert category and levels
+    return await CategoryManager.insertCategory(this.user, this.surveyId, categoryToCreate, true, this.tx)
   }
 
   async insertItems (category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
