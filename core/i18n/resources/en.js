@@ -230,13 +230,12 @@ module.exports = {
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
-  analysis: {
-    processingChain: {
-      dateExecuted: 'Date executed',
-      status: 'Status',
-      deleteConfirm: 'Delete this processing chain?\n$t(common.cantUndoWarning)',
-      deleteComplete: 'Processing chain deleted',
-    }
+  processingChainView: {
+    dateExecuted: 'Date executed',
+    status: 'Status',
+    deleteConfirm: 'Delete this processing chain?\n$t(common.cantUndoWarning)',
+    deleteComplete: 'Processing chain deleted',
+    processingSteps: 'Processing steps',
   },
 
   itemsTable: {

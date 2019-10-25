@@ -1,11 +1,11 @@
-const Request = require('@server/utils/request')
-const Response = require('@server/utils/response')
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const ProcessingChainService = require('../service/processingChainService')
+import * as ProcessingChainService from '../service/processingChainService'
 
-module.exports.init = app => {
+export const init = app => {
 
   //====== CREATE
 
@@ -22,15 +22,15 @@ module.exports.init = app => {
     }
   })
 
-  //====== READ
+  //====== READ - Chain
 
   app.get('/survey/:surveyId/processing-chains/count', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
       const { surveyId, surveyCycleKey } = Request.getParams(req)
 
       const count = await ProcessingChainService.countChainsBySurveyId(surveyId, surveyCycleKey)
-      res.json(count)
 
+      res.json(count)
     } catch (err) {
       next(err)
     }
@@ -54,7 +54,21 @@ module.exports.init = app => {
 
       const processingChain = await ProcessingChainService.fetchChainByUuid(surveyId, processingChainUuid)
 
-      res.json({ processingChain })
+      res.json(processingChain)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  //====== READ - Steps
+
+  app.get('/survey/:surveyId/processing-chain/:processingChainUuid/processing-steps', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingChainUuid } = Request.getParams(req)
+
+      const processingSteps = await ProcessingChainService.fetchStepsByChainUuid(surveyId, processingChainUuid)
+
+      res.json(processingSteps)
     } catch (err) {
       next(err)
     }
@@ -67,9 +81,9 @@ module.exports.init = app => {
       const { surveyId, processingChainUuid, key, value } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const processingChain = await ProcessingChainService.updateChainProp(user, surveyId, processingChainUuid, key, value)
+      await ProcessingChainService.updateChainProp(user, surveyId, processingChainUuid, key, value)
 
-      res.json({ processingChain })
+      Response.sendOk(res)
     } catch (err) {
       next(err)
     }

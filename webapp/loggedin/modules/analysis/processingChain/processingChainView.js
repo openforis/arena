@@ -2,14 +2,16 @@ import './processingChainView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import ProcessingChain from '@common/analysis/processingChain'
+import * as Survey from '@core/survey/survey'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
-import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+import ProcessingChainSteps from './components/processingChainSteps'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
@@ -40,8 +42,9 @@ const ProcessingChainView = props => {
     navigateToProcessingChainsView(history)
   }, [surveyCycleKey])
 
-  return processingChain
-    ? (
+  return R.isEmpty(processingChain)
+    ? null
+    : (
       <div className="processing-chain">
         <div className="form">
 
@@ -57,17 +60,22 @@ const ProcessingChainView = props => {
             labels={ProcessingChain.getDescriptions(processingChain)}
             onChange={descriptions => putProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
           />
+
+          <ProcessingChainSteps
+            processingChain={processingChain}
+          />
+
         </div>
 
         <button className="btn-s btn-danger btn-delete"
-                onClick={() => window.confirm(i18n.t('analysis.processingChain.deleteConfirm')) &&
+                onClick={() => window.confirm(i18n.t('processingChainView.deleteConfirm')) &&
                   deleteProcessingChain(history)}>
           <span className="icon icon-bin icon-12px icon-left"/>
           {i18n.t('common.delete')}
         </button>
       </div>
     )
-    : null
+
 }
 
 const mapStateToProps = (state, { match }) => ({

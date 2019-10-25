@@ -9,9 +9,9 @@ const ProcessingChainsRowHeader = () => {
     <>
       <div>{i18n.t('common.label')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>
-      <div>{i18n.t('analysis.processingChain.dateExecuted')}</div>
+      <div>{i18n.t('processingChainView.dateExecuted')}</div>
       <div>{i18n.t('common.draft')}</div>
-      <div>{i18n.t('analysis.processingChain.status')}</div>
+      <div>{i18n.t('processingChainView.status')}</div>
     </>
   )
 }
