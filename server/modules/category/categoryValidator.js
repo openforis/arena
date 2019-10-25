@@ -119,7 +119,7 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
   const childrenByUuid = R.groupBy(R.prop(CategoryItem.keys.uuid))(children)
 
   const childrenValidationsArr = await Promise.all(children.map(
-    validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid, parentItemUuid)
+    validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid)
   ))
 
   //merge children validations
