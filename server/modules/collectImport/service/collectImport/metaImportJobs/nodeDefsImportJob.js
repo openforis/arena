@@ -146,8 +146,8 @@ class NodeDefsImportJob extends Job {
     }
 
     // 2. insert node def into db
-    const nodeDefParam = this._createNodeDef(parentNodeDef, type, props)
-    let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, tx)
+    const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
+    let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, true, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
     // 2a. increment processed items before recursive call to insertNodeDef
@@ -378,8 +378,8 @@ class NodeDefsImportJob extends Job {
         [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, `${nodeDefName}_${itemCode}`),
         [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)(NodeDef.getLabels())
       }
-      const qualifierNodeDefParam = this._createNodeDef(parentNodeDef, nodeDefType.text, props)
-      const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, tx)
+      const qualifierNodeDefParam = _createNodeDef(parentNodeDef, nodeDefType.text, props)
+      const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, true, tx)
       const propsAdvanced = {
         [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(util.format(qualifiableItemApplicableExpressionFormat, nodeDefName, itemCode))]
       }
@@ -446,11 +446,10 @@ class NodeDefsImportJob extends Job {
       return null
     }
   }
-
-  _createNodeDef (parentNodeDef, type, props) {
-    return NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, Survey.cycleOneKey, props)
-  }
 }
+
+const _createNodeDef = (parentNodeDef, type, props) =>
+  NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, Survey.cycleOneKey, props)
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {
