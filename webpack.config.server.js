@@ -26,7 +26,7 @@ const entry = entryPath => [
 
 module.exports = {
   mode: 'development',
-  devtool: false,
+  devtool: isProduction ? false : 'source-map',
   externals: [
     nodeExternals({ whitelist: ['webpack/hot/poll?1000'] }),
     'worker_threads',
