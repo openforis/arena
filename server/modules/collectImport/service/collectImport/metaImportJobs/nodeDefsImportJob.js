@@ -89,7 +89,7 @@ class NodeDefsImportJob extends Job {
       [Survey.collectReportKeys.issuesTotal]: this.issuesCount,
       [Survey.collectReportKeys.issuesResolved]: 0
     }
-    await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, tx)
+    await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, true, tx)
 
     //fetch survey and store it in context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, Survey.cycleOneKey, true, true, false, false, tx)

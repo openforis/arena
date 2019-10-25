@@ -8,7 +8,7 @@ const Survey = require('@core/survey/survey')
 const testSurvey = {
   name: 'test_survey_' + uuidv4(),
   label: 'Test Survey',
-  lang: 'en'
+  languages: ['en']
 }
 
 const createSurveyTest = async () => {
@@ -19,7 +19,8 @@ const createSurveyTest = async () => {
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   assert.equal(Survey.getName(surveyInfo), testSurvey.name)
-  assert.equal(Survey.getLanguage(testSurvey.lang)(surveyInfo), testSurvey.lang)
+  const expectedDefaultLanguage = testSurvey.languages[0]
+  assert.equal(Survey.getLanguage(expectedDefaultLanguage)(surveyInfo), expectedDefaultLanguage)
   assert.equal(Survey.getDefaultLabel(surveyInfo), testSurvey.label)
 }
 

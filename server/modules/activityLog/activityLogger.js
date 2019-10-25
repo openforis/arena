@@ -9,6 +9,7 @@ const type = {
   surveyCreate: 'surveyCreate',
   surveyPropUpdate: 'surveyPropUpdate',
   surveyPublish: 'surveyPublish',
+  surveyCollectImport: 'surveyCollectImport',
 
   // nodeDef
   nodeDefCreate: 'nodeDefCreate',

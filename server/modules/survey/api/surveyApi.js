@@ -21,7 +21,7 @@ module.exports.init = app => {
       const validation = await SurveyService.validateNewSurvey(surveyReq)
 
       if (Validation.isValid(validation)) {
-        const survey = await SurveyService.createSurvey(user, surveyReq)
+        const survey = await SurveyService.createSurvey(user, { ...surveyReq, languages: [surveyReq.lang] })
 
         res.json({ survey })
       } else {

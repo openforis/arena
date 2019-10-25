@@ -20,7 +20,7 @@ describe('Activity Log Test', async () => {
     const surveyParam = {
       name: 'test_survey_' + uuidv4(),
       label: 'Test Survey',
-      lang: 'en'
+      languages: ['en']
     }
     const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
     const surveyId = Survey.getId(survey)
