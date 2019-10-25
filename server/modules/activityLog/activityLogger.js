@@ -9,6 +9,7 @@ const type = {
   surveyCreate: 'surveyCreate',
   surveyPropUpdate: 'surveyPropUpdate',
   surveyPublish: 'surveyPublish',
+  surveyCollectImport: 'surveyCollectImport',
 
   // nodeDef
   nodeDefCreate: 'nodeDefCreate',
@@ -26,6 +27,7 @@ const type = {
   categoryItemInsert: 'categoryItemInsert',
   categoryItemPropUpdate: 'categoryItemPropUpdate',
   categoryItemDelete: 'categoryItemDelete',
+  categoryImport: 'categoryImport',
 
   //taxonomy
   taxonomyCreate: 'taxonomyCreate',

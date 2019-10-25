@@ -14,12 +14,12 @@ const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
 
 const Srs = require('@core/geo/srs')
 
-const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
+const newSurvey = (ownerUuid, name, label, languages, collectUri = null) => ({
   [SurveyInfo.keys.uuid]: uuidv4(),
   [SurveyInfo.keys.props]: {
     [SurveyInfo.keys.name]: name,
-    [SurveyInfo.keys.labels]: { [lang]: label },
-    [SurveyInfo.keys.languages]: [lang],
+    [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
+    [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
     ...collectUri
       ? { collectUri }

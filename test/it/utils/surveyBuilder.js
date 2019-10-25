@@ -155,7 +155,7 @@ class SurveyBuilder {
     const surveyParam = this.build()
 
     return await client.tx(async t => {
-      const survey = await SurveyManager.insertSurvey(this.user, surveyParam, false, t)
+      const survey = await SurveyManager.insertSurvey(this.user, surveyParam, false, true, t)
 
       const surveyId = Survey.getId(survey)
 

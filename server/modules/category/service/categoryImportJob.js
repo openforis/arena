@@ -1,6 +1,7 @@
 const fs = require('fs')
 const R = require('ramda')
 
+const ActivityLog = require('@server/modules/activityLog/activityLogger')
 const Job = require('@server/job/job')
 
 const Category = require('@core/survey/category')
@@ -36,6 +37,8 @@ class CategoryImportJob extends Job {
   async execute () {
     // 2. fetch or create category
     this.category = await this._fetchOrCreateCategory()
+
+    await ActivityLog.log(this.user, this.surveyId, ActivityLog.type.categoryImport, {uuid: Category.getUuid(this.category)}, false, this.tx)
 
     // 3. import levels
     await this._importLevels()
@@ -108,7 +111,7 @@ class CategoryImportJob extends Job {
       const category = Category.newCategory({
         [Category.props.name]: CategoryImportJobParams.getCategoryName(this.params)
       })
-      return await CategoryManager.insertCategory(this.user, this.surveyId, category, this.tx)
+      return await CategoryManager.insertCategory(this.user, this.surveyId, category, true, this.tx)
     }
   }
 
@@ -128,7 +131,7 @@ class CategoryImportJob extends Job {
     const itemExtraDef = this.extractItemExtraDef()
 
     if (!R.isEmpty(itemExtraDef)) {
-      await CategoryManager.updateCategoryProp(this.user, this.surveyId, Category.getUuid(this.category), Category.props.itemExtraDef, itemExtraDef, this.tx)
+      await CategoryManager.updateCategoryProp(this.user, this.surveyId, Category.getUuid(this.category), Category.props.itemExtraDef, itemExtraDef, true, this.tx)
       this.category = Category.assocItemExtraDef(itemExtraDef)(this.category)
     }
 

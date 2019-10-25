@@ -33,7 +33,7 @@ const updateReportItem = async (user, surveyId, itemId, props, resolved, client 
       ...collectReport,
       [Survey.collectReportKeys.issuesResolved]: issuesResolvedUpdated
     }
-    await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReportUpdated, tx)
+    await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReportUpdated, false, tx)
 
     return itemUpdated
   })

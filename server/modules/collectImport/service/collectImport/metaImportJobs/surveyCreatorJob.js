@@ -4,7 +4,9 @@ const Survey = require('@core/survey/survey')
 
 const Job = require('@server/job/job')
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
+const ActivityLog = require('@server/modules/activityLog/activityLogger')
+
+const SurveyManager = require('@server/modules/survey/manager/surveyManager')
 
 const CollectSurvey = require('../model/collectSurvey')
 
@@ -28,19 +30,27 @@ class SurveyCreatorJob extends Job {
 
     const defaultLanguage = languages[0]
 
-    const collectProjectLabels = CollectSurvey.getElementsByName('project')(collectSurvey)
-    const label = CollectSurvey.toLabels(collectProjectLabels, defaultLanguage)[defaultLanguage]
+    const label = R.pipe(
+      CollectSurvey.toLabels('project', defaultLanguage),
+      R.prop(defaultLanguage)
+    )(collectSurvey)
 
-    const survey = await SurveyManager.createSurvey(this.user, {
-      name,
-      label,
-      lang: defaultLanguage,
-      collectUri
-    }, false, tx)
+    const survey = await SurveyManager.createSurvey(
+      this.user,
+      {
+        name,
+        label,
+        languages,
+        collectUri
+      },
+      false,
+      true,
+      tx
+    )
 
     const surveyId = Survey.getId(survey)
 
-    await SurveyManager.updateSurveyProp(this.user, surveyId, Survey.infoKeys.languages, languages, tx)
+    await ActivityLog.log(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
 
     this.setContext({ survey, surveyId, defaultLanguage })
   }

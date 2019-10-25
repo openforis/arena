@@ -42,12 +42,12 @@ const validateSurveyInfo = async surveyInfo => await SurveyValidator.validateSur
 
 // ====== CREATE
 
-const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntityDef = true, client = db) => {
-  const surveyParam = Survey.newSurvey(User.getUuid(user), name, label, lang, collectUri)
-  return await insertSurvey(user, surveyParam, createRootEntityDef, client)
+const createSurvey = async (user, { name, label, languages, collectUri = null }, createRootEntityDef = true, system = false, client = db) => {
+  const surveyParam = Survey.newSurvey(User.getUuid(user), name, label, languages, collectUri)
+  return await insertSurvey(user, surveyParam, createRootEntityDef, system, client)
 }
 
-const insertSurvey = async (user, surveyParam, createRootEntityDef = true, client = db) => {
+const insertSurvey = async (user, surveyParam, createRootEntityDef = true, system = false, client = db) => {
   const survey = await client.tx(
     async t => {
       // insert survey into db
@@ -58,7 +58,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       await migrateSurveySchema(surveyId)
 
       // log survey create activity
-      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, false, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, system, t)
 
       if (createRootEntityDef) {
         // insert root entity def
@@ -76,7 +76,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
             )
           }
         )
-        await NodeDefManager.insertNodeDef(user, surveyId, rootEntityDef, t)
+        await NodeDefManager.insertNodeDef(user, surveyId, rootEntityDef, true, t)
       }
 
       // update user prefs
@@ -137,12 +137,12 @@ const fetchUserSurveysInfo = async (user, offset, limit) => R.map(
 )
 
 // ====== UPDATE
-const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
+const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
   await client.tx(async t => {
     await Promise.all([
       SurveyRepository.updateSurveyProp(surveyId, key, value, t),
       SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
     return await fetchSurveyById(surveyId, true, true, t)
