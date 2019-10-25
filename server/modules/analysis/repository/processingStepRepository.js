@@ -20,11 +20,13 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
       ${schema}.processing_step_calculation c
     ON
       s.uuid = c.processing_step_uuid
+    WHERE
+      s.processing_chain_uuid = $1
     GROUP BY
       s.uuid
     ORDER BY
       s.index`,
-    [],
+    [processingChainUuid],
     camelize
   )
 }

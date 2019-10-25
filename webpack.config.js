@@ -19,22 +19,21 @@ const versionString = lastCommit + '_' + new Date().toISOString()
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
 class CleanUpStatsPlugin {
-  shouldPickStatChild(child) {
-    return child.name.indexOf('mini-css-extract-plugin') !== 0;
+  shouldPickStatChild (child) {
+    return child.name.indexOf('mini-css-extract-plugin') !== 0
   }
 
-  apply(compiler) {
+  apply (compiler) {
     compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
-      const children = stats.compilation.children;
+      const children = stats.compilation.children
       if (Array.isArray(children)) {
         // eslint-disable-next-line no-param-reassign
         stats.compilation.children = children
-          .filter(child => this.shouldPickStatChild(child));
+          .filter(child => this.shouldPickStatChild(child))
       }
-    });
+    })
   }
 }
-
 
 // ==== init plugins
 const plugins = [
@@ -113,6 +112,14 @@ const webPackConfig = {
           'css-loader',
           'sass-loader',
         ]
+      },
+      //Below is added to use leader-line https://github.com/anseki/leader-line/issues/8#issuecomment-370147614
+      {
+        test: path.resolve(__dirname, 'node_modules/leader-line/'),
+        use: [{
+          loader: 'skeleton-loader',
+          options: { procedure: content => `${content}export default LeaderLine` }
+        }]
       }
     ]
   },

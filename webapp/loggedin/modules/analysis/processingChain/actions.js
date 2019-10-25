@@ -15,9 +15,11 @@ export const processingChainPropUpdate = 'survey/processingChain/prop/update'
 
 export const processingChainStepsLoad = 'survey/processingChain/steps/load'
 
+export const resetProcessingChainState = () => dispatch =>
+  dispatch({ type: processingChainUpdate, processingChain: {} })
+
 export const navigateToProcessingChainsView = history => dispatch => {
-  // reset current processing chain
-  dispatch({ type: processingChainUpdate, processingChain: null })
+  dispatch(resetProcessingChainState())
   // navigate to processing chains view
   history.push(appModuleUri(analysisModules.processingChains))
 }
@@ -26,7 +28,6 @@ export const navigateToProcessingChainsView = history => dispatch => {
 
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-
   const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
 
   dispatch({ type: processingChainUpdate, processingChain })

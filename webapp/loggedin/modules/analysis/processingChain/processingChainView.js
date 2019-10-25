@@ -20,7 +20,8 @@ import {
   fetchProcessingChain,
   navigateToProcessingChainsView,
   putProcessingChainProp,
-  deleteProcessingChain
+  deleteProcessingChain,
+  resetProcessingChainState
 } from './actions'
 
 const ProcessingChainView = props => {
@@ -29,13 +30,17 @@ const ProcessingChainView = props => {
     surveyInfo, surveyCycleKey,
     processingChainUuid, processingChain,
     history,
-    fetchProcessingChain, navigateToProcessingChainsView, putProcessingChainProp, deleteProcessingChain,
+    fetchProcessingChain, navigateToProcessingChainsView, putProcessingChainProp, deleteProcessingChain, resetProcessingChainState,
   } = props
 
   const i18n = useI18n()
 
   useEffect(() => {
     fetchProcessingChain(processingChainUuid)
+
+    return () => {
+      resetProcessingChainState()
+    }
   }, [])
 
   useOnUpdate(() => {
@@ -87,5 +92,11 @@ const mapStateToProps = (state, { match }) => ({
 
 export default connect(
   mapStateToProps,
-  { fetchProcessingChain, navigateToProcessingChainsView, putProcessingChainProp, deleteProcessingChain },
+  {
+    fetchProcessingChain,
+    navigateToProcessingChainsView,
+    putProcessingChainProp,
+    deleteProcessingChain,
+    resetProcessingChainState
+  },
 )(ProcessingChainView)
