@@ -14,6 +14,7 @@ const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')
 const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
+const ActivityLog = require('@server/modules/activityLog/activityLogger')
 const SystemError = require('@server/utils/systemError')
 
 const requiredColumns = [
@@ -43,14 +44,16 @@ class TaxonomyImportJob extends Job {
     this.csvReader = null
   }
 
-  async execute (tx) {
-    const { surveyId, taxonomyUuid } = this
+  async execute () {
+    const { user, surveyId, taxonomyUuid, tx } = this
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
+
     // 1. load taxonomy and check it has not published
 
-    this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, this.tx)
+    this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
     if (Taxonomy.isPublished(this.taxonomy)) {
       throw new SystemError('cannotOverridePublishedTaxa')
@@ -58,7 +61,7 @@ class TaxonomyImportJob extends Job {
 
     // 2. delete old draft taxa
     this.logDebug('delete old draft taxa')
-    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(this.user, surveyId, taxonomyUuid, this.tx)
+    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
 
     // 3. start CSV row parsing
     this.logDebug('start CSV file parsing')
@@ -79,7 +82,7 @@ class TaxonomyImportJob extends Job {
         await this.setStatusFailed()
       } else {
         this.logDebug('no errors found, finalizing import')
-        await this.taxonomyImportManager.finalizeImport(this.taxonomy, this.tx)
+        await this.taxonomyImportManager.finalizeImport(this.taxonomy, tx)
       }
     }
   }

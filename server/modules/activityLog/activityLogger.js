@@ -34,6 +34,7 @@ const type = {
   taxonomyPropUpdate: 'taxonomyPropUpdate',
   taxonomyDelete: 'taxonomyDelete',
   taxonomyTaxaDelete: 'taxonomyTaxaDelete',
+  taxonomyTaxaImport: 'taxonomyTaxaImport',
   taxonInsert: 'taxonInsert',
 
   //record

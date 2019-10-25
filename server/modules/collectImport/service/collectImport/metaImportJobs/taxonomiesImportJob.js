@@ -66,7 +66,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,
     })
-    const taxonomy = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, tx)
+    const taxonomy = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, true, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     // 3. parse CSV file
