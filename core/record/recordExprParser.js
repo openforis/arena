@@ -92,7 +92,7 @@ const evalApplicableExpressions = async (survey, record, node, expressions, stop
         convertToNodeValues
           ? R.isNil(valueEval) || R.isEmpty(valueEval)
           ? null
-          : RecordExprValueConverter.valueExprToValueNode(survey, record, node, valueEval)
+          : RecordExprValueConverter.toNodeValue(survey, record, node, valueEval)
           : valueEval
 
       return {
