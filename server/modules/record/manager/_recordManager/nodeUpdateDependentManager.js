@@ -87,7 +87,10 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
       const exprValue = R.propOr(null, 'value', exprEval)
 
       //4. persist updated node value if changed, and return updated node
-      const value = await toNodeValue(survey, record, nodeCtx, exprValue)
+      const value = R.isNil(exprValue) || R.isEmpty(exprValue)
+        ? null
+        : RecordExprValueConverter.valueExprToValueNode(survey, record, nodeCtx, exprValue)
+
       const oldValue = Node.getValue(nodeCtx, null)
       const nodeCtxUuid = Node.getUuid(nodeCtx)
 
@@ -108,14 +111,6 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
 
   return R.mergeAll(nodesUpdated)
 }
-
-/**
- * Converts expression result into a node value
- */
-const toNodeValue = async (survey, record, node, valueExpr) =>
-  R.isNil(valueExpr) || R.isEmpty(valueExpr)
-    ? null
-    : RecordExprValueConverter.valueExprToValueNode(survey, record, node, valueExpr)
 
 module.exports = {
   updateDependentsDefaultValues,
