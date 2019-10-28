@@ -315,7 +315,7 @@ class NodeDefsImportJob extends Job {
         const messages = CollectSurvey.toLabels('message', defaultLanguage)(element)
         const { condition } = CollectSurvey.getAttributes(element)
 
-        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.check, collectExpr, condition, messages, tx)
+        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.validationRules, collectExpr, condition, messages, tx)
       }
     }
   }
@@ -347,12 +347,8 @@ class NodeDefsImportJob extends Job {
   }
 
   async addNodeDefImportIssue (nodeDefUuid, expressionType, expression = null, applyIf = null, messages = {}, tx) {
-    await CollectImportReportManager.insertItem(this.surveyId, nodeDefUuid, {
-      [CollectImportReportItem.propKeys.expressionType]: expressionType,
-      [CollectImportReportItem.propKeys.expression]: expression,
-      [CollectImportReportItem.propKeys.applyIf]: applyIf,
-      [CollectImportReportItem.propKeys.messages]: messages
-    }, tx)
+    await CollectImportReportManager.insertItem(this.surveyId, nodeDefUuid,
+      CollectImportReportItem.newReportItem(expressionType, expression, applyIf, messages), tx)
 
     this.issuesCount++
   }

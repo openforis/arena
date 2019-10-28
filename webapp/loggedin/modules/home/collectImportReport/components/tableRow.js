@@ -16,6 +16,7 @@ import { setNodeDefForEdit } from '../../../../surveyViews/nodeDefEdit/actions'
 
 const TableRow = props => {
   const {
+    i18n,
     item, idx,
     nodeDef, nodeDefPath, languages,
     updateCollectImportReportItem, setNodeDefForEdit
@@ -27,7 +28,7 @@ const TableRow = props => {
       className="table__row">
       <div>{idx + 1}</div>
       <div>{nodeDefPath}</div>
-      <div>{CollectImportReportItem.getExpressionType(item)}</div>
+      <div>{i18n.t(`homeView.collectImportReport.exprType.${CollectImportReportItem.getExpressionType(item)}`)}</div>
       <div>{CollectImportReportItem.getExpression(item)}</div>
       <div>{CollectImportReportItem.getApplyIf(item)}</div>
       <div>
@@ -78,6 +79,7 @@ const mapStateToProps = (state, props) => {
   const nodeDefPath = _getNodeDefPath(survey, nodeDef, lang)
 
   return {
+    i18n: AppState.getI18n(state),
     nodeDef,
     nodeDefPath,
     languages: Survey.getLanguages(survey),

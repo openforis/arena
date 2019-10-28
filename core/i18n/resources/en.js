@@ -167,6 +167,12 @@ module.exports = {
       expression: 'Expression',
       messages: 'Messages',
       resolved: 'Resolved',
+      exprType: {
+        applicable: '$t(nodeDefEdit.advancedProps.applicableIf)',
+        codeParent: 'Parent code',
+        defaultValue: 'Default value',
+        validationRules: 'Validation rules',
+      }
     },
     recordsSummary: {
       recordsAdded: 'Records added from {{from}} to {{to}}',
