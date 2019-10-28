@@ -30,8 +30,6 @@ const newReportItem = (expressionType, expression, applyIf, messages) => ({
 })
 
 module.exports = {
-  keys,
-  propKeys,
   exprTypes,
 
   newReportItem,

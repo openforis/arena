@@ -12,6 +12,7 @@ const keys = {
   maxCount: 'maxCount',
 }
 
+// ===== CREATE
 const newValidationRecordDuplicate = (isUnique = false) => Validation.newInstance(
   isUnique,
   {
@@ -23,6 +24,7 @@ const newValidationRecordDuplicate = (isUnique = false) => Validation.newInstanc
   }
 )
 
+// ===== READ
 const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
   Validation.getFieldValidation(Node.getUuid(parentNode)),
   Validation.getFieldValidation(keys.childrenCount),
@@ -38,6 +40,7 @@ const getNodeValidation = node =>
 module.exports = {
   keys,
 
+  // CREATE
   newValidationRecordDuplicate,
 
   // READ
