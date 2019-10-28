@@ -14,4 +14,5 @@ export const log = async (user, surveyId, type, content, system, client) =>
 export const logMany = ActivityLogRepository.insertMany
 
 //===== READ
+export const fetch = ActivityLogRepository.fetch
 export const fetchLogs = ActivityLogRepository.fetchAll
