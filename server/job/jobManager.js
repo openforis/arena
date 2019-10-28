@@ -9,7 +9,7 @@ const WebSocketEvents = require('@common/webSocket/webSocketEvents')
 
 const userJobThreads = new ThreadsCache()
 
-const notifyJobUpdate = jobSerialized => {
+const _notifyJobUpdate = jobSerialized => {
   const userUuid = jobSerialized.userUuid
 
   WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
@@ -42,7 +42,7 @@ const executeJobThread = job => {
   const thread = new ThreadManager(
     'jobThread.js',
     { jobType: job.type, jobParams: job.params },
-    async job => await notifyJobUpdate(job)
+    job => _notifyJobUpdate(job)
   )
 
   userJobThreads.putThread(job.userUuid, thread)
