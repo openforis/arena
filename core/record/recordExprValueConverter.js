@@ -26,7 +26,7 @@ const _valueExprToValueCode = (survey, record, nodeCtx, valueExpr) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const parentNode = Record.getParentNode(nodeCtx)(record)
 
-  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey) || {}
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
 
   return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
 }
