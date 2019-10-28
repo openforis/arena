@@ -109,27 +109,25 @@ class CategoriesImportJob extends Job {
       }
       await this.itemBatchPersister.addItem(item, tx)
 
+      // update qualifiable item codes cache
+      if (CollectSurvey.getAttribute('qualifiable')(collectItem) === 'true') {
+        const code = CollectSurvey.getChildElementText('code')(collectItem)
+        this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
+          R.pathOr([], [Category.getName(category), String(levelIndex)]),
+          R.ifElse(
+            R.includes(code),
+            R.identity,
+            R.append(code)
+          ),
+          codes => R.assocPath([Category.getName(category), String(levelIndex)], codes, this.qualifiableItemCodesByCategoryAndLevel)
+        )(this.qualifiableItemCodesByCategoryAndLevel)
+      }
+
       // insert child items recursively
       const collectChildItems = CollectSurvey.getElementsByName('item')(collectItem)
       if (!R.isEmpty(collectChildItems)) {
         await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
       }
-
-      // update qualifiable item codes cache
-      collectChildItems.forEach(collectItem => {
-        if (CollectSurvey.getAttribute('qualifiable')(collectItem) === 'true') {
-          const code = CollectSurvey.getChildElementText('code')(collectItem)
-          this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
-            R.pathOr([], [Category.getName(category), levelIndex + '']),
-            R.ifElse(
-              R.includes(code),
-              R.identity,
-              R.append(code)
-            ),
-            codes => R.assocPath([Category.getName(category), levelIndex + ''], codes, this.qualifiableItemCodesByCategoryAndLevel)
-          )(this.qualifiableItemCodesByCategoryAndLevel)
-        }
-      })
     }
   }
 

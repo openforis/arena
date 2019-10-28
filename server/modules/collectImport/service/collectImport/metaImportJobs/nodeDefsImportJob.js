@@ -25,7 +25,7 @@ const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const CollectImportReportManager = require('../../../manager/collectImportReportManager')
 const CollectSurvey = require('../model/collectSurvey')
 
-const qualifiableItemApplicableExpressionFormat = `this.node('%s').getValue().props.code === '%s'`
+const qualifiableItemApplicableExpressionFormat = `this.node('%s').getValue().props.code === "%s"`
 const specifyAttributeSuffix = 'specify'
 
 const checkExpressionParserByType = {
@@ -366,13 +366,16 @@ class NodeDefsImportJob extends Job {
     const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
 
     const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
-    const qualifiableItemCodes = R.pathOr([], [categoryName, levelIndex + ''], qualifiableItemCodesByCategoryAndLevel)
+    const qualifiableItemCodes = R.pathOr([], [categoryName, String(levelIndex)], qualifiableItemCodesByCategoryAndLevel)
 
     for (const itemCode of qualifiableItemCodes) {
       const nodeDefName = NodeDef.getName(nodeDef)
       const props = {
-        [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, `${nodeDefName}_${itemCode}`),
-        [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)(NodeDef.getLabels())
+        [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`),
+        [NodeDef.propKeys.labels]: R.pipe(
+          NodeDef.getLabels,
+          R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)
+        )(nodeDef)
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, nodeDefType.text, props)
       const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, true, tx)
