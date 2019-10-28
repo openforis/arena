@@ -6,20 +6,22 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 const _valueExprToValueBoolean = (survey, record, nodeCtx, valueExpr) =>
-  R.is(String, valueExpr) && R.includes(valueExpr, ['true', 'false'])
+  R.is(Boolean, valueExpr)
+    ? valueExpr
+    : R.is(String, valueExpr) && R.includes(valueExpr, ['true', 'false'])
     ? valueExpr
     : null
 
 const _isStringOrNumber = val => R.is(String, val) || R.is(Number, val)
 
-const _valueExprToCode = valueExpr =>
+const _toPrimitive = (valueExpr, TypeTo) =>
   _isStringOrNumber(valueExpr)
-    ? String(valueExpr) // cast to string because it could be a Number
+    ? TypeTo(valueExpr)
     : null
 
 const _valueExprToValueCode = (survey, record, nodeCtx, valueExpr) => {
   // valueExpr is the code of a category item
-  const code = _valueExprToCode(valueExpr)
+  const code = _toPrimitive(valueExpr, String)
   if (code === null)
     return null
 
@@ -33,7 +35,7 @@ const _valueExprToValueCode = (survey, record, nodeCtx, valueExpr) => {
 
 const _valueExprToValueTaxon = (survey, record, nodeCtx, valueExpr) => {
   // valueExpr is the code of a taxon
-  const taxonCode = _valueExprToCode(valueExpr)
+  const taxonCode = _toPrimitive(valueExpr, String)
   if (taxonCode === null)
     return null
 
@@ -47,10 +49,10 @@ const _valueExprToValueNodeFns = {
   [NodeDef.nodeDefType.boolean]: _valueExprToValueBoolean,
   [NodeDef.nodeDefType.code]: _valueExprToValueCode,
   [NodeDef.nodeDefType.date]: (survey, record, nodeCtx, valueExpr) => valueExpr,
-  [NodeDef.nodeDefType.decimal]: (survey, record, nodeCtx, valueExpr) => R.ifElse(_isStringOrNumber, Number, R.always(null))(valueExpr),
-  [NodeDef.nodeDefType.integer]: (survey, record, nodeCtx, valueExpr) => R.ifElse(_isStringOrNumber, Number, R.always(null))(valueExpr),
+  [NodeDef.nodeDefType.decimal]: (survey, record, nodeCtx, valueExpr) => _toPrimitive(valueExpr, Number),
+  [NodeDef.nodeDefType.integer]: (survey, record, nodeCtx, valueExpr) => _toPrimitive(valueExpr, Number),
   [NodeDef.nodeDefType.taxon]: _valueExprToValueTaxon,
-  [NodeDef.nodeDefType.text]: (survey, record, nodeCtx, valueExpr) => _isStringOrNumber(valueExpr) ? String(valueExpr) : null,
+  [NodeDef.nodeDefType.text]: (survey, record, nodeCtx, valueExpr) => _toPrimitive(valueExpr, String),
   [NodeDef.nodeDefType.time]: (survey, record, nodeCtx, valueExpr) => valueExpr,
 }
 
