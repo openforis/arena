@@ -5214,6 +5214,11 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
+leader-line@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/leader-line/-/leader-line-1.0.5.tgz#691b5e2649ddff30d9e03084fb327503120dc77a"
+  integrity sha512-OHA4YmCO7LcvnQ9u4AWUrmuIzOE1/pxOzA2eHmb0DhtoKlEf0xiBm5aYtv77OmmMeW5xnbE1G6Hayp/vrtMOmw==
+
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
@@ -8156,6 +8161,13 @@ simple-swizzle@^0.2.2:
   integrity sha1-pNprY1/8zMoz9w0Xy5JZLeleVXo=
   dependencies:
     is-arrayish "^0.3.1"
+
+skeleton-loader@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/skeleton-loader/-/skeleton-loader-2.0.0.tgz#4154ed123d28be036c5d65297633d9049a70ea63"
+  integrity sha1-QVTtEj0ovgNsXWUpdjPZBJpw6mM=
+  dependencies:
+    loader-utils "^1.1.0"
 
 slash@^1.0.0:
   version "1.0.0"

@@ -1,12 +1,30 @@
-const ProcessUtils = require('@core/processUtils')
-const ProcessingChain = require('@common/analysis/processingChain')
+import * as ProcessUtils from '@core/processUtils'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
-const ProcessingChainManager = require('../manager/processingChainManager')
-const SurveyManager = require('../../survey/manager/surveyManager')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-const ProcessingStepScriptGenerator = require('./_processingChainScriptGenerator/processingStepScriptGenerator')
+import * as ProcessingStepScriptGenerator from './_processingChainScriptGenerator/processingStepScriptGenerator'
 
-const generateScript = async (surveyId, processingChain) => {
+export {
+  // ====== CREATE - Chain
+  createChain,
+
+  // ======  READ - Chain
+  countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid,
+
+  // ======  READ - Steps
+  fetchStepsByChainUuid,
+
+  // ======  UPDATE - Chain
+  updateChainProp,
+
+  // ======  DELETE - Chain
+  deleteChain
+} from '../manager/processingChainManager'
+
+// ====== EXECUTION
+
+export const generateScript = async (surveyId, processingChain) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, ProcessingChain.getCycle(processingChain))
 
   const outputDir = ProcessUtils.ENV.analysisOutputDir
@@ -14,22 +32,4 @@ const generateScript = async (surveyId, processingChain) => {
     await ProcessingStepScriptGenerator.generateScript(survey, ProcessingChain.getCycle(processingChain), processingStep, outputDir)
   }
 
-}
-
-module.exports = {
-  // CREATE
-  createChain: ProcessingChainManager.createChain,
-
-  // READ
-  countChainsBySurveyId: ProcessingChainManager.countChainsBySurveyId,
-  fetchChainsBySurveyId: ProcessingChainManager.fetchChainsBySurveyId,
-  fetchChainByUuid: ProcessingChainManager.fetchChainByUuid,
-
-  // UPDATE
-  updateChainProp: ProcessingChainManager.updateChainProp,
-
-  // DELETE
-  deleteChain: ProcessingChainManager.deleteChain,
-
-  generateScript,
 }

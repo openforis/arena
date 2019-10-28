@@ -3,6 +3,10 @@
   padding-top: 2rem;
   position: relative;
 
+  .form-item {
+    grid-template-columns: .2fr .8fr;
+  }
+
   .btn-delete {
     position: absolute;
     width: 80px;

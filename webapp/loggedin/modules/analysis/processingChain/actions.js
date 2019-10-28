@@ -2,20 +2,24 @@ import axios from 'axios'
 
 import ProcessingChain from '@common/analysis/processingChain'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-
 import { debounceAction } from '@webapp/utils/reduxUtils'
+import { analysisModules, appModuleUri } from '@webapp/loggedin/appModules'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
-import { analysisModules, appModuleUri } from '../../../appModules'
+
 import { showNotification } from '@webapp/app/appNotification/actions'
 
-export const processingChainUpdate = '/analysis/processingChain/update'
-export const processingChainPropUpdate = '/analysis/processingChain/prop/update'
+export const processingChainUpdate = 'survey/processingChain/update'
+export const processingChainPropUpdate = 'survey/processingChain/prop/update'
+
+export const processingChainStepsLoad = 'survey/processingChain/steps/load'
+
+export const resetProcessingChainState = () => dispatch =>
+  dispatch({ type: processingChainUpdate, processingChain: {} })
 
 export const navigateToProcessingChainsView = history => dispatch => {
-  // reset current processing chain
-  dispatch({ type: processingChainUpdate, processingChain: null })
+  dispatch(resetProcessingChainState())
   // navigate to processing chains view
   history.push(appModuleUri(analysisModules.processingChains))
 }
@@ -24,10 +28,17 @@ export const navigateToProcessingChainsView = history => dispatch => {
 
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-
-  const { data: { processingChain } } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
+  const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
 
   dispatch({ type: processingChainUpdate, processingChain })
+}
+
+export const fetchProcessingSteps = processingChainUuid => async (dispatch, getState) => {
+  const surveyId = SurveyState.getSurveyId(getState())
+
+  const { data: processingSteps } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-steps`)
+
+  dispatch({ type: processingChainStepsLoad, processingSteps })
 }
 
 // ====== UPDATE
@@ -57,5 +68,5 @@ export const deleteProcessingChain = history => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`)
 
   dispatch(navigateToProcessingChainsView(history))
-  dispatch(showNotification('analysis.processingChain.deleteComplete'))
+  dispatch(showNotification('processingChainView.deleteComplete'))
 }

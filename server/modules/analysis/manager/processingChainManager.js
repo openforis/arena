@@ -1,12 +1,14 @@
-const db = require('@server/db/db')
+import db from '@server/db/db'
 
-const ActivityLog = require('../../activityLog/activityLogger')
+import * as ActivityLog from '@server/modules/activityLog/activityLogger'
 
-const ProcessingChain = require('@common/analysis/processingChain')
+import * as ProcessingChain from '@common/analysis/processingChain'
 
-const ProcessingChainRepository = require('../repository/processingChainRepository')
+import * as ProcessingChainRepository from '../repository/processingChainRepository'
 
-const createChain = async (user, surveyId, cycle, client = db) =>
+// ====== CREATE
+
+export const createChain = async (user, surveyId, cycle, client = db) =>
   await client.tx(async t => {
     const processingChain = await ProcessingChainRepository.insertChain(surveyId, cycle, t)
     await ActivityLog.log(user, surveyId, ActivityLog.type.processingChainCreate,
@@ -14,31 +16,27 @@ const createChain = async (user, surveyId, cycle, client = db) =>
     return ProcessingChain.getUuid(processingChain)
   })
 
-const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
+// ====== READ - Chain
+
+export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '../repository/processingChainRepository'
+
+// ====== READ - Steps
+
+export { fetchStepsByChainUuid } from '../repository/processingStepRepository'
+
+// ====== UPDATE
+
+export const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
     ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate,
       { uuid: processingChainUuid, key, value }, false, t)
   ]))
 
-const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
+// ====== DELETE
+
+export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t),
     ActivityLog.log(user, surveyId, ActivityLog.type.processingChainDelete, { uuid: processingChainUuid }, false, t)
   ]))
-
-module.exports = {
-  // CREATE
-  createChain,
-
-  // READ
-  countChainsBySurveyId: ProcessingChainRepository.countChainsBySurveyId,
-  fetchChainsBySurveyId: ProcessingChainRepository.fetchChainsBySurveyId,
-  fetchChainByUuid: ProcessingChainRepository.fetchChainByUuid,
-
-  // UPDATE
-  updateChainProp,
-
-  // DELETE
-  deleteChain,
-}

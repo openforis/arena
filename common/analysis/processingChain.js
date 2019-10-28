@@ -72,6 +72,8 @@ const isDraft = R.ifElse(
 
 // ====== UPDATE
 
+const assocProcessingSteps = R.assoc(keys.processingSteps)
+
 const assocProcessingStep = step => chain => R.pipe(
   getProcessingSteps,
   R.append(step),
@@ -105,5 +107,6 @@ module.exports = {
 
   //UPDATE
   assocProp: ObjectUtils.setProp,
+  assocProcessingSteps,
   assocProcessingStep,
 }
