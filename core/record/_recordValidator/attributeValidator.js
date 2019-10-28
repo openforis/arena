@@ -99,7 +99,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
         // validate only attributes not deleted and not validated already
         if (!Node.isDeleted(node) && !attributeValidations[nodeUuid]) {
           const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-          attributeValidations[nodeUuid] = await validateAttribute(survey, record, node, nodeDef)
+          attributeValidations[nodeUuid] = await validateAttribute(survey, record, node)
         }
       }
     }
