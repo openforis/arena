@@ -20,7 +20,7 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
   // 4. associate validation error to each key node
   const validationNodesKey = {}
   for (const keyNode of keyNodes) {
-    validationNodesKey[Node.getUuid(keyNode)] = _newValidationRecordDuplicate(isUnique)
+    validationNodesKey[Node.getUuid(keyNode)] = RecordValidation.newValidationRecordDuplicate(isUnique)
   }
   return validationNodesKey
 }
@@ -37,7 +37,7 @@ const validateRecordsUniqueness = async (survey, cycle, keyNodes, recordUuidExcl
       const isUnique = count === '1'
       const validationNodesKeyFields = {}
       for (const nodeKeyUuid of nodesKeyUuids) {
-        validationNodesKeyFields[nodeKeyUuid] = _newValidationRecordDuplicate(isUnique)
+        validationNodesKeyFields[nodeKeyUuid] = RecordValidation.newValidationRecordDuplicate(isUnique)
       }
       result[recordUuid] = Validation.newInstance(
         isUnique,
@@ -47,17 +47,6 @@ const validateRecordsUniqueness = async (survey, cycle, keyNodes, recordUuidExcl
   }
   return result
 }
-
-const _newValidationRecordDuplicate = isUnique => Validation.newInstance(
-  isUnique,
-  {
-    [RecordValidation.keys.recordKeys]: Validation.newInstance(
-      isUnique,
-      {},
-      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }]
-    )
-  }
-)
 
 module.exports = {
   validateRecordKeysUniqueness,

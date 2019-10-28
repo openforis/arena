@@ -12,6 +12,17 @@ const keys = {
   maxCount: 'maxCount',
 }
 
+const newValidationRecordDuplicate = (isUnique = false) => Validation.newInstance(
+  isUnique,
+  {
+    [keys.recordKeys]: Validation.newInstance(
+      isUnique,
+      {},
+      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }]
+    )
+  }
+)
+
 const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
   Validation.getFieldValidation(Node.getUuid(parentNode)),
   Validation.getFieldValidation(keys.childrenCount),
@@ -26,6 +37,8 @@ const getNodeValidation = node =>
 
 module.exports = {
   keys,
+
+  newValidationRecordDuplicate,
 
   // READ
   getNodeValidation,

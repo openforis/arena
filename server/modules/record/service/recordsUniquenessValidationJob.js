@@ -50,7 +50,7 @@ class RecordsUniquenessValidationJob extends Job {
 
     if (!R.isEmpty(rowsRecordsDuplicate)) {
       // 3. update records validation
-      const validationDuplicate = _createValidationRecordDuplicate(nodeDefRoot)
+      const validationDuplicate = RecordValidation.newValidationRecordDuplicate()
 
       for (const rowRecordDuplicate of rowsRecordsDuplicate) {
         if (this.isCanceled())
@@ -101,16 +101,6 @@ class RecordsUniquenessValidationJob extends Job {
 }
 
 RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
-
-const _createValidationRecordDuplicate = () => Validation.newInstance(
-  false,
-  {
-    [RecordValidation.keys.recordKeys]: Validation.newInstance(
-      false,
-      {},
-      [{ key: Validation.messageKeys.record.keyDuplicate }]
-    )
-  })
 
 const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   const nodeValidation = Validation.getFieldValidation(nodeUuid)(validationRecord)
