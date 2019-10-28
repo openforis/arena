@@ -131,7 +131,7 @@ class SurveyBuilder {
 
   constructor (user, rootDefBuilder) {
     this.user = user
-    this.name = `test_${new Date().getTime()}`
+    this.name = `DO NOT USE! test_${new Date().getTime()}`
     this.label = 'Test'
     this.lang = 'en'
     this.rootDefBuilder = rootDefBuilder

@@ -18,7 +18,7 @@ describe('Activity Log Test', async () => {
 
   it('Activity Log on Survey Creation', async () => {
     const surveyParam = {
-      name: 'test_survey_' + uuidv4(),
+      name: 'DO NOT USE! test_survey_' + uuidv4(),
       label: 'Test Survey',
       languages: ['en']
     }

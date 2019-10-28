@@ -6,7 +6,7 @@ const SurveyManager = require('@server/modules/survey/manager/surveyManager')
 const Survey = require('@core/survey/survey')
 
 const testSurvey = {
-  name: 'test_survey_' + uuidv4(),
+  name: 'DO NOT USE! test_survey_' + uuidv4(),
   label: 'Test Survey',
   languages: ['en']
 }
