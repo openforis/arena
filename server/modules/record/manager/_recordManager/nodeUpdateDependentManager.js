@@ -6,6 +6,7 @@ const NodeDef = require('@core/survey/nodeDef')
 const Record = require('@core/record/record')
 const Node = require('@core/record/node')
 const RecordExprParser = require('@core/record/recordExprParser')
+const RecordExprValueConverter = require('@core/record/recordExprValueConverter')
 
 const NodeRepository = require('../../repository/nodeRepository')
 
@@ -108,39 +109,13 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
   return R.mergeAll(nodesUpdated)
 }
 
-// convert expression result into a node value
-// it uses categoryRepository or taxonomyRepository when expression result is category item code or taxon code
-const toNodeValue = async (survey, record, node, valueExpr) => {
-  if (R.isNil(valueExpr) || R.isEmpty(valueExpr)) {
-    return null
-  }
-
-  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  const isExprPrimitive = R.is(String, valueExpr) || R.is(Number, valueExpr)
-
-  if (isExprPrimitive) {
-    if (NodeDef.isCode(nodeDef)) {
-      // valueExpr is the code of a category item
-      // cast to string because it could be a Number
-      const code = '' + valueExpr
-      const parentNode = Record.getParentNode(node)(record)
-
-      const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey) || {}
-
-      return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
-
-    } else if (NodeDef.isTaxon(nodeDef)) {
-      // valueExpr is the code of a taxon
-      // cast to string because it could be a Number
-      const code = '' + valueExpr
-      const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
-
-      return taxonUuid ? { [Node.valuePropKeys.taxonUuid]: taxonUuid } : null
-    }
-  }
-
-  return valueExpr
-}
+/**
+ * Converts expression result into a node value
+ */
+const toNodeValue = async (survey, record, node, valueExpr) =>
+  R.isNil(valueExpr) || R.isEmpty(valueExpr)
+    ? null
+    : RecordExprValueConverter.valueExprToValueNode(survey, record, node, valueExpr)
 
 module.exports = {
   updateDependentsDefaultValues,

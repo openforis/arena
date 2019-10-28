@@ -46,8 +46,8 @@ const defaultValueAppliedTest = async () => {
 
   //define default values
   const defaultValues = [
-    newDefaultValue('1', 'false'), //should not be applied
-    newDefaultValue('2')
+    newDefaultValue(`'default value 1'`, 'false'), //should not be applied
+    newDefaultValue(`'default value 2'`)
   ]
   const nodeDef = Survey.getNodeDefByName('node_def_text')(survey)
 
@@ -67,7 +67,7 @@ const defaultValueAppliedTest = async () => {
     const reloadedNode = R.head(nodes)
 
     //compare value with default value
-    expect(Node.getValue(reloadedNode)).to.equal(2)
+    expect(Node.getValue(reloadedNode)).to.equal('default value 2')
   })
 }
 
