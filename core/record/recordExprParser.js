@@ -83,7 +83,7 @@ const evalApplicableExpression = async (survey, record, nodeCtx, expressions, co
   R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, true, convertToNodeValue))
 
 const evalApplicableExpressions = async (survey, record, node, expressions, stopAtFirstFound = false, convertToNodeValues = false) => {
-  const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound, convertToNodeValues)
+  const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
   return await Promise.all(
     applicableExpressions.map(async expression => {
