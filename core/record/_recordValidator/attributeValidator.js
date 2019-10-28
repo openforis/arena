@@ -55,8 +55,10 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
   return errorMessage
 }
 
-const validateAttribute = async (survey, record, attribute, nodeDef) => {
+const validateAttribute = async (survey, record, attribute) => {
   if (Record.isNodeApplicable(attribute)(record)) {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(attribute))(survey)
+
     return await Validator.validate(attribute, {
       [Node.keys.value]: [
         _validateRequired(survey, nodeDef),
