@@ -6,7 +6,7 @@ const ValidationResult = require('@core/validation/validationResult')
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
-const Expression = require('@core/exprParser/expression')
+const Expression = require('@core/expressionParser/expression')
 const ObjectUtils = require('@core/objectUtils')
 
 const SystemError = require('@server/utils/systemError')

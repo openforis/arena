@@ -10,7 +10,7 @@ const RB = require('../it/utils/recordBuilder')
 const RecordUtils = require('../it/utils/recordUtils')
 const { getContextUser } = require('../testContext')
 
-const RecordExprParser = require('@core/record/recordExprParser')
+const RecordExpressionParser = require('@core/record/recordExpressionParser')
 
 let survey = {}
 let record = {}
@@ -40,27 +40,27 @@ before(async () => {
   dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
 })
 
-describe('RecordExprParser Test', () => {
+describe('RecordExpressionParser Test', () => {
 
   // ====== nodes hierarchy tests
   it('this.parent()', async () => {
-    const res = await RecordExprParser.evalNodeQuery(survey, record, node, 'this.parent()')
+    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent()')
     const p = Record.getParentNode(node)(record)
     assert.equal(Node.getUuid(res), Node.getUuid(root))
   })
 
   it('this.parent().parent()', async () => {
-    const res = await RecordExprParser.evalNodeQuery(survey, record, node, 'this.parent().parent()')
+    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent().parent()')
     assert.equal(res, null)
   })
 
   it(`this.parent().node('dbh')`, async () => {
-    const res = await RecordExprParser.evalNodeQuery(survey, record, node, `this.parent().node('dbh')`)
+    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `this.parent().node('dbh')`)
     assert.equal(Node.getUuid(res), Node.getUuid(dbh))
   })
 
   it(`this.sibling('dbh')`, async () => {
-    const res = await RecordExprParser.evalNodeQuery(survey, record, node, `this.sibling('dbh')`)
+    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `this.sibling('dbh')`)
     assert.equal(Node.getUuid(res), Node.getUuid(dbh))
   })
 
@@ -94,7 +94,7 @@ describe('RecordExprParser Test', () => {
 
     it(q, async () => {
 
-      const res = await RecordExprParser.evalNodeQuery(survey, record, node, q)
+      const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, q)
 
       if (R.isEmpty(resKeys)) {
         assert.equal(res, r)

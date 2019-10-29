@@ -5,8 +5,8 @@ const NodeDef = require('@core/survey/nodeDef')
 
 const Record = require('@core/record/record')
 const Node = require('@core/record/node')
-const RecordExprParser = require('@core/record/recordExprParser')
-const RecordExprValueConverter = require('@core/record/recordExprValueConverter')
+const RecordExpressionParser = require('@core/record/recordExpressionParser')
+const RecordExpressionValueConverter = require('@core/record/recordExpressionValueConverter')
 
 const NodeRepository = require('../../repository/nodeRepository')
 
@@ -25,7 +25,7 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
   //NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
   for (const { nodeCtx, nodeDef } of nodePointersToUpdate) {
     //3. evaluate applicable expression
-    const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef))
+    const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef))
     const applicable = R.propOr(false, 'value', exprEval)
 
     //4. persist updated node value if changed, and return updated node
@@ -83,13 +83,13 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
       const { nodeCtx, nodeDef } = nodePointer
 
       //3. evaluate applicable default value expression
-      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))
+      const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))
 
       const exprValue = R.pipe(
         R.propOr(null, 'value'),
         R.unless(
           R.isNil,
-          value => RecordExprValueConverter.toNodeValue(survey, record, node, value)
+          value => RecordExpressionValueConverter.toNodeValue(survey, record, node, value)
         )
       )(exprEval)
 

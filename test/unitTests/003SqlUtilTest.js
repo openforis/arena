@@ -1,6 +1,6 @@
 const { assert, expect } = require('chai')
 
-const jsep = require('@core/exprParser/helpers/jsep')
+const jsep = require('@core/expressionParser/helpers/jsep')
 const { getWherePreparedStatement } = require('@common/surveyRdb/dataFilter')
 
 const goodExpressions = [

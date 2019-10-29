@@ -1,6 +1,6 @@
 const {assert} = require('chai')
 
-const {evalString} = require('@core/exprParser/expression')
+const {evalString} = require('@core/expressionParser/expression')
 
 const queries = [
   {q: '1 + 1', r: 2},
@@ -13,7 +13,7 @@ const queries = [
   {q: '16 / (Math.pow(2, 3) - 2) === 2.6666666666666665', r: true},
 ]
 
-describe('ExprParser test', () => {
+describe('ExpressionParser test', () => {
 
   queries.forEach(query =>
     it(query.q, async () => {

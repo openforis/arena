@@ -6,7 +6,7 @@ const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const NodeDefValidations = require('@core/survey/nodeDefValidations')
 const Record = require('../record')
 const Node = require('../node')
-const RecordExprParser = require('../recordExprParser')
+const RecordExpressionParser = require('../recordExpressionParser')
 const Validator = require('@core/validation/validator')
 const Validation = require('@core/validation/validation')
 const ValidationResult = require('@core/validation/validationResult')
@@ -34,7 +34,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
   }
   const validations = NodeDef.getValidations(nodeDef)
 
-  const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
+  const applicableExpressionsEval = await RecordExpressionParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
 
   let errorMessage = null
 

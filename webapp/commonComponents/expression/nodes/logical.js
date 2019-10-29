@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Expression from '@core/exprParser/expression'
+import Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '../../hooks'
 
