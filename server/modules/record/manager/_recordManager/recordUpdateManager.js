@@ -1,7 +1,8 @@
 const R = require('ramda')
 
 const db = require('@server/db/db')
-const ActivityLog = require('@server/modules/activityLog/activityLogger')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+const ActivityLog = require('@server/modules/activityLog/activityLog')
 const SystemError = require('@server/utils/systemError')
 
 const ObjectUtils = require('@core/objectUtils')
@@ -49,7 +50,7 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       await Promise.all([
         RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
-        ActivityLog.log(user, surveyId, ActivityLog.type.recordStepUpdate, {uuid: recordUuid, stepId}, system, t)
+        ActivityLogRepository.log(user, surveyId, ActivityLog.type.recordStepUpdate, {uuid: recordUuid, stepId}, system, t)
       ])
     } else {
       throw new SystemError('cantUpdateStep')
@@ -60,7 +61,7 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
 //==== DELETE
 const deleteRecord = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { uuid: recordUuid }, false, t)
+    await ActivityLogRepository.log(user, surveyId, ActivityLog.type.recordDelete, { uuid: recordUuid }, false, t)
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
   })
 

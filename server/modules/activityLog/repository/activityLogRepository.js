@@ -5,19 +5,23 @@ import * as User from '@core/user/user'
 import * as db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import * as Activity from '../activity'
+import * as ActivityLog from '../activityLog'
 
-export const insert = async (user, surveyId, activity, client) =>
-  client.none(`
+//===== CREATE
+export const log = async (user, surveyId, type, content, system, client) =>
+  await client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
-    [Activity.getType(activity), User.getUuid(user), Activity.getContent(activity), Activity.isSystem(activity)])
+    [type, User.getUuid(user), content, system])
 
-export const insertMany = async (user, surveyId, activities, client) =>
+export const logMany = async (user, surveyId, activities, client) =>
   await client.batch([
-    activities.map(activity => insert(user, surveyId, activity, client))
+    activities.map(activity =>
+      log(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
+    )
   ])
 
+//===== READ
 export const fetch = async (surveyId, activityTypes, offset = 0, client = db) =>
   await client.map(`
     WITH

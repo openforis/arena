@@ -10,7 +10,8 @@ const Taxon = require('@core/survey/taxon')
 const TaxonomyRepository = require('../repository/taxonomyRepository')
 const TaxonomyValidator = require('../taxonomyValidator')
 
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLog')
+const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
 
 /**
  * ====== CREATE
@@ -19,7 +20,7 @@ const insertTaxonomy = async (user, surveyId, taxonomy, system = false, client =
   await client.tx(async t => {
     const [taxonomyInserted] = await Promise.all([
       TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
-      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)
+      ActivityLogRepository.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)
     ])
     return await validateTaxonomy(surveyId, [], taxonomyInserted)
   })
@@ -27,7 +28,7 @@ const insertTaxonomy = async (user, surveyId, taxonomy, system = false, client =
 const insertTaxa = async (surveyId, taxa, user, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.insertTaxa(surveyId, taxa, t),
-    ActivityLog.logMany(
+    ActivityLogRepository.logMany(
       user,
       surveyId,
       taxa.map(taxon => ActivityLog.newActivity(ActivityLog.type.taxonInsert, taxon, true)),
@@ -129,7 +130,7 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, syst
   await client.tx(async t => (await Promise.all([
       TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
       markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }, system, t)
+      ActivityLogRepository.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }, system, t)
     ]))[0]
   )
 
@@ -139,13 +140,13 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t),
     markSurveyDraft(surveyId, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { uuid: taxonomyUuid }, false, t)
+    ActivityLogRepository.log(user, surveyId, ActivityLog.type.taxonomyDelete, { uuid: taxonomyUuid }, false, t)
   ]))
 
 const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { uuid: taxonomyUuid }, true, t)
+    ActivityLogRepository.log(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { uuid: taxonomyUuid }, true, t)
   ]))
 
 module.exports = {

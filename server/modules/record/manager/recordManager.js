@@ -14,14 +14,15 @@ const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
 const NodeRepository = require('../repository/nodeRepository')
 
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLog')
+const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
 
 //CREATE
 const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   await client.tx(async t => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
     if (!Record.isPreview(record)) {
-      await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
+      await ActivityLogRepository.log(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
     }
     return recordDb
   })
@@ -37,7 +38,7 @@ const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) =>
 
   await client.tx(async t => await Promise.all([
     NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
-    ActivityLog.logMany(user, surveyId, activities, t)
+    ActivityLogRepository.logMany(user, surveyId, activities, t)
   ]))
 }
 

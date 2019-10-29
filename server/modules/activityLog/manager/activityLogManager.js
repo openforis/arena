@@ -1,0 +1,1 @@
+export { log, logMany, fetch } from '../repository/activityLogRepository'

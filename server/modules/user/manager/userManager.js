@@ -5,7 +5,8 @@ const AuthGroups = require('@core/auth/authGroups')
 const UserRepository = require('../repository/userRepository')
 
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLog')
+const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
 
 // ==== CREATE
 
@@ -18,7 +19,7 @@ const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid
 const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
   await client.tx(async t => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
-    await ActivityLog.log(
+    await ActivityLogRepository.log(
       user,
       surveyId,
       ActivityLog.type.userInvite,
@@ -71,7 +72,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
       await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
     }
 
-    await ActivityLog.log(
+    await ActivityLogRepository.log(
       user,
       surveyId,
       ActivityLog.type.userUpdate,
@@ -90,7 +91,7 @@ const updateUser = _userFetcher(_updateUser)
 const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await Promise.all([
     AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
-    ActivityLog.log(
+    ActivityLogRepository.log(
       user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, false, client
     )
   ])

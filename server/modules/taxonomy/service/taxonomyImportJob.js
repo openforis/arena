@@ -14,7 +14,8 @@ const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')
 const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
-const ActivityLog = require('@server/modules/activityLog/activityLogger')
+const ActivityLog = require('@server/modules/activityLog/activityLog')
+const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 const SystemError = require('@server/utils/systemError')
 
 const requiredColumns = [
@@ -49,7 +50,7 @@ class TaxonomyImportJob extends Job {
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
+    await ActivityLogManager.log(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
 
     // 1. load taxonomy and check it has not published
 

@@ -24,7 +24,8 @@ const UserRepository = require('../../user/repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const SchemaRdbRepository = require('../../surveyRdb/repository/schemaRdbRepository')
 
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLog')
+const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
 
 const assocSurveyInfo = info => ({ info })
 
@@ -58,7 +59,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, syste
       await migrateSurveySchema(surveyId)
 
       // log survey create activity
-      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, system, t)
+      await ActivityLogRepository.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, system, t)
 
       if (createRootEntityDef) {
         // insert root entity def
@@ -142,7 +143,7 @@ const updateSurveyProp = async (user, surveyId, key, value, system = false, clie
     await Promise.all([
       SurveyRepository.updateSurveyProp(surveyId, key, value, t),
       SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-      ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
+      ActivityLogRepository.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
     return await fetchSurveyById(surveyId, true, true, t)
@@ -164,7 +165,7 @@ const updateSurveyProps = async (user, surveyId, props, client = db) =>
           await Promise.all([
             SurveyRepository.updateSurveyProp(surveyId, key, value, t),
             SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-            ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t)
+            ActivityLogRepository.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t)
           ])
 
           if (key === Survey.infoKeys.cycles) {
