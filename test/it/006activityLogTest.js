@@ -18,8 +18,8 @@ describe('Activity Log Test', async () => {
 
   it('Activity Log on Survey Creation', async () => {
     const surveyParam = {
-      name: 'DO NOT USE! test_survey_' + uuidv4(),
-      label: 'Test Survey',
+      name: 'do_not_use__test_survey_' + uuidv4(),
+      label: 'DO NOT USE! Test Survey',
       languages: ['en']
     }
     const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
