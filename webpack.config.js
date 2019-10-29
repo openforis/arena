@@ -113,14 +113,6 @@ const webPackConfig = {
           'sass-loader',
         ]
       },
-      //Below is added to use leader-line https://github.com/anseki/leader-line/issues/8#issuecomment-370147614
-      {
-        test: path.resolve(__dirname, 'node_modules/leader-line/'),
-        use: [{
-          loader: 'skeleton-loader',
-          options: { procedure: content => `${content}export default LeaderLine` }
-        }]
-      }
     ]
   },
   plugins: plugins

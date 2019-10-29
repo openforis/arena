@@ -1,16 +1,17 @@
 @import "~@webapp/style/vars";
 
 .processing-chain__steps {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
 }
 
 .processing-chain__step {
   position: relative;
-  min-width: 150px;
-  min-height: 50px;
+  flex: 0 0 150px;
+  height: 50px;
   border: 1px solid $greyBorder;
-  margin-right: 30px;
+  margin: 10px 30px 10px 0;
   background-color: $white;
   transition: .2s all;
 

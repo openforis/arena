@@ -116,6 +116,6 @@ export const analysisModules = {
   },
   processingStep: {
     key: 'processingStep',
-    path: `${appModules.analysis.path}/processingChain`,
+    path: `${appModules.analysis.path}/processingStep`,
   },
 }

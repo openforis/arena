@@ -25,6 +25,9 @@ export const navigateToProcessingChainsView = history => dispatch => {
   history.push(appModuleUri(analysisModules.processingChains))
 }
 
+export const navigateToProcessingStepView = (history, processingStepUuid) => _ =>
+  history.push(`${appModuleUri(analysisModules.processingStep)}${processingStepUuid}`)
+
 // ====== CREATE
 
 export const createProcessingStep = history => async (dispatch, getState) => {
@@ -38,11 +41,11 @@ export const createProcessingStep = history => async (dispatch, getState) => {
   const processingStepIndex = processingSteps.length
 
   const { data: processingStepUuid } = await axios.post(
-    `/api/survey/${surveyId}/processing-chain/${processingChainUuid}`,
+    `/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-step`,
     { processingStepIndex }
   )
 
-  history.push(`${appModuleUri(analysisModules.processingStep)}${processingStepUuid}`)
+  dispatch(navigateToProcessingStepView(history, processingStepUuid))
   dispatch(hideAppLoader())
 }
 
