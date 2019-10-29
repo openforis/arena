@@ -56,6 +56,7 @@ const type = {
   processingChainCreate: 'processingChainCreate',
   processingChainPropUpdate: 'processingChainPropUpdate',
   processingChainDelete: 'processingChainDelete',
+  processingStepCreate: 'processingStepCreate',
 }
 
 const keys = {

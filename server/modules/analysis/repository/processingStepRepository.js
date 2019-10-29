@@ -2,9 +2,20 @@ import camelize from 'camelize'
 
 import db from '@server/db/db'
 
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { dbTransformCallback, getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
+export const insertStep = async (surveyId, processingChainUuid, processingStepIndex, client = db) =>
+  await client.one(`
+      INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_step
+        (processing_chain_uuid, index)  
+      VALUES 
+        ($1, $2)
+      RETURNING *
+    `,
+    [processingChainUuid, processingStepIndex],
+    dbTransformCallback
+  )
 
 // ====== READ
 export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, client = db) => {

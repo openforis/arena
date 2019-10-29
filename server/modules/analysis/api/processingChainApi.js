@@ -7,7 +7,7 @@ import * as ProcessingChainService from '../service/processingChainService'
 
 export const init = app => {
 
-  //====== CREATE
+  //====== CREATE - Chain
 
   app.post('/survey/:surveyId/processing-chain', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
@@ -16,7 +16,22 @@ export const init = app => {
 
       const processingChainUuid = await ProcessingChainService.createChain(user, surveyId, surveyCycleKey)
 
-      res.json({ processingChainUuid })
+      res.json(processingChainUuid)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  //====== CREATE - Step
+
+  app.post('/survey/:surveyId/processing-chain/:processingChainUuid/processing-step', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingChainUuid, processingStepIndex } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const processingStepUuid = await ProcessingChainService.createStep(user, surveyId, processingChainUuid, processingStepIndex)
+
+      res.json(processingStepUuid)
     } catch (err) {
       next(err)
     }
