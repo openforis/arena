@@ -18,10 +18,11 @@ const propKeys = {
 const exprTypes = {
   applicable: 'applicable',
   codeParent: 'codeParent',
-  check: 'check',
+  defaultValue: 'defaultValue',
+  validationRules: 'validationRules',
 }
 
-const createItem = (expressionType, expression, applyIf = null, messages = null) => ({
+const newReportItem = (expressionType, expression, applyIf, messages) => ({
   [propKeys.expressionType]: expressionType,
   [propKeys.expression]: expression,
   [propKeys.applyIf]: applyIf,
@@ -29,11 +30,9 @@ const createItem = (expressionType, expression, applyIf = null, messages = null)
 })
 
 module.exports = {
-  keys,
-  propKeys,
   exprTypes,
 
-  createItem,
+  newReportItem,
 
   isResolved: R.propOr(false, keys.resolved),
   getNodeDefUuid: R.prop(keys.nodeDefUuid),

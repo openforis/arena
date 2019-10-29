@@ -67,6 +67,7 @@ const ProcessingChainView = props => {
           />
 
           <ProcessingChainSteps
+            history={history}
             processingChain={processingChain}
           />
 

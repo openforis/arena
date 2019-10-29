@@ -4,17 +4,27 @@ import * as ActivityLog from '@server/modules/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingStep from '@common/analysis/processingStep'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
+import * as ProcessingStepRepository from '../repository/processingStepRepository'
 
-// ====== CREATE
+// ====== CREATE - Chain
 
 export const createChain = async (user, surveyId, cycle, client = db) =>
   await client.tx(async t => {
     const processingChain = await ProcessingChainRepository.insertChain(surveyId, cycle, t)
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate,
-      { processingChain }, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate, { processingChain }, false, t)
     return ProcessingChain.getUuid(processingChain)
+  })
+
+// ====== CREATE - Step
+
+export const createStep = async (user, surveyId, processingChainUuid, processingStepIndex, client = db) =>
+  await client.tx(async t => {
+    const processingStep = await ProcessingStepRepository.insertStep(surveyId, processingChainUuid, processingStepIndex, t)
+    await ActivityLogRepository.log(user, surveyId, ActivityLog.type.processingStepCreate, { processingStep }, false, t)
+    return ProcessingStep.getUuid(processingStep)
   })
 
 // ====== READ - Chain

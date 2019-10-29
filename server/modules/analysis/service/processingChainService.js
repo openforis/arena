@@ -9,6 +9,9 @@ export {
   // ====== CREATE - Chain
   createChain,
 
+  // ====== CREATE - Step
+  createStep,
+
   // ======  READ - Chain
   countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid,
 

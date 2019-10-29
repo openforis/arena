@@ -106,8 +106,8 @@ const ExpressionProp = (props) => {
           <LabelsEditor
             formLabelKey="common.errorMessage"
             labels={NodeDefExpression.getMessages(expression)}
-            onChange={labelItem =>
-              onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
+            onChange={messages =>
+              onUpdate(NodeDefExpression.assocMessages(messages)(expression))
             }
             readOnly={NodeDefExpression.isEmpty(expression)}
           />

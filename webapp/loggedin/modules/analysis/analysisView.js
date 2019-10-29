@@ -6,6 +6,7 @@ import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ProcessingChainsView from './processingChains/processingChainsView'
 import ProcessingChainView from './processingChain/processingChainView'
+import ProcessingStepView from './processingStep/processingStepView'
 
 const AnalysisView = () => (
   <SurveyDefsLoader
@@ -23,6 +24,10 @@ const AnalysisView = () => (
         {
           component: ProcessingChainView,
           path: `${appModuleUri(analysisModules.processingChain)}:processingChainUuid/`,
+        },
+        {
+          component: ProcessingStepView,
+          path: `${appModuleUri(analysisModules.processingStep)}:processingStepUuid/`,
         },
       ]}
     />

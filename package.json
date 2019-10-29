@@ -84,7 +84,6 @@
     "jsep": "^0.3.4",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.1",
-    "leader-line": "^1.0.5",
     "log4js": "^5.2.1",
     "marked": "^0.7.0",
     "memoize-one": "^5.1.1",

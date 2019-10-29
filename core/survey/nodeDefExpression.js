@@ -45,17 +45,6 @@ const assocProp = (propName, value) => R.pipe(
   R.dissoc(keys.placeholder),
 )
 
-const assocMessages = messages => assocProp(keys.messages, messages)
-
-const assocMessage = message =>
-  nodeDefExpression => {
-    const messagesOld = getMessages(nodeDefExpression)
-    const messagesNew = R.assoc(message.lang, message.label, messagesOld)
-    return assocMessages(messagesNew)(nodeDefExpression)
-  }
-
-const assocSeverity = severity => assocProp(keys.severity, severity)
-
 // ====== UTILS
 
 const extractNodeDefNames = (jsExpr = '') => {
@@ -107,8 +96,8 @@ module.exports = {
   //UPDATE
   assocExpression: expression => assocProp(keys.expression, expression),
   assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
-  assocMessage,
-  assocSeverity,
+  assocMessages: messages => assocProp(keys.messages, messages),
+  assocSeverity: severity => assocProp(keys.severity, severity),
 
   //UTILS
   findReferencedNodeDefs

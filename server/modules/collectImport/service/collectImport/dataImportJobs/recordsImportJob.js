@@ -171,12 +171,11 @@ class RecordsImportJob extends Job {
         if (NodeDef.isEntity(nodeDef)) {
 
           // create child nodes to insert
-          const { nodesToInsert, validation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
-          recordValidation = validation
+          const { nodesToInsert, recordValidation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
           queue.enqueueItems(nodesToInsert)
 
         } else {
-          const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
+          const validationAttribute = await RecordValidator.validateAttribute(survey, record, nodeToInsert)
           if (!Validation.isValid(validationAttribute)) {
             Validation.setValid(false)(recordValidation)
             Validation.setField(Node.getUuid(nodeToInsert), validationAttribute)(recordValidation)
