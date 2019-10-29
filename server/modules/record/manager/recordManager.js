@@ -1,10 +1,14 @@
-const db = require('@server/db/db')
 const camelize = require('camelize')
+
+const ActivityLog = require('@common/activityLog/activityLog')
 
 const Survey = require('@core/survey/survey')
 const NodeDef = require('@core/survey/nodeDef')
 const Record = require('@core/record/record')
 const ObjectUtils = require('@core/objectUtils')
+
+const db = require('@server/db/db')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 const RecordUpdateManager = require('./_recordManager/recordUpdateManager')
 const RecordValidationManager = require('./_recordManager/recordValidationManager')
@@ -14,14 +18,12 @@ const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
 const NodeRepository = require('../repository/nodeRepository')
 
-const ActivityLog = require('../../activityLog/activityLogger')
-
 //CREATE
 const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   await client.tx(async t => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
     if (!Record.isPreview(record)) {
-      await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
     }
     return recordDb
   })
@@ -37,7 +39,7 @@ const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) =>
 
   await client.tx(async t => await Promise.all([
     NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
-    ActivityLog.logMany(user, surveyId, activities, t)
+    ActivityLogRepository.insertMany(user, surveyId, activities, t)
   ]))
 }
 

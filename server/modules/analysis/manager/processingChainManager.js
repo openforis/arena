@@ -1,6 +1,7 @@
 import db from '@server/db/db'
 
-import * as ActivityLog from '@server/modules/activityLog/activityLogger'
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -13,7 +14,7 @@ import * as ProcessingStepRepository from '../repository/processingStepRepositor
 export const createChain = async (user, surveyId, cycle, client = db) =>
   await client.tx(async t => {
     const processingChain = await ProcessingChainRepository.insertChain(surveyId, cycle, t)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.processingChainCreate, { processingChain }, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate, { processingChain }, false, t)
     return ProcessingChain.getUuid(processingChain)
   })
 
@@ -22,7 +23,7 @@ export const createChain = async (user, surveyId, cycle, client = db) =>
 export const createStep = async (user, surveyId, processingChainUuid, processingStepIndex, client = db) =>
   await client.tx(async t => {
     const processingStep = await ProcessingStepRepository.insertStep(surveyId, processingChainUuid, processingStepIndex, t)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.processingStepCreate, { processingStep }, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCreate, { processingStep }, false, t)
     return ProcessingStep.getUuid(processingStep)
   })
 
@@ -39,7 +40,7 @@ export { fetchStepsByChainUuid } from '../repository/processingStepRepository'
 export const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainPropUpdate,
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainPropUpdate,
       { uuid: processingChainUuid, key, value }, false, t)
   ]))
 
@@ -48,5 +49,5 @@ export const updateChainProp = async (user, surveyId, processingChainUuid, key, 
 export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t),
-    ActivityLog.log(user, surveyId, ActivityLog.type.processingChainDelete, { uuid: processingChainUuid }, false, t)
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, { uuid: processingChainUuid }, false, t)
   ]))

@@ -1,5 +1,7 @@
+const ActivityLog = require('@common/activityLog/activityLog')
+
 const Job = require('@server/job/job')
-const ActivityLog = require('@server/modules/activityLog/activityLogger')
+const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 
 const NodeDefsValidationJob = require('./jobs/nodeDefsValidationJob')
 const CategoriesValidationJob = require('./jobs/categoriesValidationJob')
@@ -33,7 +35,7 @@ class SurveyPublishJob extends Job {
   async onStart () {
     await super.onStart()
 
-    await ActivityLog.log(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
+    await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
   }
 }
 

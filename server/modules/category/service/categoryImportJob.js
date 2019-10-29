@@ -1,7 +1,8 @@
 const fs = require('fs')
 const R = require('ramda')
 
-const ActivityLog = require('@server/modules/activityLog/activityLogger')
+const ActivityLog = require('@common/activityLog/activityLog')
+const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 const Job = require('@server/job/job')
 
 const Category = require('@core/survey/category')
@@ -62,7 +63,7 @@ class CategoryImportJob extends Job {
   }
 
   async logCategoryImportActivity () {
-    await ActivityLog.log(this.user, this.surveyId, ActivityLog.type.categoryImport, { uuid: Category.getUuid(this.category) }, false, this.tx)
+    await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.categoryImport, { uuid: Category.getUuid(this.category) }, false, this.tx)
   }
 
   async beforeSuccess () {

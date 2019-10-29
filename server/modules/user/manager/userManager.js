@@ -1,11 +1,13 @@
 const db = require('@server/db/db')
 
+const ActivityLog = require('@common/activityLog/activityLog')
+
 const User = require('@core/user/user')
 const AuthGroups = require('@core/auth/authGroups')
-const UserRepository = require('../repository/userRepository')
 
-const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+const AuthGroupRepository = require('@server/modules/auth/repository/authGroupRepository')
+const UserRepository = require('@server/modules/user/repository/userRepository')
 
 // ==== CREATE
 
@@ -18,7 +20,7 @@ const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid
 const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
   await client.tx(async t => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
-    await ActivityLog.log(
+    await ActivityLogRepository.insert(
       user,
       surveyId,
       ActivityLog.type.userInvite,
@@ -71,7 +73,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
       await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
     }
 
-    await ActivityLog.log(
+    await ActivityLogRepository.insert(
       user,
       surveyId,
       ActivityLog.type.userUpdate,
@@ -90,7 +92,7 @@ const updateUser = _userFetcher(_updateUser)
 const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await Promise.all([
     AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
-    ActivityLog.log(
+    ActivityLogRepository.insert(
       user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, false, client
     )
   ])

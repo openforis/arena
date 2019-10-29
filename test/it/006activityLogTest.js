@@ -6,8 +6,10 @@ const { uuidv4 } = require('@core/uuid')
 
 const Survey = require('@core/survey/survey')
 const Record = require('@core/record/record')
+const ObjectUtils = require('@core/objectUtils')
 
-const ActivityLogger = require('@server/modules/activityLog/activityLogger')
+const ActivityLog = require('@common/activityLog/activityLog')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 const SurveyManager = require('@server/modules/survey/manager/surveyManager')
 const RecordManager = require('@server/modules/record/manager/recordManager')
 
@@ -25,13 +27,7 @@ describe('Activity Log Test', async () => {
     const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
     const surveyId = Survey.getId(survey)
 
-    const logs = await ActivityLogger.fetchLogs(surveyId)
-
-    expect(logs.length).to.be.at.least(1)
-
-    const surveyCreateLogs = R.filter(
-      R.propEq(ActivityLogger.keys.type, ActivityLogger.type.surveyCreate)
-    )(logs)
+    const surveyCreateLogs = await ActivityLogRepository.fetch(surveyId, ActivityLog.type.surveyCreate)
 
     expect(surveyCreateLogs).to.have.lengthOf(1)
 
@@ -54,12 +50,11 @@ describe('Activity Log Test', async () => {
 
     const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
-    const logs = await ActivityLogger.fetchLogs(surveyId)
+    const logs = await ActivityLogRepository.fetch(surveyId, [ActivityLog.type.recordCreate])
     expect(logs.length).to.be.at.least(1)
 
-    const recordCreateLogs = R.filter(log =>
-      R.propEq(ActivityLogger.keys.type, ActivityLogger.type.recordCreate, log) &&
-      R.pathEq([ActivityLogger.keys.content, Record.keys.uuid], Record.getUuid(record), log)
+    const recordCreateLogs = R.filter(
+      activity => ObjectUtils.getUuid(ActivityLog.getContent(activity)) === Record.getUuid(record)
     )(logs)
 
     expect(recordCreateLogs).to.have.lengthOf(1)

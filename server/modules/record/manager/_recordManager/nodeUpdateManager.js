@@ -11,7 +11,8 @@ const Record = require('@core/record/record')
 const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
 const NodeRepository = require('../../repository/nodeRepository')
 
-const ActivityLog = require('../../../activityLog/activityLogger')
+const ActivityLog = require('@common/activityLog/activityLog')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 //==== UPDATE
 
@@ -24,7 +25,7 @@ const persistNode = async (user, survey, record, node, t) => {
     // update
     const surveyId = Survey.getId(survey)
     if (!Record.isPreview(record))
-      await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), false, t)
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), false, t)
 
     const nodeValue = Node.getValue(node)
     const meta = {
@@ -112,7 +113,7 @@ const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInser
   const surveyId = Survey.getId(survey)
 
   if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
@@ -148,7 +149,7 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
   if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { uuid: nodeUuid }, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDelete, { uuid: nodeUuid }, false, t)
 
   // get dependent key attributes before node is removed from record
   // and return them so they will be re-validated later on
@@ -163,7 +164,7 @@ const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, 
   await client.tx(async t => {
     const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, t)
     const activities = nodesDeleted.map(node => ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true))
-    await ActivityLog.logMany(user, surveyId, activities, t)
+    await ActivityLogRepository.insertMany(user, surveyId, activities, t)
     return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
   })
 
