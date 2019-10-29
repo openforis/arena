@@ -19,7 +19,7 @@ const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid
 const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
   await client.tx(async t => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
-    await ActivityLogRepository.log(
+    await ActivityLogRepository.insert(
       user,
       surveyId,
       ActivityLog.type.userInvite,
@@ -72,7 +72,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
       await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
     }
 
-    await ActivityLogRepository.log(
+    await ActivityLogRepository.insert(
       user,
       surveyId,
       ActivityLog.type.userUpdate,
@@ -91,7 +91,7 @@ const updateUser = _userFetcher(_updateUser)
 const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await Promise.all([
     AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
-    ActivityLogRepository.log(
+    ActivityLogRepository.insert(
       user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, false, client
     )
   ])

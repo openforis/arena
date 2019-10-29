@@ -51,7 +51,7 @@ class SurveyCreatorJob extends Job {
 
     const surveyId = Survey.getId(survey)
 
-    await ActivityLogManager.log(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
+    await ActivityLogManager.insert(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
 
     this.setContext({ survey, surveyId, defaultLanguage })
   }

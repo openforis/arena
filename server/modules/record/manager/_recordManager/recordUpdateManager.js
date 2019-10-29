@@ -50,7 +50,7 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       await Promise.all([
         RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
-        ActivityLogRepository.log(user, surveyId, ActivityLog.type.recordStepUpdate, {uuid: recordUuid, stepId}, system, t)
+        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordStepUpdate, {uuid: recordUuid, stepId}, system, t)
       ])
     } else {
       throw new SystemError('cantUpdateStep')
@@ -61,7 +61,7 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
 //==== DELETE
 const deleteRecord = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
-    await ActivityLogRepository.log(user, surveyId, ActivityLog.type.recordDelete, { uuid: recordUuid }, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, { uuid: recordUuid }, false, t)
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
   })
 

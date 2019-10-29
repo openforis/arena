@@ -50,7 +50,7 @@ class TaxonomyImportJob extends Job {
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
-    await ActivityLogManager.log(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
+    await ActivityLogManager.insert(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
 
     // 1. load taxonomy and check it has not published
 

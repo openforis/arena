@@ -82,6 +82,11 @@ before(async () => {
   processingChain = ProcessingChain.assocProcessingStep(step1)(processingChain)
 })
 
+after(async () => {
+  if (survey)
+    await SurveyManager.deleteSurvey(Survey.getId(survey))
+})
+
 const simpleTest = async () => {
   // console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))

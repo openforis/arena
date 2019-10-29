@@ -63,7 +63,7 @@ class CategoryImportJob extends Job {
   }
 
   async logCategoryImportActivity () {
-    await ActivityLogManager.log(this.user, this.surveyId, ActivityLog.type.categoryImport, { uuid: Category.getUuid(this.category) }, false, this.tx)
+    await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.categoryImport, { uuid: Category.getUuid(this.category) }, false, this.tx)
   }
 
   async beforeSuccess () {

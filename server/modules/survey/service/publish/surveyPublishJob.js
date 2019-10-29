@@ -34,7 +34,7 @@ class SurveyPublishJob extends Job {
   async onStart () {
     await super.onStart()
 
-    await ActivityLogManager.log(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
+    await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
   }
 }
 

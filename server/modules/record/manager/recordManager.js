@@ -22,7 +22,7 @@ const insertRecord = async (user, surveyId, record, system = false, client = db)
   await client.tx(async t => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
     if (!Record.isPreview(record)) {
-      await ActivityLogRepository.log(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
     }
     return recordDb
   })
@@ -38,7 +38,7 @@ const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) =>
 
   await client.tx(async t => await Promise.all([
     NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
-    ActivityLogRepository.logMany(user, surveyId, activities, t)
+    ActivityLogRepository.insertMany(user, surveyId, activities, t)
   ]))
 }
 
