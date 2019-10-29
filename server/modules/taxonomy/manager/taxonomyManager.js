@@ -1,17 +1,19 @@
 const R = require('ramda')
 
-const db = require('@server/db/db')
+const ActivityLog = require('@common/activityLog/activityLog')
+
 
 const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('@core/survey/taxonomy')
 const Taxon = require('@core/survey/taxon')
 
+const db = require('@server/db/db')
+
 const TaxonomyRepository = require('../repository/taxonomyRepository')
 const TaxonomyValidator = require('../taxonomyValidator')
 
-const ActivityLog = require('../../activityLog/activityLog')
-const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 /**
  * ====== CREATE
@@ -130,7 +132,11 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, syst
   await client.tx(async t => (await Promise.all([
       TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }, system, t)
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyPropUpdate, {
+        uuid: taxonomyUuid,
+        key,
+        value
+      }, system, t)
     ]))[0]
   )
 

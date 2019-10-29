@@ -1,10 +1,14 @@
-const db = require('@server/db/db')
 const camelize = require('camelize')
+
+const ActivityLog = require('@common/activityLog/activityLog')
 
 const Survey = require('@core/survey/survey')
 const NodeDef = require('@core/survey/nodeDef')
 const Record = require('@core/record/record')
 const ObjectUtils = require('@core/objectUtils')
+
+const db = require('@server/db/db')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 const RecordUpdateManager = require('./_recordManager/recordUpdateManager')
 const RecordValidationManager = require('./_recordManager/recordValidationManager')
@@ -13,9 +17,6 @@ const SurveyRepository = require('../../survey/repository/surveyRepository')
 const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
 const NodeRepository = require('../repository/nodeRepository')
-
-const ActivityLog = require('../../activityLog/activityLog')
-const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
 
 //CREATE
 const insertRecord = async (user, surveyId, record, system = false, client = db) =>

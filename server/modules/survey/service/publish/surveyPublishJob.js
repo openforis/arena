@@ -1,5 +1,6 @@
+const ActivityLog = require('@common/activityLog/activityLog')
+
 const Job = require('@server/job/job')
-const ActivityLog = require('@server/modules/activityLog/activityLog')
 const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 
 const NodeDefsValidationJob = require('./jobs/nodeDefsValidationJob')

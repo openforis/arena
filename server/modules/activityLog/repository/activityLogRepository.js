@@ -5,7 +5,7 @@ import * as User from '@core/user/user'
 import * as db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import * as ActivityLog from '../activityLog'
+import * as ActivityLog from '@common/activityLog/activityLog'
 
 //===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>

@@ -1,1 +1,1 @@
-export { insert, insertMany, fetch } from '../repository/activityLogRepository'
+export { insert, insertMany, fetch } from '@server/modules/activityLog/repository/activityLogRepository'

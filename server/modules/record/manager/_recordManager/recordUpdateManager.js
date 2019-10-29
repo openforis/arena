@@ -1,9 +1,6 @@
 const R = require('ramda')
 
-const db = require('@server/db/db')
-const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
-const ActivityLog = require('@server/modules/activityLog/activityLog')
-const SystemError = require('@server/utils/systemError')
+const ActivityLog = require('@common/activityLog/activityLog')
 
 const ObjectUtils = require('@core/objectUtils')
 const Survey = require('@core/survey/survey')
@@ -12,12 +9,16 @@ const Record = require('@core/record/record')
 const RecordStep = require('@core/record/recordStep')
 const Node = require('@core/record/node')
 
-const RecordValidationManager = require('./recordValidationManager')
-const NodeUpdateManager = require('./nodeUpdateManager')
+const db = require('@server/db/db')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+const SystemError = require('@server/utils/systemError')
 
 const RecordRepository = require('@server/modules/record/repository/recordRepository')
 const FileRepository = require('@server/modules/record/repository/fileRepository')
 const DataTableUpdateRepository = require('@server/modules/surveyRdb/repository/dataTableUpdateRepository')
+
+const RecordValidationManager = require('./recordValidationManager')
+const NodeUpdateManager = require('./nodeUpdateManager')
 
 /**
  * =======
@@ -50,7 +51,10 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       await Promise.all([
         RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
-        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordStepUpdate, {uuid: recordUuid, stepId}, system, t)
+        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordStepUpdate, {
+          uuid: recordUuid,
+          stepId
+        }, system, t)
       ])
     } else {
       throw new SystemError('cantUpdateStep')

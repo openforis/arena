@@ -1,7 +1,8 @@
 const R = require('ramda')
 
+const ActivityLog = require('@common/activityLog/activityLog')
+
 const db = require('@server/db/db')
-const { migrateSurveySchema } = require('@server/db/migration/dbMigrator')
 const { uuidv4 } = require('@core/uuid')
 
 const Survey = require('@core/survey/survey')
@@ -16,6 +17,8 @@ const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const UserManager = require('../../user/manager/userManager')
 const AuthGroups = require('@core/auth/authGroups')
 
+const { migrateSurveySchema } = require('@server/db/migration/dbMigrator')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
 const SurveyRepository = require('../repository/surveyRepository')
 const CategoryRepository = require('../../category/repository/categoryRepository')
@@ -24,8 +27,6 @@ const UserRepository = require('../../user/repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const SchemaRdbRepository = require('../../surveyRdb/repository/schemaRdbRepository')
 
-const ActivityLog = require('../../activityLog/activityLog')
-const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
 
 const assocSurveyInfo = info => ({ info })
 

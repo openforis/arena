@@ -9,8 +9,8 @@ const { uuidv4 } = require('@core/uuid')
 const NodeDefRepository = require('../repository/nodeDefRepository')
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
-const ActivityLog = require('../../activityLog/activityLog')
-const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
+const ActivityLog = require('@common/activityLog/activityLog')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 // ======= CREATE
 

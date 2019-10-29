@@ -11,8 +11,8 @@ const Record = require('@core/record/record')
 const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
 const NodeRepository = require('../../repository/nodeRepository')
 
-const ActivityLog = require('../../../activityLog/activityLog')
-const ActivityLogRepository = require('../../../activityLog/repository/activityLogRepository')
+const ActivityLog = require('@common/activityLog/activityLog')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 //==== UPDATE
 

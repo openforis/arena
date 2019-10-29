@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const ActivityLog = require('@common/activityLog/activityLog')
+
 const Job = require('@server/job/job')
 
 const { languageCodes } = require('@core/app/languages')
@@ -14,7 +16,6 @@ const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')
 const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
-const ActivityLog = require('@server/modules/activityLog/activityLog')
 const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 const SystemError = require('@server/utils/systemError')
 

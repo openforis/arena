@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const db = require('@server/db/db')
+const ActivityLog = require('@common/activityLog/activityLog')
 
 const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 const ObjectUtils = require('@core/objectUtils')
@@ -11,8 +11,8 @@ const Category = require('@core/survey/category')
 const CategoryLevel = require('@core/survey/categoryLevel')
 const Validation = require('@core/validation/validation')
 
-const ActivityLog = require('../../activityLog/activityLog')
-const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
+const db = require('@server/db/db')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 
 const CategoryImportSummaryGenerator = require('./categoryImportSummaryGenerator')
 
@@ -114,7 +114,11 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, syst
     await Promise.all([
       CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryPropUpdate, { uuid: categoryUuid, key, value }, system, t)
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryPropUpdate, {
+        uuid: categoryUuid,
+        key,
+        value
+      }, system, t)
     ])
     const categories = await validateCategories(surveyId, t)
     return {
@@ -146,7 +150,11 @@ const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value
     const [item] = await Promise.all([
       CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemPropUpdate, { uuid: itemUuid, key, value }, false, t)
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemPropUpdate, {
+        uuid: itemUuid,
+        key,
+        value
+      }, false, t)
     ])
     return {
       item,

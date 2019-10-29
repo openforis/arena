@@ -1,6 +1,6 @@
 import db from '@server/db/db'
 
-import * as ActivityLog from '@server/modules/activityLog/activityLog'
+import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
@@ -23,7 +23,7 @@ export const createChain = async (user, surveyId, cycle, client = db) =>
 export const createStep = async (user, surveyId, processingChainUuid, processingStepIndex, client = db) =>
   await client.tx(async t => {
     const processingStep = await ProcessingStepRepository.insertStep(surveyId, processingChainUuid, processingStepIndex, t)
-    await ActivityLogRepository.log(user, surveyId, ActivityLog.type.processingStepCreate, { processingStep }, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCreate, { processingStep }, false, t)
     return ProcessingStep.getUuid(processingStep)
   })
 

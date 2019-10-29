@@ -1,12 +1,13 @@
 const db = require('@server/db/db')
 
+const ActivityLog = require('@common/activityLog/activityLog')
+
 const User = require('@core/user/user')
 const AuthGroups = require('@core/auth/authGroups')
-const UserRepository = require('../repository/userRepository')
 
-const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
-const ActivityLog = require('../../activityLog/activityLog')
-const ActivityLogRepository = require('../../activityLog/repository/activityLogRepository')
+const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+const AuthGroupRepository = require('@server/modules/auth/repository/authGroupRepository')
+const UserRepository = require('@server/modules/user/repository/userRepository')
 
 // ==== CREATE
 

@@ -4,7 +4,7 @@ const Survey = require('@core/survey/survey')
 
 const Job = require('@server/job/job')
 
-const ActivityLog = require('@server/modules/activityLog/activityLog')
+const ActivityLog = require('@common/activityLog/activityLog')
 const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 
 const SurveyManager = require('@server/modules/survey/manager/surveyManager')

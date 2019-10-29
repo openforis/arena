@@ -1,7 +1,7 @@
 const fs = require('fs')
 const R = require('ramda')
 
-const ActivityLog = require('@server/modules/activityLog/activityLog')
+const ActivityLog = require('@common/activityLog/activityLog')
 const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
 const Job = require('@server/job/job')
 
