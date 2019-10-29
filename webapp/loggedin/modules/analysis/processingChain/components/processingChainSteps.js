@@ -1,12 +1,12 @@
 import './processingChainSteps.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import {
   createProcessingStep,
