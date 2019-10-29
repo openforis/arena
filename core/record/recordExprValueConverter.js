@@ -12,9 +12,9 @@ const _toPrimitive = (val, TypeTo) =>
 
 const _toBoolean = (survey, record, nodeCtx, valueExpr) =>
   R.is(Boolean, valueExpr)
-    ? valueExpr
+    ? String(valueExpr)
     : R.is(String, valueExpr) && R.includes(valueExpr, ['true', 'false'])
-    ? Boolean(valueExpr)
+    ? valueExpr
     : null
 
 const _toCode = (survey, record, nodeCtx, valueExpr) => {
