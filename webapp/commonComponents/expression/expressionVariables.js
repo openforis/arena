@@ -7,78 +7,66 @@ import sqlTypes from '@common/surveyRdb/sqlTypes'
 
 import Expression from '@core/expressionParser/expression'
 
-const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
-  const nodeDefName = NodeDef.getName(nodeDef)
+// TODO: match all nodeDefTypes and throw an error if unknown:
+const toSqlType = nodeDef =>
+  NodeDef.isInteger(nodeDef)
+  ? sqlTypes.integer
+  : NodeDef.isDecimal(nodeDef)
+    ? sqlTypes.decimal
+    : sqlTypes.varchar
 
-  const getValueFnFromParent = () => {
-    const parentFnCalls = depth > 0
-      ? '.' + R.repeat('parent()', depth).join('.')
-      : ''
-    return `this${parentFnCalls}.node('${nodeDefName}').getValue()`
-  }
-
-  const getValueFnFromContextNode = () => `this.getValue()`
-
-  const valueProp = NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
-    ? '.props.code'
-    : ''
-
-  const valueFn = NodeDef.getUuid(nodeDef) === NodeDef.getUuid(nodeDefCurrent)
-    ? getValueFnFromContextNode()
-    : getValueFnFromParent()
-
-  return [{
-    value: `${valueFn}${valueProp}`,
-
-    label: NodeDef.getLabel(nodeDef, lang),
-
-    type: NodeDef.isInteger(nodeDef) ? sqlTypes.integer
-      : NodeDef.isDecimal(nodeDef) ? sqlTypes.decimal
-        : sqlTypes.varchar,
-  }]
-}
+const getJsVariables = (nodeDef, lang) => [{
+  value: NodeDef.getName(nodeDef),
+  label: NodeDef.getLabel(nodeDef, lang),
+  type: toSqlType(nodeDef),
+  // TODO: add uuid here for symmetry?
+}]
 
 const getSqlVariables = (nodeDef, lang) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
 
-  return colNames.map(col => ({
-
-    value: col,
-
-    label: NodeDef.getLabel(nodeDef, lang) + (
+  // TODO: Explain what getLabel does and why
+  const getLabel = col =>
+    NodeDef.getLabel(nodeDef, lang) + (
       colNames.length === 1
-        ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col)
-    ),
+      ? ''
+      : ' - ' + NodeDefTable.extractColName(nodeDef, col)
+    )
 
-    type: NodeDef.isInteger(nodeDef) ? sqlTypes.integer :
-      NodeDef.isDecimal(nodeDef) ? sqlTypes.decimal
-        : sqlTypes.varchar,
-
+  return colNames.map(col => ({
+    value: col,
+    label: getLabel(col),
+    type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef)
   }))
 }
 
-const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth, lang) => {
+const isValidExpressionType = childDef =>
+  !NodeDef.isEntity(childDef)
+  && !NodeDef.isCoordinate(childDef)
+  && !NodeDef.isFile(childDef)
+
+const getChildDefVariables = (survey, nodeDefContext, mode, lang) => {
 
   return R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
     R.map(childDef => {
-      if (NodeDef.isEntity(childDef) || NodeDef.isCoordinate(childDef) || NodeDef.isFile(childDef))
+      if (!isValidExpressionType(childDef))
         return null
       else if (mode === Expression.modes.sql)
         return getSqlVariables(childDef, lang)
       else if (mode === Expression.modes.json)
-        return getJsVariables(childDef, nodeDefCurrent, lang, depth)
+        return getJsVariables(childDef, lang)
     }),
     R.flatten,
     R.reject(R.isNil),
   )(survey)
 }
 
-export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1, preferredLang) => {
+export const getVariables = (survey, nodeDefContext, mode, preferredLang) => {
 
   const lang = Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey))
-  const variables = getChildDefVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
+  const variables = getChildDefVariables(survey, nodeDefContext, mode, lang)
 
   return NodeDef.isRoot(nodeDefContext)
     ? variables
@@ -89,7 +77,6 @@ export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth
         Survey.getNodeDefParent(nodeDefContext)(survey),
         null,
         mode,
-        depth + 1
       )
     )
 }

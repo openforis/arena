@@ -55,15 +55,15 @@ export const mapStateToProps = (state, props) => {
   const lang = AppState.getLang(state)
 
   const {
-    nodeDefUuidContext, nodeDefUuidCurrent,
-    mode = Expression.modes.json, isContextParent = false,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
+    mode = Expression.modes.json,
   } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
-  const depth = isContextParent ? 0 : 1
 
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
+  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, mode, lang)
 
   return {
     nodeDefContext,

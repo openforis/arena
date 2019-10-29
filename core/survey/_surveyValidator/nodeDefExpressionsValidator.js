@@ -11,6 +11,19 @@ const ObjectUtils = require('@core/objectUtils')
 
 const SystemError = require('@server/utils/systemError')
 
+// Get reachable nodes, i.e. the children of the node's ancestors.
+// NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
+const getReachableNodes = (survey, nodeDef) => {
+  const visibleNodes = []
+  const visitorFn = nodeDef => {
+    const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+    visibleNodes.unshift(...nodeDefChildren)
+  }
+  Survey.visitAncestorsAndSelf(nodeDef, visitorFn)(survey)
+  return visibleNodes
+}
+
+
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
@@ -42,6 +55,14 @@ const bindNode = (survey, nodeDef) => ({
       throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeSibling, { name })
     }
     return bindNode(survey, def)
+  },
+
+  getReachableNodeValue: nodeName => {
+    const allNodes = getReachableNodes(survey, nodeDef)
+    const def = allNodes.filter(x => NodeDef.getName(x) === nodeName)[0]
+    if (!def) throw new Error(`Node not found: ${nodeName}`)
+
+    return bindNode(survey, def).getValue()
   },
 })
 

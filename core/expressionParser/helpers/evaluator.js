@@ -82,10 +82,11 @@ const thisEval = expr => {
   return 'this'
 }
 
-const identifierEval = expr => {
+const identifierEval = (expr, ctx) => {
   // console.log('== identifierExpression ')
   // console.log(expr)
-  return R.prop('name')(expr)
+  const name = R.prop('name')(expr)
+  return ctx.node.getReachableNodeValue(name)
 }
 
 const groupEval = async (expr, ctx) => {

@@ -19,6 +19,13 @@ const evalNodeQuery = async (survey, record, node, query) => {
   return await Expression.evalString(query, ctx)
 }
 
+// Get reachable nodes, i.e. the children of the node's ancestors.
+// NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
+const getReachableNodes = (record, node) => {
+  const ancestors = Record.getAncestorsAndSelf(node)(record)
+  return R.flatten(ancestors.map(n => Record.getNodeChildren(n)(record)))
+}
+
 const bindNode = (survey, record, node) => {
 
   const getChildNode = (parentNode, name) => {
@@ -74,7 +81,21 @@ const bindNode = (survey, record, node) => {
         : NodeDef.isBoolean(nodeDef)
           ? value === 'true'
           : value
-    }
+    },
+
+    getReachableNodeValue: nodeName => {
+      const allNodes = getReachableNodes(record, node)
+      const allNodeDefs = Survey.getNodeDefsByUuids(allNodes.map(x => x.nodeDefUuid))(survey)
+
+      const resolved =
+        R.zip(allNodeDefs, allNodes)
+        .filter(([nodeDef, _node]) => NodeDef.getName(nodeDef) === nodeName)[0]
+
+      if (!resolved) throw new Error(`Node not found: ${nodeName}`)
+      const [_, resolvedNode] = resolved
+
+      return bindNode(survey, record, resolvedNode).getValue()
+    },
   }
 }
 
