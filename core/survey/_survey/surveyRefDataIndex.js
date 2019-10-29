@@ -64,7 +64,7 @@ const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode
   if (levelIndex > 0) {
     const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
     parentCategoryItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
-    hierarchyCode = R.append(Node.getCategoryItemUuid(parentCodeAttribute), Node.getHierarchyCode(parentCodeAttribute))
+    hierarchyCode = R.append(parentCategoryItemUuid, Node.getHierarchyCode(parentCodeAttribute))
   }
 
   const itemUuid = R.path(

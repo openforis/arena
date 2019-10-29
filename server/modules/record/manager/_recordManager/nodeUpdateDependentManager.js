@@ -6,6 +6,7 @@ const NodeDef = require('@core/survey/nodeDef')
 const Record = require('@core/record/record')
 const Node = require('@core/record/node')
 const RecordExprParser = require('@core/record/recordExprParser')
+const RecordExprValueConverter = require('@core/record/recordExprValueConverter')
 
 const NodeRepository = require('../../repository/nodeRepository')
 
@@ -83,20 +84,26 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
 
       //3. evaluate applicable default value expression
       const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))
-      const exprValue = R.propOr(null, 'value', exprEval)
+
+      const exprValue = R.pipe(
+        R.propOr(null, 'value'),
+        R.unless(
+          R.isNil,
+          value => RecordExprValueConverter.toNodeValue(survey, record, node, value)
+        )
+      )(exprEval)
 
       //4. persist updated node value if changed, and return updated node
-      const value = await toNodeValue(survey, record, nodeCtx, exprValue)
       const oldValue = Node.getValue(nodeCtx, null)
       const nodeCtxUuid = Node.getUuid(nodeCtx)
 
-      return R.equals(oldValue, value)
+      return R.equals(oldValue, exprValue)
         ? {}
         : {
           [nodeCtxUuid]: await NodeRepository.updateNode(
             Survey.getId(survey),
             nodeCtxUuid,
-            value,
+            exprValue,
             { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
             Record.isPreview(record),
             tx
@@ -106,40 +113,6 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
   )
 
   return R.mergeAll(nodesUpdated)
-}
-
-// convert expression result into a node value
-// it uses categoryRepository or taxonomyRepository when expression result is category item code or taxon code
-const toNodeValue = async (survey, record, node, valueExpr) => {
-  if (R.isNil(valueExpr) || R.isEmpty(valueExpr)) {
-    return null
-  }
-
-  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  const isExprPrimitive = R.is(String, valueExpr) || R.is(Number, valueExpr)
-
-  if (isExprPrimitive) {
-    if (NodeDef.isCode(nodeDef)) {
-      // valueExpr is the code of a category item
-      // cast to string because it could be a Number
-      const code = '' + valueExpr
-      const parentNode = Record.getParentNode(node)(record)
-
-      const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey) || {}
-
-      return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
-
-    } else if (NodeDef.isTaxon(nodeDef)) {
-      // valueExpr is the code of a taxon
-      // cast to string because it could be a Number
-      const code = '' + valueExpr
-      const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
-
-      return taxonUuid ? { [Node.valuePropKeys.taxonUuid]: taxonUuid } : null
-    }
-  }
-
-  return valueExpr
 }
 
 module.exports = {

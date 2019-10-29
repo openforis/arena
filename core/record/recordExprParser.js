@@ -85,11 +85,14 @@ const evalApplicableExpressions = async (survey, record, node, expressions, stop
   const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
   return await Promise.all(
-    applicableExpressions.map(async expression => ({
+    applicableExpressions.map(async expression => {
+      const value = await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
+
+      return {
         expression,
-        value: await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
-      })
-    )
+        value
+      }
+    })
   )
 }
 
