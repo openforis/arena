@@ -2,9 +2,9 @@ import * as R from 'ramda'
 
 import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 
-export const stateKey = 'processingChain'
+export const stateKey = 'processingStep'
 
-export const getProcessingChain = R.pipe(
+export const getProcessingStep = R.pipe(
   AnalysisState.getState,
   R.prop(stateKey)
 )

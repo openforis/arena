@@ -1,3 +1,5 @@
+import camelize from 'camelize'
+
 import db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -47,7 +49,8 @@ export const fetchChainByUuid = async (surveyId, processingChainUuid, client = d
       FROM ${getSurveyDBSchema(surveyId)}.processing_chain
       WHERE uuid = $1
     `,
-    [processingChainUuid]
+    [processingChainUuid],
+    camelize
   )
 
 // ====== UPDATE

@@ -89,6 +89,18 @@ export const init = app => {
     }
   })
 
+  app.get('/survey/:surveyId/processing-step/:processingStepUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingStepUuid } = Request.getParams(req)
+
+      const processingStep = await ProcessingChainService.fetchStepByUuid(surveyId, processingStepUuid)
+
+      res.json(processingStep)
+    } catch (err) {
+      next(err)
+    }
+  })
+
   //====== UPDATE
 
   app.put('/survey/:surveyId/processing-chain/:processingChainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {

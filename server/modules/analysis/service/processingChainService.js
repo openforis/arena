@@ -16,7 +16,7 @@ export {
   countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid,
 
   // ======  READ - Steps
-  fetchStepsByChainUuid,
+  fetchStepsByChainUuid, fetchStepByUuid,
 
   // ======  UPDATE - Chain
   updateChainProp,

@@ -41,6 +41,16 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
     camelize
   )
 }
+
+export const fetchStepByUuid = async (surveyId, processingStepUuid, client = db) =>
+  await client.one(`
+      SELECT *
+      FROM ${getSurveyDBSchema(surveyId)}.processing_step
+      WHERE uuid = $1
+    `,
+    [processingStepUuid],
+    camelize
+  )
 // ====== UPDATE
 
 // ====== DELETE
