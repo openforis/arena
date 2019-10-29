@@ -5,7 +5,7 @@ import NodeDef from '@core/survey/nodeDef'
 import NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import sqlTypes from '@common/surveyRdb/sqlTypes'
 
-import Expression from '@core/exprParser/expression'
+import Expression from '@core/expressionParser/expression'
 
 const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
   const nodeDefName = NodeDef.getName(nodeDef)

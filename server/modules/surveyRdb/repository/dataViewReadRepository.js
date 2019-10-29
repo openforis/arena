@@ -14,7 +14,7 @@ const Record = require('@core/record/record')
 const SchemaRdb = require('@common/surveyRdb/schemaRdb')
 const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
 
-const Expression = require('@core/exprParser/expression.js')
+const Expression = require('@core/expressionParser/expression.js')
 const DataSort = require('@common/surveyRdb/dataSort')
 const DataFilter = require('@common/surveyRdb/dataFilter')
 

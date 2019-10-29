@@ -7,7 +7,7 @@ const NodeDef = require('@core/survey/nodeDef')
 const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Record = require('./record')
 const Node = require('./node')
-const Expression = require('@core/exprParser/expression')
+const Expression = require('@core/expressionParser/expression')
 
 const evalNodeQuery = async (survey, record, node, query) => {
   const ctx = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import Survey from '@core/survey/survey'
-import Expression from '@core/exprParser/expression'
+import Expression from '@core/expressionParser/expression'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'

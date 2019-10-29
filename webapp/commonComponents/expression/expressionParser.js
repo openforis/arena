@@ -1,6 +1,6 @@
 import Survey from '@core/survey/survey'
 import NodeDef from '@core/survey/nodeDef'
-import Expression from '@core/exprParser/expression'
+import Expression from '@core/expressionParser/expression'
 
 import { isNotBlank } from '@core/stringUtils'
 
