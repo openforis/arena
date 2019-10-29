@@ -22,7 +22,7 @@ export const insertMany = async (user, surveyId, activities, client) =>
   ])
 
 //===== READ
-export const fetch = async (surveyId, activityTypes, offset = 0, client = db) =>
+export const fetch = async (surveyId, activityTypes, offset = 0, limit = 30, client = db) =>
   await client.map(`
     WITH
       log AS
@@ -59,7 +59,7 @@ export const fetch = async (surveyId, activityTypes, offset = 0, client = db) =>
     ORDER BY
       l.date_created DESC
     OFFSET $2
-    LIMIT 30`,
-    [activityTypes, offset],
+    LIMIT $3`,
+    [activityTypes, offset, limit],
     camelize
   )
