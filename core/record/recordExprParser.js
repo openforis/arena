@@ -88,12 +88,15 @@ const evalApplicableExpressions = async (survey, record, node, expressions, stop
   return await Promise.all(
     applicableExpressions.map(async expression => {
       const valueEval = await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
-      const value =
-        convertToNodeValues
-          ? R.isNil(valueEval) || R.isEmpty(valueEval)
-          ? null
-          : RecordExprValueConverter.toNodeValue(survey, record, node, valueEval)
-          : valueEval
+
+      let value
+      if (R.isNil(valueEval) || R.isEmpty(valueEval)) {
+        value = null
+      } else if (convertToNodeValues) {
+        value = RecordExprValueConverter.toNodeValue(survey, record, node, valueEval)
+      } else {
+        value = valueEval
+      }
 
       return {
         expression,
