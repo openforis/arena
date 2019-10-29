@@ -6,6 +6,7 @@ const NodeDef = require('@core/survey/nodeDef')
 const Record = require('@core/record/record')
 const Node = require('@core/record/node')
 const RecordExprParser = require('@core/record/recordExprParser')
+const RecordExprValueConverter = require('@core/record/recordExprValueConverter')
 
 const NodeRepository = require('../../repository/nodeRepository')
 
@@ -82,8 +83,15 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
       const { nodeCtx, nodeDef } = nodePointer
 
       //3. evaluate applicable default value expression
-      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef), true)
-      const exprValue = R.propOr(null, 'value', exprEval)
+      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))
+
+      const exprValue = R.pipe(
+        R.propOr(null, 'value'),
+        R.unless(
+          R.isNil,
+          value => RecordExprValueConverter.toNodeValue(survey, record, node, value)
+        )
+      )(exprEval)
 
       //4. persist updated node value if changed, and return updated node
       const oldValue = Node.getValue(nodeCtx, null)

@@ -8,7 +8,6 @@ const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Record = require('./record')
 const Node = require('./node')
 const Expression = require('@core/exprParser/expression')
-const RecordExprValueConverter = require('./recordExprValueConverter')
 
 const evalNodeQuery = async (survey, record, node, query) => {
   const ctx = {
@@ -79,24 +78,15 @@ const bindNode = (survey, record, node) => {
   }
 }
 
-const evalApplicableExpression = async (survey, record, nodeCtx, expressions, convertToNodeValue = false) =>
-  R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, true, convertToNodeValue))
+const evalApplicableExpression = async (survey, record, nodeCtx, expressions) =>
+  R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
 
-const evalApplicableExpressions = async (survey, record, node, expressions, stopAtFirstFound = false, convertToNodeValues = false) => {
+const evalApplicableExpressions = async (survey, record, node, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
   return await Promise.all(
     applicableExpressions.map(async expression => {
-      const valueEval = await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
-
-      let value
-      if (R.isNil(valueEval) || R.isEmpty(valueEval)) {
-        value = null
-      } else if (convertToNodeValues) {
-        value = RecordExprValueConverter.toNodeValue(survey, record, node, valueEval)
-      } else {
-        value = valueEval
-      }
+      const value = await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
 
       return {
         expression,
