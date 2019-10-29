@@ -1,6 +1,9 @@
+import camelize from 'camelize'
+
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as User from '@core/user/user'
 import * as db from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import * as Activity from '../activity'
 
@@ -16,22 +19,22 @@ export const insertMany = async (user, surveyId, activities, client) =>
   ])
 
 export const fetch = async (surveyId, activityTypes, offset = 0, client = db) =>
-  client.any(`
+  await client.map(`
     WITH
       log AS
       (
         SELECT
           a.type,
-          a.date_created,
+          ${DbUtils.selectDate('a.date_created', 'date_created')},
           a.user_uuid,
-          a.params,
-          RANK() OVER (PARTITION BY a.user_uuid, a.type, a.params->'uuid' ORDER BY a.date_created DESC) -- use always uuid in params
+          a.content,
+          RANK() OVER (PARTITION BY a.user_uuid, a.type, a.content->'uuid' ORDER BY a.date_created DESC) -- use always uuid in content
           AS rank
         FROM
           ${getSurveyDBSchema(surveyId)}.activity_log a
         WHERE
           system = false
-        ${activityTypes ? 'AND a.type IN ($1)' : ''}
+        ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
     
       )
     SELECT
@@ -46,14 +49,15 @@ export const fetch = async (surveyId, activityTypes, offset = 0, client = db) =>
       u.uuid = l.user_uuid
     LEFT OUTER JOIN
       ${getSurveyDBSchema(surveyId)}.node_def n
-      on l.params ->> 'parentUuid'  = n.uuid::text
+      on l.content ->> 'parentUuid'  = n.uuid::text
     WHERE
       l.rank = 1
     ORDER BY
       l.date_created DESC
     OFFSET $2
     LIMIT 30`,
-    [activityTypes, offset]
+    [activityTypes, offset],
+    camelize
   )
 
 export const fetchAll = async (surveyId, client = db) =>
