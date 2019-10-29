@@ -20,7 +20,7 @@ participant RecordUniquenessValidator
 box "Record" #f1efe6
 participant Record
 participant RecordValidator
-participant RecordExprParser
+participant RecordExpressionParser
 end box
 
 box "Persistence" #ece8d6
@@ -68,8 +68,8 @@ RecordUpdateThread -> RecordManager ++ : persistNode
                 NodeUpdateManager -> NodeUpdateDependentManager ++ #FFCFCF: updateDependentsApplicable
                     NodeUpdateDependentManager -> Record ++ : getDependentNodes
                         Record -> NodeUpdateDependentManager -- : nodes
-                    NodeUpdateDependentManager -> RecordExprParser ++ : evalApplicableExpression
-                        RecordExprParser -> NodeUpdateDependentManager -- : expressionEvaluated
+                    NodeUpdateDependentManager -> RecordExpressionParser ++ : evalApplicableExpression
+                        RecordExpressionParser -> NodeUpdateDependentManager -- : expressionEvaluated
                     NodeUpdateDependentManager -> NodeRepository ++ : updateChildrenApplicability
                         NodeRepository -> NodeUpdateDependentManager -- : nodes
                     NodeUpdateDependentManager -> NodeUpdateManager -- : nodes
@@ -78,8 +78,8 @@ RecordUpdateThread -> RecordManager ++ : persistNode
                  NodeUpdateManager -> NodeUpdateDependentManager ++ #FFCFCF : updateDependentsDefaultValues
                      NodeUpdateDependentManager -> Record ++ : getDependentNodes
                          Record -> NodeUpdateDependentManager -- : nodes
-                     NodeUpdateDependentManager -> RecordExprParser ++ : evalApplicableExpression
-                         RecordExprParser -> NodeUpdateDependentManager -- : expressionEvaluated
+                     NodeUpdateDependentManager -> RecordExpressionParser ++ : evalApplicableExpression
+                         RecordExpressionParser -> NodeUpdateDependentManager -- : expressionEvaluated
                      NodeUpdateDependentManager -> NodeUpdateDependentManager ++ #FF6F6F: toNodeValue
                          NodeUpdateDependentManager -> NodeUpdateDependentManager -- : nodeValue
                      NodeUpdateDependentManager -> NodeRepository ++ : updateNode

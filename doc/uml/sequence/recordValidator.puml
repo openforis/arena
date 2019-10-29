@@ -9,7 +9,7 @@ participant CountValidator
 
 box "Record" #ece8d6
 participant Record
-participant RecordExprParser
+participant RecordExpressionParser
 end box
 
 Caller -> RecordValidator ++ : validateNodes
@@ -28,8 +28,8 @@ RecordValidator -> AttributeValidator ++ : validateSelfAndDependentAttributes
                         AttributeTypeValidator -> AttributeValidator -- : validation
 
                     AttributeValidator -> AttributeValidator ++ #FF6F6F : validateNodeValidations
-                        AttributeValidator -> RecordExprParser ++ : evalApplicableExpressions
-                            RecordExprParser -> AttributeValidator -- : expressionsEvaluated
+                        AttributeValidator -> RecordExpressionParser ++ : evalApplicableExpressions
+                            RecordExpressionParser -> AttributeValidator -- : expressionsEvaluated
                         AttributeValidator -> AttributeValidator -- : validations
 
                     AttributeValidator -> AttributeValidator -- : attributeValidations
