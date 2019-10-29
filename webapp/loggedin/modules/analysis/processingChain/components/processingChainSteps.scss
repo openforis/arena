@@ -1,35 +1,64 @@
 @import "~@webapp/style/vars";
 
 .processing-chain__steps {
-  position: relative;
+  padding-left: 20px;
+}
+
+.processing-chain__steps-label {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+
+  button {
+    margin-left: 5px;
+  }
 }
 
 .processing-chain__step {
   position: relative;
-  flex: 0 0 150px;
+  display: flex;
   height: 50px;
-  border: 1px solid $greyBorder;
-  margin: 10px 30px 10px 0;
-  background-color: $white;
-  transition: .2s all;
+  padding: 20px 0;
+  margin-left: 16px;
 
-  .icon-edit {
+  &:not(:first-child)::before {
     position: absolute;
-    right: 5px;
-    top: 5px;
-    opacity: 0;
-    color: lighten($black, 15%);
-    transition: .4s all;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    width: 2px;
+    content: "";
+    background-color: $greyBorder;
   }
+}
+
+.processing-chain__step-index {
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px 0 -15px;
+  padding-left: 1px;
+  border-radius: 100%;
+  border: 2px solid $greyAppBg;
+  background-color: $blueLightFocus;
+  color: lighten($black, 20%);
+  font-weight: 600;
+  font-size: .75rem;
+}
+
+.processing-chain__step-content {
+  transition: .2s all;
+  display: grid;
+  grid-template-columns: 250px auto;
+  height: 32px;
+  align-items: center;
+  padding: 0 10px;
 
   &:hover {
     background-color: $blueLightFocus;
     cursor: pointer;
-
-    .icon-edit {
-      opacity: 1;
-    }
   }
 }
