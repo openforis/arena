@@ -9,6 +9,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
+import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
 
 export const processingChainUpdate = 'survey/processingChain/update'
 export const processingChainPropUpdate = 'survey/processingChain/prop/update'
@@ -24,6 +25,27 @@ export const navigateToProcessingChainsView = history => dispatch => {
   history.push(appModuleUri(analysisModules.processingChains))
 }
 
+// ====== CREATE
+
+export const createProcessingStep = history => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+  const state = getState()
+
+  const surveyId = SurveyState.getSurveyId(state)
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+  const processingChainUuid = ProcessingChain.getUuid(processingChain)
+  const processingSteps = ProcessingChain.getProcessingSteps(processingChain)
+  const processingStepIndex = processingSteps.length
+
+  const { data: processingStepUuid } = await axios.post(
+    `/api/survey/${surveyId}/processing-chain/${processingChainUuid}`,
+    { processingStepIndex }
+  )
+
+  history.push(`${appModuleUri(analysisModules.processingStep)}${processingStepUuid}`)
+  dispatch(hideAppLoader())
+}
+
 // ====== READ
 
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
@@ -35,7 +57,6 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 
 export const fetchProcessingSteps = processingChainUuid => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-
   const { data: processingSteps } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-steps`)
 
   dispatch({ type: processingChainStepsLoad, processingSteps })

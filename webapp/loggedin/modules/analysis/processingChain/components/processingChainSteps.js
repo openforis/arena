@@ -9,10 +9,16 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import { fetchProcessingSteps } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import {
+  createProcessingStep,
+  fetchProcessingSteps
+} from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainSteps = props => {
-  const { processingChain, fetchProcessingSteps } = props
+  const {
+    history, processingChain,
+    createProcessingStep, fetchProcessingSteps
+  } = props
   const i18n = useI18n()
 
   const processingSteps = ProcessingChain.getProcessingSteps(processingChain)
@@ -54,6 +60,7 @@ const ProcessingChainSteps = props => {
               const index = ProcessingStep.getIndex(step)
               return (
                 <div key={index} className={`processing-chain__step processing-chain__step_${index}`}>
+                  <span className="icon icon-pencil2 icon-10px icon-edit"/>
                   {
                     ProcessingStep.getEntityUuid(step)
                   }
@@ -62,6 +69,10 @@ const ProcessingChainSteps = props => {
             }
           )
         }
+
+        <button className="btn processing-chain__step" onClick={() => createProcessingStep(history)}>
+          <span className="icon icon-plus icon-14px"/>
+        </button>
       </div>
     </div>
   )
@@ -72,4 +83,4 @@ ProcessingChainSteps.defaultProps = {
   processingChain: null,
 }
 
-export default connect(null, { fetchProcessingSteps })(ProcessingChainSteps)
+export default connect(null, { createProcessingStep, fetchProcessingSteps })(ProcessingChainSteps)
