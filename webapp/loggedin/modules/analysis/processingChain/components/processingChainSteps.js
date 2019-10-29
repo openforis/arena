@@ -29,7 +29,12 @@ const ProcessingChainSteps = props => {
 
   return (
     <div className="form-item">
-      <label className="form-label">{i18n.t('processingChainView.processingSteps')}</label>
+      <div className="form-label processing-chain__steps-label">
+        {i18n.t('processingChainView.processingSteps')}
+        <button className="btn-s btn-transparent" onClick={() => createProcessingStep(history)}>
+          <span className="icon icon-plus icon-14px"/>
+        </button>
+      </div>
 
       <div className="processing-chain__steps">
         {
@@ -38,19 +43,18 @@ const ProcessingChainSteps = props => {
               return (
                 <div key={index} className="processing-chain__step"
                      onClick={() => navigateToProcessingStepView(history, ProcessingStep.getUuid(step))}>
-                  <span className="icon icon-pencil2 icon-10px icon-edit"/>
-                  {
-                    ProcessingStep.getEntityUuid(step)
-                  }
+                  <div className="processing-chain__step-index">
+                    {index + 1}
+                  </div>
+                  <div className="processing-chain__step-content">
+                    <div>{ProcessingStep.getEntityUuid(step)}</div>
+                    <span className="icon icon-pencil2 icon-10px icon-edit"/>
+                  </div>
                 </div>
               )
             }
           )
         }
-
-        <button className="btn processing-chain__step" onClick={() => createProcessingStep(history)}>
-          <span className="icon icon-plus icon-14px"/>
-        </button>
       </div>
     </div>
   )
