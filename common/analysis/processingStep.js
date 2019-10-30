@@ -18,6 +18,7 @@ const keysProps = {
 
 // ====== READ
 
+const getProcessingChainUuid = R.prop(keys.processingChainUuid)
 const getCalculationSteps = R.propOr([], keys.calculationSteps)
 const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
@@ -37,6 +38,7 @@ module.exports = {
 
   //READ
   getProps: ObjectUtils.getProps,
+  getProcessingChainUuid,
   getCalculationSteps,
   getCategoryUuid,
   getEntityUuid,

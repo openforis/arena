@@ -6,6 +6,7 @@ import * as R from 'ramda'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
+import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -15,13 +16,14 @@ import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processi
 import {
   fetchProcessingStep,
   resetProcessingStepState,
-  putProcessingStepProps
+  putProcessingStepProps,
+  deleteProcessingStep,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingStepView = props => {
   const {
-    processingStepUuid, processingStep,
-    fetchProcessingStep, resetProcessingStepState, putProcessingStepProps
+    history, processingStepUuid, processingStep, processingStepNext,
+    fetchProcessingStep, resetProcessingStepState, putProcessingStepProps, deleteProcessingStep
   } = props
 
   useEffect(() => {
@@ -31,6 +33,8 @@ const ProcessingStepView = props => {
       resetProcessingStepState()
     }
   }, [])
+
+  const i18n = useI18n()
 
   return R.isEmpty(processingStep)
     ? null
@@ -49,6 +53,16 @@ const ProcessingStepView = props => {
             }}
           />
 
+          {
+            !processingStepNext &&
+            <button className="btn-s btn-danger btn-delete"
+                    onClick={() => window.confirm(i18n.t('processingStepView.deleteConfirm')) &&
+                      deleteProcessingStep(history)}>
+              <span className="icon icon-bin icon-12px icon-left"/>
+              {i18n.t('common.delete')}
+            </button>
+          }
+
         </div>
       </div>
     )
@@ -56,10 +70,11 @@ const ProcessingStepView = props => {
 
 const mapStateToProps = (state, { match }) => ({
   processingStepUuid: getUrlParam('processingStepUuid')(match),
-  processingStep: ProcessingStepState.getProcessingStep(state)
+  processingStep: ProcessingStepState.getProcessingStep(state),
+  processingStepNext: ProcessingStepState.getProcessingStepNext(state),
 })
 
 export default connect(
   mapStateToProps,
-  { fetchProcessingStep, resetProcessingStepState, putProcessingStepProps }
+  { fetchProcessingStep, resetProcessingStepState, putProcessingStepProps, deleteProcessingStep }
 )(ProcessingStepView)

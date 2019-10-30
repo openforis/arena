@@ -76,17 +76,21 @@ export const putProcessingChainProp = (key, value) => async (dispatch, getState)
   dispatch({ type: processingChainPropUpdate, key, value })
 
   const action = async () => {
+    dispatch(showAppSaving())
     const surveyId = SurveyState.getSurveyId(state)
     await axios.put(
       `/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`,
       { key, value }
     )
+    dispatch(hideAppSaving())
   }
   dispatch(debounceAction(action, `${processingChainPropUpdate}_${ProcessingChain.getUuid(processingChain)}`))
 }
 
 // ====== DELETE
 export const deleteProcessingChain = history => async (dispatch, getState) => {
+  dispatch(showAppSaving())
+
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingChain = ProcessingChainState.getProcessingChain(state)
@@ -95,4 +99,5 @@ export const deleteProcessingChain = history => async (dispatch, getState) => {
 
   dispatch(navigateToProcessingChainsView(history))
   dispatch(showNotification('processingChainView.deleteComplete'))
+  dispatch(hideAppSaving())
 }

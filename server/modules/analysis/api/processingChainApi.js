@@ -1,7 +1,8 @@
+import * as ProcessingStep from '@common/analysis/processingStep'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ProcessingChainService from '../service/processingChainService'
 
@@ -94,8 +95,15 @@ export const init = app => {
       const { surveyId, processingStepUuid } = Request.getParams(req)
 
       const processingStep = await ProcessingChainService.fetchStepByUuid(surveyId, processingStepUuid)
+      const processingChainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
+      const index = ProcessingStep.getIndex(processingStep)
 
-      res.json(processingStep)
+      const [processingStepPrev, processingStepNext] = await Promise.all([
+        ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index - 1),
+        ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index + 1)
+      ])
+
+      res.json({ processingStep, processingStepPrev, processingStepNext })
     } catch (err) {
       next(err)
     }
@@ -131,7 +139,7 @@ export const init = app => {
     }
   })
 
-  //====== DELETE
+  //====== DELETE - Chain
 
   app.delete('/survey/:surveyId/processing-chain/:processingChainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
@@ -139,6 +147,21 @@ export const init = app => {
       const user = Request.getUser(req)
 
       await ProcessingChainService.deleteChain(user, surveyId, processingChainUuid)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  //====== DELETE - Step
+
+  app.delete('/survey/:surveyId/processing-step/:processingStepUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingStepUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await ProcessingChainService.deleteStep(user, surveyId, processingStepUuid)
 
       Response.sendOk(res)
     } catch (err) {

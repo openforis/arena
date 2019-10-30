@@ -6,12 +6,40 @@ import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 
 export const stateKey = 'processingStep'
 
-export const getProcessingStep = R.pipe(
+const keys = {
+  step: 'step',
+  stepPrev: 'stepPrev',
+  stepNext: 'stepNext',
+}
+
+// ====== READ
+
+const _getStep = (stepKey, defaultTo = null) => R.pipe(
   AnalysisState.getState,
-  R.prop(stateKey)
+  R.pathOr(defaultTo, [stateKey, stepKey])
 )
 
-export const mergeProcessingStepProps = props => processingStepState => {
-  const propsUpdate = R.pipe(ProcessingStep.getProps, R.mergeLeft(props))(processingStepState)
-  return R.assoc(ProcessingStep.keys.props, propsUpdate)(processingStepState)
-}
+export const getProcessingStep = _getStep(keys.step, {})
+
+export const getProcessingStepPrev = _getStep(keys.stepPrev)
+
+export const getProcessingStepNext = _getStep(keys.stepNext)
+
+// ====== UPDATE
+
+export const assocProcessingStep = (processingStep, processingStepPrev, processingStepNext) => R.pipe(
+  R.assoc(keys.step, processingStep),
+  R.assoc(keys.stepPrev, processingStepPrev),
+  R.assoc(keys.stepNext, processingStepNext),
+)
+
+export const mergeProcessingStepProps = props => processingStepState => R.pipe(
+  R.prop(keys.step),
+  ProcessingStep.getProps,
+  R.mergeLeft(props),
+  propsUpdate => R.assocPath(
+    [keys.step, ProcessingStep.keys.props],
+    propsUpdate,
+    processingStepState
+  )
+)(processingStepState)

@@ -16,7 +16,7 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [processingStepUpdate]: (state, { processingStep }) => processingStep,
+  [processingStepUpdate]: (state, { processingStep, processingStepPrev, processingStepNext }) => ProcessingStepState.assocProcessingStep(processingStep, processingStepPrev, processingStepNext)(state),
   [processingStepPropsUpdate]: (state, { props }) => ProcessingStepState.mergeProcessingStepProps(props)(state),
 }
 
