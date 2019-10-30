@@ -421,6 +421,7 @@ module.exports = {
 
     expressions: {
       expressionInvalid: 'Invalid expression: {{details}}',
+      unableToFindNode: 'unable to find node: {{name}}',
       cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',

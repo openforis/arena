@@ -3,9 +3,9 @@ const R = require('ramda')
 const Validator = require('@core/validation/validator')
 const Validation = require('@core/validation/validation')
 const ValidationResult = require('@core/validation/validationResult')
-const Survey = require('../survey')
-const NodeDef = require('../nodeDef')
-const NodeDefExpression = require('../nodeDefExpression')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Expression = require('@core/expressionParser/expression')
 const ObjectUtils = require('@core/objectUtils')
 
@@ -13,6 +13,7 @@ const SystemError = require('@server/utils/systemError')
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
+// TODO: maybe filter out nodes that cannot be evaluated in expressions?
 const getReachableNodes = (survey, nodeDef) => {
   const visibleNodes = []
   const visitorFn = nodeDef => {
@@ -60,7 +61,15 @@ const bindNode = (survey, nodeDef) => ({
   getReachableNodeValue: nodeName => {
     const allNodes = getReachableNodes(survey, nodeDef)
     const def = allNodes.filter(x => NodeDef.getName(x) === nodeName)[0]
-    if (!def) throw new Error(`Node not found: ${nodeName}`)
+
+    if (!def)
+      throw new SystemError(
+        Validation.messageKeys.expressions.unableToFindNode,
+        { name: nodeName } )
+    if (!Expression.isValidExpressionType(def))
+      throw new SystemError(
+        Validation.messageKeys.expressions.unableToFindNode,
+        { name: nodeName, type: NodeDef.getType(def) } )
 
     return bindNode(survey, def).getValue()
   },
@@ -68,18 +77,12 @@ const bindNode = (survey, nodeDef) => ({
 
 const validateNodeDefExpr = async (survey, nodeDef, expr) => {
   try {
-    await Expression.evalString(
-      expr,
-      {
-        node: bindNode(survey, nodeDef),
-        functions: {
-          [Expression.types.ThisExpression]: (expr, { node }) => node,
-        },
-      }
-    )
+    const node = bindNode(survey, nodeDef)
+    await Expression.evalString(expr, { node })
     return null
   } catch (e) {
     const details = R.is(SystemError, e) ? `$t(${e.key})` : e.toString()
+    console.error(e)
     return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, { details, ...e.params })
   }
 }

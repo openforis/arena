@@ -28,17 +28,17 @@ before(async () => {
       SB.attribute('num', NodeDef.nodeDefType.decimal),
       SB.attribute('num_double', NodeDef.nodeDefType.decimal)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression(`this.sibling('num').getValue() * 2`)),
+        .defaultValues(NodeDefExpression.createExpression(`num * 2`)),
       SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression(`this.sibling('num_double').getValue() * this.sibling('num_double').getValue()`)),
+        .defaultValues(NodeDefExpression.createExpression(`num_double * num_double`)),
       SB.attribute('num_range')
         .readOnly()
         .defaultValues(
-          NodeDefExpression.createExpression('a', `this.sibling('num').getValue() <= 0`),
-          NodeDefExpression.createExpression('b', `this.sibling('num').getValue() <= 10`),
-          NodeDefExpression.createExpression('c', `this.sibling('num').getValue() <= 20`),
-          NodeDefExpression.createExpression('z')
+          NodeDefExpression.createExpression('"a"', `num <= 0`),
+          NodeDefExpression.createExpression('"b"', `num <= 10`),
+          NodeDefExpression.createExpression('"c"', `num <= 20`),
+          NodeDefExpression.createExpression('"z"')
         )
     )
   ).buildAndStore()
@@ -95,7 +95,8 @@ describe('Calculated value test', async () => {
     for (const testValue of testValues) {
       const [sourceValue, expectedValue] = testValue
 
-      record = await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', sourceValue, 'root/num_range', expectedValue)
+      record = await updateNodeAndExpectDependentNodeValueToBe(
+        survey, record, 'root/num', sourceValue, 'root/num_range', expectedValue)
     }
   })
 

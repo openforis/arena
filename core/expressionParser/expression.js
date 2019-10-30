@@ -1,5 +1,6 @@
 const R = require('ramda')
 
+const NodeDef = require('@core/survey/nodeDef')
 const jsep = require('./helpers/jsep')
 const { evalExpression } = require('./helpers/evaluator')
 const { toString: toStringUtils, isValid } = require('./helpers/utils')
@@ -67,6 +68,12 @@ const newBinary = (left, right, operator = '') => ({
   right,
 })
 
+// Return true if the nodeDef can be used in expressions and false otherwise
+const isValidExpressionType = nodeDef =>
+  !NodeDef.isEntity(nodeDef)
+  && !NodeDef.isCoordinate(nodeDef)
+  && !NodeDef.isFile(nodeDef)
+
 module.exports = {
   types,
   modes,
@@ -82,6 +89,7 @@ module.exports = {
   isBinary: isType(types.BinaryExpression),
   isIdentifier: isType(types.Identifier),
   isLogical: isType(types.LogicalExpression),
+  isValidExpressionType,
 
   // Instance creators
   newLiteral,

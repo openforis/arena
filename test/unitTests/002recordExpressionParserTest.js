@@ -43,49 +43,49 @@ before(async () => {
 describe('RecordExpressionParser Test', () => {
 
   // ====== nodes hierarchy tests
-  it('this.parent()', async () => {
-    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent()')
-    const p = Record.getParentNode(node)(record)
-    assert.equal(Node.getUuid(res), Node.getUuid(root))
-  })
+  // it('this.parent()', async () => {
+  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent()')
+  //   const p = Record.getParentNode(node)(record)
+  //   assert.equal(Node.getUuid(res), Node.getUuid(root))
+  // })
 
-  it('this.parent().parent()', async () => {
-    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent().parent()')
-    assert.equal(res, null)
-  })
+  // it('this.parent().parent()', async () => {
+  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent().parent()')
+  //   assert.equal(res, null)
+  // })
 
-  it(`this.parent().node('dbh')`, async () => {
-    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `this.parent().node('dbh')`)
-    assert.equal(Node.getUuid(res), Node.getUuid(dbh))
-  })
+  // it(`dbh`, async () => {
+  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `dbh`)
+  //   assert.equal(Node.getUuid(res), Node.getUuid(dbh))
+  // })
 
-  it(`this.sibling('dbh')`, async () => {
-    const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `this.sibling('dbh')`)
-    assert.equal(Node.getUuid(res), Node.getUuid(dbh))
-  })
+  // it(`dbh`, async () => {
+  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `dbh`)
+  //   assert.equal(Node.getUuid(res), Node.getUuid(dbh))
+  // })
 
   // ====== value expr tests
   const queries = [
-    { q: 'this.getValue() + 1', r: 13 },
-    { q: 'this.getValue() !== 1', r: true },
-    { q: '!this.getValue()', r: false },
-    { q: '!(this.getValue() === 1)', r: true },
+    { q: 'tree + 1', r: 13 },
+    { q: 'tree !== 1', r: true },
+    { q: '!tree', r: false },
+    { q: '!(tree === 1)', r: true },
     //18 + 1
-    { q: 'this.parent().node("dbh").getValue() + 1', r: 19 },
+    { q: 'dbh + 1', r: 19 },
     //18 + 1
-    { q: `this.sibling('dbh').getValue() + 1`, r: 19 },
+    { q: `dbh + 1`, r: 19 },
     //18 + 1 + 12
-    { q: 'this.parent().node("dbh").getValue() + 1 + this.getValue()', r: 31 },
+    { q: 'dbh + 1 + tree', r: 31 },
     //18 + 12
-    { q: 'this.sibling("dbh").getValue() + this.getValue()', r: 30 },
+    { q: 'dbh + tree', r: 30 },
     //19 >= 12
-    { q: 'this.parent().node("dbh").getValue() + 1 >= this.getValue()', r: true },
+    { q: 'dbh + 1 >= tree', r: true },
     //18 * 0.5 >= 12
-    { q: `(this.sibling('dbh').getValue() * 0.5) >= this.getValue()`, r: false },
+    { q: `(dbh * 0.5) >= tree`, r: false },
     //1728
-    { q: `Math.pow(this.getValue(), 3)`, r: 1728 },
+    { q: `pow(tree, 3)`, r: 1728 },
     // 18 * 0.5 >= 1728
-    { q: `(this.sibling("dbh").getValue() * 0.5) >= Math.pow(this.getValue(), 3)`, r: false },
+    { q: `(dbh * 0.5) >= pow(tree, 3)`, r: false },
   ]
 
   queries.forEach(query => {

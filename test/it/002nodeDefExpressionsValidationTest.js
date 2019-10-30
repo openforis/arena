@@ -25,52 +25,70 @@ const validateExpression = async (survey, nodeDefName, expression) => {
  */
 const expressions = [
   {
-    t: 'Test "this" expression',
+    t: 'Test a literal number',
     n: 'node_def_text',
-    e: 'this',
+    e: '123',
     v: true
   },
   {
-    t: 'Test "parent()" expression',
+    t: 'Test a literal string',
     n: 'node_def_text',
-    e: 'this.parent()',
+    e: '"123"',
     v: true
   },
   {
-    t: 'Test "node()" expression',
+    t: 'Test using a node itself as an expression',
     n: 'node_def_text',
-    e: 'this.value * 1',
+    e: 'node_def_text',
     v: true
   },
   {
-    t: 'Test "sibling()" expression',
+    t: 'Test using a sibling value',
     n: 'node_def_text',
-    e: 'this.parent().node("node_def_text")',
+    e: 'sibling1',
     v: true
   },
   {
-    t: 'Test syntax error',
+    t: 'Test using an ancestor attribute value',
     n: 'node_def_text',
-    e: 'this.parent().node("undefined_node")',
+    e: 'ancestor1',
+    v: true
+  },
+  {
+    t: 'Test using a node that does not exist',
+    n: 'node_def_text',
+    e: 'undefined_node',
     v: false
   },
   {
-    t: 'Test invalid node expression',
+    t: 'Test using a node that exists but is not reachable in the ancestor hierarchy',
     n: 'node_def_text',
-    e: 'this.node("node_def_2")',
+    e: 'unreachable_node',
     v: false
   },
   {
-    t: 'Test invalid sibling expression',
+    t: 'Test an expression with a syntax error',
     n: 'node_def_text',
-    e: 'this.sibling("undefined_node")',
+    e: '+',
     v: false
   },
   {
-    t: 'Test invalid node expression on attribute',
+    t: 'Test an expression with a type error',
     n: 'node_def_text',
-    e: 'this.value ==== 1',
+    e: '1 + node_def_text',
     v: false
+  },
+  {
+    t: 'Test appending number to a string',
+    n: 'node_def_text',
+    e: 'node_def_text + 1',
+    v: true
+  },
+  {
+    t: 'Test appending string to a string',
+    n: 'node_def_text',
+    e: 'node_def_text + " - " + node_def_text',
+    v: true
   },
 ]
 

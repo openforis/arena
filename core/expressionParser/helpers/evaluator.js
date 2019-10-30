@@ -5,37 +5,98 @@ const { isString } = require('@core/stringUtils')
 
 const SystemError = require('@server/utils/systemError')
 
-const unaryEval = async (expr, ctx) => {
-  const { argument, operator } = expr
-  const res = await evalExpression(argument, ctx)
-  const x = `${operator} ${JSON.stringify(res)}`
-  // console.log('=== UNARY')
-  // console.log(x)
-  return eval(x)
+// Built-in functions that can be called, i.e. the standard library.
+// Nothing outside of this set may be used.
+//
+// NB: Namespace conflicts between functions and nodes/variables are allowed
+// I.e. there can be a field called "pow", even if pow(2,3) is a function invocation.
+//
+// stdlib: { [fn]: [Function, min_arity, max_arity? (-1 for infinite)] }
+const stdlib = {
+  pow: [Math.pow, 2], // arity 2
+
+  // arity 1+ (arity 0 allowed by JS)
+  min: [Math.min, 1, -1],
+  max: [Math.max, 1, -1],
 }
 
-const binaryEval = async (expr, ctx) => {
+const unaryOperators = {
+  '!': a => !a,
+  // TODO: Under JS semantics, "+" coerces a string to a number. Do we want to allow that?
+  '+': a => +a,
+  '-': a => -a,
+}
+
+const binaryOperators = {
+  // Short-circuiting operators (we coerce the output to bool)
+  '||':  (a, b) => !!(a || b),
+  '&&':  (a, b) => !!(a && b),
+  // Normal boolean operators:
+  '==':  (a, b) => a === b,
+  '!=':  (a, b) => a !== b,
+  '===': (a, b) => a === b,
+  '!==': (a, b) => a !== b,
+  '<':   (a, b) => a < b,
+  '>':   (a, b) => a > b,
+  '<=':  (a, b) => a <= b,
+  '>=':  (a, b) => a >= b,
+  // Don't allow bitwise operators:
+  // '|':   (a, b) => a | b,
+  // '^':   (a, b) => a ^ b,
+  // '&':   (a, b) => a & b,
+  // Arithmetic operators:
+  '<<':  (a, b) => a << b,
+  '>>':  (a, b) => a >> b,
+  '>>>': (a, b) => a >>> b,
+  '+':   (a, b) => a + b,
+  '-':   (a, b) => a - b,
+  '*':   (a, b) => a * b,
+  '/':   (a, b) => a / b,
+  '%':   (a, b) => a % b,
+}
+
+const unaryEval = (expr, ctx) => {
+  const { argument, operator } = expr
+
+  const fn = unaryOperators[operator]
+  if (!fn) throw new SystemError('undefinedFunction', { fnName: operator })
+
+  const res = evalExpression(argument, ctx)
+
+  // const x = `${operator} ${JSON.stringify(res)}`
+  // console.log('=== UNARY')
+  // console.log(x)
+  return fn(res)
+}
+
+const binaryEval = (expr, ctx) => {
   const { left, right, operator } = expr
-  const leftResult = await evalExpression(left, ctx)
-  const rightResult = await evalExpression(right, ctx)
+
+  const fn = binaryOperators[operator]
+  if (!fn) throw new SystemError('undefinedFunction', { fnName: operator })
+
+  const leftResult = evalExpression(left, ctx)
+  const rightResult = evalExpression(right, ctx)
 
   if (R.isNil(leftResult) || R.isNil(rightResult))
     return null
 
-  const x = `${JSON.stringify(leftResult)} ${operator} ${JSON.stringify(rightResult)}`
+  // const x = `${JSON.stringify(leftResult)} ${operator} ${JSON.stringify(rightResult)}`
   // console.log('=== BINARY')
   // console.log(x)
-  return eval(x)
+  return fn(leftResult, rightResult)
 }
 
-const memberEval = async (expr, ctx) => {
+// Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
+const memberEval = (expr, ctx) => {
   // console.log('== member')
   // console.log(expr)
+  throw new SystemError('invalidSyntax')
 
   const { object, property } = expr
 
-  const objectRes = await evalExpression(object, ctx)
-  const propertyRes = await evalExpression(property, ctx)
+  const objectRes = evalExpression(object, ctx)
+  const propertyRes = evalExpression(property, ctx)
 
   if (!(objectRes && propertyRes))
     return null
@@ -46,52 +107,71 @@ const memberEval = async (expr, ctx) => {
   else return null
 }
 
-const callEval = async (expr, ctx) => {
+const callEval = (expr, ctx) => {
   // console.log('== call')
   // console.log(expr)
 
   // arguments is a reserved word in strict mode
   const { callee, arguments: exprArgs } = expr
 
-  const fn = await evalExpression(callee, ctx)
-  const args = await Promise.all(
-    exprArgs.map(async arg => await evalExpression(arg, ctx))
-  )
+  const fnName = callee.name
+  const fnArity = exprArgs.length
 
-  if (fn) {
-    const res = await R.apply(fn, args)
+  // No complex expressions may be put in place of a function body.
+  // Only a plain identifier is allowed.
+  if (callee.type !== types.Identifier)
+    throw new SystemError('invalidFunctionType', { fnName: callee.type })
 
-    // console.log('== CALLEE = RES ', res)
-    return res
-  } else {
-    const fnName = R.pathOr('', ['property', 'name'])(callee)
-    throw new SystemError('undefinedFunction', { fnName: fnName })
-  }
+  // The function must be found in the standard library.
+  if (!(fnName in stdlib))
+    throw new SystemError('undefinedFunction', { fnName })
+
+  const [fn, minArity, maxArity] = stdlib[fnName]
+
+  if (fnArity < minArity)
+    throw new SystemError('functionHasTooFewArguments', { fnName })
+
+  const maxArityIsDefined = maxArity !== undefined
+  const maxArityIsInfinite = maxArity < 0
+  if (maxArityIsDefined && !maxArityIsInfinite && fnArity > maxArity)
+    throw new SystemError('functionHasTooManyArguments', { fnName })
+
+  const args = exprArgs.map(arg => evalExpression(arg, ctx))
+
+  // Currently there are no side effects from function evaluation so it's
+  // safe to call the function even when we're just parsing the expression
+  // to find all identifiers being used.
+  return R.apply(fn, args)
 }
 
-const literalEval = expr => {
+const literalEval = (expr, _ctx) => {
   // console.log('== literal ')
   // console.log(expr)
   return R.prop('value')(expr)
 }
 
-const thisEval = expr => {
+// "this" is a remnant of the JS that's not allowed in our simplified expression syntax.
+// We still have to handle "this" since the JSEP parser will produce these nodes.
+const thisEval = (expr, _ctx) => {
   // console.log('== this ')
   // console.log(expr)
-  //
-  return 'this'
+  throw new SystemError('reservedKeywordUsed', { keyword: 'this', expr })
 }
 
+const _getIdentifierName = R.prop('name')
 const identifierEval = (expr, ctx) => {
   // console.log('== identifierExpression ')
   // console.log(expr)
-  const name = R.prop('name')(expr)
+  const name =_getIdentifierName(expr)
+
+  if (!ctx.node) throw new SystemError('nodeContextMustBeDefined', { name })
+
   return ctx.node.getReachableNodeValue(name)
 }
 
-const groupEval = async (expr, ctx) => {
+const groupEval = (expr, ctx) => {
   const { argument } = expr
-  return await evalExpression(argument, ctx)
+  return evalExpression(argument, ctx)
 }
 
 const typeFns = {
@@ -106,19 +186,24 @@ const typeFns = {
   [types.GroupExpression]: groupEval,
 }
 
-const evalExpression = async (expr, ctx) => {
+export const evalExpression = (expr, ctx) => {
   const functions = R.pipe(
     R.prop('functions'),
     R.mergeRight(typeFns)
   )(ctx)
 
   const fn = functions[expr.type]
-  if (fn)
-    return await fn(expr, ctx)
-  else
-    throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
+  if (!fn) throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
+
+  return fn(expr, ctx)
 }
 
-module.exports = {
-  evalExpression,
+export const getExpressionIdentifiers = expr => {
+  const identifiers = []
+  const functions = {
+    [types.Identifier]: (expr, _ctx) => { identifiers.push(_getIdentifierName(expr)) },
+  }
+
+  evalExpression(expr, { functions })
+  return R.uniq(identifiers)
 }

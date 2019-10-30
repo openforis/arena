@@ -26,7 +26,7 @@ before(async () => {
         .key(),
       SB.attribute('num', NodeDef.nodeDefType.decimal),
       SB.attribute('dependent_node')
-        .applyIf(`this.node('num').getValue() > 100`)
+        .applyIf(`num > 100`)
     )
   ).buildAndStore()
 
@@ -77,7 +77,7 @@ describe('Applicable Test', async () => {
 
       const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
 
-      expect(applicable).to.equal(expectedValue)
+      expect(applicable).to.equal(expectedValue, sourceValue)
     }
   })
 })

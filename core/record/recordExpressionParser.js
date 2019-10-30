@@ -8,13 +8,12 @@ const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Record = require('./record')
 const Node = require('./node')
 const Expression = require('@core/expressionParser/expression')
+const SystemError = require('@server/utils/systemError')
+const Validation = require('@core/validation/validation')
 
 const evalNodeQuery = async (survey, record, node, query) => {
   const ctx = {
     node: bindNode(survey, record, node),
-    functions: {
-      [Expression.types.ThisExpression]: (expr, { node }) => node
-    },
   }
   return await Expression.evalString(query, ctx)
 }
@@ -84,17 +83,22 @@ const bindNode = (survey, record, node) => {
     },
 
     getReachableNodeValue: nodeName => {
-      const allNodes = getReachableNodes(record, node)
-      const allNodeDefs = Survey.getNodeDefsByUuids(allNodes.map(x => x.nodeDefUuid))(survey)
+      const _getNodeByGivenName = R.pipe(
+        Node.getNodeDefUuid,
+        uuid => Survey.getNodeDefByUuid(uuid)(survey),
+        NodeDef.getName,
+        R.equals(nodeName),
+      )
+      const resolvedNodes =
+        getReachableNodes(record, node)
+        .filter(_getNodeByGivenName)
 
-      const resolved =
-        R.zip(allNodeDefs, allNodes)
-        .filter(([nodeDef, _node]) => NodeDef.getName(nodeDef) === nodeName)[0]
+      if (resolvedNodes.length === 0)
+        throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName })
+      if (resolvedNodes.length > 1)
+        throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, { name: nodeName, multiple: true })
 
-      if (!resolved) throw new Error(`Node not found: ${nodeName}`)
-      const [_, resolvedNode] = resolved
-
-      return bindNode(survey, record, resolvedNode).getValue()
+      return bindNode(survey, record, resolvedNodes[0]).getValue()
     },
   }
 }

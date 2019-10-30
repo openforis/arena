@@ -41,17 +41,12 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const isValidExpressionType = childDef =>
-  !NodeDef.isEntity(childDef)
-  && !NodeDef.isCoordinate(childDef)
-  && !NodeDef.isFile(childDef)
-
 const getChildDefVariables = (survey, nodeDefContext, mode, lang) => {
 
   return R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
     R.map(childDef => {
-      if (!isValidExpressionType(childDef))
+      if (!Expression.isValidExpressionType(childDef))
         return null
       else if (mode === Expression.modes.sql)
         return getSqlVariables(childDef, lang)
