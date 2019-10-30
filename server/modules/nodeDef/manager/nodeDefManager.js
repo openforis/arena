@@ -16,10 +16,15 @@ const ActivityLogRepository = require('@server/modules/activityLog/repository/ac
 
 const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
   await client.tx(async t => {
+    const nodeDefParentUuid = NodeDef.getParentUuid(nodeDefParam)
+    const nodeDefParent = nodeDefParentUuid ? await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefParentUuid, true, false, t) : null
+    const parentName = NodeDef.getName(nodeDefParent)
+    const activityLogContent = { ...nodeDefParam, parentName }
+
     const [nodeDef] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, activityLogContent, system, t)
     ])
     return nodeDef
   })
@@ -88,14 +93,17 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
       ? await _updateNodeDefOnCyclesUpdate(surveyId, nodeDefUuid, props[NodeDef.propKeys.cycles], t)
       : []
 
+    const nodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t)
+
     const logContent = {
       uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
-      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced })
+      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
+      keys: Object.keys({ ...props, ...propsAdvanced }),
+      name: NodeDef.getName(nodeDef)
     }
 
-    const [nodeDef] = await Promise.all([
-      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
+    await Promise.all([
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t)
     ])
@@ -123,9 +131,12 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
   await db.tx(async t => {
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
-    await markSurveyDraft(surveyId, t)
+    const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { uuid: nodeDefUuid }, false, t)
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t)
+    ])
 
     return nodeDef
   })

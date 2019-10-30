@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as ObjectUtils from '@core/objectUtils'
+
 export const type = {
   //survey
   surveyCreate: 'surveyCreate',
@@ -19,7 +21,7 @@ export const type = {
   categoryLevelInsert: 'categoryLevelInsert',
   categoryLevelPropUpdate: 'categoryLevelPropUpdate',
   categoryLevelDelete: 'categoryLevelDelete',
-  categoryLevelsDelete: 'categoryLevelsDelete',
+  categoryLevelsDelete: 'categoryLevelsDelete', //system
   categoryItemInsert: 'categoryItemInsert',
   categoryItemPropUpdate: 'categoryItemPropUpdate',
   categoryItemDelete: 'categoryItemDelete',
@@ -29,7 +31,7 @@ export const type = {
   taxonomyCreate: 'taxonomyCreate',
   taxonomyPropUpdate: 'taxonomyPropUpdate',
   taxonomyDelete: 'taxonomyDelete',
-  taxonomyTaxaDelete: 'taxonomyTaxaDelete',
+  taxonomyTaxaDelete: 'taxonomyTaxaDelete', //system
   taxonomyTaxaImport: 'taxonomyTaxaImport',
   taxonInsert: 'taxonInsert',
 
@@ -56,9 +58,12 @@ export const type = {
 }
 
 export const keys = {
-  type: 'type',
   content: 'content',
+  dateCreated: ObjectUtils.keys.dateCreated,
+  type: 'type',
   system: 'system',
+  userName: 'userName',
+  userUuid: 'userUuid',
 }
 
 export const newActivity = (type, content, system = false) => ({
@@ -67,6 +72,10 @@ export const newActivity = (type, content, system = false) => ({
   [keys.system]: system,
 })
 
+export const getUserUuid = R.prop(keys.userUuid)
+export const getUserName = R.prop(keys.userName)
 export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
+export const getDateCreated = ObjectUtils.getDateCreated
+

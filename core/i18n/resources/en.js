@@ -251,6 +251,61 @@ module.exports = {
 
   // ====== Survey views
 
+  activityLogView: {
+    message: {
+      //survey
+      surveyCreate: 'created the survey',
+      surveyPropUpdate: 'updated {{key}} of survey',
+      surveyPublish: 'published the survey',
+      surveyCollectImport: 'imported the survey from Collect',
+
+      // nodeDef
+      nodeDefCreate: 'created node definition {{type}} in entity {{parentName}}',
+      nodeDefUpdate: 'updated {{keys}} of node definition {{name}}',
+      nodeDefMarkDeleted: 'deleted the node definition {{name}}',
+
+      //category
+      categoryInsert: 'added new category',
+      categoryPropUpdate: 'updated {{prop}} of category {{categoryName}}',
+      categoryDelete: 'deleted the category {{categoryName}}',
+      categoryLevelInsert: 'added level {{name}} at {{index}} to category {{categoryName}}',
+      categoryLevelPropUpdate: 'updated level {{index}} {{prop}} of category {{categoryName}}',
+      categoryLevelDelete: 'deleted level {{index}} of category {{categoryName}}',
+      categoryItemInsert: 'added item to level {{index}} of category {{categoryName}}',
+      categoryItemPropUpdate: 'updated item {{code}} {{prop}} of category {{categoryName}}',
+      categoryItemDelete: 'deleted item {{code}} in level {{index}} of category {{categoryName}}',
+      categoryImport: 'imported CSV file into category {{categoryName}}',
+
+      //taxonomy
+      taxonomyCreate: 'added new taxonomy',
+      taxonomyPropUpdate: 'updated {{prop}} of taxonomy {{taxonomyName}}',
+      taxonomyDelete: 'deleted taxonomy taxonomy {{taxonomyName}}',
+      taxonomyTaxaImport: 'imported CSV file into taxonomy {{taxonomyName}}',
+      taxonInsert: 'added taxon to taxonomy {{taxonomyName}}',
+
+      //record
+      recordCreate: 'added new record',
+      recordDelete: 'deleted the record {{recordKeys}}',
+      recordStepUpdate: 'changed record step from {{stepFrom}} to {{stepTo}}',
+
+      //node
+      nodeCreate: 'added a new node of type {{nodeDefName}}',
+      nodeValueUpdate: 'updated node {{path}}',
+      nodeDelete: 'deleted node {{path}}',
+
+      // user
+      userInvite: 'invited user {{name}} with role {{role}}',
+      userUpdate: 'assigned user {{name}} to group {{groupName}}',
+      userRemove: 'removed user {{name}} from survey',
+
+      // analysis
+      processingChainCreate: 'added new processing chain',
+      processingChainPropUpdate: 'updated processing chain {{label}} {{prop}}',
+      processingChainDelete: 'deleted processing chain {{label}}',
+      processingStepCreate: 'added new processing step to processing chain {{processingChainLabel}}',
+    }
+  },
+
   nodeDefEdit: {
     basic: 'Basic',
     advanced: 'Advanced',

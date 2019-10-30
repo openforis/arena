@@ -43,8 +43,8 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       )
     SELECT
       l.*,
-      u.name,
-      n.uuid as node_def_parent_uuid
+      u.name AS user_name,
+      n.uuid AS node_def_parent_uuid
     FROM
       log AS l
     JOIN

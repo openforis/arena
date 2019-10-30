@@ -4,7 +4,7 @@ import React from 'react'
 
 import SurveyInfo from './surveyInfo/surveyInfo'
 import RecordsSummary from './recordsSummary/recordsSummary'
-import ActivityLog from './activityLog/activityLog'
+import ActivityLogView from './activityLog/activityLogView'
 
 const DashboardView = () => (
   <div className="home-dashboard">
@@ -13,7 +13,7 @@ const DashboardView = () => (
 
     <RecordsSummary/>
 
-    <ActivityLog/>
+    <ActivityLogView/>
 
   </div>
 )
