@@ -56,6 +56,13 @@ const getSurveyId = R.prop(keys.surveyId)
 
 const getPermissions = R.propOr([], keys.permissions)
 
+const getRecordSteps = R.propOr([], keys.recordSteps)
+
+const getRecordEditLevel = step => R.pipe(
+  getRecordSteps,
+  R.prop(step),
+)
+
 const isSystemAdminGroup = R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
@@ -71,6 +78,8 @@ module.exports = {
   getSurveyId,
   getSurveyUuid,
   getPermissions,
+  getRecordSteps,
+  getRecordEditLevel,
   isSystemAdminGroup,
   isEqual: ObjectUtils.isEqual,
 }

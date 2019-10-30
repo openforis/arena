@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import User from '@core/user/user'
 import Survey from '@core/survey/survey'
 import UserValidator from '@core/user/userValidator'
-import AuthGroups from '@core/auth/authGroups'
+import AuthGroup from '@core/auth/authGroup'
 import Authorizer from '@core/auth/authorizer'
 
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
@@ -66,7 +66,7 @@ export const useUserViewState = props => {
   const setName = name => setObjectField('name', name)
   const setEmail = email => setObjectField('email', email)
   const setGroup = group => {
-    const groupUuid = AuthGroups.getUuid(group)
+    const groupUuid = AuthGroup.getUuid(group)
     setObjectField('groupUuid', groupUuid)
   }
 
@@ -87,8 +87,8 @@ export const useUserViewState = props => {
     )(surveyGroups)
 
     setSurveyGroupsMenuItems(menuGroups.map(g => ({
-      uuid: AuthGroups.getUuid(g),
-      label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label_plural`)
+      uuid: AuthGroup.getUuid(g),
+      label: i18n.t(`authGroups.${AuthGroup.getName(g)}.label_plural`)
     })))
 
     // init user

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import * as AuthGroups from '@core/auth/authGroups'
+import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
@@ -68,9 +68,12 @@ const _getAvailableActivityTypes = async (surveyId, user) => {
   return R.pipe(
     User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo)),
     AuthGroups.getPermissions,
+    //for each permission in group, get available activity types
     R.reduce(
       (accActivityTypes, permission) => {
-        accActivityTypes.push(...activityTypesByPermission[permission])
+        const activityTypes = activityTypesByPermission[permission]
+        if (activityTypes)
+          accActivityTypes.push(...activityTypes)
         return accActivityTypes
       },
       [...activityTypesCommon]

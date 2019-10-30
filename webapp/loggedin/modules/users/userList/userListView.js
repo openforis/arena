@@ -8,7 +8,7 @@ import TableView from '../../../tableViews/tableView'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import AuthGroups from '@core/auth/authGroups'
+import AuthGroup from '@core/auth/authGroup'
 import Authorizer from '@core/auth/authorizer'
 import Survey from '@core/survey/survey'
 import User from '@core/user/user'
@@ -66,7 +66,7 @@ const UsersRow = props => {
         {User.getEmail(userListItem)}
       </div>
       <div>
-        {i18n.t(`authGroups.${AuthGroups.getName(authGroup)}.label_plural`)}
+        {i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}
       </div>
       <div>
         {

@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const ObjectUtils = require('@core/objectUtils')
 const StringUtils = require('@core/stringUtils')
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const keys = require('./_user/userKeys')
 const UserPrefs = require('./_user/userPrefs')
@@ -16,7 +16,7 @@ const getPrefs = R.propOr({}, keys.prefs)
 const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
 //====== CHECK
-const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
 const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
 //====== AUTH GROUP
@@ -25,7 +25,7 @@ const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user
   R.ifElse(
     R.always(includeSystemAdmin && isSystemAdmin(user)),
     R.head,
-    R.find(group => AuthGroups.getSurveyUuid(group) === surveyUuid)
+    R.find(group => AuthGroup.getSurveyUuid(group) === surveyUuid)
   )
 )(user)
 
@@ -37,7 +37,7 @@ const assocAuthGroup = authGroup => user => {
 const dissocAuthGroup = authGroup => user => {
   const authGroups = R.pipe(
     getAuthGroups,
-    R.reject(R.propEq(AuthGroups.keys.uuid, AuthGroups.getUuid(authGroup))),
+    R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))),
   )(user)
   return R.assoc(keys.authGroups, authGroups, user)
 }

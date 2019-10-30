@@ -3,12 +3,12 @@ const R = require('ramda')
 const Survey = require('@core/survey/survey')
 const Record = require('@core/record/record')
 const User = require('@core/user/user')
-const AuthGroups = require('./authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const {
   permissions,
   keys,
-} = AuthGroups
+} = AuthGroup
 
 // ======
 // ====== Survey
@@ -20,7 +20,7 @@ const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
 const _hasSurveyPermission = permission => (user, surveyInfo) =>
   user && surveyInfo && (
     User.isSystemAdmin(user) ||
-    R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroups.getPermissions)(user, surveyInfo))
+    R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo))
   )
 
 // READ
@@ -49,11 +49,11 @@ const canEditRecord = (user, record) => {
 
   const recordDataStep = Record.getStep(record)
 
-  const userAuthGroup = User.getAuthGroups(user).find(authGroup => AuthGroups.getSurveyUuid(authGroup) === Record.getSurveyUuid(record))
+  const userAuthGroup = User.getAuthGroupBySurveyUuid(Record.getSurveyUuid(record))(user)
 
   // level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
-  const level = R.path([keys.recordSteps, recordDataStep], userAuthGroup)
+  const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
 
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
@@ -61,13 +61,13 @@ const canEditRecord = (user, record) => {
 const canEditRecordsInDataQuery = R.pipe(
   _getSurveyUserGroup,
   authGroup => R.includes(
-    AuthGroups.getName(authGroup),
+    AuthGroup.getName(authGroup),
     [
-      AuthGroups.groupNames.systemAdmin,
-      AuthGroups.groupNames.surveyAdmin,
-      AuthGroups.groupNames.surveyEditor,
-      AuthGroups.groupNames.dataAnalyst,
-      AuthGroups.groupNames.dataCleanser
+      AuthGroup.groupNames.systemAdmin,
+      AuthGroup.groupNames.surveyAdmin,
+      AuthGroup.groupNames.surveyEditor,
+      AuthGroup.groupNames.dataAnalyst,
+      AuthGroup.groupNames.dataCleanser
     ]
   )
 )

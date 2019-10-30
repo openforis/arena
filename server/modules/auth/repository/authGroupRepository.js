@@ -3,7 +3,7 @@ const db = require('@server/db/db')
 
 const dbTransformCallback = camelize
 
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 // ==== CREATE
 
@@ -15,10 +15,10 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
     WHERE s.id = $2 
     RETURNING *`,
     [
-      authGroup.name,
+      AuthGroup.getName(authGroup),
       surveyId,
-      JSON.stringify(authGroup.permissions),
-      JSON.stringify(authGroup.recordSteps),
+      JSON.stringify(AuthGroup.getPermissions(authGroup)),
+      JSON.stringify(AuthGroup.getRecordSteps(authGroup)),
     ],
     dbTransformCallback
   )
@@ -85,7 +85,7 @@ const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
     AND (
       (g.survey_uuid = s.uuid AND g.uuid = gu.group_uuid)
       OR
-      (gu.group_uuid = g.uuid AND g.name = '${AuthGroups.groupNames.systemAdmin}')
+      (gu.group_uuid = g.uuid AND g.name = '${AuthGroup.groupNames.systemAdmin}')
     ) 
     RETURNING *`,
     [groupUuid, userUuid, surveyId],
