@@ -21,6 +21,9 @@ export {
   // ======  UPDATE - Chain
   updateChainProp,
 
+  // ======  UPDATE - Step
+  updateStepProps,
+
   // ======  DELETE - Chain
   deleteChain
 } from '../manager/processingChainManager'

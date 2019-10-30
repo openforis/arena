@@ -35,13 +35,26 @@ export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '
 
 export { fetchStepsByChainUuid, fetchStepByUuid } from '../repository/processingStepRepository'
 
-// ====== UPDATE
+// ====== UPDATE - Chain
 
 export const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainPropUpdate,
-      { uuid: processingChainUuid, key, value }, false, t)
+    ActivityLogRepository.insert(
+      user, surveyId, ActivityLog.type.processingChainPropUpdate,
+      { uuid: processingChainUuid, key, value }, false, t
+    )
+  ]))
+
+// ====== UPDATE - Step
+
+export const updateStepProps = async (user, surveyId, processingStepUuid, props, client = db) =>
+  await client.tx(async t => await Promise.all([
+    ProcessingStepRepository.updateStepProps(surveyId, processingStepUuid, props, t),
+    ActivityLogRepository.insert(
+      user, surveyId, ActivityLog.type.processingStepPropsUpdate,
+      { uuid: processingStepUuid, ...props }, false, t
+    )
   ]))
 
 // ====== DELETE

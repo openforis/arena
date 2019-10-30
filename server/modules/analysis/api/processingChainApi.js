@@ -101,7 +101,7 @@ export const init = app => {
     }
   })
 
-  //====== UPDATE
+  //====== UPDATE - Chain
 
   app.put('/survey/:surveyId/processing-chain/:processingChainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
@@ -109,6 +109,21 @@ export const init = app => {
       const user = Request.getUser(req)
 
       await ProcessingChainService.updateChainProp(user, surveyId, processingChainUuid, key, value)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  //====== UPDATE - Step
+
+  app.put('/survey/:surveyId/processing-step/:processingStepUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingStepUuid, props } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await ProcessingChainService.updateStepProps(user, surveyId, processingStepUuid, props)
 
       Response.sendOk(res)
     } catch (err) {

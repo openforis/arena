@@ -36,6 +36,7 @@ module.exports = {
   keysProps,
 
   //READ
+  getProps: ObjectUtils.getProps,
   getCalculationSteps,
   getCategoryUuid,
   getEntityUuid,

@@ -53,6 +53,7 @@ export const type = {
   processingChainPropUpdate: 'processingChainPropUpdate',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',
+  processingStepPropsUpdate: 'processingStepPropsUpdate',
 }
 
 export const keys = {
