@@ -3,7 +3,6 @@ const ObjectUtils = require('@core/objectUtils')
 
 const keys = {
   uuid: 'uuid',
-  authGroups: 'authGroups',
   permissions: 'permissions',
   recordSteps: 'recordSteps',
   all: 'all',
@@ -29,6 +28,7 @@ const permissions = {
   recordAnalyse: 'recordAnalyse',
 
   // users
+  userEdit: 'userEdit',
   userInvite: 'userInvite',
 
   // edit
@@ -46,8 +46,6 @@ const groupNames = {
   surveyGuest: 'surveyGuest',
 }
 
-const getAuthGroups = R.propOr([], keys.authGroups)
-
 const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
@@ -55,6 +53,8 @@ const getName = R.prop(keys.name)
 const getSurveyUuid = R.prop(keys.surveyUuid)
 
 const getSurveyId = R.prop(keys.surveyId)
+
+const getPermissions = R.propOr([], keys.permissions)
 
 const isSystemAdminGroup = R.pipe(
   getName,
@@ -66,12 +66,11 @@ module.exports = {
   permissions,
   groupNames,
 
-  getAuthGroups,
-
   getUuid,
   getName,
   getSurveyId,
   getSurveyUuid,
+  getPermissions,
   isSystemAdminGroup,
   isEqual: ObjectUtils.isEqual,
 }

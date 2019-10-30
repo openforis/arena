@@ -11,7 +11,7 @@ const UserPrefs = require('./_user/userPrefs')
 const getName = R.propOr('', keys.name)
 const getEmail = R.prop(keys.email)
 const getLang = R.propOr('en', keys.lang)
-const getAuthGroups = R.prop(keys.authGroups)
+const getAuthGroups = ObjectUtils.getAuthGroups
 const getPrefs = R.propOr({}, keys.prefs)
 const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
@@ -20,6 +20,15 @@ const isSystemAdmin = user => user && R.any(AuthGroups.isSystemAdminGroup)(getAu
 const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
 //====== AUTH GROUP
+const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user => R.pipe(
+  getAuthGroups,
+  R.ifElse(
+    R.always(includeSystemAdmin && isSystemAdmin(user)),
+    R.head,
+    R.find(group => AuthGroups.getSurveyUuid(group) === surveyUuid)
+  )
+)(user)
+
 const assocAuthGroup = authGroup => user => {
   const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
   return R.assoc(keys.authGroups, authGroups, user)
@@ -44,6 +53,7 @@ module.exports = {
   getEmail,
   getLang,
   getAuthGroups,
+  getAuthGroupBySurveyUuid,
   getPrefs,
   hasProfilePicture,
 

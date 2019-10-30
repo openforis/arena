@@ -60,6 +60,7 @@ const getDateModified = getDate(keys.dateModified)
 const getCycle = R.prop(keys.cycle)
 const getIndex = R.propOr(0, keys.index)
 const getNodeDefUuid = R.prop(keys.nodeDefUuid)
+const getAuthGroups = R.prop(keys.authGroups)
 
 //===== UPDATE
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
@@ -113,6 +114,7 @@ module.exports = {
   getCycle,
   getIndex,
   getNodeDefUuid,
+  getAuthGroups,
 
   // UPDATE
   setProp,

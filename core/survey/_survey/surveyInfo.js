@@ -108,7 +108,7 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-const getAuthGroups = R.prop(keys.authGroups)
+const getAuthGroups = ObjectUtils.getAuthGroups
 
 const _getAuthGroupByName = name => R.pipe(
   getAuthGroups,

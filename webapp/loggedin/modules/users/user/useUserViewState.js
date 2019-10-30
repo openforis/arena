@@ -104,7 +104,7 @@ export const useUserViewState = props => {
       // set form object field from server side response
       setName(isUserAcceptPending ? '' : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
       setEmail(User.getEmail(userToUpdate))
-      setGroup(Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo))
+      setGroup(User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate))
 
       // set edit form permissions
       const canEdit = Authorizer.canEditUser(user, surveyInfo, userToUpdate)

@@ -1,4 +1,5 @@
 const R = require('ramda')
+const { expect } = require('chai')
 
 const db = require('@server/db/db')
 
@@ -109,6 +110,25 @@ const getValidationMaxCount = (parentNode, childDef) => R.pipe(
   Validation.getFieldValidation(RecordValidation.keys.maxCount)
 )
 
+const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourcePath, sourceValue, dependentPath, dependentExpectedValue) => {
+  // update source node value
+  const nodeSource = findNodeByPath(sourcePath)(survey, record)
+
+  const nodesUpdated = {
+    [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource)
+  }
+  record = Record.assocNodes(nodesUpdated)(record)
+
+  // update dependent nodes
+  const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+  record = recordUpdate
+
+  const nodeDependent = findNodeByPath(dependentPath)(survey, record)
+
+  expect(Node.getValue(nodeDependent)).to.equal(dependentExpectedValue)
+  return record
+}
+
 module.exports = {
   newRecord,
   insertAndInitRecord,
@@ -119,4 +139,6 @@ module.exports = {
 
   findNodeByPath,
   traverse,
+
+  updateNodeAndExpectDependentNodeValueToBe,
 }

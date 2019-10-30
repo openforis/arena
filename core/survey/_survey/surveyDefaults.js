@@ -6,12 +6,13 @@ const getDefaultAuthGroups = () => [
     permissions: [
       AuthGroups.permissions.permissionsEdit,
       AuthGroups.permissions.surveyEdit,
-      AuthGroups.permissions.userInvite,
       AuthGroups.permissions.recordView,
       AuthGroups.permissions.recordCreate,
       AuthGroups.permissions.recordEdit,
       AuthGroups.permissions.recordCleanse,
       AuthGroups.permissions.recordAnalyse,
+      AuthGroups.permissions.userEdit,
+      AuthGroups.permissions.userInvite,
     ],
     recordSteps: {
       '1': AuthGroups.keys.all,

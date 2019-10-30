@@ -10,9 +10,9 @@ export const init = app => {
   app.get(`/survey/:surveyId/activity-log`, AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId, offset, limit } = Request.getParams(req)
-      const activityTypes = Request.getJsonParam(req, 'activityTypes', [])
+      const user = Request.getUser(req)
 
-      const activities = await ActivityLogService.fetch(surveyId, activityTypes, R.clamp(0, NaN, offset), R.clamp(30, 100, limit))
+      const activities = await ActivityLogService.fetch(user, surveyId, R.clamp(0, NaN, offset), R.clamp(30, 100, limit))
 
       res.json({ activities })
     } catch (err) {

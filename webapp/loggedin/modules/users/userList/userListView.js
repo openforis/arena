@@ -8,10 +8,10 @@ import TableView from '../../../tableViews/tableView'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Authorizer from '@core/auth/authorizer'
-
-import User from '@core/user/user'
 import AuthGroups from '@core/auth/authGroups'
+import Authorizer from '@core/auth/authorizer'
+import Survey from '@core/survey/survey'
+import User from '@core/user/user'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
@@ -51,7 +51,7 @@ const UsersRow = props => {
   const { row: userListItem, user, surveyInfo } = props
   const i18n = useI18n()
 
-  const authGroup = Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
+  const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userListItem)
   const canEditUser = Authorizer.canEditUser(user, surveyInfo, userListItem)
 
   return (

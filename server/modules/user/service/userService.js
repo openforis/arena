@@ -104,7 +104,7 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-  const groupToUpdate = Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo)
+  const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
 
   if (AuthGroups.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
     throw new UnauthorizedError(User.getName(user))
