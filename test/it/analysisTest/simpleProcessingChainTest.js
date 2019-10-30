@@ -1,5 +1,5 @@
 const R = require('ramda')
-const { assert, expect } = require('chai')
+// const { assert, expect } = require('chai')
 
 const Survey = require('@core/survey/survey')
 const NodeDef = require('@core/survey/nodeDef')
