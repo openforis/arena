@@ -3,51 +3,41 @@ const R = require('ramda')
 const Survey = require('@core/survey/survey')
 const Record = require('@core/record/record')
 const User = require('@core/user/user')
-const AuthGroups = require('./authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const {
   permissions,
   keys,
-} = AuthGroups
-
-const _isSurveyAdmin = (user, surveyInfo) =>
-  Survey.isAuthGroupAdmin(getSurveyUserGroup(user, surveyInfo))(surveyInfo)
+} = AuthGroup
 
 // ======
 // ====== Survey
 // ======
 
-const getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) => {
-  if (includeSystemAdmin && User.isSystemAdmin(user)) {
-    return R.pipe(User.getAuthGroups, R.head)(user)
-  }
-  return AuthGroups.getAuthGroups(user).find(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
-}
+const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
+  User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo), includeSystemAdmin)(user)
 
-const getSurveyUserPermissions = (user, surveyInfo) =>
-  R.propOr([], keys.permissions, getSurveyUserGroup(user, surveyInfo))
-
-const hasSurveyPermission = permission => (user, surveyInfo) =>
+const _hasSurveyPermission = permission => (user, surveyInfo) =>
   user && surveyInfo && (
     User.isSystemAdmin(user) ||
-    R.includes(permission, getSurveyUserPermissions(user, surveyInfo))
+    R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo))
   )
 
 // READ
-const canViewSurvey = (user, surveyInfo) => !!getSurveyUserGroup(user, surveyInfo)
+const canViewSurvey = (user, surveyInfo) => !!_getSurveyUserGroup(user, surveyInfo)
 
 // UPDATE
-const canEditSurvey = hasSurveyPermission(permissions.surveyEdit)
+const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
 
 // ======
 // ====== Record
 // ======
 
 // CREATE
-const canCreateRecord = hasSurveyPermission(permissions.recordCreate)
+const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
 
 // READ
-const canViewRecord = hasSurveyPermission(permissions.recordView)
+const canViewRecord = _hasSurveyPermission(permissions.recordView)
 
 // UPDATE
 const canEditRecord = (user, record) => {
@@ -59,51 +49,51 @@ const canEditRecord = (user, record) => {
 
   const recordDataStep = Record.getStep(record)
 
-  const userAuthGroup = User.getAuthGroups(user).find(authGroup => AuthGroups.getSurveyUuid(authGroup) === Record.getSurveyUuid(record))
+  const userAuthGroup = User.getAuthGroupBySurveyUuid(Record.getSurveyUuid(record))(user)
 
   // level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
-  const level = R.path([keys.recordSteps, recordDataStep], userAuthGroup)
+  const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
 
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
 const canEditRecordsInDataQuery = R.pipe(
-  getSurveyUserGroup,
+  _getSurveyUserGroup,
   authGroup => R.includes(
-    AuthGroups.getName(authGroup),
+    AuthGroup.getName(authGroup),
     [
-      AuthGroups.groupNames.systemAdmin,
-      AuthGroups.groupNames.surveyAdmin,
-      AuthGroups.groupNames.surveyEditor,
-      AuthGroups.groupNames.dataAnalyst,
-      AuthGroups.groupNames.dataCleanser
+      AuthGroup.groupNames.systemAdmin,
+      AuthGroup.groupNames.surveyAdmin,
+      AuthGroup.groupNames.surveyEditor,
+      AuthGroup.groupNames.dataAnalyst,
+      AuthGroup.groupNames.dataCleanser
     ]
   )
 )
 
-const canAnalyzeRecords = hasSurveyPermission(permissions.recordAnalyse)
+const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 
 // ======
 // ====== Users
 // ======
 
 // CREATE
-const canInviteUsers = hasSurveyPermission(permissions.userInvite)
+const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 
 // READ
 const canViewUser = (user, surveyInfo, userToView) => {
   return User.isSystemAdmin(user) || (
-    !!getSurveyUserGroup(user, surveyInfo, false) &&
-    !!getSurveyUserGroup(userToView, surveyInfo, false)
+    !!_getSurveyUserGroup(user, surveyInfo, false) &&
+    !!_getSurveyUserGroup(userToView, surveyInfo, false)
   )
 }
 
 // EDIT
 const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
   User.isSystemAdmin(user) || (
-    _isSurveyAdmin(user, surveyInfo) &&
-    !!getSurveyUserGroup(userToUpdate, surveyInfo, false)
+    _hasSurveyPermission(permissions.userEdit)(user, surveyInfo) &&
+    !!_getSurveyUserGroup(userToUpdate, surveyInfo, false)
   )
 
 const canEditUser = (user, surveyInfo, userToUpdate) => (
@@ -125,8 +115,6 @@ const canRemoveUser = (user, surveyInfo, userToRemove) => (
 )
 
 module.exports = {
-  getSurveyUserGroup,
-
   // Survey permissions
   canViewSurvey,
   canEditSurvey,

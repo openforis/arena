@@ -3,7 +3,7 @@ const db = require('@server/db/db')
 const ActivityLog = require('@common/activityLog/activityLog')
 
 const User = require('@core/user/user')
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
 const AuthGroupRepository = require('@server/modules/auth/repository/authGroupRepository')
@@ -65,7 +65,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
   await client.tx(async t => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
 
-    if (AuthGroups.isSystemAdminGroup(newGroup)) {
+    if (AuthGroup.isSystemAdminGroup(newGroup)) {
       // if new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
       await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
       await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
