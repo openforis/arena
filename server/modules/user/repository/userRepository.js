@@ -4,7 +4,7 @@ const camelize = require('camelize')
 
 const User = require('@core/user/user')
 const Survey = require('@core/survey/survey')
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const selectFields = ['uuid', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
@@ -33,7 +33,7 @@ const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client 
     ON gu.user_uuid = u.uuid
     JOIN auth_group g
     ON g.uuid = gu.group_uuid
-    AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroups.groupNames.systemAdmin}'))`,
+    AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))`,
     [surveyId, countSystemAdmins])
 
 const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSystemAdmins = false, client = db) =>
@@ -44,7 +44,7 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSys
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-      AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroups.groupNames.systemAdmin}'))
+      AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))
     GROUP BY u.uuid, g.name
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}

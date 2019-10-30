@@ -11,7 +11,7 @@ const SurveyManager = require('../../survey/manager/surveyManager')
 
 const Survey = require('@core/survey/survey')
 const User = require('@core/user/user')
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 const Authorizer = require('@core/auth/authorizer')
 
 const SystemError = require('@server/utils/systemError')
@@ -24,7 +24,7 @@ const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serv
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
-  if (!User.isSystemAdmin(user) && AuthGroups.isSystemAdminGroup(group)) {
+  if (!User.isSystemAdmin(user) && AuthGroup.isSystemAdminGroup(group)) {
     throw new UnauthorizedError(User.getName(user))
   }
 
@@ -32,19 +32,19 @@ const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serv
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   // If the survey is not published, only survey admins and system admins can be invited
-  if (!Survey.isPublished(surveyInfo) && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
+  if (!Survey.isPublished(surveyInfo) && !(AuthGroup.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
     throw new UnauthorizedError(User.getName(user))
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
-  const groupName = AuthGroups.getName(group)
+  const groupName = AuthGroup.getName(group)
   const groupLabel = `$t(authGroups.${groupName}.label)`
 
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
-    const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
+    const hasRoleInSurvey = newUserGroups.some(g => AuthGroup.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 
     if (!User.hasAccepted(dbUser)) {
       throw new SystemError('appErrors.userHasPendingInvitation', { email })
@@ -104,9 +104,9 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-  const groupToUpdate = Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo)
+  const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
 
-  if (AuthGroups.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
+  if (AuthGroup.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
     throw new UnauthorizedError(User.getName(user))
   }
 

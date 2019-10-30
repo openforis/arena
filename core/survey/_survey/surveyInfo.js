@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const ObjectUtils = require('@core/objectUtils')
 const StringUtils = require('@core/stringUtils')
@@ -108,16 +108,16 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-const getAuthGroups = R.prop(keys.authGroups)
+const getAuthGroups = ObjectUtils.getAuthGroups
 
 const _getAuthGroupByName = name => R.pipe(
   getAuthGroups,
-  R.find(R.propEq(AuthGroups.keys.name, name))
+  R.find(R.propEq(AuthGroup.keys.name, name))
 )
 
-const getAuthGroupAdmin = _getAuthGroupByName(AuthGroups.groupNames.surveyAdmin)
+const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
 
-const isAuthGroupAdmin = group => surveyInfo => AuthGroups.isEqual(group)(getAuthGroupAdmin(surveyInfo))
+const isAuthGroupAdmin = group => surveyInfo => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
 
 module.exports = {
   keys,
