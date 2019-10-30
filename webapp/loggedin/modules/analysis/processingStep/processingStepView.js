@@ -22,7 +22,7 @@ import {
 
 const ProcessingStepView = props => {
   const {
-    history, processingStepUuid, processingStep, processingStepNext,
+    history, processingStepUuid, processingStep, processingStepPrev, processingStepNext,
     fetchProcessingStep, resetProcessingStepState, putProcessingStepProps, deleteProcessingStep
   } = props
 
@@ -44,6 +44,7 @@ const ProcessingStepView = props => {
 
           <EntitySelector
             processingStep={processingStep}
+            processingStepPrev={processingStepPrev}
             onChange={entityUuid => {
               const props = {
                 [ProcessingStep.keysProps.entityUuid]: entityUuid,
@@ -72,6 +73,7 @@ const mapStateToProps = (state, { match }) => ({
   processingStepUuid: getUrlParam('processingStepUuid')(match),
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
+  processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
 })
 
 export default connect(

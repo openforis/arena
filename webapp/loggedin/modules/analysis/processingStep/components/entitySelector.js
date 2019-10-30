@@ -14,16 +14,20 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-const getEntities = (hierarchy, lang) => {
+const getEntities = (survey, entityStepPrev, lang) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    const label = NodeDef.getLabel(nodeDef, lang)
-    entities.push({
-      key: NodeDef.getUuid(nodeDef),
-      value: StringUtils.nbsp + R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') + label
-    })
+    if (!entityStepPrev || NodeDef.isRoot(nodeDef) || Survey.isNodeDefAncestor(nodeDef, entityStepPrev)(survey)) {
+      const label = NodeDef.getLabel(nodeDef, lang)
+      entities.push({
+        key: NodeDef.getUuid(nodeDef),
+        value: StringUtils.nbsp + R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') + label
+      })
+    }
   }
+
+  const hierarchy = Survey.getHierarchy()(survey)
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
 
   return entities
@@ -31,14 +35,10 @@ const getEntities = (hierarchy, lang) => {
 
 const EntitySelector = props => {
   const {
-    hierarchy, lang, processingStep,
+    processingStep, entities,
     onChange
   } = props
 
-  const [entities, setEntities] = useState([])
-  useEffect(() => {
-    setEntities(getEntities(hierarchy, lang))
-  }, [])
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
   const i18n = useI18n()
@@ -64,9 +64,16 @@ const EntitySelector = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  hierarchy: Survey.getHierarchy()(SurveyState.getSurvey(state)),
-  lang: AppState.getLang(state),
-})
+const mapStateToProps = (state, { processingStepPrev }) => {
+  const survey = SurveyState.getSurvey(state)
+  const entityStepPrev = R.pipe(
+    ProcessingStep.getEntityUuid,
+    entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey)
+  )(processingStepPrev)
+
+  return {
+    entities: getEntities(survey, entityStepPrev, AppState.getLang(state)),
+  }
+}
 
 export default connect(mapStateToProps)(EntitySelector)
