@@ -33,7 +33,7 @@ export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '
 
 // ====== READ - Steps
 
-export { fetchStepsByChainUuid } from '../repository/processingStepRepository'
+export { fetchStepsByChainUuid, fetchStepByUuid } from '../repository/processingStepRepository'
 
 // ====== UPDATE
 
