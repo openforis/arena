@@ -24,6 +24,7 @@ const ENV = {
   pgHost: process.env['PGHOST'],
   pgPort: process.env['PGPORT'],
   pgSsl: process.env['PGSSL'] === 'true',
+  migrateOnly: process.env['MIGRATE_ONLY'] === 'true',
   //EMAIL
   adminEmail: process.env['ADMIN_EMAIL'],
   sendGridApiKey: process.env['SENDGRID_API_KEY'],
