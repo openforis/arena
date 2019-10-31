@@ -20,10 +20,22 @@ const stdlib = {
 }
 
 const unaryOperators = {
-  '!': a => !a,
-  // TODO: Under JS semantics, "+" coerces a string to a number. Do we want to allow that?
-  '+': a => +a,
-  '-': a => -a,
+  // Only accept bools and nulls as input.
+  // Otherwise return null
+  '!': x =>
+    R.is(Boolean, x) || R.isNil(x)
+      ? !x : null,
+
+  // Negation: Only accept normal finite numbers, otherwise return null
+  // NOTE: Under JS semantics, we would have -"123" -> -123
+  '-': x =>
+    R.is(Number, x) && !isNaN(x) && isFinite(x)
+    ? -x : null,
+
+  // Don't allow the unary + operator now. Define semantics for it first.
+  // Under JS semantics, "+" coerces a string to a number.
+  // Maybe we should just have `parseNumber` in `stdlib`?
+  // '+': x => R.isNil(x) ? null : +x,
 }
 
 const booleanOperators = {
@@ -72,12 +84,7 @@ const unaryEval = (expr, ctx) => {
   if (!fn) throw new SystemError('undefinedFunction', { fnName: operator })
 
   const res = evalExpression(argument, ctx)
-
-  // Return null if the input is null
-  // However, the logical negation operator "!" always returns a boolean
-  return operator === '!' || !R.isNil(res)
-    ? fn(res)
-    : null
+  return fn(res)
 }
 
 const binaryEval = (expr, ctx) => {
@@ -91,6 +98,14 @@ const binaryEval = (expr, ctx) => {
 
   const nullCount = [leftResult, rightResult].filter(R.isNil).length
 
+  // Arithmetic operators will always return nulls for any non-numeric inputs
+  if (operator in arithmeticOperators) {
+    return R.is(Number, leftResult) && R.is(Number, rightResult)
+      ? fn(leftResult, rightResult)
+      : null
+  }
+
+  // Boolean operators:
   // Like ternary logic, but logical OR has special handling.
   // The expression is boolean if either value is not null.
   // Otherwise the result is null.
