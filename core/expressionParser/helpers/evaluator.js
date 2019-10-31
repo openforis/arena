@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const { types } = require('./types')
-const { isString } = require('@core/stringUtils')
 
 const SystemError = require('@server/utils/systemError')
 
@@ -32,27 +31,31 @@ const binaryOperators = {
   '||':  (a, b) => !!(a || b),
   '&&':  (a, b) => !!(a && b),
   // Normal boolean operators:
-  '==':  (a, b) => a === b,
-  '!=':  (a, b) => a !== b,
   '===': (a, b) => a === b,
   '!==': (a, b) => a !== b,
   '<':   (a, b) => a < b,
   '>':   (a, b) => a > b,
   '<=':  (a, b) => a <= b,
   '>=':  (a, b) => a >= b,
-  // Don't allow bitwise operators:
-  // '|':   (a, b) => a | b,
-  // '^':   (a, b) => a ^ b,
-  // '&':   (a, b) => a & b,
   // Arithmetic operators:
-  '<<':  (a, b) => a << b,
-  '>>':  (a, b) => a >> b,
-  '>>>': (a, b) => a >>> b,
   '+':   (a, b) => a + b,
   '-':   (a, b) => a - b,
   '*':   (a, b) => a * b,
   '/':   (a, b) => a / b,
   '%':   (a, b) => a % b,
+  // Only allow one kind of equalities.
+  // TODO: I would have preferred to only have == and != but there are
+  // some hidden dependencies on === and !==...
+  // '==':  (a, b) => a === b,
+  // '!=':  (a, b) => a !== b,
+  // Don't allow bitwise operators:
+  // '|':   (a, b) => a | b,
+  // '^':   (a, b) => a ^ b,
+  // '&':   (a, b) => a & b,
+  // Don't allow shifts either:
+  // '<<':  (a, b) => a << b,
+  // '>>':  (a, b) => a >> b,
+  // '>>>': (a, b) => a >>> b,
 }
 
 const unaryEval = (expr, ctx) => {
