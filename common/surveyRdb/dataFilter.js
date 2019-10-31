@@ -20,10 +20,24 @@ const js2sqlOperators = {
   '%': '%',
 }
 
+const stdlib2sql = {
+  'pow': 'pow',
+  'min': 'least',
+  'max': 'greatest',
+}
+
+const logicalOrTemplate = `
+CASE
+  WHEN {left} IS NULL AND {right} IS NULL
+  THEN NULL
+  ELSE coalesce({left}, false) OR coalesce({right}, false)
+END
+`.trim()
+
 const binaryToString = (node, paramsArr) => {
   const { operator, left, right } = node
-  const { clause: clauseLeft, paramsArr: paramsArrLeft } = toPreparedStatement(left, paramsArr)
-  const { clause: clauseRight, paramsArr: paramsArrRight } = toPreparedStatement(right, paramsArrLeft)
+  const clauseLeft = toPreparedStatement(left, paramsArr)
+  const clauseRight = toPreparedStatement(right, paramsArr)
 
   const sqlOperator = js2sqlOperators[operator]
 
@@ -31,71 +45,60 @@ const binaryToString = (node, paramsArr) => {
 
   // Logical OR returns a non-null value if either of its parameters is not null.
   if (sqlOperator == 'OR')
-    return {
-      clause: `
-      CASE
-        WHEN ${clauseLeft} IS NULL AND ${clauseRight} IS NULL
-        THEN NULL
-        ELSE coalesce(${clauseLeft}, false) OR coalesce(${clauseRight}, false)
-      END
-      `,
-      paramsArr: paramsArrRight,
-    }
+    return logicalOrTemplate
+      .replace('{left}', clauseLeft)
+      .replace('{right}', clauseRight)
 
   // Logical OR returns a non-null value if either of its parameters is not null.
-  return {
-    clause: `${clauseLeft} ${sqlOperator} ${clauseRight}`,
-    paramsArr: paramsArrRight,
-  }
+  return `${clauseLeft} ${sqlOperator} ${clauseRight}`
 }
 
-const getNextParamName = paramsArr => `_${paramsArr.length}`
+const addParameterWithValue = (value, paramsArr) => {
+  paramsArr.push(value);
+  return `_${paramsArr.length - 1}`
+}
 
 const converters = {
-  [types.Identifier]: (node, paramsArr) => ({
-    clause: `$/${getNextParamName(paramsArr)}:name/`,
-    paramsArr: paramsArr.concat(node.name),
-  }),
-  [types.BinaryExpression]: binaryToString,
-  [types.MemberExpression]: (node, paramsArr) => {
-    const obj = toPreparedStatement(node.obj, paramsArr)
-    const property = toPreparedStatement(node.property, obj.paramsArr)
-
-    return {
-      clause: `${obj.clause}.${property.clause}`,
-      paramsArr: property.paramsArr,
-    }
+  [types.Identifier]: (node, paramsArr) => {
+    const param = addParameterWithValue(node.name, paramsArr)
+    return `$/${param}:name/`
   },
-  [types.Literal]: (node, paramsArr) => ({
-    clause: `$/${getNextParamName(paramsArr)}/`,
-    paramsArr: paramsArr.concat([
-      R.isNil(node.value) ? null : node.raw
-    ]),
-  }),
+  [types.Literal]: (node, paramsArr) => {
+    if (R.isNil(node.value)) return 'NULL'
+    const param = addParameterWithValue(node.raw, paramsArr)
+    return `$/${param}/`
+  },
   [types.UnaryExpression]: (node, paramsArr) => {
-    const { clause, paramsArr: newParams } = toPreparedStatement(node.argument, paramsArr)
-    return {
-      clause: `${node.operator} ${clause}`,
-      paramsArr: newParams,
-    }
+    const clause = toPreparedStatement(node.argument, paramsArr)
+    return `${node.operator} ${clause}`
   },
+  [types.BinaryExpression]: binaryToString,
   [types.LogicalExpression]: binaryToString,
   [types.GroupExpression]: (node, paramsArr) => {
-    const { clause, paramsArr: newParams } = toPreparedStatement(node.argument, paramsArr)
-    return {
-      clause: `(${clause})`,
-      paramsArr: newParams,
-    }
+    const clause = toPreparedStatement(node.argument, paramsArr)
+    return `(${clause})`
   },
+  [types.CallExpression]: (node, paramsArr) => {
+    // arguments is a reserved word in strict mode
+    const { callee, arguments: exprArgs } = node
+
+    const fnName = callee.name
+    const sqlFnName = stdlib2sql[callee.name]
+    if (!sqlFnName) throw new SystemError('undefinedFunction', { fnName })
+
+    const clauses = exprArgs.map(arg => toPreparedStatement(arg, paramsArr))
+    return `${sqlFnName}(${clauses.join(", ")})`
+  }
 }
 
 const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
 const getWherePreparedStatement = expr => {
-  const prepStatement = toPreparedStatement(expr, [])
-  const params = prepStatement.paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
+  const paramsArr = []
+  const prepStatement = toPreparedStatement(expr, paramsArr)
+  const params = paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
-  return { clause: prepStatement.clause, params }
+  return { clause: prepStatement, params }
 }
 
 module.exports = {
