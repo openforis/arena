@@ -60,8 +60,15 @@ const getDateModified = getDate(keys.dateModified)
 const getCycle = R.prop(keys.cycle)
 const getIndex = R.propOr(0, keys.index)
 const getNodeDefUuid = R.prop(keys.nodeDefUuid)
+const getAuthGroups = R.prop(keys.authGroups)
 
 //===== UPDATE
+const mergeProps = props => obj => R.pipe(
+  getProps,
+  R.mergeLeft(props),
+  propsUpdate => R.assoc(keys.props, propsUpdate, obj)
+)(obj)
+
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
 const setInPath = (pathArray, value, includeEmpty = true) => obj => {
@@ -113,8 +120,10 @@ module.exports = {
   getCycle,
   getIndex,
   getNodeDefUuid,
+  getAuthGroups,
 
   // UPDATE
+  mergeProps,
   setProp,
   setInPath,
 

@@ -8,10 +8,10 @@ import TableView from '../../../tableViews/tableView'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
+import AuthGroup from '@core/auth/authGroup'
 import Authorizer from '@core/auth/authorizer'
-
+import Survey from '@core/survey/survey'
 import User from '@core/user/user'
-import AuthGroups from '@core/auth/authGroups'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
@@ -51,7 +51,7 @@ const UsersRow = props => {
   const { row: userListItem, user, surveyInfo } = props
   const i18n = useI18n()
 
-  const authGroup = Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
+  const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userListItem)
   const canEditUser = Authorizer.canEditUser(user, surveyInfo, userListItem)
 
   return (
@@ -66,7 +66,7 @@ const UsersRow = props => {
         {User.getEmail(userListItem)}
       </div>
       <div>
-        {i18n.t(`authGroups.${AuthGroups.getName(authGroup)}.label_plural`)}
+        {i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}
       </div>
       <div>
         {

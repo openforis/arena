@@ -1,5 +1,4 @@
 const R = require('ramda')
-const { assert, expect } = require('chai')
 
 const Survey = require('@core/survey/survey')
 const NodeDef = require('@core/survey/nodeDef')
@@ -8,6 +7,7 @@ const ProcessingStep = require('@common/analysis/processingStep')
 const ProcessingStepCalculation = require('@common/analysis/processingStepCalculation')
 
 const ProcessingChainService = require('@server/modules/analysis/service/processingChainService')
+const SurveyManager = require('@server/modules/survey/manager/surveyManager')
 
 const { getContextUser } = require('../../testContext')
 const SB = require('../utils/surveyBuilder')
