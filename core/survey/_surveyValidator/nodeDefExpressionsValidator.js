@@ -14,7 +14,7 @@ const SystemError = require('@server/utils/systemError')
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
 // TODO: maybe filter out nodes that cannot be evaluated in expressions?
-const getReachableNodes = (survey, nodeDef) => {
+const getReachableNodeDefs = (survey, nodeDef) => {
   const visibleNodes = []
   const visitorFn = nodeDef => {
     const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
@@ -59,8 +59,8 @@ const bindNode = (survey, nodeDef) => ({
   },
 
   getReachableNodeValue: nodeName => {
-    const allNodes = getReachableNodes(survey, nodeDef)
-    const def = allNodes.filter(x => NodeDef.getName(x) === nodeName)[0]
+    const allNodeDefs = getReachableNodeDefs(survey, nodeDef)
+    const def = allNodeDefs.filter(x => NodeDef.getName(x) === nodeName)[0]
 
     if (!def)
       throw new SystemError(
@@ -82,7 +82,6 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
     return null
   } catch (e) {
     const details = R.is(SystemError, e) ? `$t(${e.key})` : e.toString()
-    console.error(e)
     return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, { details, ...e.params })
   }
 }

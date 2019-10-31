@@ -8,7 +8,7 @@ const StringUtils = require('@core/stringUtils')
 const ObjectUtils = require('@core/objectUtils')
 
 const Expression = require('@core/expressionParser/expression')
-const { getExpressionIdentifiers } = require('@core/expressionParser/helpers/evaluator')
+const Evaluator = require('@core/expressionParser/helpers/evaluator')
 
 const keys = {
   placeholder: 'placeholder',
@@ -53,7 +53,7 @@ const assocProp = (propName, value) => R.pipe(
 const extractNodeDefNames = (jsExpr = '') =>
   StringUtils.isBlank(jsExpr)
   ? []
-  : getExpressionIdentifiers(Expression.fromString(jsExpr))
+  : Evaluator.getExpressionIdentifiers(Expression.fromString(jsExpr))
 
 const findReferencedNodeDefs = nodeDefExpressions =>
   R.pipe(
