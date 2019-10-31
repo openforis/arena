@@ -545,7 +545,11 @@ module.exports = {
     unableToFindNode: 'Unable to find node with name {{name}}',
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
     undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
+    invalidSyntax: `Expression syntax is invalid`,
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+
     userHasPendingInvitation: `There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',

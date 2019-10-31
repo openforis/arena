@@ -120,7 +120,7 @@ const callEval = (expr, ctx) => {
   // No complex expressions may be put in place of a function body.
   // Only a plain identifier is allowed.
   if (callee.type !== types.Identifier)
-    throw new SystemError('invalidFunctionType', { fnName: callee.type })
+    throw new SystemError('invalidSyntax', { fnType: callee.type })
 
   // The function must be found in the standard library.
   if (!(fnName in stdlib))
@@ -129,12 +129,12 @@ const callEval = (expr, ctx) => {
   const [fn, minArity, maxArity] = stdlib[fnName]
 
   if (fnArity < minArity)
-    throw new SystemError('functionHasTooFewArguments', { fnName })
+    throw new SystemError('functionHasTooFewArguments', { fnName, minArgs: minArity, numArgs: fnArity })
 
   const maxArityIsDefined = maxArity !== undefined
   const maxArityIsInfinite = maxArity < 0
   if (maxArityIsDefined && !maxArityIsInfinite && fnArity > maxArity)
-    throw new SystemError('functionHasTooManyArguments', { fnName })
+    throw new SystemError('functionHasTooManyArguments', { fnName, maxArgs: maxArity, numArgs: fnArity })
 
   const args = exprArgs.map(arg => evalExpression(arg, ctx))
 
@@ -155,7 +155,7 @@ const literalEval = (expr, _ctx) => {
 const thisEval = (expr, _ctx) => {
   // console.log('== this ')
   // console.log(expr)
-  throw new SystemError('reservedKeywordUsed', { keyword: 'this', expr })
+  throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
 const _getIdentifierName = R.prop('name')
@@ -164,7 +164,7 @@ const identifierEval = (expr, ctx) => {
   // console.log(expr)
   const name =_getIdentifierName(expr)
 
-  if (!ctx.node) throw new SystemError('nodeContextMustBeDefined', { name })
+  if (!ctx.node) throw new SystemError('internalError', { name, msg: 'Node context must be defined before evaluation' })
 
   return ctx.node.getReachableNodeValue(name)
 }
