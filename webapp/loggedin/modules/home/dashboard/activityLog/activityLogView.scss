@@ -35,7 +35,7 @@
   display: grid;
   grid-template-columns: 1fr 120px;
   align-items: center;
-  font-size: .9rem;
+  font-size: .8rem;
   grid-column-gap: 20px;
 
   .activity {
@@ -44,6 +44,8 @@
 
     .profile-picture-thumbnail {
       margin: 0 5px;
+      width: 25px;
+      height: 25px;
     }
   }
 
@@ -51,7 +53,6 @@
     justify-self: right;
     padding-right: 5px;
     color: $blueDark;
-    font-size: .8rem;
   }
 }
 

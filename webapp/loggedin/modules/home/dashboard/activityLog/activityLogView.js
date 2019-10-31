@@ -32,7 +32,7 @@ const ActivityLogView = props => {
     <div className="activity-log">
 
       <div className="activity-log__header">
-        {i18n.t('homeView.activityLog.recentActivity')}
+        {i18n.t('activityLogView.recentActivity')}
       </div>
 
       <div className="activity-log__content">
@@ -42,7 +42,7 @@ const ActivityLogView = props => {
               <div className="activity-log__content-item">
                 <div className="activity">
                   <ProfilePicture userUuid={ActivityLog.getUserUuid(activityLog)} thumbnail={true}/>
-                  {`${ActivityLog.getUserName(activityLog)} ${i18n.t(`activityLogView.message.${ActivityLog.getType(activityLog)}`, { ...ActivityLog.getContent(activityLog) })}`}
+                  {`${ActivityLog.getUserName(activityLog)} ${i18n.t(`activityLogView.messages.${ActivityLog.getType(activityLog)}`, { ...ActivityLog.getContent(activityLog) })}`}
                 </div>
                 <div className="date">
                   {DateUtils.getRelativeDate(i18n, ActivityLog.getDateCreated(activityLog))}
