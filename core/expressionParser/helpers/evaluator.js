@@ -63,9 +63,6 @@ const unaryEval = (expr, ctx) => {
 
   const res = evalExpression(argument, ctx)
 
-  // const x = `${operator} ${JSON.stringify(res)}`
-  // console.log('=== UNARY')
-  // console.log(x)
   return fn(res)
 }
 
@@ -81,36 +78,16 @@ const binaryEval = (expr, ctx) => {
   if (R.isNil(leftResult) || R.isNil(rightResult))
     return null
 
-  // const x = `${JSON.stringify(leftResult)} ${operator} ${JSON.stringify(rightResult)}`
-  // console.log('=== BINARY')
-  // console.log(x)
   return fn(leftResult, rightResult)
 }
 
 // Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
 const memberEval = (expr, ctx) => {
-  // console.log('== member')
-  // console.log(expr)
   throw new SystemError('invalidSyntax')
 
-  const { object, property } = expr
-
-  const objectRes = evalExpression(object, ctx)
-  const propertyRes = evalExpression(property, ctx)
-
-  if (!(objectRes && propertyRes))
-    return null
-  else if (isString(objectRes))
-    return eval(`${objectRes}.${propertyRes}`)
-  else if (R.has(propertyRes, objectRes))
-    return R.prop(propertyRes, objectRes)
-  else return null
 }
 
 const callEval = (expr, ctx) => {
-  // console.log('== call')
-  // console.log(expr)
-
   // arguments is a reserved word in strict mode
   const { callee, arguments: exprArgs } = expr
 
@@ -144,24 +121,16 @@ const callEval = (expr, ctx) => {
   return R.apply(fn, args)
 }
 
-const literalEval = (expr, _ctx) => {
-  // console.log('== literal ')
-  // console.log(expr)
-  return R.prop('value')(expr)
-}
+const literalEval = (expr, _ctx) => R.prop('value')(expr)
 
 // "this" is a remnant of the JS that's not allowed in our simplified expression syntax.
 // We still have to handle "this" since the JSEP parser will produce these nodes.
 const thisEval = (expr, _ctx) => {
-  // console.log('== this ')
-  // console.log(expr)
   throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
 const _getIdentifierName = R.prop('name')
 const identifierEval = (expr, ctx) => {
-  // console.log('== identifierExpression ')
-  // console.log(expr)
   const name =_getIdentifierName(expr)
 
   if (!ctx.node) throw new SystemError('internalError', { name, msg: 'Node context must be defined before evaluation' })
