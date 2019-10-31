@@ -6,8 +6,8 @@ const logical = {
 }
 
 const comparison = {
-  eq: { key: '===', value: '=' },
-  notEq: { key: '!==', value: '!=' },
+  eq: { key: '==', value: '=' },
+  notEq: { key: '!=', value: '!=' },
   gt: { key: '>', value: '>' },
   less: { key: '<', value: '<' },
   gtOrEq: { key: '>=', value: '>=' },
