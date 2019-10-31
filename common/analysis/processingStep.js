@@ -18,6 +18,7 @@ const keysProps = {
 
 // ====== READ
 
+const getProcessingChainUuid = R.prop(keys.processingChainUuid)
 const getCalculationSteps = R.propOr([], keys.calculationSteps)
 const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
@@ -36,6 +37,7 @@ module.exports = {
   keysProps,
 
   //READ
+  getProcessingChainUuid,
   getCalculationSteps,
   getCategoryUuid,
   getEntityUuid,
@@ -44,5 +46,6 @@ module.exports = {
   isVirtual,
 
   //UPDATE
+  mergeProps: ObjectUtils.mergeProps,
   assocCalculation,
 }

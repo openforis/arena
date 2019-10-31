@@ -9,7 +9,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
+import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 
 export const processingChainUpdate = 'survey/processingChain/update'
 export const processingChainPropUpdate = 'survey/processingChain/prop/update'
@@ -52,10 +52,12 @@ export const createProcessingStep = history => async (dispatch, getState) => {
 // ====== READ
 
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
+  dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
 
   dispatch({ type: processingChainUpdate, processingChain })
+  dispatch(hideAppSaving())
 }
 
 export const fetchProcessingSteps = processingChainUuid => async (dispatch, getState) => {
@@ -74,17 +76,21 @@ export const putProcessingChainProp = (key, value) => async (dispatch, getState)
   dispatch({ type: processingChainPropUpdate, key, value })
 
   const action = async () => {
+    dispatch(showAppSaving())
     const surveyId = SurveyState.getSurveyId(state)
     await axios.put(
       `/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`,
       { key, value }
     )
+    dispatch(hideAppSaving())
   }
   dispatch(debounceAction(action, `${processingChainPropUpdate}_${ProcessingChain.getUuid(processingChain)}`))
 }
 
 // ====== DELETE
 export const deleteProcessingChain = history => async (dispatch, getState) => {
+  dispatch(showAppSaving())
+
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingChain = ProcessingChainState.getProcessingChain(state)
@@ -93,4 +99,5 @@ export const deleteProcessingChain = history => async (dispatch, getState) => {
 
   dispatch(navigateToProcessingChainsView(history))
   dispatch(showNotification('processingChainView.deleteComplete'))
+  dispatch(hideAppSaving())
 }

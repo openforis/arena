@@ -16,13 +16,19 @@ export {
   countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid,
 
   // ======  READ - Steps
-  fetchStepsByChainUuid,
+  fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex,
 
   // ======  UPDATE - Chain
   updateChainProp,
 
+  // ======  UPDATE - Step
+  updateStepProps,
+
   // ======  DELETE - Chain
-  deleteChain
+  deleteChain,
+
+  // ======  DELETE - Step
+  deleteStep,
 } from '../manager/processingChainManager'
 
 // ====== EXECUTION

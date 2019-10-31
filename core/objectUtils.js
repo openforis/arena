@@ -63,6 +63,12 @@ const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 const getAuthGroups = R.prop(keys.authGroups)
 
 //===== UPDATE
+const mergeProps = props => obj => R.pipe(
+  getProps,
+  R.mergeLeft(props),
+  propsUpdate => R.assoc(keys.props, propsUpdate, obj)
+)(obj)
+
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
 const setInPath = (pathArray, value, includeEmpty = true) => obj => {
@@ -117,6 +123,7 @@ module.exports = {
   getAuthGroups,
 
   // UPDATE
+  mergeProps,
   setProp,
   setInPath,
 

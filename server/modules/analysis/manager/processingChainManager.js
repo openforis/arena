@@ -1,4 +1,5 @@
 import db from '@server/db/db'
+import SystemError from '@server/utils/systemError'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -33,21 +34,48 @@ export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '
 
 // ====== READ - Steps
 
-export { fetchStepsByChainUuid } from '../repository/processingStepRepository'
+export { fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex } from '../repository/processingStepRepository'
 
-// ====== UPDATE
+// ====== UPDATE - Chain
 
 export const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainPropUpdate,
-      { uuid: processingChainUuid, key, value }, false, t)
+    ActivityLogRepository.insert(
+      user, surveyId, ActivityLog.type.processingChainPropUpdate,
+      { uuid: processingChainUuid, key, value }, false, t
+    )
   ]))
 
-// ====== DELETE
+// ====== UPDATE - Step
+
+export const updateStepProps = async (user, surveyId, processingStepUuid, props, client = db) =>
+  await client.tx(async t => await Promise.all([
+    ProcessingStepRepository.updateStepProps(surveyId, processingStepUuid, props, t),
+    ActivityLogRepository.insert(
+      user, surveyId, ActivityLog.type.processingStepPropsUpdate,
+      { uuid: processingStepUuid, ...props }, false, t
+    )
+  ]))
+
+// ====== DELETE - Chain
 
 export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t),
     ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, { uuid: processingChainUuid }, false, t)
   ]))
+
+// ====== DELETE - Step
+
+export const deleteStep = async (user, surveyId, processingStepUuid, client = db) => {
+  const processingStep = await ProcessingStepRepository.fetchStepByUuid(surveyId, processingStepUuid)
+  const processingStepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(surveyId, ProcessingStep.getProcessingChainUuid(processingStep), ProcessingStep.getIndex(processingStep) + 1)
+  if (!!processingStepNext)
+    throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
+
+  await client.tx(async t => await Promise.all([
+    ProcessingStepRepository.deleteStep(surveyId, processingStepUuid, t),
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, { uuid: processingStepUuid }, false, t)
+  ]))
+}
