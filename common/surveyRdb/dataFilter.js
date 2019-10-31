@@ -7,8 +7,8 @@ const js2sqlOperators = {
   '&&': 'AND',
   '||': 'OR',
   // IS (NOT) DISTINCT FROM always returns true/false, even for nulls
-  '===': 'IS NOT DISTINCT FROM',
-  '!==': 'IS DISTINCT FROM',
+  '==': 'IS NOT DISTINCT FROM',
+  '!=': 'IS DISTINCT FROM',
   '>': '>',
   '<': '<',
   '>=': '>=',

@@ -6,14 +6,14 @@ const { getWherePreparedStatement } = require('@common/surveyRdb/dataFilter')
 const goodExpressions = [
   { q: '1', r: { clause: '$/_0/', params: { _0: '1' } } },
   { q: '1 / 1', r: { clause: '$/_0/ / $/_1/', params: { _0: '1', _1: '1' } } },
-  { q: '1 + 1 === 2', r: { clause: '$/_0/ + $/_1/ IS NOT DISTINCT FROM $/_2/', params: { _0: '1', _1: '1', _2: '2' } } },
+  { q: '1 + 1 == 2', r: { clause: '$/_0/ + $/_1/ IS NOT DISTINCT FROM $/_2/', params: { _0: '1', _1: '1', _2: '2' } } },
   { q: 'a', r: { clause: '$/_0:name/', params: { _0: 'a' } } },
   { q: '-a', r: { clause: '- $/_0:name/', params: { _0: 'a' } } },
-  { q: 'a === 1', r: { clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/', params: { _0: 'a', _1: '1' } } },
-  { q: `a !== 'a'`, r: { clause: '$/_0:name/ IS DISTINCT FROM $/_1/', params: { _0: 'a', _1: `'a'` } } },
-  { q: `a !== "a"`, r: { clause: '$/_0:name/ IS DISTINCT FROM $/_1/', params: { _0: 'a', _1: `"a"` } } },
+  { q: 'a == 1', r: { clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/', params: { _0: 'a', _1: '1' } } },
+  { q: `a != 'a'`, r: { clause: '$/_0:name/ IS DISTINCT FROM $/_1/', params: { _0: 'a', _1: `'a'` } } },
+  { q: `a != "a"`, r: { clause: '$/_0:name/ IS DISTINCT FROM $/_1/', params: { _0: 'a', _1: `"a"` } } },
   {
-    q: `a === 1 && b !== 'b'`,
+    q: `a == 1 && b != 'b'`,
     r: {
       clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/',
       params: { _0: 'a', _1: '1', _2: 'b', _3: `'b'` },
@@ -22,7 +22,7 @@ const goodExpressions = [
 
   // This is complicated because logical OR has special semantics:
   {
-    q: `(a === 1 && b !== 'b') || c > 1`,
+    q: `(a == 1 && b != 'b') || c > 1`,
     r: {
       clause: "\n      CASE\n        WHEN ($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/) IS NULL AND $/_4:name/ > $/_5/ IS NULL\n        THEN NULL\n        ELSE coalesce(($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/), false) OR coalesce($/_4:name/ > $/_5/, false)\n      END\n      ",
       params: { _0: 'a', _1: '1', _2: 'b', _3: '\'b\'', _4: 'c', _5: '1' },

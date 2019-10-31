@@ -43,17 +43,16 @@ const booleanOperators = {
   '||':  (a, b) => !!(a || b),
   '&&':  (a, b) => !!(a && b),
   // Normal boolean operators:
-  '===': (a, b) => a === b,
-  '!==': (a, b) => a !== b,
+  '==': (a, b) => a === b,
+  '!=': (a, b) => a !== b,
   '<':   (a, b) => a < b,
   '>':   (a, b) => a > b,
   '<=':  (a, b) => a <= b,
   '>=':  (a, b) => a >= b,
   // Only allow one kind of equalities.
-  // TODO: I would have preferred to only have == and != but there are
   // some hidden dependencies on === and !==...
-  // '==':  (a, b) => a === b,
-  // '!=':  (a, b) => a !== b,
+  // '===':  (a, b) => a === b,
+  // '!==':  (a, b) => a !== b,
 }
 
 const arithmeticOperators = {
