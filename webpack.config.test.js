@@ -1,23 +1,16 @@
 require('core-js/stable')
 require('regenerator-runtime/runtime')
-const webpack = require('webpack')
-const path = require('path')
 const nodeExternals = require('webpack-node-externals')
 const mainConfig = require('./webpack.config')
 
 require('dotenv').config()
 
-// const ExtractTextPlugin = require('extract-text-webpack-plugin')
-// const config = require("./webpack.config.js")
-// config.target = "node"
-// config.mode= 'development'
-// module.exports = config
 module.exports = {
-  // plugins: [new ExtractTextPlugin({filename: 'test-style.css'})],
   entry: ['core-js/stable', 'regenerator-runtime/runtime'],
   target: 'node', // in order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   mode: 'development',
+  devtool: 'source-map',
   node: {
     __filename: true,
     __dirname: true
@@ -38,18 +31,6 @@ module.exports = {
           }
         }
       },
-      // {
-      //   test: /\.less$/,
-      //   use: ExtractTextPlugin.extract({
-      //     fallback: 'style-loader',
-      //     use: ['css-loader', 'less-loader']
-      //   })
-      // }
     ]
   },
-  // plugins: [
-  //   new webpack.DefinePlugin({
-  //     'process.env.migrations_test_dirname': JSON.stringify(path.resolve(__dirname, 'server/db/migration/survey/migrations'))
-  //   })
-  // ]
 }

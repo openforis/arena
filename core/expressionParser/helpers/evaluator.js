@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const { types } = require('./types')
+const types = require('./types')
 
 const SystemError = require('@server/utils/systemError')
 
@@ -30,7 +30,7 @@ const unaryOperators = {
   // NOTE: Under JS semantics, we would have -"123" -> -123
   '-': x =>
     R.is(Number, x) && !isNaN(x) && isFinite(x)
-    ? -x : null,
+      ? -x : null,
 
   // Don't allow the unary + operator now. Define semantics for it first.
   // Under JS semantics, "+" coerces a string to a number.
@@ -40,15 +40,15 @@ const unaryOperators = {
 
 const booleanOperators = {
   // Short-circuiting operators (we coerce the output to bool)
-  '||':  (a, b) => !!(a || b),
-  '&&':  (a, b) => !!(a && b),
+  '||': (a, b) => !!(a || b),
+  '&&': (a, b) => !!(a && b),
   // Normal boolean operators:
   '===': (a, b) => a === b,
   '!==': (a, b) => a !== b,
-  '<':   (a, b) => a < b,
-  '>':   (a, b) => a > b,
-  '<=':  (a, b) => a <= b,
-  '>=':  (a, b) => a >= b,
+  '<': (a, b) => a < b,
+  '>': (a, b) => a > b,
+  '<=': (a, b) => a <= b,
+  '>=': (a, b) => a >= b,
   // Only allow one kind of equalities.
   // TODO: I would have preferred to only have == and != but there are
   // some hidden dependencies on === and !==...
@@ -57,11 +57,11 @@ const booleanOperators = {
 }
 
 const arithmeticOperators = {
-  '+':   (a, b) => a + b,
-  '-':   (a, b) => a - b,
-  '*':   (a, b) => a * b,
-  '/':   (a, b) => a / b,
-  '%':   (a, b) => a % b,
+  '+': (a, b) => a + b,
+  '-': (a, b) => a - b,
+  '*': (a, b) => a * b,
+  '/': (a, b) => a / b,
+  '%': (a, b) => a % b,
   // Don't allow bitwise operators:
   // '|':   (a, b) => a | b,
   // '^':   (a, b) => a ^ b,
@@ -121,9 +121,8 @@ const binaryEval = (expr, ctx) => {
 }
 
 // Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
-const memberEval = (expr, ctx) => {
+const memberEval = _ => {
   throw new SystemError('invalidSyntax')
-
 }
 
 const callEval = (expr, ctx) => {
@@ -169,12 +168,10 @@ const thisEval = (expr, _ctx) => {
 }
 
 const _getIdentifierName = R.prop('name')
-const identifierEval = (expr, ctx) => {
-  const name =_getIdentifierName(expr)
-
-  if (!ctx.node) throw new SystemError('internalError', { name, msg: 'Node context must be defined before evaluation' })
-
-  return ctx.node.getReachableNodeValue(name)
+const identifierEval = expr => {
+  // console.log('== identifierExpression ')
+  // console.log(expr)
+  return R.prop('name')(expr)
 }
 
 const groupEval = (expr, ctx) => {

@@ -28,7 +28,10 @@ class NodeDefBuilder {
   }
 
   _createNodeDef (survey, parentDefUuid) {
-    return NodeDef.newNodeDef(parentDefUuid, this.type, Survey.cycleOneKey, this.props)
+    const nodeDef = NodeDef.newNodeDef(parentDefUuid, this.type, Survey.cycleOneKey, this.props)
+    const nodeDefParent = Survey.getNodeDefByUuid(parentDefUuid)(survey)
+    const h = [...NodeDef.getMetaHierarchy(nodeDefParent), parentDefUuid]
+    return NodeDef.assocMetaHierarchy(h)(nodeDef)
   }
 
   applyIf (expr) {

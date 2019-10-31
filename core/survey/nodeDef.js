@@ -126,6 +126,8 @@ const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
+const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
+
 // ==== UTILS
 const canNodeDefBeMultiple = nodeDef =>
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
@@ -238,6 +240,7 @@ module.exports = {
 
   // meta
   getMetaHierarchy,
+  assocMetaHierarchy,
 
   //UTILS
   canNodeDefBeMultiple,

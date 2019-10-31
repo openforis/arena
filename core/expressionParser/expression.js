@@ -1,11 +1,11 @@
 const R = require('ramda')
 
 const NodeDef = require('@core/survey/nodeDef')
-const jsep = require('./helpers/jsep')
-const { evalExpression } = require('./helpers/evaluator')
-const { toString: toStringUtils, isValid } = require('./helpers/utils')
-const { types } = require('./helpers/types')
 
+const jsep = require('./helpers/jsep')
+const Evaluator = require('./helpers/evaluator')
+const ExpressionUtils = require('./helpers/utils')
+const types = require('./helpers/types')
 const operators = require('./helpers/operators')
 
 const modes = {
@@ -14,7 +14,7 @@ const modes = {
 }
 
 const toString = (expr, exprMode = modes.json) => {
-  const string = toStringUtils(expr)
+  const string = ExpressionUtils.toString(expr)
 
   return exprMode === modes.sql
     ? R.pipe(
@@ -41,8 +41,7 @@ const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-const evalString = async (query, ctx) =>
-  await evalExpression(fromString(query), ctx)
+const evalString = async (query, ctx) => await Evaluator.evalExpression(fromString(query), ctx)
 
 // ====== Type checking
 
@@ -81,7 +80,8 @@ module.exports = {
   toString,
   fromString,
   evalString,
-  isValid,
+  isValid: ExpressionUtils.isValid,
+  getExpressionIdentifiers: Evaluator.getExpressionIdentifiers,
 
   // Type checking
   isLiteral: isType(types.Literal),
