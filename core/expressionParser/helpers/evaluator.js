@@ -20,13 +20,25 @@ const stdlib = {
 }
 
 const unaryOperators = {
-  '!': a => !a,
-  // TODO: Under JS semantics, "+" coerces a string to a number. Do we want to allow that?
-  '+': a => +a,
-  '-': a => -a,
+  // Only accept bools and nulls as input.
+  // Otherwise return null
+  '!': x =>
+    R.is(Boolean, x) || R.isNil(x)
+      ? !x : null,
+
+  // Negation: Only accept normal finite numbers, otherwise return null
+  // NOTE: Under JS semantics, we would have -"123" -> -123
+  '-': x =>
+    R.is(Number, x) && !isNaN(x) && isFinite(x)
+    ? -x : null,
+
+  // Don't allow the unary + operator now. Define semantics for it first.
+  // Under JS semantics, "+" coerces a string to a number.
+  // Maybe we should just have `parseNumber` in `stdlib`?
+  // '+': x => R.isNil(x) ? null : +x,
 }
 
-const binaryOperators = {
+const booleanOperators = {
   // Short-circuiting operators (we coerce the output to bool)
   '||':  (a, b) => !!(a || b),
   '&&':  (a, b) => !!(a && b),
@@ -37,17 +49,19 @@ const binaryOperators = {
   '>':   (a, b) => a > b,
   '<=':  (a, b) => a <= b,
   '>=':  (a, b) => a >= b,
-  // Arithmetic operators:
-  '+':   (a, b) => a + b,
-  '-':   (a, b) => a - b,
-  '*':   (a, b) => a * b,
-  '/':   (a, b) => a / b,
-  '%':   (a, b) => a % b,
   // Only allow one kind of equalities.
   // TODO: I would have preferred to only have == and != but there are
   // some hidden dependencies on === and !==...
   // '==':  (a, b) => a === b,
   // '!=':  (a, b) => a !== b,
+}
+
+const arithmeticOperators = {
+  '+':   (a, b) => a + b,
+  '-':   (a, b) => a - b,
+  '*':   (a, b) => a * b,
+  '/':   (a, b) => a / b,
+  '%':   (a, b) => a % b,
   // Don't allow bitwise operators:
   // '|':   (a, b) => a | b,
   // '^':   (a, b) => a ^ b,
@@ -58,6 +72,11 @@ const binaryOperators = {
   // '>>>': (a, b) => a >>> b,
 }
 
+const binaryOperators = {
+  ...booleanOperators,
+  ...arithmeticOperators,
+}
+
 const unaryEval = (expr, ctx) => {
   const { argument, operator } = expr
 
@@ -65,7 +84,6 @@ const unaryEval = (expr, ctx) => {
   if (!fn) throw new SystemError('undefinedFunction', { fnName: operator })
 
   const res = evalExpression(argument, ctx)
-
   return fn(res)
 }
 
@@ -78,10 +96,28 @@ const binaryEval = (expr, ctx) => {
   const leftResult = evalExpression(left, ctx)
   const rightResult = evalExpression(right, ctx)
 
-  if (R.isNil(leftResult) || R.isNil(rightResult))
-    return null
+  const nullCount = [leftResult, rightResult].filter(R.isNil).length
 
-  return fn(leftResult, rightResult)
+  // Arithmetic operators will always return nulls for any non-numeric inputs
+  if (operator in arithmeticOperators) {
+    return R.is(Number, leftResult) && R.is(Number, rightResult)
+      ? fn(leftResult, rightResult)
+      : null
+  }
+
+  // Boolean operators:
+  // Like ternary logic, but logical OR has special handling.
+  // The expression is boolean if either value is not null.
+  // Otherwise the result is null.
+  // All other operators return null if either operand is null
+  const isValid = (
+    (operator === '||' && nullCount < 2)
+    || (nullCount === 0)
+  )
+
+  return isValid
+    ? fn(leftResult, rightResult)
+    : null
 }
 
 // Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
