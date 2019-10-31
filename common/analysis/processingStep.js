@@ -37,7 +37,6 @@ module.exports = {
   keysProps,
 
   //READ
-  getProps: ObjectUtils.getProps,
   getProcessingChainUuid,
   getCalculationSteps,
   getCategoryUuid,
@@ -47,5 +46,6 @@ module.exports = {
   isVirtual,
 
   //UPDATE
+  mergeProps: ObjectUtils.mergeProps,
   assocCalculation,
 }

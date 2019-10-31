@@ -35,11 +35,6 @@ export const assocProcessingStep = (processingStep, processingStepPrev, processi
 
 export const mergeProcessingStepProps = props => processingStepState => R.pipe(
   R.prop(keys.step),
-  ProcessingStep.getProps,
-  R.mergeLeft(props),
-  propsUpdate => R.assocPath(
-    [keys.step, ProcessingStep.keys.props],
-    propsUpdate,
-    processingStepState
-  )
+  ProcessingStep.mergeProps(props),
+  processingStepUpdate => R.assoc(keys.step, processingStepUpdate, processingStepState)
 )(processingStepState)
