@@ -1,0 +1,70 @@
+@import "~@webapp/style/vars";
+
+.processing-chain__step {
+  position: relative;
+  display: flex;
+  margin-left: 16px;
+
+  &:not(:last-child) {
+    padding-bottom: 10px;
+  }
+
+  &:not(:first-child) {
+    padding-top: 10px;
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    width: 2px;
+    content: "";
+    background-color: $greyBorder;
+  }
+}
+
+.processing-chain__step-index {
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px 0 -15px;
+  padding-left: 1px;
+  border-radius: 100%;
+  border: 2px solid $greyAppBg;
+  background-color: $blueLightFocus;
+  color: lighten($black, 20%);
+  font-weight: 600;
+  font-size: .75rem;
+}
+
+.processing-chain__step-content {
+  position: relative;
+  transition: .2s all;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-column-gap: 20px;
+  align-items: center;
+  height: 32px;
+  padding: 0 20px;
+  font-size: .9rem;
+
+  .icon-edit {
+    transition: .3s all;
+    opacity: 0;
+    color: lighten($black, 20%)
+  }
+
+  &:hover {
+    background-color: $blueLightFocus;
+    cursor: pointer;
+
+    .icon-edit {
+      opacity: 1;
+    }
+  }
+}

@@ -7,17 +7,14 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+import ProcessingChainStep from './processingChainStep'
 
-import {
-  createProcessingStep,
-  fetchProcessingSteps,
-  navigateToProcessingStepView
-} from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { createProcessingStep, fetchProcessingSteps } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainSteps = props => {
   const {
     history, processingChain,
-    createProcessingStep, fetchProcessingSteps, navigateToProcessingStepView
+    createProcessingStep, fetchProcessingSteps
   } = props
   const i18n = useI18n()
 
@@ -38,22 +35,12 @@ const ProcessingChainSteps = props => {
 
       <div className="processing-chain__steps">
         {
-          processingSteps.map(step => {
-              const index = ProcessingStep.getIndex(step)
-              return (
-                <div key={index} className="processing-chain__step"
-                     onClick={() => navigateToProcessingStepView(history, ProcessingStep.getUuid(step))}>
-                  <div className="processing-chain__step-index">
-                    {index + 1}
-                  </div>
-                  <div className="processing-chain__step-content">
-                    <div>{ProcessingStep.getEntityUuid(step)}</div>
-                    <span className="icon icon-pencil2 icon-10px icon-edit"/>
-                  </div>
-                </div>
-              )
-            }
-          )
+          processingSteps.map(processingStep => (
+            <ProcessingChainStep
+              key={ProcessingStep.getIndex(processingStep)}
+              history={history}
+              processingStep={processingStep}/>
+          ))
         }
       </div>
     </div>
@@ -67,5 +54,5 @@ ProcessingChainSteps.defaultProps = {
 
 export default connect(
   null,
-  { createProcessingStep, fetchProcessingSteps, navigateToProcessingStepView }
+  { createProcessingStep, fetchProcessingSteps }
 )(ProcessingChainSteps)

@@ -111,5 +111,6 @@
   },
   "browserslist": [
     "last 2 versions"
-  ]
+  ],
+  "version": "0.0.0"
 }

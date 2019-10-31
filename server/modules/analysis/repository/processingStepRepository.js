@@ -2,7 +2,7 @@ import camelize from 'camelize'
 
 import db from '@server/db/db'
 
-import { dbTransformCallback, getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
 export const insertStep = async (surveyId, processingChainUuid, processingStepIndex, client = db) =>
@@ -14,7 +14,7 @@ export const insertStep = async (surveyId, processingChainUuid, processingStepIn
       RETURNING *
     `,
     [processingChainUuid, processingStepIndex],
-    dbTransformCallback
+    camelize
   )
 
 // ====== READ
@@ -44,13 +44,42 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
 
 export const fetchStepByUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.one(`
-      SELECT *
-      FROM ${getSurveyDBSchema(surveyId)}.processing_step
-      WHERE uuid = $1
+    SELECT *
+    FROM ${getSurveyDBSchema(surveyId)}.processing_step
+    WHERE uuid = $1
     `,
     [processingStepUuid],
     camelize
   )
+
+export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, index, client = db) =>
+  await client.oneOrNone(`
+    SELECT *
+    FROM ${getSurveyDBSchema(surveyId)}.processing_step
+    WHERE processing_chain_uuid = $1
+    AND index = $2
+    `,
+    [processingChainUuid, index],
+    camelize
+  )
+
 // ====== UPDATE
 
+export const updateStepProps = async (surveyId, processingStepUuid, props, client = db) =>
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.processing_step
+    SET props = props || $2::jsonb
+    WHERE uuid = $1
+    `,
+    [processingStepUuid, props],
+  )
+
 // ====== DELETE
+
+export const deleteStep = async (surveyId, processingStepUuid, client = db) =>
+  await client.none(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_step
+    WHERE uuid = $1
+    `,
+    [processingStepUuid]
+  )

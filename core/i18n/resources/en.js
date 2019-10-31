@@ -244,6 +244,11 @@ module.exports = {
     processingSteps: 'Processing steps',
   },
 
+  processingStepView: {
+    deleteConfirm: 'Delete this processing step?\n$t(common.cantUndoWarning)',
+    deleteComplete: 'Processing step deleted',
+  },
+
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
@@ -540,6 +545,7 @@ module.exports = {
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
+    processingStepOnlyLastCanBeDeleted: `Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted`,
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
