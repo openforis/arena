@@ -1,0 +1,12 @@
+@import "~@webapp/style/vars";
+
+.processing-step__entity-selector {
+  max-width: 600px;
+}
+
+.processing-step__entity-selector-dialog {
+  .dropdown__list-item {
+    padding-left: 20px;
+    text-align: left;
+  }
+}

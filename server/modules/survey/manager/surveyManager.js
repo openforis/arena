@@ -15,7 +15,7 @@ const Validation = require('@core/validation/validation')
 
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const UserManager = require('../../user/manager/userManager')
-const AuthGroups = require('@core/auth/authGroups')
+const AuthGroup = require('@core/auth/authGroup')
 
 const { migrateSurveySchema } = require('@server/db/migration/dbMigrator')
 const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
@@ -90,7 +90,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, syste
 
       // add user to survey admins group (if not system admin)
       if (!User.isSystemAdmin(user)) {
-        await UserManager.addUserToGroup(user, surveyId, AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), User.getUuid(user), t)
+        await UserManager.addUserToGroup(user, surveyId, AuthGroup.getUuid(Survey.getAuthGroupAdmin(surveyInfo)), User.getUuid(user), t)
       }
 
       return surveyInfo

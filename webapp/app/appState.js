@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import Survey from '@core/survey/survey'
 import User from '@core/user/user'
-import AuthGroups from '@core/auth/authGroups'
+import AuthGroup from '@core/auth/authGroup'
 
 export const keys = {
   status: 'status',
@@ -57,7 +57,7 @@ export const dissocUserPropsOnSurveyDelete = surveyInfo => appState => {
     R.prop(keys.user),
     User.getAuthGroups,
     R.find(
-      R.propEq(AuthGroups.keys.surveyUuid, Survey.getUuid(surveyInfo))
+      R.propEq(AuthGroup.keys.surveyUuid, Survey.getUuid(surveyInfo))
     )
   )(appState)
   const user = R.pipe(
