@@ -43,17 +43,16 @@ const booleanOperators = {
   '||': (a, b) => !!(a || b),
   '&&': (a, b) => !!(a && b),
   // Normal boolean operators:
-  '===': (a, b) => a === b,
-  '!==': (a, b) => a !== b,
+  '==': (a, b) => a === b,
+  '!=': (a, b) => a !== b,
   '<': (a, b) => a < b,
   '>': (a, b) => a > b,
   '<=': (a, b) => a <= b,
   '>=': (a, b) => a >= b,
   // Only allow one kind of equalities.
-  // TODO: I would have preferred to only have == and != but there are
   // some hidden dependencies on === and !==...
-  // '==':  (a, b) => a === b,
-  // '!=':  (a, b) => a !== b,
+  // '===':  (a, b) => a === b,
+  // '!==':  (a, b) => a !== b,
 }
 
 const arithmeticOperators = {
@@ -167,7 +166,6 @@ const thisEval = (expr, _ctx) => {
   throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
-const _getIdentifierName = R.prop('name')
 const identifierEval = expr => {
   // console.log('== identifierExpression ')
   // console.log(expr)
@@ -206,7 +204,7 @@ export const evalExpression = (expr, ctx) => {
 export const getExpressionIdentifiers = expr => {
   const identifiers = []
   const functions = {
-    [types.Identifier]: (expr, _ctx) => { identifiers.push(_getIdentifierName(expr)) },
+    [types.Identifier]: (expr, _ctx) => { identifiers.push(R.prop('name')(expr)) },
   }
 
   evalExpression(expr, { functions })

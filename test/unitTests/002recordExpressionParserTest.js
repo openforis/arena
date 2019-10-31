@@ -67,12 +67,12 @@ describe('RecordExpressionParser Test', () => {
   // ====== value expr tests
   const queries = [
     { q: 'tree + 1', r: 13 },
-    { q: 'tree !== 1', r: true },
+    { q: 'tree != 1', r: true },
     // !12 == null under strict logical negation semantics
     { q: '!tree', r: null },
     // Number + String is invalid -> null
     { q: 'tree + "1"', r: null },
-    { q: '!(tree === 1)', r: true },
+    { q: '!(tree == 1)', r: true },
     //18 + 1
     { q: 'dbh + 1', r: 19 },
     //18 + 1

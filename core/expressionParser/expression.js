@@ -20,8 +20,8 @@ const toString = (expr, exprMode = modes.json) => {
     ? R.pipe(
       R.replace(/&&/g, 'AND'),
       R.replace(/\|\|/g, 'OR'),
-      R.replace(/===/g, '='),
-      R.replace(/!==/g, '!='),
+      R.replace(/==/g, '='),
+      R.replace(/!=/g, '!='),
     )(string)
     : string
 }
@@ -32,16 +32,16 @@ const fromString = (string, exprMode = modes.json) => {
     R.pipe(
       R.replace(/AND/g, '&&'),
       R.replace(/OR/g, '||'),
-      R.replace(/=/g, '==='),
-      R.replace(/!===/g, '!=='),
-      R.replace(/>===/g, '>='),
-      R.replace(/<===/g, '<='),
+      R.replace(/=/g, '=='),
+      R.replace(/!==/g, '!='),
+      R.replace(/>==/g, '>='),
+      R.replace(/<==/g, '<='),
     )(string)
 
   return jsep(exprString)
 }
 
-const evalString = async (query, ctx) => await Evaluator.evalExpression(fromString(query), ctx)
+const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
 
 // ====== Type checking
 

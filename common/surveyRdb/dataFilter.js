@@ -1,10 +1,14 @@
+const R = require('ramda')
+
 const { types } = require('@core/expressionParser/expression')
+const SystemError = require('@server/utils/systemError')
 
 const js2sqlOperators = {
   '&&': 'AND',
   '||': 'OR',
-  '===': '=',
-  '!==': '!=',
+  // IS (NOT) DISTINCT FROM always returns true/false, even for nulls
+  '==': 'IS NOT DISTINCT FROM',
+  '!=': 'IS DISTINCT FROM',
   '>': '>',
   '<': '<',
   '>=': '>=',
@@ -17,19 +21,30 @@ const js2sqlOperators = {
 }
 
 const binaryToString = (node, paramsArr) => {
-  const { operator, left, right, right: { type: rightType, value: rightValue } } = node
+  const { operator, left, right } = node
   const { clause: clauseLeft, paramsArr: paramsArrLeft } = toPreparedStatement(left, paramsArr)
-
-  if (operator === '===' && rightType === types.Literal && rightValue === null) {
-    return {
-      clause: `${clauseLeft} IS NULL`,
-      paramsArr: paramsArrLeft,
-    }
-  }
-
   const { clause: clauseRight, paramsArr: paramsArrRight } = toPreparedStatement(right, paramsArrLeft)
+
+  const sqlOperator = js2sqlOperators[operator]
+
+  if (!sqlOperator) throw new SystemError('undefinedFunction', { fnName: operator })
+
+  // Logical OR returns a non-null value if either of its parameters is not null.
+  if (sqlOperator == 'OR')
+    return {
+      clause: `
+      CASE
+        WHEN ${clauseLeft} IS NULL AND ${clauseRight} IS NULL
+        THEN NULL
+        ELSE coalesce(${clauseLeft}, false) OR coalesce(${clauseRight}, false)
+      END
+      `,
+      paramsArr: paramsArrRight,
+    }
+
+  // Logical OR returns a non-null value if either of its parameters is not null.
   return {
-    clause: `${clauseLeft} ${js2sqlOperators[operator]} ${clauseRight}`,
+    clause: `${clauseLeft} ${sqlOperator} ${clauseRight}`,
     paramsArr: paramsArrRight,
   }
 }
@@ -53,7 +68,9 @@ const converters = {
   },
   [types.Literal]: (node, paramsArr) => ({
     clause: `$/${getNextParamName(paramsArr)}/`,
-    paramsArr: paramsArr.concat(node.raw),
+    paramsArr: paramsArr.concat([
+      R.isNil(node.value) ? null : node.raw
+    ]),
   }),
   [types.UnaryExpression]: (node, paramsArr) => {
     const { clause, paramsArr: newParams } = toPreparedStatement(node.argument, paramsArr)
