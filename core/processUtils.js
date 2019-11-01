@@ -12,7 +12,7 @@ const ENV = {
   buildReport: process.env['BUILD_REPORT'] === 'true',
   // APP VERSION
   applicationVersion: process.env['APPLICATION_VERSION'],
-  gitCommithash: process.env['GIT_COMMIT_HASH'],
+  gitCommitHash: process.env['GIT_COMMIT_HASH'],
   gitBranch: process.env['GIT_BRANCH'],
   // COGNITO
   cognitoRegion: process.env['COGNITO_REGION'],
