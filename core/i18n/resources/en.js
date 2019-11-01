@@ -53,6 +53,7 @@ module.exports = {
     type: 'Type',
     undefinedName: 'Undefined name',
     upload: 'Upload',
+    version: 'Version',
     view: 'View',
     warning: 'Warning',
     warning_plural: 'Warnings',

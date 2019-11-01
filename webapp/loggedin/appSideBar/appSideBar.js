@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import * as ProcessUtils from '@core/processUtils'
 import AppSideBarModules from './components/appSideBarModules'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as SideBarState from './appSidebarState'
@@ -21,6 +22,8 @@ const AppSideBar = (props) => {
   } = props
 
   const element = useRef(null)
+
+  const i18n = useI18n()
 
   return (
     <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
@@ -39,14 +42,16 @@ const AppSideBar = (props) => {
         pathname={pathname}
         sideBarOpened={isSideBarOpened}/>
 
+      {isSideBarOpened &&
       <div
-        class="app-version"
+        className="app-version"
         data-commit-hash={ProcessUtils.ENV.gitCommithash}
         data-branch={ProcessUtils.ENV.gitBranch}
-        data-package-version={ProcessUtils.ENV.packageVersion}
-      >
-        {isSideBarOpened && `OpenForis Arena version ${ProcessUtils.ENV.applicationVersion}`}
+        data-package-version={ProcessUtils.ENV.packageVersion}>
+        OpenForis Arena<br/>
+        {`${i18n.t('common.version')} ${ProcessUtils.ENV.applicationVersion}`}
       </div>
+      }
 
     </div>
   )
