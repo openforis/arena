@@ -3,6 +3,7 @@ import './appSideBar.scss'
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
+import * as ProcessUtils from '@core/processUtils'
 import AppSideBarModules from './components/appSideBarModules'
 
 import * as AppState from '@webapp/app/appState'
@@ -37,6 +38,15 @@ const AppSideBar = (props) => {
         surveyInfo={surveyInfo}
         pathname={pathname}
         sideBarOpened={isSideBarOpened}/>
+
+      <div
+        class="app-version"
+        data-commit-hash={ProcessUtils.ENV.gitCommithash}
+        data-branch={ProcessUtils.ENV.gitBranch}
+        data-package-version={ProcessUtils.ENV.packageVersion}
+      >
+        {isSideBarOpened && `OpenForis Arena version ${ProcessUtils.ENV.applicationVersion}`}
+      </div>
 
     </div>
   )

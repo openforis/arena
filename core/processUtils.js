@@ -10,7 +10,10 @@ const ENV = {
   nodeEnv: process.env['NODE_ENV'] || environments.development,
   tempFolder: process.env['TEMP_FOLDER'] || '/tmp/arena_upload',
   buildReport: process.env['BUILD_REPORT'] === 'true',
-  sourceVersion: process.env['SOURCE_VERSION'] || 'N/A',
+  applicationVersion: process.env['APPLICATION_VERSION'],
+  gitCommithash: process.env['GIT_COMMIT_HASH'],
+  gitBranch: process.env['GIT_BRANCH'],
+  packageVersion: process.env['PACKAGE_VERSION'],
   //COGNITO
   cognitoRegion: process.env['COGNITO_REGION'],
   cognitoUserPoolId: process.env['COGNITO_USER_POOL_ID'],
