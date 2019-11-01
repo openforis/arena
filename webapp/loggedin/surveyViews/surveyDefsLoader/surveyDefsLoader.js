@@ -26,7 +26,9 @@ const SurveyDefsLoader = (props) => {
   }, [surveyUuid])
 
   useOnUpdate(() => {
-    reloadSurveyDefs(draft, validate)
+    if (surveyUuid) {
+      reloadSurveyDefs(draft, validate)
+    }
   }, [surveyCycleKey])
 
   const i18n = useI18n()

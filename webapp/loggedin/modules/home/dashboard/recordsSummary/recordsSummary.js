@@ -9,7 +9,6 @@ import RecordsSummaryChart from './chart/recordsSummaryChart'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
 import DateUtils from '@core/dateUtils'
-import Survey from '@core/survey/survey'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordsSummaryState from './recordsSummaryState'
@@ -20,7 +19,7 @@ const formatDate = dateStr => dateStr ? DateUtils.format(DateUtils.parseISO(date
 
 const RecordsSummary = props => {
   const {
-    surveyInfo, surveyCycleKey,
+    surveyCycleKey,
     timeRange, from, to, counts,
     fetchRecordsSummary
   } = props
@@ -38,50 +37,43 @@ const RecordsSummary = props => {
   ]
   const timeRangeSelection = timeRangeItems.find(R.propEq('key', timeRange))
 
-  const surveyInfoValid = Survey.isValid(surveyInfo)
-
   useEffect(() => {
-    if (surveyInfoValid) {
-      fetchRecordsSummary(surveyCycleKey, timeRange)
-    }
-  }, [surveyInfo, surveyCycleKey])
+    fetchRecordsSummary(surveyCycleKey, timeRange)
+  }, [surveyCycleKey])
 
-  return surveyInfoValid
-    ? (
-      <div className="home-dashboard__records-summary">
+  return (
+    <div className="home-dashboard__records-summary">
 
-        <div className="home-dashboard__records-summary-header">
-          <h6>
-            {i18n.t('homeView.recordsSummary.recordsAdded', { from: formatDate(from), to: formatDate(to) })}
-          </h6>
+      <div className="home-dashboard__records-summary-header">
+        <h6>
+          {i18n.t('homeView.recordsSummary.recordsAdded', { from: formatDate(from), to: formatDate(to) })}
+        </h6>
 
-          <div className="time-range" ref={timeRangeElementRef}>
-            <span className="icon icon-calendar icon-12px icon-left"/>
-            <Dropdown
-              items={timeRangeItems}
-              selection={timeRangeSelection}
-              onChange={item => fetchRecordsSummary(surveyCycleKey, item.key)}
-              sourceElement={timeRangeElementRef.current}
-              readOnlyInput={true}
-            />
-          </div>
+        <div className="time-range" ref={timeRangeElementRef}>
+          <span className="icon icon-calendar icon-12px icon-left"/>
+          <Dropdown
+            items={timeRangeItems}
+            selection={timeRangeSelection}
+            onChange={item => fetchRecordsSummary(surveyCycleKey, item.key)}
+            sourceElement={timeRangeElementRef.current}
+            readOnlyInput={true}
+          />
         </div>
-
-        {
-          from && to &&
-          <RecordsSummaryChart
-            counts={counts}
-            from={from}
-            to={to}/>
-        }
-
       </div>
-    )
-    : null
+
+      {
+        from && to &&
+        <RecordsSummaryChart
+          counts={counts}
+          from={from}
+          to={to}/>
+      }
+
+    </div>
+  )
 }
 
 const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   timeRange: RecordsSummaryState.getTimeRange(state),
   from: RecordsSummaryState.getFrom(state),
