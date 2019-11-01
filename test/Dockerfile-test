@@ -1,0 +1,14 @@
+FROM node:12-alpine
+
+# git is currently required for the version string:
+RUN apk add --no-cache git
+
+# cache these as much as possible:
+COPY package.json yarn.lock /app/
+
+RUN cd /app; yarn --ignore-scripts; npm rebuild node-sass
+
+COPY . /app/
+RUN cd /app; yarn build:server:dev
+
+WORKDIR /app

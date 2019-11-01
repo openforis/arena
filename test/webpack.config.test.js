@@ -1,7 +1,7 @@
 require('core-js/stable')
 require('regenerator-runtime/runtime')
 const nodeExternals = require('webpack-node-externals')
-const mainConfig = require('./webpack.config')
+const mainConfig = require('../webpack.config')
 
 require('dotenv').config()
 
