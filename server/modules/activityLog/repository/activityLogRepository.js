@@ -2,10 +2,14 @@ import camelize from 'camelize'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as User from '@core/user/user'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+
+import * as ActivityLog from '@common/activityLog/activityLog'
+
 import * as db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import * as ActivityLog from '@common/activityLog/activityLog'
 
 //===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
@@ -22,12 +26,13 @@ export const insertMany = async (user, surveyId, activities, client) =>
   ])
 
 //===== READ
-export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 30, client = db) =>
+export const fetch = async (surveyId, draft = false, activityTypes = null, offset = 0, limit = 30, client = db) =>
   await client.map(`
     WITH
       log AS
       (
         SELECT
+          a.id,
           a.type,
           ${DbUtils.selectDate('a.date_created', 'date_created')},
           a.user_uuid,
@@ -43,8 +48,13 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       )
     SELECT
       l.*,
-      u.name AS user_name,
-      n.uuid AS node_def_parent_uuid
+      l.content || jsonb_build_object(
+        'userName', u.name,
+        'nodeDefParentUuid', node_def_parent.uuid,
+        'nodeDefName', ${DbUtils.getPropColCombined(NodeDef.propKeys.name, draft, 'node_def.')},
+        'nodeDefParentName', ${DbUtils.getPropColCombined(NodeDef.propKeys.name, draft, 'node_def_parent.')},
+        'categoryName', ${DbUtils.getPropColCombined(Category.props.name, draft, 'category.')}
+      ) as content
     FROM
       log AS l
     JOIN
@@ -52,8 +62,14 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
     ON
       u.uuid = l.user_uuid
     LEFT OUTER JOIN
-      ${getSurveyDBSchema(surveyId)}.node_def n
-      on l.content ->> 'parentUuid'  = n.uuid::text
+      ${getSurveyDBSchema(surveyId)}.node_def
+      on l.content ->> 'uuid' = node_def.uuid::text
+    LEFT OUTER JOIN
+      ${getSurveyDBSchema(surveyId)}.node_def node_def_parent
+      on l.content ->> 'parentUuid' = node_def_parent.uuid::text
+    LEFT OUTER JOIN
+      ${getSurveyDBSchema(surveyId)}.category
+      on l.content ->> 'uuid' = category.uuid::text
     WHERE
       l.rank = 1
     ORDER BY

@@ -27,6 +27,7 @@ const isBlank = value => value === null || value === undefined || R.isEmpty(valu
 const isEqual = other => self => getUuid(other) === getUuid(self)
 
 //====== READ
+const getId = R.prop(keys.id)
 const getUuid = R.propOr(null, keys.uuid)
 
 const getProps = R.propOr({}, keys.props)
@@ -106,9 +107,10 @@ module.exports = {
   keysProps,
 
   // READ
+  getId,
+  getUuid,
   getProps,
   getProp,
-  getUuid,
   getParentUuid: R.propOr(null, keys.parentUuid),
   getLabels,
   getLabel,

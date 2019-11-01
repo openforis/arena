@@ -2,65 +2,88 @@ import './activityLogView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
+import Authorizer from '@core/auth/authorizer'
 import DateUtils from '@core/dateUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { useAsyncGetRequest, useI18n } from '../../../../../commonComponents/hooks'
-import ProfilePicture from '../../../../../commonComponents/profilePicture'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
-import * as AppState from '../../../../../app/appState'
+import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
+
+import { fetchActivityLogs, resetActivityLogs } from './actions'
+import * as AppState from '@webapp/app/appState'
 
 const ActivityLogView = props => {
 
-  const { surveyId } = props
+  const {
+    activityLogs,
+    canEditDef,
+    fetchActivityLogs
+  } = props
 
   const i18n = useI18n()
 
-  const { data: { activityLogs = [] } = { activityLog: [] }, dispatch: fetchActivityLogs, setState: setActivityLogs } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/activity-log`,
-    { params: { offset: 0, limit: 30 } }
-  )
-
   useEffect(() => {
     fetchActivityLogs()
+
+    return () => {
+      resetActivityLogs()
+    }
   }, [])
 
   return (
-    <div className="activity-log">
+    <SurveyDefsLoader
+      draft={canEditDef}
+      validate={canEditDef}>
 
-      <div className="activity-log__header">
-        {i18n.t('activityLogView.recentActivity')}
-      </div>
+      <div className="activity-log">
 
-      <div className="activity-log__content">
-        {
-          activityLogs.map(activityLog => (
-            <>
-              <div className="activity-log__content-item">
-                <div className="activity">
-                  <ProfilePicture userUuid={ActivityLog.getUserUuid(activityLog)} thumbnail={true}/>
-                  {`${ActivityLog.getUserName(activityLog)} ${i18n.t(`activityLogView.messages.${ActivityLog.getType(activityLog)}`, { ...ActivityLog.getContent(activityLog) })}`}
+        <div className="activity-log__header">
+          {i18n.t('activityLogView.recentActivity')}
+        </div>
+
+        <div className="activity-log__content">
+          {R.isEmpty(activityLogs)
+            ? null
+            : activityLogs.map(activityLog => (
+              <div key={ActivityLog.getId(activityLog)}>
+                <div
+                  className="activity-log__content-item">
+                  <div className="activity">
+                    <ProfilePicture userUuid={ActivityLog.getUserUuid(activityLog)} thumbnail={true}/>
+                    {`${ActivityLog.getUserName(activityLog)} ${activityLog.message}`}
+                  </div>
+                  <div className="date">
+                    {DateUtils.getRelativeDate(i18n, ActivityLog.getDateCreated(activityLog))}
+                  </div>
                 </div>
-                <div className="date">
-                  {DateUtils.getRelativeDate(i18n, ActivityLog.getDateCreated(activityLog))}
-                </div>
+                <div className="activity-log__content-item-sep"/>
               </div>
-              <div className="activity-log__content-item-sep"/>
-            </>
-          ))
-        }
-      </div>
+            ))
+          }
+        </div>
 
-    </div>
+      </div>
+    </SurveyDefsLoader>
   )
 
 }
 
-const mapStateToProps = state => ({
-  surveyId: SurveyState.getSurveyId(state),
-})
+const mapStateToProps = state => {
+  const user = AppState.getUser(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
 
-export default connect(mapStateToProps)(ActivityLogView)
+  return {
+    surveyId: SurveyState.getSurveyId(state),
+    activityLogs: ActivityLogState.getState(state),
+    canEditDef: Authorizer.canEditSurvey(user, surveyInfo),
+  }
+}
+
+export default connect(mapStateToProps, { fetchActivityLogs, resetActivityLogs })(ActivityLogView)

@@ -1,3 +1,5 @@
+const ActivityLog = require('@common/activityLog/activityLog')
+
 module.exports = {
 
   common: {
@@ -191,57 +193,57 @@ module.exports = {
     recentActivity: 'Recent activity',
     messages: {
       //survey
-      surveyCreate: 'created the survey',
-      surveyPropUpdate: 'updated survey {{key}}',
-      surveyPublish: 'published the survey',
-      surveyCollectImport: 'imported the survey from Collect',
+      [ActivityLog.type.surveyCreate]: 'created the survey',
+      [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
+      [ActivityLog.type.surveyPublish]: 'published the survey',
+      [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
 
       // nodeDef
-      nodeDefCreate: 'added node definition {{type}} in entity {{parentName}}',
-      nodeDefUpdate: 'updated {{keys}} of node definition {{name}}',
-      nodeDefMarkDeleted: 'deleted node definition {{name}}',
+      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{nodeDefParentName}}',
+      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{nodeDefName}}',
+      [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
 
       //category
-      categoryInsert: 'added category',
-      categoryPropUpdate: 'updated {{prop}} of category {{categoryName}}',
-      categoryDelete: 'deleted category {{categoryName}}',
-      categoryLevelInsert: 'added level at index {{index}} to category {{categoryName}}',
-      categoryLevelPropUpdate: 'updated level {{index}} {{prop}} of category {{categoryName}}',
-      categoryLevelDelete: 'deleted level {{index}} of category {{categoryName}}',
-      categoryItemInsert: 'added item to level {{index}} of category {{categoryName}}',
-      categoryItemPropUpdate: 'updated item {{code}} {{prop}} of category {{categoryName}}',
-      categoryItemDelete: 'deleted item {{code}} at level {{index}} of category {{categoryName}}',
-      categoryImport: 'imported CSV file to category {{categoryName}}',
+      [ActivityLog.type.categoryInsert]: 'added category',
+      [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
+      [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
+      [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
+      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{prop}} of category {{categoryName}}',
+      [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemInsert]: 'added item to level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{prop}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemDelete]: 'deleted item {{code}} at level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
 
       //taxonomy
-      taxonomyCreate: 'added taxonomy',
-      taxonomyPropUpdate: 'updated {{prop}} of taxonomy {{taxonomyName}}',
-      taxonomyDelete: 'deleted taxonomy {{taxonomyName}}',
-      taxonomyTaxaImport: 'imported CSV file to taxonomy {{taxonomyName}}',
-      taxonInsert: 'added taxon to taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
+      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{prop}} of taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
 
       //record
-      recordCreate: 'added record',
-      recordDelete: 'deleted record {{recordKeys}}',
-      recordStepUpdate: 'updated record step from {{stepFrom}} to {{stepTo}}',
+      [ActivityLog.type.recordCreate]: 'added record',
+      [ActivityLog.type.recordDelete]: 'deleted record {{recordKeys}}',
+      [ActivityLog.type.recordStepUpdate]: 'updated record step from {{stepFrom}} to {{stepTo}}',
 
       //node
-      nodeCreate: 'added node of type {{nodeDefName}}',
-      nodeValueUpdate: 'updated node {{path}} value',
-      nodeDelete: 'deleted node {{path}}',
+      [ActivityLog.type.nodeCreate]: 'added node of type {{nodeDefName}}',
+      [ActivityLog.type.nodeValueUpdate]: 'updated node {{path}} value',
+      [ActivityLog.type.nodeDelete]: 'deleted node {{path}}',
 
       // user
-      userInvite: 'invited user {{name}} with role {{role}}',
-      userUpdate: 'updated user {{name}} group to {{groupName}}',
-      userRemove: 'removed user {{name}} from survey',
+      [ActivityLog.type.userInvite]: 'invited user {{name}} with role {{role}}',
+      [ActivityLog.type.userUpdate]: 'updated user {{name}} group to {{groupName}}',
+      [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
 
       // analysis
-      processingChainCreate: 'added processing chain',
-      processingChainPropUpdate: 'updated {{prop}} processing chain {{label}}',
-      processingChainDelete: 'deleted processing chain {{label}}',
-      processingStepCreate: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      processingStepPropsUpdate: 'updated processing step {{index}} {{prop}} to {{value}}',
-      processingStepDelete: 'deleted processing step {{index}}',
+      [ActivityLog.type.processingChainCreate]: 'added processing chain',
+      [ActivityLog.type.processingChainPropUpdate]: 'updated {{prop}} processing chain {{label}}',
+      [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
+      [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
+      [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} {{prop}} to {{value}}',
+      [ActivityLog.type.processingStepDelete]: 'deleted processing step {{index}}',
     }
   },
 

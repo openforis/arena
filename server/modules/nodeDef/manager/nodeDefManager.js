@@ -15,19 +15,12 @@ const ActivityLogRepository = require('@server/modules/activityLog/repository/ac
 // ======= CREATE
 
 const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
-  await client.tx(async t => {
-    const nodeDefParentUuid = NodeDef.getParentUuid(nodeDefParam)
-    const nodeDefParent = nodeDefParentUuid ? await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefParentUuid, true, false, t) : null
-    const parentName = NodeDef.getName(nodeDefParent)
-    const activityLogContent = { ...nodeDefParam, parentName }
-
-    const [nodeDef] = await Promise.all([
+  await client.tx(async t => (await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, activityLogContent, system, t)
-    ])
-    return nodeDef
-  })
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
+    ]))[0]
+  )
 
 // ======= READ
 
@@ -100,7 +93,6 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
       ...(R.isEmpty(props) ? {} : { props }),
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
       keys: Object.keys({ ...props, ...propsAdvanced }),
-      name: NodeDef.getName(nodeDef)
     }
 
     await Promise.all([

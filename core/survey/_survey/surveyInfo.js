@@ -36,7 +36,7 @@ const cycleOneKey = '0'
 const getInfo = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
-const getId = R.prop(keys.id)
+const getId = ObjectUtils.getId
 
 const getUuid = ObjectUtils.getUuid
 

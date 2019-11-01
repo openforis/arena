@@ -64,8 +64,13 @@ export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   type: 'type',
   system: 'system',
-  userName: 'userName',
   userUuid: 'userUuid',
+}
+
+export const keysContent = {
+  nodeDefName: 'nodeDefName',
+  nodeDefParentName: 'nodeDefParentName',
+  userName: 'userName',
 }
 
 export const newActivity = (type, content, system = false) => ({
@@ -74,10 +79,14 @@ export const newActivity = (type, content, system = false) => ({
   [keys.system]: system,
 })
 
+export const getId = ObjectUtils.getId
 export const getUserUuid = R.prop(keys.userUuid)
-export const getUserName = R.prop(keys.userName)
 export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
 export const getDateCreated = ObjectUtils.getDateCreated
 
+// content props
+export const getUserName = R.path([keys.content, keysContent.userName])
+export const getNodeDefName = R.path([keys.content, keysContent.nodeDefName])
+export const getNodeDefParentName = R.path([keys.content, keys.nodeDefParentName])

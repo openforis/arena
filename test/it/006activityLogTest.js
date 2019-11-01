@@ -27,7 +27,7 @@ describe('Activity Log Test', async () => {
     const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
     const surveyId = Survey.getId(survey)
 
-    const surveyCreateLogs = await ActivityLogRepository.fetch(surveyId, ActivityLog.type.surveyCreate)
+    const surveyCreateLogs = await ActivityLogRepository.fetch(surveyId, true, ActivityLog.type.surveyCreate)
 
     expect(surveyCreateLogs).to.have.lengthOf(1)
 
@@ -50,7 +50,7 @@ describe('Activity Log Test', async () => {
 
     const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
-    const logs = await ActivityLogRepository.fetch(surveyId, [ActivityLog.type.recordCreate])
+    const logs = await ActivityLogRepository.fetch(surveyId, true, [ActivityLog.type.recordCreate])
     expect(logs.length).to.be.at.least(1)
 
     const recordCreateLogs = R.filter(
