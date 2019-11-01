@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const types = require('./types')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 // Built-in functions that can be called, i.e. the standard library.
 // Nothing outside of this set may be used.

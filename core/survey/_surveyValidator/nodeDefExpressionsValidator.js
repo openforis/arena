@@ -9,7 +9,7 @@ const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Expression = require('@core/expressionParser/expression')
 const ObjectUtils = require('@core/objectUtils')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const _getNodeValue = nodeDef =>
   NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)

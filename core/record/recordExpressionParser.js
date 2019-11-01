@@ -10,7 +10,7 @@ const Node = require('@core/record/node')
 const Expression = require('@core/expressionParser/expression')
 const Validation = require('@core/validation/validation')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const _getNodeValue = (survey, node) => {
   if (Node.isValueBlank(node))

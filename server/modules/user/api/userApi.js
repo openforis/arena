@@ -10,7 +10,7 @@ const UserValidator = require('@core/user/userValidator')
 const Validation = require('@core/validation/validation')
 const ProcessUtils = require('@core/processUtils')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 module.exports.init = app => {
 

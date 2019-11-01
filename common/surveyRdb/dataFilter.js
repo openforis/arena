@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const { types } = require('@core/expressionParser/expression')
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const js2sqlOperators = {
   '&&': 'AND',
