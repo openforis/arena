@@ -14,9 +14,6 @@ const ProcessUtils = require('./core/processUtils')
 
 const buildReport = ProcessUtils.ENV.buildReport
 
-const lastCommit = ProcessUtils.ENV.applicationVersion
-const versionString = `${lastCommit}_${new Date().toISOString()}`
-
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
 class CleanUpStatsPlugin {
@@ -48,7 +45,6 @@ const plugins = [
     template: './web-resources/index.html'
   }),
   new webpack.DefinePlugin({
-    __SYSTEM_VERSION__: JSON.stringify(versionString),
     __BUST__: JSON.stringify(uuidv4()),
     'process': {
       'env': {
@@ -59,7 +55,6 @@ const plugins = [
         'APPLICATION_VERSION': JSON.stringify(gitRevisionPlugin.version()),
         'GIT_COMMIT_HASH': JSON.stringify(gitRevisionPlugin.commithash()),
         'GIT_BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
-        'PACKAGE_VERSION': JSON.stringify(process.env.npm_package_version),
         }
     }
   }),

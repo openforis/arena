@@ -46,8 +46,7 @@ const AppSideBar = (props) => {
       <div
         className="app-version"
         data-commit-hash={ProcessUtils.ENV.gitCommithash}
-        data-branch={ProcessUtils.ENV.gitBranch}
-        data-package-version={ProcessUtils.ENV.packageVersion}>
+        data-branch={ProcessUtils.ENV.gitBranch}>
         OpenForis Arena<br/>
         {`${i18n.t('common.version')} ${ProcessUtils.ENV.applicationVersion}`}
       </div>
