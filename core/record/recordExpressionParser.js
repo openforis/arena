@@ -78,13 +78,11 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
 }
 
 const evalNodeQuery = async (survey, record, node, query) => {
-  const ctx = {
-    node,
-    functions: {
-      [Expression.types.Identifier]: _identifierEval(survey, record),
-    }
+  const functions = {
+    [Expression.types.Identifier]: _identifierEval(survey, record),
   }
-  return await Expression.evalString(query, ctx)
+
+  return await Expression.evalString(query, { node, functions })
 }
 
 const evalApplicableExpression = async (survey, record, nodeCtx, expressions) =>

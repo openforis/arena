@@ -167,9 +167,7 @@ const thisEval = (expr, _ctx) => {
 }
 
 const identifierEval = expr => {
-  // console.log('== identifierExpression ')
-  // console.log(expr)
-  return R.prop('name')(expr)
+  throw new SystemError('identifierEvalNotImplemented', { expr })
 }
 
 const groupEval = (expr, ctx) => {
