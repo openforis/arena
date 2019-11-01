@@ -78,12 +78,10 @@ const SortExpressionComponent = props => {
       survey,
       nodeDefUuidCols,
       nodeDefContext,
-      nodeDefCurrent,
       mode,
-      depth,
     } = props
 
-    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
+    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, mode, lang)
     return variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1)
   }
 
@@ -141,22 +139,17 @@ const mapStateToProps = (state, props) => {
 
   const {
     nodeDefUuidContext,
-    nodeDefUuidCurrent,
     nodeDefUuidCols,
   } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
-  const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
   const mode = Expression.modes.sql
-  const depth = 0
 
   return {
     survey,
     nodeDefUuidCols,
     nodeDefContext,
-    nodeDefCurrent,
     mode,
-    depth,
   }
 }
 

@@ -3,7 +3,9 @@ import './appSideBar.scss'
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
+import * as ProcessUtils from '@core/processUtils'
 import AppSideBarModules from './components/appSideBarModules'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as SideBarState from './appSidebarState'
@@ -21,6 +23,8 @@ const AppSideBar = (props) => {
 
   const element = useRef(null)
 
+  const i18n = useI18n()
+
   return (
     <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
       {/*toggle sidebar */}
@@ -37,6 +41,16 @@ const AppSideBar = (props) => {
         surveyInfo={surveyInfo}
         pathname={pathname}
         sideBarOpened={isSideBarOpened}/>
+
+      {isSideBarOpened &&
+      <div
+        className="app-version"
+        data-commit-hash={ProcessUtils.ENV.gitCommitHash}
+        data-branch={ProcessUtils.ENV.gitBranch}>
+        OpenForis Arena<br/>
+        {`${i18n.t('common.version')} ${ProcessUtils.ENV.applicationVersion}`}
+      </div>
+      }
 
     </div>
   )

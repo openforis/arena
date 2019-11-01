@@ -32,8 +32,8 @@ export const initApp = () => async dispatch => {
     }
     dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
   } catch (e) {
-    dispatch({ type: appPropsChange, i18n })
-    dispatch(throwSystemError(e.message))
+    dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n })
+    CognitoAuth.logout()
   }
 }
 

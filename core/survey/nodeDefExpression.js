@@ -7,6 +7,8 @@ const ValidationResult = require('@core/validation/validationResult')
 const StringUtils = require('@core/stringUtils')
 const ObjectUtils = require('@core/objectUtils')
 
+const Expression = require('@core/expressionParser/expression')
+
 const keys = {
   placeholder: 'placeholder',
   expression: 'expression',
@@ -47,19 +49,10 @@ const assocProp = (propName, value) => R.pipe(
 
 // ====== UTILS
 
-const extractNodeDefNames = (jsExpr = '') => {
-  if (StringUtils.isBlank(jsExpr))
-    return []
-
-  const names = []
-  const regex = /(node|sibling)\(['"](\w+)['"]\)/g
-
-  let matches
-  while (matches = regex.exec(jsExpr)) {
-    names.push(matches[2])
-  }
-  return names
-}
+const extractNodeDefNames = (jsExpr = '') =>
+  StringUtils.isBlank(jsExpr)
+    ? []
+    : Expression.getExpressionIdentifiers(Expression.fromString(jsExpr))
 
 const findReferencedNodeDefs = nodeDefExpressions =>
   R.pipe(

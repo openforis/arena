@@ -14,6 +14,4 @@ const types = {
   GroupExpression: 'GroupExpression',
 }
 
-module.exports = {
-  types
-}
+module.exports = types

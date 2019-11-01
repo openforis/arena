@@ -29,6 +29,7 @@ module.exports = {
 
   expressions: {
     expressionInvalid: 'validationErrors.expressions.expressionInvalid',
+    unableToFindNode: 'validationErrors.expressions.unableToFindNode',
     cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
     unableToFindNodeChild: 'validationErrors.expressions.unableToFindNodeChild',
     unableToFindNodeParent: 'validationErrors.expressions.unableToFindNodeParent',

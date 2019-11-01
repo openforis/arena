@@ -13,7 +13,7 @@ const Node = require('@core/record/node')
 const RecordValidator = require('@core/record/recordValidator')
 const Validation = require('@core/validation/validation')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')

@@ -1,4 +1,4 @@
-const SystemError = require('./systemError')
+const SystemError = require('@core/systemError')
 const UnauthorizedError = require('./unauthorizedError')
 
 const status = {

@@ -41,8 +41,8 @@ before(async () => {
         .maxCount(4),
       SB.attribute('percent_attr', NodeDef.nodeDefType.integer)
         .expressions(
-          NodeDefExpression.createExpression('this.getValue() > 0'),
-          NodeDefExpression.createExpression('this.getValue() <= 100')
+          NodeDefExpression.createExpression('percent_attr > 0'),
+          NodeDefExpression.createExpression('percent_attr <= 100'),
         )
     )
   ).buildAndStore()

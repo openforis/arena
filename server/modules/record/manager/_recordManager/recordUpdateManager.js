@@ -11,7 +11,7 @@ const Node = require('@core/record/node')
 
 const db = require('@server/db/db')
 const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const RecordRepository = require('@server/modules/record/repository/recordRepository')
 const FileRepository = require('@server/modules/record/repository/fileRepository')

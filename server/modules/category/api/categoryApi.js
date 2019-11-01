@@ -1,5 +1,5 @@
 const Request = require('@server/utils/request')
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const Category = require('@core/survey/category')
 const ObjectUtils = require('@core/objectUtils')

@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const GoogleFontsPlugin = require('google-fonts-plugin')
+const GitRevisionPlugin = require('git-revision-webpack-plugin')
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 require('dotenv').config()
@@ -12,9 +13,6 @@ const uuidv4 = require('uuid/v4')
 const ProcessUtils = require('./core/processUtils')
 
 const buildReport = ProcessUtils.ENV.buildReport
-
-const lastCommit = ProcessUtils.ENV.sourceVersion
-const versionString = lastCommit + '_' + new Date().toISOString()
 
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
@@ -35,8 +33,11 @@ class CleanUpStatsPlugin {
   }
 }
 
+const gitRevisionPlugin = new GitRevisionPlugin()
+
 // ==== init plugins
 const plugins = [
+  gitRevisionPlugin,
   new MiniCssExtractPlugin({
     filename: 'styles-[hash].css'
   }),
@@ -44,15 +45,17 @@ const plugins = [
     template: './web-resources/index.html'
   }),
   new webpack.DefinePlugin({
-    __SYSTEM_VERSION__: `"${versionString}"`,
-    __BUST__: `"${uuidv4()}"`,
+    __BUST__: JSON.stringify(uuidv4()),
     'process': {
       'env': {
         'NODE_ENV': JSON.stringify(ProcessUtils.ENV.nodeEnv),
         'COGNITO_REGION': JSON.stringify(ProcessUtils.ENV.cognitoRegion),
         'COGNITO_USER_POOL_ID': JSON.stringify(ProcessUtils.ENV.cognitoUserPoolId),
         'COGNITO_CLIENT_ID': JSON.stringify(ProcessUtils.ENV.cognitoClientId),
-      }
+        'APPLICATION_VERSION': JSON.stringify(gitRevisionPlugin.version()),
+        'GIT_COMMIT_HASH': JSON.stringify(gitRevisionPlugin.commithash()),
+        'GIT_BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
+        }
     }
   }),
   new GoogleFontsPlugin({

@@ -2,7 +2,7 @@
   "license": "MIT",
   "name": "open-foris-arena",
   "engines": {
-    "node": ">=10.15.3",
+    "node": ">=12.0.0",
     "yarn": ">=1.16.0"
   },
   "scripts": {
@@ -12,16 +12,16 @@
     "build": "webpack --display-error-details -p --config webpack.config.js",
     "build-prod-report": "cross-env NODE_ENV=production BUILD_REPORT=true webpack --display-error-details -p --config webpack.config.js",
     "build:watch": "webpack --display-error-details --config webpack.config.js --watch --experimental-worker",
-    "clean": "rm -rf dist/",
-    "start": "node --experimental-worker dist/server.js",
-    "postinstall": "webpack --display-error-details --config webpack.config.js",
     "watch": "npm run build:server:dev && npm-run-all --parallel build:watch nodemon:prod watch:server",
     "create-migration": "./server/db/migration/create-migration.sh",
     "build:server:dev": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.js",
     "dev:server": "npm run build:server:dev && npm-run-all --parallel nodemon:prod watch:server",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.js --watch",
-    "nodemon:prod": "cross-env NODE_ENV=development node-dev --no-notify --experimental-worker --inspect -- dist/server.js",
-    "test": "mocha-webpack --timeout 30000 --display-error-details --webpack-config webpack.config.test.js \"test/*/*.js\""
+    "nodemon:prod": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
+    "test": "mocha-webpack --timeout 30000 --display-error-details --webpack-config webpack.config.test.js \"test/*/*.js\"",
+    "postinstall": "webpack --display-error-details --config webpack.config.js",
+    "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test",
+    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "devDependencies": {
     "@babel/cli": "^7.6.3",
@@ -36,6 +36,7 @@
     "core-js": "3.3.3",
     "cross-env": "^6.0.3",
     "css-loader": "^3.2.0",
+    "git-revision-webpack-plugin": "^3.0.4",
     "google-fonts-plugin": "^4.1.0",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.8.0",
@@ -115,5 +116,5 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "version": "0.0.0"
+  "version": "0.0.1"
 }

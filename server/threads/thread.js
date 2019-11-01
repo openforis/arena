@@ -40,6 +40,7 @@ class Thread {
     } catch (e) {
       const error = e.toString()
       this.logger.error(`Error in thread:  ${error}`)
+      this.logger.error(e.stack)
       this.postMessage({ type: Thread.messageTypes.error, error })
     }
   }
