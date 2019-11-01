@@ -18,7 +18,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 .app-sidebar__btn-toggle {
   padding: 10px;
   position: absolute;
-  top: 0px;
+  top: 0;
   left: 12px;
 }
 
@@ -88,7 +88,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 
   .app-sidebar__module-placeholder {
     height: 30px;
-    padding: 0px;
+    padding: 0;
   }
 }
 
@@ -117,18 +117,15 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   }
 }
 
-//.app-sidebar__btn-of {
-//  color: rgba($white, 0.5);
-//  border-bottom: 1px solid rgba($white, 0.5) !important;
-//  text-transform: uppercase;
-//  font-weight: 600;
-//  letter-spacing: -0.10rem;
-//  font-size: .8rem;
-//  padding: .3rem .5rem .15rem;
-//
-//  &:hover {
-//    background-color: rgba($white, .1);
-//    color: rgba($white, .75);
-//    border-bottom: 1px solid rgba($white, 0.75) !important;
-//  }
-//}
+.app-version {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: $sidebarWidthOpened;
+  padding: 10px 20px;
+  font-size: .75rem;
+  color: lighten($black, 25%);
+  font-weight: 600;
+  text-align: center;
+}
+
