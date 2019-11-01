@@ -17,7 +17,7 @@ const TaxonomyManager = require('../manager/taxonomyManager')
 const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
 const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const requiredColumns = [
   'code',

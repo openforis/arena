@@ -75,40 +75,49 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
       )
   }
 
-  const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.defaultValues, true, nodeDependentPointersFilterFn)(record)
+  const nodePointersToUpdate = Record.getDependentNodePointers(
+    survey,
+    node,
+    Survey.dependencyTypes.defaultValues,
+    true, // includeSelf
+    nodeDependentPointersFilterFn,
+  )(record)
 
   //2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
-    nodePointersToUpdate.map(async nodePointer => {
-      const { nodeCtx, nodeDef } = nodePointer
+    nodePointersToUpdate.map(async ({ nodeCtx, nodeDef }) => {
 
       //3. evaluate applicable default value expression
-      const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))
+      const exprEval = await RecordExpressionParser.evalApplicableExpression(
+        survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef)
+      )
+
+      const oldValue = Node.getValue(nodeCtx, null)
 
       const exprValue = R.pipe(
         R.propOr(null, 'value'),
         R.unless(
           R.isNil,
-          value => RecordExpressionValueConverter.toNodeValue(survey, record, node, value)
+          value => RecordExpressionValueConverter.toNodeValue(survey, record, nodeCtx, value)
         )
       )(exprEval)
 
       //4. persist updated node value if changed, and return updated node
-      const oldValue = Node.getValue(nodeCtx, null)
+
+      if (R.equals(oldValue, exprValue)) return {}
+
       const nodeCtxUuid = Node.getUuid(nodeCtx)
 
-      return R.equals(oldValue, exprValue)
-        ? {}
-        : {
-          [nodeCtxUuid]: await NodeRepository.updateNode(
-            Survey.getId(survey),
-            nodeCtxUuid,
-            exprValue,
-            { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
-            Record.isPreview(record),
-            tx
-          )
-        }
+      return {
+        [nodeCtxUuid]: await NodeRepository.updateNode(
+          Survey.getId(survey),
+          nodeCtxUuid,
+          exprValue,
+          { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
+          Record.isPreview(record),
+          tx
+        )
+      }
     })
   )
 

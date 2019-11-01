@@ -1,10 +1,11 @@
 const R = require('ramda')
 
-const jsep = require('./helpers/jsep')
-const { evalExpression } = require('./helpers/evaluator')
-const { toString: toStringUtils, isValid } = require('./helpers/utils')
-const { types } = require('./helpers/types')
+const NodeDef = require('@core/survey/nodeDef')
 
+const jsep = require('./helpers/jsep')
+const Evaluator = require('./helpers/evaluator')
+const ExpressionUtils = require('./helpers/utils')
+const types = require('./helpers/types')
 const operators = require('./helpers/operators')
 
 const modes = {
@@ -13,14 +14,14 @@ const modes = {
 }
 
 const toString = (expr, exprMode = modes.json) => {
-  const string = toStringUtils(expr)
+  const string = ExpressionUtils.toString(expr)
 
   return exprMode === modes.sql
     ? R.pipe(
       R.replace(/&&/g, 'AND'),
       R.replace(/\|\|/g, 'OR'),
-      R.replace(/===/g, '='),
-      R.replace(/!==/g, '!='),
+      R.replace(/==/g, '='),
+      R.replace(/!=/g, '!='),
     )(string)
     : string
 }
@@ -31,17 +32,16 @@ const fromString = (string, exprMode = modes.json) => {
     R.pipe(
       R.replace(/AND/g, '&&'),
       R.replace(/OR/g, '||'),
-      R.replace(/=/g, '==='),
-      R.replace(/!===/g, '!=='),
-      R.replace(/>===/g, '>='),
-      R.replace(/<===/g, '<='),
+      R.replace(/=/g, '=='),
+      R.replace(/!==/g, '!='),
+      R.replace(/>==/g, '>='),
+      R.replace(/<==/g, '<='),
     )(string)
 
   return jsep(exprString)
 }
 
-const evalString = async (query, ctx) =>
-  await evalExpression(fromString(query), ctx)
+const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
 
 // ====== Type checking
 
@@ -67,6 +67,12 @@ const newBinary = (left, right, operator = '') => ({
   right,
 })
 
+// Return true if the nodeDef can be used in expressions and false otherwise
+const isValidExpressionType = nodeDef =>
+  !NodeDef.isEntity(nodeDef)
+  && !NodeDef.isCoordinate(nodeDef)
+  && !NodeDef.isFile(nodeDef)
+
 module.exports = {
   types,
   modes,
@@ -74,7 +80,8 @@ module.exports = {
   toString,
   fromString,
   evalString,
-  isValid,
+  isValid: ExpressionUtils.isValid,
+  getExpressionIdentifiers: Evaluator.getExpressionIdentifiers,
 
   // Type checking
   isLiteral: isType(types.Literal),
@@ -82,6 +89,7 @@ module.exports = {
   isBinary: isType(types.BinaryExpression),
   isIdentifier: isType(types.Identifier),
   isLogical: isType(types.LogicalExpression),
+  isValidExpressionType,
 
   // Instance creators
   newLiteral,

@@ -3,59 +3,60 @@ const R = require('ramda')
 const Validator = require('@core/validation/validator')
 const Validation = require('@core/validation/validation')
 const ValidationResult = require('@core/validation/validationResult')
-const Survey = require('../survey')
-const NodeDef = require('../nodeDef')
-const NodeDefExpression = require('../nodeDefExpression')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Expression = require('@core/expressionParser/expression')
 const ObjectUtils = require('@core/objectUtils')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
-const bindNode = (survey, nodeDef) => ({
-  ...nodeDef,
-  value: 1, //simulates node value
-  //simulates node value
-  getValue: () => NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1,
-  parent: () => {
-    const def = Survey.getNodeDefParent(nodeDef)(survey)
-    if (!def) {
-      const name = NodeDef.getName(nodeDef)
-      throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeParent, { name })
-    }
-    return bindNode(survey, def)
-  },
-  node: childName => {
-    if (NodeDef.isEntity(nodeDef)) {
-      const def = Survey.getNodeDefChildByName(nodeDef, childName)(survey)
-      if (!def) {
-        throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeChild, { name: childName })
-      }
-      return bindNode(survey, def)
-    } else {
-      const parentName = NodeDef.getName(nodeDef)
-      throw new SystemError(Validation.messageKeys.expressions.cannotGetChildOfAttribute, { childName, parentName })
-    }
-  },
-  sibling: name => {
-    const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
-    if (!def) {
-      throw new SystemError(Validation.messageKeys.expressions.unableToFindNodeSibling, { name })
-    }
-    return bindNode(survey, def)
-  },
-})
+const _getNodeValue = nodeDef =>
+  NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
+    ? { props: { code: '' } }
+    : 1 //simulates node value
+
+// Get reachable nodes, i.e. the children of the node's ancestors.
+// NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
+const _getReachableNodeDefs = (survey, nodeDef) => {
+  const visibleNodes = []
+  const visitorFn = nodeDef => {
+    const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+    visibleNodes.unshift(...nodeDefChildren)
+  }
+  Survey.visitAncestorsAndSelf(nodeDef, visitorFn)(survey)
+  return visibleNodes
+}
+
+const _getReachableNodeValue = (survey, nodeDef, nodeName) => {
+  const allNodeDefs = _getReachableNodeDefs(survey, nodeDef)
+  const def = allNodeDefs.filter(x => NodeDef.getName(x) === nodeName)[0]
+
+  if (!def)
+    throw new SystemError(
+      Validation.messageKeys.expressions.unableToFindNode,
+      { name: nodeName } )
+  if (!Expression.isValidExpressionType(def))
+    throw new SystemError(
+      Validation.messageKeys.expressions.unableToFindNode,
+      { name: nodeName, type: NodeDef.getType(def) } )
+
+  return _getNodeValue(def)
+}
+
+const _identifierEval = (survey, nodeDef) => (expr, _ctx) => {
+  const nodeName = R.prop('name')(expr)
+  return _getReachableNodeValue(survey, nodeDef, nodeName)
+}
 
 const validateNodeDefExpr = async (survey, nodeDef, expr) => {
+  const functions = {
+    [Expression.types.Identifier]: _identifierEval(survey, nodeDef)
+  }
+
   try {
-    await Expression.evalString(
-      expr,
-      {
-        node: bindNode(survey, nodeDef),
-        functions: {
-          [Expression.types.ThisExpression]: (expr, { node }) => node,
-        },
-      }
-    )
+    // NB: `node` not needed here
+    await Expression.evalString(expr, { functions })
     return null
   } catch (e) {
     const details = R.is(SystemError, e) ? `$t(${e.key})` : e.toString()

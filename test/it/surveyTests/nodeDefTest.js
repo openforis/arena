@@ -30,15 +30,16 @@ const createNodeDefsTest = async () => {
   const rootDef = await fetchRootNodeDef()
   const rootDefUuid = NodeDef.getUuid(rootDef)
 
-  const type = NodeDef.nodeDefType.text
-  const nodeDefReq = createNodeDef(rootDefUuid, type, `node_def_${type}`)
-  const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
+  for (const nodeType in NodeDef.nodeDefType) {
+    const nodeDefReq = createNodeDef(rootDefUuid, nodeType, `node_def_${nodeType}`)
+    const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
-  expect(nodeDefDb.id).to.not.be.undefined
-  expect(nodeDefDb.type).to.equal(type)
-  expect(nodeDefDb.parentUuid).to.equal(NodeDef.getParentUuid(nodeDefReq))
-  expect(nodeDefDb.uuid).to.equal(NodeDef.getUuid(nodeDefReq))
-  expect(nodeDefDb.props).to.eql(nodeDefReq.props)
+    expect(nodeDefDb.id).to.not.be.undefined
+    expect(nodeDefDb.type).to.equal(nodeType)
+    expect(nodeDefDb.parentUuid).to.equal(NodeDef.getParentUuid(nodeDefReq))
+    expect(nodeDefDb.uuid).to.equal(NodeDef.getUuid(nodeDefReq))
+    expect(nodeDefDb.props).to.eql(nodeDefReq.props)
+  }
 }
 
 const updateNodeDefTest = async () => {

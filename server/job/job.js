@@ -8,7 +8,7 @@ const { jobEvents, jobStatus } = require('./jobUtils')
 const User = require('@core/user/user.js')
 const { throttle, cancelThrottle } = require('@core/functionsDefer')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 class JobEvent {
 

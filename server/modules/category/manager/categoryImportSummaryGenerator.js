@@ -5,7 +5,7 @@ const Category = require('@core/survey/category')
 const CategoryImportSummary = require('@core/survey/categoryImportSummary')
 const Validation = require('@core/validation/validation')
 const StringUtils = require('@core/stringUtils')
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 
 const CSVReader = require('@server/utils/file/csvReader')
 

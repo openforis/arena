@@ -8,7 +8,7 @@ const { isBlank, contains } = require('@core/stringUtils')
 const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 const Request = require('@server/utils/request')
 
 const toItem = (type, lang = null) =>

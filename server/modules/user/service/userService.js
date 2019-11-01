@@ -14,7 +14,7 @@ const User = require('@core/user/user')
 const AuthGroup = require('@core/auth/authGroup')
 const Authorizer = require('@core/auth/authorizer')
 
-const SystemError = require('@server/utils/systemError')
+const SystemError = require('@core/systemError')
 const UnauthorizedError = require('@server/utils/unauthorizedError')
 const Mailer = require('@server/utils/mailer')
 

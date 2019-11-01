@@ -34,7 +34,8 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
   }
   const validations = NodeDef.getValidations(nodeDef)
 
-  const applicableExpressionsEval = await RecordExpressionParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
+  const applicableExpressionsEval = await RecordExpressionParser.evalApplicableExpressions(
+    survey, record, node, NodeDefValidations.getExpressions(validations) )
 
   let errorMessage = null
 

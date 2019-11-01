@@ -1,5 +1,5 @@
 import db from '@server/db/db'
-import SystemError from '@server/utils/systemError'
+import SystemError from '@core/systemError'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
