@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import DateUtils from '@core/dateUtils'
 
-import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ActivityLogMessage from './activityLogMessage'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
@@ -18,7 +18,7 @@ import { fetchActivityLogs, resetActivityLogs } from './actions'
 
 const ActivityLogView = props => {
 
-  const { activityLogs, fetchActivityLogs } = props
+  const { activityLogMessages, fetchActivityLogs } = props
 
   const i18n = useI18n()
 
@@ -37,24 +37,25 @@ const ActivityLogView = props => {
         {i18n.t('activityLogView.recentActivity')}
       </div>
 
-      <div className="activity-log__content">
-        {R.isEmpty(activityLogs)
-          ? null
-          : activityLogs.map(activityLog => (
-            <div key={ActivityLog.getId(activityLog)}>
-              <div
-                className="activity-log__content-item">
-                <div className="activity">
-                  <ProfilePicture userUuid={ActivityLog.getUserUuid(activityLog)} thumbnail={true}/>
-                  {`${ActivityLog.getUserName(activityLog)} ${activityLog.message}`}
+      <div className="activity-log__messages">
+        {
+          R.isEmpty(activityLogMessages)
+            ? null
+            : activityLogMessages.map(message => (
+              <div key={ActivityLogMessage.getId(message)}>
+                <div
+                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`}>
+                  <div className="activity">
+                    <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true}/>
+                    {`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
+                  </div>
+                  <div className="date">
+                    {DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}
+                  </div>
                 </div>
-                <div className="date">
-                  {DateUtils.getRelativeDate(i18n, ActivityLog.getDateCreated(activityLog))}
-                </div>
+                <div className="activity-log__message-separator"/>
               </div>
-              <div className="activity-log__content-item-sep"/>
-            </div>
-          ))
+            ))
         }
       </div>
 
@@ -65,7 +66,7 @@ const ActivityLogView = props => {
 
 const mapStateToProps = state => ({
   surveyId: SurveyState.getSurveyId(state),
-  activityLogs: ActivityLogState.getState(state),
+  activityLogMessages: ActivityLogState.getState(state),
 })
 
 export default connect(mapStateToProps, { fetchActivityLogs, resetActivityLogs })(ActivityLogView)

@@ -2,14 +2,11 @@ import camelize from 'camelize'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as User from '@core/user/user'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-
 
 //===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
@@ -48,28 +45,13 @@ export const fetch = async (surveyId, draft = false, activityTypes = null, offse
       )
     SELECT
       l.*,
-      l.content || jsonb_build_object(
-        'userName', u.name,
-        'nodeDefParentUuid', node_def_parent.uuid,
-        'nodeDefName', ${DbUtils.getPropColCombined(NodeDef.propKeys.name, draft, 'node_def.')},
-        'nodeDefParentName', ${DbUtils.getPropColCombined(NodeDef.propKeys.name, draft, 'node_def_parent.')},
-        'categoryName', ${DbUtils.getPropColCombined(Category.props.name, draft, 'category.')}
-      ) as content
+      u.name AS user_name
     FROM
       log AS l
     JOIN
       public."user" u
     ON
       u.uuid = l.user_uuid
-    LEFT OUTER JOIN
-      ${getSurveyDBSchema(surveyId)}.node_def
-      on l.content ->> 'uuid' = node_def.uuid::text
-    LEFT OUTER JOIN
-      ${getSurveyDBSchema(surveyId)}.node_def node_def_parent
-      on l.content ->> 'parentUuid' = node_def_parent.uuid::text
-    LEFT OUTER JOIN
-      ${getSurveyDBSchema(surveyId)}.category
-      on l.content ->> 'uuid' = category.uuid::text
     WHERE
       l.rank = 1
     ORDER BY

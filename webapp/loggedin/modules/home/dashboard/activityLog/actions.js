@@ -5,30 +5,29 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 
-import * as MessageGenerator from './messageGenerator'
+import * as ActivityLogMessageParser from './activityLogMessageParser'
 
-export const homeActivityLogsUpdate = 'home/activityLogs/update'
-export const homeActivityLogsReset = 'home/activityLogs/reset'
+export const homeActivityMessagesUpdate = 'home/activityLog/messages/update'
+export const homeActivityMessagesReset = 'home/activityLog/messages/reset'
 
-export const fetchActivityLogs = (offset = 0, limit = 30) =>
-  async (dispatch, getState) => {
-    try {
-      const state = getState()
-      const survey = SurveyState.getSurvey(state)
-      const surveyId = Survey.getId(survey)
-      const i18n = AppState.getI18n(state)
+export const fetchActivityLogs = (offset = 0, limit = 30) => async (dispatch, getState) => {
+  try {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const surveyId = Survey.getId(survey)
+    const i18n = AppState.getI18n(state)
 
-      const { data } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params: { offset, limit } })
+    const { data: { activityLogs } } = await axios.get(
+      `/api/survey/${surveyId}/activity-log`,
+      { params: { offset, limit } }
+    )
 
-      const activityLogs = data.activityLogs.map(activityLog => ({
-        ...activityLog,
-        ...MessageGenerator.generate(i18n, survey, activityLog)
-      }))
+    const activityLogMessages = activityLogs.map(ActivityLogMessageParser.toMessage(i18n, survey))
 
-      dispatch({ type: homeActivityLogsUpdate, activityLogs })
-    } catch (e) {
-      console.log(e)
-    }
+    dispatch({ type: homeActivityMessagesUpdate, activityLogMessages })
+  } catch (e) {
+    console.log(e)
   }
+}
 
-export const resetActivityLogs = () => dispatch => dispatch({ type: homeActivityLogsReset })
+export const resetActivityLogs = () => dispatch => dispatch({ type: homeActivityMessagesReset })

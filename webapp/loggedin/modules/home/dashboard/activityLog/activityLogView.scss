@@ -23,7 +23,7 @@
   font-size: .9rem;
 }
 
-.activity-log__content {
+.activity-log__messages {
   margin-top: 45px;
   padding: 10px 0;
   height: calc(100% - 45px);
@@ -31,12 +31,16 @@
   position: relative;
 }
 
-.activity-log__content-item {
+.activity-log__message {
   display: grid;
   grid-template-columns: 1fr 120px;
   align-items: center;
   font-size: .8rem;
   grid-column-gap: 20px;
+
+  &.item-deleted {
+    text-decoration: line-through;
+  }
 
   .activity {
     display: flex;
@@ -56,7 +60,7 @@
   }
 }
 
-.activity-log__content-item-sep {
+.activity-log__message-separator {
   width: 70%;
   height: 1px;
   margin: 8px 15%;

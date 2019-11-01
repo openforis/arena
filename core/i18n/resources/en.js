@@ -199,8 +199,8 @@ module.exports = {
       [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
 
       // nodeDef
-      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{nodeDefParentName}}',
-      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{nodeDefName}}',
+      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
+      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
       [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
 
       //category
