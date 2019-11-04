@@ -15,12 +15,14 @@ const ActivityLogRepository = require('@server/modules/activityLog/repository/ac
 // ======= CREATE
 
 const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
-  await client.tx(async t => (await Promise.all([
+  await client.tx(async t => {
+    const [nodeDef] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
-    ]))[0]
-  )
+    ])
+    return nodeDef
+  })
 
 // ======= READ
 
