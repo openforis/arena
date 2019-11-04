@@ -43,10 +43,11 @@ module.exports = async () => {
 
   app.use(/^\/$/, (req, res) => res.redirect('/app/home'))
 
-  app.use('/', express.static(`${__dirname}/../../dist`))
-  app.use('/app*', express.static(`${__dirname}/../../dist`))
-  app.use('/img/', express.static(`${__dirname}/../../web-resources/img`))
-  // app.use('/css/', express.static(`${__dirname}/../../web-resources/css`))
+  const dist = ProcessUtils.ENV.arenaDist
+  const imgDir = `${ProcessUtils.ENV.arenaRoot}/web-resources/img`
+  app.use('/', express.static(dist))
+  app.use('/app*', express.static(dist))
+  app.use('/img/', express.static(imgDir))
 
   // ====== apis
   authApi.init(app)
