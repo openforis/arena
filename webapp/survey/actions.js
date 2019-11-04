@@ -54,9 +54,9 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
 
 export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
 
-export const reloadSurveyDefs = (draft = false, validate = false) => dispatch => {
-  dispatch(resetSurveyDefs())
-  dispatch(initSurveyDefs(draft, validate))
+export const reloadSurveyDefs = (draft = false, validate = false) => async dispatch => {
+  await dispatch(resetSurveyDefs())
+  await dispatch(initSurveyDefs(draft, validate))
 }
 
 // ====== SET ACTIVE SURVEY
@@ -75,8 +75,9 @@ export const publishSurvey = () => async (dispatch, getState) => {
   const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
 
   dispatch(
-    showAppJobMonitor(data.job, () => {
-      dispatch(setActiveSurvey(surveyId, true))
+    showAppJobMonitor(data.job, async () => {
+      await dispatch(setActiveSurvey(surveyId, true))
+      await dispatch(initSurveyDefs(true, true))
     })
   )
 }
