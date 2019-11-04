@@ -29,7 +29,7 @@ export default {
 
   [ActivityLog.type.categoryLevelInsert]: survey => activityLog => {
     const categoryLevelInserted = ActivityLog.getContent(activityLog)
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
 
     return {
       index: CategoryLevel.getIndex(categoryLevelInserted),
@@ -38,7 +38,7 @@ export default {
   },
 
   [ActivityLog.type.categoryLevelPropUpdate]: survey => activityLog => {
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
     const levelUuid = ActivityLog.getContentUuid(activityLog)
     const level = Category.getLevelByUuid(levelUuid)(category)
 
@@ -50,7 +50,7 @@ export default {
   },
 
   [ActivityLog.type.categoryLevelDelete]: survey => activityLog => {
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
     const index = ActivityLog.getContentIndex(activityLog)
 
     return {
@@ -63,7 +63,7 @@ export default {
 
   [ActivityLog.type.categoryItemInsert]: survey => activityLog => {
     const itemInserted = ActivityLog.getContent(activityLog)
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
     const levelUuid = CategoryItem.getLevelUuid(itemInserted)
     const level = Category.getLevelByUuid(levelUuid)(category)
 
@@ -74,7 +74,7 @@ export default {
   },
 
   [ActivityLog.type.categoryItemPropUpdate]: survey => activityLog => {
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
 
     return {
       code: ActivityLog.getContentCode(activityLog),
@@ -84,7 +84,7 @@ export default {
   },
 
   [ActivityLog.type.categoryItemDelete]: survey => activityLog => {
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
     const levelUuid = ActivityLog.getContentLevelUuid(activityLog)
     const level = Category.getLevelByUuid(levelUuid)(category)
 
@@ -98,7 +98,7 @@ export default {
   // ===== CATEGORY IMPORT
 
   [ActivityLog.type.categoryImport]: survey => activityLog => {
-    const category = ActivityLogMessageParserUtils.getCategory(survey)(activityLog)
+    const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
 
     return {
       categoryName: Category.getName(category)
