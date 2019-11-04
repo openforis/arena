@@ -1,0 +1,55 @@
+version: '3.4'
+services:
+
+  db:
+    image: "mdillon/postgis:11"
+    environment:
+      # Must duplicate due to limitations of docker-compose:
+      POSTGRES_DB: of-arena-dev
+      POSTGRES_USER: arena
+      POSTGRES_PASSWORD: arena
+
+  app_server:
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "9990:9090"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+      args:
+        COGNITO_REGION: "$COGNITO_REGION"
+        COGNITO_USER_POOL_ID: "$COGNITO_USER_POOL_ID"
+        COGNITO_CLIENT_ID: "$COGNITO_CLIENT_ID"
+
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: of-arena-dev
+      PGUSER: arena
+      PGPASSWORD: arena
+      TEMP_FOLDER: /tmp/arena_upload
+      ANALYSIS_OUTPUT_DIR: /tmp/arena/analysis
+
+    # Execute tests and migrations when postgres is finished:
+    command: "sh -c '
+      while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
+      exec pm2-runtime server.js
+    '"
+
+  web:
+    depends_on:
+      - app_server
+    ports:
+      - "9880:80"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod_web
+      args:
+        COGNITO_REGION: "$COGNITO_REGION"
+        COGNITO_USER_POOL_ID: "$COGNITO_USER_POOL_ID"
+        COGNITO_CLIENT_ID: "$COGNITO_CLIENT_ID"

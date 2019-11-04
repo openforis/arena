@@ -24,7 +24,7 @@ before_install:
 
 script:
   - mkdir -p "$TEMP_FOLDER" "$ANALYSIS_OUTPUT_DIR"
-  - yarn --ignore-scripts
+  - yarn install --ignore-scripts --frozen-lockfile
   - yarn build:server:prod # compile server "binary"
   - yarn server:migrate # migrate DB to latest version
   - yarn test # run test suite (depends on server:migrate)
