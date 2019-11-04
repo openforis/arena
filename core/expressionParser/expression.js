@@ -70,6 +70,7 @@ const newBinary = (left, right, operator = '') => ({
 // Return true if the nodeDef can be used in expressions and false otherwise
 const isValidExpressionType = nodeDef =>
   !NodeDef.isEntity(nodeDef)
+  && !NodeDef.isMultiple(nodeDef)
   && !NodeDef.isCoordinate(nodeDef)
   && !NodeDef.isFile(nodeDef)
 

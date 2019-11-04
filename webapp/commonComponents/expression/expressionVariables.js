@@ -70,8 +70,8 @@ export const getVariables = (survey, nodeDefContext, mode, preferredLang) => {
       getVariables(
         survey,
         Survey.getNodeDefParent(nodeDefContext)(survey),
-        null,
         mode,
+        preferredLang,
       )
     )
 }
