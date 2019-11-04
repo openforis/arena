@@ -209,11 +209,11 @@ module.exports = {
       [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
       [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
       [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
-      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{prop}} of category {{categoryName}}',
+      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{key}} of category {{categoryName}}',
       [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemInsert]: 'added item to level {{index}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{prop}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemDelete]: 'deleted item {{code}} at level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemInsert]: 'added item to level {{levelIndex}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{key}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemDelete]: 'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
       [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
 
       //taxonomy

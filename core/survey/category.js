@@ -127,6 +127,7 @@ module.exports = {
   getName: ObjectUtils.getProp(props.name, ''),
   getLevelsArray,
   getLevelByIndex,
+  getLevelByUuid,
   isPublished: R.propOr(false, keys.published),
 
   // UPDATE

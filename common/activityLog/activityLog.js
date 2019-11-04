@@ -73,6 +73,13 @@ export const keysContent = {
   parentUuid: ObjectUtils.keys.parentUuid,
   name: ObjectUtils.keys.name,
   key: 'key',
+  value: 'value',
+  //category
+  categoryName: 'categoryName',
+  categoryUuid: 'categoryUuid',
+  index: 'index',
+  code: 'code',
+  levelUuid: 'levelUuid',
 }
 
 // ====== CREATE
@@ -100,3 +107,9 @@ export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)
 export const getContentKey = _getContentProp(keysContent.key)
+// content props category
+export const getContentCategoryName = _getContentProp(keysContent.categoryName)
+export const getContentCategoryUuid = _getContentProp(keysContent.categoryUuid)
+export const getContentIndex = _getContentProp(keysContent.index)
+export const getContentCode = _getContentProp(keysContent.code)
+export const getContentLevelUuid = _getContentProp(keysContent.levelUuid)

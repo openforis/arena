@@ -3,15 +3,19 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogMessage from './activityLogMessage'
 
 import i18nMessageParamsFnsSurvey from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsSurvey'
+import i18nMessageParamsFnsCategory from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsCategory'
 
 import isItemDeletedFnsSurvey from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsSurvey'
+import isItemDeletedFnsCategory from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsCategory'
 
 const i18nMessageParamsFns = {
   ...i18nMessageParamsFnsSurvey,
+  ...i18nMessageParamsFnsCategory,
 }
 
 const isItemDeletedFns = {
-  ...isItemDeletedFnsSurvey
+  ...isItemDeletedFnsSurvey,
+  ...isItemDeletedFnsCategory,
 }
 
 export const toMessage = (i18n, survey) => activityLog => {
