@@ -88,15 +88,14 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
       ? await _updateNodeDefOnCyclesUpdate(surveyId, nodeDefUuid, props[NodeDef.propKeys.cycles], t)
       : []
 
-    const nodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t)
-
     const logContent = {
       uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
-    await Promise.all([
+    const [nodeDef] = await Promise.all([
+      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t)
     ])
