@@ -2,10 +2,11 @@ import camelize from 'camelize'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as User from '@core/user/user'
-import * as db from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+
+import * as db from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 //===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
@@ -28,6 +29,7 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       log AS
       (
         SELECT
+          a.id,
           a.type,
           ${DbUtils.selectDate('a.date_created', 'date_created')},
           a.user_uuid,
@@ -43,17 +45,13 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       )
     SELECT
       l.*,
-      u.name,
-      n.uuid as node_def_parent_uuid
+      u.name AS user_name
     FROM
       log AS l
     JOIN
       public."user" u
     ON
       u.uuid = l.user_uuid
-    LEFT OUTER JOIN
-      ${getSurveyDBSchema(surveyId)}.node_def n
-      on l.content ->> 'parentUuid'  = n.uuid::text
     WHERE
       l.rank = 1
     ORDER BY

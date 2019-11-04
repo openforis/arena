@@ -1,3 +1,5 @@
+const ActivityLog = require('@common/activityLog/activityLog')
+
 module.exports = {
 
   common: {
@@ -186,8 +188,63 @@ module.exports = {
       year: '{{count}} Year',
       year_plural: '{{count}} Years',
     },
-    activityLog: {
-      recentActivity: 'Recent activity',
+  },
+
+  activityLogView: {
+    recentActivity: 'Recent activity',
+    messages: {
+      //survey
+      [ActivityLog.type.surveyCreate]: 'created the survey',
+      [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
+      [ActivityLog.type.surveyPublish]: 'published the survey',
+      [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
+
+      // nodeDef
+      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
+      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
+      [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
+
+      //category
+      [ActivityLog.type.categoryInsert]: 'added category',
+      [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
+      [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
+      [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
+      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{prop}} of category {{categoryName}}',
+      [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemInsert]: 'added item to level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{prop}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemDelete]: 'deleted item {{code}} at level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
+
+      //taxonomy
+      [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
+      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{prop}} of taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
+
+      //record
+      [ActivityLog.type.recordCreate]: 'added record',
+      [ActivityLog.type.recordDelete]: 'deleted record {{recordKeys}}',
+      [ActivityLog.type.recordStepUpdate]: 'updated record step from {{stepFrom}} to {{stepTo}}',
+
+      //node
+      [ActivityLog.type.nodeCreate]: 'added node of type {{nodeDefName}}',
+      [ActivityLog.type.nodeValueUpdate]: 'updated node {{path}} value',
+      [ActivityLog.type.nodeDelete]: 'deleted node {{path}}',
+
+      // user
+      [ActivityLog.type.userInvite]: 'invited user {{name}} with role {{role}}',
+      [ActivityLog.type.userUpdate]: 'updated user {{name}} group to {{groupName}}',
+      [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
+
+      // analysis
+      [ActivityLog.type.processingChainCreate]: 'added processing chain',
+      [ActivityLog.type.processingChainPropUpdate]: 'updated {{prop}} processing chain {{label}}',
+      [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
+      [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
+      [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} {{prop}} to {{value}}',
+      [ActivityLog.type.processingStepDelete]: 'deleted processing step {{index}}',
     }
   },
 

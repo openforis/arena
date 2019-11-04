@@ -91,7 +91,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     const logContent = {
       uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
-      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced })
+      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
     const [nodeDef] = await Promise.all([
@@ -123,9 +123,12 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
   await db.tx(async t => {
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
-    await markSurveyDraft(surveyId, t)
+    const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { uuid: nodeDefUuid }, false, t)
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t)
+    ])
 
     return nodeDef
   })

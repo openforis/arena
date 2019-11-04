@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as ObjectUtils from '@core/objectUtils'
+
 export const type = {
   //survey
   surveyCreate: 'surveyCreate',
@@ -19,7 +21,7 @@ export const type = {
   categoryLevelInsert: 'categoryLevelInsert',
   categoryLevelPropUpdate: 'categoryLevelPropUpdate',
   categoryLevelDelete: 'categoryLevelDelete',
-  categoryLevelsDelete: 'categoryLevelsDelete',
+  categoryLevelsDelete: 'categoryLevelsDelete', //system
   categoryItemInsert: 'categoryItemInsert',
   categoryItemPropUpdate: 'categoryItemPropUpdate',
   categoryItemDelete: 'categoryItemDelete',
@@ -29,7 +31,7 @@ export const type = {
   taxonomyCreate: 'taxonomyCreate',
   taxonomyPropUpdate: 'taxonomyPropUpdate',
   taxonomyDelete: 'taxonomyDelete',
-  taxonomyTaxaDelete: 'taxonomyTaxaDelete',
+  taxonomyTaxaDelete: 'taxonomyTaxaDelete', //system
   taxonomyTaxaImport: 'taxonomyTaxaImport',
   taxonInsert: 'taxonInsert',
 
@@ -58,17 +60,43 @@ export const type = {
 }
 
 export const keys = {
-  type: 'type',
   content: 'content',
+  dateCreated: ObjectUtils.keys.dateCreated,
+  type: 'type',
   system: 'system',
+  userUuid: 'userUuid',
+  userName: 'userName',
 }
 
+export const keysContent = {
+  uuid: ObjectUtils.keys.uuid,
+  parentUuid: ObjectUtils.keys.parentUuid,
+  name: ObjectUtils.keys.name,
+  key: 'key',
+}
+
+// ====== CREATE
 export const newActivity = (type, content, system = false) => ({
   [keys.type]: type,
   [keys.content]: content,
   [keys.system]: system,
 })
 
+// ====== READ
+
+export const getId = ObjectUtils.getId
+export const getUserUuid = R.prop(keys.userUuid)
 export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
+export const getDateCreated = ObjectUtils.getDateCreated
+
+// props associated from fetch
+export const getUserName = R.prop(keys.userName)
+
+// content props
+const _getContentProp = prop => R.path([keys.content, prop])
+export const getContentUuid = _getContentProp(keysContent.uuid)
+export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
+export const getContentName = _getContentProp(keysContent.name)
+export const getContentKey = _getContentProp(keysContent.key)

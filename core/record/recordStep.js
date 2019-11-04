@@ -1,8 +1,10 @@
 const R = require('ramda')
 
+const ObjectUtils = require('@core/objectUtils')
+
 const keys = {
   steps: 'steps',
-  id: 'id',
+  id: ObjectUtils.keys.id,
   name: 'name',
 }
 
@@ -36,7 +38,7 @@ const getNextStep = stepId => getStepIncrement(stepId, +1)
 
 const getPreviousStep = stepId => getStepIncrement(stepId, -1)
 
-const getId = R.prop(keys.id)
+const getId = ObjectUtils.getId
 const getName = R.prop(keys.name)
 
 const areAdjacent = (step1, step2) => {

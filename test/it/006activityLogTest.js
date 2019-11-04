@@ -27,7 +27,7 @@ describe('Activity Log Test', async () => {
     const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
     const surveyId = Survey.getId(survey)
 
-    const surveyCreateLogs = await ActivityLogRepository.fetch(surveyId, ActivityLog.type.surveyCreate)
+    const surveyCreateLogs = await ActivityLogRepository.fetch(surveyId, [ActivityLog.type.surveyCreate])
 
     expect(surveyCreateLogs).to.have.lengthOf(1)
 
