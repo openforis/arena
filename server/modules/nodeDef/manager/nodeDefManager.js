@@ -92,7 +92,6 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
       uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
-      keys: Object.keys({ ...props, ...propsAdvanced }),
     }
 
     await Promise.all([
