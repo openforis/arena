@@ -8,6 +8,10 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils'
 
 export default {
+  [ActivityLog.type.surveyPropUpdate]: () => activityLog => ({
+    key: ActivityLog.getContentKey(activityLog),
+  }),
+
   [ActivityLog.type.nodeDefCreate]: survey => activityLog => {
     const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
     const nodeDefParent = R.pipe(
@@ -33,7 +37,7 @@ export default {
     }
   },
 
-  [ActivityLog.type.nodeDefMarkDeleted]: _ => activityLog => ({
+  [ActivityLog.type.nodeDefMarkDeleted]: () => activityLog => ({
     name: ActivityLog.getContentName(activityLog)
   }),
 }

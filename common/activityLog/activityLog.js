@@ -72,6 +72,7 @@ export const keysContent = {
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   name: ObjectUtils.keys.name,
+  key: 'key',
 }
 
 // ====== CREATE
@@ -98,3 +99,4 @@ const _getContentProp = prop => R.path([keys.content, prop])
 export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)
+export const getContentKey = _getContentProp(keysContent.key)
