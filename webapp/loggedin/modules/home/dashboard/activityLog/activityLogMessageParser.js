@@ -4,18 +4,22 @@ import * as ActivityLogMessage from './activityLogMessage'
 
 import i18nMessageParamsFnsSurvey from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsSurvey'
 import i18nMessageParamsFnsCategory from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsCategory'
+import i18nMessageParamsFnsTaxonomy from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsTaxonomy'
 
 import isItemDeletedFnsSurvey from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsSurvey'
 import isItemDeletedFnsCategory from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsCategory'
+import isItemDeletedFnsTaxonomy from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsTaxonomy'
 
 const i18nMessageParamsFns = {
   ...i18nMessageParamsFnsSurvey,
   ...i18nMessageParamsFnsCategory,
+  ...i18nMessageParamsFnsTaxonomy,
 }
 
 const isItemDeletedFns = {
   ...isItemDeletedFnsSurvey,
   ...isItemDeletedFnsCategory,
+  ...isItemDeletedFnsTaxonomy,
 }
 
 export const toMessage = (i18n, survey) => activityLog => {

@@ -2,7 +2,6 @@ const R = require('ramda')
 
 const ActivityLog = require('@common/activityLog/activityLog')
 
-
 const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('@core/survey/taxonomy')
@@ -133,9 +132,9 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, syst
       TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyPropUpdate, {
-        uuid: taxonomyUuid,
-        key,
-        value
+        [ActivityLog.keysContent.uuid]: taxonomyUuid,
+        [ActivityLog.keysContent.key]: key,
+        [ActivityLog.keysContent.value]: value
       }, system, t)
     ]))[0]
   )
@@ -143,16 +142,22 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, syst
 // ============== DELETE
 
 const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
-  await client.tx(async t => await Promise.all([
-    TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t),
-    markSurveyDraft(surveyId, t),
-    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyDelete, { uuid: taxonomyUuid }, false, t)
-  ]))
+  await client.tx(async t => {
+    const taxonomy = await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, t)
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: taxonomyUuid,
+      [ActivityLog.keysContent.taxonomyName]: Taxonomy.getName(taxonomy),
+    }
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyDelete, logContent, false, t)
+    ])
+  })
 
 const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
-    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { uuid: taxonomyUuid }, true, t)
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { [ActivityLog.keysContent.uuid]: taxonomyUuid }, true, t)
   ]))
 
 module.exports = {

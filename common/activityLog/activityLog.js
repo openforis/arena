@@ -33,7 +33,7 @@ export const type = {
   taxonomyDelete: 'taxonomyDelete',
   taxonomyTaxaDelete: 'taxonomyTaxaDelete', //system
   taxonomyTaxaImport: 'taxonomyTaxaImport',
-  taxonInsert: 'taxonInsert',
+  taxonInsert: 'taxonInsert', //system
 
   //record
   recordCreate: 'recordCreate',
@@ -80,6 +80,8 @@ export const keysContent = {
   index: 'index',
   code: 'code',
   levelUuid: 'levelUuid',
+  //taxonomy
+  taxonomyName: 'taxonomyName',
 }
 
 // ====== CREATE
@@ -113,3 +115,5 @@ export const getContentCategoryUuid = _getContentProp(keysContent.categoryUuid)
 export const getContentIndex = _getContentProp(keysContent.index)
 export const getContentCode = _getContentProp(keysContent.code)
 export const getContentLevelUuid = _getContentProp(keysContent.levelUuid)
+// content props taxonomy
+export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
