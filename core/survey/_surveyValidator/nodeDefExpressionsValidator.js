@@ -30,16 +30,16 @@ const _getReachableNodeDefs = (survey, nodeDef) => {
 
 const _getReachableNodeValue = (survey, nodeDef, nodeName) => {
   const allNodeDefs = _getReachableNodeDefs(survey, nodeDef)
-  const def = allNodeDefs.filter(x => NodeDef.getName(x) === nodeName)[0]
+  const def = allNodeDefs.find(x => NodeDef.getName(x) === nodeName)
 
   if (!def)
     throw new SystemError(
       Validation.messageKeys.expressions.unableToFindNode,
-      { name: nodeName } )
+      { name: nodeName })
   if (!Expression.isValidExpressionType(def))
     throw new SystemError(
       Validation.messageKeys.expressions.unableToFindNode,
-      { name: nodeName, type: NodeDef.getType(def) } )
+      { name: nodeName, type: NodeDef.getType(def) })
 
   return _getNodeValue(def)
 }

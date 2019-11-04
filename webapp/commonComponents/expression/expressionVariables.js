@@ -29,8 +29,8 @@ const getSqlVariables = (nodeDef, lang) => {
   const getLabel = col =>
     NodeDef.getLabel(nodeDef, lang) + (
       colNames.length === 1
-      ? ''
-      : ' - ' + NodeDefTable.extractColName(nodeDef, col)
+        ? ''
+        : ' - ' + NodeDefTable.extractColName(nodeDef, col)
     )
 
   return colNames.map(col => ({
@@ -70,8 +70,8 @@ export const getVariables = (survey, nodeDefContext, mode, preferredLang) => {
       getVariables(
         survey,
         Survey.getNodeDefParent(nodeDefContext)(survey),
-        null,
         mode,
+        preferredLang,
       )
     )
 }
