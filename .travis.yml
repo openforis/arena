@@ -1,0 +1,45 @@
+---
+language: node_js
+os: linux
+dist: bionic # Ubuntu 18.04 LTS
+services:
+  - docker
+
+cache: yarn
+node_js:
+  - lts/* # latest node LTS
+
+before_install:
+  - >
+    docker run
+    -d
+    --name $PGDATABASE-db
+    -p $PGPORT:5432
+    -e POSTGRES_DB=$PGDATABASE
+    -e POSTGRES_USER=$PGUSER
+    -e POSTGRES_PASSWORD=$PGPASSWORD
+    mdillon/postgis:11
+
+  - docker ps -a
+
+script:
+  - mkdir -p "$TEMP_FOLDER" "$ANALYSIS_OUTPUT_DIR"
+  - yarn --ignore-scripts
+  - yarn build:server:prod # compile server "binary"
+  - yarn server:migrate # migrate DB to latest version
+  - yarn test # run test suite (depends on server:migrate)
+  - yarn build-prod # build the Web app
+
+env:
+  - >
+    PORT=9090
+
+    PGHOST=localhost
+    PGPORT=5444
+    PGDATABASE=of-arena-ci
+    PGUSER=arena
+    PGPASSWORD=arena
+
+    TEMP_FOLDER=/tmp/arena_upload
+
+    ANALYSIS_OUTPUT_DIR=/tmp/arena/analysis

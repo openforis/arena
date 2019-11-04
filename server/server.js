@@ -3,9 +3,13 @@ require('dotenv').config()
 // const cluster = require('cluster')
 const dbMigrator = require('./db/migration/dbMigrator')
 const appCluster = require('./system/appCluster')
+const ProcessUtils = require('@core/processUtils')
 
 const initialize = async () => {
   await dbMigrator.migrateAll()
+  if (ProcessUtils.ENV.migrateOnly)
+    process.exit();
+
   await appCluster()
 }
 

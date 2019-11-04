@@ -1,0 +1,15 @@
+*
+
+# Include git for version info...
+!.git
+
+!webpack*.js
+!common
+!core
+!server
+!webapp
+!web-resources
+!package.json
+!yarn.lock
+
+!test
