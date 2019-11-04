@@ -23,7 +23,7 @@ export const insertMany = async (user, surveyId, activities, client) =>
   ])
 
 //===== READ
-export const fetch = async (surveyId, draft = false, activityTypes = null, offset = 0, limit = 30, client = db) =>
+export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 30, client = db) =>
   await client.map(`
     WITH
       log AS
