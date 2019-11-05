@@ -8,6 +8,8 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const activityTypesCommon = [
   ActivityLog.type.surveyCreate,
@@ -82,8 +84,36 @@ const _getAvailableActivityTypes = async (surveyId, user) => {
 }
 
 export const fetch = async (user, surveyId, offset, limit) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
   const activityTypes = await _getAvailableActivityTypes(surveyId, user)
-  return await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
+  const activitiesDb = await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
+
+  const activities = []
+
+  for (const activity of activitiesDb) {
+    if (R.includes(ActivityLog.getType(activity), [ActivityLog.type.nodeCreate, ActivityLog.type.nodeValueUpdate])) {
+      const nodeHierarchyDb = ActivityLog.getParentPath(activity)
+      const parentPath = []
+      for (const { nodeDefUuid, nodeUuid } of nodeHierarchyDb) {
+        const ancestorDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+        const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, ancestorDef, ActivityLog.getRecordUuid(activity), nodeUuid)
+        parentPath.push({
+          nodeDefUuid,
+          nodeUuid,
+          keys
+        })
+      }
+      activities.push({
+        ...activity,
+        [ActivityLog.keys.parentPath]: parentPath
+      })
+    } else {
+      activities.push(activity)
+    }
+  }
+
+  return activities
 }
 
 export const { insert } = ActivityLogRepository

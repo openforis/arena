@@ -15,6 +15,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
 import { fetchActivityLogs, resetActivityLogs } from './actions'
+import Markdown from '@webapp/commonComponents/markdown'
 
 const ActivityLogView = props => {
 
@@ -47,7 +48,7 @@ const ActivityLogView = props => {
                   className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`}>
                   <div className="activity">
                     <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true}/>
-                    {`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
+                    <Markdown source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}/>
                   </div>
                   <div className="date">
                     {DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}

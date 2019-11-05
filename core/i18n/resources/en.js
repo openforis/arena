@@ -229,7 +229,7 @@ module.exports = {
       [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
 
       //node
-      [ActivityLog.type.nodeCreate]: 'added node of type {{nodeDefName}}',
+      [ActivityLog.type.nodeCreate]: 'added node {{name}} in record {{recordKeys}} {{parentPath}}',
       [ActivityLog.type.nodeValueUpdate]: 'updated node {{path}} value',
       [ActivityLog.type.nodeDelete]: 'deleted node {{path}}',
 

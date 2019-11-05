@@ -68,6 +68,7 @@ export const keys = {
   //props associated from fetch
   userName: 'userName',
   recordUuid: 'recordUuid',
+  parentPath: 'parentPath',
 }
 
 export const keysContent = {
@@ -109,6 +110,7 @@ export const getDateCreated = ObjectUtils.getDateCreated
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
+export const getParentPath = R.prop(keys.parentPath)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])

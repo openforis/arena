@@ -6,9 +6,9 @@ const NodeDef = require('@core/survey/nodeDef')
 const SchemaRdb = require('@common/surveyRdb/schemaRdb')
 const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
 
-const DataTable = require('../schemaRdb/dataTable')
-
-const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchemaRepositoryUtils')
+const db = require('@server/db/db')
+const DataTable = require('@server/modules/surveyRdb/schemaRdb/dataTable')
+const SurveySchemaRepositoryUtils = require('@server/modules/survey/repository/surveySchemaRepositoryUtils')
 
 /**
  * Returns a list of items for each record containing duplicate entities.
@@ -19,7 +19,7 @@ const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchem
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  */
-const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
+const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client = db) => {
   const surveyId = Survey.getId(survey)
 
   const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
@@ -69,6 +69,26 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
   )
 }
 
+const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDef, recordUuid, nodeUuid = null, client = db) => {
+  const surveyId = Survey.getId(survey)
+  const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
+  const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
+  const keyColumns = R.pipe(R.map(NodeDefTable.getColName), R.join(', '))(entityDefKeys)
+
+  return await client.map(`
+    SELECT
+      ${keyColumns}
+    FROM
+      ${table}
+    WHERE
+      ${DataTable.colNameRecordUuuid} = $1
+      ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.colNameUuuid} = $2`}`,
+    [recordUuid, nodeUuid],
+    row => Object.values(row)
+  )
+}
+
 module.exports = {
-  fetchRecordsWithDuplicateEntities
+  fetchRecordsWithDuplicateEntities,
+  fetchEntityKeysByRecordAndNodeDefUuid
 }

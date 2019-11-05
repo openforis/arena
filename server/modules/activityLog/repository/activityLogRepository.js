@@ -4,6 +4,7 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as Node from '@core/record/node'
 
 import * as db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -42,11 +43,22 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
           system = false
         ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
     
+      ),
+      node_hierarchy AS (
+        --nodeCreate: get hierarchy from meta
+        SELECT l.id, jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}') as node_uuid
+        FROM ${getSurveyDBSchema(surveyId)}.activity_log l 
+        UNION
+        --nodeValueUpdate: get hierarchy from content.parentPath
+        SELECT l.id, jsonb_array_elements_text(l.content -> '${ActivityLog.keys.parentPath}') as node_uuid
+        FROM ${getSurveyDBSchema(surveyId)}.activity_log l 
       )
+
     SELECT
       l.*,
       u.name AS user_name,
-      r.uuid AS record_uuid
+      COALESCE(r.uuid, n.record_uuid) AS record_uuid,
+      json_agg(json_build_object('nodeDefUuid', n.node_def_uuid, 'nodeUuid', node_hierarchy.node_uuid)) as parent_path
     FROM
       log AS l
     JOIN
@@ -55,9 +67,17 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       u.uuid = l.user_uuid
     LEFT OUTER JOIN 
       ${getSurveyDBSchema(surveyId)}.record r
-    ON l.content->>'uuid' = r.uuid::text
+      ON l.content->>'uuid' = r.uuid::text
+   JOIN 
+      node_hierarchy 
+      ON node_hierarchy.id = l.id
+   LEFT OUTER JOIN 
+      ${getSurveyDBSchema(surveyId)}.node n 
+      ON n.uuid::text = node_hierarchy.node_uuid
     WHERE
       l.rank = 1
+    GROUP BY 
+      l.id, l.type, l.date_created, l.user_uuid, l.content, l.rank, u.name, r.uuid, n.record_uuid
     ORDER BY
       l.date_created DESC
     OFFSET $2

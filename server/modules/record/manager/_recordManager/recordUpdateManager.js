@@ -16,7 +16,7 @@ const SystemError = require('@core/systemError')
 const RecordRepository = require('@server/modules/record/repository/recordRepository')
 const FileRepository = require('@server/modules/record/repository/fileRepository')
 const DataTableUpdateRepository = require('@server/modules/surveyRdb/repository/dataTableUpdateRepository')
-const DataViewReadRepository = require('@server/modules/surveyRdb/repository/dataViewReadRepository')
+const DataTableReadRepository = require('@server/modules/surveyRdb/repository/dataTableReadRepository')
 
 const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
@@ -50,14 +50,12 @@ const updateRecordStep = async (user, survey, record, stepId, system = false, cl
 
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       const recordUuid = Record.getUuid(record)
-      const keys = await DataViewReadRepository.fetchRecordKeysByRecordUuid(survey, recordUuid, t)
       const surveyId = Survey.getId(survey)
 
       await Promise.all([
         RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
         ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordStepUpdate, {
           [ActivityLog.keysContent.uuid]: recordUuid,
-          [ActivityLog.keysContent.keys]: keys,
           [ActivityLog.keysContent.stepFrom]: currentStepId,
           [ActivityLog.keysContent.stepTo]: stepId
         }, system, t)
@@ -71,7 +69,7 @@ const updateRecordStep = async (user, survey, record, stepId, system = false, cl
 //==== DELETE
 const deleteRecord = async (user, survey, uuid) =>
   await db.tx(async t => {
-    const keys = await DataViewReadRepository.fetchRecordKeysByRecordUuid(survey, uuid, t)
+    const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, Survey.getNodeDefRoot(survey), uuid, null, t)
     const logContent = {
       [ActivityLog.keysContent.uuid]: uuid,
       [ActivityLog.keysContent.keys]: keys

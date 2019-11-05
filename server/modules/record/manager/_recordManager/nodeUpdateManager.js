@@ -22,10 +22,20 @@ const persistNode = async (user, survey, record, node, t) => {
   const existingNode = Record.getNodeByUuid(nodeUuid)(record)
 
   if (existingNode) {
-    // update
+    // updating existing node
     const surveyId = Survey.getId(survey)
-    if (!Record.isPreview(record))
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), false, t)
+    if (!Record.isPreview(record)) {
+      const nodeParent = Record.getParentNode(node)(record)
+      const logContent = R.pipe(
+        // keep only node uuid and value
+        R.pick([Node.keys.uuid, Node.keys.value]),
+        R.assoc(ActivityLog.keysContent.recordUuid, Record.getUuid(record)),
+        // assoc parent node path
+        R.assoc(ActivityLog.keys.parentPath, Record.getNodePath(survey, nodeParent)(record))
+      )(node)
+
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, false, t)
+    }
 
     const nodeValue = Node.getValue(node)
     const meta = {
@@ -39,7 +49,7 @@ const persistNode = async (user, survey, record, node, t) => {
     return await _onNodeUpdate(survey, record, nodeUpdate, {}, t)
 
   } else {
-    // create
+    // inserting new node
     return await insertNode(user, survey, record, node, false, t)
   }
 }
@@ -112,8 +122,9 @@ const insertNode = async (user, survey, record, node, system, t) => {
 const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInsert, system, t) => {
   const surveyId = Survey.getId(survey)
 
-  if (!Record.isPreview(record))
+  if (!Record.isPreview(record)) {
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
+  }
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
