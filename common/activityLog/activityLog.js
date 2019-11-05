@@ -66,6 +66,7 @@ export const keys = {
   system: 'system',
   userUuid: 'userUuid',
   userName: 'userName',
+  recordDeleted: 'recordDeleted',
 }
 
 export const keysContent = {
@@ -103,6 +104,7 @@ export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
 export const getDateCreated = ObjectUtils.getDateCreated
+export const isRecordDeleted = R.propEq(keys.recordDeleted, true)
 
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
@@ -121,7 +123,8 @@ export const getContentCode = _getContentProp(keysContent.code)
 export const getContentLevelUuid = _getContentProp(keysContent.levelUuid)
 // content props taxonomy
 export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
-// content props keys
+// content props record
 export const getContentKeys = _getContentProp(keysContent.keys)
 export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
+

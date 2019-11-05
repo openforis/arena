@@ -1,8 +1,9 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils'
-
 export default {
+  [ActivityLog.type.recordCreate]: () => activityLog =>
+    ActivityLog.isRecordDeleted(activityLog),
 
-
+  [ActivityLog.type.recordStepUpdate]: () => activityLog =>
+    ActivityLog.isRecordDeleted(activityLog),
 }
