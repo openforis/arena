@@ -82,6 +82,10 @@ export const keysContent = {
   levelUuid: 'levelUuid',
   //taxonomy
   taxonomyName: 'taxonomyName',
+  //record
+  keys: 'keys',
+  stepFrom: 'stepFrom',
+  stepTo: 'stepTo',
 }
 
 // ====== CREATE
@@ -117,3 +121,7 @@ export const getContentCode = _getContentProp(keysContent.code)
 export const getContentLevelUuid = _getContentProp(keysContent.levelUuid)
 // content props taxonomy
 export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
+// content props keys
+export const getContentKeys = _getContentProp(keysContent.keys)
+export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
+export const getContentStepTo = _getContentProp(keysContent.stepTo)
