@@ -45,13 +45,17 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       )
     SELECT
       l.*,
-      u.name AS user_name
+      u.name AS user_name,
+      r.uuid AS record_uuid
     FROM
       log AS l
     JOIN
       public."user" u
     ON
       u.uuid = l.user_uuid
+    LEFT OUTER JOIN 
+      ${getSurveyDBSchema(surveyId)}.record r
+    ON l.content->>'uuid' = r.uuid::text
     WHERE
       l.rank = 1
     ORDER BY

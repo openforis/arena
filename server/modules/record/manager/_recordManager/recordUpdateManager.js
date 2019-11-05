@@ -16,6 +16,7 @@ const SystemError = require('@core/systemError')
 const RecordRepository = require('@server/modules/record/repository/recordRepository')
 const FileRepository = require('@server/modules/record/repository/fileRepository')
 const DataTableUpdateRepository = require('@server/modules/surveyRdb/repository/dataTableUpdateRepository')
+const DataViewReadRepository = require('@server/modules/surveyRdb/repository/dataViewReadRepository')
 
 const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
@@ -39,9 +40,8 @@ const initNewRecord = async (user, survey, record, nodesUpdateListener = null, n
 
 //==== UPDATE
 
-const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = false, client = db) => {
+const updateRecordStep = async (user, survey, record, stepId, system = false, client = db) => {
   await client.tx(async t => {
-    const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, t)
 
     // check if the step exists and that is't adjacent to the current one
     const currentStepId = Record.getStep(record)
@@ -49,11 +49,17 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
     const stepUpdate = RecordStep.getStep(stepId)
 
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
+      const recordUuid = Record.getUuid(record)
+      const keys = await DataViewReadRepository.fetchRecordKeysByRecordUuid(survey, recordUuid, t)
+      const surveyId = Survey.getId(survey)
+
       await Promise.all([
         RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
         ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordStepUpdate, {
-          uuid: recordUuid,
-          stepId
+          [ActivityLog.keysContent.uuid]: recordUuid,
+          [ActivityLog.keysContent.keys]: keys,
+          [ActivityLog.keysContent.stepFrom]: currentStepId,
+          [ActivityLog.keysContent.stepTo]: stepId
         }, system, t)
       ])
     } else {
@@ -63,10 +69,18 @@ const updateRecordStep = async (user, surveyId, recordUuid, stepId, system = fal
 }
 
 //==== DELETE
-const deleteRecord = async (user, surveyId, recordUuid) =>
+const deleteRecord = async (user, survey, uuid) =>
   await db.tx(async t => {
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, { uuid: recordUuid }, false, t)
-    await RecordRepository.deleteRecord(surveyId, recordUuid, t)
+    const keys = await DataViewReadRepository.fetchRecordKeysByRecordUuid(survey, uuid, t)
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: uuid,
+      [ActivityLog.keysContent.keys]: keys
+    }
+    const surveyId = Survey.getId(survey)
+    await Promise.all([
+      RecordRepository.deleteRecord(surveyId, uuid, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
+    ])
   })
 
 const deleteRecordPreview = async (surveyId, recordUuid) =>

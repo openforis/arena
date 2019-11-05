@@ -65,7 +65,9 @@ export const keys = {
   type: 'type',
   system: 'system',
   userUuid: 'userUuid',
+  //props associated from fetch
   userName: 'userName',
+  recordUuid: 'recordUuid',
 }
 
 export const keysContent = {
@@ -82,6 +84,10 @@ export const keysContent = {
   levelUuid: 'levelUuid',
   //taxonomy
   taxonomyName: 'taxonomyName',
+  //record
+  keys: 'keys',
+  stepFrom: 'stepFrom',
+  stepTo: 'stepTo',
 }
 
 // ====== CREATE
@@ -102,6 +108,7 @@ export const getDateCreated = ObjectUtils.getDateCreated
 
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
+export const getRecordUuid = R.prop(keys.recordUuid)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -117,3 +124,8 @@ export const getContentCode = _getContentProp(keysContent.code)
 export const getContentLevelUuid = _getContentProp(keysContent.levelUuid)
 // content props taxonomy
 export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
+// content props record
+export const getContentKeys = _getContentProp(keysContent.keys)
+export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
+export const getContentStepTo = _getContentProp(keysContent.stepTo)
+

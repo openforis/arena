@@ -225,8 +225,8 @@ module.exports = {
 
       //record
       [ActivityLog.type.recordCreate]: 'added record',
-      [ActivityLog.type.recordDelete]: 'deleted record {{recordKeys}}',
-      [ActivityLog.type.recordStepUpdate]: 'updated record step from {{stepFrom}} to {{stepTo}}',
+      [ActivityLog.type.recordDelete]: 'deleted record {{keys}}',
+      [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
 
       //node
       [ActivityLog.type.nodeCreate]: 'added node of type {{nodeDefName}}',
