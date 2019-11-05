@@ -218,7 +218,7 @@ module.exports = {
 
       //taxonomy
       [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
-      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{prop}} of taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{key}} of taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',

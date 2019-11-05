@@ -39,3 +39,15 @@ export const isItemCategoryDeleted = survey => R.pipe(
   getItemCategory(survey),
   R.isNil
 )
+
+// ===== TAXONOMY
+
+export const getTaxonomy = survey => R.pipe(
+  ActivityLog.getContentUuid,
+  taxonomyUuid => Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
+)
+
+export const isTaxonomyDeleted = survey => R.pipe(
+  getTaxonomy(survey),
+  R.isNil
+)
