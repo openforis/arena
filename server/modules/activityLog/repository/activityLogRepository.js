@@ -46,7 +46,7 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
     SELECT
       l.*,
       u.name AS user_name,
-      r.uuid IS NULL AS record_deleted
+      r.uuid AS record_uuid
     FROM
       log AS l
     JOIN

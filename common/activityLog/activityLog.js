@@ -66,7 +66,7 @@ export const keys = {
   system: 'system',
   userUuid: 'userUuid',
   userName: 'userName',
-  recordDeleted: 'recordDeleted',
+  recordUuid: 'recordUuid',
 }
 
 export const keysContent = {
@@ -104,7 +104,7 @@ export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
 export const getDateCreated = ObjectUtils.getDateCreated
-export const isRecordDeleted = R.propEq(keys.recordDeleted, true)
+export const getRecordUuid = R.prop(keys.recordUuid)
 
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
