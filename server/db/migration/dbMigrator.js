@@ -76,6 +76,7 @@ const migrateAll = async () => {
     logger.info('database migrations completed')
   } catch (err) {
     logger.error(`error running database migrations: ${err.toString()}`)
+    throw err;
   }
 }
 
