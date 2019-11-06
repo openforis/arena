@@ -88,6 +88,10 @@ export const keysContent = {
   keys: 'keys',
   stepFrom: 'stepFrom',
   stepTo: 'stepTo',
+  //user
+  userName: 'userName',
+  userEmail: 'userEmail',
+  groupUuid: 'groupUuid',
 }
 
 // ====== CREATE
@@ -128,4 +132,7 @@ export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
 export const getContentKeys = _getContentProp(keysContent.keys)
 export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
-
+// content props user
+export const getContentUserName = _getContentProp(keysContent.userName)
+export const getContentUserEmail = _getContentProp(keysContent.userEmail)
+export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)

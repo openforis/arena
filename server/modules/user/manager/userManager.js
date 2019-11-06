@@ -18,17 +18,20 @@ const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid
   })
 
 const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
-  await client.tx(async t => {
-    await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
-    await ActivityLogRepository.insert(
+  await client.tx(async t => await Promise.all([
+    AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t),
+    ActivityLogRepository.insert(
       user,
       surveyId,
       ActivityLog.type.userInvite,
-      { uuid: User.getUuid(userToAdd), groupUuid },
+      {
+        [ActivityLog.keysContent.uuid]: User.getUuid(userToAdd),
+        [ActivityLog.keysContent.groupUuid]: groupUuid
+      },
       false,
       t
     )
-  })
+  ]))
 
 // ==== READ
 
@@ -77,7 +80,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
       user,
       surveyId,
       ActivityLog.type.userUpdate,
-      { uuid: userUuid, name, email, groupUuid },
+      { [ActivityLog.keysContent.uuid]: userUuid, name, email, groupUuid },
       false,
       t
     )
@@ -90,12 +93,17 @@ const updateUser = _userFetcher(_updateUser)
 // ==== DELETE
 
 const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
-  await Promise.all([
-    AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
-    ActivityLogRepository.insert(
-      user, surveyId, ActivityLog.type.userRemove, { uuid: userUuidToRemove }, false, client
-    )
-  ])
+  await client.tx(async t => {
+    const userToRemove = await UserRepository.fetchUserByUuid(userUuidToRemove, t)
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: userUuidToRemove,
+      [ActivityLog.keysContent.userName]: User.getName(userToRemove)
+    }
+    return await Promise.all([
+      AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userRemove, logContent, false, t)
+    ])
+  })
 
 const updateUserPrefs = async user => ({
   ...await UserRepository.updateUserPrefs(user),
