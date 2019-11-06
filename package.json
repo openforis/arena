@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@esri/proj-codes": "^2.2.0",
+    "@godaddy/terminus": "^4.2.1",
     "@sendgrid/mail": "^6.4.0",
     "amazon-cognito-identity-js": "^3.2.0",
     "aws-sdk": "^2.561.0",

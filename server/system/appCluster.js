@@ -3,9 +3,11 @@ const bodyParser = require('body-parser')
 const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
+const { createTerminus } = require('@godaddy/terminus')
 
 const ProcessUtils = require('@core/processUtils')
 const Log = require('@server/log/log')
+const db = require('@server/db/db')
 
 const headerMiddleware = require('./middleware/headerMiddleware')
 const jwtMiddleware = require('./middleware/jwtMiddleware')
@@ -63,6 +65,23 @@ module.exports = async () => {
 
   // ====== socket middleware
   WebSocket.init(server, jwtMiddleware)
+
+  const onSignal = () => {
+    logger.info('server is starting cleanup')
+    db.end()
+  }
+
+  const onHealthCheck = async () => {
+    // checks if the system is healthy, like the db connection is live
+    // resolves, if healthy, rejects if not
+    await db.one('select 1 from "user" limit 1')
+  }
+
+  createTerminus(server, {
+    signal: 'SIGINT',
+    healthChecks: { '/healthcheck': onHealthCheck },
+    onSignal,
+  })
 
   // ====== schedulers
   await RecordPreviewCleanup.init()

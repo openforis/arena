@@ -732,6 +732,14 @@
   resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.3.0.tgz#526ccd9488cafd34d7ba9c23d759d0ebd41d6d1d"
   integrity sha512-MdHLW52b3UBgr0nPYTARjYnxd77u7sM+8ulq3rQqHzSYS6VLrK91dU/SDmogeRvJlnwSWHlIEJVTifEmNpDPLA==
 
+"@godaddy/terminus@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.2.1.tgz#4698f05a9f1322d9abe931e258f8ed3cfd941997"
+  integrity sha512-JmpB/FNSRgXwHcdbRIOhAajI9A2F9bUdZURvM55hLPSXdkHHH2F2Cg3PorA4v3mJbCM53xqRFE57ND/xU2WBiw==
+  dependencies:
+    es6-promisify "^6.0.0"
+    stoppable "^1.0.5"
+
 "@sendgrid/client@^6.4.0":
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/@sendgrid/client/-/client-6.4.0.tgz#d58df30adea5d7d09e747e2b61f9f859deeda798"
@@ -3384,6 +3392,11 @@ es6-iterator@~2.0.3:
     d "1"
     es5-ext "^0.10.35"
     es6-symbol "^3.1.1"
+
+es6-promisify@^6.0.0:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/es6-promisify/-/es6-promisify-6.0.2.tgz#525c23725b8510f5f1f2feb5a1fbad93a93e29b4"
+  integrity sha512-eO6vFm0JvqGzjWIQA6QVKjxpmELfhWbDUWHm1rPfIbn55mhKPiAa5xpLmQWJrNa629ZIeQ8ZvMAi13kvrjK6Mg==
 
 es6-symbol@^3.1.1, es6-symbol@~3.1.2:
   version "3.1.3"
@@ -8438,6 +8451,11 @@ stdout-stream@^1.4.0:
   integrity sha512-j4emi03KXqJWcIeF8eIXkjMFN1Cmb8gUlDYGeBALLPo5qdyTfA9bOtl8m33lRoC+vFMkP3gl0WsDr6+gzxbbTA==
   dependencies:
     readable-stream "^2.0.1"
+
+stoppable@^1.0.5:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/stoppable/-/stoppable-1.1.0.tgz#32da568e83ea488b08e4d7ea2c3bcc9d75015d5b"
+  integrity sha512-KXDYZ9dszj6bzvnEMRYvxgeTHU74QBFL54XKtP3nyMuJ81CFYtABZ3bAzL2EdFUaEwJOBOgENyFj3R7oTzDyyw==
 
 stream-browserify@^2.0.1:
   version "2.0.2"
