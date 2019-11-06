@@ -4,6 +4,7 @@ import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -11,6 +12,7 @@ import * as SurveyRepository from '@server/modules/survey/repository/surveyRepos
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
 
 const activityTypesCommon = [
   ActivityLog.type.surveyCreate,
@@ -103,6 +105,14 @@ const _transformActivityLogUser = surveyUuid => async activityLogDb => {
   )
 }
 
+const _transformActivityLogProcessingChain = surveyId => async activityLogDb => {
+  const processingChain = await ProcessingChainRepository.fetchChainByUuid(surveyId, ActivityLog.getContentUuid(activityLogDb))
+  return R.unless(
+    R.always(R.isNil(processingChain)),
+    R.assocPath([ActivityLog.keys.content, ActivityLog.keysContent.labels], ProcessingChain.getLabels(processingChain))
+  )(activityLogDb)
+}
+
 export const fetch = async (user, surveyId, offset, limit) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -112,6 +122,8 @@ export const fetch = async (user, surveyId, offset, limit) => {
   return await Promise.all(activityLogsDb.map(async activityLogDb => {
     if (R.includes(ActivityLog.getType(activityLogDb), [ActivityLog.type.userInvite, ActivityLog.type.userUpdate])) {
       return await _transformActivityLogUser(surveyUuid)(activityLogDb)
+    } else if (ActivityLog.getType(activityLogDb) === ActivityLog.type.processingChainPropUpdate) {
+      return await _transformActivityLogProcessingChain(surveyId)(activityLogDb)
     } else {
       return activityLogDb
     }

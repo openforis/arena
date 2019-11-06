@@ -92,6 +92,8 @@ export const keysContent = {
   userName: 'userName',
   userEmail: 'userEmail',
   groupUuid: 'groupUuid',
+  //analysis
+  labels: 'labels',
 }
 
 // ====== CREATE
@@ -136,3 +138,5 @@ export const getContentStepTo = _getContentProp(keysContent.stepTo)
 export const getContentUserName = _getContentProp(keysContent.userName)
 export const getContentUserEmail = _getContentProp(keysContent.userEmail)
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
+// content props analysis
+export const getContentLabels = _getContentProp(keysContent.labels)

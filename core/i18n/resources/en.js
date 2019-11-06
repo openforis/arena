@@ -240,7 +240,7 @@ module.exports = {
 
       // analysis
       [ActivityLog.type.processingChainCreate]: 'added processing chain',
-      [ActivityLog.type.processingChainPropUpdate]: 'updated {{prop}} processing chain {{label}}',
+      [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
       [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} {{prop}} to {{value}}',
