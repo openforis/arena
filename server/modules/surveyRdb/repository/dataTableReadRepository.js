@@ -69,13 +69,14 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
   )
 }
 
-const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDef, recordUuid, nodeUuid = null, client = db) => {
+const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, recordUuid, nodeUuid = null, client = db) => {
   const surveyId = Survey.getId(survey)
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
   const keyColumns = R.pipe(R.map(NodeDefTable.getColName), R.join(', '))(entityDefKeys)
 
-  return await client.map(`
+  return await client.oneOrNone(`
     SELECT
       ${keyColumns}
     FROM

@@ -49,11 +49,6 @@ const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
     R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
   )(record)
 
-const getNodePath = (survey, node) => R.pipe(
-  getAncestorsAndSelf(node),
-  R.map(Node.getUuid)
-)
-
 // descendants
 const getNodeChildren = node => record => R.pipe(
   NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
@@ -224,7 +219,6 @@ module.exports = {
   getParentNode,
   getAncestorsAndSelf,
   getAncestorByNodeDefUuid,
-  getNodePath,
 
   // descendants
   getNodeChildren,

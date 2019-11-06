@@ -35,7 +35,7 @@ const initNewRecord = async (user, survey, record, nodesUpdateListener = null, n
 
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, t)
+    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
   })
 
 //==== UPDATE
@@ -69,7 +69,8 @@ const updateRecordStep = async (user, survey, record, stepId, system = false, cl
 //==== DELETE
 const deleteRecord = async (user, survey, uuid) =>
   await db.tx(async t => {
-    const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, Survey.getNodeDefRoot(survey), uuid, null, t)
+    const rootDef = Survey.getNodeDefRoot(survey)
+    const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, NodeDef.getUuid(rootDef), uuid, null, t)
     const logContent = {
       [ActivityLog.keysContent.uuid]: uuid,
       [ActivityLog.keysContent.keys]: keys
@@ -103,13 +104,14 @@ const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
  * ======
  */
 const persistNode = async (user, survey, record, node,
-                           nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                           nodesUpdateListener = null, nodesValidationListener = null,
+                           system = false, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
     node,
-    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, t),
+    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, system, t),
     nodesUpdateListener,
     nodesValidationListener,
     t

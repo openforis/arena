@@ -24,8 +24,9 @@ export const insertMany = async (user, surveyId, activities, client) =>
   ])
 
 //===== READ
-export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 30, client = db) =>
-  await client.map(`
+export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 30, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return await client.map(`
     WITH
       log AS
       (
@@ -38,27 +39,27 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
           RANK() OVER (PARTITION BY a.user_uuid, a.type, a.content->'uuid' ORDER BY a.date_created DESC) -- use always uuid in content
           AS rank
         FROM
-          ${getSurveyDBSchema(surveyId)}.activity_log a
+          ${schema}.activity_log a
         WHERE
           system = false
         ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
     
       ),
       node_hierarchy AS (
-        --nodeCreate: get hierarchy from meta
-        SELECT l.id, jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}') as node_uuid
-        FROM ${getSurveyDBSchema(surveyId)}.activity_log l 
-        UNION
-        --nodeValueUpdate: get hierarchy from content.parentPath
-        SELECT l.id, jsonb_array_elements_text(l.content -> '${ActivityLog.keys.parentPath}') as node_uuid
-        FROM ${getSurveyDBSchema(surveyId)}.activity_log l 
+        --nodeCreate/nodeValueUpdate: get hierarchy from content.meta.h
+        SELECT l.id, jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}') AS node_uuid
+        FROM ${schema}.activity_log l 
       )
 
     SELECT
       l.*,
       u.name AS user_name,
-      COALESCE(r.uuid, n.record_uuid) AS record_uuid,
-      json_agg(json_build_object('nodeDefUuid', n.node_def_uuid, 'nodeUuid', node_hierarchy.node_uuid)) as parent_path
+      r.uuid AS record_uuid,
+      n.node_def_uuid AS node_def_uuid,
+      json_agg(json_build_object(
+        'nodeDefUuid', node_h.node_def_uuid, 
+        'nodeUuid', h.node_uuid
+      )) AS parent_path
     FROM
       log AS l
     JOIN
@@ -66,18 +67,21 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
     ON
       u.uuid = l.user_uuid
     LEFT OUTER JOIN 
-      ${getSurveyDBSchema(surveyId)}.record r
+      ${schema}.record r
       ON l.content->>'uuid' = r.uuid::text
-   JOIN 
-      node_hierarchy 
-      ON node_hierarchy.id = l.id
-   LEFT OUTER JOIN 
-      ${getSurveyDBSchema(surveyId)}.node n 
-      ON n.uuid::text = node_hierarchy.node_uuid
+    LEFT OUTER JOIN 
+      ${schema}.node n 
+      ON l.content->>'uuid' = n.uuid::text
+    LEFT OUTER JOIN 
+      node_hierarchy h
+      ON h.id = l.id
+    LEFT OUTER JOIN 
+      ${schema}.node node_h 
+      ON node_h.uuid::text = h.node_uuid
     WHERE
       l.rank = 1
     GROUP BY 
-      l.id, l.type, l.date_created, l.user_uuid, l.content, l.rank, u.name, r.uuid, n.record_uuid
+      l.id, l.type, l.date_created, l.user_uuid, l.content, l.rank, u.name, r.uuid, n.record_uuid, n.node_def_uuid
     ORDER BY
       l.date_created DESC
     OFFSET $2
@@ -85,3 +89,4 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
     [activityTypes, offset, limit],
     camelize
   )
+}

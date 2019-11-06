@@ -69,6 +69,7 @@ export const keys = {
   userName: 'userName',
   recordUuid: 'recordUuid',
   parentPath: 'parentPath',
+  nodeDefUuid: 'nodeDefUuid',
 }
 
 export const keysContent = {
@@ -89,6 +90,9 @@ export const keysContent = {
   keys: 'keys',
   stepFrom: 'stepFrom',
   stepTo: 'stepTo',
+  //node
+  nodeDefUuid: 'nodeDefUuid',
+  recordUuid: 'recordUuid',
 }
 
 // ====== CREATE
@@ -111,6 +115,7 @@ export const getDateCreated = ObjectUtils.getDateCreated
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
 export const getParentPath = R.prop(keys.parentPath)
+export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -130,4 +135,5 @@ export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
 export const getContentKeys = _getContentProp(keysContent.keys)
 export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
-
+export const getContentNodeDefUuid = _getContentProp(keysContent.nodeDefUuid)
+export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)

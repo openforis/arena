@@ -230,8 +230,8 @@ module.exports = {
 
       //node
       [ActivityLog.type.nodeCreate]: 'added node {{name}} in record {{recordKeys}} {{parentPath}}',
-      [ActivityLog.type.nodeValueUpdate]: 'updated node {{path}} value',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{path}}',
+      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in record {{recordKeys}} {{parentPath}}',
+      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} in record {{recordKeys}} {{parentPath}}',
 
       // user
       [ActivityLog.type.userInvite]: 'invited user {{name}} with role {{role}}',
