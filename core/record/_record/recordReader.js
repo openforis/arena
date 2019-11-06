@@ -33,11 +33,11 @@ const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
 // ancestors
 const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
-const getAncestorsAndSelf = node => record => {
+const getAncestorsAndSelf = entity => record => {
   const ancestors = []
-  while (node) {
-    ancestors.push(node)
-    node = getParentNode(node)(record)
+  while (entity) {
+    ancestors.push(entity)
+    entity = getParentNode(entity)(record)
   }
   return ancestors
 }

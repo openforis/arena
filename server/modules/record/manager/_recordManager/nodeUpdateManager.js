@@ -118,9 +118,8 @@ const insertNode = async (user, survey, record, node, system, t) => {
 const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInsert, system, t) => {
   const surveyId = Survey.getId(survey)
 
-  if (!Record.isPreview(record)) {
+  if (!Record.isPreview(record))
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
-  }
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
