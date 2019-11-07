@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const GoogleFontsPlugin = require('google-fonts-plugin')
@@ -44,6 +45,16 @@ const plugins = [
   new HtmlWebpackPlugin({
     template: './web-resources/index.html'
   }),
+  new HtmlReplaceWebpackPlugin([
+    {
+      pattern: '$COGNITO_USER_POOL_ID',
+      replacement: ProcessUtils.ENV.cognitoUserPoolId
+    },
+    {
+      pattern: '$COGNITO_CLIENT_ID',
+      replacement: ProcessUtils.ENV.cognitoClientId
+    },
+  ]),
   new webpack.DefinePlugin({
     __BUST__: JSON.stringify(uuidv4()),
     'process': {
