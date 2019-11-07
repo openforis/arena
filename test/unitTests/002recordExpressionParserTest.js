@@ -44,23 +44,23 @@ describe('RecordExpressionParser Test', () => {
 
   // ====== nodes hierarchy tests
   // it('this.parent()', async () => {
-  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent()')
+  //   const res = RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent()')
   //   const p = Record.getParentNode(node)(record)
   //   assert.equal(Node.getUuid(res), Node.getUuid(root))
   // })
 
   // it('this.parent().parent()', async () => {
-  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent().parent()')
+  //   const res = RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent().parent()')
   //   assert.equal(res, null)
   // })
 
   // it(`dbh`, async () => {
-  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `dbh`)
+  //   const res = RecordExpressionParser.evalNodeQuery(survey, record, node, `dbh`)
   //   assert.equal(Node.getUuid(res), Node.getUuid(dbh))
   // })
 
   // it(`dbh`, async () => {
-  //   const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, `dbh`)
+  //   const res = RecordExpressionParser.evalNodeQuery(survey, record, node, `dbh`)
   //   assert.equal(Node.getUuid(res), Node.getUuid(dbh))
   // })
 
@@ -95,9 +95,8 @@ describe('RecordExpressionParser Test', () => {
     const { q, r } = query
     const resKeys = R.keys(r)
 
-    it(q, async () => {
-
-      const res = await RecordExpressionParser.evalNodeQuery(survey, record, node, q)
+    it(q, () => {
+      const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
 
       if (R.isEmpty(resKeys)) {
         assert.equal(res, r)
