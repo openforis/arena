@@ -48,11 +48,11 @@ const plugins = [
   new HtmlReplaceWebpackPlugin([
     {
       pattern: '$COGNITO_USER_POOL_ID',
-      replacement: ProcessUtils.ENV.cognitoUserPoolId
+      replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
     },
     {
       pattern: '$COGNITO_CLIENT_ID',
-      replacement: ProcessUtils.ENV.cognitoClientId
+      replacement: ProcessUtils.ENV.cognitoClientId || '',
     },
   ]),
   new webpack.DefinePlugin({
