@@ -1,6 +1,7 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
+const NumberUtils = require('@core/numberUtils')
 const ObjectUtils = require('@core/objectUtils')
 const Survey = require('@core/survey/survey')
 const NodeDef = require('@core/survey/nodeDef')
@@ -33,6 +34,11 @@ const nodeValuePropProcessor = (survey, nodeDefCol, nodeCol) =>
     return getValueFromItem(nodeDefCol, colName, nodeValue)
   }
 
+/**
+ * Convert an input value to RDB compatible output value
+ * The contract is such that the value output value must always be compatible with RDB.
+ * In case of any errors, return NULL.
+ */
 const props = {
   [nodeDefType.entity]: {
     [colValueProcessor]: () => () => Node.getUuid,
@@ -41,10 +47,20 @@ const props = {
 
   [nodeDefType.integer]: {
     [colTypeProcessor]: () => () => sqlTypes.integer,
+    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
+      const value = Node.getValue(nodeCol)
+      const num = NumberUtils.toNumber(value)
+      return () => Number.isInteger(num) ? num : null
+    },
   },
 
   [nodeDefType.decimal]: {
     [colTypeProcessor]: () => () => sqlTypes.decimal,
+    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
+      const value = Node.getValue(nodeCol)
+      const num = NumberUtils.toNumber(value)
+      return () => !Number.isNaN(num) && Number.isFinite(num) ? num : null
+    },
   },
 
   [nodeDefType.date]: {

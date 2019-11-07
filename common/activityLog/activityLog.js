@@ -72,9 +72,10 @@ export const keys = {
   //user
   targetUserName: 'targetUserName',
   targetUserEmail: 'targetUserEmail',
-  targetUserRemoved: 'targetUserRemoved',
+  targetUserUuid: 'targetUserUuid',
   //analysis
   processingChainLabels: 'processingChainLabels',
+  processingStepIndex: 'processingStepIndex',
 }
 
 export const keysContent = {
@@ -99,6 +100,7 @@ export const keysContent = {
   groupUuid: 'groupUuid',
   //analysis
   labels: 'labels',
+  processingChainUuid: 'processingChainUuid',
 }
 
 // ====== CREATE
@@ -121,9 +123,10 @@ export const getDateCreated = ObjectUtils.getDateCreated
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
 export const getTargetUserName = R.prop(keys.targetUserName)
+export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
-export const isTargetUserRemoved = R.propEq(keys.targetUserRemoved, true)
 export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
+export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -131,6 +134,7 @@ export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)
 export const getContentKey = _getContentProp(keysContent.key)
+export const getContentValue = _getContentProp(keysContent.value)
 // content props category
 export const getContentCategoryName = _getContentProp(keysContent.categoryName)
 export const getContentCategoryUuid = _getContentProp(keysContent.categoryUuid)

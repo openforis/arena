@@ -61,14 +61,12 @@ const activityTypesByPermission = {
   ],
 }
 
-const _getAvailableActivityTypes = async (surveyId, user) => {
+const _getAvailableActivityTypes = async (surveyUuid, user) => {
   if (User.isSystemAdmin(user))
     return null
 
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
-
   return R.pipe(
-    User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo)),
+    User.getAuthGroupBySurveyUuid(surveyUuid),
     AuthGroups.getPermissions,
     //for each permission in group, get available activity types
     R.reduce(
@@ -84,8 +82,9 @@ const _getAvailableActivityTypes = async (surveyId, user) => {
 }
 
 export const fetch = async (user, surveyId, offset, limit) => {
-  const activityTypes = await _getAvailableActivityTypes(surveyId, user)
-  return await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
+  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
+  const activityTypes = await _getAvailableActivityTypes(Survey.getUuid(surveyInfo), user)
+  return await ActivityLogRepository.fetch(surveyInfo, activityTypes, offset, limit)
 }
 
 export const { insert } = ActivityLogRepository
