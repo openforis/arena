@@ -25,7 +25,6 @@ const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const CollectImportReportManager = require('../../../manager/collectImportReportManager')
 const CollectSurvey = require('../model/collectSurvey')
 
-const qualifiableItemApplicableExpressionFormat = `this.node('%s').getValue().props.code === "%s"`
 const specifyAttributeSuffix = 'specify'
 
 const checkExpressionParserByType = {
@@ -380,7 +379,7 @@ class NodeDefsImportJob extends Job {
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, nodeDefType.text, props)
       const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, true, tx)
       const propsAdvanced = {
-        [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(util.format(qualifiableItemApplicableExpressionFormat, nodeDefName, itemCode))]
+        [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
       }
       await NodeDefManager.updateNodeDefProps(this.user, this.surveyId, NodeDef.getUuid(qualifierNodeDef), {}, propsAdvanced, true, tx)
 
