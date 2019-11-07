@@ -3,13 +3,11 @@ import * as R from 'ramda'
 import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
 
 const activityTypesCommon = [
   ActivityLog.type.surveyCreate,
