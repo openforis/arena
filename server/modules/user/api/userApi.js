@@ -79,6 +79,10 @@ module.exports.init = app => {
       const { userUuid } = Request.getParams(req)
 
       const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
+
+      // Ensure we don't need to make duplicate requests by caching the profile picture for a little while.
+      res.set('Cache-Control', 'private, max-age=120');
+
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
