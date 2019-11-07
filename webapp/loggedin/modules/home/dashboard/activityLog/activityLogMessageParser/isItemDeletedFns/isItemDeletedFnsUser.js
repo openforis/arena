@@ -2,10 +2,10 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _isUserDeleted = () => R.pipe(ActivityLog.getContentUserEmail, R.isNil)
+const _isUserDeletedFromSurvey = () => R.pipe(ActivityLog.getContentUserCanAccessSurvey, R.not)
 
 export default {
-  [ActivityLog.type.userInvite]: _isUserDeleted,
+  [ActivityLog.type.userInvite]: _isUserDeletedFromSurvey,
 
-  [ActivityLog.type.userUpdate]: _isUserDeleted,
+  [ActivityLog.type.userUpdate]: _isUserDeletedFromSurvey,
 }

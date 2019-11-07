@@ -93,17 +93,10 @@ const updateUser = _userFetcher(_updateUser)
 // ==== DELETE
 
 const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
-  await client.tx(async t => {
-    const userToRemove = await UserRepository.fetchUserByUuid(userUuidToRemove, t)
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: userUuidToRemove,
-      [ActivityLog.keysContent.userName]: User.getName(userToRemove)
-    }
-    return await Promise.all([
-      AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userRemove, logContent, false, t)
-    ])
-  })
+  await client.tx(async t => await Promise.all([
+    AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userRemove, { [ActivityLog.keysContent.uuid]: userUuidToRemove }, false, t)
+  ]))
 
 const updateUserPrefs = async user => ({
   ...await UserRepository.updateUserPrefs(user),

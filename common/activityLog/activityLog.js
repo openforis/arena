@@ -91,6 +91,7 @@ export const keysContent = {
   //user
   userName: 'userName',
   userEmail: 'userEmail',
+  userCanAccessSurvey: 'userCanAccessSurvey',
   groupUuid: 'groupUuid',
 }
 
@@ -135,4 +136,5 @@ export const getContentStepTo = _getContentProp(keysContent.stepTo)
 // content props user
 export const getContentUserName = _getContentProp(keysContent.userName)
 export const getContentUserEmail = _getContentProp(keysContent.userEmail)
+export const getContentUserCanAccessSurvey = _getContentProp(keysContent.userCanAccessSurvey)
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)

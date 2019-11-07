@@ -92,15 +92,15 @@ const _transformActivityLogUser = surveyUuid => async activityLogDb => {
   const user = await UserRepository.fetchUserByUuid(ActivityLog.getContentUuid(activityLogDb))
   const canUserAccessSurvey = await _canUserAccessSurvey(user, surveyUuid)
 
-  // assoc user email and name only if user has not been removed from survey
-  return R.when(
-    R.always(canUserAccessSurvey),
-    R.pipe(
-      R.assocPath([ActivityLog.keys.content, ActivityLog.keysContent.userEmail], User.getEmail(user)),
-      R.assocPath([ActivityLog.keys.content, ActivityLog.keysContent.userName], User.getName(user)),
-    ),
-    activityLogDb
-  )
+  return {
+    ...activityLogDb,
+    [ActivityLog.keys.content]: {
+      ...ActivityLog.getContent(activityLogDb),
+      [ActivityLog.keysContent.userEmail]: User.getEmail(user),
+      [ActivityLog.keysContent.userName]: User.getName(user),
+      [ActivityLog.keysContent.userCanAccessSurvey]: canUserAccessSurvey,
+    }
+  }
 }
 
 export const fetch = async (user, surveyId, offset, limit) => {
@@ -110,7 +110,7 @@ export const fetch = async (user, surveyId, offset, limit) => {
   const activityLogsDb = await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
 
   return await Promise.all(activityLogsDb.map(async activityLogDb => {
-    if (R.includes(ActivityLog.getType(activityLogDb), [ActivityLog.type.userInvite, ActivityLog.type.userUpdate])) {
+    if (R.includes(ActivityLog.getType(activityLogDb), [ActivityLog.type.userInvite, ActivityLog.type.userUpdate, ActivityLog.type.userRemove])) {
       return await _transformActivityLogUser(surveyUuid)(activityLogDb)
     } else {
       return activityLogDb
