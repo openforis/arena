@@ -13,19 +13,6 @@ COPY . /app/
 FROM node:12-alpine AS prod_builder
 RUN apk add --no-cache git jq
 
-# The output of the build stage depends only on these variables,
-# because they get baked in to the Web app bundle.
-ARG COGNITO_REGION
-ARG COGNITO_USER_POOL_ID
-ARG COGNITO_CLIENT_ID
-
-ENV COGNITO_REGION ${COGNITO_CLIENT_ID}
-ENV COGNITO_USER_POOL_ID ${COGNITO_USER_POOL_ID}
-ENV COGNITO_CLIENT_ID ${COGNITO_CLIENT_ID}
-
-# Check that environment variables (Dockerfile arguments) are set:
-RUN env; sh -c 'test -n "${COGNITO_CLIENT_ID}"'
-
 COPY --from=base /app /app
 
 RUN cd /app; yarn build-prod; mv dist dist-web
@@ -60,7 +47,8 @@ COPY server/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=prod_builder /app/web-resources/img/ /usr/share/nginx/html/img/
 COPY --from=prod_builder /app/dist-web/ /usr/share/nginx/html/
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /usr/share/nginx/html
+CMD ["sh", "-c", "envsubst < index.html > index.new; mv index.new index.html; exec nginx -g \"daemon off;\""]
 
 #############################################################
 

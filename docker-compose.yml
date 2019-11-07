@@ -20,10 +20,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: prod
-      args:
-        COGNITO_REGION: "$COGNITO_REGION"
-        COGNITO_USER_POOL_ID: "$COGNITO_USER_POOL_ID"
-        COGNITO_CLIENT_ID: "$COGNITO_CLIENT_ID"
 
     environment:
       PGHOST: db
@@ -49,7 +45,3 @@ services:
       context: .
       dockerfile: Dockerfile
       target: prod_web
-      args:
-        COGNITO_REGION: "$COGNITO_REGION"
-        COGNITO_USER_POOL_ID: "$COGNITO_USER_POOL_ID"
-        COGNITO_CLIENT_ID: "$COGNITO_CLIENT_ID"
