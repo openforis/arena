@@ -36,13 +36,17 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
       //applicability changed
 
       //update node and add it to nodesUpdated
-      nodesUpdated[nodeCtxUuid] = await NodeRepository.updateChildrenApplicability(
-        Survey.getId(survey),
-        nodeCtxUuid,
-        nodeDefUuid,
-        applicable,
-        tx
-      )
+      nodesUpdated[nodeCtxUuid] = {
+        ...await NodeRepository.updateChildrenApplicability(
+          Survey.getId(survey),
+          nodeCtxUuid,
+          nodeDefUuid,
+          applicable,
+          tx
+        ),
+        //preserve 'created' flag (used by rdb generator)
+        ...Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}
+      }
 
       const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
 
