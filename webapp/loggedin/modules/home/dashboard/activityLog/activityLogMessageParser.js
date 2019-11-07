@@ -14,6 +14,7 @@ import isItemDeletedFnsCategory from './activityLogMessageParser/isItemDeletedFn
 import isItemDeletedFnsTaxonomy from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsTaxonomy'
 import isItemDeletedFnsRecord from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsRecord'
 import isItemDeletedFnsUser from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsUser'
+import isItemDeletedFnsAnalysis from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsAnalysis'
 
 const i18nMessageParamsFns = {
   ...i18nMessageParamsFnsSurvey,
@@ -30,6 +31,7 @@ const isItemDeletedFns = {
   ...isItemDeletedFnsTaxonomy,
   ...isItemDeletedFnsRecord,
   ...isItemDeletedFnsUser,
+  ...isItemDeletedFnsAnalysis,
 }
 
 export const toMessage = (i18n, survey) => activityLog => {

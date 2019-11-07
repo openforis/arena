@@ -3,15 +3,12 @@ import * as R from 'ramda'
 import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as AuthGroup from '@core/auth/authGroup'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as UserRepository from '@server/modules/user/repository/userRepository'
-import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
 
 const activityTypesCommon = [
@@ -64,12 +61,14 @@ const activityTypesByPermission = {
   ],
 }
 
-const _getAvailableActivityTypes = async (surveyUuid, user) => {
+const _getAvailableActivityTypes = async (surveyId, user) => {
   if (User.isSystemAdmin(user))
     return null
 
+  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
+
   return R.pipe(
-    User.getAuthGroupBySurveyUuid(surveyUuid),
+    User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo)),
     AuthGroups.getPermissions,
     //for each permission in group, get available activity types
     R.reduce(
@@ -84,50 +83,9 @@ const _getAvailableActivityTypes = async (surveyUuid, user) => {
   )(user)
 }
 
-const _canUserAccessSurvey = async (user, surveyUuid) => {
-  const authGroups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
-  const userSurveyAuthGroups = R.filter(g => AuthGroup.getSurveyUuid(g) === surveyUuid)(authGroups)
-  return !R.isEmpty(userSurveyAuthGroups)
-}
-
-const _transformActivityLogUser = surveyUuid => async activityLogDb => {
-  const user = await UserRepository.fetchUserByUuid(ActivityLog.getContentUuid(activityLogDb))
-  const canUserAccessSurvey = await _canUserAccessSurvey(user, surveyUuid)
-
-  // assoc user email and name only if user has not been removed from survey
-  return R.when(
-    R.always(canUserAccessSurvey),
-    R.pipe(
-      R.assocPath([ActivityLog.keys.content, ActivityLog.keysContent.userEmail], User.getEmail(user)),
-      R.assocPath([ActivityLog.keys.content, ActivityLog.keysContent.userName], User.getName(user)),
-    ),
-    activityLogDb
-  )
-}
-
-const _transformActivityLogProcessingChain = surveyId => async activityLogDb => {
-  const processingChain = await ProcessingChainRepository.fetchChainByUuid(surveyId, ActivityLog.getContentUuid(activityLogDb))
-  return R.unless(
-    R.always(R.isNil(processingChain)),
-    R.assocPath([ActivityLog.keys.content, ActivityLog.keysContent.labels], ProcessingChain.getLabels(processingChain))
-  )(activityLogDb)
-}
-
 export const fetch = async (user, surveyId, offset, limit) => {
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
-  const surveyUuid = Survey.getUuid(surveyInfo)
-  const activityTypes = await _getAvailableActivityTypes(surveyUuid, user)
-  const activityLogsDb = await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
-
-  return await Promise.all(activityLogsDb.map(async activityLogDb => {
-    if (R.includes(ActivityLog.getType(activityLogDb), [ActivityLog.type.userInvite, ActivityLog.type.userUpdate])) {
-      return await _transformActivityLogUser(surveyUuid)(activityLogDb)
-    } else if (ActivityLog.getType(activityLogDb) === ActivityLog.type.processingChainPropUpdate) {
-      return await _transformActivityLogProcessingChain(surveyId)(activityLogDb)
-    } else {
-      return activityLogDb
-    }
-  }))
+  const activityTypes = await _getAvailableActivityTypes(surveyId, user)
+  return await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
 }
 
 export const { insert } = ActivityLogRepository

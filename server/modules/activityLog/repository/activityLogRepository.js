@@ -4,6 +4,7 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as db from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -40,13 +41,34 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
           ${getSurveyDBSchema(surveyId)}.activity_log a
         WHERE
           system = false
-        ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
+        ${activityTypes ? 'AND a.type IN ($2:csv)' : ''}
     
       )
     SELECT
       l.*,
       u.name AS user_name,
-      r.uuid AS record_uuid
+      r.uuid AS record_uuid,
+      -- user activities keys
+      user_target.name AS target_user_name,
+      user_target.email AS target_user_email,
+      -- check if target user has been removed (not in auth_group_user table)
+      NOT EXISTS (    
+        SELECT * 
+        FROM  
+          public.survey s
+        JOIN
+          public.auth_group_user agu
+        ON
+          agu.user_uuid = user_target.uuid 
+        JOIN  
+          public.auth_group ag
+        ON 
+          ag.uuid = agu.group_uuid AND ag.survey_uuid = s.uuid
+        WHERE 
+          s.id = $1
+      ) as target_user_removed,
+      -- analysis activities keys
+      processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels
     FROM
       log AS l
     JOIN
@@ -55,13 +77,24 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       u.uuid = l.user_uuid
     LEFT OUTER JOIN 
       ${getSurveyDBSchema(surveyId)}.record r
-    ON l.content->>'uuid' = r.uuid::text
+    ON 
+      l.content->>'uuid' = r.uuid::text
+    -- user activities
+    LEFT OUTER JOIN 
+      public.user user_target
+    ON 
+      l.content->>'uuid' = user_target.uuid::text
+    -- analysis activities
+    LEFT OUTER JOIN 
+      ${getSurveyDBSchema(surveyId)}.processing_chain
+    ON 
+      l.content->>'uuid' = processing_chain.uuid::text
     WHERE
       l.rank = 1
     ORDER BY
       l.date_created DESC
-    OFFSET $2
-    LIMIT $3`,
-    [activityTypes, offset, limit],
+    OFFSET $3
+    LIMIT $4`,
+    [surveyId, activityTypes, offset, limit],
     camelize
   )
