@@ -234,8 +234,8 @@ module.exports = {
       [ActivityLog.type.nodeDelete]: 'deleted node {{path}}',
 
       // user
-      [ActivityLog.type.userInvite]: 'invited user {{name}} with role {{role}}',
-      [ActivityLog.type.userUpdate]: 'updated user {{name}} group to {{groupName}}',
+      [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
+      [ActivityLog.type.userUpdate]: 'updated user {{name}}',
       [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
 
       // analysis
