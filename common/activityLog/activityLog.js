@@ -65,9 +65,14 @@ export const keys = {
   type: 'type',
   system: 'system',
   userUuid: 'userUuid',
+
   //props associated from fetch
   userName: 'userName',
   recordUuid: 'recordUuid',
+  //user
+  targetUserName: 'targetUserName',
+  targetUserEmail: 'targetUserEmail',
+  targetUserRemoved: 'targetUserRemoved',
 }
 
 export const keysContent = {
@@ -89,9 +94,6 @@ export const keysContent = {
   stepFrom: 'stepFrom',
   stepTo: 'stepTo',
   //user
-  userName: 'userName',
-  userEmail: 'userEmail',
-  userCanAccessSurvey: 'userCanAccessSurvey',
   groupUuid: 'groupUuid',
 }
 
@@ -114,6 +116,9 @@ export const getDateCreated = ObjectUtils.getDateCreated
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
+export const getTargetUserName =  R.prop(keys.targetUserName)
+export const getTargetUserEmail =  R.prop(keys.targetUserEmail)
+export const isTargetUserRemoved = R.propEq(keys.targetUserRemoved, true)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -134,7 +139,4 @@ export const getContentKeys = _getContentProp(keysContent.keys)
 export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
 // content props user
-export const getContentUserName = _getContentProp(keysContent.userName)
-export const getContentUserEmail = _getContentProp(keysContent.userEmail)
-export const getContentUserCanAccessSurvey = _getContentProp(keysContent.userCanAccessSurvey)
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)

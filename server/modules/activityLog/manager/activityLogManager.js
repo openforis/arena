@@ -9,7 +9,6 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 
 const activityTypesCommon = [
@@ -82,24 +81,19 @@ const _getAvailableActivityTypes = async (surveyUuid, user) => {
   )(user)
 }
 
-const _canUserAccessSurvey = async (user, surveyUuid) => {
-  const authGroups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
-  const userSurveyAuthGroups = R.filter(g => AuthGroup.getSurveyUuid(g) === surveyUuid)(authGroups)
-  return !R.isEmpty(userSurveyAuthGroups)
-}
-
 const _transformActivityLogUser = surveyUuid => async activityLogDb => {
-  const user = await UserRepository.fetchUserByUuid(ActivityLog.getContentUuid(activityLogDb))
-  const canUserAccessSurvey = await _canUserAccessSurvey(user, surveyUuid)
+  const userUuid = ActivityLog.getContentUuid(activityLogDb)
+  const authGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
+  const isTargetUserRemoved =
+    R.none(AuthGroup.isSystemAdminGroup)(authGroups) &&
+    R.pipe(
+      R.filter(g => AuthGroup.getSurveyUuid(g) === surveyUuid),
+      R.isEmpty
+    )(authGroups)
 
   return {
     ...activityLogDb,
-    [ActivityLog.keys.content]: {
-      ...ActivityLog.getContent(activityLogDb),
-      [ActivityLog.keysContent.userEmail]: User.getEmail(user),
-      [ActivityLog.keysContent.userName]: User.getName(user),
-      [ActivityLog.keysContent.userCanAccessSurvey]: canUserAccessSurvey,
-    }
+    [ActivityLog.keys.targetUserRemoved]: isTargetUserRemoved
   }
 }
 

@@ -8,21 +8,25 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 export default {
 
   [ActivityLog.type.userInvite]: (survey, i18n) => activityLog => {
-    const groups = R.pipe(Survey.getSurveyInfo, Survey.getAuthGroups)(survey)
-    const group = groups.find(group => AuthGroup.getUuid(group) === ActivityLog.getContentGroupUuid(activityLog))
+    const groupUuid = ActivityLog.getContentGroupUuid(activityLog)
+    const group = R.pipe(
+      Survey.getSurveyInfo,
+      Survey.getAuthGroups,
+      R.find(g => AuthGroup.getUuid(g) === groupUuid)
+    )(survey)
 
     return {
-      email: ActivityLog.getContentUserEmail(activityLog),
+      email: ActivityLog.getTargetUserEmail(activityLog),
       groupName: i18n.t(`authGroups.${AuthGroup.getName(group)}.label`)
     }
   },
 
   [ActivityLog.type.userUpdate]: () => activityLog => ({
-    name: ActivityLog.getContentUserName(activityLog)
+    name: ActivityLog.getTargetUserName(activityLog)
   }),
 
   [ActivityLog.type.userRemove]: () => activityLog => ({
-    name: ActivityLog.getContentUserName(activityLog)
+    name: ActivityLog.getTargetUserName(activityLog)
   })
 
 }

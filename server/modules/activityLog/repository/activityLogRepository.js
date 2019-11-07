@@ -46,7 +46,10 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
     SELECT
       l.*,
       u.name AS user_name,
-      r.uuid AS record_uuid
+      r.uuid AS record_uuid,
+      -- user activities keys
+      user_target.name AS target_user_name,
+      user_target.email AS target_user_email
     FROM
       log AS l
     JOIN
@@ -55,7 +58,13 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       u.uuid = l.user_uuid
     LEFT OUTER JOIN 
       ${getSurveyDBSchema(surveyId)}.record r
-    ON l.content->>'uuid' = r.uuid::text
+    ON 
+      l.content->>'uuid' = r.uuid::text
+    -- user activities
+    LEFT OUTER JOIN 
+      public.user user_target
+    ON 
+      l.content->>'uuid' = user_target.uuid::text
     WHERE
       l.rank = 1
     ORDER BY
