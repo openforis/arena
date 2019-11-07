@@ -72,7 +72,7 @@ export const keys = {
   //user
   targetUserName: 'targetUserName',
   targetUserEmail: 'targetUserEmail',
-  targetUserRemoved: 'targetUserRemoved',
+  targetUserUuid: 'targetUserUuid',
 }
 
 export const keysContent = {
@@ -118,7 +118,7 @@ export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
 export const getTargetUserName =  R.prop(keys.targetUserName)
 export const getTargetUserEmail =  R.prop(keys.targetUserEmail)
-export const isTargetUserRemoved = R.propEq(keys.targetUserRemoved, true)
+export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
