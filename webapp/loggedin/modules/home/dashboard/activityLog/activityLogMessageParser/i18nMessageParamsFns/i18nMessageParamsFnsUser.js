@@ -9,15 +9,17 @@ export default {
 
   [ActivityLog.type.userInvite]: (survey, i18n) => activityLog => {
     const groupUuid = ActivityLog.getContentGroupUuid(activityLog)
-    const group = R.pipe(
+    const groupName = R.pipe(
       Survey.getSurveyInfo,
       Survey.getAuthGroups,
-      R.find(g => AuthGroup.getUuid(g) === groupUuid)
+      R.find(g => AuthGroup.getUuid(g) === groupUuid),
+      AuthGroup.getName,
+      R.defaultTo(AuthGroup.groupNames.systemAdmin)
     )(survey)
 
     return {
       email: ActivityLog.getTargetUserEmail(activityLog),
-      groupName: i18n.t(`authGroups.${AuthGroup.getName(group)}.label`)
+      groupName: i18n.t(`authGroups.${groupName}.label`)
     }
   },
 

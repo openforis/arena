@@ -3,13 +3,11 @@ import * as R from 'ramda'
 import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as AuthGroup from '@core/auth/authGroup'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 
 const activityTypesCommon = [
   ActivityLog.type.surveyCreate,
@@ -61,12 +59,14 @@ const activityTypesByPermission = {
   ],
 }
 
-const _getAvailableActivityTypes = async (surveyUuid, user) => {
+const _getAvailableActivityTypes = async (surveyId, user) => {
   if (User.isSystemAdmin(user))
     return null
 
+  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
+
   return R.pipe(
-    User.getAuthGroupBySurveyUuid(surveyUuid),
+    User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo)),
     AuthGroups.getPermissions,
     //for each permission in group, get available activity types
     R.reduce(
@@ -81,35 +81,9 @@ const _getAvailableActivityTypes = async (surveyUuid, user) => {
   )(user)
 }
 
-const _transformActivityLogUser = surveyUuid => async activityLogDb => {
-  const userUuid = ActivityLog.getContentUuid(activityLogDb)
-  const authGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
-  const isTargetUserRemoved =
-    R.none(AuthGroup.isSystemAdminGroup)(authGroups) &&
-    R.pipe(
-      R.filter(g => AuthGroup.getSurveyUuid(g) === surveyUuid),
-      R.isEmpty
-    )(authGroups)
-
-  return {
-    ...activityLogDb,
-    [ActivityLog.keys.targetUserRemoved]: isTargetUserRemoved
-  }
-}
-
 export const fetch = async (user, surveyId, offset, limit) => {
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
-  const surveyUuid = Survey.getUuid(surveyInfo)
-  const activityTypes = await _getAvailableActivityTypes(surveyUuid, user)
-  const activityLogsDb = await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
-
-  return await Promise.all(activityLogsDb.map(async activityLogDb => {
-    if (R.includes(ActivityLog.getType(activityLogDb), [ActivityLog.type.userInvite, ActivityLog.type.userUpdate, ActivityLog.type.userRemove])) {
-      return await _transformActivityLogUser(surveyUuid)(activityLogDb)
-    } else {
-      return activityLogDb
-    }
-  }))
+  const activityTypes = await _getAvailableActivityTypes(surveyId, user)
+  return await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
 }
 
 export const { insert } = ActivityLogRepository

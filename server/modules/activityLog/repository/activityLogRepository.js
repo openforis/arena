@@ -40,7 +40,7 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
           ${getSurveyDBSchema(surveyId)}.activity_log a
         WHERE
           system = false
-        ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
+        ${activityTypes ? 'AND a.type IN ($2:csv)' : ''}
     
       )
     SELECT
@@ -49,7 +49,23 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       r.uuid AS record_uuid,
       -- user activities keys
       user_target.name AS target_user_name,
-      user_target.email AS target_user_email
+      user_target.email AS target_user_email,
+      -- check if target user has been removed (not in auth_group_user table)
+      NOT EXISTS (    
+        SELECT * 
+        FROM  
+          public.survey s
+        JOIN
+          public.auth_group_user agu
+        ON
+          agu.user_uuid = user_target.uuid 
+        JOIN  
+          public.auth_group ag
+        ON 
+          ag.uuid = agu.group_uuid AND ag.survey_uuid = s.uuid
+        WHERE 
+          s.id = $1
+      ) as target_user_removed
     FROM
       log AS l
     JOIN
@@ -69,8 +85,8 @@ export const fetch = async (surveyId, activityTypes = null, offset = 0, limit = 
       l.rank = 1
     ORDER BY
       l.date_created DESC
-    OFFSET $2
-    LIMIT $3`,
-    [activityTypes, offset, limit],
+    OFFSET $3
+    LIMIT $4`,
+    [surveyId, activityTypes, offset, limit],
     camelize
   )
