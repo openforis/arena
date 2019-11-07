@@ -243,8 +243,8 @@ module.exports = {
       [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} {{prop}} to {{value}}',
-      [ActivityLog.type.processingStepDelete]: 'deleted processing step {{index}}',
+      [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} of processing chain {{processingChainLabel}}',
+      [ActivityLog.type.processingStepDelete]: 'deleted processing step {{index}} of processing chain {{processingChainLabel}}',
     }
   },
 

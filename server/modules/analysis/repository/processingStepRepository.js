@@ -66,12 +66,14 @@ export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, ind
 // ====== UPDATE
 
 export const updateStepProps = async (surveyId, processingStepUuid, props, client = db) =>
-  await client.query(`
+  await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_step
     SET props = props || $2::jsonb
     WHERE uuid = $1
+    RETURNING *
     `,
     [processingStepUuid, props],
+    camelize
   )
 
 // ====== DELETE
