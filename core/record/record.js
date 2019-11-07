@@ -68,6 +68,7 @@ module.exports = {
   // ====== UPDATE
   assocNodes: RecordUpdater.assocNodes,
   assocNode: RecordUpdater.assocNode,
+  mergeNodes: RecordUpdater.mergeNodes,
 
   // ====== DELETE
   deleteNode: RecordUpdater.deleteNode,

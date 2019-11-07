@@ -9,7 +9,7 @@ const RecordReader = require('./recordReader')
 
 // ====== UPDATE
 
-const assocNodes = nodes => record => {
+const mergeNodes = nodes => record => {
   let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated))
     recordUpdated[keys.nodes] = {}
@@ -34,6 +34,23 @@ const assocNodes = nodes => record => {
         recordUpdated = NodesIndex.addNode(nodeUpdated)(recordUpdated)
       }
 
+    }
+  }, nodes)
+
+  return recordUpdated
+}
+
+const assocNodes = nodes => record => {
+  let recordUpdated = { ...record }
+  if (!(keys.nodes in recordUpdated))
+    recordUpdated[keys.nodes] = {}
+
+  R.forEachObjIndexed((node, nodeUuid) => {
+    if (Node.isDeleted(node)) {
+      recordUpdated = deleteNode(node)(recordUpdated)
+    } else {
+      recordUpdated[keys.nodes][nodeUuid] = node
+      recordUpdated = NodesIndex.addNode(node)(recordUpdated)
     }
   }, nodes)
 
@@ -82,6 +99,7 @@ const deleteNode = node => record => {
 module.exports = {
   assocNodes,
   assocNode,
+  mergeNodes,
   mergeNodeValidations,
 
   deleteNode,
