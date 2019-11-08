@@ -207,6 +207,20 @@ const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
 const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
+const updateItems = async (surveyId, items, client = db) => {
+  const values = items.map(item => [
+    CategoryItem.getUuid(item),
+    CategoryItem.getProps(item)
+  ])
+  await client.none(DbUtils.updateAllQuery(
+    getSurveyDBSchema(surveyId),
+    'category_item',
+    { name: 'uuid', cast: 'uuid' },
+    [{ name: 'props_draft', cast: 'jsonb' }],
+    values
+  ))
+}
+
 // ============== DELETE
 
 const deleteCategory = async (surveyId, categoryUuid, client = db) =>
@@ -266,6 +280,7 @@ module.exports = {
   markCategoriesPublishedBySurveyId,
   updateLevelProp,
   updateItemProp,
+  updateItems,
 
   //DELETE
   deleteCategory,
