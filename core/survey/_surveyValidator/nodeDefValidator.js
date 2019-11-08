@@ -97,9 +97,9 @@ const propsValidations = survey => ({
 
 const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = await Promise.all([
-    NodeDefExpressionsValidator.validate(survey, nodeDef, nodeDef, NodeDef.getDefaultValues(nodeDef), false, Validation.messageKeys.nodeDefEdit.defaultValuesInvalid),
-    NodeDefExpressionsValidator.validate(survey, Survey.getNodeDefParent(nodeDef)(survey), nodeDef, NodeDef.getApplicable(nodeDef), false, Validation.messageKeys.nodeDefEdit.applyIfInvalid),
-    NodeDefValidationsValidator.validate(survey, nodeDef, nodeDef, NodeDef.getValidations(nodeDef), Validation.messageKeys.nodeDefEdit.validationsInvalid)
+    NodeDefExpressionsValidator.validate(survey, nodeDef, nodeDef, NodeDef.getDefaultValues(nodeDef), true, false, Validation.messageKeys.nodeDefEdit.defaultValuesInvalid),
+    NodeDefExpressionsValidator.validate(survey, Survey.getNodeDefParent(nodeDef)(survey), nodeDef, NodeDef.getApplicable(nodeDef), false, false, Validation.messageKeys.nodeDefEdit.applyIfInvalid),
+    NodeDefValidationsValidator.validate(survey, nodeDef)
   ])
 
   return Validation.newInstance(

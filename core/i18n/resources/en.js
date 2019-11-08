@@ -483,13 +483,14 @@ module.exports = {
     },
 
     expressions: {
+      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
+      cannotUseCurrentNode: 'cannot use current node {{name}} in this expression',
+      circularDependencyError: 'cannot reference node {{name}} because it references the current node',
       expressionInvalid: 'Invalid expression: {{details}}',
       unableToFindNode: 'unable to find node: {{name}}',
-      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
-      circularDependencyError: 'cannot reference node {{name}} because it references the current node',
     },
 
     nodeDefEdit: {
