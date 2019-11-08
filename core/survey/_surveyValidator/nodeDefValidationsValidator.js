@@ -19,7 +19,7 @@ const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) =>
   return R.pipe(
     Validation.assocFieldValidation(
       NodeDefValidations.keys.expressions,
-      await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
+      await NodeDefExpressionsValidator.validate(survey, nodeDef, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
     ),
     R.when(
       validation => errorKey && !Validation.isValid(validation) && !Validation.hasErrors(validation),

@@ -489,6 +489,7 @@ module.exports = {
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
+      circularDependencyError: 'cannot reference node {{name}} because it references the current node',
     },
 
     nodeDefEdit: {
