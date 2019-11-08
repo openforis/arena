@@ -1,20 +1,20 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-const DataTable = require('./dataTable')
-const DataCol = require('./dataCol')
+import * as DataTable from './dataTable'
+import * as DataCol from './dataCol'
 
-const getName = NodeDefTable.getViewName
+export const getName = NodeDefTable.getViewName
 
-const alias = `a`
-const aliasParent = `p`
+export const alias = `a`
+export const aliasParent = `p`
 
-const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
+export const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
-const getSelectFields = (survey, nodeDef) => {
+export const getSelectFields = (survey, nodeDef) => {
   const fields = []
   Survey.visitAncestorsAndSelf(
     nodeDef,
@@ -57,18 +57,10 @@ const getCols = (survey, nodeDef, isSelf) => {
   return fields
 }
 
-const getJoin = (schemaName, nodeDefParent) =>
+export const getJoin = (schemaName, nodeDefParent) =>
   nodeDefParent
     ? `JOIN 
        ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
       `
     : ''
-
-module.exports = {
-  alias,
-  aliasParent,
-  getName,
-  getSelectFields,
-  getJoin,
-}

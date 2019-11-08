@@ -3,7 +3,7 @@ import './sortEditor.scss'
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Expression from '@core/expressionParser/expression'
+import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
 import Popup from '@webapp/commonComponents/popup'
@@ -12,7 +12,7 @@ import { useI18n, usePrevious } from '@webapp/commonComponents/hooks'
 
 import SortRow from './sortRow'
 
-import Survey from '@core/survey/survey'
+import * as Survey from '@core/survey/survey'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 

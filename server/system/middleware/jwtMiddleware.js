@@ -1,11 +1,11 @@
-const Jwt = require('@server/utils/jwt')
+import * as Jwt from '@server/utils/jwt'
 
-const UserService = require('@server/modules/user/service/userService')
-const AuthService = require('@server/modules/auth/service/authService')
+import * as UserService from '@server/modules/user/service/userService'
+import * as AuthService from '@server/modules/auth/service/authService'
 
-const UnauthorizedError = require('@server/utils/unauthorizedError')
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
-module.exports = async (req, res, next) => {
+export const jwtMiddleware = async (req, res, next) => {
   const authorizationHeader = req.headers && req.headers.authorization
 
   if (!authorizationHeader) {
@@ -30,4 +30,4 @@ module.exports = async (req, res, next) => {
       next(new UnauthorizedError())
     }
   }
-}
+};

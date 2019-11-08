@@ -1,20 +1,20 @@
-const Request = require('@server/utils/request')
-const Response = require('@server/utils/response')
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 
-const ObjectUtils = require('@core/objectUtils')
-const Taxon = require('@core/survey/taxon')
+import * as ObjectUtils from '@core/objectUtils'
+import * as Taxon from '@core/survey/taxon'
 
-const { jobToJSON } = require('@server/job/jobUtils')
-const TaxonomyService = require('../service/taxonomyService')
+import { jobToJSON } from '@server/job/jobUtils';
+import * as TaxonomyService from '../service/taxonomyService'
 
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
-module.exports.init = app => {
+export const init = app => {
 
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -165,4 +165,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

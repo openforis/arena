@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import * as R from 'ramda'
 
-import Validation from '@core/validation/validation'
+import * as Validation from '@core/validation/validation'
 
 export default (obj, validatorFn = null, validationEnabled = false) => {
   const [state, setState] = useState({

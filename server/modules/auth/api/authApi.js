@@ -1,16 +1,18 @@
-const Loggger = require('@server/log/log').getLogger('AuthAPI')
-const Request = require('@server/utils/request')
-const Response = require('@server/utils/response')
-const Jwt = require('@server/utils/jwt')
+import * as Log from '@server/log/log'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import * as Jwt from '@server/utils/jwt'
 
-const Survey = require('@core/survey/survey')
-const User = require('@core/user/user')
-const Authorizer = require('@core/auth/authorizer')
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+import * as Authorizer from '@core/auth/authorizer'
 
-const SurveyService = require('../../survey/service/surveyService')
-const UserService = require('../../user/service/userService')
-const RecordService = require('../../record/service/recordService')
-const AuthService = require('../service/authService')
+import * as SurveyService from '../../survey/service/surveyService'
+import * as UserService from '../../user/service/userService'
+import * as RecordService from '../../record/service/recordService'
+import * as AuthService from '../service/authService'
+
+const Logger = Log.getLogger('AuthAPI')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
@@ -30,7 +32,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
   }
 }
 
-module.exports.init = app => {
+export const init = app => {
 
   app.get('/auth/user', async (req, res, next) => {
     try {
@@ -61,4 +63,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

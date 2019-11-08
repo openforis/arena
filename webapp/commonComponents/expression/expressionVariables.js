@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import sqlTypes from '@common/surveyRdb/sqlTypes'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import { sqlTypes } from '@common/surveyRdb/sqlTypes'
 
-import Expression from '@core/expressionParser/expression'
+import * as Expression from '@core/expressionParser/expression'
 
 // TODO: match all nodeDefTypes and throw an error if unknown:
 const toSqlType = nodeDef =>

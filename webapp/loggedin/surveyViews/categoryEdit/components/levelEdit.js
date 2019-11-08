@@ -9,17 +9,17 @@ import ItemEdit from './itemEdit'
 
 import { normalizeName } from '@core/stringUtils'
 
-import Survey from '@core/survey/survey'
-import Category from '@core/survey/category'
-import CategoryLevel from '@core/survey/categoryLevel'
-import CategoryItem from '@core/survey/categoryItem'
-import Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Validation from '@core/validation/validation'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as CategoryEditState from '../categoryEditState'
 
-import Authorizer from '@core/auth/authorizer'
+import * as Authorizer from '@core/auth/authorizer'
 
 import {
   createCategoryLevelItem,

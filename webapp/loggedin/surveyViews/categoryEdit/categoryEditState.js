@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import CategoryItem from '@core/survey/categoryItem'
-import CategoryImportSummary from '@core/survey/categoryImportSummary'
+import * as Survey from '@core/survey/survey'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
 import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '@webapp/survey/surveyState'

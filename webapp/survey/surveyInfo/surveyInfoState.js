@@ -1,5 +1,5 @@
-import Survey from '@core/survey/survey'
-import Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 
 /**
  * ======

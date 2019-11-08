@@ -1,13 +1,13 @@
-const R = require('ramda')
-const camelize = require('camelize')
+import * as R from 'ramda'
+import * as camelize from 'camelize'
 
-const db = require('@server/db/db')
-const DbUtils = require('@server/db/dbUtils')
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
-const Node = require('@core/record/node')
-const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
+import * as Node from '@core/record/node'
+import { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } from '../../survey/repository/surveySchemaRepositoryUtils';
 
-const tableColumns = ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'] //used for node values batch insert
+export const tableColumns = ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'] //used for node values batch insert
 
 // ============== UTILS
 
@@ -56,7 +56,7 @@ const _getNodeSelectQuery = (surveyId, draft) => {
 
 // ============== CREATE
 
-const insertNode = async (surveyId, node, draft, client = db) => {
+export const insertNode = async (surveyId, node, draft, client = db) => {
   const meta = {
     ...Node.getMeta(node),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
@@ -81,7 +81,7 @@ const insertNode = async (surveyId, node, draft, client = db) => {
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
-const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
+export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
   await client.none(DbUtils.insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
@@ -91,7 +91,7 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
 
 // ============== READ
 
-const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
+export const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
   await client.map(`
     ${_getNodeSelectQuery(surveyId, draft)}
     WHERE n.record_uuid = $1
@@ -100,7 +100,7 @@ const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) 
     dbTransformCallback
   )
 
-const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
+export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
   await client.one(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1`,
@@ -108,7 +108,7 @@ const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
-const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
+export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   await client.map(`
     ${_getNodeSelectQuery(surveyId, false)}
     WHERE n.record_uuid = $1
@@ -120,7 +120,7 @@ const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, chi
 
 
 // ============== UPDATE
-const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
+export const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1,
@@ -139,7 +139,7 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = 
   return { ...node, [Node.keys.updated]: true }
 }
 
-const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
+export const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET meta = jsonb_set(meta, '{"${Node.metaKeys.childApplicability}", "${childDefUuid}"}', '${applicable}')
@@ -150,7 +150,7 @@ const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUui
   )
 
 // ============== DELETE
-const deleteNode = async (surveyId, nodeUuid, client = db) =>
+export const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
@@ -159,7 +159,7 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
     dbTransformCallback
   )
 
-const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
+export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
   await client.manyOrNone(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE node_def_uuid IN ($1:csv)
@@ -189,27 +189,7 @@ const stringifyValue = value => {
   )(value)
 }
 
-module.exports = {
-  tableColumns,
+//UTILS
+export const disableTriggers = async (surveyId, client = db) => await disableSurveySchemaTableTriggers(surveyId, 'node', client)
+export const enableTriggers = async (surveyId, client = db) => await enableSurveySchemaTableTriggers(surveyId, 'node', client)
 
-  //CREATE
-  insertNode,
-  insertNodesFromValues,
-
-  //READ
-  fetchNodesByRecordUuid,
-  fetchNodeByUuid,
-  fetchChildNodesByNodeDefUuids,
-
-  //UPDATE
-  updateNode,
-  updateChildrenApplicability,
-
-  //DELETE
-  deleteNode,
-  deleteNodesByNodeDefUuids,
-
-  //UTILS
-  disableTriggers: async (surveyId, client = db) => await disableSurveySchemaTableTriggers(surveyId, 'node', client),
-  enableTriggers: async (surveyId, client = db) => await enableSurveySchemaTableTriggers(surveyId, 'node', client),
-}

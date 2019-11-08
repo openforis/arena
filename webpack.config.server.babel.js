@@ -1,7 +1,7 @@
-const webpack = require('webpack')
-const path = require('path')
-const nodeExternals = require('webpack-node-externals')
-const mainConfig = require('./webpack.config')
+import * as webpack from 'webpack'
+import * as path from 'path'
+import nodeExternals from 'webpack-node-externals'
+import mainConfig from './webpack.config.babel'
 
 const nodeEnv = process.env.NODE_ENV
 const isProduction = nodeEnv === 'production'
@@ -24,12 +24,12 @@ const entry = entryPath => [
   path.resolve(path.join(__dirname, entryPath))
 ]
 
-module.exports = {
+export default {
   mode: 'development',
   devtool: isProduction ? false : 'source-map',
   externals: [
     nodeExternals({ whitelist: ['webpack/hot/poll?1000'] }),
-    'worker_threads',
+    // 'worker_threads',
   ],
   name: 'server',
   plugins,
@@ -43,7 +43,7 @@ module.exports = {
     publicPath: 'dist/',
     path: path.resolve(__dirname, './'),
     filename: 'dist/[id].js',
-    libraryTarget: 'commonjs2',
+    // libraryTarget: 'commonjs2',
     hotUpdateChunkFilename: 'dist/hot-update-[id].js',
     hotUpdateMainFilename: 'dist/hot-update-[hash].json',
   },
@@ -62,7 +62,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/env'],
+            presets: ['@babel/preset-env'],
             plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
           },
         },

@@ -1,27 +1,27 @@
-const R = require('ramda')
-const camelize = require('camelize')
+import * as R from 'ramda'
+import * as camelize from 'camelize'
 
-const db = require('@server/db/db')
-const dbUtils = require('@server/db/dbUtils')
+import { db } from '@server/db/db'
+import * as dbUtils from '@server/db/dbUtils'
 
-const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils';
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const Record = require('@core/record/record')
+import * as Record from '@core/record/record'
 
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-const Expression = require('@core/expressionParser/expression.js')
-const DataSort = require('@common/surveyRdb/dataSort')
-const DataFilter = require('@common/surveyRdb/dataFilter')
+import * as Expression from '@core/expressionParser/expression.js'
+import * as DataSort from '@common/surveyRdb/dataSort'
+import * as DataFilter from '@common/surveyRdb/dataFilter'
 
-const DataCol = require('../schemaRdb/dataCol')
-const DataTable = require('../schemaRdb/dataTable')
+import * as DataCol from '../schemaRdb/dataCol'
+import * as DataTable from '../schemaRdb/dataTable'
 
-const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort = [], queryStream = false, client = db) => {
+export const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort = [], queryStream = false, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
   // columns
   const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})
@@ -51,7 +51,7 @@ const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filter
     : await client.any(select, params)
 }
 
-const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
+export const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
 
@@ -75,7 +75,7 @@ const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => 
   return Number(countRS.count)
 }
 
-const countDuplicateRecords = async (survey, record, client = db) => {
+export const countDuplicateRecords = async (survey, record, client = db) => {
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
@@ -107,7 +107,7 @@ const countDuplicateRecords = async (survey, record, client = db) => {
   return await runCount(surveyId, Record.getCycle(record), tableName, whereExpr, client)
 }
 
-const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
+export const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
@@ -158,7 +158,7 @@ const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUuidExclud
   )
 }
 
-const fetchRecordKeysByRecordUuid = async (survey, recordUuid, client = db) => {
+export const fetchRecordKeysByRecordUuid = async (survey, recordUuid, client = db) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
@@ -176,13 +176,4 @@ const fetchRecordKeysByRecordUuid = async (survey, recordUuid, client = db) => {
     [recordUuid],
     row => Object.values(row)
   )
-}
-
-module.exports = {
-  runSelect,
-  runCount,
-
-  countDuplicateRecords,
-  fetchRecordsCountByKeys,
-  fetchRecordKeysByRecordUuid,
 }

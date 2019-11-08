@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Taxon from '@core/survey/taxon'
+import * as Taxon from '@core/survey/taxon'
 
 const TaxaTableRow = props => {
 

@@ -1,9 +1,9 @@
-const CategoryManager = require('../manager/categoryManager')
-const JobManager = require('@server/job/jobManager')
-const CategoryImportJob = require('./categoryImportJob')
-const CategoryImportJobParams = require('./categoryImportJobParams')
+import * as CategoryManager from '../manager/categoryManager'
+import * as JobManager from '@server/job/jobManager'
+import CategoryImportJob from './categoryImportJob'
+import * as CategoryImportJobParams from './categoryImportJobParams'
 
-const importCategory = (user, surveyId, categoryUuid, summary) => {
+export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
@@ -16,23 +16,20 @@ const importCategory = (user, surveyId, categoryUuid, summary) => {
   return job
 }
 
-module.exports = {
-  insertCategory: CategoryManager.insertCategory,
-  createImportSummary: CategoryManager.createImportSummary,
-  createImportSummaryFromStream: CategoryManager.createImportSummaryFromStream,
-  importCategory,
-  insertLevel: CategoryManager.insertLevel,
-  insertItem: CategoryManager.insertItem,
+export const insertCategory = CategoryManager.insertCategory
+export const createImportSummary = CategoryManager.createImportSummary
+export const createImportSummaryFromStream = CategoryManager.createImportSummaryFromStream
+export const insertLevel = CategoryManager.insertLevel
+export const insertItem = CategoryManager.insertItem
 
-  fetchCategoriesAndLevelsBySurveyId: CategoryManager.fetchCategoriesAndLevelsBySurveyId,
-  fetchCategoryAndLevelsByUuid: CategoryManager.fetchCategoryAndLevelsByUuid,
-  fetchItemsByParentUuid: CategoryManager.fetchItemsByParentUuid,
+export const fetchCategoriesAndLevelsBySurveyId = CategoryManager.fetchCategoriesAndLevelsBySurveyId
+export const fetchCategoryAndLevelsByUuid = CategoryManager.fetchCategoryAndLevelsByUuid
+export const fetchItemsByParentUuid = CategoryManager.fetchItemsByParentUuid
 
-  updateCategoryProp: CategoryManager.updateCategoryProp,
-  updateLevelProp: CategoryManager.updateLevelProp,
-  updateItemProp: CategoryManager.updateItemProp,
+export const updateCategoryProp = CategoryManager.updateCategoryProp
+export const updateLevelProp = CategoryManager.updateLevelProp
+export const updateItemProp = CategoryManager.updateItemProp
 
-  deleteCategory: CategoryManager.deleteCategory,
-  deleteLevel: CategoryManager.deleteLevel,
-  deleteItem: CategoryManager.deleteItem,
-}
+export const deleteCategory = CategoryManager.deleteCategory
+export const deleteLevel = CategoryManager.deleteLevel
+export const deleteItem = CategoryManager.deleteItem

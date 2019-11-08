@@ -1,4 +1,4 @@
-class Queue {
+export default class Queue {
 
   constructor (items = []) {
     this.data = []
@@ -36,5 +36,3 @@ class Queue {
   }
 
 }
-
-module.exports = Queue

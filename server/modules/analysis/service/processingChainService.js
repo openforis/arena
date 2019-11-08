@@ -42,3 +42,4 @@ export const generateScript = async (surveyId, processingChain) => {
   }
 
 }
+

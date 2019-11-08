@@ -1,11 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const SurveyCycle = require('../../survey/surveyCycle')
-const Validator = require('../../validation/validator')
-const Validation = require('../../validation/validation')
-const ValidationResult = require('../../validation/validationResult')
+import * as SurveyCycle from '../../survey/surveyCycle'
+import * as Validator from '../../validation/validator'
+import * as Validation from '../../validation/validation'
+import * as ValidationResult from '../../validation/validationResult'
 
-const DateUtils = require('../../dateUtils')
+import * as DateUtils from '../../dateUtils'
 
 const MAX_CYCLES = 10
 
@@ -41,20 +41,16 @@ const _cycleValidators = (cyclePrev, isLast) => ({
     Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateStartMandatory),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateStartInvalid),
     _validateCycleStartDateBeforeEndDate,
-    ...cyclePrev
-      ? [_validateDateStartAfterPrevDateEnd(cyclePrev)]
-      : []
+    ...((cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : []))
   ],
   [SurveyCycle.keys.dateEnd]: [
     //date end is required for all but the last cycle
-    ...isLast
-      ? []
-      : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)],
+    ...((isLast ? [] : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)])),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateEndInvalid)
   ],
 })
 
-const validateCycles = async cycles => {
+export const validateCycles = async cycles => {
   const cyclesArray = R.values(cycles)
   const cyclesSize = cyclesArray.length
 
@@ -86,8 +82,4 @@ const validateCycles = async cycles => {
   }
 
   return result
-}
-
-module.exports = {
-  validateCycles
 }

@@ -1,12 +1,12 @@
-const Request = require('@server/utils/request')
+import * as Request from '@server/utils/request'
 
-const CollectImportService = require('../service/collectImportService')
+import * as CollectImportService from '../service/collectImportService'
 
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const JobUtils = require('@server/job/jobUtils')
+import * as JobUtils from '@server/job/jobUtils'
 
-module.exports.init = app => {
+export const init = app => {
 
   // CREATE
 
@@ -64,4 +64,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const StringUtils = require('@core/stringUtils')
+import * as StringUtils from '@core/stringUtils'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
-const Expression = require('@core/expressionParser/expression')
-const Validation = require('@core/validation/validation')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as Expression from '@core/expressionParser/expression'
+import * as Validation from '@core/validation/validation'
 
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
 const _getNodeValue = (survey, node) => {
   if (Node.isValueBlank(node))
@@ -77,7 +77,7 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
   return _getNodeValue(survey, referencedNodes[0])
 }
 
-const evalNodeQuery = (survey, record, node, query) => {
+export const evalNodeQuery = (survey, record, node, query) => {
   const functions = {
     [Expression.types.Identifier]: _identifierEval(survey, record),
   }
@@ -85,10 +85,10 @@ const evalNodeQuery = (survey, record, node, query) => {
   return Expression.evalString(query, { node, functions })
 }
 
-const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
+export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
   R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
 
-const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
+export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
   return applicableExpressions.map(
@@ -112,10 +112,4 @@ const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtF
     }
   }
   return applicableExpressions
-}
-
-module.exports = {
-  evalNodeQuery,
-  evalApplicableExpression,
-  evalApplicableExpressions,
 }

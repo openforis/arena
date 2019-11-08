@@ -1,17 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const ProcessingChain = require('@common/analysis/processingChain')
-const ProcessingStep = require('@common/analysis/processingStep')
-const ProcessingStepCalculation = require('@common/analysis/processingStepCalculation')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-const ProcessingChainService = require('@server/modules/analysis/service/processingChainService')
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
+import * as ProcessingChainService from '@server/modules/analysis/service/processingChainService'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-const { getContextUser } = require('../../testContext')
-const SB = require('../utils/surveyBuilder')
-const RB = require('../utils/recordBuilder')
+import { getContextUser } from '../../testContext';
+import * as SB from '../utils/surveyBuilder'
+import * as RB from '../utils/recordBuilder'
 
 let survey = null
 let records = []
@@ -87,13 +87,9 @@ after(async () => {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
 })
 
-const simpleTest = async () => {
+export const simpleTest = async () => {
   // console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))
 
   await ProcessingChainService.generateScript(Survey.getId(survey), processingChain)
-}
-
-module.exports = {
-  simpleTest
 }

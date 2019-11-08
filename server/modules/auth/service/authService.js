@@ -1,18 +1,14 @@
-const Jwt = require('@server/utils/jwt')
+import * as Jwt from '@server/utils/jwt'
 
-const AuthManager = require('../manager/authManager')
+import * as AuthManager from '../manager/authManager'
 
-const blacklistToken = async token => {
+export const blacklistToken = async token => {
   const expiration = Jwt.getExpiration(token)
   const jti = Jwt.getJti(token)
 
   await AuthManager.blacklistToken(jti, expiration)
 }
 
-module.exports = {
-  blacklistToken,
+export const findBlacklistedToken = AuthManager.findBlacklistedToken
 
-  findBlacklistedToken: AuthManager.findBlacklistedToken,
-
-  deleteExpiredJwtTokens: AuthManager.deleteExpiredJwtTokens,
-}
+export const deleteExpiredJwtTokens = AuthManager.deleteExpiredJwtTokens

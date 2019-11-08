@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Taxonomy from '@core/survey/taxonomy'
+import * as Taxonomy from '@core/survey/taxonomy'
 import { languages } from '@core/app/languages'
 
 import useI18n from '@webapp/commonComponents/hooks/useI18n'

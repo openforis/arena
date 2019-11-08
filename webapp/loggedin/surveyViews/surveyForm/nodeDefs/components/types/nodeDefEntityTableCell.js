@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import NodeDefSwitch from '../../nodeDefSwitch'
 import ProgressBar from '@webapp/commonComponents/progressBar'
 
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCell = props => {

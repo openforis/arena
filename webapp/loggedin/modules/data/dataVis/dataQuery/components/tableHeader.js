@@ -9,7 +9,7 @@ import SortEditor from './sort/sortEditor'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 import Tooltip from '@webapp/commonComponents/tooltip'
 
-import Expression from '@core/expressionParser/expression'
+import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
 import {

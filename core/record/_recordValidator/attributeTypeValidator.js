@@ -1,17 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const DateTimeUtils = require('@core/dateUtils')
-const NumberUtils = require('@core/numberUtils')
+import * as DateTimeUtils from '@core/dateUtils'
+import * as NumberUtils from '@core/numberUtils'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 const { nodeDefType } = NodeDef
-const Taxon = require('@core/survey/taxon')
+import * as Taxon from '@core/survey/taxon'
 
-const Node = require('../node')
-const GeoUtils = require('@core/geo/geoUtils')
+import * as Node from '../node'
+import * as GeoUtils from '@core/geo/geoUtils'
 
-const Validation = require('@core/validation/validation')
+import * as Validation from '@core/validation/validation'
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
@@ -81,15 +81,11 @@ const validateTaxon = (survey, nodeDef, node) => {
   return Survey.includesTaxonVernacularName(nodeDef, Taxon.getCode(taxon), vernacularNameUuid)(survey)
 }
 
-const validateValueType = (survey, nodeDef) => (propName, node) => {
+export const validateValueType = (survey, nodeDef) => (propName, node) => {
   if (Node.isValueBlank(node))
     return null
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
   return valid ? null : { key: Validation.messageKeys.record.valueInvalid }
-}
-
-module.exports = {
-  validateValueType
 }

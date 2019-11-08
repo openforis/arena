@@ -1,13 +1,13 @@
-const { parentPort, workerData, isMainThread } = require('worker_threads')
+import { parentPort, workerData, isMainThread } from 'worker_threads';
 
-const Log = require('@server/log/log')
+import * as Log from '@server/log/log'
 
-const ThreadParams = require('./threadParams')
+import * as ThreadParams from './threadParams'
 
 /**
  * Base class for thread execution in Worker Pool
  */
-class Thread {
+export default class Thread {
 
   constructor (params) {
     this.params = params ? params : { ...workerData }
@@ -58,5 +58,3 @@ class Thread {
 Thread.messageTypes = {
   error: 'error',
 }
-
-module.exports = Thread

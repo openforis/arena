@@ -4,8 +4,8 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import TableColumn from './tableColumn'
 
-import NodeDef from '@core/survey/nodeDef'
-import Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
 
 import { appModuleUri, dataModules } from '../../../../../appModules'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'

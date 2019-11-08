@@ -9,12 +9,12 @@ import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefEditButtons from './components/nodeDefEditButtons'
 
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefValidations from '@core/survey/nodeDefValidations'
-import Validation from '@core/validation/validation'
-import Record from '@core/record/record'
-import Node from '@core/record/node'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Validation from '@core/validation/validation'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../../record/recordState'
@@ -146,10 +146,8 @@ const mapStateToProps = (state, props) => {
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,
-    ...entry
-      ? mapEntryProps()
-      : {},
-  }
+    ...((entry ? mapEntryProps() : {})),
+  };
 }
 
 export default connect(

@@ -1,12 +1,12 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Node = require('@core/record/node')
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
-const DataTable = require('../schemaRdb/dataTable')
-const DataCol = require('../schemaRdb/dataCol')
+import * as DataTable from '../schemaRdb/dataTable'
+import * as DataCol from '../schemaRdb/dataCol'
 
 const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
@@ -37,10 +37,8 @@ const _getColNames = (nodeDef, type) =>
       DataTable.colNameRecordUuuid,
       DataTable.colNameRecordCycle,
       DataTable.colNameParentUuuid,
-      ...NodeDef.isMultipleAttribute(nodeDef)
-        ? DataCol.getNames(nodeDef)
-        //entity
-        : []
+      ...((NodeDef.isMultipleAttribute(nodeDef) ? //entity
+      DataCol.getNames(nodeDef) : []))
     ]
     : DataCol.getNames(nodeDef)
 
@@ -51,10 +49,8 @@ const _getColValues = async (survey, cycle, nodeDef, node, type, client) =>
       Node.getRecordUuid(node),
       cycle,
       Node.getParentUuid(node),
-      ...NodeDef.isMultipleAttribute(nodeDef)
-        ? await Promise.all(DataCol.getValues(survey, nodeDef, node))
-        //entity
-        : []
+      ...((NodeDef.isMultipleAttribute(nodeDef) ? //entity
+      await Promise.all(DataCol.getValues(survey, nodeDef, node)) : []))
     ]
     : await DataCol.getValues(survey, nodeDef, node)
 
@@ -114,7 +110,7 @@ const queryByType = {
   [types.update]: _update,
 }
 
-const updateTable = async (survey, cycle, nodeDefs, nodes, client) => {
+export const updateTable = async (survey, cycle, nodeDefs, nodes, client) => {
   const updates = await _toUpdates(survey, cycle, nodeDefs, nodes, client)
 
   await client.batch(
@@ -122,8 +118,4 @@ const updateTable = async (survey, cycle, nodeDefs, nodes, client) => {
       queryByType[update.type](update, client)
     )
   )
-}
-
-module.exports = {
-  updateTable,
 }

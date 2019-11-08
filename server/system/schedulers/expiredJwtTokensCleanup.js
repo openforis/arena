@@ -1,10 +1,10 @@
-const schedule = require('node-schedule')
+import * as schedule from 'node-schedule'
 
-const Log = require('@server/log/log')
+import * as Log from '@server/log/log'
 
-const AuthService = require('@server/modules/auth/service/authService')
+import * as AuthService from '@server/modules/auth/service/authService'
 
-const init = () => {
+export const init = () => {
   const logger = Log.getLogger('ExpiredJwtTokensCleanup')
 
   schedule.scheduleJob('0 1 * * *', async () => {
@@ -20,8 +20,4 @@ const init = () => {
       logger.error(`Error deleting expired jwt tokens: ${err.toString()}`)
     }
   })
-}
-
-module.exports = {
-  init
 }

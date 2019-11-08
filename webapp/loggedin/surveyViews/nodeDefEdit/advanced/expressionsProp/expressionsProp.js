@@ -3,8 +3,8 @@ import './expressionsProp.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import NodeDefExpression from '@core/survey/nodeDefExpression'
-import Validation from '@core/validation/validation'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem } from '@webapp/commonComponents/form/input'

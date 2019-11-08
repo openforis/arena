@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import Survey from '@core/survey/survey'
-import Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as SurveyState from '../surveyState'

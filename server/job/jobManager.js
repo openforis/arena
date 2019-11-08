@@ -1,9 +1,9 @@
-const { jobThreadMessageTypes } = require('./jobUtils')
-const ThreadsCache = require('@server/threads/threadsCache')
-const ThreadManager = require('@server/threads/threadManager')
+import { jobThreadMessageTypes } from './jobUtils';
+import ThreadsCache from '@server/threads/threadsCache'
+import ThreadManager from '@server/threads/threadManager'
 
-const WebSocket = require('@server/utils/webSocket')
-const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+import * as WebSocket from '@server/utils/webSocket'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 // USER JOB WORKERS
 
@@ -28,7 +28,7 @@ const _notifyJobUpdate = jobSerialized => {
 
 // ====== UPDATE
 
-const cancelActiveJobByUserUuid = async userUuid => {
+export const cancelActiveJobByUserUuid = async userUuid => {
   const jobThread = userJobThreads.getThread(userUuid)
   if (jobThread) {
     jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
@@ -37,7 +37,7 @@ const cancelActiveJobByUserUuid = async userUuid => {
 
 // ====== EXECUTE
 
-const executeJobThread = job => {
+export const executeJobThread = job => {
 
   const thread = new ThreadManager(
     'jobThread.js',
@@ -46,10 +46,4 @@ const executeJobThread = job => {
   )
 
   userJobThreads.putThread(job.userUuid, thread)
-}
-
-module.exports = {
-  executeJobThread,
-
-  cancelActiveJobByUserUuid,
 }

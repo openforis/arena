@@ -7,9 +7,9 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import { Modal, ModalBody, ModalFooter } from '@webapp/commonComponents/modal'
 
-import Category from '@core/survey/category'
-import CategoryImportSummary from '@core/survey/categoryImportSummary'
-import Languages from '@core/app/languages'
+import * as Category from '@core/survey/category'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import * as Languages from '@core/app/languages'
 
 import { importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType } from '../actions'
 

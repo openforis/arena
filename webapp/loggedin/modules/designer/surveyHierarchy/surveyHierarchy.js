@@ -3,7 +3,7 @@ import './surveyHierarchy.scss'
 import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '@core/survey/survey'
+import * as Survey from '@core/survey/survey'
 
 import Tree from './surveyHierarchyTree'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'

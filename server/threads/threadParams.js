@@ -1,15 +1,9 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const keys = {
+export const keys = {
   socketId: 'socketId',
   surveyId: 'surveyId',
   user: 'user',
 }
 
-const getSocketId = R.prop(keys.socketId)
-
-module.exports = {
-  keys,
-
-  getSocketId,
-}
+export const getSocketId = R.prop(keys.socketId)

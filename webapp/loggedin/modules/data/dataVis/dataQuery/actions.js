@@ -1,8 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import DataSort from '@common/surveyRdb/dataSort'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as DataSort from '@common/surveyRdb/dataSort'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as DataQueryState from './dataQueryState'

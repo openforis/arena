@@ -7,9 +7,9 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import ItemsView from '../items/itemsView'
 import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
 
-import Survey from '@core/survey/survey'
-import Taxonomy from '@core/survey/taxonomy'
-import Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Authorizer from '@core/auth/authorizer'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'

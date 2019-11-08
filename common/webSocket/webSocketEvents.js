@@ -1,4 +1,4 @@
-const webSocketEvents = {
+export const WebSocketEvents = {
   // websocket events
   connection: 'connection',
   disconnect: 'disconnect',
@@ -14,5 +14,3 @@ const webSocketEvents = {
   error: 'threadError',
   recordSessionExpired: 'recordSessionExpired',
 }
-
-module.exports = webSocketEvents

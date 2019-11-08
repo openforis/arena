@@ -1,19 +1,19 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const NodeDefValidations = require('@core/survey/nodeDefValidations')
-const Record = require('../record')
-const Node = require('../node')
-const RecordExpressionParser = require('../recordExpressionParser')
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
-const ValidationResult = require('@core/validation/validationResult')
-const StringUtils = require('@core/stringUtils')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Record from '../record'
+import * as Node from '../node'
+import * as RecordExpressionParser from '../recordExpressionParser'
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as StringUtils from '@core/stringUtils'
 
-const AttributeTypeValidator = require('./attributeTypeValidator')
-const AttributeKeyValidator = require('./attributeKeyValidator')
+import * as AttributeTypeValidator from './attributeTypeValidator'
+import * as AttributeKeyValidator from './attributeKeyValidator'
 
 const _validateRequired = (survey, nodeDef) => (propName, node) =>
   (
@@ -56,7 +56,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
   return errorMessage
 }
 
-const validateAttribute = async (survey, record, attribute) => {
+export const validateAttribute = async (survey, record, attribute) => {
   if (Record.isNodeApplicable(attribute)(record)) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(attribute))(survey)
 
@@ -73,7 +73,7 @@ const validateAttribute = async (survey, record, attribute) => {
   }
 }
 
-const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
+export const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
   // output
   const attributeValidations = {}
 
@@ -87,9 +87,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 
       const nodesToValidate = [
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
-        ...NodeDef.isKey(nodeDef)
-          ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record))
-          : []
+        ...((NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record)) : []))
       ]
 
       // call validateAttribute for each attribute
@@ -136,8 +134,3 @@ const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
 }
 
 const _nodePointersToNodes = R.pluck('nodeCtx')
-
-module.exports = {
-  validateAttribute,
-  validateSelfAndDependentAttributes
-}

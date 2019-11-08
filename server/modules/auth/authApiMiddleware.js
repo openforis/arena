@@ -1,13 +1,13 @@
-const Request = require('@server/utils/request')
+import * as Request from '@server/utils/request'
 
-const SurveyManager = require('../survey/manager/surveyManager')
-const RecordService = require('../record/service/recordService')
-const UserService = require('../user/service/userService')
+import * as SurveyManager from '../survey/manager/surveyManager'
+import * as RecordService from '../record/service/recordService'
+import * as UserService from '../user/service/userService'
 
-const Authorizer = require('@core/auth/authorizer')
-const Survey = require('@core/survey/survey')
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
 
-const UnauthorizedError = require('@server/utils/unauthorizedError')
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
 const checkPermission = (req, next, permissionFn, ...args) => {
   const user = Request.getUser(req)
@@ -57,21 +57,20 @@ const requireUserPermission = permissionFn => async (req, res, next) => {
   }
 }
 
-module.exports = {
-  // Survey
-  requireSurveyViewPermission: requireSurveyPermission(Authorizer.canViewSurvey),
-  requireSurveyEditPermission: requireSurveyPermission(Authorizer.canEditSurvey),
+// Survey
+export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
+export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
 
-  // Record
-  requireRecordListViewPermission: requireSurveyPermission(Authorizer.canViewSurvey),
-  requireRecordCreatePermission: requireSurveyPermission(Authorizer.canCreateRecord),
-  requireRecordEditPermission: requireRecordPermission(Authorizer.canEditRecord),
-  requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
-  requireRecordAnalysisPermission: requireSurveyPermission(Authorizer.canAnalyzeRecords),
+// Record
+export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
+export const requireRecordCreatePermission = requireSurveyPermission(Authorizer.canCreateRecord)
+export const requireRecordEditPermission = requireRecordPermission(Authorizer.canEditRecord)
+export const requireRecordViewPermission = requireSurveyPermission(Authorizer.canViewRecord)
+export const requireRecordAnalysisPermission = requireSurveyPermission(Authorizer.canAnalyzeRecords)
 
-  // User
-  requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),
-  requireUserViewPermission: requireUserPermission(Authorizer.canViewUser),
-  requireUserEditPermission: requireUserPermission(Authorizer.canEditUser),
-  requireUserRemovePermission: requireUserPermission(Authorizer.canRemoveUser),
-}
+// User
+export const requireUserInvitePermission = requireSurveyPermission(Authorizer.canInviteUsers)
+export const requireUserViewPermission = requireUserPermission(Authorizer.canViewUser)
+export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
+export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)
+

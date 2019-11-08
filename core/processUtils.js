@@ -3,7 +3,7 @@ const environments = {
   production: 'production',
 }
 
-const ENV = {
+export const ENV = {
   arenaRoot: process.env['ARENA_ROOT'],
   arenaDist: process.env['ARENA_DIST'],
   port: process.env['PORT'] || '9090',
@@ -35,11 +35,5 @@ const ENV = {
   analysisOutputDir: process.env['ANALYSIS_OUTPUT_DIR'],
 }
 
-const isEnvDevelopment = ENV.nodeEnv === environments.development
-const isEnvProduction = ENV.nodeEnv === environments.production
-
-module.exports = {
-  ENV,
-  isEnvDevelopment,
-  isEnvProduction,
-}
+export const isEnvDevelopment = ENV.nodeEnv === environments.development
+export const isEnvProduction = ENV.nodeEnv === environments.production

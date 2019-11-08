@@ -1,17 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const DateUtils = require('@core/dateUtils')
+import * as DateUtils from '@core/dateUtils'
 
-const getRootEntityName = R.pipe(
+export const getRootEntityName = R.pipe(
   R.keys,
   R.reject(R.equals('_declaration')),
   R.head,
 )
 
-const getRootEntity = (collectRecord, rootEntityName = null) =>
+export const getRootEntity = (collectRecord, rootEntityName = null) =>
   collectRecord[rootEntityName || getRootEntityName(collectRecord)]
 
-const getNodeChildren = path => R.pipe(
+export const getNodeChildren = path => R.pipe(
   R.pathOr([], path),
   R.unless(
     R.is(Array),
@@ -19,27 +19,16 @@ const getNodeChildren = path => R.pipe(
   )
 )
 
-const getTextValue = prop => R.path([prop, '_text'])
+export const getTextValue = prop => R.path([prop, '_text'])
 
-const getTextValues = valObj => R.pipe(
+export const getTextValues = valObj => R.pipe(
   R.keys,
   R.reduce((acc, prop) => R.assoc(prop, getTextValue(prop)(valObj), acc), {})
 )(valObj)
 
 const getAttribute = attrName => R.path(['_attributes', attrName])
 
-const getDateCreated = R.pipe(
+export const getDateCreated = R.pipe(
   getRootEntity,
   getAttribute('created'),
 )
-
-module.exports = {
-  getRootEntityName,
-  getRootEntity,
-  getDateCreated,
-  getNodeChildren,
-
-  getTextValue,
-  getTextValues,
-
-}

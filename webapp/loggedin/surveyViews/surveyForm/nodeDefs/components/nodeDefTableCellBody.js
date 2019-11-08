@@ -6,12 +6,12 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
-import CategoryItem from '@core/survey/categoryItem'
-import Node from '@core/record/node'
-import NodeRefData from '@core/record/nodeRefData'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import * as NodeDefUiProps from '../nodeDefUIProps'

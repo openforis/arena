@@ -1,6 +1,6 @@
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-module.exports = {
+export const enTranslation = {
 
   common: {
     add: 'Add',
@@ -694,4 +694,4 @@ module.exports = {
       temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
     }
   }
-}
+};

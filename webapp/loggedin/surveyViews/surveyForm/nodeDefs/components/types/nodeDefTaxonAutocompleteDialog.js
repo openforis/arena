@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 import AutocompleteDialog from '@webapp/commonComponents/form/autocompleteDialog'
 import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
 
-import Taxon from '@core/survey/taxon'
+import * as Taxon from '@core/survey/taxon'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props

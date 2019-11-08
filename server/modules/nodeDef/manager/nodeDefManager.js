@@ -1,20 +1,20 @@
-const R = require('ramda')
-const db = require('@server/db/db')
+import * as R from 'ramda'
+import { db } from '@server/db/db'
 
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefLayout = require('@core/survey/nodeDefLayout')
-const ObjectUtils = require('@core/objectUtils')
-const { uuidv4 } = require('@core/uuid')
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as ObjectUtils from '@core/objectUtils'
+import { uuidv4 } from '@core/uuid';
 
-const NodeDefRepository = require('../repository/nodeDefRepository')
-const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
+import * as NodeDefRepository from '../repository/nodeDefRepository'
+import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils';
 
-const ActivityLog = require('@common/activityLog/activityLog')
-const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 // ======= CREATE
 
-const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
+export const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
   await client.tx(async t => {
     const [nodeDef] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
@@ -26,10 +26,12 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, clien
 
 // ======= READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, client = db) => {
+export const fetchNodeDefsBySurveyId = async (surveyId, cycle = null, draft = false, advanced = false, includeDeleted = false, client = db) => {
   const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client)
   return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 }
+
+export const fetchNodeDefByUuid = NodeDefRepository.fetchNodeDefByUuid
 
 // ======= UPDATE
 
@@ -81,7 +83,7 @@ const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, clien
   return []
 }
 
-const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, system = false, client = db) =>
+export const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, system = false, client = db) =>
   await client.tx(async t => {
     // update descendants cycle when updating entity cycle
     const nodeDefsUpdated = NodeDef.propKeys.cycles in props
@@ -106,7 +108,11 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     }
   })
 
-const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
+export const addNodeDefsCycles = NodeDefRepository.addNodeDefsCycles
+
+export const deleteNodeDefsCycles = NodeDefRepository.deleteNodeDefsCycles
+
+export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
   for (const langDeleted of langsDeleted) {
@@ -119,7 +125,7 @@ const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
 
 // ======= DELETE
 
-const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
+export const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
   await db.tx(async t => {
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
@@ -133,22 +139,5 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
     return nodeDef
   })
 
-module.exports = {
-  //CREATE
-  insertNodeDef,
-
-  //READ
-  fetchNodeDefsBySurveyId,
-  fetchNodeDefByUuid: NodeDefRepository.fetchNodeDefByUuid,
-
-  //UPDATE
-  updateNodeDefProps,
-  addNodeDefsCycles: NodeDefRepository.addNodeDefsCycles,
-  deleteNodeDefsCycles: NodeDefRepository.deleteNodeDefsCycles,
-  publishNodeDefsProps,
-
-  //DELETE
-  markNodeDefDeleted,
-  permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
-  markNodeDefsWithoutCyclesDeleted: NodeDefRepository.markNodeDefsWithoutCyclesDeleted,
-}
+export const permanentlyDeleteNodeDefs = NodeDefRepository.permanentlyDeleteNodeDefs
+export const markNodeDefsWithoutCyclesDeleted = NodeDefRepository.markNodeDefsWithoutCyclesDeleted

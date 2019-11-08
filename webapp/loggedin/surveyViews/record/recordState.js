@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import Record from '@core/record/record'
+import * as Record from '@core/record/record'
 
 import * as SurveyViewsState from '../surveyViewsState'
 

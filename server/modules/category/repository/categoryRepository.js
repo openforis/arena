@@ -1,23 +1,23 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
-const DbUtils = require('@server/db/dbUtils')
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
-const Category = require('@core/survey/category')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const CategoryItem = require('@core/survey/categoryItem')
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 
-const {
+import {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableProp,
-  dbTransformCallback
-} = require('../../survey/repository/surveySchemaRepositoryUtils')
+  dbTransformCallback,
+} from '../../survey/repository/surveySchemaRepositoryUtils'
 
 // ============== CREATE
 
-const insertCategory = async (surveyId, category, client = db) =>
+export const insertCategory = async (surveyId, category, client = db) =>
   await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props_draft)
         VALUES ($1, $2)
@@ -26,7 +26,7 @@ const insertCategory = async (surveyId, category, client = db) =>
     def => dbTransformCallback(def, true, true)
   )
 
-const insertLevel = async (surveyId, level, client = db) =>
+export const insertLevel = async (surveyId, level, client = db) =>
   await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
@@ -35,7 +35,7 @@ const insertLevel = async (surveyId, level, client = db) =>
     def => dbTransformCallback(def, true, true)
   )
 
-const insertItem = async (surveyId, item, client = db) =>
+export const insertItem = async (surveyId, item, client = db) =>
   await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
@@ -44,7 +44,7 @@ const insertItem = async (surveyId, item, client = db) =>
     def => dbTransformCallback(def, true, true)
   )
 
-const insertItems = async (surveyId, items, client = db) => {
+export const insertItems = async (surveyId, items, client = db) => {
   const values = items.map(item => [
     CategoryItem.getUuid(item),
     CategoryItem.getLevelUuid(item),
@@ -95,12 +95,12 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
     ON
       c.uuid = l.category_uuid`
 
-const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
+export const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
   const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
   return categories || {}
 }
 
-const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = false, includeValidation = false, client = db) => {
+export const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = false, includeValidation = false, client = db) => {
   const { categories } = await client.one(
     `${_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation)} WHERE c.uuid = $1`,
     [categoryUuid]
@@ -108,7 +108,7 @@ const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = fals
   return R.pipe(R.values, R.head)(categories)
 }
 
-const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
+export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
   const items = await client.map(`
       SELECT i.* 
       FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -126,7 +126,7 @@ const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, c
     : R.filter(item => item.published)(items)
 }
 
-const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
+export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
   const items = await client.map(`
     SELECT i.* 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -149,7 +149,7 @@ const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null,
     : R.filter(item => item.published)(items)
 }
 
-const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
+export const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
   await client.map(
     `SELECT i.* 
      FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -161,7 +161,7 @@ const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft 
     item => dbTransformCallback(item, draft, true)
   )
 
-const fetchIndex = async (surveyId, draft = false, client = db) =>
+export const fetchIndex = async (surveyId, draft = false, client = db) =>
   await client.map(`
     SELECT 
       l.category_uuid,
@@ -183,10 +183,10 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
 
 // ============== UPDATE
 
-const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
+export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
 
-const updateCategoryValidation = async (surveyId, categoryUuid, validation, client = db) =>
+export const updateCategoryValidation = async (surveyId, categoryUuid, validation, client = db) =>
   await client.none(`
       UPDATE ${getSurveyDBSchema(surveyId)}.category 
       SET validation = $1::jsonb 
@@ -195,19 +195,19 @@ const updateCategoryValidation = async (surveyId, categoryUuid, validation, clie
     [validation, categoryUuid]
   )
 
-const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =>
+export const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =>
   await client.any(`
       UPDATE ${getSurveyDBSchema(surveyId)}.category
       SET published = true
   `)
 
-const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
+export const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 
-const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
+export const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
-const updateItems = async (surveyId, items, client = db) => {
+export const updateItems = async (surveyId, items, client = db) => {
   const values = items.map(item => [
     CategoryItem.getUuid(item),
     CategoryItem.getProps(item)
@@ -223,13 +223,13 @@ const updateItems = async (surveyId, items, client = db) => {
 
 // ============== DELETE
 
-const deleteCategory = async (surveyId, categoryUuid, client = db) =>
+export const deleteCategory = async (surveyId, categoryUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category', categoryUuid, client)
 
-const deleteLevel = async (surveyId, levelUuid, client = db) =>
+export const deleteLevel = async (surveyId, levelUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelUuid, client)
 
-const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
+export const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
   await client.none(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
       WHERE category_uuid = $1
@@ -237,7 +237,7 @@ const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
     [categoryUuid]
   )
 
-const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) =>
+export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) =>
   await client.map(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level l
       WHERE 
@@ -253,41 +253,8 @@ const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) 
     R.prop('uuid')
   )
 
-const deleteItem = async (surveyId, itemUuid, client = db) =>
+export const deleteItem = async (surveyId, itemUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
 
-const deleteItemLabels = async (surveyId, langCode, client = db) =>
+export const deleteItemLabels = async (surveyId, langCode, client = db) =>
   await deleteSurveySchemaTableProp(surveyId, 'category_item', ['labels', langCode], client)
-
-module.exports = {
-  //CREATE
-  insertCategory,
-  insertLevel,
-  insertItem,
-  insertItems,
-
-  //READ
-  fetchCategoriesAndLevelsBySurveyId,
-  fetchCategoryAndLevelsByUuid,
-  fetchItemsByCategoryUuid,
-  fetchItemsByParentUuid,
-  fetchItemsByLevelIndex,
-  fetchIndex,
-
-  //UPDATE
-  updateCategoryProp,
-  updateCategoryValidation,
-  markCategoriesPublishedBySurveyId,
-  updateLevelProp,
-  updateItemProp,
-  updateItems,
-
-  //DELETE
-  deleteCategory,
-  deleteLevel,
-  deleteLevelsByCategory,
-  deleteLevelsEmptyByCategory,
-  deleteItem,
-
-  deleteItemLabels,
-}

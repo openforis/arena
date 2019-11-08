@@ -1,29 +1,29 @@
-const util = require('util')
-const R = require('ramda')
+import * as util from 'util'
+import * as R from 'ramda'
 
-const { uuidv4 } = require('@core/uuid')
-const StringUtils = require('@core/stringUtils')
-const ObjectUtils = require('@core/objectUtils')
+import { uuidv4 } from '@core/uuid';
+import * as StringUtils from '@core/stringUtils'
+import * as ObjectUtils from '@core/objectUtils'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefValidations = require('@core/survey/nodeDefValidations')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const NodeDefLayout = require('@core/survey/nodeDefLayout')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 const { nodeDefType } = NodeDef
-const Category = require('@core/survey/category')
-const Taxonomy = require('@core/survey/taxonomy')
-const CollectImportReportItem = require('@core/survey/collectImportReportItem')
-const Validator = require('@core/validation/validator')
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as Validator from '@core/validation/validator'
 
-const Job = require('@server/job/job')
-const SamplingPointDataImportJob = require('./samplingPointDataImportJob')
-const CollectImportJobContext = require('../collectImportJobContext')
+import Job from '@server/job/job'
+import SamplingPointDataImportJob from './samplingPointDataImportJob'
+import * as CollectImportJobContext from '../collectImportJobContext'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
-const CollectImportReportManager = require('../../../manager/collectImportReportManager')
-const CollectSurvey = require('../model/collectSurvey')
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
+import * as CollectImportReportManager from '../../../manager/collectImportReportManager'
+import * as CollectSurvey from '../model/collectSurvey'
 
 const specifyAttributeSuffix = 'specify'
 
@@ -63,7 +63,7 @@ const checkExpressionParserByType = {
   }
 }
 
-class NodeDefsImportJob extends Job {
+export default class NodeDefsImportJob extends Job {
 
   constructor (params) {
     super(NodeDefsImportJob.type, params)
@@ -128,18 +128,16 @@ class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, ['instance', 'heading'], nodeDefLabelSuffix)(collectNodeDef),
       //layout props (render)
-      ...type === NodeDef.nodeDefType.entity
-        ? {
+      ...((type === NodeDef.nodeDefType.entity ? // calculated
+      {
           [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
             Survey.cycleOneKey,
             tableLayout ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form,
             determineNodeDefPageUuid(type, collectNodeDef)
           )
-        }
-        // calculated
-        : {
+        } : {
           [NodeDef.propKeys.readOnly]: calculated
-        },
+        })),
       // extra props
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
@@ -206,7 +204,7 @@ class NodeDefsImportJob extends Job {
     }
     nodeDefsInfo.push({
       uuid: nodeDefUuid,
-      ...field ? { field } : {}
+      ...((field ? { field } : {}))
     })
 
     this.nodeDefs[nodeDefUuid] = nodeDef
@@ -228,16 +226,14 @@ class NodeDefsImportJob extends Job {
 
     // 2. validations
     propsAdvanced[NodeDef.propKeys.validations] = {
-      ...multiple
-        ? {
+      ...((multiple ? {
           [NodeDefValidations.keys.count]: {
             [NodeDefValidations.keys.min]: CollectSurvey.getAttribute('minCount')(collectNodeDef),
             [NodeDefValidations.keys.max]: CollectSurvey.getAttribute('maxCount')(collectNodeDef),
           }
-        }
-        : {
+        } : {
           [NodeDefValidations.keys.required]: CollectSurvey.getAttribute('required')(collectNodeDef),
-        }
+        }))
     }
 
     if (type !== nodeDefType.entity) {
@@ -473,5 +469,3 @@ const determineNodeDefPageUuid = (type, collectNodeDef) => {
 }
 
 NodeDefsImportJob.type = 'NodeDefsImportJob'
-
-module.exports = NodeDefsImportJob

@@ -1,15 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDef = require('@core/survey/nodeDef')
-const CategoryItem = require('@core/survey/categoryItem')
-const Taxon = require('@core/survey/taxon')
-const { isBlank, contains } = require('@core/stringUtils')
+import * as NodeDef from '@core/survey/nodeDef'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Taxon from '@core/survey/taxon'
+import { isBlank, contains } from '@core/stringUtils';
 
-const CategoryManager = require('../../category/manager/categoryManager')
-const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
+import * as CategoryManager from '../../category/manager/categoryManager'
+import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
-const SystemError = require('@core/systemError')
-const Request = require('@server/utils/request')
+import SystemError from '@core/systemError'
+import * as Request from '@server/utils/request'
 
 const toItem = (type, lang = null) =>
   item => item
@@ -27,7 +27,7 @@ const toItem = (type, lang = null) =>
     )
     : null
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
@@ -103,4 +103,4 @@ module.exports.init = app => {
     }
   })
 
-}
+};

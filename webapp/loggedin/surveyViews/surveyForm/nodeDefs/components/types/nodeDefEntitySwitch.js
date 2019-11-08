@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import NodeDefEntityTable from './nodeDefEntityTable'
 import NodeDefEntityForm from './nodeDefEntityForm'
 
-import Survey from '@core/survey/survey'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 

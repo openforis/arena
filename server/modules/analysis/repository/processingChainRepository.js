@@ -1,6 +1,6 @@
 import camelize from 'camelize'
 
-import db from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
@@ -77,3 +77,4 @@ export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
     [processingChainUuid],
     camelize
   )
+

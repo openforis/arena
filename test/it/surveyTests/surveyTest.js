@@ -1,9 +1,9 @@
-const { setContextSurvey, getContextUser } = require('../../testContext')
-const { assert } = require('chai')
-const { uuidv4 } = require('@core/uuid')
+import { setContextSurvey, getContextUser } from '../../testContext';
+import { assert } from 'chai';
+import { uuidv4 } from '@core/uuid';
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
-const Survey = require('@core/survey/survey')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as Survey from '@core/survey/survey'
 
 const testSurvey = {
   name: 'do_not_use__test_survey_' + uuidv4(),
@@ -11,7 +11,7 @@ const testSurvey = {
   languages: ['en']
 }
 
-const createSurveyTest = async () => {
+export const createSurveyTest = async () => {
   const survey = await SurveyManager.createSurvey(getContextUser(), testSurvey)
 
   setContextSurvey(survey)
@@ -27,7 +27,3 @@ const createSurveyTest = async () => {
 // const publishSurveyTest = async () => {
 //   const survey = getContextSurvey()
 // }
-
-module.exports = {
-  createSurveyTest,
-}

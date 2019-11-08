@@ -1,9 +1,9 @@
-const Survey = require('@core/survey/survey')
+import * as Survey from '@core/survey/survey'
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
-const UserManager = require('@server/modules/user/manager/userManager')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as UserManager from '@server/modules/user/manager/userManager'
 
-const User = require('@core/user/user')
+import * as User from '@core/user/user'
 
 let user = null
 let survey = null
@@ -12,31 +12,24 @@ let survey = null
  * Initializing test context (user)
  * before executing all tests
  */
-const initTestContext = async () => {
+export const initTestContext = async () => {
   user = await UserManager.fetchUserByEmail('admin@openforis.org')
 }
 
-const destroyTestContext = async () => {
+export const destroyTestContext = async () => {
   if (survey)
     await SurveyManager.deleteSurvey(Survey.getId(survey))
 }
 
-const setContextSurvey = s => {
+export const setContextSurvey = s => {
   survey = s
   user = User.assocPrefSurveyCurrent(Survey.getId(survey))(user)
 }
 
-const fetchFullContextSurvey = async (draft = true, advanced = true) =>
+export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
   await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), Survey.cycleOneKey, draft, advanced)
 
-module.exports = {
-  initTestContext,
-  destroyTestContext,
+export const getContextUser = () => user
+export const getContextSurvey = () => survey
+export const getContextSurveyId = () => Survey.getId(survey)
 
-  getContextUser: () => user,
-
-  getContextSurvey: () => survey,
-  fetchFullContextSurvey,
-  getContextSurveyId: () => Survey.getId(survey),
-  setContextSurvey
-}

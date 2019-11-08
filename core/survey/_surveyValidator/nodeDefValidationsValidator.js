@@ -1,16 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
 
-const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
+import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
 
-const validate = async (survey, nodeDef) => {
+export const validate = async (survey, nodeDef) => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
-
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
       [`${NodeDefExpression.keys.count}.${NodeDefExpression.keys.min}`]:
@@ -30,8 +29,4 @@ const validate = async (survey, nodeDef) => {
       Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }])
     )
   )(validation)
-}
-
-module.exports = {
-  validate
 }

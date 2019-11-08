@@ -1,8 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { nbsp } from '@core/stringUtils'
 

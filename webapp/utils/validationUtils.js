@@ -1,8 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Validation from '@core/validation/validation'
-import ValidationResult from '@core/validation/validationResult'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 import Markdown from '../commonComponents/markdown'
 
 const getErrorText = i18n => error =>

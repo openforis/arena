@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import User from '@core/user/user'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as User from '@core/user/user'
 
 import * as AppState from '@webapp/app/appState'
 

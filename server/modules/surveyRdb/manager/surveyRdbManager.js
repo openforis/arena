@@ -1,21 +1,21 @@
-const R = require('ramda')
-const db = require('@server/db/db')
-const CSVWriter = require('@server/utils/file/csvWriter')
+import * as R from 'ramda'
+import { db } from '@server/db/db'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
-const DataTable = require('../schemaRdb/dataTable')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as DataTable from '../schemaRdb/dataTable'
 
-const RecordRepository = require('../../record/repository/recordRepository')
-const NodeRepository = require('../../record/repository/nodeRepository')
+import * as RecordRepository from '../../record/repository/recordRepository'
+import * as NodeRepository from '../../record/repository/nodeRepository'
 
-const SchemaRdbRepository = require('../repository/schemaRdbRepository')
-const DataTableInsertRepository = require('../repository/dataTableInsertRepository')
-const DataTableUpdateRepository = require('../repository/dataTableUpdateRepository')
-const DataTableReadRepository = require('../repository/dataTableReadRepository')
-const DataViewCreateRepository = require('../repository/dataViewCreateRepository')
-const DataViewReadRepository = require('../repository/dataViewReadRepository')
+import * as SchemaRdbRepository from '../repository/schemaRdbRepository'
+import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
+import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
+import * as DataTableReadRepository from '../repository/dataTableReadRepository'
+import * as DataViewCreateRepository from '../repository/dataViewCreateRepository'
+import * as DataViewReadRepository from '../repository/dataViewReadRepository'
 
 // ==== DML
 const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
@@ -27,7 +27,7 @@ const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = 
   }
 }
 
-const queryTable = async (
+export const queryTable = async (
   survey, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
   offset = 0, limit = null, filterExpr = null, sort = [],
   editMode = false, streamOutput = null
@@ -83,23 +83,19 @@ const queryTable = async (
   return rows
 }
 
-const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
+export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
   return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
 
-module.exports = {
-  dropSchema: SchemaRdbRepository.dropSchema,
-  createSchema: SchemaRdbRepository.createSchema,
-  createTableAndView: DataViewCreateRepository.createTableAndView,
+export const dropSchema = SchemaRdbRepository.dropSchema
+export const createSchema = SchemaRdbRepository.createSchema
+export const createTableAndView = DataViewCreateRepository.createTableAndView
 
-  populateTable: DataTableInsertRepository.populateTable,
-  updateTable: DataTableUpdateRepository.updateTable,
+export const populateTable = DataTableInsertRepository.populateTable
+export const updateTable = DataTableUpdateRepository.updateTable
 
-  queryTable,
-  countTable,
-  countDuplicateRecords: DataViewReadRepository.countDuplicateRecords,
-  fetchRecordsCountByKeys: DataViewReadRepository.fetchRecordsCountByKeys,
-  fetchRecordsWithDuplicateEntities: DataTableReadRepository.fetchRecordsWithDuplicateEntities,
-}
+export const countDuplicateRecords = DataViewReadRepository.countDuplicateRecords
+export const fetchRecordsCountByKeys = DataViewReadRepository.fetchRecordsCountByKeys
+export const fetchRecordsWithDuplicateEntities = DataTableReadRepository.fetchRecordsWithDuplicateEntities

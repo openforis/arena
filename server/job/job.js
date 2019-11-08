@@ -1,14 +1,13 @@
-const db = require('@server/db/db')
-const Log = require('@server/log/log')
+import { db } from '@server/db/db'
+import * as Log from '@server/log/log'
 
-const { uuidv4 } = require('@core/uuid')
+import { uuidv4 } from '@core/uuid';
+import { jobEvents, jobStatus } from './jobUtils';
 
-const { jobEvents, jobStatus } = require('./jobUtils')
+import * as User from '@core/user/user.js'
+import { throttle, cancelThrottle } from '@core/functionsDefer';
 
-const User = require('@core/user/user.js')
-const { throttle, cancelThrottle } = require('@core/functionsDefer')
-
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
 class JobEvent {
 
@@ -36,7 +35,7 @@ class JobEvent {
  * - beforeEnd
  * - onEnd
  */
-class Job {
+export default class Job {
 
   constructor (type, params = {}, innerJobs = []) {
     this.params = params
@@ -383,5 +382,3 @@ Job.keysContext = {
   survey: 'survey',
   user: 'user',
 }
-
-module.exports = Job

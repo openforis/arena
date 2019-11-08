@@ -1,9 +1,9 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const { uuidv4 } = require('@core/uuid')
-const ObjectUtils = require('@core/objectUtils')
+import { uuidv4 } from '@core/uuid';
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   uuid: ObjectUtils.keys.uuid,
   taxonomyUuid: 'taxonomyUuid',
   props: ObjectUtils.keys.props,
@@ -13,18 +13,18 @@ const keys = {
   vernacularLanguage: 'vernacularLanguage',
 }
 
-const propKeys = {
+export const propKeys = {
   code: 'code',
   family: 'family',
   genus: 'genus',
   scientificName: 'scientificName',
 }
 
-const unlistedCode = 'UNL'
-const unknownCode = 'UNK'
+export const unlistedCode = 'UNL'
+export const unknownCode = 'UNK'
 
 // ===== CREATE
-const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
+export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
   uuid: uuidv4(),
   [keys.taxonomyUuid]: taxonomyUuid,
   props: {
@@ -37,11 +37,16 @@ const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularN
 })
 
 // ====== READ
-const getCode = ObjectUtils.getProp(propKeys.code, '')
+export const getUuid = ObjectUtils.getUuid
+export const getTaxonomyUuid = R.prop(keys.taxonomyUuid)
+export const getCode = ObjectUtils.getProp(propKeys.code, '')
+export const getFamily = ObjectUtils.getProp(propKeys.family, '')
+export const getGenus = ObjectUtils.getProp(propKeys.genus, '')
+export const getScientificName = ObjectUtils.getProp(propKeys.scientificName, '')
 
-const getVernacularNames = R.propOr({}, keys.vernacularNames)
+export const getVernacularNames = R.propOr({}, keys.vernacularNames)
 
-const getVernacularName = lang => taxon => R.pipe(
+export const getVernacularName = lang => taxon => R.pipe(
   getVernacularNames,
   R.prop(lang),
   R.defaultTo(
@@ -49,30 +54,10 @@ const getVernacularName = lang => taxon => R.pipe(
   )
 )(taxon)
 
-const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
+export const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
+export const getVernacularNameUuid = R.prop(keys.vernacularNameUuid)
 
-module.exports = {
-  keys,
-  propKeys,
-  unlistedCode,
-  unknownCode,
+export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
+export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
 
-  //CREATE
-  newTaxon,
-
-  //READ
-  getUuid: ObjectUtils.getUuid,
-  getTaxonomyUuid: R.prop(keys.taxonomyUuid),
-  getCode,
-  getFamily: ObjectUtils.getProp(propKeys.family, ''),
-  getGenus: ObjectUtils.getProp(propKeys.genus, ''),
-  getScientificName: ObjectUtils.getProp(propKeys.scientificName, ''),
-  getVernacularNames,
-  getVernacularName,
-  getVernacularLanguage,
-  getVernacularNameUuid: R.prop(keys.vernacularNameUuid),
-  isUnlistedTaxon: R.pipe(getCode, R.equals(unlistedCode)),
-  isUnknownTaxon: R.pipe(getCode, R.equals(unknownCode)),
-
-  isEqual: ObjectUtils.isEqual,
-}
+export const isEqual = ObjectUtils.isEqual
