@@ -25,6 +25,7 @@ class CategoryImportJob extends Job {
     this.itemsByCodes = {} // cache of category items by ancestor codes
     this.summary = null
     this.category = null
+    this.totalEmpty = 0
   }
 
   async onStart () {
@@ -188,6 +189,8 @@ class CategoryImportJob extends Job {
           this.itemsByCodes[itemCodeKey] = item
         }
       }
+    } else {
+      this.totalEmpty++
     }
     this.incrementProcessedItems()
   }
@@ -222,7 +225,7 @@ class CategoryImportJob extends Job {
     const items = Object.values(this.itemsByCodes)
     await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
     this.incrementProcessedItems()
-    this.logDebug(`${items.length} items inserted`)
+    this.logDebug(`${items.length} items inserted (${this.totalEmpty} skipped as empty)`)
   }
 
   _checkCodesNotEmpty (codes) {
