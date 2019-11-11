@@ -106,6 +106,7 @@ module.exports = {
 
   // ====== READ dependencies
   getNodeDefDependencies: SurveyDependencies.getNodeDefDependencies,
+  isNodeDefDependentOn: SurveyDependencies.isNodeDefDependentOn,
 
   // ====== UPDATE
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,

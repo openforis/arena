@@ -28,9 +28,11 @@ module.exports = {
   },
 
   expressions: {
+    cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
+    cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
+    circularDependencyError:  'validationErrors.expressions.circularDependencyError',
     expressionInvalid: 'validationErrors.expressions.expressionInvalid',
     unableToFindNode: 'validationErrors.expressions.unableToFindNode',
-    cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
     unableToFindNodeChild: 'validationErrors.expressions.unableToFindNodeChild',
     unableToFindNodeParent: 'validationErrors.expressions.unableToFindNodeParent',
     unableToFindNodeSibling: 'validationErrors.expressions.unableToFindNodeSibling',

@@ -81,7 +81,7 @@ const SortExpressionComponent = props => {
       mode,
     } = props
 
-    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, mode, lang)
+    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, null, mode, lang)
     return variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1)
   }
 

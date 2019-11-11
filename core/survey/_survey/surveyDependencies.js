@@ -14,10 +14,12 @@ const dependencyTypes = {
   validations: 'validations',
 }
 
-const addDep = (type, nodeDefUuid, nodeDefDepUuid) =>
+const _getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
+
+const _addDep = (type, nodeDefUuid, nodeDefDepUuid) =>
   graph => {
     const dep = R.pipe(
-      getDeps(type, nodeDefUuid),
+      _getDeps(type, nodeDefUuid),
       R.append(nodeDefDepUuid)
     )(graph)
     return R.assocPath([type, nodeDefUuid], dep)(graph)
@@ -29,7 +31,7 @@ const addDeps = (survey, nodeDef, type, expressions) =>
 
     for (const refName of refNames) {
       const nodeDefRef = SurveyNodeDefs.getNodeDefByName(refName)(survey)
-      graph = addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
+      graph = _addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
     }
     return graph
   }
@@ -74,7 +76,37 @@ const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
   )
 )
 
-const getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
+/**
+ * Returns true if nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
+ *
+ */
+const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
+  if (nodeDefUuid === nodeDefSourceUuid)
+    return false
+
+  const stack = []
+  stack.push(nodeDefSourceUuid)
+
+  const visitedUuids = new Set()
+
+  while (stack.length > 0) {
+    const nodeDefUuidCurrent = stack.pop()
+
+    if (nodeDefUuid === nodeDefUuidCurrent)
+      return true
+
+    visitedUuids.add(nodeDefUuidCurrent)
+
+    const dependencies = getNodeDefDependencies(nodeDefUuidCurrent)(survey)
+    R.forEach(nodeDefUuidDependent => {
+      if (!visitedUuids.has(nodeDefUuidDependent)) {
+        stack.push(nodeDefUuidDependent)
+      }
+    })(dependencies)
+  }
+
+  return false
+}
 
 module.exports = {
   dependencyTypes,
@@ -84,6 +116,7 @@ module.exports = {
   // READ
   getDependencyGraph,
   getNodeDefDependencies,
+  isNodeDefDependentOn,
 
   // UPDATE
   assocDependencyGraph: dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)

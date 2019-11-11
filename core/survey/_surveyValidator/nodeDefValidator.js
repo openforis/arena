@@ -97,9 +97,9 @@ const propsValidations = survey => ({
 
 const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = await Promise.all([
-    NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getDefaultValues(nodeDef), false, Validation.messageKeys.nodeDefEdit.defaultValuesInvalid),
-    NodeDefExpressionsValidator.validate(survey, Survey.getNodeDefParent(nodeDef)(survey), NodeDef.getApplicable(nodeDef), false, Validation.messageKeys.nodeDefEdit.applyIfInvalid),
-    NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef), Validation.messageKeys.nodeDefEdit.validationsInvalid)
+    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
+    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
+    NodeDefValidationsValidator.validate(survey, nodeDef)
   ])
 
   return Validation.newInstance(
@@ -129,8 +129,15 @@ const validateNodeDef = async (survey, nodeDef) => {
 }
 
 const validateNodeDefs = async survey => {
-  const nodeDefs = Survey.getNodeDefs(survey)
+  // build and assoc dependency graph to survey
+  survey = R.pipe(
+    Survey.buildDependencyGraph,
+    graph => Survey.assocDependencyGraph(graph)(survey)
+  )(survey)
+
   const validation = Validation.newInstance()
+
+  const nodeDefs = Survey.getNodeDefs(survey)
 
   for (const nodeDefUuid of Object.keys(nodeDefs)) {
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
