@@ -80,8 +80,10 @@ module.exports.init = app => {
 
       const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
 
-      // Ensure we don't need to make duplicate requests by caching the profile picture for a little while.
-      res.set('Cache-Control', 'private, max-age=120');
+      // Ensure we don't need to make duplicate requests by caching the profile picture for a small instant.
+      // The value of 3 seconds is chosen as the smallest amount of time it takes for a user to switch to
+      // a new profile picture, ensuring they always see their own newest picture.
+      res.set('Cache-Control', 'private, max-age=3');
 
       if (profilePicture) {
         res.end(profilePicture, 'binary')
