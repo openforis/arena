@@ -134,7 +134,6 @@ export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)
 export const getContentKey = _getContentProp(keysContent.key)
-export const getContentValue = _getContentProp(keysContent.value)
 // content props category
 export const getContentCategoryName = _getContentProp(keysContent.categoryName)
 export const getContentCategoryUuid = _getContentProp(keysContent.categoryUuid)
