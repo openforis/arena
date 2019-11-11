@@ -151,24 +151,41 @@ const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, val
     }
   })
 
-const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
+const _newCategoryItemUpdateLogActivity = (categoryUuid, item, key, value, system) => ActivityLog.newActivity(
+  ActivityLog.type.categoryItemPropUpdate,
+  {
+    [ActivityLog.keysContent.uuid]: CategoryItem.getUuid(item),
+    [ActivityLog.keysContent.code]: CategoryItem.getCode(item),
+    [ActivityLog.keysContent.categoryUuid]: categoryUuid,
+    [ActivityLog.keysContent.levelUuid]: CategoryItem.getLevelUuid(item),
+    [ActivityLog.keysContent.key]: key,
+    [ActivityLog.keysContent.value]: value
+  },
+  system
+)
+
+const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, validateCategory = true, client = db) =>
   await client.tx(async t => {
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
     await Promise.all([
       markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemPropUpdate, {
-        [ActivityLog.keysContent.uuid]: itemUuid,
-        [ActivityLog.keysContent.code]: CategoryItem.getCode(item),
-        [ActivityLog.keysContent.categoryUuid]: categoryUuid,
-        [ActivityLog.keysContent.levelUuid]: CategoryItem.getLevelUuid(item),
-        [ActivityLog.keysContent.key]: key,
-        [ActivityLog.keysContent.value]: value
-      }, false, t)
+      ActivityLogRepository.insertMany(user, surveyId, [_newCategoryItemUpdateLogActivity(categoryUuid, item, key, value, false)], t)
     ])
     return {
       item,
-      category: await validateCategory(surveyId, categoryUuid, t),
+      category: validateCategory ? await validateCategory(surveyId, categoryUuid, t) : null,
     }
+  })
+
+const updateItemsExtra = async (user, surveyId, categoryUuid, items, client = db) =>
+  await client.tx(async t => {
+    const logActivities = items.map(item =>
+      _newCategoryItemUpdateLogActivity(categoryUuid, item, CategoryItem.props.extra, CategoryItem.getExtra(item), true)
+    )
+    await Promise.all([
+      ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+      CategoryRepository.updateItems(surveyId, items, t)
+    ])
   })
 
 // ====== DELETE
@@ -289,6 +306,7 @@ module.exports = {
   updateCategoryProp,
   updateLevelProp,
   updateItemProp,
+  updateItemsExtra,
 
   //DELETE
   deleteCategory,

@@ -25,7 +25,9 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
   //NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
   for (const { nodeCtx, nodeDef } of nodePointersToUpdate) {
     //3. evaluate applicable expression
-    const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef))
+    const exprEval = RecordExpressionParser.evalApplicableExpression(
+      survey, record, nodeCtx, NodeDef.getApplicable(nodeDef)
+    )
     const applicable = R.propOr(false, 'value', exprEval)
 
     //4. persist updated node value if changed, and return updated node
@@ -36,13 +38,17 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
       //applicability changed
 
       //update node and add it to nodesUpdated
-      nodesUpdated[nodeCtxUuid] = await NodeRepository.updateChildrenApplicability(
-        Survey.getId(survey),
-        nodeCtxUuid,
-        nodeDefUuid,
-        applicable,
-        tx
-      )
+      nodesUpdated[nodeCtxUuid] = {
+        ...await NodeRepository.updateChildrenApplicability(
+          Survey.getId(survey),
+          nodeCtxUuid,
+          nodeDefUuid,
+          applicable,
+          tx
+        ),
+        //preserve 'created' flag (used by rdb generator)
+        ...Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}
+      }
 
       const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
 
@@ -88,7 +94,7 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
     nodePointersToUpdate.map(async ({ nodeCtx, nodeDef }) => {
 
       //3. evaluate applicable default value expression
-      const exprEval = await RecordExpressionParser.evalApplicableExpression(
+      const exprEval = RecordExpressionParser.evalApplicableExpression(
         survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef)
       )
 

@@ -13,10 +13,10 @@ const RecordUpdater = require('./_record/recordUpdater')
 
 // ====== CREATE
 
-const newRecord = (user, cycle, preview = false, dateCreated = null) => ({
+const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
-  [keys.step]: RecordStep.getDefaultStep(),
+  [keys.step]: step || RecordStep.getDefaultStep(),
   [keys.cycle]: cycle,
   [keys.preview]: preview,
   [keys.dateCreated]: dateCreated,
@@ -68,6 +68,7 @@ module.exports = {
   // ====== UPDATE
   assocNodes: RecordUpdater.assocNodes,
   assocNode: RecordUpdater.assocNode,
+  mergeNodes: RecordUpdater.mergeNodes,
 
   // ====== DELETE
   deleteNode: RecordUpdater.deleteNode,

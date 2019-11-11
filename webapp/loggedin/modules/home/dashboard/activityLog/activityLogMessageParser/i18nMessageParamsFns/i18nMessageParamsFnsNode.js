@@ -5,7 +5,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-const _getParams = (survey, lang) => activityLog => {
+const _getParams = (survey, i18n) => activityLog => {
   const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -13,7 +13,7 @@ const _getParams = (survey, lang) => activityLog => {
     ActivityLog.getParentPath,
     R.map(({ nodeDefUuid, keys }) => {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const label = NodeDef.getLabel(nodeDef, lang)
+      const label = NodeDef.getLabel(nodeDef, i18n.lang)
       // do not show keys for root entity
       return NodeDef.isRoot(nodeDef)
         ? label

@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const GoogleFontsPlugin = require('google-fonts-plugin')
@@ -44,14 +45,24 @@ const plugins = [
   new HtmlWebpackPlugin({
     template: './web-resources/index.html'
   }),
+  // Only substitute in variables in development.
+  // In production, this is done upon container startup.
+  new HtmlReplaceWebpackPlugin(
+    ProcessUtils.isEnvProduction ? [] : [
+    {
+      pattern: '$COGNITO_USER_POOL_ID',
+      replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
+    },
+    {
+      pattern: '$COGNITO_CLIENT_ID',
+      replacement: ProcessUtils.ENV.cognitoClientId || '',
+    },
+  ]),
   new webpack.DefinePlugin({
     __BUST__: JSON.stringify(uuidv4()),
     'process': {
       'env': {
         'NODE_ENV': JSON.stringify(ProcessUtils.ENV.nodeEnv),
-        'COGNITO_REGION': JSON.stringify(ProcessUtils.ENV.cognitoRegion),
-        'COGNITO_USER_POOL_ID': JSON.stringify(ProcessUtils.ENV.cognitoUserPoolId),
-        'COGNITO_CLIENT_ID': JSON.stringify(ProcessUtils.ENV.cognitoClientId),
         'APPLICATION_VERSION': JSON.stringify(gitRevisionPlugin.version()),
         'GIT_COMMIT_HASH': JSON.stringify(gitRevisionPlugin.commithash()),
         'GIT_BRANCH': JSON.stringify(gitRevisionPlugin.branch()),

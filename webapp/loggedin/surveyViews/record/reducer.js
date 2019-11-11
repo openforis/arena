@@ -23,7 +23,7 @@ const actionHandlers = {
   [recordDelete]: () => ({}),
 
   // node updates
-  [nodesUpdate]: (state, { nodes }) => Record.assocNodes(nodes)(state),
+  [nodesUpdate]: (state, { nodes }) => Record.mergeNodes(nodes)(state),
   [nodeDelete]: (state, { node }) => Record.deleteNode(node)(state),
 
   // validation updates

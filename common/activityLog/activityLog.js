@@ -65,11 +65,19 @@ export const keys = {
   type: 'type',
   system: 'system',
   userUuid: 'userUuid',
+
   //props associated from fetch
   userName: 'userName',
   recordUuid: 'recordUuid',
   parentPath: 'parentPath',
   nodeDefUuid: 'nodeDefUuid',
+  //user
+  targetUserName: 'targetUserName',
+  targetUserEmail: 'targetUserEmail',
+  targetUserUuid: 'targetUserUuid',
+  //analysis
+  processingChainLabels: 'processingChainLabels',
+  processingStepIndex: 'processingStepIndex',
 }
 
 export const keysContent = {
@@ -93,6 +101,11 @@ export const keysContent = {
   //node
   nodeDefUuid: 'nodeDefUuid',
   recordUuid: 'recordUuid',
+  //user
+  groupUuid: 'groupUuid',
+  //analysis
+  labels: 'labels',
+  processingChainUuid: 'processingChainUuid',
 }
 
 // ====== CREATE
@@ -116,6 +129,11 @@ export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
 export const getParentPath = R.prop(keys.parentPath)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
+export const getTargetUserName = R.prop(keys.targetUserName)
+export const getTargetUserUuid = R.prop(keys.targetUserUuid)
+export const getTargetUserEmail = R.prop(keys.targetUserEmail)
+export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
+export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -137,3 +155,7 @@ export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
 export const getContentNodeDefUuid = _getContentProp(keysContent.nodeDefUuid)
 export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)
+// content props user
+export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
+// content props analysis
+export const getContentLabels = _getContentProp(keysContent.labels)

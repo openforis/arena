@@ -6,10 +6,9 @@ import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const activityTypesCommon = [
   ActivityLog.type.surveyCreate,
@@ -61,14 +60,12 @@ const activityTypesByPermission = {
   ],
 }
 
-const _getAvailableActivityTypes = async (surveyId, user) => {
+const _getAvailableActivityTypes = async (surveyUuid, user) => {
   if (User.isSystemAdmin(user))
     return null
 
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
-
   return R.pipe(
-    User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo)),
+    User.getAuthGroupBySurveyUuid(surveyUuid),
     AuthGroups.getPermissions,
     //for each permission in group, get available activity types
     R.reduce(
@@ -104,8 +101,9 @@ const _addNodeParentPathKeys = async (survey, activity) => {
 
 export const fetch = async (user, surveyId, offset, limit) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
-  const activityTypes = await _getAvailableActivityTypes(surveyId, user)
-  const activitiesDb = await ActivityLogRepository.fetch(surveyId, activityTypes, offset, limit)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const activityTypes = await _getAvailableActivityTypes(Survey.getUuid(surveyInfo), user)
+  const activitiesDb = await ActivityLogRepository.fetch(surveyInfo, activityTypes, offset, limit)
 
   return await Promise.all(activitiesDb.map(activity =>
     R.includes(ActivityLog.getType(activity), [ActivityLog.type.nodeCreate, ActivityLog.type.nodeValueUpdate, ActivityLog.type.nodeDelete])

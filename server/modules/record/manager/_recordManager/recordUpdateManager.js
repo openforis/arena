@@ -190,6 +190,9 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
     await DataTableUpdateRepository.updateTable(survey, Record.getCycle(record), nodeDefs, updatedNodesAndDependents, t)
+
+    // merge updated nodes with existing ones (remove created/updated flags nodes)
+    record = Record.mergeNodes(updatedNodesAndDependents)(record)
   }
 
   return {

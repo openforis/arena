@@ -69,9 +69,11 @@ export const updateChainProp = async (surveyId, processingChainUuid, key, value,
 // ====== DELETE
 
 export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
-  await client.none(`
+  await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1
+    RETURNING ${selectFields}
     `,
-    [processingChainUuid]
+    [processingChainUuid],
+    camelize
   )

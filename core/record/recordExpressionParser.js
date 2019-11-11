@@ -77,34 +77,34 @@ const _identifierEval = (survey, record) => (expr, { node }) => {
   return _getNodeValue(survey, referencedNodes[0])
 }
 
-const evalNodeQuery = async (survey, record, node, query) => {
+const evalNodeQuery = (survey, record, node, query) => {
   const functions = {
     [Expression.types.Identifier]: _identifierEval(survey, record),
   }
 
-  return await Expression.evalString(query, { node, functions })
+  return Expression.evalString(query, { node, functions })
 }
 
-const evalApplicableExpression = async (survey, record, nodeCtx, expressions) =>
-  R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
+const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
+  R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
 
-const evalApplicableExpressions = async (survey, record, node, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
+const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
+  const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
-  return await Promise.all(applicableExpressions.map(
-    async expression => ({
+  return applicableExpressions.map(
+    expression => ({
       expression,
-      value: await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
+      value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
     })
-  ))
+  )
 }
 
-const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
+const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = []
   for (const expression of expressions) {
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
 
-    if (StringUtils.isBlank(applyIfExpr) || await evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
+    if (StringUtils.isBlank(applyIfExpr) || evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
       applicableExpressions.push(expression)
 
       if (stopAtFirstFound)

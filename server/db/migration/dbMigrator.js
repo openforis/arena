@@ -31,8 +31,12 @@ const migrateSchema = async (schema = publicSchema) => {
   const migrateOptions = {
     config: R.clone(config),
     cwd: `${path.join(__dirname, migrationsFolder)}`,
-    env
-  }
+    env,
+
+    // Required to work around an EventEmitter leak bug.
+    // See: https://github.com/db-migrate/node-db-migrate/issues/421
+    throwUncatched: true,
+}
 
   migrateOptions.config[env].schema = schema
 
@@ -76,6 +80,7 @@ const migrateAll = async () => {
     logger.info('database migrations completed')
   } catch (err) {
     logger.error(`error running database migrations: ${err.toString()}`)
+    throw err;
   }
 }
 

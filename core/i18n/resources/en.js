@@ -234,17 +234,17 @@ module.exports = {
       [ActivityLog.type.nodeDelete]: 'deleted node {{name}} in record {{recordKeys}} {{parentPath}}',
 
       // user
-      [ActivityLog.type.userInvite]: 'invited user {{name}} with role {{role}}',
-      [ActivityLog.type.userUpdate]: 'updated user {{name}} group to {{groupName}}',
+      [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
+      [ActivityLog.type.userUpdate]: 'updated user {{name}}',
       [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
 
       // analysis
       [ActivityLog.type.processingChainCreate]: 'added processing chain',
-      [ActivityLog.type.processingChainPropUpdate]: 'updated {{prop}} processing chain {{label}}',
+      [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} {{prop}} to {{value}}',
-      [ActivityLog.type.processingStepDelete]: 'deleted processing step {{index}}',
+      [ActivityLog.type.processingStepPropsUpdate]: 'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
+      [ActivityLog.type.processingStepDelete]: 'deleted processing chain {{processingChainLabel}} step {{index}}',
     }
   },
 
@@ -305,6 +305,7 @@ module.exports = {
   processingStepView: {
     deleteConfirm: 'Delete this processing step?\n$t(common.cantUndoWarning)',
     deleteComplete: 'Processing step deleted',
+    category: 'Category',
   },
 
   itemsTable: {
