@@ -4,6 +4,8 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
@@ -46,8 +48,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
           ${schema}.activity_log a
         WHERE
           system = false
-        ${activityTypes ? 'AND a.type IN ($2:csv)' : ''}
-    
+          ${activityTypes ? 'AND a.type IN ($2:csv)' : ''}
       )
     SELECT
       l.*,
@@ -56,7 +57,10 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       -- user activities keys
       user_target.name AS target_user_name,
       user_target.email AS target_user_email,
-      agu.user_uuid AS target_user_uuid -- null if user has been removed from survey
+      agu.user_uuid AS target_user_uuid, -- null if user has been removed from survey
+      -- analysis activities keys
+      processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
+      processing_step.index AS processing_step_index
     FROM
       log AS l
     JOIN
@@ -86,6 +90,17 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       ag.uuid = agu.group_uuid AND ag.survey_uuid = $1
     
     -- end of user activities part
+
+    -- start of analysis activities part
+    LEFT OUTER JOIN 
+      ${schema}.processing_chain
+    ON 
+      processing_chain.uuid::text IN (l.content->>'uuid', l.content->>'${ProcessingStep.keys.processingChainUuid}')
+    LEFT OUTER JOIN 
+      ${schema}.processing_step
+    ON 
+      processing_step.uuid::text = l.content->>'uuid'
+    -- end of analysis activities part
     
     WHERE
       l.rank = 1
