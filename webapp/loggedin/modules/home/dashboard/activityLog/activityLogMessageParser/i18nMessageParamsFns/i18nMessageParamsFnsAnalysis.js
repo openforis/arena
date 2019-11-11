@@ -1,5 +1,9 @@
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
@@ -25,10 +29,28 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepPropsUpdate]: (survey, i18n) => activityLog => ({
-    index: ActivityLog.getProcessingStepIndex(activityLog),
-    processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog)
-  }),
+  [ActivityLog.type.processingStepPropsUpdate]: (survey, i18n) => activityLog => {
+    const content = ActivityLog.getContent(activityLog)
+
+    // only one of entityUuid or categoryUuid can have a value associated
+    const entityUuid = content[ProcessingStep.keysProps.entityUuid]
+    const categoryUuid = content[ProcessingStep.keysProps.categoryUuid]
+
+    let key, value
+    if (entityUuid) {
+      key = i18n.t('nodeDefsTypes.entity')
+      value = R.pipe(Survey.getNodeDefByUuid(entityUuid), entityDef => NodeDef.getLabel(entityDef, i18n.lang))(survey)
+    } else {
+      key = i18n.t('processingStepView.category')
+      value = R.pipe(Survey.getCategoryByUuid(categoryUuid), Category.getName)(survey)
+    }
+    return {
+      key,
+      value,
+      processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
+      index: ActivityLog.getProcessingStepIndex(activityLog)
+    }
+  },
 
   [ActivityLog.type.processingStepDelete]: (survey, i18n) => activityLog => ({
     index: ActivityLog.getContentIndex(activityLog),

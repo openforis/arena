@@ -243,7 +243,7 @@ module.exports = {
       [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      [ActivityLog.type.processingStepPropsUpdate]: 'updated processing step {{index}} of processing chain {{processingChainLabel}}',
+      [ActivityLog.type.processingStepPropsUpdate]: 'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
       [ActivityLog.type.processingStepDelete]: 'deleted processing step {{index}} of processing chain {{processingChainLabel}}',
     }
   },
@@ -305,6 +305,7 @@ module.exports = {
   processingStepView: {
     deleteConfirm: 'Delete this processing step?\n$t(common.cantUndoWarning)',
     deleteComplete: 'Processing step deleted',
+    category: 'Category',
   },
 
   itemsTable: {
