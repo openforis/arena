@@ -32,6 +32,8 @@ const getCode = ObjectUtils.getProp(props.code, '')
 
 const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item))(item)
 
+const getExtra = ObjectUtils.getProp(props.extra)
+
 module.exports = {
   keys,
   props,
@@ -46,15 +48,16 @@ module.exports = {
   getParentUuid: R.prop(keys.parentUuid),
   getCode,
   getLabels: ObjectUtils.getLabels,
-  getLabel ,
+  getLabel,
   getDescriptions: ObjectUtils.getDescriptions,
   getDescription: ObjectUtils.getDescription,
-
+  getExtra,
+  getProps: ObjectUtils.getProps,
   isEqual: ObjectUtils.isEqual,
 
   // NOT USED YET
   getExtraProp: prop => R.pipe(
-    ObjectUtils.getProp(keys.extra),
+    getExtra,
     R.propOr('', prop)
   ),
 
