@@ -1,18 +1,27 @@
-const {expect} = require('chai')
+const { expect } = require('chai')
 
 const SurveyValidator = require('@core/survey/surveyValidator')
 const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefValidations = require('@core/survey/nodeDefValidations')
 const Validation = require('@core/validation/validation')
 const NodeDefExpression = require('@core/survey/nodeDefExpression')
 
-const {fetchFullContextSurvey} = require('../testContext')
+const { fetchFullContextSurvey } = require('../testContext')
 
 const validateExpression = async (survey, nodeDefName, expression) => {
   const nodeDef = Survey.getNodeDefByName(nodeDefName)(survey)
 
-  const expressions = [{[NodeDefExpression.keys.expression]: expression}]
+  nodeDef[NodeDef.keys.props] = {
+    ...NodeDef.getProps(nodeDef),
+    [NodeDef.propKeys.validations]: {
+      [NodeDefValidations.keys.expressions]: [
+        { [NodeDefExpression.keys.expression]: expression }
+      ]
+    }
+  }
 
-  return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, expressions)
+  return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, Survey.dependencyTypes.validations)
 }
 
 /**

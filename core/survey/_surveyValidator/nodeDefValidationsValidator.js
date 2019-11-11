@@ -1,9 +1,11 @@
 const R = require('ramda')
 
-const NodeDefValidations = require('../nodeDefValidations')
-const NodeDef = require('../nodeDef')
+const Survey = require('@core/survey/survey')
+const NodeDef = require('@core/survey/nodeDef')
+const NodeDefExpression = require('@core/survey/nodeDefExpression')
 const Validator = require('@core/validation/validator')
 const Validation = require('@core/validation/validation')
+
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
 const validate = async (survey, nodeDef) => {
@@ -11,17 +13,17 @@ const validate = async (survey, nodeDef) => {
 
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
-      [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.min}`]:
+      [`${NodeDefExpression.keys.count}.${NodeDefExpression.keys.min}`]:
         [Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMinMustBePositiveNumber)],
-      [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.max}`]:
+      [`${NodeDefExpression.keys.count}.${NodeDefExpression.keys.max}`]:
         [Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber)],
     })
     : {}
 
   return R.pipe(
     Validation.assocFieldValidation(
-      NodeDefValidations.keys.expressions,
-      await NodeDefExpressionsValidator.validate(survey, nodeDef, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false, true)
+      NodeDefExpression.keys.expressions,
+      await NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations)
     ),
     R.when(
       validation => !Validation.isValid(validation) && !Validation.hasErrors(validation),
