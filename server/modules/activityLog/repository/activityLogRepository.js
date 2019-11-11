@@ -39,25 +39,56 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     WITH
       log AS
       (
+        -- select only the last activity_log row per user, type and content.uuid
         SELECT
           a.id,
           a.type,
           ${DbUtils.selectDate('a.date_created', 'date_created')},
           a.user_uuid,
           a.content,
-          RANK() OVER (PARTITION BY a.user_uuid, a.type, a.content->'uuid' ORDER BY a.date_created DESC) -- use always uuid in content
-          AS rank
+          RANK() OVER (PARTITION BY a.user_uuid, a.type, a.content->'uuid' ORDER BY a.date_created DESC) -- use always uuid in content AS rank
         FROM
           ${schema}.activity_log a
         WHERE
           system = false
           ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
       ),
-      node_hierarchy AS
+      
+      log_limited AS
+      (
+        SELECT id, type, date_created, user_uuid, content, content->>'uuid' AS content_uuid
+        FROM log
+        WHERE rank = 1
+        ORDER BY
+          log.date_created DESC, log.id DESC
+        OFFSET $3
+        LIMIT $4
+      ),
+      
+      log_node_hierarchy AS
       (
         --nodeCreate/nodeValueUpdate: get hierarchy from content.meta.h
-        SELECT l.id, jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}') AS node_uuid
-        FROM ${schema}.activity_log l 
+        SELECT 
+          l.id, 
+          jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}') AS ancestor_node_uuid
+        FROM log_limited l 
+      ),
+      
+      log_parent_paths AS
+      (
+        SELECT
+          log_node_hierarchy.id,
+          json_agg(json_build_object(
+            'nodeDefUuid', node_h.node_def_uuid, 
+            'nodeUuid', log_node_hierarchy.ancestor_node_uuid
+          )) AS parent_path
+        FROM 
+          log_node_hierarchy
+        LEFT OUTER JOIN 
+          ${schema}.node node_h 
+          ON node_h.uuid::text = log_node_hierarchy.ancestor_node_uuid  
+        GROUP BY
+          log_node_hierarchy.id
       )
 
     SELECT
@@ -68,10 +99,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       -- node activities keys
       
       n.node_def_uuid AS node_def_uuid,
-      json_agg(json_build_object(
-        'nodeDefUuid', node_h.node_def_uuid, 
-        'nodeUuid', h.node_uuid
-      )) AS parent_path,
+      log_parent_paths.parent_path,
       
       -- user activities keys
       
@@ -85,7 +113,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       processing_step.index AS processing_step_index
       
     FROM
-      log AS l
+      log_limited AS l
     JOIN
       public."user" u
     ON
@@ -93,21 +121,17 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.record r
     ON
-      l.content->>'uuid' = r.uuid::text
+      r.uuid::text = l.content_uuid
 
     -- start of node activities part
     LEFT OUTER JOIN 
       ${schema}.node n 
     ON 
-      l.content->>'uuid' = n.uuid::text
+      n.uuid::text = l.content_uuid
     LEFT OUTER JOIN 
-      node_hierarchy h
+      log_parent_paths
     ON 
-      h.id = l.id
-    LEFT OUTER JOIN 
-      ${schema}.node node_h 
-    ON 
-      node_h.uuid::text = h.node_uuid
+      l.id = log_parent_paths.id
     -- end of node activities part
 
     -- start of user activities part
@@ -116,7 +140,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       public.user user_target
     ON 
-      l.content->>'uuid' = user_target.uuid::text
+      user_target.uuid::text = l.content_uuid
     -- join with auth group tables to check if the target user has been removed 
     LEFT OUTER JOIN
       public.auth_group_user agu
@@ -133,23 +157,12 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.processing_chain
     ON 
-      processing_chain.uuid::text IN (l.content->>'uuid', l.content->>'${ProcessingStep.keys.processingChainUuid}')
+      processing_chain.uuid::text IN (l.content_uuid, l.content->>'${ProcessingStep.keys.processingChainUuid}')
     LEFT OUTER JOIN 
       ${schema}.processing_step
     ON 
-      processing_step.uuid::text = l.content->>'uuid'
-    -- end of analysis activities part
-    
-    WHERE
-      l.rank = 1
-    GROUP BY 
-      l.id, l.type, l.date_created, l.user_uuid, l.content, l.rank, u.name, r.uuid, n.record_uuid, n.node_def_uuid, 
-      user_target.name, user_target.email, agu.user_uuid,
-      processing_chain.props, processing_step.index
-    ORDER BY
-      l.date_created DESC
-    OFFSET $3
-    LIMIT $4`,
+      processing_step.uuid::text = l.content_uuid
+    -- end of analysis activities part`,
     [surveyUuid, activityTypes, offset, limit],
     camelize
   )
