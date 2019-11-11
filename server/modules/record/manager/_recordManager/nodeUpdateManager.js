@@ -24,20 +24,20 @@ const persistNode = async (user, survey, record, node, system, t) => {
   if (existingNode) {
     // updating existing node
     const surveyId = Survey.getId(survey)
-    if (!Record.isPreview(record)) {
-      const logContent = R.pipe(
-        // keep only node uuid, recordUuid, meta and value
-        R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.meta, Node.keys.value]),
-      )(node)
-
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
-    }
-
     const nodeValue = Node.getValue(node)
     const meta = {
       ...Node.getMeta(node),
       [Node.metaKeys.defaultValue]: false
     }
+    if (!Record.isPreview(record)) {
+      // keep only node uuid, recordUuid, meta and value
+      const logContent = R.pipe(
+        R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
+        R.assoc(Node.keys.meta, meta)
+      )(node)
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
+    }
+
     const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, Record.isPreview(record), t)
 
     record = Record.assocNode(nodeUpdate)(record)
