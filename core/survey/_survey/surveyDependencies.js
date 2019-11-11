@@ -89,7 +89,7 @@ const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
 
   const visitedUuids = new Set()
 
-  while(stack.length > 0) {
+  while (stack.length > 0) {
     const nodeDefUuidCurrent = stack.pop()
 
     if (nodeDefUuid === nodeDefUuidCurrent)
@@ -98,11 +98,11 @@ const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
     visitedUuids.add(nodeDefUuidCurrent)
 
     const dependencies = getNodeDefDependencies(nodeDefUuidCurrent)(survey)
-    dependencies.forEach(nodeDefUuidDependent => {
-      if(!visitedUuids.has(nodeDefUuidDependent)) {
+    R.forEach(nodeDefUuidDependent => {
+      if (!visitedUuids.has(nodeDefUuidDependent)) {
         stack.push(nodeDefUuidDependent)
       }
-    })
+    })(dependencies)
   }
 
   return false
