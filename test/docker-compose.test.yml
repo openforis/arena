@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 services:
 
   arena_db:
@@ -14,7 +14,9 @@ services:
       - arena_db
     build:
       context: ..
-      dockerfile: test/Dockerfile-test
+      dockerfile: test/Dockerfile
+      target: test
+
     environment:
       PGHOST: arena_db
       PGPORT: 5432

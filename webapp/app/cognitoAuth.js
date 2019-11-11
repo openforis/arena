@@ -1,14 +1,12 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
 
-import ProcessUtils from '@core/processUtils'
-
 export const keysAction = {
   success: 'success',
   newPasswordRequired: 'newPasswordRequired'
 }
 
-const UserPoolId = ProcessUtils.ENV.cognitoUserPoolId
-const ClientId = ProcessUtils.ENV.cognitoClientId
+const UserPoolId = window.cognitoUserPoolId
+const ClientId = window.cognitoClientId
 
 const _getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 

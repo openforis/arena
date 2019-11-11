@@ -73,6 +73,9 @@ export const keys = {
   targetUserName: 'targetUserName',
   targetUserEmail: 'targetUserEmail',
   targetUserUuid: 'targetUserUuid',
+  //analysis
+  processingChainLabels: 'processingChainLabels',
+  processingStepIndex: 'processingStepIndex',
 }
 
 export const keysContent = {
@@ -95,6 +98,9 @@ export const keysContent = {
   stepTo: 'stepTo',
   //user
   groupUuid: 'groupUuid',
+  //analysis
+  labels: 'labels',
+  processingChainUuid: 'processingChainUuid',
 }
 
 // ====== CREATE
@@ -116,9 +122,11 @@ export const getDateCreated = ObjectUtils.getDateCreated
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
-export const getTargetUserName =  R.prop(keys.targetUserName)
-export const getTargetUserEmail =  R.prop(keys.targetUserEmail)
+export const getTargetUserName = R.prop(keys.targetUserName)
 export const getTargetUserUuid = R.prop(keys.targetUserUuid)
+export const getTargetUserEmail = R.prop(keys.targetUserEmail)
+export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
+export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -140,3 +148,5 @@ export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
 // content props user
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
+// content props analysis
+export const getContentLabels = _getContentProp(keysContent.labels)
