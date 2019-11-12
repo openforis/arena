@@ -146,18 +146,20 @@ export const enTranslation = {
     createSurvey: 'Create Survey',
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmPublish: `**You are about to publish the survey {{survey}}**
-      
-Please, note that:
+      confirmPublish: `#### You are about to publish the survey {{survey}} ####
 
-- All labels associated with deleted languages will be permanently deleted.
-- Node definitions cannot be changed from single to multiple and vice versa.
-- All category items cannot change code and cannot be deleted.
-- All taxa cannot be modified.
-- All records associated with deleted cycles will be permanently deleted.
-- All nodes associated with deleted node definitions will be permanently deleted.
+###### During publish: ###### 
+- Labels associated with deleted languages will be permanently deleted.
+- Records associated with deleted cycles will be permanently deleted.
+- Data associated with deleted form fields will be permanently deleted.
 
-Are you sure you want to continue?`,
+###### After publish: ###### 
+- Form fields cannot be changed from single to multiple and vice versa.
+- Category items' codes cannot be changed.
+- Category items cannot be deleted.
+- Taxa cannot be modified.
+
+** Are you sure you want to continue? **`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',
