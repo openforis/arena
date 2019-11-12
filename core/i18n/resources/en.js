@@ -365,6 +365,8 @@ export const enTranslation = {
   surveyForm: {
     subPage: 'Sub page',
     addChildTo: 'Add to {{nodeDef}}',
+    hidePages:'Hide pages',
+    showPages:'Show pages',
     formEditActions: {
       preview: 'Preview',
     },
