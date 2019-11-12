@@ -19,7 +19,7 @@ export const insert = async (user, surveyId, type, content, system, client) =>
   await client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
-    [type, User.getUuid(user), content, system]
+    [type, User.getUuid(user), content || {}, system]
   )
 
 export const insertMany = async (user, surveyId, activities, client) =>
@@ -37,30 +37,32 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
 
   return await client.map(`
     WITH
-      log AS
-      (
-        -- select only the last activity_log row per user, type and content.uuid
-        SELECT
-          a.id,
-          a.type,
-          ${DbUtils.selectDate('a.date_created', 'date_created')},
-          a.user_uuid,
-          a.content,
-          RANK() OVER (PARTITION BY a.user_uuid, a.type, a.content->'uuid' ORDER BY a.date_created DESC) -- use always uuid in content AS rank
-        FROM
-          ${schema}.activity_log a
-        WHERE
-          system = false
-          ${activityTypes ? 'AND a.type IN ($1:csv)' : ''}
-      ),
-      
       log_limited AS
       (
-        SELECT id, type, date_created, user_uuid, content, content->>'uuid' AS content_uuid
-        FROM log
-        WHERE rank = 1
+        -- select only the last activity_log row per user, type and content.uuid within one day
+        SELECT
+          DISTINCT ON (
+            date_created::date,
+            user_uuid,
+            type,
+            content->>'uuid'
+          ) 
+          id,
+          content,
+          type,
+          user_uuid, 
+          ${DbUtils.selectDate('date_created')},
+          content->>'uuid' AS content_uuid
+        FROM
+          ${schema}.activity_log
+        WHERE
+          NOT system
+          ${activityTypes ? ' AND type in ($2)' : ''}
         ORDER BY
-          log.date_created DESC, log.id DESC
+          date_created::date DESC,
+          user_uuid,
+          type,
+          content_uuid
         OFFSET $3
         LIMIT $4
       ),
