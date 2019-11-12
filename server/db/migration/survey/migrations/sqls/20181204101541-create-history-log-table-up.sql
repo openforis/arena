@@ -17,3 +17,49 @@ CREATE INDEX activity_log_user_aggregated_idx ON activity_log (
   (content->>'uuid') NULLS LAST,
   date_created DESC
 ) WHERE NOT system;
+
+-- This view exists as a way to efficiently get iterate over
+-- activity_log_user_aggregate. Using the other view directly
+-- will result in worse performance due to the inability to
+-- use indexes correctly.
+CREATE VIEW activity_log_user_aggregate_keys AS
+SELECT 
+  date_created::date as date,
+  user_uuid,
+  type,
+  (content->>'uuid')::uuid
+FROM activity_log
+WHERE not system
+group by 1,2,3,4
+ORDER BY date_created::date DESC;
+
+-- This view aggregates each user's activity log entries by the day
+-- Each day contains its last individual change per each of following
+-- attribute combinations:
+--   * user,
+--   * change type (type), and
+--   * the content UUID (if any)
+CREATE VIEW activity_log_user_aggregate AS
+SELECT
+    DISTINCT ON (
+        date_created::date,
+        user_uuid,
+        type,
+        content_uuid
+    )
+    id,
+    date_created,
+    user_uuid,
+    type,
+    (content->>'uuid')::uuid as content_uuid,
+    content
+FROM
+    activity_log
+WHERE
+    NOT system
+ORDER BY
+    date_created::date DESC,
+    user_uuid,
+    type,
+    content_uuid,
+    date_created DESC;

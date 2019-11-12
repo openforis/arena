@@ -28,7 +28,7 @@ CREATE TABLE
     step         varchar(63) NOT NULL,
     cycle        varchar(2)     NOT NULL,
     date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
-    preview      boolean                     DEFAULT FALSE,
+    preview      boolean     NOT NULL        DEFAULT FALSE,
     validation   jsonb       NOT NULL        DEFAULT '{}'::jsonb,
 
     PRIMARY KEY (uuid),

@@ -36,38 +36,42 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
   const schema = getSurveyDBSchema(surveyId)
 
   return await client.map(`
-    WITH
-      log_limited AS
+  WITH
+      log_days AS 
       (
-        -- select only the last activity_log row per user, type and content.uuid within one day
+        -- Get rows up to offset+limit.
+        -- From this we obtain the earliest date to we need to consider in the later query.
+        select date
+        from activity_log_user_aggregate_keys
+        ${activityTypes ? ' WHERE type in ($2)' : ''}
+        LIMIT $3 + $4 -- LIMIT + OFFSET
+      ),
+      log_days_all AS (
+        -- With the date, refine the query to include ALL rows
+        -- from activity_log_user_aggregate up to and including that date.
+        --
+        -- Then sort the result with the real timestamp to obtain the correct
+        -- ordering of log entries from the view.
+        SELECT *
+        FROM activity_log_user_aggregate
+        WHERE date_created >= (select min(log_days.date) from log_days)
+        ${activityTypes ? ' AND type in ($2)' : ''}
+      ),
+      log_limited AS (
+        -- With the correct list of rows, sort them in the right order
+        -- and return the result respecting the given LIMIT and OFFSET parameters.
         SELECT
-          DISTINCT ON (
-            date_created::date,
-            user_uuid,
-            type,
-            (content->>'uuid')::uuid
-          ) 
           id,
           content,
           type,
           user_uuid, 
           ${DbUtils.selectDate('date_created')},
-          (content->>'uuid')::uuid AS content_uuid
-        FROM
-          ${schema}.activity_log
-        WHERE
-          NOT system
-          ${activityTypes ? ' AND type IN ($2:csv)' : ''}
-        ORDER BY
-          date_created::date DESC,
-          user_uuid,
-          type,
-          content_uuid,
-          date_created DESC -- get the last entry from the day
+          content_uuid
+        FROM log_days_all
+        ORDER BY date_created DESC, id DESC -- id is a tie-breaker
         OFFSET $3
         LIMIT $4
       ),
-      
       log_node_hierarchy AS
       (
         --nodeCreate/nodeValueUpdate: get hierarchy from content.meta.h
@@ -75,8 +79,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
           l.id, 
           jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}')::uuid AS ancestor_node_uuid
         FROM log_limited l 
-      ),
-      
+      ),      
       log_parent_paths AS
       (
         SELECT
@@ -166,7 +169,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     ON 
       processing_step.uuid = l.content_uuid
     -- end of analysis activities part
-    
+
     ORDER BY
       l.date_created DESC`,
     [surveyUuid, activityTypes, offset, limit],
