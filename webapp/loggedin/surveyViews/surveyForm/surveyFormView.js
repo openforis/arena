@@ -95,6 +95,7 @@ const SurveyFormView = (props) => {
         <div className={`survey-form${className}`}>
 
           {
+            showPageNavigation &&
             <FormPageNavigation
               surveyInfo={surveyInfo}
               surveyCycleKey={surveyCycleKey}
@@ -102,7 +103,6 @@ const SurveyFormView = (props) => {
               entry={entry}
               canEditDef={canEditDef}
               level={0}
-              showPageNavigation={showPageNavigation}
             />
           }
 
