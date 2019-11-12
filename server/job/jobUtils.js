@@ -1,4 +1,4 @@
-const jobStatus = {
+export const jobStatus = {
   pending: 'pending',
   running: 'running',
   succeeded: 'succeeded',
@@ -6,13 +6,13 @@ const jobStatus = {
   failed: 'failed',
 }
 
-const jobEvents = {
+export const jobEvents = {
   created: 'created',
   statusChange: 'statusChange', //job has changed its status
   progress: 'progress', //job is running and the processed items changed
 }
 
-const jobThreadMessageTypes = {
+export const jobThreadMessageTypes = {
   fetchJob: 'fetchJob',
   cancelJob: 'cancelJob',
 }
@@ -36,7 +36,7 @@ const calculatedElapsedMillis = job =>
     ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime()
     : 0
 
-const jobToJSON = job => ({
+export const jobToJSON = job => ({
   type: job.type,
   userUuid: job.userUuid,
   surveyId: job.surveyId,
@@ -62,10 +62,3 @@ const jobToJSON = job => ({
   result: jobStatus.succeeded ? job.result : null,
 
 })
-
-module.exports = {
-  jobStatus,
-  jobEvents,
-  jobThreadMessageTypes,
-  jobToJSON,
-}

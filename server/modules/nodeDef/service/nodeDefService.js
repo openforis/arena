@@ -1,11 +1,9 @@
-const NodeDefManager = require('../manager/nodeDefManager')
+import * as NodeDefManager from '../manager/nodeDefManager'
 
-module.exports = {
+export const insertNodeDef = NodeDefManager.insertNodeDef
 
-  insertNodeDef: NodeDefManager.insertNodeDef,
+export const updateNodeDefProps = NodeDefManager.updateNodeDefProps
 
-  updateNodeDefProps: NodeDefManager.updateNodeDefProps,
+export const markNodeDefDeleted = NodeDefManager.markNodeDefDeleted
 
-  markNodeDefDeleted: NodeDefManager.markNodeDefDeleted,
 
-}

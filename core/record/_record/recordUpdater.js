@@ -1,15 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Node = require('../node')
-const Validation = require('@core/validation/validation')
+import * as Node from '../node'
+import * as Validation from '@core/validation/validation'
 
-const keys = require('./recordKeys')
-const NodesIndex = require('./recordNodesIndex')
-const RecordReader = require('./recordReader')
+import { keys } from './recordKeys'
+import * as NodesIndex from './recordNodesIndex'
+import * as RecordReader from './recordReader'
 
 // ====== UPDATE
 
-const mergeNodes = nodes => record => {
+export const mergeNodes = nodes => record => {
   let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated))
     recordUpdated[keys.nodes] = {}
@@ -40,7 +40,7 @@ const mergeNodes = nodes => record => {
   return recordUpdated
 }
 
-const assocNodes = nodes => record => {
+export const assocNodes = nodes => record => {
   let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated))
     recordUpdated[keys.nodes] = {}
@@ -57,9 +57,9 @@ const assocNodes = nodes => record => {
   return recordUpdated
 }
 
-const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
+export const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
-const mergeNodeValidations = nodeValidations => record => R.pipe(
+export const mergeNodeValidations = nodeValidations => record => R.pipe(
   Validation.getValidation,
   Validation.mergeValidation(nodeValidations),
   validationMerged => Validation.assocValidation(validationMerged)(record)
@@ -67,7 +67,7 @@ const mergeNodeValidations = nodeValidations => record => R.pipe(
 
 // ====== DELETE
 
-const deleteNode = node => record => {
+export const deleteNode = node => record => {
   const nodeUuid = Node.getUuid(node)
 
   // 1. remove entity children recursively
@@ -94,13 +94,4 @@ const deleteNode = node => record => {
   delete recordUpdated[keys.nodes][nodeUuid]
 
   return recordUpdated
-}
-
-module.exports = {
-  assocNodes,
-  assocNode,
-  mergeNodes,
-  mergeNodeValidations,
-
-  deleteNode,
 }

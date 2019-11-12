@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import Taxonomy from '@core/survey/taxonomy'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonomyEditState from './taxonomyEditState'
 
 import { appUserLogout } from '@webapp/app/actions'

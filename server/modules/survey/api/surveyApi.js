@@ -1,17 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Response = require('@server/utils/response')
-const Request = require('@server/utils/request')
-const JobUtils = require('@server/job/jobUtils')
+import * as Response from '@server/utils/response'
+import * as Request from '@server/utils/request'
+import * as JobUtils from '@server/job/jobUtils'
 
-const Validation = require('@core/validation/validation')
-const User = require('@core/user/user')
+import * as Validation from '@core/validation/validation'
+import * as User from '@core/user/user'
 
-const AuthMiddleware = require('../../auth/authApiMiddleware')
-const SurveyService = require('../service/surveyService')
-const UserService = require('../../user/service/userService')
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as SurveyService from '../service/surveyService'
+import * as UserService from '../../user/service/userService'
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== CREATE
   app.post('/survey', async (req, res, next) => {
@@ -118,4 +118,5 @@ module.exports.init = app => {
     }
   })
 
-}
+};
+

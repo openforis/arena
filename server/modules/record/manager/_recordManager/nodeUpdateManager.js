@@ -1,22 +1,22 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Queue = require('@core/queue')
+import Queue from '@core/queue'
 
-const ObjectUtils = require('@core/objectUtils')
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Node = require('@core/record/node')
-const Record = require('@core/record/record')
+import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 
-const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
-const NodeRepository = require('../../repository/nodeRepository')
+import * as NodeUpdateDependentManager from './nodeUpdateDependentManager'
+import * as NodeRepository from '../../repository/nodeRepository'
 
-const ActivityLog = require('@common/activityLog/activityLog')
-const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 //==== UPDATE
 
-const persistNode = async (user, survey, record, node, system, t) => {
+export const persistNode = async (user, survey, record, node, system, t) => {
   const nodeUuid = Node.getUuid(node)
 
   const existingNode = Record.getNodeByUuid(nodeUuid)(record)
@@ -50,7 +50,7 @@ const persistNode = async (user, survey, record, node, system, t) => {
   }
 }
 
-const updateNodesDependents = async (survey, record, nodes, tx) => {
+export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // output
   let nodesUpdated = { ...nodes }
 
@@ -97,7 +97,7 @@ const updateNodesDependents = async (survey, record, nodes, tx) => {
 }
 
 // ==== CREATE
-const insertNode = async (user, survey, record, node, system, t) => {
+export const insertNode = async (user, survey, record, node, system, t) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -149,7 +149,7 @@ const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInser
 
 //==== DELETE
 
-const deleteNode = async (user, survey, record, nodeUuid, t) => {
+export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const surveyId = Survey.getId(survey)
 
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
@@ -175,7 +175,7 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
   return await _onNodeUpdate(survey, record, node, nodeDependentKeyAttributes, t)
 }
 
-const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>
+export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>
   await client.tx(async t => {
     const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, t)
     const activities = nodesDeleted.map(node => ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true))
@@ -218,10 +218,10 @@ const _createUpdateResult = (record, node, nodes) => {
     nodes: {
       [Node.getUuid(node)]: node,
       //always assoc parentNode, used in surveyRdbManager.updateTableNodes
-      ...parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {},
+      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
       ...nodes
     }
-  }
+  };
 }
 
 const _getNodeDependentKeyAttributes = (survey, record, node) => {
@@ -250,12 +250,4 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
     }
   }
   return nodeDependentKeyAttributes
-}
-
-module.exports = {
-  insertNode,
-  persistNode,
-  updateNodesDependents,
-  deleteNode,
-  deleteNodesByNodeDefUuids
 }

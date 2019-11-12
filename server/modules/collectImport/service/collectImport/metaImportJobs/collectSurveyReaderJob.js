@@ -1,16 +1,16 @@
-const FileZip = require('@server/utils/file/fileZip')
-const FileXml = require('@server/utils/file/fileXml')
+import FileZip from '@server/utils/file/fileZip'
+import * as FileXml from '@server/utils/file/fileXml'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const CollectSurvey = require('../model/collectSurvey')
+import * as CollectSurvey from '../model/collectSurvey'
 
 const idmlXmlFileName = 'idml.xml'
 
 /**
  * Reads the schema from a Collect backup file and saves it into the job context under idmlSource property
  */
-class CollectSurveyReaderJob extends Job {
+export default class CollectSurveyReaderJob extends Job {
 
   constructor (params) {
     super('CollectSurveyReaderJob', params)
@@ -29,5 +29,3 @@ class CollectSurveyReaderJob extends Job {
     this.setContext({ collectSurveyFileZip, collectSurvey })
   }
 }
-
-module.exports = CollectSurveyReaderJob

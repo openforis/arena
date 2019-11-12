@@ -1,14 +1,14 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-const db = require('@server/db/db')
-const DataTable = require('@server/modules/surveyRdb/schemaRdb/dataTable')
-const SurveySchemaRepositoryUtils = require('@server/modules/survey/repository/surveySchemaRepositoryUtils')
+import { db } from '@server/db/db'
+import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Returns a list of items for each record containing duplicate entities.
@@ -19,7 +19,7 @@ const SurveySchemaRepositoryUtils = require('@server/modules/survey/repository/s
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  */
-const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client = db) => {
+export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
   const surveyId = Survey.getId(survey)
 
   const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
@@ -69,7 +69,7 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
   )
 }
 
-const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, recordUuid, nodeUuid = null, client = db) => {
+export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, recordUuid, nodeUuid = null, client = db) => {
   const surveyId = Survey.getId(survey)
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
@@ -87,9 +87,4 @@ const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, reco
     [recordUuid, nodeUuid],
     row => Object.values(row)
   )
-}
-
-module.exports = {
-  fetchRecordsWithDuplicateEntities,
-  fetchEntityKeysByRecordAndNodeDefUuid
 }

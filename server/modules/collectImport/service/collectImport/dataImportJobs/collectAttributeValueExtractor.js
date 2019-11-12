@@ -1,20 +1,20 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const { uuidv4 } = require('@core/uuid')
-const DateUtils = require('@core/dateUtils')
+import { uuidv4 } from '@core/uuid';
+import * as DateUtils from '@core/dateUtils'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 const { nodeDefType } = NodeDef
-const Taxon = require('@core/survey/taxon')
+import * as Taxon from '@core/survey/taxon'
 
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
-const RecordFile = require('@core/record/recordFile')
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as RecordFile from '@core/record/recordFile'
 
-const FileManager = require('../../../../record/manager/fileManager')
-const CollectSurvey = require('../model/collectSurvey')
-const CollectRecord = require('../model/collectRecord')
+import * as FileManager from '../../../../record/manager/fileManager'
+import * as CollectSurvey from '../model/collectSurvey'
+import * as CollectRecord from '../model/collectRecord'
 
 const extractTextValueAndMeta = (collectNode, collectNodeField = 'value') => {
   const value = CollectRecord.getTextValue(collectNodeField)(collectNode)
@@ -137,7 +137,7 @@ const extractTimeValueAndMeta = collectNode => {
   }
 }
 
-const extractAttributeValueAndMeta = async (
+export const extractAttributeValueAndMeta = async (
   survey, nodeDef, record, node, // arena items
   collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode, collectNodeField, // collect items
   tx,
@@ -168,8 +168,4 @@ const extractAttributeValueAndMeta = async (
     case nodeDefType.time:
       return extractTimeValueAndMeta(collectNode)
   }
-}
-
-module.exports = {
-  extractAttributeValueAndMeta
 }

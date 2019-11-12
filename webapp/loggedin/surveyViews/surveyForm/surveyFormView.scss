@@ -25,7 +25,7 @@
 
 // Survey form grid style
 .survey-form.page-navigation-off {
-  grid-template-columns: 30px 1fr;
+  grid-template-columns: 1fr;
 }
 
 // Survey form edit mode grid style
@@ -43,7 +43,7 @@
 }
 
 .survey-form.edit.page-navigation-off {
-  grid-template-columns: 30px 1fr 200px;
+  grid-template-columns: 1fr 200px;
 }
 
 .survey-form.edit.form-actions-off {
@@ -51,5 +51,5 @@
 }
 
 .survey-form.edit.form-actions-off.page-navigation-off {
-  grid-template-columns: 30px 1fr 0;
+  grid-template-columns: 1fr 0;
 }

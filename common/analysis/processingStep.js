@@ -1,8 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   calculationSteps: 'calculationSteps',
   index: ObjectUtils.keys.index,
   processingChainUuid: 'processingChainUuid',
@@ -10,7 +10,7 @@ const keys = {
   uuid: ObjectUtils.keys.uuid,
 }
 
-const keysProps = {
+export const keysProps = {
   entityUuid: 'entityUuid', // OR
   categoryUuid: 'categoryUuid', // OR
   virtual: 'virtual', //true|false
@@ -18,34 +18,20 @@ const keysProps = {
 
 // ====== READ
 
-const getProcessingChainUuid = R.prop(keys.processingChainUuid)
-const getCalculationSteps = R.propOr([], keys.calculationSteps)
-const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
-const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
-const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
+export const getProcessingChainUuid = R.prop(keys.processingChainUuid)
+export const getCalculationSteps = R.propOr([], keys.calculationSteps)
+export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
+export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
+export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
+export const getIndex = ObjectUtils.getIndex
+export const getUuid = ObjectUtils.getUuid
 
 // ====== UPDATE
 
-const assocCalculation = processingStepCalculation => processingStep => R.pipe(
+export const assocCalculation = processingStepCalculation => processingStep => R.pipe(
   getCalculationSteps,
   R.append(processingStepCalculation),
   calculationSteps => R.assoc(keys.calculationSteps, calculationSteps, processingStep)
 )(processingStep)
 
-module.exports = {
-  keys,
-  keysProps,
-
-  //READ
-  getProcessingChainUuid,
-  getCalculationSteps,
-  getCategoryUuid,
-  getEntityUuid,
-  getIndex: ObjectUtils.getIndex,
-  getUuid: ObjectUtils.getUuid,
-  isVirtual,
-
-  //UPDATE
-  mergeProps: ObjectUtils.mergeProps,
-  assocCalculation,
-}
+export const mergeProps = ObjectUtils.mergeProps

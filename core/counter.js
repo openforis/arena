@@ -1,4 +1,4 @@
-class Counter {
+export default class Counter {
 
   constructor () {
     this._count = 0
@@ -17,5 +17,3 @@ class Counter {
   }
 
 }
-
-module.exports = Counter

@@ -1,30 +1,39 @@
-const express = require('express')
+import * as express from 'express'
 
-const router = express.Router()
+import * as userApi from '@server/modules/user/api/userApi'
+import * as activityLogApi from '@server/modules/activityLog/api/activityLogApi'
+import * as surveyApi from '@server/modules/survey/api/surveyApi'
+import * as nodeDefApi from '@server/modules/nodeDef/api/nodeDefApi'
+import * as categoryApi from '@server/modules/category/api/categoryApi'
+import * as taxonomyApi from '@server/modules/taxonomy/api/taxonomyApi'
+import * as geoApi from '@server/modules/geo/api/geoApi'
+import * as collectImportApi from '@server/modules/collectImport/api/collectImportApi'
+import * as recordApi from '@server/modules/record/api/recordApi'
+import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
+import * as processingChainApi from '@server/modules/analysis/api/processingChainApi'
+import * as jobApi from '@server/job/jobApi'
+import * as expressionApi from '@server/modules/expression/api/expressionApi'
+
+export const router = express.Router()
 
 //init apis
+userApi.init(router)
 
-require('@server/modules/user/api/userApi').init(router)
+activityLogApi.init(router)
 
-require('@server/modules/activityLog/api/activityLogApi').init(router)
+surveyApi.init(router)
+nodeDefApi.init(router)
+categoryApi.init(router)
+taxonomyApi.init(router)
+geoApi.init(router)
 
-require('@server/modules/survey/api/surveyApi').init(router)
-require('@server/modules/nodeDef/api/nodeDefApi').init(router)
-require('@server/modules/category/api/categoryApi').init(router)
-require('@server/modules/taxonomy/api/taxonomyApi').init(router)
-require('@server/modules/geo/api/geoApi').init(router)
+collectImportApi.init(router)
 
-require('@server/modules/collectImport/api/collectImportApi').init(router)
+recordApi.init(router)
 
-require('@server/modules/record/api/recordApi').init(router)
+surveyRdbApi.init(router)
 
-require('@server/modules/surveyRdb/api/surveyRdbApi').init(router)
+processingChainApi.init(router)
+jobApi.init(router)
 
-require('@server/modules/analysis/api/processingChainApi').init(router)
-require('@server/job/jobApi').init(router)
-
-require('@server/modules/expression/api/expressionApi').init(router)
-
-module.exports = {
-  router
-}
+expressionApi.init(router)

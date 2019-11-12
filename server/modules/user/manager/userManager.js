@@ -1,23 +1,23 @@
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-const User = require('@core/user/user')
-const AuthGroup = require('@core/auth/authGroup')
+import * as User from '@core/user/user'
+import * as AuthGroup from '@core/auth/authGroup'
 
-const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
-const AuthGroupRepository = require('@server/modules/auth/repository/authGroupRepository')
-const UserRepository = require('@server/modules/user/repository/userRepository')
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as UserRepository from '@server/modules/user/repository/userRepository'
 
 // ==== CREATE
 
-const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid, client = db) =>
+export const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid, client = db) =>
   await client.tx(async t => {
     const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, uuid, email, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
-const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
+export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
   await client.tx(async t => {
     await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
     const group = await AuthGroupRepository.fetchGroupByUuid(groupUuid, t)
@@ -49,11 +49,15 @@ const _userFetcher = fetchFn => async (...args) => {
   return null
 }
 
-const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
+export const countUsersBySurveyId = UserRepository.countUsersBySurveyId
 
-const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
+export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
-const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
+export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
+
+export const fetchUserProfilePicture = UserRepository.fetchUserProfilePicture  
+
+export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
 
@@ -64,6 +68,7 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
       }))
     )
   })
+
 
 // ==== UPDATE
 
@@ -90,39 +95,21 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
     return await UserRepository.updateUser(userUuid, name, email, profilePicture, t)
   })
 
-const updateUser = _userFetcher(_updateUser)
+export const updateUser = _userFetcher(_updateUser)
 
-// ==== DELETE
+export const updateUsername = UserRepository.updateUsername
 
-const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
-  await client.tx(async t => await Promise.all([
-    AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
-    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userRemove, { [ActivityLog.keysContent.uuid]: userUuidToRemove }, false, t)
-  ]))
-
-const updateUserPrefs = async user => ({
+export const updateUserPrefs = async user => ({
   ...await UserRepository.updateUserPrefs(user),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
 })
 
-module.exports = {
-  // CREATE
-  insertUser,
-  addUserToGroup,
+export const resetUsersPrefsSurveyCycle = UserRepository.resetUsersPrefsSurveyCycle
 
-  // READ
-  fetchUsersBySurveyId,
-  countUsersBySurveyId: UserRepository.countUsersBySurveyId,
-  fetchUserByUuid,
-  fetchUserByEmail,
-  fetchUserProfilePicture: UserRepository.fetchUserProfilePicture,
+// ==== DELETE
 
-  // UPDATE
-  updateUser,
-  updateUsername: UserRepository.updateUsername,
-  updateUserPrefs,
-  resetUsersPrefsSurveyCycle: UserRepository.resetUsersPrefsSurveyCycle,
-
-  // DELETE
-  deleteUser,
-}
+export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
+  await client.tx(async t => await Promise.all([
+    AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, t),
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userRemove, { [ActivityLog.keysContent.uuid]: userUuidToRemove }, false, t)
+  ]))

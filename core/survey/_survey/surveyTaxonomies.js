@@ -1,21 +1,13 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
 const taxonomies = 'taxonomies'
 
 // ====== READ
-const getTaxonomies = R.propOr({}, taxonomies)
+export const getTaxonomies = R.propOr({}, taxonomies)
 
-const getTaxonomiesArray = R.pipe(getTaxonomies, R.values)
+export const getTaxonomiesArray = R.pipe(getTaxonomies, R.values)
 
-const getTaxonomyByUuid = uuid => R.pipe(getTaxonomies, R.prop(uuid))
+export const getTaxonomyByUuid = uuid => R.pipe(getTaxonomies, R.prop(uuid))
 
 // ====== UPDATE
-const assocTaxonomies = newTaxonomies => R.assoc(taxonomies, newTaxonomies)
-
-module.exports = {
-  getTaxonomies,
-  getTaxonomiesArray,
-  getTaxonomyByUuid,
-
-  assocTaxonomies,
-}
+export const assocTaxonomies = newTaxonomies => R.assoc(taxonomies, newTaxonomies)

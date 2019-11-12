@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-import Survey from '@core/survey/survey'
-import Expression from '@core/expressionParser/expression'
+import * as Survey from '@core/survey/survey'
+import * as Expression from '@core/expressionParser/expression'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -63,7 +63,7 @@ export const mapStateToProps = (state, props) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, mode, lang)
+  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, lang)
 
   return {
     nodeDefContext,

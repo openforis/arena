@@ -1,22 +1,20 @@
-const R = require('ramda')
-const { assert } = require('chai')
+import * as R from 'ramda'
+import { assert } from 'chai';
 
-const NodeDef = require('@core/survey/nodeDef')
-const Node = require('@core/record/node')
-const Record = require('@core/record/record')
+import * as NodeDef from '@core/survey/nodeDef'
 
-const SB = require('../it/utils/surveyBuilder')
-const RB = require('../it/utils/recordBuilder')
-const RecordUtils = require('../it/utils/recordUtils')
-const { getContextUser } = require('../testContext')
+import * as RecordUtils from '../it/utils/recordUtils'
+import * as SB from '../it/utils/surveyBuilder'
+import * as RB from '../it/utils/recordBuilder'
+import { getContextUser } from '../testContext';
 
-const RecordExpressionParser = require('@core/record/recordExpressionParser')
+import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 
 let survey = {}
 let record = {}
-let root = {}
+// let root = {}
 let node = {}
-let dbh = {}
+// let dbh = {}
 
 before(async () => {
   const user = getContextUser()
@@ -35,9 +33,9 @@ before(async () => {
     )
   ).build()
 
-  root = RecordUtils.findNodeByPath('cluster')(survey, record)
+  // root = RecordUtils.findNodeByPath('cluster')(survey, record)
   node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
-  dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
+  // dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
 })
 
 describe('RecordExpressionParser Test', () => {

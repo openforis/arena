@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import Record from '@core/record/record'
+import * as Record from '@core/record/record'
 import { appUserLogout } from '@webapp/app/actions'
 
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'

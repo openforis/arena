@@ -1,13 +1,13 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const Taxonomy = require('@core/survey/taxonomy')
-const Validation = require('@core/validation/validation')
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Validation from '@core/validation/validation'
 
-const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
+import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 
-class TaxonomiesValidationJob extends Job {
+export default class TaxonomiesValidationJob extends Job {
   constructor (params) {
     super(TaxonomiesValidationJob.type, params)
   }
@@ -29,5 +29,3 @@ class TaxonomiesValidationJob extends Job {
 }
 
 TaxonomiesValidationJob.type = 'TaxonomiesValidationJob'
-
-module.exports = TaxonomiesValidationJob

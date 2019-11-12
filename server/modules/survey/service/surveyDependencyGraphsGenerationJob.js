@@ -1,14 +1,14 @@
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const Survey = require('@core/survey/survey')
+import * as Survey from '@core/survey/survey'
 
-const SurveyManager = require('../manager/surveyManager')
+import * as SurveyManager from '../manager/surveyManager'
 
 /**
  * Generates the survey dependency graph and stores it in the metadata of the survey.
  * (It requires the survey to be set in the context or it loads it with "published" props)
  */
-class SurveyDependencyGraphsGenerationJob extends Job {
+export default class SurveyDependencyGraphsGenerationJob extends Job {
 
   constructor (params) {
     super(SurveyDependencyGraphsGenerationJob.type, params)
@@ -26,5 +26,3 @@ class SurveyDependencyGraphsGenerationJob extends Job {
 }
 
 SurveyDependencyGraphsGenerationJob.type = 'SurveyDependencyGraphsGenerationJob'
-
-module.exports = SurveyDependencyGraphsGenerationJob

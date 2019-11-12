@@ -1,7 +1,7 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Node = require('../node')
-const ObjectUtils = require('@core/objectUtils')
+import * as Node from '../node'
+import * as ObjectUtils from '@core/objectUtils'
 
 /**
  * Record nodes index.
@@ -53,34 +53,34 @@ const keys = {
 /**
  * Returns the root node uuid
  */
-const getNodeRootUuid = R.prop(keys.nodeRootUuid)
+export const getNodeRootUuid = R.prop(keys.nodeRootUuid)
 
 /**
  * Returns the list of node uuids having the specified nodeDefUuid
  */
-const getNodeUuidsByDef = nodeDefUuid => R.pathOr([], [keys.nodesByDef, nodeDefUuid])
+export const getNodeUuidsByDef = nodeDefUuid => R.pathOr([], [keys.nodesByDef, nodeDefUuid])
 
 /**
  * Returns the list of node uuids having the specified parentNodeUuid and nodeDefUuid
  */
-const getNodeUuidsByParentAndDef = (parentNodeUuid, childDefUuid) => R.pathOr([], [keys.nodesByParentAndDef, parentNodeUuid, childDefUuid])
+export const getNodeUuidsByParentAndDef = (parentNodeUuid, childDefUuid) => R.pathOr([], [keys.nodesByParentAndDef, parentNodeUuid, childDefUuid])
 
 /**
  * Returns the list of all node uuids having the specified parentNodeUuid
  */
-const getNodeUuidsByParent = parentNodeUuid => R.pipe(
+export const getNodeUuidsByParent = parentNodeUuid => R.pipe(
   R.pathOr({}, [keys.nodesByParentAndDef, parentNodeUuid]),
   R.values,
   R.flatten
 )
 
-const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
+export const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
 
 // ==== ADD
 /**
  * Adds the specified nodes to the cache
  */
-const addNodes = nodes => record =>
+export const addNodes = nodes => record =>
   R.pipe(
     R.values,
     R.reject(Node.isDeleted),
@@ -90,7 +90,7 @@ const addNodes = nodes => record =>
     )
   )(nodes)
 
-const addNode = node => R.pipe(
+export const addNode = node => R.pipe(
   //rootUuid
   R.ifElse(
     R.always(Node.isRoot(node)),
@@ -117,7 +117,7 @@ const _addNodeToCodeDependentsIndex = node => record =>
 /**
  * Removed the specified node from the cache
  */
-const removeNode = node => R.pipe(
+export const removeNode = node => R.pipe(
   R.ifElse(
     R.always(Node.isRoot(node)),
     R.dissoc(keys.nodeRootUuid),
@@ -156,17 +156,3 @@ const _dissocFromIndexPath = (path, value) => record => R.pipe(
   R.without(value),
   valuesArray => ObjectUtils.setInPath(path, valuesArray)(record)
 )(record)
-
-module.exports = {
-  //ADD
-  addNodes,
-  addNode,
-  //GETTERS
-  getNodeRootUuid,
-  getNodeUuidsByParent,
-  getNodeUuidsByParentAndDef,
-  getNodeUuidsByDef,
-  getNodeCodeDependentUuids,
-  //REMOVE
-  removeNode
-}

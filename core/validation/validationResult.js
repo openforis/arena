@@ -1,6 +1,6 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const keys = {
+export const keys = {
   key: 'key',
   params: 'params',
   severity: 'severity',
@@ -9,25 +9,25 @@ const keys = {
   customErrorMessageKey: 'custom',
 }
 
-const severities = {
+export const severities = {
   error: 'error',
   warning: 'warning',
 }
 
-const newInstance = (key, params = null, severity = null, messages = null) => ({
+export const newInstance = (key, params = null, severity = null, messages = null) => ({
   [keys.key]: key,
-  ...params ? { [keys.params]: params } : {},
-  ...severity ? { [keys.severity]: severity } : {},
-  ...messages ? { [keys.messages]: messages } : {},
+  ...(params ? { [keys.params]: params } : {}),
+  ...(severity ? { [keys.severity]: severity } : {}),
+  ...(messages ? { [keys.messages]: messages } : {}),
 })
 
-const getKey = R.prop(keys.key)
-const getParams = R.propOr({}, keys.params)
-const getSeverity = R.propOr(severities.error, keys.severity)
+export const getKey = R.prop(keys.key)
+export const getParams = R.propOr({}, keys.params)
+export const getSeverity = R.propOr(severities.error, keys.severity)
 
 // custom messages
-const getMessages = R.propOr({}, keys.messages)
-const getMessage = lang => R.pipe(
+export const getMessages = R.propOr({}, keys.messages)
+export const getMessage = lang => R.pipe(
   getMessages,
   R.ifElse(
     R.has(lang),
@@ -39,20 +39,6 @@ const getMessage = lang => R.pipe(
     )
   )
 )
-const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
+export const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
 
-module.exports = {
-  keys,
-
-  severities,
-
-  newInstance,
-
-  getKey,
-  getParams,
-  getSeverity,
-  getMessages,
-  getMessage,
-  isError: R.pipe(getSeverity, R.equals(severities.error)),
-  hasMessages,
-}
+export const isError = R.pipe(getSeverity, R.equals(severities.error))

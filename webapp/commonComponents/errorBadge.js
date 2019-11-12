@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useI18n } from './hooks'
 
-import Validation from '@core/validation/validation'
+import * as Validation from '@core/validation/validation'
 
 import ValidationTooltip from './validationTooltip'
 

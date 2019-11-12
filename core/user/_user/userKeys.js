@@ -1,6 +1,6 @@
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   uuid: ObjectUtils.keys.uuid,
   name: ObjectUtils.keys.name,
   email: 'email',
@@ -9,5 +9,3 @@ const keys = {
   hasProfilePicture: 'hasProfilePicture',
   prefs: 'prefs',
 }
-
-module.exports = keys

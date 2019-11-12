@@ -1,6 +1,6 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
 const keys = {
   props: ObjectUtils.keys.props,
@@ -15,31 +15,25 @@ const propKeys = {
   messages: 'messages'
 }
 
-const exprTypes = {
+export const exprTypes = {
   applicable: 'applicable',
   codeParent: 'codeParent',
   defaultValue: 'defaultValue',
   validationRules: 'validationRules',
 }
 
-const newReportItem = (expressionType, expression, applyIf, messages) => ({
+export const newReportItem = (expressionType, expression, applyIf, messages) => ({
   [propKeys.expressionType]: expressionType,
   [propKeys.expression]: expression,
   [propKeys.applyIf]: applyIf,
   [propKeys.messages]: messages,
 })
 
-module.exports = {
-  exprTypes,
+export const isResolved = R.propOr(false, keys.resolved)
+export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
+export const getProps = R.prop(keys.props)
 
-  newReportItem,
-
-  isResolved: R.propOr(false, keys.resolved),
-  getNodeDefUuid: R.prop(keys.nodeDefUuid),
-  getProps: R.prop(keys.props),
-
-  getExpressionType: ObjectUtils.getProp(propKeys.expressionType),
-  getExpression: ObjectUtils.getProp(propKeys.expression, ''),
-  getApplyIf: ObjectUtils.getProp(propKeys.applyIf, ''),
-  getMessages: ObjectUtils.getProp(propKeys.messages, ''),
-}
+export const getExpressionType = ObjectUtils.getProp(propKeys.expressionType)
+export const getExpression = ObjectUtils.getProp(propKeys.expression, '')
+export const getApplyIf = ObjectUtils.getProp(propKeys.applyIf, '')
+export const getMessages = ObjectUtils.getProp(propKeys.messages, '')

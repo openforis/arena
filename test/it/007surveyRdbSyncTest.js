@@ -1,15 +1,15 @@
-const { expect } = require('chai')
+import { expect } from 'chai';
 
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const { getContextUser } = require('../testContext')
+import { getContextUser } from '../testContext';
 
-const Survey = require('@core/survey/survey')
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
+import * as Survey from '@core/survey/survey'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-const SB = require('./utils/surveyBuilder')
+import * as SB from './utils/surveyBuilder'
 
 const expectSchemaToExist = async (schemaName, exists = true) => {
   const result = await db.one(`
@@ -59,3 +59,4 @@ describe('Survey RDB Sync Test', async () => {
   })
 
 })
+

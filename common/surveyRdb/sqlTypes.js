@@ -1,4 +1,4 @@
-const sqlTypes = {
+export const sqlTypes = {
   uuid: 'UUID',
   varchar: 'VARCHAR',
   integer: 'BIGINT',
@@ -7,5 +7,3 @@ const sqlTypes = {
   time: 'TIME WITHOUT TIME ZONE',
   point: 'geometry(Point)',
 }
-
-module.exports = sqlTypes

@@ -1,20 +1,20 @@
-const R = require('ramda')
-const camelize = require('camelize')
+import * as R from 'ramda'
+import * as camelize from 'camelize'
 
-const NumberUtils = require('@core/numberUtils')
-const ObjectUtils = require('@core/objectUtils')
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Taxon = require('@core/survey/taxon')
-const Node = require('@core/record/node')
+import * as NumberUtils from '@core/numberUtils'
+import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Taxon from '@core/survey/taxon'
+import * as Node from '@core/record/node'
 
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
-const sqlTypes = require('@common/surveyRdb/sqlTypes')
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import { sqlTypes } from '@common/surveyRdb/sqlTypes'
 const { nodeDefType } = NodeDef
 
-const Point = require('@core/geo/point')
-const GeoUtils = require('@core/geo/geoUtils')
-const DateTimeUtils = require('@core/dateUtils')
+import * as Point from '@core/geo/point'
+import * as GeoUtils from '@core/geo/geoUtils'
+import * as DateTimeUtils from '@core/dateUtils'
 
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
@@ -125,7 +125,7 @@ const props = {
   },
 }
 
-const getColValueProcessor = nodeDef => R.propOr(
+export const getColValueProcessor = nodeDef => R.propOr(
   () => (node) => {
     return Node.isValueBlank(node)
       ? null
@@ -135,13 +135,8 @@ const getColValueProcessor = nodeDef => R.propOr(
   props[NodeDef.getType(nodeDef)]
 )
 
-const getColTypeProcessor = nodeDef => R.propOr(
+export const getColTypeProcessor = nodeDef => R.propOr(
   nodeDef => colName => `VARCHAR`,
   colTypeProcessor,
   props[NodeDef.getType(nodeDef)]
 )(nodeDef)
-
-module.exports = {
-  getColValueProcessor,
-  getColTypeProcessor,
-}

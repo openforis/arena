@@ -1,26 +1,30 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const {
-  parse: dateFnsParse,
-  parseISO,
+import {
+  parse as dateFnsParse,
   differenceInMonths,
   differenceInWeeks,
   differenceInDays,
   differenceInHours,
   differenceInMinutes,
+  format,
+  isValid as fnsIsValid
+} from 'date-fns';
+
+import { isBlank } from './stringUtils';
+
+export {
   isBefore,
   isAfter,
   format,
-
-  isValid: fnsIsValid,
-
+  parseISO,
   subDays,
   addDays,
+  differenceInDays,
+  differenceInHours,
   subMonths,
-  subYears,
-} = require('date-fns')
-
-const { isBlank } = require('./stringUtils')
+  subYears
+} from 'date-fns';
 
 const normalizeDateTimeValue = length => value => R.pipe(
   R.ifElse(
@@ -31,7 +35,7 @@ const normalizeDateTimeValue = length => value => R.pipe(
   val => val.padStart(length, '0')
 )(value)
 
-const getRelativeDate = (i18n, date) => {
+export const getRelativeDate = (i18n, date) => {
 
   if (R.isNil(date))
     return null
@@ -71,7 +75,7 @@ const getRelativeDate = (i18n, date) => {
  * @param day
  * @returns {boolean}
  */
-const isValidDate = (year, month, day) => {
+export const isValidDate = (year, month, day) => {
   if (isBlank(year) || isBlank(month) || isBlank(day)) {
     return false
   }
@@ -84,44 +88,21 @@ const isValidDate = (year, month, day) => {
     date.getDate() === +day
 }
 
-const isValidTime = (hour = '', minutes = '') =>
+export const isValidTime = (hour = '', minutes = '') =>
   isBlank(hour) || isBlank(minutes)
     ? false
     : +hour >= 0 && +hour < 24 && +minutes >= 0 && +minutes < 60
 
-const isValidDateInFormat = (dateStr, format) => {
+export const isValidDateInFormat = (dateStr, format) => {
   const parsed = parse(dateStr, format)
   return !isNaN(parsed.getTime())
 }
 
-const formatDate = (day, month, year) =>
+export const formatDate = (day, month, year) =>
   `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
 
-const formatTime = (hour, minute) =>
+export const formatTime = (hour, minute) =>
   `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
-const parse = (dateStr, format) =>
+export const parse = (dateStr, format) =>
   dateFnsParse(dateStr, format, new Date())
-
-module.exports = {
-  getRelativeDate,
-  isBefore,
-  isAfter,
-
-  isValidDate,
-  isValidTime,
-  isValidDateInFormat,
-
-  format,
-  formatTime,
-  formatDate,
-
-  parse,
-  parseISO,
-  subDays,
-  addDays,
-  differenceInDays,
-  differenceInHours,
-  subMonths,
-  subYears,
-}

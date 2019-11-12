@@ -1,7 +1,7 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const { types } = require('@core/expressionParser/expression')
-const SystemError = require('@core/systemError')
+import { types } from '@core/expressionParser/expression';
+import SystemError from '@core/systemError'
 
 const js2sqlOperators = {
   '&&': 'AND',
@@ -93,14 +93,10 @@ const converters = {
 
 const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
-const getWherePreparedStatement = expr => {
+export const getWherePreparedStatement = expr => {
   const paramsArr = []
   const prepStatement = toPreparedStatement(expr, paramsArr)
   const params = paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
   return { clause: prepStatement, params }
-}
-
-module.exports = {
-  getWherePreparedStatement,
 }

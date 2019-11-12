@@ -1,7 +1,7 @@
 import React from 'react'
 
-import ProcessingChain from '@common/analysis/processingChain'
-import DateUtils from '@core/dateUtils'
+import * as ProcessingChain from '@common/analysis/processingChain'
+import * as DateUtils from '@core/dateUtils'
 
 import ProgressBar from '@webapp/commonComponents/progressBar'
 import { useI18n } from '@webapp/commonComponents/hooks'

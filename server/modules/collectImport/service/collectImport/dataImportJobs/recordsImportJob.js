@@ -1,31 +1,31 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const BatchPersister = require('@server/db/batchPersister')
+import BatchPersister from '@server/db/batchPersister'
 
-const FileXml = require('@server/utils/file/fileXml')
-const Queue = require('@core/queue')
+import * as FileXml from '@server/utils/file/fileXml'
+import Queue from '@core/queue'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefValidations = require('@core/survey/nodeDefValidations')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
-const RecordValidator = require('@core/record/recordValidator')
-const Validation = require('@core/validation/validation')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as RecordValidator from '@core/record/recordValidator'
+import * as Validation from '@core/validation/validation'
 
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const RecordManager = require('../../../../record/manager/recordManager')
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as RecordManager from '../../../../record/manager/recordManager'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const CollectRecord = require('../model/collectRecord')
-const CollectAttributeValueExtractor = require('./collectAttributeValueExtractor')
+import * as CollectRecord from '../model/collectRecord'
+import * as CollectAttributeValueExtractor from './collectAttributeValueExtractor'
 
-const CollectSurvey = require('../model/collectSurvey')
+import * as CollectSurvey from '../model/collectSurvey'
 
-class RecordsImportJob extends Job {
+export default class RecordsImportJob extends Job {
 
   constructor (params) {
     super(RecordsImportJob.type, params)
@@ -287,5 +287,3 @@ class RecordsImportJob extends Job {
 }
 
 RecordsImportJob.type = 'RecordsImportJob'
-
-module.exports = RecordsImportJob

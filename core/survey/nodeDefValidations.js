@@ -1,8 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NumberUtils = require('@core/numberUtils')
+import * as NumberUtils from '@core/numberUtils'
 
-const keys = {
+export const keys = {
   required: 'required',
   count: 'count',
   min: 'min',
@@ -10,15 +10,16 @@ const keys = {
   expressions: 'expressions'
 }
 
-const dissocCount = R.dissoc(keys.count)
+//COUNT
+export const dissocCount = R.dissoc(keys.count)
 
 const getCountProp = key => R.pathOr('', [keys.count, key])
 
-const getMinCount = getCountProp(keys.min)
+export const getMinCount = getCountProp(keys.min)
 
-const getMaxCount = getCountProp(keys.max)
+export const getMaxCount = getCountProp(keys.max)
 
-const hasMinOrMaxCount = validations => {
+export const hasMinOrMaxCount = validations => {
   const minCount = NumberUtils.toNumber(getMinCount(validations))
   const maxCount = NumberUtils.toNumber(getMaxCount(validations))
   return !isNaN(minCount) || !isNaN(maxCount)
@@ -39,25 +40,14 @@ const assocCountProp = key =>
     )
   )
 
-module.exports = {
-  keys,
+export const assocMinCount = assocCountProp(keys.min)
+export const assocMaxCount = assocCountProp(keys.max)  
 
-  //REQUIRED
-  isRequired: R.propOr(false, keys.required),
-  assocRequired: required => R.assoc(keys.required, required),
-  dissocRequired: R.dissoc(keys.required),
+//REQUIRED
+export const isRequired = R.propOr(false, keys.required)
+export const assocRequired = required => R.assoc(keys.required, required)
+export const dissocRequired = R.dissoc(keys.required)
 
-  //COUNT
-  getMinCount,
-  getMaxCount,
-  hasMinOrMaxCount,
-
-  assocMinCount: assocCountProp(keys.min),
-  assocMaxCount: assocCountProp(keys.max),
-
-  dissocCount,
-
-  //EXPRESSIONS
-  getExpressions: R.propOr([], (keys.expressions)),
-  assocExpressions: expressions => R.assoc(keys.expressions, expressions),
-}
+//EXPRESSIONS
+export const getExpressions = R.propOr([], (keys.expressions))
+export const assocExpressions = expressions => R.assoc(keys.expressions, expressions)

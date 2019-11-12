@@ -1,23 +1,25 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDefExpression = require('../nodeDefExpression')
-const SurveyNodeDefs = require('./surveyNodeDefs')
-const NodeDef = require('../nodeDef')
+import * as NodeDefExpression from '../nodeDefExpression'
+import * as SurveyNodeDefs from './surveyNodeDefs'
+import * as NodeDef from '../nodeDef'
 
 const keys = {
   dependencyGraph: 'dependencyGraph'
 }
 
-const dependencyTypes = {
+export const dependencyTypes = {
   defaultValues: 'defaultValues',
   applicable: 'applicable',
   validations: 'validations',
 }
 
-const addDep = (type, nodeDefUuid, nodeDefDepUuid) =>
+const _getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
+
+const _addDep = (type, nodeDefUuid, nodeDefDepUuid) =>
   graph => {
     const dep = R.pipe(
-      getDeps(type, nodeDefUuid),
+      _getDeps(type, nodeDefUuid),
       R.append(nodeDefDepUuid)
     )(graph)
     return R.assocPath([type, nodeDefUuid], dep)(graph)
@@ -29,13 +31,13 @@ const addDeps = (survey, nodeDef, type, expressions) =>
 
     for (const refName of refNames) {
       const nodeDefRef = SurveyNodeDefs.getNodeDefByName(refName)(survey)
-      graph = addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
+      graph = _addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
     }
     return graph
   }
 
 //====== CREATE
-const buildGraph = survey =>
+export const buildGraph = survey =>
   R.reduce(
     (graph, nodeDef) => R.pipe(
       addDeps(survey, nodeDef, dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
@@ -46,9 +48,9 @@ const buildGraph = survey =>
     SurveyNodeDefs.getNodeDefsArray(survey)
   )
 
-const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
+export const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
 
-const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
+export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
   getDependencyGraph,
   R.ifElse(
     R.always(R.isNil(dependencyType)),
@@ -74,17 +76,37 @@ const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
   )
 )
 
-const getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
+/**
+ * Returns true if nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
+ *
+ */
+export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
+  if (nodeDefUuid === nodeDefSourceUuid)
+    return false
 
-module.exports = {
-  dependencyTypes,
+  const stack = []
+  stack.push(nodeDefSourceUuid)
 
-  buildGraph,
+  const visitedUuids = new Set()
 
-  // READ
-  getDependencyGraph,
-  getNodeDefDependencies,
+  while (stack.length > 0) {
+    const nodeDefUuidCurrent = stack.pop()
 
-  // UPDATE
-  assocDependencyGraph: dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)
+    if (nodeDefUuid === nodeDefUuidCurrent)
+      return true
+
+    visitedUuids.add(nodeDefUuidCurrent)
+
+    const dependencies = getNodeDefDependencies(nodeDefUuidCurrent)(survey)
+    R.forEach(nodeDefUuidDependent => {
+      if (!visitedUuids.has(nodeDefUuidDependent)) {
+        stack.push(nodeDefUuidDependent)
+      }
+    })(dependencies)
+  }
+
+  return false
 }
+
+// UPDATE
+export const assocDependencyGraph = dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)

@@ -1,13 +1,13 @@
-const fs = require('fs')
-const R = require('ramda')
+import * as fs from 'fs'
+import * as R from 'ramda'
 
-const Category = require('@core/survey/category')
-const CategoryImportSummary = require('@core/survey/categoryImportSummary')
-const Validation = require('@core/validation/validation')
-const StringUtils = require('@core/stringUtils')
-const SystemError = require('@core/systemError')
+import * as Category from '@core/survey/category'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import * as Validation from '@core/validation/validation'
+import * as StringUtils from '@core/stringUtils'
+import SystemError from '@core/systemError'
 
-const CSVReader = require('@server/utils/file/csvReader')
+import * as CSVReader from '@server/utils/file/csvReader'
 
 const columnProps = {
   [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
@@ -22,7 +22,7 @@ const columnDescriptionSuffix = columnProps[CategoryImportSummary.columnTypes.de
 const columnRegExpLabel = new RegExp(`^.*${columnLabelSuffix}(_[a-z]{2})?$`)
 const columnRegExpDescription = new RegExp(`^.*${columnDescriptionSuffix}(_[a-z]{2})?$`)
 
-const createImportSummaryFromStream = async stream => {
+export const createImportSummaryFromStream = async stream => {
   const columnNames = await CSVReader.readHeadersFromStream(stream)
 
   if (R.find(StringUtils.isBlank)(columnNames)) {
@@ -86,7 +86,7 @@ const createImportSummaryFromStream = async stream => {
   return summary
 }
 
-const createImportSummary = async filePath => ({
+export const createImportSummary = async filePath => ({
   ...await createImportSummaryFromStream(fs.createReadStream(filePath)),
   [CategoryImportSummary.keys.filePath]: filePath
 })
@@ -114,9 +114,4 @@ const _validateSummary = summary => {
   if (!atLeastOneCodeColumn) {
     throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
-}
-
-module.exports = {
-  createImportSummaryFromStream,
-  createImportSummary,
 }

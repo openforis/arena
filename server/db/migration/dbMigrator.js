@@ -1,17 +1,16 @@
-const DBMigrate = require('db-migrate')
-const path = require('path')
-const R = require('ramda')
+import * as DBMigrate from 'db-migrate'
+import * as path from 'path'
+import * as R from 'ramda'
 
-const Log = require('@server/log/log')
+import * as Log from '@server/log/log'
 const logger = Log.getLogger('DBMigrator')
 
-const db = require('../db')
-const config = require('./migrationConfig')
+import { db } from '../db'
+import * as config from './migrationConfig'
 
-const ProcessUtils = require('@core/processUtils')
-const { getSurveyDBSchema } = require('@server/modules/survey/repository/surveySchemaRepositoryUtils')
-
-const { fetchAllSurveyIds } = require('@server/modules/survey/repository/surveyRepository')
+import * as ProcessUtils from '@core/processUtils'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils';
+import { fetchAllSurveyIds } from '@server/modules/survey/repository/surveyRepository';
 
 const env = ProcessUtils.ENV.nodeEnv
 
@@ -50,7 +49,7 @@ const migrateSchema = async (schema = publicSchema) => {
   await dbm.up()
 }
 
-const migrateSurveySchema = async (surveyId) => {
+export const migrateSurveySchema = async (surveyId) => {
   logger.info(`starting db migrations for survey ${surveyId}`)
 
   const schema = getSurveyDBSchema(surveyId)
@@ -58,7 +57,7 @@ const migrateSurveySchema = async (surveyId) => {
   await migrateSchema(schema)
 }
 
-const migrateSurveySchemas = async () => {
+export const migrateSurveySchemas = async () => {
   const surveyIds = await fetchAllSurveyIds()
 
   logger.info(`starting data schemas migrations for ${surveyIds.length} surveys`)
@@ -69,7 +68,7 @@ const migrateSurveySchemas = async () => {
   logger.info(`data schemas migrations completed`)
 }
 
-const migrateAll = async () => {
+export const migrateAll = async () => {
   try {
     logger.info('running database migrations')
 
@@ -82,9 +81,4 @@ const migrateAll = async () => {
     logger.error(`error running database migrations: ${err.toString()}`)
     throw err;
   }
-}
-
-module.exports = {
-  migrateAll,
-  migrateSurveySchema,
 }

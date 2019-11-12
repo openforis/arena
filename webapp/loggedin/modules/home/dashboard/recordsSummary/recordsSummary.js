@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import RecordsSummaryChart from './chart/recordsSummaryChart'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-import DateUtils from '@core/dateUtils'
+import * as DateUtils from '@core/dateUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordsSummaryState from './recordsSummaryState'

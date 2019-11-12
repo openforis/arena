@@ -1,6 +1,6 @@
-const AuthGroup = require('@core/auth/authGroup')
+import * as AuthGroup from '@core/auth/authGroup'
 
-const getDefaultAuthGroups = () => [
+export const getDefaultAuthGroups = () => [
   {
     name: AuthGroup.groupNames.surveyAdmin,
     permissions: [
@@ -83,6 +83,3 @@ const getDefaultAuthGroups = () => [
   // },
 ]
 
-module.exports = {
-  getDefaultAuthGroups,
-}

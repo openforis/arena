@@ -58,3 +58,4 @@ export const toNodeValue = (survey, record, nodeCtx, valueExpr) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   return _valueExprToValueNodeFns[NodeDef.getType(nodeDef)](survey, record, nodeCtx, valueExpr)
 }
+

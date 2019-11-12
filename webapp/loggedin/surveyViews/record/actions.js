@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 import axios from 'axios'
 
-import Survey from '@core/survey/survey'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
-import Record from '@core/record/record'
-import Node from '@core/record/node'
-import NodeRefData from '@core/record/nodeRefData'
+import * as Survey from '@core/survey/survey'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 

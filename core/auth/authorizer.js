@@ -1,9 +1,9 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const Record = require('@core/record/record')
-const User = require('@core/user/user')
-const AuthGroup = require('@core/auth/authGroup')
+import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
+import * as User from '@core/user/user'
+import * as AuthGroup from '@core/auth/authGroup'
 
 const {
   permissions,
@@ -24,23 +24,23 @@ const _hasSurveyPermission = permission => (user, surveyInfo) =>
   )
 
 // READ
-const canViewSurvey = (user, surveyInfo) => !!_getSurveyUserGroup(user, surveyInfo)
+export const canViewSurvey = (user, surveyInfo) => !!_getSurveyUserGroup(user, surveyInfo)
 
 // UPDATE
-const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
 
 // ======
 // ====== Record
 // ======
 
 // CREATE
-const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
+export const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
 
 // READ
-const canViewRecord = _hasSurveyPermission(permissions.recordView)
+export const canViewRecord = _hasSurveyPermission(permissions.recordView)
 
 // UPDATE
-const canEditRecord = (user, record) => {
+export const canEditRecord = (user, record) => {
   if (!(user && record))
     return false
 
@@ -58,7 +58,7 @@ const canEditRecord = (user, record) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
-const canEditRecordsInDataQuery = R.pipe(
+export const canEditRecordsInDataQuery = R.pipe(
   _getSurveyUserGroup,
   authGroup => R.includes(
     AuthGroup.getName(authGroup),
@@ -72,17 +72,17 @@ const canEditRecordsInDataQuery = R.pipe(
   )
 )
 
-const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
+export const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 
 // ======
 // ====== Users
 // ======
 
 // CREATE
-const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
+export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 
 // READ
-const canViewUser = (user, surveyInfo, userToView) => {
+export const canViewUser = (user, surveyInfo, userToView) => {
   return User.isSystemAdmin(user) || (
     !!_getSurveyUserGroup(user, surveyInfo, false) &&
     !!_getSurveyUserGroup(userToView, surveyInfo, false)
@@ -96,41 +96,20 @@ const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
     !!_getSurveyUserGroup(userToUpdate, surveyInfo, false)
   )
 
-const canEditUser = (user, surveyInfo, userToUpdate) => (
+export const canEditUser = (user, surveyInfo, userToUpdate) => (
   User.hasAccepted(userToUpdate) && (
     User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate)
   )
 )
 
-const canEditUserEmail = _hasUserEditAccess
+export const canEditUserEmail = _hasUserEditAccess
 
-const canEditUserGroup = (user, surveyInfo, userToUpdate) => (
+export const canEditUserGroup = (user, surveyInfo, userToUpdate) => (
   !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)
 )
 
-const canRemoveUser = (user, surveyInfo, userToRemove) => (
+export const canRemoveUser = (user, surveyInfo, userToRemove) => (
   !User.isEqual(user)(userToRemove) &&
   !User.isSystemAdmin(userToRemove) &&
   _hasUserEditAccess(user, surveyInfo, userToRemove)
 )
-
-module.exports = {
-  // Survey permissions
-  canViewSurvey,
-  canEditSurvey,
-
-  // Record permissions
-  canCreateRecord,
-  canViewRecord,
-  canEditRecord,
-  canEditRecordsInDataQuery,
-  canAnalyzeRecords,
-
-  // User permissions
-  canInviteUsers,
-  canViewUser,
-  canEditUser,
-  canEditUserEmail,
-  canEditUserGroup,
-  canRemoveUser,
-}

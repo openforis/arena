@@ -8,10 +8,10 @@ import TableView from '../../../tableViews/tableView'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import AuthGroup from '@core/auth/authGroup'
-import Authorizer from '@core/auth/authorizer'
-import Survey from '@core/survey/survey'
-import User from '@core/user/user'
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
 import { appModuleUri, userModules } from '../../../appModules'
 

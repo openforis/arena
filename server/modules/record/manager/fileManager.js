@@ -1,14 +1,12 @@
-const FileRepository = require('../repository/fileRepository')
+import * as FileRepository from '../repository/fileRepository'
 
-module.exports = {
-  //CREATE
-  insertFile: FileRepository.insertFile,
+//CREATE
+export const insertFile = FileRepository.insertFile
 
-  //READ
-  fetchFileByUuid: FileRepository.fetchFileByUuid,
-  fetchFileByNodeUuid: FileRepository.fetchFileByNodeUuid,
+//READ
+export const fetchFileByUuid = FileRepository.fetchFileByUuid
+export const fetchFileByNodeUuid = FileRepository.fetchFileByNodeUuid
 
-  //DELETE
-  deleteFileByUuid: FileRepository.deleteFileByUuid,
-  deleteFilesByRecordUuids: FileRepository.deleteFilesByRecordUuids
-}
+//DELETE
+export const deleteFileByUuid = FileRepository.deleteFileByUuid
+export const deleteFilesByRecordUuids = FileRepository.deleteFilesByRecordUuids

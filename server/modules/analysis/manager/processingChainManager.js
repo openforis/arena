@@ -1,4 +1,4 @@
-import db from '@server/db/db'
+import { db } from '@server/db/db'
 import SystemError from '@core/systemError'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -91,3 +91,4 @@ export const deleteStep = async (user, surveyId, processingStepUuid, client = db
     ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t)
   ]))
 }
+

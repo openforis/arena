@@ -5,10 +5,10 @@ import { uuidv4 } from '@core/uuid'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
-import NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '../surveyState'

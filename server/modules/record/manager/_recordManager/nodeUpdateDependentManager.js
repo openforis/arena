@@ -1,20 +1,20 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
-const RecordExpressionParser = require('@core/record/recordExpressionParser')
-const RecordExpressionValueConverter = require('@core/record/recordExpressionValueConverter')
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import * as RecordExpressionValueConverter from '@core/record/recordExpressionValueConverter'
 
-const NodeRepository = require('../../repository/nodeRepository')
+import * as NodeRepository from '../../repository/nodeRepository'
 
 /**
  * Module responsible for updating applicable and default values
  */
 
-const updateDependentsApplicable = async (survey, record, node, tx) => {
+export const updateDependentsApplicable = async (survey, record, node, tx) => {
   //output
   const nodesUpdated = {} //updated nodes indexed by uuid
 
@@ -47,7 +47,7 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
           tx
         ),
         //preserve 'created' flag (used by rdb generator)
-        ...Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}
+        ...(Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {})
       }
 
       const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
@@ -65,7 +65,7 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
   return nodesUpdated
 }
 
-const updateDependentsDefaultValues = async (survey, record, node, tx) => {
+export const updateDependentsDefaultValues = async (survey, record, node, tx) => {
 
   //1. fetch dependent nodes
 
@@ -128,9 +128,4 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
   )
 
   return R.mergeAll(nodesUpdated)
-}
-
-module.exports = {
-  updateDependentsDefaultValues,
-  updateDependentsApplicable,
 }

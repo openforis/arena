@@ -1,19 +1,21 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
-const { uuidv4 } = require('@core/uuid')
+import * as ObjectUtils from '@core/objectUtils'
+import { uuidv4 } from '@core/uuid';
 
-const Validation = require('@core/validation/validation')
-const User = require('@core/user/user')
-const RecordStep = require('./recordStep')
+import * as Validation from '@core/validation/validation'
+import * as User from '@core/user/user'
+import * as RecordStep from './recordStep'
 
-const keys = require('./_record/recordKeys')
-const RecordReader = require('./_record/recordReader')
-const RecordUpdater = require('./_record/recordUpdater')
+import { keys } from './_record/recordKeys'
+import * as RecordReader from './_record/recordReader'
+import * as RecordUpdater from './_record/recordUpdater'
+
+export { keys } from './_record/recordKeys'
 
 // ====== CREATE
 
-const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
+export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
   [keys.step]: step || RecordStep.getDefaultStep(),
@@ -22,58 +24,52 @@ const newRecord = (user, cycle, preview = false, dateCreated = null, step = null
   [keys.dateCreated]: dateCreated,
 })
 
-module.exports = {
-  keys,
+// ====== READ
+export const getSurveyUuid = R.prop(keys.surveyUuid)
 
-  // ====== CREATE
-  newRecord,
+export const getUuid = ObjectUtils.getUuid
+export const isPreview = R.propEq(keys.preview, true)
+export const getOwnerUuid = R.prop(keys.ownerUuid)
+export const getOwnerName = R.prop(keys.ownerName)
+export const getStep = R.prop(keys.step)
+export const getCycle = R.prop(keys.cycle)
+export const getDateCreated = ObjectUtils.getDateCreated
+export const getDateModified = ObjectUtils.getDateModified
 
-  // ====== READ
-  getSurveyUuid: R.prop(keys.surveyUuid),
+export const getNodes = RecordReader.getNodes
+export const getNodeByUuid = RecordReader.getNodeByUuid
+export const getRootNode = RecordReader.getRootNode
+export const getNodesByDefUuid = RecordReader.getNodesByDefUuid
 
-  getUuid: ObjectUtils.getUuid,
-  isPreview: R.propEq(keys.preview, true),
-  getOwnerUuid: R.prop(keys.ownerUuid),
-  getOwnerName: R.prop(keys.ownerName),
-  getStep: R.prop(keys.step),
-  getCycle: R.prop(keys.cycle),
-  getDateCreated: ObjectUtils.getDateCreated,
-  getDateModified: ObjectUtils.getDateModified,
+// ==== hierarchy
+export const getParentNode = RecordReader.getParentNode
+export const getAncestorsAndSelf = RecordReader.getAncestorsAndSelf
+export const getAncestorByNodeDefUuid = RecordReader.getAncestorByNodeDefUuid
 
-  getNodes: RecordReader.getNodes,
-  getNodeByUuid: RecordReader.getNodeByUuid,
-  getRootNode: RecordReader.getRootNode,
-  getNodesByDefUuid: RecordReader.getNodesByDefUuid,
+export const getNodeChildren = RecordReader.getNodeChildren
+export const getNodeChildrenByDefUuid = RecordReader.getNodeChildrenByDefUuid
+export const getNodeChildByDefUuid = RecordReader.getNodeChildByDefUuid
+export const visitDescendantsAndSelf = RecordReader.visitDescendantsAndSelf
+export const isNodeApplicable = RecordReader.isNodeApplicable
 
-  // ==== hierarchy
-  getParentNode: RecordReader.getParentNode,
-  getAncestorsAndSelf: RecordReader.getAncestorsAndSelf,
-  getAncestorByNodeDefUuid: RecordReader.getAncestorByNodeDefUuid,
+// ==== dependency
+export const getDependentNodePointers = RecordReader.getDependentNodePointers
+export const getParentCodeAttribute = RecordReader.getParentCodeAttribute
+export const getDependentCodeAttributes = RecordReader.getDependentCodeAttributes
 
-  getNodeChildren: RecordReader.getNodeChildren,
-  getNodeChildrenByDefUuid: RecordReader.getNodeChildrenByDefUuid,
-  getNodeChildByDefUuid: RecordReader.getNodeChildByDefUuid,
-  visitDescendantsAndSelf: RecordReader.visitDescendantsAndSelf,
-  isNodeApplicable: RecordReader.isNodeApplicable,
+// ====== Keys
+export const getEntityKeyNodes = RecordReader.getEntityKeyNodes
+export const getEntityKeyValues = RecordReader.getEntityKeyValues
 
-  // ==== dependency
-  getDependentNodePointers: RecordReader.getDependentNodePointers,
-  getParentCodeAttribute: RecordReader.getParentCodeAttribute,
-  getDependentCodeAttributes: RecordReader.getDependentCodeAttributes,
+// ====== UPDATE
+export const assocNodes = RecordUpdater.assocNodes
+export const assocNode = RecordUpdater.assocNode
+export const mergeNodes = RecordUpdater.mergeNodes
 
-  // ====== Keys
-  getEntityKeyNodes: RecordReader.getEntityKeyNodes,
-  getEntityKeyValues: RecordReader.getEntityKeyValues,
+// ====== DELETE
+export const deleteNode = RecordUpdater.deleteNode
 
-  // ====== UPDATE
-  assocNodes: RecordUpdater.assocNodes,
-  assocNode: RecordUpdater.assocNode,
-  mergeNodes: RecordUpdater.mergeNodes,
+// ====== VALIDATION
+export const mergeNodeValidations = RecordUpdater.mergeNodeValidations
+export const getValidation = Validation.getValidation
 
-  // ====== DELETE
-  deleteNode: RecordUpdater.deleteNode,
-
-  // ====== VALIDATION
-  mergeNodeValidations: RecordUpdater.mergeNodeValidations,
-  getValidation: Validation.getValidation,
-}

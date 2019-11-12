@@ -1,23 +1,23 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const { languageCodes } = require('@core/app/languages')
-const { isNotBlank } = require('@core/stringUtils')
-const CSVReader = require('@server/utils/file/csvReader')
+import { languageCodes } from '@core/app/languages';
+import { isNotBlank } from '@core/stringUtils';
+import * as CSVReader from '@server/utils/file/csvReader'
 
-const Taxonomy = require('@core/survey/taxonomy')
-const Taxon = require('@core/survey/taxon')
-const Validation = require('@core/validation/validation')
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
+import * as Validation from '@core/validation/validation'
 
-const TaxonomyValidator = require('../taxonomyValidator')
-const TaxonomyManager = require('../manager/taxonomyManager')
-const TaxonomyImportManager = require('../manager/taxonomyImportManager')
+import * as TaxonomyValidator from '../taxonomyValidator'
+import * as TaxonomyManager from '../manager/taxonomyManager'
+import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
-const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
-const SystemError = require('@core/systemError')
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import SystemError from '@core/systemError'
 
 const requiredColumns = [
   'code',
@@ -26,7 +26,7 @@ const requiredColumns = [
   'scientific_name',
 ]
 
-class TaxonomyImportJob extends Job {
+export default class TaxonomyImportJob extends Job {
 
   constructor (params) {
     super(TaxonomyImportJob.type, params)
@@ -194,5 +194,3 @@ class TaxonomyImportJob extends Job {
 }
 
 TaxonomyImportJob.type = 'TaxonomyImportJob'
-
-module.exports = TaxonomyImportJob

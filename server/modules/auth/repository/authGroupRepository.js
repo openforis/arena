@@ -1,9 +1,9 @@
-const camelize = require('camelize')
-const db = require('@server/db/db')
+import * as camelize from 'camelize'
+import { db } from '@server/db/db'
 
 const dbTransformCallback = camelize
 
-const AuthGroup = require('@core/auth/authGroup')
+import * as AuthGroup from '@core/auth/authGroup'
 
 // ==== CREATE
 
@@ -23,12 +23,12 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
     dbTransformCallback
   )
 
-const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
+export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
   await Promise.all(surveyGroups.map(
     authGroup => insertGroup(authGroup, surveyId, client)
   ))
 
-const insertUserGroup = async (groupUuid, userUuid, client = db) =>
+export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
   await client.one(`
     INSERT INTO auth_group_user (group_uuid, user_uuid)
     VALUES ($1, $2)
@@ -39,7 +39,7 @@ const insertUserGroup = async (groupUuid, userUuid, client = db) =>
 
 // ==== READ
 
-const fetchGroupByUuid = async (groupUuid, client = db) =>
+export const fetchGroupByUuid = async (groupUuid, client = db) =>
   await client.one(`
     SELECT auth_group.*
     FROM auth_group
@@ -48,7 +48,7 @@ const fetchGroupByUuid = async (groupUuid, client = db) =>
     dbTransformCallback
   )
 
-const fetchSurveyGroups = async (surveyId, client = db) =>
+export const fetchSurveyGroups = async (surveyId, client = db) =>
   await client.map(`
     SELECT auth_group.*
     FROM auth_group
@@ -59,7 +59,7 @@ const fetchSurveyGroups = async (surveyId, client = db) =>
     dbTransformCallback
   )
 
-const fetchUserGroups = async (userUuid, client = db) =>
+export const fetchUserGroups = async (userUuid, client = db) =>
   await client.map(`
     SELECT g.*
     FROM auth_group_user gu
@@ -74,7 +74,7 @@ const fetchUserGroups = async (userUuid, client = db) =>
 
 // ==== UPDATE
 
-const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
+export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
   await client.one(`
     UPDATE auth_group_user gu
     SET group_uuid = $1
@@ -95,7 +95,7 @@ const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
 
 // ==== UPDATE
 
-const deleteAllUserGroups = async (userUuid, client = db) =>
+export const deleteAllUserGroups = async (userUuid, client = db) =>
   await client.query(`
     DELETE FROM auth_group_user
     WHERE user_uuid = $1`,
@@ -103,7 +103,7 @@ const deleteAllUserGroups = async (userUuid, client = db) =>
 
 // ==== DELETE
 
-const deleteUserGroup = async (surveyId, userUuid, client = db) =>
+export const deleteUserGroup = async (surveyId, userUuid, client = db) =>
   await client.query(`
     DELETE
     FROM
@@ -127,21 +127,3 @@ const deleteUserGroup = async (surveyId, userUuid, client = db) =>
           gu.user_uuid = $1
     )               
   `, [userUuid, surveyId])
-
-module.exports = {
-  // CREATE
-  createSurveyGroups,
-  insertUserGroup,
-
-  // READ
-  fetchGroupByUuid,
-  fetchSurveyGroups,
-  fetchUserGroups,
-
-  // UPDATE
-  updateUserGroup,
-
-  // DELETE
-  deleteAllUserGroups,
-  deleteUserGroup,
-}

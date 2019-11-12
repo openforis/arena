@@ -1,7 +1,4 @@
-const fs = Promise.promisifyAll(require('fs'))
+import fs from 'fs'
+const fsPromise = Promise.promisifyAll(fs)
 
-const readFile = async filePath => await fs.readFileAsync(filePath, { encoding: 'utf-8' })
-
-module.exports = {
-  readFile
-}
+export const readFile = async filePath => await fsPromise.readFileAsync(filePath, { encoding: 'utf-8' })

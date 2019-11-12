@@ -1,25 +1,25 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-const ObjectUtils = require('@core/objectUtils')
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Record = require('@core/record/record')
-const RecordStep = require('@core/record/recordStep')
-const Node = require('@core/record/node')
+import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
+import * as Node from '@core/record/node'
 
-const db = require('@server/db/db')
-const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
-const RecordRepository = require('@server/modules/record/repository/recordRepository')
-const FileRepository = require('@server/modules/record/repository/fileRepository')
-const DataTableUpdateRepository = require('@server/modules/surveyRdb/repository/dataTableUpdateRepository')
-const DataTableReadRepository = require('@server/modules/surveyRdb/repository/dataTableReadRepository')
+import { db } from '@server/db/db'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as FileRepository from '@server/modules/record/repository/fileRepository'
+import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
+import * as DataViewReadRepository from '@server/modules/surveyRdb/repository/dataViewReadRepository'
 
-const RecordValidationManager = require('./recordValidationManager')
-const NodeUpdateManager = require('./nodeUpdateManager')
+import * as RecordValidationManager from './recordValidationManager'
+import * as NodeUpdateManager from './nodeUpdateManager'
 
 /**
  * =======
@@ -29,7 +29,7 @@ const NodeUpdateManager = require('./nodeUpdateManager')
 
 //==== CREATE
 
-const initNewRecord = async (user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, client = db) =>
+export const initNewRecord = async (user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, client = db) =>
   await client.tx(async t => {
     const rootNodeDef = Survey.getNodeDefRoot(survey)
 
@@ -40,7 +40,7 @@ const initNewRecord = async (user, survey, record, nodesUpdateListener = null, n
 
 //==== UPDATE
 
-const updateRecordStep = async (user, survey, record, stepId, system = false, client = db) => {
+export const updateRecordStep = async (user, survey, record, stepId, system = false, client = db) => {
   await client.tx(async t => {
 
     // check if the step exists and that is't adjacent to the current one
@@ -67,7 +67,7 @@ const updateRecordStep = async (user, survey, record, stepId, system = false, cl
 }
 
 //==== DELETE
-const deleteRecord = async (user, survey, uuid) =>
+export const deleteRecord = async (user, survey, uuid) =>
   await db.tx(async t => {
     const rootDef = Survey.getNodeDefRoot(survey)
     const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, NodeDef.getUuid(rootDef), uuid, null, t)
@@ -82,13 +82,13 @@ const deleteRecord = async (user, survey, uuid) =>
     ])
   })
 
-const deleteRecordPreview = async (surveyId, recordUuid) =>
+export const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async t => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
     await FileRepository.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
-const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
+export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   await db.tx(async t => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
@@ -98,14 +98,19 @@ const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
     return recordUuids.length
   })
 
+export const deleteRecordsByCycles = RecordRepository.deleteRecordsByCycles
+
 /**
  * ======
  * NODE
  * ======
  */
-const persistNode = async (user, survey, record, node,
-                           nodesUpdateListener = null, nodesValidationListener = null,
-                           system = false, t = db) =>
+
+export const insertNode = NodeUpdateManager.insertNode
+
+export const persistNode = async (user, survey, record, node,
+                                  nodesUpdateListener = null, nodesValidationListener = null,
+                                  system = false, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
@@ -117,8 +122,10 @@ const persistNode = async (user, survey, record, node,
     t
   )
 
-const deleteNode = async (user, survey, record, nodeUuid,
-                          nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
+
+export const deleteNode = async (user, survey, record, nodeUuid,
+                                 nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
@@ -129,6 +136,8 @@ const deleteNode = async (user, survey, record, nodeUuid,
     nodesValidationListener,
     t
   )
+
+export const deleteNodesByNodeDefUuids = NodeUpdateManager.deleteNodesByNodeDefUuids
 
 const _updateNodeAndValidateRecordUniqueness = async (user, survey, record, node, nodesUpdateFn,
                                                       nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
@@ -214,22 +223,4 @@ const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
       await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, false, t)
     }
   }
-}
-
-module.exports = {
-  // RECORD
-  initNewRecord,
-  updateRecordStep,
-
-  deleteRecord,
-  deleteRecordPreview,
-  deleteRecordsPreview,
-  deleteRecordsByCycles: RecordRepository.deleteRecordsByCycles,
-
-  // NODE
-  insertNode: NodeUpdateManager.insertNode,
-  persistNode,
-  updateNodesDependents: NodeUpdateManager.updateNodesDependents,
-  deleteNode,
-  deleteNodesByNodeDefUuids: NodeUpdateManager.deleteNodesByNodeDefUuids
 }

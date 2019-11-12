@@ -1,4 +1,4 @@
-import './surveyForm.scss'
+import './surveyFormView.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
@@ -6,8 +6,8 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import Survey from '@core/survey/survey'
-import Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
 
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'
@@ -95,6 +95,7 @@ const SurveyFormView = (props) => {
         <div className={`survey-form${className}`}>
 
           {
+            showPageNavigation &&
             <FormPageNavigation
               surveyInfo={surveyInfo}
               surveyCycleKey={surveyCycleKey}
@@ -102,7 +103,6 @@ const SurveyFormView = (props) => {
               entry={entry}
               canEditDef={canEditDef}
               level={0}
-              showPageNavigation={showPageNavigation}
             />
           }
 
@@ -168,10 +168,8 @@ const mapStateToProps = (state, props) => {
     hasNodeDefAddChildTo,
     showPageNavigation,
     isSideBarOpened,
-    ...props.entry
-      ? mapEntryProps()
-      : {},
-  }
+    ...(props.entry ? mapEntryProps() : {}),
+  };
 
 }
 

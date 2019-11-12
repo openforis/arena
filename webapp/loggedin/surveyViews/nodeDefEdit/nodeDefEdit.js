@@ -3,7 +3,7 @@ import './nodeDefEdit.scss'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import StringUtils from '@core/stringUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
@@ -13,11 +13,11 @@ import ValidationsProps from './advanced/validationsProps'
 import CategoriesView from '../categories/categoriesView'
 import TaxonomiesView from '../taxonomies/taxonomiesView'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import Category from '@core/survey/category'
-import Taxonomy from '@core/survey/taxonomy'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
@@ -78,9 +78,7 @@ const NodeDefEdit = props => {
                       toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
                     },
                   },
-                  ...NodeDef.isRoot(nodeDef)
-                    ? []
-                    : [
+                  ...(NodeDef.isRoot(nodeDef) ? [] : [
                       {
                         label: i18n.t('nodeDefEdit.advanced'),
                         component: AdvancedProps,
@@ -91,7 +89,7 @@ const NodeDefEdit = props => {
                         component: ValidationsProps,
                         props: { nodeDef, validation, nodeDefParent, putNodeDefProp },
                       },
-                    ],
+                    ]),
                 ]}
                 />
 
@@ -106,7 +104,7 @@ const NodeDefEdit = props => {
         }
       </div>
     )
-    : null
+    : null;
 
 }
 

@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
 const logical = {
   and: { key: '&&', value: '&&' },
@@ -30,12 +30,11 @@ const findBinary = operator => R.find(
   binaryValues
 )
 
-module.exports = {
+export const operators = {
   logical,
   comparison,
   arithmetic,
   binary,
   binaryValues,
-
   findBinary,
 }

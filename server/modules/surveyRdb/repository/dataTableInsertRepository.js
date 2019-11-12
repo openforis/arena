@@ -1,13 +1,13 @@
-const { insertAllQuery } = require('@server/db/dbUtils')
+import { insertAllQuery } from '@server/db/dbUtils';
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-const SurveySchemaRepository = require('../../survey/repository/surveySchemaRepositoryUtils')
+import * as SurveySchemaRepository from '../../survey/repository/surveySchemaRepositoryUtils'
 
-const DataTable = require('../schemaRdb/dataTable')
+import * as DataTable from '../schemaRdb/dataTable'
 
 const getSelectQuery = (surveySchema, nodeDef) => {
   const selectNodeRows = `
@@ -49,7 +49,7 @@ const getSelectQuery = (surveySchema, nodeDef) => {
     : selectNodeRows
 }
 
-const populateTable = async (survey, nodeDef, client) => {
+export const populateTable = async (survey, nodeDef, client) => {
 
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
@@ -90,8 +90,4 @@ const populateTable = async (survey, nodeDef, client) => {
 
   // 5. drop materialized view
   await client.none(`DROP MATERIALIZED VIEW ${viewName}`)
-}
-
-module.exports = {
-  populateTable
 }

@@ -1,33 +1,32 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDefValidations = require('../nodeDefValidations')
-const NodeDef = require('../nodeDef')
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
-const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
 
-const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) => {
+import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
+
+export const validate = async (survey, nodeDef) => {
+  const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
-      [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.min}`]:
+      [`${NodeDefExpression.keys.count}.${NodeDefExpression.keys.min}`]:
         [Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMinMustBePositiveNumber)],
-      [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.max}`]:
+      [`${NodeDefExpression.keys.count}.${NodeDefExpression.keys.max}`]:
         [Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber)],
     })
     : {}
 
   return R.pipe(
     Validation.assocFieldValidation(
-      NodeDefValidations.keys.expressions,
-      await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
+      NodeDefExpression.keys.expressions,
+      await NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations)
     ),
     R.when(
-      validation => errorKey && !Validation.isValid(validation) && !Validation.hasErrors(validation),
-      Validation.setErrors([{ key: errorKey }])
+      validation => !Validation.isValid(validation) && !Validation.hasErrors(validation),
+      Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }])
     )
   )(validation)
-}
-
-module.exports = {
-  validate
 }

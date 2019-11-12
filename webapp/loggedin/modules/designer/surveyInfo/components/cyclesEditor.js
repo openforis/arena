@@ -3,9 +3,9 @@ import './cyclesEditor.scss'
 import React, { useRef } from 'react'
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import SurveyCycle from '@core/survey/surveyCycle'
-import Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
+import * as SurveyCycle from '@core/survey/surveyCycle'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'

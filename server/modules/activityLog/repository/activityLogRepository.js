@@ -11,7 +11,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as db from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 //===== CREATE
@@ -45,14 +45,14 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
             date_created::date,
             user_uuid,
             type,
-            content->>'uuid'
+            (content->>'uuid')::uuid
           ) 
           id,
           content,
           type,
           user_uuid, 
           ${DbUtils.selectDate('date_created')},
-          content->>'uuid' AS content_uuid
+          (content->>'uuid')::uuid AS content_uuid
         FROM
           ${schema}.activity_log
         WHERE
@@ -72,7 +72,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         --nodeCreate/nodeValueUpdate: get hierarchy from content.meta.h
         SELECT 
           l.id, 
-          jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}') AS ancestor_node_uuid
+          jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}')::uuid AS ancestor_node_uuid
         FROM log_limited l 
       ),
       
@@ -88,7 +88,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
           log_node_hierarchy
         LEFT OUTER JOIN 
           ${schema}.node node_h 
-          ON node_h.uuid::text = log_node_hierarchy.ancestor_node_uuid  
+          ON node_h.uuid = log_node_hierarchy.ancestor_node_uuid  
         GROUP BY
           log_node_hierarchy.id
       )
@@ -123,13 +123,13 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.record r
     ON
-      r.uuid::text = l.content_uuid
+      r.uuid = l.content_uuid
 
     -- start of node activities part
     LEFT OUTER JOIN 
       ${schema}.node n 
     ON 
-      n.uuid::text = l.content_uuid
+      n.uuid = l.content_uuid
     LEFT OUTER JOIN 
       log_parent_paths
     ON 
@@ -142,7 +142,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       public.user user_target
     ON 
-      user_target.uuid::text = l.content_uuid
+      user_target.uuid = l.content_uuid
     -- join with auth group tables to check if the target user has been removed 
     LEFT OUTER JOIN
       public.auth_group_user agu
@@ -159,11 +159,11 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.processing_chain
     ON 
-      processing_chain.uuid::text IN (l.content_uuid, l.content->>'${ProcessingStep.keys.processingChainUuid}')
+      processing_chain.uuid IN (l.content_uuid, (l.content->>'${ProcessingStep.keys.processingChainUuid}')::uuid)
     LEFT OUTER JOIN 
       ${schema}.processing_step
     ON 
-      processing_step.uuid::text = l.content_uuid
+      processing_step.uuid = l.content_uuid
     -- end of analysis activities part
     
     ORDER BY

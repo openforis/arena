@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
+import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'

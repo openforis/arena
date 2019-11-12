@@ -1,9 +1,9 @@
-const R = require('ramda')
-const StreamZip = require('node-stream-zip')
+import * as R from 'ramda'
+import StreamZip from 'node-stream-zip'
 
-const Log = require('@server/log/log')
+import * as Log from '@server/log/log'
 
-class FileZip {
+export default class FileZip {
 
   constructor (file) {
     this.file = file
@@ -74,5 +74,3 @@ class FileZip {
     this.streamZip.close()
   }
 }
-
-module.exports = FileZip

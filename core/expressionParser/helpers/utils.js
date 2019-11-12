@@ -1,7 +1,7 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const { trim, isNotBlank } = require('@core/stringUtils')
-const types = require('./types')
+import { trim, isNotBlank } from '@core/stringUtils';
+import { types } from './types'
 
 // toString
 const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
@@ -51,14 +51,9 @@ const typeProps = {
 
 const getTypeProp = (type, prop) => R.path([type, prop], typeProps)
 
-const toString = expr => trim(
+export const toString = expr => trim(
   getTypeProp(expr.type, 'toString')(expr)
 )
 
-const isValid = expr =>
+export const isValid = expr =>
   getTypeProp(expr.type, 'isValid')(expr)
-
-module.exports = {
-  toString,
-  isValid,
-}

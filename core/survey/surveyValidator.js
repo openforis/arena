@@ -1,13 +1,11 @@
-const SurveyInfoValidator = require('./_surveyValidator/surveyInfoValidator')
-const NodeDefValidator = require('./_surveyValidator/nodeDefValidator')
-const NodeDefExpressionsValidator = require('./_surveyValidator/nodeDefExpressionsValidator')
+import * as SurveyInfoValidator from './_surveyValidator/surveyInfoValidator'
+import * as NodeDefValidator from './_surveyValidator/nodeDefValidator'
+import * as NodeDefExpressionsValidator from './_surveyValidator/nodeDefExpressionsValidator'
 
-module.exports = {
-  validateNewSurvey: SurveyInfoValidator.validateNewSurvey,
+export const validateNewSurvey = SurveyInfoValidator.validateNewSurvey
 
-  validateSurveyInfo: SurveyInfoValidator.validateSurveyInfo,
+export const validateSurveyInfo = SurveyInfoValidator.validateSurveyInfo
 
-  validateNodeDefs: NodeDefValidator.validateNodeDefs,
+export const validateNodeDefs = NodeDefValidator.validateNodeDefs
 
-  validateNodeDefExpressions: NodeDefExpressionsValidator.validate,
-}
+export const validateNodeDefExpressions = NodeDefExpressionsValidator.validate

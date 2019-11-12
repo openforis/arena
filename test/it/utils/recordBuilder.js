@@ -1,15 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
-const RecordManager = require('@server/modules/record/manager/recordManager')
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-const RecordUtils = require('../utils/recordUtils')
+import * as RecordUtils from '../utils/recordUtils'
 
 class NodeBuilder {
 
@@ -119,8 +119,6 @@ class RecordBuilder {
   }
 }
 
-module.exports = {
-  record: (user, survey, rootEntityBuilder) => new RecordBuilder(user, survey, rootEntityBuilder),
-  entity: (nodeDefName, ...childBuilders) => new EntityBuilder(nodeDefName, ...childBuilders),
-  attribute: (nodeDefName, value = null) => new AttributeBuilder(nodeDefName, value)
-}
+export const record = (user, survey, rootEntityBuilder) => new RecordBuilder(user, survey, rootEntityBuilder)
+export const entity = (nodeDefName, ...childBuilders) => new EntityBuilder(nodeDefName, ...childBuilders)
+export const attribute = (nodeDefName, value = null) => new AttributeBuilder(nodeDefName, value)

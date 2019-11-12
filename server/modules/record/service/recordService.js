@@ -1,30 +1,32 @@
-const R = require('ramda')
-const fs = require('fs')
+import * as R from 'ramda'
+import * as fs from 'fs'
 
-const Logger = require('@server/log/log').getLogger('RecordService')
+import * as Log from '@server/log/log'
 
-const Survey = require('@core/survey/survey')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
-const RecordFile = require('@core/record/recordFile')
-const Authorizer = require('@core/auth/authorizer')
+import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as RecordFile from '@core/record/recordFile'
+import * as Authorizer from '@core/auth/authorizer'
 
-const WebSocketEvents = require('@common/webSocket/webSocketEvents')
-const WebSocket = require('@server/utils/webSocket')
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import * as WebSocket from '@server/utils/webSocket'
 
-const SurveyManager = require('../../survey/manager/surveyManager')
-const RecordManager = require('../manager/recordManager')
-const FileManager = require('../manager/fileManager')
+import * as SurveyManager from '../../survey/manager/surveyManager'
+import * as RecordManager from '../manager/recordManager'
+import * as FileManager from '../manager/fileManager'
 
-const RecordServiceThreads = require('./update/recordServiceThreads')
-const RecordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
+import * as RecordServiceThreads from './update/recordServiceThreads'
+import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
+
+const Logger = Log.getLogger('RecordService')
 
 /**
  * ======
  * RECORD
  * ======
  */
-const createRecord = async (socketId, user, surveyId, recordToCreate) => {
+export const createRecord = async (socketId, user, surveyId, recordToCreate) => {
   Logger.debug('create record: ', recordToCreate)
 
   const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
@@ -36,7 +38,18 @@ const createRecord = async (socketId, user, surveyId, recordToCreate) => {
   return record
 }
 
-const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
+export const fetchRecordByUuid = RecordManager.fetchRecordByUuid
+export const countRecordsBySurveyId = RecordManager.countRecordsBySurveyId
+export const fetchRecordsSummaryBySurveyId = RecordManager.fetchRecordsSummaryBySurveyId
+export const fetchRecordCreatedCountsByDates = RecordManager.fetchRecordCreatedCountsByDates
+
+export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
+  const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Record.getCycle(record))
+  return await RecordManager.updateRecordStep(user, survey, record, stepId)
+}
+
+export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
@@ -53,13 +66,15 @@ const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
 }
 
-const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
-  const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Record.getCycle(record))
-  return await RecordManager.updateRecordStep(user, survey, record, stepId)
+export const deleteRecordsPreview = async (olderThan24Hours = false) => {
+  const surveyIds = await SurveyManager.fetchAllSurveyIds()
+  const counts = await Promise.all(surveyIds.map(
+    surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
+  ))
+  return R.sum(counts)
 }
 
-const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
+export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, draft)
@@ -73,7 +88,7 @@ const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
   return record
 }
 
-const checkOut = async (socketId, user, surveyId, recordUuid) => {
+export const checkOut = async (socketId, user, surveyId, recordUuid) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
 
   if (Record.isPreview(record)) {
@@ -82,6 +97,8 @@ const checkOut = async (socketId, user, surveyId, recordUuid) => {
 
   RecordServiceThreads.dissocSocket(socketId)
 }
+
+export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
 
 /**
  * ======
@@ -101,7 +118,9 @@ const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
   }
 }
 
-const persistNode = async (socketId, user, surveyId, node, file) => {
+export const fetchNodeByUuid = RecordManager.fetchNodeByUuid
+
+export const persistNode = async (socketId, user, surveyId, node, file) => {
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
@@ -115,43 +134,6 @@ const persistNode = async (socketId, user, surveyId, node, file) => {
   )
 }
 
-const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) => _sendNodeUpdateMessage(
+export const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) => _sendNodeUpdateMessage(
   socketId, user, surveyId, recordUuid, { type: RecordThreadMessageTypes.nodeDelete, nodeUuid, user }
 )
-
-const deleteRecordsPreview = async (olderThan24Hours = false) => {
-  const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const counts = await Promise.all(surveyIds.map(
-    surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
-  ))
-  return R.sum(counts)
-}
-
-module.exports = {
-  // ====== RECORD
-
-  //create
-  createRecord,
-
-  //read
-  fetchRecordByUuid: RecordManager.fetchRecordByUuid,
-  countRecordsBySurveyId: RecordManager.countRecordsBySurveyId,
-  fetchRecordsSummaryBySurveyId: RecordManager.fetchRecordsSummaryBySurveyId,
-  fetchRecordCreatedCountsByDates: RecordManager.fetchRecordCreatedCountsByDates,
-
-  //update
-  updateRecordStep,
-
-  // delete
-  deleteRecord,
-  deleteRecordsPreview,
-
-  checkIn,
-  checkOut,
-  dissocSocketFromRecordThread: RecordServiceThreads.dissocSocket,
-
-  // ======  NODE
-  fetchNodeByUuid: RecordManager.fetchNodeByUuid,
-  persistNode,
-  deleteNode,
-}

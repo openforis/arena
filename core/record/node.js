@@ -1,13 +1,13 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
-const StringUtils = require('@core/stringUtils')
-const { uuidv4 } = require('@core/uuid')
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid';
 
-const Validation = require('@core/validation/validation')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Validation from '@core/validation/validation'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const keys = {
+export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
@@ -25,14 +25,14 @@ const keys = {
   dirty: 'dirty' //modified by the user but not persisted yet
 }
 
-const metaKeys = {
+export const metaKeys = {
   hierarchy: 'h', //ancestor nodes uuids hierarchy
   childApplicability: 'childApplicability', //applicability by child def uuid
   defaultValue: 'defaultValue', //true if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', //hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
 
-const valuePropKeys = {
+export const valuePropKeys = {
   // generic code (can be used by taxon or categoryItem)
   code: 'code',
 
@@ -62,7 +62,7 @@ const valuePropKeys = {
  * ======
  */
 
-const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
+export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.nodeDefUuid]: nodeDefUuid,
   [keys.recordUuid]: recordUuid,
@@ -75,7 +75,7 @@ const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
   }
 })
 
-const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
+export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
   ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
   [keys.placeholder]: true
 })
@@ -86,13 +86,13 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
  * ======
  */
 
-const getUuid = ObjectUtils.getUuid
+export const getUuid = ObjectUtils.getUuid
 
-const getParentUuid = ObjectUtils.getParentUuid
+export const getParentUuid = ObjectUtils.getParentUuid
 
-const getRecordUuid = R.prop(keys.recordUuid)
+export const getRecordUuid = R.prop(keys.recordUuid)
 
-const getValue = (node = {}, defaultValue = {}) =>
+export const getValue = (node = {}, defaultValue = {}) =>
   R.propOr(defaultValue, keys.value, node)
 
 const getValueProp = (prop, defaultValue = null) => R.pipe(
@@ -100,30 +100,53 @@ const getValueProp = (prop, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, prop),
 )
 
-const getNodeDefUuid = ObjectUtils.getNodeDefUuid
+export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 
-const getNodeDefUuids = nodes => R.pipe(
+export const getNodeDefUuids = nodes => R.pipe(
   R.keys,
   R.map(key => getNodeDefUuid(nodes[key])),
   R.uniq
 )(nodes)
 
-const getMeta = R.propOr({}, keys.meta)
+export const isPlaceholder = R.propEq(keys.placeholder, true)
+export const isCreated = R.propEq(keys.created, true)
+export const isUpdated = R.propEq(keys.updated, true)
+export const isDeleted = R.propEq(keys.deleted, true)
+export const isDirty = R.propEq(keys.dirty, true)
+export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isEqual = ObjectUtils.isEqual
 
-const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+export const getValidation = Validation.getValidation  
 
-const isDescendantOf = ancestor =>
+// ===== READ metadata
+
+export const getMeta = R.propOr({}, keys.meta)
+
+export const isChildApplicable = childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
+export const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
+
+export const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+
+export const isDescendantOf = ancestor =>
   node => R.includes(
     getUuid(ancestor),
     getHierarchy(node),
   )
+
+// code metadata
+export const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
 
 /**
  * ======
  * UPDATE
  * ======
  */
-const mergeMeta = meta => node => R.pipe(
+
+export const assocValue = R.assoc(keys.value)
+export const assocMeta = R.assoc(keys.meta)
+export const assocValidation = Validation.assocValidation
+
+export const mergeMeta = meta => node => R.pipe(
   getMeta,
   R.mergeLeft(meta),
   metaUpdated => R.assoc(keys.meta, metaUpdated)(node)
@@ -134,7 +157,7 @@ const mergeMeta = meta => node => R.pipe(
  * UTILS
  * ======
  */
-const isValueBlank = node => {
+export const isValueBlank = node => {
   const value = getValue(node, null)
 
   if (R.isNil(value))
@@ -146,103 +169,57 @@ const isValueBlank = node => {
   return R.isEmpty(value)
 }
 
-module.exports = {
-  keys,
-  valuePropKeys,
-  metaKeys,
 
-  // ==== CREATE
-  newNode,
-  newNodePlaceholder,
+// ====== Node Value extractor
 
-  // ==== READ
-  getUuid,
-  getParentUuid,
-  getRecordUuid,
-  getValue,
-  getNodeDefUuid,
+// date
+export const getDateYear = R.pipe(
+  R.partialRight(getValue, ['//']),
+  R.split('/'),
+  R.prop(2),
+  StringUtils.trim,
+)
+export const getDateMonth = R.pipe(
+  R.partialRight(getValue, ['//']),
+  R.split('/'),
+  R.prop(1),
+  StringUtils.trim
+)
+export const getDateDay = R.pipe(
+  R.partialRight(getValue, ['//']),
+  R.split('/'),
+  R.prop(0),
+  StringUtils.trim
+)
 
-  getNodeDefUuids,
+// time
+export const getTimeHour = R.pipe(
+  R.partialRight(getValue, [':']),
+  R.split(':'),
+  R.prop(0),
+  StringUtils.trim
+)
+export const getTimeMinute = R.pipe(
+  R.partialRight(getValue, [':']),
+  R.split(':'),
+  R.prop(1),
+  StringUtils.trim
+)
 
-  isPlaceholder: R.propEq(keys.placeholder, true),
-  isCreated: R.propEq(keys.created, true),
-  isUpdated: R.propEq(keys.updated, true),
-  isDeleted: R.propEq(keys.deleted, true),
-  isDirty: R.propEq(keys.dirty, true),
-  isRoot: R.pipe(getParentUuid, R.isNil),
-  isEqual: ObjectUtils.isEqual,
+// coordinate
+export const getCoordinateX = getValueProp(valuePropKeys.x)
+export const getCoordinateY = getValueProp(valuePropKeys.y)
+export const getCoordinateSrs = (node, defaultValue = null) => getValueProp(valuePropKeys.srs, defaultValue)(node)
 
-  getValidation: Validation.getValidation,
+// file
+export const getFileName = getValueProp(valuePropKeys.fileName, '')
+export const getFileUuid = getValueProp(valuePropKeys.fileUuid, '')
 
-  // ==== READ metadata
-  getMeta,
-  isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
-  isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
-  isDescendantOf,
-  getHierarchy,
-  // code metadata
-  getHierarchyCode: R.pathOr([], [keys.meta, metaKeys.hierarchyCode]),
+// code
+export const getCategoryItemUuid = getValueProp(valuePropKeys.itemUuid)
 
-  // ==== UPDATE
-  assocValue: R.assoc(keys.value),
-  assocMeta: R.assoc(keys.meta),
-  assocValidation: Validation.assocValidation,
-  mergeMeta,
-
-  // ==== UTILS
-  isValueBlank,
-
-  // ====== Node Value extractor
-
-  // date
-  getDateYear: R.pipe(
-    R.partialRight(getValue, ['//']),
-    R.split('/'),
-    R.prop(2),
-    StringUtils.trim,
-  ),
-  getDateMonth: R.pipe(
-    R.partialRight(getValue, ['//']),
-    R.split('/'),
-    R.prop(1),
-    StringUtils.trim
-  ),
-  getDateDay: R.pipe(
-    R.partialRight(getValue, ['//']),
-    R.split('/'),
-    R.prop(0),
-    StringUtils.trim
-  ),
-
-  // time
-  getTimeHour: R.pipe(
-    R.partialRight(getValue, [':']),
-    R.split(':'),
-    R.prop(0),
-    StringUtils.trim
-  ),
-  getTimeMinute: R.pipe(
-    R.partialRight(getValue, [':']),
-    R.split(':'),
-    R.prop(1),
-    StringUtils.trim
-  ),
-
-  // coordinate
-  getCoordinateX: getValueProp(valuePropKeys.x),
-  getCoordinateY: getValueProp(valuePropKeys.y),
-  getCoordinateSrs: (node, defaultValue = null) => getValueProp(valuePropKeys.srs, defaultValue)(node),
-
-  // file
-  getFileName: getValueProp(valuePropKeys.fileName, ''),
-  getFileUuid: getValueProp(valuePropKeys.fileUuid, ''),
-
-  // code
-  getCategoryItemUuid: getValueProp(valuePropKeys.itemUuid),
-
-  // taxon
-  getTaxonUuid: getValueProp(valuePropKeys.taxonUuid),
-  getVernacularNameUuid: getValueProp(valuePropKeys.vernacularNameUuid),
-  getScientificName: getValueProp(valuePropKeys.scientificName, ''),
-  getVernacularName: getValueProp(valuePropKeys.vernacularName, ''),
-}
+// taxon
+export const getTaxonUuid = getValueProp(valuePropKeys.taxonUuid)
+export const getVernacularNameUuid = getValueProp(valuePropKeys.vernacularNameUuid)
+export const getScientificName = getValueProp(valuePropKeys.scientificName, '')
+export const getVernacularName = getValueProp(valuePropKeys.vernacularName, '')

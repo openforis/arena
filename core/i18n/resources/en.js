@@ -1,6 +1,6 @@
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-module.exports = {
+export const enTranslation = {
 
   common: {
     add: 'Add',
@@ -365,6 +365,8 @@ module.exports = {
   surveyForm: {
     subPage: 'Sub page',
     addChildTo: 'Add to {{nodeDef}}',
+    hidePages:'Hide pages',
+    showPages:'Show pages',
     formEditActions: {
       preview: 'Preview',
     },
@@ -484,9 +486,11 @@ module.exports = {
     },
 
     expressions: {
+      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
+      cannotUseCurrentNode: 'cannot use current node {{name}} in this expression',
+      circularDependencyError: 'cannot reference node {{name}} because it references the current node',
       expressionInvalid: 'Invalid expression: {{details}}',
       unableToFindNode: 'unable to find node: {{name}}',
-      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
@@ -692,4 +696,4 @@ module.exports = {
       temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
     }
   }
-}
+};
