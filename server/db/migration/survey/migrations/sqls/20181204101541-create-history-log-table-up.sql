@@ -14,5 +14,6 @@ CREATE INDEX activity_log_user_aggregated_idx ON activity_log (
   (date_created::date) DESC,
   user_uuid,
   type,
-  (content->>'uuid') NULLS LAST
+  (content->>'uuid') NULLS LAST,
+  date_created DESC
 ) WHERE NOT system;

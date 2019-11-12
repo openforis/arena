@@ -62,7 +62,8 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
           date_created::date DESC,
           user_uuid,
           type,
-          content_uuid
+          content_uuid,
+          date_created DESC -- get the last entry from the day
         OFFSET $3
         LIMIT $4
       ),
