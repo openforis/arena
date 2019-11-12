@@ -3,18 +3,18 @@ import './formHeader.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
 import NodeDef from '@core/survey/nodeDef'
 import NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
+import { useI18n } from '@webapp/commonComponents/hooks'
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'
 
+import { toggleFormPageNavigation } from '../../surveyForm/actions'
 import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
 
 const FormHeader = props => {
@@ -23,7 +23,8 @@ const FormHeader = props => {
     surveyCycleKey, edit, entry, preview,
     history, canEditDef,
     nodeDefPage, nodeDefPageLabel,
-    createNodeDef,
+    showPageNavigation,
+    toggleFormPageNavigation, createNodeDef,
   } = props
 
   const i18n = useI18n()
@@ -31,6 +32,13 @@ const FormHeader = props => {
   return (
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
+
+        <button className="btn-s survey-form-header__btn-page-toggle"
+                onClick={toggleFormPageNavigation}
+                title={i18n.t(`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`)}>
+          <span className="icon icon-stack icon-12px icon-left"/>
+          <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px icon-left`}/>
+        </button>
 
         <h5>{nodeDefPageLabel}</h5>
 
@@ -78,5 +86,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { createNodeDef }
+  { toggleFormPageNavigation, createNodeDef }
 )(FormHeader)

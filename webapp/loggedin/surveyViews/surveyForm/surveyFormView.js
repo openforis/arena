@@ -1,4 +1,4 @@
-import './surveyForm.scss'
+import './surveyFormView.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
@@ -95,6 +95,7 @@ const SurveyFormView = (props) => {
         <div className={`survey-form${className}`}>
 
           {
+            showPageNavigation &&
             <FormPageNavigation
               surveyInfo={surveyInfo}
               surveyCycleKey={surveyCycleKey}
@@ -102,7 +103,6 @@ const SurveyFormView = (props) => {
               entry={entry}
               canEditDef={canEditDef}
               level={0}
-              showPageNavigation={showPageNavigation}
             />
           }
 
