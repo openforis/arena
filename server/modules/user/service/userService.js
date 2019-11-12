@@ -1,26 +1,26 @@
-const fs = require('fs')
+import * as fs from 'fs'
 
-const passwordGenerator = require('generate-password')
+import * as passwordGenerator from 'generate-password'
 
-const db = require('@server/db/db')
-const aws = require('@server/system/aws')
+import { db } from '@server/db/db'
+import * as aws from '@server/system/aws'
 
-const UserManager = require('../manager/userManager')
-const AuthManager = require('../../auth/manager/authManager')
-const SurveyManager = require('../../survey/manager/surveyManager')
+import * as UserManager from '../manager/userManager'
+import * as AuthManager from '../../auth/manager/authManager'
+import * as SurveyManager from '../../survey/manager/surveyManager'
 
-const Survey = require('@core/survey/survey')
-const User = require('@core/user/user')
-const AuthGroup = require('@core/auth/authGroup')
-const Authorizer = require('@core/auth/authorizer')
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Authorizer from '@core/auth/authorizer'
 
-const SystemError = require('@core/systemError')
-const UnauthorizedError = require('@server/utils/unauthorizedError')
-const Mailer = require('@server/utils/mailer')
+import SystemError from '@core/systemError'
+import UnauthorizedError from '@server/utils/unauthorizedError'
+import * as Mailer from '@server/utils/mailer'
 
 // ====== CREATE
 
-const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serverUrl) => {
+export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serverUrl) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -86,21 +86,24 @@ const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serv
 
 // ====== READ
 
-const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
+export const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
   const fetchSystemAdmins = User.isSystemAdmin(user)
 
   return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
 }
 
-const countUsersBySurveyId = async (user, surveyId) => {
+export const countUsersBySurveyId = async (user, surveyId) => {
   const countSystemAdmins = User.isSystemAdmin(user)
 
   return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
 }
 
+export const fetchUserByUuid = UserManager.fetchUserByUuid
+export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
+
 // ====== UPDATE
 
-const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
+export const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
@@ -127,7 +130,7 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
   return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 
-const acceptInvitation = async (user, userUuid, name, client = db) => {
+export const acceptInvitation = async (user, userUuid, name, client = db) => {
   // For now a user can change only his own name
   if (User.getUuid(user) !== userUuid)
     throw new UnauthorizedError(User.getName(user))
@@ -139,24 +142,8 @@ const acceptInvitation = async (user, userUuid, name, client = db) => {
   })
 }
 
-module.exports = {
-  // ==== User
-  // CREATE
-  inviteUser,
+// DELETE
+export const deleteUser = UserManager.deleteUser
 
-  // READ
-  countUsersBySurveyId,
-  fetchUsersBySurveyId,
-  fetchUserByUuid: UserManager.fetchUserByUuid,
-  fetchUserProfilePicture: UserManager.fetchUserProfilePicture,
-
-  // UPDATE
-  updateUser,
-  acceptInvitation,
-
-  // DELETE
-  deleteUser: UserManager.deleteUser,
-
-  // ==== User prefs
-  updateUserPrefs: UserManager.updateUserPrefs,
-}
+// ==== User prefs
+export const updateUserPrefs = UserManager.updateUserPrefs

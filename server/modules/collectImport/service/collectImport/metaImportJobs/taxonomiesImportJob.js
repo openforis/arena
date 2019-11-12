@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Taxonomy = require('@core/survey/taxonomy')
-const Taxon = require('@core/survey/taxon')
-const Validation = require('@core/validation/validation')
-const { languageCodesISO636_2 } = require('@core/app/languages')
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
+import * as Validation from '@core/validation/validation'
+import { languageCodesISO636_2 } from '@core/app/languages';
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
-const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImportManager')
+import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
+import TaxonomyImportManager from '../../../../taxonomy/manager/taxonomyImportManager'
 
-const CSVReader = require('@server/utils/file/csvReader')
+import * as CSVReader from '@server/utils/file/csvReader'
 
 const speciesFilesPath = 'species/'
 
@@ -18,7 +18,7 @@ const speciesFilesPath = 'species/'
  * Inserts a taxonomy for each taxonomy in the Collect survey.
  * Saves the list of inserted taxonomies in the "taxonomies" context property
  */
-class TaxonomiesImportJob extends Job {
+export default class TaxonomiesImportJob extends Job {
 
   constructor (params) {
     super('TaxonomiesImportJob', params)
@@ -164,5 +164,3 @@ class TaxonomiesImportJob extends Job {
     return !(rowDuplicateCode || rowDuplicateScientificName)
   }
 }
-
-module.exports = TaxonomiesImportJob

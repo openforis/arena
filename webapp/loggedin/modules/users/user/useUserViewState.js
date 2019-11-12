@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
-import User from '@core/user/user'
-import Survey from '@core/survey/survey'
-import UserValidator from '@core/user/userValidator'
-import AuthGroup from '@core/auth/authGroup'
-import Authorizer from '@core/auth/authorizer'
+import * as User from '@core/user/user'
+import * as Survey from '@core/survey/survey'
+import * as UserValidator from '@core/user/userValidator'
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Authorizer from '@core/auth/authorizer'
 
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 

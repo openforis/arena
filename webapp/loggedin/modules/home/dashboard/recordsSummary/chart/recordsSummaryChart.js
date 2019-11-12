@@ -2,7 +2,7 @@ import './recordsSummaryChart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 
-import DateUtils from '@core/dateUtils'
+import * as DateUtils from '@core/dateUtils'
 
 import YAxis, { getScale as getYScale } from './components/yAxis'
 import XAxis, { getScale as getXScale } from './components/xAxis'

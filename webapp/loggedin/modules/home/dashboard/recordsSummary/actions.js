@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import DateUtils from '@core/dateUtils'
+import * as DateUtils from '@core/dateUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordsSummaryState from './recordsSummaryState'

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as ValidationUtils from '@webapp/utils/validationUtils'
-import Validation from '@core/validation/validation'
+import * as Validation from '@core/validation/validation'
 
 import Tooltip from './tooltip'
 

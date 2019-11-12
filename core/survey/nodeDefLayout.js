@@ -1,8 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   layout: 'layout',
   // layout keys
   pageUuid: 'pageUuid', // page uuid
@@ -11,7 +11,7 @@ const keys = {
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
 }
 
-const renderType = {
+export const renderType = {
   // entity
   form: 'form',
   table: 'table',
@@ -24,14 +24,14 @@ const renderType = {
   tableBody: 'tableBody',
 }
 
-const displayIn = {
+export const displayIn = {
   parentPage: 'parentPage',
   ownPage: 'ownPage',
 }
 
 // ====== CREATE
 
-const newLayout = (cycle, renderType, pageUuid = null) => R.pipe(
+export const newLayout = (cycle, renderType, pageUuid = null) => R.pipe(
   R.assocPath([cycle, keys.renderType], renderType),
   R.when(
     R.always(pageUuid),
@@ -41,22 +41,22 @@ const newLayout = (cycle, renderType, pageUuid = null) => R.pipe(
 
 // ====== READ
 
-const getLayout = ObjectUtils.getProp(keys.layout, {})
+export const getLayout = ObjectUtils.getProp(keys.layout, {})
 
 const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(
   getLayout,
   R.pathOr(defaultTo, [cycle, prop])
 )
 
-const getRenderType = cycle => _getPropLayout(cycle, keys.renderType)
+export const getRenderType = cycle => _getPropLayout(cycle, keys.renderType)
 
-const getLayoutChildren = cycle => _getPropLayout(cycle, keys.layoutChildren, [])
+export const getLayoutChildren = cycle => _getPropLayout(cycle, keys.layoutChildren, [])
 
-const getColumnsNo = cycle => _getPropLayout(cycle, keys.columnsNo, 3)
+export const getColumnsNo = cycle => _getPropLayout(cycle, keys.columnsNo, 3)
 
-const getPageUuid = cycle => _getPropLayout(cycle, keys.pageUuid)
+export const getPageUuid = cycle => _getPropLayout(cycle, keys.pageUuid)
 
-const getDisplayIn = cycle => R.ifElse(
+export const getDisplayIn = cycle => R.ifElse(
   hasPage(cycle),
   R.always(displayIn.ownPage),
   R.always(displayIn.parentPage)
@@ -64,52 +64,23 @@ const getDisplayIn = cycle => R.ifElse(
 
 // ====== CHECK
 
-const hasPage = cycle => R.pipe(getPageUuid(cycle), R.isNil, R.not)
+export const hasPage = cycle => R.pipe(getPageUuid(cycle), R.isNil, R.not)
 
 const isRenderType = (cycle, type) => R.pipe(
   getRenderType(cycle),
   R.equals(type),
 )
-const isRenderTable = cycle => isRenderType(cycle, renderType.table)
-const isRenderForm = cycle => isRenderType(cycle, renderType.form)
-const isRenderDropdown = cycle => isRenderType(cycle, renderType.dropdown)
-const isRenderCheckbox = cycle => isRenderType(cycle, renderType.checkbox)
+export const isRenderTable = cycle => isRenderType(cycle, renderType.table)
+export const isRenderForm = cycle => isRenderType(cycle, renderType.form)
+export const isRenderDropdown = cycle => isRenderType(cycle, renderType.dropdown)
+export const isRenderCheckbox = cycle => isRenderType(cycle, renderType.checkbox)
 
-const isDisplayInParentPage = cycle => R.pipe(
+export const isDisplayInParentPage = cycle => R.pipe(
   getDisplayIn(cycle),
   R.propEq(displayIn.parentPage)
 )
 // ====== UTILS
 
-const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))
+export const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))
 
-const filterNodeDefsWithPage = cycle => R.filter(hasPage(cycle))
-
-module.exports = {
-  keys,
-  renderType,
-  displayIn,
-
-  //CREATE
-  newLayout,
-
-  //READ
-  getLayout,
-  getRenderType,
-  getLayoutChildren,
-  getColumnsNo,
-  getPageUuid,
-  getDisplayIn,
-
-  //CHECK
-  hasPage,
-  isRenderTable,
-  isRenderForm,
-  isRenderDropdown,
-  isRenderCheckbox,
-  isDisplayInParentPage,
-
-  //UTILS
-  rejectNodeDefsWithPage,
-  filterNodeDefsWithPage,
-}
+export const filterNodeDefsWithPage = cycle => R.filter(hasPage(cycle))

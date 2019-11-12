@@ -1,4 +1,4 @@
-const types = {
+export const messageTypes = {
   threadKill: 'threadKill',
   threadInit: 'threadInit',
 
@@ -6,5 +6,3 @@ const types = {
   nodePersist: 'nodePersist',
   nodeDelete: 'nodeDelete',
 }
-
-module.exports = types

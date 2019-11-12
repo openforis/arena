@@ -1,27 +1,27 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Record = require('@core/record/record')
-const RecordValidation = require('@core/record/recordValidation')
-const Validation = require('@core/validation/validation')
-const RecordManager = require('@server/modules/record/manager/recordManager')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
+import * as Validation from '@core/validation/validation'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-const Queue = require('@core/queue')
+import Queue from '@core/queue'
 
-const newRecord = (user, preview = false) =>
+export const newRecord = (user, preview = false) =>
   Record.newRecord(user, Survey.cycleOneKey, preview)
 
-const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
+export const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
   await client.tx(async t => {
     const record = newRecord(user, preview)
     const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, true, t)
     return await RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
   })
 
-const getNodePath = node => (survey, record) => {
+export const getNodePath = node => (survey, record) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -43,7 +43,7 @@ const getNodePath = node => (survey, record) => {
   }
 }
 
-const findNodeByPath = path => (survey, record) => {
+export const findNodeByPath = path => (survey, record) => {
   const parts = R.ifElse(
     R.is(Array),
     R.identity,
@@ -81,7 +81,7 @@ const findNodeByPath = path => (survey, record) => {
   return currentNode
 }
 
-const traverse = visitorFn => async record => {
+export const traverse = visitorFn => async record => {
   const root = Record.getRootNode(record)
   const queue = new Queue()
   queue.enqueue(root)
@@ -97,26 +97,14 @@ const traverse = visitorFn => async record => {
   }
 }
 
-const getValidationMinCount = (parentNode, childDef) => R.pipe(
+export const getValidationMinCount = (parentNode, childDef) => R.pipe(
   Validation.getValidation,
   RecordValidation.getValidationChildrenCount(parentNode, childDef),
   Validation.getFieldValidation(RecordValidation.keys.minCount)
 )
 
-const getValidationMaxCount = (parentNode, childDef) => R.pipe(
+export const getValidationMaxCount = (parentNode, childDef) => R.pipe(
   Validation.getValidation,
   RecordValidation.getValidationChildrenCount(parentNode, childDef),
   Validation.getFieldValidation(RecordValidation.keys.maxCount)
 )
-
-module.exports = {
-  newRecord,
-  insertAndInitRecord,
-
-  getNodePath,
-  getValidationMinCount,
-  getValidationMaxCount,
-
-  findNodeByPath,
-  traverse,
-}

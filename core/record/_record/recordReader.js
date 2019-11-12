@@ -1,28 +1,28 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Queue = require('@core/queue')
+import Queue from '@core/queue'
 
-const SurveyNodeDefs = require('@core/survey/_survey/surveyNodeDefs')
-const SurveyDependencies = require('@core/survey/_survey/surveyDependencies')
-const NodeDef = require('@core/survey/nodeDef')
-const Node = require('../node')
+import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
+import * as SurveyDependencies from '@core/survey/_survey/surveyDependencies'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '../node'
 
-const keys = require('./recordKeys')
-const NodesIndex = require('./recordNodesIndex')
+import { keys } from './recordKeys'
+import * as NodesIndex from './recordNodesIndex'
 
 /**
  * === simple getters
  */
-const getNodes = R.propOr({}, keys.nodes)
+export const getNodes = R.propOr({}, keys.nodes)
 
-const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
+export const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
-const getRootNode = record => R.pipe(
+export const getRootNode = record => R.pipe(
   NodesIndex.getNodeRootUuid,
   uuid => getNodeByUuid(uuid)(record)
 )(record)
 
-const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
+export const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
   NodesIndex.getNodeUuidsByDef(nodeDefUuid),
   R.map(uuid => getNodeByUuid(uuid)(record))
 )(record)
@@ -31,9 +31,9 @@ const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
  * ==== hierarchy
  */
 // ancestors
-const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
+export const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
-const getAncestorsAndSelf = entity => record => {
+export const getAncestorsAndSelf = entity => record => {
   const ancestors = []
   while (entity) {
     ancestors.push(entity)
@@ -42,7 +42,7 @@ const getAncestorsAndSelf = entity => record => {
   return ancestors
 }
 
-const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
+export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
   R.pipe(
     getParentNode(node),
     parentNode => getAncestorsAndSelf(parentNode)(record),
@@ -50,12 +50,12 @@ const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
   )(record)
 
 // descendants
-const getNodeChildren = node => record => R.pipe(
+export const getNodeChildren = node => record => R.pipe(
   NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
   R.map(uuid => getNodeByUuid(uuid)(record))
 )(record)
 
-const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
+export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
   R.map(uuid => getNodeByUuid(uuid)(record)),
   nodes =>
@@ -65,12 +65,12 @@ const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
     ])(nodes)
 )(record)
 
-const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
+export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
   getNodeChildrenByDefUuid(parentNode, nodeDefUuid),
   R.head
 )
 
-const visitDescendantsAndSelf = (node, visitor) => record => {
+export const visitDescendantsAndSelf = (node, visitor) => record => {
   const queue = new Queue()
 
   queue.enqueue(node)
@@ -88,7 +88,7 @@ const visitDescendantsAndSelf = (node, visitor) => record => {
 /**
  * Returns true if a node and all its ancestors are applicable
  */
-const isNodeApplicable = node => record => {
+export const isNodeApplicable = node => record => {
   if (Node.isRoot(node))
     return true
 
@@ -112,7 +112,7 @@ const isNodeApplicable = node => record => {
  *   nodeDef, //node definition
  * }
  */
-const getDependentNodePointers = (survey, node, dependencyType, includeSelf = false, filterFn = null) => record => {
+export const getDependentNodePointers = (survey, node, dependencyType, includeSelf = false, filterFn = null) => record => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
   const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
@@ -171,12 +171,12 @@ const getDependentNodePointers = (survey, node, dependencyType, includeSelf = fa
 }
 
 // code attributes
-const getDependentCodeAttributes = node => record => R.pipe(
+export const getDependentCodeAttributes = node => record => R.pipe(
   NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
   R.map(uuid => getNodeByUuid(uuid)(record))
 )(record)
 
-const getParentCodeAttribute = (survey, parentNode, nodeDef) => record => {
+export const getParentCodeAttribute = (survey, parentNode, nodeDef) => record => {
   const parentCodeDefUuid = NodeDef.getParentCodeDefUuid(nodeDef)
 
   if (parentCodeDefUuid) {
@@ -193,7 +193,7 @@ const getParentCodeAttribute = (survey, parentNode, nodeDef) => record => {
 
 // ====== Keys
 
-const getEntityKeyNodes = (survey, nodeEntity) => record => {
+export const getEntityKeyNodes = (survey, nodeEntity) => record => {
   const nodeDefEntity = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(nodeEntity))(survey)
   const nodeDefKeys = SurveyNodeDefs.getNodeDefKeys(nodeDefEntity)(survey)
 
@@ -203,38 +203,7 @@ const getEntityKeyNodes = (survey, nodeEntity) => record => {
   )(nodeDefKeys)
 }
 
-const getEntityKeyValues = (survey, nodeEntity) => R.pipe(
+export const getEntityKeyValues = (survey, nodeEntity) => R.pipe(
   getEntityKeyNodes(survey, nodeEntity),
   R.map(Node.getValue)
 )
-
-module.exports = {
-  getNodes,
-  getNodeByUuid,
-  getRootNode,
-  getNodesByDefUuid,
-
-  // ==== hierarchy
-  // ancestors
-  getParentNode,
-  getAncestorsAndSelf,
-  getAncestorByNodeDefUuid,
-
-  // descendants
-  getNodeChildren,
-  getNodeChildrenByDefUuid,
-  getNodeChildByDefUuid,
-  visitDescendantsAndSelf,
-  isNodeApplicable,
-
-  // ==== dependency
-  getDependentNodePointers,
-
-  // code
-  getParentCodeAttribute,
-  getDependentCodeAttributes,
-
-  // ====== Keys
-  getEntityKeyNodes,
-  getEntityKeyValues,
-}

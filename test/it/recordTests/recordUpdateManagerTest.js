@@ -1,21 +1,21 @@
-const { expect } = require('chai')
+import { expect } from 'chai';
 
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
-const NodeDefRepository = require('@server/modules/nodeDef/repository/nodeDefRepository')
-const RecordManager = require('@server/modules/record/manager/recordManager')
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
+import { getContextUser, fetchFullContextSurvey } from '../../testContext';
 
-const RecordUtils = require('../utils/recordUtils')
+import * as RecordUtils from '../utils/recordUtils'
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
@@ -25,7 +25,7 @@ const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => 
     Survey.getId(survey), NodeDef.getUuid(nodeDef), {}, propsAdvanced)
 }
 
-const recordCreationTest = async () => {
+export const recordCreationTest = async () => {
   const survey = await fetchFullContextSurvey()
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
@@ -41,7 +41,7 @@ const recordCreationTest = async () => {
   expect(R.isEmpty(nodes)).to.equal(false)
 }
 
-const defaultValueAppliedTest = async () => {
+export const defaultValueAppliedTest = async () => {
   let survey = await fetchFullContextSurvey()
   const user = getContextUser()
 
@@ -74,9 +74,3 @@ const defaultValueAppliedTest = async () => {
 
 //==== helper methods
 const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
-
-module.exports = {
-  recordCreationTest,
-  defaultValueAppliedTest
-}
-

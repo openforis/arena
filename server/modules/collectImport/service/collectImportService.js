@@ -1,15 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const Survey = require('@core/survey/survey')
+import * as Survey from '@core/survey/survey'
 
-const SurveyManager = require('../../survey/manager/surveyManager')
-const CollectImportReportManager = require('../manager/collectImportReportManager')
-const JobManager = require('@server/job/jobManager')
-const CollectImportJob = require('./collectImport/collectImportJob')
+import * as SurveyManager from '../../survey/manager/surveyManager'
+import * as CollectImportReportManager from '../manager/collectImportReportManager'
+import * as JobManager from '@server/job/jobManager'
+import CollectImportJob from './collectImport/collectImportJob'
 
-const startCollectImportJob = (user, filePath) => {
+// COLLECT SURVEY IMPORT
+export const startCollectImportJob = (user, filePath) => {
   const job = new CollectImportJob({ user, filePath })
 
   JobManager.executeJobThread(job)
@@ -17,7 +18,17 @@ const startCollectImportJob = (user, filePath) => {
   return job
 }
 
-const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
+// REPORT ITEMS
+
+// CREATE
+export const insertReportItem = CollectImportReportManager.insertItem
+
+// READ
+export const fetchReportItems = CollectImportReportManager.fetchItems
+export const countReportItems = CollectImportReportManager.countItems
+
+// UPDATE
+export const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
   await client.tx(async tx => {
     //1. update import report item
     const itemUpdated = await CollectImportReportManager.updateItem(surveyId, itemId, props, resolved, tx)
@@ -37,17 +48,3 @@ const updateReportItem = async (user, surveyId, itemId, props, resolved, client 
 
     return itemUpdated
   })
-
-module.exports = {
-  // COLLECT SURVEY IMPORT
-  startCollectImportJob,
-
-  // REPORT ITEMS
-  // CREATE
-  insertReportItem: CollectImportReportManager.insertItem,
-  // READ
-  fetchReportItems: CollectImportReportManager.fetchItems,
-  countReportItems: CollectImportReportManager.countItems,
-  // UPDATE
-  updateReportItem
-}

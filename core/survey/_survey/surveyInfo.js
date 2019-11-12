@@ -1,11 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const AuthGroup = require('@core/auth/authGroup')
+import * as AuthGroup from '@core/auth/authGroup'
 
-const ObjectUtils = require('@core/objectUtils')
-const StringUtils = require('@core/stringUtils')
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 
-const keys = {
+export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
   info: 'info',
@@ -26,52 +26,52 @@ const keys = {
   steps: 'steps',
 }
 
-const collectReportKeys = {
+export const collectReportKeys = {
   issuesTotal: 'issuesTotal',
   issuesResolved: 'issuesResolved'
 }
 
-const cycleOneKey = '0'
+export const cycleOneKey = '0'
 
-const getInfo = R.propOr({}, keys.info)
+export const getInfo = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
-const getId = ObjectUtils.getId
+export const getId = ObjectUtils.getId
 
-const getUuid = ObjectUtils.getUuid
+export const getUuid = ObjectUtils.getUuid
 
-const getName = ObjectUtils.getProp(keys.name, '')
+export const getName = ObjectUtils.getProp(keys.name, '')
 
-const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
+export const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
 
-const isPublished = R.propEq(keys.published, true)
+export const isPublished = R.propEq(keys.published, true)
 
-const isDraft = R.propEq(keys.draft, true)
+export const isDraft = R.propEq(keys.draft, true)
 
-const getLanguages = ObjectUtils.getProp(keys.languages, [])
+export const getLanguages = ObjectUtils.getProp(keys.languages, [])
 
-const getDefaultLanguage = R.pipe(getLanguages, R.head)
+export const getDefaultLanguage = R.pipe(getLanguages, R.head)
 
-const getLabels = ObjectUtils.getProp(keys.labels, {})
+export const getLabels = ObjectUtils.getProp(keys.labels, {})
 
-const getDefaultLabel = surveyInfo => {
+export const getDefaultLabel = surveyInfo => {
   const labels = getLabels(surveyInfo)
   const lang = getDefaultLanguage(surveyInfo)
   return R.prop(lang, labels)
 }
 
-const getLabel = (surveyInfo, lang) => {
+export const getLabel = (surveyInfo, lang) => {
   const label = ObjectUtils.getLabel(lang)(surveyInfo)
   return StringUtils.isBlank(label)
     ? getName(surveyInfo)
     : label
 }
 
-const getSRS = ObjectUtils.getProp(keys.srs, [])
+export const getSRS = ObjectUtils.getProp(keys.srs, [])
 
-const getDefaultSRS = R.pipe(getSRS, R.head)
+export const getDefaultSRS = R.pipe(getSRS, R.head)
 
-const getStatus = surveyInfo =>
+export const getStatus = surveyInfo =>
   isPublished(surveyInfo) && isDraft(surveyInfo)
     ? 'PUBLISHED-DRAFT'
     : isPublished(surveyInfo)
@@ -80,85 +80,47 @@ const getStatus = surveyInfo =>
       ? 'DRAFT'
       : ''
 
-const getCycles = ObjectUtils.getProp(keys.cycles)
+export const getCycles = ObjectUtils.getProp(keys.cycles)
 
-const getCollectUri = ObjectUtils.getProp(keys.collectUri)
+export const getCycleKeys = R.pipe(getCycles, R.keys)
 
-const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
+export const getDateCreated = ObjectUtils.getDateCreated
 
-const hasCollectReportIssues = R.pipe(
+export const getDateModified = ObjectUtils.getDateModified
+
+export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
+
+export const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
+
+export const hasCollectReportIssues = R.pipe(
   getCollectReport,
   R.propSatisfies(total => total > 0, collectReportKeys.issuesTotal)
 )
 
-const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
+export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
-const getLanguage = preferredLang => surveyInfo => R.pipe(
+export const getLanguage = preferredLang => surveyInfo => R.pipe(
   getLanguages,
   R.find(R.equals(preferredLang)),
   R.defaultTo(getDefaultLanguage(surveyInfo))
 )(surveyInfo)
 
 // ====== UPDATE
-const markDraft = R.assoc(keys.draft, true)
+export const markDraft = R.assoc(keys.draft, true)
 
 // ====== UTILS
 
-const isValid = surveyInfo => surveyInfo && surveyInfo.id
+export const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-const getAuthGroups = ObjectUtils.getAuthGroups
+export const getAuthGroups = ObjectUtils.getAuthGroups
 
 const _getAuthGroupByName = name => R.pipe(
   getAuthGroups,
   R.find(R.propEq(AuthGroup.keys.name, name))
 )
 
-const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
+export const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
 
-const isAuthGroupAdmin = group => surveyInfo => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
-
-module.exports = {
-  keys,
-  collectReportKeys,
-  cycleOneKey,
-
-  // ====== READ
-  getInfo,
-
-  getId,
-  getUuid,
-  isPublished,
-  isDraft,
-  getName,
-  getDescriptions,
-  getLanguage,
-  getLanguages,
-  getDefaultLanguage,
-  getSRS,
-  getDefaultSRS,
-  getLabels,
-  getDefaultLabel,
-  getLabel,
-  getStatus,
-  getCycles,
-  getCycleKeys: R.pipe(getCycles, R.keys),
-  getDateCreated: ObjectUtils.getDateCreated,
-  getDateModified: ObjectUtils.getDateModified,
-  getCollectUri,
-  isFromCollect,
-  getCollectReport,
-  hasCollectReportIssues,
-
-  // ====== UPDATE
-  markDraft,
-
-  // ====== AUTH GROUPS
-  getAuthGroups,
-  getAuthGroupAdmin,
-  isAuthGroupAdmin,
-
-  // ====== UTILS
-  isValid,
-}
+export const isAuthGroupAdmin = group => surveyInfo => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))

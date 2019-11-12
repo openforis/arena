@@ -1,16 +1,16 @@
-require('dotenv').config()
+import 'dotenv/config'
 
-// const cluster = require('cluster')
-const dbMigrator = require('./db/migration/dbMigrator')
-const appCluster = require('./system/appCluster')
-const ProcessUtils = require('@core/processUtils')
+// import * as cluster from 'cluster'
+import * as dbMigrator from './db/migration/dbMigrator'
+import * as appCluster from './system/appCluster'
+import * as ProcessUtils from '@core/processUtils'
 
 const initialize = async () => {
   await dbMigrator.migrateAll()
   if (ProcessUtils.ENV.migrateOnly)
     process.exit();
 
-  await appCluster()
+  await appCluster.run()
 }
 
 initialize()
@@ -23,7 +23,7 @@ initialize()
 //
 //   // process.env.WEB_CONCURRENCY is used by Heroku
 //   // const numWorkers = process.env.WEB_CONCURRENCY || require('os').cpus().length
-//   const numWorkers = require('os').cpus().length
+//   import * as numWorkers from 'os'.cpus().length
 //
 //   console.log('Master cluster setting up ' + numWorkers + ' workers...')
 //
@@ -46,4 +46,5 @@ initialize()
 //   serverCluster()
 //
 // }
+
 

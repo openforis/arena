@@ -1,21 +1,21 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const Node = require('@core/record/node')
-const RecordValidation = require('@core/record/recordValidation')
-const Validation = require('@core/validation/validation')
+import * as Node from '@core/record/node'
+import * as RecordValidation from '@core/record/recordValidation'
+import * as Validation from '@core/validation/validation'
 
-const SurveyManager = require('../../survey/manager/surveyManager')
-const RecordManager = require('../manager/recordManager')
-const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
+import * as SurveyManager from '../../survey/manager/surveyManager'
+import * as RecordManager from '../manager/recordManager'
+import * as SurveyRdbManager from '../../surveyRdb/manager/surveyRdbManager'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
 const recordValidationUpdateBatchSize = 1000
 
-class RecordsUniquenessValidationJob extends Job {
+export default class RecordsUniquenessValidationJob extends Job {
 
   constructor (params) {
     super(RecordsUniquenessValidationJob.type, params)
@@ -114,5 +114,3 @@ const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
     Validation.setField(nodeUuid, nodeValidationUpdated),
   )(validationRecord)
 }
-
-module.exports = RecordsUniquenessValidationJob

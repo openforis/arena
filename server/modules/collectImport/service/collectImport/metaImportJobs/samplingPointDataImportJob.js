@@ -1,13 +1,13 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const CollectImportJobContext = require('../collectImportJobContext')
-const Category = require('@core/survey/category')
-const CategoryItem = require('@core/survey/categoryItem')
-const Point = require('@core/geo/point')
+import * as CollectImportJobContext from '../collectImportJobContext'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Point from '@core/geo/point'
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
-const CategoryImportJob = require('../../../../category/service/categoryImportJob')
-const CategoryImportJobParams = require('../../../../category/service/categoryImportJobParams')
+import * as CategoryManager from '../../../../category/manager/categoryManager'
+import CategoryImportJob from '../../../../category/service/categoryImportJob'
+import * as CategoryImportJobParams from '../../../../category/service/categoryImportJobParams'
 
 const keysExtra = {
   x: 'x',
@@ -21,7 +21,7 @@ const keysItem = {
 
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
-class SamplingPointDataImportJob extends CategoryImportJob {
+export default class SamplingPointDataImportJob extends CategoryImportJob {
 
   constructor (params) {
     super({
@@ -91,5 +91,3 @@ class SamplingPointDataImportJob extends CategoryImportJob {
 }
 
 SamplingPointDataImportJob.categoryName = 'sampling_point_data'
-
-module.exports = SamplingPointDataImportJob

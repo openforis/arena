@@ -9,7 +9,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as db from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 //===== CREATE
@@ -112,3 +112,4 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     camelize
   )
 }
+

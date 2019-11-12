@@ -1,18 +1,18 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const Record = require('@core/record/record')
-const RecordValidator = require('@core/record/recordValidator')
-const Node = require('@core/record/node')
-const Validation = require('@core/validation/validation')
+import * as Record from '@core/record/record'
+import * as RecordValidator from '@core/record/recordValidator'
+import * as Node from '@core/record/node'
+import * as Validation from '@core/validation/validation'
 
-const RecordRepository = require('../../repository/recordRepository')
+import * as RecordRepository from '../../repository/recordRepository'
 
-const RecordUniquenessValidator = require('./recordUniquenessValidator')
+import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
-const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordKeysUniqueness, tx) => {
+export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordKeysUniqueness, tx) => {
 
   // 1. validate nodes
   const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
@@ -50,7 +50,7 @@ const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
   )
 )(nodes)
 
-const persistValidation = async (survey, record, nodesValidation, tx) => {
+export const persistValidation = async (survey, record, nodesValidation, tx) => {
   const surveyId = Survey.getId(survey)
 
   const recordValidationUpdated = R.pipe(
@@ -62,7 +62,7 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
   await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)
 }
 
-const validateRecordsUniquenessAndPersistValidation = async (survey, record, excludeRecordFromCount, t) => {
+export const validateRecordsUniquenessAndPersistValidation = async (survey, record, excludeRecordFromCount, t) => {
   const recordKeyNodes = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
 
   const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(survey, Record.getCycle(record), recordKeyNodes, Record.getUuid(record), excludeRecordFromCount, t)
@@ -74,10 +74,6 @@ const validateRecordsUniquenessAndPersistValidation = async (survey, record, exc
   }
 }
 
-module.exports = {
-  persistValidation,
-  updateRecordValidationsFromValues: RecordRepository.updateRecordValidationsFromValues,
-  validateNodesAndPersistValidation,
-  validateRecordKeysUniqueness: RecordUniquenessValidator.validateRecordKeysUniqueness,
-  validateRecordsUniquenessAndPersistValidation,
-}
+export const updateRecordValidationsFromValues = RecordRepository.updateRecordValidationsFromValues
+
+export const validateRecordKeysUniqueness = RecordUniquenessValidator.validateRecordKeysUniqueness

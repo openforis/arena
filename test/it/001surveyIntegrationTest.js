@@ -1,10 +1,10 @@
-require('dotenv').config()
+import 'dotenv/config'
 
-const {initTestContext, destroyTestContext} = require('../testContext')
+import { initTestContext, destroyTestContext } from '../testContext';
 
-const SurveyIntegrationTest = require('./surveyTests/surveyTest')
-const CategoryTest = require('./surveyTests/categoryTest')
-const NodeDefTest = require('./surveyTests/nodeDefTest')
+import * as SurveyIntegrationTest from './surveyTests/surveyTest'
+import * as CategoryTest from './surveyTests/categoryTest'
+import * as NodeDefTest from './surveyTests/nodeDefTest'
 
 before(initTestContext)
 

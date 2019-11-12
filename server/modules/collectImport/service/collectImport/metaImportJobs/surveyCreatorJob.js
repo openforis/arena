@@ -1,17 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
+import * as Survey from '@core/survey/survey'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const ActivityLog = require('@common/activityLog/activityLog')
-const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-const CollectSurvey = require('../model/collectSurvey')
+import * as CollectSurvey from '../model/collectSurvey'
 
-class SurveyCreatorJob extends Job {
+export default class SurveyCreatorJob extends Job {
 
   constructor (params) {
     super('SurveyCreatorJob', params)
@@ -56,5 +56,3 @@ class SurveyCreatorJob extends Job {
     this.setContext({ survey, surveyId, defaultLanguage })
   }
 }
-
-module.exports = SurveyCreatorJob

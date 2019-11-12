@@ -1,11 +1,9 @@
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
-class UnauthorizedError extends SystemError {
+export default class UnauthorizedError extends SystemError {
   constructor (userName) {
     super('appErrors.userNotAuthorized', { userName })
 
     this.name = 'UnauthorizedError'
   }
 }
-
-module.exports = UnauthorizedError

@@ -1,21 +1,23 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Log = require('@server/log/log').getLogger('RecordUpdateThread')
+import * as Log from '@server/log/log'
 
-const messageTypes = require('./recordThreadMessageTypes')
-const Thread = require('@server/threads/thread')
+import { messageTypes } from './recordThreadMessageTypes'
+import Thread from '@server/threads/thread'
 
-const SurveyManager = require('../../../../survey/manager/surveyManager')
-const RecordManager = require('../../../manager/recordManager')
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as RecordManager from '../../../manager/recordManager'
 
-const Survey = require('@core/survey/survey')
-const Record = require('@core/record/record')
-const Validation = require('@core/validation/validation')
-const Queue = require('@core/queue')
+import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
+import * as Validation from '@core/validation/validation'
+import Queue from '@core/queue'
 
-const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-const RecordUpdateThreadParams = require('./recordUpdateThreadParams')
+import * as RecordUpdateThreadParams from './recordUpdateThreadParams'
+
+const Logger = Log.getLogger('RecordUpdateThread')
 
 class RecordUpdateThread extends Thread {
 
@@ -92,7 +94,7 @@ class RecordUpdateThread extends Thread {
   }
 
   async processMessage (msg) {
-    Log.debug('process message', msg)
+    Logger.debug('process message', msg)
 
     switch (msg.type) {
       case messageTypes.threadInit:
@@ -144,4 +146,5 @@ class RecordUpdateThread extends Thread {
 }
 
 new RecordUpdateThread()
+
 

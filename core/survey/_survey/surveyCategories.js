@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Category = require('../category')
+import * as Category from '../category'
 
 const categories = 'categories'
 
 // ====== READ
-const getCategories = R.pipe(
+export const getCategories = R.pipe(
   R.prop(categories),
   R.defaultTo({})
 )
 
-const getCategoriesArray = R.pipe(
+export const getCategoriesArray = R.pipe(
   getCategories,
   R.values,
   //sort by name
@@ -26,18 +26,10 @@ const getCategoriesArray = R.pipe(
   })
 )
 
-const getCategoryByUuid = uuid => R.pipe(
+export const getCategoryByUuid = uuid => R.pipe(
   getCategories,
   R.prop(uuid)
 )
 
 // ====== UPDATE
-const assocCategories = newCategories => R.assoc(categories, newCategories)
-
-module.exports = {
-  getCategories,
-  getCategoriesArray,
-  getCategoryByUuid,
-
-  assocCategories,
-}
+export const assocCategories = newCategories => R.assoc(categories, newCategories)

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 
 import * as R from 'ramda'
 import * as d3 from 'd3'
-import DateUtils from '@core/dateUtils'
+import * as DateUtils from '@core/dateUtils'
 
 const getAxisValues = (from, to) => {
   const fromDate = DateUtils.parseISO(from)

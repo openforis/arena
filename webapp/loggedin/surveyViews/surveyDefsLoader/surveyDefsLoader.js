@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import Survey from '@core/survey/survey'
+import * as Survey from '@core/survey/survey'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 

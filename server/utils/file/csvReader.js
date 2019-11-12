@@ -1,9 +1,9 @@
-const csvParser = require('csv').parse
-const fs = require('fs')
+import { parse as csvParser } from 'csv'
+import * as fs from 'fs'
 
-const Queue = require('@core/queue')
+import Queue from '@core/queue'
 
-const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
+export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
   let canceled = false
   const queue = new Queue()
@@ -83,10 +83,10 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
   return { start, cancel }
 }
 
-const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
+export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
   createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
 
-const readHeadersFromStream = async stream => {
+export const readHeadersFromStream = async stream => {
   let result = []
 
   const reader = createReaderFromStream(
@@ -99,10 +99,4 @@ const readHeadersFromStream = async stream => {
   await reader.start()
 
   return result
-}
-
-module.exports = {
-  createReaderFromFile,
-  createReaderFromStream,
-  readHeadersFromStream,
 }

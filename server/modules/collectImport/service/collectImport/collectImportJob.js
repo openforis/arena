@@ -1,20 +1,20 @@
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const SurveyManager = require('../../../survey/manager/surveyManager')
+import * as SurveyManager from '../../../survey/manager/surveyManager'
 
-const CollectSurveyReaderJob = require('./metaImportJobs/collectSurveyReaderJob')
-const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')
-const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
-const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
-const SamplingPointDataImportJob = require('./metaImportJobs/samplingPointDataImportJob')
-const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
-const SurveyDependencyGraphsGenerationJob = require('../../../survey/service/surveyDependencyGraphsGenerationJob')
+import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
+import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
+import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
+import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
+import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImportJob'
+import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
+import SurveyDependencyGraphsGenerationJob from '../../../survey/service/surveyDependencyGraphsGenerationJob'
 
-const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
-const RecordsUniquenessValidationJob = require('../../../record/service/recordsUniquenessValidationJob')
-const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
+import RecordsImportJob from './dataImportJobs/recordsImportJob'
+import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
+import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
 
-class CollectImportJob extends Job {
+export default class CollectImportJob extends Job {
 
   constructor (params) {
     super(CollectImportJob.type, params, [
@@ -54,5 +54,3 @@ class CollectImportJob extends Job {
 }
 
 CollectImportJob.type = 'CollectImportJob'
-
-module.exports = CollectImportJob

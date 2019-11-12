@@ -8,8 +8,8 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
-import Survey from '@core/survey/survey'
-import Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'

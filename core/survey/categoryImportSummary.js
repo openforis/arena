@@ -1,11 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const keys = {
+export const keys = {
   columns: 'columns',
   filePath: 'filePath',
 }
 
-const keysColumn = {
+export const keysColumn = {
   dataType: 'dataType',
   lang: 'lang',
   levelIndex: 'levelIndex',
@@ -14,7 +14,7 @@ const keysColumn = {
   type: 'type',
 }
 
-const columnTypes = {
+export const columnTypes = {
   code: 'code',
   description: 'description',
   extra: 'extra',
@@ -23,16 +23,18 @@ const columnTypes = {
 
 // ===== SUMMARY
 
-const newSummary = (columns, filePath = null) => ({
+export const newSummary = (columns, filePath = null) => ({
   [keys.columns]: columns,
   [keys.filePath]: filePath
 })
 
-const getColumns = R.propOr({}, keys.columns)
+export const getColumns = R.propOr({}, keys.columns)
+
+export const getFilePath = R.prop(keys.filePath)
 
 // ===== COLUMN
 
-const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
+export const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
   [keysColumn.type]: type,
   [keysColumn.levelName]: levelName,
   [keysColumn.levelIndex]: levelIndex,
@@ -40,36 +42,38 @@ const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataTyp
   [keysColumn.dataType]: dataType,
 })
 
-const getColumnType = R.prop(keysColumn.type)
+export const getColumnType = R.prop(keysColumn.type)
 
-const getColumnLevelName = R.prop(keysColumn.levelName)
+export const getColumnLevelName = R.prop(keysColumn.levelName)
 
-const getColumnLevelIndex = R.prop(keysColumn.levelIndex)
+export const getColumnLevelIndex = R.prop(keysColumn.levelIndex)
 
-const getColumnLang = R.prop(keysColumn.lang)
+export const getColumnLang = R.prop(keysColumn.lang)
 
-const getColumnDataType = R.prop(keysColumn.dataType)
+export const getColumnDataType = R.prop(keysColumn.dataType)
 
 const isColumnType = type => R.pipe(
   getColumnType,
   R.equals(type)
 )
 
-const isColumnCode = isColumnType(columnTypes.code)
-const isColumnExtra = isColumnType(columnTypes.extra)
-const isColumnLabel = isColumnType(columnTypes.label)
-const isColumnDescription = isColumnType(columnTypes.description)
+export const isColumnCode = isColumnType(columnTypes.code)
+export const isColumnExtra = isColumnType(columnTypes.extra)
+export const isColumnLabel = isColumnType(columnTypes.label)
+export const isColumnDescription = isColumnType(columnTypes.description)
+
+export const hasColumnLang = column => isColumnLabel(column) || isColumnDescription(column)
 
 // ===== UTILS
 
-const getLevelNames = R.pipe(
+export const getLevelNames = R.pipe(
   getColumns,
   R.values,
   R.filter(isColumnCode),
   R.map(getColumnLevelName)
 )
 
-const getColumnName = (type, levelIndex) => R.pipe(
+export const getColumnName = (type, levelIndex) => R.pipe(
   getColumns,
   Object.entries,
   R.find(([columnName, column]) =>
@@ -78,45 +82,12 @@ const getColumnName = (type, levelIndex) => R.pipe(
   entry => entry ? entry[0] : null
 )
 
-const hasColumn = (type, levelIndex) => R.pipe(
+export const hasColumn = (type, levelIndex) => R.pipe(
   getColumnName(type, levelIndex),
   R.isNil,
   R.not
 )
 
-module.exports = {
-  columnTypes,
-
-  keys,
-  keysColumn,
-
-  // ==== SUMMARY
-  // CREATE
-  newSummary,
-  // READ
-  getColumns,
-  getFilePath: R.prop(keys.filePath),
-  // UPDATE
-  assocColumns: R.assoc(keys.columns),
-  assocColumnDataType: (columnName, dataType) => R.assocPath([keys.columns, columnName, keysColumn.dataType], dataType),
-
-  // ==== COLUMN
-  newColumn,
-
-  getColumnType,
-  getColumnLevelName,
-  getColumnLevelIndex,
-  getColumnLang,
-  getColumnDataType,
-
-  isColumnCode,
-  isColumnExtra,
-  isColumnLabel,
-  isColumnDescription,
-  hasColumnLang: column => isColumnLabel(column) || isColumnDescription(column),
-
-  // ==== utils
-  getLevelNames,
-  getColumnName,
-  hasColumn,
-}
+// UPDATE
+export const assocColumns = R.assoc(keys.columns)
+export const assocColumnDataType = (columnName, dataType) => R.assocPath([keys.columns, columnName, keysColumn.dataType], dataType)

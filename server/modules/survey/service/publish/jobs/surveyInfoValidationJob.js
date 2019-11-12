@@ -1,11 +1,11 @@
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const Validation = require('@core/validation/validation')
-const Survey = require('@core/survey/survey')
+import * as Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
 
-const SurveyManager = require('../../../manager/surveyManager')
+import * as SurveyManager from '../../../manager/surveyManager'
 
-class SurveyInfoValidationJob extends Job {
+export default class SurveyInfoValidationJob extends Job {
 
   constructor (params) {
     super(SurveyInfoValidationJob.type, params)
@@ -24,5 +24,3 @@ class SurveyInfoValidationJob extends Job {
 }
 
 SurveyInfoValidationJob.type = 'SurveyInfoValidationJob'
-
-module.exports = SurveyInfoValidationJob

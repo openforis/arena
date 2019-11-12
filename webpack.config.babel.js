@@ -1,17 +1,17 @@
-const path = require('path')
-const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const GoogleFontsPlugin = require('google-fonts-plugin')
-const GitRevisionPlugin = require('git-revision-webpack-plugin')
+import 'dotenv/config'
+import path from 'path'
+import webpack from 'webpack'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import HtmlReplaceWebpackPlugin from 'html-replace-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
+import GoogleFontsPlugin from 'google-fonts-plugin'
+import GitRevisionPlugin from 'git-revision-webpack-plugin'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import uuidv4 from 'uuid/v4'
+import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-require('dotenv').config()
-const uuidv4 = require('uuid/v4')
-
-const ProcessUtils = require('./core/processUtils')
+import * as ProcessUtils from './core/processUtils'
 
 const buildReport = ProcessUtils.ENV.buildReport
 
@@ -112,7 +112,7 @@ const webPackConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/env', '@babel/react'],
+            presets: ['@babel/preset-env', '@babel/react'],
             plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
           }
         }
@@ -134,8 +134,6 @@ const webPackConfig = {
 
 // if (prodBuild) {
 
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
 webpack.optimization = {
   minimizer: [
     new UglifyJsPlugin({
@@ -155,4 +153,4 @@ webpack.optimization = {
 webPackConfig.devtool = 'source-map'
 // }
 
-module.exports = webPackConfig
+export default webPackConfig

@@ -1,7 +1,7 @@
-const R = require('ramda')
-const ObjectUtils = require('@core/objectUtils')
+import * as R from 'ramda'
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   uuid: 'uuid',
   permissions: 'permissions',
   recordSteps: 'recordSteps',
@@ -12,7 +12,7 @@ const keys = {
   name: 'name',
 }
 
-const permissions = {
+export const permissions = {
   // surveys
   surveyCreate: 'surveyCreate',
 
@@ -36,7 +36,7 @@ const permissions = {
   permissionsEdit: 'permissionsEdit',
 }
 
-const groupNames = {
+export const groupNames = {
   systemAdmin: 'systemAdmin',
   surveyAdmin: 'surveyAdmin',
   surveyEditor: 'surveyEditor',
@@ -46,40 +46,26 @@ const groupNames = {
   surveyGuest: 'surveyGuest',
 }
 
-const getUuid = R.prop(keys.uuid)
+export const getUuid = R.prop(keys.uuid)
 
-const getName = R.prop(keys.name)
+export const getName = R.prop(keys.name)
 
-const getSurveyUuid = R.prop(keys.surveyUuid)
+export const getSurveyUuid = R.prop(keys.surveyUuid)
 
-const getSurveyId = R.prop(keys.surveyId)
+export const getSurveyId = R.prop(keys.surveyId)
 
-const getPermissions = R.propOr([], keys.permissions)
+export const getPermissions = R.propOr([], keys.permissions)
 
-const getRecordSteps = R.propOr([], keys.recordSteps)
+export const getRecordSteps = R.propOr([], keys.recordSteps)
 
-const getRecordEditLevel = step => R.pipe(
+export const getRecordEditLevel = step => R.pipe(
   getRecordSteps,
   R.prop(step),
 )
 
-const isSystemAdminGroup = R.pipe(
+export const isSystemAdminGroup = R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
 )
 
-module.exports = {
-  keys,
-  permissions,
-  groupNames,
-
-  getUuid,
-  getName,
-  getSurveyId,
-  getSurveyUuid,
-  getPermissions,
-  getRecordSteps,
-  getRecordEditLevel,
-  isSystemAdminGroup,
-  isEqual: ObjectUtils.isEqual,
-}
+export const isEqual = ObjectUtils.isEqual

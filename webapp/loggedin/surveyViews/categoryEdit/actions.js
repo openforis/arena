@@ -4,9 +4,9 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import Category from '@core/survey/category'
-import CategoryLevel from '@core/survey/categoryLevel'
-import CategoryItem from '@core/survey/categoryItem'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 
 import {
   categoryCreate,

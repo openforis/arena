@@ -1,31 +1,21 @@
-const ThreadsCache = require('@server/threads/threadsCache')
+import ThreadsCache from '@server/threads/threadsCache'
 
 const threads = new ThreadsCache()
 const threadZombies = new Set() // set of threads marked to be killed
 
 // thread cache
-const get = recordUuid => threads.getThread(recordUuid)
+export const get = recordUuid => threads.getThread(recordUuid)
 
-const put = (recordUuid, thread) => threads.putThread(recordUuid, thread)
+export const put = (recordUuid, thread) => threads.putThread(recordUuid, thread)
 
-const remove = recordUuid => {
+export const remove = recordUuid => {
   threads.removeThread(recordUuid)
   threadZombies.delete(recordUuid)
 }
 
 // thread zombies
-const markZombie = recordUuid => threadZombies.add(recordUuid)
+export const markZombie = recordUuid => threadZombies.add(recordUuid)
 
-const reviveZombie = recordUuid => threadZombies.delete(recordUuid)
+export const reviveZombie = recordUuid => threadZombies.delete(recordUuid)
 
-const isZombie = recordUuid => threadZombies.has(recordUuid)
-
-module.exports = {
-  get,
-  remove,
-  put,
-
-  markZombie,
-  reviveZombie,
-  isZombie,
-}
+export const isZombie = recordUuid => threadZombies.has(recordUuid)

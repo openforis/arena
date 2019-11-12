@@ -6,7 +6,9 @@ FROM node:12-alpine AS base
 COPY package.json yarn.lock /app/
 
 RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass
-COPY . /app/
+
+COPY .git /app/.git
+RUN cd /app; git reset --hard
 
 ############################################################
 

@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
-const ColProps = require('./dataColProps')
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as ColProps from './dataColProps'
 
-const getNames = NodeDefTable.getColNames
+export const getNames = NodeDefTable.getColNames
 
-const getNamesAndType = nodeDefCol =>
+export const getNamesAndType = nodeDefCol =>
   getNames(nodeDefCol).map(col =>
     `${col} ${ColProps.getColTypeProcessor(nodeDefCol)(col)}`
   )
 
-const getValues = (survey, nodeDefCol, nodeCol = {}) => {
+export const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
   const valueFn = valueFnProcessor(survey, nodeDefCol, nodeCol)
   const values = getNames(nodeDefCol).map(colName =>
@@ -19,15 +19,7 @@ const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   return values
 }
 
-const getValue = R.pipe(
+export const getValue = R.pipe(
   getValues,
   R.head
 )
-
-module.exports = {
-  getNames,
-  getNamesAndType,
-
-  getValues,
-  getValue,
-}

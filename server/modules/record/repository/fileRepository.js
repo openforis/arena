@@ -1,12 +1,12 @@
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const RecordFile = require('@core/record/recordFile')
+import * as RecordFile from '@core/record/recordFile'
 
-const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils';
 
 // ============== CREATE
 
-const insertFile = async (surveyId, file, client = db) => {
+export const insertFile = async (surveyId, file, client = db) => {
   const { uuid, props, content } = file
 
   return await client.one(`
@@ -19,14 +19,14 @@ const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-const fetchFileByUuid = async (surveyId, uuid, client = db) =>
+export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
   await client.one(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
 
-const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
+export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
   await client.one(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.nodeUuid}' = $1`,
@@ -34,29 +34,16 @@ const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
   )
 
 // ============== DELETE
-const deleteFileByUuid = async (surveyId, uuid, client = db) =>
+export const deleteFileByUuid = async (surveyId, uuid, client = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
 
-const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
+export const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
     [uuids]
   )
-
-module.exports = {
-  //CREATE
-  insertFile,
-
-  //READ
-  fetchFileByUuid,
-  fetchFileByNodeUuid,
-
-  //DELETE
-  deleteFileByUuid,
-  deleteFilesByRecordUuids
-}

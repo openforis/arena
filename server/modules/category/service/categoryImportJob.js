@@ -1,25 +1,24 @@
-const fs = require('fs')
-const R = require('ramda')
+import * as fs from 'fs'
+import * as R from 'ramda'
 
-const ActivityLog = require('@common/activityLog/activityLog')
-const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
-const Job = require('@server/job/job')
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import Job from '@server/job/job'
 
-const Category = require('@core/survey/category')
-const CategoryImportSummary = require('@core/survey/categoryImportSummary')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const CategoryItem = require('@core/survey/categoryItem')
-const Validation = require('@core/validation/validation')
-const StringUtils = require('@core/stringUtils')
-const ObjectUtils = require('@core/objectUtils')
+import * as Category from '@core/survey/category'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Validation from '@core/validation/validation'
+import * as StringUtils from '@core/stringUtils'
+import * as ObjectUtils from '@core/objectUtils'
 
-const BatchPersister = require('@server/db/batchPersister')
+import BatchPersister from '@server/db/batchPersister'
+import * as CategoryManager from '../manager/categoryManager'
+import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
+import * as CategoryImportJobParams from './categoryImportJobParams'
 
-const CategoryManager = require('../manager/categoryManager')
-const CategoryImportCSVParser = require('../manager/categoryImportCSVParser')
-const CategoryImportJobParams = require('./categoryImportJobParams')
-
-class CategoryImportJob extends Job {
+export default class CategoryImportJob extends Job {
 
   constructor (params, type = CategoryImportJob.type) {
     super(type, params)
@@ -295,6 +294,4 @@ class CategoryImportJob extends Job {
 }
 
 CategoryImportJob.type = 'CategoryImportJob'
-
-module.exports = CategoryImportJob
 

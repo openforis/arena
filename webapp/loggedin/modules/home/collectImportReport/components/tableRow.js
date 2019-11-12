@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
 import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
 import Checkbox from '@webapp/commonComponents/form/checkbox'

@@ -1,20 +1,20 @@
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-const Job = require('@server/job/job')
-const ActivityLogManager = require('@server/modules/activityLog/manager/activityLogManager')
+import Job from '@server/job/job'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
-const NodeDefsValidationJob = require('./jobs/nodeDefsValidationJob')
-const CategoriesValidationJob = require('./jobs/categoriesValidationJob')
-const TaxonomiesValidationJob = require('./jobs/taxonomiesValidationJob')
-const SurveyInfoValidationJob = require('./jobs/surveyInfoValidationJob')
-const RecordCheckJob = require('../recordCheckJob')
-const SurveyPropsPublishJob = require('./jobs/surveyPropsPublishJob')
-const CyclesDeletedCheckJob = require('./jobs/cyclesDeletedCheckJob')
-const SurveyDependencyGraphsGenerationJob = require('../surveyDependencyGraphsGenerationJob')
-const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
-const RecordsUniquenessValidationJob = require('../../../record/service/recordsUniquenessValidationJob')
+import NodeDefsValidationJob from './jobs/nodeDefsValidationJob'
+import CategoriesValidationJob from './jobs/categoriesValidationJob'
+import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
+import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
+import RecordCheckJob from '../recordCheckJob'
+import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
+import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
+import SurveyDependencyGraphsGenerationJob from '../surveyDependencyGraphsGenerationJob'
+import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
+import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
 
-class SurveyPublishJob extends Job {
+export default class SurveyPublishJob extends Job {
 
   constructor (params) {
     super(SurveyPublishJob.type, params, [
@@ -40,5 +40,3 @@ class SurveyPublishJob extends Job {
 }
 
 SurveyPublishJob.type = 'SurveyPublishJob'
-
-module.exports = SurveyPublishJob

@@ -1,18 +1,18 @@
-const { expect } = require('chai')
+import { expect } from 'chai';
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
-const RecordManager = require('@server/modules/record/manager/recordManager')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-const { getContextUser } = require('../testContext')
+import { getContextUser } from '../testContext';
 
-const SB = require('./utils/surveyBuilder')
-const RB = require('./utils/recordBuilder')
-const RecordUtils = require('./utils/recordUtils')
+import * as SB from './utils/surveyBuilder'
+import * as RB from './utils/recordBuilder'
+import * as RecordUtils from './utils/recordUtils'
 
 let survey
 let record

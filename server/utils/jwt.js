@@ -1,9 +1,9 @@
-const axios = require('axios')
-const jwkToPem = require('jwk-to-pem')
-const jsonwebtoken = require('jsonwebtoken')
+import * as axios from 'axios'
+import * as jwkToPem from 'jwk-to-pem'
+import * as jsonwebtoken from 'jsonwebtoken'
 
-const JwtConstants = require('@core/auth/jwtConstants')
-const ProcessUtils = require('@core/processUtils')
+import * as JwtConstants from '@core/auth/jwtConstants'
+import * as ProcessUtils from '@core/processUtils'
 
 const region = ProcessUtils.ENV.cognitoRegion
 const poolId = ProcessUtils.ENV.cognitoUserPoolId
@@ -41,7 +41,7 @@ const _findVerificationKey = (token, pemList) => {
 const _verifyToken = (token, pem) =>
   jsonwebtoken.verify(token, pem, verificationOptions)
 
-const validate = async token => {
+export const validate = async token => {
   let verificationKey = _findVerificationKey(token, indexedKeys)
 
   // Refresh verification keys if none was found and search again
@@ -53,14 +53,8 @@ const validate = async token => {
   return _verifyToken(token, verificationKey)
 }
 
-const getExpiration = token => _decode(token).payload.exp
+export const getExpiration = token => _decode(token).payload.exp
 
-const getJti = token => _decode(token).payload.jti
+export const getJti = token => _decode(token).payload.jti
 
-module.exports = {
-  bearerPrefix: JwtConstants.bearer,
-
-  validate,
-  getExpiration,
-  getJti,
-}
+export const bearerPrefix = JwtConstants.bearer

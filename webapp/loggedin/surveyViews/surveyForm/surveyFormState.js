@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import Record from '@core/record/record'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyViewsState from '../surveyViewsState'
 import * as RecordState from '../record/recordState'

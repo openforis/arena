@@ -1,15 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
-const SurveyNodeDefs = require('./surveyNodeDefs')
-const NodeDef = require('@core/survey/nodeDef')
-const RecordReader = require('@core/record/_record/recordReader')
-const Node = require('@core/record/node')
+import * as SurveyNodeDefs from './surveyNodeDefs'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as RecordReader from '@core/record/_record/recordReader'
+import * as Node from '@core/record/node'
 
-const CategoryItem = require('@core/survey/categoryItem')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const Taxon = require('@core/survey/taxon')
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Taxon from '@core/survey/taxon'
 
 /**
  * categoryItemUuidIndex : {
@@ -55,7 +55,7 @@ const keys = {
 // ====== READ
 
 // ==== category index
-const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => survey => {
+export const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => survey => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   let parentCategoryItemUuid = 'null'
@@ -77,11 +77,11 @@ const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode
   }
 }
 
-const getCategoryItemByUuid = categoryItemUuid => R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
+export const getCategoryItemByUuid = categoryItemUuid => R.pathOr(null, [keys.indexRefData, keys.categoryItemIndex, categoryItemUuid])
 
 // ==== taxonomy index
 
-const getTaxonUuid = (nodeDef, taxonCode) => survey => {
+export const getTaxonUuid = (nodeDef, taxonCode) => survey => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
     [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.uuid],
@@ -89,7 +89,7 @@ const getTaxonUuid = (nodeDef, taxonCode) => survey => {
   )
 }
 
-const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => survey => {
+export const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => survey => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
     [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.vernacularNames, vernacularName],
@@ -97,7 +97,7 @@ const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => surve
   )
 }
 
-const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => survey => {
+export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => survey => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.pipe(
     R.path(
@@ -108,11 +108,11 @@ const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => 
   )(survey)
 }
 
-const getTaxonByUuid = taxonUuid => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
+export const getTaxonByUuid = taxonUuid => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
 
 // ====== UPDATE
 
-const assocRefData = (categoryItemsRefData, taxaIndexRefData) => survey => {
+export const assocRefData = (categoryItemsRefData, taxaIndexRefData) => survey => {
   const refDataIndex = {
     ..._getCategoryIndex(categoryItemsRefData),
     ..._getTaxonomyIndex(taxaIndexRefData),
@@ -166,17 +166,3 @@ const _getTaxonomyIndex = R.reduce(
   },
   {}
 )
-
-module.exports = {
-  // ==== category index
-  getCategoryItemUuidAndCodeHierarchy,
-  getCategoryItemByUuid,
-
-  // ==== taxonomy index
-  getTaxonUuid,
-  getTaxonVernacularNameUuid,
-  getTaxonByUuid,
-  includesTaxonVernacularName,
-
-  assocRefData,
-}

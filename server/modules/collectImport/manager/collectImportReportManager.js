@@ -1,12 +1,10 @@
-const CollectImportReportRepository = require('../repository/collectImportReportRepository')
+import * as CollectImportReportRepository from '../repository/collectImportReportRepository'
 
-module.exports = {
-  insertItem: CollectImportReportRepository.insertItem,
+export const insertItem = CollectImportReportRepository.insertItem
 
-  // READ
-  fetchItems: CollectImportReportRepository.fetchItems,
-  countItems: CollectImportReportRepository.countItems,
+// READ
+export const fetchItems = CollectImportReportRepository.fetchItems
+export const countItems = CollectImportReportRepository.countItems
 
-  // UPDATE
-  updateItem: CollectImportReportRepository.updateItem
-}
+// UPDATE
+export const updateItem = CollectImportReportRepository.updateItem

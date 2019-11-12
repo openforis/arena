@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import Survey from '@core/survey/survey'
-import User from '@core/user/user'
-import AuthGroup from '@core/auth/authGroup'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+import * as AuthGroup from '@core/auth/authGroup'
 
 export const keys = {
   status: 'status',

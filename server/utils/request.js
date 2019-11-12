@@ -1,10 +1,10 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const User = require('@core/user/user')
+import * as User from '@core/user/user'
 
-const getServerUrl = req => `${req.protocol}://${req.get('host')}`
+export const getServerUrl = req => `${req.protocol}://${req.get('host')}`
 
-const getParams = req => R.pipe(
+export const getParams = req => R.pipe(
   R.mergeLeft(R.prop('query', req)),
   R.mergeLeft(R.prop('params', req)),
   R.mergeLeft(R.prop('body', req)),
@@ -18,48 +18,29 @@ const getParams = req => R.pipe(
   )
 )({})
 
-const getJsonParam = (req, param, defaultValue = null) => {
+export const getJsonParam = (req, param, defaultValue = null) => {
   const jsonStr = R.prop(param, getParams(req))
   return jsonStr
     ? JSON.parse(jsonStr)
     : defaultValue
 }
 
-const getFile = R.pathOr(null, ['files', 'file'])
+export const getFile = R.pathOr(null, ['files', 'file'])
 
-const getBody = R.propOr(null, 'body')
+export const getBody = R.propOr(null, 'body')
 
 // User
 
-const getUser = R.prop('user')
-const getUserUuid = R.pipe(getUser, R.prop('uuid'))
-const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
+export const getUser = R.prop('user')
+export const getUserUuid = R.pipe(getUser, R.prop('uuid'))
+export const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
 // i18n
 
-const getI18n = R.prop('i18n')
+export const getI18n = R.prop('i18n')
 
 // Cookies
 
 const getCookie = name => R.path(['cookies', name])
 
-const getSocketId = getCookie('io')
-
-module.exports = {
-  getServerUrl,
-  getParams,
-  getJsonParam,
-  getFile,
-  getBody,
-
-  // User
-  getUserUuid,
-  getUser,
-  getSurveyCycleKey,
-
-  // i18n
-  getI18n,
-
-  // Cookies
-  getSocketId
-}
+export const getSocketId = getCookie('io')

@@ -1,14 +1,14 @@
-const R = require('ramda')
-const { uuidv4 } = require('@core/uuid')
+import * as R from 'ramda'
+import { uuidv4 } from '@core/uuid';
 
-const ObjectUtils = require('@core/objectUtils')
-const NodeDefValidations = require('./nodeDefValidations')
+import * as ObjectUtils from '@core/objectUtils'
+import * as NodeDefValidations from './nodeDefValidations'
 
-const StringUtils = require('@core/stringUtils')
+import * as StringUtils from '@core/stringUtils'
 
 // ======== NODE DEF PROPERTIES
 
-const nodeDefType = {
+export const nodeDefType = {
   integer: 'integer',
   decimal: 'decimal',
   text: 'text',
@@ -22,7 +22,7 @@ const nodeDefType = {
   entity: 'entity',
 }
 
-const keys = {
+export const keys = {
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
@@ -34,7 +34,7 @@ const keys = {
   published: 'published',
 }
 
-const propKeys = {
+export const propKeys = {
   applicable: 'applicable',
   cycles: 'cycles',
   defaultValues: 'defaultValues',
@@ -57,11 +57,11 @@ const metaKeys = {
   h: 'h',
 }
 
-const maxKeyAttributes = 3
+export const maxKeyAttributes = 3
 
 // ==== CREATE
 
-const newNodeDef = (parentUuid, type, cycle, props, analysis = false) => ({
+export const newNodeDef = (parentUuid, type, cycle, props, analysis = false) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: parentUuid,
   [keys.type]: type,
@@ -74,62 +74,83 @@ const newNodeDef = (parentUuid, type, cycle, props, analysis = false) => ({
 
 // ==== READ
 
-const getType = R.prop(keys.type)
-const getName = ObjectUtils.getProp(propKeys.name, '')
-const getParentUuid = ObjectUtils.getParentUuid
-const getCycles = ObjectUtils.getProp(propKeys.cycles, [])
+export const getType = R.prop(keys.type)
+export const getName = ObjectUtils.getProp(propKeys.name, '')
+export const getParentUuid = ObjectUtils.getParentUuid
+export const getCycles = ObjectUtils.getProp(propKeys.cycles, [])
 
-const isKey = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
-const isRoot = R.pipe(getParentUuid, R.isNil)
-const isMultiple = R.pipe(ObjectUtils.getProp(propKeys.multiple), R.equals(true))
-const isSingle = R.pipe(isMultiple, R.not)
+export const isKey = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
+export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isMultiple = R.pipe(ObjectUtils.getProp(propKeys.multiple), R.equals(true))
+export const isSingle = R.pipe(isMultiple, R.not)
 
 const isType = type => R.pipe(getType, R.equals(type))
 
-const isEntity = isType(nodeDefType.entity)
-const isSingleEntity = nodeDef => isEntity(nodeDef) && isSingle(nodeDef)
-const isMultipleEntity = nodeDef => isEntity(nodeDef) && isMultiple(nodeDef)
-const isEntityOrMultiple = nodeDef => isEntity(nodeDef) || isMultiple(nodeDef)
+export const isEntity = isType(nodeDefType.entity)
+export const isSingleEntity = nodeDef => isEntity(nodeDef) && isSingle(nodeDef)
+export const isMultipleEntity = nodeDef => isEntity(nodeDef) && isMultiple(nodeDef)
+export const isEntityOrMultiple = nodeDef => isEntity(nodeDef) || isMultiple(nodeDef)
 
-const isAttribute = R.pipe(isEntity, R.not)
-const isSingleAttribute = nodeDef => isAttribute(nodeDef) && isSingle(nodeDef)
-const isMultipleAttribute = nodeDef => isAttribute(nodeDef) && isMultiple(nodeDef)
+export const isAttribute = R.pipe(isEntity, R.not)
+export const isSingleAttribute = nodeDef => isAttribute(nodeDef) && isSingle(nodeDef)
+export const isMultipleAttribute = nodeDef => isAttribute(nodeDef) && isMultiple(nodeDef)
+export const isReadOnly = ObjectUtils.getProp(propKeys.readOnly, false)
 
-const isBoolean = isType(nodeDefType.boolean)
-const isCode = isType(nodeDefType.code)
-const isCoordinate = isType(nodeDefType.coordinate)
-const isDecimal = isType(nodeDefType.decimal)
-const isFile = isType(nodeDefType.file)
-const isInteger = isType(nodeDefType.integer)
-const isTaxon = isType(nodeDefType.taxon)
+export const isBoolean = isType(nodeDefType.boolean)
+export const isCode = isType(nodeDefType.code)
+export const isCoordinate = isType(nodeDefType.coordinate)
+export const isDecimal = isType(nodeDefType.decimal)
+export const isFile = isType(nodeDefType.file)
+export const isInteger = isType(nodeDefType.integer)
+export const isTaxon = isType(nodeDefType.taxon)
 
-const isPublished = R.propEq(keys.published, true)
-const isDeleted = R.propEq(keys.deleted, true)
-const isAnalysis = R.propEq(keys.analysis, true)
+export const isPublished = R.propEq(keys.published, true)
+export const isDeleted = R.propEq(keys.deleted, true)
+export const isAnalysis = R.propEq(keys.analysis, true)
 
-const getLabel = (nodeDef, lang) => {
+export const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
   return StringUtils.isBlank(label)
     ? getName(nodeDef)
     : label
 }
 
-const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
-const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+export const getUuid = ObjectUtils.getUuid
+export const getProp = ObjectUtils.getProp
+export const getProps = ObjectUtils.getProps
+export const isEqual = ObjectUtils.isEqual
 
-const getValidations = ObjectUtils.getProp(propKeys.validations, {})
+export const getLabels = ObjectUtils.getLabels
+export const getDescriptions = ObjectUtils.getProp(propKeys.descriptions, {})
+export const getCategoryUuid = ObjectUtils.getProp(propKeys.categoryUuid)
+export const getTaxonomyUuid = ObjectUtils.getProp(propKeys.taxonomyUuid)
+export const getCycleFirst = R.pipe(getCycles, R.head)
+
+//advanced props
+export const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
+export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+
+export const getValidations = ObjectUtils.getProp(propKeys.validations, {})
+
+export const getApplicable = ObjectUtils.getProp(propKeys.applicable, [])
+export const getValidationExpressions = R.pipe(
+  getValidations,
+  NodeDefValidations.getExpressions,
+)
+export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
+
 
 // ==== READ meta
-const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
+export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
-const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)
+export const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
-const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
+export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 
 // ==== UTILS
-const canNodeDefBeMultiple = nodeDef =>
+export const canNodeDefBeMultiple = nodeDef =>
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
   R.includes(
     getType(nodeDef),
@@ -142,9 +163,9 @@ const canNodeDefBeMultiple = nodeDef =>
     ]
   )
 
-const canNodeDefBeKey = nodeDef => canNodeDefTypeBeKey(getType(nodeDef))
+export const canNodeDefBeKey = nodeDef => canNodeDefTypeBeKey(getType(nodeDef))
 
-const canNodeDefTypeBeKey = type =>
+export const canNodeDefTypeBeKey = type =>
   R.includes(type,
     [
       nodeDefType.date,
@@ -157,7 +178,7 @@ const canNodeDefTypeBeKey = type =>
     ]
   )
 
-const canHaveDefaultValue = nodeDef =>
+export const canHaveDefaultValue = nodeDef =>
   isSingleAttribute(nodeDef) &&
   R.includes(
     getType(nodeDef),
@@ -174,77 +195,3 @@ const canHaveDefaultValue = nodeDef =>
   )
   // allow default value when parent code is null (for node def code)
   && !getParentCodeDefUuid(nodeDef)
-
-module.exports = {
-  nodeDefType,
-  keys,
-  propKeys,
-  maxKeyAttributes,
-
-  //CREATE
-  newNodeDef,
-
-  //READ
-  getUuid: ObjectUtils.getUuid,
-  getProp: ObjectUtils.getProp,
-  getProps: ObjectUtils.getProps,
-  isEqual: ObjectUtils.isEqual,
-
-  getType,
-  getName,
-  getParentUuid,
-  getLabels: ObjectUtils.getLabels,
-  getLabel,
-  getDescriptions: ObjectUtils.getProp(propKeys.descriptions, {}),
-  getCategoryUuid: ObjectUtils.getProp(propKeys.categoryUuid),
-  getParentCodeDefUuid,
-  getTaxonomyUuid: ObjectUtils.getProp(propKeys.taxonomyUuid),
-  getCycles,
-  getCycleFirst: R.pipe(getCycles, R.head),
-
-  isKey,
-  isMultiple,
-  isSingle,
-  isRoot,
-  isEntity,
-  isAttribute,
-  isEntityOrMultiple,
-  isSingleEntity,
-  isMultipleEntity,
-  isSingleAttribute,
-  isMultipleAttribute,
-  isReadOnly: ObjectUtils.getProp(propKeys.readOnly, false),
-
-  isBoolean,
-  isCode,
-  isCoordinate,
-  isDecimal,
-  isFile,
-  isInteger,
-  isTaxon,
-
-  isPublished,
-  isDeleted,
-  isAnalysis,
-
-  //advanced props
-  getDefaultValues,
-  hasDefaultValues,
-  getApplicable: ObjectUtils.getProp(propKeys.applicable, []),
-  getValidations,
-  getValidationExpressions: R.pipe(
-    getValidations,
-    NodeDefValidations.getExpressions,
-  ),
-  hasAdvancedPropsDraft: R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not),
-
-  // meta
-  getMetaHierarchy,
-  assocMetaHierarchy,
-
-  //UTILS
-  canNodeDefBeMultiple,
-  canNodeDefBeKey,
-  canNodeDefTypeBeKey,
-  canHaveDefaultValue,
-}

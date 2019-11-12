@@ -8,12 +8,12 @@ import { FormItem } from '@webapp/commonComponents/form/input'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-import Taxon from '@core/survey/taxon'
-import NodeDef from '@core/survey/nodeDef'
-import Node from '@core/record/node'
-import NodeRefData from '@core/record/nodeRefData'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
-import StringUtils from '@core/stringUtils'
+import * as Taxon from '@core/survey/taxon'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as StringUtils from '@core/stringUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 

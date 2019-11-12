@@ -6,8 +6,8 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
 import * as SurveyFormState from '../surveyFormState'

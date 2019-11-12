@@ -1,7 +1,7 @@
-const Thread = require('@server/threads/thread')
+import Thread from '@server/threads/thread'
 
-const {jobThreadMessageTypes, jobToJSON} = require('./jobUtils')
-const JobCreator = require('./jobCreator')
+import { jobThreadMessageTypes, jobToJSON } from './jobUtils';
+import * as JobCreator from './jobCreator'
 
 class JobThread extends Thread {
 

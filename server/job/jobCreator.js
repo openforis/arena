@@ -1,9 +1,9 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const CategoryImportJob = require('@server/modules/category/service/categoryImportJob')
-const CollectImportJob = require('@server/modules/collectImport/service/collectImport/collectImportJob')
-const SurveyPublishJob = require('@server/modules/survey/service/publish/surveyPublishJob')
-const TaxonomyImportJob = require('@server/modules/taxonomy/service/taxonomyImportJob')
+import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
+import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
+import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
+import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 
 const jobClasses = [
   CategoryImportJob,
@@ -14,12 +14,8 @@ const jobClasses = [
 
 const getJobClass = jobType => R.find(R.propEq('type', jobType), jobClasses)
 
-const createJob = (jobType, params) => {
+export const createJob = (jobType, params) => {
   const JobClass = getJobClass(jobType)
 
   return new JobClass(params)
-}
-
-module.exports = {
-  createJob,
 }

@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import { Input } from '@webapp/commonComponents/form/input'
 
-import Survey from '@core/survey/survey'
+import * as Survey from '@core/survey/survey'
 import * as SurveyState from '@webapp/survey/surveyState'
 
 import { getLanguageLabel } from '@core/app/languages'

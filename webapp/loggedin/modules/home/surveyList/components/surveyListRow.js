@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Survey from '@core/survey/survey'
-import DateUtils from '@core/dateUtils'
+import * as Survey from '@core/survey/survey'
+import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 

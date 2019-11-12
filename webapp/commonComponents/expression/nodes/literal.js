@@ -9,8 +9,8 @@ import { BinaryOperandType } from './binaryOperand'
 import * as ExpressionParser from '../expressionParser'
 import { useAsyncGetRequest } from '../../hooks'
 
-import NodeDef from '@core/survey/nodeDef'
-import StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as StringUtils from '@core/stringUtils'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'

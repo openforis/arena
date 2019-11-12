@@ -1,12 +1,12 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const CategoryImportSummary = require('@core/survey/categoryImportSummary')
-const ObjectUtils = require('@core/objectUtils')
-const StringUtils = require('@core/stringUtils')
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 
-const CSVReader = require('@server/utils/file/csvReader')
+import * as CSVReader from '@server/utils/file/csvReader'
 
-const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
+export const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   return CSVReader.createReaderFromStream(
@@ -55,8 +55,4 @@ const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalCha
     },
     onTotalChange
   )
-}
-
-module.exports = {
-  createRowsReaderFromStream,
 }

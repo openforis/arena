@@ -3,7 +3,7 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 
-import User from '@core/user/user'
+import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
 import LoginView from '@webapp/login/loginView'
@@ -13,7 +13,7 @@ import AppNotificationView from './appNotification/appNotificationView'
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
-import WebSocketEvents from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import AppContext from './appContext'
 

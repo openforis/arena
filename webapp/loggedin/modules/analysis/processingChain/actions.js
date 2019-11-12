@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import { analysisModules, appModuleUri } from '@webapp/loggedin/appModules'

@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
 const keywords = [
   'asc',
@@ -20,8 +20,4 @@ const keywords = [
   'value',
 ]
 
-const isKeyword = value => R.includes(value, keywords)
-
-module.exports = {
-  isKeyword
-}
+export const isKeyword = value => R.includes(value, keywords)

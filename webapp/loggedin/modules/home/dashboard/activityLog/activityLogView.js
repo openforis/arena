@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import DateUtils from '@core/dateUtils'
+import * as DateUtils from '@core/dateUtils'
 
 import * as ActivityLogMessage from './activityLogMessage'
 

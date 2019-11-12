@@ -6,12 +6,12 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import Record from '@core/record/record'
-import Validation from '@core/validation/validation'
-import Authorizer from '@core/auth/authorizer'
-import Date from '@core/dateUtils'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Validation from '@core/validation/validation'
+import * as Authorizer from '@core/auth/authorizer'
+import * as Date from '@core/dateUtils'
 
 const RecordsRow = props => {
   const {

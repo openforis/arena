@@ -1,11 +1,11 @@
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-const Category = require('@core/survey/category')
-const Validation = require('@core/validation/validation')
+import * as Category from '@core/survey/category'
+import * as Validation from '@core/validation/validation'
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
+import * as CategoryManager from '../../../../category/manager/categoryManager'
 
-class CategoriesValidationJob extends Job {
+export default class CategoriesValidationJob extends Job {
 
   constructor (params) {
     super(CategoriesValidationJob.type, params)
@@ -33,5 +33,3 @@ class CategoriesValidationJob extends Job {
 }
 
 CategoriesValidationJob.type = 'CategoriesValidationJob'
-
-module.exports = CategoriesValidationJob
