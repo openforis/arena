@@ -6,8 +6,8 @@ import ExpressionEditor from '@webapp/commonComponents/expression/expressionEdit
 import LabelsEditor from '../../../labelsEditor/labelsEditor'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDefExpression from '@core/survey/nodeDefExpression'
-import ValidationResult from '@core/validation/validationResult'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as ValidationResult from '@core/validation/validationResult'
 import * as ValidationUtils from '@webapp/utils/validationUtils'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 

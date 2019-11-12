@@ -1,14 +1,14 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
 
-const Survey = require('../survey')
-const NodeDef = require('../nodeDef')
-const NodeDefLayout = require('../nodeDefLayout')
+import * as Survey from '../survey'
+import * as NodeDef from '../nodeDef'
+import * as NodeDefLayout from '../nodeDefLayout'
 
-const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
-const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
+import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
+import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
 const { keys, propKeys } = NodeDef
 
@@ -128,7 +128,7 @@ const validateNodeDef = async (survey, nodeDef) => {
   return Validation.isValid(validation) ? null : validation
 }
 
-const validateNodeDefs = async survey => {
+export const validateNodeDefs = async survey => {
   // build and assoc dependency graph to survey
   survey = R.pipe(
     Survey.buildDependencyGraph,
@@ -151,8 +151,3 @@ const validateNodeDefs = async survey => {
 
   return validation
 }
-
-module.exports = {
-  validateNodeDefs,
-}
-

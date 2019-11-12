@@ -1,12 +1,12 @@
-const fs = require('fs')
-const path = require('path')
-const R = require('ramda')
+import * as fs from 'fs'
+import * as path from 'path'
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const ProcessingStep = require('@common/analysis/processingStep')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingStep from '@common/analysis/processingStep'
 
-const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
+import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 
 const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
 
@@ -39,7 +39,7 @@ const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
   )
 }
 
-const generateScript = async (survey, cycle, processingStep, outputDir) => {
+export const generateScript = async (survey, cycle, processingStep, outputDir) => {
   const nodeDefTable = R.pipe(
     ProcessingStep.getEntityUuid,
     entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey)
@@ -50,8 +50,4 @@ const generateScript = async (survey, cycle, processingStep, outputDir) => {
     await _generateDataFile(survey, cycle, nodeDefTable, outputDir)
   }
 
-}
-
-module.exports = {
-  generateScript
 }

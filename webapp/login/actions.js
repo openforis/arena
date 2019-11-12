@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as CognitoAuth from '@webapp/app/cognitoAuth'
 
-import Validation from '@core/validation/validation'
+import * as Validation from '@core/validation/validation'
 
 import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader } from '../app/actions'

@@ -4,7 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import Authorizer from '@core/auth/authorizer'
+import * as Authorizer from '@core/auth/authorizer'
 
 import TableView from '../../tableViews/tableView'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
@@ -12,7 +12,7 @@ import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Taxonomy from '@core/survey/taxonomy'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'

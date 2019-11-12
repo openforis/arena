@@ -7,9 +7,9 @@ import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import NodeDef from '@core/survey/nodeDef'
-import Node from '@core/record/node'
-import RecordFile from '@core/record/recordFile'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as RecordFile from '@core/record/recordFile'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
   const value = {

@@ -1,11 +1,15 @@
-const io = require('socket.io')()
-const R = require('ramda')
+import * as socketIoServer from 'socket.io'
+import * as R from 'ramda'
 
-const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-const Logger = require('@server/log/log').getLogger('WebSocket')
-const Request = require('./request')
-const Jwt = require('./jwt')
+import * as Log from '@server/log/log'
+import * as Request from './request'
+import * as Jwt from './jwt'
+
+const Logger = Log.getLogger('WebSocket')
+
+const io = socketIoServer()
 
 const socketsById = new Map() //Map(<[socketId]:socket>)
 const socketIdsByUserUuid = new Map() //Map(<[userUuid]>:Set(socketIds))
@@ -31,19 +35,19 @@ const deleteSocket = (userUuid, socketId) => {
   }
 }
 
-const notifySocket = (socketId, eventType, message) => {
+export const notifySocket = (socketId, eventType, message) => {
   const socket = socketsById.get(socketId)
   socket.emit(eventType, message)
 }
 
-const notifyUser = (userUuid, eventType, message) => {
+export const notifyUser = (userUuid, eventType, message) => {
   const socketIds = socketIdsByUserUuid.get(userUuid)
   for (const socketId of socketIds) {
     notifySocket(socketId, eventType, message)
   }
 }
 
-const init = (server, jwtMiddleware) => {
+export const init = (server, jwtMiddleware) => {
 
   io.attach(server)
 
@@ -73,10 +77,4 @@ const init = (server, jwtMiddleware) => {
     }
   })
 
-}
-
-module.exports = {
-  init,
-  notifySocket,
-  notifyUser,
 }

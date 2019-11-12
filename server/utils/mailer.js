@@ -1,11 +1,11 @@
-const sgMail = require('@sendgrid/mail')
+import * as sgMail from '@sendgrid/mail'
 
-const ProcessUtils = require('@core/processUtils')
-const i18nFactory = require('@core/i18n/i18nFactory')
+import * as ProcessUtils from '@core/processUtils'
+import * as i18nFactory from '@core/i18n/i18nFactory';
 
 sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
 
-const sendEmail = async (to, msgKey, msgParams = {}, lang) => {
+export const sendEmail = async (to, msgKey, msgParams = {}, lang) => {
   const i18n = await i18nFactory.createI18nPromise(lang)
 
   const from = ProcessUtils.ENV.adminEmail
@@ -18,8 +18,4 @@ const sendEmail = async (to, msgKey, msgParams = {}, lang) => {
     subject,
     html,
   })
-}
-
-module.exports = {
-  sendEmail,
 }

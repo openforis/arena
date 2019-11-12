@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import ExpressionNode from './expressionNode'
 import { useI18n } from '../../hooks'
 
-import Expression from '@core/expressionParser/expression'
+import * as Expression from '@core/expressionParser/expression'
 
 export const BinaryOperandType = {
   left: 'left',

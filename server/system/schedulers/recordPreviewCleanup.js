@@ -1,8 +1,10 @@
-const schedule = require('node-schedule')
+import * as schedule from 'node-schedule'
 
-const Logger = require('@server/log/log').getLogger('RecordPreviewCleanup')
+import * as Log from '@server/log/log'
 
-const RecordService = require('@server/modules/record/service/recordService')
+const Logger = Log.getLogger('RecordPreviewCleanup')
+
+import * as RecordService from '@server/modules/record/service/recordService'
 
 const initSchedule = () =>
   schedule.scheduleJob('0 0 * * *', async () => {
@@ -17,7 +19,7 @@ const initSchedule = () =>
     }
   })
 
-const init = async () => {
+export const init = async () => {
   try {
     Logger.debug('Deleting stale preview records')
     const count = await RecordService.deleteRecordsPreview()
@@ -27,8 +29,4 @@ const init = async () => {
   }
 
   initSchedule()
-}
-
-module.exports = {
-  init
 }

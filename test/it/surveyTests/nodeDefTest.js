@@ -1,11 +1,11 @@
-const { getContextSurvey } = require('../../testContext')
-const { expect } = require('chai')
-const R = require('ramda')
+import { getContextSurvey } from '../../testContext';
+import { expect } from 'chai';
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const NodeDefRepository = require('@server/modules/nodeDef/repository/nodeDefRepository')
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
@@ -23,7 +23,7 @@ const createAndStoreNodeDef = async (parentNodeUuid, type, name) => {
   return await NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
 }
 
-const createNodeDefsTest = async () => {
+export const createNodeDefsTest = async () => {
   const survey = getContextSurvey()
   const surveyId = Survey.getId(survey)
 
@@ -42,7 +42,7 @@ const createNodeDefsTest = async () => {
   }
 }
 
-const updateNodeDefTest = async () => {
+export const updateNodeDefTest = async () => {
   const survey = getContextSurvey()
   const surveyId = Survey.getId(survey)
 
@@ -66,9 +66,4 @@ const updateNodeDefTest = async () => {
   const reloadedNodeDef2 = R.find(n => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
   expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
   expect(NodeDef.getName(reloadedNodeDef2)).to.equal(NodeDef.getName(nodeDef2))
-}
-
-module.exports = {
-  createNodeDefsTest,
-  updateNodeDefTest,
 }

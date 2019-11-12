@@ -1,7 +1,7 @@
-const R = require('ramda')
-const camelize = require('camelize')
-const db = require('@server/db/db')
-const { now } = require('@server/db/dbUtils')
+import * as R from 'ramda'
+import * as camelize from 'camelize'
+import { db } from '@server/db/db'
+import { now } from '@server/db/dbUtils';
 
 const mergeProps = (def, draft) => {
   const { props, propsDraft } = def
@@ -16,7 +16,7 @@ const mergeProps = (def, draft) => {
   )(def)
 }
 
-const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) => R.pipe(
+export const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) => R.pipe(
   // assoc published and draft properties based on props
   def => assocPublishedDraft ? R.pipe(
     R.assoc('published', !R.isEmpty(def.props)),
@@ -28,11 +28,11 @@ const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) =>
   def => mergeProps(def, draft)
 )(def)
 
-const getSurveyDBSchema = surveyId => `survey_${surveyId}`
+export const getSurveyDBSchema = surveyId => `survey_${surveyId}`
 
 // ====== UPDATE
 
-const markSurveyDraft = async (surveyId, client = db) =>
+export const markSurveyDraft = async (surveyId, client = db) =>
   await client.query(`
     UPDATE survey
     SET draft         = true,
@@ -40,7 +40,7 @@ const markSurveyDraft = async (surveyId, client = db) =>
     WHERE id = $1
   `, [surveyId])
 
-const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
+export const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
   await client.query(`
     UPDATE
       ${getSurveyDBSchema(surveyId)}.${tableName}
@@ -49,7 +49,7 @@ const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =
       props_draft = '{}'::jsonb
   `)
 
-const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
+export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
      SET props_draft = props_draft || $1
@@ -59,7 +59,7 @@ const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key,
     , def => dbTransformCallback(def, true)
   )
 
-const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) =>
+export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) =>
   await client.one(`
     DELETE 
     FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
@@ -68,28 +68,14 @@ const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, cl
     , def => dbTransformCallback(def, true)
   )
 
-const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
+export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
   await client.none(`
     UPDATE ${getSurveyDBSchema(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
 
-const disableSurveySchemaTableTriggers = async (surveyId, tableName, client = db) =>
+export const disableSurveySchemaTableTriggers = async (surveyId, tableName, client = db) =>
   await client.none(`ALTER TABLE ${getSurveyDBSchema(surveyId)}.${tableName} DISABLE TRIGGER ALL`)
 
-const enableSurveySchemaTableTriggers = async (surveyId, tableName, client = db) =>
+export const enableSurveySchemaTableTriggers = async (surveyId, tableName, client = db) =>
   await client.none(`ALTER TABLE ${getSurveyDBSchema(surveyId)}.${tableName} ENABLE TRIGGER ALL`)
 
-module.exports = {
-  dbTransformCallback,
 
-  getSurveyDBSchema,
-
-  markSurveyDraft,
-  publishSurveySchemaTableProps,
-
-  updateSurveySchemaTableProp,
-  deleteSurveySchemaTableRecord,
-  deleteSurveySchemaTableProp,
-
-  disableSurveySchemaTableTriggers,
-  enableSurveySchemaTableTriggers
-}

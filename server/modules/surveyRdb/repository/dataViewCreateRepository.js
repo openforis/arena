@@ -1,9 +1,9 @@
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
-const DataTable = require('../schemaRdb/dataTable')
-const DataView = require('../schemaRdb/dataView')
+import * as DataTable from '../schemaRdb/dataTable'
+import * as DataView from '../schemaRdb/dataView'
 
 const toTableViewCreate = (survey, nodeDef) => {
   const surveyId = Survey.getSurveyInfo(survey).id
@@ -26,7 +26,7 @@ const toTableViewCreate = (survey, nodeDef) => {
   }
 }
 
-const createTableAndView = async (survey, nodeDef, client) => {
+export const createTableAndView = async (survey, nodeDef, client) => {
   const tableViewCreate = toTableViewCreate(survey, nodeDef)
 
   await client.query(`
@@ -51,8 +51,4 @@ const createTableAndView = async (survey, nodeDef, client) => {
       FROM ${tableViewCreate.viewFrom}
       ${tableViewCreate.viewJoin}
   `)
-}
-
-module.exports = {
-  createTableAndView
 }

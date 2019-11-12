@@ -1,21 +1,21 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ActivityLog = require('@common/activityLog/activityLog')
+import * as ActivityLog from '@common/activityLog/activityLog'
 
-const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
-const ObjectUtils = require('@core/objectUtils')
+import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils';
+import * as ObjectUtils from '@core/objectUtils'
 
-const CategoryRepository = require('../repository/categoryRepository')
-const CategoryValidator = require('../categoryValidator')
-const Category = require('@core/survey/category')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const CategoryItem = require('@core/survey/categoryItem')
-const Validation = require('@core/validation/validation')
+import * as CategoryRepository from '../repository/categoryRepository'
+import * as CategoryValidator from '../categoryValidator'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Validation from '@core/validation/validation'
 
-const db = require('@server/db/db')
-const ActivityLogRepository = require('@server/modules/activityLog/repository/activityLogRepository')
+import { db } from '@server/db/db'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
-const CategoryImportSummaryGenerator = require('./categoryImportSummaryGenerator')
+import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 
 // ====== VALIDATION
 
@@ -27,12 +27,12 @@ const _validateCategoryFromCategories = async (surveyId, categories, categoryUui
   return Validation.assocValidation(validation)(category)
 }
 
-const validateCategory = async (surveyId, categoryUuid, client = db) => {
+export const validateCategory = async (surveyId, categoryUuid, client = db) => {
   const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(surveyId, true, true, client)
   return await _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
 }
 
-const validateCategories = async (surveyId, client = db) => {
+export const validateCategories = async (surveyId, client = db) => {
   const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(surveyId, true, true, client)
 
   const categoriesValidated = await Promise.all(Object.keys(categories).map(
@@ -43,7 +43,7 @@ const validateCategories = async (surveyId, client = db) => {
 
 // ====== CREATE
 
-const insertCategory = async (user, surveyId, category, system = false, client = db) =>
+export const insertCategory = async (user, surveyId, category, system = false, client = db) =>
   await client.tx(async t => {
     const [categoryDb] = await Promise.all([
       CategoryRepository.insertCategory(surveyId, category, t),
@@ -55,7 +55,7 @@ const insertCategory = async (user, surveyId, category, system = false, client =
     return await validateCategory(surveyId, Category.getUuid(categoryDb), t)
   })
 
-const insertLevel = async (user, surveyId, levelParam, system = false, client = db) =>
+export const insertLevel = async (user, surveyId, levelParam, system = false, client = db) =>
   await client.tx(async t => {
     const [level] = await Promise.all([
       CategoryRepository.insertLevel(surveyId, levelParam, t),
@@ -68,7 +68,7 @@ const insertLevel = async (user, surveyId, levelParam, system = false, client = 
     }
   })
 
-const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
+export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
   await client.tx(async t => {
     const logContent = {
       ...itemParam,
@@ -89,7 +89,7 @@ const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) 
  * Bulk insert of category items.
  * Items can belong to different categories and validation is not performed.
  */
-const insertItems = async (user, surveyId, items, client = db) =>
+export const insertItems = async (user, surveyId, items, client = db) =>
   await client.tx(async t => {
     const activityLogs = items.map(
       item => ActivityLog.newActivity(ActivityLog.type.categoryItemInsert, item, true)
@@ -101,9 +101,19 @@ const insertItems = async (user, surveyId, items, client = db) =>
     ])
   })
 
+export const createImportSummary = CategoryImportSummaryGenerator.createImportSummary
+export const createImportSummaryFromStream = CategoryImportSummaryGenerator.createImportSummaryFromStream  
+
+// ====== READ
+export const fetchCategoriesAndLevelsBySurveyId = CategoryRepository.fetchCategoriesAndLevelsBySurveyId
+export const fetchCategoryAndLevelsByUuid = CategoryRepository.fetchCategoryAndLevelsByUuid
+export const fetchItemsByCategoryUuid = CategoryRepository.fetchItemsByCategoryUuid
+export const fetchItemsByParentUuid = CategoryRepository.fetchItemsByParentUuid
+export const fetchItemsByLevelIndex = CategoryRepository.fetchItemsByLevelIndex
+
 // ====== UPDATE
 
-const publishProps = async (surveyId, langsDeleted, client = db) =>
+export const publishProps = async (surveyId, langsDeleted, client = db) =>
   await client.tx(async t =>
     await Promise.all([
       publishSurveySchemaTableProps(surveyId, 'category', t),
@@ -114,7 +124,7 @@ const publishProps = async (surveyId, langsDeleted, client = db) =>
     ])
   )
 
-const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, system = false, client = db) =>
+export const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, system = false, client = db) =>
   await client.tx(async t => {
     await Promise.all([
       CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t),
@@ -132,7 +142,7 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, syst
     }
   })
 
-const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
+export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
   await client.tx(async t => {
     const [level] = await Promise.all([
       CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t),
@@ -178,7 +188,7 @@ const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value
     }
   })
 
-const updateItemsExtra = async (user, surveyId, categoryUuid, items, client = db) =>
+export const updateItemsExtra = async (user, surveyId, categoryUuid, items, client = db) =>
   await client.tx(async t => {
     const logActivities = items.map(item =>
       _newCategoryItemUpdateLogActivity(categoryUuid, item, CategoryItem.props.extra, CategoryItem.getExtra(item), true)
@@ -190,7 +200,7 @@ const updateItemsExtra = async (user, surveyId, categoryUuid, items, client = db
   })
 
 // ====== DELETE
-const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
+export const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
   await client.tx(async t => {
     const category = await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
 
@@ -207,7 +217,7 @@ const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
     return await validateCategories(surveyId, t)
   })
 
-const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, client = db) =>
+export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, client = db) =>
   await client.tx(async t => {
     const levelDeleted = await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
 
@@ -229,7 +239,7 @@ const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, client = db)
  * Deletes all levels without items.
  * Category validation is not performed
  */
-const deleteLevelsEmptyByCategory = async (user, surveyId, category, client = db) =>
+export const deleteLevelsEmptyByCategory = async (user, surveyId, category, client = db) =>
   await client.tx(async t => {
     const levels = Category.getLevelsArray(category)
     const levelUuidsDeleted = await CategoryRepository.deleteLevelsEmptyByCategory(surveyId, Category.getUuid(category), t)
@@ -250,7 +260,7 @@ const deleteLevelsEmptyByCategory = async (user, surveyId, category, client = db
  * Deletes all levels and creates new ones with the specified names.
  * Category validation is not performed
  */
-const replaceLevels = async (user, surveyId, category, levelNamesNew, client = db) =>
+export const replaceLevels = async (user, surveyId, category, levelNamesNew, client = db) =>
   await client.tx(async t => {
     const categoryUuid = Category.getUuid(category)
     const levelsNew = levelNamesNew.map((levelName, index) =>
@@ -269,7 +279,7 @@ const replaceLevels = async (user, surveyId, category, levelNamesNew, client = d
     return Category.assocLevelsArray(levelsNew)(category)
   })
 
-const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client = db) =>
+export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client = db) =>
   await client.tx(async t => {
     const item = await CategoryRepository.deleteItem(surveyId, itemUuid, t)
     const logContent = {
@@ -285,38 +295,3 @@ const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client = db) =
 
     return await validateCategory(surveyId, categoryUuid, t)
   })
-
-module.exports = {
-  //CREATE
-  insertCategory,
-  insertLevel,
-  insertItem,
-  insertItems,
-  createImportSummary: CategoryImportSummaryGenerator.createImportSummary,
-  createImportSummaryFromStream: CategoryImportSummaryGenerator.createImportSummaryFromStream,
-
-  //READ
-  fetchCategoriesAndLevelsBySurveyId: CategoryRepository.fetchCategoriesAndLevelsBySurveyId,
-  fetchCategoryAndLevelsByUuid: CategoryRepository.fetchCategoryAndLevelsByUuid,
-  fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
-  fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
-  fetchItemsByLevelIndex: CategoryRepository.fetchItemsByLevelIndex,
-
-  //UPDATE
-  publishProps,
-  updateCategoryProp,
-  updateLevelProp,
-  updateItemProp,
-  updateItemsExtra,
-
-  //DELETE
-  deleteCategory,
-  deleteLevel,
-  deleteLevelsEmptyByCategory,
-  deleteItem,
-
-  //UTILS
-  replaceLevels,
-  validateCategory,
-  validateCategories,
-}

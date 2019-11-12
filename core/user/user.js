@@ -1,26 +1,32 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
-const StringUtils = require('@core/stringUtils')
-const AuthGroup = require('@core/auth/authGroup')
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
+import * as AuthGroup from '@core/auth/authGroup'
 
-const keys = require('./_user/userKeys')
-const UserPrefs = require('./_user/userPrefs')
+import { keys } from './_user/userKeys'
+import * as UserPrefs from './_user/userPrefs'
+
+export { keys } from './_user/userKeys'
+
+export const keysPrefs = UserPrefs.keysPrefs
 
 //====== READ
-const getName = R.propOr('', keys.name)
-const getEmail = R.prop(keys.email)
-const getLang = R.propOr('en', keys.lang)
-const getAuthGroups = ObjectUtils.getAuthGroups
-const getPrefs = R.propOr({}, keys.prefs)
-const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
+export const isEqual = ObjectUtils.isEqual
+export const getUuid = ObjectUtils.getUuid
+export const getName = R.propOr('', keys.name)
+export const getEmail = R.prop(keys.email)
+export const getLang = R.propOr('en', keys.lang)
+export const getAuthGroups = ObjectUtils.getAuthGroups
+export const getPrefs = R.propOr({}, keys.prefs)
+export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
 //====== CHECK
-const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
-const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
+export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
+export const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
 //====== AUTH GROUP
-const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user => R.pipe(
+export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user => R.pipe(
   getAuthGroups,
   R.ifElse(
     R.always(includeSystemAdmin && isSystemAdmin(user)),
@@ -29,12 +35,12 @@ const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user
   )
 )(user)
 
-const assocAuthGroup = authGroup => user => {
+export const assocAuthGroup = authGroup => user => {
   const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
   return R.assoc(keys.authGroups, authGroups, user)
 }
 
-const dissocAuthGroup = authGroup => user => {
+export const dissocAuthGroup = authGroup => user => {
   const authGroups = R.pipe(
     getAuthGroups,
     R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))),
@@ -42,38 +48,14 @@ const dissocAuthGroup = authGroup => user => {
   return R.assoc(keys.authGroups, authGroups, user)
 }
 
-module.exports = {
-  keys,
-  keysPrefs: UserPrefs.keysPrefs,
+//PREFS
+export const newPrefs = UserPrefs.newPrefs
+export const getPrefSurveyCurrent = UserPrefs.getPrefSurveyCurrent
+export const getPrefSurveyCycle = UserPrefs.getPrefSurveyCycle
+export const getPrefSurveyCurrentCycle = UserPrefs.getPrefSurveyCurrentCycle
 
-  // READ
-  isEqual: ObjectUtils.isEqual,
-  getUuid: ObjectUtils.getUuid,
-  getName,
-  getEmail,
-  getLang,
-  getAuthGroups,
-  getAuthGroupBySurveyUuid,
-  getPrefs,
-  hasProfilePicture,
+export const assocPrefSurveyCurrent = UserPrefs.assocPrefSurveyCurrent
+export const assocPrefSurveyCycle = UserPrefs.assocPrefSurveyCycle
+export const assocPrefSurveyCurrentAndCycle = UserPrefs.assocPrefSurveyCurrentAndCycle
 
-  //CHECK
-  isSystemAdmin,
-  hasAccepted,
-
-  //AUTH GROUP
-  assocAuthGroup,
-  dissocAuthGroup,
-
-  //PREFS
-  newPrefs: UserPrefs.newPrefs,
-  getPrefSurveyCurrent: UserPrefs.getPrefSurveyCurrent,
-  getPrefSurveyCycle: UserPrefs.getPrefSurveyCycle,
-  getPrefSurveyCurrentCycle: UserPrefs.getPrefSurveyCurrentCycle,
-
-  assocPrefSurveyCurrent: UserPrefs.assocPrefSurveyCurrent,
-  assocPrefSurveyCycle: UserPrefs.assocPrefSurveyCycle,
-  assocPrefSurveyCurrentAndCycle: UserPrefs.assocPrefSurveyCurrentAndCycle,
-
-  deletePrefSurvey: UserPrefs.deletePrefSurvey,
-}
+export const deletePrefSurvey = UserPrefs.deletePrefSurvey

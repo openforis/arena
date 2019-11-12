@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
-import User from '@core/user/user'
+import * as User from '@core/user/user'
 import * as AppState from '@webapp/app/appState'
 
 import { logout } from '@webapp/app/actions'

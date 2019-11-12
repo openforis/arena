@@ -3,8 +3,8 @@ import './components/dataQueryView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Table from './components/table'

@@ -1,7 +1,7 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ValidatorErrorKeys = require('./_validator/validatorErrorKeys')
-const ObjectUtils = require('@core/objectUtils')
+import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
+import * as ObjectUtils from '@core/objectUtils'
 
 // const objectInvalid = {
 //   [keys.valid]: false,
@@ -22,7 +22,7 @@ const ObjectUtils = require('@core/objectUtils')
 //   },
 // }
 
-const keys = {
+export const keys = {
   fields: 'fields',
   valid: 'valid',
   errors: 'errors',
@@ -32,12 +32,14 @@ const keys = {
   validation: 'validation',
 }
 
+export const messageKeys = ValidatorErrorKeys
+
 //====== UTILS
 
 /**
  * Removes valid fields validations and updates 'valid' attribute
  */
-const cleanup = validation => {
+export const cleanup = validation => {
   //cleanup fields
   let allFieldsValid = true
   const fieldsCleaned = Object.entries(getFieldValidations(validation)).reduce(
@@ -60,7 +62,7 @@ const cleanup = validation => {
   )
 }
 
-const recalculateValidity = validation => R.pipe(
+export const recalculateValidity = validation => R.pipe(
   getFieldValidations,
   // update validity in each field
   R.map(recalculateValidity),
@@ -72,7 +74,7 @@ const recalculateValidity = validation => R.pipe(
   }
 )(validation)
 
-const updateCounts = validation => {
+export const updateCounts = validation => {
   let totalErrors = 0
   let totalWarnings = 0
 
@@ -111,7 +113,7 @@ const updateCounts = validation => {
 
 //====== CREATE
 
-const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
+export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
   [keys.valid]: valid,
   [keys.fields]: fields,
   [keys.errors]: errors,
@@ -120,37 +122,37 @@ const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => (
 
 //====== READ
 
-const isValid = R.propOr(true, keys.valid)
-const getFieldValidations = R.propOr({}, keys.fields)
-const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
+export const isValid = R.propOr(true, keys.valid)
+export const getFieldValidations = R.propOr({}, keys.fields)
+export const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
 
-const getErrors = R.propOr([], keys.errors)
-const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
-const getWarnings = R.propOr([], keys.warnings)
-const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
+export const getErrors = R.propOr([], keys.errors)
+export const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
+export const getWarnings = R.propOr([], keys.warnings)
+export const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
 const hasWarningsInFields = R.pipe(getFieldValidations, R.values, R.any(hasWarnings))
-const isWarning = validation => hasWarnings(validation) || hasWarningsInFields(validation)
-const getCounts = R.propOr({}, keys.counts)
-const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
-const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
+export const isWarning = validation => hasWarnings(validation) || hasWarningsInFields(validation)
+export const getCounts = R.propOr({}, keys.counts)
+export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
+export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
 
 //====== UPDATE
 
-const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
-const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
-const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
+export const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
+export const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
+export const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
 
-const assocFieldValidation = (field, fieldValidation) => R.pipe(
+export const assocFieldValidation = (field, fieldValidation) => R.pipe(
   R.assocPath([keys.fields, field], fieldValidation),
   cleanup
 )
 
-const dissocFieldValidation = field => R.pipe(
+export const dissocFieldValidation = field => R.pipe(
   R.dissocPath([keys.fields, field]),
   cleanup
 )
 
-const mergeValidation = validationNew => validationOld => R.pipe(
+export const mergeValidation = validationNew => validationOld => R.pipe(
   validation => ({
     [keys.fields]: R.mergeDeepRight(
       getFieldValidations(validation),
@@ -162,42 +164,6 @@ const mergeValidation = validationNew => validationOld => R.pipe(
 
 // Object
 
-const getValidation = R.propOr(newInstance(), keys.validation)
-const isObjValid = R.pipe(getValidation, isValid)
-const assocValidation = R.assoc(keys.validation)
-
-module.exports = {
-  keys,
-
-  messageKeys: ValidatorErrorKeys,
-
-  newInstance,
-
-  isValid,
-  getFieldValidations,
-  getFieldValidation,
-
-  getErrors,
-  hasErrors,
-  getWarnings,
-  hasWarnings,
-  isWarning,
-  getCounts,
-  getErrorsCount,
-  getWarningsCount,
-
-  setValid,
-  setField,
-  setErrors,
-
-  assocFieldValidation,
-  dissocFieldValidation,
-  mergeValidation,
-  recalculateValidity,
-  updateCounts,
-
-  // Object
-  getValidation,
-  isObjValid,
-  assocValidation,
-}
+export const getValidation = R.propOr(newInstance(), keys.validation)
+export const isObjValid = R.pipe(getValidation, isValid)
+export const assocValidation = R.assoc(keys.validation)

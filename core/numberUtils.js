@@ -1,13 +1,7 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const toNumber = num => R.isNil(num) || R.isEmpty(num) ? NaN : Number(num)
+export const toNumber = num => R.isNil(num) || R.isEmpty(num) ? NaN : Number(num)
 
-const isInteger = R.pipe(toNumber, Number.isInteger)
+export const isInteger = R.pipe(toNumber, Number.isInteger)
 
-const isFloat = R.pipe(toNumber, Number.isFinite)
-
-module.exports = {
-  toNumber,
-  isFloat,
-  isInteger,
-}
+export const isFloat = R.pipe(toNumber, Number.isFinite)

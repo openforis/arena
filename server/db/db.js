@@ -1,8 +1,10 @@
-const Log = require('@server/log/log')
+import * as Log from '@server/log/log'
+
+import * as pgPromise from 'pg-promise'
+
+import * as ProcessUtils from '@core/processUtils'
 
 const logger = Log.getLogger('DB')
-
-const ProcessUtils = require('@core/processUtils')
 
 const debugOptions = {
   query: (e) => {
@@ -13,8 +15,8 @@ const debugOptions = {
   }
 }
 
-// const pgp = require('pg-promise')(debugOptions)
-const pgp = require('pg-promise')({})
+// const pgp = pgPromise(debugOptions)
+const pgp = pgPromise({})
 
 const configCommon = {
   // how long a client is allowed to remain idle before being closed
@@ -39,6 +41,4 @@ const config = ProcessUtils.ENV.dbUrl
     ...configCommon
   }
 
-const db = pgp(config)
-
-module.exports = db
+export const db = pgp(config)

@@ -1,7 +1,6 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDef = require('@core/survey/nodeDef')
-const { nodeDefType } = NodeDef
+import { nodeDefType } from '@core/survey/nodeDef'
 
 const keys = {
   attributes: 'attributes',
@@ -53,19 +52,19 @@ const nodeDefFieldsExtractorByCollectType = {
   [collectNodeDefTypes.time]: () => [{ type: nodeDefType.time }],
 }
 
-const layoutTypes = {
+export const layoutTypes = {
   table: 'table',
 }
 
-const samplingPointDataCodeListNames = ['sampling_design', 'ofc_sampling_design']
+export const samplingPointDataCodeListNames = ['sampling_design', 'ofc_sampling_design']
 
-const getNodeDefFieldsByCollectNodeDef = collectNodeDef => {
+export const getNodeDefFieldsByCollectNodeDef = collectNodeDef => {
   const collectType = getElementName(collectNodeDef)
   const fieldsExtractor = nodeDefFieldsExtractorByCollectType[collectType]
   return fieldsExtractor && fieldsExtractor(collectNodeDef)
 }
 
-const toLabels = (elName, defaultLang, typesFilter = [], suffix = '') =>
+export const toLabels = (elName, defaultLang, typesFilter = [], suffix = '') =>
   xml =>
     R.pipe(
       getElementsByName(elName),
@@ -82,14 +81,14 @@ const toLabels = (elName, defaultLang, typesFilter = [], suffix = '') =>
       }, {})
     )(xml)
 
-const getElements = R.propOr([], keys.elements)
+export const getElements = R.propOr([], keys.elements)
 
-const getElementsByName = name => R.pipe(
+export const getElementsByName = name => R.pipe(
   getElements,
   R.filter(el => getElementName(el) === name)
 )
 
-const getElementsByPath = path =>
+export const getElementsByPath = path =>
   xml =>
     R.reduce((acc, pathPart) =>
         R.ifElse(
@@ -107,27 +106,29 @@ const getElementsByPath = path =>
       , xml, path
     )
 
-const getElementByName = name => R.pipe(
+export const getElementByName = name => R.pipe(
   getElementsByName(name),
   R.head
 )
 
-const getNodeDefChildByName = name => R.pipe(
+export const getNodeDefChildByName = name => R.pipe(
   getElements,
   R.find(el => getNodeDefName(el) === name)
 )
 
-const getElementName = R.prop(keys.name)
+export const getElementName = R.prop(keys.name)
 
-const getText = R.pipe(
+export const getText = R.pipe(
   getElements,
   R.find(R.propEq(keys.type, keys.text)),
   R.prop(keys.text)
 )
 
-const getAttributes = R.propOr({}, keys.attributes)
+export const getChildElementText = name => R.pipe(getElementByName(name), getText)
 
-const getAttribute = (name, defaultValue = null) => R.pipe(
+export const getAttributes = R.propOr({}, keys.attributes)
+
+export const getAttribute = (name, defaultValue = null) => R.pipe(
   getAttributes,
   R.propOr(defaultValue, name)
 )
@@ -137,16 +138,23 @@ const getAttribute = (name, defaultValue = null) => R.pipe(
  */
 const getNodeDefName = getAttribute('name')
 
-const getAttributeBoolean = name => R.pipe(
+export const getAttributeName = getNodeDefName
+
+export const getAttributeBoolean = name => R.pipe(
   getAttribute(name),
   R.equals('true')
 )
 
-const getUiAttribute = (name, defaultValue = null) => collectXmlElement =>
+export const getUiAttribute = (name, defaultValue = null) => collectXmlElement =>
   getAttribute(`n1:${name}`)(collectXmlElement) ||
   getAttribute(`ui:${name}`, defaultValue)(collectXmlElement)
 
-const getNodeDefByPath = collectNodeDefPath => collectSurvey => {
+export const getNodeDefRoot = R.pipe(
+  getElementsByPath(['schema', 'entity']),
+  R.head,
+)
+
+export const getNodeDefByPath = collectNodeDefPath => collectSurvey => {
   const collectAncestorNodeNames = R.pipe(
     R.split('/'),
     R.reject(R.isEmpty)
@@ -170,7 +178,7 @@ const getNodeDefByPath = collectNodeDefPath => collectSurvey => {
   return currentCollectNode
 }
 
-const getNodeDefChildren = collectNodeDef => R.pipe(
+export const getNodeDefChildren = collectNodeDef => R.pipe(
   getElements,
   R.filter(_isNodeDefElement)
 )(collectNodeDef)
@@ -179,33 +187,3 @@ const _isNodeDefElement = R.pipe(
   getElementName,
   name => R.includes(name, R.keys(collectNodeDefTypes))
 )
-
-module.exports = {
-  layoutTypes,
-
-  samplingPointDataCodeListNames,
-
-  getNodeDefFieldsByCollectNodeDef,
-
-  toLabels,
-  getElements,
-  getElementsByName,
-  getElementByName,
-  getElementsByPath,
-  getElementName,
-  getText,
-  getChildElementText: name => R.pipe(getElementByName(name), getText),
-  getAttributes,
-  getAttribute,
-  getAttributeName: getNodeDefName,
-  getAttributeBoolean,
-  getUiAttribute,
-
-  getNodeDefRoot: R.pipe(
-    getElementsByPath(['schema', 'entity']),
-    R.head
-  ),
-  getNodeDefByPath,
-  getNodeDefChildByName,
-  getNodeDefChildren
-}

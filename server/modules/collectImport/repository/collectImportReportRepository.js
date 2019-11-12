@@ -1,14 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
-const DbUtils = require('@server/db/dbUtils')
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
-const {
-  getSurveyDBSchema,
-  dbTransformCallback
-} = require('../../survey/repository/surveySchemaRepositoryUtils')
+import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils';
 
-const fetchItems = async (surveyId, client = db) =>
+export const fetchItems = async (surveyId, client = db) =>
   await client.map(`
       SELECT * 
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
@@ -18,7 +15,7 @@ const fetchItems = async (surveyId, client = db) =>
     dbTransformCallback
   )
 
-const countItems = async (surveyId, client = db) =>
+export const countItems = async (surveyId, client = db) =>
   await client.one(`
       SELECT COUNT(*) as tot
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
@@ -27,7 +24,7 @@ const countItems = async (surveyId, client = db) =>
     R.prop('tot')
   )
 
-const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
+export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
   await client.one(`
       INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props)
       VALUES ($1, $2)
@@ -37,7 +34,7 @@ const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
     dbTransformCallback
   )
 
-const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
+export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
   await client.one(`
       UPDATE ${getSurveyDBSchema(surveyId)}.collect_import_report
       SET 
@@ -50,15 +47,3 @@ const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
     [itemId, props, resolved],
     dbTransformCallback
   )
-
-module.exports = {
-  // CREATE
-  insertItem,
-
-  // READ
-  fetchItems,
-  countItems,
-
-  // UPDATE
-  updateItem
-}

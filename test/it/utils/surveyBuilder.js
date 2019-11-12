@@ -1,17 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const NodeDefValidations = require('@core/survey/nodeDefValidations')
-const User = require('@core/user/user')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as User from '@core/user/user'
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
-const NodeDefRepository = require('@server/modules/nodeDef/repository/nodeDefRepository')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 
-const SurveyPublishJob = require('@server/modules/survey/service/publish/surveyPublishJob')
+import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 
 class NodeDefBuilder {
 
@@ -180,8 +180,6 @@ class SurveyBuilder {
   }
 }
 
-module.exports = {
-  survey: (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder),
-  entity: (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders),
-  attribute: (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)
-}
+export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder)
+export const entity = (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders)
+export const attribute = (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)

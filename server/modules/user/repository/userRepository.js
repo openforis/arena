@@ -1,10 +1,10 @@
-const db = require('@server/db/db')
+import { db } from '@server/db/db'
 
-const camelize = require('camelize')
+import * as camelize from 'camelize'
 
-const User = require('@core/user/user')
-const Survey = require('@core/survey/survey')
-const AuthGroup = require('@core/auth/authGroup')
+import * as User from '@core/user/user'
+import * as Survey from '@core/survey/survey'
+import * as AuthGroup from '@core/auth/authGroup'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
@@ -13,7 +13,7 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // CREATE
 
-const insertUser = async (surveyId, surveyCycleKey, uuid, email, client = db) =>
+export const insertUser = async (surveyId, surveyCycleKey, uuid, email, client = db) =>
   await client.one(`
     INSERT INTO "user" AS u (uuid, email, prefs)
     VALUES ($1, $2, $3::jsonb)
@@ -23,7 +23,7 @@ const insertUser = async (surveyId, surveyCycleKey, uuid, email, client = db) =>
 
 // READ
 
-const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
+export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
   await client.one(`
     SELECT count(*)
     FROM "user" u
@@ -36,7 +36,7 @@ const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client 
     AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))`,
     [surveyId, countSystemAdmins])
 
-const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSystemAdmins = false, client = db) =>
+export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSystemAdmins = false, client = db) =>
   await client.map(`
     SELECT ${selectFieldsCommaSep}
     FROM "user" u
@@ -52,7 +52,7 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSys
     [surveyId, fetchSystemAdmins],
     camelize)
 
-const fetchUserByUuid = async (uuid, client = db) =>
+export const fetchUserByUuid = async (uuid, client = db) =>
   await client.one(`
     SELECT ${selectFieldsCommaSep}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
@@ -60,7 +60,7 @@ const fetchUserByUuid = async (uuid, client = db) =>
     [uuid],
     camelize)
 
-const fetchUserByEmail = async (email, client = db) =>
+export const fetchUserByEmail = async (email, client = db) =>
   await client.oneOrNone(`
     SELECT ${selectFieldsCommaSep}
     FROM "user" u
@@ -68,7 +68,7 @@ const fetchUserByEmail = async (email, client = db) =>
     [email],
     camelize)
 
-const fetchUserProfilePicture = async (uuid, client = db) =>
+export const fetchUserProfilePicture = async (uuid, client = db) =>
   await client.one(`
     SELECT profile_picture
     FROM "user"
@@ -78,7 +78,7 @@ const fetchUserProfilePicture = async (uuid, client = db) =>
 
 // ==== UPDATE
 
-const updateUser = async (uuid, name, email, profilePicture, client = db) =>
+export const updateUser = async (uuid, name, email, profilePicture, client = db) =>
   await client.one(`
     UPDATE "user" u
     SET
@@ -90,7 +90,7 @@ const updateUser = async (uuid, name, email, profilePicture, client = db) =>
     [name, email, profilePicture, uuid],
     camelize)
 
-const updateUsername = async (user, name, client = db) =>
+export const updateUsername = async (user, name, client = db) =>
   await client.one(`
     UPDATE "user"  u
     SET name = $1
@@ -101,7 +101,7 @@ const updateUsername = async (user, name, client = db) =>
 
 // ==== PREFS
 
-const updateUserPrefs = async (user, client = db) => await client.one(`
+export const updateUserPrefs = async (user, client = db) => await client.one(`
     UPDATE "user" u
     SET prefs = prefs || $1::jsonb
     WHERE u.uuid = $2
@@ -110,7 +110,7 @@ const updateUserPrefs = async (user, client = db) => await client.one(`
   camelize
 )
 
-const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
+export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
   const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
   // remove from surveys current pref
   await client.query(`
@@ -130,7 +130,7 @@ const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 /**
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
  */
-const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
+export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
   const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysPrefs.cycle}}'`
   await client.query(`
       UPDATE "user" u
@@ -138,25 +138,4 @@ const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = d
       WHERE prefs #>>  ${surveyCyclePath} IN ($1:csv)
     `,
     [cycleKeysDeleted])
-}
-
-module.exports = {
-  // CREATE
-  insertUser,
-
-  // READ
-  countUsersBySurveyId,
-  fetchUsersBySurveyId,
-  fetchUserByUuid,
-  fetchUserByEmail,
-  fetchUserProfilePicture,
-
-  // UPDATE
-  updateUser,
-  updateUsername,
-  updateUserPrefs,
-
-  // PREFS
-  deleteUsersPrefsSurvey,
-  resetUsersPrefsSurveyCycle,
 }

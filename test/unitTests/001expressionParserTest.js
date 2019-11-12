@@ -1,6 +1,6 @@
-const { assert } = require('chai')
+import { assert } from 'chai';
 
-const Expression = require('@core/expressionParser/expression')
+import * as Expression from '@core/expressionParser/expression'
 
 const queries = [
   { q: '1 + 1', r: 2 },

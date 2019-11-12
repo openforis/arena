@@ -1,22 +1,17 @@
-const Request = require('@server/utils/request')
-const { sendOk, sendFile } = require('@server/utils/response')
+import * as Request from '@server/utils/request'
+import { sendOk, sendFile } from '@server/utils/response';
 
-const User = require('@core/user/user')
-const Record = require('@core/record/record')
-const RecordFile = require('@core/record/recordFile')
-const Node = require('@core/record/node')
+import * as User from '@core/user/user'
+import * as Record from '@core/record/record'
+import * as RecordFile from '@core/record/recordFile'
+import * as Node from '@core/record/node'
 
-const RecordService = require('../service/recordService')
-const FileService = require('../service/fileService')
+import * as RecordService from '../service/recordService'
+import * as FileService from '../service/fileService'
 
-const {
-  requireRecordListViewPermission,
-  requireRecordEditPermission,
-  requireRecordCreatePermission,
-  requireRecordViewPermission,
-} = require('../../auth/authApiMiddleware')
+import { requireRecordListViewPermission, requireRecordEditPermission, requireRecordCreatePermission, requireRecordViewPermission } from '../../auth/authApiMiddleware';
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== CREATE
   app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
@@ -173,4 +168,5 @@ module.exports.init = app => {
     sendOk(res)
   })
 
-}
+};
+

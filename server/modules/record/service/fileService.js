@@ -1,10 +1,8 @@
-const FileManager = require('../manager/fileManager')
+import * as FileManager from '../manager/fileManager'
 
-module.exports = {
-  // CREATE
-  insertFile: FileManager.insertFile,
+// CREATE
+export const insertFile = FileManager.insertFile
 
-  // READ
-  fetchFileByUuid: FileManager.fetchFileByUuid,
-  fetchFileByNodeUuid: FileManager.fetchFileByNodeUuid,
-}
+// READ
+export const fetchFileByUuid = FileManager.fetchFileByUuid
+export const fetchFileByNodeUuid = FileManager.fetchFileByNodeUuid

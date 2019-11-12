@@ -1,22 +1,22 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Category = require('@core/survey/category')
-const CategoryItem = require('@core/survey/categoryItem')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const ObjectUtils = require('@core/objectUtils')
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as ObjectUtils from '@core/objectUtils'
 
-const Job = require('@server/job/job')
-const BatchPersister = require('@server/db/batchPersister')
+import Job from '@server/job/job'
+import BatchPersister from '@server/db/batchPersister'
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
+import * as CategoryManager from '../../../../category/manager/categoryManager'
 
-const CollectSurvey = require('../model/collectSurvey')
+import * as CollectSurvey from '../model/collectSurvey'
 
 /**
  * Inserts a category for each code list in the Collect survey.
  * Saves the list of inserted categories in the "categories" context property
  */
-class CategoriesImportJob extends Job {
+export default class CategoriesImportJob extends Job {
 
   constructor (params) {
     super('CategoriesImportJob', params)
@@ -136,5 +136,3 @@ class CategoriesImportJob extends Job {
   }
 
 }
-
-module.exports = CategoriesImportJob

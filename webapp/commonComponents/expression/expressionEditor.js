@@ -5,7 +5,7 @@ import * as R from 'ramda'
 
 import ExpressionEditorPopup from './expressionEditorPopup'
 
-import Expression from '@core/expressionParser/expression'
+import * as Expression from '@core/expressionParser/expression'
 
 const ExpressionEditor = props => {
 

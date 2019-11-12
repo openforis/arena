@@ -3,9 +3,9 @@ import './formPageNavigation.scss'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'

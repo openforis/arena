@@ -1,8 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Validation = require('./validation')
-const ValidationResult = require('./validationResult')
-const ValidatorFunctions = require('./_validator/validatorFunctions')
+import * as Validation from './validation'
+import * as ValidationResult from './validationResult'
+import * as ValidatorFunctions from './_validator/validatorFunctions'
 
 const validateProp = async (obj, prop, validations = []) => {
   const validationsEvaluated = await Promise.all(
@@ -23,7 +23,7 @@ const validateProp = async (obj, prop, validations = []) => {
   return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
 }
 
-const validate = async (obj, propsValidations, removeValidFields = true) => {
+export const validate = async (obj, propsValidations, removeValidFields = true) => {
   const validation = Validation.newInstance()
 
   for (const [prop, propValidations] of Object.entries(propsValidations)) {
@@ -43,14 +43,10 @@ const validate = async (obj, propsValidations, removeValidFields = true) => {
   return validation
 }
 
-module.exports = {
-  validate,
-
-  // validator functions
-  validateRequired: ValidatorFunctions.validateRequired,
-  validateItemPropUniqueness: ValidatorFunctions.validateItemPropUniqueness,
-  validateNotKeyword: ValidatorFunctions.validateNotKeyword,
-  validateName: ValidatorFunctions.validateName,
-  validatePositiveNumber: ValidatorFunctions.validatePositiveNumber,
-  isKeyword: ValidatorFunctions.isKeyword,
-}
+// validator functions
+export const validateRequired = ValidatorFunctions.validateRequired
+export const validateItemPropUniqueness = ValidatorFunctions.validateItemPropUniqueness
+export const validateNotKeyword = ValidatorFunctions.validateNotKeyword
+export const validateName = ValidatorFunctions.validateName
+export const validatePositiveNumber = ValidatorFunctions.validatePositiveNumber
+export const isKeyword = ValidatorFunctions.isKeyword

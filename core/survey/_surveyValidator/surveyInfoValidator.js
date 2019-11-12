@@ -1,10 +1,10 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
+import * as Survey from '@core/survey/survey'
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
 
-const SurveyCyclesValidator = require('./surveyCyclesValidator')
+import * as SurveyCyclesValidator from './surveyCyclesValidator'
 
 const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
   return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)
@@ -12,7 +12,7 @@ const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
     : null
 }
 
-const validateNewSurvey = async (survey, surveyInfos) => await Validator.validate(
+export const validateNewSurvey = async (survey, surveyInfos) => await Validator.validate(
   survey,
   {
     'name': [
@@ -24,7 +24,7 @@ const validateNewSurvey = async (survey, surveyInfos) => await Validator.validat
   }
 )
 
-const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
+export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
   const validation = await Validator.validate(
     surveyInfo,
     {
@@ -41,9 +41,4 @@ const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
   const cyclesValidation = await SurveyCyclesValidator.validateCycles(Survey.getCycles(surveyInfo))
 
   return Validation.assocFieldValidation(Survey.infoKeys.cycles, cyclesValidation)(validation)
-}
-
-module.exports = {
-  validateNewSurvey,
-  validateSurveyInfo,
 }

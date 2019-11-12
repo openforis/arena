@@ -10,9 +10,9 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-import Survey from '@core/survey/survey'
-import Node from '@core/record/node'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 

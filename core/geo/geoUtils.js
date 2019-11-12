@@ -4,24 +4,24 @@
  * This module uses @esri/proj-codes library and stores all the Spatial Reference Systems (with code, name and wkt)
  * into an array that can be huge.
  */
-const R = require('ramda')
+import * as R from 'ramda'
 /**
  * Projected coordinate reference systems
  * format: {wkid: id, name:"CRS name", wkt: "Well Know Text"}
  */
-const projected = require('@esri/proj-codes/pe_list_projcs.json')
+import * as projected from '@esri/proj-codes/pe_list_projcs.json'
 /**
  * Geographic coordinate reference systems
  * format: same as projected
  */
-const geographic = require('@esri/proj-codes/pe_list_geogcs.json')
-const proj4 = require('proj4')
-const isValidCoordinates = require('is-valid-coordinates')
+import * as geographic from '@esri/proj-codes/pe_list_geogcs.json'
+import proj4 from 'proj4';
+import * as isValidCoordinates from 'is-valid-coordinates'
 
-const Srs = require('./srs')
-const ObjectUtils = require('@core/objectUtils')
-const NumberUtils = require('@core/numberUtils')
-const StringUtils = require('@core/stringUtils')
+import * as Srs from './srs'
+import * as ObjectUtils from '@core/objectUtils'
+import * as NumberUtils from '@core/numberUtils'
+import * as StringUtils from '@core/stringUtils'
 
 const invalidLonLatCoordinates = [0, 90] //proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 
@@ -43,7 +43,7 @@ const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
 /**
  * Finds a list of srs whose name or code matches the specified parameter
  */
-const findSrsByCodeOrName = (codeOrName, limit = 200) =>
+export const findSrsByCodeOrName = (codeOrName, limit = 200) =>
   R.pipe(
     R.filter(item =>
       StringUtils.contains(codeOrName, item.code) ||
@@ -54,7 +54,7 @@ const findSrsByCodeOrName = (codeOrName, limit = 200) =>
 
 const getSrsByCode = code => srsByCode[code]
 
-const isCoordinateValid = (srsCode, x, y) => {
+export const isCoordinateValid = (srsCode, x, y) => {
   const srs = getSrsByCode(srsCode)
 
   if (!srs ||
@@ -76,10 +76,4 @@ const isCoordinateValid = (srsCode, x, y) => {
     return !R.equals(lonLat, invalidLonLatCoordinates) &&
       isValidCoordinates(lonLat[0], lonLat[1])
   }
-}
-
-module.exports = {
-  findSrsByCodeOrName,
-
-  isCoordinateValid,
 }

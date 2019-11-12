@@ -1,15 +1,15 @@
-const R = require('ramda')
-const fs = require('fs')
-const { transform, stringify } = require('csv')
+import * as R from 'ramda'
+import * as fs from 'fs'
+import { transform, stringify } from 'csv';
 
-const StringUtils = require('@core/stringUtils')
+import * as StringUtils from '@core/stringUtils'
 
 const _transformObj = obj => Object.entries(obj).reduce(
   (objAcc, [key, value]) => Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),
   {}
 )
 
-const transformToStream = (stream, columns) => {
+export const transformToStream = (stream, columns) => {
   const transformer = transform(_transformObj)
   transformer
     .pipe(stringify({ quoted_string: true, header: true, columns }))
@@ -17,7 +17,7 @@ const transformToStream = (stream, columns) => {
   return transformer
 }
 
-const writeToStream = (stream, data) => new Promise((resolve, reject) => {
+export const writeToStream = (stream, data) => new Promise((resolve, reject) => {
   const transformer = transformToStream(stream, R.pipe(R.head, R.keys)(data))
   transformer
     .on('error', reject)
@@ -27,10 +27,4 @@ const writeToStream = (stream, data) => new Promise((resolve, reject) => {
   transformer.end()
 })
 
-const writeToFile = (filePath, data) => writeToStream(fs.createWriteStream(filePath), data)
-
-module.exports = {
-  transformToStream,
-  writeToFile,
-  writeToStream,
-}
+export const writeToFile = (filePath, data) => writeToStream(fs.createWriteStream(filePath), data)

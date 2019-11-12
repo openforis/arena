@@ -1,15 +1,9 @@
+# Ignore everything by default, whitelist relevant files
 *
 
-# Include git for version info...
+# Simpler to just git clone everything that's important
 !.git
 
-!webpack*.js
-!common
-!core
-!server
-!webapp
-!web-resources
+# Dependencies are specified separately for caching purposes
 !package.json
 !yarn.lock
-
-!test

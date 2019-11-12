@@ -1,10 +1,10 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Category = require('@core/survey/category')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const CategoryItem = require('@core/survey/categoryItem')
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
 
 const keys = {
   children: 'children',
@@ -157,7 +157,7 @@ const categoryValidators = (categories) => ({
 const validateCategoryProps = async (categories, category) =>
   await Validator.validate(category, categoryValidators(categories))
 
-const validateCategory = async (categories, category, items) => {
+export const validateCategory = async (categories, category, items) => {
   const itemsByParentUuid = R.groupBy(R.prop(CategoryItem.keys.parentUuid))(items)
 
   const categoryValidation = await validateCategoryProps(categories, category)
@@ -175,8 +175,4 @@ const validateCategory = async (categories, category, items) => {
       Validation.setField(keys.items, itemsValidation)
     ),
   )(categoryValidation)
-}
-
-module.exports = {
-  validateCategory,
 }

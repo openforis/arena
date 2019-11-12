@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
-const SurveyManager = require('../manager/surveyManager')
-const RecordManager = require('../../record/manager/recordManager')
+import * as SurveyManager from '../manager/surveyManager'
+import * as RecordManager from '../../record/manager/recordManager'
 
-const Job = require('@server/job/job')
+import Job from '@server/job/job'
 
-class RecordCheckJob extends Job {
+export default class RecordCheckJob extends Job {
 
   constructor (params) {
     super(RecordCheckJob.type, params)
@@ -168,5 +168,3 @@ const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, t
 }
 
 RecordCheckJob.type = 'RecordCheckJob'
-
-module.exports = RecordCheckJob

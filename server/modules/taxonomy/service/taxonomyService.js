@@ -1,13 +1,13 @@
-const CSVWriter = require('@server/utils/file/csvWriter')
-const db = require('@server/db/db')
+import * as CSVWriter from '@server/utils/file/csvWriter'
+import { db } from '@server/db/db'
 
-const Taxonomy = require('@core/survey/taxonomy')
+import * as Taxonomy from '@core/survey/taxonomy'
 
-const TaxonomyManager = require('../manager/taxonomyManager')
-const JobManager = require('@server/job/jobManager')
-const TaxonomyImportJob = require('./taxonomyImportJob')
+import * as TaxonomyManager from '../manager/taxonomyManager'
+import * as JobManager from '@server/job/jobManager'
+import TaxonomyImportJob from './taxonomyImportJob'
 
-const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
+export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, draft)
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
@@ -26,7 +26,7 @@ const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
     })
 }
 
-const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
+export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
   const job = new TaxonomyImportJob({
     user,
     surveyId,
@@ -39,28 +39,23 @@ const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
   return job
 }
 
-module.exports = {
-  insertTaxonomy: TaxonomyManager.insertTaxonomy,
+export const insertTaxonomy = TaxonomyManager.insertTaxonomy
 
-  fetchTaxonomyByUuid: TaxonomyManager.fetchTaxonomyByUuid,
-  fetchTaxonomiesBySurveyId: TaxonomyManager.fetchTaxonomiesBySurveyId,
+export const fetchTaxonomyByUuid = TaxonomyManager.fetchTaxonomyByUuid
+export const fetchTaxonomiesBySurveyId = TaxonomyManager.fetchTaxonomiesBySurveyId
 
-  countTaxaByTaxonomyUuid: TaxonomyManager.countTaxaByTaxonomyUuid,
-  findTaxaByCode: TaxonomyManager.findTaxaByCode,
-  findTaxaByScientificName: TaxonomyManager.findTaxaByScientificName,
-  findTaxaByCodeOrScientificName: TaxonomyManager.findTaxaByCodeOrScientificName,
-  findTaxaByVernacularName: TaxonomyManager.findTaxaByVernacularName,
+export const countTaxaByTaxonomyUuid = TaxonomyManager.countTaxaByTaxonomyUuid
+export const findTaxaByCode = TaxonomyManager.findTaxaByCode
+export const findTaxaByScientificName = TaxonomyManager.findTaxaByScientificName
+export const findTaxaByCodeOrScientificName = TaxonomyManager.findTaxaByCodeOrScientificName
+export const findTaxaByVernacularName = TaxonomyManager.findTaxaByVernacularName
 
-  fetchTaxaWithVernacularNames: TaxonomyManager.fetchTaxaWithVernacularNames,
-  fetchTaxonByUuid: TaxonomyManager.fetchTaxonByUuid,
-  fetchTaxonVernacularNameByUuid: TaxonomyManager.fetchTaxonVernacularNameByUuid,
+export const fetchTaxaWithVernacularNames = TaxonomyManager.fetchTaxaWithVernacularNames
+export const fetchTaxonByUuid = TaxonomyManager.fetchTaxonByUuid
+export const fetchTaxonVernacularNameByUuid = TaxonomyManager.fetchTaxonVernacularNameByUuid
 
-  // update
-  updateTaxonomyProp: TaxonomyManager.updateTaxonomyProp,
+// update
+export const updateTaxonomyProp = TaxonomyManager.updateTaxonomyProp
 
-  // delete
-  deleteTaxonomy: TaxonomyManager.deleteTaxonomy,
-
-  exportTaxa,
-  importTaxonomy,
-}
+// delete
+export const deleteTaxonomy = TaxonomyManager.deleteTaxonomy

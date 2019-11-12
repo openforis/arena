@@ -8,9 +8,9 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import ExpressionsProp from './expressionsProp/expressionsProp'
 
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefValidations from '@core/survey/nodeDefValidations'
-import Validation from '@core/validation/validation'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Validation from '@core/validation/validation'
 
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 

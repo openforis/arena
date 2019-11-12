@@ -1,19 +1,19 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const keys = {
+export const keys = {
   code: 'code',
   name: 'name',
   wkt: 'wkt',
 }
 
-const newSrs = (code, name, wkt) => ({
+export const newSrs = (code, name, wkt) => ({
   [keys.code]: code,
   [keys.name]: name,
   [keys.wkt]: wkt,
 })
 
 //EPSG:4326 WGS84 Lat Lon Spatial Reference System
-const latLonSrs = newSrs(
+export const latLonSrs = newSrs(
   '4326',
   'GCS WGS 1984',
   `GEOGCS["WGS 84",
@@ -28,18 +28,7 @@ const latLonSrs = newSrs(
       AUTHORITY["EPSG","4326"]]`
 )
 
-const getCode = R.prop(keys.code)
-const getName = R.prop(keys.name)
-const getWkt = R.prop(keys.wkt)
-
-module.exports = {
-  keys,
-  latLonSrs,
-
-  newSrs,
-
-  isLatLon: code => getCode(latLonSrs) === code,
-  getCode,
-  getName,
-  getWkt,
-}
+export const isLatLon = code => getCode(latLonSrs) === code
+export const getCode = R.prop(keys.code)
+export const getName = R.prop(keys.name)
+export const getWkt = R.prop(keys.wkt)

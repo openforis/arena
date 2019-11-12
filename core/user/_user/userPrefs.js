@@ -1,10 +1,10 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = require('./userKeys')
+import { keys } from './userKeys'
 
-const keysPrefs = {
+export const keysPrefs = {
   surveys: 'surveys',
   current: 'current',
   cycle: ObjectUtils.keys.cycle,
@@ -14,7 +14,7 @@ const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
 const pathSurveyCycle = surveyId => [keys.prefs, keysPrefs.surveys, String(surveyId), keysPrefs.cycle]
 
 //====== CREATE
-const newPrefs = (surveyId, surveyCycleKey) => ({
+export const newPrefs = (surveyId, surveyCycleKey) => ({
   [keysPrefs.surveys]: {
     [keysPrefs.current]: surveyId,
     [surveyId]: {
@@ -24,27 +24,27 @@ const newPrefs = (surveyId, surveyCycleKey) => ({
 })
 
 //====== READ
-const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
+export const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
 
-const getPrefSurveyCycle = surveyId => R.path(pathSurveyCycle(surveyId))
+export const getPrefSurveyCycle = surveyId => R.path(pathSurveyCycle(surveyId))
 
-const getPrefSurveyCurrentCycle = user => R.pipe(
+export const getPrefSurveyCurrentCycle = user => R.pipe(
   getPrefSurveyCurrent,
   surveyId => getPrefSurveyCycle(surveyId)(user)
 )(user)
 
 //====== UPDATE
-const assocPrefSurveyCurrent = surveyId => R.assocPath(pathSurveyCurrent, surveyId)
+export const assocPrefSurveyCurrent = surveyId => R.assocPath(pathSurveyCurrent, surveyId)
 
-const assocPrefSurveyCycle = (surveyId, cycle) => R.assocPath(pathSurveyCycle(surveyId), cycle)
+export const assocPrefSurveyCycle = (surveyId, cycle) => R.assocPath(pathSurveyCycle(surveyId), cycle)
 
-const assocPrefSurveyCurrentAndCycle = (surveyId, cycle) => R.pipe(
+export const assocPrefSurveyCurrentAndCycle = (surveyId, cycle) => R.pipe(
   assocPrefSurveyCurrent(surveyId),
   assocPrefSurveyCycle(surveyId, cycle)
 )
 
 //====== DELETE
-const deletePrefSurvey = surveyId => user => {
+export const deletePrefSurvey = surveyId => user => {
   const surveyIdPref = getPrefSurveyCurrent(user)
   return R.pipe(
     R.when(
@@ -53,24 +53,4 @@ const deletePrefSurvey = surveyId => user => {
     ),
     R.dissocPath([keys.prefs, keysPrefs.surveys, String(surveyId)])
   )(user)
-}
-
-module.exports = {
-  keysPrefs,
-
-  //CREATE
-  newPrefs,
-
-  //READ
-  getPrefSurveyCurrent,
-  getPrefSurveyCycle,
-  getPrefSurveyCurrentCycle,
-
-  //UPDATE
-  assocPrefSurveyCurrent,
-  assocPrefSurveyCycle,
-  assocPrefSurveyCurrentAndCycle,
-
-  //DELETE
-  deletePrefSurvey,
 }

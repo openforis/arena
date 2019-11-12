@@ -1,26 +1,26 @@
-const R = require('ramda')
-const { uuidv4 } = require('@core/uuid')
+import * as R from 'ramda'
+import { uuidv4 } from '@core/uuid';
 
-const ObjectUtils = require('@core/objectUtils')
+import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
   uuid: 'uuid',
   props: 'props',
   parentUuid: 'parentUuid',
   levelUuid: 'levelUuid'
 }
 
-const props = {
+export const props = {
   code: 'code',
   extra: 'extra',
 }
 
-const keysExtraDef = {
+export const keysExtraDef = {
   dataType: 'dataType'
 }
 
 // ====== CREATE
-const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
+export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
   [keys.uuid]: uuidv4(),
   [keys.levelUuid]: levelUuid,
   [keys.parentUuid]: parentItemUuid,
@@ -28,37 +28,20 @@ const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 })
 
 // ====== READ
-const getCode = ObjectUtils.getProp(props.code, '')
+export const getUuid = ObjectUtils.getUuid
+export const getLevelUuid = R.prop(keys.levelUuid)
+export const getParentUuid = R.prop(keys.parentUuid)
+export const getCode = ObjectUtils.getProp(props.code, '')
+export const getLabels = ObjectUtils.getLabels
+export const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item))(item)
+export const getDescriptions = ObjectUtils.getDescriptions
+export const getDescription = ObjectUtils.getDescription
+export const getExtra = ObjectUtils.getProp(props.extra)
+export const getProps = ObjectUtils.getProps
+export const isEqual = ObjectUtils.isEqual
 
-const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item))(item)
-
-const getExtra = ObjectUtils.getProp(props.extra)
-
-module.exports = {
-  keys,
-  props,
-  keysExtraDef,
-
-  //CREATE
-  newItem,
-
-  //READ
-  getUuid: ObjectUtils.getUuid,
-  getLevelUuid: R.prop(keys.levelUuid),
-  getParentUuid: R.prop(keys.parentUuid),
-  getCode,
-  getLabels: ObjectUtils.getLabels,
-  getLabel,
-  getDescriptions: ObjectUtils.getDescriptions,
-  getDescription: ObjectUtils.getDescription,
-  getExtra,
-  getProps: ObjectUtils.getProps,
-  isEqual: ObjectUtils.isEqual,
-
-  // NOT USED YET
-  getExtraProp: prop => R.pipe(
-    getExtra,
-    R.propOr('', prop)
-  ),
-
-}
+// NOT USED YET
+export const getExtraProp = prop => R.pipe(
+  ObjectUtils.getProp(keys.extra),
+  R.propOr('', prop),
+)

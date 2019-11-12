@@ -1,4 +1,4 @@
-class SystemError extends Error {
+export default class SystemError extends Error {
 
   constructor (key, params) {
     super(key)
@@ -23,5 +23,3 @@ class SystemError extends Error {
   }
 
 }
-
-module.exports = SystemError

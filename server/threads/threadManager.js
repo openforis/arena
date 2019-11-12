@@ -1,21 +1,21 @@
-const path = require('path')
-const { Worker } = require('worker_threads')
+import * as path from 'path'
+import { Worker } from 'worker_threads';
 
-const ProcessUtils = require('@core/processUtils')
-const User = require('@core/user/user')
+import * as ProcessUtils from '@core/processUtils'
+import * as User from '@core/user/user'
 
-const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-const Log = require('@server/log/log')
-const WebSocket = require('@server/utils/webSocket')
+import * as Log from '@server/log/log'
+import * as WebSocket from '@server/utils/webSocket'
 
-const Thread = require('./thread')
-const ThreadParams = require('./threadParams')
+import Thread from './thread'
+import * as ThreadParams from './threadParams'
 
 /**
  * Base class for managing communication between EventLoop and Thread in worker pool
  */
-class ThreadManager {
+export default class ThreadManager {
 
   constructor (fileName, data, messageHandler, exitHandler = null) {
     const filePath = path.resolve(ProcessUtils.ENV.arenaDist, fileName)
@@ -63,5 +63,3 @@ class ThreadManager {
   }
 
 }
-
-module.exports = ThreadManager

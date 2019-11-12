@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import CategoryItem from '@core/survey/categoryItem'
+import * as CategoryItem from '@core/survey/categoryItem'
 
 const Checkbox = props => {
   const {

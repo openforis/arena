@@ -1,18 +1,18 @@
-const Request = require('@server/utils/request')
-const Response = require('@server/utils/response')
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const UserService = require('../service/userService')
+import * as UserService from '../service/userService'
 
-const User = require('@core/user/user')
-const UserValidator = require('@core/user/userValidator')
-const Validation = require('@core/validation/validation')
-const ProcessUtils = require('@core/processUtils')
+import * as User from '@core/user/user'
+import * as UserValidator from '@core/user/userValidator'
+import * as Validation from '@core/validation/validation'
+import * as ProcessUtils from '@core/processUtils'
 
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== CREATE
 
@@ -163,4 +163,5 @@ module.exports.init = app => {
     }
   })
 
-}
+};
+

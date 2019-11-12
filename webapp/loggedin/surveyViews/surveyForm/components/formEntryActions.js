@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
-import Record from '@core/record/record'
-import RecordStep from '@core/record/recordStep'
-import Validation from '@core/validation/validation'
+import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
+import * as Validation from '@core/validation/validation'
 
 import { deleteRecord, updateRecordStep } from '../../record/actions'
 import { appModuleUri, designerModules } from '../../../appModules'

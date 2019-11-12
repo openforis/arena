@@ -1,7 +1,7 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Category = require('@core/survey/category')
-const Taxonomy = require('@core/survey/taxonomy')
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 const keys = {
   collectSurveyFileZip: 'collectSurveyFileZip',
@@ -12,46 +12,32 @@ const keys = {
 
 // ===== READ
 
-const getCollectSurveyFileZip = R.prop(keys.collectSurveyFileZip)
+export const getCollectSurveyFileZip = R.prop(keys.collectSurveyFileZip)
 
-const getCategories = R.propOr([], keys.categories)
+export const getCategories = R.propOr([], keys.categories)
 
-const getCategoryByName = name => R.pipe(
+export const getCategoryByName = name => R.pipe(
   getCategories,
   R.find(c => name === Category.getName(c))
 )
 
-const getSurvey = R.prop(keys.survey)
+export const getSurvey = R.prop(keys.survey)
 
-const getTaxonomies = R.propOr([], keys.taxonomies)
+export const getTaxonomies = R.propOr([], keys.taxonomies)
 
-const getTaxonomyByName = name => R.pipe(
+export const getTaxonomyByName = name => R.pipe(
   getTaxonomies,
   R.find(t => name === Taxonomy.getName(t))
 )
 
 // ===== UPDATE
 
-const assocSurvey = R.assoc(keys.survey)
+export const assocSurvey = R.assoc(keys.survey)
 
 const assocCategories = R.assoc(keys.categories)
 
-const assocCategory = category => context => R.pipe(
+export const assocCategory = category => context => R.pipe(
   getCategories,
   R.append(category),
   categories => assocCategories(categories)(context)
 )(context)
-
-module.exports = {
-  //READ
-  getCollectSurveyFileZip,
-  getCategories,
-  getCategoryByName,
-  getSurvey,
-  getTaxonomies,
-  getTaxonomyByName,
-
-  //UPDATE
-  assocSurvey,
-  assocCategory,
-}

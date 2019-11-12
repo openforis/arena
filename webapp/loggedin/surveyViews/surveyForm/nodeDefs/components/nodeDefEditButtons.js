@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'

@@ -1,4 +1,4 @@
-const types = {
+export const types = {
   Compound: 'Compound',
   Identifier: 'Identifier',
   MemberExpression: 'MemberExpression',
@@ -13,5 +13,3 @@ const types = {
   // custom - not managed by jsep
   GroupExpression: 'GroupExpression',
 }
-
-module.exports = types

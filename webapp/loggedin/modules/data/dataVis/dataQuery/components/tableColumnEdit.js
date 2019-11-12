@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefLayout from '@core/survey/nodeDefLayout'
-import Record from '@core/record/record'
-import Node from '@core/record/node'
-import Authorizer from '@core/auth/authorizer'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as Authorizer from '@core/auth/authorizer'
 
 import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 

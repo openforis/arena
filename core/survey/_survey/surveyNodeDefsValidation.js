@@ -1,23 +1,17 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDef = require('../nodeDef')
-const Validation = require('@core/validation/validation')
+import * as NodeDef from '../nodeDef'
+import * as Validation from '@core/validation/validation'
 
 const keys = {
   nodeDefsValidation: 'nodeDefsValidation'
 }
 
-const getNodeDefsValidation = R.propOr({}, keys.nodeDefsValidation)
+export const getNodeDefsValidation = R.propOr({}, keys.nodeDefsValidation)
 
-const assocNodeDefsValidation = R.assoc(keys.nodeDefsValidation)
+export const assocNodeDefsValidation = R.assoc(keys.nodeDefsValidation)
 
-const getNodeDefValidation = nodeDef => R.pipe(
+export const getNodeDefValidation = nodeDef => R.pipe(
   getNodeDefsValidation,
   Validation.getFieldValidation(NodeDef.getUuid(nodeDef))
 )
-
-module.exports = {
-  getNodeDefsValidation,
-  assocNodeDefsValidation,
-  getNodeDefValidation,
-}

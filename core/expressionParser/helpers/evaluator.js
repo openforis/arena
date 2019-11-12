@@ -1,8 +1,8 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const types = require('./types')
+import { types } from './types'
 
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
 // Built-in functions that can be called, i.e. the standard library.
 // Nothing outside of this set may be used.
@@ -166,7 +166,7 @@ const thisEval = (expr, _ctx) => {
   throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
-const identifierEval = expr => {
+const identifierEval = (expr,ctx) => {
   throw new SystemError('identifierEvalNotImplemented', { expr })
 }
 
@@ -208,3 +208,4 @@ export const getExpressionIdentifiers = expr => {
   evalExpression(expr, { functions })
   return R.uniq(identifiers)
 }
+

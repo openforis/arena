@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Expression from '@core/expressionParser/expression'
+import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '../../hooks'
 

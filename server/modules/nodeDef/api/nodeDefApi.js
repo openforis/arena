@@ -1,11 +1,11 @@
-const Request = require('@server/utils/request')
-const AuthMiddleware = require('../../auth/authApiMiddleware')
+import * as Request from '@server/utils/request'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const SurveyService = require('../../survey/service/surveyService')
-const NodeDefService = require('../service/nodeDefService')
+import * as SurveyService from '../../survey/service/surveyService'
+import * as NodeDefService from '../service/nodeDefService'
 
 const sendRespNodeDefs = async (res, surveyId, cycle, sendNodeDefs = false, draft = true, advanced = true, validate = true, nodeDefsUpdated = null) => {
   const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate)
@@ -17,7 +17,7 @@ const sendRespNodeDefs = async (res, surveyId, cycle, sendNodeDefs = false, draf
   })
 }
 
-module.exports.init = app => {
+export const init = app => {
 
   // ==== CREATE
 
@@ -85,4 +85,5 @@ module.exports.init = app => {
       next(err)
     }
   })
-}
+};
+

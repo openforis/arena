@@ -1,13 +1,10 @@
-const AuthGroupRepository = require('../repository/authGroupRepository')
-const JwtRepository = require('../repository/jwtRepository')
+import * as AuthGroupRepository from '../repository/authGroupRepository'
+import * as JwtRepository from '../repository/jwtRepository'
 
-module.exports = {
+export const fetchGroupByUuid = AuthGroupRepository.fetchGroupByUuid
 
-  fetchGroupByUuid: AuthGroupRepository.fetchGroupByUuid,
+export const blacklistToken = JwtRepository.blacklistToken
 
-  blacklistToken: JwtRepository.blacklistToken,
+export const findBlacklistedToken = JwtRepository.findBlacklistedToken
 
-  findBlacklistedToken: JwtRepository.findBlacklistedToken,
-
-  deleteExpiredJwtTokens: JwtRepository.deleteExpiredJwtTokens,
-}
+export const deleteExpiredJwtTokens = JwtRepository.deleteExpiredJwtTokens

@@ -6,9 +6,9 @@ import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import Taxonomy from '@core/survey/taxonomy'
-import Validation from '@core/validation/validation'
-import StringUtils from '@core/stringUtils'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Validation from '@core/validation/validation'
+import * as StringUtils from '@core/stringUtils'
 
 const TaxonomyEditHeader = props => {
   const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props

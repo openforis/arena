@@ -1,4 +1,4 @@
-module.exports = {
+export const ValidatorErrorKeys = {
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
   invalidDate: 'validationErrors.invalidDate',
@@ -110,4 +110,4 @@ module.exports = {
     NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
     CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
   }
-}
+};

@@ -1,14 +1,14 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDefExpression = require('../nodeDefExpression')
-const SurveyNodeDefs = require('./surveyNodeDefs')
-const NodeDef = require('../nodeDef')
+import * as NodeDefExpression from '../nodeDefExpression'
+import * as SurveyNodeDefs from './surveyNodeDefs'
+import * as NodeDef from '../nodeDef'
 
 const keys = {
   dependencyGraph: 'dependencyGraph'
 }
 
-const dependencyTypes = {
+export const dependencyTypes = {
   defaultValues: 'defaultValues',
   applicable: 'applicable',
   validations: 'validations',
@@ -37,7 +37,7 @@ const addDeps = (survey, nodeDef, type, expressions) =>
   }
 
 //====== CREATE
-const buildGraph = survey =>
+export const buildGraph = survey =>
   R.reduce(
     (graph, nodeDef) => R.pipe(
       addDeps(survey, nodeDef, dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
@@ -48,9 +48,9 @@ const buildGraph = survey =>
     SurveyNodeDefs.getNodeDefsArray(survey)
   )
 
-const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
+export const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
 
-const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
+export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
   getDependencyGraph,
   R.ifElse(
     R.always(R.isNil(dependencyType)),
@@ -80,7 +80,7 @@ const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.pipe(
  * Returns true if nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
  *
  */
-const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
+export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
   if (nodeDefUuid === nodeDefSourceUuid)
     return false
 
@@ -108,16 +108,5 @@ const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
   return false
 }
 
-module.exports = {
-  dependencyTypes,
-
-  buildGraph,
-
-  // READ
-  getDependencyGraph,
-  getNodeDefDependencies,
-  isNodeDefDependentOn,
-
-  // UPDATE
-  assocDependencyGraph: dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)
-}
+// UPDATE
+export const assocDependencyGraph = dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)

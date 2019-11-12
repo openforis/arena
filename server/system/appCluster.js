@@ -1,25 +1,25 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const compression = require('compression')
-const cookieParser = require('cookie-parser')
-const fileUpload = require('express-fileupload')
-const { createTerminus } = require('@godaddy/terminus')
+import * as express from 'express'
+import * as bodyParser from 'body-parser'
+import * as compression from 'compression'
+import * as cookieParser from 'cookie-parser'
+import * as fileUpload from 'express-fileupload'
+import { createTerminus } from '@godaddy/terminus'
 
-const ProcessUtils = require('@core/processUtils')
-const Log = require('@server/log/log')
-const db = require('@server/db/db')
+import * as ProcessUtils from '@core/processUtils'
+import * as Log from '@server/log/log'
+import { db } from '@server/db/db'
 
-const headerMiddleware = require('./middleware/headerMiddleware')
-const jwtMiddleware = require('./middleware/jwtMiddleware')
-const errorMiddleware = require('./middleware/errorMiddleware')
-const authApi = require('@server/modules/auth/api/authApi')
-const apiRouter = require('./apiRouter')
-const WebSocket = require('@server/utils/webSocket')
-const RecordPreviewCleanup = require('./schedulers/recordPreviewCleanup')
-const ExpiredJwtTokensCleanup = require('./schedulers/expiredJwtTokensCleanup')
-const TempFilesCleanup = require('./schedulers/tempFilesCleanup')
+import * as headerMiddleware from './middleware/headerMiddleware'
+import { jwtMiddleware } from './middleware/jwtMiddleware'
+import * as errorMiddleware from './middleware/errorMiddleware'
+import * as authApi from '@server/modules/auth/api/authApi'
+import * as apiRouter from './apiRouter'
+import * as WebSocket from '@server/utils/webSocket'
+import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
+import * as ExpiredJwtTokensCleanup from './schedulers/expiredJwtTokensCleanup'
+import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 
-module.exports = async () => {
+export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info(`server initialization start`)

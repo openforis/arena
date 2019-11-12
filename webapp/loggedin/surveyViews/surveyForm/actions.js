@@ -1,7 +1,7 @@
-import Survey from '@core/survey/survey'
-import NodeDef from '@core/survey/nodeDef'
-import Record from '@core/record/record'
-import Node from '@core/record/node'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../record/recordState'

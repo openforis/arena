@@ -1,9 +1,10 @@
-const SurveyManager = require('../manager/surveyManager')
+import * as SurveyManager from '../manager/surveyManager'
 
-const JobManager = require('@server/job/jobManager')
-const SurveyPublishJob = require('./publish/surveyPublishJob')
+import * as JobManager from '@server/job/jobManager'
+import SurveyPublishJob from './publish/surveyPublishJob'
 
-const startPublishJob = (user, surveyId) => {
+// JOBS
+export const startPublishJob = (user, surveyId) => {
   const job = new SurveyPublishJob({ user, surveyId })
 
   JobManager.executeJobThread(job)
@@ -11,23 +12,18 @@ const startPublishJob = (user, surveyId) => {
   return job
 }
 
-module.exports = {
-  // CREATE
-  createSurvey: SurveyManager.createSurvey,
-  validateNewSurvey: SurveyManager.validateNewSurvey,
+// CREATE
+export const createSurvey = SurveyManager.createSurvey
+export const validateNewSurvey = SurveyManager.validateNewSurvey
 
-  // READ
-  fetchUserSurveysInfo: SurveyManager.fetchUserSurveysInfo,
-  countUserSurveys: SurveyManager.countUserSurveys,
-  fetchSurveyById: SurveyManager.fetchSurveyById,
-  fetchSurveyAndNodeDefsBySurveyId: SurveyManager.fetchSurveyAndNodeDefsBySurveyId,
+// READ
+export const fetchUserSurveysInfo = SurveyManager.fetchUserSurveysInfo
+export const countUserSurveys = SurveyManager.countUserSurveys
+export const fetchSurveyById = SurveyManager.fetchSurveyById
+export const fetchSurveyAndNodeDefsBySurveyId = SurveyManager.fetchSurveyAndNodeDefsBySurveyId
 
-  // UPDATE
-  updateSurveyProps: SurveyManager.updateSurveyProps,
+// UPDATE
+export const updateSurveyProps = SurveyManager.updateSurveyProps
 
-  // DELETE
-  deleteSurvey: SurveyManager.deleteSurvey,
-
-  // JOBS
-  startPublishJob,
-}
+// DELETE
+export const deleteSurvey = SurveyManager.deleteSurvey

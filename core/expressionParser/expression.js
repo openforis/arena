@@ -1,19 +1,22 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const NodeDef = require('@core/survey/nodeDef')
+import * as NodeDef from '@core/survey/nodeDef'
 
-const jsep = require('./helpers/jsep')
-const Evaluator = require('./helpers/evaluator')
-const ExpressionUtils = require('./helpers/utils')
-const types = require('./helpers/types')
-const operators = require('./helpers/operators')
+import jsep from './helpers/jsep'
+import * as Evaluator from './helpers/evaluator'
+import * as ExpressionUtils from './helpers/utils'
 
-const modes = {
+import { types } from './helpers/types'
+
+export { types } from './helpers/types'
+export { operators } from './helpers/operators'
+
+export const modes = {
   json: 'json',
   sql: 'sql',
 }
 
-const toString = (expr, exprMode = modes.json) => {
+export const toString = (expr, exprMode = modes.json) => {
   const string = ExpressionUtils.toString(expr)
 
   return exprMode === modes.sql
@@ -26,7 +29,7 @@ const toString = (expr, exprMode = modes.json) => {
     : string
 }
 
-const fromString = (string, exprMode = modes.json) => {
+export const fromString = (string, exprMode = modes.json) => {
   const exprString = exprMode === modes.json ?
     string :
     R.pipe(
@@ -41,62 +44,46 @@ const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
+export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
+
+export const isValid = ExpressionUtils.isValid
+export const getExpressionIdentifiers = Evaluator.getExpressionIdentifiers
+
 
 // ====== Type checking
 
 const isType = type => R.propEq('type', type)
 
-// ====== Instance creators
-
-const newLiteral = (value = null) => ({
-  type: types.Literal,
-  value: value,
-  raw: value || '',
-})
-
-const newIdentifier = (value = '') => ({
-  type: types.Identifier,
-  name: value,
-})
-
-const newBinary = (left, right, operator = '') => ({
-  type: types.BinaryExpression,
-  operator,
-  left,
-  right,
-})
-
 // Return true if the nodeDef can be used in expressions and false otherwise
-const isValidExpressionType = nodeDef =>
+export const isValidExpressionType = nodeDef =>
   !NodeDef.isEntity(nodeDef)
   && !NodeDef.isMultiple(nodeDef)
   && !NodeDef.isCoordinate(nodeDef)
   && !NodeDef.isFile(nodeDef)
 
-module.exports = {
-  types,
-  modes,
+export const isLiteral = isType(types.Literal)
+export const isCompound = isType(types.Compound)
+export const isBinary = isType(types.BinaryExpression)
+export const isIdentifier = isType(types.Identifier)
+export const isLogical = isType(types.LogicalExpression)
 
-  toString,
-  fromString,
-  evalString,
-  isValid: ExpressionUtils.isValid,
-  getExpressionIdentifiers: Evaluator.getExpressionIdentifiers,
 
-  // Type checking
-  isLiteral: isType(types.Literal),
-  isCompound: isType(types.Compound),
-  isBinary: isType(types.BinaryExpression),
-  isIdentifier: isType(types.Identifier),
-  isLogical: isType(types.LogicalExpression),
-  isValidExpressionType,
+// ====== Instance creators
 
-  // Instance creators
-  newLiteral,
-  newIdentifier,
-  newBinary,
+export const newLiteral = (value = null) => ({
+  type: types.Literal,
+  value: value,
+  raw: value || '',
+})
 
-  // operators
-  operators,
-}
+export const newIdentifier = (value = '') => ({
+  type: types.Identifier,
+  name: value,
+})
+
+export const newBinary = (left, right, operator = '') => ({
+  type: types.BinaryExpression,
+  operator,
+  left,
+  right,
+})

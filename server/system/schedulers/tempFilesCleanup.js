@@ -1,11 +1,13 @@
-const fs = require('fs')
-const path = require('path')
-const schedule = require('node-schedule')
+import * as fs from 'fs'
+import * as path from 'path'
+import * as schedule from 'node-schedule'
 
-const Logger = require('@server/log/log').getLogger('TempFilesCleanup')
+import * as Log from '@server/log/log'
 
-const DateUtils = require('@core/dateUtils')
-const ProcessUtils = require('@core/processUtils')
+import * as DateUtils from '@core/dateUtils'
+import * as ProcessUtils from '@core/processUtils'
+
+const Logger = Log.getLogger('TempFilesCleanup')
 
 const initSchedule = () =>
   // execute the cron job every day at 2AM
@@ -42,12 +44,8 @@ const cleanupTempFiles = async (olderThanHours = null) => {
   Logger.debug(`${count} temp files deleted`)
 }
 
-const init = async () => {
+export const init = async () => {
   await cleanupTempFiles()
 
   initSchedule()
-}
-
-module.exports = {
-  init
 }

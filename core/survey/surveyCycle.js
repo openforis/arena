@@ -1,11 +1,11 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ObjectUtils = require('@core/objectUtils')
-const DateUtils = require('@core/dateUtils')
+import * as ObjectUtils from '@core/objectUtils'
+import * as DateUtils from '@core/dateUtils'
 
-const dateFormat = 'yyyy-MM-dd'
+export const dateFormat = 'yyyy-MM-dd'
 
-const keys = {
+export const keys = {
   dateStart: 'dateStart',
   dateEnd: 'dateEnd',
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -13,34 +13,16 @@ const keys = {
 }
 
 //====== CREATE
-const newCycle = () => ({
+export const newCycle = () => ({
   [keys.dateStart]: DateUtils.format(Date.now(), dateFormat)
 })
 
 //====== READ
-const getDateStart = R.propOr(null, keys.dateStart)
-const getDateEnd = R.propOr(null, keys.dateEnd)
-const getDescriptions = R.propOr({}, keys.descriptions)
-const getLabels = R.propOr({}, keys.labels)
+export const getDateStart = R.propOr(null, keys.dateStart)
+export const getDateEnd = R.propOr(null, keys.dateEnd)
+export const getDescriptions = R.propOr({}, keys.descriptions)
+export const getLabels = R.propOr({}, keys.labels)
 
 //====== UPDATE
-const setDateStart = R.assoc(keys.dateStart)
-const setDateEnd = R.assoc(keys.dateEnd)
-
-module.exports = {
-  keys,
-  dateFormat,
-
-  //CREATE
-  newCycle,
-
-  // READ
-  getDateStart,
-  getDateEnd,
-  getDescriptions,
-  getLabels,
-
-  //UPDATE
-  setDateStart,
-  setDateEnd,
-}
+export const setDateStart = R.assoc(keys.dateStart)
+export const setDateEnd = R.assoc(keys.dateEnd)

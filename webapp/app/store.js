@@ -15,7 +15,7 @@ import * as ErrorsState from './appErrors/appErrorsState'
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from './appErrorsMiddleware'
-import ProcessUtils from '@core/processUtils'
+import * as ProcessUtils from '@core/processUtils'
 
 const appReducers = {
   app: appReducer,
@@ -40,7 +40,7 @@ if (ProcessUtils.isEnvDevelopment) {
   middlewares.push(logger)
 }
 
-const store = createStore(
+export const store = createStore(
   createReducer({}),
   applyMiddleware(...middlewares)
 )
@@ -51,5 +51,3 @@ export const injectReducers = (name, asyncReducer) => {
   store.asyncReducers[name] = asyncReducer
   store.replaceReducer(createReducer(store.asyncReducers))
 }
-
-export default store

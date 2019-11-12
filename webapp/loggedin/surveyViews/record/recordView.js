@@ -8,13 +8,13 @@ import { getUrlParam } from '@webapp/utils/routerUtils'
 
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import Survey from '@core/survey/survey'
-import Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
 
 import SurveyFormView from '../surveyForm/surveyFormView'
 
-import Authorizer from '@core/auth/authorizer'
-import WebSocketEvents from '@common/webSocket/webSocketEvents'
+import * as Authorizer from '@core/auth/authorizer'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import * as AppState from '@webapp/app/appState'

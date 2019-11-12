@@ -13,7 +13,7 @@ import AppRouterSwitch from './app/appRouterSwitch'
 
 import * as AxiosJwtMiddleware from './app/axiosJwtMiddleware'
 
-import store from './app/store'
+import { store } from './app/store'
 
 function renderApp () {
 

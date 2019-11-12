@@ -3,7 +3,7 @@ import './dashboardView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Authorizer from '@core/auth/authorizer'
+import * as Authorizer from '@core/auth/authorizer'
 
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import SurveyInfo from './surveyInfo/surveyInfo'

@@ -1,8 +1,8 @@
-const Request = require('@server/utils/request')
+import * as Request from '@server/utils/request'
 
-const GeoUtils = require('@core/geo/geoUtils')
+import * as GeoUtils from '@core/geo/geoUtils'
 
-module.exports.init = app => {
+export const init = app => {
   // ==== READ
   app.get('/geo/srs/find', async (req, res) => {
     const { codeOrName } = Request.getParams(req)
@@ -11,4 +11,5 @@ module.exports.init = app => {
 
     res.json({ srss })
   })
-}
+};
+

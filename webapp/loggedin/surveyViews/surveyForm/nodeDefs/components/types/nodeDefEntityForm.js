@@ -11,10 +11,10 @@ import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../../nodeDefSwitch'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
-import NodeDef from '@core/survey/nodeDef'
-import Record from '@core/record/record'
-import Node from '@core/record/node'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { setFormPageNode, getNodeKeyLabelValues } from '../../../../surveyForm/actions'
 

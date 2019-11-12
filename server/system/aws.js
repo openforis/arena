@@ -1,6 +1,6 @@
-const aws = require('aws-sdk')
+import * as aws from 'aws-sdk'
 
-const ProcessUtils = require('@core/processUtils')
+import * as ProcessUtils from '@core/processUtils'
 
 const _getAwsClient = () =>
   new aws.CognitoIdentityServiceProvider({
@@ -16,7 +16,7 @@ const _sendAwsRequest = request =>
     })
   })
 
-const inviteUser = (email, temporaryPassword) => {
+export const inviteUser = (email, temporaryPassword) => {
   const params = {
     UserPoolId: ProcessUtils.ENV.cognitoUserPoolId,
     // Username and email are the same in our case
@@ -37,7 +37,7 @@ const inviteUser = (email, temporaryPassword) => {
   return _sendAwsRequest(_getAwsClient().adminCreateUser(params))
 }
 
-const updateUser = (oldEmail, email, name) => {
+export const updateUser = (oldEmail, email, name) => {
   if (email === null && name === null) {
     return
   }
@@ -68,16 +68,10 @@ const updateUser = (oldEmail, email, name) => {
   return _sendAwsRequest(_getAwsClient().adminUpdateUserAttributes(params))
 }
 
-const deleteUser = email => {
+export const deleteUser = email => {
   const params = {
     UserPoolId: ProcessUtils.ENV.cognitoUserPoolId,
     Username: email
   }
   return _sendAwsRequest(_getAwsClient().adminDeleteUser(params))
-}
-
-module.exports = {
-  inviteUser,
-  updateUser,
-  deleteUser,
 }

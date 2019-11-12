@@ -3,8 +3,8 @@ import './formHeader.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDef from '@core/survey/nodeDef'
-import NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/commonComponents/hooks'

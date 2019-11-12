@@ -1,4 +1,4 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
 const languagesMap = {
   ab: {en: 'Abkhazian'},
@@ -584,21 +584,13 @@ const language_ISO_636_2_Map = {
   zza: {en: 'Zaza; Dimili; Dimli; Kirdki; Kirmanjki; Zazaki'},
 }
 
-const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languagesMap)
+export const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languagesMap)
 
-const languages = R.pipe(
+export const languages = R.pipe(
   R.keys,
   R.map(lang => ({key: lang, value: getLanguageLabel(lang)}))
 )(languagesMap)
 
-const languageCodes = languages.map(R.prop('key'))
+export const languageCodes = languages.map(R.prop('key'))
 
-const languageCodesISO636_2 = R.keys(language_ISO_636_2_Map)
-
-module.exports = {
-  languages,
-  languageCodes,
-  languageCodesISO636_2,
-
-  getLanguageLabel,
-}
+export const languageCodesISO636_2 = R.keys(language_ISO_636_2_Map)

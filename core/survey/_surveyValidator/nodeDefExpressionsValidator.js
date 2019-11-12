@@ -1,16 +1,16 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Validator = require('@core/validation/validator')
-const Validation = require('@core/validation/validation')
-const ValidationResult = require('@core/validation/validationResult')
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefValidations = require('@core/survey/nodeDefValidations')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const Expression = require('@core/expressionParser/expression')
-const ObjectUtils = require('@core/objectUtils')
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Expression from '@core/expressionParser/expression'
+import * as ObjectUtils from '@core/objectUtils'
 
-const SystemError = require('@core/systemError')
+import SystemError from '@core/systemError'
 
 const contextByDependencyTypeFns = {
   [Survey.dependencyTypes.defaultValues]: (survey, nodeDef) => nodeDef,
@@ -154,7 +154,7 @@ const _validateExpression = async (survey, nodeDef, dependencyType, nodeDefExpre
     : validation
 }
 
-const validate = async (survey, nodeDef, dependencyType) => {
+export const validate = async (survey, nodeDef, dependencyType) => {
   const result = Validation.newInstance()
 
   const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](nodeDef)
@@ -176,8 +176,4 @@ const validate = async (survey, nodeDef, dependencyType) => {
     Validation.setErrors([{ key: errorKey }])(result)
 
   return result
-}
-
-module.exports = {
-  validate,
 }

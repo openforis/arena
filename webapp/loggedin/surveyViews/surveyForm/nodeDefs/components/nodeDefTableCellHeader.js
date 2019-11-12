@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import NodeDef from '@core/survey/nodeDef'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 

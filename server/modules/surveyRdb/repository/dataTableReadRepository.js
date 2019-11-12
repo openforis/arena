@@ -1,14 +1,14 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-const SchemaRdb = require('@common/surveyRdb/schemaRdb')
-const NodeDefTable = require('@common/surveyRdb/nodeDefTable')
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-const DataTable = require('../schemaRdb/dataTable')
+import * as DataTable from '../schemaRdb/dataTable'
 
-const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchemaRepositoryUtils')
+import * as SurveySchemaRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Returns a list of items for each record containing duplicate entities.
@@ -19,7 +19,7 @@ const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchem
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  */
-const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
+export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
   const surveyId = Survey.getId(survey)
 
   const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
@@ -67,8 +67,4 @@ const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, n
     `,
     [cycle]
   )
-}
-
-module.exports = {
-  fetchRecordsWithDuplicateEntities
 }

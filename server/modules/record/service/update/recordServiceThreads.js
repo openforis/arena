@@ -1,15 +1,15 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const ThreadManager = require('@server/threads/threadManager')
-const RecordUpdateThreadParams = require('./thread/recordUpdateThreadParams')
-const ThreadParams = require('@server/threads/threadParams')
+import ThreadManager from '@server/threads/threadManager'
+import * as RecordUpdateThreadParams from './thread/recordUpdateThreadParams'
+import * as ThreadParams from '@server/threads/threadParams'
 
-const WebSocket = require('@server/utils/webSocket')
-const WebSocketEvents = require('@common/webSocket/webSocketEvents')
+import * as WebSocket from '@server/utils/webSocket'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-const RecordSocketsMap = require('./recordSocketsMap')
-const RecordThreadsMap = require('../update/recordThreadsMap')
-const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
+import * as RecordSocketsMap from './recordSocketsMap'
+import * as RecordThreadsMap from '../update/recordThreadsMap'
+import { messageTypes as RecordThreadMessageTypes } from './thread/recordThreadMessageTypes'
 
 const recordThreadTimeouts = {}
 
@@ -27,7 +27,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
   }
 
   const messageHandler = msg => {
-    if (msg.type === recordThreadMessageTypes.threadKill) {
+    if (msg.type === RecordThreadMessageTypes.threadKill) {
       if (RecordThreadsMap.isZombie(recordUuid)) {
         clearTimeout(recordThreadTimeouts[recordUuid])
         delete recordThreadTimeouts[recordUuid]
@@ -70,9 +70,9 @@ const _resetThreadInactivityTimeout = recordUuid => {
   }, 60 * 60 * 1000)
 }
 
-const getRecordThread = RecordThreadsMap.get
+export const getRecordThread = RecordThreadsMap.get
 
-const getOrCreatedRecordThread = (socketId, user, surveyId, recordUuid) => {
+export const getOrCreatedRecordThread = (socketId, user, surveyId, recordUuid) => {
   if (RecordThreadsMap.isZombie(recordUuid)) {
     RecordThreadsMap.reviveZombie(recordUuid)
   }
@@ -83,20 +83,20 @@ const getOrCreatedRecordThread = (socketId, user, surveyId, recordUuid) => {
 }
 
 // ====== DELETE
-const killRecordThread = recordUuid => {
+export const killRecordThread = recordUuid => {
   const thread = getRecordThread(recordUuid)
 
   RecordThreadsMap.markZombie(recordUuid)
-  thread.postMessage({ type: recordThreadMessageTypes.threadKill })
+  thread.postMessage({ type: RecordThreadMessageTypes.threadKill })
 }
 
 // ======
 // SOCKETS
 // ======
 
-const getSocketIds = RecordSocketsMap.getSocketIds
+export const getSocketIds = RecordSocketsMap.getSocketIds
 
-const assocSocket = RecordSocketsMap.assocSocket
+export const assocSocket = RecordSocketsMap.assocSocket
 
 const _terminateThreadIfNoSockets = recordUuid => {
   const thread = getRecordThread(recordUuid)
@@ -106,7 +106,7 @@ const _terminateThreadIfNoSockets = recordUuid => {
   }
 }
 
-const dissocSocket = socketId => {
+export const dissocSocket = socketId => {
   const recordUuid = RecordSocketsMap.getRecordUuid(socketId)
   if (recordUuid) {
     RecordSocketsMap.dissocSocket(recordUuid, socketId)
@@ -114,20 +114,7 @@ const dissocSocket = socketId => {
   }
 }
 
-const dissocSocketsByRecordUuid = recordUuid => {
+export const dissocSocketsByRecordUuid = recordUuid => {
   RecordSocketsMap.dissocSockets(recordUuid)
   _terminateThreadIfNoSockets(recordUuid)
-}
-
-module.exports = {
-  // THREAD
-  getOrCreatedRecordThread,
-  getRecordThread,
-  killRecordThread,
-
-  // SOCKET
-  getSocketIds,
-  assocSocket,
-  dissocSocket,
-  dissocSocketsByRecordUuid,
 }

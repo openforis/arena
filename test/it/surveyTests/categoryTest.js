@@ -1,14 +1,14 @@
-const R = require('ramda')
+import * as R from 'ramda'
 
-const { getContextSurveyId, getContextUser } = require('../../testContext')
-const { expect } = require('chai')
+import { getContextSurveyId, getContextUser } from '../../testContext';
+import { expect } from 'chai';
 
-const CategoryManager = require('@server/modules/category/manager/categoryManager')
-const Category = require('@core/survey/category')
-const CategoryLevel = require('@core/survey/categoryLevel')
-const CategoryItem = require('@core/survey/categoryItem')
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 
-const createCategoryTest = async () => {
+export const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
@@ -22,7 +22,7 @@ const createCategoryTest = async () => {
   expect(reloadedCategory).to.deep.equal(category)
 }
 
-const createCategoryLevelTest = async () => {
+export const createCategoryLevelTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
@@ -42,7 +42,7 @@ const createCategoryLevelTest = async () => {
   expect(Category.getLevelsArray(reloadedCategory).length).to.be.equal(2)
 }
 
-const createCategoryItemTest = async () => {
+export const createCategoryItemTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
@@ -64,7 +64,7 @@ const createCategoryItemTest = async () => {
   expect(CategoryItem.getLabel('en')(item)).to.be.equal(itemLabel)
 }
 
-const updateCategoryTest = async () => {
+export const updateCategoryTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
@@ -79,16 +79,4 @@ const updateCategoryTest = async () => {
 const _fetchFirstCategory = async surveyId => {
   const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(surveyId, true, false)
   return R.pipe(R.values, R.head)(categories)
-}
-
-module.exports = {
-  //category
-  createCategoryTest,
-  updateCategoryTest,
-
-  //level
-  createCategoryLevelTest,
-
-  //item
-  createCategoryItemTest,
 }

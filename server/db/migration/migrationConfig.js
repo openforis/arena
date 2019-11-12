@@ -1,4 +1,4 @@
-const ProcessUtils = require('@core/processUtils')
+import * as ProcessUtils from '@core/processUtils'
 
 const config = {
   driver: 'pg',
@@ -12,3 +12,4 @@ const config = {
 
 export const development = config
 export const production = config
+

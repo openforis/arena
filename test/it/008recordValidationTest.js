@@ -1,20 +1,19 @@
-const { expect } = require('chai')
+import { expect } from 'chai';
+import { initTestContext, getContextUser } from '../testContext';
 
-const { initTestContext, getContextUser } = require('../testContext')
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as Validation from '@core/validation/validation'
 
-const Survey = require('@core/survey/survey')
-const NodeDef = require('@core/survey/nodeDef')
-const NodeDefExpression = require('@core/survey/nodeDefExpression')
-const Record = require('@core/record/record')
-const Node = require('@core/record/node')
-const Validation = require('@core/validation/validation')
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-const SurveyManager = require('@server/modules/survey/manager/surveyManager')
-const RecordManager = require('@server/modules/record/manager/recordManager')
-
-const SB = require('./utils/surveyBuilder')
-const RB = require('./utils/recordBuilder')
-const RecordUtils = require('./utils/recordUtils')
+import * as SB from './utils/surveyBuilder'
+import * as RB from './utils/recordBuilder'
+import * as RecordUtils from './utils/recordUtils'
 
 let survey = null
 let record = null
