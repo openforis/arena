@@ -148,12 +148,12 @@ export const enTranslation = {
     surveyInfo: {
       confirmPublish: `#### You are about to publish the survey {{survey}} ####
 
-###### During publish: ###### 
-- Labels associated with deleted languages will be permanently deleted.
-- Records associated with deleted cycles will be permanently deleted.
-- Data associated with deleted form fields will be permanently deleted.
+###### The publishing process will *permanently delete* the following information ###### 
+- Labels associated with deleted languages.
+- Records associated with deleted cycles.
+- Data associated with deleted form fields.
 
-###### After publish: ###### 
+###### After publishing: ###### 
 - Form fields cannot be changed from single to multiple and vice versa.
 - Category items' codes cannot be changed.
 - Category items cannot be deleted.
