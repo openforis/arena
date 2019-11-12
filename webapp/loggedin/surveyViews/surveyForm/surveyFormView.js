@@ -1,4 +1,4 @@
-import './surveyForm.scss'
+import './surveyFormView.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
