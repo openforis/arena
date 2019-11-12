@@ -3,6 +3,7 @@ import { assert } from 'chai';
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as RecordUtils from '../it/utils/recordUtils'
 import * as SB from '../it/utils/surveyBuilder'
 import * as RB from '../it/utils/recordBuilder'
 import { getContextUser } from '../testContext';
@@ -33,7 +34,7 @@ before(async () => {
   ).build()
 
   // root = RecordUtils.findNodeByPath('cluster')(survey, record)
-  // node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
+  node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
   // dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
 })
 
