@@ -164,16 +164,17 @@ const _newCategoryItemUpdateLogActivity = (categoryUuid, item, key, value, syste
   system
 )
 
-const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, validateCategory = true, client = db) =>
+const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
   await client.tx(async t => {
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
     await Promise.all([
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insertMany(user, surveyId, [_newCategoryItemUpdateLogActivity(categoryUuid, item, key, value, false)], t)
     ])
+
     return {
       item,
-      category: validateCategory ? await validateCategory(surveyId, categoryUuid, t) : null,
+      category: await validateCategory(surveyId, categoryUuid, t),
     }
   })
 
