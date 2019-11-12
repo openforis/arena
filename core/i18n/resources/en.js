@@ -159,7 +159,7 @@ export const enTranslation = {
 - Category items cannot be deleted.
 - Taxa cannot be modified.
 
-** Are you sure you want to continue? **`,
+**Are you sure you want to continue?**`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',

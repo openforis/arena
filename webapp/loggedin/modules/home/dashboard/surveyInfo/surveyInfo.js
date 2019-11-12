@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
-import WindowConfirm from '@webapp/commonComponents/windowConfirm'
+import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 import * as Survey from '@core/survey/survey'
@@ -100,7 +100,7 @@ const SurveyInfo = props => {
 
       {
         showPublishConfirm &&
-        <WindowConfirm
+        <ConfirmDialog
           message={i18n.t('homeView.surveyInfo.confirmPublish', { survey: surveyLabel })}
           onOk={publishSurvey}
           onCancel={() => setShowPublishConfirm(false)}

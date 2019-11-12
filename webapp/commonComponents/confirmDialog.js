@@ -1,4 +1,4 @@
-import './windowConfirm.scss'
+import './confirmDialog.scss'
 
 import React from 'react'
 
@@ -6,13 +6,13 @@ import { Modal, ModalBody, ModalFooter } from '@webapp/commonComponents/modal'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Markdown from '@webapp/commonComponents/markdown'
 
-const WindowConfirm = props => {
+const ConfirmDialog = props => {
 
   const { message, onOk, onCancel } = props
   const i18n = useI18n()
 
   return (
-    <Modal className="window-confirm">
+    <Modal className="confirm-dialog">
 
       <ModalBody>
         <Markdown source={message}/>
@@ -34,10 +34,10 @@ const WindowConfirm = props => {
   )
 }
 
-WindowConfirm.defaultProps = {
+ConfirmDialog.defaultProps = {
   message: '',
   onOk: () => {},
   onCancel: () => {},
 }
 
-export default WindowConfirm
+export default ConfirmDialog
