@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
-import * as NodeDef from '@core/survey/nodeDef'
-const { nodeDefType } = NodeDef
+import { nodeDefType } from '@core/survey/nodeDef'
 
 const keys = {
   attributes: 'attributes',
@@ -134,12 +133,12 @@ export const getAttribute = (name, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, name)
 )
 
-export const getAttributeName = getNodeDefName
-
 /**
  * Returns the attribute called 'name' of a node def element
  */
 const getNodeDefName = getAttribute('name')
+
+export const getAttributeName = getNodeDefName
 
 export const getAttributeBoolean = name => R.pipe(
   getAttribute(name),

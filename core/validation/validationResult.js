@@ -16,9 +16,9 @@ export const severities = {
 
 export const newInstance = (key, params = null, severity = null, messages = null) => ({
   [keys.key]: key,
-  ...((params ? { [keys.params]: params } : {})),
-  ...((severity ? { [keys.severity]: severity } : {})),
-  ...((messages ? { [keys.messages]: messages } : {})),
+  ...(params ? { [keys.params]: params } : {}),
+  ...(severity ? { [keys.severity]: severity } : {}),
+  ...(messages ? { [keys.messages]: messages } : {}),
 })
 
 export const getKey = R.prop(keys.key)

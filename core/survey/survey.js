@@ -21,7 +21,7 @@ export const newSurvey = (ownerUuid, name, label, languages, collectUri = null) 
     [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    ...((collectUri ? { collectUri } : {})),
+    ...(collectUri ? { collectUri } : {}),
     [SurveyInfo.keys.cycles]: {
       [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle()
     }

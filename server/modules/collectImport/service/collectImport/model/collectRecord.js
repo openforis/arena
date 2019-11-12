@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import * as DateUtils from '@core/dateUtils'
-
 export const getRootEntityName = R.pipe(
   R.keys,
   R.reject(R.equals('_declaration')),

@@ -87,7 +87,7 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
 
       const nodesToValidate = [
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
-        ...((NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record)) : []))
+        ...(NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record)) : [])
       ]
 
       // call validateAttribute for each attribute

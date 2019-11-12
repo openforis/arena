@@ -203,7 +203,7 @@ const _createUpdateResult = (record, node, nodes) => {
     nodes: {
       [Node.getUuid(node)]: node,
       //always assoc parentNode, used in surveyRdbManager.updateTableNodes
-      ...((parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {})),
+      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
       ...nodes
     }
   };

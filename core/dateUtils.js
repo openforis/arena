@@ -1,9 +1,30 @@
 import * as R from 'ramda'
 
-import { parse as dateFnsParse, parseISO, differenceInMonths, differenceInWeeks, differenceInDays, differenceInHours, differenceInMinutes, isBefore, isAfter, format, isValid as fnsIsValid, subDays, addDays, subMonths, subYears } from 'date-fns';
+import {
+  parse as dateFnsParse,
+  differenceInMonths,
+  differenceInWeeks,
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  format,
+  isValid as fnsIsValid
+} from 'date-fns';
+
 import { isBlank } from './stringUtils';
 
-export { isBefore, isAfter, format, parseISO, subDays, addDays, differenceInDays, differenceInHours, subMonths, subYears } from 'date-fns';
+export {
+  isBefore,
+  isAfter,
+  format,
+  parseISO,
+  subDays,
+  addDays,
+  differenceInDays,
+  differenceInHours,
+  subMonths,
+  subYears
+} from 'date-fns';
 
 const normalizeDateTimeValue = length => value => R.pipe(
   R.ifElse(

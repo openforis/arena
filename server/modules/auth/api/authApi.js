@@ -1,4 +1,3 @@
-import * as Log from '@server/log/log'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as Jwt from '@server/utils/jwt'
@@ -11,8 +10,6 @@ import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
 import * as AuthService from '../service/authService'
-
-const Logger = Log.getLogger('AuthAPI')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 

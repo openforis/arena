@@ -1,4 +1,3 @@
-import * as util from 'util'
 import * as R from 'ramda'
 
 import { uuidv4 } from '@core/uuid';
@@ -10,7 +9,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-const { nodeDefType } = NodeDef
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
@@ -20,8 +18,8 @@ import Job from '@server/job/job'
 import SamplingPointDataImportJob from './samplingPointDataImportJob'
 import * as CollectImportJobContext from '../collectImportJobContext'
 
-import * as SurveyManager from '../../../../survey/manager/surveyManager'
-import * as NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as CollectImportReportManager from '../../../manager/collectImportReportManager'
 import * as CollectSurvey from '../model/collectSurvey'
 
@@ -128,7 +126,7 @@ export default class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, ['instance', 'heading'], nodeDefLabelSuffix)(collectNodeDef),
       //layout props (render)
-      ...((type === NodeDef.nodeDefType.entity ? // calculated
+      ...(type === NodeDef.nodeDefType.entity ? // calculated
       {
           [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
             Survey.cycleOneKey,
@@ -137,7 +135,7 @@ export default class NodeDefsImportJob extends Job {
           )
         } : {
           [NodeDef.propKeys.readOnly]: calculated
-        })),
+        }),
       // extra props
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
@@ -153,7 +151,7 @@ export default class NodeDefsImportJob extends Job {
     // 3. insert children and updated layout props
     const propsUpdated = {}
 
-    if (type === nodeDefType.entity) {
+    if (type === NodeDef.nodeDefType.entity) {
       // 3a. insert child definitions
 
       const childrenUuids = []
@@ -181,7 +179,7 @@ export default class NodeDefsImportJob extends Job {
           R.assocPath([Survey.cycleOneKey, NodeDefLayout.keys.layoutChildren], childrenUuids)
         )(nodeDef)
       }
-    } else if (type === nodeDefType.code) {
+    } else if (type === NodeDef.nodeDefType.code) {
       // add parent code def uuid
       const parentCodeDefUuid = await this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
       if (parentCodeDefUuid) {
@@ -204,7 +202,7 @@ export default class NodeDefsImportJob extends Job {
     }
     nodeDefsInfo.push({
       uuid: nodeDefUuid,
-      ...((field ? { field } : {}))
+      ...(field ? { field } : {})
     })
 
     this.nodeDefs[nodeDefUuid] = nodeDef
@@ -226,17 +224,17 @@ export default class NodeDefsImportJob extends Job {
 
     // 2. validations
     propsAdvanced[NodeDef.propKeys.validations] = {
-      ...((multiple ? {
+      ...(multiple ? {
           [NodeDefValidations.keys.count]: {
             [NodeDefValidations.keys.min]: CollectSurvey.getAttribute('minCount')(collectNodeDef),
             [NodeDefValidations.keys.max]: CollectSurvey.getAttribute('maxCount')(collectNodeDef),
           }
         } : {
           [NodeDefValidations.keys.required]: CollectSurvey.getAttribute('required')(collectNodeDef),
-        }))
+        })
     }
 
-    if (type !== nodeDefType.entity) {
+    if (type !== NodeDef.nodeDefType.entity) {
       await this.parseNodeDefValidationRules(nodeDefUuid, collectNodeDef, tx)
     }
 
@@ -251,7 +249,7 @@ export default class NodeDefsImportJob extends Job {
 
   extractNodeDefExtraProps (parentNodeDef, type, collectNodeDef) {
     switch (type) {
-      case nodeDefType.code:
+      case NodeDef.nodeDefType.code:
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
         const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
           ? SamplingPointDataImportJob.categoryName
@@ -262,7 +260,7 @@ export default class NodeDefsImportJob extends Job {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
           [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, NodeDefLayout.renderType.dropdown)
         }
-      case nodeDefType.taxon:
+      case NodeDef.nodeDefType.taxon:
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
         const taxonomy = CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
 
@@ -372,7 +370,7 @@ export default class NodeDefsImportJob extends Job {
           R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)
         )(nodeDef)
       }
-      const qualifierNodeDefParam = _createNodeDef(parentNodeDef, nodeDefType.text, props)
+      const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props)
       const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, qualifierNodeDefParam, true, tx)
       const propsAdvanced = {
         [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
@@ -397,7 +395,7 @@ export default class NodeDefsImportJob extends Job {
 
       count++
 
-      if (CollectSurvey.getElementName(collectNodeDef) === nodeDefType.entity) {
+      if (CollectSurvey.getElementName(collectNodeDef) === NodeDef.nodeDefType.entity) {
         for (const collectNodeDefChild of CollectSurvey.getElements(collectNodeDef)) {
           if (this.isCanceled())
             break

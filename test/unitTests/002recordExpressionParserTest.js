@@ -2,21 +2,18 @@ import * as R from 'ramda'
 import { assert } from 'chai';
 
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
 
 import * as SB from '../it/utils/surveyBuilder'
 import * as RB from '../it/utils/recordBuilder'
-import * as RecordUtils from '../it/utils/recordUtils'
 import { getContextUser } from '../testContext';
 
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 
 let survey = {}
 let record = {}
-let root = {}
+// let root = {}
 let node = {}
-let dbh = {}
+// let dbh = {}
 
 before(async () => {
   const user = getContextUser()
@@ -35,9 +32,9 @@ before(async () => {
     )
   ).build()
 
-  root = RecordUtils.findNodeByPath('cluster')(survey, record)
-  node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
-  dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
+  // root = RecordUtils.findNodeByPath('cluster')(survey, record)
+  // node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
+  // dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
 })
 
 describe('RecordExpressionParser Test', () => {

@@ -4,7 +4,7 @@ module.exports = function (api) {
 
   // If testing for a specific env, we recommend specifics to avoid instantiating a plugin for
   // any possible NODE_ENV value that might come up during plugin execution.
-  var _isProd = api.cache(() => process.env.NODE_ENV === "production");
+  global._isProd = api.cache(() => process.env.NODE_ENV === "production");
 
   return {
         presets: ['@babel/preset-env', '@babel/react'],

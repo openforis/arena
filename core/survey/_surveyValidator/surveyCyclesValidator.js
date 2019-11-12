@@ -41,11 +41,11 @@ const _cycleValidators = (cyclePrev, isLast) => ({
     Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateStartMandatory),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateStartInvalid),
     _validateCycleStartDateBeforeEndDate,
-    ...((cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : []))
+    ...(cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : [])
   ],
   [SurveyCycle.keys.dateEnd]: [
     //date end is required for all but the last cycle
-    ...((isLast ? [] : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)])),
+    ...(isLast ? [] : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)]),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateEndInvalid)
   ],
 })

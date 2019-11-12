@@ -37,8 +37,11 @@ const _getColNames = (nodeDef, type) =>
       DataTable.colNameRecordUuuid,
       DataTable.colNameRecordCycle,
       DataTable.colNameParentUuuid,
-      ...((NodeDef.isMultipleAttribute(nodeDef) ? //entity
-      DataCol.getNames(nodeDef) : []))
+      ...(
+        NodeDef.isMultipleAttribute(nodeDef) //entity
+        ? DataCol.getNames(nodeDef)
+        : []
+      )
     ]
     : DataCol.getNames(nodeDef)
 
@@ -49,8 +52,11 @@ const _getColValues = async (survey, cycle, nodeDef, node, type, client) =>
       Node.getRecordUuid(node),
       cycle,
       Node.getParentUuid(node),
-      ...((NodeDef.isMultipleAttribute(nodeDef) ? //entity
-      await Promise.all(DataCol.getValues(survey, nodeDef, node)) : []))
+      ...(
+        NodeDef.isMultipleAttribute(nodeDef) //entity
+        ? await Promise.all(DataCol.getValues(survey, nodeDef, node))
+        : []
+      )
     ]
     : await DataCol.getValues(survey, nodeDef, node)
 

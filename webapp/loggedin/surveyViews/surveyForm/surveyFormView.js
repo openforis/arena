@@ -168,7 +168,7 @@ const mapStateToProps = (state, props) => {
     hasNodeDefAddChildTo,
     showPageNavigation,
     isSideBarOpened,
-    ...((props.entry ? mapEntryProps() : {})),
+    ...(props.entry ? mapEntryProps() : {}),
   };
 
 }

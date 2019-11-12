@@ -47,7 +47,7 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
           tx
         ),
         //preserve 'created' flag (used by rdb generator)
-        ...((Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}))
+        ...(Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {})
       }
 
       const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)

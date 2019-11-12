@@ -78,7 +78,7 @@ const NodeDefEdit = props => {
                       toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
                     },
                   },
-                  ...((NodeDef.isRoot(nodeDef) ? [] : [
+                  ...(NodeDef.isRoot(nodeDef) ? [] : [
                       {
                         label: i18n.t('nodeDefEdit.advanced'),
                         component: AdvancedProps,
@@ -89,7 +89,7 @@ const NodeDefEdit = props => {
                         component: ValidationsProps,
                         props: { nodeDef, validation, nodeDefParent, putNodeDefProp },
                       },
-                    ])),
+                    ]),
                 ]}
                 />
 

@@ -146,7 +146,7 @@ const mapStateToProps = (state, props) => {
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,
-    ...((entry ? mapEntryProps() : {})),
+    ...(entry ? mapEntryProps() : {}),
   };
 }
 

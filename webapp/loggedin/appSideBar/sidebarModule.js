@@ -44,10 +44,10 @@ export const getModulesHierarchy = (user, surveyInfo) => [
     appModules.data,
     [dataModules.records, dataModules.dataVis]
   ),
-  ...((Authorizer.canAnalyzeRecords(user, surveyInfo) ? [getModule(
+  ...(Authorizer.canAnalyzeRecords(user, surveyInfo) ? [getModule(
       appModules.analysis,
       [analysisModules.processingChains]
-    )] : [])),
+    )] : []),
   getModule(
     appModules.users,
     [userModules.users]
