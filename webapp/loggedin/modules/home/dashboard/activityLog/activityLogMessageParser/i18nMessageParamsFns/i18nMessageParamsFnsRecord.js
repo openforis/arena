@@ -10,6 +10,6 @@ export default {
     keys: ActivityLog.getContentKeys(activityLog),
     stepFrom: ActivityLog.getContentStepFrom(activityLog),
     stepTo: ActivityLog.getContentStepTo(activityLog)
-  }),
+  })
 
 }
