@@ -57,7 +57,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
           ${schema}.activity_log
         WHERE
           NOT system
-          ${activityTypes ? ' AND type in ($2)' : ''}
+          ${activityTypes ? ' AND type IN ($2:csv)' : ''}
         ORDER BY
           date_created::date DESC,
           user_uuid,
@@ -164,7 +164,10 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       ${schema}.processing_step
     ON 
       processing_step.uuid::text = l.content_uuid
-    -- end of analysis activities part`,
+    -- end of analysis activities part
+    
+    ORDER BY
+      l.date_created DESC`,
     [surveyUuid, activityTypes, offset, limit],
     camelize
   )
