@@ -46,6 +46,7 @@ export const enTranslation = {
     no: 'No',
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
+    ok: 'Ok',
     required: 'Required',
     reset: 'Reset',
     save: 'Save',
@@ -145,7 +146,18 @@ export const enTranslation = {
     createSurvey: 'Create Survey',
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
+      confirmPublish: `**You are about to publish the survey {{survey}}**
+      
+Please, note that:
+
+- All labels associated with deleted languages will be permanently deleted.
+- Node definitions cannot be changed from single to multiple and vice versa.
+- All category items cannot change code and cannot be deleted.
+- All taxa cannot be modified.
+- All records associated with deleted cycles will be permanently deleted.
+- All nodes associated with deleted node definitions will be permanently deleted.
+
+Are you sure you want to continue?`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',
@@ -365,8 +377,8 @@ export const enTranslation = {
   surveyForm: {
     subPage: 'Sub page',
     addChildTo: 'Add to {{nodeDef}}',
-    hidePages:'Hide pages',
-    showPages:'Show pages',
+    hidePages: 'Hide pages',
+    showPages: 'Show pages',
     formEditActions: {
       preview: 'Preview',
     },
@@ -696,4 +708,4 @@ export const enTranslation = {
       temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
     }
   }
-};
+}
