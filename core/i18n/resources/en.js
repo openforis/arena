@@ -229,9 +229,9 @@ export const enTranslation = {
       [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
 
       //node
-      [ActivityLog.type.nodeCreate]: 'added node of type {{name}} in record {{recordKeys}} {{parentPath}}',
-      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in record {{recordKeys}} {{parentPath}}',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} in record {{recordKeys}} {{parentPath}}',
+      [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
+      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} to record {{recordKeys}}',
+      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} in {{parentPath}} from record {{recordKeys}}',
 
       // user
       [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
