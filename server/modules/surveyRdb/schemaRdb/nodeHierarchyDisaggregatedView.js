@@ -3,6 +3,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 export const columns = {
   nodeId: 'node_id',
   nodeUuid: 'node_uuid',
+  nodeDefUuid: 'node_def_uuid',
   nodeAncestorId: 'node_ancestor_id',
   nodeAncestorUuid: 'node_ancestor_uuid',
   nodeDefAncestorUuid: 'node_def_ancestor_uuid',

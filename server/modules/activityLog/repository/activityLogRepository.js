@@ -5,14 +5,13 @@ import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as Node from '@core/record/node'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 
 //===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
@@ -71,30 +70,6 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         ORDER BY date_created DESC, id DESC -- id is a tie-breaker
         OFFSET $3
         LIMIT $4
-      ),
-      log_node_hierarchy AS
-      (
-        --nodeCreate/nodeValueUpdate: get hierarchy from content.meta.h
-        SELECT 
-          l.id, 
-          jsonb_array_elements_text(l.content #> '{${Node.keys.meta},${Node.metaKeys.hierarchy}}')::uuid AS ancestor_node_uuid
-        FROM log_limited l 
-      ),      
-      log_parent_paths AS
-      (
-        SELECT
-          log_node_hierarchy.id,
-          json_agg(json_build_object(
-            'nodeDefUuid', node_h.node_def_uuid, 
-            'nodeUuid', log_node_hierarchy.ancestor_node_uuid
-          )) AS parent_path
-        FROM 
-          log_node_hierarchy
-        LEFT OUTER JOIN 
-          ${schema}.node node_h 
-          ON node_h.uuid = log_node_hierarchy.ancestor_node_uuid  
-        GROUP BY
-          log_node_hierarchy.id
       )
 
     SELECT
@@ -103,18 +78,15 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       r.uuid AS record_uuid,
       
       -- node activities keys
-      
-      n.node_def_uuid AS node_def_uuid,
-      coalesce(log_parent_paths.parent_path, '[]'::json) parent_path,
+      n_h.${NodeKeysHierarchyView.columns.nodeDefUuid},
+      n_h.${NodeKeysHierarchyView.columns.keysHierarchy},
       
       -- user activities keys
-      
       user_target.name AS target_user_name,
       user_target.email AS target_user_email,
       agu.user_uuid AS target_user_uuid, -- null if user has been removed from survey
       
       -- analysis activities keys
-      
       processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
       processing_step.index AS processing_step_index
       
@@ -130,14 +102,10 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       r.uuid = l.content_uuid
 
     -- start of node activities part
-    LEFT OUTER JOIN 
-      ${schema}.node n 
-    ON 
-      n.uuid = l.content_uuid
-    LEFT OUTER JOIN 
-      log_parent_paths
-    ON 
-      l.id = log_parent_paths.id
+    LEFT OUTER JOIN
+      ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} n_h
+    ON
+      l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeUuid}    
     -- end of node activities part
 
     -- start of user activities part

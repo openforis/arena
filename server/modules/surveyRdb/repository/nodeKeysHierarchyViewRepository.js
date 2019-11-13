@@ -16,6 +16,7 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
     CREATE VIEW ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} AS (
       SELECT
         h.${NodeHierarchyDisaggregatedView.columns.nodeUuid} AS ${NodeKeysHierarchyView.columns.nodeUuid},
+        h.${NodeHierarchyDisaggregatedView.columns.nodeDefUuid} AS ${NodeKeysHierarchyView.columns.nodeDefUuid},
         jsonb_agg(
           jsonb_build_object( 'nodeUuid', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}, 'keys', k_h.${NodeKeysView.columns.keys} ) 
           ORDER BY h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorId} 
@@ -35,6 +36,7 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
         k_s.${NodeKeysView.columns.nodeUuid} = h.${NodeHierarchyDisaggregatedView.columns.nodeUuid}
       GROUP BY
         h.${NodeHierarchyDisaggregatedView.columns.nodeUuid},
+        h.${NodeHierarchyDisaggregatedView.columns.nodeDefUuid},
         k_s.${NodeKeysView.columns.keys}
     )
   `)
