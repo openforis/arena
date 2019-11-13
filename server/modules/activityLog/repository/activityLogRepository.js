@@ -42,9 +42,9 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         -- Get rows up to offset+limit.
         -- From this we obtain the earliest date to we need to consider in the later query.
         select date
-        from activity_log_user_aggregate_keys
+        from ${schema}.activity_log_user_aggregate_keys
         ${activityTypes ? ' WHERE type in ($2)' : ''}
-        LIMIT $3 + $4 -- LIMIT + OFFSET
+        LIMIT $3::int + $4::int -- LIMIT + OFFSET
       ),
       log_days_all AS (
         -- With the date, refine the query to include ALL rows
@@ -53,7 +53,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         -- Then sort the result with the real timestamp to obtain the correct
         -- ordering of log entries from the view.
         SELECT *
-        FROM activity_log_user_aggregate
+        FROM ${schema}.activity_log_user_aggregate
         WHERE date_created >= (select min(log_days.date) from log_days)
         ${activityTypes ? ' AND type in ($2)' : ''}
       ),
@@ -105,7 +105,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       -- node activities keys
       
       n.node_def_uuid AS node_def_uuid,
-      log_parent_paths.parent_path,
+      coalesce(log_parent_paths.parent_path, '[]'::json) parent_path,
       
       -- user activities keys
       
