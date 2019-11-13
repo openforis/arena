@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils';
+import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
 import * as CategoryRepository from '../repository/categoryRepository'
@@ -102,7 +102,7 @@ export const insertItems = async (user, surveyId, items, client = db) =>
   })
 
 export const createImportSummary = CategoryImportSummaryGenerator.createImportSummary
-export const createImportSummaryFromStream = CategoryImportSummaryGenerator.createImportSummaryFromStream  
+export const createImportSummaryFromStream = CategoryImportSummaryGenerator.createImportSummaryFromStream
 
 // ====== READ
 export const fetchCategoriesAndLevelsBySurveyId = CategoryRepository.fetchCategoriesAndLevelsBySurveyId
@@ -174,7 +174,7 @@ const _newCategoryItemUpdateLogActivity = (categoryUuid, item, key, value, syste
   system
 )
 
-const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
+export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
   await client.tx(async t => {
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
     await Promise.all([
