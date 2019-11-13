@@ -2,12 +2,15 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as DataTable from './dataTable'
 import * as DataCol from './dataCol'
 
 export const getName = NodeDefTable.getViewName
+export const getNameWithSchema = surveyId => nodeDef => `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDef)}`
 
 export const alias = `a`
 export const aliasParent = `p`
