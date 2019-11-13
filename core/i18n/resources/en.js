@@ -46,6 +46,7 @@ export const enTranslation = {
     no: 'No',
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
+    ok: 'Ok',
     required: 'Required',
     reset: 'Reset',
     save: 'Save',
@@ -145,7 +146,20 @@ export const enTranslation = {
     createSurvey: 'Create Survey',
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
+      confirmPublish: `#### You are about to publish the survey {{survey}} ####
+
+###### The publishing process will *permanently delete* the following information ###### 
+- Labels associated with deleted languages.
+- Records associated with deleted cycles.
+- Data associated with deleted form fields.
+
+###### After publishing: ###### 
+- Form fields cannot be changed from single to multiple and vice versa.
+- Category items' codes cannot be changed.
+- Category items cannot be deleted.
+- Taxa cannot be modified.
+
+**Are you sure you want to continue?**`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
       editInfo: 'Edit info',
       publish: 'Publish',
@@ -365,8 +379,8 @@ export const enTranslation = {
   surveyForm: {
     subPage: 'Sub page',
     addChildTo: 'Add to {{nodeDef}}',
-    hidePages:'Hide pages',
-    showPages:'Show pages',
+    hidePages: 'Hide pages',
+    showPages: 'Show pages',
     formEditActions: {
       preview: 'Preview',
     },
@@ -696,4 +710,4 @@ export const enTranslation = {
       temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
     }
   }
-};
+}

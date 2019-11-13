@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
+import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 import * as Survey from '@core/survey/survey'
@@ -26,9 +27,11 @@ const SurveyInfo = props => {
   } = props
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false)
 
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
+  const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
   return (
     <>
@@ -36,7 +39,7 @@ const SurveyInfo = props => {
 
         <Header>
           <h3>
-            {Survey.getLabel(surveyInfo, lang)}
+            {surveyLabel}
           </h3>
 
           <div className="survey-status">
@@ -56,9 +59,7 @@ const SurveyInfo = props => {
             canEditDef &&
             <a className="btn-s btn-transparent"
                aria-disabled={!Survey.isDraft(surveyInfo)}
-               onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmPublish'))
-                 ? publishSurvey()
-                 : null}>
+               onClick={() => setShowPublishConfirm(true)}>
               <div className="triangle-left"/>
               <span className="icon icon-checkmark2 icon-12px icon-left"/>
               {i18n.t('homeView.surveyInfo.publish')}
@@ -95,6 +96,15 @@ const SurveyInfo = props => {
           onCancel={() => setShowDeleteDialog(false)}
           onDelete={() => deleteSurvey()}
           surveyName={Survey.getName(surveyInfo)}/>
+      }
+
+      {
+        showPublishConfirm &&
+        <ConfirmDialog
+          message={i18n.t('homeView.surveyInfo.confirmPublish', { survey: surveyLabel })}
+          onOk={publishSurvey}
+          onCancel={() => setShowPublishConfirm(false)}
+        />
       }
     </>
   )
