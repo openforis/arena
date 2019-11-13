@@ -161,7 +161,7 @@ export default class RecordsImportJob extends Job {
 
         nodeToInsert = R.pipe(
           Node.assocValue(value),
-          Node.assocMeta(meta),
+          Node.mergeMeta(meta),
         )(nodeToInsert)
 
         await this._insertNode(nodeDef, nodeToInsert)

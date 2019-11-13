@@ -6,8 +6,9 @@ import * as User from '@core/user/user'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
 
 const activityTypesCommon = [
   ActivityLog.type.surveyCreate,
@@ -79,10 +80,36 @@ const _getAvailableActivityTypes = async (surveyUuid, user) => {
   )(user)
 }
 
+const _addNodeParentPathKeys = async (survey, activity) => {
+  const recordUuid = ActivityLog.getContentRecordUuid(activity)
+  const nodeHierarchyDb = ActivityLog.getParentPath(activity)
+
+  const ancestorKeys = await Promise.all(nodeHierarchyDb.map(
+    ({ nodeDefUuid, nodeUuid }) =>
+      R.isNil(nodeDefUuid) || R.isNil(nodeUuid)
+        ? null
+        : DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, nodeDefUuid, recordUuid, nodeUuid)
+  ))
+
+  const parentPath = R.zipWith((parentPathDb, keys) => ({ ...parentPathDb, keys }), nodeHierarchyDb, ancestorKeys)
+
+  return {
+    ...activity,
+    [ActivityLog.keys.parentPath]: parentPath
+  }
+}
+
 export const fetch = async (user, surveyId, offset, limit) => {
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
+  const surveyInfo = Survey.getSurveyInfo(survey)
   const activityTypes = await _getAvailableActivityTypes(Survey.getUuid(surveyInfo), user)
-  return await ActivityLogRepository.fetch(surveyInfo, activityTypes, offset, limit)
+  const activitiesDb = await ActivityLogRepository.fetch(surveyInfo, activityTypes, offset, limit)
+
+  return await Promise.all(activitiesDb.map(activity =>
+    R.includes(ActivityLog.getType(activity), [ActivityLog.type.nodeCreate, ActivityLog.type.nodeValueUpdate, ActivityLog.type.nodeDelete])
+      ? _addNodeParentPathKeys(survey, activity)
+      : activity
+  ))
 }
 
 export const { insert } = ActivityLogRepository

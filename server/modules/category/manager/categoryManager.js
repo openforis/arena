@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils';
+import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
 import * as CategoryRepository from '../repository/categoryRepository'
@@ -102,7 +102,7 @@ export const insertItems = async (user, surveyId, items, client = db) =>
   })
 
 export const createImportSummary = CategoryImportSummaryGenerator.createImportSummary
-export const createImportSummaryFromStream = CategoryImportSummaryGenerator.createImportSummaryFromStream  
+export const createImportSummaryFromStream = CategoryImportSummaryGenerator.createImportSummaryFromStream
 
 // ====== READ
 export const fetchCategoriesAndLevelsBySurveyId = CategoryRepository.fetchCategoriesAndLevelsBySurveyId

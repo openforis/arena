@@ -6,9 +6,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import * as DataTable from '../schemaRdb/dataTable'
-
-import * as SurveySchemaRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils'
+import { db } from '@server/db/db'
+import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Returns a list of items for each record containing duplicate entities.
@@ -66,5 +66,25 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
     GROUP BY r.uuid, r.validation
     `,
     [cycle]
+  )
+}
+
+export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, recordUuid, nodeUuid = null, client = db) => {
+  const surveyId = Survey.getId(survey)
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
+  const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
+  const keyColumns = R.pipe(R.map(NodeDefTable.getColName), R.join(', '))(entityDefKeys)
+
+  return await client.oneOrNone(`
+    SELECT
+      ${keyColumns}
+    FROM
+      ${table}
+    WHERE
+      ${DataTable.colNameRecordUuuid} = $1
+      ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.colNameUuuid} = $2`}`,
+    [recordUuid, nodeUuid],
+    row => Object.values(row)
   )
 }

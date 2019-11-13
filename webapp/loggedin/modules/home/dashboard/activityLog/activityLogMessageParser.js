@@ -6,6 +6,7 @@ import i18nMessageParamsFnsSurvey from './activityLogMessageParser/i18nMessagePa
 import i18nMessageParamsFnsCategory from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsCategory'
 import i18nMessageParamsFnsTaxonomy from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsTaxonomy'
 import i18nMessageParamsFnsRecord from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsRecord'
+import i18nMessageParamsFnsNode from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsNode'
 import i18nMessageParamsFnsUser from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsUser'
 import i18nMessageParamsFnsAnalysis from './activityLogMessageParser/i18nMessageParamsFns/i18nMessageParamsFnsAnalysis'
 
@@ -13,6 +14,7 @@ import isItemDeletedFnsSurvey from './activityLogMessageParser/isItemDeletedFns/
 import isItemDeletedFnsCategory from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsCategory'
 import isItemDeletedFnsTaxonomy from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsTaxonomy'
 import isItemDeletedFnsRecord from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsRecord'
+import isItemDeletedFnsNode from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsNode'
 import isItemDeletedFnsUser from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsUser'
 import isItemDeletedFnsAnalysis from './activityLogMessageParser/isItemDeletedFns/isItemDeletedFnsAnalysis'
 
@@ -21,6 +23,7 @@ const i18nMessageParamsFns = {
   ...i18nMessageParamsFnsCategory,
   ...i18nMessageParamsFnsTaxonomy,
   ...i18nMessageParamsFnsRecord,
+  ...i18nMessageParamsFnsNode,
   ...i18nMessageParamsFnsUser,
   ...i18nMessageParamsFnsAnalysis,
 }
@@ -30,6 +33,7 @@ const isItemDeletedFns = {
   ...isItemDeletedFnsCategory,
   ...isItemDeletedFnsTaxonomy,
   ...isItemDeletedFnsRecord,
+  ...isItemDeletedFnsNode,
   ...isItemDeletedFnsUser,
   ...isItemDeletedFnsAnalysis,
 }

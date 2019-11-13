@@ -14,7 +14,7 @@ import * as Record from '@core/record/record'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import * as Expression from '@core/expressionParser/expression.js'
+import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 import * as DataFilter from '@common/surveyRdb/dataFilter'
 

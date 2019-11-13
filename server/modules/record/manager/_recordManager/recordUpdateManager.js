@@ -9,14 +9,13 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Node from '@core/record/node'
 
-import { db } from '@server/db/db'
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import SystemError from '@core/systemError'
 
+import { db } from '@server/db/db'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileRepository from '@server/modules/record/repository/fileRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
-import * as DataViewReadRepository from '@server/modules/surveyRdb/repository/dataViewReadRepository'
 
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
@@ -35,7 +34,7 @@ export const initNewRecord = async (user, survey, record, nodesUpdateListener = 
 
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, t)
+    return await persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, t)
   })
 
 //==== UPDATE
@@ -50,14 +49,12 @@ export const updateRecordStep = async (user, survey, record, stepId, system = fa
 
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       const recordUuid = Record.getUuid(record)
-      const keys = await DataViewReadRepository.fetchRecordKeysByRecordUuid(survey, recordUuid, t)
       const surveyId = Survey.getId(survey)
 
       await Promise.all([
         RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t),
         ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordStepUpdate, {
           [ActivityLog.keysContent.uuid]: recordUuid,
-          [ActivityLog.keysContent.keys]: keys,
           [ActivityLog.keysContent.stepFrom]: currentStepId,
           [ActivityLog.keysContent.stepTo]: stepId
         }, system, t)
@@ -71,7 +68,8 @@ export const updateRecordStep = async (user, survey, record, stepId, system = fa
 //==== DELETE
 export const deleteRecord = async (user, survey, uuid) =>
   await db.tx(async t => {
-    const keys = await DataViewReadRepository.fetchRecordKeysByRecordUuid(survey, uuid, t)
+    const rootDef = Survey.getNodeDefRoot(survey)
+    const keys = await DataTableReadRepository.fetchEntityKeysByRecordAndNodeDefUuid(survey, NodeDef.getUuid(rootDef), uuid, null, t)
     const logContent = {
       [ActivityLog.keysContent.uuid]: uuid,
       [ActivityLog.keysContent.keys]: keys
@@ -110,22 +108,23 @@ export const deleteRecordsByCycles = RecordRepository.deleteRecordsByCycles
 export const insertNode = NodeUpdateManager.insertNode
 
 export const persistNode = async (user, survey, record, node,
-                           nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                                  nodesUpdateListener = null, nodesValidationListener = null,
+                                  system = false, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
     node,
-    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, t),
+    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, system, t),
     nodesUpdateListener,
     nodesValidationListener,
     t
   )
 
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
-  
+
 export const deleteNode = async (user, survey, record, nodeUuid,
-                          nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+                                 nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
   await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,

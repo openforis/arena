@@ -16,22 +16,28 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 //==== UPDATE
 
-export const persistNode = async (user, survey, record, node, t) => {
+export const persistNode = async (user, survey, record, node, system, t) => {
   const nodeUuid = Node.getUuid(node)
 
   const existingNode = Record.getNodeByUuid(nodeUuid)(record)
 
   if (existingNode) {
-    // update
+    // updating existing node
     const surveyId = Survey.getId(survey)
-    if (!Record.isPreview(record))
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), false, t)
-
     const nodeValue = Node.getValue(node)
     const meta = {
       ...Node.getMeta(node),
       [Node.metaKeys.defaultValue]: false
     }
+    if (!Record.isPreview(record)) {
+      // keep only node uuid, recordUuid, meta and value
+      const logContent = R.pipe(
+        R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
+        R.assoc(Node.keys.meta, meta)
+      )(node)
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
+    }
+
     const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, Record.isPreview(record), t)
 
     record = Record.assocNode(nodeUpdate)(record)
@@ -39,8 +45,8 @@ export const persistNode = async (user, survey, record, node, t) => {
     return await _onNodeUpdate(survey, record, nodeUpdate, {}, t)
 
   } else {
-    // create
-    return await insertNode(user, survey, record, node, false, t)
+    // inserting new node
+    return await insertNode(user, survey, record, node, system, t)
   }
 }
 
@@ -130,7 +136,7 @@ const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInser
   for (const childDef of childDefs) {
     if (NodeDef.isSingle(childDef)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-      const childNodesInserted = await _insertNodeRecursively(user, survey, childDef, record, childNode, system, t)
+      const childNodesInserted = await _insertNodeRecursively(user, survey, childDef, record, childNode, true, t)
       Object.assign(childNodes, childNodesInserted)
     }
   }
@@ -148,8 +154,17 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
 
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
-  if (!Record.isPreview(record))
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDelete, { uuid: nodeUuid }, false, t)
+  if (!Record.isPreview(record)) {
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: nodeUuid,
+      [ActivityLog.keysContent.recordUuid]: Node.getRecordUuid(node),
+      [ActivityLog.keysContent.nodeDefUuid]: Node.getNodeDefUuid(node),
+      [Node.keys.meta]: {
+        [Node.metaKeys.hierarchy]: Node.getHierarchy(node)
+      },
+    }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDelete, logContent, false, t)
+  }
 
   // get dependent key attributes before node is removed from record
   // and return them so they will be re-validated later on

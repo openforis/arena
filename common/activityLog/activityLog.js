@@ -69,6 +69,8 @@ export const keys = {
   //props associated from fetch
   userName: 'userName',
   recordUuid: 'recordUuid',
+  parentPath: 'parentPath',
+  nodeDefUuid: 'nodeDefUuid',
   //user
   targetUserName: 'targetUserName',
   targetUserEmail: 'targetUserEmail',
@@ -96,6 +98,9 @@ export const keysContent = {
   keys: 'keys',
   stepFrom: 'stepFrom',
   stepTo: 'stepTo',
+  //node
+  nodeDefUuid: 'nodeDefUuid',
+  recordUuid: 'recordUuid',
   //user
   groupUuid: 'groupUuid',
   //analysis
@@ -122,6 +127,8 @@ export const getDateCreated = ObjectUtils.getDateCreated
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
+export const getParentPath = R.prop(keys.parentPath)
+export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getTargetUserName = R.prop(keys.targetUserName)
 export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
@@ -146,6 +153,8 @@ export const getContentTaxonomyName = _getContentProp(keysContent.taxonomyName)
 export const getContentKeys = _getContentProp(keysContent.keys)
 export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
+export const getContentNodeDefUuid = _getContentProp(keysContent.nodeDefUuid)
+export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)
 // content props user
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
 // content props analysis
