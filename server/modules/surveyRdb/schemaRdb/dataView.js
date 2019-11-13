@@ -12,6 +12,10 @@ export const getName = NodeDefTable.getViewName
 export const alias = `a`
 export const aliasParent = `p`
 
+export const columns = {
+  keys: '_keys'
+}
+
 export const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
 export const getSelectFields = (survey, nodeDef) => {
@@ -28,12 +32,20 @@ export const getSelectFields = (survey, nodeDef) => {
     }
   )(survey)
 
-  // add record_uuid, date_created, date_modified
+  const fieldKey = R.pipe(
+    Survey.getNodeDefKeys(nodeDef),
+    R.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}', ${alias}.${DataCol.getName(nodeDefKey)}`),
+    R.join(', '),
+    content => `jsonb_build_object(${content}) AS ${columns.keys}`
+  )(survey)
+
+  // add record_uuid, date_created, date_modified, keys
   fields.unshift(
     `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${DataTable.colNameRecordUuuid}`,
     `${alias}.${DataTable.colNameRecordCycle}`,
     `${alias}.date_created`,
-    `${alias}.date_modified`
+    `${alias}.date_modified`,
+    fieldKey,
   )
 
   return fields
