@@ -43,7 +43,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         -- From this we obtain the earliest date to we need to consider in the later query.
         select date
         from ${schema}.activity_log_user_aggregate_keys
-        ${activityTypes ? ' WHERE type in ($2)' : ''}
+        ${activityTypes ? ' WHERE type in ($2:csv)' : ''}
         LIMIT $3::int + $4::int -- LIMIT + OFFSET
       ),
       log_days_all AS (
@@ -55,7 +55,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         SELECT *
         FROM ${schema}.activity_log_user_aggregate
         WHERE date_created >= (select min(log_days.date) from log_days)
-        ${activityTypes ? ' AND type in ($2)' : ''}
+        ${activityTypes ? ' AND type in ($2:csv)' : ''}
       ),
       log_limited AS (
         -- With the correct list of rows, sort them in the right order
