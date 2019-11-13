@@ -174,7 +174,7 @@ const _newCategoryItemUpdateLogActivity = (categoryUuid, item, key, value, syste
   system
 )
 
-const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
+export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
   await client.tx(async t => {
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
     await Promise.all([
