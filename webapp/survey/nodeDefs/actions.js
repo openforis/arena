@@ -64,12 +64,12 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 
 // ==== CREATE
 
-export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const nodeDef = NodeDef.newNodeDef(parentUuid, type, cycle, props)
+  const nodeDef = NodeDef.newNodeDef(parent, type, cycle, props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 

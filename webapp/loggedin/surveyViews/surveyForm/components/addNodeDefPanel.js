@@ -75,7 +75,7 @@ const AddNodeDefPanel = props => {
         surveyCycleKey={surveyCycleKey}
         nodeDef={nodeDef}
         addNodeDef={(type, props) => {
-          createNodeDef(NodeDef.getUuid(nodeDef), type, props)
+          createNodeDef(nodeDef, type, props)
         }}
         setFormNodeDefAddChildTo={setFormNodeDefAddChildTo}
       />

@@ -46,7 +46,7 @@ const FormHeader = props => {
           edit && canEditDef &&
           <button className="btn-s btn-transparent btn-add-sub-page"
                   onClick={() => createNodeDef(
-                    NodeDef.getUuid(nodeDefPage),
+                    nodeDefPage,
                     NodeDef.nodeDefType.entity,
                     {
                       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(

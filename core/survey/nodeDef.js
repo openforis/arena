@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { uuidv4 } from '@core/uuid';
+import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDefValidations from './nodeDefValidations'
@@ -61,14 +61,17 @@ export const maxKeyAttributes = 3
 
 // ==== CREATE
 
-export const newNodeDef = (parentUuid, type, cycle, props, analysis = false) => ({
+export const newNodeDef = (nodeDefParent, type, cycle, props, analysis = false) => ({
   [keys.uuid]: uuidv4(),
-  [keys.parentUuid]: parentUuid,
+  [keys.parentUuid]: getUuid(nodeDefParent),
   [keys.type]: type,
   [keys.analysis]: analysis,
   [keys.props]: {
     ...props,
     [propKeys.cycles]: [cycle]
+  },
+  [keys.meta]: {
+    [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : []
   },
 })
 
@@ -141,6 +144,8 @@ export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpt
 
 
 // ==== READ meta
+export const getMeta = R.propOr({}, keys.meta)
+
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 export const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)

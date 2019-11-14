@@ -27,11 +27,8 @@ class NodeDefBuilder {
     return this
   }
 
-  _createNodeDef (survey, parentDefUuid) {
-    const nodeDef = NodeDef.newNodeDef(parentDefUuid, this.type, Survey.cycleOneKey, this.props)
-    const nodeDefParent = Survey.getNodeDefByUuid(parentDefUuid)(survey)
-    const h = [...NodeDef.getMetaHierarchy(nodeDefParent), parentDefUuid]
-    return NodeDef.assocMetaHierarchy(h)(nodeDef)
+  _createNodeDef (survey, parentDef) {
+    return NodeDef.newNodeDef(parentDef, this.type, Survey.cycleOneKey, this.props)
   }
 
   applyIf (expr) {
@@ -76,15 +73,13 @@ class EntityDefBuilder extends NodeDefBuilder {
     this.childBuilders = childBuilders
   }
 
-  build (survey, parentDefUuid = null) {
-    const def = this._createNodeDef(survey, parentDefUuid)
-
-    const defUuid = NodeDef.getUuid(def)
+  build (survey, parentDef = null) {
+    const def = this._createNodeDef(survey, parentDef)
 
     return R.pipe(
-      R.map(childBuilder => childBuilder.build(survey, defUuid)),
+      R.map(childBuilder => childBuilder.build(survey, def)),
       R.mergeAll,
-      R.assoc(defUuid, def),
+      R.assoc(NodeDef.getUuid(def), def),
     )(this.childBuilders)
   }
 }
@@ -120,8 +115,8 @@ class AttributeDefBuilder extends NodeDefBuilder {
     return this
   }
 
-  build (survey, parentDefUuid = null) {
-    const def = this._createNodeDef(survey, parentDefUuid)
+  build (survey, parentDef = null) {
+    const def = this._createNodeDef(survey, parentDef)
     def[NodeDef.keys.analysis] = this._analysis
 
     return {
