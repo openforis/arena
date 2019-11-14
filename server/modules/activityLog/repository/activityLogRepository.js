@@ -32,6 +32,7 @@ export const insertMany = async (user, surveyId, activities, client) =>
 export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+  const published = Survey.isPublished(surveyInfo)
   const schema = getSurveyDBSchema(surveyId)
 
   return await client.map(`
@@ -78,9 +79,12 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       r.uuid AS record_uuid,
       
       -- node activities keys
+    ${
+      published ? `
       n_h.${NodeKeysHierarchyView.columns.nodeDefUuid},
       n_h.${NodeKeysHierarchyView.columns.keysHierarchy},
-      
+      ` : ''
+    }
       -- user activities keys
       user_target.name AS target_user_name,
       user_target.email AS target_user_email,
@@ -102,10 +106,14 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       r.uuid = l.content_uuid
 
     -- start of node activities part
+    ${
+      published ? `
     LEFT OUTER JOIN
       ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} n_h
     ON
-      l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeUuid}    
+      l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeUuid}
+    ` : ''
+    }
     -- end of node activities part
 
     -- start of user activities part
