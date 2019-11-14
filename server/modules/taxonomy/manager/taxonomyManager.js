@@ -116,6 +116,7 @@ export const fetchTaxonByUuid = TaxonomyRepository.fetchTaxonByUuid
 export const fetchTaxonByCode = TaxonomyRepository.fetchTaxonByCode
 export const fetchTaxonVernacularNameByUuid = TaxonomyRepository.fetchTaxonVernacularNameByUuid
 export const fetchTaxaWithVernacularNames = TaxonomyRepository.fetchTaxaWithVernacularNames
+export const fetchTaxonUuidAndVernacularNamesByCode = TaxonomyRepository.fetchTaxonUuidAndVernacularNamesByCode
 
 export const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, draft) => {
   const taxonomy = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
@@ -146,6 +147,16 @@ export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, valu
     ]))[0]
   )
 
+export const updateTaxa = async (surveyId, taxa, user, client = db) =>
+  await client.tx(async t => await Promise.all([
+    TaxonomyRepository.updateTaxa(surveyId, taxa, t),
+    ActivityLogRepository.insertMany(
+      user,
+      surveyId,
+      taxa.map(taxon => ActivityLog.newActivity(ActivityLog.type.taxonUpdate, taxon, true)),
+      t
+    )
+  ]))
 // ============== DELETE
 
 export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>

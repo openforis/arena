@@ -13,6 +13,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     let ended = false
     let headers = null
     let total = 0
+    let processingHeaders = false
     let processingRow = false //prevents the call to processNext when a row is already being processed
 
     const processNext = () => {
@@ -47,13 +48,22 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         queue.enqueue(data)
         onTotalChange && onTotalChange(++total)
 
-        if (!started || wasEmpty && !processingRow) {
+        if (!processingHeaders && (!started || wasEmpty && !processingRow)) {
           started = true
           processNext()
         }
       } else {
         headers = data
-        onHeaders && onHeaders(headers)
+
+        if (onHeaders) {
+          (async () => {
+            processingHeaders = true
+            await onHeaders(headers)
+            processingHeaders = false
+            if (!processingRow && !queue.isEmpty())
+              await processNext()
+          })()
+        }
       }
     }
 

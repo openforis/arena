@@ -56,8 +56,11 @@ export default class TaxonomyImportJob extends Job {
 
     this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
-    if (!Taxonomy.isPublished(this.taxonomy)) {
-      // 2. delete old draft taxa (only if taxonomy is not published)
+
+    if (Taxonomy.isPublished(this.taxonomy)){
+
+    } else {
+      // 2b. delete old draft taxa (only if taxonomy is not published)
       this.logDebug('delete old draft taxa')
       await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
     }
@@ -97,7 +100,8 @@ export default class TaxonomyImportJob extends Job {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, headers)
-      this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.vernacularLanguageCodes)
+      this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomy, this.vernacularLanguageCodes, this.tx)
+      await this.taxonomyImportManager.init()
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
       this.csvReader.cancel()

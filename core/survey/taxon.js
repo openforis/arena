@@ -38,6 +38,7 @@ export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vern
 
 // ====== READ
 export const getUuid = ObjectUtils.getUuid
+export const getProps = ObjectUtils.getProps
 export const getTaxonomyUuid = R.prop(keys.taxonomyUuid)
 export const getCode = ObjectUtils.getProp(propKeys.code, '')
 export const getFamily = ObjectUtils.getProp(propKeys.family, '')

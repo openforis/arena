@@ -34,29 +34,74 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
   )
 
 export const insertTaxa = async (surveyId, taxa, client = db) =>
-  await client.batch(R.reduce((acc, taxon) => {
-      const taxonInsertPromise = insertOrUpdateTaxon(surveyId, taxon, client)
+  await client.tx(async t => await Promise.all(taxa.map(
+    taxon => insertTaxon(surveyId, taxon, t)
+  )))
 
-      const vernacularNameInsertPromises = insertOrUpdateVernacularNames(
-        surveyId, Taxon.getTaxonomyUuid(taxon), Taxon.getCode(taxon), Taxon.getVernacularNames(taxon), client)
+export const updateTaxa = async (surveyId, taxa, client = db) =>
+  await client.tx(async t => await Promise.all(taxa.map(
+    taxon => updateTaxon(surveyId, taxon, t)
+  )))
 
-      return R.pipe(
-        R.append(taxonInsertPromise),
-        R.concat(vernacularNameInsertPromises)
-      )(acc)
-    }, [], taxa)
+/*await client.batch(R.reduce((acc, taxon) => {
+    const taxonInsertPromise = insertOrUpdateTaxon(surveyId, taxon, client)
+
+    const vernacularNameInsertPromises = insertOrUpdateVernacularNames(
+      surveyId, Taxon.getTaxonomyUuid(taxon), Taxon.getCode(taxon), Taxon.getVernacularNames(taxon), client)
+
+    return R.pipe(
+      R.append(taxonInsertPromise),
+      R.concat(vernacularNameInsertPromises)
+    )(acc)
+  }, [], taxa)
+)
+*/
+
+const insertTaxon = async (surveyId, taxon, t) =>
+  await t.none(
+    `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_uuid, props_draft)
+          VALUES ($1, $2, $3)`,
+    [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), Taxon.getProps(taxon)]
+  )
+
+const updateTaxon = async (surveyId, taxon, t) =>
+  await t.none(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.taxon
+     SET props_draft = $2
+     WHERE uuid = $1`,
+    [Taxon.getUuid(taxon), Taxon.getProps(taxon)]
   )
 
 const insertOrUpdateTaxon = async (surveyId, taxon, client = db) =>
+  await client.tx(async t => {
+    const taxonExisting = await fetchTaxonByCode(surveyId, Taxon.getTaxonomyUuid(taxon), Taxon.getCode(taxon), true, t)
+    if (taxonExisting) {
+      const props = {
+        ...Taxon.getProps(taxon),
+      }
+
+      /*await t.none(`UPDATE ${getSurveyDBSchema(surveyId)}.taxon
+        SET props_draft = props_draft || $2
+        WHERE uuid = $1`,
+        [Taxon.getUuid(taxon), props]
+      )*/
+    } else {
+      await insertTaxon(surveyId, taxon, t)
+    }
+
+  })
+/*
   await client.one(
     `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_uuid, props_draft)
       VALUES ($1, $2, $3)
       ON CONFLICT (taxonomy_uuid, ((props||props_draft)->>'${Taxon.propKeys.code}')) DO
-        UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
+        UPDATE
+          SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
       RETURNING *`,
     [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), taxon.props],
     record => dbTransformCallback(record, true, true)
   )
+*/
 
 const insertOrUpdateVernacularNames = (surveyId, taxonomyUuid, taxonCode, vernacularNames, client = db) =>
   Object.entries(vernacularNames).map(([lang, vernacularName]) =>
@@ -286,6 +331,21 @@ export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = d
     `
     , [uuid],
     record => dbTransformCallback(record, draft, true)
+  )
+
+export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft = false, client = db) =>
+  await client.one(`
+    SELECT 
+      json_object_agg(
+        ${DbUtils.getPropColCombined(Taxon.propKeys.code, draft)}, 
+        json_build_object(
+          'uuid', uuid,
+          'vernacularNames', ${DbUtils.getPropColCombined(Taxon.propKeys.vernacularNames, draft)}
+        )) as index
+    FROM ${getSurveyDBSchema(surveyId)}.taxon
+    WHERE taxonomy_uuid = $1`,
+    [taxonomyUuid],
+    row => row['index'] || {}
   )
 
 // ============== Index
