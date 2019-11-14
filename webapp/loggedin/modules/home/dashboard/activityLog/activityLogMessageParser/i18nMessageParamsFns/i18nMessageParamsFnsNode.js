@@ -4,6 +4,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeKeys from '@core/record/nodeKeys'
 
 const _getParams = (survey, i18n) => activityLog => {
   const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
@@ -11,22 +12,14 @@ const _getParams = (survey, i18n) => activityLog => {
 
   const parentPath = R.pipe(
     ActivityLog.getKeysHierarchy,
-    R.map(({ nodeDefUuid, keys }) => {
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const label = NodeDef.getLabel(nodeDef, i18n.lang)
-      // do not show keys for root entity
-      return NodeDef.isRoot(nodeDef)
-        ? label
-        : `${label}[${R.values(keys)}]`
-    }),
-    R.join(' / ')
+    NodeKeys.getKeysHierarchyPath(survey, i18n.lang)
   )(activityLog)
 
   // get record keys from parent path first item (root)
   const recordKeys = R.pipe(
     ActivityLog.getKeysHierarchy,
     R.head,
-    R.prop('keys'),
+    R.prop(NodeKeys.keys.keys),
     R.values
   )(activityLog)
 
@@ -38,7 +31,6 @@ const _getParams = (survey, i18n) => activityLog => {
 }
 
 export default {
-
   [ActivityLog.type.nodeCreate]: _getParams,
 
   [ActivityLog.type.nodeValueUpdate]: _getParams,

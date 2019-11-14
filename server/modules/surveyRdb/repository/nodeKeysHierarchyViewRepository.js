@@ -1,6 +1,7 @@
 import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeKeys from '@core/record/nodeKeys'
 
 import * as NodeKeysView from '../schemaRdb/nodeKeysView'
 import * as NodeHierarchyDisaggregatedView from '../schemaRdb/nodeHierarchyDisaggregatedView'
@@ -20,9 +21,9 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
         h.${NodeHierarchyDisaggregatedView.columns.nodeDefUuid} AS ${NodeKeysHierarchyView.columns.nodeDefUuid},
         jsonb_agg(
           jsonb_build_object(
-            'nodeDefUuid', k_h.${NodeKeysView.columns.nodeDefUuid}, 
-            'nodeUuid', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}, 
-            'keys', k_h.${NodeKeysView.columns.keys} 
+            '${NodeKeys.keys.nodeDefUuid}', k_h.${NodeKeysView.columns.nodeDefUuid}, 
+            '${NodeKeys.keys.nodeUuid}', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}, 
+            '${NodeKeys.keys.keys}', k_h.${NodeKeysView.columns.keys} 
           ) 
           ORDER BY h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorId} 
         ) AS ${NodeKeysHierarchyView.columns.keysHierarchy},
