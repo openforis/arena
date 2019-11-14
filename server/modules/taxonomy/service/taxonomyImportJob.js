@@ -17,7 +17,6 @@ import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import SystemError from '@core/systemError'
 
 const requiredColumns = [
   'code',
@@ -53,17 +52,15 @@ export default class TaxonomyImportJob extends Job {
 
     await ActivityLogManager.insert(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
 
-    // 1. load taxonomy and check it has not published
+    // 1. load taxonomy
 
     this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
-    if (Taxonomy.isPublished(this.taxonomy)) {
-      throw new SystemError('cannotOverridePublishedTaxa')
+    if (!Taxonomy.isPublished(this.taxonomy)) {
+      // 2. delete old draft taxa (only if taxonomy is not published)
+      this.logDebug('delete old draft taxa')
+      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
     }
-
-    // 2. delete old draft taxa
-    this.logDebug('delete old draft taxa')
-    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
 
     // 3. start CSV row parsing
     this.logDebug('start CSV file parsing')
@@ -99,7 +96,6 @@ export default class TaxonomyImportJob extends Job {
   async _onHeaders (headers) {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
-      this.headers = headers
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, headers)
       this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.vernacularLanguageCodes)
     } else {

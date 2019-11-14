@@ -44,24 +44,12 @@ CREATE INDEX taxon_vernacular_name_taxon_idx ON taxon (taxonomy_uuid);
 
 CREATE UNIQUE INDEX
 taxon_props_code_idx
-ON taxon (taxonomy_uuid, (props->>'code'));
+ON taxon (taxonomy_uuid, ((props||props_draft)->>'code'));
 
 CREATE UNIQUE INDEX
 taxon_props_scientific_name_idx
-ON taxon (taxonomy_uuid, (props->>'scientificName'));
-
-CREATE UNIQUE INDEX
-taxon_props_draft_code_idx
-ON taxon (taxonomy_uuid, (props_draft->>'code'));
-
-CREATE UNIQUE INDEX
-taxon_props_draft_scientific_name_idx
-ON taxon (taxonomy_uuid, (props_draft->>'scientificName'));
+ON taxon (taxonomy_uuid, ((props||props_draft)->>'scientificName'));
 
 CREATE UNIQUE INDEX
 taxon_vernacular_name_props_lang_idx
-ON taxon_vernacular_name (taxon_uuid, (props->>'lang'));
-
-CREATE UNIQUE INDEX
-taxon_vernacular_name_props_draft_lang_idx
-ON taxon_vernacular_name (taxon_uuid, (props_draft->>'lang'));
+ON taxon_vernacular_name (taxon_uuid, (props||props_draft->>'lang'));
