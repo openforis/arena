@@ -58,19 +58,7 @@ export const canEditRecord = (user, record) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
-export const canEditRecordsInDataQuery = R.pipe(
-  _getSurveyUserGroup,
-  authGroup => R.includes(
-    AuthGroup.getName(authGroup),
-    [
-      AuthGroup.groupNames.systemAdmin,
-      AuthGroup.groupNames.surveyAdmin,
-      AuthGroup.groupNames.surveyEditor,
-      AuthGroup.groupNames.dataAnalyst,
-      AuthGroup.groupNames.dataCleanser
-    ]
-  )
-)
+export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
 export const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 

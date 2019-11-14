@@ -131,7 +131,7 @@ const mapStateToProps = state => {
     showTable: DataQueryState.hasTableAndCols(state),
     nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
     editMode,
-    canEdit: Authorizer.canEditRecordsInDataQuery(user, surveyInfo),
+    canEdit: Authorizer.canCleanseRecords(user, surveyInfo),
   }
 }
 
