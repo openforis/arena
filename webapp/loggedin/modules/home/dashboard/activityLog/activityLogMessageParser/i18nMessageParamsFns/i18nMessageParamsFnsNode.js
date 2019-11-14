@@ -17,7 +17,7 @@ const _getParams = (survey, i18n) => activityLog => {
       // do not show keys for root entity
       return NodeDef.isRoot(nodeDef)
         ? label
-        : `${label}[${keys}]`
+        : `${label}[${R.values(keys)}]`
     }),
     R.join(' / ')
   )(activityLog)
@@ -26,11 +26,12 @@ const _getParams = (survey, i18n) => activityLog => {
   const recordKeys = R.pipe(
     ActivityLog.getKeysHierarchy,
     R.head,
-    R.prop('keys')
+    R.prop('keys'),
+    R.values
   )(activityLog)
 
   return {
-    name: NodeDef.getName(nodeDef),
+    name: NodeDef.getLabel(nodeDef, i18n.lang),
     recordKeys,
     parentPath
   }

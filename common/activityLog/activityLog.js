@@ -127,7 +127,7 @@ export const getDateCreated = ObjectUtils.getDateCreated
 // props associated from fetch
 export const getUserName = R.prop(keys.userName)
 export const getRecordUuid = R.prop(keys.recordUuid)
-export const getKeysHierarchy = R.prop(keys.keysHierarchy)
+export const getKeysHierarchy = R.propOr([], keys.keysHierarchy)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getTargetUserName = R.prop(keys.targetUserName)
 export const getTargetUserUuid = R.prop(keys.targetUserUuid)

@@ -245,7 +245,7 @@ export const enTranslation = {
       //node
       [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
       [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} to record {{recordKeys}}',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} in {{parentPath}} from record {{recordKeys}}',
+      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} from record {{recordKeys}}',
 
       // user
       [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
