@@ -10,7 +10,7 @@ const _getParams = (survey, i18n) => activityLog => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
   const parentPath = R.pipe(
-    ActivityLog.getParentPath,
+    ActivityLog.getKeysHierarchy,
     R.map(({ nodeDefUuid, keys }) => {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const label = NodeDef.getLabel(nodeDef, i18n.lang)
@@ -24,7 +24,7 @@ const _getParams = (survey, i18n) => activityLog => {
 
   // get record keys from parent path first item (root)
   const recordKeys = R.pipe(
-    ActivityLog.getParentPath,
+    ActivityLog.getKeysHierarchy,
     R.head,
     R.prop('keys')
   )(activityLog)

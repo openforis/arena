@@ -10,7 +10,7 @@ export default {
   [ActivityLog.type.nodeValueUpdate]: () => _isNodeDeleted,
 
   [ActivityLog.type.nodeDelete]: () => activityLog => {
-    const parentPath = ActivityLog.getParentPath(activityLog)
+    const parentPath = ActivityLog.getKeysHierarchy(activityLog)
     //nodeDefUuid in parent path elements will be null if the corresponding node has been deleted
     return R.any(({ nodeDefUuid }) => R.isNil(nodeDefUuid))(parentPath)
   }
