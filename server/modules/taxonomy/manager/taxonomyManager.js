@@ -4,10 +4,14 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
+import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
 
-import { publishSurveySchemaTableProps, markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {
+  publishSurveySchemaTableProps,
+  markSurveyDraft
+} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
@@ -115,7 +119,10 @@ export const fetchTaxonByUuid = TaxonomyRepository.fetchTaxonByUuid
 export const fetchTaxonByCode = TaxonomyRepository.fetchTaxonByCode
 export const fetchTaxonVernacularNameByUuid = TaxonomyRepository.fetchTaxonVernacularNameByUuid
 export const fetchTaxaWithVernacularNames = TaxonomyRepository.fetchTaxaWithVernacularNames
-export const fetchTaxonUuidAndVernacularNamesByCode = TaxonomyRepository.fetchTaxonUuidAndVernacularNamesByCode
+export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft) => {
+  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft)
+  return ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
+}
 
 export const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid, draft) => {
   const taxonomy = await fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)

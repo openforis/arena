@@ -89,36 +89,30 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
     r => parseInt(r.count)
   )
 
-export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) => {
-  const schema = getSurveyDBSchema(surveyId)
-
-  return await client.map(`
-      WITH vernacular_names AS
-      (
-      SELECT
-          vn.taxon_uuid,
-          json_object_agg(
-            ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')}, 
-            ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}
-          )
-          AS names
-      FROM
-          ${schema}.taxon_vernacular_name vn
-      GROUP BY 
-          vn.taxon_uuid
-      )
-      
+export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) =>
+  await client.map(`
       SELECT
           t.*,
-          vn.names as vernacular_names
+          COALESCE(
+            jsonb_object_agg(
+              ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')},
+              json_build_object(
+                '${TaxonVernacularName.keys.uuid}', vn.uuid,
+                '${TaxonVernacularName.keys.props}', ${DbUtils.getPropsCombined(draft, 'vn.', false)}
+              )
+            ) FILTER (WHERE vn.uuid IS NOT NULL),
+            '{}'
+          ) as vernacular_names
       FROM
-          ${schema}.taxon t
+          ${getSurveyDBSchema(surveyId)}.taxon t
       LEFT OUTER JOIN
-          vernacular_names vn
+          ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
       ON
           vn.taxon_uuid = t.uuid
       WHERE
           t.taxonomy_uuid = $1
+      GROUP BY
+          t.id
       ORDER BY
         ${DbUtils.getPropColCombined(Taxon.propKeys.family, draft, 't.')},
         ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')}
@@ -128,7 +122,6 @@ export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft
     [taxonomyUuid, offset],
     record => dbTransformCallback(record, draft, true)
   )
-}
 
 export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
   const vernacularNamesSubSelects = R.pipe(
@@ -263,31 +256,6 @@ export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = d
     `
     , [uuid],
     record => dbTransformCallback(record, draft, true)
-  )
-
-export const fetchTaxonUuidAndVernacularNamesByCode = async (surveyId, taxonomyUuid, draft = false, client = db) =>
-  await client.one(`
-    SELECT 
-      json_object_agg(
-        ${DbUtils.getPropColCombined(Taxon.propKeys.code, draft, 't.')}, 
-        json_build_object(
-          'uuid', t.uuid,
-          '${Taxon.propKeys.vernacularNames}', (
-            SELECT jsonb_object_agg(
-              ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')},
-              json_build_object(
-                'uuid', vn.uuid,
-                'props', ${DbUtils.getPropsCombined(draft, 'vn.', false)}
-              )
-            )
-            FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
-            WHERE vn.taxon_uuid = t.uuid
-          )
-        ))
-    FROM ${getSurveyDBSchema(surveyId)}.taxon t
-    WHERE t.taxonomy_uuid = $1`,
-    [taxonomyUuid],
-    R.pipe(R.values, R.head)
   )
 
 // ============== Index

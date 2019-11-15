@@ -94,9 +94,10 @@ export const setInPath = (pathArray, value, includeEmpty = true) => obj => {
 }
 
 //====== UTILS / uuid
-export const toIndexedObj = (array, prop) => array.reduce(
+export const toIndexedObj = (array, propName) => array.reduce(
   (acc, item) => {
-    acc[item[prop]] = item
+    const prop = R.path(propName.split('.'), item)
+    acc[prop] = item
     return acc
   },
   {}

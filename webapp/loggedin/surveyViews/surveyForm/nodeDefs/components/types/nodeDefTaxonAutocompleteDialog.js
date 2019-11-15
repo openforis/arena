@@ -24,7 +24,7 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
       </div>
       {vernacularLang &&
       <div style={{ gridColumn: 2 }}>
-        {`${Taxon.getVernacularName()(taxon)} (${vernacularLang})`}
+        {`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}
       </div>
       }
     </div>
