@@ -1,6 +1,7 @@
 @import "~@webapp/style/vars";
 
-.processing-chain__step {
+.processing-chain__step,
+.processing-step__calculation {
   position: relative;
   display: flex;
   margin-left: 16px;
@@ -25,7 +26,8 @@
   }
 }
 
-.processing-chain__step-index {
+.processing-chain__step-index,
+.processing-step__calculation-index {
   z-index: 1;
   width: 32px;
   height: 32px;

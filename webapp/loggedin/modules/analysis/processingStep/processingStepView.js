@@ -8,7 +8,7 @@ import { getUrlParam } from '@webapp/utils/routerUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
-import ProcessingStepCalculations from './components/processingStepCalculations'
+import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 
@@ -55,7 +55,7 @@ const ProcessingStepView = props => {
             }}
           />
 
-          <ProcessingStepCalculations
+          <ProcessingStepCalculationsList
             processingStep={processingStep}
           />
 
