@@ -30,7 +30,7 @@ export const createNodeKeysView = async (survey, client = db) => {
 
   await client.query(`
     CREATE VIEW ${NodeKeysView.getNameWithSchema(surveyId)} AS (
-    ${selectViews.join(` UNION `)}
+    ${selectViews.join(` UNION ALL `)}
     )
   `)
 }

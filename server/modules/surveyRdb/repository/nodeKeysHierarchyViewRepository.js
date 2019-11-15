@@ -41,10 +41,7 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
       ON
         k_s.${NodeKeysView.columns.nodeUuid} = h.${NodeHierarchyDisaggregatedView.columns.nodeUuid}
       GROUP BY
-        h.${NodeHierarchyDisaggregatedView.columns.nodeId},
-        h.${NodeHierarchyDisaggregatedView.columns.nodeUuid},
-        h.${NodeHierarchyDisaggregatedView.columns.nodeDefUuid},
-        k_s.${NodeKeysView.columns.keys}
+        1,2,3,5
     )
   `)
 }

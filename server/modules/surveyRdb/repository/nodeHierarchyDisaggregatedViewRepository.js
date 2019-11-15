@@ -35,7 +35,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
         ON
           n.uuid = h.${columns.nodeAncestorUuid}
         -- Union with root nodes  
-        UNION
+        UNION ALL
         SELECT
           n.id              AS ${columns.nodeId},
           n.uuid            AS ${columns.nodeUuid},
