@@ -12,14 +12,14 @@ const fetchRootNodeDef = async () => {
   return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
-const createNodeDef = (parentNodeUuid, type, name) =>
-  NodeDef.newNodeDef(parentNodeUuid, type, Survey.cycleOneKey, {
+const createNodeDef = (nodeDefParent, type, name) =>
+  NodeDef.newNodeDef(nodeDefParent, type, Survey.cycleOneKey, {
     [NodeDef.propKeys.name]: name,
   })
 
-const createAndStoreNodeDef = async (parentNodeUuid, type, name) => {
+const createAndStoreNodeDef = async (nodeDefParent, type, name) => {
   const survey = getContextSurvey()
-  const nodeDef = createNodeDef(parentNodeUuid, type, name)
+  const nodeDef = createNodeDef(nodeDefParent, type, name)
   return await NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
 }
 
@@ -28,10 +28,9 @@ export const createNodeDefsTest = async () => {
   const surveyId = Survey.getId(survey)
 
   const rootDef = await fetchRootNodeDef()
-  const rootDefUuid = NodeDef.getUuid(rootDef)
 
   for (const nodeType in NodeDef.nodeDefType) {
-    const nodeDefReq = createNodeDef(rootDefUuid, nodeType, `node_def_${nodeType}`)
+    const nodeDefReq = createNodeDef(rootDef, nodeType, `node_def_${nodeType}`)
     const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
     expect(nodeDefDb.id).to.not.be.undefined
@@ -47,10 +46,9 @@ export const updateNodeDefTest = async () => {
   const surveyId = Survey.getId(survey)
 
   const rootDef = await fetchRootNodeDef()
-  const rootDefUuid = NodeDef.getUuid(rootDef)
 
-  const nodeDef1 = await createAndStoreNodeDef(rootDefUuid, NodeDef.nodeDefType.text, 'node_def_1')
-  const nodeDef2 = await createAndStoreNodeDef(rootDefUuid, NodeDef.nodeDefType.boolean, 'node_def_2')
+  const nodeDef1 = await createAndStoreNodeDef(rootDef, NodeDef.nodeDefType.text, 'node_def_1')
+  const nodeDef2 = await createAndStoreNodeDef(rootDef, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
   const nodeDef1Uuid = NodeDef.getUuid(nodeDef1)
