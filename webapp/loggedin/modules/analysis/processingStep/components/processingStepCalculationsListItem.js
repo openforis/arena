@@ -1,3 +1,5 @@
+import './processingStepCalculationsListItem.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -7,19 +9,28 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
+import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+
+import { setProcessingStepCalculationForEdit } from '../actions'
 
 const ProcessingStepCalculationsListItem = props => {
 
-  const { calculation, nodeDef, lang } = props
+  const {
+    calculation, calculationForEdit, nodeDef, lang,
+    calculationEditorOpened,
+    setProcessingStepCalculationForEdit,
+  } = props
 
+  const className = `processing-step__calculation${ProcessingStepCalculation.isEqual(calculationForEdit)(calculation) ? ' editing' : ''}`
   return (
-    <div className="processing-step__calculation">
+    <div className={className}>
 
       <div className="processing-step__calculation-index">
         {ProcessingStepCalculation.getIndex(calculation) + 1}
       </div>
 
-      <div className="processing-chain__step-content">
+      <div className="processing-step__calculation-content"
+           onClick={() => setProcessingStepCalculationForEdit(calculation)}>
         <div>
           {ProcessingStepCalculation.getUuid(calculation)}
           {nodeDef && NodeDef.getLabel(nodeDef, lang)}
@@ -41,8 +52,12 @@ const mapStateToProps = (state, { calculation }) => {
   const survey = SurveyState.getSurvey(state)
   return {
     lang: AppState.getLang(state),
-    nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+    calculationForEdit: ProcessingStepState.getProcessingStepCalculationForEdit(state),
   }
 }
 
-export default connect(mapStateToProps)(ProcessingStepCalculationsListItem)
+export default connect(
+  mapStateToProps,
+  { setProcessingStepCalculationForEdit }
+)(ProcessingStepCalculationsListItem)

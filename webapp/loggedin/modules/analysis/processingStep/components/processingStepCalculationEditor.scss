@@ -1,0 +1,25 @@
+@import "~@webapp/style/vars";
+
+.processing-step__calculation-editor {
+  position: absolute;
+  top: 0;
+  width: calc(100% - 200px);
+  height: 100%;
+  transform: translate(calc(100% + 230px), 0);
+  transition: all 300ms ease;
+  border-left: 2px solid $greyBorder;
+
+  .btn-close {
+    position: absolute;
+    border-radius: 100%;
+    padding: 8px;
+    top: 0rem;
+    left: 1rem;
+  }
+}
+
+.processing-step.calculation-editor-opened {
+  .processing-step__calculation-editor {
+    transform: translate(200px, 0);
+  }
+}

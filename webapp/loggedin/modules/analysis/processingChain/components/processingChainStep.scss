@@ -44,7 +44,8 @@
   font-size: .75rem;
 }
 
-.processing-chain__step-content {
+.processing-chain__step-content,
+.processing-step__calculation-content {
   position: relative;
   transition: .2s all;
   display: grid;

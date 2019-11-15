@@ -2,6 +2,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from './processingStepState'
@@ -15,9 +16,15 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
+export const processingStepCalculationIndexForEditUpdate = 'analysis/processingStep/calculation/edit'
 
 export const resetProcessingStepState = () => dispatch =>
   dispatch({ type: processingStepUpdate, processingStep: {}, processingStepPrev: null, processingStepNext: null })
+
+export const setProcessingStepCalculationForEdit = calculation => dispatch => dispatch({
+  type: processingStepCalculationIndexForEditUpdate,
+  index: ProcessingStepCalculation.getIndex(calculation)
+})
 
 // ====== CREATE
 
@@ -72,7 +79,7 @@ export const putProcessingStepProps = props => async (dispatch, getState) => {
   dispatch(debounceAction(action, `${processingStepPropsUpdate}_${processingStepUuid}`))
 }
 
-// ====== UPDATE
+// ====== DELETE
 
 export const deleteProcessingStep = history => async (dispatch, getState) => {
   dispatch(showAppSaving())

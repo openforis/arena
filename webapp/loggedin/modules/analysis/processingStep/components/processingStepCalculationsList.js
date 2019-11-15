@@ -11,7 +11,7 @@ import { createProcessingStepCalculation } from '../actions'
 
 const ProcessingStepCalculationsList = props => {
   const {
-    processingStep,
+    processingStep, calculationEditorOpened,
     createProcessingStepCalculation
   } = props
 
@@ -21,13 +21,16 @@ const ProcessingStepCalculationsList = props => {
   return (
     <div className="form-item">
 
-      <div className="form-label processing-step__calculations-label">
-        {i18n.t('processingStepView.calculationSteps')}
-        <button className="btn-s btn-transparent"
-                onClick={() => createProcessingStepCalculation()}>
-          <span className="icon icon-plus icon-14px"/>
-        </button>
-      </div>
+      {
+        !calculationEditorOpened &&
+        <div className="form-label processing-step__calculations-label">
+          {i18n.t('processingStepView.calculationSteps')}
+          <button className="btn-s btn-transparent"
+                  onClick={() => createProcessingStepCalculation()}>
+            <span className="icon icon-plus icon-14px"/>
+          </button>
+        </div>
+      }
 
       <div className="processing-step__calculations">
         {
@@ -35,6 +38,7 @@ const ProcessingStepCalculationsList = props => {
             <ProcessingStepCalculationsListItem
               key={ProcessingStepCalculation.getIndex(calculation)}
               calculation={calculation}
+              calculationEditorOpened={calculationEditorOpened}
             />
           ))
         }
