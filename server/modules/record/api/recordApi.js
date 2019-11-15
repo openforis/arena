@@ -9,7 +9,13 @@ import * as Node from '@core/record/node'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
-import { requireRecordListViewPermission, requireRecordEditPermission, requireRecordCreatePermission, requireRecordViewPermission } from '../../auth/authApiMiddleware';
+import {
+  requireRecordListViewPermission,
+  requireRecordEditPermission,
+  requireRecordCreatePermission,
+  requireRecordViewPermission,
+  requireRecordCleansePermission,
+} from '../../auth/authApiMiddleware';
 
 export const init = app => {
 
@@ -94,6 +100,30 @@ export const init = app => {
       const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
 
       sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.get('/survey/:surveyId/validationReport', requireRecordCleansePermission, async (req, res, next) => {
+    try {
+      const { surveyId, offset, limit } = Request.getParams(req)
+
+      const list = await RecordService.fetchValidationReport(surveyId, offset, limit)
+
+      res.json({ list })
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.get('/survey/:surveyId/validationReport/count', requireRecordCleansePermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const count = await RecordService.countValidationReports(surveyId)
+
+      res.json(count)
     } catch (err) {
       next(err)
     }

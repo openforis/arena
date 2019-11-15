@@ -8,6 +8,7 @@ import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoade
 import RecordsView from './records/recordsView'
 import RecordView from '../../surveyViews/record/recordView'
 import DataVisView from './dataVis/dataVisView'
+import ValidationReportView from './validationReport/validationReportView'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
@@ -32,7 +33,7 @@ const DataView = ({ surveyInfo }) => {
             component: RecordsView,
             path: appModuleUri(dataModules.records),
           },
-          //edit record
+          // edit record
           {
             component: RecordView,
             path: appModuleUri(dataModules.record) + ':recordUuid/',
@@ -43,7 +44,11 @@ const DataView = ({ surveyInfo }) => {
             component: DataVisView,
             path: appModuleUri(dataModules.dataVis),
           },
-
+          // validation report
+          {
+            component: ValidationReportView,
+            path: appModuleUri(dataModules.validationReport),
+          },
         ]}
       />
     </SurveyDefsLoader>

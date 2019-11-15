@@ -92,6 +92,10 @@ export const dataModules = {
     key: 'dataVis',
     path: `${appModules.data.path}/dataVis`,
   },
+  validationReport: {
+    key: 'validationReport',
+    path: `${appModules.data.path}/validationReport`,
+  },
 }
 
 export const userModules = {

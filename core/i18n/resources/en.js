@@ -116,6 +116,7 @@ export const enTranslation = {
     data: 'Data',
     records: 'Records',
     dataVis: 'Data vis',
+    validationReport: 'Validation report',
 
     users: 'Users',
     userList: 'User list',

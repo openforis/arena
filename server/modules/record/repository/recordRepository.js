@@ -4,7 +4,7 @@ import * as camelize from 'camelize'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils';
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'

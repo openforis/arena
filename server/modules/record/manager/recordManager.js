@@ -12,6 +12,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import * as RecordValidationManager from './_recordManager/recordValidationManager'
+import * as ValidationReportManager from './_recordManager/validationReportManager'
 
 import * as SurveyRepository from '../../survey/repository/surveyRepository'
 import * as NodeDefRepository from '../../nodeDef/repository/nodeDefRepository'
@@ -96,6 +97,8 @@ export const deleteRecordsByCycles = RecordUpdateManager.deleteRecordsByCycles
 export const persistValidation = RecordValidationManager.persistValidation
 export const updateRecordValidationsFromValues = RecordValidationManager.updateRecordValidationsFromValues
 export const validateNodesAndPersistValidation = RecordValidationManager.validateNodesAndPersistValidation
+export const fetchValidationReport = ValidationReportManager.fetchValidationReport
+export const countValidationReports = ValidationReportManager.countValidationReports
 
 // ====  UTILS
 export const disableTriggers = NodeRepository.disableTriggers
