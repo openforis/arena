@@ -84,7 +84,7 @@ export default class TaxonomiesImportJob extends Job {
     if (this.hasErrors()) {
       await this.setStatusFailed()
     } else {
-      await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
+      await this.taxonomyImportManager.finalizeImport(taxonomy)
     }
 
     return taxonomy
@@ -114,7 +114,7 @@ export default class TaxonomiesImportJob extends Job {
 
       const taxon = Taxon.newTaxon(taxonomyUuid, code, family, genus, scientificName, vernacularNames)
 
-      await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, tx)
+      await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     }
     this.currentRow++
     this.incrementProcessedItems()

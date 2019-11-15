@@ -22,55 +22,49 @@ export default class TaxonomyImportManager {
     this.vernacularLanguageCodes = vernacularLanguageCodes
     this.tx = tx
 
-    this.batchPersisterInsert = new BatchPersister(async items => await TaxonomyManager.insertTaxa(this.surveyId, items, this.user, this.tx))
-    this.batchPersisterUpdate = new BatchPersister(async items => await TaxonomyManager.updateTaxa(this.surveyId, items, this.user, this.tx))
+    this.batchPersisterInsert = new BatchPersister(async items => await TaxonomyManager.insertTaxa(this.user, this.surveyId, items, this.tx))
+    this.batchPersisterUpdate = new BatchPersister(async items => await TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx))
     this.insertedCodes = {} //cache of inserted taxa codes
     this.existingUuidAndVernacularNamesByCode = null // existing taxon uuids and vernacular names (indexed by code)
   }
 
   async init () {
     this.existingUuidAndVernacularNamesByCode = await TaxonomyManager.fetchTaxonUuidAndVernacularNamesByCode(
-      this.surveyId, Taxonomy.getUuid(this.taxonomy), true, this.tx)
+      this.surveyId, Taxonomy.getUuid(this.taxonomy), true, this.tx) || {}
   }
 
-  async addTaxonToInsertBuffer (taxon, t) {
+  async addTaxonToUpdateBuffer (taxon) {
     const taxonExisting = this.existingUuidAndVernacularNamesByCode[Taxon.getCode(taxon)]
     if (taxonExisting) {
-      const vernacularNamesUpdated = {
-        ...Taxon.getVernacularNames(taxonExisting)
-      }
-      const taxonUpdated = {
-        ...taxonExisting,
-        [Taxon.keys.props]: {
-          ...Taxon.getProps(taxonExisting),
-          [Taxon.propKeys.scientificName]: Taxon.getScientificName(taxon),
-          [Taxon.propKeys.vernacularNames]: vernacularNamesUpdated,
-        }
-      }
-      await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated), t)
+      // update existing item
+      const taxonUpdated = Taxon.merge(taxon)(taxonExisting)
+      await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
     } else {
-      await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon), t)
+      // insert new one
+      await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
     }
     this.insertedCodes[Taxon.getCode(taxon)] = true
   }
 
-  async finalizeImport (taxonomy, t) {
+  async finalizeImport () {
     const { user, surveyId } = this
 
-    await this.batchPersisterInsert.flush(t)
+    await this.batchPersisterInsert.flush()
 
     //insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
       createPredefinedTaxa,
       R.filter(taxon => !this.insertedCodes[Taxon.getCode(taxon)])
-    )(taxonomy)
+    )(this.taxonomy)
 
-    if (!R.isEmpty(predefinedTaxaToInsert)) {
-      await TaxonomyManager.insertTaxa(surveyId, predefinedTaxaToInsert, user, t)
+    for (const predefinedTaxon of predefinedTaxaToInsert) {
+      await this.addTaxonToUpdateBuffer(predefinedTaxon)
     }
+    await this.batchPersisterInsert.flush()
+    await this.batchPersisterUpdate.flush()
 
     //set vernacular lang codes in taxonomy
-    await TaxonomyManager.updateTaxonomyProp(user, surveyId, Taxonomy.getUuid(taxonomy),
-      Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, true, t)
+    await TaxonomyManager.updateTaxonomyProp(user, surveyId, Taxonomy.getUuid(this.taxonomy),
+      Taxonomy.keysProps.vernacularLanguageCodes, this.vernacularLanguageCodes, true, this.tx)
   }
 }

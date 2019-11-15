@@ -4,12 +4,13 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job from '@server/job/job'
 
-import { languageCodes } from '@core/app/languages';
-import { isNotBlank } from '@core/stringUtils';
+import { languageCodes } from '@core/app/languages'
+import * as StringUtils from '@core/stringUtils'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 
 import * as TaxonomyValidator from '../taxonomyValidator'
@@ -56,8 +57,7 @@ export default class TaxonomyImportJob extends Job {
 
     this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
-
-    if (Taxonomy.isPublished(this.taxonomy)){
+    if (Taxonomy.isPublished(this.taxonomy)) {
 
     } else {
       // 2b. delete old draft taxa (only if taxonomy is not published)
@@ -113,7 +113,7 @@ export default class TaxonomyImportJob extends Job {
     const taxon = await this._parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
-      await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, this.tx)
+      await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon, this.tx)
     } else {
       this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
@@ -186,10 +186,17 @@ export default class TaxonomyImportJob extends Job {
   }
 
   _parseVernacularNames (vernacularNames) {
-    return R.reduce((acc, langCode) => {
-      const vernacularName = vernacularNames[langCode]
-      return isNotBlank(vernacularName) ? R.assoc(langCode, vernacularName, acc) : acc
-    }, {}, this.vernacularLanguageCodes)
+    return R.reduce(
+      (accVernacularNames, langCode) => {
+        const name = vernacularNames[langCode]
+        return R.when(
+          R.always(StringUtils.isNotBlank(name)),
+          R.assoc(langCode, TaxonVernacularName.newTaxonVernacularName(langCode, name))
+        )(accVernacularNames)
+      },
+      {},
+      this.vernacularLanguageCodes
+    )
   }
 }
 

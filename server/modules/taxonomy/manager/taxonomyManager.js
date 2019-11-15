@@ -2,17 +2,16 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils';
-
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 
 import { db } from '@server/db/db'
 
+import { publishSurveySchemaTableProps, markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
-
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 /**
  * ====== CREATE
@@ -26,7 +25,7 @@ export const insertTaxonomy = async (user, surveyId, taxonomy, system = false, c
     return await validateTaxonomy(surveyId, [], taxonomyInserted)
   })
 
-export const insertTaxa = async (surveyId, taxa, user, client = db) =>
+export const insertTaxa = async (user, surveyId, taxa, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.insertTaxa(surveyId, taxa, t),
     ActivityLogRepository.insertMany(
@@ -147,7 +146,7 @@ export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, valu
     ]))[0]
   )
 
-export const updateTaxa = async (surveyId, taxa, user, client = db) =>
+export const updateTaxa = async (user, surveyId, taxa, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.updateTaxa(surveyId, taxa, t),
     ActivityLogRepository.insertMany(
