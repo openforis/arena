@@ -57,6 +57,7 @@ export const type = {
   processingStepCreate: 'processingStepCreate',
   processingStepPropsUpdate: 'processingStepPropsUpdate',
   processingStepDelete: 'processingStepDelete',
+  processingStepCalculationCreate: 'processingStepCalculationCreate',
 }
 
 export const keys = {

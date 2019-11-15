@@ -9,6 +9,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
+import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
 // ====== CREATE - Chain
 
@@ -19,13 +20,22 @@ export const createChain = async (user, surveyId, cycle, client = db) =>
     return ProcessingChain.getUuid(processingChain)
   })
 
-// ====== CREATE - Step
+// ====== CREATE - Processing Step
 
-export const createStep = async (user, surveyId, processingChainUuid, processingStepIndex, client = db) =>
+export const createProcessingStep = async (user, surveyId, processingChainUuid, processingStepIndex, client = db) =>
   await client.tx(async t => {
     const processingStep = await ProcessingStepRepository.insertStep(surveyId, processingChainUuid, processingStepIndex, t)
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCreate, processingStep, false, t)
     return ProcessingStep.getUuid(processingStep)
+  })
+
+// ====== CREATE - Processing Step Calculation
+
+export const createProcessingStepCalculation = async (user, surveyId, processingStepUuid, index, client = db) =>
+  await client.tx(async t => {
+    const calculationStep = await ProcessingStepCalculationRepository.insertCalculationStep(surveyId, processingStepUuid, index, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCalculationCreate, calculationStep, false, t)
+    return calculationStep
   })
 
 // ====== READ - Chain
