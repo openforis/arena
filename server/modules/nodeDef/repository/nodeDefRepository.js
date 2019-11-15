@@ -29,18 +29,15 @@ const nodeDefSelectFields =
 
 // ============== CREATE
 
-export const insertNodeDef = async (surveyId, nodeDef, client = db) => {
-  const parentUuid = NodeDef.getParentUuid(nodeDef)
-  return await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-          (parent_uuid, uuid, type, props_draft, meta)
-        VALUES ($1, $2, $3, $4, $5::jsonb)
-        RETURNING *
-    `,
-    [parentUuid, NodeDef.getUuid(nodeDef), NodeDef.getType(nodeDef), NodeDef.getProps(nodeDef), JSON.stringify(NodeDef.getMeta(nodeDef))],
+export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
+  await client.one(`
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
+      (parent_uuid, uuid, type, props_draft, meta)
+    VALUES ($1, $2, $3, $4, $5::jsonb)
+    RETURNING *`,
+    [NodeDef.getParentUuid(nodeDef), NodeDef.getUuid(nodeDef), NodeDef.getType(nodeDef), NodeDef.getProps(nodeDef), NodeDef.getMeta(nodeDef)],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
-}
 
 // ============== READ
 

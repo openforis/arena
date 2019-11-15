@@ -12,14 +12,14 @@ const fetchRootNodeDef = async () => {
   return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
-const createNodeDef = (parentNode, type, name) =>
-  NodeDef.newNodeDef(parentNode, type, Survey.cycleOneKey, {
+const createNodeDef = (nodeDefParent, type, name) =>
+  NodeDef.newNodeDef(nodeDefParent, type, Survey.cycleOneKey, {
     [NodeDef.propKeys.name]: name,
   })
 
-const createAndStoreNodeDef = async (parentNode, type, name) => {
+const createAndStoreNodeDef = async (nodeDefParent, type, name) => {
   const survey = getContextSurvey()
-  const nodeDef = createNodeDef(parentNode, type, name)
+  const nodeDef = createNodeDef(nodeDefParent, type, name)
   return await NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
 }
 
