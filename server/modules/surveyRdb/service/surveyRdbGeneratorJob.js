@@ -20,7 +20,7 @@ export default class SurveyRdbGeneratorJob extends Job {
     //get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
 
-    this.total = 1 + length
+    this.total = 1 + length + 3 //create schema + create and populate tables + create views
 
     this.logDebug('drop and create schema - start')
 
@@ -52,6 +52,23 @@ export default class SurveyRdbGeneratorJob extends Job {
     }
 
     await Survey.traverseHierarchyItem(root, traverseNodeDef)
+
+    //3 ==== Create views
+    this.logDebug(`create node keys view - start`)
+    await SurveyRdbManager.createNodeKeysView(survey, tx)
+    this.incrementProcessedItems()
+    this.logDebug(`create node keys view - end`)
+
+    this.logDebug(`create node hierarchy disaggregated view - start`)
+    await SurveyRdbManager.createNodeHierarchyDisaggregatedView(survey, tx)
+    this.incrementProcessedItems()
+    this.logDebug(`create node hierarchy disaggregated view - end`)
+
+    this.logDebug(`create node keys hierarchy view - start`)
+    await SurveyRdbManager.createNodeKeysHierarchyView(survey, tx)
+    this.incrementProcessedItems()
+    this.logDebug(`create node keys hierarchy view - end`)
+
   }
 
   async fetchSurvey (tx) {

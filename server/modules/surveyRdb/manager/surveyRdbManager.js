@@ -17,7 +17,18 @@ import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewCreateRepository from '../repository/dataViewCreateRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
 
+// ==== DDL
+
+export const dropSchema = SchemaRdbRepository.dropSchema
+export const createSchema = SchemaRdbRepository.createSchema
+export const createTableAndView = DataViewCreateRepository.createTableAndView
+
+export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
+export { createNodeHierarchyDisaggregatedView }from '../repository/nodeHierarchyDisaggregatedViewRepository'
+export { createNodeKeysHierarchyView }from '../repository/nodeKeysHierarchyViewRepository'
+
 // ==== DML
+
 const _getQueryData = async (survey, cycle, nodeDefUuidTable, nodeDefUuidCols = []) => {
   const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
   return {
@@ -88,10 +99,6 @@ export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
   return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
-
-export const dropSchema = SchemaRdbRepository.dropSchema
-export const createSchema = SchemaRdbRepository.createSchema
-export const createTableAndView = DataViewCreateRepository.createTableAndView
 
 export const populateTable = DataTableInsertRepository.populateTable
 export const updateTable = DataTableUpdateRepository.updateTable

@@ -4,6 +4,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ColProps from './dataColProps'
 
 export const getNames = NodeDefTable.getColNames
+export const getName = NodeDefTable.getColName
 
 export const getNamesAndType = nodeDefCol =>
   getNames(nodeDefCol).map(col =>
