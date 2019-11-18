@@ -37,7 +37,7 @@ export default class TaxonomyImportManager {
     const taxonExisting = this.existingUuidAndVernacularNamesByCode[Taxon.getCode(taxon)]
     if (taxonExisting) {
       // update existing item
-      const taxonUpdated = Taxon.merge(taxon)(taxonExisting)
+      const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
       await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
     } else {
       // insert new one

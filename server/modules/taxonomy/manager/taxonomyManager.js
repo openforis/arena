@@ -26,7 +26,7 @@ export const insertTaxonomy = async (user, surveyId, taxonomy, system = false, c
       TaxonomyRepository.insertTaxonomy(surveyId, taxonomy),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)
     ])
-    return await validateTaxonomy(surveyId, [], taxonomyInserted)
+    return await validateTaxonomy(surveyId, [], taxonomyInserted, true, t)
   })
 
 export const insertTaxa = async (user, surveyId, taxa, client = db) =>
@@ -48,15 +48,15 @@ export const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validat
 
   return validate
     ? await Promise.all(
-      taxonomies.map(async taxonomy => await validateTaxonomy(surveyId, taxonomies, taxonomy, client))
+      taxonomies.map(async taxonomy => await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client))
     )
     : taxonomies
 }
 
 export const countTaxaByTaxonomyUuid = TaxonomyRepository.countTaxaByTaxonomyUuid
 
-const validateTaxonomy = async (surveyId, taxonomies = [], taxonomy, client = db) => {
-  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, Taxonomy.getUuid(taxonomy), client)
+const validateTaxonomy = async (surveyId, taxonomies = [], taxonomy, draft, client = db) => {
+  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, Taxonomy.getUuid(taxonomy), draft, client)
 
   return {
     ...taxonomy,
@@ -69,7 +69,7 @@ export const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false,
 
   if (validate) {
     const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
-    return await validateTaxonomy(surveyId, taxonomies, taxonomy, client)
+    return await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client)
   } else {
     return taxonomy
   }

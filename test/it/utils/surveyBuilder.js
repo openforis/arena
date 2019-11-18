@@ -13,6 +13,8 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 
+import { TaxonomyBuilder, TaxonBuilder } from './surveyBuilder/surveyBuilderTaxonomy'
+
 class NodeDefBuilder {
 
   constructor (name, type) {
@@ -35,37 +37,32 @@ class NodeDefBuilder {
   }
 
   applyIf (expr) {
-    this.props[NodeDef.propKeys.applicable] = [NodeDefExpression.createExpression(expr)]
-    return this
+    return this._setProp(NodeDef.propKeys.applicable, [NodeDefExpression.createExpression(expr)])
   }
 
   multiple () {
-    this.props[NodeDef.propKeys.multiple] = true
-    return this
+    return this._setProp(NodeDef.propKeys.multiple, true)
   }
 
   minCount (count) {
-    this.props[NodeDef.propKeys.validations] = R.pipe(
+    return this._setProp(NodeDef.propKeys.validations, R.pipe(
       NodeDef.getValidations,
       NodeDefValidations.assocMinCount(count)
-    )(this)
-    return this
+    )(this))
   }
 
   maxCount (count) {
-    this.props[NodeDef.propKeys.validations] = R.pipe(
+    return this._setProp(NodeDef.propKeys.validations, R.pipe(
       NodeDef.getValidations,
       NodeDefValidations.assocMaxCount(count)
-    )(this)
-    return this
+    )(this))
   }
 
   expressions (...expressions) {
-    this.props[NodeDef.propKeys.validations] = R.pipe(
+    return this._setProp(NodeDef.propKeys.validations, R.pipe(
       NodeDef.getValidations,
       NodeDefValidations.assocExpressions(expressions)
-    )(this)
-    return this
+    )(this))
   }
 }
 
@@ -101,8 +98,7 @@ class AttributeDefBuilder extends NodeDefBuilder {
   }
 
   readOnly () {
-    this.props[NodeDef.propKeys.readOnly] = true
-    return this
+    return this._setProp(NodeDef.propKeys.readOnly, true)
   }
 
   defaultValues (...defaultValues) {
@@ -138,6 +134,8 @@ class SurveyBuilder {
     this.label = 'DO NOT USE! Test'
     this.lang = 'en'
     this.rootDefBuilder = rootDefBuilder
+
+    this.taxonomyBuilders = []
   }
 
   build () {
@@ -148,6 +146,12 @@ class SurveyBuilder {
       Survey.assocNodeDefs(nodeDefs),
       s => Survey.assocDependencyGraph(Survey.buildDependencyGraph(s))(s)
     )(survey)
+  }
+
+  taxonomy (name, ...taxonBuilders) {
+    const taxonomyBuilder = new TaxonomyBuilder(name, ...taxonBuilders)
+    this.taxonomyBuilders.push(taxonomyBuilder)
+    return this
   }
 
   /**
@@ -162,11 +166,16 @@ class SurveyBuilder {
 
       const surveyId = Survey.getId(survey)
 
+      // node defs
       const { root } = Survey.getHierarchy(R.always, true)(surveyParam)
-
       await Survey.traverseHierarchyItem(root, async nodeDef =>
         await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
       )
+
+      // taxonomies
+      for (const taxonomyBuilder of this.taxonomyBuilders) {
+        await taxonomyBuilder.buildAndStore(this.user, surveyId, t)
+      }
 
       if (publish) {
         const publishJob = new SurveyPublishJob({ user: this.user, surveyId })
@@ -180,6 +189,9 @@ class SurveyBuilder {
   }
 }
 
+// ==== survey
 export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder)
 export const entity = (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders)
 export const attribute = (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)
+// ==== taxonomy
+export const taxon = (code, family, genus, scientificName, ...vernacularNames) => new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)

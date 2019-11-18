@@ -42,14 +42,12 @@ const _insertTaxon = async (surveyId, taxon, client = db) =>
 
 const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
   Object.entries(vernacularNames).map(([lang, vernacularName]) =>
-    client.one(
+    client.none(
       `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props_draft)
         VALUES ($1, $2, $3)
         ON CONFLICT (taxon_uuid, ((props||props_draft)->>'${TaxonVernacularName.keysProps.lang}')) DO
-         UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $3
-        RETURNING *`,
-      [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)],
-      record => dbTransformCallback(record, true, true)
+         UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $3`,
+      [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)]
     )
   )
 
