@@ -84,5 +84,5 @@ export const taxonPublishedUpdateVernacularNamesTest = async () => {
   // check that its props have been updated
   expect(TaxonVernacularName.getProps(vernacularNameReloaded)).to.deep.equal(TaxonVernacularName.getProps(vernacularNameUpdated), 'Vernacular name props have not been updated')
   // check that its uuid has not changed
-  expect(TaxonVernacularName.getUuid(vernacularNameReloaded)).to.not.equal(TaxonVernacularName.getUuid(vernacularNameOld), 'Vernacular name uuid changed')
+  expect(TaxonVernacularName.getUuid(vernacularNameReloaded)).to.equal(TaxonVernacularName.getUuid(vernacularNameOld), 'Vernacular name uuid changed')
 }
