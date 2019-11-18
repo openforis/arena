@@ -2,6 +2,7 @@
 
 .survey-form__node-def-edit-buttons {
   position: absolute;
+  top: 0;
   right: 0;
   background-color: rgba($grey, .9);
   padding: 0 .3rem;
@@ -10,6 +11,11 @@
   display: flex;
   font-size: .8rem;
   align-items: center;
+}
+
+.survey-form__node-def-page > .survey-form__node-def-edit-buttons {
+  position: sticky;
+  float: right;
 }
 
 .survey-form__node-def-edit-page-props {
