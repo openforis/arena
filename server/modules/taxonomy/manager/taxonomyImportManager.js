@@ -51,8 +51,6 @@ export default class TaxonomyImportManager {
   async finalizeImport () {
     const { user, surveyId } = this
 
-    await this.batchPersisterInsert.flush()
-
     //insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
       createPredefinedTaxa,

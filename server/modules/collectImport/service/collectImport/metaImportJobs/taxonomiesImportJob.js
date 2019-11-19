@@ -96,8 +96,6 @@ export default class TaxonomiesImportJob extends Job {
   async onHeaders (headers) {
     this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
 
-    console.log('====langCodes', this.vernacularLangCodes)
-
     this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomyCurrent, this.vernacularLangCodes, this.tx)
     await this.taxonomyImportManager.init()
 
