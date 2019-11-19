@@ -6,6 +6,7 @@ import * as Category from '@core/survey/category'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 const _getProcessingChainLabel = lang =>
   R.pipe(ActivityLog.getProcessingChainLabels, R.prop(lang))
@@ -56,4 +57,13 @@ export default {
     index: ActivityLog.getContentIndex(activityLog),
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog)
   }),
+
+  [ActivityLog.type.processingStepCalculationCreate]: (survey, i18n) => activityLog => {
+    const calculation = ActivityLog.getContent(activityLog)
+    return {
+      index: ProcessingStepCalculation.getIndex(calculation),
+      processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
+      stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
+    }
+  },
 }

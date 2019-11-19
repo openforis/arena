@@ -34,8 +34,18 @@ export const createProcessingStep = async (user, surveyId, processingChainUuid, 
 
 export const createProcessingStepCalculation = async (user, surveyId, processingStepUuid, index, client = db) =>
   await client.tx(async t => {
-    const calculationStep = await ProcessingStepCalculationRepository.insertCalculationStep(surveyId, processingStepUuid, index, t)
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCalculationCreate, calculationStep, false, t)
+    const [calculationStep, processingStep] = await Promise.all([
+      ProcessingStepCalculationRepository.insertCalculationStep(surveyId, processingStepUuid, index, t),
+      ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
+    ])
+    const logContent = {
+      ...calculationStep,
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep)
+    }
+    await ActivityLogRepository.insert(
+      user, surveyId, ActivityLog.type.processingStepCalculationCreate,
+      logContent, false, t
+    )
     return calculationStep
   })
 
