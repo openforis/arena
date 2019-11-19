@@ -11,7 +11,7 @@ import * as User from '@core/user/user'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 
-import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
+import * as SurveyUtils from './surveyUtils'
 
 import { TaxonomyBuilder, TaxonBuilder } from './surveyBuilder/surveyBuilderTaxonomy'
 
@@ -178,10 +178,7 @@ class SurveyBuilder {
       }
 
       if (publish) {
-        const publishJob = new SurveyPublishJob({ user: this.user, surveyId })
-        await publishJob.start(t)
-        if (publishJob.isFailed())
-          throw new Error(`Test survey buildAndStore failed: ${JSON.stringify(publishJob)}`)
+        await SurveyUtils.publishSurvey(this.user, surveyId, t)
       }
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, !publish, true, false, false, t)
       return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)

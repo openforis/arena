@@ -7,6 +7,7 @@ describe('Taxonomy test', () => {
   it('Taxa insert test', TaxonomyTests.taxaInsertTest)
   it('Taxon update test', TaxonomyTests.taxonUpdateTest)
   it('Taxon published update test', TaxonomyPublishedTests.taxonPublishedUpdateTest)
-  it('Taxon published updated vernacular name test', TaxonomyPublishedTests.taxonPublishedUpdateVernacularNamesTest)
+  it('Taxon published add vernacular name test', TaxonomyPublishedTests.taxonPublishedAddVernacularNameTest)
+  it('Taxon published updated vernacular name test', TaxonomyPublishedTests.taxonPublishedUpdateVernacularNameTest)
 })
 

@@ -55,7 +55,7 @@ export const taxonomyUpdateTest = async () => {
   const taxonomyNameUpdated = 'species_list_updated'
   await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, Taxonomy.keysProps.name, taxonomyNameUpdated)
 
-  const taxonomyUpdated = TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyNameUpdated)
+  const taxonomyUpdated = TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyNameUpdated, true)
   expect(taxonomyUpdated).to.be.not.undefined
 
   // restore original taxonomy name
@@ -90,7 +90,7 @@ export const taxaInsertTest = async () => {
 export const taxonUpdateTest = async () => {
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
-  const taxonomy = await TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyName)
+  const taxonomy = await TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyName, true)
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
   const taxonCode = 'ALB/GLA'
