@@ -24,7 +24,9 @@ CREATE TABLE
   CONSTRAINT taxon_taxonomy_fk FOREIGN KEY (taxonomy_uuid) REFERENCES taxonomy (uuid) ON DELETE CASCADE
 );
 
-CREATE INDEX taxon_taxonomy_idx ON taxon (taxonomy_uuid);
+CREATE INDEX
+taxon_taxonomy_idx
+ON taxon (taxonomy_uuid);
 
 CREATE TABLE
   taxon_vernacular_name
@@ -40,7 +42,9 @@ CREATE TABLE
   CONSTRAINT taxon_vernacular_name_taxon_fk FOREIGN KEY (taxon_uuid) REFERENCES taxon (uuid) ON DELETE CASCADE
 );
 
-CREATE INDEX taxon_vernacular_name_taxon_idx ON taxon (taxonomy_uuid);
+CREATE INDEX
+taxon_vernacular_name_taxon_idx
+ON taxon_vernacular_name (taxon_uuid);
 
 CREATE UNIQUE INDEX
 taxon_props_code_idx
