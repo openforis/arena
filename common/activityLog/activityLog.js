@@ -166,3 +166,5 @@ export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
 // content props analysis
 export const getContentLabels = _getContentProp(keysContent.labels)
+export const getContentIndexFrom = _getContentProp(keysContent.indexFrom)
+export const getContentIndexTo = _getContentProp(keysContent.indexTo)

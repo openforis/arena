@@ -66,4 +66,11 @@ export default {
       stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
     }
   },
+
+  [ActivityLog.type.processingStepCalculationIndexUpdate]: (survey, i18n) => activityLog => ({
+    indexFrom: ActivityLog.getContentIndexFrom(activityLog),
+    indexTo: ActivityLog.getContentIndexTo(activityLog),
+    processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
+    stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
+  }),
 }

@@ -260,6 +260,7 @@ export const enTranslation = {
       [ActivityLog.type.processingStepPropsUpdate]: 'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
       [ActivityLog.type.processingStepDelete]: 'deleted processing chain {{processingChainLabel}} step {{index}}',
       [ActivityLog.type.processingStepCalculationCreate]: 'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
+      [ActivityLog.type.processingStepCalculationIndexUpdate]: 'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
     }
   },
 
