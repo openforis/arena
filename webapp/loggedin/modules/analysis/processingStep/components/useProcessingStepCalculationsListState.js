@@ -14,7 +14,6 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
     const { currentTarget } = evt
     elementDragRef.current = currentTarget
     const placeholder = placeholderRef.current
-    const elementDrag = elementDragRef.current
 
     const { width, height } = elementOffset(currentTarget)
     placeholder.style.width = `${width}px`
