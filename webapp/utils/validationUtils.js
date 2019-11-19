@@ -34,8 +34,16 @@ export const getValidationFieldMessages = (i18n, showKeys = true) => validation 
   // extract invalid fields error messages
   Validation.getFieldValidations,
   Object.entries,
-  R.map(([field, fieldValidation]) => `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`),
-  // prepend validation error messages
+  entries => (function f (entries) {
+    return R.reduce((errorAcc, [field, fieldValidation]) => {
+      if (field !== 'childrenCount') {
+        return errorAcc.concat(`${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`)
+      }
+
+      const childFieldValidation = Object.values(fieldValidation.fields)
+      return childFieldValidation.reduce((prev, curr) => prev.concat(f(Object.entries(Validation.getFieldValidations(curr)))), errorAcc)
+    }, [])(entries)
+  })(entries),
   messages => R.pipe(
     getValidationErrorMessages(i18n),
     R.concat(messages)

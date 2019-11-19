@@ -1,140 +1,119 @@
-// // import './validationReportView.scss'
-
-// import TableView from '@webapp/loggedin/tableViews/tableView'
-
-// import React from 'react'
-// import { connect } from 'react-redux'
-
-// // import * as SurveyState from '@webapp/survey/surveyState'
-
-// const DataVisView = props => {
-//   // const { surveyCycleKey, resetDataVis } = props
-
-//   return (
-//     <div />
-//   )
-// }
-
-// const mapStateToProps = state => ({
-//   // surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-// })
-
-// export default connect(
-//   mapStateToProps,
-//   // { resetDataVis }
-// )(DataVisView)
-
-// import './userListView.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 
 import TableView from '@webapp/loggedin/tableViews/tableView'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
-import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 
-import { appModuleUri, userModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, dataModules } from '@webapp/loggedin/appModules'
 
-import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as RecordsState from '@webapp/loggedin/modules/data/records/recordsState'
 
-const UsersHeaderLeft = props => {
+import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
+
+import * as ValidationUtils from '@webapp/utils/validationUtils'
+
+const ValidationReportRowHeader = ({ nodeDefKeys }) => {
   const i18n = useI18n()
-  const { canInvite } = props
 
-  return (
-    <div>
-      {canInvite && (
-        <Link to={appModuleUri(userModules.user)} className="btn btn-s">
-          <span className="icon icon-user-plus icon-12px icon-left"/>
-          {i18n.t('usersView.inviteUser')}
-        </Link>
-      )}
-    </div>
-  )
-}
-
-const UsersRowHeader = () => {
-  const i18n = useI18n()
   return (
     <>
-      <div/>
-      <div>{i18n.t('common.name')}</div>
-      <div>{i18n.t('common.email')}</div>
-      <div>{i18n.t('common.group')}</div>
-      <div>{i18n.t('usersView.accepted')}</div>
+      <div>#</div>
+      { nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, i18n.lang)}</div>) }
+      <div>{i18n.t('common.path')}</div>
+      {/* <div>{i18n.t('common.type')}</div> */}
+      <div>{i18n.t('common.error')}</div>
     </>
   )
 }
 
-const UsersRow = props => {
-  // const { row: userListItem, user, surveyInfo } = props
-  // const i18n = useI18n()
+const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
+  const i18n = useI18n()
 
-  // const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userListItem)
-  // const canEditUser = Authorizer.canEditUser(user, surveyInfo, userListItem)
+  const path = row.keys_hierarchy.slice(1).reduce((path, h) => {
+    const parentNodeDef = Survey.getNodeDefByUuid(h.nodeDefUuid)(survey)
+    const parentNodeDefName = NodeDef.getLabel(parentNodeDef, i18n.lang)
+    const keyValues = Object.values(h.keys).reduce((values, value) => values.concat(value === null ? 'null' : value), [])
+
+    return path.concat(`${parentNodeDefName} (${keyValues.join(', ')})`)
+  }, [])
+
+  const lastNodeDef = Survey.getNodeDefByUuid(row.node_def_uuid)(survey)
+  path.push(NodeDef.getLabel(lastNodeDef, i18n.lang))
+
+  const errors = ValidationUtils.getValidationFieldMessagesHTML(i18n, false)(row.validation)
+
+  const hierarchyKeys = row.keys_hierarchy[0].keys
 
   return (
     <>
-      <div className="users-list__cell-profile-picture">
-        test
-        {/* <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail={true}/>
+      <div>
+        {idx + offset + 1}
+      </div>
+      {
+        nodeDefKeys.map((k, i) =>
+          // TODO fix hierarchyKeys = null
+          <div key={i}>{hierarchyKeys ? hierarchyKeys[Node.getUuid(k)] : ''}</div>
+        )
+      }
+      <div>
+        {path.join(' / ')}
       </div>
       <div>
-        {User.getName(userListItem)}
-      </div>
-      <div>
-        {User.getEmail(userListItem)}
-      </div>
-      <div>
-        {i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}
-      </div>
-      <div>
-        {
-          User.hasAccepted(userListItem) &&
-          <span className="icon icon-user-check icon-16px"/>
-        }
-      </div>
-      <div>
-        <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/> */}
+        {errors}
       </div>
     </>
   )
 }
 
-const ValidationReportView = ({ canInvite, user, surveyInfo, history }) => {
-  const onRowClick = user => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
+const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, history }) => {
+  useOnUpdate(() => {
+    reloadListItems('validationReport') // TODO
+  }, [surveyCycleKey])
+
+  const onRowClick = record => {
+    const parentNodeUuid = record.node_uuid
+    const recordUuid = record.uuid
+    const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+
+    history.push(recordEditUrl)
+  }
+
+  // const surveyInfo = Survey.getSurveyInfo(survey)
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
+  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
+
+  const noCols = nodeDefKeys.length
+  const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 200px 250px`
 
   return <TableView
     module={'validationReport'}
-    className="users-list"
-    gridTemplateColumns={'35px repeat(3, 1fr) 10rem 50px'}
-    headerLeftComponent={UsersHeaderLeft}
-    rowHeaderComponent={UsersRowHeader}
-    rowComponent={UsersRow}
+    gridTemplateColumns={gridTemplateColumns}
+    rowHeaderComponent={ValidationReportRowHeader}
+    rowComponent={ValidationReportRow}
+
+    nodeDefKeys={nodeDefKeys}
 
     canInvite={canInvite}
     user={user}
-    surveyInfo={surveyInfo}
+    survey={survey}
 
     onRowClick={onRowClick}
   />
 }
 
 const mapStateToProps = state => {
-  const user = AppState.getUser(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const survey = SurveyState.getSurvey(state)
 
   return {
-    user,
-    surveyInfo,
-    canInvite: Authorizer.canInviteUsers(user, surveyInfo),
+    survey,
+    nodeDefKeys: RecordsState.getNodeDefKeys(state),
+    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   }
 }
 
-export default connect(mapStateToProps)(ValidationReportView)
+export default connect(mapStateToProps, { reloadListItems })(ValidationReportView)

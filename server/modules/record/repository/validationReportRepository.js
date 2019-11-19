@@ -1,4 +1,3 @@
-// import * as R from 'ramda'
 // import * as camelize from 'camelize'
 
 import { db } from '@server/db/db'
@@ -10,6 +9,7 @@ import * as SchemaRdb from '../../../../common/surveyRdb/schemaRdb'
 
 const query = (surveyId, offset = 0, limit = null) =>
   `SELECT
+    r.uuid,
     k.key AS node_uuid,
     k.value AS validation,
     h.node_def_uuid,

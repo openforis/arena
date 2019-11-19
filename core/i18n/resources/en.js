@@ -47,6 +47,7 @@ export const enTranslation = {
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
     ok: 'Ok',
+    path: 'Path',
     required: 'Required',
     reset: 'Reset',
     save: 'Save',
@@ -181,7 +182,6 @@ export const enTranslation = {
       importFromCollect: 'Import from Collect',
     },
     collectImportReport: {
-      path: 'Path',
       expression: 'Expression',
       messages: 'Messages',
       resolved: 'Resolved',
