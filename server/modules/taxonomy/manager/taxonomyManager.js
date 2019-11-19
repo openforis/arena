@@ -153,6 +153,12 @@ export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, valu
     ]))[0]
   )
 
+export const updateTaxon = async (user, surveyId, taxon, client = db) =>
+  await client.tx(async t => await Promise.all([
+    TaxonomyRepository.updateTaxon(surveyId, taxon, t),
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonUpdate, taxon, true, t)
+  ]))
+
 export const updateTaxa = async (user, surveyId, taxa, client = db) =>
   await client.tx(async t => await Promise.all([
     TaxonomyRepository.updateTaxa(surveyId, taxa, t),
@@ -163,6 +169,7 @@ export const updateTaxa = async (user, surveyId, taxa, client = db) =>
       t
     )
   ]))
+
 // ============== DELETE
 
 export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) =>
@@ -178,8 +185,8 @@ export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) 
     ])
   })
 
-export const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, client = db) =>
-  await client.tx(async t => await Promise.all([
+export const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, t) =>
+  await Promise.all([
     TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
     ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { [ActivityLog.keysContent.uuid]: taxonomyUuid }, true, t)
-  ]))
+  ])

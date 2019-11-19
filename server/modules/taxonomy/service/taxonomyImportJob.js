@@ -4,7 +4,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job from '@server/job/job'
 
-import { languageCodes } from '@core/app/languages'
+import { languageCodesISO636_2 } from '@core/app/languages'
 import * as StringUtils from '@core/stringUtils'
 import * as CSVReader from '@server/utils/file/csvReader'
 
@@ -57,10 +57,8 @@ export default class TaxonomyImportJob extends Job {
 
     this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
-    if (Taxonomy.isPublished(this.taxonomy)) {
-
-    } else {
-      // 2b. delete old draft taxa (only if taxonomy is not published)
+    if (!Taxonomy.isPublished(this.taxonomy)) {
+      // 2. delete old draft taxa (only if taxonomy is not published)
       this.logDebug('delete old draft taxa')
       await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
     }
@@ -68,12 +66,13 @@ export default class TaxonomyImportJob extends Job {
     // 3. start CSV row parsing
     this.logDebug('start CSV file parsing')
 
-    this.csvReader = await (CSVReader.createReaderFromFile(
+    this.csvReader = CSVReader.createReaderFromFile(
       this.filePath,
       async headers => await this._onHeaders(headers),
       async row => await this._onRow(row),
       total => this.total = total
-    )).start()
+    )
+    await this.csvReader.start()
 
     this.logDebug(`CSV file processed, ${this.processed} rows processed`)
 
@@ -84,7 +83,7 @@ export default class TaxonomyImportJob extends Job {
         await this.setStatusFailed()
       } else {
         this.logDebug('no errors found, finalizing import')
-        await this.taxonomyImportManager.finalizeImport(this.taxonomy, tx)
+        await this.taxonomyImportManager.finalizeImport()
       }
     }
   }
@@ -99,7 +98,7 @@ export default class TaxonomyImportJob extends Job {
   async _onHeaders (headers) {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
-      this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, headers)
+      this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
       this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomy, this.vernacularLanguageCodes, this.tx)
       await this.taxonomyImportManager.init()
     } else {
@@ -113,7 +112,7 @@ export default class TaxonomyImportJob extends Job {
     const taxon = await this._parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
-      await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon, this.tx)
+      await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     } else {
       this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
@@ -121,6 +120,7 @@ export default class TaxonomyImportJob extends Job {
   }
 
   _validateHeaders (columns) {
+    this.logDebug('columns', columns)
     const missingColumns = R.difference(requiredColumns, columns)
     if (R.isEmpty(missingColumns)) {
       return true

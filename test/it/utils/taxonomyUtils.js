@@ -34,7 +34,7 @@ export const addVernacularNameToTaxon = async (user, surveyId, taxonomyName, tax
 
   // update taxon
   const taxonUpdated = await Taxon.assocVernacularName(lang, vernacularName)(taxon)
-  await TaxonomyManager.updateTaxa(user, surveyId, [taxonUpdated])
+  await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
 
   return { vernacularNameNew, vernacularNameOld }
 }

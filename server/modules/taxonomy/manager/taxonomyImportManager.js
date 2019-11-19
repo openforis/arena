@@ -24,13 +24,15 @@ export default class TaxonomyImportManager {
 
     this.batchPersisterInsert = new BatchPersister(async items => await TaxonomyManager.insertTaxa(this.user, this.surveyId, items, this.tx))
     this.batchPersisterUpdate = new BatchPersister(async items => await TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx))
-    this.insertedCodes = {} //cache of inserted taxa codes
-    this.existingUuidAndVernacularNamesByCode = null // existing taxon uuids and vernacular names (indexed by code)
+    this.insertedCodes = new Set() //inserted taxa codes
+    this.existingUuidAndVernacularNamesByCode = {} // existing taxon uuids and vernacular names (indexed by code)
   }
 
   async init () {
-    this.existingUuidAndVernacularNamesByCode = await TaxonomyManager.fetchTaxonUuidAndVernacularNamesByCode(
-      this.surveyId, Taxonomy.getUuid(this.taxonomy), true, this.tx) || {}
+    if (this.taxonomy && Taxonomy.isPublished(this.taxonomy)) //taxa deleted before import for draft taxonomies
+      this.existingUuidAndVernacularNamesByCode = await TaxonomyManager.fetchTaxonUuidAndVernacularNamesByCode(
+        this.surveyId, Taxonomy.getUuid(this.taxonomy), true, this.tx
+      )
   }
 
   async addTaxonToUpdateBuffer (taxon) {
@@ -43,7 +45,7 @@ export default class TaxonomyImportManager {
       // insert new one
       await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
     }
-    this.insertedCodes[Taxon.getCode(taxon)] = true
+    this.insertedCodes.add(Taxon.getCode(taxon))
   }
 
   async finalizeImport () {
@@ -54,7 +56,7 @@ export default class TaxonomyImportManager {
     //insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
       createPredefinedTaxa,
-      R.filter(taxon => !this.insertedCodes[Taxon.getCode(taxon)])
+      R.filter(taxon => !this.insertedCodes.has(Taxon.getCode(taxon)))
     )(this.taxonomy)
 
     for (const predefinedTaxon of predefinedTaxaToInsert) {
