@@ -24,4 +24,4 @@ script:
       # Handle infrastructure changes now if we got this far:
       curl -fsSL https://get.pulumi.com/ | sh
       export PATH=$PATH:$HOME/.pulumi/bin
-      ./infra/travis_${TRAVIS_EVENT_TYPE}.sh
+      infra/travis_${TRAVIS_EVENT_TYPE}.sh
