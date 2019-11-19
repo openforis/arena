@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -7,13 +7,18 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import useI18n from '@webapp/commonComponents/hooks/useI18n'
 import ProcessingStepCalculationsListItem from './processingStepCalculationsListItem'
 
-import { createProcessingStepCalculation } from '../actions'
+import useProcessingStepCalculationsListState from './useProcessingStepCalculationsListState'
+
+import { createProcessingStepCalculation, putProcessingStepCalculationIndex } from '../actions'
 
 const ProcessingStepCalculationsList = props => {
   const {
     processingStep, calculationEditorOpened,
-    createProcessingStepCalculation
+    createProcessingStepCalculation, putProcessingStepCalculationIndex
   } = props
+
+  const placeholderRef = useRef(null)
+  const { dragging, onDragStart, onDragEnd, onDragOver } = useProcessingStepCalculationsListState(placeholderRef, putProcessingStepCalculationIndex)
 
   const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
   const i18n = useI18n()
@@ -36,11 +41,21 @@ const ProcessingStepCalculationsList = props => {
         {
           calculationSteps.map(calculation => (
             <ProcessingStepCalculationsListItem
-              key={ProcessingStepCalculation.getIndex(calculation)}
+              key={ProcessingStepCalculation.getUuid(calculation)}
               calculation={calculation}
+              dragging={dragging}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              onDragOver={onDragOver}
             />
           ))
         }
+
+        <div className="processing-step__calculation placeholder" ref={placeholderRef}>
+          <div className="processing-step__calculation-index"/>
+          <div className="processing-step__calculation-content"/>
+        </div>
+
       </div>
     </div>
   )
@@ -50,4 +65,7 @@ ProcessingStepCalculationsList.defaultProps = {
   processingStep: null
 }
 
-export default connect(null, { createProcessingStepCalculation })(ProcessingStepCalculationsList)
+export default connect(
+  null,
+  { createProcessingStepCalculation, putProcessingStepCalculationIndex }
+)(ProcessingStepCalculationsList)

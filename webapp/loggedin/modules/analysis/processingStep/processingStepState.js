@@ -69,3 +69,17 @@ export const assocCalculation = calculation => R.pipe(
   _updateProcessingStep(ProcessingStep.assocCalculation(calculation)),
   assocCalculationIndexForEdit(ProcessingStepCalculation.getIndex(calculation))
 )
+
+export const updateCalculationIndex = (indexFrom, indexTo) => processingStepState => R.pipe(
+  R.prop(keys.step),
+  ProcessingStep.getCalculationSteps,
+  R.move(indexFrom, indexTo),
+  calculations => {
+    const calculationsUpdate = calculations.map((calculation, idx) =>
+      ProcessingStepCalculation.assocIndex(idx)(calculation)
+    )
+    return _updateProcessingStep(
+      ProcessingStep.assocCalculations(calculationsUpdate)
+    )(processingStepState)
+  }
+)(processingStepState)

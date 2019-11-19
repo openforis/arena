@@ -17,15 +17,26 @@ const ProcessingStepCalculationsListItem = props => {
 
   const {
     calculation, calculationForEdit, nodeDef, lang,
+    dragging, onDragStart, onDragEnd, onDragOver,
     setProcessingStepCalculationForEdit,
   } = props
 
-  const className = `processing-step__calculation${ProcessingStepCalculation.isEqual(calculationForEdit)(calculation) ? ' editing' : ''}`
+  let className = 'processing-step__calculation'
+  className += ProcessingStepCalculation.isEqual(calculationForEdit)(calculation) ? ' editing' : ''
+  className += dragging ? ' dragging' : ''
+
+  const index = ProcessingStepCalculation.getIndex(calculation)
+
   return (
-    <div className={className}>
+    <div className={className}
+         draggable={true}
+         onDragStart={onDragStart}
+         onDragOver={onDragOver}
+         onDragEnd={onDragEnd}
+         data-index={index}>
 
       <div className="processing-step__calculation-index">
-        {ProcessingStepCalculation.getIndex(calculation) + 1}
+        {index + 1}
       </div>
 
       <div className="processing-step__calculation-content"

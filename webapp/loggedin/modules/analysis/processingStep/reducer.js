@@ -7,6 +7,7 @@ import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions
 import {
   processingStepCalculationCreate,
   processingStepCalculationIndexForEditUpdate,
+  processingStepCalculationIndexUpdate,
   processingStepPropsUpdate,
   processingStepUpdate,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
@@ -23,6 +24,7 @@ const actionHandlers = {
 
   [processingStepCalculationCreate]: (state, { calculation }) => ProcessingStepState.assocCalculation(calculation)(state),
   [processingStepCalculationIndexForEditUpdate]: (state, { index }) => ProcessingStepState.assocCalculationIndexForEdit(index)(state),
+  [processingStepCalculationIndexUpdate]: (state, { indexFrom, indexTo }) => ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
 }
 
 export default exportReducer(actionHandlers)

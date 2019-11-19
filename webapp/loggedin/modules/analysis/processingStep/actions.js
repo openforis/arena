@@ -17,6 +17,7 @@ export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
 export const processingStepCalculationIndexForEditUpdate = 'analysis/processingStep/calculation/edit'
+export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
 
 export const resetProcessingStepState = () => dispatch =>
   dispatch({ type: processingStepUpdate, processingStep: {}, processingStepPrev: null, processingStepNext: null })
@@ -77,6 +78,10 @@ export const putProcessingStepProps = props => async (dispatch, getState) => {
     dispatch(hideAppSaving())
   }
   dispatch(debounceAction(action, `${processingStepPropsUpdate}_${processingStepUuid}`))
+}
+
+export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async dispatch => {
+  dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
 }
 
 // ====== DELETE
