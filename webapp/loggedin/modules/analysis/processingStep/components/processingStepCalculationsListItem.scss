@@ -1,0 +1,22 @@
+@import "~@webapp/style/vars";
+
+.processing-step__calculation-index {
+  transition: all 300ms ease;
+}
+
+.processing-step__calculation.editing {
+  .processing-step__calculation-index {
+    background-color: $yellow;
+  }
+
+}
+
+.processing-step.calculation-editor-opened {
+  .processing-step__calculation-content {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: .85rem;
+    padding: 0 5px;
+  }
+}

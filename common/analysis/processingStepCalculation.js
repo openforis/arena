@@ -28,3 +28,4 @@ export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
+export const isEqual = ObjectUtils.isEqual

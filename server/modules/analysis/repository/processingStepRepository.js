@@ -44,9 +44,30 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
 
 export const fetchStepByUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.one(`
-    SELECT *
-    FROM ${getSurveyDBSchema(surveyId)}.processing_step
-    WHERE uuid = $1
+    SELECT
+        s.*,
+        COALESCE(
+          jsonb_agg(
+              json_build_object(
+                'uuid', c.uuid,
+                'index', c.index, 
+                'node_def_uuid', c.node_def_uuid,
+                'props', c.props
+              )
+              ORDER BY c.index
+          ) FILTER (WHERE c.uuid IS NOT NULL),
+          '[]'
+        ) AS calculation_steps
+    FROM
+        ${getSurveyDBSchema(surveyId)}.processing_step s
+    LEFT OUTER JOIN
+        ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+    ON
+        s.uuid = c.processing_step_uuid
+    WHERE
+        s.uuid = $1
+    GROUP BY
+        s.uuid
     `,
     [processingStepUuid],
     camelize

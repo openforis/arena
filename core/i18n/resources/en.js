@@ -320,6 +320,7 @@ export const enTranslation = {
     deleteConfirm: 'Delete this processing step?\n$t(common.cantUndoWarning)',
     deleteComplete: 'Processing step deleted',
     category: 'Category',
+    calculationSteps: 'Calculation Steps',
   },
 
   itemsTable: {
