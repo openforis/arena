@@ -17,7 +17,6 @@ const ProcessingStepCalculationsListItem = props => {
 
   const {
     calculation, calculationForEdit, nodeDef, lang,
-    calculationEditorOpened,
     setProcessingStepCalculationForEdit,
   } = props
 

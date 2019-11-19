@@ -38,7 +38,6 @@ const ProcessingStepCalculationsList = props => {
             <ProcessingStepCalculationsListItem
               key={ProcessingStepCalculation.getIndex(calculation)}
               calculation={calculation}
-              calculationEditorOpened={calculationEditorOpened}
             />
           ))
         }
