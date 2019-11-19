@@ -1,13 +1,13 @@
 secretsprovider: awskms://alias/ArenaTestConfigKey?region=eu-west-1
 encryptedkey: AQICAHhHQgX8T0AokjpKbfWomgKg1y1rSiVzR18p1LNYLukaIwE60UB2fr7PciroupBREVBEAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMpApUs+JQn7t2wsm2AgEQgDveI40Z7cXqN/oNJvI33unXI1+Q7NOK9xFHYTbnRURJN00LDrm5HGESKRiq72E1K4YhgqLzCij9UR4wZQ==
 config:
-  arena-test:adminEmail:
+  arena:adminEmail:
     secure: v1:nklk7+QQKEDDA2Pc:+ILaTfLjBP0UaIabK9AXdTJiWHitEldtXtTBgLVpIYgzAtRlpntYI+TVeEZgYg==
-  arena-test:certificateArn: arn:aws:acm:eu-west-1:407725983764:certificate/57402190-04d0-4f65-aea0-abd4225cf109
-  arena-test:cognitoClientId:
+  arena:certificateArn: arn:aws:acm:eu-west-1:407725983764:certificate/57402190-04d0-4f65-aea0-abd4225cf109
+  arena:cognitoClientId:
     secure: v1:iaLm+yfVMOPwr6B/:VpyYP+ZnpnfqM/ibNPwUchCxKorjMzodFDq/zu9y+Okg4FHkmx9R+3+6
-  arena-test:cognitoUserPoolArn: arn:aws:cognito-idp:eu-west-1:407725983764:userpool/eu-west-1_O3oNqhz5A
-  arena-test:sendgridApiKey:
+  arena:cognitoUserPoolArn: arn:aws:cognito-idp:eu-west-1:407725983764:userpool/eu-west-1_O3oNqhz5A
+  arena:sendgridApiKey:
     secure: v1:1P8eUpEzTlIG6Moz:9ZJTpRo8DUbxJlaaJaROAWaPI7+tA0VOrOhJaFuAsGoKbGjvptY3UycwJ5isGH4Cd5+l6tLTAbeqxdnf8qtfJLLFEpvpkLvMH/lvIeGL3qaUlilC5g==
-  arena-test:targetDomain: test.openforis-arena.org
+  arena:targetDomain: test.openforis-arena.org
   aws:region: eu-west-1

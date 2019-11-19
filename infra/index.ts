@@ -9,7 +9,7 @@ const isProduction = name !== 'arena-test';
 // Store the non-references resources here so they don't look like they're never used.
 const results: { [k: string]: Object } = {};
 
-const pulumiConfig = new pulumi.Config(name);
+const pulumiConfig = new pulumi.Config();
 
 const certificateArn = pulumiConfig.require('certificateArn');
 const cognitoUserPoolArn = pulumiConfig.require('cognitoUserPoolArn');
