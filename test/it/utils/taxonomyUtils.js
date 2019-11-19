@@ -30,7 +30,7 @@ export const addVernacularNameToTaxon = async (user, surveyId, taxonomyName, tax
   // create new vernacular name or updated existing one
   const vernacularNameNew = TaxonVernacularName.newTaxonVernacularName(lang, name)
   const vernacularNameOld = Taxon.getVernacularNameByLang(lang)(taxon)
-  const vernacularName = vernacularNameOld ? TaxonVernacularName.merge(vernacularNameNew)(vernacularNameOld) : vernacularNameNew
+  const vernacularName = vernacularNameOld ? TaxonVernacularName.mergeProps(vernacularNameNew)(vernacularNameOld) : vernacularNameNew
 
   // update taxon
   const taxonUpdated = await Taxon.assocVernacularName(lang, vernacularName)(taxon)

@@ -26,7 +26,7 @@ export const getProps = ObjectUtils.getProps
 export const getName = ObjectUtils.getProp(keysProps.name)
 
 // ===== UTILS
-export const merge = vernacularNameNew => vernacularName => ({
+export const mergeProps = vernacularNameNew => vernacularName => ({
   ...vernacularName,
   [keys.props]: {
     ...getProps(vernacularName),

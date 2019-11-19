@@ -70,7 +70,7 @@ export const mergeProps = taxonNew => taxon => {
     (accVernacularNames, [lang, vernacularName]) => {
       const vernacularNameExisting = getVernacularNameByLang(lang)(taxon)
       if (vernacularNameExisting) {
-        accVernacularNames[lang] = TaxonVernacularName.merge(vernacularName)(vernacularNameExisting)
+        accVernacularNames[lang] = TaxonVernacularName.mergeProps(vernacularName)(vernacularNameExisting)
       } else {
         accVernacularNames[lang] = vernacularName
       }
