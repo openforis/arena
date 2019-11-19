@@ -58,7 +58,13 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         if (onHeaders) {
           (async () => {
             processingHeaders = true
-            await onHeaders(headers)
+            try {
+              await onHeaders(headers)
+            } catch (e) {
+              cancel()
+              reject(e)
+              return
+            }
             processingHeaders = false
             if (!processingRow && !queue.isEmpty())
               await processNext()
