@@ -139,7 +139,7 @@ export const init = app => {
     }
   })
 
-  //====== UPDATE - Step
+  //====== UPDATE - Processing Step
 
   app.put('/survey/:surveyId/processing-step/:processingStepUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
@@ -147,6 +147,19 @@ export const init = app => {
       const user = Request.getUser(req)
 
       await ProcessingChainService.updateStepProps(user, surveyId, processingStepUuid, props)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.put('/survey/:surveyId/processing-step/:processingStepUuid/calculation-index', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingStepUuid, indexFrom, indexTo } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await ProcessingChainService.updateStepCalculationIndex(user, surveyId, processingStepUuid, indexFrom, indexTo)
 
       Response.sendOk(res)
     } catch (err) {

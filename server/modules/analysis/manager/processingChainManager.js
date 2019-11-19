@@ -6,6 +6,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
@@ -57,7 +58,7 @@ export const updateChainProp = async (user, surveyId, processingChainUuid, key, 
     )
   ]))
 
-// ====== UPDATE - Step
+// ====== UPDATE - Processing Step
 
 export const updateStepProps = async (user, surveyId, processingStepUuid, props, client = db) =>
   await client.tx(async t => {
@@ -69,6 +70,23 @@ export const updateStepProps = async (user, surveyId, processingStepUuid, props,
     }
     await ActivityLogRepository.insert(
       user, surveyId, ActivityLog.type.processingStepPropsUpdate, logContent, false, t)
+  })
+
+export const updateStepCalculationIndex = async (user, surveyId, processingStepUuid, indexFrom, indexTo, client = db) =>
+  await client.tx(async t => {
+    const calculation = await ProcessingStepCalculationRepository.updateCalculationIndex(surveyId, processingStepUuid, indexFrom, indexTo, t)
+    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: ProcessingStepCalculation.getUuid(calculation),
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
+      [ActivityLog.keysContent.processingStepUuid]: ProcessingStep.getUuid(processingStep),
+      [ActivityLog.keysContent.indexFrom]: indexFrom,
+      [ActivityLog.keysContent.indexTo]: indexTo,
+    }
+    await ActivityLogRepository.insert(
+      user, surveyId, ActivityLog.type.processingStepCalculationIndexUpdate,
+      logContent, false, t
+    )
   })
 
 // ====== DELETE - Chain

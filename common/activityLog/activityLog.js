@@ -58,6 +58,7 @@ export const type = {
   processingStepPropsUpdate: 'processingStepPropsUpdate',
   processingStepDelete: 'processingStepDelete',
   processingStepCalculationCreate: 'processingStepCalculationCreate',
+  processingStepCalculationIndexUpdate: 'processingStepCalculationIndexUpdate',
 }
 
 export const keys = {
@@ -107,6 +108,9 @@ export const keysContent = {
   //analysis
   labels: 'labels',
   processingChainUuid: 'processingChainUuid',
+  processingStepUuid: 'processingStepUuid',
+  indexFrom: 'indexFrom',
+  indexTo: 'indexTo',
 }
 
 // ====== CREATE

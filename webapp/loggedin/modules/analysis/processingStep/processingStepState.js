@@ -11,7 +11,7 @@ const keys = {
   step: 'step',
   stepPrev: 'stepPrev',
   stepNext: 'stepNext',
-  calculationIndexForEdit: 'calculationIndexForEdit',
+  calculationUuidForEdit: 'calculationIndexForEdit',
 }
 
 // ====== READ
@@ -34,13 +34,13 @@ export const getProcessingStepNext = _getStep(keys.stepNext)
 
 export const getProcessingStepCalculationForEdit = state => R.pipe(
   getState,
-  R.propOr(null, keys.calculationIndexForEdit),
+  R.propOr(null, keys.calculationUuidForEdit),
   R.unless(
     R.isNil,
-    idx => R.pipe(
+    uuid => R.pipe(
       getProcessingStep,
       ProcessingStep.getCalculationSteps,
-      R.prop(idx)
+      R.find(R.propEq(ProcessingStepCalculation.keys.uuid, uuid))
     )(state)
   )
 )(state)
@@ -63,11 +63,11 @@ export const mergeProcessingStepProps = props => _updateProcessingStep(
   ProcessingStep.mergeProps(props),
 )
 
-export const assocCalculationIndexForEdit = R.assoc(keys.calculationIndexForEdit)
+export const assocCalculationUuidForEdit = R.assoc(keys.calculationUuidForEdit)
 
 export const assocCalculation = calculation => R.pipe(
   _updateProcessingStep(ProcessingStep.assocCalculation(calculation)),
-  assocCalculationIndexForEdit(ProcessingStepCalculation.getIndex(calculation))
+  assocCalculationUuidForEdit(ProcessingStepCalculation.getUuid(calculation))
 )
 
 export const updateCalculationIndex = (indexFrom, indexTo) => processingStepState => R.pipe(
