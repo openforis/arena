@@ -181,33 +181,19 @@ export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = fal
   return R.head(taxa)
 }
 
-const findTaxaByPropLike = async (surveyId,
-                                  taxonomyUuid,
-                                  filterProp,
-                                  filterValue,
-                                  draft = false,
-                                  client = db) => {
+const findTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, client = db) => {
   const searchValue = toSearchValue(filterValue)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(filterProp, draft) : ''
   return await findTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, filterProp, draft, client)
 }
 
-export const findTaxaByCode = async (surveyId,
-                                     taxonomyUuid,
-                                     filterValue,
-                                     draft = false,
-                                     client = db) =>
+export const findTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
   await findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, `${filterValue}*`, draft, client)
 
-export const findTaxaByScientificName = async (surveyId,
-                                               taxonomyUuid,
-                                               filterValue,
-                                               draft = false,
-                                               client = db) =>
+export const findTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
   await findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.scientificName, `*${filterValue}*`, draft, client)
 
 export const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
-
   const searchValue = toSearchValue(`*${filterValue}*`)
   const whereCondition = `
     ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
@@ -218,11 +204,7 @@ export const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, fil
   return await findTaxaByCondition(surveyId, taxonomyUuid, whereCondition, searchValue, Taxon.propKeys.scientificName, draft, client)
 }
 
-export const findTaxaByVernacularName = async (surveyId,
-                                               taxonomyUuid,
-                                               filterValue,
-                                               draft = false,
-                                               client = db) => {
+export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
   const searchValue = toSearchValue(`*${filterValue}*`)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(TaxonVernacularName.keysProps.name, draft, 'vn.') : ''
 
