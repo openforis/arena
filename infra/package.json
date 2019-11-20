@@ -1,0 +1,13 @@
+{
+    "license": "MIT",
+    "name": "arena-infra",
+    "devDependencies": {
+        "@types/node": "^8.0.0"
+    },
+    "dependencies": {
+        "@pulumi/aws": "^1.0.0",
+        "@pulumi/awsx": "^0.18.10",
+        "@pulumi/pulumi": "^1.0.0",
+        "@pulumi/random": "^1.2.0"
+    }
+}
