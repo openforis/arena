@@ -1,9 +1,10 @@
 import './nodeDefEditButtons.scss'
 
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -20,17 +21,28 @@ const NodeDefEditButtons = (props) => {
     putNodeDefLayoutProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
+  const elementRef = useRef(null)
+  const [style, setStyle] = useState({})
+
   const i18n = useI18n()
 
+  useEffect(() => {
+    const { parentNode } = elementRef.current
+    if (parentNode.classList.contains('survey-form__node-def-page')) {
+      const { top } = elementOffset(parentNode)
+      setStyle({ position: 'fixed', top: `${top}px`, right: `25px` })
+    }
+  }, [])
+
   return edit && canEditDef && (
-    <div className="survey-form__node-def-edit-buttons">
+    <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
 
       {
         NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) &&
         <div className="survey-form__node-def-edit-page-props">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
-                 type="number" min="1" max="12"
+                 type="number" min="1" max="12" step="1"
                  onChange={e => e.target.value > 0 ?
                    putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
                    : null
