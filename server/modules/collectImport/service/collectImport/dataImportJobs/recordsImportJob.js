@@ -268,9 +268,7 @@ export default class RecordsImportJob extends Job {
       Node.getRecordUuid(node),
       Node.getParentUuid(node),
       NodeDef.getUuid(nodeDef),
-      value === null || (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isCoordinate(nodeDef) || NodeDef.isFile(nodeDef))
-        ? value
-        : JSON.stringify(value),
+      JSON.stringify(value),
       {
         ...Node.getMeta(node),
         [Node.metaKeys.childApplicability]: {}
