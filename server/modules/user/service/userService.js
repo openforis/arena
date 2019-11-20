@@ -104,23 +104,27 @@ export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
 // ====== UPDATE
 
 export const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId)
-  const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-  const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
-
-  if (AuthGroup.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
-    throw new UnauthorizedError(User.getName(user))
-  }
-
-  // Check if email has changed
   const oldEmail = User.getEmail(userToUpdate)
   const oldName = User.getName(userToUpdate)
-  if (oldEmail !== email) {
-    // Throw exception if user is not allowed to edit the email
-    const canEditEmail = Authorizer.canEditUserEmail(user, Survey.getSurveyInfo(survey), userToUpdate)
-    if (!canEditEmail) {
+
+  // if not surveyId, user is updating him/her self
+  if (surveyId) {
+    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
+
+    if (AuthGroup.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
       throw new UnauthorizedError(User.getName(user))
+    }
+
+    // Check if email has changed
+    if (oldEmail !== email) {
+      // Throw exception if user is not allowed to edit the email
+      const canEditEmail = Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate)
+      if (!canEditEmail) {
+        throw new UnauthorizedError(User.getName(user))
+      }
     }
   }
   await aws.updateUser(oldEmail, oldEmail !== email ? email : null, oldName !== name ? name : null)
