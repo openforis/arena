@@ -32,7 +32,7 @@ const NodeDefEntityFormGrid = props => {
   }
 
   const columns = NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)
-  const rdgLayout = JSON.parse(JSON.stringify(NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)))
+  const rdgLayout = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
   const innerPageChildren = NodeDefLayout.rejectNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   return innerPageChildren.length > 0

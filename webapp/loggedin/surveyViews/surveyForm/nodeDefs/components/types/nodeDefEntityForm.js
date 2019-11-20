@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 
@@ -12,10 +12,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
-import * as SurveyFormState from '../../../../surveyForm/surveyFormState'
-import * as RecordState from '../../../../record/recordState'
+import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
+import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
-import { setFormPageNode, getNodeKeyLabelValues } from '../../../../surveyForm/actions'
+import { setFormPageNode, getNodeKeyLabelValues } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 
 const NodeDefEntityForm = props => {
 
