@@ -21,20 +21,23 @@ const NodeDefEditButtons = (props) => {
     putNodeDefLayoutProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
+  const show = edit && canEditDef
   const elementRef = useRef(null)
   const [style, setStyle] = useState({})
 
   const i18n = useI18n()
 
   useEffect(() => {
-    const { parentNode } = elementRef.current
-    if (parentNode.classList.contains('survey-form__node-def-page')) {
-      const { top } = elementOffset(parentNode)
-      setStyle({ position: 'fixed', top: `${top}px`, right: `25px` })
+    if (show) {
+      const { parentNode } = elementRef.current
+      if (parentNode.classList.contains('survey-form__node-def-page')) {
+        const { top } = elementOffset(parentNode)
+        setStyle({ position: 'fixed', top: `${top}px`, right: `25px` })
+      }
     }
   }, [])
 
-  return edit && canEditDef && (
+  return show && (
     <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
 
       {
