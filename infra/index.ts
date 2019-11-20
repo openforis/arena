@@ -158,7 +158,8 @@ results.ecsService = new awsx.ecs.FargateService(`${name}-service`, {
                     extraOptions: ['--target=prod'],
                 }),
                 environment,
-                memory: 512,
+                // 512MB is too definitely too little for heavy things like Collect import jobs.
+                memory: 1024,
                 cpu: 512,
             },
             arena_web: {
