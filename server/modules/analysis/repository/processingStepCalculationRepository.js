@@ -24,51 +24,31 @@ export const updateCalculationIndex = async (surveyId, processingStepUuid, index
   const indexPlaceholder = -1
   const queries = []
 
-  // set index placeholder for element being edited
-  queries.push(client.one(`
+  const _getUpdate = (indexCurrent, indexUpdate) => client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-    SET index = $3
+    SET index = ${indexUpdate}
     WHERE processing_step_uuid = $1
     AND index = $2
-    RETURNING uuid
+    RETURNING *
     `,
-    [processingStepUuid, indexFrom, indexPlaceholder]
-  ))
+    [processingStepUuid, indexCurrent]
+  )
+
+  // set index placeholder for element being edited
+  queries.push(_getUpdate(indexFrom, indexPlaceholder))
 
   // decrement previous calculations (element is moved forward)
   for (let i = indexFrom + 1; i <= indexTo; i++) {
-    queries.push(client.query(`
-      UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-      SET index = index - 1
-      WHERE processing_step_uuid = $1
-      AND index = $2
-    `,
-      [processingStepUuid, i]
-    ))
+    queries.push(_getUpdate(i, `index - 1`))
   }
 
   // increment next calculations (element is moved backward)
   for (let i = indexFrom - 1; i >= indexTo; i--) {
-    queries.push(client.query(`
-      UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-      SET index = index + 1
-      WHERE processing_step_uuid = $1
-      AND index = $2
-    `,
-      [processingStepUuid, i]
-    ))
+    queries.push(_getUpdate(i, `index + 1`))
   }
 
   // set index for element being edited
-  queries.push(client.one(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-    SET index = $3
-    WHERE processing_step_uuid = $1
-    AND index = $2
-    RETURNING *
-  `,
-    [processingStepUuid, indexPlaceholder, indexTo]
-  ))
+  queries.push(_getUpdate(indexPlaceholder, indexTo))
 
   const queriesRes = await client.batch(queries)
 
