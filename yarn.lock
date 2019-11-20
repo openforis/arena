@@ -2594,9 +2594,9 @@ d3-axis@1:
   integrity sha512-ejINPfPSNdGFKEOAtnBtdkpr24c4d4jsei6Lg98mxf424ivoDP2956/5HDpIAtmHo85lqT4pruy+zEgvRUBqaQ==
 
 d3-brush@1:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/d3-brush/-/d3-brush-1.1.4.tgz#a457887f558eb094b07d3db5c633facac6bd4cc4"
-  integrity sha512-DRcFXGcVZiJF644i78m/HM8P0U19hWYRFcAnacOVGvpOpzkqGm3H0EAoAH6jwyY/lqfH49d+5vz2TgznP/zlMA==
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/d3-brush/-/d3-brush-1.1.5.tgz#066b8e84d17b192986030446c97c0fba7e1bacdc"
+  integrity sha512-rEaJ5gHlgLxXugWjIkolTA0OyMvw8UWU1imYXy1v642XyyswmI1ybKOv05Ft+ewq+TFmdliD3VuK0pRp1VT/5A==
   dependencies:
     d3-dispatch "1"
     d3-drag "1"
@@ -2810,9 +2810,9 @@ d3-zoom@1:
     d3-transition "1"
 
 d3@^5.14.1:
-  version "5.14.1"
-  resolved "https://registry.yarnpkg.com/d3/-/d3-5.14.1.tgz#42e2a5728f8043ccbe67a82d5b09365c4db768b4"
-  integrity sha512-x5VpyP/IS8DP8zePZtcoXmILmM3+YeF4mbvhH6bHICQPPuPYgfcxuGsZZBTh8+e2w9L/5myX76IVxWcPdizNxg==
+  version "5.14.2"
+  resolved "https://registry.yarnpkg.com/d3/-/d3-5.14.2.tgz#a3fb3af016d362aaf4dacbe618ae949c1744b8c4"
+  integrity sha512-Ccipa9XrYW5N0QkP6u0Qb8kU6WekIXBiDenmZm1zLvuq/9pBBhRCJLCICEOsH5Og4B0Xw02bhqGkK5VN/oPH0w==
   dependencies:
     d3-array "1"
     d3-axis "1"
@@ -7306,7 +7306,7 @@ prompt@^1.0.0:
     utile "0.3.x"
     winston "2.1.x"
 
-prop-types@15.x, prop-types@^15.0.0, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@15.x, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -7495,7 +7495,15 @@ react-dom@^16.12.0:
     prop-types "^15.6.2"
     scheduler "^0.18.0"
 
-react-draggable@^4.0.0, react-draggable@^4.0.3, react-draggable@^4.1.0:
+react-draggable@3.x:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-3.3.2.tgz#966ef1d90f2387af3c2d8bd3516f601ea42ca359"
+  integrity sha512-oaz8a6enjbPtx5qb0oDWxtDNuybOylvto1QLydsXgKmwT7e3GXC2eMVDwEMIUYJIFqVG72XpOv673UuuAq6LhA==
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+
+react-draggable@^4.0.3, react-draggable@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.1.0.tgz#e1c5b774001e32f0bff397254e1e9d5448ac92a4"
   integrity sha512-Or/qe70cfymshqoC8Lsp0ukTzijJObehb7Vfl7tb5JRxoV+b6PDkOGoqYaWBzZ59k9dH/bwraLGsnlW78/3vrA==
@@ -7503,16 +7511,16 @@ react-draggable@^4.0.0, react-draggable@^4.0.3, react-draggable@^4.1.0:
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
-react-grid-layout@^0.17.1:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/react-grid-layout/-/react-grid-layout-0.17.1.tgz#0b75c72e5b7d7085f0f0054e160b31298971c5e2"
-  integrity sha512-L+wHFevK+klKvoAHuHn4Q5qHtrW+4zCj0F3QnpR7wZbkZPmrdaWC7cztFLXwINq6WnOWGE22BCTCDCHJi7dVDw==
+react-grid-layout@^0.16.6:
+  version "0.16.6"
+  resolved "https://registry.yarnpkg.com/react-grid-layout/-/react-grid-layout-0.16.6.tgz#9b2407a2b946c2260ebaf66f13b556e1da4efeb2"
+  integrity sha512-h2EsYgsqcESLJeevQSJsEKp8hhh+phOlXDJoMhlV2e7T3VWQL+S6iCF3iD/LK19r4oyRyOMDEir0KV+eLXrAyw==
   dependencies:
     classnames "2.x"
     lodash.isequal "^4.0.0"
-    prop-types "^15.0.0"
-    react-draggable "^4.0.0"
-    react-resizable "^1.9.0"
+    prop-types "15.x"
+    react-draggable "3.x"
+    react-resizable "1.x"
 
 react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.9.0:
   version "16.12.0"
@@ -7531,7 +7539,7 @@ react-redux@^7.1.1:
     prop-types "^15.7.2"
     react-is "^16.9.0"
 
-react-resizable@^1.9.0:
+react-resizable@1.x:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/react-resizable/-/react-resizable-1.9.0.tgz#7426f06852180e6844bbbc32ead67760d2904a65"
   integrity sha512-YAls7H4+34MMDg2cPnhVfLtes//XWvrLNuxbVwawwJFIGlPvhGi8BLCcIsDdLJ2CCCxtymVotk2Hq4RtPJ7t5g==
