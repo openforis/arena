@@ -58,6 +58,7 @@ export const type = {
   processingStepPropsUpdate: 'processingStepPropsUpdate',
   processingStepDelete: 'processingStepDelete',
   processingStepCalculationCreate: 'processingStepCalculationCreate',
+  processingStepCalculationIndexUpdate: 'processingStepCalculationIndexUpdate',
 }
 
 export const keys = {
@@ -79,6 +80,7 @@ export const keys = {
   //analysis
   processingChainLabels: 'processingChainLabels',
   processingStepIndex: 'processingStepIndex',
+  processingStepCalculationIndex: 'processingStepCalculationIndex',
 }
 
 export const keysContent = {
@@ -107,6 +109,9 @@ export const keysContent = {
   //analysis
   labels: 'labels',
   processingChainUuid: 'processingChainUuid',
+  processingStepUuid: 'processingStepUuid',
+  indexFrom: 'indexFrom',
+  indexTo: 'indexTo',
 }
 
 // ====== CREATE
@@ -135,6 +140,7 @@ export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
 export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
 export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
+export const getProcessingStepCalculationIndex = R.prop(keys.processingStepCalculationIndex)
 
 // content props
 const _getContentProp = prop => R.path([keys.content, prop])
@@ -160,3 +166,5 @@ export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
 // content props analysis
 export const getContentLabels = _getContentProp(keysContent.labels)
+export const getContentIndexFrom = _getContentProp(keysContent.indexFrom)
+export const getContentIndexTo = _getContentProp(keysContent.indexTo)

@@ -66,6 +66,8 @@ export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.prop(keys.authGroups)
 
 //===== UPDATE
+export const assocIndex = R.assoc(keys.index)
+
 export const mergeProps = props => obj => R.pipe(
   getProps,
   R.mergeLeft(props),

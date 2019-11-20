@@ -1,5 +1,14 @@
 @import "~@webapp/style/vars";
 
+
+.processing-step__calculation.placeholder {
+  display: none;
+}
+
+.processing-step__calculation.dragging * {
+  pointer-events: none;
+}
+
 .processing-step__calculation-index {
   transition: all 300ms ease;
 }

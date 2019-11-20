@@ -16,14 +16,15 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
-export const processingStepCalculationIndexForEditUpdate = 'analysis/processingStep/calculation/edit'
+export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
+export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
 
 export const resetProcessingStepState = () => dispatch =>
   dispatch({ type: processingStepUpdate, processingStep: {}, processingStepPrev: null, processingStepNext: null })
 
 export const setProcessingStepCalculationForEdit = calculation => dispatch => dispatch({
-  type: processingStepCalculationIndexForEditUpdate,
-  index: ProcessingStepCalculation.getIndex(calculation)
+  type: processingStepCalculationForEditUpdate,
+  uuid: ProcessingStepCalculation.getUuid(calculation)
 })
 
 // ====== CREATE
@@ -79,6 +80,26 @@ export const putProcessingStepProps = props => async (dispatch, getState) => {
   dispatch(debounceAction(action, `${processingStepPropsUpdate}_${processingStepUuid}`))
 }
 
+export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async (dispatch, getState) => {
+  dispatch(showAppSaving())
+
+  dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
+
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const processingStepUuid = R.pipe(
+    ProcessingStepState.getProcessingStep,
+    ProcessingStep.getUuid
+  )(state)
+
+  await axios.put(
+    `/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculation-index`,
+    { indexFrom, indexTo }
+  )
+
+  dispatch(hideAppSaving())
+}
+
 // ====== DELETE
 
 export const deleteProcessingStep = history => async (dispatch, getState) => {
@@ -93,5 +114,4 @@ export const deleteProcessingStep = history => async (dispatch, getState) => {
   dispatch(navigateToProcessingChainView(history, ProcessingStep.getProcessingChainUuid(processingStep)))
   dispatch(showNotification('processingStepView.deleteComplete'))
   dispatch(hideAppSaving())
-
 }

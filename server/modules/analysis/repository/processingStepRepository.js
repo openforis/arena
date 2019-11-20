@@ -73,6 +73,16 @@ export const fetchStepByUuid = async (surveyId, processingStepUuid, client = db)
     camelize
   )
 
+export const fetchStepSummaryByUuid = async (surveyId, processingStepUuid, client = db) =>
+  await client.oneOrNone(`
+    SELECT *
+    FROM ${getSurveyDBSchema(surveyId)}.processing_step
+    WHERE uuid = $1
+    `,
+    [processingStepUuid],
+    camelize
+  )
+
 export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, index, client = db) =>
   await client.oneOrNone(`
     SELECT *
