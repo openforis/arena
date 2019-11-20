@@ -34,6 +34,7 @@ export const type = {
   taxonomyTaxaDelete: 'taxonomyTaxaDelete', //system
   taxonomyTaxaImport: 'taxonomyTaxaImport',
   taxonInsert: 'taxonInsert', //system
+  taxonUpdate: 'taxonUpdate', //system
 
   //record
   recordCreate: 'recordCreate',

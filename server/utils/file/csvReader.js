@@ -9,32 +9,54 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
   const queue = new Queue()
 
   const start = () => new Promise((resolve, reject) => {
-    let started = false
     let ended = false
     let headers = null
     let total = 0
     let processingRow = false //prevents the call to processNext when a row is already being processed
 
+    /**
+     * Executes the specified function fn in a try catch.
+     * Calls "reject" if the execution throws an error.
+     */
+    const _tryOrCancel = async fn => {
+      try {
+        await fn()
+      } catch (e) {
+        cancel()
+        reject(e)
+      }
+    }
+
     const processNext = () => {
       (async () => {
+        processingRow = true
+
         if (queue.isEmpty()) {
           if (ended)
             resolve()
         } else if (!canceled) {
           const row = queue.dequeue()
-          if (onRow) {
-            processingRow = true
-            try {
-              await onRow(_indexRowByHeaders(row))
-              processingRow = false
-            } catch (e) {
-              cancel()
-              reject(e)
-              return
+
+          if (headers) {
+            //headers read, process rows
+            if (onRow) {
+              await _tryOrCancel(async () => {
+                await onRow(_indexRowByHeaders(row))
+              })
+            }
+          } else {
+            //process headers
+            headers = row
+            if (onHeaders) {
+              await _tryOrCancel(async () => {
+                await onHeaders(headers)
+              })
             }
           }
           processNext()
         }
+
+        processingRow = false
       })()
     }
 
@@ -42,18 +64,16 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       if (canceled)
         return resolve()
 
-      if (headers) {
-        const wasEmpty = queue.isEmpty()
-        queue.enqueue(data)
-        onTotalChange && onTotalChange(++total)
+      ++total
+      if (total > 0) {
+        // skip first row (headers)
+        onTotalChange && onTotalChange(total)
+      }
 
-        if (!started || wasEmpty && !processingRow) {
-          started = true
-          processNext()
-        }
-      } else {
-        headers = data
-        onHeaders && onHeaders(headers)
+      const wasEmpty = queue.isEmpty()
+      queue.enqueue(data)
+      if (!processingRow && wasEmpty) {
+        processNext()
       }
     }
 

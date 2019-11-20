@@ -157,7 +157,8 @@ export const enTranslation = {
 - Form fields cannot be changed from single to multiple and vice versa.
 - Category items' codes cannot be changed.
 - Category items cannot be deleted.
-- Taxa cannot be modified.
+- Taxonomy codes cannot be changed.
+- Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
