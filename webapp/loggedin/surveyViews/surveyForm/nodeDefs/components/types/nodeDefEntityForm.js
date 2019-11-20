@@ -27,11 +27,7 @@ const NodeDefEntityForm = props => {
 
   useEffect(() => {
     if (entry && NodeDef.isSingle(nodeDef)) {
-      const nodeUuid = R.pipe(
-        R.head,
-        R.prop(Node.keys.uuid)
-      )(nodes)
-
+      const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
       setFormPageNode(nodeDef, nodeUuid)
     }
   }, [NodeDef.getUuid(nodeDef)])
