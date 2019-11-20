@@ -9,6 +9,8 @@ import { elementOffset } from '@webapp/utils/domUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
+
 import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
@@ -17,7 +19,7 @@ const NodeDefEditButtons = (props) => {
 
   const {
     surveyCycleKey, nodeDef,
-    edit, canEditDef,
+    edit, canEditDef, hasNodeDefAddChildTo,
     putNodeDefLayoutProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
@@ -31,11 +33,12 @@ const NodeDefEditButtons = (props) => {
     if (show) {
       const { parentNode } = elementRef.current
       if (parentNode.classList.contains('survey-form__node-def-page')) {
+        const right = hasNodeDefAddChildTo ? 225 : 25
         const { top } = elementOffset(parentNode)
-        setStyle({ position: 'fixed', top: `${top}px`, right: `25px` })
+        setStyle({ position: 'fixed', top: `${top}px`, right: `${right}px` })
       }
     }
-  }, [])
+  }, [hasNodeDefAddChildTo])
 
   return show && (
     <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
@@ -88,9 +91,15 @@ const NodeDefEditButtons = (props) => {
 
 }
 
-export default connect(null, {
-  setNodeDefForEdit,
-  setFormNodeDefAddChildTo,
-  putNodeDefLayoutProp,
-  removeNodeDef,
-})(NodeDefEditButtons)
+const mapStateToProps = state => ({
+  hasNodeDefAddChildTo: !!SurveyFormState.getNodeDefAddChildTo(state)
+})
+
+export default connect(
+  mapStateToProps,
+  {
+    setNodeDefForEdit,
+    setFormNodeDefAddChildTo,
+    putNodeDefLayoutProp,
+    removeNodeDef,
+  })(NodeDefEditButtons)
