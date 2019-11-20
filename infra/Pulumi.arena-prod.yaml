@@ -6,7 +6,7 @@ config:
   arena:certificateArn: arn:aws:acm:eu-west-1:407725983764:certificate/52a9c5cd-ec53-4ffd-8eec-05e38ed45b18
   arena:cognitoClientId:
     secure: v1:9ZkMxjY0zxFpONiq:AkZcDY53BPy44QjO3M5B/y2Lcu2bTx67Amj2HySPBcrNtg==
-  arena:cognitoUserPoolArn: arn:aws:cognito-idp:eu-west-1:407725983764:userpool/eu-west-1_01nCDuE4s
+  arena:cognitoUserPoolArn: arn:aws:cognito-idp:eu-west-1:407725983764:userpool/eu-west-1_O3oNqhz5A
   arena:sendgridApiKey:
     secure: v1:gpWrZ2+lkUzC3Kyw:81n6zcLEPmMDJ3/wbA8FKFgmLy5J3F5SuEN/Qchcw8FDGL9Ejbj4YASED02otdxFUQsJ1jhkjpQwJikdhe8PqS3Sl4Ri7JIJIGPMR4G6zxBQlpssWg==
   arena:targetDomain: www.openforis-arena.org
