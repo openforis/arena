@@ -66,7 +66,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   await client.query(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
     `,
     [
       Node.getUuid(node),
@@ -130,7 +130,7 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
 export const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET value = $1,
+    SET value = $1::jsonb,
     meta = meta || $2::jsonb, 
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
