@@ -3,19 +3,19 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE
   survey
 (
-  id            bigserial NOT NULL,
-  uuid          uuid      UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+  id            bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
+  uuid          uuid      NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
 
   published     boolean   NOT NULL DEFAULT false,
   draft         boolean   NOT NULL DEFAULT true,
 
-  date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
-  date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+  date_created  TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+  date_modified TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
 
-  props         jsonb              DEFAULT '{}'::jsonb,
-  props_draft   jsonb              DEFAULT '{}'::jsonb,
+  props         jsonb     NOT NULL DEFAULT '{}'::jsonb,
+  props_draft   jsonb     NOT NULL DEFAULT '{}'::jsonb,
 
-  meta          jsonb              DEFAULT '{}'::jsonb,
+  meta          jsonb     NOT NULL DEFAULT '{}'::jsonb,
 
   owner_uuid    uuid      NOT NULL,
 
