@@ -11,6 +11,15 @@ import * as Validation from '@core/validation/validation'
 import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
+import UnauthorizedError from '@server/utils/unauthorizedError'
+
+const _checkSelf = req => {
+  const { userUuid } = Request.getParams(req)
+  const user = Request.getUser(req)
+  if (userUuid !== User.getUuid(user)) {
+    throw new UnauthorizedError(user && User.getName(user))
+  }
+}
 
 export const init = app => {
 
@@ -37,12 +46,24 @@ export const init = app => {
 
   // ==== READ
 
+  const _getUser = async (req, res) => {
+    const { userUuid } = Request.getParams(req)
+    const user = await UserService.fetchUserByUuid(userUuid)
+    res.json(user)
+  }
+
   app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
-      const { userUuid } = Request.getParams(req)
-      const user = await UserService.fetchUserByUuid(userUuid)
+      await _getUser(req, res)
+    } catch (err) {
+      next(err)
+    }
+  })
 
-      res.json(user)
+  app.get('/user/:userUuid', async (req, res, next) => {
+    try {
+      _checkSelf(req)
+      await _getUser(req, res)
     } catch (err) {
       next(err)
     }
@@ -83,7 +104,7 @@ export const init = app => {
       // Ensure we don't need to make duplicate requests by caching the profile picture for a small instant.
       // The value of 3 seconds is chosen as the smallest amount of time it takes for a user to switch to
       // a new profile picture, ensuring they always see their own newest picture.
-      res.set('Cache-Control', 'private, max-age=3');
+      res.set('Cache-Control', 'private, max-age=3')
 
       if (profilePicture) {
         res.end(profilePicture, 'binary')
@@ -110,22 +131,35 @@ export const init = app => {
     }
   })
 
+  const _updateUser = async (req, res) => {
+    const validation = await UserValidator.validateUser(Request.getBody(req))
+
+    if (!Validation.isValid(validation)) {
+      throw new SystemError('appErrors.userInvalid')
+    }
+
+    const user = Request.getUser(req)
+    const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
+
+    const fileReq = Request.getFile(req)
+
+    const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid, fileReq)
+
+    res.json(updatedUser)
+  }
+
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      const validation = await UserValidator.validateUser(Request.getBody(req))
+      await _updateUser(req, res)
+    } catch (err) {
+      next(err)
+    }
+  })
 
-      if (!Validation.isValid(validation)) {
-        throw new SystemError('appErrors.userInvalid')
-      }
-
-      const user = Request.getUser(req)
-      const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
-
-      const fileReq = Request.getFile(req)
-
-      const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid, fileReq)
-
-      res.json(updatedUser)
+  app.put('/user/:userUuid', async (req, res, next) => {
+    try {
+      _checkSelf(req)
+      await _updateUser(req, res)
     } catch (err) {
       next(err)
     }
@@ -163,5 +197,4 @@ export const init = app => {
     }
   })
 
-};
-
+}

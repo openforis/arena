@@ -31,9 +31,10 @@ export const useUserViewState = props => {
 
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const i18n = useI18n()
+  const editingSelf = User.getUuid(user) === userUuid && !surveyId // this can happen for system administrator when they don't have an active survey
 
   const { data: userToUpdate = {}, dispatch: fetchUser, loaded } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/user/${userUuid}`
+    `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`
   )
 
   const isInvitation = !userUuid
@@ -76,9 +77,11 @@ export const useUserViewState = props => {
     // init form groups
 
     // All groups if published, SurveyAdmin group otherwise
-    const surveyGroups = Survey.isPublished(surveyInfo)
-      ? Survey.getAuthGroups(surveyInfo)
-      : [Survey.getAuthGroupAdmin(surveyInfo)]
+    const surveyGroups = editingSelf
+      ? []
+      : Survey.isPublished(surveyInfo)
+        ? Survey.getAuthGroups(surveyInfo)
+        : [Survey.getAuthGroupAdmin(surveyInfo)]
 
     // Add SystemAdmin group if current user is a SystemAdmin himself
     const menuGroups = R.when(
@@ -153,7 +156,7 @@ export const useUserViewState = props => {
     error: userSaveError,
   } = isInvitation
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, userInviteParams)
-    : useAsyncMultipartPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formData)
+    : useAsyncMultipartPutRequest(`/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${User.getUuid(userToUpdate)}`, formData)
 
   useOnUpdate(() => {
     hideAppLoader()
@@ -171,7 +174,9 @@ export const useUserViewState = props => {
         showNotification('usersView.updateUserConfirmation', { name: formObject.name })
       }
 
-      history.push(appModuleUri(userModules.users))
+      if (!editingSelf) {
+        history.push(appModuleUri(userModules.users))
+      }
     }
   }, [userSaved, userSaveError])
 
