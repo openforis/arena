@@ -8,6 +8,7 @@ export const ENV = {
   arenaDist: process.env['ARENA_DIST'],
   port: process.env['PORT'] || '9090',
   nodeEnv: process.env['NODE_ENV'] || environments.development,
+  debug: !!process.env['DEBUG'],
   tempFolder: process.env['TEMP_FOLDER'] || '/tmp/arena_upload',
   buildReport: process.env['BUILD_REPORT'] === 'true',
   // APP VERSION
