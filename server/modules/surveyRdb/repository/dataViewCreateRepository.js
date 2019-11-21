@@ -33,9 +33,9 @@ export const createTableAndView = async (survey, nodeDef, client) => {
     CREATE TABLE
       ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
     (
-      id bigserial NOT NULL,
-      date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
-      date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+      id            bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
+      date_created  TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+      date_modified TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
       ${tableViewCreate.colsAndType.join(', ')},
       ${tableViewCreate.uuidUniqueIdx},
       ${tableViewCreate.recordForeignKey}

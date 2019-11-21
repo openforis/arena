@@ -1,23 +1,23 @@
 CREATE TABLE
   processing_chain
   (
-    uuid uuid DEFAULT uuid_generate_v4() NOT NULL,
-    cycle VARCHAR(2) NOT NULL,
-    date_created TIMESTAMP without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
-    date_modified TIMESTAMP without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
-    date_executed TIMESTAMP without TIME zone,
-    props jsonb DEFAULT '{}'::jsonb NOT NULL,
-    status_exec VARCHAR(15),
+    uuid           uuid        NOT NULL DEFAULT uuid_generate_v4(),
+    cycle          VARCHAR     NOT NULL CHECK (cycle SIMILAR TO '[0-9]|[1-9][0-9]' ),
+    date_created   TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+    date_modified  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+    date_executed  TIMESTAMP       NULL,
+    props          jsonb       NOT NULL DEFAULT '{}'::jsonb,
+    status_exec    VARCHAR(32)     NULL,
     PRIMARY KEY (uuid)
   );
 
 CREATE TABLE
   processing_step
   (
-    uuid uuid DEFAULT uuid_generate_v4() NOT NULL,
-    processing_chain_uuid uuid NOT NULL,
-    index INTEGER DEFAULT 0 NOT NULL,
-    props jsonb DEFAULT '{}'::jsonb NOT NULL,
+    uuid                   uuid    NOT NULL DEFAULT uuid_generate_v4(),
+    processing_chain_uuid  uuid    NOT NULL,
+    index                  integer NOT NULL DEFAULT 0,
+    props                  jsonb   NOT NULL DEFAULT '{}'::jsonb,
     PRIMARY KEY (uuid),
     CONSTRAINT processingstep_chain_fk FOREIGN KEY (processing_chain_uuid) REFERENCES "processing_chain" ("uuid") ON DELETE CASCADE,
     CONSTRAINT processingstep_index_idx UNIQUE (processing_chain_uuid, index)
@@ -26,11 +26,11 @@ CREATE TABLE
 CREATE TABLE
   processing_step_calculation
   (
-    uuid uuid DEFAULT uuid_generate_v4() NOT NULL,
-    processing_step_uuid uuid NOT NULL,
-    node_def_uuid uuid,
-    index INTEGER DEFAULT 0 NOT NULL,
-    props jsonb DEFAULT '{}'::jsonb NOT NULL,
+    uuid                  uuid    NOT NULL DEFAULT uuid_generate_v4(),
+    processing_step_uuid  uuid    NOT NULL,
+    node_def_uuid         uuid    NOT NULL,
+    index                 integer NOT NULL DEFAULT 0,
+    props                 jsonb   NOT NULL DEFAULT '{}'::jsonb,
     PRIMARY KEY (uuid),
     CONSTRAINT processingstepcalculation_processingstep_fk FOREIGN KEY (processing_step_uuid) REFERENCES "processing_step" ("uuid") ON DELETE CASCADE,
     CONSTRAINT processingstepcalculation_nodedef_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
