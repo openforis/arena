@@ -43,7 +43,7 @@ export const run = async () => {
 
   app.use(compression({ threshold: 512 }))
 
-  app.use(/^\/$/, (req, res) => res.redirect('/app/home'))
+  app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
 
   const dist = ProcessUtils.ENV.arenaDist
   const imgDir = `${ProcessUtils.ENV.arenaRoot}/web-resources/img`
