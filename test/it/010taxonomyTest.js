@@ -8,6 +8,6 @@ describe('Taxonomy test', () => {
   it('Taxon update test', TaxonomyTests.taxonUpdateTest)
   it('Taxon published update test', TaxonomyPublishedTests.taxonPublishedUpdateTest)
   it('Taxon published add vernacular name test', TaxonomyPublishedTests.taxonPublishedAddVernacularNameTest)
-  it('Taxon published updated vernacular name test', TaxonomyPublishedTests.taxonPublishedUpdateVernacularNameTest)
+  it('Taxon published update vernacular names test', TaxonomyPublishedTests.taxonPublishedUpdateVernacularNamesTest)
 })
 

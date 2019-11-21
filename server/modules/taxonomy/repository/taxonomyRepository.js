@@ -34,19 +34,22 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
   )
 
 const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
-  Object.entries(vernacularNames).map(([lang, vernacularName]) =>
-    client.none(
-      `INSERT INTO 
+  R.pipe(R.values, R.flatten, R.map(vernacularName =>
+      client.none(
+        `INSERT INTO 
            ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props_draft)
         VALUES 
           ($1, $2, $3)
-        ON CONFLICT 
-          (taxon_uuid, ((props||props_draft)->>'${TaxonVernacularName.keysProps.lang}')) DO
-        UPDATE SET 
+        ON CONFLICT (
+          taxon_uuid, 
+          ((props||props_draft)->>'${TaxonVernacularName.keysProps.lang}'), 
+          ((props||props_draft)->>'${TaxonVernacularName.keysProps.name}')
+        ) DO UPDATE SET 
           props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $3`,
-      [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)]
+        [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)]
+      )
     )
-  )
+  )(vernacularNames)
 
 export const insertTaxon = async (surveyId, taxon, client = db) =>
   await client.batch([
@@ -93,22 +96,33 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
 
 export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) =>
   await client.map(`
+      WITH vernacular_names AS (
+        SELECT
+          vn.taxon_uuid,
+          (vn.props || vn.props_draft)->>'${TaxonVernacularName.keysProps.lang}' as lang,
+          array_agg(
+            json_build_object(
+              '${TaxonVernacularName.keys.uuid}', vn.uuid,
+              '${TaxonVernacularName.keys.props}', vn.props || vn.props_draft
+            )
+          ) as names
+        FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+        GROUP BY vn.taxon_uuid, (vn.props || vn.props_draft)->>'${TaxonVernacularName.keysProps.lang}'
+      )
+
       SELECT
           t.*,
           COALESCE(
             jsonb_object_agg(
-              ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')},
-              json_build_object(
-                '${TaxonVernacularName.keys.uuid}', vn.uuid,
-                '${TaxonVernacularName.keys.props}', ${DbUtils.getPropsCombined(draft, 'vn.', false)}
-              )
-            ) FILTER (WHERE vn.uuid IS NOT NULL),
+              vn.lang,
+              vn.names
+            ) FILTER (WHERE vn.lang IS NOT NULL),
             '{}'
           ) as vernacular_names
       FROM
           ${getSurveyDBSchema(surveyId)}.taxon t
       LEFT OUTER JOIN
-          ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+          vernacular_names vn
       ON
           vn.taxon_uuid = t.uuid
       WHERE
@@ -128,16 +142,14 @@ export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft
 export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
   const vernacularNamesSubSelects = R.pipe(
     R.map(langCode =>
-      `(
-          SELECT
-              ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}
-          FROM
-               ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
-          WHERE
-              vn.taxon_uuid = t.uuid
-              AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}' 
-       ) AS ${langCode}`
-    ),
+      `(SELECT
+            string_agg(${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}, '${TaxonVernacularName.NAMES_SEPARATOR}') as names
+        FROM
+            ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+        WHERE
+            vn.taxon_uuid = t.uuid
+            AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}'
+       ) AS ${langCode}`),
     R.join(', ')
   )(vernacularLangCodes)
 

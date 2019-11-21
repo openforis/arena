@@ -26,8 +26,8 @@ before(async () => {
     )
   ).taxonomy(taxonomyName,
     SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
-      .vernacularName('en', 'Mahogany')
-      .vernacularName('sw', 'Mbambakofi'),
+      .vernacularName('eng', 'Mahogany')
+      .vernacularName('swa', 'Mbambakofi'),
     SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
   ).buildAndStore(false)
 })
@@ -74,7 +74,10 @@ export const taxaInsertTest = async () => {
     Taxon.newTaxon(taxonomyUuid, 'ALB', 'Fabaceae', 'Albizia', 'Albizia'),
     Taxon.newTaxon(taxonomyUuid, 'ALB/SCH', 'Fabaceae', 'Albizia', 'Albizia schimperiana'),
     Taxon.newTaxon(taxonomyUuid, 'ALB/GLA', 'Fabaceae', 'Albizia', 'Albizia glaberrima', {
-      'en': TaxonVernacularName.newTaxonVernacularName('en', 'Mgerenge')
+      'swa': [
+        TaxonVernacularName.newTaxonVernacularName('swa', 'Mgerenge'),
+        TaxonVernacularName.newTaxonVernacularName('swa', 'Mchani')
+      ]
     }),
   ]
 

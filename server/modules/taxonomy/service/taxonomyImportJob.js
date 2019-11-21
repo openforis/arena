@@ -5,19 +5,16 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 
 import { languageCodesISO636_2 } from '@core/app/languages'
-import * as StringUtils from '@core/stringUtils'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 
-import * as TaxonomyValidator from '../taxonomyValidator'
 import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import TaxonParser from './taxonParser'
 
 const requiredColumns = [
   'code',
@@ -36,14 +33,10 @@ export default class TaxonomyImportJob extends Job {
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
 
-    this.rowsByField = {
-      [Taxon.propKeys.code]: {}, //maps codes to csv file rows
-      [Taxon.propKeys.scientificName]: {} //maps scientific names to csv file rows
-    }
-
-    this.taxonomyImportManager = null //to be initialized in onHeaders
-
     this.csvReader = null
+    this.taxonomyImportManager = null //to be initialized in onHeaders
+    this.vernacularLanguageCodes = null
+    this.taxonParser = null
   }
 
   async execute () {
@@ -101,6 +94,7 @@ export default class TaxonomyImportJob extends Job {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
       this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomy, this.vernacularLanguageCodes, this.tx)
       await this.taxonomyImportManager.init()
+      this.taxonParser = new TaxonParser(this.taxonomyUuid, this.vernacularLanguageCodes)
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
       this.csvReader.cancel()
@@ -109,7 +103,7 @@ export default class TaxonomyImportJob extends Job {
   }
 
   async _onRow (row) {
-    const taxon = await this._parseTaxon(row)
+    const taxon = await this.taxonParser.parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
@@ -138,66 +132,6 @@ export default class TaxonomyImportJob extends Job {
     }
   }
 
-  async _parseTaxon (data) {
-    const { family, genus, scientific_name, code, ...vernacularNames } = data
-
-    const taxon = Taxon.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this._parseVernacularNames(vernacularNames))
-
-    return await this._validateTaxon(taxon)
-  }
-
-  async _validateTaxon (taxon) {
-    const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
-
-    //validate taxon uniqueness among inserted values
-    if (Validation.isValid(validation)) {
-      const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
-      this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
-
-      const scientificName = Taxon.getScientificName(taxon)
-      this._addValueToIndex(Taxon.propKeys.scientificName, scientificName, Validation.messageKeys.taxonomyEdit.scientificNameDuplicate, validation)
-    }
-
-    return {
-      ...taxon,
-      validation,
-    }
-  }
-
-  _addValueToIndex (field, value, errorKeyDuplicate, validation) {
-    const duplicateRow = this.rowsByField[field][value]
-    if (duplicateRow) {
-      R.pipe(
-        Validation.setValid(false),
-        Validation.setField(
-          field,
-          Validation.newInstance(
-            false,
-            {},
-            [{
-              key: errorKeyDuplicate,
-              params: { row: this.processed + 1, duplicateRow }
-            }]
-          ))
-      )(validation)
-    } else {
-      this.rowsByField[field][value] = this.processed + 1
-    }
-  }
-
-  _parseVernacularNames (vernacularNames) {
-    return R.reduce(
-      (accVernacularNames, langCode) => {
-        const name = vernacularNames[langCode]
-        return R.when(
-          R.always(StringUtils.isNotBlank(name)),
-          R.assoc(langCode, TaxonVernacularName.newTaxonVernacularName(langCode, name))
-        )(accVernacularNames)
-      },
-      {},
-      this.vernacularLanguageCodes
-    )
-  }
 }
 
 TaxonomyImportJob.type = 'TaxonomyImportJob'

@@ -48,9 +48,9 @@ export const getScientificName = ObjectUtils.getProp(propKeys.scientificName, ''
 
 export const getVernacularNames = R.propOr({}, keys.vernacularNames)
 
-export const getVernacularNameByLang = lang => R.pipe(
+export const getVernacularNamesByLang = lang => R.pipe(
   getVernacularNames,
-  R.prop(lang),
+  R.propOr([], lang),
 )
 
 export const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
@@ -63,18 +63,16 @@ export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
 export const isEqual = ObjectUtils.isEqual
 
 //==== UPDATE
-export const assocVernacularName = (lang, vernacularName) => R.assocPath([keys.vernacularNames, lang], vernacularName)
+export const assocVernacularNames = (lang, vernacularNames) => R.assocPath([keys.vernacularNames, lang], vernacularNames)
 
 export const mergeProps = taxonNew => taxon => {
   const vernacularNamesUpdated = Object.entries(getVernacularNames(taxonNew)).reduce(
-    (accVernacularNames, [lang, vernacularName]) => {
-      const vernacularNameExisting = getVernacularNameByLang(lang)(taxon)
-      if (vernacularNameExisting) {
-        accVernacularNames[lang] = TaxonVernacularName.mergeProps(vernacularName)(vernacularNameExisting)
-      } else {
-        accVernacularNames[lang] = vernacularName
-      }
-      return accVernacularNames
+    (accVernacularNames, [lang, vernacularNames]) => {
+      const vernacularNamesExisting = getVernacularNamesByLang(lang)(taxon)
+      const vernacularNamesUpdated = R.isEmpty(vernacularNamesExisting)
+        ? vernacularNames
+        : TaxonVernacularName.mergeVernacularNames(vernacularNames)(vernacularNamesExisting)
+      return R.assoc(lang, vernacularNamesUpdated, accVernacularNames)
     },
     {}
   )

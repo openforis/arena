@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -10,6 +12,8 @@ export const keysProps = {
   lang: 'lang',
   name: 'name',
 }
+
+export const NAMES_SEPARATOR = ' / '
 
 // ===== CREATE
 export const newTaxonVernacularName = (lang, name) => ({
@@ -33,3 +37,9 @@ export const mergeProps = vernacularNameNew => vernacularName => ({
     [keysProps.name]: getName(vernacularNameNew)
   }
 })
+
+export const mergeVernacularNames = vernacularNames => vernacularNamesExisting => {
+  const namesExisting = R.map(getName)(vernacularNamesExisting)
+  const vernacularNamesNew = R.reject(vernacularNameNew => R.includes(getName(vernacularNameNew), namesExisting))(vernacularNames)
+  return R.concat(vernacularNamesNew, vernacularNamesExisting)
+}
