@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import * as R from 'ramda'
+
 import TableView from '@webapp/loggedin/tableViews/tableView'
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
@@ -15,7 +17,9 @@ import * as RecordsState from '@webapp/loggedin/modules/data/records/recordsStat
 
 import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
 
-import * as ValidationUtils from '@webapp/utils/validationUtils'
+import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
+
+const validationReportModule = 'validationReport'
 
 const ValidationReportRowHeader = ({ nodeDefKeys }) => {
   const i18n = useI18n()
@@ -25,8 +29,7 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
       <div>#</div>
       { nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, i18n.lang)}</div>) }
       <div>{i18n.t('common.path')}</div>
-      {/* <div>{i18n.t('common.type')}</div> */}
-      <div>{i18n.t('common.error')}</div>
+      <div>{i18n.t('common.error_plural')} / {i18n.t('common.warning_plural')}</div>
     </>
   )
 }
@@ -45,8 +48,6 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
   const lastNodeDef = Survey.getNodeDefByUuid(row.node_def_uuid)(survey)
   path.push(NodeDef.getLabel(lastNodeDef, i18n.lang))
 
-  const errors = ValidationUtils.getValidationFieldMessagesHTML(i18n, false)(row.validation)
-
   const hierarchyKeys = row.keys_hierarchy[0].keys
 
   return (
@@ -56,29 +57,28 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
       </div>
       {
         nodeDefKeys.map((k, i) =>
-          // TODO fix hierarchyKeys = null
-          <div key={i}>{hierarchyKeys ? hierarchyKeys[Node.getUuid(k)] : ''}</div>
+          <div key={i}>{hierarchyKeys ? hierarchyKeys[Node.getUuid(k)] : row.keys_self[Node.getUuid(k)]}</div>
         )
       }
       <div>
         {path.join(' / ')}
       </div>
       <div>
-        {errors}
+        <ValidationFieldMessagesHTMLComponent validation={row.validation} showKeys={false} />
       </div>
     </>
   )
 }
 
-const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, history }) => {
+const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadListItems, history }) => {
   useOnUpdate(() => {
-    reloadListItems('validationReport') // TODO
+    reloadListItems(validationReportModule, { cycle: surveyCycleKey })
   }, [surveyCycleKey])
 
   const onRowClick = record => {
-    const parentNodeUuid = record.node_uuid
+    const parentEntityUuid = R.prop('nodeUuid', R.last(record.keys_hierarchy))
     const recordUuid = record.uuid
-    const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+    const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentEntityUuid}`
 
     history.push(recordEditUrl)
   }
@@ -88,10 +88,14 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, history
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
 
   const noCols = nodeDefKeys.length
-  const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 200px 250px`
+  const gridTemplateColumns = `70px repeat(${noCols}, 200px) 1fr 2fr`
+
+  const restParams = { cycle: surveyCycleKey }
 
   return <TableView
-    module={'validationReport'}
+    module={validationReportModule}
+    restParams={restParams}
+
     gridTemplateColumns={gridTemplateColumns}
     rowHeaderComponent={ValidationReportRowHeader}
     rowComponent={ValidationReportRow}

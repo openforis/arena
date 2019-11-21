@@ -535,8 +535,8 @@ export const enTranslation = {
       oneOrMoreInvalidValues: 'One or more values are invalid',
 
       entityKeyDuplicate: 'Duplicate entity key',
-      nodesMaxCountExceeded: 'Nodes must be less than or equal to {{maxCount}}',
-      nodesMinCountNotReached: 'Nodes must be more than or equal to {{minCount}}',
+      nodesMaxCountExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
+      nodesMinCountNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
     },

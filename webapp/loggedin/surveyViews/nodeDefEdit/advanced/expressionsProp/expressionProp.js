@@ -1,14 +1,14 @@
 import React from 'react'
-import * as R from 'ramda'
 
-import Tooltip from '@webapp/commonComponents/tooltip'
+import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import ExpressionEditor from '@webapp/commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../labelsEditor/labelsEditor'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as ValidationUtils from '@webapp/utils/validationUtils'
+// import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 
 const ExpressionProp = (props) => {
@@ -33,15 +33,13 @@ const ExpressionProp = (props) => {
     }
   ]
 
-  const errorMessages = ValidationUtils.getValidationFieldMessages(i18n, false)(validation)
-
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
 
   return (
-    <Tooltip
-      messages={errorMessages}
-      position="bottom"
-      type={!R.isEmpty(errorMessages) ? 'error' : ''}>
+    <ValidationTooltip
+      validation={validation}
+      showKeys={false}
+      type={Validation.isValid(validation) ? '' : 'error'}>
 
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
 
@@ -113,7 +111,7 @@ const ExpressionProp = (props) => {
           />
         }
       </div>
-    </Tooltip>
+    </ValidationTooltip>
   )
 }
 

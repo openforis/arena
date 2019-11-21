@@ -21,12 +21,13 @@ const query = (surveyId, offset = 0, limit = null) =>
   JOIN
     ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
   ON k.key::uuid = h.node_uuid
+  WHERE r.cycle = $1
   ORDER BY r.uuid, h.node_id
   LIMIT ${limit || 'ALL'}
   OFFSET ${offset}`
 
-export const fetchValidationReport = async (surveyId, offset, limit, client = db) =>
-  await client.any(query(surveyId, offset, limit))
+export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
+  await client.any(query(surveyId, offset, limit), [cycle])
 
-export const countValidationReports = async (surveyId, client = db) =>
-  await client.one(`SELECT count(*) from(${query(surveyId)}) as v`)
+export const countValidationReports = async (surveyId, cycle, client = db) =>
+  await client.one(`SELECT count(*) from(${query(surveyId, '0')}) as v`, [cycle])

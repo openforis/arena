@@ -1,15 +1,11 @@
 import React from 'react'
 
-import * as ValidationUtils from '@webapp/utils/validationUtils'
+import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
 import * as Validation from '@core/validation/validation'
 
 import Tooltip from './tooltip'
 
-import { useI18n } from './hooks'
-
 export default ({ validation, className, showKeys, children }) => {
-  const i18n = useI18n()
-
   const isValid = Validation.isValid(validation)
 
   const type = isValid
@@ -18,14 +14,14 @@ export default ({ validation, className, showKeys, children }) => {
       ? 'warning'
       : 'error'
 
-  const messagesHtml = isValid
+  const content = isValid
     ? null
-    : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
+    : React.createElement(ValidationFieldMessagesHTMLComponent, { validation, showKeys })
 
   return (
     <Tooltip
       type={type}
-      messages={messagesHtml}
+      content={content}
       className={className}>
       {children}
     </Tooltip>

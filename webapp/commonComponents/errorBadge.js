@@ -19,7 +19,7 @@ const ErrorBadge = props => {
   const invalid = !Validation.isValid(validation)
 
   // when there are warnings add 'warning' class to className
-  const className = classNameProps + (Validation.isWarning(validation) ? ' warning': '')
+  const className = classNameProps + (Validation.isWarning(validation) ? ' warning' : '')
 
   return invalid
     ? (
