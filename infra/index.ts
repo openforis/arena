@@ -4,7 +4,7 @@ import * as awsx from "@pulumi/awsx";
 import * as random from "@pulumi/random";
 
 const name = pulumi.getStack();
-const isProduction = name !== 'arena-test';
+const isProduction = name === 'arena-prod';
 
 // Store the non-references resources here so they don't look like they're never used.
 const results: { [k: string]: Object } = {};

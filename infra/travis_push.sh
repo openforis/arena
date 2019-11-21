@@ -11,12 +11,12 @@ commit_tag=$(git describe --exact-match HEAD 2>/dev/null)
 # Update the stack
 case ${TRAVIS_BRANCH} in
     master)
+        pulumi stack select arena-dev
+        pulumi up --yes
         if [[ -n $commit_tag ]]; then
             echo "Deploying tagged release to QA environment: $commit_tag"
             pulumi stack select arena-test
             pulumi up --yes
-        else
-            echo "Skipping deploy for an untagged commit"
         fi
         ;;
     production)
