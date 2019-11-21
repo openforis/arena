@@ -28,6 +28,8 @@ export const getUuid = ObjectUtils.getUuid
 
 // ====== UPDATE
 
+export const assocCalculations = R.assoc(keys.calculationSteps)
+
 export const assocCalculation = processingStepCalculation => processingStep => R.pipe(
   getCalculationSteps,
   R.append(processingStepCalculation),

@@ -1,10 +1,10 @@
 CREATE TABLE
   category
 (
-  id          bigserial NOT NULL,
+  id          bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
   uuid        uuid      NOT NULL DEFAULT uuid_generate_v4(),
-  props       jsonb              DEFAULT '{}'::jsonb,
-  props_draft jsonb              DEFAULT '{}'::jsonb,
+  props       jsonb     NOT NULL DEFAULT '{}'::jsonb,
+  props_draft jsonb     NOT NULL DEFAULT '{}'::jsonb,
   validation  jsonb     NOT NULL DEFAULT '{}'::jsonb,
   published   boolean   NOT NULL DEFAULT false,
 
@@ -15,12 +15,12 @@ CREATE TABLE
 CREATE TABLE
   category_level
 (
-  id            bigserial NOT NULL,
+  id            bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
   uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
   category_uuid uuid      NOT NULL,
   index         integer   NOT NULL,
-  props         jsonb              DEFAULT '{}'::jsonb,
-  props_draft   jsonb              DEFAULT '{}'::jsonb,
+  props         jsonb     NOT NULL DEFAULT '{}'::jsonb,
+  props_draft   jsonb     NOT NULL DEFAULT '{}'::jsonb,
 
   PRIMARY KEY (id),
   CONSTRAINT category_level_uuid_idx UNIQUE (uuid),
@@ -31,17 +31,19 @@ CREATE TABLE
 CREATE TABLE
   category_item
 (
-  id          bigserial NOT NULL,
+  id          bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
   uuid        uuid      NOT NULL DEFAULT uuid_generate_v4(),
   level_uuid  uuid      NOT NULL,
-  parent_uuid uuid,
-  props       jsonb              DEFAULT '{}'::jsonb,
-  props_draft jsonb              DEFAULT '{}'::jsonb,
+  parent_uuid uuid          NULL,
+  props       jsonb     NOT NULL DEFAULT '{}'::jsonb,
+  props_draft jsonb     NOT NULL DEFAULT '{}'::jsonb,
 
   PRIMARY KEY (id),
   CONSTRAINT category_item_uuid_idx UNIQUE (uuid),
-  CONSTRAINT category_item_level_fk FOREIGN KEY (level_uuid) REFERENCES category_level (uuid) ON DELETE CASCADE,
-  CONSTRAINT category_item_parent_fk FOREIGN KEY (parent_uuid) REFERENCES category_item (uuid) ON DELETE CASCADE
+  CONSTRAINT category_item_level_fk FOREIGN KEY (level_uuid)
+    REFERENCES category_level (uuid) ON DELETE CASCADE,
+  CONSTRAINT category_item_parent_fk FOREIGN KEY (parent_uuid)
+    REFERENCES category_item (uuid) ON DELETE CASCADE
 );
 
 CREATE INDEX category_item_level_uuid_idx ON category_item(level_uuid);

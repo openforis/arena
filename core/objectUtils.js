@@ -61,11 +61,13 @@ export const getDateCreated = getDate(keys.dateCreated)
 export const getDateModified = getDate(keys.dateModified)
 
 export const getCycle = R.prop(keys.cycle)
-export const getIndex = R.propOr(0, keys.index)
+export const getIndex = R.propOr(null, keys.index)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.prop(keys.authGroups)
 
 //===== UPDATE
+export const assocIndex = R.assoc(keys.index)
+
 export const mergeProps = props => obj => R.pipe(
   getProps,
   R.mergeLeft(props),
@@ -94,9 +96,10 @@ export const setInPath = (pathArray, value, includeEmpty = true) => obj => {
 }
 
 //====== UTILS / uuid
-export const toIndexedObj = (array, prop) => array.reduce(
+export const toIndexedObj = (array, propName) => array.reduce(
   (acc, item) => {
-    acc[item[prop]] = item
+    const prop = R.path(propName.split('.'), item)
+    acc[prop] = item
     return acc
   },
   {}

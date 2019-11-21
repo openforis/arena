@@ -1,0 +1,4 @@
+upstream backend {
+    # Substitute in ARENA_HOST with envsubst
+    server ${ARENA_HOST};
+}

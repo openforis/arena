@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
+import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 
 const validationWrapper = fields => ({
   valid: false,
@@ -31,7 +31,7 @@ const AppJobErrors = ({ job }) => {
                   {i18n.t(errorKey)}
                 </div>
                 <div className="item-error">
-                  <ValidationFieldMessagesHTMLComponent validation={validationWrapper(error)} showKeys={false} />
+                  <ValidationFieldMessages validation={validationWrapper(error)} showKeys={false} />
                 </div>
               </div>
             )

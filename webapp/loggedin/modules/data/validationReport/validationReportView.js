@@ -17,7 +17,7 @@ import * as RecordsState from '@webapp/loggedin/modules/data/records/recordsStat
 
 import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
 
-import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
+import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 
 const validationReportModule = 'validationReport'
 
@@ -64,7 +64,7 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
         {path.join(' / ')}
       </div>
       <div>
-        <ValidationFieldMessagesHTMLComponent validation={row.validation} showKeys={false} />
+        <ValidationFieldMessages validation={row.validation} showKeys={false} />
       </div>
     </>
   )

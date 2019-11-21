@@ -140,7 +140,7 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, ge
         const isRenderTable = value === NodeDefLayout.renderType.table
         const isRenderForm = value === NodeDefLayout.renderType.form
 
-        if (isRenderTable){
+        if (isRenderTable) {
           layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
         } else if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
           // entity rendered as form can only exists in its own page
@@ -165,10 +165,12 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   //dependency graph is not associated to the survey in UI, it's built every time it's needed
   const dependencyGraph = Survey.buildDependencyGraph(survey)
   const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(survey)
-  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(NodeDef.getUuid(nodeDef))(surveyWithDependencies)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
   const i18n = AppState.getI18n(state)
 
-  if (!R.isEmpty(nodeDefDependentsUuids)) {
+  if (!(R.isEmpty(nodeDefDependentsUuids) || R.equals(nodeDefDependentsUuids, [nodeDefUuid]))) {
+    // node has not dependencies or it has expressions that depend on itself
     const nodeDefDependents = R.pipe(
       R.map(R.pipe(
         nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
@@ -189,7 +191,7 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
     const surveyId = Survey.getId(survey)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`, { params: cycle })
+    const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: cycle })
     dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
     dispatch(_updateParentLayout(nodeDef, true))

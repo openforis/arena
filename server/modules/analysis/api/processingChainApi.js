@@ -23,16 +23,31 @@ export const init = app => {
     }
   })
 
-  //====== CREATE - Step
+  //====== CREATE - Processing Step
 
   app.post('/survey/:surveyId/processing-chain/:processingChainUuid/processing-step', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
       const { surveyId, processingChainUuid, processingStepIndex } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const processingStepUuid = await ProcessingChainService.createStep(user, surveyId, processingChainUuid, processingStepIndex)
+      const processingStepUuid = await ProcessingChainService.createProcessingStep(user, surveyId, processingChainUuid, processingStepIndex)
 
       res.json(processingStepUuid)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  //====== CREATE - Processing Step Calculation
+
+  app.post('/survey/:surveyId/processing-step/:processingStepUuid/calculation', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingStepUuid, index } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const calculationStep = await ProcessingChainService.createProcessingStepCalculation(user, surveyId, processingStepUuid, index)
+
+      res.json(calculationStep)
     } catch (err) {
       next(err)
     }
@@ -124,7 +139,7 @@ export const init = app => {
     }
   })
 
-  //====== UPDATE - Step
+  //====== UPDATE - Processing Step
 
   app.put('/survey/:surveyId/processing-step/:processingStepUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
@@ -132,6 +147,19 @@ export const init = app => {
       const user = Request.getUser(req)
 
       await ProcessingChainService.updateStepProps(user, surveyId, processingStepUuid, props)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.put('/survey/:surveyId/processing-step/:processingStepUuid/calculation-index', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
+    try {
+      const { surveyId, processingStepUuid, indexFrom, indexTo } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await ProcessingChainService.updateStepCalculationIndex(user, surveyId, processingStepUuid, indexFrom, indexTo)
 
       Response.sendOk(res)
     } catch (err) {

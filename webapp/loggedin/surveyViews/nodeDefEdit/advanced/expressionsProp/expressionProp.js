@@ -8,7 +8,6 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-// import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 
 const ExpressionProp = (props) => {

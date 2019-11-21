@@ -2,80 +2,65 @@
 
 ## Prerequisites
 
-First, [install Yarn](https://yarnpkg.com/en/docs/install) (modern npm replacement).
+First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replacement).
 
-Then, install [NodeJs](https://nodejs.org/en/download/) (currently the LTS version we are using is 6.x).
+Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using LTS version 12.x).
 
-## Building web application
+## Development (server and the web app)
 
-To build it once:
+Installing dependencies:
+```shell
+yarn
+npm rebuild node-sass # Sometimes needed
+```
 
-```yarn run build```
+For development, `yarn watch` will run the server and the Web app in parallel and "hot reload" on any changes:
+```shell
+yarn watch
+```
 
-To constantly build it when something changes, run:
+## The .env file
 
-```yarn watch```
+The .env file is needed for development and locally running the stack.
 
-## Running the server
+must be added to the root directory of the project and must match the template `.env.template`.
 
-```node server/server.js```
+## Running the stack locally
 
+The following runs the "production" stack locally with Docker Compose, (re-)buildigs.
+This creates a web server listening on `localhost` port `9880` by default.
 
+Note that the Dockerfile build process will only use the `HEAD` commit from the currently
+checked out branch. Uncommitted changes will be ignored.
 
-## Database
+```shell
+docker-compose up --build --abort-on-container-exit
+```
 
-#### Create your own local datbase
+## Running the test suite
 
-If you have a Docker server configured locally, just run this command:
+The following runs the test suite with an isolated Dockerized DB instance.
 
+Note: What's tested is the **committed** code only. Uncommitted changes are ignored.
 
-```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena mdillon/postgis:11```
+```shell
+yarn test:docker
+```
 
-Add the db configurations to the **`.env`** file [(see .env section)](#env-file)
+## Database migrations
 
-#### To restart the database server
+Migrations are run automatically on server startup.
 
-```docker container restart of-arena-dev-db```
+### Adding a new database migration
 
-#### Database Migrations
+When you need execute DDL or other update update logic (e.g. to add a new table to the database, `dbtable`), create a migration template with:
 
-Migrations are run automatically on startup of the server.
-
-##### Adding a database migration
-
-When you need execute a DDL (e.g. add new table to the database, say "dbtable"), create a migration template with:
-
-```yarn run create-migration add-table-dbtable```
+```shell
+yarn run create-migration add-table-dbtable
+```
 
 Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>- add-table-dbtable-<up/down>.sql`
 
-You should edit the `<timestamp>-add-table-dbtable-up.sql to contain your `create table` -statement. 
-You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to run migrations downwards.
+You should edit the `<timestamp>-add-table-dbtable-up.sql` to contain your DDL statements.
 
-
-## .env File
-
-The .env file must be added to the root directory of the project and must contain the following environment variables:
-```
-# Default web server port
-PORT=9090
-
-# DB
-PGHOST=localhost
-PGPORT=5444
-PGDATABASE=of-arena-dev
-PGUSER=arena
-PGPASSWORD=arena
-
-# AWS Cognito
-COGNITO_REGION=cognito_region
-COGNITO_USER_POOL_ID=cognito_user_pool_id
-COGNITO_CLIENT_ID=cognito_client_id
-
-# temp folder
-TEMP_FOLDER=/tmp/arena_upload
-
-#Email
-ADMIN_EMAIL=administrator_email_address
-SENDGRID_API_KEY=your_sendgrid_api_key
-```
+You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to undo migrations.

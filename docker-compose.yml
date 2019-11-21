@@ -28,15 +28,17 @@ services:
       PGUSER: arena
       PGPASSWORD: arena
       TEMP_FOLDER: /tmp/arena_upload
-      ANALYSIS_OUTPUT_DIR: /tmp/arena/analysis
+      ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
 
-    # Execute tests and migrations when postgres is finished:
+    # Start application server when Postgres is ready:
     command: "sh -c '
       while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
       exec pm2-runtime server.js
     '"
 
   web:
+    env_file:
+      - .env
     depends_on:
       - app_server
     ports:
@@ -45,3 +47,5 @@ services:
       context: .
       dockerfile: Dockerfile
       target: prod_web
+    environment:
+      ARENA_HOST: app_server:9090

@@ -66,9 +66,16 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   await client.query(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
     `,
-    [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getValue(node, null)), meta],
+    [
+      Node.getUuid(node),
+      Node.getRecordUuid(node),
+      Node.getParentUuid(node),
+      Node.getNodeDefUuid(node),
+      JSON.stringify(Node.getValue(node, null)),
+      meta,
+    ],
   )
 
   const nodeAdded = await client.one(`
@@ -123,11 +130,11 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
 export const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET value = $1,
+    SET value = $1::jsonb,
     meta = meta || $2::jsonb, 
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
-    `, [stringifyValue(value), meta, nodeUuid]
+    `, [JSON.stringify(value), meta, nodeUuid]
   )
   const node = await client.one(`
     ${_getNodeSelectQuery(surveyId, draft)}
@@ -168,26 +175,6 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     [nodeDefUuids],
     dbTransformCallback
   )
-
-const stringifyValue = value => {
-  const isJsonString = str => {
-    try {
-      return R.is(Object, JSON.parse(str))
-    } catch (e) {
-      return false
-    }
-  }
-
-  return R.ifElse(
-    R.isNil,
-    R.identity,
-    R.ifElse(
-      v => R.is(String, v) && isJsonString(v),
-      R.identity,
-      v => JSON.stringify(v)
-    )
-  )(value)
-}
 
 //UTILS
 export const disableTriggers = async (surveyId, client = db) => await disableSurveySchemaTableTriggers(surveyId, 'node', client)

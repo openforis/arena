@@ -1,5 +1,23 @@
 @import "~@webapp/style/vars";
 
+.processing-step {
+  .form {
+    transition: all 300ms ease;
+  }
+
+  &.calculation-editor-opened {
+    .form {
+      width: 200px;
+      overflow-x: hidden;
+    }
+
+    .processing-step__calculations {
+      padding-left: 0;
+    }
+  }
+
+}
+
 .processing-step__entity-selector {
   max-width: 600px;
 }

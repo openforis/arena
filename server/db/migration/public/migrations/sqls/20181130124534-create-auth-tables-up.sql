@@ -1,11 +1,11 @@
 CREATE TABLE
   auth_group
 (
-  uuid         uuid NOT NULL DEFAULT uuid_generate_v4(),
+  uuid         uuid         NOT NULL DEFAULT uuid_generate_v4(),
   name         VARCHAR(255) NOT NULL,
-  survey_uuid  uuid REFERENCES survey (uuid) ON DELETE CASCADE,
-  permissions  jsonb DEFAULT '{}'::jsonb,
-  record_steps jsonb DEFAULT '{}'::jsonb,
+  survey_uuid  uuid             NULL REFERENCES survey (uuid) ON DELETE CASCADE,
+  permissions  jsonb        NOT NULL DEFAULT '{}'::jsonb,
+  record_steps jsonb        NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (uuid)
 );
 
@@ -19,8 +19,8 @@ CREATE TABLE
 
 CREATE TABLE jwt_token_blacklist
 (
-  token_jti  VARCHAR,
-  expiration bigint,
+  token_jti  VARCHAR NOT NULL,
+  expiration bigint      NULL, -- TODO: can it really be null though?
   PRIMARY KEY (token_jti)
 );
 

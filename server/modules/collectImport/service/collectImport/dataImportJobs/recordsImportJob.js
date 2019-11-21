@@ -89,7 +89,10 @@ export default class RecordsImportJob extends Job {
 
   async beforeEnd () {
     await super.beforeEnd()
-    await RecordManager.enableTriggers(this.surveyId, this.tx)
+    if (this.isSucceeded()) {
+      // re-enable triggers only if transaction is still open
+      await RecordManager.enableTriggers(this.surveyId, this.tx)
+    }
   }
 
   getEntryNames () {
@@ -268,9 +271,7 @@ export default class RecordsImportJob extends Job {
       Node.getRecordUuid(node),
       Node.getParentUuid(node),
       NodeDef.getUuid(nodeDef),
-      value === null || (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isCoordinate(nodeDef) || NodeDef.isFile(nodeDef))
-        ? value
-        : JSON.stringify(value),
+      JSON.stringify(value),
       {
         ...Node.getMeta(node),
         [Node.metaKeys.childApplicability]: {}

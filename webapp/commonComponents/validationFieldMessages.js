@@ -12,8 +12,6 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidations from '@core/record/recordValidation'
 
-// import * as RecordValidation from '@core/record/recordValidation'
-
 import * as SurveyState from '@webapp/survey/surveyState'
 
 import Markdown from '../commonComponents/markdown'
@@ -78,7 +76,7 @@ const getValidationFieldMessagesHTML = (i18n, showKeys = true, survey) =>
     )(validation)
 
 
-const ValidationFieldMessagesHTMLComponent = ({ validation, showKeys, survey }) => {
+const ValidationFieldMessages = ({ validation, showKeys, survey }) => {
   const i18n = useI18n()
 
   return <>{getValidationFieldMessagesHTML(i18n, showKeys, survey)(validation)}</>
@@ -92,4 +90,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(ValidationFieldMessagesHTMLComponent)
+export default connect(mapStateToProps)(ValidationFieldMessages)

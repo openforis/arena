@@ -1,10 +1,7 @@
-import * as AuthGroupRepository from '../repository/authGroupRepository'
-import * as JwtRepository from '../repository/jwtRepository'
+export { fetchGroupByUuid } from '../repository/authGroupRepository'
 
-export const fetchGroupByUuid = AuthGroupRepository.fetchGroupByUuid
-
-export const blacklistToken = JwtRepository.blacklistToken
-
-export const findBlacklistedToken = JwtRepository.findBlacklistedToken
-
-export const deleteExpiredJwtTokens = JwtRepository.deleteExpiredJwtTokens
+export {
+    blacklistToken,
+    findBlacklistedToken,
+    deleteExpiredJwtTokens,
+} from '../repository/jwtRepository'

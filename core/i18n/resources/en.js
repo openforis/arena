@@ -159,7 +159,8 @@ export const enTranslation = {
 - Form fields cannot be changed from single to multiple and vice versa.
 - Category items' codes cannot be changed.
 - Category items cannot be deleted.
-- Taxa cannot be modified.
+- Taxonomy codes cannot be changed.
+- Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
@@ -260,6 +261,8 @@ export const enTranslation = {
       [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
       [ActivityLog.type.processingStepPropsUpdate]: 'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
       [ActivityLog.type.processingStepDelete]: 'deleted processing chain {{processingChainLabel}} step {{index}}',
+      [ActivityLog.type.processingStepCalculationCreate]: 'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
+      [ActivityLog.type.processingStepCalculationIndexUpdate]: 'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
     }
   },
 
@@ -321,6 +324,7 @@ export const enTranslation = {
     deleteConfirm: 'Delete this processing step?\n$t(common.cantUndoWarning)',
     deleteComplete: 'Processing step deleted',
     category: 'Category',
+    calculationSteps: 'Calculation Steps',
   },
 
   itemsTable: {

@@ -7,6 +7,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -22,11 +23,9 @@ export const insert = async (user, surveyId, type, content, system, client) =>
   )
 
 export const insertMany = async (user, surveyId, activities, client) =>
-  await client.batch([
-    activities.map(activity =>
-      insert(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
-    )
-  ])
+  await client.batch(activities.map(activity =>
+    insert(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
+  ))
 
 //===== READ
 export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
@@ -92,7 +91,8 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       
       -- analysis activities keys
       processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
-      processing_step.index AS processing_step_index
+      processing_step.index AS processing_step_index,
+      processing_step_calculation.index AS processing_step_calculation_index
       
     FROM
       log_limited AS l
@@ -143,7 +143,11 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.processing_step
     ON 
-      processing_step.uuid = l.content_uuid
+      processing_step.uuid IN (l.content_uuid, (l.content->>'${ProcessingStepCalculation.keys.processingStepUuid}')::uuid)
+    LEFT OUTER JOIN 
+      ${schema}.processing_step_calculation
+    ON 
+      processing_step_calculation.uuid = l.content_uuid
     -- end of analysis activities part
 
     ORDER BY

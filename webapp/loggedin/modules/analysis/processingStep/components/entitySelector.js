@@ -36,6 +36,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
 const EntitySelector = props => {
   const {
     processingStep, entities,
+    calculationEditorOpened,
     onChange
   } = props
 
@@ -46,15 +47,19 @@ const EntitySelector = props => {
   return (
     <div className="form-item">
 
-      <div className="form-label processing-chain__steps-label">
-        {i18n.t('nodeDefsTypes.entity')}
-      </div>
+      {
+        !calculationEditorOpened &&
+        <div className="form-label processing-chain__steps-label">
+          {i18n.t('nodeDefsTypes.entity')}
+        </div>
+      }
 
       <Dropdown
         className="processing-step__entity-selector"
         autocompleteDialogClassName="processing-step__entity-selector-dialog"
         items={entities}
         selection={entity}
+        readOnly={calculationEditorOpened}
         onChange={
           item => onChange(R.prop('key', item))
         }

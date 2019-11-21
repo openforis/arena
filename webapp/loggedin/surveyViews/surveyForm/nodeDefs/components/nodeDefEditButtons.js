@@ -1,12 +1,15 @@
 import './nodeDefEditButtons.scss'
 
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
+import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
 import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
@@ -16,21 +19,36 @@ const NodeDefEditButtons = (props) => {
 
   const {
     surveyCycleKey, nodeDef,
-    edit, canEditDef,
+    edit, canEditDef, hasNodeDefAddChildTo,
     putNodeDefLayoutProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
+  const show = edit && canEditDef
+  const elementRef = useRef(null)
+  const [style, setStyle] = useState({})
+
   const i18n = useI18n()
 
-  return edit && canEditDef && (
-    <div className="survey-form__node-def-edit-buttons">
+  useEffect(() => {
+    if (show) {
+      const { parentNode } = elementRef.current
+      if (parentNode.classList.contains('survey-form__node-def-page')) {
+        const right = hasNodeDefAddChildTo ? 225 : 25
+        const { top } = elementOffset(parentNode)
+        setStyle({ position: 'fixed', top: `${top}px`, right: `${right}px` })
+      }
+    }
+  }, [hasNodeDefAddChildTo])
+
+  return show && (
+    <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
 
       {
         NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) &&
         <div className="survey-form__node-def-edit-page-props">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
-                 type="number" min="1" max="12"
+                 type="number" min="1" max="12" step="1"
                  onChange={e => e.target.value > 0 ?
                    putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
                    : null
@@ -73,9 +91,15 @@ const NodeDefEditButtons = (props) => {
 
 }
 
-export default connect(null, {
-  setNodeDefForEdit,
-  setFormNodeDefAddChildTo,
-  putNodeDefLayoutProp,
-  removeNodeDef,
-})(NodeDefEditButtons)
+const mapStateToProps = state => ({
+  hasNodeDefAddChildTo: !!SurveyFormState.getNodeDefAddChildTo(state)
+})
+
+export default connect(
+  mapStateToProps,
+  {
+    setNodeDefForEdit,
+    setFormNodeDefAddChildTo,
+    putNodeDefLayoutProp,
+    removeNodeDef,
+  })(NodeDefEditButtons)

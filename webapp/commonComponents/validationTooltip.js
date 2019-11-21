@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ValidationFieldMessagesHTMLComponent from '@webapp/utils/validationUtils'
+import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 import * as Validation from '@core/validation/validation'
 
 import Tooltip from './tooltip'
@@ -16,7 +16,7 @@ export default ({ validation, className, showKeys, children }) => {
 
   const content = isValid
     ? null
-    : React.createElement(ValidationFieldMessagesHTMLComponent, { validation, showKeys })
+    : React.createElement(ValidationFieldMessages, { validation, showKeys })
 
   return (
     <Tooltip

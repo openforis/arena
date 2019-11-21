@@ -9,8 +9,11 @@ export {
   // ====== CREATE - Chain
   createChain,
 
-  // ====== CREATE - Step
-  createStep,
+  // ====== CREATE - Processing Step
+  createProcessingStep,
+
+  // ====== CREATE - Processing Step Calculation
+  createProcessingStepCalculation,
 
   // ======  READ - Chain
   countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid,
@@ -22,7 +25,7 @@ export {
   updateChainProp,
 
   // ======  UPDATE - Step
-  updateStepProps,
+  updateStepProps, updateStepCalculationIndex,
 
   // ======  DELETE - Chain
   deleteChain,

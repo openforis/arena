@@ -33,7 +33,6 @@ const TaxonomyEditHeader = props => {
           canEdit &&
           <UploadButton
             label={i18n.t('common.csvImport')}
-            disabled={Taxonomy.isPublished(taxonomy)}
             accept=".csv"
             onChange={async ([file]) => { await uploadTaxonomyFile(taxonomy, file) }}/>
 
