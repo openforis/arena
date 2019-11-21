@@ -24,14 +24,5 @@ CREATE TABLE jwt_token_blacklist
   PRIMARY KEY (token_jti)
 );
 
--- INSERT ADMIN USER
-INSERT INTO "user" (name, email)
-VALUES ('Admin', 'admin@openforis.org');
-
 INSERT INTO auth_group (name)
 VALUES ('systemAdmin');
-
-INSERT INTO auth_group_user (user_uuid, group_uuid)
-SELECT u.uuid, g.uuid
-FROM "user" u, "auth_group" g
-WHERE u.email = 'admin@openforis.org' AND g.name = 'systemAdmin';
