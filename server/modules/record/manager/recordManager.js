@@ -96,7 +96,3 @@ export const deleteRecordsByCycles = RecordUpdateManager.deleteRecordsByCycles
 export const persistValidation = RecordValidationManager.persistValidation
 export const updateRecordValidationsFromValues = RecordValidationManager.updateRecordValidationsFromValues
 export const validateNodesAndPersistValidation = RecordValidationManager.validateNodesAndPersistValidation
-
-// ====  UTILS
-export const disableTriggers = NodeRepository.disableTriggers
-export const enableTriggers = NodeRepository.enableTriggers

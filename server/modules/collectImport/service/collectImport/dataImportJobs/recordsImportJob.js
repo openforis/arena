@@ -35,7 +35,9 @@ export default class RecordsImportJob extends Job {
 
   async onStart () {
     await super.onStart()
-    await RecordManager.disableTriggers(this.surveyId, this.tx)
+
+    // Speed up processing a bit:
+    await this.tx.query('SET CONSTRAINTS ALL DEFERRED')
   }
 
   async execute () {
@@ -89,10 +91,6 @@ export default class RecordsImportJob extends Job {
 
   async beforeEnd () {
     await super.beforeEnd()
-    if (this.isSucceeded()) {
-      // re-enable triggers only if transaction is still open
-      await RecordManager.enableTriggers(this.surveyId, this.tx)
-    }
   }
 
   getEntryNames () {
