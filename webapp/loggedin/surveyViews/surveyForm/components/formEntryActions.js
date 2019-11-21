@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
@@ -9,8 +8,7 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { deleteRecord, updateRecordStep } from '../../record/actions'
-import { appModuleUri, designerModules } from '../../../appModules'
+import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '../../record/actions'
 
 import * as RecordState from '../../record/recordState'
 
@@ -45,7 +43,11 @@ const RecordEntryButtons = (props) => {
           </button>
         }
 
-        <span>{i18n.t('surveyForm.formEntryActions.step', { id: RecordStep.getId(step), name: getStepLabel(step) })}</span>
+        <span>
+          {
+            i18n.t('surveyForm.formEntryActions.step', { id: RecordStep.getId(step), name: getStepLabel(step) })
+          }
+        </span>
 
         {
           stepNext &&
@@ -81,7 +83,7 @@ const FormEntryActions = (props) => {
     history, preview,
     step, stepNext, stepPrev,
     valid,
-    deleteRecord, updateRecordStep,
+    deleteRecord, deleteRecordUuidPreview, updateRecordStep,
   } = props
 
   const i18n = useI18n()
@@ -91,20 +93,21 @@ const FormEntryActions = (props) => {
       {
         preview
           ? (
-            <Link to={appModuleUri(designerModules.formDesigner)} className="btn-s btn-transparent">
+            <button className="btn-s btn-transparent" onClick={deleteRecordUuidPreview}>
               <span className="icon icon-eye-blocked icon-12px icon-left"/>
               {i18n.t('surveyForm.formEntryActions.closePreview')}
-            </Link>
+            </button>
           )
           : (
             props.entry &&
-            <RecordEntryButtons history={history}
-                                deleteRecord={deleteRecord}
-                                updateRecordStep={updateRecordStep}
-                                step={step}
-                                stepNext={stepNext}
-                                stepPrev={stepPrev}
-                                valid={valid}/>
+            <RecordEntryButtons
+              history={history}
+              deleteRecord={deleteRecord}
+              updateRecordStep={updateRecordStep}
+              step={step}
+              stepNext={stepNext}
+              stepPrev={stepPrev}
+              valid={valid}/>
           )
       }
     </div>
@@ -123,4 +126,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, { deleteRecord, updateRecordStep })(FormEntryActions)
+export default connect(
+  mapStateToProps,
+  { deleteRecord, deleteRecordUuidPreview, updateRecordStep }
+)(FormEntryActions)

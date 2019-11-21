@@ -26,7 +26,7 @@ import { appModules, appModuleUri, dataModules, designerModules } from '../../ap
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
 export const recordDelete = 'survey/record/delete'
-export const recordUuidPreview = 'survey/record/preview/update'
+export const recordUuidPreviewUpdate = 'survey/record/preview/update'
 
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
@@ -78,9 +78,9 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
 
   const recordUuid = Record.getUuid(record)
   if (preview) {
-    dispatch({ type: recordUuidPreview, recordUuid })
+    dispatch({ type: recordUuidPreviewUpdate, recordUuid })
   } else {
-    history.push(`${dataModules.record.path}${recordUuid}`)
+    history.push(`${appModuleUri(dataModules.record)}${recordUuid}`)
   }
 }
 
@@ -161,6 +161,8 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
 
   dispatch(recordDeleted(history))
 }
+
+export const deleteRecordUuidPreview = () => dispatch => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
 
 /**
  * ============

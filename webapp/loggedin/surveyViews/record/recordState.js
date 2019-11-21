@@ -5,6 +5,7 @@ import * as Record from '@core/record/record'
 import * as SurveyViewsState from '../surveyViewsState'
 
 export const stateKey = 'record'
+
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 
 const keys = {
@@ -18,9 +19,13 @@ export const getRecord = R.pipe(getState, R.prop(keys.recordEdit))
 
 export const getRecordUuid = R.pipe(getRecord, Record.getUuid)
 
+export const getRecordUuidPreview = R.pipe(getState, R.prop(keys.recordPreviewUuid))
+
 // ====== UPDATE
 
 export const assocRecord = R.assoc(keys.recordEdit)
+
+export const assocRecordUuidPreview = R.assoc(keys.recordPreviewUuid)
 
 const _updateRecord = fn => recordState => R.pipe(
   R.prop(keys.recordEdit),

@@ -5,7 +5,15 @@ import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { formReset } from '../surveyForm/actions'
 
-import { nodeDelete, nodesUpdate, recordCreate, recordDelete, recordLoad, validationsUpdate } from './actions'
+import {
+  nodeDelete,
+  nodesUpdate,
+  recordCreate,
+  recordDelete,
+  recordLoad,
+  recordUuidPreviewUpdate,
+  validationsUpdate
+} from './actions'
 
 import * as RecordState from './recordState'
 
@@ -29,6 +37,9 @@ const actionHandlers = {
 
   // validation updates
   [validationsUpdate]: (state, { validations }) => RecordState.mergeRecordNodeValidations(validations)(state),
+
+  // record preview
+  [recordUuidPreviewUpdate]: (state, { recordUuid }) => RecordState.assocRecordUuidPreview(recordUuid)(state)
 }
 
 export default exportReducer(actionHandlers)
