@@ -89,7 +89,10 @@ export default class RecordsImportJob extends Job {
 
   async beforeEnd () {
     await super.beforeEnd()
-    await RecordManager.enableTriggers(this.surveyId, this.tx)
+    if (this.isSucceeded()) {
+      // re-enable triggers only if transaction is still open
+      await RecordManager.enableTriggers(this.surveyId, this.tx)
+    }
   }
 
   getEntryNames () {

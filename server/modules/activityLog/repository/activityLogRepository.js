@@ -23,11 +23,9 @@ export const insert = async (user, surveyId, type, content, system, client) =>
   )
 
 export const insertMany = async (user, surveyId, activities, client) =>
-  await client.batch([
-    activities.map(activity =>
-      insert(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
-    )
-  ])
+  await client.batch(activities.map(activity =>
+    insert(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
+  ))
 
 //===== READ
 export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
