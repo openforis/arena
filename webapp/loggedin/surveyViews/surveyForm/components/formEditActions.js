@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { createRecord } from '../../record/actions'
+import { createRecord } from '@webapp/loggedin/surveyViews/record/actions'
 
 const FormEditActions = ({ history, createRecord }) => {
   const i18n = useI18n()

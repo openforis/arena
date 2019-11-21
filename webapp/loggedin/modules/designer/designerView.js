@@ -7,7 +7,6 @@ import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoade
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyFormView from '../../surveyViews/surveyForm/surveyFormView'
 import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
-import RecordView from '../../surveyViews/record/recordView'
 import CategoriesView from '../../surveyViews/categories/categoriesView'
 import TaxonomiesView from '../../surveyViews/taxonomies/taxonomiesView'
 
@@ -40,12 +39,6 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           {
             component: SurveyHierarchy,
             path: appModuleUri(designerModules.surveyHierarchy),
-          },
-
-          {
-            component: RecordView,
-            path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-            props: { edit: true, draftDefs: true, canEditDef, preview: true },
           },
 
           {

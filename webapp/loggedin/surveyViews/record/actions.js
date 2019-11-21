@@ -26,6 +26,7 @@ import { appModules, appModuleUri, dataModules, designerModules } from '../../ap
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
 export const recordDelete = 'survey/record/delete'
+export const recordUuidPreview = 'survey/record/preview/update'
 
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
@@ -75,8 +76,12 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
 
   await axios.post(`/api/survey/${surveyId}/record`, record)
 
-  const moduleUri = appModuleUri(preview ? designerModules.recordPreview : dataModules.record)
-  history.push(moduleUri + Record.getUuid(record))
+  const recordUuid = Record.getUuid(record)
+  if (preview) {
+    dispatch({ type: recordUuidPreview, recordUuid })
+  } else {
+    history.push(`${dataModules.record.path}${recordUuid}`)
+  }
 }
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => dispatch => {
