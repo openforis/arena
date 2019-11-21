@@ -21,7 +21,7 @@ import {
 } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
-import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
+import { appModules, appModuleUri, dataModules } from '../../appModules'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
