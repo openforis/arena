@@ -6,15 +6,25 @@ First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replace
 
 Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using LTS version 12.x).
 
-## Development (server and the web app)
+## Development
 
-Installing dependencies:
+To install local database:
+```shell script
+sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena mdillon/postgis:11
+``` 
+
+To restart local database:
+```shell script
+docker container restart of-arena-dev-db
+```
+
+To install dependencies:
 ```shell
 yarn
 npm rebuild node-sass # Sometimes needed
 ```
 
-For development, `yarn watch` will run the server and the Web app in parallel and "hot reload" on any changes:
+To run the server and the Web app in parallel with "hot reload" on any changes:
 ```shell
 yarn watch
 ```
