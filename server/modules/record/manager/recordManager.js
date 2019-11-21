@@ -11,14 +11,14 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
-import * as RecordValidationManager from './_recordManager/recordValidationManager'
 
-import * as SurveyRepository from '../../survey/repository/surveyRepository'
-import * as NodeDefRepository from '../../nodeDef/repository/nodeDefRepository'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '../repository/recordRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 
-//CREATE
+// ==== CREATE
+
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   await client.tx(async t => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
@@ -45,7 +45,8 @@ export const insertNodesFromValues = async (user, surveyId, nodeValues, client =
 
 export const insertNode = RecordUpdateManager.insertNode
 
-//READ
+// ==== READ
+
 export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
@@ -61,38 +62,33 @@ export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, lim
   }
 }
 
-export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
-  await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+export {
+  fetchRecordByUuid, fetchRecordsUuidAndCycle, countRecordsBySurveyId, fetchRecordCreatedCountsByDates
+} from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client = db) => {
-  const record = await fetchRecordByUuid(surveyId, recordUuid, client)
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, draft, client)
 
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
-export const fetchRecordsUuidAndCycle = RecordRepository.fetchRecordsUuidAndCycle
-export const countRecordsBySurveyId = RecordRepository.countRecordsBySurveyId
-export const fetchRecordCreatedCountsByDates = RecordRepository.fetchRecordCreatedCountsByDates
-
-export const fetchNodeByUuid = NodeRepository.fetchNodeByUuid
-export const fetchChildNodesByNodeDefUuids = NodeRepository.fetchChildNodesByNodeDefUuids
+export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
 // ==== UPDATE
-export const initNewRecord = RecordUpdateManager.initNewRecord
-export const updateRecordStep = RecordUpdateManager.updateRecordStep
-export const persistNode = RecordUpdateManager.persistNode
-export const updateNodesDependents = RecordUpdateManager.updateNodesDependents
+
+export {
+  initNewRecord, updateRecordStep, persistNode, updateNodesDependents
+} from './_recordManager/recordUpdateManager'
 
 // ==== DELETE
-export const deleteRecord = RecordUpdateManager.deleteRecord
-export const deleteRecordPreview = RecordUpdateManager.deleteRecordPreview
-export const deleteRecordsPreview = RecordUpdateManager.deleteRecordsPreview
-export const deleteNode = RecordUpdateManager.deleteNode
-export const deleteNodesByNodeDefUuids = RecordUpdateManager.deleteNodesByNodeDefUuids
-export const deleteRecordsByCycles = RecordUpdateManager.deleteRecordsByCycles
+
+export {
+  deleteRecord, deleteRecordPreview, deleteRecordsPreview, deleteRecordsByCycles,
+  deleteNode, deleteNodesByNodeDefUuids,
+} from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION
-export const persistValidation = RecordValidationManager.persistValidation
-export const updateRecordValidationsFromValues = RecordValidationManager.updateRecordValidationsFromValues
-export const validateNodesAndPersistValidation = RecordValidationManager.validateNodesAndPersistValidation
+export {
+  persistValidation, updateRecordValidationsFromValues, validateNodesAndPersistValidation
+} from './_recordManager/recordValidationManager'

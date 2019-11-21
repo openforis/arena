@@ -65,10 +65,6 @@ export const designerModules = {
     key: 'surveyHierarchy',
     path: `${appModules.designer.path}/surveyHierarchy`,
   },
-  recordPreview: {
-    key: 'preview',
-    path: `${appModules.designer.path}/preview`,
-  },
   categories: {
     key: 'categories',
     path: `${appModules.designer.path}/categories`,

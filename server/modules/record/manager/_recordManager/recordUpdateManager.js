@@ -16,6 +16,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileRepository from '@server/modules/record/repository/fileRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
+import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
 
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
