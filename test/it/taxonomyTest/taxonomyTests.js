@@ -146,13 +146,13 @@ export const taxonomyImportNewTest = async () => {
       [Taxon.propKeys.scientificName]: 'Afzelia quanzensis',
     }, 'Taxon not imported correctly')
     // check vernacular names
-    expect(TaxonomyUtils.getTaxonSingleVernacularName('eng')(taxon)).to.be.equal('Mahogany', 'Vernacular name not imported correctly')
+    expect(TaxonomyUtils.getTaxonSingleVernacularNameText('eng')(taxon)).to.be.equal('Mahogany', 'Vernacular name not imported correctly')
   }
   // check that multiple vernacular names are imported correctly
   {
     const taxon = R.find(taxon => Taxon.getCode(taxon) === 'ALB/GLA', taxa)
     expect(taxon).to.not.be.undefined
-    const vernacularNames = TaxonomyUtils.getTaxonVernacularNames('swa')(taxon)
+    const vernacularNames = TaxonomyUtils.getTaxonVernacularNamesText('swa')(taxon)
     expect(vernacularNames).to.be.deep.equal(['Mchani', 'Mgerenge'])
   }
 }

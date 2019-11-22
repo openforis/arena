@@ -33,6 +33,16 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
     record => dbTransformCallback(record, true, true)
   )
 
+/**
+ * Inserts or updated vernacular names into the specified taxon.
+ * The vernacularNames parameter is an object indexed by language.
+ * Each value is an array of TaxonVernacularName objects.
+ * E.g.
+ * {
+ *   'swa': [TaxonVernacularNameObject1, TaxonVernacularNameObject2],
+ *   'eng': [TaxonVernacularNameObject3, TaxonVernacularNameObject4]
+ * }
+ */
 const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
   R.pipe(R.values, R.flatten, R.map(vernacularName =>
       client.none(
@@ -40,11 +50,7 @@ const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, cl
            ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props_draft)
         VALUES 
           ($1, $2, $3)
-        ON CONFLICT (
-          taxon_uuid, 
-          ((props||props_draft)->>'${TaxonVernacularName.keysProps.lang}'), 
-          ((props||props_draft)->>'${TaxonVernacularName.keysProps.name}')
-        ) DO UPDATE SET 
+        ON CONFLICT (uuid) DO UPDATE SET 
           props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $3`,
         [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)]
       )

@@ -39,8 +39,8 @@ after(async () => {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
 })
 
-const _addVernacularNameToTaxon = async (taxonCode, lang, name) =>
-  TaxonomyUtils.addVernacularNameToTaxon(getContextUser(), Survey.getId(survey), taxonomyName, taxonCode, lang, name)
+const _updateTaxonWithNewVernacularNames = async (taxonCode, lang, names) =>
+  TaxonomyUtils.updateTaxonWithNewVernacularNames(getContextUser(), Survey.getId(survey), taxonomyName, taxonCode, lang, names)
 
 const _publishSurvey = async () =>
   SurveyUtils.publishSurvey(getContextUser(), Survey.getId(survey))
@@ -79,7 +79,7 @@ export const taxonPublishedAddVernacularNameTest = async () => {
   const lang = 'swa'
 
   // add vernacular name
-  const { vernacularNamesNew } = await _addVernacularNameToTaxon(taxonCode, lang, 'Swahili Vernacular Name')
+  const { vernacularNamesNew } = await _updateTaxonWithNewVernacularNames(taxonCode, lang, ['Swahili Vernacular Name'])
   const vernacularNameNew = R.head(vernacularNamesNew)
 
   // reload vernacular name
@@ -101,24 +101,24 @@ export const taxonPublishedUpdateVernacularNamesTest = async () => {
   const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyName, false)
   const taxonCode = 'AFZ/QUA'
   const lang = 'swa'
-  const name = 'New Swahili name'
+  const name1 = 'Mbambakofi updated'
+  const name2 = 'New Swahili name'
 
-  // add new vernacular name
-  const { vernacularNamesNew, vernacularNamesOld } = await _addVernacularNameToTaxon(taxonCode, lang, name)
-  const vernacularNameOld = R.head(vernacularNamesOld)
+  // update taxon vernacular names
+  const { vernacularNamesNew, vernacularNamesOld } = await _updateTaxonWithNewVernacularNames(taxonCode, lang, [name1, name2])
+  const vernacularName1Old = R.head(vernacularNamesOld)
 
   // reload vernacular name
   const taxonReloaded = await TaxonomyUtils.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
   const vernacularNamesReloaded = Taxon.getVernacularNamesByLang(lang)(taxonReloaded)
-
-  // check that there are 2 vernacular names for the same language now
-  expect(R.length(vernacularNamesNew)).to.be.equal(2, 'Vernacular name not inserted')
+  // check that the old vernacular name has been updated correctly
+  const vernacularName1Reloaded = R.find(vn => TaxonVernacularName.getName(vn) === name1)(vernacularNamesReloaded)
+  expect(vernacularName1Reloaded).to.be.not.undefined
+  // check that the uuid of the old vernacular name has not changed
+  expect(TaxonVernacularName.getUuid(vernacularName1Reloaded)).to.be.equal(TaxonVernacularName.getUuid(vernacularName1Old), 'Existing vernacular name UUID changed')
   // check that the new vernacular name has been inserted correctly
-  const vernacularNameNewReloaded = R.find(vn => TaxonVernacularName.getName(vn) === name)(vernacularNamesReloaded)
-  expect(vernacularNameNewReloaded).to.be.not.undefined
-  // check that the old vernacular name has not changed
-  const vernacularNameOldReloaded = R.find(vn => TaxonVernacularName.getName(vn) === TaxonVernacularName.getName(vernacularNameOld))(vernacularNamesReloaded)
-  expect(vernacularNameOldReloaded).to.be.deep.equal(vernacularNameOld, 'Existing vernacular name changed')
+  const vernacularName2Reloaded = R.find(vn => TaxonVernacularName.getName(vn) === name2)(vernacularNamesReloaded)
+  expect(vernacularName2Reloaded).to.be.not.undefined
 
   await _publishSurvey()
 }

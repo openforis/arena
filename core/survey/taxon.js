@@ -65,15 +65,36 @@ export const isEqual = ObjectUtils.isEqual
 //==== UPDATE
 export const assocVernacularNames = (lang, vernacularNames) => R.assocPath([keys.vernacularNames, lang], vernacularNames)
 
+export const appendVernacularName = vernacularName => taxon => R.pipe(
+  getVernacularNamesByLang(TaxonVernacularName.getLang(vernacularName)),
+  R.append(vernacularName),
+  vernacularNames => assocVernacularNames(TaxonVernacularName.getLang(vernacularName), vernacularNames)(taxon)
+)(taxon)
+
+const _mergeVernacularNames = vernacularNamesArrayNew => vernacularNamesArrayExisting =>
+  R.reduce(
+    (accVernacularNames, index) => {
+      const vernacularNameNew = R.prop(index, vernacularNamesArrayNew)
+      const vernacularNameExisting = R.prop(index, vernacularNamesArrayExisting)
+      const vernacularNameUpdated = vernacularNameNew && vernacularNameExisting
+        ? TaxonVernacularName.mergeProps(vernacularNameNew)(vernacularNameExisting) // merge new vernacular name into existing one
+        : vernacularNameNew
+          ? vernacularNameNew // there is no existing vernacular name, take the new one
+          : vernacularNameExisting // take the existing one
+      return R.append(vernacularNameUpdated, accVernacularNames)
+    },
+    [],
+    R.times(R.identity, Math.max(vernacularNamesArrayNew.length, vernacularNamesArrayExisting.length))
+  )
+
 export const mergeProps = taxonNew => taxon => {
   const vernacularNamesUpdated = Object.entries(getVernacularNames(taxonNew)).reduce(
-    (accVernacularNames, [lang, vernacularNames]) => {
-      const vernacularNamesExisting = getVernacularNamesByLang(lang)(taxon)
-      const vernacularNamesUpdated = R.isEmpty(vernacularNamesExisting)
-        ? vernacularNames
-        : TaxonVernacularName.mergeVernacularNames(vernacularNames)(vernacularNamesExisting)
-      return R.assoc(lang, vernacularNamesUpdated, accVernacularNames)
-    },
+    (accVernacularNames, [lang, vernacularNamesArray]) =>
+      R.pipe(
+        getVernacularNamesByLang(lang),
+        _mergeVernacularNames(vernacularNamesArray),
+        vernacularNamesUpdated => R.assoc(lang, vernacularNamesUpdated, accVernacularNames)
+      )(taxon),
     {}
   )
 
