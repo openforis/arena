@@ -89,11 +89,6 @@ export {
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION
-
 export {
   persistValidation, updateRecordValidationsFromValues, validateNodesAndPersistValidation
 } from './_recordManager/recordValidationManager'
-
-// ====  UTILS
-
-export { disableTriggers, enableTriggers }from '../repository/nodeRepository'
