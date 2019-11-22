@@ -10,8 +10,12 @@ import * as SchemaRdb from '../../../../common/surveyRdb/schemaRdb'
 const query = (surveyId, offset = 0, limit = null) =>
   `SELECT
     r.uuid,
+    r.step,
+    r.owner_uuid,
+
     k.key AS node_uuid,
     k.value AS validation,
+
     h.node_def_uuid,
     h.keys_self,
     h.keys_hierarchy
@@ -21,7 +25,9 @@ const query = (surveyId, offset = 0, limit = null) =>
   JOIN
     ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
   ON k.key::uuid = h.node_uuid
-  WHERE r.cycle = $1
+  WHERE 
+    r.cycle = $1
+    AND NOT r.preview
   ORDER BY r.uuid, h.node_id
   LIMIT ${limit || 'ALL'}
   OFFSET ${offset}`

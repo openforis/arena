@@ -12,9 +12,11 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as Authorizer from '@core/auth/authorizer'
 
 import { appModuleUri, dataModules } from '@webapp/loggedin/appModules'
 
+import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordsState from '@webapp/loggedin/modules/data/records/recordsState'
 
@@ -33,11 +35,12 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
       { nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, i18n.lang)}</div>) }
       <div>{i18n.t('common.path')}</div>
       <div>{i18n.t('common.messages')}</div>
+      <div />
     </>
   )
 }
 
-const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
+const ValidationReportRow = ({ user, survey, row, nodeDefKeys, idx, offset }) => {
   const i18n = useI18n()
 
   const path = row.keysHierarchy.slice(1).reduce((path, h) => {
@@ -48,10 +51,18 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
     return path.concat(`${parentNodeDefName} (${keyValues.join(', ')})`)
   }, [])
 
-  const lastNodeDef = Survey.getNodeDefByUuid(row.nodeDefUuid)(survey)
+  const lastNodeDef = Survey.getNodeDefByUuid(NodeDef.getUuid(row))(survey)
   path.push(NodeDef.getLabel(lastNodeDef, i18n.lang))
 
   const hierarchyKeys = row.keysHierarchy[0].keys
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const canEdit = Survey.isPublished(surveyInfo) &&
+    Authorizer.canEditRecord(user, {
+      [Record.keys.step]: Record.getStep(row),
+      [Record.keys.surveyUuid]: Survey.getUuid(surveyInfo),
+      [Record.keys.ownerUuid]: Record.getOwnerUuid(row)
+    })
 
   return (
     <>
@@ -68,6 +79,9 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
       </div>
       <div className='validation_report_view__message'>
         <ValidationFieldMessages validation={row.validation} showKeys={false} />
+      </div>
+      <div>
+        <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
     </>
   )
@@ -86,12 +100,11 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadL
     history.push(recordEditUrl)
   }
 
-  // const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
 
   const noCols = nodeDefKeys.length
-  const gridTemplateColumns = `70px repeat(${noCols}, 200px) 1fr 2fr`
+  const gridTemplateColumns = `70px repeat(${noCols}, 200px) 1fr 2fr 50px`
 
   const restParams = { cycle: surveyCycleKey }
 
@@ -115,10 +128,9 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadL
 }
 
 const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
-
   return {
-    survey,
+    user: AppState.getUser(state),
+    survey: SurveyState.getSurvey(state),
     nodeDefKeys: RecordsState.getNodeDefKeys(state),
     surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   }

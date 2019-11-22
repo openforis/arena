@@ -16,7 +16,7 @@ import * as RecordValidations from '@core/record/recordValidation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import Markdown from '../commonComponents/markdown'
+import Markdown from '@webapp/commonComponents/markdown'
 
 
 const getErrorText = i18n => error =>
@@ -24,22 +24,19 @@ const getErrorText = i18n => error =>
     ? ValidationResult.getMessage(i18n.lang)(error)
     : i18n.t(ValidationResult.getKey(error), ValidationResult.getParams(error))
 
-const getErrorMessages = i18n => R.pipe(
-  Validation.getErrors,
+const getMessages = (fn, type) => i18n => R.pipe(
+  fn,
   R.map(getErrorText(i18n)),
   R.join(', '),
-  text => text ? ['error', text] : []
+  msg => msg ? [type, msg] : []
 )
 
-const getWarningMessages = i18n => R.pipe(
-  Validation.getWarnings,
-  R.map(getErrorText(i18n)),
-  R.join(', '),
-  text => text ? ['warning', text] : []
+const getValidationErrorMessages = i18n => R.converge(
+  R.concat, [
+    getMessages(Validation.getWarnings, 'warning')(i18n),
+    getMessages(Validation.getErrors, 'error')(i18n)
+  ]
 )
-
-const getValidationErrorMessages = i18n => validation =>
-  R.concat(getWarningMessages(i18n)(validation))(getErrorMessages(i18n)(validation))
 
 const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
   getValidationErrorMessages(i18n),
@@ -82,6 +79,7 @@ const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => valid
     R.concat(messages)
   )(validation)
 )(validation)
+
 
 const getValidationFieldMessagesHTML = (i18n, showKeys = true, survey) =>
   validation =>
