@@ -63,7 +63,7 @@ const RecordView = props => {
       sessionExpired(history)
     })
     AppWebSocket.on(WebSocketEvents.applicationError, ({key, params}) => {
-      applicationError(history, recordUuidUrlParam, key, params)
+      applicationError(history, key, params)
     })
 
     // add beforeunload event listener
@@ -133,7 +133,6 @@ const mapStateToProps = (state, { match, location }) => {
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
     surveyCycleKey,
     preview: !!recordUuidPreview,
-    applicationError,
   }
 }
 

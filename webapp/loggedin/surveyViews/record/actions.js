@@ -12,6 +12,7 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import * as RecordState from './recordState'
+import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
 import {
   showAppLoader,
@@ -57,8 +58,8 @@ export const sessionExpired = history => dispatch => {
   _navigateToModuleDataHome(history)
 }
 
-export const applicationError = (history, recordUuid, key, params) => dispatch => {
-  dispatch(showNotification(key, params, 'error'))
+export const applicationError = (history, key, params) => dispatch => {
+  dispatch(showNotification(key, params, NotificationState.severity.error))
   history.push(appModuleUri(appModules.designer))
 }
 

@@ -83,7 +83,7 @@ class RecordUpdateThread extends Thread {
               params: e.params,
             }
           })
-          process.exit(1) // Stop processing
+          return // Stop processing
         } else {
           // Unexpected error: Crash and burn
           throw e
