@@ -11,7 +11,6 @@ import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 import * as Authorizer from '@core/auth/authorizer'
 
 import { appModuleUri, dataModules } from '@webapp/loggedin/appModules'
@@ -32,7 +31,6 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
   return (
     <>
       <div>#</div>
-      { nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, i18n.lang)}</div>) }
       <div>{i18n.t('common.path')}</div>
       <div>{i18n.t('common.messages')}</div>
       <div />
@@ -40,21 +38,24 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
   )
 }
 
-const ValidationReportRow = ({ user, survey, row, nodeDefKeys, idx, offset }) => {
+const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   const i18n = useI18n()
 
-  const path = row.keysHierarchy.slice(1).reduce((path, h) => {
+  let keysHierarchy = row.keysHierarchy
+  if (keysHierarchy[0].nodeDefUuid === null) {
+    keysHierarchy = keysHierarchy.slice(1)
+  }
+  keysHierarchy = keysHierarchy.concat({ keys: row.keysSelf || {}, nodeDefUuid: row.nodeDefUuid })
+
+  const getKeyValues = keys => Object.values(keys).reduce((values, value) => values.concat(value === null ? '' : value), [])
+
+  const path = keysHierarchy.reduce((p, h) => {
     const parentNodeDef = Survey.getNodeDefByUuid(h.nodeDefUuid)(survey)
-    const parentNodeDefName = NodeDef.getLabel(parentNodeDef, i18n.lang)
-    const keyValues = Object.values(h.keys).reduce((values, value) => values.concat(value === null ? 'null' : value), [])
+    const parentNodeDefLabel = NodeDef.getLabel(parentNodeDef, i18n.lang)
+    const keyValues = getKeyValues(h.keys)
 
-    return path.concat(`${parentNodeDefName} (${keyValues.join(', ')})`)
+    return p.concat(`${parentNodeDefLabel} [${keyValues.join(', ')}]`)
   }, [])
-
-  const lastNodeDef = Survey.getNodeDefByUuid(NodeDef.getUuid(row))(survey)
-  path.push(NodeDef.getLabel(lastNodeDef, i18n.lang))
-
-  const hierarchyKeys = row.keysHierarchy[0].keys
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const canEdit = Survey.isPublished(surveyInfo) &&
@@ -69,16 +70,11 @@ const ValidationReportRow = ({ user, survey, row, nodeDefKeys, idx, offset }) =>
       <div>
         {idx + offset + 1}
       </div>
-      {
-        nodeDefKeys.map((k, i) =>
-          <div key={i}>{hierarchyKeys ? hierarchyKeys[Node.getUuid(k)] : row.keysSelf[Node.getUuid(k)]}</div>
-        )
-      }
       <div>
         {path.join(' / ')}
       </div>
       <div className='validation_report_view__message'>
-        <ValidationFieldMessages validation={row.validation} showKeys={false} />
+        <ValidationFieldMessages validation={row.validation} showKeys={false} showIcons={true}/>
       </div>
       <div>
         <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
@@ -100,11 +96,7 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadL
     history.push(recordEditUrl)
   }
 
-  const nodeDefRoot = Survey.getNodeDefRoot(survey)
-  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
-
-  const noCols = nodeDefKeys.length
-  const gridTemplateColumns = `70px repeat(${noCols}, 200px) 1fr 2fr 50px`
+  const gridTemplateColumns = `70px 1fr 2fr 50px`
 
   const restParams = { cycle: surveyCycleKey }
 
@@ -116,8 +108,6 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadL
     gridTemplateColumns={gridTemplateColumns}
     rowHeaderComponent={ValidationReportRowHeader}
     rowComponent={ValidationReportRow}
-
-    nodeDefKeys={nodeDefKeys}
 
     canInvite={canInvite}
     user={user}

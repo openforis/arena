@@ -17,14 +17,6 @@
   justify-self: left;
 
   .validation_field_message {
-    font-weight: 600;
-     
-    &.warning {
-      color: $orange;
-    }
-
-    &.error {
-      color: $red;
-    }
+    color: $black;
   }
 }

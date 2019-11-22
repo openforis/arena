@@ -75,26 +75,29 @@ const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => valid
   }),
   messages => R.pipe(
     getValidationErrorMessages(i18n),
-    x => [x],
+    x => x.length ? [x] : [],
     R.concat(messages)
   )(validation)
 )(validation)
 
 
-const getValidationFieldMessagesHTML = (i18n, showKeys = true, survey) =>
+const getValidationFieldMessagesHTML = (i18n, showKeys, showIcons, survey) =>
   validation =>
     R.pipe(
       getValidationFieldMessages(i18n, showKeys, survey),
       R.addIndex(R.map)(
-        ([type, message], i) => <Markdown className={`validation_field_message ${type}`} key={i} source={message}/>
+        ([type, message], i) => <div className={`validation_field_message ${type}`} key={i}>
+          { showIcons && <span className="icon icon-warning icon-12px icon-left" /> }
+          <Markdown className="validation_field_message__text" source={message}/>
+        </div>
       )
     )(validation)
 
 
-const ValidationFieldMessages = ({ validation, showKeys, survey }) => {
+const ValidationFieldMessages = ({ validation, showKeys = true, showIcons = false, survey }) => {
   const i18n = useI18n()
 
-  return <>{getValidationFieldMessagesHTML(i18n, showKeys, survey)(validation)}</>
+  return <>{getValidationFieldMessagesHTML(i18n, showKeys, showIcons, survey)(validation)}</>
 }
 
 const mapStateToProps = state => {
