@@ -1,8 +1,7 @@
-import * as Log from '@server/log/log'
-
+import Promise from 'bluebird'
 import * as pgPromise from 'pg-promise'
-
 import * as ProcessUtils from '@core/processUtils'
+import * as Log from '@server/log/log'
 
 const logger = Log.getLogger('DB')
 
@@ -15,8 +14,27 @@ const debugOptions = {
   }
 }
 
-// const pgp = pgPromise(debugOptions)
-const pgp = pgPromise({})
+// Enable all options that help with debugging.
+// TODO: Re-consider these later when the app matures.
+Promise.config({
+  // Enable warnings
+  warnings: true,
+  // Enable long stack traces
+  longStackTraces: true,
+  // Enable cancellation
+  cancellation: true,
+  // Enable monitoring
+  monitoring: true,
+  // Enable async hooks
+  asyncHooks: true,
+});
+
+const initOptions = {
+  promiseLib: Promise,
+  ...(ProcessUtils.ENV.debug ? debugOptions : {}),
+}
+
+const pgp = pgPromise(initOptions);
 
 const configCommon = {
   // how long a client is allowed to remain idle before being closed

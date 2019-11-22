@@ -21,11 +21,12 @@ import {
 } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
-import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
+import { appModules, appModuleUri, dataModules } from '../../appModules'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
 export const recordDelete = 'survey/record/delete'
+export const recordUuidPreviewUpdate = 'survey/record/preview/update'
 
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
@@ -75,8 +76,12 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
 
   await axios.post(`/api/survey/${surveyId}/record`, record)
 
-  const moduleUri = appModuleUri(preview ? designerModules.recordPreview : dataModules.record)
-  history.push(moduleUri + Record.getUuid(record))
+  const recordUuid = Record.getUuid(record)
+  if (preview) {
+    dispatch({ type: recordUuidPreviewUpdate, recordUuid })
+  } else {
+    history.push(`${appModuleUri(dataModules.record)}${recordUuid}`)
+  }
 }
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => dispatch => {
@@ -156,6 +161,8 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
 
   dispatch(recordDeleted(history))
 }
+
+export const deleteRecordUuidPreview = () => dispatch => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
 
 /**
  * ============

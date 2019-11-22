@@ -5,7 +5,7 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as Node from '@core/record/node'
-import { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } from '../../survey/repository/surveySchemaRepositoryUtils';
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils';
 
 export const tableColumns = ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'] //used for node values batch insert
 
@@ -175,8 +175,3 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     [nodeDefUuids],
     dbTransformCallback
   )
-
-//UTILS
-export const disableTriggers = async (surveyId, client = db) => await disableSurveySchemaTableTriggers(surveyId, 'node', client)
-export const enableTriggers = async (surveyId, client = db) => await enableSurveySchemaTableTriggers(surveyId, 'node', client)
-

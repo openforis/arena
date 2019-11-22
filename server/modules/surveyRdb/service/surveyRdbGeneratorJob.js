@@ -40,7 +40,6 @@ export default class SurveyRdbGeneratorJob extends Job {
       // ===== create table
       this.logDebug(`create data table ${nodeDefName} - start`)
       await SurveyRdbManager.createTableAndView(survey, nodeDef, tx)
-      // await tx.none(`ALTER TABLE ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDef, nodeDefParent)} DISABLE TRIGGER ALL`)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table

@@ -3,13 +3,12 @@ import { connect } from 'react-redux'
 
 import * as Authorizer from '@core/auth/authorizer'
 
-import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
-import InnerModuleSwitch from '../components/innerModuleSwitch'
-import SurveyFormView from '../../surveyViews/surveyForm/surveyFormView'
+import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
+import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
+import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
+import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
+import FormDesignerView from './formDesigner/formDesignerView'
 import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
-import RecordView from '../../surveyViews/record/recordView'
-import CategoriesView from '../../surveyViews/categories/categoriesView'
-import TaxonomiesView from '../../surveyViews/taxonomies/taxonomiesView'
 
 import { appModules, appModuleUri, designerModules } from '../../appModules'
 
@@ -32,20 +31,13 @@ const DesignerView = ({ canEditDef, resetForm }) => {
         moduleDefault={designerModules.formDesigner}
         modules={[
           {
-            component: SurveyFormView,
+            component: FormDesignerView,
             path: appModuleUri(designerModules.formDesigner),
-            props: { edit: true, draft: true, canEditDef },
           },
 
           {
             component: SurveyHierarchy,
             path: appModuleUri(designerModules.surveyHierarchy),
-          },
-
-          {
-            component: RecordView,
-            path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-            props: { edit: true, draftDefs: true, canEditDef, preview: true },
           },
 
           {

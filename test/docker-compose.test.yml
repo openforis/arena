@@ -27,8 +27,10 @@ services:
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
 
     # Execute tests and migrations when postgres is finished:
-    command: "sh -c '
-      while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
-      mkdir -p $$TEMP_FOLDER $$ANALYSIS_OUTPUT_DIR;
-      yarn run npm-run-all server:migrate test
-    '"
+    command: |
+      sh -c '
+        set -e # exit on first failure
+        while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
+        mkdir -p $$TEMP_FOLDER $$ANALYSIS_OUTPUT_DIR;
+        yarn run npm-run-all server:migrate test
+      '
