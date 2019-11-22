@@ -52,7 +52,7 @@ const getValidationFieldErrorMessage = (i18n, field) => R.pipe(
       )
     ),
     R.identity
-  ),
+  )
 )
 
 const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => validation => R.pipe(
@@ -78,15 +78,15 @@ const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => valid
   }),
   messages => R.pipe(
     getValidationErrorMessages(i18n),
+    x => [x],
     R.concat(messages)
-  )(validation),
+  )(validation)
 )(validation)
 
 const getValidationFieldMessagesHTML = (i18n, showKeys = true, survey) =>
   validation =>
     R.pipe(
       getValidationFieldMessages(i18n, showKeys, survey),
-      x => console.log('x', x) || x,
       R.addIndex(R.map)(
         ([type, message], i) => <Markdown className={`validation_field_message ${type}`} key={i} source={message}/>
       )

@@ -1,3 +1,5 @@
+import './validationReportView.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -7,6 +9,7 @@ import TableView from '@webapp/loggedin/tableViews/tableView'
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
@@ -29,7 +32,7 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
       <div>#</div>
       { nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, i18n.lang)}</div>) }
       <div>{i18n.t('common.path')}</div>
-      <div>{i18n.t('common.error_plural')} / {i18n.t('common.warning_plural')}</div>
+      <div>{i18n.t('common.messages')}</div>
     </>
   )
 }
@@ -37,7 +40,7 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
 const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
   const i18n = useI18n()
 
-  const path = row.keys_hierarchy.slice(1).reduce((path, h) => {
+  const path = row.keysHierarchy.slice(1).reduce((path, h) => {
     const parentNodeDef = Survey.getNodeDefByUuid(h.nodeDefUuid)(survey)
     const parentNodeDefName = NodeDef.getLabel(parentNodeDef, i18n.lang)
     const keyValues = Object.values(h.keys).reduce((values, value) => values.concat(value === null ? 'null' : value), [])
@@ -45,10 +48,10 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
     return path.concat(`${parentNodeDefName} (${keyValues.join(', ')})`)
   }, [])
 
-  const lastNodeDef = Survey.getNodeDefByUuid(row.node_def_uuid)(survey)
+  const lastNodeDef = Survey.getNodeDefByUuid(row.nodeDefUuid)(survey)
   path.push(NodeDef.getLabel(lastNodeDef, i18n.lang))
 
-  const hierarchyKeys = row.keys_hierarchy[0].keys
+  const hierarchyKeys = row.keysHierarchy[0].keys
 
   return (
     <>
@@ -57,13 +60,13 @@ const ValidationReportRow = ({ survey, row, nodeDefKeys, idx, offset }) => {
       </div>
       {
         nodeDefKeys.map((k, i) =>
-          <div key={i}>{hierarchyKeys ? hierarchyKeys[Node.getUuid(k)] : row.keys_self[Node.getUuid(k)]}</div>
+          <div key={i}>{hierarchyKeys ? hierarchyKeys[Node.getUuid(k)] : row.keysSelf[Node.getUuid(k)]}</div>
         )
       }
       <div>
         {path.join(' / ')}
       </div>
-      <div>
+      <div className='validation_report_view__message'>
         <ValidationFieldMessages validation={row.validation} showKeys={false} />
       </div>
     </>
@@ -76,8 +79,8 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadL
   }, [surveyCycleKey])
 
   const onRowClick = record => {
-    const parentEntityUuid = R.prop('nodeUuid', R.last(record.keys_hierarchy))
-    const recordUuid = record.uuid
+    const parentEntityUuid = R.prop('nodeUuid', R.last(record.keysHierarchy))
+    const recordUuid = Record.getUuid(record)
     const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentEntityUuid}`
 
     history.push(recordEditUrl)
@@ -93,6 +96,7 @@ const ValidationReportView = ({ canInvite, user, survey, surveyCycleKey, reloadL
   const restParams = { cycle: surveyCycleKey }
 
   return <TableView
+    className='validation_report_view__table'
     module={validationReportModule}
     restParams={restParams}
 

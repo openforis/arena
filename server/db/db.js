@@ -15,8 +15,8 @@ const debugOptions = {
   }
 }
 
-const pgp = pgPromise(debugOptions)
-// const pgp = pgPromise({})
+// const pgp = pgPromise(debugOptions)
+const pgp = pgPromise({})
 
 const configCommon = {
   // how long a client is allowed to remain idle before being closed

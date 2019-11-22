@@ -22,9 +22,9 @@ class Tooltip extends React.Component {
   }
 
   mouseEnter () {
-    const { messages, content, type = '' } = this.props
+    const { messages, content, show, type = '' } = this.props
 
-    if (content) {
+    if (show && (content || !(R.isEmpty(messages) || R.isNil(messages)))) {
       const style = this.getStyle()
       const className = `tooltip__message${type ? '-' + type : ''}`
 

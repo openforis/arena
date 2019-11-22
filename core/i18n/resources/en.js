@@ -41,6 +41,7 @@ export const enTranslation = {
     label_plural: 'Labels',
     language: 'Language',
     manage: 'Manage',
+    messages: 'Messages',
     name: 'Name',
     new: 'New',
     no: 'No',
@@ -184,7 +185,6 @@ export const enTranslation = {
     },
     collectImportReport: {
       expression: 'Expression',
-      messages: 'Messages',
       resolved: 'Resolved',
       exprType: {
         applicable: '$t(nodeDefEdit.advancedProps.applicableIf)',

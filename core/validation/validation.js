@@ -128,10 +128,14 @@ export const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields,
 
 export const getErrors = R.propOr([], keys.errors)
 export const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
+export const isError = validation =>
+  hasErrors(validation) || R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
+
 export const getWarnings = R.propOr([], keys.warnings)
 export const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
-const hasWarningsInFields = R.pipe(getFieldValidations, R.values, R.any(hasWarnings))
-export const isWarning = validation => hasWarnings(validation) || hasWarningsInFields(validation)
+export const isWarning = validation =>
+  hasWarnings(validation) || R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
+
 export const getCounts = R.propOr({}, keys.counts)
 export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
 export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))

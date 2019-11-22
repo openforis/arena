@@ -1,4 +1,4 @@
-// import * as camelize from 'camelize'
+import * as camelize from 'camelize'
 
 import { db } from '@server/db/db'
 
@@ -27,7 +27,8 @@ const query = (surveyId, offset = 0, limit = null) =>
   OFFSET ${offset}`
 
 export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
-  await client.any(query(surveyId, offset, limit), [cycle])
+  await client.map(query(surveyId, offset, limit), [cycle], res =>
+    Object.entries(res).reduce((obj, [k, v]) => { obj[camelize(k)] = v; return obj }, {}))
 
 export const countValidationReports = async (surveyId, cycle, client = db) =>
   await client.one(`SELECT count(*) from(${query(surveyId, '0')}) as v`, [cycle])
