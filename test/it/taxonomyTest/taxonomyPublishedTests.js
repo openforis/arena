@@ -11,7 +11,7 @@ import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManag
 
 import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
-import * as TaxonomyUtils from '../utils/taxonomyUtils'
+import * as TaxonomyUtils from './taxonomyUtils'
 import * as SurveyUtils from '../utils/surveyUtils'
 
 const taxonomyName = 'species_list'

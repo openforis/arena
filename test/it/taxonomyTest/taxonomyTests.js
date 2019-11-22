@@ -6,13 +6,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+import { jobStatus } from '@server/job/jobUtils'
 
 import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
-import * as TaxonomyUtils from '../utils/taxonomyUtils'
+import * as TaxonomyUtils from './taxonomyUtils'
 
 const taxonomyName = 'species_list'
 let survey = null
@@ -109,3 +111,49 @@ export const taxonUpdateTest = async () => {
 
   expect(Taxon.getProps(taxonReloaded)).to.deep.equal(Taxon.getProps(taxonNew))
 }
+
+const _importFile = async (taxonomyName, importFileName) =>
+  TaxonomyUtils.importFile(getContextUser(), Survey.getId(survey), taxonomyName, importFileName)
+
+export const taxonomyImportErrorMissingColumnsTest = async () => {
+  const { job } = await _importFile(taxonomyName, 'species list test (short with vernacular names) (errors) (missing columns).csv')
+  expect(job.status).to.be.equal(jobStatus.failed)
+  expect(R.path(['errors', '1', 'all', 'errors', '0', 'key'], job)).to.be.equal(Validation.messageKeys.taxonomyImportJob.missingRequiredColumns)
+}
+
+export const taxonomyImportErrorDuplicateItemsTest = async () => {
+  const { job } = await _importFile(taxonomyName, 'species list test (short with vernacular names) (errors).csv')
+  expect(job.status).to.be.equal(jobStatus.failed)
+}
+
+export const taxonomyImportNewTest = async () => {
+  const { job, taxonomyUuid } = await _importFile('New taxonomy', 'species list test (short with vernacular names).csv')
+
+  // check that the job completed successfully
+  expect(job.status).to.be.equal(jobStatus.succeeded, `Failed to run TaxonomyImportJob: ${JSON.stringify(job)}`)
+  // check that the correct number of taxa has been imported
+  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(Survey.getId(survey), taxonomyUuid, true)
+  expect(taxa.length).to.be.equal(14 /*12 items + Unlisted + Unknown */, '')
+
+  // check that all taxon props have been imported
+  {
+    const taxon = R.find(taxon => Taxon.getCode(taxon) === 'AFZ/QUA', taxa)
+    expect(taxon).to.not.be.undefined
+    expect(Taxon.getProps(taxon)).to.be.deep.equal({
+      [Taxon.propKeys.code]: 'AFZ/QUA',
+      [Taxon.propKeys.family]: 'Fabaceae',
+      [Taxon.propKeys.genus]: 'Afzelia',
+      [Taxon.propKeys.scientificName]: 'Afzelia quanzensis',
+    }, 'Taxon not imported correctly')
+    // check vernacular names
+    expect(TaxonomyUtils.getTaxonSingleVernacularName('eng')(taxon)).to.be.equal('Mahogany', 'Vernacular name not imported correctly')
+  }
+  // check that multiple vernacular names are imported correctly
+  {
+    const taxon = R.find(taxon => Taxon.getCode(taxon) === 'ALB/GLA', taxa)
+    expect(taxon).to.not.be.undefined
+    const vernacularNames = TaxonomyUtils.getTaxonVernacularNames('swa')(taxon)
+    expect(vernacularNames).to.be.deep.equal(['Mchani', 'Mgerenge'])
+  }
+}
+

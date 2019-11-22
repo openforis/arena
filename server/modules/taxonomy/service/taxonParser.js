@@ -10,17 +10,17 @@ import * as TaxonomyValidator from '../taxonomyValidator'
 
 export default class TaxonParser {
 
-  constructor(taxonomyUuid, vernacularLanguageCodes) {
+  constructor (taxonomyUuid, vernacularLanguageCodes) {
     this.taxonomyUuid = taxonomyUuid
     this.vernacularLanguageCodes = vernacularLanguageCodes
-    
+
     this.rowsByField = {
       [Taxon.propKeys.code]: {}, //maps codes to csv file rows
       [Taxon.propKeys.scientificName]: {} //maps scientific names to csv file rows
     }
   }
 
-  async parseTaxon(row) {
+  async parseTaxon (row) {
     const { family, genus, scientific_name, code, ...vernacularNamesByLang } = row
 
     const taxon = Taxon.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this._parseVernacularNames(vernacularNamesByLang))
@@ -28,7 +28,7 @@ export default class TaxonParser {
     return await this._validateTaxon(taxon)
   }
 
-  async _validateTaxon(taxon) {
+  async _validateTaxon (taxon) {
     const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
 
     //validate taxon uniqueness among inserted values
@@ -46,7 +46,7 @@ export default class TaxonParser {
     }
   }
 
-  _addValueToIndex(field, value, errorKeyDuplicate, validation) {
+  _addValueToIndex (field, value, errorKeyDuplicate, validation) {
     const duplicateRow = this.rowsByField[field][value]
     if (duplicateRow) {
       R.pipe(
@@ -67,17 +67,14 @@ export default class TaxonParser {
     }
   }
 
-  _parseVernacularNames(vernacularNamesByLang) {
+  _parseVernacularNames (vernacularNamesByLang) {
     return Object.entries(vernacularNamesByLang).reduce(
       (accVernacularNames, [langCode, nameOriginal]) => {
         if (StringUtils.isBlank(nameOriginal))
           return accVernacularNames
-        
-        if (R.includes(langCode, ['synonyms']))
-          langCode = 'lat' //consider synonyms as vernacular names in Latin
 
         const names = R.pipe(
-          R.split(/[,/]/), //split name using , or / as separators
+          R.split(TaxonVernacularName.NAMES_SEPARATOR),
           R.map(
             R.pipe(
               R.trim, //trim names
