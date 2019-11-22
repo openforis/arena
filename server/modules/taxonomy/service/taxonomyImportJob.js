@@ -14,7 +14,7 @@ import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import TaxonParser from './taxonParser'
+import TaxonCSVParser from './taxonCSVParser'
 
 const requiredColumns = [
   'code',
@@ -36,7 +36,7 @@ export default class TaxonomyImportJob extends Job {
     this.csvReader = null
     this.taxonomyImportManager = null //to be initialized in onHeaders
     this.vernacularLanguageCodes = null
-    this.taxonParser = null
+    this.taxonCSVParser = null
   }
 
   async execute () {
@@ -94,7 +94,7 @@ export default class TaxonomyImportJob extends Job {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
       this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomy, this.vernacularLanguageCodes, this.tx)
       await this.taxonomyImportManager.init()
-      this.taxonParser = new TaxonParser(this.taxonomyUuid, this.vernacularLanguageCodes)
+      this.taxonCSVParser = new TaxonCSVParser(this.taxonomyUuid, this.vernacularLanguageCodes)
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
       this.csvReader.cancel()
@@ -103,7 +103,7 @@ export default class TaxonomyImportJob extends Job {
   }
 
   async _onRow (row) {
-    const taxon = await this.taxonParser.parseTaxon(row)
+    const taxon = await this.taxonCSVParser.parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)

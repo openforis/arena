@@ -8,7 +8,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as TaxonomyValidator from '../taxonomyValidator'
 
-export default class TaxonParser {
+export default class TaxonCSVParser {
 
   constructor (taxonomyUuid, vernacularLanguageCodes) {
     this.taxonomyUuid = taxonomyUuid
@@ -69,25 +69,20 @@ export default class TaxonParser {
 
   _parseVernacularNames (vernacularNamesByLang) {
     return Object.entries(vernacularNamesByLang).reduce(
-      (accVernacularNames, [langCode, nameOriginal]) => {
-        if (StringUtils.isBlank(nameOriginal))
-          return accVernacularNames
-
-        const names = R.pipe(
-          R.split(TaxonVernacularName.NAMES_SEPARATOR),
-          R.map(
-            R.pipe(
-              R.trim, //trim names
-              name => TaxonVernacularName.newTaxonVernacularName(langCode, name)
+      (accVernacularNames, [langCode, nameOriginal]) =>
+        R.ifElse(
+          StringUtils.isBlank,
+          R.always(accVernacularNames),
+          R.pipe(
+            R.split(TaxonVernacularName.NAMES_SEPARATOR),
+            R.map(name => TaxonVernacularName.newTaxonVernacularName(langCode, StringUtils.trim(name))),
+            R.ifElse(
+              R.isEmpty,
+              R.always(accVernacularNames),
+              names => R.assoc(langCode, names)(accVernacularNames)
             )
           )
-        )(nameOriginal)
-
-        return R.unless(
-          R.always(R.isEmpty(names)),
-          R.assoc(langCode, names)
-        )(accVernacularNames)
-      },
+        )(nameOriginal),
       {}
     )
   }

@@ -110,23 +110,17 @@ export default class TaxonomiesImportJob extends Job {
       const genus = R.pipe(R.split(' '), R.head)(scientificName)
 
       const vernacularNames = R.reduce(
-        (accVernacularNames, lang) => {
-          const names = R.pipe(
+        (accVernacularNames, lang) =>
+          R.pipe(
             R.prop(lang),
             R.split(/[,/]/),
-            R.map(
-              R.pipe(
-                R.trim, //trim names
-                name => TaxonVernacularName.newTaxonVernacularName(lang, name)
-              )
+            R.map(name => TaxonVernacularName.newTaxonVernacularName(lang, StringUtils.trim(name))),
+            R.ifElse(
+              R.isEmpty,
+              R.always(accVernacularNames),
+              names => R.assoc(lang, names)(accVernacularNames)
             )
-          )(row)
-
-          return R.unless(
-            R.always(R.isEmpty(names)),
-            R.assoc(lang, names)
-          )(accVernacularNames)
-        },
+          )(row),
         {},
         this.vernacularLangCodes
       )

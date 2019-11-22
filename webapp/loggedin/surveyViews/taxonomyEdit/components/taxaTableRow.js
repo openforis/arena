@@ -21,7 +21,7 @@ const TaxaTableRow = props => {
             return <div key={`${Taxon.getUuid(taxon)}_vernacular_name_${lang}`}>
               {R.pipe(
                 R.map(TaxonVernacularName.getName),
-                R.join(' / ')
+                R.join(TaxonVernacularName.NAMES_SEPARATOR)
               )(vernacularNames)}
             </div>
           }
