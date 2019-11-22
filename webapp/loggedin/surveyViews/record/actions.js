@@ -57,6 +57,11 @@ export const sessionExpired = history => dispatch => {
   _navigateToModuleDataHome(history)
 }
 
+export const applicationError = (history, recordUuid, key, params) => dispatch => {
+  dispatch(showNotification(key, params, 'error'))
+  history.push(appModuleUri(appModules.designer))
+}
+
 export const cycleChanged = history => () => _navigateToModuleDataHome(history)
 
 /**

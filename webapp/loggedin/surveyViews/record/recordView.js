@@ -29,13 +29,15 @@ import {
   nodesUpdateCompleted,
   recordDeleted,
   sessionExpired,
-  cycleChanged
+  cycleChanged,
+  applicationError,
 } from './actions'
 
 const RecordView = props => {
   const {
     recordLoaded, preview, canEditRecord, surveyCycleKey,
-    sessionExpired, cycleChanged, history
+    sessionExpired, cycleChanged, history,
+    applicationError,
   } = props
 
   const recordLoadedRef = useRef(false)
@@ -60,6 +62,9 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.recordSessionExpired, () => {
       sessionExpired(history)
     })
+    AppWebSocket.on(WebSocketEvents.applicationError, ({key, params}) => {
+      applicationError(history, recordUuidUrlParam, key, params)
+    })
 
     // add beforeunload event listener
     window.addEventListener('beforeunload', componentUnload)
@@ -72,6 +77,7 @@ const RecordView = props => {
     AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
     AppWebSocket.off(WebSocketEvents.recordDelete)
     AppWebSocket.off(WebSocketEvents.recordSessionExpired)
+    AppWebSocket.off(WebSocketEvents.applicationError)
 
     const { recordUuidUrlParam, checkOutRecord, resetForm } = props
 
@@ -126,7 +132,8 @@ const mapStateToProps = (state, { match, location }) => {
     recordUuidUrlParam: getUrlParam('recordUuid')(match) || recordUuidPreview,
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
     surveyCycleKey,
-    preview: !!recordUuidPreview
+    preview: !!recordUuidPreview,
+    applicationError,
   }
 }
 
@@ -136,7 +143,8 @@ const enhance = compose(
     mapStateToProps,
     {
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, nodesUpdateCompleted, recordDeleted, sessionExpired, cycleChanged
+      recordNodesUpdate, nodeValidationsUpdate, nodesUpdateCompleted,
+      recordDeleted, sessionExpired, cycleChanged, applicationError,
     }
   )
 )

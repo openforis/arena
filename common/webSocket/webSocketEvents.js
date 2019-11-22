@@ -13,4 +13,5 @@ export const WebSocketEvents = {
   recordDelete: 'recordDelete',
   error: 'threadError',
   recordSessionExpired: 'recordSessionExpired',
+  applicationError: 'applicationError',
 }

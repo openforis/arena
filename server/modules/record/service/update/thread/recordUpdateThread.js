@@ -16,6 +16,7 @@ import Queue from '@core/queue'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as RecordUpdateThreadParams from './recordUpdateThreadParams'
+import SystemError from '@core/systemError'
 
 const Logger = Log.getLogger('RecordUpdateThread')
 
@@ -70,7 +71,24 @@ class RecordUpdateThread extends Thread {
       this.processing = true
 
       const msg = this.queue.dequeue()
-      await this.processMessage(msg)
+      try {
+        await this.processMessage(msg)
+      } catch (e) {
+        // SystemError is an expected error type, e.g. when there's a problem with expressions.
+        if (e instanceof SystemError) {
+          this.postMessage({
+            type: WebSocketEvents.applicationError,
+            content: {
+              key: e.key,
+              params: e.params,
+            }
+          })
+          process.exit(1) // Stop processing
+        } else {
+          // Unexpected error: Crash and burn
+          throw e
+        }
+      }
 
       this.processing = false
       await this.processNext()
