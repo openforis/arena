@@ -89,10 +89,6 @@ export default class RecordsImportJob extends Job {
     await this.batchPersister.flush(this.tx)
   }
 
-  async beforeEnd () {
-    await super.beforeEnd()
-  }
-
   getEntryNames () {
     const { collectSurveyFileZip } = this.context
 
