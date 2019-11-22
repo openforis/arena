@@ -102,7 +102,10 @@ const SurveyInfo = props => {
         showPublishConfirm &&
         <ConfirmDialog
           message={i18n.t('homeView.surveyInfo.confirmPublish', { survey: surveyLabel })}
-          onOk={publishSurvey}
+          onOk={() => {
+            setShowPublishConfirm(false)
+            publishSurvey()
+          }}
           onCancel={() => setShowPublishConfirm(false)}
         />
       }
