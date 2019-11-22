@@ -99,11 +99,8 @@ typings/
 # Optional npm cache directory
 .npm
 
-# Optional ESLint cache
+# Optional eslint cache
 .eslintcache
-
-# Optional ESLint configuration
-.eslintrc.json
 
 # Optional REPL history
 .node_repl_history
