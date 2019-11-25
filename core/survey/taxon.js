@@ -78,9 +78,7 @@ const _mergeVernacularNames = vernacularNamesArrayNew => vernacularNamesArrayExi
       const vernacularNameExisting = R.prop(index, vernacularNamesArrayExisting)
       const vernacularNameUpdated = vernacularNameNew && vernacularNameExisting
         ? TaxonVernacularName.mergeProps(vernacularNameNew)(vernacularNameExisting) // merge new vernacular name into existing one
-        : vernacularNameNew
-          ? vernacularNameNew // there is no existing vernacular name, take the new one
-          : vernacularNameExisting // take the existing one
+        : vernacularNameNew || vernacularNameExisting // there is no existing vernacular name, take the new one
       return R.append(vernacularNameUpdated, accVernacularNames)
     },
     [],
@@ -93,7 +91,7 @@ export const mergeProps = taxonNew => taxon => {
       R.pipe(
         getVernacularNamesByLang(lang),
         _mergeVernacularNames(vernacularNamesArray),
-        vernacularNamesUpdated => R.assoc(lang, vernacularNamesUpdated, accVernacularNames)
+        R.assoc(lang, R.__, accVernacularNames)
       )(taxon),
     {}
   )
