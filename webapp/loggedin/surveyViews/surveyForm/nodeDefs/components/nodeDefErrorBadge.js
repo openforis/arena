@@ -64,8 +64,8 @@ const mapStateToProps = (state, props) => {
         validation = RecordValidation.getNodeValidation(node)(recordValidation)
       } else if (NodeDef.isEntity(nodeDef)) {
         // only entities can have children with min/max count validation
-        validation = Validation.getFieldValidation(parentNode.uuid)(recordValidation)
-        // validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
+        const fieldValidation = Validation.getFieldValidation(NodeDef.getUuid(parentNode))(recordValidation)
+        validation = RecordValidation.getValidationChildrenCount(NodeDef.getUuid(nodeDef))(fieldValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
         validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])
       }

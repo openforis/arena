@@ -2,7 +2,10 @@
 
 .tooltip {
   &:hover {
-    cursor: pointer;
+    cursor: default;
+    &.hoverable {
+      cursor: pointer;
+    }
   }
 }
 

@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import * as camelize from 'camelize'
 
 import { db } from '@server/db/db'
@@ -7,7 +8,7 @@ import * as SchemaRdb from '../../../../common/surveyRdb/schemaRdb'
 
 // ============== READ
 
-const query = (surveyId, offset = 0, limit = null) =>
+const query = (surveyId) =>
   `SELECT
     r.uuid,
     r.step,
@@ -29,12 +30,13 @@ const query = (surveyId, offset = 0, limit = null) =>
     r.cycle = $1
     AND NOT r.preview
   ORDER BY r.uuid, h.node_id
-  LIMIT ${limit || 'ALL'}
-  OFFSET ${offset}`
+  LIMIT $2
+  OFFSET $3`
 
 export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
-  await client.map(query(surveyId, offset, limit), [cycle], res =>
-    Object.entries(res).reduce((obj, [k, v]) => { obj[camelize(k)] = v; return obj }, {}))
+  await client.map(query(surveyId, limit), [cycle, limit, offset], R.pipe(
+    R.toPairs,
+    R.reduce((obj, [k, v]) => R.assoc(camelize(k), v, obj), {})))
 
 export const countValidationReports = async (surveyId, cycle, client = db) =>
-  await client.one(`SELECT count(*) from(${query(surveyId, '0')}) as v`, [cycle])
+  await client.one(`SELECT count(*) from(${query(surveyId)}) AS v`, [cycle, null, null])

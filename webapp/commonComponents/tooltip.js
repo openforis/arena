@@ -22,9 +22,9 @@ class Tooltip extends React.Component {
   }
 
   mouseEnter () {
-    const { messages, content, show, type = '' } = this.props
+    const { messages, content, showContent, type } = this.props
 
-    if (show && (content || !(R.isEmpty(messages) || R.isNil(messages)))) {
+    if (showContent && (content || !(R.isEmpty(messages) || R.isNil(messages)))) {
       const style = this.getStyle()
       const className = `tooltip__message${type ? '-' + type : ''}`
 
@@ -43,10 +43,10 @@ class Tooltip extends React.Component {
   }
 
   render () {
-    const { children, className, type = '' } = this.props
+    const { children, className, type, showContent } = this.props
     const { messageElement } = this.state
 
-    const tooltipClass = `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '')
+    const tooltipClass = `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '') + (showContent ? ' hoverable' : '')
 
     return (
       <div className={tooltipClass}
@@ -73,6 +73,7 @@ Tooltip.defaultProps = {
   messages: [],
   className: null,
   type: null,
+  showContent: true,
 }
 
 export default Tooltip

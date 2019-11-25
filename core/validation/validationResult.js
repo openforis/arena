@@ -9,7 +9,7 @@ export const keys = {
   customErrorMessageKey: 'custom',
 }
 
-export const severities = {
+export const severity = {
   error: 'error',
   warning: 'warning',
 }
@@ -23,7 +23,7 @@ export const newInstance = (key, params = null, severity = null, messages = null
 
 export const getKey = R.prop(keys.key)
 export const getParams = R.propOr({}, keys.params)
-export const getSeverity = R.propOr(severities.error, keys.severity)
+export const getSeverity = R.propOr(severity.error, keys.severity)
 
 // custom messages
 export const getMessages = R.propOr({}, keys.messages)
@@ -41,4 +41,4 @@ export const getMessage = lang => R.pipe(
 )
 export const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
 
-export const isError = R.pipe(getSeverity, R.equals(severities.error))
+export const isError = R.pipe(getSeverity, R.equals(severity.error))

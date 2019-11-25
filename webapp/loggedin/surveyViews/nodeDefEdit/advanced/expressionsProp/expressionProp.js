@@ -23,11 +23,11 @@ const ExpressionProp = (props) => {
 
   const severityItems = [
     {
-      key: ValidationResult.severities.error,
+      key: ValidationResult.severity.error,
       label: i18n.t('common.error')
     },
     {
-      key: ValidationResult.severities.warning,
+      key: ValidationResult.severity.warning,
       label: i18n.t('common.warning')
     }
   ]

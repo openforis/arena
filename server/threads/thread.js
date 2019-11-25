@@ -1,4 +1,4 @@
-import { parentPort, workerData, isMainThread } from 'worker_threads';
+import { parentPort, workerData, isMainThread } from 'worker_threads'
 
 import * as Log from '@server/log/log'
 

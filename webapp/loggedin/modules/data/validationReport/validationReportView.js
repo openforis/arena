@@ -41,21 +41,25 @@ const ValidationReportRowHeader = ({ nodeDefKeys }) => {
 const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   const i18n = useI18n()
 
+  const nodeDefUuid = row.nodeDefUuid
+
   let keysHierarchy = row.keysHierarchy
-  if (keysHierarchy[0].nodeDefUuid === null) {
+  if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === nodeDefUuid) {
     keysHierarchy = keysHierarchy.slice(1)
   }
   keysHierarchy = keysHierarchy.concat({ keys: row.keysSelf || {}, nodeDefUuid: row.nodeDefUuid })
 
-  const getKeyValues = keys => Object.values(keys).reduce((values, value) => values.concat(value === null ? '' : value), [])
+  const path = R.pipe(
+    R.map(hierarchyPart => {
+      const keyValues = R.reject(R.isNil)(R.values((hierarchyPart.keys)))
+      const keyValuesStr = keyValues.length ? `[${keyValues.join(', ')}]` : ''
+      const parentNodeDef = Survey.getNodeDefByUuid(hierarchyPart.nodeDefUuid)(survey)
+      const parentNodeDefLabel = NodeDef.getLabel(parentNodeDef, i18n.lang)
 
-  const path = keysHierarchy.reduce((p, h) => {
-    const parentNodeDef = Survey.getNodeDefByUuid(h.nodeDefUuid)(survey)
-    const parentNodeDefLabel = NodeDef.getLabel(parentNodeDef, i18n.lang)
-    const keyValues = getKeyValues(h.keys)
-
-    return p.concat(`${parentNodeDefLabel} [${keyValues.join(', ')}]`)
-  }, [])
+      return `${parentNodeDefLabel} ${keyValuesStr}`
+    }),
+    R.join(' / ')
+  )(keysHierarchy)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const canEdit = Survey.isPublished(surveyInfo) &&
@@ -71,7 +75,7 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
         {idx + offset + 1}
       </div>
       <div>
-        {path.join(' / ')}
+        {path}
       </div>
       <div className='validation_report_view__message'>
         <ValidationFieldMessages validation={row.validation} showKeys={false} showIcons={true}/>

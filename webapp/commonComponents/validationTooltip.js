@@ -19,14 +19,14 @@ export default ({ validation, className, showKeys, children }) => {
     ? null
     : React.createElement(ValidationFieldMessages, { validation, showKeys })
 
-  const show = Validation.isWarning(validation) || Validation.isError(validation)
+  const showContent = Validation.isWarning(validation) || Validation.isError(validation)
 
   return (
     <Tooltip
       type={type}
       content={content}
       className={className}
-      show={show}>
+      showContent={showContent}>
       {children}
     </Tooltip>
   )

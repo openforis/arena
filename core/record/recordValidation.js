@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
 import * as Node from './node'
-import * as NodeDef from '@core/survey/nodeDef'
 
 export const keys = {
   recordKeys: 'recordKeys',
@@ -25,10 +24,11 @@ export const newValidationRecordDuplicate = (isUnique = false) => Validation.new
 )
 
 // ===== READ
-export const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
-  Validation.getFieldValidation(Node.getUuid(parentNode)),
+export const getValidationChildrenCount = childDefUuid => R.pipe(
   Validation.getFieldValidation(keys.childrenCount),
-  Validation.getFieldValidation(NodeDef.getUuid(childDef))
+  Validation.getFieldValidation(childDefUuid),
+  v => Validation.newInstance(false, { [childDefUuid]: v }),
+  v => Validation.newInstance(false, { [keys.childrenCount]: v })
 )
 
 export const getNodeValidation = node =>
