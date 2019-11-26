@@ -70,10 +70,11 @@ class Tooltip extends React.Component {
 }
 
 Tooltip.defaultProps = {
-  messages: [],
+  messages: [], // Array of messages
+  content: null, // HTML content
   className: null,
-  type: null,
-  showContent: true,
+  type: null, // Tooltip type (error or warning)
+  showContent: true, // Set to false not to show the tooltip on mouse over
 }
 
 export default Tooltip

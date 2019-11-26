@@ -1,9 +1,9 @@
 import React from 'react'
 
-import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 import * as Validation from '@core/validation/validation'
 
 import Tooltip from './tooltip'
+import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 
 export default ({ validation, className, showKeys, children }) => {
   const isValid = Validation.isValid(validation)

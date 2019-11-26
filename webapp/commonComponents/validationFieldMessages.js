@@ -80,11 +80,11 @@ const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => valid
         ret.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
       }
     }),
-    messages => R.pipe(
-      getValidationErrorMessages(i18n),
-      x => x.length ? [x] : [],
-      R.concat(messages)
-    )(validation)
+  )(validation)
+
+  R.pipe(
+    getValidationErrorMessages(i18n),
+    x => { if (x.length) ret.push(x) }
   )(validation)
 
   return ret
@@ -105,11 +105,7 @@ const ValidationFieldMessages = ({ validation, showKeys = true, showIcons = fals
 }
 
 const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
-
-  return {
-    survey,
-  }
+  return { survey: SurveyState.getSurvey(state) }
 }
 
 export default connect(mapStateToProps)(ValidationFieldMessages)

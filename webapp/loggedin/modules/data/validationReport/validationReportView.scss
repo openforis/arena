@@ -1,19 +1,14 @@
 @import "~@webapp/style/vars";
 
-.validation_report_view__table {
+.validation_report__table {
 
-
-  // .table__rows {
-  //   background-color: red;
-  // }
   .table__row {
     height: unset;
-    // background-color: red;
     padding: 6px 0;
   }
 }
 
-.validation_report_view__message {
+.validation_report__message {
   justify-self: left;
 
   .validation_field_message {
