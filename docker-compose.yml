@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prod
+      target: arena-server
 
     environment:
       PGHOST: db
@@ -46,6 +46,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prod_web
+      target: arena-web
     environment:
       ARENA_HOST: app_server:9090

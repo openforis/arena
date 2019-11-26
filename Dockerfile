@@ -29,7 +29,7 @@ RUN cd /app; set -o pipefail; ( \
 
 ############################################################
 
-FROM node:12-alpine AS prod
+FROM node:12-alpine AS arena-server
 RUN npm install pm2 -g
 
 COPY --from=prod_builder /app/node_modules /app/node_modules
@@ -44,7 +44,7 @@ CMD ["pm2-runtime", "server.js"]
 
 #############################################################
 
-FROM nginx:alpine AS prod_web
+FROM nginx:alpine AS arena-web
 COPY --from=prod_builder /app/server/run_nginx.sh /run_nginx.sh
 COPY --from=prod_builder /app/server/nginx_backend.conf.envsubst /etc/nginx/conf.d/backend.conf.envsubst
 COPY --from=prod_builder /app/server/nginx.conf /etc/nginx/conf.d/default.conf
