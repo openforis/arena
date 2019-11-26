@@ -105,7 +105,7 @@ export const taxonPublishedUpdateVernacularNamesTest = async () => {
   const name2 = 'New Swahili name'
 
   // update taxon vernacular names
-  const { vernacularNamesNew, vernacularNamesOld } = await _updateTaxonWithNewVernacularNames(taxonCode, lang, [name1, name2])
+  const { vernacularNamesOld } = await _updateTaxonWithNewVernacularNames(taxonCode, lang, [name1, name2])
   const vernacularName1Old = R.head(vernacularNamesOld)
 
   // reload vernacular name
