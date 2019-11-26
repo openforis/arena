@@ -8,7 +8,7 @@ import * as SchemaRdb from '../../../../common/surveyRdb/schemaRdb'
 
 // ============== READ
 
-const query = (surveyId) =>
+const query = surveyId =>
   `SELECT
     r.uuid,
     r.step,
@@ -34,7 +34,7 @@ const query = (surveyId) =>
   OFFSET $3`
 
 export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
-  await client.map(query(surveyId, limit), [cycle, limit, offset], R.pipe(
+  await client.map(query(surveyId), [cycle, limit, offset], R.pipe(
     R.toPairs,
     R.reduce((obj, [k, v]) => R.assoc(camelize(k), v, obj), {})))
 
