@@ -22,16 +22,16 @@ class Tooltip extends React.Component {
   }
 
   mouseEnter () {
-    const { messages, content, showContent, type } = this.props
+    const { messages, messageComponent, showContent, type } = this.props
 
-    if (showContent && (content || !(R.isEmpty(messages) || R.isNil(messages)))) {
+    if (showContent && (messageComponent || !(R.isEmpty(messages) || R.isNil(messages)))) {
       const style = this.getStyle()
       const className = `tooltip__message${type ? '-' + type : ''}`
 
       this.setState({
         messageElement:
           <div className={className} style={style}>
-            { content || messages.map((msg, i) => <div key={i}>{msg}</div>)}
+            { messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
           </div>
       })
 
@@ -71,7 +71,7 @@ class Tooltip extends React.Component {
 
 Tooltip.defaultProps = {
   messages: [], // Array of messages
-  content: null, // HTML content
+  messageComponent: null, // React message component
   className: null,
   type: null, // Tooltip type (error or warning)
   showContent: true, // Set to false not to show the tooltip on mouse over

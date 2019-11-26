@@ -5,15 +5,16 @@ import * as Validation from '@core/validation/validation'
 import Tooltip from './tooltip'
 import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 
-export default ({ validation, className, showKeys, children }) => {
+const ValidationTooltip = props => {
+  const { validation, className, showKeys, children } = props
+
   const isValid = Validation.isValid(validation)
 
-  let type = ''
-  if (Validation.isError(validation)) {
-    type = 'error'
-  } else if (Validation.isWarning(validation)) {
-    type = 'warning'
-  }
+  const type = Validation.isError(validation)
+    ? 'error'
+    : Validation.isWarning(validation)
+      ? 'warning'
+      : ''
 
   const content = isValid
     ? null
@@ -24,10 +25,18 @@ export default ({ validation, className, showKeys, children }) => {
   return (
     <Tooltip
       type={type}
-      content={content}
+      messageComponent={content}
       className={className}
       showContent={showContent}>
       {children}
     </Tooltip>
   )
 }
+
+ValidationTooltip.defaultProps = {
+  validation: null,
+  className: '',
+  showKeys: false,
+}
+
+export default ValidationTooltip
