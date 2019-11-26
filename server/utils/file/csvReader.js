@@ -6,13 +6,11 @@ import Queue from '@core/queue'
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
   let canceled = false
-  const queue = new Queue()
 
   const start = () => new Promise((resolve, reject) => {
-    let ended = false
+    const queue = new Queue()
     let headers = null
     let total = 0
-    let processingRow = false //prevents the call to processNext when a row is already being processed
 
     /**
      * Executes the specified function fn in a try catch.
@@ -27,18 +25,19 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       }
     }
 
+    const _indexRowByHeaders = row =>
+      headers
+        ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: row[index] }), {})
+        : row
+
     const processNext = () => {
       (async () => {
-        processingRow = true
 
-        if (queue.isEmpty()) {
-          if (ended)
-            resolve()
-        } else if (!canceled) {
-          const row = queue.dequeue()
+        // run until there's a row in the queue and it's not been canceled
+        for (let row = queue.dequeue(); !!row && !canceled; row = queue.dequeue()) {
 
           if (headers) {
-            //headers read, process rows
+            //headers have been read, process row
             if (onRow) {
               await _tryOrCancel(async () => {
                 await onRow(_indexRowByHeaders(row))
@@ -53,10 +52,9 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
               })
             }
           }
-          processNext()
         }
 
-        processingRow = false
+        return resolve()
       })()
     }
 
@@ -64,29 +62,19 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       if (canceled)
         return resolve()
 
-      ++total
-      if (total > 0) {
-        // skip first row (headers)
+      // skip first row (headers)
+      if (total++ > 0)
         onTotalChange && onTotalChange(total)
-      }
 
-      const wasEmpty = queue.isEmpty()
       queue.enqueue(data)
-      if (!processingRow && wasEmpty) {
-        processNext()
-      }
     }
 
     const onEnd = () => {
-      ended = true
       if (queue.isEmpty())
         resolve()
+      else
+        processNext()
     }
-
-    const _indexRowByHeaders = row =>
-      headers
-        ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: row[index] }), {})
-        : row
 
     stream
       .pipe(csvParser())
