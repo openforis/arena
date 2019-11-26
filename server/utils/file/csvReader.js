@@ -16,9 +16,9 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
      * Executes the specified function fn in a try catch.
      * Calls "reject" if the execution throws an error.
      */
-    const _tryOrCancel = async fn => {
+    const _tryOrCancel = async fnPromise => {
       try {
-        await fn()
+        await fnPromise
       } catch (e) {
         cancel()
         reject(e)
@@ -30,7 +30,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: row[index] }), {})
         : row
 
-    const processNext = () => {
+    const processQueue = () => {
       (async () => {
 
         // run until there's a row in the queue and it's not been canceled
@@ -38,19 +38,11 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
 
           if (headers) {
             //headers have been read, process row
-            if (onRow) {
-              await _tryOrCancel(async () => {
-                await onRow(_indexRowByHeaders(row))
-              })
-            }
+            onRow && await _tryOrCancel(onRow(_indexRowByHeaders(row)))
           } else {
             //process headers
             headers = row
-            if (onHeaders) {
-              await _tryOrCancel(async () => {
-                await onHeaders(headers)
-              })
-            }
+            onHeaders && await _tryOrCancel(onHeaders(headers))
           }
         }
 
@@ -73,7 +65,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       if (queue.isEmpty())
         resolve()
       else
-        processNext()
+        processQueue()
     }
 
     stream
