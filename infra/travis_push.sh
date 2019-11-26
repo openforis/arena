@@ -20,6 +20,7 @@ pulumi_up() {
 REPOSITORY_BASE=407725983764.dkr.ecr.eu-west-1.amazonaws.com
 
 push() {
+    # shellcheck disable=SC2091
     $(aws ecr get-login --no-include-email --region eu-west-1)
 
     pushd ..
