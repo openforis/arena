@@ -55,5 +55,5 @@ taxon_props_scientific_name_idx
 ON taxon (taxonomy_uuid, ((props||props_draft)->>'scientificName'));
 
 CREATE UNIQUE INDEX
-taxon_vernacular_name_props_lang_idx
-ON taxon_vernacular_name (taxon_uuid, (props||props_draft->>'lang'));
+taxon_vernacular_name_props_lang_name_idx
+ON taxon_vernacular_name (taxon_uuid, (props||props_draft->>'lang'), (props||props_draft->>'name'));
