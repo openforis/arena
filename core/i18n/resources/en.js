@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 export const enTranslation = {

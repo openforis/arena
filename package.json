@@ -43,6 +43,9 @@
       "unicorn/filename-case": "off",
       "comma-dangle": "off",
       "prefer-destructuring": "off",
+      "react/prop-types": "off",
+      "prefer-named-capture-group": "off",
+      "import/no-unassigned-import": ["warn", {"allow": ["**/*.css", "**/*.scss", "**/*.sass" ]}],
       "no-unused-vars": [
         "warn",
         {
