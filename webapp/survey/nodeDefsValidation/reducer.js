@@ -22,8 +22,8 @@ const actionHandlers = {
   [surveyDefsReset]: () => ({}),
 
   // NodeDefsValidation load
-  [surveyDefsLoad]: (state = {}, { nodeDefsValidation }) => nodeDefsValidation,
-  [nodeDefsValidationUpdate]: (state = {}, { nodeDefsValidation }) =>
+  [surveyDefsLoad]: (_state, { nodeDefsValidation }) => nodeDefsValidation,
+  [nodeDefsValidationUpdate]: (_state, { nodeDefsValidation }) =>
     nodeDefsValidation,
 }
 

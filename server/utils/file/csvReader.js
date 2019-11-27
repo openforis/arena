@@ -74,9 +74,9 @@ export const createReaderFromStream = (
         }
 
         ++total
-        if (total > 0) {
+        if (total > 0 && onTotalChange) {
           // Skip first row (headers)
-          onTotalChange && onTotalChange(total)
+          onTotalChange(total)
         }
 
         const wasEmpty = queue.isEmpty()
@@ -113,7 +113,7 @@ export const createReaderFromStream = (
 
   const cancel = () => {
     canceled = true
-    stream && stream.destroy()
+    if (stream) stream.destroy()
   }
 
   return { start, cancel }

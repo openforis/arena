@@ -113,7 +113,7 @@ const _countChildren = (record, parentNode, childDef) => {
   )(record)
 
   return NodeDef.isEntity(childDef)
-    ? nodes.length
+    ? nodes.length > 0
     : R.pipe(R.reject(Node.isValueBlank), R.length)(nodes)
 }
 

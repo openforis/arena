@@ -3,7 +3,7 @@ import * as Log from '@server/log/log'
 
 import { uuidv4 } from '@core/uuid'
 
-import * as User from '@core/user/user.js'
+import * as User from '@core/user/user'
 import { throttle, cancelThrottle } from '@core/functionsDefer'
 
 import SystemError from '@core/systemError'
@@ -161,7 +161,7 @@ export default class Job {
    * @param tx DB transaction
    *
    */
-  async execute(tx) {}
+  async execute(_tx) {}
 
   onEvent(listener) {
     this.eventListener = listener
@@ -333,6 +333,8 @@ export default class Job {
         // Propagate progress event to parent job
         await this._notifyEvent(this._createJobEvent(jobEvents.progress))
         break
+      default:
+        this.logDebug(`Unknown event status: ${event.status}`)
     }
   }
 

@@ -113,7 +113,7 @@ const UserView = props => {
                     user: name,
                     survey: Survey.getLabel(surveyInfo, lang),
                   })
-                  window.confirm(confirmMessage) ? removeUser() : null
+                  if (window.confirm(confirmMessage)) removeUser()
                 }}
               >
                 <span className="icon icon-bin icon-left icon-10px" />

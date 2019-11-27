@@ -153,7 +153,7 @@ export const countTaxaByTaxonomyUuid = async (
       FROM ${getSurveyDBSchema(surveyId)}.taxon
       WHERE taxonomy_uuid = $1`,
     [taxonomyUuid],
-    r => parseInt(r.count),
+    r => parseInt(r.count, 10),
   )
 
 export const fetchTaxaWithVernacularNames = async (

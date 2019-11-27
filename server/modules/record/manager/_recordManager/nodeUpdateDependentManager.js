@@ -64,10 +64,9 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
 
       for (const nodeCtxChild of nodeCtxChildren) {
         // 5. add nodeCtxChild and its descendants to nodesUpdated
-        Record.visitDescendantsAndSelf(
-          nodeCtxChild,
-          node => (nodesUpdated[Node.getUuid(node)] = node),
-        )(record)
+        Record.visitDescendantsAndSelf(nodeCtxChild, node => {
+          nodesUpdated[Node.getUuid(node)] = node
+        })(record)
       }
     }
   }

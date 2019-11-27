@@ -29,7 +29,7 @@ export const createNodeDefsTest = async () => {
 
   const rootDef = await fetchRootNodeDef()
 
-  for (const nodeType in NodeDef.nodeDefType) {
+  for (const nodeType of Object.keys(NodeDef.nodeDefType)) {
     const nodeDefReq = createNodeDef(rootDef, nodeType, `node_def_${nodeType}`)
     const nodeDefDb = await NodeDefRepository.insertNodeDef(
       surveyId,

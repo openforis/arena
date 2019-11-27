@@ -1,9 +1,7 @@
 import { elementOffset } from '../domUtils'
 
 // ResizeObserver polyfill
-
-// if (typeof ResizeObserver === 'undefined') {
-window.ResizeObserver = class ResizeObserver {
+export default class ResizeObserver {
   constructor(callback) {
     this.observables = []
     // Array of observed elements that looks like this:
@@ -57,14 +55,15 @@ window.ResizeObserver = class ResizeObserver {
           obj.size = { width, height, x, y }
           return true
         }
+
+        return false
       })
       .map(obj => obj.el)
 
-    if (changedEntries.length) {
+    if (changedEntries.length > 0) {
       this.callback(changedEntries)
     }
 
     this.af = window.requestAnimationFrame(this.checkSize)
   }
 }
-// }

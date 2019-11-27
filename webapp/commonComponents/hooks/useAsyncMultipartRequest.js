@@ -1,5 +1,3 @@
-import React from 'react'
-
 import useAsyncPostRequest from './useAsyncPostRequest'
 import useAsyncPutRequest from './useAsyncPutRequest'
 

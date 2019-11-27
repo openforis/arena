@@ -1,4 +1,4 @@
-import Promise from 'bluebird'
+import BluebirdPromise from 'bluebird'
 import * as pgPromise from 'pg-promise'
 import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
@@ -16,7 +16,7 @@ const debugOptions = {
 
 // Enable all options that help with debugging.
 // TODO: Re-consider these later when the app matures.
-Promise.config({
+BluebirdPromise.config({
   // Enable warnings
   warnings: true,
   // Enable long stack traces
@@ -30,7 +30,7 @@ Promise.config({
 })
 
 const initOptions = {
-  promiseLib: Promise,
+  promiseLib: BluebirdPromise,
   ...(ProcessUtils.ENV.debug ? debugOptions : {}),
 }
 

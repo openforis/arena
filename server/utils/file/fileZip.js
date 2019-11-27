@@ -61,7 +61,7 @@ export default class FileZip {
       R.filter(R.propEq('isDirectory', false)),
       R.keys,
       R.filter(R.startsWith(path)),
-      R.map(entry => entry.substring(path.length)),
+      R.map(entry => entry.slice(path.length)),
     )(this.streamZip.entries())
   }
 

@@ -10,6 +10,7 @@ import * as Record from '@core/record/record'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { db } from '@server/db/db'
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as NodeUpdateDependentManager from './nodeUpdateDependentManager'
 
@@ -290,11 +291,11 @@ export const deleteNodesByNodeDefUuids = async (
     return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
   })
 
-const _onNodeUpdate = async (survey, record, node, nodeDependents = {}, t) => {
+const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
   // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
 
-  let updatedNodes = nodeDependents
+  let updatedNodes = nodeDependents || {}
 
   // Delete dependent code nodes
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
@@ -353,10 +354,9 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
         const nodeKeyValues = R.map(Node.getValue)(nodeKeys)
 
         if (R.equals(nodeKeyValues, nodeDeletedKeyValues)) {
-          nodeKeys.forEach(
-            nodeKey =>
-              (nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey),
-          )
+          for (const nodeKey of nodeKeys) {
+            nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey
+          }
         }
       })
     }

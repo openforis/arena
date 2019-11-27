@@ -161,7 +161,7 @@ export const updateNode = async (
   surveyId,
   nodeUuid,
   value,
-  meta = {},
+  meta,
   draft,
   client = db,
 ) => {
@@ -173,7 +173,7 @@ export const updateNode = async (
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [JSON.stringify(value), meta, nodeUuid],
+    [JSON.stringify(value), meta || {}, nodeUuid],
   )
   const node = await client.one(
     `

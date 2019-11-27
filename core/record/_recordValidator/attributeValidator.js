@@ -164,7 +164,7 @@ const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
 
   for (const sibling of siblings) {
     const nodesKey = Record.getEntityKeyNodes(survey, sibling)(record)
-    siblingKeys.push.apply(siblingKeys, nodesKey)
+    siblingKeys.push(...nodesKey)
   }
 
   return siblingKeys

@@ -31,7 +31,7 @@ const getValueFromItem = (
   return isInProps ? NodeDef.getProp(prop)(item) : R.propOr(null, prop, item)
 }
 
-const nodeValuePropProcessor = (survey, nodeDefCol, nodeCol) => (
+const nodeValuePropProcessor = (_survey, nodeDefCol, _nodeCol) => (
   node,
   colName,
 ) => {
@@ -70,7 +70,7 @@ const props = {
 
   [nodeDefType.date]: {
     [colTypeProcessor]: () => () => sqlTypes.date,
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const [year, month, day] = [
         Node.getDateYear(nodeCol),
         Node.getDateMonth(nodeCol),
@@ -85,7 +85,7 @@ const props = {
 
   [nodeDefType.time]: {
     [colTypeProcessor]: () => () => sqlTypes.time,
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const [hour, minute] = [
         Node.getTimeHour(nodeCol),
         Node.getTimeMinute(nodeCol),
@@ -103,16 +103,15 @@ const props = {
         ? Survey.getCategoryItemByUuid(itemUuid)(survey)
         : {}
 
-      return (node, colName) =>
+      return (_node, colName) =>
         R.endsWith('code', colName)
           ? getValueFromItem(nodeDefCol, colName, item, true)
-          : // 'label'
-            ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+          : ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item) // 'label'
     },
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, _nodeDefCol, nodeCol) => {
       // Return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
@@ -120,15 +119,14 @@ const props = {
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxon.getCode(taxon)
-          : // Scientific_name
-          Taxon.isUnlistedTaxon(taxon)
+          : Taxon.isUnlistedTaxon(taxon) // Scientific_name
           ? Node.getScientificName(node) // From node value
           : Taxon.getScientificName(taxon) // From taxon item
     },
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const [x, y, srsCode] = [
         Node.getCoordinateX(nodeCol),
         Node.getCoordinateY(nodeCol),
@@ -161,7 +159,7 @@ export const getColValueProcessor = nodeDef =>
 
 export const getColTypeProcessor = nodeDef =>
   R.propOr(
-    nodeDef => colName => 'VARCHAR',
+    _nodeDef => _colName => 'VARCHAR',
     colTypeProcessor,
     props[NodeDef.getType(nodeDef)],
   )(nodeDef)

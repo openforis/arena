@@ -205,7 +205,6 @@ export default class RecordsImportJob extends Job {
               record,
               nodeToInsert,
               collectSurveyFileZip,
-              collectSurvey,
               collectNodeDef,
               collectNode,
               field,

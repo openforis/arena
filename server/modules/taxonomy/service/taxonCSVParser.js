@@ -23,7 +23,7 @@ export default class TaxonCSVParser {
     const {
       family,
       genus,
-      scientific_name,
+      scientific_name: scientificName,
       code,
       ...vernacularNamesByLang
     } = row
@@ -33,7 +33,7 @@ export default class TaxonCSVParser {
       code,
       family,
       genus,
-      scientific_name,
+      scientificName,
       this._parseVernacularNames(vernacularNamesByLang),
     )
 

@@ -122,7 +122,7 @@ export default class SurveyHierarchyTree {
       .tree()
       .size([height, width])
       .nodeSize([50, 10])
-      .separation((a, b) => (a.parent !== b.parent ? 2 : 1))
+      .separation((a, b) => (a.parent === b.parent ? 1 : 2))
 
     // Assigns parent, children, height, depth
     this.root = d3.hierarchy(this.data, d => d.children)
@@ -167,7 +167,7 @@ export default class SurveyHierarchyTree {
       .enter()
       .append('g')
       .attr('class', 'node')
-      .attr('transform', d => `translate(${source.y0}, ${source.x0})`)
+      .attr('transform', _d => `translate(${source.y0}, ${source.x0})`)
 
     const hasChildren = d => d.children || d._children
 
@@ -235,7 +235,7 @@ export default class SurveyHierarchyTree {
       .enter()
       .insert('path', 'g')
       .attr('class', 'link')
-      .attr('d', d => {
+      .attr('d', _d => {
         const o = { x: node.x0, y: node.y0 }
         return diagonal(o, o)
       })
@@ -256,7 +256,7 @@ export default class SurveyHierarchyTree {
       .transition()
       .duration(transitionDuration)
       .ease(easeExit)
-      .attr('d', d => {
+      .attr('d', _d => {
         const o = { x: node.x, y: node.y }
         return diagonal(o, o)
       })

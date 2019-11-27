@@ -11,7 +11,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Authorizer from '@core/auth/authorizer'
-import * as Date from '@core/dateUtils'
+import * as DateUtils from '@core/dateUtils'
 
 const RecordsRow = props => {
   const { row: record, nodeDefKeys, surveyInfo, user, idx, offset } = props
@@ -34,8 +34,12 @@ const RecordsRow = props => {
       {nodeDefKeys.map((n, i) => (
         <div key={i}>{record[camelize(NodeDef.getName(n))]}</div>
       ))}
-      <div>{Date.getRelativeDate(i18n, Record.getDateCreated(record))}</div>
-      <div>{Date.getRelativeDate(i18n, Record.getDateModified(record))}</div>
+      <div>
+        {DateUtils.getRelativeDate(i18n, Record.getDateCreated(record))}
+      </div>
+      <div>
+        {DateUtils.getRelativeDate(i18n, Record.getDateModified(record))}
+      </div>
       <div>{Record.getOwnerName(record)}</div>
       <div>{Record.getStep(record)}</div>
       <div>

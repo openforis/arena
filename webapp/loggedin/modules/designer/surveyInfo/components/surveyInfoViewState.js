@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import * as R from 'ramda'
+import { useEffect } from 'react'
 
 import { useFormObject } from '@webapp/commonComponents/hooks'
 

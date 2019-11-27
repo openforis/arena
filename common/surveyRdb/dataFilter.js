@@ -46,7 +46,7 @@ const binaryToString = (node, paramsArr) => {
   }
 
   // Logical OR returns a non-null value if either of its parameters is not null.
-  if (sqlOperator == 'OR') {
+  if (sqlOperator === 'OR') {
     return logicalOrTemplate
       .replace('{left}', clauseLeft)
       .replace('{right}', clauseRight)

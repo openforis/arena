@@ -3,7 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as DataTable from '../schemaRdb/dataTable'
-import * as DataView from '../schemaRdb/dataView'
+import * as RDBDataView from '../schemaRdb/dataView'
 
 const toTableViewCreate = (survey, nodeDef) => {
   const surveyId = Survey.getSurveyInfo(survey).id
@@ -24,10 +24,10 @@ const toTableViewCreate = (survey, nodeDef) => {
     ),
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
-    viewName: DataView.getName(nodeDef, nodeDefParent),
-    viewFields: DataView.getSelectFields(survey, nodeDef),
-    viewFrom: `${schemaName}.${tableName} as ${DataView.alias}`,
-    viewJoin: DataView.getJoin(schemaName, nodeDefParent),
+    viewName: RDBDataView.getName(nodeDef, nodeDefParent),
+    viewFields: RDBDataView.getSelectFields(survey, nodeDef),
+    viewFrom: `${schemaName}.${tableName} as ${RDBDataView.alias}`,
+    viewJoin: RDBDataView.getJoin(schemaName, nodeDefParent),
   }
 }
 

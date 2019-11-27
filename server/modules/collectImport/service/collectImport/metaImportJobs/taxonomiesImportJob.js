@@ -4,7 +4,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
-import { languageCodesISO636_2 } from '@core/app/languages'
+import { languageCodesISO639part2 } from '@core/app/languages'
 import * as StringUtils from '@core/stringUtils'
 
 import Job from '@server/job/job'
@@ -69,10 +69,7 @@ export default class TaxonomiesImportJob extends Job {
     this.rowsByScientificName = {}
 
     // 2. insert taxonomy
-    const taxonomyName = speciesFileName.substring(
-      0,
-      speciesFileName.length - 4,
-    )
+    const taxonomyName = speciesFileName.slice(0, speciesFileName.length - 4)
 
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,
@@ -97,7 +94,9 @@ export default class TaxonomiesImportJob extends Job {
       speciesFileStream,
       headers => this.onHeaders(headers),
       async row => await this.onRow(speciesFileName, taxonomyUuid, row),
-      total => (this.total = totalPrevious + total),
+      total => {
+        this.total = totalPrevious + total
+      },
     ).start()
 
     if (this.hasErrors()) {
@@ -110,7 +109,7 @@ export default class TaxonomiesImportJob extends Job {
   async onHeaders(headers) {
     this.vernacularLangCodes = R.innerJoin(
       (a, b) => a === b,
-      languageCodesISO636_2,
+      languageCodesISO639part2,
       headers,
     )
 

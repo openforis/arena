@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
 import * as User from '@core/user/user'

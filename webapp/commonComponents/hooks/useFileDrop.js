@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 export default (handler, elemRef, acceptedTypes) => {
   const eventTypes = ['dragenter', 'dragover', 'dragleave', 'drop']

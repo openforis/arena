@@ -89,24 +89,26 @@ const extractDateValueAndMeta = collectNode => {
 const extractFileValueAndMeta = (
   survey,
   node,
-  collectSurvey,
   collectSurveyFileZip,
   collectNodeDef,
   tx,
 ) => async collectNode => {
-  const { file_name, file_size } = CollectRecord.getTextValues(collectNode)
+  const {
+    file_name: fileName,
+    file_size: fileSize,
+  } = CollectRecord.getTextValues(collectNode)
 
   const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
   const content = collectSurveyFileZip.getEntryData(
-    `upload/${collectNodeDefId}/${file_name}`,
+    `upload/${collectNodeDefId}/${fileName}`,
   )
 
   if (content) {
     const fileUuid = uuidv4()
     const file = RecordFile.createFile(
       fileUuid,
-      file_name,
-      file_size,
+      fileName,
+      fileSize,
       content,
       Node.getRecordUuid(node),
       Node.getUuid(node),
@@ -116,8 +118,8 @@ const extractFileValueAndMeta = (
     return {
       value: {
         [Node.valuePropKeys.fileUuid]: fileUuid,
-        [Node.valuePropKeys.fileName]: file_name,
-        [Node.valuePropKeys.fileSize]: file_size,
+        [Node.valuePropKeys.fileName]: fileName,
+        [Node.valuePropKeys.fileSize]: fileSize,
       },
     }
   }
@@ -128,8 +130,8 @@ const extractFileValueAndMeta = (
 const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
   const {
     code,
-    scientific_name,
-    vernacular_name,
+    scientific_name: scientificName,
+    vernacular_name: vernacularName,
   } = CollectRecord.getTextValues(collectNode)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
 
@@ -139,19 +141,19 @@ const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
     }
 
     if (code === Taxon.unlistedCode) {
-      value[Node.valuePropKeys.scientificName] = scientific_name
+      value[Node.valuePropKeys.scientificName] = scientificName
     }
 
-    if (vernacular_name) {
+    if (vernacularName) {
       const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(
         nodeDef,
         code,
-        vernacular_name,
+        vernacularName,
       )(survey)
       if (vernacularNameUuid) {
         value[Node.valuePropKeys.vernacularNameUuid] = vernacularNameUuid
       } else {
-        value[Node.valuePropKeys.vernacularName] = vernacular_name
+        value[Node.valuePropKeys.vernacularName] = vernacularName
       }
     }
 
@@ -176,7 +178,6 @@ export const extractAttributeValueAndMeta = async (
   record,
   node, // Arena items
   collectSurveyFileZip,
-  collectSurvey,
   collectNodeDef,
   collectNode,
   collectNodeField, // Collect items
@@ -202,7 +203,6 @@ export const extractAttributeValueAndMeta = async (
       return await extractFileValueAndMeta(
         survey,
         node,
-        collectSurvey,
         collectSurveyFileZip,
         collectNodeDef,
         tx,
@@ -213,5 +213,8 @@ export const extractAttributeValueAndMeta = async (
 
     case nodeDefType.time:
       return extractTimeValueAndMeta(collectNode)
+
+    default:
+      throw new Error(`Unknown NodeDef type: ${NodeDef.getType(nodeDef)}`)
   }
 }

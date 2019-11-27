@@ -44,7 +44,7 @@ export const createImportSummaryFromStream = async stream => {
   const getOrCreateLevel = (columnName, columnType) => {
     const columnProp = columnProps[columnType]
     if (columnProp) {
-      const name = columnName.substr(
+      const name = columnName.slice(
         0,
         columnName.length -
           columnProp.suffix.length -
@@ -85,7 +85,7 @@ export const createImportSummaryFromStream = async stream => {
     const columnProp = columnProps[columnType]
     const language =
       columnProp && columnProp.lang
-        ? columnName.substring(columnName.lastIndexOf('_') + 1)
+        ? columnName.slice(columnName.lastIndexOf('_') + 1)
         : null
 
     acc[columnName] = CategoryImportSummary.newColumn(
@@ -116,7 +116,7 @@ const _validateSummary = summary => {
 
   let atLeastOneCodeColumn = false
 
-  Object.entries(columns).forEach(([columnName, column]) => {
+  for (const column of Object.values(columns)) {
     if (CategoryImportSummary.isColumnCode(column)) {
       atLeastOneCodeColumn = true
     } else if (
@@ -139,7 +139,7 @@ const _validateSummary = summary => {
         )
       }
     }
-  })
+  }
 
   if (!atLeastOneCodeColumn) {
     throw new SystemError(

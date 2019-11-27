@@ -8,6 +8,7 @@ import * as appCluster from './system/appCluster'
 const initialize = async () => {
   await dbMigrator.migrateAll()
   if (ProcessUtils.ENV.migrateOnly) {
+    // eslint-disable-next-line unicorn/no-process-exit
     process.exit()
   }
 

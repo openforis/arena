@@ -31,7 +31,7 @@ class TabBar extends React.Component {
     this.state = { selection: props.selection || TabBar.defaultProps.selection }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps) {
     const { selection } = this.props
     const { selection: selectionPrev } = prevProps
     if (selection !== selectionPrev) {
@@ -53,7 +53,7 @@ class TabBar extends React.Component {
           selection={selection}
           onClick={tabIndex => {
             this.setState({ selection: tabIndex })
-            onClick && onClick(tabs[tabIndex])
+            if (onClick) onClick(tabs[tabIndex])
           }}
         />
 

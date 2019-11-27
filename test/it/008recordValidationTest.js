@@ -68,13 +68,14 @@ after(async () => {
   }
 })
 
-const _persistNode = async node =>
-  (record = await RecordManager.persistNode(
+const _persistNode = async node => {
+  record = await RecordManager.persistNode(
     getContextUser(),
     survey,
     record,
     node,
-  ))
+  )
+}
 
 const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)

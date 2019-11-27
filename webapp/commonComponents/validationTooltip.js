@@ -7,7 +7,7 @@ import Tooltip from './tooltip'
 
 import { useI18n } from './hooks'
 
-export default ({ validation, className, showKeys, children }) => {
+const ValidationTooltip = ({ validation, className, showKeys, children }) => {
   const i18n = useI18n()
 
   const isValid = Validation.isValid(validation)
@@ -28,3 +28,5 @@ export default ({ validation, className, showKeys, children }) => {
     </Tooltip>
   )
 }
+
+export default ValidationTooltip

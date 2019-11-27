@@ -29,7 +29,7 @@ const actionHandlers = {
 
   [surveyDefsReset]: () => ({}),
 
-  [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
+  [surveyDefsLoad]: (_state, { nodeDefs }) => nodeDefs,
 
   // Single nodeDef actions
   [nodeDefCreate]: (state, { nodeDef }) =>

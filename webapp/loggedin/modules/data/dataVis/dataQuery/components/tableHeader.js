@@ -113,7 +113,9 @@ const TableHeader = props => {
 
         <Tooltip messages={sortMsg && [sortMsg]}>
           <button
-            className={`btn btn-s btn-edit${sort.length ? ' highlight' : ''}`}
+            className={`btn btn-s btn-edit${
+              sort.length > 0 ? ' highlight' : ''
+            }`}
             onClick={toggleSortEditor}
           >
             <span className="icon icon-sort-amount-asc icon-14px" />

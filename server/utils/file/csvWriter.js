@@ -14,6 +14,7 @@ const _transformObj = obj =>
 export const transformToStream = (stream, columns) => {
   const transformer = transform(_transformObj)
   transformer
+    // eslint-disable-next-line camelcase
     .pipe(stringify({ quoted_string: true, header: true, columns }))
     .pipe(stream)
   return transformer

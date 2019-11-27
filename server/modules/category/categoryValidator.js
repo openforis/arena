@@ -90,8 +90,6 @@ const validateNotEmptyFirstLevelItems = itemsByParentUuid => (
 
 const validateItem = (
   category,
-  siblings,
-  siblingsByUuid,
   siblingsByCode,
   itemsByParentUuid,
 ) => async item => {
@@ -145,18 +143,9 @@ const validateItemsByParentUuid = async (
 ) => {
   const children = getChildrenItems(itemsByParentUuid, parentItemUuid)
   const childrenByCode = R.groupBy(CategoryItem.getCode)(children)
-  const childrenByUuid = R.groupBy(R.prop(CategoryItem.keys.uuid))(children)
 
   const childrenValidationsArr = await Promise.all(
-    children.map(
-      validateItem(
-        category,
-        children,
-        childrenByUuid,
-        childrenByCode,
-        itemsByParentUuid,
-      ),
-    ),
+    children.map(validateItem(category, childrenByCode, itemsByParentUuid)),
   )
 
   // Merge children validations

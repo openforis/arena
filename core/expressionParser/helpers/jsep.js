@@ -1,4 +1,3 @@
-/* eslint-disable */
 //     JavaScript Expression Parser (JSEP) <%= version %>
 //     JSEP may be freely distributed under the MIT License
 //     http://jsep.from.so/
@@ -66,7 +65,7 @@
     getMaxKeyLen = function(obj) {
       var max_len = 0, len;
       for(var key in obj) {
-        if((len = key.length) > max_len && obj.hasOwnProperty(key)) {
+        if((len = key.length) > max_len && Object.prototype.hasOwnProperty.call(obj, key)) {
           max_len = len;
         }
       }
@@ -183,7 +182,7 @@
             // Don't accept a binary op when it is an identifier.
             // Binary ops that start with a identifier-valid character must be followed
             // by a non identifier-part valid character
-            if(binary_ops.hasOwnProperty(to_check) && (
+            if(Object.prototype.hasOwnProperty.call(binary_ops, to_check) && (
               !isIdentifierStart(exprICode(index)) ||
               (index+to_check.length< expr.length && !isIdentifierPart(exprICode(index+to_check.length)))
             )) {
@@ -277,7 +276,7 @@
               // Don't accept an unary op when it is an identifier.
               // Unary ops that start with a identifier-valid character must be followed
               // by a non identifier-part valid character
-              if(unary_ops.hasOwnProperty(to_check) && (
+              if(Object.prototype.hasOwnProperty.call(unary_ops, to_check) && (
                 !isIdentifierStart(exprICode(index)) ||
                 (index+to_check.length < expr.length && !isIdentifierPart(exprICode(index+to_check.length)))
               )) {
@@ -409,7 +408,7 @@
           }
           identifier = expr.slice(start, index);
 
-          if(literals.hasOwnProperty(identifier)) {
+          if(Object.prototype.hasOwnProperty.call(literals, identifier)) {
             return {
               type: LITERAL,
               value: literals[identifier],

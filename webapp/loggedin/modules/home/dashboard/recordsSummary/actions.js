@@ -25,6 +25,9 @@ const getFromDate = (date, timeRange) => {
 
     case RecordsSummaryState.timeRanges._1Year:
       return DateUtils.subYears(date, 1)
+
+    default:
+      throw new Error(`Unknown timeRange: ${timeRange}`)
   }
 }
 

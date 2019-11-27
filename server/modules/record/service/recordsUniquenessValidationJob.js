@@ -79,9 +79,9 @@ export default class RecordsUniquenessValidationJob extends Job {
         const {
           uuid: recordUuid,
           validation,
-          node_duplicate_uuids,
+          node_duplicate_uuids: nodeDuplicateUuids,
         } = rowRecordDuplicate
-        const nodeRootUuid = node_duplicate_uuids[0]
+        const nodeRootUuid = nodeDuplicateUuids[0]
         const nodesKeyDuplicate = await RecordManager.fetchChildNodesByNodeDefUuids(
           this.surveyId,
           recordUuid,

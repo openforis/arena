@@ -78,7 +78,7 @@ export const setInPath = (pathArray, value, includeEmpty = true) => obj => {
     if (i === pathArray.length - 1) {
       objCurrent[pathPart] = value
     } else {
-      if (!objCurrent.hasOwnProperty(pathPart)) {
+      if (!Object.prototype.hasOwnProperty.call(objCurrent, pathPart)) {
         objCurrent[pathPart] = {}
       }
 

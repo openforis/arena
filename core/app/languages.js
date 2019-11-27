@@ -181,7 +181,7 @@ const languagesMap = {
   zu: { en: 'Zulu' },
 }
 
-const language_ISO_636_2_Map = {
+const iso639part2Names = {
   aar: { en: 'Afar' },
   abk: { en: 'Abkhazian' },
   ace: { en: 'Achinese' },
@@ -594,4 +594,4 @@ export const languages = R.pipe(
 
 export const languageCodes = languages.map(R.prop('key'))
 
-export const languageCodesISO636_2 = R.keys(language_ISO_636_2_Map)
+export const languageCodesISO639part2 = R.keys(iso639part2Names)

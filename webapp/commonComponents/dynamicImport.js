@@ -7,26 +7,26 @@ export default class DynamicImport extends React.Component {
     this.state = { component: null }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { load } = this.props
 
-    load().then(module => {
-      const { component, reducers } = module
+    const module = await load()
+    const { component, reducers } = module
 
-      if (reducers) {
-        reducers.forEach(reducer => {
-          injectReducers(reducer.name, reducer.fn)
-        })
-      }
-
-      this.setState({
-        component: component ? component : module.default,
+    if (reducers) {
+      reducers.forEach(reducer => {
+        injectReducers(reducer.name, reducer.fn)
       })
+    }
+
+    this.setState({
+      component: component ? component : module.default,
     })
   }
 
   render() {
     const { component } = this.state
+    // eslint-disable-next-line no-unused-vars
     const { module, ...rest } = this.props
     return component ? React.createElement(component, rest) : null
   }

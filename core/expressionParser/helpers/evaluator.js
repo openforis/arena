@@ -172,7 +172,7 @@ const thisEval = (expr, _ctx) => {
   throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
-const identifierEval = (expr, ctx) => {
+const identifierEval = (expr, _ctx) => {
   throw new SystemError('identifierEvalNotImplemented', { expr })
 }
 

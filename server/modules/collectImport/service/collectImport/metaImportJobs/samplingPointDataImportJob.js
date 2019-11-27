@@ -12,6 +12,7 @@ import * as CategoryImportJobParams from '../../../../category/service/categoryI
 const keysExtra = {
   x: 'x',
   y: 'y',
+  // eslint-disable-next-line camelcase
   srs_id: 'srs_id',
 }
 
@@ -88,11 +89,11 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   }
 
   extractItemExtraProps(extra) {
-    const { srs_id, x, y } = extra
+    const { srs_id: srsId, x, y } = extra
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
-      [keysItem.location]: Point.newPoint(srs_id, x, y),
+      [keysItem.location]: Point.newPoint(srsId, x, y),
     }
 
     return super.extractItemExtraProps(extraUpdated)

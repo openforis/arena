@@ -58,7 +58,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
 
 export const fetchNodeDefsBySurveyId = async (
   surveyId,
-  cycle = null,
+  cycle,
   draft,
   advanced = false,
   includeDeleted = false,
@@ -83,7 +83,7 @@ export const fetchNodeDefsBySurveyId = async (
       ${!draft ? " AND props <> '{}'::jsonb" : ''}
       ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
     ORDER BY id`,
-    [JSON.stringify(cycle)],
+    [JSON.stringify(cycle || null)],
     res => dbTransformCallback(res, draft, advanced),
   )
 
@@ -246,7 +246,7 @@ export const addNodeDefsCycles = async (
 
 export const copyNodeDefsCyclesLayout = async (
   surveyId,
-  nodeDefUuid = null,
+  nodeDefUuid,
   cycleStart,
   cycles,
   client = db,
@@ -279,7 +279,7 @@ export const deleteNodeDefsCycles = async (surveyId, cycles, client = db) => {
 
 export const deleteNodeDefsCyclesLayout = async (
   surveyId,
-  nodeDefUuid = null,
+  nodeDefUuid,
   cycles,
   client = db,
 ) =>

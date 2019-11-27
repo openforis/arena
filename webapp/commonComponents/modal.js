@@ -4,7 +4,7 @@ import React from 'react'
 import { KeyboardMap } from '@webapp/utils/keyboardMap'
 import * as R from 'ramda'
 
-export const ModalClose = ({ children, onClose }) => (
+export const ModalClose = ({ _children, onClose }) => (
   <div className="modal-close" onClick={() => onClose()}>
     <span className="icon icon-cross icon-20px" />
   </div>
@@ -42,9 +42,7 @@ export class Modal extends React.Component {
     const { onClose, closeOnEsc = true } = this.props
 
     if (e.type === 'keydown' && e.keyCode === KeyboardMap.Esc) {
-      if (closeOnEsc) {
-        onClose && onClose()
-      }
+      if (closeOnEsc && onClose) onClose()
     }
   }
 

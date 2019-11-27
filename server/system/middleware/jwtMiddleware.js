@@ -5,7 +5,7 @@ import * as AuthService from '@server/modules/auth/service/authService'
 
 import UnauthorizedError from '@server/utils/unauthorizedError'
 
-export const jwtMiddleware = async (req, res, next) => {
+export const jwtMiddleware = async (req, _res, next) => {
   const authorizationHeader = req.headers && req.headers.authorization
 
   if (!authorizationHeader) {
@@ -14,11 +14,11 @@ export const jwtMiddleware = async (req, res, next) => {
     next(new Error('Authorization header is not a bearer header'))
   } else {
     try {
-      const jwtToken = authorizationHeader.substr(Jwt.bearerPrefix.length)
+      const jwtToken = authorizationHeader.slice(Jwt.bearerPrefix.length)
 
       // Check if token is blacklisted
       if (await AuthService.findBlacklistedToken(Jwt.getJti(jwtToken))) {
-        throw new Error()
+        throw new Error('Invalid token')
       }
 
       const tokenDecoded = await Jwt.validate(jwtToken)

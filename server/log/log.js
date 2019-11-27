@@ -76,7 +76,7 @@ class Logger {
   }
 
   _log(level, msgs) {
-    this._isLevelEnabled(level) &&
+    if (this._isLevelEnabled(level))
       logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
   }
 }

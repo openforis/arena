@@ -21,12 +21,7 @@ const ItemsView = props => {
 
       {onClose && (
         <div className="items__footer">
-          <button
-            className="btn"
-            onClick={() => {
-              onClose ? onClose() : null
-            }}
-          >
+          <button className="btn" onClick={() => onClose()}>
             Close
           </button>
         </div>

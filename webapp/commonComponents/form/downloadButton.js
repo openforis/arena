@@ -33,7 +33,7 @@ const DownloadButton = props => {
           ['headers', 'content-disposition'],
           response,
         )
-        const fileName = contentDisposition.substring(
+        const fileName = contentDisposition.slice(
           'attachment; filename='.length,
         )
         FileSaver.saveAs(blob, fileName)

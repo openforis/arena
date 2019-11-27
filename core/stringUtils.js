@@ -11,7 +11,7 @@ export const leftTrim = R.replace(/^\s+/, '')
 const toLower = R.pipe(trim, R.toLower)
 
 export const truncate = maxLength => text =>
-  text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+  text.length > maxLength ? text.slice(0, maxLength) + '...' : text
 
 export const contains = (value = '', string = '') =>
   R.includes(toLower(value), toLower(string))

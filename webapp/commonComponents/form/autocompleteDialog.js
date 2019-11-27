@@ -62,6 +62,8 @@ class AutocompleteDialog extends React.Component {
         this.close()
         inputField.focus()
         break
+      default:
+      // Do nothing
     }
   }
 
@@ -95,6 +97,8 @@ class AutocompleteDialog extends React.Component {
         case KeyboardMap.Down:
           offset = 1
           break
+        default:
+        // Do nothing
       }
 
       if (offset) {

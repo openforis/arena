@@ -45,7 +45,7 @@ const DataPoints = props => {
     d3.select(elementRef.current).call(tooltipRef.current)
 
     return () => {
-      document.getElementsByClassName(tooltipClassName)[0].remove()
+      document.querySelector(`.${tooltipClassName}`).remove()
     }
   }, [])
 

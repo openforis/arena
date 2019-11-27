@@ -25,15 +25,17 @@ const TableView = props => {
   )
 }
 
+const DummyComponent = () => <div></div>
+
 TableView.defaultProps = {
   module: '',
   moduleApiUri: null,
   restParams: {},
   className: '',
   gridTemplateColumns: '1fr',
-  headerLeftComponent: () => <div></div>,
-  rowHeaderComponent: () => <div></div>,
-  rowComponent: () => <div></div>,
+  headerLeftComponent: DummyComponent,
+  rowHeaderComponent: DummyComponent,
+  rowComponent: DummyComponent,
   noItemsLabelKey: 'common.noItems',
   onRowClick: null, // Function to be passed when an action has to be performed on row click
   isRowActive: null, // Function to be passed when a row must be highlighted

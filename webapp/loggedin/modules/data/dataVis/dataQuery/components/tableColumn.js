@@ -21,7 +21,7 @@ const TableColumn = props => {
   const isHeader = !row
   const isData = Boolean(row)
   const noCols = editMode
-    ? NodeDefUIProps.getFormFields(nodeDef).length
+    ? NodeDefUIProps.getFormFields(nodeDef).length > 0
     : colNames.length
   const widthOuter = colWidth * noCols
   const widthInner = (1 / noCols) * 100 + '%'
@@ -62,7 +62,7 @@ const TableColumn = props => {
           {colNames.map((col, i) =>
             isData ? (
               <div key={i} style={{ width: widthInner }} className="ellipsis">
-                {row.hasOwnProperty(col) ? (
+                {Object.prototype.hasOwnProperty.call(row, col) ? (
                   row[col]
                 ) : (
                   <div

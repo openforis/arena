@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -140,7 +140,7 @@ const mapStateToProps = (state, props) => {
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
       const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
-      nodeDefChild && nodeDefColumnsAgg.push(nodeDefChild)
+      if (nodeDefChild) nodeDefColumnsAgg.push(nodeDefChild)
       return nodeDefColumnsAgg
     },
     [],

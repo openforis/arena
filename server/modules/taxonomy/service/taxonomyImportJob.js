@@ -4,7 +4,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job from '@server/job/job'
 
-import { languageCodesISO636_2 } from '@core/app/languages'
+import { languageCodesISO639part2 } from '@core/app/languages'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -77,7 +77,9 @@ export default class TaxonomyImportJob extends Job {
       this.filePath,
       async headers => await this._onHeaders(headers),
       async row => await this._onRow(row),
-      total => (this.total = total),
+      total => {
+        this.total = total
+      },
     )
     await this.csvReader.start()
 
@@ -108,7 +110,7 @@ export default class TaxonomyImportJob extends Job {
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin(
         (a, b) => a === b,
-        languageCodesISO636_2,
+        languageCodesISO639part2,
         headers,
       )
       this.taxonomyImportManager = new TaxonomyImportManager(

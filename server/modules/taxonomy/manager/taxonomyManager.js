@@ -94,7 +94,7 @@ export const countTaxaByTaxonomyUuid =
 
 const validateTaxonomy = async (
   surveyId,
-  taxonomies = [],
+  taxonomies,
   taxonomy,
   draft,
   client = db,
@@ -109,7 +109,7 @@ const validateTaxonomy = async (
   return {
     ...taxonomy,
     validation: await TaxonomyValidator.validateTaxonomy(
-      taxonomies,
+      taxonomies || [],
       taxonomy,
       taxaCount,
     ),

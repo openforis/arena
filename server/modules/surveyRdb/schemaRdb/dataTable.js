@@ -20,8 +20,7 @@ export const getNodeDefColumns = (survey, nodeDef) =>
         R.filter(NodeDef.isSingleAttribute),
         R.sortBy(R.ascend(R.prop('id'))),
       )(survey)
-    : // Multiple attr table
-      [nodeDef]
+    : [nodeDef] // Multiple attr table
 
 export const getName = NodeDefTable.getTableName
 

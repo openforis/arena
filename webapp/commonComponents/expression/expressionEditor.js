@@ -21,7 +21,7 @@ const ExpressionEditor = props => {
   const [edit, setEdit] = useState(false)
 
   const applyChange = query => {
-    onChange && onChange(query)
+    if (onChange) onChange(query)
     setEdit(false)
   }
 

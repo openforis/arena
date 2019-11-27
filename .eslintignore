@@ -1,0 +1,2 @@
+server/db/migration/*/migrations/*.js
+**/jsep.js

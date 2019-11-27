@@ -27,8 +27,6 @@ class RecordUpdateThread extends Thread {
     this.survey = null
     this.record = null
     this.processing = false
-
-    this.sendThreadInitMsg()
   }
 
   sendThreadInitMsg() {
@@ -160,6 +158,9 @@ class RecordUpdateThread extends Thread {
       case messageTypes.threadKill:
         this.postMessage(msg)
         break
+
+      default:
+        Logger.debug(`Skipping unknown message type: ${msg.type}`)
     }
 
     if (
@@ -170,4 +171,5 @@ class RecordUpdateThread extends Thread {
   }
 }
 
-new RecordUpdateThread()
+const thread = new RecordUpdateThread()
+thread.sendThreadInitMsg()

@@ -189,7 +189,7 @@ export default class NodeDefsImportJob extends Job {
             [NodeDef.propKeys.readOnly]: calculated,
           }),
       // Extra props
-      ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef),
+      ...this.extractNodeDefExtraProps(type, collectNodeDef),
     }
 
     // 2. insert node def into db
@@ -369,9 +369,9 @@ export default class NodeDefsImportJob extends Job {
     return propsAdvanced
   }
 
-  extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef) {
+  extractNodeDefExtraProps(type, collectNodeDef) {
     switch (type) {
-      case NodeDef.nodeDefType.code:
+      case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
         const categoryName = R.includes(
           listName,
@@ -390,7 +390,9 @@ export default class NodeDefsImportJob extends Job {
             NodeDefLayout.renderType.dropdown,
           ),
         }
-      case NodeDef.nodeDefType.taxon:
+      }
+
+      case NodeDef.nodeDefType.taxon: {
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(
           collectNodeDef,
         )
@@ -401,6 +403,8 @@ export default class NodeDefsImportJob extends Job {
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy),
         }
+      }
+
       default:
         return {}
     }
@@ -505,9 +509,9 @@ export default class NodeDefsImportJob extends Job {
   async addNodeDefImportIssue(
     nodeDefUuid,
     expressionType,
-    expression = null,
-    applyIf = null,
-    messages = {},
+    expression,
+    applyIf,
+    messages,
     tx,
   ) {
     await CollectImportReportManager.insertItem(
@@ -515,9 +519,9 @@ export default class NodeDefsImportJob extends Job {
       nodeDefUuid,
       CollectImportReportItem.newReportItem(
         expressionType,
-        expression,
-        applyIf,
-        messages,
+        expression || null,
+        applyIf || null,
+        messages || {},
       ),
       tx,
     )

@@ -74,6 +74,8 @@ const getChildDefVariables = (
       if (mode === Expression.modes.json) {
         return getJsVariables(childDef, lang)
       }
+
+      return null
     }),
     R.flatten,
     R.reject(R.isNil),

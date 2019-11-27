@@ -31,7 +31,6 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 
 const _getQueryData = async (
   survey,
-  cycle,
   nodeDefUuidTable,
   nodeDefUuidCols = [],
 ) => {
@@ -63,7 +62,7 @@ export const queryTable = async (
     nodeDefTable,
     tableName,
     colNames: colNamesParams,
-  } = await _getQueryData(survey, cycle, nodeDefUuidTable, nodeDefUuidCols)
+  } = await _getQueryData(survey, nodeDefUuidTable, nodeDefUuidCols)
 
   // Get hierarchy entities uuid col names
   const ancestorUuidColNames = []
@@ -144,7 +143,7 @@ export const queryTable = async (
 
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
-  const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
+  const { tableName } = await _getQueryData(survey, nodeDefUuidTable)
   return await DataViewReadRepository.runCount(
     surveyId,
     cycle,

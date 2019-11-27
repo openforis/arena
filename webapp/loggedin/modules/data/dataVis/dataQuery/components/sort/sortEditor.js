@@ -68,7 +68,7 @@ const SortExpressionComponent = props => {
     const { onChange, onClose } = props
 
     if (DataSort.toString(sortCriteria) !== sortCriteriaStrPrev) {
-      onChange && onChange(sortCriteria)
+      if (onChange) onChange(sortCriteria)
     }
 
     onClose()
@@ -116,7 +116,7 @@ const SortExpressionComponent = props => {
             />
           ))}
 
-          {Boolean(unchosenVariables.length) && (
+          {Boolean(unchosenVariables.length > 0) && (
             <SortRow
               variables={unchosenVariables}
               onSelectVariable={item => addCriteria(item)}

@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { appErrorCreate } from './appErrors/actions'
 
-const createAxiosMiddleware = axios => ({ dispatch, getState }) => {
+const createAxiosMiddleware = axios => ({ dispatch }) => {
   axios.interceptors.response.use(null, error => {
     const message = R.pathOr(
       error.message,

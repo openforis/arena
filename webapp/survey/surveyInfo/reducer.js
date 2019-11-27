@@ -18,12 +18,15 @@ import {
 } from '../nodeDefs/actions'
 
 // Category actions
-import { categoryCreate } from '../categories/actions'
+import {
+  categoryCreate,
+  categoryDelete,
+  categoryUpdate,
+} from '../categories/actions'
 
 // Taxonomies actions
-import { taxonomyCreate } from '../taxonomies/actions'
-import { categoryDelete, categoryUpdate } from '../categories/actions'
 import {
+  taxonomyCreate,
   taxonomyDelete,
   taxonomyPropUpdate,
   taxonomyUpdate,

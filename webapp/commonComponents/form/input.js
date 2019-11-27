@@ -12,7 +12,7 @@ export const FormItem = ({ label, children, className = '' }) => (
   </div>
 )
 
-export const Input = React.forwardRef((props, ref) => {
+const InputComponent = (props, ref) => {
   const {
     validation = {},
     disabled = false,
@@ -54,4 +54,6 @@ export const Input = React.forwardRef((props, ref) => {
       )}
     </ValidationTooltip>
   )
-})
+}
+
+export const Input = React.forwardRef(InputComponent)

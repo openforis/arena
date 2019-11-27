@@ -224,7 +224,9 @@ export default class CategoryImportJob extends Job {
 
         await this._onRow(itemRow)
       },
-      total => (this.total = total + 1), // +1 consider final db inserts
+      total => {
+        this.total = total + 1
+      }, // +1 consider final db inserts
     )
 
     await reader.start()

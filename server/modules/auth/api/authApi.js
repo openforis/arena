@@ -6,10 +6,13 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 
+import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
 import * as AuthService from '../service/authService'
+
+const Logger = Log.getLogger('AuthAPI')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
@@ -22,7 +25,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
 
     sendResponse(res, user, survey)
   } catch (error) {
-    Loggger.error(
+    Logger.error(
       `error loading survey with id ${surveyId}: ${error.toString()}`,
     )
     // Survey not found with user pref
@@ -38,9 +41,11 @@ export const init = app => {
       const user = Request.getUser(req)
       const surveyId = User.getPrefSurveyCurrent(user)
 
-      surveyId
-        ? await sendUserSurvey(res, user, surveyId)
-        : sendResponse(res, user)
+      if (surveyId) {
+        await sendUserSurvey(res, user, surveyId)
+      } else {
+        sendResponse(res, user)
+      }
     } catch (error) {
       next(error)
     }
@@ -52,7 +57,7 @@ export const init = app => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromRecordThread(socketId)
 
-      const token = req.headers.authorization.substring(Jwt.bearerPrefix.length)
+      const token = req.headers.authorization.slice(Jwt.bearerPrefix.length)
 
       await AuthService.blacklistToken(token)
 

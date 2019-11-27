@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-export default ({
+const NodeDeleteButton = ({
   nodeDef,
   node,
   disabled = false,
@@ -29,3 +29,5 @@ export default ({
     </button>
   )
 }
+
+export default NodeDeleteButton

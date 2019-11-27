@@ -82,7 +82,7 @@ export const getColumnName = (type, levelIndex) =>
     getColumns,
     Object.entries,
     R.find(
-      ([columnName, column]) =>
+      ([_columnName, column]) =>
         getColumnType(column) === type &&
         getColumnLevelIndex(column) === levelIndex,
     ),

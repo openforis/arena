@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { useFormObject } from '@webapp/commonComponents/hooks'
 
 import { validateAcceptInvitationObj, getFirstError } from './loginValidator'
