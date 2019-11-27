@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as ObjectUtils from '@core/objectUtils'
+
 import * as NodeDefExpression from '../nodeDefExpression'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 import * as NodeDef from '../nodeDef'
@@ -16,14 +18,12 @@ export const dependencyTypes = {
 
 const _getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
 
-const _addDep = (type, nodeDefUuid, nodeDefDepUuid) =>
-  graph => {
-    const dep = R.pipe(
-      _getDeps(type, nodeDefUuid),
-      R.append(nodeDefDepUuid)
-    )(graph)
-    return R.assocPath([type, nodeDefUuid], dep)(graph)
-  }
+const _addDep = (type, nodeDefUuid, nodeDefDepUuid) => graph =>
+  R.pipe(
+    _getDeps(type, nodeDefUuid),
+    R.append(nodeDefDepUuid),
+    dep => ObjectUtils.setInPath([type, nodeDefUuid], dep)(graph)
+  )(graph)
 
 const addDeps = (survey, nodeDef, type, expressions) =>
   graph => {
