@@ -27,8 +27,9 @@ class CleanUpStatsPlugin {
       const children = stats.compilation.children
       if (Array.isArray(children)) {
         // eslint-disable-next-line no-param-reassign
-        stats.compilation.children = children
-          .filter(child => this.shouldPickStatChild(child))
+        stats.compilation.children = children.filter(child =>
+          this.shouldPickStatChild(child),
+        )
       }
     })
   }
@@ -40,24 +41,27 @@ const gitRevisionPlugin = new GitRevisionPlugin()
 const plugins = [
   gitRevisionPlugin,
   new MiniCssExtractPlugin({
-    filename: 'styles-[hash].css'
+    filename: 'styles-[hash].css',
   }),
   new HtmlWebpackPlugin({
-    template: './web-resources/index.html'
+    template: './web-resources/index.html',
   }),
   // Only substitute in variables in development.
   // In production, this is done upon container startup.
   new HtmlReplaceWebpackPlugin(
-    ProcessUtils.isEnvProduction ? [] : [
-      {
-        pattern: '$COGNITO_USER_POOL_ID',
-        replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
-      },
-      {
-        pattern: '$COGNITO_CLIENT_ID',
-        replacement: ProcessUtils.ENV.cognitoClientId || '',
-      },
-    ]),
+    ProcessUtils.isEnvProduction
+      ? []
+      : [
+          {
+            pattern: '$COGNITO_USER_POOL_ID',
+            replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
+          },
+          {
+            pattern: '$COGNITO_CLIENT_ID',
+            replacement: ProcessUtils.ENV.cognitoClientId || '',
+          },
+        ],
+  ),
   new webpack.DefinePlugin({
     __BUST__: JSON.stringify(uuidv4()),
     process: {
@@ -66,17 +70,17 @@ const plugins = [
         APPLICATION_VERSION: JSON.stringify(gitRevisionPlugin.version()),
         GIT_COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
         GIT_BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
-      }
-    }
+      },
+    },
   }),
   new GoogleFontsPlugin({
-    fonts: [{
-      family: 'Montserrat',
-      variants: ['200', '400', '600', '800']
-    }],
-    formats: [
-      'woff2'
-    ]
+    fonts: [
+      {
+        family: 'Montserrat',
+        variants: ['200', '400', '600', '800'],
+      },
+    ],
+    formats: ['woff2'],
   }),
   new CleanUpStatsPlugin(),
 ]
@@ -90,7 +94,16 @@ const webPackConfig = {
   entry: ['./webapp/main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
+    extensions: [
+      '.webpack-loader.js',
+      '.web-loader.js',
+      '.loader.js',
+      '.js',
+      '.jsx',
+      '.scss',
+      '.sass',
+      '.css',
+    ],
     alias: {
       '@common': path.resolve(__dirname, 'common/'),
       '@core': path.resolve(__dirname, 'core/'),
@@ -102,7 +115,7 @@ const webPackConfig = {
   output: {
     filename: 'bundle-[hash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/'
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -113,23 +126,26 @@ const webPackConfig = {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env', '@babel/react'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
-          }
-        }
+            plugins: [
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-syntax-dynamic-import',
+            ],
+          },
+        },
       },
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
           },
           'css-loader',
           'sass-loader',
-        ]
+        ],
       },
-    ]
+    ],
   },
-  plugins
+  plugins,
 }
 
 // If (prodBuild) {
@@ -142,10 +158,10 @@ webpack.optimization = {
         compress: true,
         output: {comments: false},
       },
-      sourceMap: true
+      sourceMap: true,
     }),
-    new OptimizeCSSAssetsPlugin({})
-  ]
+    new OptimizeCSSAssetsPlugin({}),
+  ],
 }
 
 // }

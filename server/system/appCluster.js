@@ -29,13 +29,15 @@ export const run = async () => {
   // ====== app initializations
   app.use(bodyParser.json({limit: '5000kb'}))
   app.use(cookieParser())
-  app.use(fileUpload({
-    // Limit upload to 1 GB
-    limits: {fileSize: 1024 * 1024 * 1024},
-    abortOnLimit: true,
-    useTempFiles: true,
-    tempFileDir: ProcessUtils.ENV.tempFolder,
-  }))
+  app.use(
+    fileUpload({
+      // Limit upload to 1 GB
+      limits: {fileSize: 1024 * 1024 * 1024},
+      abortOnLimit: true,
+      useTempFiles: true,
+      tempFileDir: ProcessUtils.ENV.tempFolder,
+    }),
+  )
 
   headerMiddleware.init(app)
 
@@ -60,7 +62,9 @@ export const run = async () => {
 
   // ====== server
   const server = app.listen(ProcessUtils.ENV.port, () => {
-    logger.info(`server initialization end - listening on port ${ProcessUtils.ENV.port}`)
+    logger.info(
+      `server initialization end - listening on port ${ProcessUtils.ENV.port}`,
+    )
   })
 
   // ====== socket middleware

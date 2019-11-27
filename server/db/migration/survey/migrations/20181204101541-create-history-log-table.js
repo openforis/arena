@@ -8,19 +8,23 @@ const path = require('path')
 let Promise
 
 /**
-  * We receive the dbmigrate dependency from dbmigrate initially.
-  * This enables us to not have to rely on NODE_PATH.
-  */
-exports.setup = function (options, seedLink) {
+ * We receive the dbmigrate dependency from dbmigrate initially.
+ * This enables us to not have to rely on NODE_PATH.
+ */
+exports.setup = function(options, seedLink) {
   dbm = options.dbmigrate
   type = dbm.dataType
   seed = seedLink
   Promise = options.Promise
 }
 
-exports.up = function (db) {
-  const filePath = path.join(__dirname, 'sqls', '20181204101541-create-history-log-table-up.sql')
-  return new Promise(((resolve, reject) => {
+exports.up = function(db) {
+  const filePath = path.join(
+    __dirname,
+    'sqls',
+    '20181204101541-create-history-log-table-up.sql',
+  )
+  return new Promise((resolve, reject) => {
     fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
       if (err) {
         return reject(err)
@@ -30,15 +34,18 @@ exports.up = function (db) {
 
       resolve(data)
     })
-  }))
-    .then(data => {
-      return db.runSql(data)
-    })
+  }).then(data => {
+    return db.runSql(data)
+  })
 }
 
-exports.down = function (db) {
-  const filePath = path.join(__dirname, 'sqls', '20181204101541-create-history-log-table-down.sql')
-  return new Promise(((resolve, reject) => {
+exports.down = function(db) {
+  const filePath = path.join(
+    __dirname,
+    'sqls',
+    '20181204101541-create-history-log-table-down.sql',
+  )
+  return new Promise((resolve, reject) => {
     fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
       if (err) {
         return reject(err)
@@ -48,12 +55,11 @@ exports.down = function (db) {
 
       resolve(data)
     })
-  }))
-    .then(data => {
-      return db.runSql(data)
-    })
+  }).then(data => {
+    return db.runSql(data)
+  })
 }
 
 exports._meta = {
-  version: 1
+  version: 1,
 }

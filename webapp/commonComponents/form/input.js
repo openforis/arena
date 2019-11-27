@@ -29,37 +29,29 @@ export const Input = React.forwardRef((props, ref) => {
   }
 
   return (
-    <ValidationTooltip
-      validation={validation}
-      className="form-input-container">
-
-      {
-        mask
-          ? (
-            <TextMask
-              ref={ref}
-              Component={InputAdapter}
-              mask={mask}
-              className="form-input"
-              aria-disabled={disabled}
-              isControlled={true}
-              value={value}
-              onChange={(e, {value}) => onChangeValue(value)}
-              {...inputProps}
-            />
-          )
-          : (
-            <input
-              ref={ref}
-              className="form-input"
-              aria-disabled={disabled}
-              value={value}
-              onChange={e => onChangeValue(e.target.value)}
-              {...inputProps}
-            />
-          )
-      }
-
+    <ValidationTooltip validation={validation} className="form-input-container">
+      {mask ? (
+        <TextMask
+          ref={ref}
+          Component={InputAdapter}
+          mask={mask}
+          className="form-input"
+          aria-disabled={disabled}
+          isControlled={true}
+          value={value}
+          onChange={(e, {value}) => onChangeValue(value)}
+          {...inputProps}
+        />
+      ) : (
+        <input
+          ref={ref}
+          className="form-input"
+          aria-disabled={disabled}
+          value={value}
+          onChange={e => onChangeValue(e.target.value)}
+          {...inputProps}
+        />
+      )}
     </ValidationTooltip>
   )
 })

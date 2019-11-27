@@ -14,15 +14,12 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Date from '@core/dateUtils'
 
 const RecordsRow = props => {
-  const {
-    row: record, nodeDefKeys,
-    surveyInfo, user,
-    idx, offset,
-  } = props
+  const {row: record, nodeDefKeys, surveyInfo, user, idx, offset} = props
 
   const i18n = useI18n()
 
-  const canEdit = Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record)
+  const canEdit =
+    Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record)
 
   return (
     <>
@@ -34,37 +31,25 @@ const RecordsRow = props => {
         />
         {idx + offset + 1}
       </div>
-      {
-        nodeDefKeys.map((n, i) =>
-          <div key={i}>{record[camelize(NodeDef.getName(n))]}</div>
-        )
-      }
+      {nodeDefKeys.map((n, i) => (
+        <div key={i}>{record[camelize(NodeDef.getName(n))]}</div>
+      ))}
+      <div>{Date.getRelativeDate(i18n, Record.getDateCreated(record))}</div>
+      <div>{Date.getRelativeDate(i18n, Record.getDateModified(record))}</div>
+      <div>{Record.getOwnerName(record)}</div>
+      <div>{Record.getStep(record)}</div>
       <div>
-        {Date.getRelativeDate(i18n, Record.getDateCreated(record))}
+        {R.pipe(Validation.getValidation, Validation.getErrorsCount)(record)}
       </div>
       <div>
-        {Date.getRelativeDate(i18n, Record.getDateModified(record))}
+        {R.pipe(Validation.getValidation, Validation.getWarningsCount)(record)}
       </div>
       <div>
-        {Record.getOwnerName(record)}
-      </div>
-      <div>
-        {Record.getStep(record)}
-      </div>
-      <div>
-        {R.pipe(
-          Validation.getValidation,
-          Validation.getErrorsCount
-        )(record)}
-      </div>
-      <div>
-        {R.pipe(
-          Validation.getValidation,
-          Validation.getWarningsCount
-        )(record)}
-      </div>
-      <div>
-        <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
+        <span
+          className={`icon icon-12px icon-action ${
+            canEdit ? 'icon-pencil2' : 'icon-eye'
+          }`}
+        />
       </div>
     </>
   )

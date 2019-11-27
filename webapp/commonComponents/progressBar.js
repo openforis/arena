@@ -3,18 +3,12 @@ import './progressBar.scss'
 import React from 'react'
 
 const ProgressBar = props => {
-  const {
-    progress, className = '',
-    showText,
-  } = props
+  const {progress, className = '', showText} = props
 
   return (
     <div className={`progress-bar ${className}`}>
-      <div className="filler" style={{width: `${progress}%`}}/>
-      {
-        showText &&
-        <span className="progress">({progress}%)</span>
-      }
+      <div className="filler" style={{width: `${progress}%`}} />
+      {showText && <span className="progress">({progress}%)</span>}
     </div>
   )
 }

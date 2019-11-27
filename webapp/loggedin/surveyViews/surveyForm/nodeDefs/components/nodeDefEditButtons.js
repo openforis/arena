@@ -11,15 +11,24 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
-import {putNodeDefLayoutProp, removeNodeDef} from '@webapp/survey/nodeDefs/actions'
+import {
+  putNodeDefLayoutProp,
+  removeNodeDef,
+} from '@webapp/survey/nodeDefs/actions'
 import {setFormNodeDefAddChildTo} from '../../actions'
 import {setNodeDefForEdit} from '../../../nodeDefEdit/actions'
 
 const NodeDefEditButtons = props => {
   const {
-    surveyCycleKey, nodeDef,
-    edit, canEditDef, hasNodeDefAddChildTo,
-    putNodeDefLayoutProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
+    surveyCycleKey,
+    nodeDef,
+    edit,
+    canEditDef,
+    hasNodeDefAddChildTo,
+    putNodeDefLayoutProp,
+    setNodeDefForEdit,
+    setFormNodeDefAddChildTo,
+    removeNodeDef,
   } = props
 
   const show = edit && canEditDef
@@ -39,65 +48,80 @@ const NodeDefEditButtons = props => {
     }
   }, [hasNodeDefAddChildTo])
 
-  return show && (
-    <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
+  return (
+    show && (
+      <div
+        className="survey-form__node-def-edit-buttons"
+        ref={elementRef}
+        style={style}
+      >
+        {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (
+          <div className="survey-form__node-def-edit-page-props">
+            {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
+            <input
+              value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
+              type="number"
+              min="1"
+              max="12"
+              step="1"
+              onChange={e =>
+                e.target.value > 0
+                  ? putNodeDefLayoutProp(
+                      nodeDef,
+                      NodeDefLayout.keys.columnsNo,
+                      Number(e.target.value),
+                    )
+                  : null
+              }
+            />
+          </div>
+        )}
 
-      {
-        NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) &&
-        <div className="survey-form__node-def-edit-page-props">
-          {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
-          <input value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
-            type="number" min="1" max="12" step="1"
-            onChange={e => e.target.value > 0
-              ? putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
-              : null
-            }/>
-        </div>
-      }
-
-      <button className="btn btn-s btn-transparent"
-        onClick={() => setNodeDefForEdit(nodeDef)}
-        onMouseDown={e => {
-          e.stopPropagation()
-        }}>
-        <span className="icon icon-pencil2 icon-12px"/>
-      </button>
-
-      {
-        NodeDef.isEntity(nodeDef) &&
-        <button className="btn btn-s btn-transparent"
-          onClick={() => setFormNodeDefAddChildTo(nodeDef)}
+        <button
+          className="btn btn-s btn-transparent"
+          onClick={() => setNodeDefForEdit(nodeDef)}
           onMouseDown={e => {
             e.stopPropagation()
-          }}>
-          <span className="icon icon-plus icon-12px"/>
+          }}
+        >
+          <span className="icon icon-pencil2 icon-12px" />
         </button>
-      }
 
-      {
-        !NodeDef.isRoot(nodeDef) &&
-        <button className="btn btn-s btn-transparent"
-          onClick={() => removeNodeDef(nodeDef)}
-          onMouseDown={e => {
-            e.stopPropagation()
-          }}>
-          <span className="icon icon-bin2 icon-12px"/>
-        </button>
-      }
+        {NodeDef.isEntity(nodeDef) && (
+          <button
+            className="btn btn-s btn-transparent"
+            onClick={() => setFormNodeDefAddChildTo(nodeDef)}
+            onMouseDown={e => {
+              e.stopPropagation()
+            }}
+          >
+            <span className="icon icon-plus icon-12px" />
+          </button>
+        )}
 
-    </div>
+        {!NodeDef.isRoot(nodeDef) && (
+          <button
+            className="btn btn-s btn-transparent"
+            onClick={() => removeNodeDef(nodeDef)}
+            onMouseDown={e => {
+              e.stopPropagation()
+            }}
+          >
+            <span className="icon icon-bin2 icon-12px" />
+          </button>
+        )}
+      </div>
+    )
   )
 }
 
 const mapStateToProps = state => ({
-  hasNodeDefAddChildTo: Boolean(SurveyFormState.getNodeDefAddChildTo(state))
+  hasNodeDefAddChildTo: Boolean(SurveyFormState.getNodeDefAddChildTo(state)),
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    setNodeDefForEdit,
-    setFormNodeDefAddChildTo,
-    putNodeDefLayoutProp,
-    removeNodeDef,
-  })(NodeDefEditButtons)
+export default connect(mapStateToProps, {
+  setNodeDefForEdit,
+  setFormNodeDefAddChildTo,
+  putNodeDefLayoutProp,
+  removeNodeDef,
+})(NodeDefEditButtons)

@@ -17,15 +17,16 @@ export const getNodes = R.propOr({}, keys.nodes)
 
 export const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
-export const getRootNode = record => R.pipe(
-  NodesIndex.getNodeRootUuid,
-  uuid => getNodeByUuid(uuid)(record)
-)(record)
+export const getRootNode = record =>
+  R.pipe(NodesIndex.getNodeRootUuid, uuid => getNodeByUuid(uuid)(record))(
+    record,
+  )
 
-export const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
-  NodesIndex.getNodeUuidsByDef(nodeDefUuid),
-  R.map(uuid => getNodeByUuid(uuid)(record))
-)(record)
+export const getNodesByDefUuid = nodeDefUuid => record =>
+  R.pipe(
+    NodesIndex.getNodeUuidsByDef(nodeDefUuid),
+    R.map(uuid => getNodeByUuid(uuid)(record)),
+  )(record)
 
 /**
  * ==== hierarchy
@@ -47,29 +48,32 @@ export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
   R.pipe(
     getParentNode(node),
     parentNode => getAncestorsAndSelf(parentNode)(record),
-    R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
+    R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid),
   )(record)
 
 // Descendants
-export const getNodeChildren = node => record => R.pipe(
-  NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
-  R.map(uuid => getNodeByUuid(uuid)(record))
-)(record)
+export const getNodeChildren = node => record =>
+  R.pipe(
+    NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
+    R.map(uuid => getNodeByUuid(uuid)(record)),
+  )(record)
 
-export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
-  NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
-  R.map(uuid => getNodeByUuid(uuid)(record)),
-  nodes =>
-    R.sortWith([
-      R.propOr(false, Node.keys.placeholder),
-      R.prop(Node.keys.dateCreated)
-    ])(nodes)
-)(record)
+export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record =>
+  R.pipe(
+    NodesIndex.getNodeUuidsByParentAndDef(
+      Node.getUuid(parentNode),
+      nodeDefUuid,
+    ),
+    R.map(uuid => getNodeByUuid(uuid)(record)),
+    nodes =>
+      R.sortWith([
+        R.propOr(false, Node.keys.placeholder),
+        R.prop(Node.keys.dateCreated),
+      ])(nodes),
+  )(record)
 
-export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
-  getNodeChildrenByDefUuid(parentNode, nodeDefUuid),
-  R.head
-)
+export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
+  R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
 
 export const visitDescendantsAndSelf = (node, visitor) => record => {
   const queue = new Queue()
@@ -95,7 +99,9 @@ export const isNodeApplicable = node => record => {
   }
 
   const nodeParent = getParentNode(node)(record)
-  const isApplicable = Node.isChildApplicable(Node.getNodeDefUuid(node))(nodeParent)
+  const isApplicable = Node.isChildApplicable(Node.getNodeDefUuid(node))(
+    nodeParent,
+  )
   if (isApplicable) {
     return isNodeApplicable(nodeParent)(record)
   }
@@ -114,28 +120,43 @@ export const isNodeApplicable = node => record => {
  *   nodeDef, //node definition
  * }
  */
-export const getDependentNodePointers = (survey, node, dependencyType, includeSelf = false, filterFn = null) => record => {
+export const getDependentNodePointers = (
+  survey,
+  node,
+  dependencyType,
+  includeSelf = false,
+  filterFn = null,
+) => record => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
-  const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
+  const dependentUuids = SurveyDependencies.getNodeDefDependencies(
+    nodeDefUuid,
+    dependencyType,
+  )(survey)
 
   const nodePointers = []
 
   if (dependentUuids) {
-    const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
+    const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(
+      survey,
+    )
 
     for (const dependentDef of dependentDefs) {
       // 1 find common parent def
       const commonParentDefUuid = R.pipe(
         R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
-        R.last
+        R.last,
       )(NodeDef.getMetaHierarchy(dependentDef))
 
       // 2 find common parent node
-      const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
+      const commonParentNode = getAncestorByNodeDefUuid(
+        node,
+        commonParentDefUuid,
+      )(record)
 
       // 3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
-      const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
+      const isDependencyApplicable =
+        dependencyType === SurveyDependencies.dependencyTypes.applicable
 
       const nodeDefUuidDependent = isDependencyApplicable
         ? NodeDef.getParentUuid(dependentDef)
@@ -143,14 +164,14 @@ export const getDependentNodePointers = (survey, node, dependencyType, includeSe
 
       const nodeDependents = getNodesByDefUuid(nodeDefUuidDependent)(record)
       for (const nodeDependent of nodeDependents) {
-        if (Node.isDescendantOf(commonParentNode)(nodeDependent) ||
-          (
-            isDependencyApplicable && Node.getUuid(nodeDependent) === Node.getUuid(commonParentNode)
-          )
+        if (
+          Node.isDescendantOf(commonParentNode)(nodeDependent) ||
+          (isDependencyApplicable &&
+            Node.getUuid(nodeDependent) === Node.getUuid(commonParentNode))
         ) {
           const nodePointer = {
             nodeDef: dependentDef,
-            nodeCtx: nodeDependent
+            nodeCtx: nodeDependent,
           }
           if (filterFn === null || filterFn(nodePointer)) {
             nodePointers.push(nodePointer)
@@ -163,7 +184,7 @@ export const getDependentNodePointers = (survey, node, dependencyType, includeSe
   if (includeSelf) {
     const nodePointerSelf = {
       nodeDef,
-      nodeCtx: node
+      nodeCtx: node,
     }
     if (filterFn === null || filterFn(nodePointerSelf)) {
       nodePointers.push(nodePointerSelf)
@@ -174,19 +195,26 @@ export const getDependentNodePointers = (survey, node, dependencyType, includeSe
 }
 
 // Code attributes
-export const getDependentCodeAttributes = node => record => R.pipe(
-  NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
-  R.map(uuid => getNodeByUuid(uuid)(record))
-)(record)
+export const getDependentCodeAttributes = node => record =>
+  R.pipe(
+    NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
+    R.map(uuid => getNodeByUuid(uuid)(record)),
+  )(record)
 
-export const getParentCodeAttribute = (survey, parentNode, nodeDef) => record => {
+export const getParentCodeAttribute = (
+  survey,
+  parentNode,
+  nodeDef,
+) => record => {
   const parentCodeDefUuid = NodeDef.getParentCodeDefUuid(nodeDef)
 
   if (parentCodeDefUuid) {
     const ancestors = getAncestorsAndSelf(parentNode)(record)
     for (const ancestor of ancestors) {
       const children = getNodeChildren(ancestor)(record)
-      const nodeFound = children.find(node => Node.getNodeDefUuid(node) === parentCodeDefUuid)
+      const nodeFound = children.find(
+        node => Node.getNodeDefUuid(node) === parentCodeDefUuid,
+      )
       if (nodeFound) {
         return nodeFound
       }
@@ -199,16 +227,18 @@ export const getParentCodeAttribute = (survey, parentNode, nodeDef) => record =>
 // ====== Keys
 
 export const getEntityKeyNodes = (survey, nodeEntity) => record => {
-  const nodeDefEntity = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(nodeEntity))(survey)
+  const nodeDefEntity = SurveyNodeDefs.getNodeDefByUuid(
+    Node.getNodeDefUuid(nodeEntity),
+  )(survey)
   const nodeDefKeys = SurveyNodeDefs.getNodeDefKeys(nodeDefEntity)(survey)
 
   return R.pipe(
-    R.map(nodeDefKey => getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)),
+    R.map(nodeDefKey =>
+      getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record),
+    ),
     R.flatten,
   )(nodeDefKeys)
 }
 
-export const getEntityKeyValues = (survey, nodeEntity) => R.pipe(
-  getEntityKeyNodes(survey, nodeEntity),
-  R.map(Node.getValue)
-)
+export const getEntityKeyValues = (survey, nodeEntity) =>
+  R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))

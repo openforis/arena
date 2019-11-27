@@ -26,19 +26,30 @@ export default class CyclesDeletedCheckJob extends Job {
     if (!R.isEmpty(cycleKeysDeleted)) {
       // 2. mark node defs without cycles as 'deleted'
       this.logDebug('marking node defs without cycles as deleted')
-      await NodeDefManager.markNodeDefsWithoutCyclesDeleted(this.surveyId, this.tx)
+      await NodeDefManager.markNodeDefsWithoutCyclesDeleted(
+        this.surveyId,
+        this.tx,
+      )
       this.logDebug('node defs without cycles marked as deleted')
       this.incrementProcessedItems()
 
       // 3. delete records of deleted cycles
       this.logDebug('deleting records')
-      const recordsDeletedUuids = await RecordManager.deleteRecordsByCycles(this.surveyId, cycleKeysDeleted, this.tx)
+      const recordsDeletedUuids = await RecordManager.deleteRecordsByCycles(
+        this.surveyId,
+        cycleKeysDeleted,
+        this.tx,
+      )
       this.logDebug(`records deleted: ${R.length(recordsDeletedUuids)}`)
       this.incrementProcessedItems()
 
       // 4. reset users pref cycle (if among deleted ones)
       this.logDebug('updating users prefs')
-      await UserManager.resetUsersPrefsSurveyCycle(this.surveyId, cycleKeysDeleted, this.tx)
+      await UserManager.resetUsersPrefsSurveyCycle(
+        this.surveyId,
+        cycleKeysDeleted,
+        this.tx,
+      )
       this.logDebug('users prefs updated')
     }
 
@@ -46,12 +57,25 @@ export default class CyclesDeletedCheckJob extends Job {
   }
 
   async _findDeletedCycleKeys() {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, this.tx)
+    const survey = await SurveyManager.fetchSurveyById(
+      this.surveyId,
+      true,
+      false,
+      this.tx,
+    )
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo)) {
-      const surveyPrev = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
+      const surveyPrev = await SurveyManager.fetchSurveyById(
+        this.surveyId,
+        false,
+        false,
+        this.tx,
+      )
       const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
-      return R.difference(Survey.getCycleKeys(surveyInfoPrev), Survey.getCycleKeys(surveyInfo))
+      return R.difference(
+        Survey.getCycleKeys(surveyInfoPrev),
+        Survey.getCycleKeys(surveyInfo),
+      )
     }
 
     return []

@@ -14,7 +14,7 @@ export const keys = {
 
 // ====== CREATE
 export const newCycle = () => ({
-  [keys.dateStart]: DateUtils.format(Date.now(), dateFormat)
+  [keys.dateStart]: DateUtils.format(Date.now(), dateFormat),
 })
 
 // ====== READ

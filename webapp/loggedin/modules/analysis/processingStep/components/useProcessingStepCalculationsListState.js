@@ -37,7 +37,10 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
       const height = target.offsetHeight / 2
       const parent = target.parentNode
 
-      parent.insertBefore(placeholder, relY > height ? target.nextElementSibling : target)
+      parent.insertBefore(
+        placeholder,
+        relY > height ? target.nextElementSibling : target,
+      )
     }
   }
 

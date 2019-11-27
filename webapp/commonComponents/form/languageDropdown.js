@@ -14,11 +14,15 @@ const LanguageDropdown = props => {
     ? {key: selection, value: getLanguageLabel(selection)}
     : null
 
-  return <Dropdown placeholder={i18n.t('common.language')}
-    items={languages}
-    selection={selectedItem}
-    onChange={e => onChange(e ? e.key : null)}
-    validation={validation}/>
+  return (
+    <Dropdown
+      placeholder={i18n.t('common.language')}
+      items={languages}
+      selection={selectedItem}
+      onChange={e => onChange(e ? e.key : null)}
+      validation={validation}
+    />
+  )
 }
 
 export default LanguageDropdown

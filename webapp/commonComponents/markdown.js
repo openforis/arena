@@ -10,7 +10,10 @@ const Markdown = props => {
   }, [source])
 
   return (
-    <Container className={className} dangerouslySetInnerHTML={{__html: output}}/>
+    <Container
+      className={className}
+      dangerouslySetInnerHTML={{__html: output}}
+    />
   )
 }
 

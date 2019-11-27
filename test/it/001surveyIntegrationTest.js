@@ -11,15 +11,18 @@ before(initTestContext)
 describe('Survey Test', () => {
   // ==== SURVEY
 
-  it('Create Survey', async () => await SurveyIntegrationTest.createSurveyTest())
+  it('Create Survey', async () =>
+    await SurveyIntegrationTest.createSurveyTest())
 
   // ==== CATEGORY
 
   it('Create Category', async () => await CategoryTest.createCategoryTest())
 
-  it('Create Category Level', async () => await CategoryTest.createCategoryLevelTest())
+  it('Create Category Level', async () =>
+    await CategoryTest.createCategoryLevelTest())
 
-  it('Create Category Item', async () => await CategoryTest.createCategoryItemTest())
+  it('Create Category Item', async () =>
+    await CategoryTest.createCategoryItemTest())
 
   it('Update Category', async () => await CategoryTest.updateCategoryTest())
 

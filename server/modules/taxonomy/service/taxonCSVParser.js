@@ -15,14 +15,21 @@ export default class TaxonCSVParser {
 
     this.rowsByField = {
       [Taxon.propKeys.code]: {}, // Maps codes to csv file rows
-      [Taxon.propKeys.scientificName]: {} // Maps scientific names to csv file rows
+      [Taxon.propKeys.scientificName]: {}, // Maps scientific names to csv file rows
     }
   }
 
   async parseTaxon(row) {
     const {family, genus, scientific_name, code, ...vernacularNamesByLang} = row
 
-    const taxon = Taxon.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this._parseVernacularNames(vernacularNamesByLang))
+    const taxon = Taxon.newTaxon(
+      this.taxonomyUuid,
+      code,
+      family,
+      genus,
+      scientific_name,
+      this._parseVernacularNames(vernacularNamesByLang),
+    )
 
     return await this._validateTaxon(taxon)
   }
@@ -33,10 +40,20 @@ export default class TaxonCSVParser {
     // validate taxon uniqueness among inserted values
     if (Validation.isValid(validation)) {
       const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
-      this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
+      this._addValueToIndex(
+        Taxon.propKeys.code,
+        code,
+        Validation.messageKeys.taxonomyEdit.codeDuplicate,
+        validation,
+      )
 
       const scientificName = Taxon.getScientificName(taxon)
-      this._addValueToIndex(Taxon.propKeys.scientificName, scientificName, Validation.messageKeys.taxonomyEdit.scientificNameDuplicate, validation)
+      this._addValueToIndex(
+        Taxon.propKeys.scientificName,
+        scientificName,
+        Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
+        validation,
+      )
     }
 
     return {
@@ -52,14 +69,13 @@ export default class TaxonCSVParser {
         Validation.setValid(false),
         Validation.setField(
           field,
-          Validation.newInstance(
-            false,
-            {},
-            [{
+          Validation.newInstance(false, {}, [
+            {
               key: errorKeyDuplicate,
-              params: {row: this.processed + 1, duplicateRow}
-            }]
-          ))
+              params: {row: this.processed + 1, duplicateRow},
+            },
+          ]),
+        ),
       )(validation)
     } else {
       this.rowsByField[field][value] = this.processed + 1
@@ -74,15 +90,18 @@ export default class TaxonCSVParser {
           R.always(accVernacularNames),
           R.pipe(
             R.split(TaxonVernacularName.NAMES_SEPARATOR),
-            R.map(name => TaxonVernacularName.newTaxonVernacularName(langCode, StringUtils.trim(name))),
-            R.ifElse(
-              R.isEmpty,
-              R.always(accVernacularNames),
-              names => R.assoc(langCode, names)(accVernacularNames)
-            )
-          )
+            R.map(name =>
+              TaxonVernacularName.newTaxonVernacularName(
+                langCode,
+                StringUtils.trim(name),
+              ),
+            ),
+            R.ifElse(R.isEmpty, R.always(accVernacularNames), names =>
+              R.assoc(langCode, names)(accVernacularNames),
+            ),
+          ),
         )(nameOriginal),
-      {}
+      {},
     )
   }
 }

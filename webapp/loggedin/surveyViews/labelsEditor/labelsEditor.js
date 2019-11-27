@@ -14,30 +14,40 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import {getLanguageLabel} from '@core/app/languages'
 
 const LanguageBadge = ({lang, compact}) => (
-  <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>
-    {
-      compact ? lang : getLanguageLabel(lang)
-    }
+  <div
+    className="badge-of labels-editor__label-lang-badge"
+    title={compact ? getLanguageLabel(lang) : null}
+  >
+    {compact ? lang : getLanguageLabel(lang)}
   </div>
 )
 
-const LabelRow = ({labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage}) => (
+const LabelRow = ({
+  labels,
+  lang,
+  onChange,
+  readOnly,
+  showLanguageBadge,
+  compactLanguage,
+}) => (
   <div className="labels-editor__label">
+    {showLanguageBadge && (
+      <LanguageBadge lang={lang} compact={compactLanguage} />
+    )}
 
-    {
-      showLanguageBadge &&
-      <LanguageBadge lang={lang} compact={compactLanguage}/>
-    }
-
-    <Input value={R.propOr('', lang, labels)}
-      onChange={value => onChange(
-        R.ifElse(
-          R.always(R.isEmpty(value)),
-          R.dissoc(lang),
-          R.assoc(lang, value)
-        )(labels)
-      )}
-      readOnly={readOnly}/>
+    <Input
+      value={R.propOr('', lang, labels)}
+      onChange={value =>
+        onChange(
+          R.ifElse(
+            R.always(R.isEmpty(value)),
+            R.dissoc(lang),
+            R.assoc(lang, value),
+          )(labels),
+        )
+      }
+      readOnly={readOnly}
+    />
   </div>
 )
 
@@ -58,9 +68,7 @@ const LabelsEditor = props => {
     compactLanguage,
   } = props
 
-  const displayLangs = preview
-    ? R.slice(0, maxPreview, languages)
-    : languages
+  const displayLangs = preview ? R.slice(0, maxPreview, languages) : languages
 
   const _canTogglePreview = canTogglePreview && languages.length > maxPreview
 
@@ -69,38 +77,41 @@ const LabelsEditor = props => {
   return (
     <div className={className}>
       <div className="labels-editor-label">
-        {
-          showFormLabel &&
+        {showFormLabel && (
           <label className="form-label">
             {i18n.t(formLabelKey, {count: languages.length})}
           </label>
-        }
-        {
-          _canTogglePreview &&
-          <button className="btn-s btn-toggle-labels"
+        )}
+        {_canTogglePreview && (
+          <button
+            className="btn-s btn-toggle-labels"
             style={{justifySelf: 'end'}}
-            onClick={() => setPreview(!preview)}>
-            <span className={`icon icon-${preview ? 'enlarge2' : 'shrink2'} icon-12px`}/>
+            onClick={() => setPreview(!preview)}
+          >
+            <span
+              className={`icon icon-${
+                preview ? 'enlarge2' : 'shrink2'
+              } icon-12px`}
+            />
             {/* { */}
             {/* this.preview() ? '...more' : '...less' */}
             {/* } */}
           </button>
-        }
+        )}
       </div>
       <div className="labels-editor__labels">
-        {
-          displayLangs.map(lang =>
-            <LabelRow key={lang}
-              lang={lang}
-              labels={labels}
-              onChange={onChange}
-              readOnly={readOnly}
-              showLanguageBadge={languages.length > 1}
-              compactLanguage={compactLanguage}/>
-          )
-        }
+        {displayLangs.map(lang => (
+          <LabelRow
+            key={lang}
+            lang={lang}
+            labels={labels}
+            onChange={onChange}
+            readOnly={readOnly}
+            showLanguageBadge={languages.length > 1}
+            compactLanguage={compactLanguage}
+          />
+        ))}
       </div>
-
     </div>
   )
 }
@@ -118,7 +129,8 @@ LabelsEditor.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => ({
-  languages: props.languages || Survey.getLanguages(SurveyState.getSurveyInfo(state))
+  languages:
+    props.languages || Survey.getLanguages(SurveyState.getSurveyInfo(state)),
 })
 
 export default connect(mapStateToProps)(LabelsEditor)

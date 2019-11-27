@@ -19,14 +19,21 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
   const nodesUpdated = {} // Updated nodes indexed by uuid
 
   // 1. fetch dependent nodes
-  const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
+  const nodePointersToUpdate = Record.getDependentNodePointers(
+    survey,
+    node,
+    Survey.dependencyTypes.applicable,
+  )(record)
 
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
   for (const {nodeCtx, nodeDef} of nodePointersToUpdate) {
     // 3. evaluate applicable expression
     const exprEval = RecordExpressionParser.evalApplicableExpression(
-      survey, record, nodeCtx, NodeDef.getApplicable(nodeDef)
+      survey,
+      record,
+      nodeCtx,
+      NodeDef.getApplicable(nodeDef),
     )
     const applicable = R.propOr(false, 'value', exprEval)
 
@@ -39,24 +46,27 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
 
       // update node and add it to nodesUpdated
       nodesUpdated[nodeCtxUuid] = {
-        ...await NodeRepository.updateChildrenApplicability(
+        ...(await NodeRepository.updateChildrenApplicability(
           Survey.getId(survey),
           nodeCtxUuid,
           nodeDefUuid,
           applicable,
-          tx
-        ),
+          tx,
+        )),
         // Preserve 'created' flag (used by rdb generator)
-        ...(Node.isCreated(nodeCtx) ? {[Node.keys.created]: true} : {})
+        ...(Node.isCreated(nodeCtx) ? {[Node.keys.created]: true} : {}),
       }
 
-      const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
+      const nodeCtxChildren = Record.getNodeChildrenByDefUuid(
+        nodeCtx,
+        nodeDefUuid,
+      )(record)
 
       for (const nodeCtxChild of nodeCtxChildren) {
         // 5. add nodeCtxChild and its descendants to nodesUpdated
         Record.visitDescendantsAndSelf(
           nodeCtxChild,
-          node => nodesUpdated[Node.getUuid(node)] = node
+          node => (nodesUpdated[Node.getUuid(node)] = node),
         )(record)
       }
     }
@@ -65,7 +75,12 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
   return nodesUpdated
 }
 
-export const updateDependentsDefaultValues = async (survey, record, node, tx) => {
+export const updateDependentsDefaultValues = async (
+  survey,
+  record,
+  node,
+  tx,
+) => {
   // 1. fetch dependent nodes
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
@@ -73,11 +88,10 @@ export const updateDependentsDefaultValues = async (survey, record, node, tx) =>
   const nodeDependentPointersFilterFn = nodePointer => {
     const {nodeCtx, nodeDef} = nodePointer
 
-    return NodeDef.isAttribute(nodeDef) &&
-      (
-        Node.isValueBlank(nodeCtx) ||
-        Node.isDefaultValueApplied(nodeCtx)
-      )
+    return (
+      NodeDef.isAttribute(nodeDef) &&
+      (Node.isValueBlank(nodeCtx) || Node.isDefaultValueApplied(nodeCtx))
+    )
   }
 
   const nodePointersToUpdate = Record.getDependentNodePointers(
@@ -93,17 +107,24 @@ export const updateDependentsDefaultValues = async (survey, record, node, tx) =>
     nodePointersToUpdate.map(async ({nodeCtx, nodeDef}) => {
       // 3. evaluate applicable default value expression
       const exprEval = RecordExpressionParser.evalApplicableExpression(
-        survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef)
+        survey,
+        record,
+        nodeCtx,
+        NodeDef.getDefaultValues(nodeDef),
       )
 
       const oldValue = Node.getValue(nodeCtx, null)
 
       const exprValue = R.pipe(
         R.propOr(null, 'value'),
-        R.unless(
-          R.isNil,
-          value => RecordExpressionValueConverter.toNodeValue(survey, record, nodeCtx, value)
-        )
+        R.unless(R.isNil, value =>
+          RecordExpressionValueConverter.toNodeValue(
+            survey,
+            record,
+            nodeCtx,
+            value,
+          ),
+        ),
       )(exprEval)
 
       // 4. persist updated node value if changed, and return updated node
@@ -121,10 +142,10 @@ export const updateDependentsDefaultValues = async (survey, record, node, tx) =>
           exprValue,
           {[Node.metaKeys.defaultValue]: !R.isNil(exprEval)},
           Record.isPreview(record),
-          tx
-        )
+          tx,
+        ),
       }
-    })
+    }),
   )
 
   return R.mergeAll(nodesUpdated)

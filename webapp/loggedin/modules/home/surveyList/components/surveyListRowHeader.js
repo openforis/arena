@@ -7,7 +7,7 @@ const SurveyListRowHeader = () => {
 
   return (
     <>
-      <div/>
+      <div />
       <div>{i18n.t('common.name')}</div>
       <div>{i18n.t('common.label')}</div>
       <div>{i18n.t('common.dateCreated')}</div>

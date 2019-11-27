@@ -96,15 +96,19 @@ const converters = {
 
     const clauses = exprArgs.map(arg => toPreparedStatement(arg, paramsArr))
     return `${sqlFnName}(${clauses.join(', ')})`
-  }
+  },
 }
 
-const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
+const toPreparedStatement = (expr, paramsArr) =>
+  converters[expr.type](expr, paramsArr)
 
 export const getWherePreparedStatement = expr => {
   const paramsArr = []
   const prepStatement = toPreparedStatement(expr, paramsArr)
-  const params = paramsArr.reduce((acc, cur, i) => ({...acc, [`_${i}`]: cur}), {})
+  const params = paramsArr.reduce(
+    (acc, cur, i) => ({...acc, [`_${i}`]: cur}),
+    {},
+  )
 
   return {clause: prepStatement, params}
 }

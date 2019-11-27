@@ -22,27 +22,38 @@ import {
 
 const CategoriesView = props => {
   const {
-    categories, category, selectedItemUuid,
-    createCategory, deleteCategory, setCategoryForEdit,
-    onSelect, onClose, canSelect,
-    readOnly
+    categories,
+    category,
+    selectedItemUuid,
+    createCategory,
+    deleteCategory,
+    setCategoryForEdit,
+    onSelect,
+    onClose,
+    canSelect,
+    readOnly,
   } = props
 
-  useEffect(() =>
-    () => {
+  useEffect(
+    () => () => {
       if (category) {
         setCategoryForEdit(null)
       }
-    }, [Category.getUuid(category)]
+    },
+    [Category.getUuid(category)],
   )
 
   const i18n = useI18n()
 
-  const canDeleteCategory = category => category.usedByNodeDefs
-    ? alert(i18n.t('categoryEdit.cantBeDeleted'))
-    : window.confirm(i18n.t('categoryEdit.confirmDelete', {
-      categoryName: Category.getName(category) || i18n.t('common.undefinedName')
-    }))
+  const canDeleteCategory = category =>
+    category.usedByNodeDefs
+      ? alert(i18n.t('categoryEdit.cantBeDeleted'))
+      : window.confirm(
+          i18n.t('categoryEdit.confirmDelete', {
+            categoryName:
+              Category.getName(category) || i18n.t('common.undefinedName'),
+          }),
+        )
 
   return (
     <ItemsView
@@ -60,7 +71,8 @@ const CategoriesView = props => {
       canSelect={canSelect}
       onSelect={onSelect}
       onClose={onClose}
-      readOnly={readOnly}/>
+      readOnly={readOnly}
+    />
   )
 }
 
@@ -73,22 +85,21 @@ const mapStateToProps = state => {
     Survey.getCategoriesArray,
     R.map(category => ({
       ...category,
-      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
-    }))
+      usedByNodeDefs: !R.isEmpty(
+        Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey),
+      ),
+    })),
   )(survey)
 
   return {
     categories,
     category: CategoryEditState.getCategoryForEdit(state),
-    readOnly: !Authorizer.canEditSurvey(user, surveyInfo)
+    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    createCategory,
-    deleteCategory,
-    setCategoryForEdit,
-  }
-)(CategoriesView)
+export default connect(mapStateToProps, {
+  createCategory,
+  deleteCategory,
+  setCategoryForEdit,
+})(CategoriesView)

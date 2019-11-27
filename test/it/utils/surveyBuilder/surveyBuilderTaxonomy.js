@@ -12,13 +12,17 @@ export class TaxonomyBuilder {
   }
 
   build() {
-    const taxonomy = Taxonomy.newTaxonomy({[Taxonomy.keysProps.name]: this.name})
+    const taxonomy = Taxonomy.newTaxonomy({
+      [Taxonomy.keysProps.name]: this.name,
+    })
 
-    const taxa = this.taxonBuilders.map(taxonBuilder => taxonBuilder.build(taxonomy))
+    const taxa = this.taxonBuilders.map(taxonBuilder =>
+      taxonBuilder.build(taxonomy),
+    )
 
     return {
       taxonomy,
-      taxa
+      taxa,
     }
   }
 
@@ -42,12 +46,19 @@ export class TaxonBuilder {
   vernacularName(lang, name) {
     this.vernacularNames = R.pipe(
       R.propOr([], lang),
-      R.append(TaxonVernacularName.newTaxonVernacularName(lang, name))
+      R.append(TaxonVernacularName.newTaxonVernacularName(lang, name)),
     )(this.vernacularNames)
     return this
   }
 
   build(taxonomy) {
-    return Taxon.newTaxon(Taxonomy.getUuid(taxonomy), this.code, this.family, this.genus, this.scientificName, this.vernacularNames)
+    return Taxon.newTaxon(
+      Taxonomy.getUuid(taxonomy),
+      this.code,
+      this.family,
+      this.genus,
+      this.scientificName,
+      this.vernacularNames,
+    )
   }
 }

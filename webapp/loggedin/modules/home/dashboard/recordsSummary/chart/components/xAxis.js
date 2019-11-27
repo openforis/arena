@@ -20,12 +20,14 @@ const getAxisValues = (from, to) => {
 }
 
 export const getScale = (counts, from, to, {width, left, right}) =>
-  d3.scaleTime()
+  d3
+    .scaleTime()
     .range([R.isEmpty(counts) ? 0 : left, width - right])
     .domain([DateUtils.parseISO(from), DateUtils.parseISO(to)])
 
 const getAxis = (from, to, counts, chartProps) =>
-  d3.axisBottom(getScale(counts, from, to, chartProps))
+  d3
+    .axisBottom(getScale(counts, from, to, chartProps))
     .tickValues(getAxisValues(from, to))
     .tickFormat(d => DateUtils.format(d, 'dd-MMM-yyyy')) // TODO put year on a new line https://bl.ocks.org/mbostock/7555321
     .tickSize(5)
@@ -41,14 +43,14 @@ const XAxis = props => {
   // On data update
   useEffect(() => {
     const axis = getAxis(from, to, counts, chartProps)
-    axisRef.current = d3.select(elementRef.current).call(axis)
-    // Update bottom offset
+    axisRef.current = d3
+      .select(elementRef.current)
+      .call(axis)
+      // Update bottom offset
       .attr('transform', () => `translate(0, ${height - bottom})`)
   }, [chartProps])
 
-  return (
-    <g className="x-axis" ref={elementRef}/>
-  )
+  return <g className="x-axis" ref={elementRef} />
 }
 
 export default XAxis

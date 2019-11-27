@@ -17,13 +17,12 @@ const publicSchema = 'public'
 
 const migrationFolders = {
   public: 'public',
-  survey: 'survey'
+  survey: 'survey',
 }
 
 const migrateSchema = async (schema = publicSchema) => {
-  const migrationsFolder = schema === publicSchema
-    ? migrationFolders.public
-    : migrationFolders.survey
+  const migrationsFolder =
+    schema === publicSchema ? migrationFolders.public : migrationFolders.survey
 
   const migrateOptions = {
     config: R.clone(config),
@@ -58,7 +57,9 @@ export const migrateSurveySchema = async surveyId => {
 export const migrateSurveySchemas = async () => {
   const surveyIds = await fetchAllSurveyIds()
 
-  logger.info(`starting data schemas migrations for ${surveyIds.length} surveys`)
+  logger.info(
+    `starting data schemas migrations for ${surveyIds.length} surveys`,
+  )
 
   for (const element of surveyIds) {
     await migrateSurveySchema(element)

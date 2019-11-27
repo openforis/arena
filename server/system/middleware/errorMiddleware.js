@@ -10,4 +10,3 @@ export const init = app => {
     Response.sendErr(res, err)
   })
 }
-

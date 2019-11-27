@@ -22,10 +22,7 @@ const DesignerView = ({canEditDef, resetForm}) => {
   }, [])
 
   return (
-    <SurveyDefsLoader
-      draft={canEditDef}
-      validate={canEditDef}>
-
+    <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
       <InnerModuleSwitch
         moduleRoot={appModules.designer}
         moduleDefault={designerModules.formDesigner}
@@ -49,7 +46,6 @@ const DesignerView = ({canEditDef, resetForm}) => {
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
           },
-
         ]}
       />
     </SurveyDefsLoader>

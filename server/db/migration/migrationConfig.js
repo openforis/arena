@@ -12,4 +12,3 @@ const config = {
 
 export const development = config
 export const production = config
-

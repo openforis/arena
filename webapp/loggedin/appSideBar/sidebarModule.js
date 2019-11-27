@@ -10,7 +10,7 @@ import {
   dataModules,
   designerModules,
   homeModules,
-  userModules
+  userModules,
 } from '../appModules'
 
 const keys = {
@@ -31,27 +31,22 @@ const getModule = (module, children = null, root = true) => ({
   [keys.elementRef]: useRef(null),
   [keys.children]: children
     ? children.map(childModule => getModule(childModule, null, false))
-    : []
+    : [],
 })
 
 export const getModulesHierarchy = (user, surveyInfo) => [
   getModule(appModules.home),
-  getModule(
-    appModules.designer,
-    [designerModules.formDesigner, designerModules.surveyHierarchy, designerModules.categories, designerModules.taxonomies]
-  ),
-  getModule(
-    appModules.data,
-    [dataModules.records, dataModules.dataVis]
-  ),
-  ...(Authorizer.canAnalyzeRecords(user, surveyInfo) ? [getModule(
-    appModules.analysis,
-    [analysisModules.processingChains]
-  )] : []),
-  getModule(
-    appModules.users,
-    [userModules.users]
-  )
+  getModule(appModules.designer, [
+    designerModules.formDesigner,
+    designerModules.surveyHierarchy,
+    designerModules.categories,
+    designerModules.taxonomies,
+  ]),
+  getModule(appModules.data, [dataModules.records, dataModules.dataVis]),
+  ...(Authorizer.canAnalyzeRecords(user, surveyInfo)
+    ? [getModule(appModules.analysis, [analysisModules.processingChains])]
+    : []),
+  getModule(appModules.users, [userModules.users]),
 ]
 
 export const getKey = R.prop(keys.key)

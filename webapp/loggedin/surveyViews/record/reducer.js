@@ -12,7 +12,7 @@ import {
   recordDelete,
   recordLoad,
   recordUuidPreviewUpdate,
-  validationsUpdate
+  validationsUpdate,
 } from './actions'
 
 import * as RecordState from './recordState'
@@ -36,10 +36,12 @@ const actionHandlers = {
   [nodeDelete]: (state, {node}) => RecordState.deleteRecordNode(node)(state),
 
   // Validation updates
-  [validationsUpdate]: (state, {validations}) => RecordState.mergeRecordNodeValidations(validations)(state),
+  [validationsUpdate]: (state, {validations}) =>
+    RecordState.mergeRecordNodeValidations(validations)(state),
 
   // Record preview
-  [recordUuidPreviewUpdate]: (state, {recordUuid}) => RecordState.assocRecordUuidPreview(recordUuid)(state)
+  [recordUuidPreviewUpdate]: (state, {recordUuid}) =>
+    RecordState.assocRecordUuidPreview(recordUuid)(state),
 }
 
 export default exportReducer(actionHandlers)

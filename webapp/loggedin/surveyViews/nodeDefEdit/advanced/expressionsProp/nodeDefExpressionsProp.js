@@ -9,9 +9,19 @@ import ExpressionsProp from './expressionsProp'
 
 const NodeDefExpressionsProp = props => {
   const {
-    nodeDef, nodeDefUuidContext,
-    propName, nodeDefValidation, label, multiple, applyIf, showLabels, readOnly, putNodeDefProp,
-    isContextParent, canBeConstant, isBoolean,
+    nodeDef,
+    nodeDefUuidContext,
+    propName,
+    nodeDefValidation,
+    label,
+    multiple,
+    applyIf,
+    showLabels,
+    readOnly,
+    putNodeDefProp,
+    isContextParent,
+    canBeConstant,
+    isBoolean,
   } = props
 
   const values = NodeDef.getProp(propName, [])(nodeDef)
@@ -21,7 +31,7 @@ const NodeDefExpressionsProp = props => {
       nodeDef,
       propName,
       R.reject(NodeDefExpression.isPlaceholder, expressions),
-      true
+      true,
     )
   }
 
@@ -60,7 +70,6 @@ NodeDefExpressionsProp.defaultProps = {
   isContextParent: false,
   canBeConstant: false,
   isBoolean: true,
-
 }
 
 export default NodeDefExpressionsProp

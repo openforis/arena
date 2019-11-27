@@ -24,11 +24,15 @@ const typeValidatorFns = {
     GeoUtils.isCoordinateValid(
       Node.getCoordinateSrs(node),
       Node.getCoordinateX(node),
-      Node.getCoordinateY(node)
+      Node.getCoordinateY(node),
     ),
 
   [nodeDefType.date]: (survey, nodeDef, node, value) => {
-    const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
+    const [year, month, day] = [
+      Node.getDateYear(node),
+      Node.getDateMonth(node),
+      Node.getDateDay(node),
+    ]
     return DateTimeUtils.isValidDate(year, month, day)
   },
 
@@ -43,8 +47,7 @@ const typeValidatorFns = {
   [nodeDefType.taxon]: (survey, nodeDef, node, value) =>
     validateTaxon(survey, nodeDef, node),
 
-  [nodeDefType.text]: (survey, nodeDef, node, value) =>
-    R.is(String, value),
+  [nodeDefType.text]: (survey, nodeDef, node, value) => R.is(String, value),
 
   [nodeDefType.time]: (survey, nodeDef, node, value) => {
     const [hour, minute] = [Node.getTimeHour(node), Node.getTimeMinute(node)]
@@ -81,7 +84,11 @@ const validateTaxon = (survey, nodeDef, node) => {
   }
 
   // Vernacular name not found
-  return Survey.includesTaxonVernacularName(nodeDef, Taxon.getCode(taxon), vernacularNameUuid)(survey)
+  return Survey.includesTaxonVernacularName(
+    nodeDef,
+    Taxon.getCode(taxon),
+    vernacularNameUuid,
+  )(survey)
 }
 
 export const validateValueType = (survey, nodeDef) => (propName, node) => {

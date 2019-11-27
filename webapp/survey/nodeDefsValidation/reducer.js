@@ -7,7 +7,7 @@ import {
   surveyDefsLoad,
   surveyDefsReset,
   surveyDelete,
-  surveyUpdate
+  surveyUpdate,
 } from '../actions'
 
 import {nodeDefsValidationUpdate} from '../nodeDefs/actions'
@@ -23,7 +23,8 @@ const actionHandlers = {
 
   // NodeDefsValidation load
   [surveyDefsLoad]: (state = {}, {nodeDefsValidation}) => nodeDefsValidation,
-  [nodeDefsValidationUpdate]: (state = {}, {nodeDefsValidation}) => nodeDefsValidation,
+  [nodeDefsValidationUpdate]: (state = {}, {nodeDefsValidation}) =>
+    nodeDefsValidation,
 }
 
 export default exportReducer(actionHandlers)

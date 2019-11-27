@@ -10,14 +10,19 @@ const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
     ? func
       ? func(item)
       : prop
-        ? R.prop(prop)(item)
-        : (R.has(defaultProp)(item)
-          ? R.prop(defaultProp)(item)
-          : item)
+      ? R.prop(prop)(item)
+      : R.has(defaultProp)(item)
+      ? R.prop(defaultProp)(item)
+      : item
     : item // Primitive
 
 const getItemLabel = (item, itemLabelFunction, itemLabelProp) =>
-  extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value')
+  extractValueFromFunctionOrProp(
+    item,
+    itemLabelFunction,
+    itemLabelProp,
+    'value',
+  )
 
 const getItemKey = (item, itemKeyFunction, itemKeyProp) =>
   extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
@@ -32,22 +37,23 @@ const Chip = props => {
     readOnly,
   } = props
 
-  return <div className="form-input">
+  return (
+    <div className="form-input">
+      <div className="form-input-chip-item">
+        {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
-    <div className="form-input-chip-item">
-      {getItemLabel(item, itemLabelFunction, itemLabelProp)}
-
-      {
-        !readOnly &&
-        <button className="btn btn-s btn-remove"
-          onClick={() => onDelete(item)}
-          aria-disabled={!canBeRemoved}>
-          <span className="icon icon-cross icon-8px"/>
-        </button>
-      }
+        {!readOnly && (
+          <button
+            className="btn btn-s btn-remove"
+            onClick={() => onDelete(item)}
+            aria-disabled={!canBeRemoved}
+          >
+            <span className="icon icon-cross icon-8px" />
+          </button>
+        )}
+      </div>
     </div>
-
-  </div>
+  )
 }
 
 const InputChips = props => {
@@ -64,7 +70,9 @@ const InputChips = props => {
     readOnly,
     disabled,
     validation,
-    onChange, onItemAdd, onItemRemove,
+    onChange,
+    onItemAdd,
+    onItemRemove,
   } = props
 
   const onDropdownChange = item => {
@@ -100,27 +108,28 @@ const InputChips = props => {
     ? async value => rejectSelectedItems(await itemsLookupFunction(value))
     : null
 
-  const showDropdown = !readOnly && (!R.isEmpty(dropdownItems) || itemsLookupFunction)
+  const showDropdown =
+    !readOnly && (!R.isEmpty(dropdownItems) || itemsLookupFunction)
 
   return (
     <div className="form-input-chip">
-      {
-        selection.map(item =>
-          <Chip key={getItemKey(item, itemKeyFunction, itemKeyProp)}
-            item={item}
-            itemKeyProp={itemKeyProp}
-            itemKeyFunction={itemKeyFunction}
-            itemLabelFunction={itemLabelFunction}
-            itemLabelProp={itemLabelProp}
-            onDelete={removeItem}
-            canBeRemoved={selection.length > requiredItems}
-            readOnly={readOnly}/>
-        )
-      }
+      {selection.map(item => (
+        <Chip
+          key={getItemKey(item, itemKeyFunction, itemKeyProp)}
+          item={item}
+          itemKeyProp={itemKeyProp}
+          itemKeyFunction={itemKeyFunction}
+          itemLabelFunction={itemLabelFunction}
+          itemLabelProp={itemLabelProp}
+          onDelete={removeItem}
+          canBeRemoved={selection.length > requiredItems}
+          readOnly={readOnly}
+        />
+      ))}
 
-      {
-        showDropdown &&
-        <Dropdown items={dropdownItems}
+      {showDropdown && (
+        <Dropdown
+          items={dropdownItems}
           itemsLookupFunction={dropdownItemsLookupFunction}
           itemKeyProp={itemKeyProp}
           itemKeyFunction={itemKeyFunction}
@@ -132,8 +141,9 @@ const InputChips = props => {
           autocompleteMinChars={dropdownAutocompleteMinChars}
           readOnly={readOnly}
           disabled={disabled}
-          validation={validation}/>
-      }
+          validation={validation}
+        />
+      )}
     </div>
   )
 }

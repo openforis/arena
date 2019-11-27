@@ -8,54 +8,40 @@ import BinaryOperand, {BinaryOperandType} from './binaryOperand'
 import EditButtons from './editButtons'
 
 const Binary = props => {
-  const {
-    node, onChange,
-    canDelete = false, onDelete,
-    isBoolean
-  } = props
+  const {node, onChange, canDelete = false, onDelete, isBoolean} = props
 
   const isLeftLiteral = R.pipe(
     R.prop(BinaryOperandType.left),
-    Expression.isLiteral
+    Expression.isLiteral,
   )(node)
 
   return (
     <div className="binary">
-      <BinaryOperand
-        {...props}
-        type={BinaryOperandType.left}
-      />
+      <BinaryOperand {...props} type={BinaryOperandType.left} />
 
-      {
-        (isBoolean || !isLeftLiteral) &&
+      {(isBoolean || !isLeftLiteral) && (
         <React.Fragment>
-
           <Dropdown
             className="operator"
             items={Expression.operators.binaryValues}
             selection={Expression.operators.findBinary(node.operator)}
-            onChange={item => onChange(
-              R.assoc('operator', R.propOr('', 'key', item), node)
-            )}
+            onChange={item =>
+              onChange(R.assoc('operator', R.propOr('', 'key', item), node))
+            }
           />
 
-          <BinaryOperand
-            {...props}
-            type={BinaryOperandType.right}
-          />
+          <BinaryOperand {...props} type={BinaryOperandType.right} />
 
-          {
-            isBoolean &&
+          {isBoolean && (
             <EditButtons
               node={node}
               onChange={onChange}
               onDelete={onDelete}
               canDelete={canDelete}
             />
-          }
+          )}
         </React.Fragment>
-      }
-
+      )}
     </div>
   )
 }

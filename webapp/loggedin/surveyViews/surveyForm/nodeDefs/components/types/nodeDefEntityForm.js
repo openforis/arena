@@ -13,15 +13,24 @@ import * as Node from '@core/record/node'
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
-import {setFormPageNode, getNodeKeyLabelValues} from '@webapp/loggedin/surveyViews/surveyForm/actions'
+import {
+  setFormPageNode,
+  getNodeKeyLabelValues,
+} from '@webapp/loggedin/surveyViews/surveyForm/actions'
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 
 const NodeDefEntityForm = props => {
   const {
-    nodeDef, nodes, parentNode, selectedNode,
-    edit, entry, entryMultiple,
-    setFormPageNode, getNodeKeyLabelValues,
+    nodeDef,
+    nodes,
+    parentNode,
+    selectedNode,
+    edit,
+    entry,
+    entryMultiple,
+    setFormPageNode,
+    getNodeKeyLabelValues,
   } = props
 
   useEffect(() => {
@@ -33,7 +42,6 @@ const NodeDefEntityForm = props => {
 
   return (
     <div>
-
       <NodeDefErrorBadge
         nodeDef={nodeDef}
         edit={edit}
@@ -41,26 +49,22 @@ const NodeDefEntityForm = props => {
         nodes={nodes}
       />
 
-      {
-        entryMultiple &&
+      {entryMultiple && (
         <NodeDefEntityFormNodeSelect
           {...props}
           selectedNode={selectedNode}
           getNodeKeyLabelValues={getNodeKeyLabelValues}
-          onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}
+          onChange={selectedNodeUuid =>
+            setFormPageNode(nodeDef, selectedNodeUuid)
+          }
         />
-      }
+      )}
 
-      {
-        entry && selectedNode &&
-        <NodeDefEntityFormGrid {...props} node={selectedNode}/>
-      }
+      {entry && selectedNode && (
+        <NodeDefEntityFormGrid {...props} node={selectedNode} />
+      )}
 
-      {
-        edit &&
-        <NodeDefEntityFormGrid {...props} node={null}/>
-      }
-
+      {edit && <NodeDefEntityFormGrid {...props} node={null} />}
     </div>
   )
 }
@@ -95,12 +99,10 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  return entry
-    ? getEntryProps()
-    : {}
+  return entry ? getEntryProps() : {}
 }
 
-export default connect(
-  mapStateToProps,
-  {setFormPageNode, getNodeKeyLabelValues}
-)(NodeDefEntityForm)
+export default connect(mapStateToProps, {
+  setFormPageNode,
+  getNodeKeyLabelValues,
+})(NodeDefEntityForm)

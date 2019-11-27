@@ -17,8 +17,8 @@ class Popup extends React.PureComponent {
 
     return {
       padding: padding + 'px',
-      top: (elemOffset.top - padding) + 'px',
-      left: (elemOffset.left - padding) + 'px'
+      top: elemOffset.top - padding + 'px',
+      left: elemOffset.left - padding + 'px',
     }
   }
 
@@ -31,16 +31,12 @@ class Popup extends React.PureComponent {
     const {style} = this.state
 
     return (
-      <div className={`popup ${className}`}
-        ref={this.elementRef}
-        style={style}>
-        <button className="btn popup__btn-close"
-          onClick={onClose}>
-          <span className="icon icon-cross icon-8px"/>
+      <div className={`popup ${className}`} ref={this.elementRef} style={style}>
+        <button className="btn popup__btn-close" onClick={onClose}>
+          <span className="icon icon-cross icon-8px" />
         </button>
 
         {children}
-
       </div>
     )
   }

@@ -26,14 +26,22 @@ import {setFormNodeDefAddChildTo, resetForm} from './actions'
 
 const SurveyFormView = props => {
   const {
-    surveyInfo, surveyCycleKey, nodeDef,
-    edit, entry, preview,
-    hasNodeDefAddChildTo, showPageNavigation,
-    canEditDef, canEditRecord,
-    recordUuid, parentNode,
+    surveyInfo,
+    surveyCycleKey,
+    nodeDef,
+    edit,
+    entry,
+    preview,
+    hasNodeDefAddChildTo,
+    showPageNavigation,
+    canEditDef,
+    canEditRecord,
+    recordUuid,
+    parentNode,
     isSideBarOpened,
     history,
-    setFormNodeDefAddChildTo, resetForm,
+    setFormNodeDefAddChildTo,
+    resetForm,
   } = props
 
   const editAllowed = edit && canEditDef
@@ -55,9 +63,7 @@ const SurveyFormView = props => {
         el.classList.add('mounted')
       }
     }, 100)
-  },
-  [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened]
-  )
+  }, [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened])
 
   // On cycle update, reset form
   useOnUpdate(() => {
@@ -73,60 +79,48 @@ const SurveyFormView = props => {
     }
   }, [])
 
-  return nodeDef
-    ? (
-      <div>
+  return nodeDef ? (
+    <div>
+      {editAllowed && <NodeDefEdit />}
 
-        {
-          editAllowed &&
-          <NodeDefEdit/>
-        }
+      <FormHeader
+        surveyCycleKey={surveyCycleKey}
+        edit={edit}
+        entry={entry && canEditRecord}
+        preview={preview}
+        history={history}
+        canEditDef={canEditDef}
+      />
 
-        <FormHeader
-          surveyCycleKey={surveyCycleKey}
-          edit={edit}
-          entry={entry && canEditRecord}
-          preview={preview}
-          history={history}
-          canEditDef={canEditDef}
-        />
-
-        <div className={`survey-form${className}`}>
-
-          {
-            showPageNavigation &&
-            <FormPageNavigation
-              surveyInfo={surveyInfo}
-              surveyCycleKey={surveyCycleKey}
-              edit={edit}
-              entry={entry}
-              canEditDef={canEditDef}
-              level={0}
-            />
-          }
-
-          <NodeDefSwitch
+      <div className={`survey-form${className}`}>
+        {showPageNavigation && (
+          <FormPageNavigation
             surveyInfo={surveyInfo}
             surveyCycleKey={surveyCycleKey}
-            nodeDef={nodeDef}
             edit={edit}
             entry={entry}
-            preview={preview}
-            recordUuid={recordUuid}
-            parentNode={parentNode}
             canEditDef={canEditDef}
-            canEditRecord={canEditRecord}/>
+            level={0}
+          />
+        )}
 
-          {
-            editAllowed && hasNodeDefAddChildTo &&
-            <AddNodeDefPanel/>
-          }
+        <NodeDefSwitch
+          surveyInfo={surveyInfo}
+          surveyCycleKey={surveyCycleKey}
+          nodeDef={nodeDef}
+          edit={edit}
+          entry={entry}
+          preview={preview}
+          recordUuid={recordUuid}
+          parentNode={parentNode}
+          canEditDef={canEditDef}
+          canEditRecord={canEditRecord}
+        />
 
-        </div>
-
+        {editAllowed && hasNodeDefAddChildTo && <AddNodeDefPanel />}
       </div>
-    )
-    : null
+    </div>
+  ) : null
 }
 
 SurveyFormView.defaultProps = {
@@ -149,13 +143,17 @@ const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
-  const hasNodeDefAddChildTo = Boolean(SurveyFormState.getNodeDefAddChildTo(state))
+  const hasNodeDefAddChildTo = Boolean(
+    SurveyFormState.getNodeDefAddChildTo(state),
+  )
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
   const isSideBarOpened = SideBarState.isOpened(state)
 
   const mapEntryProps = () => ({
-    parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
+    parentNode: nodeDef
+      ? SurveyFormState.getFormPageParentNode(nodeDef)(state)
+      : null,
     recordUuid: Record.getUuid(record),
   })
 
@@ -172,6 +170,6 @@ const mapStateToProps = (state, props) => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps, {setFormNodeDefAddChildTo, resetForm})
+  connect(mapStateToProps, {setFormNodeDefAddChildTo, resetForm}),
 )
 export default enhance(SurveyFormView)

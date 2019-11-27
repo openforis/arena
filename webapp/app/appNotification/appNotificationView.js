@@ -13,29 +13,26 @@ import {hideNotification} from './actions'
 
 const AppNotificationView = props => {
   const {
-    visible, messageKey, messageParams, severity,
+    visible,
+    messageKey,
+    messageParams,
+    severity,
     i18n,
     hideNotification,
   } = props
 
   return (
-    <CSSTransition
-      in={visible}
-      timeout={250}
-      unmountOnExit>
-
+    <CSSTransition in={visible} timeout={250} unmountOnExit>
       <div className={`app-notification ${severity}`}>
-        <button className="btn-s btn-transparent app-notification__btn-close"
-          onClick={hideNotification}>
-          <span className="icon icon-cross icon-8px"/>
+        <button
+          className="btn-s btn-transparent app-notification__btn-close"
+          onClick={hideNotification}
+        >
+          <span className="icon icon-cross icon-8px" />
         </button>
 
-        <div>
-          {i18n.t(messageKey, messageParams)}
-        </div>
-
+        <div>{i18n.t(messageKey, messageParams)}</div>
       </div>
-
     </CSSTransition>
   )
 }

@@ -26,6 +26,7 @@
   },
   "xo": {
     "semicolon": false,
+    "prettier": true,
     "space": 2,
     "settings": {
       "react": {

@@ -4,25 +4,23 @@ import React from 'react'
 import {KeyboardMap} from '@webapp/utils/keyboardMap'
 import * as R from 'ramda'
 
-export const ModalClose = ({children, onClose}) =>
+export const ModalClose = ({children, onClose}) => (
   <div className="modal-close" onClick={() => onClose()}>
-    <span className="icon icon-cross icon-20px"/>
+    <span className="icon icon-cross icon-20px" />
   </div>
+)
 
-export const ModalHeader = ({children}) =>
-  <div className="modal-header">
-    {children}
-  </div>
+export const ModalHeader = ({children}) => (
+  <div className="modal-header">{children}</div>
+)
 
-export const ModalBody = ({children}) =>
-  <div className="modal-body">
-    {children}
-  </div>
+export const ModalBody = ({children}) => (
+  <div className="modal-body">{children}</div>
+)
 
-export const ModalFooter = ({children}) =>
-  <div className="modal-footer">
-    {children}
-  </div>
+export const ModalFooter = ({children}) => (
+  <div className="modal-footer">{children}</div>
+)
 
 export class Modal extends React.Component {
   constructor(props) {
@@ -53,17 +51,15 @@ export class Modal extends React.Component {
   render() {
     const {children, isOpen = true, className = ''} = this.props
 
-    return R.propEq('closed', true)(this.state)
-      ? null
-      : (
-        <div className={`modal ${className}`}
-          tabIndex="-1"
-          role="dialog"
-          style={{display: isOpen ? 'block' : 'none'}}>
-          <div className="modal-content">
-            {children}
-          </div>
-        </div>
-      )
+    return R.propEq('closed', true)(this.state) ? null : (
+      <div
+        className={`modal ${className}`}
+        tabIndex="-1"
+        role="dialog"
+        style={{display: isOpen ? 'block' : 'none'}}
+      >
+        <div className="modal-content">{children}</div>
+      </div>
+    )
   }
 }

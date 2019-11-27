@@ -7,23 +7,28 @@ import {
   appPropsChange,
   appUserLogout,
   appSavingUpdate,
-  systemErrorThrow} from './actions'
+  systemErrorThrow,
+} from './actions'
 
 const actionHandlers = {
+  [systemErrorThrow]: (state, {error}) =>
+    AppState.assocSystemError(error)(state),
 
-  [systemErrorThrow]: (state, {error}) => AppState.assocSystemError(error)(state),
-
-  [appPropsChange]: (state, {survey, ...props}) => assocActionProps(state, props),
+  [appPropsChange]: (state, {survey, ...props}) =>
+    assocActionProps(state, props),
 
   // ====== user
 
   [appUserLogout]: state => AppState.logoutUser(state),
 
-  [surveyCreate]: (state, {survey}) => AppState.assocUserPropsOnSurveyCreate(survey)(state),
+  [surveyCreate]: (state, {survey}) =>
+    AppState.assocUserPropsOnSurveyCreate(survey)(state),
 
-  [surveyUpdate]: (state, {survey}) => AppState.assocUserPropsOnSurveyUpdate(survey)(state),
+  [surveyUpdate]: (state, {survey}) =>
+    AppState.assocUserPropsOnSurveyUpdate(survey)(state),
 
-  [surveyDelete]: (state, {surveyInfo}) => AppState.dissocUserPropsOnSurveyDelete(surveyInfo)(state),
+  [surveyDelete]: (state, {surveyInfo}) =>
+    AppState.dissocUserPropsOnSurveyDelete(surveyInfo)(state),
 
   // ====== saving
   [appSavingUpdate]: (state, {saving}) => AppState.assocSaving(saving)(state),

@@ -9,10 +9,9 @@ const SrsEditor = props => {
   const {srs, validation, readOnly, setSrs} = props
 
   const srsLookupFunction = async value => {
-    const {data} = await axios.get(
-      '/api/geo/srs/find',
-      {params: {codeOrName: value}}
-    )
+    const {data} = await axios.get('/api/geo/srs/find', {
+      params: {codeOrName: value},
+    })
     return data.srss
   }
 
@@ -20,7 +19,9 @@ const SrsEditor = props => {
     <InputChips
       itemsLookupFunction={srsLookupFunction}
       itemKeyProp={Srs.keys.code}
-      itemLabelFunction={srs => `${Srs.getName(srs)} (EPSG:${Srs.getCode(srs)})`}
+      itemLabelFunction={srs =>
+        `${Srs.getName(srs)} (EPSG:${Srs.getCode(srs)})`
+      }
       selection={srs}
       dropdownAutocompleteMinChars={3}
       requiredItems={1}

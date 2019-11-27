@@ -21,30 +21,32 @@ export const toString = (expr, exprMode = modes.json) => {
 
   return exprMode === modes.sql
     ? R.pipe(
-      R.replace(/&&/g, 'AND'),
-      R.replace(/\|\|/g, 'OR'),
-      R.replace(/==/g, '='),
-      R.replace(/!=/g, '!='),
-    )(string)
+        R.replace(/&&/g, 'AND'),
+        R.replace(/\|\|/g, 'OR'),
+        R.replace(/==/g, '='),
+        R.replace(/!=/g, '!='),
+      )(string)
     : string
 }
 
 export const fromString = (string, exprMode = modes.json) => {
-  const exprString = exprMode === modes.json
-    ? string
-    : R.pipe(
-      R.replace(/AND/g, '&&'),
-      R.replace(/OR/g, '||'),
-      R.replace(/=/g, '=='),
-      R.replace(/!==/g, '!='),
-      R.replace(/>==/g, '>='),
-      R.replace(/<==/g, '<='),
-    )(string)
+  const exprString =
+    exprMode === modes.json
+      ? string
+      : R.pipe(
+          R.replace(/AND/g, '&&'),
+          R.replace(/OR/g, '||'),
+          R.replace(/=/g, '=='),
+          R.replace(/!==/g, '!='),
+          R.replace(/>==/g, '>='),
+          R.replace(/<==/g, '<='),
+        )(string)
 
   return jsep(exprString)
 }
 
-export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
+export const evalString = (query, ctx) =>
+  Evaluator.evalExpression(fromString(query), ctx)
 
 export const isValid = ExpressionUtils.isValid
 export const getExpressionIdentifiers = Evaluator.getExpressionIdentifiers

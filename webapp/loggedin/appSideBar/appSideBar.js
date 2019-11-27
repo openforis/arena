@@ -14,43 +14,46 @@ import AppSideBarModules from './components/appSideBarModules'
 import {toggleSideBar} from './actions'
 
 const AppSideBar = props => {
-  const {
-    pathname,
-    user, surveyInfo, isSideBarOpened,
-    toggleSideBar
-  } = props
+  const {pathname, user, surveyInfo, isSideBarOpened, toggleSideBar} = props
 
   const element = useRef(null)
 
   const i18n = useI18n()
 
   return (
-    <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
+    <div
+      className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`}
+      ref={element}
+    >
       {/* toggle sidebar */}
-      <a className="app-sidebar__btn-toggle"
+      <a
+        className="app-sidebar__btn-toggle"
         onClick={() => {
           element.current.classList.toggle('opened')
           toggleSideBar()
-        }}>
-        <span className="icon icon-16px icon-menu"/>
+        }}
+      >
+        <span className="icon icon-16px icon-menu" />
       </a>
 
       <AppSideBarModules
         user={user}
         surveyInfo={surveyInfo}
         pathname={pathname}
-        sideBarOpened={isSideBarOpened}/>
+        sideBarOpened={isSideBarOpened}
+      />
 
-      {isSideBarOpened &&
-      <div
-        className="app-version"
-        data-commit-hash={ProcessUtils.ENV.gitCommitHash}
-        data-branch={ProcessUtils.ENV.gitBranch}>
-        OpenForis Arena<br/>
-        {`${i18n.t('common.version')} ${ProcessUtils.ENV.applicationVersion}`}
-      </div>
-      }
-
+      {isSideBarOpened && (
+        <div
+          className="app-version"
+          data-commit-hash={ProcessUtils.ENV.gitCommitHash}
+          data-branch={ProcessUtils.ENV.gitBranch}
+        >
+          OpenForis Arena
+          <br />
+          {`${i18n.t('common.version')} ${ProcessUtils.ENV.applicationVersion}`}
+        </div>
+      )}
     </div>
   )
 }

@@ -15,10 +15,7 @@ import SurveyListRowHeader from './components/surveyListRowHeader'
 import SurveyListRow from './components/surveyListRow'
 
 const SurveyListView = props => {
-  const {
-    user, surveyInfo, history,
-    setActiveSurvey,
-  } = props
+  const {user, surveyInfo, history, setActiveSurvey} = props
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -30,7 +27,8 @@ const SurveyListView = props => {
     setActiveSurvey(Survey.getId(surveyRow), canEdit)
   }
 
-  const isRowActive = surveyRow => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
+  const isRowActive = surveyRow =>
+    Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
 
   return (
     <TableView

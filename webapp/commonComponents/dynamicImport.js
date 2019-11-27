@@ -20,7 +20,7 @@ export default class DynamicImport extends React.Component {
       }
 
       this.setState({
-        component: (component) ? component : module.default
+        component: component ? component : module.default,
       })
     })
   }
@@ -28,8 +28,6 @@ export default class DynamicImport extends React.Component {
   render() {
     const {component} = this.state
     const {module, ...rest} = this.props
-    return component
-      ? React.createElement(component, rest)
-      : null
+    return component ? React.createElement(component, rest) : null
   }
 }

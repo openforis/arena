@@ -7,13 +7,15 @@ import Identifier from './identifier'
 const Call = ({node, variables, onChange}) => {
   const nodeIdentifier = {
     type: Expression.types.Identifier,
-    name: Expression.toString(node)
+    name: Expression.toString(node),
   }
 
   return (
-    <Identifier node={nodeIdentifier}
+    <Identifier
+      node={nodeIdentifier}
       variables={variables}
-      onChange={onChange}/>
+      onChange={onChange}
+    />
   )
 }
 

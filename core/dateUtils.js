@@ -8,7 +8,7 @@ import {
   differenceInHours,
   differenceInMinutes,
   format,
-  isValid as fnsIsValid
+  isValid as fnsIsValid,
 } from 'date-fns'
 
 import {isBlank} from './stringUtils'
@@ -23,17 +23,13 @@ export {
   differenceInDays,
   differenceInHours,
   subMonths,
-  subYears
+  subYears,
 } from 'date-fns'
 
-const normalizeDateTimeValue = length => value => R.pipe(
-  R.ifElse(
-    R.is(String),
-    R.identity,
-    R.toString
-  ),
-  val => val.padStart(length, '0')
-)(value)
+const normalizeDateTimeValue = length => value =>
+  R.pipe(R.ifElse(R.is(String), R.identity, R.toString), val =>
+    val.padStart(length, '0'),
+  )(value)
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
@@ -85,18 +81,23 @@ export const isValidDate = (year, month, day) => {
     return false
   }
 
-  const date = (new Date(year, month - 1, day))
+  const date = new Date(year, month - 1, day)
 
-  return Boolean(fnsIsValid(date)) &&
+  return (
+    Boolean(fnsIsValid(date)) &&
     date.getFullYear() === Number(year) &&
     date.getMonth() + 1 === Number(month) &&
     date.getDate() === Number(day)
+  )
 }
 
 export const isValidTime = (hour = '', minutes = '') =>
   isBlank(hour) || isBlank(minutes)
     ? false
-    : Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60
+    : Number(hour) >= 0 &&
+      Number(hour) < 24 &&
+      Number(minutes) >= 0 &&
+      Number(minutes) < 60
 
 export const isValidDateInFormat = (dateStr, format) => {
   const parsed = parse(dateStr, format)
@@ -104,7 +105,9 @@ export const isValidDateInFormat = (dateStr, format) => {
 }
 
 export const formatDate = (day, month, year) =>
-  `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
+  `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(
+    month,
+  )}/${normalizeDateTimeValue(4)(year)}`
 
 export const formatTime = (hour, minute) =>
   `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`

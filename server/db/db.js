@@ -11,7 +11,7 @@ const debugOptions = {
     if (e.params) {
       logger.debug(`PARAMS: ${JSON.stringify(e.params)}`)
     }
-  }
+  },
 }
 
 // Enable all options that help with debugging.
@@ -42,21 +42,21 @@ const configCommon = {
   // Max number of clients in the pool
   max: 10,
   // Whether to use ssl connections
-  ssl: ProcessUtils.ENV.pgSsl
+  ssl: ProcessUtils.ENV.pgSsl,
 }
 
 const config = ProcessUtils.ENV.dbUrl
   ? {
-    connectionString: ProcessUtils.ENV.dbUrl,
-    ...configCommon
-  }
+      connectionString: ProcessUtils.ENV.dbUrl,
+      ...configCommon,
+    }
   : {
-    user: ProcessUtils.ENV.pgUser,
-    database: ProcessUtils.ENV.pgDatabase,
-    password: ProcessUtils.ENV.pgPassword,
-    host: ProcessUtils.ENV.pgHost,
-    port: ProcessUtils.ENV.pgPort,
-    ...configCommon
-  }
+      user: ProcessUtils.ENV.pgUser,
+      database: ProcessUtils.ENV.pgDatabase,
+      password: ProcessUtils.ENV.pgPassword,
+      host: ProcessUtils.ENV.pgHost,
+      port: ProcessUtils.ENV.pgPort,
+      ...configCommon,
+    }
 
 export const db = pgp(config)

@@ -25,14 +25,14 @@ export default class SurveyCreatorJob extends Job {
 
     const languages = R.pipe(
       CollectSurvey.getElementsByName('language'),
-      R.map(CollectSurvey.getText)
+      R.map(CollectSurvey.getText),
     )(collectSurvey)
 
     const defaultLanguage = languages[0]
 
     const label = R.pipe(
       CollectSurvey.toLabels('project', defaultLanguage),
-      R.prop(defaultLanguage)
+      R.prop(defaultLanguage),
     )(collectSurvey)
 
     const survey = await SurveyManager.createSurvey(
@@ -41,16 +41,23 @@ export default class SurveyCreatorJob extends Job {
         name,
         label,
         languages,
-        collectUri
+        collectUri,
       },
       false,
       true,
-      tx
+      tx,
     )
 
     const surveyId = Survey.getId(survey)
 
-    await ActivityLogManager.insert(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
+    await ActivityLogManager.insert(
+      this.user,
+      surveyId,
+      ActivityLog.type.surveyCollectImport,
+      null,
+      false,
+      this.tx,
+    )
 
     this.setContext({survey, surveyId, defaultLanguage})
   }

@@ -4,7 +4,7 @@ import React from 'react'
 
 const Header = ({children}) => (
   <header>
-    <div className="separator"/>
+    <div className="separator" />
     {children}
   </header>
 )

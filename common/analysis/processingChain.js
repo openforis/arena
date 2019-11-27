@@ -44,10 +44,18 @@ export const newProcessingStep = (processingChain, props = {}) => ({
   [ProcessingStep.keys.props]: props,
 })
 
-export const newProcessingStepCalculation = (processingStep, nodeDefUuid, props = {}) => ({
+export const newProcessingStepCalculation = (
+  processingStep,
+  nodeDefUuid,
+  props = {},
+) => ({
   [ProcessingStepCalculation.keys.uuid]: uuidv4(),
-  [ProcessingStepCalculation.keys.processingStepUuid]: ProcessingStep.getUuid(processingStep),
-  [ProcessingStepCalculation.keys.index]: ProcessingStep.getCalculationSteps(processingStep).length,
+  [ProcessingStepCalculation.keys.processingStepUuid]: ProcessingStep.getUuid(
+    processingStep,
+  ),
+  [ProcessingStepCalculation.keys.index]: ProcessingStep.getCalculationSteps(
+    processingStep,
+  ).length,
   [ProcessingStepCalculation.keys.nodeDefUuid]: nodeDefUuid,
   [ProcessingStepCalculation.keys.props]: props,
 })
@@ -72,17 +80,16 @@ export const getLabel = ObjectUtils.getLabel
 export const isDraft = R.ifElse(
   R.pipe(getDateExecuted, R.isNil),
   R.always(true),
-  chain => DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
+  chain => DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain)),
 )
 
 // ====== UPDATE
 
 export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
-export const assocProcessingStep = step => chain => R.pipe(
-  getProcessingSteps,
-  R.append(step),
-  steps => R.assoc(keys.processingSteps, steps, chain)
-)(chain)
+export const assocProcessingStep = step => chain =>
+  R.pipe(getProcessingSteps, R.append(step), steps =>
+    R.assoc(keys.processingSteps, steps, chain),
+  )(chain)
 
 export const assocProp = ObjectUtils.setProp

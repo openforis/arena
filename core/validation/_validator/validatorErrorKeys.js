@@ -28,26 +28,34 @@ export const ValidatorErrorKeys = {
   },
 
   expressions: {
-    cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
+    cannotGetChildOfAttribute:
+      'validationErrors.expressions.cannotGetChildOfAttribute',
     cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
-    circularDependencyError: 'validationErrors.expressions.circularDependencyError',
+    circularDependencyError:
+      'validationErrors.expressions.circularDependencyError',
     expressionInvalid: 'validationErrors.expressions.expressionInvalid',
     unableToFindNode: 'validationErrors.expressions.unableToFindNode',
     unableToFindNodeChild: 'validationErrors.expressions.unableToFindNodeChild',
-    unableToFindNodeParent: 'validationErrors.expressions.unableToFindNodeParent',
-    unableToFindNodeSibling: 'validationErrors.expressions.unableToFindNodeSibling',
+    unableToFindNodeParent:
+      'validationErrors.expressions.unableToFindNodeParent',
+    unableToFindNodeSibling:
+      'validationErrors.expressions.unableToFindNodeSibling',
   },
 
   nodeDefEdit: {
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',
-    countMaxMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMaxMustBePositiveNumber',
-    countMinMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMinMustBePositiveNumber',
+    countMaxMustBePositiveNumber:
+      'validationErrors.nodeDefEdit.countMaxMustBePositiveNumber',
+    countMinMustBePositiveNumber:
+      'validationErrors.nodeDefEdit.countMinMustBePositiveNumber',
     defaultValuesInvalid: 'validationErrors.nodeDefEdit.defaultValuesInvalid',
-    defaultValuesNotSpecified: 'validationErrors.nodeDefEdit.defaultValuesNotSpecified',
+    defaultValuesNotSpecified:
+      'validationErrors.nodeDefEdit.defaultValuesNotSpecified',
     categoryRequired: 'validationErrors.nodeDefEdit.categoryRequired',
     childrenEmpty: 'validationErrors.nodeDefEdit.childrenEmpty',
-    expressionApplyIfOnlyLastOneCanBeEmpty: 'validationErrors.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty',
+    expressionApplyIfOnlyLastOneCanBeEmpty:
+      'validationErrors.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty',
     expressionDuplicate: 'validationErrors.nodeDefEdit.expressionDuplicate',
     expressionRequired: 'validationErrors.nodeDefEdit.expressionRequired',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
@@ -72,12 +80,17 @@ export const ValidatorErrorKeys = {
     srsRequired: 'validationErrors.surveyInfoEdit.srsRequired',
     cyclesRequired: 'validationErrors.surveyInfoEdit.cyclesRequired',
     cyclesExceedingMax: 'validationErrors.surveyInfoEdit.cyclesExceedingMax',
-    cycleDateStartMandatory: 'validationErrors.surveyInfoEdit.cycleDateStartMandatory',
-    cycleDateStartInvalid: 'validationErrors.surveyInfoEdit.cycleDateStartInvalid',
-    cycleDateStartBeforeDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartBeforeDateEnd',
+    cycleDateStartMandatory:
+      'validationErrors.surveyInfoEdit.cycleDateStartMandatory',
+    cycleDateStartInvalid:
+      'validationErrors.surveyInfoEdit.cycleDateStartInvalid',
+    cycleDateStartBeforeDateEnd:
+      'validationErrors.surveyInfoEdit.cycleDateStartBeforeDateEnd',
     cycleDateEndInvalid: 'validationErrors.surveyInfoEdit.cycleDateEndInvalid',
-    cycleDateEndMandatoryExceptForLastCycle: 'validationErrors.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
-    cycleDateStartAfterPrevDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
+    cycleDateEndMandatoryExceptForLastCycle:
+      'validationErrors.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
+    cycleDateStartAfterPrevDateEnd:
+      'validationErrors.surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
   },
 
   taxonomyEdit: {
@@ -85,13 +98,16 @@ export const ValidatorErrorKeys = {
     codeRequired: 'validationErrors.taxonomyEdit.codeRequired',
     familyRequired: 'validationErrors.taxonomyEdit.familyRequired',
     genusRequired: 'validationErrors.taxonomyEdit.genusRequired',
-    scientificNameDuplicate: 'validationErrors.taxonomyEdit.scientificNameDuplicate',
-    scientificNameRequired: 'validationErrors.taxonomyEdit.scientificNameRequired',
+    scientificNameDuplicate:
+      'validationErrors.taxonomyEdit.scientificNameDuplicate',
+    scientificNameRequired:
+      'validationErrors.taxonomyEdit.scientificNameRequired',
     taxaEmpty: 'validationErrors.taxonomyEdit.taxaEmpty',
   },
 
   taxonomyImportJob: {
-    missingRequiredColumns: 'validationErrors.taxonomyImportJob.missingRequiredColumns'
+    missingRequiredColumns:
+      'validationErrors.taxonomyImportJob.missingRequiredColumns',
   },
 
   user: {
@@ -109,5 +125,5 @@ export const ValidatorErrorKeys = {
     UserNotFoundException: 'validationErrors.user.userDoesNotExist',
     NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
     CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
-  }
+  },
 }

@@ -18,22 +18,31 @@ export const jobThreadMessageTypes = {
 }
 
 const calculateJobProgress = job => {
-  const partialProgress = job.status === jobStatus.succeeded
-    ? 100
-    : (job.total > 0
-      ? Math.floor(100 * job.processed / job.total)
-      : 0)
+  const partialProgress =
+    job.status === jobStatus.succeeded
+      ? 100
+      : job.total > 0
+      ? Math.floor((100 * job.processed) / job.total)
+      : 0
 
-  if (job.innerJobs.length === 0 || job.currentInnerJobIndex < 0 || partialProgress === 100) {
+  if (
+    job.innerJobs.length === 0 ||
+    job.currentInnerJobIndex < 0 ||
+    partialProgress === 100
+  ) {
     return partialProgress
   }
 
-  return partialProgress + Math.floor(calculateJobProgress(job.getCurrentInnerJob()) / job.total)
+  return (
+    partialProgress +
+    Math.floor(calculateJobProgress(job.getCurrentInnerJob()) / job.total)
+  )
 }
 
 const calculatedElapsedMillis = job =>
   job.startTime
-    ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime()
+    ? (job.endTime ? job.endTime : new Date()).getTime() -
+      job.startTime.getTime()
     : 0
 
 export const jobToJSON = job => ({
@@ -60,5 +69,4 @@ export const jobToJSON = job => ({
   // Output
   errors: jobStatus.failed ? job.errors : null,
   result: jobStatus.succeeded ? job.result : null,
-
 })

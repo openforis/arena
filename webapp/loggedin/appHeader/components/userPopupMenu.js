@@ -36,63 +36,63 @@ const UserPopupMenu = props => {
   }, [])
 
   return (
-    <div className="user-popup-menu"
-      ref={elementRef}
-      onMouseLeave={onClose}>
-
+    <div className="user-popup-menu" ref={elementRef} onMouseLeave={onClose}>
       <div className="user-popup-menu__user">
-
-        <ProfilePicture userUuid={User.getUuid(user)}/>
+        <ProfilePicture userUuid={User.getUuid(user)} />
 
         <div className="user-details">
-          <div>
-            {User.getName(user)}
-          </div>
+          <div>{User.getName(user)}</div>
           <div>
             <Link
               className="btn-s btn-transparent"
               to={`${appModuleUri(userModules.user)}${User.getUuid(user)}/`}
-              onClick={onClose}>
-              <span className="icon icon-user icon-12px icon-left"/>
+              onClick={onClose}
+            >
+              <span className="icon icon-user icon-12px icon-left" />
               {i18n.t('header.myProfile')}
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="user-popup-menu__sep"/>
+      <div className="user-popup-menu__sep" />
 
-      <Link to={appModuleUri(homeModules.surveyList)}
+      <Link
+        to={appModuleUri(homeModules.surveyList)}
         onClick={onClose}
-        className="btn-s btn-transparent">
-        <span className="icon icon-paragraph-justify icon-12px icon-left"/>
+        className="btn-s btn-transparent"
+      >
+        <span className="icon icon-paragraph-justify icon-12px icon-left" />
         {i18n.t('appModules.surveyList')}
       </Link>
 
-      <Link to={appModuleUri(homeModules.surveyNew)}
+      <Link
+        to={appModuleUri(homeModules.surveyNew)}
         className="btn-s btn-transparent"
-        onClick={onClose}>
-        <span className="icon icon-plus icon-12px icon-left"/>
+        onClick={onClose}
+      >
+        <span className="icon icon-plus icon-12px icon-left" />
         {i18n.t('homeView.createSurvey')}
       </Link>
 
-      <div className="user-popup-menu__sep"/>
+      <div className="user-popup-menu__sep" />
 
-      <a className="btn-s btn-transparent"
+      <a
+        className="btn-s btn-transparent"
         onClick={() => {
           onClose()
           logout()
-        }}>
-        <span className="icon icon-switch icon-12px icon-left"/>
+        }}
+      >
+        <span className="icon icon-switch icon-12px icon-left" />
         {i18n.t('sidebar.logout')}
       </a>
-
     </div>
   )
 }
 
 const mapStateToProps = state => ({
-  user: AppState.getUser(state)
+  user: AppState.getUser(state),
 })
 
 export default connect(mapStateToProps, {logout})(UserPopupMenu)

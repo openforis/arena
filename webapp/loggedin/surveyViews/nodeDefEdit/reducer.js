@@ -16,9 +16,11 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [nodeDefEditUpdate]: (state, {nodeDef}) => NodeDefEditState.assocNodeDef(nodeDef)(state),
+  [nodeDefEditUpdate]: (state, {nodeDef}) =>
+    NodeDefEditState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefCreate]: (state, {nodeDef}) => NodeDefEditState.assocNodeDef(nodeDef)(state),
+  [nodeDefCreate]: (state, {nodeDef}) =>
+    NodeDefEditState.assocNodeDef(nodeDef)(state),
 }
 
 export default exportReducer(actionHandlers)

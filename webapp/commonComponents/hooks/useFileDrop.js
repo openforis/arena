@@ -14,9 +14,11 @@ export default (handler, elemRef, acceptedTypes) => {
 
     const fileItems = [...evt.dataTransfer.items]
 
-    const fileItem = fileItems.find(item =>
-      !acceptedTypes ||
-      acceptedTypes.find(acceptedType => acceptedType.test(item.type)))
+    const fileItem = fileItems.find(
+      item =>
+        !acceptedTypes ||
+        acceptedTypes.find(acceptedType => acceptedType.test(item.type)),
+    )
 
     if (fileItem) {
       handler(fileItem.getAsFile())

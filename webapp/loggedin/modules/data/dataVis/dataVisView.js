@@ -19,9 +19,7 @@ const DataVisView = props => {
 
   return (
     <div className="data-vis">
-
-      <DataQueryView/>
-
+      <DataQueryView />
     </div>
   )
 }
@@ -30,7 +28,4 @@ const mapStateToProps = state => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(
-  mapStateToProps,
-  {resetDataVis}
-)(DataVisView)
+export default connect(mapStateToProps, {resetDataVis})(DataVisView)

@@ -10,7 +10,14 @@ import NodeDeleteButton from '../nodeDeleteButton'
 
 import * as NodeDefUIProps from '../../nodeDefUIProps'
 
-const TextInput = ({nodeDef, readOnly, node, edit, updateNode, canEditRecord}) => (
+const TextInput = ({
+  nodeDef,
+  readOnly,
+  node,
+  edit,
+  updateNode,
+  canEditRecord,
+}) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       aria-disabled={edit || !canEditRecord || readOnly}
@@ -26,34 +33,37 @@ const MultipleTextInput = props => {
 
   return (
     <div>
-      {
-        nodes.map(n =>
-          (!Node.isPlaceholder(n) || canEditRecord) &&
-          <div key={Node.getUuid(n)}
-            className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}>
-
-            <NodeDefErrorBadge
-              nodeDef={nodeDef}
-              edit={false}
-              parentNode={parentNode}
-              node={n}
-            />
-
-            <TextInput {...props}
-              node={n}/>
-
-            {
-              !n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord &&
-              <NodeDeleteButton
+      {nodes.map(
+        n =>
+          (!Node.isPlaceholder(n) || canEditRecord) && (
+            <div
+              key={Node.getUuid(n)}
+              className={`survey-form__node-def-${NodeDef.getType(
+                nodeDef,
+              )} survey-form__node-def-text-multiple-container`}
+            >
+              <NodeDefErrorBadge
                 nodeDef={nodeDef}
+                edit={false}
+                parentNode={parentNode}
                 node={n}
-                showConfirm={true}
-                removeNode={removeNode}/>
-            }
+              />
 
-          </div>
-        )
-      }
+              <TextInput {...props} node={n} />
+
+              {!n.placeholder &&
+                NodeDef.isMultiple(nodeDef) &&
+                canEditRecord && (
+                  <NodeDeleteButton
+                    nodeDef={nodeDef}
+                    node={n}
+                    showConfirm={true}
+                    removeNode={removeNode}
+                  />
+                )}
+            </div>
+          ),
+      )}
     </div>
   )
 }
@@ -61,11 +71,13 @@ const MultipleTextInput = props => {
 const NodeDefText = props => {
   const {edit, entryDataQuery, nodeDef, nodes} = props
 
-  return edit
-    ? <TextInput {...props}/>
-    : (NodeDef.isMultiple(nodeDef) && !entryDataQuery
-      ? <MultipleTextInput {...props} />
-      : <TextInput {...props} node={nodes[0]}/>)
+  return edit ? (
+    <TextInput {...props} />
+  ) : NodeDef.isMultiple(nodeDef) && !entryDataQuery ? (
+    <MultipleTextInput {...props} />
+  ) : (
+    <TextInput {...props} node={nodes[0]} />
+  )
 }
 
 export default NodeDefText

@@ -13,7 +13,8 @@ export const appUserLogout = 'app/user/logout'
 
 export const systemErrorThrow = 'system/error'
 
-export const throwSystemError = error => dispatch => dispatch({type: systemErrorThrow, error})
+export const throwSystemError = error => dispatch =>
+  dispatch({type: systemErrorThrow, error})
 
 // ====== INIT
 
@@ -31,7 +32,13 @@ export const initApp = () => async dispatch => {
       survey = userSurvey.survey
     }
 
-    dispatch({type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey})
+    dispatch({
+      type: appPropsChange,
+      status: AppState.appStatus.ready,
+      i18n,
+      user,
+      survey,
+    })
   } catch (error) {
     dispatch({type: appPropsChange, status: AppState.appStatus.ready, i18n})
     CognitoAuth.logout()
@@ -41,7 +48,9 @@ export const initApp = () => async dispatch => {
 // ====== USER
 
 const getUserSurvey = async () => {
-  const {data: {user, survey}} = await axios.get('/auth/user')
+  const {
+    data: {user, survey},
+  } = await axios.get('/auth/user')
   return {user, survey}
 }
 
@@ -91,6 +100,8 @@ export const hideAppSaving = () => dispatch => {
 
 // ====== APP LOADER
 
-export const showAppLoader = () => dispatch => dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: true})
+export const showAppLoader = () => dispatch =>
+  dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: true})
 
-export const hideAppLoader = () => dispatch => dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: false})
+export const hideAppLoader = () => dispatch =>
+  dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: false})

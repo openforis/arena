@@ -22,7 +22,10 @@ const _validateDateIsBefore = (dateStr, dateToCompareStr, errorMessageKey) => {
   }
 
   const date = DateUtils.parse(dateStr, SurveyCycle.dateFormat)
-  const dateToCompare = DateUtils.parse(dateToCompareStr, SurveyCycle.dateFormat)
+  const dateToCompare = DateUtils.parse(
+    dateToCompareStr,
+    SurveyCycle.dateFormat,
+  )
 
   return DateUtils.isBefore(date, dateToCompare)
     ? null
@@ -30,24 +33,39 @@ const _validateDateIsBefore = (dateStr, dateToCompareStr, errorMessageKey) => {
 }
 
 const _validateCycleStartDateBeforeEndDate = (propName, item) =>
-  _validateDateIsBefore(SurveyCycle.getDateStart(item), SurveyCycle.getDateEnd(item),
-    Validation.messageKeys.surveyInfoEdit.cycleDateStartBeforeDateEnd)
+  _validateDateIsBefore(
+    SurveyCycle.getDateStart(item),
+    SurveyCycle.getDateEnd(item),
+    Validation.messageKeys.surveyInfoEdit.cycleDateStartBeforeDateEnd,
+  )
 
 const _validateDateStartAfterPrevDateEnd = cyclePrev => (propName, item) =>
-  _validateDateIsBefore(SurveyCycle.getDateEnd(cyclePrev), SurveyCycle.getDateStart(item),
-    Validation.messageKeys.surveyInfoEdit.cycleDateStartAfterPrevDateEnd)
+  _validateDateIsBefore(
+    SurveyCycle.getDateEnd(cyclePrev),
+    SurveyCycle.getDateStart(item),
+    Validation.messageKeys.surveyInfoEdit.cycleDateStartAfterPrevDateEnd,
+  )
 
 const _cycleValidators = (cyclePrev, isLast) => ({
   [SurveyCycle.keys.dateStart]: [
-    Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateStartMandatory),
+    Validator.validateRequired(
+      Validation.messageKeys.surveyInfoEdit.cycleDateStartMandatory,
+    ),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateStartInvalid),
     _validateCycleStartDateBeforeEndDate,
-    ...(cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : [])
+    ...(cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : []),
   ],
   [SurveyCycle.keys.dateEnd]: [
     // Date end is required for all but the last cycle
-    ...(isLast ? [] : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)]),
-    _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateEndInvalid)
+    ...(isLast
+      ? []
+      : [
+          Validator.validateRequired(
+            Validation.messageKeys.surveyInfoEdit
+              .cycleDateEndMandatoryExceptForLastCycle,
+          ),
+        ]),
+    _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateEndInvalid),
   ],
 })
 
@@ -59,9 +77,10 @@ export const validateCycles = async cycles => {
 
   // 1. validate cycles size
   if (cyclesSize === 0 || cyclesSize > MAX_CYCLES) {
-    const errorKey = cyclesSize === 0
-      ? Validation.messageKeys.surveyInfoEdit.cyclesRequired
-      : Validation.messageKeys.surveyInfoEdit.cyclesExceedingMax
+    const errorKey =
+      cyclesSize === 0
+        ? Validation.messageKeys.surveyInfoEdit.cyclesRequired
+        : Validation.messageKeys.surveyInfoEdit.cyclesExceedingMax
     Validation.setErrors([ValidationResult.newInstance(errorKey)])
     Validation.setValid(false)
   }
@@ -72,7 +91,10 @@ export const validateCycles = async cycles => {
     const cycle = cyclesArray[index]
 
     const isLast = index === cyclesSize - 1
-    const cycleValidation = await Validator.validate(cycle, _cycleValidators(cyclePrev, isLast))
+    const cycleValidation = await Validator.validate(
+      cycle,
+      _cycleValidators(cyclePrev, isLast),
+    )
 
     if (!Validation.isValid(cycleValidation)) {
       Validation.setField(String(index), cycleValidation)(result)

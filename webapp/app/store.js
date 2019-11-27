@@ -25,12 +25,11 @@ const appReducers = {
   [ErrorsState.stateKey]: errorsReducer,
 }
 
-const createReducer = asyncReducers => (
+const createReducer = asyncReducers =>
   combineReducers({
     ...appReducers,
     ...asyncReducers,
   })
-)
 
 const middlewares = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
@@ -42,7 +41,7 @@ if (ProcessUtils.isEnvDevelopment) {
 
 export const store = createStore(
   createReducer({}),
-  applyMiddleware(...middlewares)
+  applyMiddleware(...middlewares),
 )
 
 store.asyncReducers = {}

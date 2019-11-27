@@ -5,26 +5,30 @@ import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 
-const {
-  permissions,
-  keys,
-} = AuthGroup
+const {permissions, keys} = AuthGroup
 
 // ======
 // ====== Survey
 // ======
 
 const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
-  User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo), includeSystemAdmin)(user)
+  User.getAuthGroupBySurveyUuid(
+    Survey.getUuid(surveyInfo),
+    includeSystemAdmin,
+  )(user)
 
 const _hasSurveyPermission = permission => (user, surveyInfo) =>
-  user && surveyInfo && (
-    User.isSystemAdmin(user) ||
-    R.includes(permission, R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo))
-  )
+  user &&
+  surveyInfo &&
+  (User.isSystemAdmin(user) ||
+    R.includes(
+      permission,
+      R.pipe(_getSurveyUserGroup, AuthGroup.getPermissions)(user, surveyInfo),
+    ))
 
 // READ
-export const canViewSurvey = (user, surveyInfo) => Boolean(_getSurveyUserGroup(user, surveyInfo))
+export const canViewSurvey = (user, surveyInfo) =>
+  Boolean(_getSurveyUserGroup(user, surveyInfo))
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
@@ -51,13 +55,18 @@ export const canEditRecord = (user, record) => {
 
   const recordDataStep = Record.getStep(record)
 
-  const userAuthGroup = User.getAuthGroupBySurveyUuid(Record.getSurveyUuid(record))(user)
+  const userAuthGroup = User.getAuthGroupBySurveyUuid(
+    Record.getSurveyUuid(record),
+  )(user)
 
   // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
   const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
 
-  return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
+  return (
+    level === keys.all ||
+    (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
+  )
 }
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
@@ -73,33 +82,31 @@ export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 
 // READ
 export const canViewUser = (user, surveyInfo, userToView) => {
-  return User.isSystemAdmin(user) || (
-    Boolean(_getSurveyUserGroup(user, surveyInfo, false)) &&
-    Boolean(_getSurveyUserGroup(userToView, surveyInfo, false))
+  return (
+    User.isSystemAdmin(user) ||
+    (Boolean(_getSurveyUserGroup(user, surveyInfo, false)) &&
+      Boolean(_getSurveyUserGroup(userToView, surveyInfo, false)))
   )
 }
 
 // EDIT
 const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
-  User.isSystemAdmin(user) || (
-    _hasSurveyPermission(permissions.userEdit)(user, surveyInfo) &&
-    Boolean(_getSurveyUserGroup(userToUpdate, surveyInfo, false))
-  )
+  User.isSystemAdmin(user) ||
+  (_hasSurveyPermission(permissions.userEdit)(user, surveyInfo) &&
+    Boolean(_getSurveyUserGroup(userToUpdate, surveyInfo, false)))
 
-export const canEditUser = (user, surveyInfo, userToUpdate) => (
-  User.hasAccepted(userToUpdate) && (
-    User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate)
-  )
-)
+export const canEditUser = (user, surveyInfo, userToUpdate) =>
+  User.hasAccepted(userToUpdate) &&
+  (User.isEqual(user)(userToUpdate) ||
+    _hasUserEditAccess(user, surveyInfo, userToUpdate))
 
 export const canEditUserEmail = _hasUserEditAccess
 
-export const canEditUserGroup = (user, surveyInfo, userToUpdate) => (
-  !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)
-)
+export const canEditUserGroup = (user, surveyInfo, userToUpdate) =>
+  !User.isEqual(user)(userToUpdate) &&
+  _hasUserEditAccess(user, surveyInfo, userToUpdate)
 
-export const canRemoveUser = (user, surveyInfo, userToRemove) => (
+export const canRemoveUser = (user, surveyInfo, userToRemove) =>
   !User.isEqual(user)(userToRemove) &&
   !User.isSystemAdmin(userToRemove) &&
   _hasUserEditAccess(user, surveyInfo, userToRemove)
-)

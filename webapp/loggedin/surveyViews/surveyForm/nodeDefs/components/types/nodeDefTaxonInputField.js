@@ -8,10 +8,16 @@ import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
 const NodeDefTaxonInputField = props => {
   const {
-    surveyId, taxonomyUuid, edit, draft,
-    canEditRecord, readOnly,
-    field, selection,
-    onChangeTaxon, onChangeSelectionField,
+    surveyId,
+    taxonomyUuid,
+    edit,
+    draft,
+    canEditRecord,
+    readOnly,
+    field,
+    selection,
+    onChangeTaxon,
+    onChangeSelectionField,
     autocompleteSourceElement,
   } = props
 
@@ -32,7 +38,6 @@ const NodeDefTaxonInputField = props => {
 
   return (
     <React.Fragment>
-
       <Input
         ref={inputRef}
         aria-disabled={entryDisabled}
@@ -41,13 +46,11 @@ const NodeDefTaxonInputField = props => {
         onChange={onChangeInput}
       />
 
-      {
-        autocompleteOpened &&
+      {autocompleteOpened && (
         <NodeDefTaxonAutocompleteDialog
           surveyId={surveyId}
           taxonomyUuid={taxonomyUuid}
           draft={draft}
-
           inputRef={inputRef}
           field={field}
           fieldValue={inputRef.current.value}
@@ -55,8 +58,7 @@ const NodeDefTaxonInputField = props => {
           onClose={onItemSelectAutocomplete}
           autocompleteSourceElement={autocompleteSourceElement}
         />
-      }
-
+      )}
     </React.Fragment>
   )
 }

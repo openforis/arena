@@ -12,23 +12,22 @@ const ConfirmDialog = props => {
 
   return (
     <Modal className="confirm-dialog">
-
       <ModalBody>
-        <Markdown source={message}/>
+        <Markdown source={message} />
       </ModalBody>
 
       <ModalFooter>
-        <button className="btn btn-cancel modal-footer__item"
-          onClick={onCancel}>
+        <button
+          className="btn btn-cancel modal-footer__item"
+          onClick={onCancel}
+        >
           {i18n.t('common.cancel')}
         </button>
 
-        <button className="btn btn-ok modal-footer__item"
-          onClick={onOk}>
+        <button className="btn btn-ok modal-footer__item" onClick={onOk}>
           {i18n.t('common.ok')}
         </button>
       </ModalFooter>
-
     </Modal>
   )
 }

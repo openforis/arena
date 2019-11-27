@@ -5,10 +5,7 @@ import * as Category from '../category'
 const categories = 'categories'
 
 // ====== READ
-export const getCategories = R.pipe(
-  R.prop(categories),
-  R.defaultTo({})
-)
+export const getCategories = R.pipe(R.prop(categories), R.defaultTo({}))
 
 export const getCategoriesArray = R.pipe(
   getCategories,
@@ -18,18 +15,12 @@ export const getCategoriesArray = R.pipe(
     const name1 = Category.getName(category1)
     const name2 = Category.getName(category2)
 
-    return name1 < name2
-      ? -1
-      : (name1 > name2
-        ? 1
-        : 0)
-  })
+    return name1 < name2 ? -1 : name1 > name2 ? 1 : 0
+  }),
 )
 
-export const getCategoryByUuid = uuid => R.pipe(
-  getCategories,
-  R.prop(uuid)
-)
+export const getCategoryByUuid = uuid => R.pipe(getCategories, R.prop(uuid))
 
 // ====== UPDATE
-export const assocCategories = newCategories => R.assoc(categories, newCategories)
+export const assocCategories = newCategories =>
+  R.assoc(categories, newCategories)

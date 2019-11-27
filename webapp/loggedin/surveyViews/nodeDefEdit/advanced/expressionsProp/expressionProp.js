@@ -13,10 +13,19 @@ import LabelsEditor from '../../../labelsEditor/labelsEditor'
 
 const ExpressionProp = props => {
   const {
-    nodeDefUuidContext, nodeDefUuidCurrent, validation,
-    expression, applyIf, severity, showLabels, readOnly,
-    isContextParent, canBeConstant, isBoolean,
-    onUpdate, onDelete,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
+    validation,
+    expression,
+    applyIf,
+    severity,
+    showLabels,
+    readOnly,
+    isContextParent,
+    canBeConstant,
+    isBoolean,
+    onUpdate,
+    onDelete,
   } = props
 
   const i18n = useI18n()
@@ -24,15 +33,18 @@ const ExpressionProp = props => {
   const severityItems = [
     {
       key: ValidationResult.severities.error,
-      label: i18n.t('common.error')
+      label: i18n.t('common.error'),
     },
     {
       key: ValidationResult.severities.warning,
-      label: i18n.t('common.warning')
-    }
+      label: i18n.t('common.warning'),
+    },
   ]
 
-  const errorMessages = ValidationUtils.getValidationFieldMessages(i18n, false)(validation)
+  const errorMessages = ValidationUtils.getValidationFieldMessages(
+    i18n,
+    false,
+  )(validation)
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
 
@@ -40,21 +52,27 @@ const ExpressionProp = props => {
     <Tooltip
       messages={errorMessages}
       position="bottom"
-      type={!R.isEmpty(errorMessages) ? 'error' : ''}>
-
-      <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
-
-        {
-          !isPlaceholder &&
-          <button className="btn btn-s btn-transparent btn-delete"
+      type={!R.isEmpty(errorMessages) ? 'error' : ''}
+    >
+      <div
+        className={`node-def-edit__expression${
+          isPlaceholder ? ' placeholder' : ''
+        }`}
+      >
+        {!isPlaceholder && (
+          <button
+            className="btn btn-s btn-transparent btn-delete"
             aria-disabled={readOnly}
-            onClick={() => onDelete(expression)}>
-            <span className="icon icon-bin2 icon-12px"/>
+            onClick={() => onDelete(expression)}
+          >
+            <span className="icon icon-bin2 icon-12px" />
           </button>
-        }
+        )}
 
         <div className="expression-item">
-          <div className="label">{i18n.t('nodeDefEdit.expressionsProp.expression')}</div>
+          <div className="label">
+            {i18n.t('nodeDefEdit.expressionsProp.expression')}
+          </div>
 
           <ExpressionEditor
             nodeDefUuidContext={nodeDefUuidContext}
@@ -65,13 +83,15 @@ const ExpressionProp = props => {
             }
             isContextParent={isContextParent}
             canBeConstant={canBeConstant}
-            isBoolean={isBoolean}/>
+            isBoolean={isBoolean}
+          />
         </div>
 
-        {
-          applyIf &&
+        {applyIf && (
           <div className="expression-item">
-            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
+            <div className="label">
+              {i18n.t('nodeDefEdit.expressionsProp.applyIf')}
+            </div>
 
             <ExpressionEditor
               nodeDefUuidContext={nodeDefUuidContext}
@@ -84,24 +104,26 @@ const ExpressionProp = props => {
               canBeConstant={false}
             />
           </div>
-        }
-        {
-          severity &&
+        )}
+        {severity && (
           <div className="expression-item severity">
-            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.severity')}</div>
+            <div className="label">
+              {i18n.t('nodeDefEdit.expressionsProp.severity')}
+            </div>
 
             <ButtonGroup
               selectedItemKey={NodeDefExpression.getSeverity(expression)}
               onChange={severityVal =>
-                onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))
+                onUpdate(
+                  NodeDefExpression.assocSeverity(severityVal)(expression),
+                )
               }
               items={severityItems}
               disabled={NodeDefExpression.isEmpty(expression)}
             />
           </div>
-        }
-        {
-          showLabels &&
+        )}
+        {showLabels && (
           <LabelsEditor
             formLabelKey="common.errorMessage"
             labels={NodeDefExpression.getMessages(expression)}
@@ -110,7 +132,7 @@ const ExpressionProp = props => {
             }
             readOnly={NodeDefExpression.isEmpty(expression)}
           />
-        }
+        )}
       </div>
     </Tooltip>
   )

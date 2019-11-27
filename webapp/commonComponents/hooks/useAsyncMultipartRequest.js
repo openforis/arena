@@ -13,7 +13,7 @@ const makeMultipart = fn => (url, data = {}, config = {}) =>
       }
 
       return formData
-    }
+    },
   })
 
 export const useAsyncMultipartPostRequest = makeMultipart(useAsyncPostRequest)

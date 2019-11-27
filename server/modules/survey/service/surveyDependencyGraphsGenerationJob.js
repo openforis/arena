@@ -15,7 +15,17 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
 
   async execute(tx) {
     // TODO build a new graph for each survey cycle
-    const survey = this.contextSurvey || await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, Survey.cycleOneKey, false, true, false, false, tx)
+    const survey =
+      this.contextSurvey ||
+      (await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        this.surveyId,
+        Survey.cycleOneKey,
+        false,
+        true,
+        false,
+        false,
+        tx,
+      ))
 
     const graph = Survey.buildDependencyGraph(survey)
 

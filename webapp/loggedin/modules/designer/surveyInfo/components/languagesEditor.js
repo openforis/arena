@@ -10,15 +10,17 @@ const LanguagesEditor = props => {
   const {languages, setLanguages, readOnly} = props
 
   const selection = languages.map(lang => ({
-    key: lang, value: getLanguageLabel(lang)
+    key: lang,
+    value: getLanguageLabel(lang),
   }))
 
   const i18n = useI18n()
 
   return (
     <div className="form-item">
-
-      <label className="form-label">{i18n.t('languagesEditor.languages')}</label>
+      <label className="form-label">
+        {i18n.t('languagesEditor.languages')}
+      </label>
 
       <InputChips
         items={appLanguages}
@@ -30,10 +32,8 @@ const LanguagesEditor = props => {
         requiredItems={1}
         readOnly={readOnly}
       />
-
     </div>
   )
 }
 
 export default LanguagesEditor
-

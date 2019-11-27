@@ -35,7 +35,16 @@ const NodeDefCoordinate = props => {
     updateNode(nodeDef, node, newValue)
   }
 
-  const {surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly} = props
+  const {
+    surveyInfo,
+    nodeDef,
+    nodes,
+    edit,
+    entry,
+    renderType,
+    canEditRecord,
+    readOnly,
+  } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -45,29 +54,45 @@ const NodeDefCoordinate = props => {
   const surveySrs = Survey.getSRS(surveyInfo)
   const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
 
-  const xInput = <Input mask={numberMask}
-    readOnly={entryDisabled}
-    value={value.x}
-    onChange={value => handleInputChange(node, 'x', value)}/>
+  const xInput = (
+    <Input
+      mask={numberMask}
+      readOnly={entryDisabled}
+      value={value.x}
+      onChange={value => handleInputChange(node, 'x', value)}
+    />
+  )
 
-  const yInput = <Input mask={numberMask}
-    readOnly={entryDisabled}
-    value={value.y}
-    onChange={value => handleInputChange(node, 'y', value)}/>
+  const yInput = (
+    <Input
+      mask={numberMask}
+      readOnly={entryDisabled}
+      value={value.y}
+      onChange={value => handleInputChange(node, 'y', value)}
+    />
+  )
 
-  const srsDropdown = <Dropdown readOnly={entryDisabled}
-    items={surveySrs}
-    itemKeyProp="code"
-    itemLabelProp="name"
-    selection={selectedSrs}
-    onChange={selection => handleInputChange(node, 'srs', R.prop('code')(selection))}/>
+  const srsDropdown = (
+    <Dropdown
+      readOnly={entryDisabled}
+      items={surveySrs}
+      itemKeyProp="code"
+      itemLabelProp="name"
+      selection={selectedSrs}
+      onChange={selection =>
+        handleInputChange(node, 'srs', R.prop('code')(selection))
+      }
+    />
+  )
 
   if (renderType === NodeDefLayout.renderType.tableBody) {
-    return <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
-      {xInput}
-      {yInput}
-      {srsDropdown}
-    </div>
+    return (
+      <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
+        {xInput}
+        {yInput}
+        {srsDropdown}
+      </div>
+    )
   }
 
   return (
@@ -78,9 +103,7 @@ const NodeDefCoordinate = props => {
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>
         {yInput}
       </FormItem>
-      <FormItem label={i18n.t('common.srs')}>
-        {srsDropdown}
-      </FormItem>
+      <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
     </div>
   )
 }

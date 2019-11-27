@@ -14,17 +14,15 @@ const AppView = props => {
 
   return (
     <>
-
-      <AppHeader/>
+      <AppHeader />
 
       <div className="app__container">
-        <AppSideBar pathname={pathName}/>
-        <ModuleSwitch location={location}/>
+        <AppSideBar pathname={pathName} />
+        <ModuleSwitch location={location} />
       </div>
 
-      <AppJobMonitor/>
-      <AppErrors/>
-
+      <AppJobMonitor />
+      <AppErrors />
     </>
   )
 }

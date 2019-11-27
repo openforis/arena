@@ -14,9 +14,11 @@ const taxonomyValidators = (taxonomies, taxaCount) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
-    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(taxonomies)
+    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(
+      taxonomies,
+    ),
   ],
-  taxa: [validateNotEmptyTaxa(taxaCount)]
+  taxa: [validateNotEmptyTaxa(taxaCount)],
 })
 
 export const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
@@ -27,14 +29,30 @@ export const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
  */
 const taxonValidators = taxa => ({
   [`${ObjectUtils.keys.props}.${Taxon.propKeys.code}`]: [
-    Validator.validateRequired(Validation.messageKeys.taxonomyEdit.codeRequired),
-    Validator.validateItemPropUniqueness(Validation.messageKeys.taxonomyEdit.codeDuplicate)(taxa)
+    Validator.validateRequired(
+      Validation.messageKeys.taxonomyEdit.codeRequired,
+    ),
+    Validator.validateItemPropUniqueness(
+      Validation.messageKeys.taxonomyEdit.codeDuplicate,
+    )(taxa),
   ],
-  [`${ObjectUtils.keys.props}.${Taxon.propKeys.family}`]: [Validator.validateRequired(Validation.messageKeys.taxonomyEdit.familyRequired)],
-  [`${ObjectUtils.keys.props}.${Taxon.propKeys.genus}`]: [Validator.validateRequired(Validation.messageKeys.taxonomyEdit.genusRequired)],
+  [`${ObjectUtils.keys.props}.${Taxon.propKeys.family}`]: [
+    Validator.validateRequired(
+      Validation.messageKeys.taxonomyEdit.familyRequired,
+    ),
+  ],
+  [`${ObjectUtils.keys.props}.${Taxon.propKeys.genus}`]: [
+    Validator.validateRequired(
+      Validation.messageKeys.taxonomyEdit.genusRequired,
+    ),
+  ],
   [`${ObjectUtils.keys.props}.${Taxon.propKeys.scientificName}`]: [
-    Validator.validateRequired(Validation.messageKeys.taxonomyEdit.scientificNameRequired),
-    Validator.validateItemPropUniqueness(Validation.messageKeys.taxonomyEdit.scientificNameDuplicate)(taxa)
+    Validator.validateRequired(
+      Validation.messageKeys.taxonomyEdit.scientificNameRequired,
+    ),
+    Validator.validateItemPropUniqueness(
+      Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
+    )(taxa),
   ],
 })
 

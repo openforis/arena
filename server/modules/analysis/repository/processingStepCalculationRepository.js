@@ -6,33 +6,47 @@ import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaR
 
 // ====== CREATE
 
-export const insertCalculationStep = async (surveyId, processingStepUuid, index, client = db) =>
-  await client.one(`
+export const insertCalculationStep = async (
+  surveyId,
+  processingStepUuid,
+  index,
+  client = db,
+) =>
+  await client.one(
+    `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_step_calculation
         (processing_step_uuid, index)  
       VALUES 
         ($1, $2)
       RETURNING *
     `,
-  [processingStepUuid, index],
-  camelize
+    [processingStepUuid, index],
+    camelize,
   )
 
 // ====== UPDATE
 
-export const updateCalculationIndex = async (surveyId, processingStepUuid, indexFrom, indexTo, client = db) => {
+export const updateCalculationIndex = async (
+  surveyId,
+  processingStepUuid,
+  indexFrom,
+  indexTo,
+  client = db,
+) => {
   const indexPlaceholder = -1
   const queries = []
 
-  const _getUpdate = (indexCurrent, indexUpdate) => client.one(`
+  const _getUpdate = (indexCurrent, indexUpdate) =>
+    client.one(
+      `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
     SET index = ${indexUpdate}
     WHERE processing_step_uuid = $1
     AND index = $2
     RETURNING *
     `,
-  [processingStepUuid, indexCurrent]
-  )
+      [processingStepUuid, indexCurrent],
+    )
 
   // Set index placeholder for element being edited
   queries.push(_getUpdate(indexFrom, indexPlaceholder))

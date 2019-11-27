@@ -19,21 +19,18 @@ const NodeDefErrorBadge = props => {
 
   const valid = Validation.isValid(validation)
 
-  return valid && children
-    ? (
-      children
-    )
-    : (!valid
-      ? (
-        <ErrorBadge
-          validation={validation}
-          showLabel={false}
-          showKeys={false}
-          className="error-badge-inverse survey-form__node-def-error-badge">
-          {children}
-        </ErrorBadge>
-      )
-      : null)
+  return valid && children ? (
+    children
+  ) : !valid ? (
+    <ErrorBadge
+      validation={validation}
+      showLabel={false}
+      showKeys={false}
+      className="error-badge-inverse survey-form__node-def-error-badge"
+    >
+      {children}
+    </ErrorBadge>
+  ) : null
 }
 
 NodeDefErrorBadge.defaultProps = {
@@ -55,7 +52,7 @@ const mapStateToProps = (state, props) => {
   } else {
     const recordValidation = R.pipe(
       RecordState.getRecord,
-      Record.getValidation
+      Record.getValidation,
     )(state)
 
     if (NodeDef.isMultiple(nodeDef)) {
@@ -64,12 +61,19 @@ const mapStateToProps = (state, props) => {
         validation = RecordValidation.getNodeValidation(node)(recordValidation)
       } else if (NodeDef.isEntity(nodeDef)) {
         // Only entities can have children with min/max count validation
-        validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
+        validation = RecordValidation.getValidationChildrenCount(
+          parentNode,
+          nodeDef,
+        )(recordValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
-        validation = Validation.newInstance(false, {}, [{key: Validation.messageKeys.record.oneOrMoreInvalidValues}])
+        validation = Validation.newInstance(false, {}, [
+          {key: Validation.messageKeys.record.oneOrMoreInvalidValues},
+        ])
       }
     } else if (!R.isEmpty(nodes)) {
-      validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
+      validation = RecordValidation.getNodeValidation(nodes[0])(
+        recordValidation,
+      )
     }
   }
 

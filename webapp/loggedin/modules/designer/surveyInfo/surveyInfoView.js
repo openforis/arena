@@ -23,23 +23,33 @@ const SurveyInfoView = props => {
   const i18n = useI18n()
 
   const {
-    name, languages, srs, labels, descriptions, cycles,
-    setName, setLanguages, setSrs, setLabels, setDescriptions, setCycles,
-    getFieldValidation, saveProps,
+    name,
+    languages,
+    srs,
+    labels,
+    descriptions,
+    cycles,
+    setName,
+    setLanguages,
+    setSrs,
+    setLabels,
+    setDescriptions,
+    setCycles,
+    getFieldValidation,
+    saveProps,
   } = useSurveyInfoViewState(props)
 
   return (
     <div className="home-survey-info">
       <div className="form">
-
         <div className="form-item">
           <label className="form-label">{i18n.t('common.name')}</label>
           <Input
             value={name}
             validation={getFieldValidation(Survey.infoKeys.name)}
             onChange={setName}
-            readOnly={readOnly}/>
-
+            readOnly={readOnly}
+          />
         </div>
 
         <LabelsEditor
@@ -84,15 +94,12 @@ const SurveyInfoView = props => {
           />
         </div>
 
-        {
-          !readOnly &&
-          <button className="btn btn-save"
-            onClick={saveProps}>
-            <span className="icon icon-floppy-disk icon-12px icon-left"/>
+        {!readOnly && (
+          <button className="btn btn-save" onClick={saveProps}>
+            <span className="icon icon-floppy-disk icon-12px icon-left" />
             {i18n.t('common.save')}
           </button>
-        }
-
+        )}
       </div>
     </div>
   )
@@ -109,6 +116,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps, {updateSurveyInfoProps}
-)(SurveyInfoView)
+export default connect(mapStateToProps, {updateSurveyInfoProps})(SurveyInfoView)

@@ -7,7 +7,7 @@ export const keys = {
   count: 'count',
   min: 'min',
   max: 'max',
-  expressions: 'expressions'
+  expressions: 'expressions',
 }
 
 // COUNT
@@ -25,19 +25,15 @@ export const hasMinOrMaxCount = validations => {
   return !isNaN(minCount) || !isNaN(maxCount)
 }
 
-const assocCountProp = key =>
-  value => R.pipe(
+const assocCountProp = key => value =>
+  R.pipe(
     R.ifElse(
       R.always(R.isEmpty(value)),
       R.dissocPath([keys.count, key]),
-      R.assocPath([keys.count, key], value)
+      R.assocPath([keys.count, key], value),
     ),
     // If validations count obj is empty, it gets removed from validations
-    R.ifElse(
-      R.pipe(R.prop(keys.count), R.isEmpty),
-      dissocCount,
-      R.identity
-    )
+    R.ifElse(R.pipe(R.prop(keys.count), R.isEmpty), dissocCount, R.identity),
   )
 
 export const assocMinCount = assocCountProp(keys.min)
@@ -49,5 +45,6 @@ export const assocRequired = required => R.assoc(keys.required, required)
 export const dissocRequired = R.dissoc(keys.required)
 
 // EXPRESSIONS
-export const getExpressions = R.propOr([], (keys.expressions))
-export const assocExpressions = expressions => R.assoc(keys.expressions, expressions)
+export const getExpressions = R.propOr([], keys.expressions)
+export const assocExpressions = expressions =>
+  R.assoc(keys.expressions, expressions)

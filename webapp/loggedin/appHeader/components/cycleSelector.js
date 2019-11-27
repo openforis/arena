@@ -16,9 +16,10 @@ const CycleSelector = props => {
 
   const i18n = useI18n()
 
-  const cycleItems = cycleKeys.map(key =>
-    ({key, value: `${i18n.t('common.cycle')} ${Number(key) + 1}`})
-  )
+  const cycleItems = cycleKeys.map(key => ({
+    key,
+    value: `${i18n.t('common.cycle')} ${Number(key) + 1}`,
+  }))
   const cycleSelection = R.find(R.propEq('key', surveyCycleKey), cycleItems)
 
   return (

@@ -14,19 +14,16 @@ export default ({validation, className, showKeys, children}) => {
 
   const type = isValid
     ? ''
-    : (Validation.isWarning(validation)
-      ? 'warning'
-      : 'error')
+    : Validation.isWarning(validation)
+    ? 'warning'
+    : 'error'
 
   const messagesHtml = isValid
     ? null
     : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
 
   return (
-    <Tooltip
-      type={type}
-      messages={messagesHtml}
-      className={className}>
+    <Tooltip type={type} messages={messagesHtml} className={className}>
       {children}
     </Tooltip>
   )

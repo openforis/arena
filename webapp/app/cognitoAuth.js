@@ -1,8 +1,12 @@
-import {AuthenticationDetails, CognitoUser, CognitoUserPool} from 'amazon-cognito-identity-js'
+import {
+  AuthenticationDetails,
+  CognitoUser,
+  CognitoUserPool,
+} from 'amazon-cognito-identity-js'
 
 export const keysAction = {
   success: 'success',
-  newPasswordRequired: 'newPasswordRequired'
+  newPasswordRequired: 'newPasswordRequired',
 }
 
 const UserPoolId = window.cognitoUserPoolId
@@ -10,7 +14,8 @@ const ClientId = window.cognitoClientId
 
 const _getUserPool = () => new CognitoUserPool({UserPoolId, ClientId})
 
-const _newCognitoUser = Username => new CognitoUser({Username, Pool: _getUserPool()})
+const _newCognitoUser = Username =>
+  new CognitoUser({Username, Pool: _getUserPool()})
 
 // Global variables to handle completeNewPasswordChallenge flow
 let _cognitoUser
@@ -34,7 +39,7 @@ const _cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
 
     _sessionUserAttributes = userAttributes
     onSuccess(keysAction.newPasswordRequired)
-  }
+  },
 })
 
 export const getUser = () => _getUserPool().getCurrentUser()
@@ -44,7 +49,7 @@ export const login = (Username, Password) =>
     _cognitoUser = _newCognitoUser(Username)
     _cognitoUser.authenticateUser(
       new AuthenticationDetails({Username, Password}),
-      _cognitoCallbacks(resolve, reject)
+      _cognitoCallbacks(resolve, reject),
     )
   })
 
@@ -53,7 +58,7 @@ export const acceptInvitation = (name, password) =>
     _cognitoUser.completeNewPasswordChallenge(
       password,
       {..._sessionUserAttributes, name},
-      _cognitoCallbacks(resolve, reject)
+      _cognitoCallbacks(resolve, reject),
     )
   })
 
@@ -77,31 +82,36 @@ export const forgotPassword = username =>
 
 export const resetPassword = (verificationCode, password) =>
   new Promise((resolve, reject) => {
-    _cognitoUser.confirmPassword(verificationCode, password, _cognitoCallbacks(resolve, reject))
+    _cognitoUser.confirmPassword(
+      verificationCode,
+      password,
+      _cognitoCallbacks(resolve, reject),
+    )
   })
 
 /**
  *
  * @returns current accessToken.jwtToken if current session has a user or null if it doesn't
  */
-export const getJwtToken = () => new Promise((resolve, reject) => {
-  const user = getUser()
+export const getJwtToken = () =>
+  new Promise((resolve, reject) => {
+    const user = getUser()
 
-  if (user) {
-    user.getSession((err, session) => {
-      if (err) {
-        return reject(err)
-      }
+    if (user) {
+      user.getSession((err, session) => {
+        if (err) {
+          return reject(err)
+        }
 
-      try {
-        const accessToken = session.getAccessToken()
-        const jwtToken = accessToken.jwtToken
-        resolve(jwtToken)
-      } catch (error) {
-        reject(error)
-      }
-    })
-  } else {
-    resolve(null)
-  }
-})
+        try {
+          const accessToken = session.getAccessToken()
+          const jwtToken = accessToken.jwtToken
+          resolve(jwtToken)
+        } catch (error) {
+          reject(error)
+        }
+      })
+    } else {
+      resolve(null)
+    }
+  })

@@ -12,4 +12,3 @@ export const init = app => {
     res.json({srss})
   })
 }
-

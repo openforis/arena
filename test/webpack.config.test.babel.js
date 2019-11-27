@@ -11,7 +11,7 @@ export default {
   devtool: 'source-map',
   node: {
     __filename: true,
-    __dirname: true
+    __dirname: true,
   },
   resolve: {
     alias: mainConfig.resolve.alias,
@@ -25,11 +25,13 @@ export default {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/env', '@babel/react'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
-          }
-        }
+            plugins: [
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-syntax-dynamic-import',
+            ],
+          },
+        },
       },
-    ]
+    ],
   },
 }
-

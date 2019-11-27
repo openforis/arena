@@ -16,7 +16,9 @@ export default class SurveyRdbGeneratorJob extends Job {
     const surveyId = Survey.getId(survey)
 
     // Get entities or multiple attributes tables
-    const {root, length} = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
+    const {root, length} = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(
+      survey,
+    )
 
     this.total = 1 + length + 3 // Create schema + create and populate tables + create views
 
@@ -69,11 +71,25 @@ export default class SurveyRdbGeneratorJob extends Job {
   }
 
   async fetchSurvey(tx) {
-    const surveySummary = await SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
+    const surveySummary = await SurveyManager.fetchSurveyById(
+      this.surveyId,
+      true,
+      false,
+      tx,
+    )
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
-    const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+    const fetchDraft =
+      Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, null, fetchDraft, false, false, false, tx)
+    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      this.surveyId,
+      null,
+      fetchDraft,
+      false,
+      false,
+      false,
+      tx,
+    )
   }
 }
 

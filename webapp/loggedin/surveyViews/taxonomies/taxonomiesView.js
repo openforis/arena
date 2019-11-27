@@ -34,21 +34,26 @@ const TaxonomiesView = props => {
     readOnly,
   } = props
 
-  useEffect(() =>
-    () => {
+  useEffect(
+    () => () => {
       if (taxonomy) {
         setTaxonomyForEdit(null)
       }
-    }, [Taxonomy.getUuid(taxonomy)]
+    },
+    [Taxonomy.getUuid(taxonomy)],
   )
 
   const i18n = useI18n()
 
-  const canDelete = taxonomy => taxonomy.usedByNodeDefs
-    ? alert(i18n.t('taxonomy.cantBeDeleted'))
-    : window.confirm(i18n.t('taxonomy.confirmDelete', {
-      taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
-    }))
+  const canDelete = taxonomy =>
+    taxonomy.usedByNodeDefs
+      ? alert(i18n.t('taxonomy.cantBeDeleted'))
+      : window.confirm(
+          i18n.t('taxonomy.confirmDelete', {
+            taxonomyName:
+              Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
+          }),
+        )
 
   return (
     <ItemsView
@@ -66,7 +71,8 @@ const TaxonomiesView = props => {
       canSelect={canSelect}
       onSelect={onSelect}
       onClose={onClose}
-      readOnly={readOnly}/>
+      readOnly={readOnly}
+    />
   )
 }
 
@@ -79,8 +85,10 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
-    }))
+      usedByNodeDefs: !R.isEmpty(
+        Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey),
+      ),
+    })),
   )(survey)
 
   return {
@@ -90,7 +98,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
-)(TaxonomiesView)
+export default connect(mapStateToProps, {
+  createTaxonomy,
+  setTaxonomyForEdit,
+  deleteTaxonomy,
+})(TaxonomiesView)

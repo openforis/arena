@@ -18,18 +18,19 @@ let node = {}
 before(async () => {
   const user = getContextUser()
 
-  survey = SB.survey(user,
-    SB.entity('cluster',
+  survey = SB.survey(
+    user,
+    SB.entity(
+      'cluster',
       SB.attribute('tree', NodeDef.nodeDefType.integer),
       SB.attribute('dbh', NodeDef.nodeDefType.integer),
-    )
+    ),
   ).build()
 
-  record = RB.record(user, survey,
-    RB.entity('cluster',
-      RB.attribute('tree', 12),
-      RB.attribute('dbh', 18),
-    )
+  record = RB.record(
+    user,
+    survey,
+    RB.entity('cluster', RB.attribute('tree', 12), RB.attribute('dbh', 18)),
   ).build()
 
   // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
@@ -97,9 +98,7 @@ describe('RecordExpressionParser Test', () => {
       if (R.isEmpty(resKeys)) {
         assert.equal(res, r)
       } else {
-        resKeys.forEach(key =>
-          assert.equal(res[key], r[key])
-        )
+        resKeys.forEach(key => assert.equal(res[key], r[key]))
       }
     })
   })

@@ -19,7 +19,14 @@ import * as UserManager from '../manager/userManager'
 
 // ====== CREATE
 
-export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serverUrl) => {
+export const inviteUser = async (
+  user,
+  surveyId,
+  surveyCycleKey,
+  email,
+  groupUuid,
+  serverUrl,
+) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -31,7 +38,13 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   // If the survey is not published, only survey admins and system admins can be invited
-  if (!Survey.isPublished(surveyInfo) && !(AuthGroup.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
+  if (
+    !Survey.isPublished(surveyInfo) &&
+    !(
+      AuthGroup.isSystemAdminGroup(group) ||
+      Survey.isAuthGroupAdmin(group)(surveyInfo)
+    )
+  ) {
     throw new UnauthorizedError(User.getName(user))
   }
 
@@ -43,7 +56,9 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
 
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
-    const hasRoleInSurvey = newUserGroups.some(g => AuthGroup.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
+    const hasRoleInSurvey = newUserGroups.some(
+      g => AuthGroup.getSurveyUuid(g) === Survey.getUuid(surveyInfo),
+    )
 
     if (!User.hasAccepted(dbUser)) {
       throw new SystemError('appErrors.userHasPendingInvitation', {email})
@@ -55,16 +70,36 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
 
     await db.tx(async t => {
       await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser, t)
-      await Mailer.sendEmail(email, 'emails.userInvite', {serverUrl, surveyLabel, groupLabel}, lang)
+      await Mailer.sendEmail(
+        email,
+        'emails.userInvite',
+        {serverUrl, surveyLabel, groupLabel},
+        lang,
+      )
     })
   } else {
     await db.tx(async t => {
       try {
-        const password = passwordGenerator.generate({length: 8, numbers: true, uppercase: true, strict: true})
+        const password = passwordGenerator.generate({
+          length: 8,
+          numbers: true,
+          uppercase: true,
+          strict: true,
+        })
         // Add user to cognito pool
-        const {User: {Username: userUuid}} = await aws.inviteUser(email, password)
+        const {
+          User: {Username: userUuid},
+        } = await aws.inviteUser(email, password)
         // Add user to db
-        await UserManager.insertUser(user, surveyId, surveyCycleKey, userUuid, email, groupUuid, t)
+        await UserManager.insertUser(
+          user,
+          surveyId,
+          surveyCycleKey,
+          userUuid,
+          email,
+          groupUuid,
+          t,
+        )
         // Send email
         const msgParams = {
           serverUrl,
@@ -72,7 +107,7 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
           password,
           surveyLabel,
           groupLabel,
-          temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)'
+          temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)',
         }
         await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
       } catch (error) {
@@ -88,7 +123,12 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
 export const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
   const fetchSystemAdmins = User.isSystemAdmin(user)
 
-  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
+  return await UserManager.fetchUsersBySurveyId(
+    surveyId,
+    offset,
+    limit,
+    fetchSystemAdmins,
+  )
 }
 
 export const countUsersBySurveyId = async (user, surveyId) => {
@@ -102,7 +142,15 @@ export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
 
 // ====== UPDATE
 
-export const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
+export const updateUser = async (
+  user,
+  surveyId,
+  userUuid,
+  name,
+  email,
+  groupUuid,
+  file,
+) => {
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
   const oldEmail = User.getEmail(userToUpdate)
   const oldName = User.getName(userToUpdate)
@@ -111,27 +159,48 @@ export const updateUser = async (user, surveyId, userUuid, name, email, groupUui
   if (surveyId) {
     const survey = await SurveyManager.fetchSurveyById(surveyId)
     const surveyInfo = Survey.getSurveyInfo(survey)
-    const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
+    const groupToUpdate = User.getAuthGroupBySurveyUuid(
+      Survey.getUuid(surveyInfo),
+    )(userToUpdate)
 
-    if (AuthGroup.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
+    if (
+      AuthGroup.getUuid(groupToUpdate) !== groupUuid &&
+      !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)
+    ) {
       throw new UnauthorizedError(User.getName(user))
     }
 
     // Check if email has changed
     if (oldEmail !== email) {
       // Throw exception if user is not allowed to edit the email
-      const canEditEmail = Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate)
+      const canEditEmail = Authorizer.canEditUserEmail(
+        user,
+        surveyInfo,
+        userToUpdate,
+      )
       if (!canEditEmail) {
         throw new UnauthorizedError(User.getName(user))
       }
     }
   }
 
-  await aws.updateUser(oldEmail, oldEmail !== email ? email : null, oldName !== name ? name : null)
+  await aws.updateUser(
+    oldEmail,
+    oldEmail !== email ? email : null,
+    oldName !== name ? name : null,
+  )
 
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
-  return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
+  return await UserManager.updateUser(
+    user,
+    surveyId,
+    userUuid,
+    name,
+    email,
+    groupUuid,
+    profilePicture,
+  )
 }
 
 export const acceptInvitation = async (user, userUuid, name, client = db) => {

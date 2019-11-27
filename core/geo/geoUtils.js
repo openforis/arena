@@ -34,8 +34,10 @@ const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 const srsArray = R.pipe(
   R.concat(projected.ProjectedCoordinateSystems),
   R.concat(geographic.GeographicCoordinateSystems),
-  R.map(item => Srs.newSrs(item.wkid.toString(), formatName(item.name), item.wkt)),
-  R.sortBy(R.prop(Srs.keys.name))
+  R.map(item =>
+    Srs.newSrs(item.wkid.toString(), formatName(item.name), item.wkt),
+  ),
+  R.sortBy(R.prop(Srs.keys.name)),
 )([])
 
 const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
@@ -45,11 +47,12 @@ const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
  */
 export const findSrsByCodeOrName = (codeOrName, limit = 200) =>
   R.pipe(
-    R.filter(item =>
-      StringUtils.contains(codeOrName, item.code) ||
-      StringUtils.contains(codeOrName, item.name)
+    R.filter(
+      item =>
+        StringUtils.contains(codeOrName, item.code) ||
+        StringUtils.contains(codeOrName, item.name),
     ),
-    R.take(limit)
+    R.take(limit),
   )(srsArray)
 
 const getSrsByCode = code => srsByCode[code]
@@ -57,9 +60,7 @@ const getSrsByCode = code => srsByCode[code]
 export const isCoordinateValid = (srsCode, x, y) => {
   const srs = getSrsByCode(srsCode)
 
-  if (!srs ||
-    !NumberUtils.isFloat(x) ||
-    !NumberUtils.isFloat(y)) {
+  if (!srs || !NumberUtils.isFloat(x) || !NumberUtils.isFloat(y)) {
     return false
   }
 
@@ -69,11 +70,13 @@ export const isCoordinateValid = (srsCode, x, y) => {
   const lonLat = Srs.isLatLon(srsCode)
     ? [x, y] // SRS is lat-lon, projection is not needed
     : proj4(
-      Srs.getWkt(srs), // From srs
-      Srs.getWkt(Srs.latLonSrs), // To lat lon
-      [x, y] // Coordinates
-    )
+        Srs.getWkt(srs), // From srs
+        Srs.getWkt(Srs.latLonSrs), // To lat lon
+        [x, y], // Coordinates
+      )
 
-  return !R.equals(lonLat, invalidLonLatCoordinates) &&
-      isValidCoordinates(lonLat[0], lonLat[1])
+  return (
+    !R.equals(lonLat, invalidLonLatCoordinates) &&
+    isValidCoordinates(lonLat[0], lonLat[1])
+  )
 }

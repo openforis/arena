@@ -33,68 +33,99 @@ const LevelEdit = props => {
   const handleDelete = () => {
     const {survey, category, level, deleteCategoryLevel} = props
 
-    const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
-    if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
-      alert('This category level is used by some node definitions and cannot be removed')
-    } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
+    const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(
+      Category.getUuid(category),
+    )(survey)
+    if (
+      R.any(
+        def =>
+          Survey.getNodeDefCategoryLevelIndex(def)(survey) >=
+          CategoryLevel.getIndex(level),
+      )(nodeDefsCode)
+    ) {
+      alert(
+        'This category level is used by some node definitions and cannot be removed',
+      )
+    } else if (
+      confirm(
+        'Delete the level with all items? This operation cannot be undone',
+      )
+    ) {
       deleteCategoryLevel(category, level)
     }
   }
 
   const {
     surveyInfo,
-    category, level, parentItem, items, activeItemUuid, canAddItem,
+    category,
+    level,
+    parentItem,
+    items,
+    activeItemUuid,
+    canAddItem,
     canBeDeleted,
-    createCategoryLevelItem, putCategoryLevelProp, putCategoryItemProp,
-    setCategoryItemForEdit, deleteCategoryItem, readOnly,
+    createCategoryLevelItem,
+    putCategoryLevelProp,
+    putCategoryItemProp,
+    setCategoryItemForEdit,
+    deleteCategoryItem,
+    readOnly,
   } = props
 
-  const validation = Category.getLevelValidation(CategoryLevel.getIndex(level))(category)
+  const validation = Category.getLevelValidation(CategoryLevel.getIndex(level))(
+    category,
+  )
 
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
-  return <div className="category-edit__level">
+  return (
+    <div className="category-edit__level">
+      <div className="category-edit__level-header">
+        <h4 className="label">
+          <ErrorBadge validation={validation} />
+          {i18n.t('categoryEdit.level')} {level.index + 1}
+        </h4>
+        {!readOnly && (
+          <button
+            className="btn btn-s"
+            onClick={() => handleDelete()}
+            aria-disabled={!canBeDeleted}
+          >
+            <span className="icon icon-bin2 icon-12px" />
+          </button>
+        )}
+      </div>
 
-    <div className="category-edit__level-header">
-      <h4 className="label">
-        <ErrorBadge validation={validation}/>
-        {i18n.t('categoryEdit.level')} {level.index + 1}
-      </h4>
-      {
-        !readOnly &&
-        <button className="btn btn-s"
-          onClick={() => handleDelete()}
-          aria-disabled={!canBeDeleted}>
-          <span className="icon icon-bin2 icon-12px"/>
-        </button>
-      }
-    </div>
+      <FormItem label={i18n.t('common.name')}>
+        <Input
+          value={CategoryLevel.getName(level)}
+          validation={Validation.getFieldValidation('name')(validation)}
+          onChange={value =>
+            putCategoryLevelProp(category, level, 'name', normalizeName(value))
+          }
+          readOnly={readOnly}
+        />
+      </FormItem>
 
-    <FormItem label={i18n.t('common.name')}>
-      <Input value={CategoryLevel.getName(level)}
-        validation={Validation.getFieldValidation('name')(validation)}
-        onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
-        readOnly={readOnly}/>
-    </FormItem>
+      <div className="category-edit__level-items-header">
+        <h5 className="label">{i18n.t('common.item_plural')}</h5>
+        {!readOnly && (
+          <button
+            className="btn btn-s btn-add-item"
+            aria-disabled={!canAddItem}
+            onClick={() => createCategoryLevelItem(category, level, parentItem)}
+          >
+            <span className="icon icon-plus icon-12px icon-left" />
+            {i18n.t('common.add')}
+          </button>
+        )}
+      </div>
 
-    <div className="category-edit__level-items-header">
-      <h5 className="label">{i18n.t('common.item_plural')}</h5>
-      {
-        !readOnly &&
-        <button className="btn btn-s btn-add-item"
-          aria-disabled={!canAddItem}
-          onClick={() => createCategoryLevelItem(category, level, parentItem)}>
-          <span className="icon icon-plus icon-12px icon-left"/>
-          {i18n.t('common.add')}
-        </button>
-      }
-    </div>
-
-    <div className="category-edit__level-items">
-      {
-        items.map(item =>
-          <ItemEdit key={CategoryItem.getUuid(item)}
+      <div className="category-edit__level-items">
+        {items.map(item => (
+          <ItemEdit
+            key={CategoryItem.getUuid(item)}
             lang={lang}
             category={category}
             level={level}
@@ -103,11 +134,12 @@ const LevelEdit = props => {
             putCategoryItemProp={putCategoryItemProp}
             setCategoryItemForEdit={setCategoryItemForEdit}
             deleteCategoryItem={deleteCategoryItem}
-            readOnly={readOnly}/>
-        )
-      }
+            readOnly={readOnly}
+          />
+        ))}
+      </div>
     </div>
-  </div>
+  )
 }
 
 const mapStateToProps = (state, props) => {
@@ -121,7 +153,9 @@ const mapStateToProps = (state, props) => {
   const parentItem = CategoryEditState.getLevelActiveItem(index - 1)(state)
 
   const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? CategoryEditState.getLevelItemsArray(index)(state) : []
+  const items = canAddItem
+    ? CategoryEditState.getLevelItemsArray(index)(state)
+    : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
 
   const user = AppState.getUser(state)
@@ -146,4 +180,3 @@ export default connect(mapStateToProps, {
   setCategoryItemForEdit,
   deleteCategoryItem,
 })(LevelEdit)
-

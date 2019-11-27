@@ -9,41 +9,38 @@ import Popup from '../popup'
 import {useI18n} from '../hooks'
 import ExpressionNode from './nodes/expressionNode'
 
-import {useExpressionEditorPopupState, mapStateToProps} from './expressionEditorPopupState'
+import {
+  useExpressionEditorPopupState,
+  mapStateToProps,
+} from './expressionEditorPopupState'
 
 const ExpressionEditorPopup = props => {
-  const {
-    nodeDefCurrent, isBoolean, variables,
-    onChange, onClose,
-  } = props
+  const {nodeDefCurrent, isBoolean, variables, onChange, onClose} = props
 
   const {
-    query, queryDraft,
-    exprDraft, exprDraftValid,
+    query,
+    queryDraft,
+    exprDraft,
+    exprDraftValid,
     updateDraft,
   } = useExpressionEditorPopupState(props)
 
   const i18n = useI18n()
 
   return (
-    <Popup
-      className="expression-editor-popup"
-      onClose={onClose}
-      padding={20}>
-
+    <Popup className="expression-editor-popup" onClose={onClose} padding={20}>
       <div className="expression-editor__query-container">
         <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
-          {
-            R.isEmpty(queryDraft)
-              ? <span className="placeholder">- {i18n.t('common.empty')} -</span>
-              : queryDraft
-          }
+          {R.isEmpty(queryDraft) ? (
+            <span className="placeholder">- {i18n.t('common.empty')} -</span>
+          ) : (
+            queryDraft
+          )}
         </div>
       </div>
 
       <div className="expression-editor-popup__expr-container">
-        {
-          exprDraft &&
+        {exprDraft && (
           <ExpressionNode
             variables={variables}
             node={exprDraft}
@@ -51,25 +48,28 @@ const ExpressionEditorPopup = props => {
             isBoolean={isBoolean}
             nodeDefCurrent={nodeDefCurrent}
           />
-        }
+        )}
       </div>
 
       <div className="expression-editor-popup__footer">
-        <button className="btn btn-xs"
+        <button
+          className="btn btn-xs"
           onClick={() => onChange('')}
-          aria-disabled={R.isEmpty(query)}>
-          <span className="icon icon-undo2 icon-12px"/>
+          aria-disabled={R.isEmpty(query)}
+        >
+          <span className="icon icon-undo2 icon-12px" />
           {i18n.t('common.reset')}
         </button>
 
-        <button className="btn btn-xs"
+        <button
+          className="btn btn-xs"
           onClick={() => onChange(queryDraft, exprDraft)}
-          aria-disabled={query === queryDraft || !exprDraftValid}>
-          <span className="icon icon-checkmark icon-12px"/>
+          aria-disabled={query === queryDraft || !exprDraftValid}
+        >
+          <span className="icon icon-checkmark icon-12px" />
           {i18n.t('common.apply')}
         </button>
       </div>
-
     </Popup>
   )
 }

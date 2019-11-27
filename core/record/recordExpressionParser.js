@@ -32,12 +32,17 @@ const _getNodeValue = (survey, node) => {
   const value = Node.getValue(node)
   return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
     ? Number(value)
-    : (NodeDef.isBoolean(nodeDef)
-      ? value === 'true'
-      : value)
+    : NodeDef.isBoolean(nodeDef)
+    ? value === 'true'
+    : value
 }
 
-const _getReferencedNodesParent = (record, nodeCtx, nodeDefContextH, nodeDefReferencedH) => {
+const _getReferencedNodesParent = (
+  record,
+  nodeCtx,
+  nodeDefContextH,
+  nodeDefReferencedH,
+) => {
   if (Node.isRoot(nodeCtx) && nodeDefReferencedH.length === 1) {
     // NodeCtx is root and node referenced is its child
     return nodeCtx
@@ -45,7 +50,9 @@ const _getReferencedNodesParent = (record, nodeCtx, nodeDefContextH, nodeDefRefe
 
   if (R.startsWith(nodeDefReferencedH, nodeDefContextH)) {
     // NodeDefReferenced belongs to an ancestor of nodeDefContext
-    const nodeReferencedParentUuid = Node.getHierarchy(nodeCtx)[nodeDefReferencedH.length - 1]
+    const nodeReferencedParentUuid = Node.getHierarchy(nodeCtx)[
+      nodeDefReferencedH.length - 1
+    ]
     return Record.getNodeByUuid(nodeReferencedParentUuid)(record)
   }
 
@@ -62,9 +69,17 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
   const nodeDefReferenced = Survey.getNodeDefByName(nodeReferencedName)(survey)
   const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
 
-  const nodeReferencedParent = _getReferencedNodesParent(record, nodeCtx, nodeDefContextH, nodeDefReferencedH)
+  const nodeReferencedParent = _getReferencedNodesParent(
+    record,
+    nodeCtx,
+    nodeDefContextH,
+    nodeDefReferencedH,
+  )
   if (nodeReferencedParent) {
-    return Record.getNodeChildrenByDefUuid(nodeReferencedParent, NodeDef.getUuid(nodeDefReferenced))(record)
+    return Record.getNodeChildrenByDefUuid(
+      nodeReferencedParent,
+      NodeDef.getUuid(nodeDefReferenced),
+    )(record)
   }
 
   return []
@@ -75,10 +90,10 @@ const _identifierEval = (survey, record) => (expr, {node}) => {
   const referencedNodes = _getReferencedNodes(survey, record, node, nodeName)
 
   if (referencedNodes.length !== 1) {
-    throw new SystemError(
-      Validation.messageKeys.expressions.unableToFindNode,
-      {name: nodeName, multiple: referencedNodes.length > 1}
-    )
+    throw new SystemError(Validation.messageKeys.expressions.unableToFindNode, {
+      name: nodeName,
+      multiple: referencedNodes.length > 1,
+    })
   }
 
   return _getNodeValue(survey, referencedNodes[0])
@@ -92,26 +107,55 @@ export const evalNodeQuery = (survey, record, node, query) => {
   return Expression.evalString(query, {node, functions})
 }
 
-export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
+export const evalApplicableExpression = (
+  survey,
+  record,
+  nodeCtx,
+  expressions,
+) =>
   R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
 
-export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
-
-  return applicableExpressions.map(
-    expression => ({
-      expression,
-      value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
-    })
+export const evalApplicableExpressions = (
+  survey,
+  record,
+  node,
+  expressions,
+  stopAtFirstFound = false,
+) => {
+  const applicableExpressions = _getApplicableExpressions(
+    survey,
+    record,
+    node,
+    expressions,
+    stopAtFirstFound,
   )
+
+  return applicableExpressions.map(expression => ({
+    expression,
+    value: evalNodeQuery(
+      survey,
+      record,
+      node,
+      NodeDefExpression.getExpression(expression),
+    ),
+  }))
 }
 
-const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
+const _getApplicableExpressions = (
+  survey,
+  record,
+  nodeCtx,
+  expressions,
+  stopAtFirstFound = false,
+) => {
   const applicableExpressions = []
   for (const expression of expressions) {
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
 
-    if (StringUtils.isBlank(applyIfExpr) || evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
+    if (
+      StringUtils.isBlank(applyIfExpr) ||
+      evalNodeQuery(survey, record, nodeCtx, applyIfExpr)
+    ) {
       applicableExpressions.push(expression)
 
       if (stopAtFirstFound) {

@@ -32,7 +32,7 @@ class RecordUpdateThread extends Thread {
   }
 
   sendThreadInitMsg() {
-    (async () => {
+    ;(async () => {
       await this.messageHandler({type: messageTypes.threadInit})
     })()
   }
@@ -41,7 +41,7 @@ class RecordUpdateThread extends Thread {
     if (!R.isEmpty(updatedNodes)) {
       this.postMessage({
         type: WebSocketEvents.nodesUpdate,
-        content: updatedNodes
+        content: updatedNodes,
       })
     }
   }
@@ -54,8 +54,8 @@ class RecordUpdateThread extends Thread {
       content: {
         recordUuid: Record.getUuid(this.record),
         recordValid: Validation.isObjValid(recordUpdated),
-        validations
-      }
+        validations,
+      },
     })
   }
 
@@ -79,7 +79,7 @@ class RecordUpdateThread extends Thread {
             content: {
               key: error.key,
               params: error.params,
-            }
+            },
           })
           return // Stop processing
         }
@@ -95,11 +95,19 @@ class RecordUpdateThread extends Thread {
 
   async initRecordAndSurvey() {
     // Init record
-    this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, RecordUpdateThreadParams.getRecordUuid(this.params))
+    this.record = await RecordManager.fetchRecordAndNodesByUuid(
+      this.surveyId,
+      RecordUpdateThreadParams.getRecordUuid(this.params),
+    )
 
     // Init survey
     const preview = Record.isPreview(this.record)
-    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, Record.getCycle(this.record), preview, true)
+    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      this.surveyId,
+      Record.getCycle(this.record),
+      preview,
+      true,
+    )
 
     // If in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
     const dependencyGraph = preview
@@ -123,7 +131,7 @@ class RecordUpdateThread extends Thread {
           this.survey,
           this.record,
           this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this)
+          this.handleNodesValidationUpdated.bind(this),
         )
         break
 
@@ -134,7 +142,7 @@ class RecordUpdateThread extends Thread {
           this.record,
           msg.node,
           this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this)
+          this.handleNodesValidationUpdated.bind(this),
         )
         break
 
@@ -145,7 +153,7 @@ class RecordUpdateThread extends Thread {
           this.record,
           msg.nodeUuid,
           this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this)
+          this.handleNodesValidationUpdated.bind(this),
         )
         break
 
@@ -154,11 +162,12 @@ class RecordUpdateThread extends Thread {
         break
     }
 
-    if (R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])) {
+    if (
+      R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])
+    ) {
       this.postMessage({type: WebSocketEvents.nodesUpdateCompleted})
     }
   }
 }
 
 new RecordUpdateThread()
-

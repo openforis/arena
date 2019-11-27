@@ -14,18 +14,35 @@ export default class NodeDefsValidationJob extends Job {
   }
 
   async execute(tx) {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyById(
+      this.surveyId,
+      true,
+      false,
+      tx,
+    )
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
     for (const cycle of cycleKeys) {
-      const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, cycle, true, true, true, false, tx)
+      const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        this.surveyId,
+        cycle,
+        true,
+        true,
+        true,
+        false,
+        tx,
+      )
 
       R.pipe(
         Survey.getNodeDefsValidation,
         Validation.getFieldValidations,
         R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
-          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(surveyAndNodeDefs)
-          this.errors[NodeDef.getName(nodeDef)] = Validation.getFieldValidations(nodeDefValidation)
-        })
+          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(
+            surveyAndNodeDefs,
+          )
+          this.errors[
+            NodeDef.getName(nodeDef)
+          ] = Validation.getFieldValidations(nodeDefValidation)
+        }),
       )(surveyAndNodeDefs)
     }
 

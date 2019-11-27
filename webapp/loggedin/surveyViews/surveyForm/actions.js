@@ -13,17 +13,18 @@ import * as SurveyFormState from './surveyFormState'
 
 export const formReset = 'survey/form/reset'
 
-export const resetForm = () => dispatch =>
-  dispatch({type: formReset})
+export const resetForm = () => dispatch => dispatch({type: formReset})
 
-export const formNodeDefAddChildToUpdate = 'survey/form/nodeDef/addChildTo/update'
+export const formNodeDefAddChildToUpdate =
+  'survey/form/nodeDef/addChildTo/update'
 
 // Set current nodeDef unlocked
 export const setFormNodeDefAddChildTo = nodeDef => dispatch =>
   dispatch({type: formNodeDefAddChildToUpdate, nodeDef})
 
 // Current nodeDef of active form page
-export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
+export const formActivePageNodeDefUpdate =
+  'survey/form/activePageNodeDef/update'
 
 export const setFormActivePage = nodeDef => dispatch =>
   dispatch({type: formActivePageNodeDefUpdate, nodeDef})
@@ -35,7 +36,8 @@ export const setFormPageNode = (nodeDef, node) => dispatch =>
   dispatch({type: formPageNodeUpdate, nodeDef, node})
 
 // Toggle form page navigation
-export const formShowPageNavigationUpdate = 'survey/form/showPageNavigation/update'
+export const formShowPageNavigationUpdate =
+  'survey/form/showPageNavigation/update'
 
 export const toggleFormPageNavigation = () => (dispatch, getState) => {
   const showPageNavigation = !SurveyFormState.showPageNavigation(getState())
@@ -44,7 +46,10 @@ export const toggleFormPageNavigation = () => (dispatch, getState) => {
 
 // ==== utils
 
-export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getState) => {
+export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (
+  dispatch,
+  getState,
+) => {
   const state = getState()
 
   const survey = SurveyState.getSurvey(state)
@@ -52,7 +57,10 @@ export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getStat
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
 
   const getNodeDefKeyLabelValue = nodeDefKey => {
-    const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
+    const nodeKey = Record.getNodeChildByDefUuid(
+      nodeEntity,
+      NodeDef.getUuid(nodeDefKey),
+    )(record)
     const label = SurveyState.getNodeDefLabel(nodeDefKey)(state)
     const value = Node.getValue(nodeKey, '')
     return `${label} - ${value}`

@@ -2,9 +2,12 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _isProcessingChainDeleted = () => R.pipe(ActivityLog.getProcessingChainLabels, R.isNil)
-const _isProcessingStepDeleted = () => R.pipe(ActivityLog.getProcessingStepIndex, R.isNil)
-const _isProcessingStepCalculationDeleted = () => R.pipe(ActivityLog.getProcessingStepCalculationIndex, R.isNil)
+const _isProcessingChainDeleted = () =>
+  R.pipe(ActivityLog.getProcessingChainLabels, R.isNil)
+const _isProcessingStepDeleted = () =>
+  R.pipe(ActivityLog.getProcessingStepIndex, R.isNil)
+const _isProcessingStepCalculationDeleted = () =>
+  R.pipe(ActivityLog.getProcessingStepCalculationIndex, R.isNil)
 
 export default {
   [ActivityLog.type.processingChainCreate]: _isProcessingChainDeleted,
@@ -17,7 +20,9 @@ export default {
 
   [ActivityLog.type.processingStepDelete]: _isProcessingChainDeleted,
 
-  [ActivityLog.type.processingStepCalculationCreate]: _isProcessingStepCalculationDeleted,
+  [ActivityLog.type
+    .processingStepCalculationCreate]: _isProcessingStepCalculationDeleted,
 
-  [ActivityLog.type.processingStepCalculationIndexUpdate]: _isProcessingStepCalculationDeleted,
+  [ActivityLog.type
+    .processingStepCalculationIndexUpdate]: _isProcessingStepCalculationDeleted,
 }

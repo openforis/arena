@@ -9,7 +9,10 @@ const {columns} = NodeHierarchyDisaggregatedView
 
 // ====== CREATE
 
-export const createNodeHierarchyDisaggregatedView = async (survey, client = db) => {
+export const createNodeHierarchyDisaggregatedView = async (
+  survey,
+  client = db,
+) => {
   const surveyId = Survey.getId(survey)
 
   await client.query(`
@@ -25,9 +28,15 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
           (
             SELECT
               n.id                                         AS ${columns.nodeId},
-              n.uuid                                       AS ${columns.nodeUuid},
-              n.node_def_uuid                              AS ${columns.nodeDefUuid},
-              jsonb_array_elements_text(n.meta->'h')::uuid AS ${columns.nodeAncestorUuid}
+              n.uuid                                       AS ${
+                columns.nodeUuid
+              },
+              n.node_def_uuid                              AS ${
+                columns.nodeDefUuid
+              },
+              jsonb_array_elements_text(n.meta->'h')::uuid AS ${
+                columns.nodeAncestorUuid
+              }
             FROM
               ${getSurveyDBSchema(surveyId)}.node n
            ) h

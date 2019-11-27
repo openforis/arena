@@ -40,7 +40,7 @@ export default class Job {
 
     // Context object (shared among nested jobs)
     this.context = {
-      ...params
+      ...params,
     }
 
     this.uuid = uuidv4()
@@ -86,7 +86,9 @@ export default class Job {
         this.addError({
           error: {
             valid: false,
-            errors: [{key: 'appErrors.generic', params: {text: error.toString()}}],
+            errors: [
+              {key: 'appErrors.generic', params: {text: error.toString()}},
+            ],
           },
         })
         await this.setStatusFailed()
@@ -211,9 +213,10 @@ export default class Job {
     this.processed += incrementBy
 
     throttle(
-      async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
+      async () =>
+        await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
-      1000
+      1000,
     )()
   }
 

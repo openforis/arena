@@ -34,8 +34,13 @@ import {
 
 const RecordView = props => {
   const {
-    recordLoaded, preview, canEditRecord, surveyCycleKey,
-    sessionExpired, cycleChanged, history,
+    recordLoaded,
+    preview,
+    canEditRecord,
+    surveyCycleKey,
+    sessionExpired,
+    cycleChanged,
+    history,
     applicationError,
   } = props
 
@@ -43,9 +48,13 @@ const RecordView = props => {
 
   const componentLoad = () => {
     const {
-      recordUuidUrlParam, parentNodeUuidUrlParam,
+      recordUuidUrlParam,
+      parentNodeUuidUrlParam,
       checkInRecord,
-      recordNodesUpdate, nodeValidationsUpdate, nodesUpdateCompleted, recordDeleted
+      recordNodesUpdate,
+      nodeValidationsUpdate,
+      nodesUpdateCompleted,
+      recordDeleted,
     } = props
 
     // Check in record
@@ -53,7 +62,10 @@ const RecordView = props => {
 
     // Add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
-    AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
+    AppWebSocket.on(
+      WebSocketEvents.nodeValidationsUpdate,
+      nodeValidationsUpdate,
+    )
     AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       recordDeleted(history)
@@ -104,17 +116,15 @@ const RecordView = props => {
     cycleChanged(history)
   }, [surveyCycleKey])
 
-  return recordLoaded
-    ? (
-      <SurveyFormView
-        draft={preview}
-        preview={preview}
-        edit={false}
-        entry={true}
-        canEditRecord={canEditRecord}
-      />
-    )
-    : null
+  return recordLoaded ? (
+    <SurveyFormView
+      draft={preview}
+      preview={preview}
+      edit={false}
+      entry={true}
+      canEditRecord={canEditRecord}
+    />
+  ) : null
 }
 
 const mapStateToProps = (state, {match, location}) => {
@@ -126,7 +136,9 @@ const mapStateToProps = (state, {match, location}) => {
   const recordUuidPreview = RecordState.getRecordUuidPreview(state)
 
   return {
-    canEditRecord: Authorizer.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
+    canEditRecord:
+      Authorizer.canEditRecord(user, record) &&
+      (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
     recordLoaded: Boolean(record),
     recordUuidUrlParam: getUrlParam('recordUuid')(match) || recordUuidPreview,
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
@@ -137,14 +149,18 @@ const mapStateToProps = (state, {match, location}) => {
 
 const enhance = compose(
   withRouter,
-  connect(
-    mapStateToProps,
-    {
-      resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, nodesUpdateCompleted,
-      recordDeleted, sessionExpired, cycleChanged, applicationError,
-    }
-  )
+  connect(mapStateToProps, {
+    resetForm,
+    checkInRecord,
+    checkOutRecord,
+    recordNodesUpdate,
+    nodeValidationsUpdate,
+    nodesUpdateCompleted,
+    recordDeleted,
+    sessionExpired,
+    cycleChanged,
+    applicationError,
+  }),
 )
 
 export default enhance(RecordView)

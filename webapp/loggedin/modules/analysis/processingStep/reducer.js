@@ -19,12 +19,24 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [processingStepUpdate]: (state, {processingStep, processingStepPrev, processingStepNext}) => ProcessingStepState.assocProcessingStep(processingStep, processingStepPrev, processingStepNext)(state),
-  [processingStepPropsUpdate]: (state, {props}) => ProcessingStepState.mergeProcessingStepProps(props)(state),
+  [processingStepUpdate]: (
+    state,
+    {processingStep, processingStepPrev, processingStepNext},
+  ) =>
+    ProcessingStepState.assocProcessingStep(
+      processingStep,
+      processingStepPrev,
+      processingStepNext,
+    )(state),
+  [processingStepPropsUpdate]: (state, {props}) =>
+    ProcessingStepState.mergeProcessingStepProps(props)(state),
 
-  [processingStepCalculationCreate]: (state, {calculation}) => ProcessingStepState.assocCalculation(calculation)(state),
-  [processingStepCalculationForEditUpdate]: (state, {uuid}) => ProcessingStepState.assocCalculationUuidForEdit(uuid)(state),
-  [processingStepCalculationIndexUpdate]: (state, {indexFrom, indexTo}) => ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
+  [processingStepCalculationCreate]: (state, {calculation}) =>
+    ProcessingStepState.assocCalculation(calculation)(state),
+  [processingStepCalculationForEditUpdate]: (state, {uuid}) =>
+    ProcessingStepState.assocCalculationUuidForEdit(uuid)(state),
+  [processingStepCalculationIndexUpdate]: (state, {indexFrom, indexTo}) =>
+    ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
 }
 
 export default exportReducer(actionHandlers)

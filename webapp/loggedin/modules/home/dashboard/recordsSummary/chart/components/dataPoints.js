@@ -14,7 +14,9 @@ const DataPointTooltip = ({dataPoint, i18n}) => (
       {DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}
     </div>
     <div className="count">
-      {i18n.t('homeView.recordsSummary.record', {count: Number(dataPoint.count)})}
+      {i18n.t('homeView.recordsSummary.record', {
+        count: Number(dataPoint.count),
+      })}
     </div>
   </>
 )
@@ -29,13 +31,16 @@ const DataPoints = props => {
   const tooltipRef = useRef(null)
 
   useEffect(() => {
-    const tooltipClassName = 'home-dashboard__records-summary__chart-data-point-tip'
+    const tooltipClassName =
+      'home-dashboard__records-summary__chart-data-point-tip'
     tooltipRef.current = d3Tip()
       .attr('class', tooltipClassName)
       .offset([-10, 0])
-      .html(d => ReactDOMServer.renderToString(
-        <DataPointTooltip dataPoint={d} i18n={i18n}/>
-      ))
+      .html(d =>
+        ReactDOMServer.renderToString(
+          <DataPointTooltip dataPoint={d} i18n={i18n} />,
+        ),
+      )
 
     d3.select(elementRef.current).call(tooltipRef.current)
 
@@ -45,7 +50,8 @@ const DataPoints = props => {
   }, [])
 
   useEffect(() => {
-    const circle = d3.select(elementRef.current)
+    const circle = d3
+      .select(elementRef.current)
       .selectAll('circle')
       .data(counts)
 
@@ -60,7 +66,8 @@ const DataPoints = props => {
       .style('opacity', '1')
 
     // Exit
-    circle.exit()
+    circle
+      .exit()
       .transition()
       .duration(transitionDuration)
       .ease(d3.easePolyOut)
@@ -69,7 +76,9 @@ const DataPoints = props => {
       .remove()
 
     // Enter
-    circle.enter().append('circle')
+    circle
+      .enter()
+      .append('circle')
       .on('mouseover', tooltipRef.current.show)
       .on('mouseout', tooltipRef.current.hide)
       .attr('r', 0)
@@ -84,9 +93,7 @@ const DataPoints = props => {
       .style('opacity', '1')
   }, [chartProps])
 
-  return (
-    <g className="data-points" ref={elementRef}/>
-  )
+  return <g className="data-points" ref={elementRef} />
 }
 
 export default DataPoints

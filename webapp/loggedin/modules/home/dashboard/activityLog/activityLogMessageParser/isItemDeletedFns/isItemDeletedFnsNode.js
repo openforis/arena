@@ -13,5 +13,5 @@ export default {
     const keysHierarchy = ActivityLog.getKeysHierarchy(activityLog)
     // NodeDefUuid in parent path elements will be null if the corresponding node has been deleted
     return R.any(({nodeDefUuid}) => R.isNil(nodeDefUuid))(keysHierarchy)
-  }
+  },
 }

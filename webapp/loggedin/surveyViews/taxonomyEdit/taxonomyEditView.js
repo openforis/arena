@@ -17,13 +17,20 @@ import TaxaTableRow from './components/taxaTableRow'
 
 import * as TaxonomyEditState from './taxonomyEditState'
 
-import {putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile} from './actions'
+import {
+  putTaxonomyProp,
+  setTaxonomyForEdit,
+  uploadTaxonomyFile,
+} from './actions'
 
 const TaxonomyEditView = props => {
   const {
-    surveyId, taxonomy,
+    surveyId,
+    taxonomy,
     canEdit,
-    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile,
+    setTaxonomyForEdit,
+    putTaxonomyProp,
+    uploadTaxonomyFile,
   } = props
 
   const i18n = useI18n()
@@ -32,12 +39,15 @@ const TaxonomyEditView = props => {
 
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
-  const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`}`
+  const gridTemplateColumns = `.1fr .1fr .2fr .2fr .4fr ${
+    R.isEmpty(vernacularLanguageCodes)
+      ? ''
+      : `repeat(${vernacularLanguageCodes.length}, 60px)`
+  }`
 
   return (
     <div className="taxonomy-edit">
-
-      <TaxonomyEditHeader {...props}/>
+      <TaxonomyEditHeader {...props} />
 
       <TableView
         module={TaxonomyEditState.keys.taxa}
@@ -47,7 +57,6 @@ const TaxonomyEditView = props => {
         rowHeaderComponent={TaxaTableRowHeader}
         rowComponent={TaxaTableRow}
         noItemsLabelKey={'taxonomy.edit.taxaNotImported'}
-
         surveyId={surveyId}
         putTaxonomyProp={putTaxonomyProp}
         uploadTaxonomyFile={uploadTaxonomyFile}
@@ -57,12 +66,10 @@ const TaxonomyEditView = props => {
       />
 
       <div style={{justifySelf: 'center'}}>
-        <button className="btn"
-          onClick={() => setTaxonomyForEdit(null)}>
+        <button className="btn" onClick={() => setTaxonomyForEdit(null)}>
           {i18n.t('common.done')}
         </button>
       </div>
-
     </div>
   )
 }
@@ -78,9 +85,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile,
-  }
-)(TaxonomyEditView)
+export default connect(mapStateToProps, {
+  setTaxonomyForEdit,
+  putTaxonomyProp,
+  uploadTaxonomyFile,
+})(TaxonomyEditView)

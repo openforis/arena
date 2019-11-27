@@ -12,14 +12,15 @@ import RecordsView from './records/recordsView'
 import DataVisView from './dataVis/dataVisView'
 
 const DataView = ({surveyInfo}) => {
-  const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const draftDefs =
+    Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   return (
     <SurveyDefsLoader
       draft={draftDefs}
       validate={draftDefs}
-      requirePublish={true}>
-
+      requirePublish={true}
+    >
       <InnerModuleSwitch
         moduleRoot={appModules.data}
         moduleDefault={dataModules.records}
@@ -33,14 +34,13 @@ const DataView = ({surveyInfo}) => {
           {
             component: RecordView,
             path: appModuleUri(dataModules.record) + ':recordUuid/',
-            props: {draftDefs}
+            props: {draftDefs},
           },
           // Data visualization
           {
             component: DataVisView,
             path: appModuleUri(dataModules.dataVis),
           },
-
         ]}
       />
     </SurveyDefsLoader>

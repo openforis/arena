@@ -10,10 +10,7 @@ import * as TableViewsState from './tableViewsState'
 import {initListItems, fetchListItems} from './actions'
 
 const TableView = props => {
-  const {
-    module, moduleApiUri, restParams, className,
-    initListItems
-  } = props
+  const {module, moduleApiUri, restParams, className, initListItems} = props
 
   useEffect(() => {
     initListItems(module, moduleApiUri, restParams)
@@ -21,11 +18,9 @@ const TableView = props => {
 
   return (
     <div className={`table ${className}`}>
+      <TableHeader {...props} />
 
-      <TableHeader {...props}/>
-
-      <TableContent {...props}/>
-
+      <TableContent {...props} />
     </div>
   )
 }
@@ -46,7 +41,8 @@ TableView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   let {module, moduleApiUri} = props
-  moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
+  moduleApiUri =
+    moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
 
   return {
     moduleApiUri,
@@ -57,7 +53,6 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {initListItems, fetchListItems}
-)(TableView)
+export default connect(mapStateToProps, {initListItems, fetchListItems})(
+  TableView,
+)

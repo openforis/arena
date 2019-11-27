@@ -6,7 +6,7 @@ import * as ValidatorFunctions from './_validator/validatorFunctions'
 
 const validateProp = async (obj, prop, validations = []) => {
   const validationsEvaluated = await Promise.all(
-    validations.map(validationFn => validationFn(prop, obj))
+    validations.map(validationFn => validationFn(prop, obj)),
   )
 
   const errors = []
@@ -17,13 +17,21 @@ const validateProp = async (obj, prop, validations = []) => {
       const arr = ValidationResult.isError(validationResult) ? errors : warnings
       arr.push(R.omit([ValidationResult.keys.severity], validationResult))
     }
-  }
-  )
+  })
 
-  return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
+  return Validation.newInstance(
+    R.isEmpty(errors) && R.isEmpty(warnings),
+    {},
+    errors,
+    warnings,
+  )
 }
 
-export const validate = async (obj, propsValidations, removeValidFields = true) => {
+export const validate = async (
+  obj,
+  propsValidations,
+  removeValidFields = true,
+) => {
   const validation = Validation.newInstance()
 
   for (const [prop, propValidations] of Object.entries(propsValidations)) {
@@ -45,7 +53,8 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
 
 // Validator functions
 export const validateRequired = ValidatorFunctions.validateRequired
-export const validateItemPropUniqueness = ValidatorFunctions.validateItemPropUniqueness
+export const validateItemPropUniqueness =
+  ValidatorFunctions.validateItemPropUniqueness
 export const validateNotKeyword = ValidatorFunctions.validateNotKeyword
 export const validateName = ValidatorFunctions.validateName
 export const validatePositiveNumber = ValidatorFunctions.validatePositiveNumber

@@ -13,22 +13,20 @@ const SurveyListRow = props => {
 
   return (
     <>
-      <span className={`icon icon-14px icon-action icon-radio-${isRowActive(surveyRow) ? 'checked2' : 'unchecked'}`}/>
-      <div>
-        {Survey.getName(surveyInfoRow)}
-      </div>
-      <div>
-        {Survey.getDefaultLabel(surveyInfoRow)}
-      </div>
+      <span
+        className={`icon icon-14px icon-action icon-radio-${
+          isRowActive(surveyRow) ? 'checked2' : 'unchecked'
+        }`}
+      />
+      <div>{Survey.getName(surveyInfoRow)}</div>
+      <div>{Survey.getDefaultLabel(surveyInfoRow)}</div>
       <div>
         {DateUtils.getRelativeDate(i18n, Survey.getDateCreated(surveyInfoRow))}
       </div>
       <div>
         {DateUtils.getRelativeDate(i18n, Survey.getDateModified(surveyInfoRow))}
       </div>
-      <div>
-        {Survey.getStatus(surveyInfoRow)}
-      </div>
+      <div>{Survey.getStatus(surveyInfoRow)}</div>
     </>
   )
 }

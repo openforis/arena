@@ -25,8 +25,17 @@ export const updateSurveyInfoProps = props => async (dispatch, getState) => {
     dispatch({type: surveyInfoUpdate, surveyInfo})
     dispatch(resetSurveyDefs())
   } else {
-    dispatch(showNotification('common.formContainsErrors', null, NotificationState.severity.error))
-    dispatch({type: surveyInfoValidationUpdate, validation: Validation.getValidation(surveyInfo)})
+    dispatch(
+      showNotification(
+        'common.formContainsErrors',
+        null,
+        NotificationState.severity.error,
+      ),
+    )
+    dispatch({
+      type: surveyInfoValidationUpdate,
+      validation: Validation.getValidation(surveyInfo),
+    })
   }
 
   dispatch(hideAppLoader())

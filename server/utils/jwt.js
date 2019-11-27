@@ -24,10 +24,11 @@ const _getKeys = async (region, poolId) => {
 }
 
 // Index keys by kid, and convert to PEM
-const _indexKeys = keyList => keyList.reduce((keys, jwk) => {
-  keys[jwk.kid] = jwkToPem(jwk)
-  return keys
-}, {})
+const _indexKeys = keyList =>
+  keyList.reduce((keys, jwk) => {
+    keys[jwk.kid] = jwkToPem(jwk)
+    return keys
+  }, {})
 
 const _decode = token => jsonwebtoken.decode(token, {complete: true})
 

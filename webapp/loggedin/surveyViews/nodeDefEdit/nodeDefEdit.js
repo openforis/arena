@@ -18,7 +18,10 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import TaxonomiesView from '../taxonomies/taxonomiesView'
 import CategoriesView from '../categories/categoriesView'
 
-import {putNodeDefProp, putNodeDefLayoutProp} from '../../../survey/nodeDefs/actions'
+import {
+  putNodeDefProp,
+  putNodeDefLayoutProp,
+} from '../../../survey/nodeDefs/actions'
 import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
@@ -27,9 +30,13 @@ import {closeNodeDefEdit} from './actions'
 
 const NodeDefEdit = props => {
   const {
-    nodeDef, nodeDefParent, validation,
-    nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
-    putNodeDefProp, putNodeDefLayoutProp,
+    nodeDef,
+    nodeDefParent,
+    validation,
+    nodeDefKeyEditDisabled,
+    nodeDefMultipleEditDisabled,
+    putNodeDefProp,
+    putNodeDefLayoutProp,
     canUpdateCategory,
     closeNodeDefEdit,
   } = props
@@ -41,70 +48,90 @@ const NodeDefEdit = props => {
 
   const close = () => closeNodeDefEdit()
 
-  return nodeDef
-    ? (
-      <div className="node-def-edit">
-        {
-          editingCategory
-            ? (
-              <CategoriesView
-                canSelect={canUpdateCategory}
-                onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
-                selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
-                onClose={() => setEditingCategory(false)}/>
+  return nodeDef ? (
+    <div className="node-def-edit">
+      {editingCategory ? (
+        <CategoriesView
+          canSelect={canUpdateCategory}
+          onSelect={category =>
+            putNodeDefProp(
+              nodeDef,
+              NodeDef.propKeys.categoryUuid,
+              Category.getUuid(category),
             )
-            : (editingTaxonomy
-              ? (
-                <TaxonomiesView
-                  canSelect={true}
-                  onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
-                  selectedItemUuid={NodeDef.getTaxonomyUuid(nodeDef)}
-                  onClose={() => setEditingTaxonomy(false)}/>
-              )
-              : (
-                <div className="node-def-edit__container">
-                  <TabBar tabs={[
+          }
+          selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
+          onClose={() => setEditingCategory(false)}
+        />
+      ) : editingTaxonomy ? (
+        <TaxonomiesView
+          canSelect={true}
+          onSelect={taxonomy =>
+            putNodeDefProp(
+              nodeDef,
+              NodeDef.propKeys.taxonomyUuid,
+              Taxonomy.getUuid(taxonomy),
+            )
+          }
+          selectedItemUuid={NodeDef.getTaxonomyUuid(nodeDef)}
+          onClose={() => setEditingTaxonomy(false)}
+        />
+      ) : (
+        <div className="node-def-edit__container">
+          <TabBar
+            tabs={[
+              {
+                label: i18n.t('nodeDefEdit.basic'),
+                component: BasicProps,
+                props: {
+                  nodeDef,
+                  validation,
+                  nodeDefKeyEditDisabled,
+                  nodeDefMultipleEditDisabled,
+                  putNodeDefProp,
+                  putNodeDefLayoutProp,
+                  toggleCategoryEdit: editing => setEditingCategory(editing),
+                  toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
+                },
+              },
+              ...(NodeDef.isRoot(nodeDef)
+                ? []
+                : [
                     {
-                      label: i18n.t('nodeDefEdit.basic'),
-                      component: BasicProps,
+                      label: i18n.t('nodeDefEdit.advanced'),
+                      component: AdvancedProps,
                       props: {
                         nodeDef,
                         validation,
-                        nodeDefKeyEditDisabled,
-                        nodeDefMultipleEditDisabled,
+                        nodeDefParent,
                         putNodeDefProp,
-                        putNodeDefLayoutProp,
-                        toggleCategoryEdit: editing => setEditingCategory(editing),
-                        toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
                       },
                     },
-                    ...(NodeDef.isRoot(nodeDef) ? [] : [
-                      {
-                        label: i18n.t('nodeDefEdit.advanced'),
-                        component: AdvancedProps,
-                        props: {nodeDef, validation, nodeDefParent, putNodeDefProp},
+                    {
+                      label: i18n.t('nodeDefEdit.validations'),
+                      component: ValidationsProps,
+                      props: {
+                        nodeDef,
+                        validation,
+                        nodeDefParent,
+                        putNodeDefProp,
                       },
-                      {
-                        label: i18n.t('nodeDefEdit.validations'),
-                        component: ValidationsProps,
-                        props: {nodeDef, validation, nodeDefParent, putNodeDefProp},
-                      },
-                    ]),
-                  ]}
-                  />
+                    },
+                  ]),
+            ]}
+          />
 
-                  <button className="btn btn-close"
-                    onClick={() => close()}
-                    aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}>
-                    {i18n.t('common.done')}
-                  </button>
-
-                </div>
-              ))
-        }
-      </div>
-    )
-    : null
+          <button
+            className="btn btn-close"
+            onClick={() => close()}
+            aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
+          >
+            {i18n.t('common.done')}
+          </button>
+        </div>
+      )}
+    </div>
+  ) : null
 }
 
 NodeDefEdit.defaultProps = {
@@ -116,10 +143,9 @@ const isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
   NodeDef.isRoot(nodeDef) ||
   NodeDef.isMultiple(nodeDef) ||
-  (
-    !NodeDef.isKey(nodeDef) &&
-    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes
-  ) ||
+  (!NodeDef.isKey(nodeDef) &&
+    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey)
+      .length >= NodeDef.maxKeyAttributes) ||
   NodeDef.isReadOnly(nodeDef)
 
 const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
@@ -133,13 +159,16 @@ const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
-  const nodeDefParent = Survey.getNodeDefByUuid(
-    NodeDef.getParentUuid(nodeDef)
-  )(survey)
+  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(
+    survey,
+  )
   const validation = Survey.getNodeDefValidation(nodeDef)(survey)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
-  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
+  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(
+    survey,
+    nodeDef,
+  )
 
   return {
     nodeDef,
@@ -147,11 +176,13 @@ const mapStateToProps = state => {
     validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
-    canUpdateCategory: NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
+    canUpdateCategory:
+      NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey),
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {putNodeDefProp, putNodeDefLayoutProp, closeNodeDefEdit}
-)(NodeDefEdit)
+export default connect(mapStateToProps, {
+  putNodeDefProp,
+  putNodeDefLayoutProp,
+  closeNodeDefEdit,
+})(NodeDefEdit)

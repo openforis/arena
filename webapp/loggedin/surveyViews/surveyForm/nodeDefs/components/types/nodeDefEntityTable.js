@@ -8,40 +8,44 @@ import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = props => {
   const {
-    entry, edit,
-    nodeDef, nodes, parentNode, label,
+    entry,
+    edit,
+    nodeDef,
+    nodes,
+    parentNode,
+    label,
     updateNode,
-    canEditRecord, canAddNode,
+    canEditRecord,
+    canAddNode,
   } = props
 
   return (
     <div className="survey-form__node-def-entity-table">
-
       <div className="survey-form__node-def-entity-table-header">
         <NodeDefErrorBadge
           nodeDef={nodeDef}
           edit={edit}
           parentNode={parentNode}
-          nodes={nodes}>
-
+          nodes={nodes}
+        >
           <div>{label}</div>
 
-          {
-            entry && canEditRecord &&
-            <button className="btn btn-xs btn-add"
+          {entry && canEditRecord && (
+            <button
+              className="btn btn-xs btn-add"
               onClick={() => {
                 const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                 updateNode(nodeDef, entity)
               }}
-              aria-disabled={!canAddNode}>
-              <span className="icon icon-plus icon-10px"/>
+              aria-disabled={!canAddNode}
+            >
+              <span className="icon icon-plus icon-10px" />
             </button>
-          }
+          )}
         </NodeDefErrorBadge>
       </div>
 
-      <NodeDefEntityTableRows {...props}/>
-
+      <NodeDefEntityTableRows {...props} />
     </div>
   )
 }

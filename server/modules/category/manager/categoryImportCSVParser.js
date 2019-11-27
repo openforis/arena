@@ -6,7 +6,12 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as CSVReader from '@server/utils/file/csvReader'
 
-export const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
+export const createRowsReaderFromStream = async (
+  stream,
+  summary,
+  onRowItem,
+  onTotalChange,
+) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   return CSVReader.createReaderFromStream(
@@ -18,29 +23,33 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
       const labelsByLevel = {}
       const descriptionsByLevel = {}
 
-      Object.entries(columns).forEach(
-        ([columnName, column]) => {
-          const columnValue = row[columnName]
+      Object.entries(columns).forEach(([columnName, column]) => {
+        const columnValue = row[columnName]
 
-          if (CategoryImportSummary.isColumnCode(column)) {
-            codes.push(columnValue)
-          } else if (StringUtils.isNotBlank(columnValue)) {
-            if (CategoryImportSummary.isColumnExtra(column)) {
-              extra[columnName] = columnValue
-            } else {
-              // Label or description
-              const lang = CategoryImportSummary.getColumnLang(column)
-              const levelName = CategoryImportSummary.getColumnLevelName(column)
+        if (CategoryImportSummary.isColumnCode(column)) {
+          codes.push(columnValue)
+        } else if (StringUtils.isNotBlank(columnValue)) {
+          if (CategoryImportSummary.isColumnExtra(column)) {
+            extra[columnName] = columnValue
+          } else {
+            // Label or description
+            const lang = CategoryImportSummary.getColumnLang(column)
+            const levelName = CategoryImportSummary.getColumnLevelName(column)
 
-              if (CategoryImportSummary.isColumnLabel(column)) {
-                ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
-              } else if (CategoryImportSummary.isColumnDescription(column)) {
-                ObjectUtils.setInPath([levelName, lang], columnValue)(descriptionsByLevel)
-              }
+            if (CategoryImportSummary.isColumnLabel(column)) {
+              ObjectUtils.setInPath(
+                [levelName, lang],
+                columnValue,
+              )(labelsByLevel)
+            } else if (CategoryImportSummary.isColumnDescription(column)) {
+              ObjectUtils.setInPath(
+                [levelName, lang],
+                columnValue,
+              )(descriptionsByLevel)
             }
           }
         }
-      )
+      })
 
       // Determine level
       const levelIndex = R.findLastIndex(StringUtils.isNotBlank)(codes)
@@ -50,9 +59,9 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
         codes: codes.slice(0, levelIndex + 1),
         labelsByLevel,
         descriptionsByLevel,
-        extra
+        extra,
       })
     },
-    onTotalChange
+    onTotalChange,
   )
 }

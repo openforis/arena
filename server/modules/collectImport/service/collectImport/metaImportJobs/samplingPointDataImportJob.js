@@ -16,17 +16,21 @@ const keysExtra = {
 }
 
 const keysItem = {
-  location: 'location'
+  location: 'location',
 }
 
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
 export default class SamplingPointDataImportJob extends CategoryImportJob {
   constructor(params) {
-    super({
-      ...params,
-      [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName
-    }, 'SamplingPointDataImportJob')
+    super(
+      {
+        ...params,
+        [CategoryImportJobParams.keys.categoryName]:
+          SamplingPointDataImportJob.categoryName,
+      },
+      'SamplingPointDataImportJob',
+    )
   }
 
   async logCategoryImportActivity() {
@@ -42,29 +46,44 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     // Delete empty levels
     this.logDebug('Deleting empty level(s)')
     const levelsCount = Category.getLevelsArray(this.category).length
-    this.category = await CategoryManager.deleteLevelsEmptyByCategory(this.user, this.surveyId, this.category, this.tx)
-    this.logDebug(`${levelsCount - Category.getLevelsArray(this.category).length} level(s) deleted`)
+    this.category = await CategoryManager.deleteLevelsEmptyByCategory(
+      this.user,
+      this.surveyId,
+      this.category,
+      this.tx,
+    )
+    this.logDebug(
+      `${levelsCount -
+        Category.getLevelsArray(this.category).length} level(s) deleted`,
+    )
 
     await super.beforeSuccess()
   }
 
   // Start of overridden methods from CategoryImportJob
   async createReadStream() {
-    const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
-    return await collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
+    const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(
+      this.context,
+    )
+    return await collectSurveyFileZip.getEntryStream(
+      samplingPointDataZipEntryPath,
+    )
   }
 
   async getOrCreateSummary() {
     const stream = await this.createReadStream()
-    return stream ? await CategoryManager.createImportSummaryFromStream(stream) : null
+    return stream
+      ? await CategoryManager.createImportSummaryFromStream(stream)
+      : null
   }
 
   extractItemExtraDef() {
     return R.pipe(
       R.omit(R.keys(keysExtra)),
       R.assoc(keysItem.location, {
-        [CategoryItem.keysExtraDef.dataType]: Category.itemExtraDefDataTypes.geometryPoint
-      })
+        [CategoryItem.keysExtraDef.dataType]:
+          Category.itemExtraDefDataTypes.geometryPoint,
+      }),
     )(super.extractItemExtraDef())
   }
 
@@ -73,7 +92,7 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
-      [keysItem.location]: Point.newPoint(srs_id, x, y)
+      [keysItem.location]: Point.newPoint(srs_id, x, y),
     }
 
     return super.extractItemExtraProps(extraUpdated)
@@ -85,7 +104,9 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   async beforeEnd() {
     await super.beforeEnd()
     // Assoc imported category to context categories (to be used by NodeDefsImportJob)
-    this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))
+    this.setContext(
+      CollectImportJobContext.assocCategory(this.category)(this.context),
+    )
   }
 }
 

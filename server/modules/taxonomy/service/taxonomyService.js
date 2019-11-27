@@ -7,8 +7,20 @@ import * as JobManager from '@server/job/jobManager'
 import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportJob from './taxonomyImportJob'
 
-export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
-  const {taxonomy, taxaStream} = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, draft)
+export const exportTaxa = async (
+  surveyId,
+  taxonomyUuid,
+  output,
+  draft = false,
+) => {
+  const {
+    taxonomy,
+    taxaStream,
+  } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
+    surveyId,
+    taxonomyUuid,
+    draft,
+  )
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
   const headers = [
@@ -16,14 +28,12 @@ export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) 
     'family',
     'genus',
     'scientific_name',
-    ...vernacularLangCodes
+    ...vernacularLangCodes,
   ]
 
-  await db.stream(
-    taxaStream,
-    stream => {
-      stream.pipe(CSVWriter.transformToStream(output, headers))
-    })
+  await db.stream(taxaStream, stream => {
+    stream.pipe(CSVWriter.transformToStream(output, headers))
+  })
 }
 
 export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
@@ -31,7 +41,7 @@ export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
     user,
     surveyId,
     taxonomyUuid,
-    filePath
+    filePath,
   })
 
   JobManager.executeJobThread(job)
@@ -42,17 +52,21 @@ export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
 export const insertTaxonomy = TaxonomyManager.insertTaxonomy
 
 export const fetchTaxonomyByUuid = TaxonomyManager.fetchTaxonomyByUuid
-export const fetchTaxonomiesBySurveyId = TaxonomyManager.fetchTaxonomiesBySurveyId
+export const fetchTaxonomiesBySurveyId =
+  TaxonomyManager.fetchTaxonomiesBySurveyId
 
 export const countTaxaByTaxonomyUuid = TaxonomyManager.countTaxaByTaxonomyUuid
 export const findTaxaByCode = TaxonomyManager.findTaxaByCode
 export const findTaxaByScientificName = TaxonomyManager.findTaxaByScientificName
-export const findTaxaByCodeOrScientificName = TaxonomyManager.findTaxaByCodeOrScientificName
+export const findTaxaByCodeOrScientificName =
+  TaxonomyManager.findTaxaByCodeOrScientificName
 export const findTaxaByVernacularName = TaxonomyManager.findTaxaByVernacularName
 
-export const fetchTaxaWithVernacularNames = TaxonomyManager.fetchTaxaWithVernacularNames
+export const fetchTaxaWithVernacularNames =
+  TaxonomyManager.fetchTaxaWithVernacularNames
 export const fetchTaxonByUuid = TaxonomyManager.fetchTaxonByUuid
-export const fetchTaxonVernacularNameByUuid = TaxonomyManager.fetchTaxonVernacularNameByUuid
+export const fetchTaxonVernacularNameByUuid =
+  TaxonomyManager.fetchTaxonVernacularNameByUuid
 
 // Update
 export const updateTaxonomyProp = TaxonomyManager.updateTaxonomyProp

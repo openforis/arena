@@ -5,7 +5,11 @@ import * as FileTypes from '@webapp/utils/fileTypes'
 import React, {useEffect, useRef, useState} from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
-import {useProfilePicture, useFileDrop, useI18n} from '@webapp/commonComponents/hooks'
+import {
+  useProfilePicture,
+  useFileDrop,
+  useI18n,
+} from '@webapp/commonComponents/hooks'
 
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 
@@ -33,9 +37,7 @@ const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
     setImage(initialProfilePicture)
   }, [initialProfilePicture])
 
-  useFileDrop(
-    setImage,
-    dropRef, [FileTypes.image])
+  useFileDrop(setImage, dropRef, [FileTypes.image])
 
   const resetSliders = () => {
     setState(statePrev => ({
@@ -55,9 +57,7 @@ const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
   return (
     <>
       <div ref={dropRef} className="profile-picture-editor">
-
-        {
-          state.image &&
+        {state.image && (
           <AvatarEditor
             ref={avatarRef}
             image={state.image}
@@ -71,23 +71,26 @@ const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
             scale={state.scale}
             rotate={state.rotate}
           />
-        }
+        )}
 
         <div>
-          {i18n.t('userView.dragAndDrop')} <UploadButton
+          {i18n.t('userView.dragAndDrop')}{' '}
+          <UploadButton
             label={i18n.t('userView.upload')}
             showLabel={true}
             showIcon={false}
             className="btn btn-transparent btn-upload"
             accept="image/*"
-            onChange={([file]) => setImage(file)}/>
+            onChange={([file]) => setImage(file)}
+          />
         </div>
 
         <div className="form profile-picture-editor__sliders">
           <div className="form-item">
             <label className="form-label">{i18n.t('userView.scale')}</label>
             <div>
-              <input value={state.scale}
+              <input
+                value={state.scale}
                 disabled={!enabled}
                 onChange={e => setScale(Number(e.target.value))}
                 className="slider"
@@ -95,14 +98,16 @@ const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
                 step="0.01"
                 min="1"
                 max="3"
-                name="scale"/>
+                name="scale"
+              />
             </div>
           </div>
 
           <div className="form-item">
             <label className="form-label">{i18n.t('userView.rotate')}</label>
             <div>
-              <input value={state.rotate}
+              <input
+                value={state.rotate}
                 disabled={!enabled}
                 onChange={e => setRotate(Number(e.target.value))}
                 className="slider"
@@ -110,11 +115,11 @@ const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
                 step="1"
                 min="0"
                 max="360"
-                name="rotate"/>
+                name="rotate"
+              />
             </div>
           </div>
         </div>
-
       </div>
     </>
   )

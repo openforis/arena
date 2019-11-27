@@ -35,7 +35,10 @@ class AutocompleteDialog extends React.Component {
   onOutsideClick(evt) {
     const {inputField} = this.props
 
-    if (clickedOutside(this.list.current, evt) && clickedOutside(inputField, evt)) {
+    if (
+      clickedOutside(this.list.current, evt) &&
+      clickedOutside(inputField, evt)
+    ) {
       this.close()
     }
   }
@@ -131,17 +134,14 @@ class AutocompleteDialog extends React.Component {
   calculatePosition() {
     const {sourceElement, inputField} = this.props
 
-    const {
-      top,
-      left,
-      height,
-      width,
-    } = elementOffset(sourceElement || inputField)
+    const {top, left, height, width} = elementOffset(
+      sourceElement || inputField,
+    )
 
     return {
-      top: (top + height),
+      top: top + height,
       left,
-      width
+      width,
     }
   }
 
@@ -151,18 +151,20 @@ class AutocompleteDialog extends React.Component {
     const ItemRenderer = itemRenderer
 
     return (
-      <div ref={this.list}
+      <div
+        ref={this.list}
         className={`autocomplete-list ${className}`}
-        style={{...this.calculatePosition()}}>
-        {
-          items.map(item => (
-            <ItemRenderer key={itemKeyFunction(item)}
-              tabIndex="1"
-              item={item}
-              onKeyDown={e => this.onListItemKeyDown(e)}
-              onMouseDown={() => this.selectItem(item)}/>
-          ))
-        }
+        style={{...this.calculatePosition()}}
+      >
+        {items.map(item => (
+          <ItemRenderer
+            key={itemKeyFunction(item)}
+            tabIndex="1"
+            item={item}
+            onKeyDown={e => this.onListItemKeyDown(e)}
+            onMouseDown={() => this.selectItem(item)}
+          />
+        ))}
       </div>
     )
   }

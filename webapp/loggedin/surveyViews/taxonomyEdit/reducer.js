@@ -19,12 +19,15 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [taxonomyEditUpdate]: (state, {taxonomyUuid}) => TaxonomyEditState.initTaxonomyEdit(taxonomyUuid),
+  [taxonomyEditUpdate]: (state, {taxonomyUuid}) =>
+    TaxonomyEditState.initTaxonomyEdit(taxonomyUuid),
 
-  [taxonomyEditPropsUpdate]: (state, {type, ...props}) => TaxonomyEditState.mergeTaxonomyEditProps(props)(state),
+  [taxonomyEditPropsUpdate]: (state, {type, ...props}) =>
+    TaxonomyEditState.mergeTaxonomyEditProps(props)(state),
 
   // Create
-  [taxonomyCreate]: (state, {taxonomy}) => TaxonomyEditState.initTaxonomyEdit(Taxonomy.getUuid(taxonomy)),
+  [taxonomyCreate]: (state, {taxonomy}) =>
+    TaxonomyEditState.initTaxonomyEdit(Taxonomy.getUuid(taxonomy)),
 }
 
 export default exportReducer(actionHandlers)

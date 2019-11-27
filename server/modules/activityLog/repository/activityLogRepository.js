@@ -16,25 +16,44 @@ import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/node
 
 // ===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
-  await client.none(`
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
+  await client.none(
+    `
+    INSERT INTO ${getSurveyDBSchema(
+      surveyId,
+    )}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
-  [type, User.getUuid(user), content || {}, system]
+    [type, User.getUuid(user), content || {}, system],
   )
 
 export const insertMany = async (user, surveyId, activities, client) =>
-  await client.batch(activities.map(activity =>
-    insert(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
-  ))
+  await client.batch(
+    activities.map(activity =>
+      insert(
+        user,
+        surveyId,
+        ActivityLog.getType(activity),
+        ActivityLog.getContent(activity),
+        ActivityLog.isSystem(activity),
+        client,
+      ),
+    ),
+  )
 
 // ===== READ
-export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
+export const fetch = async (
+  surveyInfo,
+  activityTypes = null,
+  offset = 0,
+  limit = 30,
+  client = db,
+) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
   const schema = getSurveyDBSchema(surveyId)
 
-  return await client.map(`
+  return await client.map(
+    `
   WITH
       log_days AS 
       (
@@ -79,18 +98,22 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       
       -- node activities keys
     ${
-  published ? `
+      published
+        ? `
       n_h.${NodeKeysHierarchyView.columns.nodeDefUuid},
       n_h.${NodeKeysHierarchyView.columns.keysHierarchy},
-      ` : ''
-}
+      `
+        : ''
+    }
       -- user activities keys
       user_target.name AS target_user_name,
       user_target.email AS target_user_email,
       agu.user_uuid AS target_user_uuid, -- null if user has been removed from survey
       
       -- analysis activities keys
-      processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
+      processing_chain.props->'${
+        ProcessingChain.keysProps.labels
+      }' AS processing_chain_labels,
       processing_step.index AS processing_step_index,
       processing_step_calculation.index AS processing_step_calculation_index
       
@@ -107,13 +130,15 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
 
     -- start of node activities part
     ${
-  published ? `
+      published
+        ? `
     LEFT OUTER JOIN
       ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} n_h
     ON
       l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeUuid}
-    ` : ''
-}
+    `
+        : ''
+    }
     -- end of node activities part
 
     -- start of user activities part
@@ -139,11 +164,15 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.processing_chain
     ON 
-      processing_chain.uuid IN (l.content_uuid, (l.content->>'${ProcessingStep.keys.processingChainUuid}')::uuid)
+      processing_chain.uuid IN (l.content_uuid, (l.content->>'${
+        ProcessingStep.keys.processingChainUuid
+      }')::uuid)
     LEFT OUTER JOIN 
       ${schema}.processing_step
     ON 
-      processing_step.uuid IN (l.content_uuid, (l.content->>'${ProcessingStepCalculation.keys.processingStepUuid}')::uuid)
+      processing_step.uuid IN (l.content_uuid, (l.content->>'${
+        ProcessingStepCalculation.keys.processingStepUuid
+      }')::uuid)
     LEFT OUTER JOIN 
       ${schema}.processing_step_calculation
     ON 
@@ -152,7 +181,7 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
 
     ORDER BY
       l.date_created DESC`,
-  [surveyUuid, activityTypes, offset, limit],
-  camelize
+    [surveyUuid, activityTypes, offset, limit],
+    camelize,
   )
 }

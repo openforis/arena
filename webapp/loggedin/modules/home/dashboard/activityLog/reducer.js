@@ -13,7 +13,8 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [homeActivityMessagesUpdate]: (state, {activityLogMessages}) => activityLogMessages,
+  [homeActivityMessagesUpdate]: (state, {activityLogMessages}) =>
+    activityLogMessages,
   [homeActivityMessagesReset]: () => ({}),
 }
 

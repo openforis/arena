@@ -18,9 +18,7 @@ window.ResizeObserver = class ResizeObserver {
   }
 
   getElementSize(el) {
-    const {width, height, x, y} = el.getBBox
-      ? el.getBBox()
-      : elementOffset(el)
+    const {width, height, x, y} = el.getBBox ? el.getBBox() : elementOffset(el)
     return {width, height, x, y}
   }
 
@@ -28,7 +26,7 @@ window.ResizeObserver = class ResizeObserver {
     if (!this.observables.some(observable => observable.el === el)) {
       this.observables.push({
         el,
-        size: this.getElementSize(el)
+        size: this.getElementSize(el),
       })
     }
   }
@@ -43,15 +41,22 @@ window.ResizeObserver = class ResizeObserver {
   }
 
   checkSize() {
-    const changedEntries = this.observables.filter(obj => {
-      const {width, height, x, y} = this.getElementSize(obj.el)
-      const size = obj.size
+    const changedEntries = this.observables
+      .filter(obj => {
+        const {width, height, x, y} = this.getElementSize(obj.el)
+        const size = obj.size
 
-      if (size.height !== height || size.width !== width || size.x !== x || size.y !== y) {
-        obj.size = {width, height, x, y}
-        return true
-      }
-    }).map(obj => obj.el)
+        if (
+          size.height !== height ||
+          size.width !== width ||
+          size.x !== x ||
+          size.y !== y
+        ) {
+          obj.size = {width, height, x, y}
+          return true
+        }
+      })
+      .map(obj => obj.el)
 
     if (changedEntries.length) {
       this.callback(changedEntries)

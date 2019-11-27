@@ -12,14 +12,30 @@ import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
-export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordKeysUniqueness, tx) => {
+export const validateNodesAndPersistValidation = async (
+  survey,
+  record,
+  nodes,
+  validateRecordKeysUniqueness,
+  tx,
+) => {
   // 1. validate nodes
-  const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
+  const nodesValidation = await RecordValidator.validateNodes(
+    survey,
+    record,
+    nodes,
+  )
 
   // 2. validate record keys uniqueness
   const recordKeysValidation =
-    validateRecordKeysUniqueness && !Record.isPreview(record) && isRootNodeKeysUpdated(survey, nodes)
-      ? await RecordUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
+    validateRecordKeysUniqueness &&
+    !Record.isPreview(record) &&
+    isRootNodeKeysUpdated(survey, nodes)
+      ? await RecordUniquenessValidator.validateRecordKeysUniqueness(
+          survey,
+          record,
+          tx,
+        )
       : {}
 
   // 3. merge validations
@@ -28,9 +44,9 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
       true,
       R.mergeDeepLeft(
         recordKeysValidation,
-        Validation.getFieldValidations(nodesValidation)
-      )
-    )
+        Validation.getFieldValidations(nodesValidation),
+      ),
+    ),
   )
 
   // 4. persist validation
@@ -39,17 +55,22 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
   return validation
 }
 
-const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
-  R.values,
-  R.any(n => {
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
-    const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-    return NodeDef.isKey(nodeDef) && NodeDef.isRoot(parentDef)
-  },
-  )
-)(nodes)
+const isRootNodeKeysUpdated = (survey, nodes) =>
+  R.pipe(
+    R.values,
+    R.any(n => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
+      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+      return NodeDef.isKey(nodeDef) && NodeDef.isRoot(parentDef)
+    }),
+  )(nodes)
 
-export const persistValidation = async (survey, record, nodesValidation, tx) => {
+export const persistValidation = async (
+  survey,
+  record,
+  nodesValidation,
+  tx,
+) => {
   const surveyId = Survey.getId(survey)
 
   const recordValidationUpdated = R.pipe(
@@ -58,21 +79,49 @@ export const persistValidation = async (survey, record, nodesValidation, tx) => 
     Validation.updateCounts,
   )(record)
 
-  await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)
+  await RecordRepository.updateValidation(
+    surveyId,
+    Record.getUuid(record),
+    recordValidationUpdated,
+    tx,
+  )
 }
 
-export const validateRecordsUniquenessAndPersistValidation = async (survey, record, excludeRecordFromCount, t) => {
-  const recordKeyNodes = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
+export const validateRecordsUniquenessAndPersistValidation = async (
+  survey,
+  record,
+  excludeRecordFromCount,
+  t,
+) => {
+  const recordKeyNodes = Record.getEntityKeyNodes(
+    survey,
+    Record.getRootNode(record),
+  )(record)
 
-  const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(survey, Record.getCycle(record), recordKeyNodes, Record.getUuid(record), excludeRecordFromCount, t)
+  const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(
+    survey,
+    Record.getCycle(record),
+    recordKeyNodes,
+    Record.getUuid(record),
+    excludeRecordFromCount,
+    t,
+  )
 
-  for (const [recordUuid, nodesKeyValidation] of Object.entries(validationByRecord)) {
-    const recordToUpdate = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
+  for (const [recordUuid, nodesKeyValidation] of Object.entries(
+    validationByRecord,
+  )) {
+    const recordToUpdate = await RecordRepository.fetchRecordByUuid(
+      Survey.getId(survey),
+      recordUuid,
+      t,
+    )
 
     await persistValidation(survey, recordToUpdate, nodesKeyValidation, t)
   }
 }
 
-export const updateRecordValidationsFromValues = RecordRepository.updateRecordValidationsFromValues
+export const updateRecordValidationsFromValues =
+  RecordRepository.updateRecordValidationsFromValues
 
-export const validateRecordKeysUniqueness = RecordUniquenessValidator.validateRecordKeysUniqueness
+export const validateRecordKeysUniqueness =
+  RecordUniquenessValidator.validateRecordKeysUniqueness

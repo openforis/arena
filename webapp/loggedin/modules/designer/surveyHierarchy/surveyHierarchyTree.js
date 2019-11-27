@@ -81,7 +81,10 @@ export default class SurveyHierarchyTree {
     svgEl.setAttribute('width', `${newWidth}`)
     svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
 
-    d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
+    d3.select(this.rootG).attr(
+      'transform',
+      `translate(${svgMargin.left}, ${-bBox.y})`,
+    )
 
     if (newWidth > oldWidth) {
       treeEl.scrollLeft = newWidth
@@ -91,12 +94,14 @@ export default class SurveyHierarchyTree {
   initSvg() {
     // Set the dimensions and margins of the diagram
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
-    const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
+    const height =
+      this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
 
     // Append the svg object to the body of the page
     // appends a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
-    this.svg = d3.select(this.domElement)
+    this.svg = d3
+      .select(this.domElement)
       .append('svg')
       .classed('survey-hierarchy__svg', true)
       .attr('width', width + svgMargin.right + svgMargin.left)
@@ -107,12 +112,17 @@ export default class SurveyHierarchyTree {
     this.rootG = document.querySelector('#survey-hierarchy__root-g')
 
     // InitObserver
-    this.resizeObserver = new ResizeObserver(this.resizeObserverCallback.bind(this))
+    this.resizeObserver = new ResizeObserver(
+      this.resizeObserverCallback.bind(this),
+    )
     this.resizeObserver.observe(this.rootG)
 
     // Declares a tree layout and assigns the size
-    this.tree = d3.tree().size([height, width])
-      .nodeSize([50, 10]).separation((a, b) => a.parent !== b.parent ? 2 : 1)
+    this.tree = d3
+      .tree()
+      .size([height, width])
+      .nodeSize([50, 10])
+      .separation((a, b) => (a.parent !== b.parent ? 2 : 1))
 
     // Assigns parent, children, height, depth
     this.root = d3.hierarchy(this.data, d => d.children)
@@ -150,11 +160,12 @@ export default class SurveyHierarchyTree {
       d.y = d.depth * nodeLinkLength
     })
 
-    const node = this.svg.selectAll('g.node')
-      .data(nodes, d => d.data.uuid)
+    const node = this.svg.selectAll('g.node').data(nodes, d => d.data.uuid)
 
     // Enter any new nodes at the parent's previous position
-    const nodeEnter = node.enter().append('g')
+    const nodeEnter = node
+      .enter()
+      .append('g')
       .attr('class', 'node')
       .attr('transform', d => `translate(${source.y0}, ${source.x0})`)
 
@@ -168,16 +179,17 @@ export default class SurveyHierarchyTree {
       .attr('width', nodeWidth)
       .attr('height', nodeHeight)
 
-    const grid = fo.append('xhtml:div')
-      .attr('class', 'node-grid')
+    const grid = fo.append('xhtml:div').attr('class', 'node-grid')
 
-    grid.append('xhtml:a')
+    grid
+      .append('xhtml:a')
       .on('click', d => this.onEntityClick(d.data.uuid))
       .text(d => NodeDef.getLabel(d.data, this.lang))
 
-    grid.append('xhtml:button')
+    grid
+      .append('xhtml:button')
       .attr('class', 'btn')
-      .style('display', d => hasChildren(d) ? 'block' : 'none')
+      .style('display', d => (hasChildren(d) ? 'block' : 'none'))
       .on('click', d => this.toggleNode(d))
       .append('xhtml:span')
       .attr('class', 'icon icon-tree icon-12px')
@@ -193,7 +205,9 @@ export default class SurveyHierarchyTree {
       .attr('transform', d => `translate(${d.y}, ${d.x})`)
 
     // Remove any exiting nodes
-    node.exit().transition()
+    node
+      .exit()
+      .transition()
       .duration(transitionDuration)
       .ease(easeExit)
       .attr('transform', `translate(${source.y}, ${source.x})`)
@@ -207,8 +221,7 @@ export default class SurveyHierarchyTree {
     const links = treeData.descendants().slice(1)
 
     // Update the links...
-    const link = this.svg.selectAll('path.link')
-      .data(links, d => d.data.uuid)
+    const link = this.svg.selectAll('path.link').data(links, d => d.data.uuid)
 
     // Creates a curved (diagonal) path from parent to the child nodes
     const diagonal = (s, d) =>
@@ -218,7 +231,9 @@ export default class SurveyHierarchyTree {
           ${d.y + nodeWidth} ${d.x}`
 
     // Enter any new links at the parent's previous position
-    const linkEnter = link.enter().insert('path', 'g')
+    const linkEnter = link
+      .enter()
+      .insert('path', 'g')
       .attr('class', 'link')
       .attr('d', d => {
         const o = {x: node.x0, y: node.y0}
@@ -236,7 +251,9 @@ export default class SurveyHierarchyTree {
       .attr('d', d => diagonal(d, d.parent))
 
     // Remove any exiting links
-    link.exit().transition()
+    link
+      .exit()
+      .transition()
       .duration(transitionDuration)
       .ease(easeExit)
       .attr('d', d => {
@@ -262,7 +279,8 @@ export default class SurveyHierarchyTree {
 
     this.update(this.root)
 
-    this.svg.selectAll('.node-grid')
+    this.svg
+      .selectAll('.node-grid')
       .attr('class', 'node-grid')
       .filter(d => d.data.uuid === uuid)
       .attr('class', 'node-grid highlight')

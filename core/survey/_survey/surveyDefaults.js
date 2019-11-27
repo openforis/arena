@@ -82,4 +82,3 @@ export const getDefaultAuthGroups = () => [
   //   descriptions: {[lang]: `Can view records`},
   // },
 ]
-

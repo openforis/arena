@@ -4,25 +4,24 @@ import * as User from '@core/user/user'
 
 export const getServerUrl = req => `${req.protocol}://${req.get('host')}`
 
-export const getParams = req => R.pipe(
-  R.mergeLeft(R.prop('query', req)),
-  R.mergeLeft(R.prop('params', req)),
-  R.mergeLeft(R.prop('body', req)),
-  // Convert String boolean values to Boolean type
-  R.mapObjIndexed(val =>
-    R.ifElse(
-      v => v === 'true' || v === 'false',
-      R.always(val === 'true'),
-      R.identity
-    )(val)
-  )
-)({})
+export const getParams = req =>
+  R.pipe(
+    R.mergeLeft(R.prop('query', req)),
+    R.mergeLeft(R.prop('params', req)),
+    R.mergeLeft(R.prop('body', req)),
+    // Convert String boolean values to Boolean type
+    R.mapObjIndexed(val =>
+      R.ifElse(
+        v => v === 'true' || v === 'false',
+        R.always(val === 'true'),
+        R.identity,
+      )(val),
+    ),
+  )({})
 
 export const getJsonParam = (req, param, defaultValue = null) => {
   const jsonStr = R.prop(param, getParams(req))
-  return jsonStr
-    ? JSON.parse(jsonStr)
-    : defaultValue
+  return jsonStr ? JSON.parse(jsonStr) : defaultValue
 }
 
 export const getFile = R.pathOr(null, ['files', 'file'])

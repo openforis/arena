@@ -10,15 +10,19 @@ import AnalysisView from './analysis/analysisView'
 
 const ModuleSwitch = props => (
   <div className="app-module">
-
     <Switch location={props.location}>
-      <Route path={appModuleUri(appModules.home)} component={HomeView}/>
-      <Route path={appModuleUri(appModules.designer)} component={DesignerView}/>
-      <Route path={appModuleUri(appModules.data)} component={DataView}/>
-      <Route path={appModuleUri(appModules.users)} component={UsersView}/>
-      <Route path={appModuleUri(appModules.analysis)} component={AnalysisView}/>
+      <Route path={appModuleUri(appModules.home)} component={HomeView} />
+      <Route
+        path={appModuleUri(appModules.designer)}
+        component={DesignerView}
+      />
+      <Route path={appModuleUri(appModules.data)} component={DataView} />
+      <Route path={appModuleUri(appModules.users)} component={UsersView} />
+      <Route
+        path={appModuleUri(appModules.analysis)}
+        component={AnalysisView}
+      />
     </Switch>
-
   </div>
 )
 

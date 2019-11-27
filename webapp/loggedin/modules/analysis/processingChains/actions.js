@@ -7,8 +7,13 @@ import {analysisModules, appModuleUri} from '../../../appModules'
 
 // ====== CREATE
 
-export const navigateToProcessingChainView = (history, processingChainUuid) => () =>
-  history.push(`${appModuleUri(analysisModules.processingChain)}${processingChainUuid}`)
+export const navigateToProcessingChainView = (
+  history,
+  processingChainUuid,
+) => () =>
+  history.push(
+    `${appModuleUri(analysisModules.processingChain)}${processingChainUuid}`,
+  )
 
 export const createProcessingChain = history => async (dispatch, getState) => {
   dispatch(showAppLoader())
@@ -17,7 +22,12 @@ export const createProcessingChain = history => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-  const {data: processingChainUuid} = await axios.post(`/api/survey/${surveyId}/processing-chain`, {surveyCycleKey})
+  const {data: processingChainUuid} = await axios.post(
+    `/api/survey/${surveyId}/processing-chain`,
+    {
+      surveyCycleKey,
+    },
+  )
 
   dispatch(hideAppLoader())
   dispatch(navigateToProcessingChainView(history, processingChainUuid))

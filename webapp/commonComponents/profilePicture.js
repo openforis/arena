@@ -20,7 +20,7 @@ const ProfilePicture = props => {
 ProfilePicture.defaultProps = {
   userUuid: 'null',
   forceUpdateKey: 0, // Change it when picture of same user must be reloaded
-  thumbnail: false
+  thumbnail: false,
 }
 
 export default ProfilePicture

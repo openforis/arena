@@ -28,22 +28,19 @@ const SurveyHierarchy = props => {
 
   return (
     <div className="survey-hierarchy">
-
-      <div className="survey-hierarchy__tree" ref={treeRef}/>
+      <div className="survey-hierarchy__tree" ref={treeRef} />
 
       <div className="survey-hierarchy__attributes">
         <NodeDefsSelectorView
           hierarchy={hierarchy}
           nodeDefUuidEntity={selectedNodeDefUuid}
-          onChangeEntity={
-            nodeDefUuidEntity => tree.expandToNode(nodeDefUuidEntity)
+          onChangeEntity={nodeDefUuidEntity =>
+            tree.expandToNode(nodeDefUuidEntity)
           }
           canSelectAttributes={false}
           showAncestors={false}
         />
-
       </div>
-
     </div>
   )
 }

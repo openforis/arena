@@ -15,13 +15,17 @@ import * as RecordsSummaryState from './recordsSummaryState'
 
 import {fetchRecordsSummary} from './actions'
 
-const formatDate = dateStr => dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : ''
+const formatDate = dateStr =>
+  dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : ''
 
 const RecordsSummary = props => {
   const {
     surveyCycleKey,
-    timeRange, from, to, counts,
-    fetchRecordsSummary
+    timeRange,
+    from,
+    to,
+    counts,
+    fetchRecordsSummary,
   } = props
 
   const i18n = useI18n()
@@ -29,11 +33,26 @@ const RecordsSummary = props => {
   const timeRangeElementRef = useRef(null)
 
   const timeRangeItems = [
-    {key: RecordsSummaryState.timeRanges._2Weeks, value: i18n.t('homeView.recordsSummary.week', {count: 2})},
-    {key: RecordsSummaryState.timeRanges._1Month, value: i18n.t('homeView.recordsSummary.month', {count: 1})},
-    {key: RecordsSummaryState.timeRanges._3Months, value: i18n.t('homeView.recordsSummary.month', {count: 3})},
-    {key: RecordsSummaryState.timeRanges._6Months, value: i18n.t('homeView.recordsSummary.month', {count: 6})},
-    {key: RecordsSummaryState.timeRanges._1Year, value: i18n.t('homeView.recordsSummary.year', {count: 1})},
+    {
+      key: RecordsSummaryState.timeRanges._2Weeks,
+      value: i18n.t('homeView.recordsSummary.week', {count: 2}),
+    },
+    {
+      key: RecordsSummaryState.timeRanges._1Month,
+      value: i18n.t('homeView.recordsSummary.month', {count: 1}),
+    },
+    {
+      key: RecordsSummaryState.timeRanges._3Months,
+      value: i18n.t('homeView.recordsSummary.month', {count: 3}),
+    },
+    {
+      key: RecordsSummaryState.timeRanges._6Months,
+      value: i18n.t('homeView.recordsSummary.month', {count: 6}),
+    },
+    {
+      key: RecordsSummaryState.timeRanges._1Year,
+      value: i18n.t('homeView.recordsSummary.year', {count: 1}),
+    },
   ]
   const timeRangeSelection = timeRangeItems.find(R.propEq('key', timeRange))
 
@@ -43,14 +62,16 @@ const RecordsSummary = props => {
 
   return (
     <div className="home-dashboard__records-summary">
-
       <div className="home-dashboard__records-summary-header">
         <h6>
-          {i18n.t('homeView.recordsSummary.recordsAdded', {from: formatDate(from), to: formatDate(to)})}
+          {i18n.t('homeView.recordsSummary.recordsAdded', {
+            from: formatDate(from),
+            to: formatDate(to),
+          })}
         </h6>
 
         <div className="time-range" ref={timeRangeElementRef}>
-          <span className="icon icon-calendar icon-12px icon-left"/>
+          <span className="icon icon-calendar icon-12px icon-left" />
           <Dropdown
             items={timeRangeItems}
             selection={timeRangeSelection}
@@ -61,14 +82,9 @@ const RecordsSummary = props => {
         </div>
       </div>
 
-      {
-        from && to &&
-        <RecordsSummaryChart
-          counts={counts}
-          from={from}
-          to={to}/>
-      }
-
+      {from && to && (
+        <RecordsSummaryChart counts={counts} from={from} to={to} />
+      )}
     </div>
   )
 }

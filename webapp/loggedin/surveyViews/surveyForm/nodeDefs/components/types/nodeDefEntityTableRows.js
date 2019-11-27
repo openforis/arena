@@ -12,15 +12,17 @@ import {debounce} from '@core/functionsDefer'
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
 const NodeDefEntityTableRows = props => {
-  const {
-    entry, edit,
-    nodeDef, nodeDefColumns, nodes,
-  } = props
+  const {entry, edit, nodeDef, nodeDefColumns, nodes} = props
 
   const tableRowsRef = useRef(null)
   const tableDataRowsRef = useRef(null)
 
-  const [gridSize, setGridSize] = useState({width: 0, height: 0, top: 0, left: 0})
+  const [gridSize, setGridSize] = useState({
+    width: 0,
+    height: 0,
+    top: 0,
+    left: 0,
+  })
   const debounceDelayOnScroll = 100
 
   const onScrollTableRows = () => {
@@ -63,7 +65,9 @@ const NodeDefEntityTableRows = props => {
         const {height} = elementOffset(tableDataRowsRef.current)
 
         setGridSize(gridSizePrev => ({
-          ...gridSizePrev, width, height
+          ...gridSizePrev,
+          width,
+          height,
         }))
       }
 
@@ -83,28 +87,30 @@ const NodeDefEntityTableRows = props => {
   }
 
   return (
-    <div className="survey-form__node-def-entity-table-rows"
+    <div
+      className="survey-form__node-def-entity-table-rows"
       ref={tableRowsRef}
-      onScroll={onScrollTableRows}>
-
-      {
-        (edit || !R.isEmpty(nodes)) &&
+      onScroll={onScrollTableRows}
+    >
+      {(edit || !R.isEmpty(nodes)) && (
         <NodeDefEntityTableRow
           {...props}
           node={null}
           renderType={NodeDefLayout.renderType.tableHeader}
           gridSize={gridSize}
-          nodeDefColumns={nodeDefColumns}/>
-      }
+          nodeDefColumns={nodeDefColumns}
+        />
+      )}
 
-      {
-        entry &&
-        <div className="survey-form__node-def-entity-table-data-rows"
+      {entry && (
+        <div
+          className="survey-form__node-def-entity-table-data-rows"
           ref={tableDataRowsRef}
-          onScroll={onScrollTableDataRows}>
-          {
-            gridSize.height > 0 && gridSize.width > 0 &&
-            nodes.map((node, i) =>
+          onScroll={onScrollTableDataRows}
+        >
+          {gridSize.height > 0 &&
+            gridSize.width > 0 &&
+            nodes.map((node, i) => (
               <NodeDefEntityTableRow
                 key={i}
                 i={i}
@@ -115,12 +121,9 @@ const NodeDefEntityTableRows = props => {
                 gridSize={gridSize}
                 nodeDefColumns={nodeDefColumns}
               />
-            )
-          }
+            ))}
         </div>
-
-      }
-
+      )}
     </div>
   )
 }
@@ -130,7 +133,9 @@ const mapStateToProps = (state, props) => {
 
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(
+    nodeDef,
+  )
 
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
@@ -139,11 +144,11 @@ const mapStateToProps = (state, props) => {
       return nodeDefColumnsAgg
     },
     [],
-    nodeDefColumnUuids
+    nodeDefColumnUuids,
   )
 
   return {
-    nodeDefColumns
+    nodeDefColumns,
   }
 }
 

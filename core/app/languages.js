@@ -178,7 +178,7 @@ const languagesMap = {
   yi: {en: 'Yiddish'},
   yo: {en: 'Yoruba'},
   za: {en: 'Zhuang; Chuang'},
-  zu: {en: 'Zulu'}
+  zu: {en: 'Zulu'},
 }
 
 const language_ISO_636_2_Map = {
@@ -313,7 +313,7 @@ const language_ISO_636_2_Map = {
   grn: {en: 'Guarani'},
   gsw: {en: 'Swiss German; Alemannic; Alsatian'},
   guj: {en: 'Gujarati'},
-  gwi: {en: 'Gwich\'in'},
+  gwi: {en: "Gwich'in"},
   hai: {en: 'Haida'},
   hat: {en: 'Haitian; Haitian Creole'},
   hau: {en: 'Hausa'},
@@ -411,7 +411,7 @@ const language_ISO_636_2_Map = {
   mdf: {en: 'Moksha'},
   mdr: {en: 'Mandar'},
   men: {en: 'Mende'},
-  mic: {en: 'Mi\'kmaq; Micmac'},
+  mic: {en: "Mi'kmaq; Micmac"},
   min: {en: 'Minangkabau'},
   mis: {en: 'Uncoded languages'},
   mkd: {en: 'Macedonian (T)'},
@@ -446,7 +446,7 @@ const language_ISO_636_2_Map = {
   nob: {en: 'Bokmål, Norwegian; Norwegian Bokmål'},
   nog: {en: 'Nogai'},
   nor: {en: 'Norwegian'},
-  nqo: {en: 'N\'Ko'},
+  nqo: {en: "N'Ko"},
   nso: {en: 'Pedi; Sepedi; Northern Sotho'},
   nya: {en: 'Chichewa; Chewa; Nyanja'},
   nym: {en: 'Nyamwezi'},
@@ -584,11 +584,12 @@ const language_ISO_636_2_Map = {
   zza: {en: 'Zaza; Dimili; Dimli; Kirdki; Kirmanjki; Zazaki'},
 }
 
-export const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languagesMap)
+export const getLanguageLabel = (lang, translationLang = 'en') =>
+  R.path([lang, translationLang], languagesMap)
 
 export const languages = R.pipe(
   R.keys,
-  R.map(lang => ({key: lang, value: getLanguageLabel(lang)}))
+  R.map(lang => ({key: lang, value: getLanguageLabel(lang)})),
 )(languagesMap)
 
 export const languageCodes = languages.map(R.prop('key'))

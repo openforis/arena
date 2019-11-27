@@ -24,7 +24,10 @@ export default class ThreadManager {
     this.threadId = this.worker.threadId
     this.logger = Log.getLogger(`ThreadManager - thread ID: ${this.threadId}`)
 
-    this.worker.on('message', this.messageHandlerWrapper.bind(this)(messageHandler))
+    this.worker.on(
+      'message',
+      this.messageHandlerWrapper.bind(this)(messageHandler),
+    )
 
     this.worker.on('exit', () => {
       this.logger.debug('thread ended')
@@ -40,9 +43,17 @@ export default class ThreadManager {
     return ({user, msg}) => {
       if (msg.type === Thread.messageTypes.error) {
         if (this.socketId) {
-          WebSocket.notifySocket(this.socketId, WebSocketEvents.error, msg.error)
+          WebSocket.notifySocket(
+            this.socketId,
+            WebSocketEvents.error,
+            msg.error,
+          )
         } else {
-          WebSocket.notifyUser(User.getUuid(user), WebSocketEvents.error, msg.error)
+          WebSocket.notifyUser(
+            User.getUuid(user),
+            WebSocketEvents.error,
+            msg.error,
+          )
         }
       } else {
         messageHandler(msg)

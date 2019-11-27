@@ -26,8 +26,4 @@ const reducers = [
   {name: SideBarState.stateKey, fn: sidebarReducer},
 ]
 
-export {
-  component,
-  reducers,
-}
-
+export {component, reducers}

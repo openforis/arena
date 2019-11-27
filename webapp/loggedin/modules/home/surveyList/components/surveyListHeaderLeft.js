@@ -8,9 +8,7 @@ const SurveyListHeaderLeft = () => {
 
   return (
     <Header>
-      <h6>
-        {i18n.t('appModules.surveyList')}
-      </h6>
+      <h6>{i18n.t('appModules.surveyList')}</h6>
     </Header>
   )
 }

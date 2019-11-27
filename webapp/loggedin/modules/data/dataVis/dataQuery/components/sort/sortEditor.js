@@ -43,11 +43,19 @@ const SortExpressionComponent = props => {
 
   const refreshUnchosenVariables = () => {
     const availableVariables = getAvailableVariables(props, lang)
-    setUnchosenVariables(DataSort.getUnchosenVariables(availableVariables)(sortCriteria))
+    setUnchosenVariables(
+      DataSort.getUnchosenVariables(availableVariables)(sortCriteria),
+    )
   }
 
   const addCriteria = ({value: variable, label}) => {
-    setSortCriteria(DataSort.addCriteria(variable, label, DataSort.keys.order.asc)(sortCriteria))
+    setSortCriteria(
+      DataSort.addCriteria(
+        variable,
+        label,
+        DataSort.keys.order.asc,
+      )(sortCriteria),
+    )
     setUpdated(true)
   }
 
@@ -75,62 +83,66 @@ const SortExpressionComponent = props => {
   }
 
   const getAvailableVariables = () => {
-    const {
-      survey,
-      nodeDefUuidCols,
-      nodeDefContext,
-      mode,
-    } = props
+    const {survey, nodeDefUuidCols, nodeDefContext, mode} = props
 
-    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, null, mode, lang)
+    const variables = ExpressionVariables.getVariables(
+      survey,
+      nodeDefContext,
+      null,
+      mode,
+      lang,
+    )
     return variables.filter(v => nodeDefUuidCols.includes(v.uuid))
   }
 
   const availableVariables = getAvailableVariables()
 
   return (
-    <Popup
-      className="sort-editor-popup"
-      onClose={onClose}
-      padding={20}>
-
+    <Popup className="sort-editor-popup" onClose={onClose} padding={20}>
       <React.Fragment>
         <div className="sort-editor__criteria">
-          {sortCriteria.map((criteria, pos) =>
+          {sortCriteria.map((criteria, pos) => (
             <SortRow
               key={criteria.variable}
               variables={unchosenVariables}
-              selectedVariable={DataSort.findVariableByValue(criteria.variable)(availableVariables)}
+              selectedVariable={DataSort.findVariableByValue(criteria.variable)(
+                availableVariables,
+              )}
               onSelectVariable={item => onSelectVariable(pos, item)}
               selectedOrder={criteria.order}
               onSelectOrder={order => onSelectOrder(pos, order)}
               onDelete={() => deleteCriteria(pos)}
-              isFirst={!pos}/>)}
+              isFirst={!pos}
+            />
+          ))}
 
-          {
-            Boolean(unchosenVariables.length) &&
+          {Boolean(unchosenVariables.length) && (
             <SortRow
               variables={unchosenVariables}
               onSelectVariable={item => addCriteria(item)}
               isPlaceholder={true}
-              isFirst={!sortCriteria.length}/>
-          }
+              isFirst={!sortCriteria.length}
+            />
+          )}
         </div>
         <div className="sort-editor__footer">
-          <button className="btn btn-xs"
+          <button
+            className="btn btn-xs"
             onClick={() => reset()}
-            aria-disabled={!sortCriteria.length}>
-            <span className="icon icon-undo2 icon-16px"/> Reset
+            aria-disabled={!sortCriteria.length}
+          >
+            <span className="icon icon-undo2 icon-16px" /> Reset
           </button>
 
-          <button className="btn btn-xs"
+          <button
+            className="btn btn-xs"
             onClick={() => applyChange()}
-            aria-disabled={!updated}>
-            <span className="icon icon-checkmark icon-16px"/> Apply
+            aria-disabled={!updated}
+          >
+            <span className="icon icon-checkmark icon-16px" /> Apply
           </button>
         </div>
       </React.Fragment>
-
     </Popup>
   )
 }
@@ -138,10 +150,7 @@ const SortExpressionComponent = props => {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
 
-  const {
-    nodeDefUuidContext,
-    nodeDefUuidCols,
-  } = props
+  const {nodeDefUuidContext, nodeDefUuidCols} = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const mode = Expression.modes.sql

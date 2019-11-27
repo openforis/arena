@@ -25,7 +25,7 @@ export const latLonSrs = newSrs(
           AUTHORITY["EPSG","8901"]],
       UNIT["degree",0.01745329251994328,
           AUTHORITY["EPSG","9122"]],
-      AUTHORITY["EPSG","4326"]]`
+      AUTHORITY["EPSG","4326"]]`,
 )
 
 export const isLatLon = code => getCode(latLonSrs) === code

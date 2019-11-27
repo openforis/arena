@@ -10,32 +10,29 @@ const ItemsView = props => {
 
   const itemEditProps = {
     ...props,
-    [itemEditProp]: editedItem
+    [itemEditProp]: editedItem,
   }
 
-  return editedItem
-    ? (
-      <ItemEdit {...itemEditProps}/>
-    )
-    : (
-      <div className="items">
+  return editedItem ? (
+    <ItemEdit {...itemEditProps} />
+  ) : (
+    <div className="items">
+      <ItemsTable {...props} />
 
-        <ItemsTable {...props}/>
-
-        {
-          onClose &&
-          <div className="items__footer">
-            <button className="btn"
-              onClick={() => {
-                onClose ? onClose() : null
-              }}>
-              Close
-            </button>
-          </div>
-        }
-
-      </div>
-    )
+      {onClose && (
+        <div className="items__footer">
+          <button
+            className="btn"
+            onClick={() => {
+              onClose ? onClose() : null
+            }}
+          >
+            Close
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default ItemsView

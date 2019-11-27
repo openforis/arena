@@ -8,17 +8,9 @@ const TableRows = props => {
   return (
     <div className="table__content">
       <div className="table__rows">
-        {
-          reportItems.map((item, i) => {
-            return (
-              <TableRow
-                key={i}
-                idx={i}
-                item={item}
-              />
-            )
-          })
-        }
+        {reportItems.map((item, i) => {
+          return <TableRow key={i} idx={i} item={item} />
+        })}
       </div>
     </div>
   )

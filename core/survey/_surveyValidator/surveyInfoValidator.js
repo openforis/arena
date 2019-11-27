@@ -12,33 +12,45 @@ const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
     : null
 }
 
-export const validateNewSurvey = async (survey, surveyInfos) => await Validator.validate(
-  survey,
-  {
+export const validateNewSurvey = async (survey, surveyInfos) =>
+  await Validator.validate(survey, {
     name: [
       Validator.validateRequired(Validation.messageKeys.nameRequired),
       Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
-      validateSurveyNameUniqueness(surveyInfos)
+      validateSurveyNameUniqueness(surveyInfos),
     ],
-    lang: [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
-  }
-)
+    lang: [
+      Validator.validateRequired(
+        Validation.messageKeys.surveyInfoEdit.langRequired,
+      ),
+    ],
+  })
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
-  const validation = await Validator.validate(
-    surveyInfo,
-    {
-      'props.name': [
-        Validator.validateRequired(Validation.messageKeys.nameRequired),
-        Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
-        validateSurveyNameUniqueness(surveyInfos)
-      ],
-      'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
-      'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
-    }
+  const validation = await Validator.validate(surveyInfo, {
+    'props.name': [
+      Validator.validateRequired(Validation.messageKeys.nameRequired),
+      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+      validateSurveyNameUniqueness(surveyInfos),
+    ],
+    'props.languages': [
+      Validator.validateRequired(
+        Validation.messageKeys.surveyInfoEdit.langRequired,
+      ),
+    ],
+    'props.srs': [
+      Validator.validateRequired(
+        Validation.messageKeys.surveyInfoEdit.srsRequired,
+      ),
+    ],
+  })
+
+  const cyclesValidation = await SurveyCyclesValidator.validateCycles(
+    Survey.getCycles(surveyInfo),
   )
 
-  const cyclesValidation = await SurveyCyclesValidator.validateCycles(Survey.getCycles(surveyInfo))
-
-  return Validation.assocFieldValidation(Survey.infoKeys.cycles, cyclesValidation)(validation)
+  return Validation.assocFieldValidation(
+    Survey.infoKeys.cycles,
+    cyclesValidation,
+  )(validation)
 }

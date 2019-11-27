@@ -11,12 +11,12 @@ const useAsyncActionHandlers = [
 export default (promiseFn, promiseArgs) => {
   const [state, _dispatch] = useReducer(
     (state, {type, payload}) => useAsyncActionHandlers[type](payload),
-    {loading: false, loaded: false}
+    {loading: false, loaded: false},
   )
   const isMounted = useIsMounted()
 
   const dispatch = () => {
-    (async () => {
+    ;(async () => {
       _dispatch({type: 0, payload: state})
 
       try {

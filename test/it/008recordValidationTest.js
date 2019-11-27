@@ -22,47 +22,43 @@ before(async () => {
   await initTestContext()
   const user = getContextUser()
 
-  survey = await SB.survey(user,
-    SB.entity('cluster',
-      SB.attribute('cluster_no')
-        .key(),
-      SB.attribute('required_attr')
-        .required(),
-      SB.attribute('not_required_attr')
-        .required(false),
+  survey = await SB.survey(
+    user,
+    SB.entity(
+      'cluster',
+      SB.attribute('cluster_no').key(),
+      SB.attribute('required_attr').required(),
+      SB.attribute('not_required_attr').required(false),
       SB.attribute('numeric_attr', NodeDef.nodeDefType.integer),
       SB.attribute('date_attr', NodeDef.nodeDefType.date),
-      SB.entity('tree',
-        SB.attribute('tree_num', NodeDef.nodeDefType.integer)
-          .key()
-      ).multiple()
+      SB.entity(
+        'tree',
+        SB.attribute('tree_num', NodeDef.nodeDefType.integer).key(),
+      )
+        .multiple()
         .minCount(3)
         .maxCount(4),
-      SB.attribute('percent_attr', NodeDef.nodeDefType.integer)
-        .expressions(
-          NodeDefExpression.createExpression('percent_attr > 0'),
-          NodeDefExpression.createExpression('percent_attr <= 100'),
-        )
-    )
+      SB.attribute('percent_attr', NodeDef.nodeDefType.integer).expressions(
+        NodeDefExpression.createExpression('percent_attr > 0'),
+        NodeDefExpression.createExpression('percent_attr <= 100'),
+      ),
+    ),
   ).buildAndStore()
 
-  record = await RB.record(user, survey,
-    RB.entity('cluster',
+  record = await RB.record(
+    user,
+    survey,
+    RB.entity(
+      'cluster',
       RB.attribute('cluster_no', '1'),
       RB.attribute('required_attr', 'some value'),
       RB.attribute('not_required_attr', 'some other value'),
       RB.attribute('numeric_attr', 1),
       RB.attribute('date_attr', '01/01/2019'),
-      RB.entity('tree',
-        RB.attribute('tree_num', 1)
-      ),
-      RB.entity('tree',
-        RB.attribute('tree_num', 2)
-      ),
-      RB.entity('tree',
-        RB.attribute('tree_num', 3)
-      )
-    )
+      RB.entity('tree', RB.attribute('tree_num', 1)),
+      RB.entity('tree', RB.attribute('tree_num', 2)),
+      RB.entity('tree', RB.attribute('tree_num', 3)),
+    ),
   ).buildAndStore()
 })
 
@@ -73,41 +69,77 @@ after(async () => {
 })
 
 const _persistNode = async node =>
-  record = await RecordManager.persistNode(getContextUser(), survey, record, node)
+  (record = await RecordManager.persistNode(
+    getContextUser(),
+    survey,
+    record,
+    node,
+  ))
 
 const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
-  const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+  const children = Record.getNodeChildrenByDefUuid(
+    parentNode,
+    NodeDef.getUuid(childDef),
+  )(record)
   const node = children[childNodePosition - 1]
-  record = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
+  record = await RecordManager.deleteNode(
+    getContextUser(),
+    survey,
+    record,
+    Node.getUuid(node),
+  )
 }
 
-const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
+const updateNodeAndExpectValidationToBe = async (
+  nodePath,
+  value,
+  validationExpected,
+) => {
   const node = RecordUtils.findNodeByPath(nodePath)(survey, record)
 
   await _persistNode(Node.assocValue(value)(node))
 
-  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
+  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(
+    Record.getValidation(record),
+  )
 
   expect(Validation.isValid(nodeValidation)).to.equal(validationExpected)
 }
 
-const deleteNodeAndExpectMinCountToBe = async (parentNodePath, childNodeName, childNodePosition, expectedValidation) => {
+const deleteNodeAndExpectMinCountToBe = async (
+  parentNodePath,
+  childNodeName,
+  childNodePosition,
+  expectedValidation,
+) => {
   const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
   await _deleteNode(parentNode, childNodeName, childNodePosition)
 
-  const minCountValidation = RecordUtils.getValidationMinCount(parentNode, childDef)(record)
+  const minCountValidation = RecordUtils.getValidationMinCount(
+    parentNode,
+    childDef,
+  )(record)
 
   expect(Validation.isValid(minCountValidation)).to.equal(expectedValidation)
 }
 
-const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = true, expectedValidation = true) => {
+const addNodeAndExpectCountToBe = async (
+  parentNodePath,
+  childNodeName,
+  min = true,
+  expectedValidation = true,
+) => {
   const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
-  const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  const node = Node.newNode(
+    NodeDef.getUuid(childDef),
+    Record.getUuid(record),
+    parentNode,
+  )
 
   await _persistNode(node)
 
@@ -122,21 +154,34 @@ const addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   // Add a new tree
   const nodeRoot = Record.getRootNode(record)
   const nodeDefTree = Survey.getNodeDefByName('tree')(survey)
-  const nodeTree = Node.newNode(NodeDef.getUuid(nodeDefTree), Record.getUuid(record), nodeRoot)
+  const nodeTree = Node.newNode(
+    NodeDef.getUuid(nodeDefTree),
+    Record.getUuid(record),
+    nodeRoot,
+  )
   await _persistNode(nodeTree)
 
   // Update new tree num with a duplicate value
-  const nodeTreeNum = RecordUtils.findNodeByPath('cluster/tree[4]/tree_num')(survey, record)
+  const nodeTreeNum = RecordUtils.findNodeByPath('cluster/tree[4]/tree_num')(
+    survey,
+    record,
+  )
   const value = 2 // Duplicate value
   await _persistNode(Node.assocValue(value)(nodeTreeNum))
 
   // Expect validation to be invalid
-  const nodeTreeNumValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNum))(Record.getValidation(record))
+  const nodeTreeNumValidation = Validation.getFieldValidation(
+    Node.getUuid(nodeTreeNum),
+  )(Record.getValidation(record))
   expect(Validation.isValid(nodeTreeNumValidation)).to.equal(false)
 
   // Expect duplicate node validation to be invalid
-  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
-  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(Record.getValidation(record))
+  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath(
+    'cluster/tree[2]/tree_num',
+  )(survey, record)
+  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(
+    Node.getUuid(nodeTreeNumDuplicate),
+  )(Record.getValidation(record))
   expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(false)
 }
 
@@ -145,8 +190,12 @@ const removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =>
 
   await _deleteNode(Record.getRootNode(record), 'tree', 4)
 
-  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
-  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(Record.getValidation(record))
+  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath(
+    'cluster/tree[2]/tree_num',
+  )(survey, record)
+  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(
+    Node.getUuid(nodeTreeNumDuplicate),
+  )(Record.getValidation(record))
   expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(true)
 }
 
@@ -164,21 +213,37 @@ describe('Record Validation Test', () => {
   })
 
   it('Correct date attribute value', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/date_attr', '02/11/2019', true)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/date_attr',
+      '02/11/2019',
+      true,
+    )
   })
 
   it('Invalid date attribute value (day)', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/date_attr', '32/01/2019', false)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/date_attr',
+      '32/01/2019',
+      false,
+    )
   })
 
   it('Invalid date attribute value (month)', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/date_attr', '01/13/2019', false)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/date_attr',
+      '01/13/2019',
+      false,
+    )
   })
 
   // ========== required
 
   it('Required attribute: missing value', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/required_attr', null, false)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/required_attr',
+      null,
+      false,
+    )
   })
 
   it('Required attribute: empty value', async () => {
@@ -186,19 +251,35 @@ describe('Record Validation Test', () => {
   })
 
   it('Required attribute: not empty value', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/required_attr', 'some value', true)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/required_attr',
+      'some value',
+      true,
+    )
   })
 
   it('Not required attribute: missing value', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/not_required_attr', null, true)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/not_required_attr',
+      null,
+      true,
+    )
   })
 
   it('Not required attribute: empty value', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/not_required_attr', '', true)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/not_required_attr',
+      '',
+      true,
+    )
   })
 
   it('Not required attribute: not empty value', async () => {
-    await updateNodeAndExpectValidationToBe('cluster/not_required_attr', 'some value', true)
+    await updateNodeAndExpectValidationToBe(
+      'cluster/not_required_attr',
+      'some value',
+      true,
+    )
   })
 
   // ========== min count

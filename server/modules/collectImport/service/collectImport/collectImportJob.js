@@ -34,7 +34,7 @@ export default class CollectImportJob extends Job {
     const {surveyId} = this.context
 
     this.setResult({
-      surveyId
+      surveyId,
     })
   }
 

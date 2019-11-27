@@ -21,8 +21,11 @@ import {createCategory, deleteCategory} from '../../categoryEdit/actions'
 
 const CodeProps = props => {
   const {
-    surveyCycleKey, nodeDef, validation,
-    putNodeDefProp, putNodeDefLayoutProp,
+    surveyCycleKey,
+    nodeDef,
+    validation,
+    putNodeDefProp,
+    putNodeDefLayoutProp,
     categories,
     canUpdateCategory,
     category,
@@ -37,76 +40,100 @@ const CodeProps = props => {
   const displayAsItems = [
     {
       key: NodeDefLayout.renderType.checkbox,
-      label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox')
+      label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
     },
     {
       key: NodeDefLayout.renderType.dropdown,
-      label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown')
-    }
+      label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown'),
+    },
   ]
 
   const disabled = !canUpdateCategory
 
   const putCategoryProp = category => {
     putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
-    putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))
+    putNodeDefProp(
+      nodeDef,
+      NodeDef.propKeys.categoryUuid,
+      Category.getUuid(category),
+    )
   }
 
   return (
     <React.Fragment>
-
       <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr repeat(2, 100px)',
-        }}>
-          <Dropdown disabled={disabled}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr repeat(2, 100px)',
+          }}
+        >
+          <Dropdown
+            disabled={disabled}
             items={categories}
             itemKeyProp={'uuid'}
             itemLabelFunction={Category.getName}
-            validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
+            validation={Validation.getFieldValidation(
+              NodeDef.propKeys.categoryUuid,
+            )(validation)}
             selection={category}
-            onChange={putCategoryProp}/>
-          <button className="btn btn-s"
+            onChange={putCategoryProp}
+          />
+          <button
+            className="btn btn-s"
             style={{justifySelf: 'center'}}
             onClick={async () => {
               putCategoryProp(await createCategory())
               toggleCategoryEdit(true)
-            }}>
-
-            <span className="icon icon-plus icon-12px icon-left"/>
+            }}
+          >
+            <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <button className="btn btn-s"
+          <button
+            className="btn btn-s"
             style={{justifySelf: 'center'}}
-            onClick={() => toggleCategoryEdit(true)}>
-            <span className="icon icon-list icon-12px icon-left"/>
+            onClick={() => toggleCategoryEdit(true)}
+          >
+            <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
           </button>
         </div>
       </FormItem>
 
       <FormItem label={i18n.t('nodeDefEdit.codeProps.parentCode')}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 200px',
-        }}>
-          <Dropdown disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 200px',
+          }}
+        >
+          <Dropdown
+            disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
             items={candidateParentCodeNodeDefs}
             selection={parentCodeDef}
             itemKeyProp={'uuid'}
             itemLabelFunction={NodeDef.getName}
-            onChange={def => putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
+            onChange={def =>
+              putNodeDefProp(
+                nodeDef,
+                NodeDef.propKeys.parentCodeDefUuid,
+                NodeDef.getUuid(def),
+              )
+            }
+          />
         </div>
       </FormItem>
 
       <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
-        <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-          onChange={render => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)}
+        <ButtonGroup
+          selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
+          onChange={render =>
+            putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)
+          }
           items={displayAsItems}
         />
       </FormItem>
-
     </React.Fragment>
   )
 }
@@ -118,18 +145,18 @@ const mapStateToProps = state => {
   return {
     categories: Survey.getCategoriesArray(survey),
     canUpdateCategory: Survey.canUpdateCategory(nodeDef)(survey),
-    category: Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey),
-    candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(survey),
+    category: Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(
+      survey,
+    ),
+    candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(
+      survey,
+    ),
     parentCodeDef: Survey.getNodeDefParentCode(nodeDef)(survey),
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    putNodeDefProp,
-    createCategory,
-    deleteCategory,
-  }
-)(CodeProps)
-
+export default connect(mapStateToProps, {
+  putNodeDefProp,
+  createCategory,
+  deleteCategory,
+})(CodeProps)

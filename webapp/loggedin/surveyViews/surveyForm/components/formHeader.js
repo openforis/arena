@@ -17,11 +17,17 @@ import FormEditActions from './formEditActions'
 
 const FormHeader = props => {
   const {
-    surveyCycleKey, edit, entry, preview,
-    history, canEditDef,
-    nodeDefPage, nodeDefPageLabel,
+    surveyCycleKey,
+    edit,
+    entry,
+    preview,
+    history,
+    canEditDef,
+    nodeDefPage,
+    nodeDefPageLabel,
     showPageNavigation,
-    toggleFormPageNavigation, createNodeDef,
+    toggleFormPageNavigation,
+    createNodeDef,
   } = props
 
   const i18n = useI18n()
@@ -29,42 +35,47 @@ const FormHeader = props => {
   return (
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
-
-        <button className="btn-s survey-form-header__btn-page-toggle"
+        <button
+          className="btn-s survey-form-header__btn-page-toggle"
           onClick={toggleFormPageNavigation}
-          title={i18n.t(`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`)}>
-          <span className="icon icon-stack icon-12px icon-left"/>
-          <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px icon-left`}/>
+          title={i18n.t(
+            `surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`,
+          )}
+        >
+          <span className="icon icon-stack icon-12px icon-left" />
+          <span
+            className={`icon icon-${
+              showPageNavigation ? 'shrink2' : 'enlarge2'
+            } icon-12px icon-left`}
+          />
         </button>
 
         <h5>{nodeDefPageLabel}</h5>
 
-        {
-          edit && canEditDef &&
-          <button className="btn-s btn-transparent btn-add-sub-page"
-            onClick={() => createNodeDef(
-              nodeDefPage,
-              NodeDef.nodeDefType.entity,
-              {
+        {edit && canEditDef && (
+          <button
+            className="btn-s btn-transparent btn-add-sub-page"
+            onClick={() =>
+              createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
                   surveyCycleKey,
                   NodeDefLayout.renderType.form,
-                  uuidv4()
-                )
-              }
-            )}>
-            <span className="icon icon-plus icon-10px icon-left"/>
+                  uuidv4(),
+                ),
+              })
+            }
+          >
+            <span className="icon icon-plus icon-10px icon-left" />
             {i18n.t('surveyForm.subPage')}
           </button>
-        }
-
+        )}
       </div>
 
-      {
-        edit && canEditDef
-          ? <FormEditActions/>
-          : <FormEntryActions preview={preview} history={history} entry={entry}/>
-      }
+      {edit && canEditDef ? (
+        <FormEditActions />
+      ) : (
+        <FormEntryActions preview={preview} history={history} entry={entry} />
+      )}
     </div>
   )
 }
@@ -77,11 +88,11 @@ const mapStateToProps = state => {
   return {
     nodeDefPage,
     nodeDefPageLabel,
-    showPageNavigation
+    showPageNavigation,
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {toggleFormPageNavigation, createNodeDef}
-)(FormHeader)
+export default connect(mapStateToProps, {
+  toggleFormPageNavigation,
+  createNodeDef,
+})(FormHeader)

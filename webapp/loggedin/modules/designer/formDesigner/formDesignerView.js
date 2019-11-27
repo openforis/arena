@@ -12,13 +12,11 @@ import * as Authorizer from '@core/auth/authorizer'
 const FormDesignerView = props => {
   const {canEditDef, recordPreviewUuid} = props
 
-  return recordPreviewUuid
-    ? (
-      <RecordView canEditDef={canEditDef}/>
-    )
-    : (
-      <SurveyFormView edit={true} draft={true} canEditDef={canEditDef}/>
-    )
+  return recordPreviewUuid ? (
+    <RecordView canEditDef={canEditDef} />
+  ) : (
+    <SurveyFormView edit={true} draft={true} canEditDef={canEditDef} />
+  )
 }
 
 const mapStateToProps = state => {
@@ -27,7 +25,7 @@ const mapStateToProps = state => {
 
   return {
     canEditDef: Authorizer.canEditSurvey(user, surveyInfo),
-    recordPreviewUuid: RecordState.getRecordUuidPreview(state)
+    recordPreviewUuid: RecordState.getRecordUuidPreview(state),
   }
 }
 

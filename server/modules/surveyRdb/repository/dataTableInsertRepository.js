@@ -60,7 +60,9 @@ export const populateTable = async (survey, nodeDef, client) => {
   // 1. create materialized view
   const viewName = `${surveySchema}.m_view_data`
   const selectQuery = getSelectQuery(surveySchema, nodeDef)
-  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [nodeDefUuid])
+  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [
+    nodeDefUuid,
+  ])
 
   const {count} = await client.one(`SELECT count(id) FROM ${viewName}`)
 
@@ -70,20 +72,24 @@ export const populateTable = async (survey, nodeDef, client) => {
     const offset = i * limit
 
     // 2. fetch nodes
-    const nodes = await client.any(`select * from ${viewName} ORDER BY id OFFSET ${offset} LIMIT ${limit}  `)
+    const nodes = await client.any(
+      `select * from ${viewName} ORDER BY id OFFSET ${offset} LIMIT ${limit}  `,
+    )
 
     // 3. convert nodes into values
-    const nodesRowValues = nodes.map(
-      nodeRow => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns)
+    const nodesRowValues = nodes.map(nodeRow =>
+      DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns),
     )
 
     // 4. insert node values
-    await client.none(insertAllQuery(
-      SchemaRdb.getName(surveyId),
-      NodeDefTable.getTableName(nodeDef, nodeDefParent),
-      DataTable.getColumnNames(survey, nodeDef),
-      nodesRowValues
-    ))
+    await client.none(
+      insertAllQuery(
+        SchemaRdb.getName(surveyId),
+        NodeDefTable.getTableName(nodeDef, nodeDefParent),
+        DataTable.getColumnNames(survey, nodeDef),
+        nodesRowValues,
+      ),
+    )
   }
 
   // 5. drop materialized view

@@ -4,11 +4,13 @@ import {trim, isNotBlank} from '@core/stringUtils'
 import {types} from './types'
 
 // ToString
-const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
+const binaryToString = node =>
+  `${toString(node.left)} ${node.operator} ${toString(node.right)}`
 
 // Valid
 const propValid = prop => R.pipe(R.prop(prop), isNotBlank)
-const binaryValid = node => isValid(node.left) && propValid('operator')(node) && isValid(node.right)
+const binaryValid = node =>
+  isValid(node.left) && propValid('operator')(node) && isValid(node.right)
 
 const typeProps = {
   [types.Identifier]: {
@@ -28,8 +30,9 @@ const typeProps = {
     isValid: () => true,
   },
   [types.CallExpression]: {
-    toString: node => `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
-    isValid: node => isValid((node.callee)),
+    toString: node =>
+      `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
+    isValid: node => isValid(node.callee),
   },
   [types.UnaryExpression]: {
     toString: node => `${node.operator} ${toString(node.argument)}`,
@@ -51,9 +54,6 @@ const typeProps = {
 
 const getTypeProp = (type, prop) => R.path([type, prop], typeProps)
 
-export const toString = expr => trim(
-  getTypeProp(expr.type, 'toString')(expr)
-)
+export const toString = expr => trim(getTypeProp(expr.type, 'toString')(expr))
 
-export const isValid = expr =>
-  getTypeProp(expr.type, 'isValid')(expr)
+export const isValid = expr => getTypeProp(expr.type, 'isValid')(expr)

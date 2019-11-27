@@ -4,7 +4,7 @@ import {uuidv4} from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 
 const keys = {
-  published: 'published'
+  published: 'published',
 }
 
 export const keysProps = {
@@ -21,5 +21,8 @@ export const newTaxonomy = (props = {}) => ({
 // READ
 export const getUuid = ObjectUtils.getUuid
 export const getName = ObjectUtils.getProp(keysProps.name, '')
-export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
+export const getVernacularLanguageCodes = ObjectUtils.getProp(
+  keysProps.vernacularLanguageCodes,
+  [],
+)
 export const isPublished = R.propOr(false, keys.published)

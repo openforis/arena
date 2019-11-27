@@ -8,28 +8,25 @@ import * as ProcessingStepScriptGenerator from './_processingChainScriptGenerato
 export {
   // ====== CREATE - Chain
   createChain,
-
   // ====== CREATE - Processing Step
   createProcessingStep,
-
   // ====== CREATE - Processing Step Calculation
   createProcessingStepCalculation,
-
   // ======  READ - Chain
-  countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid,
-
+  countChainsBySurveyId,
+  fetchChainsBySurveyId,
+  fetchChainByUuid,
   // ======  READ - Steps
-  fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex,
-
+  fetchStepsByChainUuid,
+  fetchStepByUuid,
+  fetchStepSummaryByIndex,
   // ======  UPDATE - Chain
   updateChainProp,
-
   // ======  UPDATE - Step
-  updateStepProps, updateStepCalculationIndex,
-
+  updateStepProps,
+  updateStepCalculationIndex,
   // ======  DELETE - Chain
   deleteChain,
-
   // ======  DELETE - Step
   deleteStep,
 } from '../manager/processingChainManager'
@@ -37,11 +34,20 @@ export {
 // ====== EXECUTION
 
 export const generateScript = async (surveyId, processingChain) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, ProcessingChain.getCycle(processingChain))
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    surveyId,
+    ProcessingChain.getCycle(processingChain),
+  )
 
   const outputDir = ProcessUtils.ENV.analysisOutputDir
-  for (const processingStep of ProcessingChain.getProcessingSteps(processingChain)) {
-    await ProcessingStepScriptGenerator.generateScript(survey, ProcessingChain.getCycle(processingChain), processingStep, outputDir)
+  for (const processingStep of ProcessingChain.getProcessingSteps(
+    processingChain,
+  )) {
+    await ProcessingStepScriptGenerator.generateScript(
+      survey,
+      ProcessingChain.getCycle(processingChain),
+      processingStep,
+      outputDir,
+    )
   }
 }
-

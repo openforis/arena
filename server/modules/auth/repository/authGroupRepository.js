@@ -8,59 +8,64 @@ import * as AuthGroup from '@core/auth/authGroup'
 // ==== CREATE
 
 const insertGroup = async (authGroup, surveyId, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     INSERT INTO auth_group (name, survey_uuid, permissions, record_steps)
     SELECT $1, s.uuid, $3, $4
     FROM survey s
     WHERE s.id = $2 
     RETURNING *`,
-  [
-    AuthGroup.getName(authGroup),
-    surveyId,
-    JSON.stringify(AuthGroup.getPermissions(authGroup)),
-    JSON.stringify(AuthGroup.getRecordSteps(authGroup)),
-  ],
-  dbTransformCallback
+    [
+      AuthGroup.getName(authGroup),
+      surveyId,
+      JSON.stringify(AuthGroup.getPermissions(authGroup)),
+      JSON.stringify(AuthGroup.getRecordSteps(authGroup)),
+    ],
+    dbTransformCallback,
   )
 
 export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
-  await Promise.all(surveyGroups.map(
-    authGroup => insertGroup(authGroup, surveyId, client)
-  ))
+  await Promise.all(
+    surveyGroups.map(authGroup => insertGroup(authGroup, surveyId, client)),
+  )
 
 export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     INSERT INTO auth_group_user (group_uuid, user_uuid)
     VALUES ($1, $2)
     RETURNING *`,
-  [groupUuid, userUuid],
-  dbTransformCallback
+    [groupUuid, userUuid],
+    dbTransformCallback,
   )
 
 // ==== READ
 
 export const fetchGroupByUuid = async (groupUuid, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     SELECT auth_group.*
     FROM auth_group
     WHERE auth_group.uuid = $1`,
-  [groupUuid],
-  dbTransformCallback
+    [groupUuid],
+    dbTransformCallback,
   )
 
 export const fetchSurveyGroups = async (surveyId, client = db) =>
-  await client.map(`
+  await client.map(
+    `
     SELECT auth_group.*
     FROM auth_group
     JOIN survey s
     ON s.id = $1
     WHERE auth_group.survey_uuid = s.uuid`,
-  [surveyId],
-  dbTransformCallback
+    [surveyId],
+    dbTransformCallback,
   )
 
 export const fetchUserGroups = async (userUuid, client = db) =>
-  await client.map(`
+  await client.map(
+    `
     SELECT g.*
     FROM auth_group_user gu
     JOIN auth_group g
@@ -68,14 +73,20 @@ export const fetchUserGroups = async (userUuid, client = db) =>
     WHERE
       gu.user_uuid = $1
     `,
-  [userUuid],
-  dbTransformCallback
+    [userUuid],
+    dbTransformCallback,
   )
 
 // ==== UPDATE
 
-export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
-  await client.one(`
+export const updateUserGroup = async (
+  surveyId,
+  userUuid,
+  groupUuid,
+  client = db,
+) => {
+  await client.one(
+    `
     UPDATE auth_group_user gu
     SET group_uuid = $1
     FROM auth_group g
@@ -88,23 +99,26 @@ export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db
       (gu.group_uuid = g.uuid AND g.name = '${AuthGroup.groupNames.systemAdmin}')
     ) 
     RETURNING *`,
-  [groupUuid, userUuid, surveyId],
-  dbTransformCallback
+    [groupUuid, userUuid, surveyId],
+    dbTransformCallback,
   )
 }
 
 // ==== UPDATE
 
 export const deleteAllUserGroups = async (userUuid, client = db) =>
-  await client.query(`
+  await client.query(
+    `
     DELETE FROM auth_group_user
     WHERE user_uuid = $1`,
-  userUuid)
+    userUuid,
+  )
 
 // ==== DELETE
 
 export const deleteUserGroup = async (surveyId, userUuid, client = db) =>
-  await client.query(`
+  await client.query(
+    `
     DELETE
     FROM
       auth_group_user
@@ -126,4 +140,6 @@ export const deleteUserGroup = async (surveyId, userUuid, client = db) =>
         WHERE
           gu.user_uuid = $1
     )               
-  `, [userUuid, surveyId])
+  `,
+    [userUuid, surveyId],
+  )

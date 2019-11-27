@@ -13,13 +13,10 @@ const toLower = R.pipe(trim, R.toLower)
 export const truncate = maxLength => text =>
   text.length > maxLength ? text.substring(0, maxLength) + '...' : text
 
-export const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
+export const contains = (value = '', string = '') =>
+  R.includes(toLower(value), toLower(string))
 
-export const isBlank = R.ifElse(
-  isString,
-  R.pipe(trim, R.isEmpty),
-  R.isNil,
-)
+export const isBlank = R.ifElse(isString, R.pipe(trim, R.isEmpty), R.isNil)
 
 export const isNotBlank = R.pipe(isBlank, R.not)
 
@@ -30,12 +27,10 @@ export const normalizeName = R.pipe(
   R.slice(0, 60),
 )
 
-export const capitalizeFirstLetter = text => text.charAt(0).toUpperCase() + text.slice(1)
+export const capitalizeFirstLetter = text =>
+  text.charAt(0).toUpperCase() + text.slice(1)
 
 export const removeNewLines = R.when(
   isString,
-  R.pipe(
-    R.split(/\r\n|\r|\n/g),
-    R.join(' ')
-  )
+  R.pipe(R.split(/\r\n|\r|\n/g), R.join(' ')),
 )

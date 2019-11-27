@@ -21,15 +21,11 @@ const stdlib = {
 const unaryOperators = {
   // Only accept bools and nulls as input.
   // Otherwise return null
-  '!': x =>
-    R.is(Boolean, x) || R.isNil(x)
-      ? !x : null,
+  '!': x => (R.is(Boolean, x) || R.isNil(x) ? !x : null),
 
   // Negation: Only accept normal finite numbers, otherwise return null
   // NOTE: Under JS semantics, we would have -"123" -> -123
-  '-': x =>
-    R.is(Number, x) && !isNaN(x) && isFinite(x)
-      ? -x : null,
+  '-': x => (R.is(Number, x) && !isNaN(x) && isFinite(x) ? -x : null),
 
   // Don't allow the unary + operator now. Define semantics for it first.
   // Under JS semantics, "+" coerces a string to a number.
@@ -112,14 +108,9 @@ const binaryEval = (expr, ctx) => {
   // The expression is boolean if either value is not null.
   // Otherwise the result is null.
   // All other operators return null if either operand is null
-  const isValid = (
-    (operator === '||' && nullCount < 2) ||
-    (nullCount === 0)
-  )
+  const isValid = (operator === '||' && nullCount < 2) || nullCount === 0
 
-  return isValid
-    ? fn(leftResult, rightResult)
-    : null
+  return isValid ? fn(leftResult, rightResult) : null
 }
 
 // Member expressions like foo.bar are currently not in use, even though they are parsed by JSEP.
@@ -148,13 +139,21 @@ const callEval = (expr, ctx) => {
   const [fn, minArity, maxArity] = stdlib[fnName]
 
   if (fnArity < minArity) {
-    throw new SystemError('functionHasTooFewArguments', {fnName, minArgs: minArity, numArgs: fnArity})
+    throw new SystemError('functionHasTooFewArguments', {
+      fnName,
+      minArgs: minArity,
+      numArgs: fnArity,
+    })
   }
 
   const maxArityIsDefined = maxArity !== undefined
   const maxArityIsInfinite = maxArity < 0
   if (maxArityIsDefined && !maxArityIsInfinite && fnArity > maxArity) {
-    throw new SystemError('functionHasTooManyArguments', {fnName, maxArgs: maxArity, numArgs: fnArity})
+    throw new SystemError('functionHasTooManyArguments', {
+      fnName,
+      maxArgs: maxArity,
+      numArgs: fnArity,
+    })
   }
 
   const args = exprArgs.map(arg => evalExpression(arg, ctx))
@@ -195,10 +194,7 @@ const typeFns = {
 }
 
 export const evalExpression = (expr, ctx) => {
-  const functions = R.pipe(
-    R.prop('functions'),
-    R.mergeRight(typeFns)
-  )(ctx)
+  const functions = R.pipe(R.prop('functions'), R.mergeRight(typeFns))(ctx)
 
   const fn = functions[expr.type]
   if (!fn) {
@@ -219,4 +215,3 @@ export const getExpressionIdentifiers = expr => {
   evalExpression(expr, {functions})
   return R.uniq(identifiers)
 }
-

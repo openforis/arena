@@ -16,7 +16,12 @@ const toTableViewCreate = (survey, nodeDef) => {
     tableName,
     colsAndType: DataTable.getColumnNamesAndType(survey, nodeDef),
     recordForeignKey: DataTable.getRecordForeignKey(surveyId, nodeDef),
-    parentForeignKey: DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent),
+    parentForeignKey: DataTable.getParentForeignKey(
+      surveyId,
+      schemaName,
+      nodeDef,
+      nodeDefParent,
+    ),
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
     viewName: DataView.getName(nodeDef, nodeDefParent),

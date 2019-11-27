@@ -14,7 +14,7 @@ export default class FileZip {
     return new Promise((resolve, reject) => {
       const streamZip = new StreamZip({
         file: this.file,
-        storeEntries: true
+        storeEntries: true,
       })
 
       streamZip.on('ready', () => {
@@ -49,23 +49,19 @@ export default class FileZip {
   async getEntryStream(entryName) {
     return this.hasEntry(entryName)
       ? new Promise((resolve, reject) =>
-        this.streamZip.stream(entryName, (err, stm) =>
-          err
-            ? reject(err)
-            : resolve(stm)
+          this.streamZip.stream(entryName, (err, stm) =>
+            err ? reject(err) : resolve(stm),
+          ),
         )
-      )
       : null
   }
 
   getEntryNames(path = '') {
     return R.pipe(
-      R.filter(
-        R.propEq('isDirectory', false)
-      ),
+      R.filter(R.propEq('isDirectory', false)),
       R.keys,
       R.filter(R.startsWith(path)),
-      R.map(entry => entry.substring(path.length))
+      R.map(entry => entry.substring(path.length)),
     )(this.streamZip.entries())
   }
 

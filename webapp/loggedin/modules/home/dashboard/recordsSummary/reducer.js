@@ -13,8 +13,8 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // Records summary
-  [recordsSummaryUpdate]: (state, {timeRange, from, to, counts}) => RecordsSummaryState.assocSummary(timeRange, from, to, counts)(state)
-
+  [recordsSummaryUpdate]: (state, {timeRange, from, to, counts}) =>
+    RecordsSummaryState.assocSummary(timeRange, from, to, counts)(state),
 }
 
 export default exportReducer(actionHandlers)

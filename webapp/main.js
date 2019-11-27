@@ -21,11 +21,10 @@ function renderApp() {
   ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>
-        <AppRouterSwitch/>
+        <AppRouterSwitch />
       </BrowserRouter>
-    </Provider>
-    ,
-    document.querySelector('#main')
+    </Provider>,
+    document.querySelector('#main'),
   )
 }
 

@@ -21,33 +21,35 @@ let record
 before(async () => {
   const user = getContextUser()
 
-  survey = await SB.survey(user,
-    SB.entity('cluster',
-      SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
-        .key(),
+  survey = await SB.survey(
+    user,
+    SB.entity(
+      'cluster',
+      SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
       SB.attribute('num', NodeDef.nodeDefType.decimal),
       SB.attribute('num_double', NodeDef.nodeDefType.decimal)
         .readOnly()
         .defaultValues(NodeDefExpression.createExpression('num * 2')),
       SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression('num_double * num_double')),
+        .defaultValues(
+          NodeDefExpression.createExpression('num_double * num_double'),
+        ),
       SB.attribute('num_range')
         .readOnly()
         .defaultValues(
           NodeDefExpression.createExpression('"a"', 'num <= 0'),
           NodeDefExpression.createExpression('"b"', 'num <= 10'),
           NodeDefExpression.createExpression('"c"', 'num <= 20'),
-          NodeDefExpression.createExpression('"z"')
-        )
-    )
+          NodeDefExpression.createExpression('"z"'),
+        ),
+    ),
   ).buildAndStore()
 
-  record = await RB.record(user, survey,
-    RB.entity('root',
-      RB.attribute('cluster_no', 1),
-      RB.attribute('num', 1),
-    )
+  record = await RB.record(
+    user,
+    survey,
+    RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
   ).buildAndStore()
 })
 
@@ -57,20 +59,34 @@ after(async () => {
   }
 })
 
-const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourcePath, sourceValue, dependentPath, dependentExpectedValue) => {
+const updateNodeAndExpectDependentNodeValueToBe = async (
+  survey,
+  record,
+  sourcePath,
+  sourceValue,
+  dependentPath,
+  dependentExpectedValue,
+) => {
   // Update source node value
   const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
 
   const nodesUpdated = {
-    [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource)
+    [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
   }
   record = Record.assocNodes(nodesUpdated)(record)
 
   // Update dependent nodes
-  const {record: recordUpdate} = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+  const {record: recordUpdate} = await RecordManager.updateNodesDependents(
+    survey,
+    record,
+    nodesUpdated,
+  )
   record = recordUpdate
 
-  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
+  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(
+    survey,
+    record,
+  )
 
   expect(Node.getValue(nodeDependent)).to.equal(dependentExpectedValue)
   return record
@@ -78,7 +94,14 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
 
 describe('Calculated value test', () => {
   it('Calculated value updated', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double', 4)
+    await updateNodeAndExpectDependentNodeValueToBe(
+      survey,
+      record,
+      'root/num',
+      2,
+      'root/num_double',
+      4,
+    )
   })
 
   it('Calculated value with apply if updated', async () => {
@@ -96,11 +119,24 @@ describe('Calculated value test', () => {
       const [sourceValue, expectedValue] = testValue
 
       record = await updateNodeAndExpectDependentNodeValueToBe(
-        survey, record, 'root/num', sourceValue, 'root/num_range', expectedValue)
+        survey,
+        record,
+        'root/num',
+        sourceValue,
+        'root/num_range',
+        expectedValue,
+      )
     }
   })
 
   it('Calculated value cascade update', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double_square', 16)
+    await updateNodeAndExpectDependentNodeValueToBe(
+      survey,
+      record,
+      'root/num',
+      2,
+      'root/num_double_square',
+      16,
+    )
   })
 })

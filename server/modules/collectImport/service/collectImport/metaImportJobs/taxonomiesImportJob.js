@@ -36,7 +36,9 @@ export default class TaxonomiesImportJob extends Job {
 
     const taxonomies = []
 
-    const speciesFileNames = collectSurveyFileZip.getEntryNames(speciesFilesPath)
+    const speciesFileNames = collectSurveyFileZip.getEntryNames(
+      speciesFilesPath,
+    )
 
     for (const speciesFileName of speciesFileNames) {
       if (this.isCanceled()) {
@@ -67,16 +69,27 @@ export default class TaxonomiesImportJob extends Job {
     this.rowsByScientificName = {}
 
     // 2. insert taxonomy
-    const taxonomyName = speciesFileName.substring(0, speciesFileName.length - 4)
+    const taxonomyName = speciesFileName.substring(
+      0,
+      speciesFileName.length - 4,
+    )
 
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,
     })
-    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, true, tx)
+    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(
+      this.user,
+      surveyId,
+      taxonomyParam,
+      true,
+      tx,
+    )
     const taxonomyUuid = Taxonomy.getUuid(this.taxonomyCurrent)
 
     // 3. parse CSV file
-    const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
+    const speciesFileStream = await collectSurveyFileZip.getEntryStream(
+      `${speciesFilesPath}${speciesFileName}`,
+    )
 
     const totalPrevious = this.total
 
@@ -84,7 +97,7 @@ export default class TaxonomiesImportJob extends Job {
       speciesFileStream,
       headers => this.onHeaders(headers),
       async row => await this.onRow(speciesFileName, taxonomyUuid, row),
-      total => this.total = totalPrevious + total
+      total => (this.total = totalPrevious + total),
     ).start()
 
     if (this.hasErrors()) {
@@ -95,9 +108,19 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async onHeaders(headers) {
-    this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
+    this.vernacularLangCodes = R.innerJoin(
+      (a, b) => a === b,
+      languageCodesISO636_2,
+      headers,
+    )
 
-    this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomyCurrent, this.vernacularLangCodes, this.tx)
+    this.taxonomyImportManager = new TaxonomyImportManager(
+      this.user,
+      this.surveyId,
+      this.taxonomyCurrent,
+      this.vernacularLangCodes,
+      this.tx,
+    )
     await this.taxonomyImportManager.init()
 
     this.currentRow = 1
@@ -115,18 +138,28 @@ export default class TaxonomiesImportJob extends Job {
           R.pipe(
             R.prop(lang),
             R.split(/[,/]/),
-            R.map(name => TaxonVernacularName.newTaxonVernacularName(lang, StringUtils.trim(name))),
-            R.ifElse(
-              R.isEmpty,
-              R.always(accVernacularNames),
-              names => R.assoc(lang, names)(accVernacularNames)
-            )
+            R.map(name =>
+              TaxonVernacularName.newTaxonVernacularName(
+                lang,
+                StringUtils.trim(name),
+              ),
+            ),
+            R.ifElse(R.isEmpty, R.always(accVernacularNames), names =>
+              R.assoc(lang, names)(accVernacularNames),
+            ),
           )(row),
         {},
-        this.vernacularLangCodes
+        this.vernacularLangCodes,
       )
 
-      const taxon = Taxon.newTaxon(taxonomyUuid, code, family, genus, scientificName, vernacularNames)
+      const taxon = Taxon.newTaxon(
+        taxonomyUuid,
+        code,
+        family,
+        genus,
+        scientificName,
+        vernacularNames,
+      )
 
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     }
@@ -147,15 +180,24 @@ export default class TaxonomiesImportJob extends Job {
     // Check if code is duplicate
     const rowDuplicateCode = this.rowsByCode[code]
     if (rowDuplicateCode) {
-      this.addError({
-        [Taxon.propKeys.code]: {
-          valid: false,
-          errors: [{
-            key: Validation.messageKeys.taxonomyEdit.codeDuplicate,
-            params: {code, row: this.currentRow, duplicateRow: rowDuplicateCode},
-          }],
+      this.addError(
+        {
+          [Taxon.propKeys.code]: {
+            valid: false,
+            errors: [
+              {
+                key: Validation.messageKeys.taxonomyEdit.codeDuplicate,
+                params: {
+                  code,
+                  row: this.currentRow,
+                  duplicateRow: rowDuplicateCode,
+                },
+              },
+            ],
+          },
         },
-      }, speciesFileName)
+        speciesFileName,
+      )
     } else {
       this.rowsByCode[code] = this.currentRow
     }
@@ -163,15 +205,25 @@ export default class TaxonomiesImportJob extends Job {
     // Check if scientific name is duplicate
     const rowDuplicateScientificName = this.rowsByScientificName[scientificName]
     if (rowDuplicateScientificName) {
-      this.addError({
-        [Taxon.propKeys.scientificName]: {
-          valid: false,
-          errors: [{
-            key: Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
-            params: {scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName},
-          }],
+      this.addError(
+        {
+          [Taxon.propKeys.scientificName]: {
+            valid: false,
+            errors: [
+              {
+                key:
+                  Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
+                params: {
+                  scientificName,
+                  row: this.currentRow,
+                  duplicateRow: rowDuplicateScientificName,
+                },
+              },
+            ],
+          },
         },
-      }, speciesFileName)
+        speciesFileName,
+      )
     } else {
       this.rowsByScientificName[scientificName] = this.currentRow
     }

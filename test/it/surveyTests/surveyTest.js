@@ -8,7 +8,7 @@ import {setContextSurvey, getContextUser} from '../../testContext'
 const testSurvey = {
   name: 'do_not_use__test_survey_' + uuidv4(),
   label: 'DO NOT USE! Test Survey',
-  languages: ['en']
+  languages: ['en'],
 }
 
 export const createSurveyTest = async () => {
@@ -20,7 +20,10 @@ export const createSurveyTest = async () => {
 
   assert.equal(Survey.getName(surveyInfo), testSurvey.name)
   const expectedDefaultLanguage = testSurvey.languages[0]
-  assert.equal(Survey.getLanguage(expectedDefaultLanguage)(surveyInfo), expectedDefaultLanguage)
+  assert.equal(
+    Survey.getLanguage(expectedDefaultLanguage)(surveyInfo),
+    expectedDefaultLanguage,
+  )
   assert.equal(Survey.getDefaultLabel(surveyInfo), testSurvey.label)
 }
 

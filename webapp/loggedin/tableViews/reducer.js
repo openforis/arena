@@ -6,14 +6,14 @@ import * as TableViewsState from './tableViewsState'
 import {tableViewsListUpdate} from './actions'
 
 const actionHandlers = {
-
   // Reset form
   [appUserLogout]: () => ({}),
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [tableViewsListUpdate]: (state, {type, ...actionProps}) => TableViewsState.assocListUpdateProps(actionProps)(state),
+  [tableViewsListUpdate]: (state, {type, ...actionProps}) =>
+    TableViewsState.assocListUpdateProps(actionProps)(state),
 }
 
 export default exportReducer(actionHandlers)

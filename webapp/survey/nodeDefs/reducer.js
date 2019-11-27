@@ -7,7 +7,7 @@ import {
   surveyDefsLoad,
   surveyDefsReset,
   surveyDelete,
-  surveyUpdate
+  surveyUpdate,
 } from '../actions'
 
 import {
@@ -32,14 +32,17 @@ const actionHandlers = {
   [surveyDefsLoad]: (state = {}, {nodeDefs}) => nodeDefs,
 
   // Single nodeDef actions
-  [nodeDefCreate]: (state, {nodeDef}) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [nodeDefCreate]: (state, {nodeDef}) =>
+    NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropsUpdate]: (state, {nodeDefUuid, props, propsAdvanced}) => NodeDefsState.assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
+  [nodeDefPropsUpdate]: (state, {nodeDefUuid, props, propsAdvanced}) =>
+    NodeDefsState.assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
 
-  [nodeDefDelete]: (state, {nodeDef}) => NodeDefsState.dissocNodeDef(nodeDef)(state),
+  [nodeDefDelete]: (state, {nodeDef}) =>
+    NodeDefsState.dissocNodeDef(nodeDef)(state),
 
-  [nodeDefsUpdate]: (state, {nodeDefs}) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
-
+  [nodeDefsUpdate]: (state, {nodeDefs}) =>
+    NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 }
 
 export default exportReducer(actionHandlers)

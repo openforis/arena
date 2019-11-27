@@ -20,10 +20,12 @@ const actionHandlers = {
 
   // Chain
   [processingChainUpdate]: (state, {processingChain}) => processingChain,
-  [processingChainPropUpdate]: (state, {key, value}) => ProcessingChain.assocProp(key, value)(state),
+  [processingChainPropUpdate]: (state, {key, value}) =>
+    ProcessingChain.assocProp(key, value)(state),
 
   // Steps
-  [processingChainStepsLoad]: (state, {processingSteps}) => ProcessingChain.assocProcessingSteps(processingSteps)(state)
+  [processingChainStepsLoad]: (state, {processingSteps}) =>
+    ProcessingChain.assocProcessingSteps(processingSteps)(state),
 }
 
 export default exportReducer(actionHandlers)

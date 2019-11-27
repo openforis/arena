@@ -14,7 +14,7 @@ const TableHeader = () => {
       <div>{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
       <div>{i18n.t('homeView.collectImportReport.messages')}</div>
       <div>{i18n.t('homeView.collectImportReport.resolved')}</div>
-      <div/>
+      <div />
     </div>
   )
 }

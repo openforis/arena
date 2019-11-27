@@ -11,7 +11,7 @@ export const keys = {
 }
 
 export const keysProps = {
-  name: 'name'
+  name: 'name',
 }
 
 // READ

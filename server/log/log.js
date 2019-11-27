@@ -12,26 +12,24 @@ log4js.configure({
   },
   categories: {
     default: {
-      appenders: ['console'], level: 'debug'
+      appenders: ['console'],
+      level: 'debug',
       // Appenders: ['file'], level: 'error'
-    }
-  }
+    },
+  },
 })
 
 const levels = {
   debug: 'debug',
   info: 'info',
   warn: 'warn',
-  error: 'error'
+  error: 'error',
 }
 
-const _stringifyMsgs = msgs => msgs
-  .map(
-    msg => typeof msg === 'object'
-      ? JSON.stringify(msg)
-      : msg
-  )
-  .join(' ')
+const _stringifyMsgs = msgs =>
+  msgs
+    .map(msg => (typeof msg === 'object' ? JSON.stringify(msg) : msg))
+    .join(' ')
 
 /**
  * Logger class with custom prefix
@@ -78,7 +76,8 @@ class Logger {
   }
 
   _log(level, msgs) {
-    this._isLevelEnabled(level) && logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
+    this._isLevelEnabled(level) &&
+      logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
   }
 }
 

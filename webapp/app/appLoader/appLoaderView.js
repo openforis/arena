@@ -14,22 +14,21 @@ const AppLoaderView = props => {
       in={visible}
       timeout={750}
       unmountOnExit
-      className="app-loader">
+      className="app-loader"
+    >
       <div>
-
         <div className="app-loader__boxes">
-          <div/>
-          <div/>
-          <div/>
+          <div />
+          <div />
+          <div />
         </div>
-
       </div>
     </CSSTransition>
   )
 }
 
 const mapStateToProps = state => ({
-  visible: AppState.isLoaderVisible(state)
+  visible: AppState.isLoaderVisible(state),
 })
 
 export default connect(mapStateToProps)(AppLoaderView)

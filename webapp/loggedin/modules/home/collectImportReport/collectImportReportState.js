@@ -5,9 +5,7 @@ export const stateKey = 'collectImportReport'
 
 export const getState = R.pipe(HomeState.getState, R.prop(stateKey))
 
-export const updateItem = item =>
-  items => {
-    const index = R.findIndex(R.propEq('id', item.id))(items)
-    return R.update(index, item)(items)
-  }
-
+export const updateItem = item => items => {
+  const index = R.findIndex(R.propEq('id', item.id))(items)
+  return R.update(index, item)(items)
+}

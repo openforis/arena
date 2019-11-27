@@ -9,10 +9,15 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCell = props => {
   const {
-    nodeDef, parentNode,
-    canEditDef, renderType,
-    onDragStart, onDragOver, onDragEnd,
-    gridSize, windowed,
+    nodeDef,
+    parentNode,
+    canEditDef,
+    renderType,
+    onDragStart,
+    onDragOver,
+    onDragEnd,
+    gridSize,
+    windowed,
   } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -38,18 +43,19 @@ const NodeDefEntityTableCell = props => {
         const gridLeft = gridSize.left
         const gridRight = gridSize.width + gridLeft
 
-        const elemVisible = (
-          elemtTop <= gridBottom && elemBottom >= gridTop // Vertical visibility
-          &&
-          elemLeft <= gridRight && elemRight >= gridLeft // Horizontal visibility
-        )
+        const elemVisible =
+          elemtTop <= gridBottom &&
+          elemBottom >= gridTop && // Vertical visibility
+          elemLeft <= gridRight &&
+          elemRight >= gridLeft // Horizontal visibility
         setVisible(elemVisible)
       }
     }, [gridSize])
   }
 
   return (
-    <div ref={elementRef}
+    <div
+      ref={elementRef}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
       style={{width: 160 * length + 'px'}}
@@ -57,27 +63,25 @@ const NodeDefEntityTableCell = props => {
       draggable={canEditDef}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
-      onDragEnd={onDragEnd}>
-      {
-        visible
-          ? (
-            <NodeDefSwitch
-              {...props}
-              node={null}
-              nodeDef={nodeDef}
-              parentNode={parentNode}
-              renderType={renderType}
-            />
-          )
-          : (
-            <div className="survey-form__node-def-entity-table-cell-placeholder">
-              <ProgressBar
-                className="running progress-bar-striped"
-                progress={100}
-                showText={false}/>
-            </div>
-          )
-      }
+      onDragEnd={onDragEnd}
+    >
+      {visible ? (
+        <NodeDefSwitch
+          {...props}
+          node={null}
+          nodeDef={nodeDef}
+          parentNode={parentNode}
+          renderType={renderType}
+        />
+      ) : (
+        <div className="survey-form__node-def-entity-table-cell-placeholder">
+          <ProgressBar
+            className="running progress-bar-striped"
+            progress={100}
+            showText={false}
+          />
+        </div>
+      )}
     </div>
   )
 }

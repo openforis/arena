@@ -18,6 +18,6 @@ describe('ExpressionParser test', () => {
     it(query.q, () => {
       const res = Expression.evalString(query.q)
       assert.equal(res, query.r)
-    })
+    }),
   )
 })

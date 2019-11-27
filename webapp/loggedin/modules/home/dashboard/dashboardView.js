@@ -16,17 +16,13 @@ const DashboardView = props => {
   const {canEditDef} = props
 
   return (
-    <SurveyDefsLoader
-      draft={canEditDef}
-      validate={canEditDef}>
+    <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
       <div className="home-dashboard">
+        <SurveyInfo />
 
-        <SurveyInfo/>
+        <RecordsSummary />
 
-        <RecordsSummary/>
-
-        <ActivityLogView/>
-
+        <ActivityLogView />
       </div>
     </SurveyDefsLoader>
   )

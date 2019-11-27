@@ -4,100 +4,110 @@ import {parse as csvParser} from 'csv'
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
 
-export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
+export const createReaderFromStream = (
+  stream,
+  onHeaders = null,
+  onRow = null,
+  onTotalChange = null,
+) => {
   let canceled = false
   const queue = new Queue()
 
-  const start = () => new Promise((resolve, reject) => {
-    let ended = false
-    let headers = null
-    let total = 0
-    let processingRow = false // Prevents the call to processNext when a row is already being processed
+  const start = () =>
+    new Promise((resolve, reject) => {
+      let ended = false
+      let headers = null
+      let total = 0
+      let processingRow = false // Prevents the call to processNext when a row is already being processed
 
-    /**
-     * Executes the specified function fn in a try catch.
-     * Calls "reject" if the execution throws an error.
-     */
-    const _tryOrCancel = async fn => {
-      try {
-        await fn()
-      } catch (error) {
-        cancel()
-        reject(error)
+      /**
+       * Executes the specified function fn in a try catch.
+       * Calls "reject" if the execution throws an error.
+       */
+      const _tryOrCancel = async fn => {
+        try {
+          await fn()
+        } catch (error) {
+          cancel()
+          reject(error)
+        }
       }
-    }
 
-    const processNext = () => {
-      (async () => {
-        processingRow = true
+      const processNext = () => {
+        ;(async () => {
+          processingRow = true
 
-        if (queue.isEmpty()) {
-          if (ended) {
-            resolve()
-          }
-        } else if (!canceled) {
-          const row = queue.dequeue()
-
-          if (headers) {
-            // Headers read, process rows
-            if (onRow) {
-              await _tryOrCancel(async () => {
-                await onRow(_indexRowByHeaders(row))
-              })
+          if (queue.isEmpty()) {
+            if (ended) {
+              resolve()
             }
-          } else {
-            // Process headers
-            headers = row
-            if (onHeaders) {
-              await _tryOrCancel(async () => {
-                await onHeaders(headers)
-              })
+          } else if (!canceled) {
+            const row = queue.dequeue()
+
+            if (headers) {
+              // Headers read, process rows
+              if (onRow) {
+                await _tryOrCancel(async () => {
+                  await onRow(_indexRowByHeaders(row))
+                })
+              }
+            } else {
+              // Process headers
+              headers = row
+              if (onHeaders) {
+                await _tryOrCancel(async () => {
+                  await onHeaders(headers)
+                })
+              }
             }
+
+            processNext()
           }
 
-          processNext()
+          processingRow = false
+        })()
+      }
+
+      const onData = data => {
+        if (canceled) {
+          return resolve()
         }
 
-        processingRow = false
-      })()
-    }
+        ++total
+        if (total > 0) {
+          // Skip first row (headers)
+          onTotalChange && onTotalChange(total)
+        }
 
-    const onData = data => {
-      if (canceled) {
-        return resolve()
+        const wasEmpty = queue.isEmpty()
+        queue.enqueue(data)
+        if (!processingRow && wasEmpty) {
+          processNext()
+        }
       }
 
-      ++total
-      if (total > 0) {
-        // Skip first row (headers)
-        onTotalChange && onTotalChange(total)
+      const onEnd = () => {
+        ended = true
+        if (queue.isEmpty()) {
+          resolve()
+        }
       }
 
-      const wasEmpty = queue.isEmpty()
-      queue.enqueue(data)
-      if (!processingRow && wasEmpty) {
-        processNext()
-      }
-    }
+      const _indexRowByHeaders = row =>
+        headers
+          ? headers.reduce(
+              (accRow, header, index) =>
+                Object.assign(accRow, {[header]: StringUtils.trim(row[index])}),
+              {},
+            )
+          : row
 
-    const onEnd = () => {
-      ended = true
-      if (queue.isEmpty()) {
-        resolve()
-      }
-    }
-
-    const _indexRowByHeaders = row =>
-      headers
-        ? headers.reduce((accRow, header, index) => Object.assign(accRow, {[header]: StringUtils.trim(row[index])}), {})
-        : row
-
-    stream
-      .pipe(csvParser())
-      .on('data', onData)
-      .on('end', onEnd)
-      .on('error', reject)
-  })
+      stream
+        .pipe(csvParser())
+        .on('data', onData)
+        .on('end', onEnd)
+        .on('error', reject)
+    })
 
   const cancel = () => {
     canceled = true
@@ -107,19 +117,26 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
   return {start, cancel}
 }
 
-export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
-  createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
+export const createReaderFromFile = (
+  filePath,
+  onHeaders = null,
+  onRow = null,
+  onTotalChange = null,
+) =>
+  createReaderFromStream(
+    fs.createReadStream(filePath),
+    onHeaders,
+    onRow,
+    onTotalChange,
+  )
 
 export const readHeadersFromStream = async stream => {
   let result = []
 
-  const reader = createReaderFromStream(
-    stream,
-    headers => {
-      reader.cancel()
-      result = headers
-    }
-  )
+  const reader = createReaderFromStream(stream, headers => {
+    reader.cancel()
+    result = headers
+  })
   await reader.start()
 
   return result

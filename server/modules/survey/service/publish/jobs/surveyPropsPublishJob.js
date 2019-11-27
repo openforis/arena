@@ -13,9 +13,17 @@ const findDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
   const surveyInfo = Survey.getSurveyInfo(survey)
   if (Survey.isPublished(surveyInfo)) {
-    const publishedSurvey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
+    const publishedSurvey = await SurveyManager.fetchSurveyById(
+      surveyId,
+      false,
+      false,
+      t,
+    )
     const publishedSurveyInfo = Survey.getSurveyInfo(publishedSurvey)
-    return R.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfo))
+    return R.difference(
+      Survey.getLanguages(publishedSurveyInfo),
+      Survey.getLanguages(surveyInfo),
+    )
   }
 
   return []

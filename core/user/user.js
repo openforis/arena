@@ -22,18 +22,23 @@ export const getPrefs = R.propOr({}, keys.prefs)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
 // ====== CHECK
-export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
+export const isSystemAdmin = user =>
+  user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
 export const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
 // ====== AUTH GROUP
-export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user => R.pipe(
-  getAuthGroups,
-  R.ifElse(
-    R.always(includeSystemAdmin && isSystemAdmin(user)),
-    R.head,
-    R.find(group => AuthGroup.getSurveyUuid(group) === surveyUuid)
-  )
-)(user)
+export const getAuthGroupBySurveyUuid = (
+  surveyUuid,
+  includeSystemAdmin = true,
+) => user =>
+  R.pipe(
+    getAuthGroups,
+    R.ifElse(
+      R.always(includeSystemAdmin && isSystemAdmin(user)),
+      R.head,
+      R.find(group => AuthGroup.getSurveyUuid(group) === surveyUuid),
+    ),
+  )(user)
 
 export const assocAuthGroup = authGroup => user => {
   const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
@@ -56,6 +61,7 @@ export const getPrefSurveyCurrentCycle = UserPrefs.getPrefSurveyCurrentCycle
 
 export const assocPrefSurveyCurrent = UserPrefs.assocPrefSurveyCurrent
 export const assocPrefSurveyCycle = UserPrefs.assocPrefSurveyCycle
-export const assocPrefSurveyCurrentAndCycle = UserPrefs.assocPrefSurveyCurrentAndCycle
+export const assocPrefSurveyCurrentAndCycle =
+  UserPrefs.assocPrefSurveyCurrentAndCycle
 
 export const deletePrefSurvey = UserPrefs.deletePrefSurvey
