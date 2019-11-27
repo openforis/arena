@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -7,19 +7,18 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
-import { uuidv4 } from '@core/uuid'
-import { normalizeName } from '@core/stringUtils'
+import {uuidv4} from '@core/uuid'
+import {normalizeName} from '@core/stringUtils'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import {useI18n} from '@webapp/commonComponents/hooks'
+import {FormItem, Input} from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
-import LabelsEditor from '../../labelsEditor/labelsEditor'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import * as SurveyState from '@webapp/survey/surveyState'
+import LabelsEditor from '../../labelsEditor/labelsEditor'
+import * as NodeDefEditState from '../nodeDefEditState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
-
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefEditState from '../nodeDefEditState'
 
 const BasicProps = props => {
   const {
@@ -89,7 +88,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
-            onChange={(checked) => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}/>
+            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}/>
         </FormItem>
       }
 
@@ -99,7 +98,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
-            onChange={(checked) => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}/>
+            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}/>
         </FormItem>
       }
 
@@ -167,8 +166,8 @@ const BasicProps = props => {
               key: cycle,
               label: Number(cycle) + 1,
               disabled:
-                cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] || // disabled if current cycle is the only one selected in nodeDef
-                cycle === surveyCycleKey // cannot remove nodeDef from current cycle
+                cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] || // Disabled if current cycle is the only one selected in nodeDef
+                cycle === surveyCycleKey // Cannot remove nodeDef from current cycle
             }))}
             disabled={NodeDef.isRoot(nodeDef)}
           />

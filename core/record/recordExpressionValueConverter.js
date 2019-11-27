@@ -13,34 +13,36 @@ const _toPrimitive = (val, TypeTo) =>
 const _toBoolean = (survey, record, nodeCtx, valueExpr) =>
   R.is(Boolean, valueExpr)
     ? String(valueExpr)
-    : R.is(String, valueExpr) && R.includes(valueExpr, ['true', 'false'])
-    ? valueExpr
-    : null
+    : (R.is(String, valueExpr) && R.includes(valueExpr, ['true', 'false'])
+      ? valueExpr
+      : null)
 
 const _toCode = (survey, record, nodeCtx, valueExpr) => {
-  // valueExpr is the code of a category item
+  // ValueExpr is the code of a category item
   const code = _toPrimitive(valueExpr, String)
-  if (code === null)
+  if (code === null) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const parentNode = Record.getParentNode(nodeCtx)(record)
 
-  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
+  const {itemUuid} = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
 
-  return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
+  return itemUuid ? {[Node.valuePropKeys.itemUuid]: itemUuid} : null
 }
 
 const _toTaxon = (survey, record, nodeCtx, valueExpr) => {
-  // valueExpr is the code of a taxon
+  // ValueExpr is the code of a taxon
   const taxonCode = _toPrimitive(valueExpr, String)
-  if (taxonCode === null)
+  if (taxonCode === null) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
 
-  return taxonUuid ? { [Node.valuePropKeys.taxonUuid]: taxonUuid } : null
+  return taxonUuid ? {[Node.valuePropKeys.taxonUuid]: taxonUuid} : null
 }
 
 const _valueExprToValueNodeFns = {

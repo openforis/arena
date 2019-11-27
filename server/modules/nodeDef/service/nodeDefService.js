@@ -6,4 +6,3 @@ export const updateNodeDefProps = NodeDefManager.updateNodeDefProps
 
 export const markNodeDefDeleted = NodeDefManager.markNodeDefDeleted
 
-

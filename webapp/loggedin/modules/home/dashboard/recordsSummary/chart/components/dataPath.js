@@ -1,20 +1,20 @@
-import React, { useEffect, useRef } from 'react'
+import React, {useEffect, useRef} from 'react'
 
 import * as R from 'ramda'
 import * as d3 from 'd3'
-import { interpolatePath as d3interpolatePath } from 'd3-interpolate-path'
+import {interpolatePath as d3interpolatePath} from 'd3-interpolate-path'
 
 const DataPath = props => {
-  const { counts, from, to, chartProps } = props
-  const { xScale, yScale, transitionDuration } = chartProps
+  const {counts, from, to, chartProps} = props
+  const {xScale, yScale, transitionDuration} = chartProps
   const elementRef = useRef(null)
 
   const getPath = d3.line()
-    .x((d) => xScale(d.date))
-    .y((d) => yScale(d.count))
+    .x(d => xScale(d.date))
+    .y(d => yScale(d.count))
     .curve(d3.curveMonotoneX)
 
-  const getEmptyPath = () => getPath([{ date: from, count: 0 }, { date: to, count: 0 }])
+  const getEmptyPath = () => getPath([{date: from, count: 0}, {date: to, count: 0}])
 
   const interpolatePath = (previous, current) =>
     d3.select(elementRef.current)
@@ -37,8 +37,8 @@ const DataPath = props => {
 
   return (
     <path className="data-path"
-          style={{ opacity: 0 }}
-          ref={elementRef}/>
+      style={{opacity: 0}}
+      ref={elementRef}/>
   )
 }
 

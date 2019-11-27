@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 
@@ -13,7 +13,7 @@ const Checkbox = props => {
     onItemAdd, onItemRemove
   } = props
 
-  const selected = !!selectedItems.find(CategoryItem.isEqual(item))
+  const selected = Boolean(selectedItems.find(CategoryItem.isEqual(item)))
 
   return (
     <button
@@ -30,7 +30,7 @@ const Checkbox = props => {
 }
 
 const NodeDefCodeCheckbox = props => {
-  const { items = [], edit, lang } = props
+  const {items = [], edit, lang} = props
 
   const i18n = useI18n()
 
@@ -46,7 +46,7 @@ const NodeDefCodeCheckbox = props => {
               disabled={true}
               nodes={[]}
               item={
-                { uuid: '0', props: { labels: { [lang]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
+                {uuid: '0', props: {labels: {[lang]: i18n.t('surveyForm.nodeDefCode.buttonCode')}}}
               }
             />
           )

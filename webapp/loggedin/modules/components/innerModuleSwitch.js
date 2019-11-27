@@ -1,11 +1,10 @@
 import React from 'react'
-import { Route, Switch, withRouter } from 'react-router'
-import { Redirect } from 'react-router-dom'
+import {Route, Switch, withRouter} from 'react-router'
+import {Redirect} from 'react-router-dom'
 
-import { appModuleUri } from '../../appModules'
+import {appModuleUri} from '../../appModules'
 
 const InnerModuleSwitch = props => {
-
   const {
     modules, moduleRoot, moduleDefault,
     location,
@@ -24,7 +23,7 @@ const InnerModuleSwitch = props => {
               key={i}
               exact path={module.path}
               render={props =>
-                React.createElement(module.component, { ...module.props, ...props })
+                React.createElement(module.component, {...module.props, ...props})
               }/>
           )
         }

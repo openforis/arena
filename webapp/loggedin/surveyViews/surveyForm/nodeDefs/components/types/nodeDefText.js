@@ -2,15 +2,15 @@ import './nodeDefText.scss'
 
 import React from 'react'
 
-import { Input } from '@webapp/commonComponents/form/input'
+import {Input} from '@webapp/commonComponents/form/input'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 import * as NodeDefUIProps from '../../nodeDefUIProps'
 
-const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
+const TextInput = ({nodeDef, readOnly, node, edit, updateNode, canEditRecord}) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       aria-disabled={edit || !canEditRecord || readOnly}
@@ -22,7 +22,7 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
 )
 
 const MultipleTextInput = props => {
-  const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
+  const {nodeDef, parentNode, nodes, removeNode, canEditRecord} = props
 
   return (
     <div>
@@ -30,7 +30,7 @@ const MultipleTextInput = props => {
         nodes.map(n =>
           (!Node.isPlaceholder(n) || canEditRecord) &&
           <div key={Node.getUuid(n)}
-               className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}>
+            className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}>
 
             <NodeDefErrorBadge
               nodeDef={nodeDef}
@@ -40,7 +40,7 @@ const MultipleTextInput = props => {
             />
 
             <TextInput {...props}
-                       node={n}/>
+              node={n}/>
 
             {
               !n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord &&
@@ -59,13 +59,13 @@ const MultipleTextInput = props => {
 }
 
 const NodeDefText = props => {
-  const { edit, entryDataQuery, nodeDef, nodes } = props
+  const {edit, entryDataQuery, nodeDef, nodes} = props
 
   return edit
     ? <TextInput {...props}/>
-    : NodeDef.isMultiple(nodeDef) && !entryDataQuery
+    : (NodeDef.isMultiple(nodeDef) && !entryDataQuery
       ? <MultipleTextInput {...props} />
-      : <TextInput {...props} node={nodes[0]}/>
+      : <TextInput {...props} node={nodes[0]}/>)
 }
 
 export default NodeDefText

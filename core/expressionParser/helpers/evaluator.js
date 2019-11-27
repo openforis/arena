@@ -1,8 +1,7 @@
 import * as R from 'ramda'
 
-import { types } from './types'
-
 import SystemError from '@core/systemError'
+import {types} from './types'
 
 // Built-in functions that can be called, i.e. the standard library.
 // Nothing outside of this set may be used.
@@ -12,7 +11,7 @@ import SystemError from '@core/systemError'
 //
 // stdlib: { [fn]: [Function, min_arity, max_arity? (-1 for infinite)] }
 const stdlib = {
-  pow: [Math.pow, 2], // arity 2
+  pow: [Math.pow, 2], // Arity 2
 
   // arity 1+ (arity 0 allowed by JS)
   min: [Math.min, 1, -1],
@@ -40,8 +39,8 @@ const unaryOperators = {
 
 const booleanOperators = {
   // Short-circuiting operators (we coerce the output to bool)
-  '||': (a, b) => !!(a || b),
-  '&&': (a, b) => !!(a && b),
+  '||': (a, b) => Boolean(a || b),
+  '&&': (a, b) => Boolean(a && b),
   // Normal boolean operators:
   '==': (a, b) => a === b,
   '!=': (a, b) => a !== b,
@@ -77,20 +76,24 @@ const binaryOperators = {
 }
 
 const unaryEval = (expr, ctx) => {
-  const { argument, operator } = expr
+  const {argument, operator} = expr
 
   const fn = unaryOperators[operator]
-  if (!fn) throw new SystemError('undefinedFunction', { fnName: operator })
+  if (!fn) {
+    throw new SystemError('undefinedFunction', {fnName: operator})
+  }
 
   const res = evalExpression(argument, ctx)
   return fn(res)
 }
 
 const binaryEval = (expr, ctx) => {
-  const { left, right, operator } = expr
+  const {left, right, operator} = expr
 
   const fn = binaryOperators[operator]
-  if (!fn) throw new SystemError('undefinedFunction', { fnName: operator })
+  if (!fn) {
+    throw new SystemError('undefinedFunction', {fnName: operator})
+  }
 
   const leftResult = evalExpression(left, ctx)
   const rightResult = evalExpression(right, ctx)
@@ -110,8 +113,8 @@ const binaryEval = (expr, ctx) => {
   // Otherwise the result is null.
   // All other operators return null if either operand is null
   const isValid = (
-    (operator === '||' && nullCount < 2)
-    || (nullCount === 0)
+    (operator === '||' && nullCount < 2) ||
+    (nullCount === 0)
   )
 
   return isValid
@@ -125,30 +128,34 @@ const memberEval = _ => {
 }
 
 const callEval = (expr, ctx) => {
-  // arguments is a reserved word in strict mode
-  const { callee, arguments: exprArgs } = expr
+  // Arguments is a reserved word in strict mode
+  const {callee, arguments: exprArgs} = expr
 
   const fnName = callee.name
   const fnArity = exprArgs.length
 
   // No complex expressions may be put in place of a function body.
   // Only a plain identifier is allowed.
-  if (callee.type !== types.Identifier)
-    throw new SystemError('invalidSyntax', { fnType: callee.type })
+  if (callee.type !== types.Identifier) {
+    throw new SystemError('invalidSyntax', {fnType: callee.type})
+  }
 
   // The function must be found in the standard library.
-  if (!(fnName in stdlib))
-    throw new SystemError('undefinedFunction', { fnName })
+  if (!(fnName in stdlib)) {
+    throw new SystemError('undefinedFunction', {fnName})
+  }
 
   const [fn, minArity, maxArity] = stdlib[fnName]
 
-  if (fnArity < minArity)
-    throw new SystemError('functionHasTooFewArguments', { fnName, minArgs: minArity, numArgs: fnArity })
+  if (fnArity < minArity) {
+    throw new SystemError('functionHasTooFewArguments', {fnName, minArgs: minArity, numArgs: fnArity})
+  }
 
   const maxArityIsDefined = maxArity !== undefined
   const maxArityIsInfinite = maxArity < 0
-  if (maxArityIsDefined && !maxArityIsInfinite && fnArity > maxArity)
-    throw new SystemError('functionHasTooManyArguments', { fnName, maxArgs: maxArity, numArgs: fnArity })
+  if (maxArityIsDefined && !maxArityIsInfinite && fnArity > maxArity) {
+    throw new SystemError('functionHasTooManyArguments', {fnName, maxArgs: maxArity, numArgs: fnArity})
+  }
 
   const args = exprArgs.map(arg => evalExpression(arg, ctx))
 
@@ -163,15 +170,15 @@ const literalEval = (expr, _ctx) => R.prop('value')(expr)
 // "this" is a remnant of the JS that's not allowed in our simplified expression syntax.
 // We still have to handle "this" since the JSEP parser will produce these nodes.
 const thisEval = (expr, _ctx) => {
-  throw new SystemError('invalidSyntax', { keyword: 'this', expr })
+  throw new SystemError('invalidSyntax', {keyword: 'this', expr})
 }
 
-const identifierEval = (expr,ctx) => {
-  throw new SystemError('identifierEvalNotImplemented', { expr })
+const identifierEval = (expr, ctx) => {
+  throw new SystemError('identifierEvalNotImplemented', {expr})
 }
 
 const groupEval = (expr, ctx) => {
-  const { argument } = expr
+  const {argument} = expr
   return evalExpression(argument, ctx)
 }
 
@@ -194,7 +201,9 @@ export const evalExpression = (expr, ctx) => {
   )(ctx)
 
   const fn = functions[expr.type]
-  if (!fn) throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
+  if (!fn) {
+    throw new SystemError('unsupportedFunctionType', {exprType: expr.type})
+  }
 
   return fn(expr, ctx)
 }
@@ -202,10 +211,12 @@ export const evalExpression = (expr, ctx) => {
 export const getExpressionIdentifiers = expr => {
   const identifiers = []
   const functions = {
-    [types.Identifier]: (expr, _ctx) => { identifiers.push(R.prop('name')(expr)) },
+    [types.Identifier]: (expr, _ctx) => {
+      identifiers.push(R.prop('name')(expr))
+    },
   }
 
-  evalExpression(expr, { functions })
+  evalExpression(expr, {functions})
   return R.uniq(identifiers)
 }
 

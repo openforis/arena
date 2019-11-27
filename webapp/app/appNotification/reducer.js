@@ -1,4 +1,4 @@
-import { exportReducer } from '../../utils/reduxUtils'
+import {exportReducer} from '../../utils/reduxUtils'
 
 import {
   appNotificationShow,
@@ -8,7 +8,7 @@ import {
 import * as NotificationState from './appNotificationState'
 
 const actionHandlers = {
-  [appNotificationShow]: (state, { notification }) => NotificationState.show(notification),
+  [appNotificationShow]: (state, {notification}) => NotificationState.show(notification),
 
   [appNotificationHide]: NotificationState.hide,
 }

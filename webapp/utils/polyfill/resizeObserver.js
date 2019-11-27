@@ -1,10 +1,10 @@
-import { elementOffset } from '../domUtils'
+import {elementOffset} from '../domUtils'
 
 // ResizeObserver polyfill
 
 // if (typeof ResizeObserver === 'undefined') {
 window.ResizeObserver = class ResizeObserver {
-  constructor (callback) {
+  constructor(callback) {
     this.observables = []
     // Array of observed elements that looks like this:
     // [{
@@ -17,38 +17,38 @@ window.ResizeObserver = class ResizeObserver {
     this.checkSize()
   }
 
-  getElementSize (el) {
-    const { width, height, x, y } = el.getBBox
+  getElementSize(el) {
+    const {width, height, x, y} = el.getBBox
       ? el.getBBox()
       : elementOffset(el)
-    return { width, height, x, y }
+    return {width, height, x, y}
   }
 
-  observe (el) {
+  observe(el) {
     if (!this.observables.some(observable => observable.el === el)) {
       this.observables.push({
-        el: el,
+        el,
         size: this.getElementSize(el)
       })
     }
   }
 
-  unobserve (el) {
+  unobserve(el) {
     this.observables = this.observables.filter(obj => obj.el !== el)
   }
 
-  disconnect () {
+  disconnect() {
     this.observables = []
     window.cancelAnimationFrame(this.af)
   }
 
-  checkSize () {
-    const changedEntries = this.observables.filter((obj) => {
-      const { width, height, x, y } = this.getElementSize(obj.el)
+  checkSize() {
+    const changedEntries = this.observables.filter(obj => {
+      const {width, height, x, y} = this.getElementSize(obj.el)
       const size = obj.size
 
       if (size.height !== height || size.width !== width || size.x !== x || size.y !== y) {
-        obj.size = { width, height, x, y }
+        obj.size = {width, height, x, y}
         return true
       }
     }).map(obj => obj.el)
@@ -56,8 +56,8 @@ window.ResizeObserver = class ResizeObserver {
     if (changedEntries.length) {
       this.callback(changedEntries)
     }
+
     this.af = window.requestAnimationFrame(this.checkSize)
   }
-
 }
 // }

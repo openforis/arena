@@ -26,8 +26,8 @@ export const jwtMiddleware = async (req, res, next) => {
       req.user = await UserService.fetchUserByUuid(tokenDecoded.username)
 
       next()
-    } catch (e) {
+    } catch (error) {
       next(new UnauthorizedError())
     }
   }
-};
+}

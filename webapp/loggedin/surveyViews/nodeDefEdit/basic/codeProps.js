@@ -1,11 +1,11 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
+import {FormItem} from '@webapp/commonComponents/form/input'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,12 +14,12 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import {putNodeDefProp} from '@webapp/survey/nodeDefs/actions'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
-import { createCategory, deleteCategory } from '../../categoryEdit/actions'
+import {createCategory, deleteCategory} from '../../categoryEdit/actions'
 
-const CodeProps = (props) => {
+const CodeProps = props => {
   const {
     surveyCycleKey, nodeDef, validation,
     putNodeDefProp, putNodeDefLayoutProp,
@@ -48,7 +48,7 @@ const CodeProps = (props) => {
   const disabled = !canUpdateCategory
 
   const putCategoryProp = category => {
-    putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) //reset parent code
+    putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
     putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
 
@@ -61,25 +61,25 @@ const CodeProps = (props) => {
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
           <Dropdown disabled={disabled}
-                    items={categories}
-                    itemKeyProp={'uuid'}
-                    itemLabelFunction={Category.getName}
-                    validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
-                    selection={category}
-                    onChange={putCategoryProp}/>
+            items={categories}
+            itemKeyProp={'uuid'}
+            itemLabelFunction={Category.getName}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
+            selection={category}
+            onChange={putCategoryProp}/>
           <button className="btn btn-s"
-                  style={{ justifySelf: 'center' }}
-                  onClick={async () => {
-                    putCategoryProp(await createCategory())
-                    toggleCategoryEdit(true)
-                  }}>
+            style={{justifySelf: 'center'}}
+            onClick={async () => {
+              putCategoryProp(await createCategory())
+              toggleCategoryEdit(true)
+            }}>
 
             <span className="icon icon-plus icon-12px icon-left"/>
             {i18n.t('common.add')}
           </button>
           <button className="btn btn-s"
-                  style={{ justifySelf: 'center' }}
-                  onClick={() => toggleCategoryEdit(true)}>
+            style={{justifySelf: 'center'}}
+            onClick={() => toggleCategoryEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>
             {i18n.t('common.manage')}
           </button>
@@ -92,18 +92,18 @@ const CodeProps = (props) => {
           gridTemplateColumns: '1fr 200px',
         }}>
           <Dropdown disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
-                    items={candidateParentCodeNodeDefs}
-                    selection={parentCodeDef}
-                    itemKeyProp={'uuid'}
-                    itemLabelFunction={NodeDef.getName}
-                    onChange={def => putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
+            items={candidateParentCodeNodeDefs}
+            selection={parentCodeDef}
+            itemKeyProp={'uuid'}
+            itemLabelFunction={NodeDef.getName}
+            onChange={def => putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
         </div>
       </FormItem>
 
       <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
         <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-                     onChange={render => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)}
-                     items={displayAsItems}
+          onChange={render => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)}
+          items={displayAsItems}
         />
       </FormItem>
 

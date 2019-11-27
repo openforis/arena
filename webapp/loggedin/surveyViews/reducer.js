@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import {combineReducers} from 'redux'
 
 import * as CategoryEditState from './categoryEdit/categoryEditState'
 import * as NodeDefEditState from './nodeDefEdit/nodeDefEditState'

@@ -1,20 +1,18 @@
 export default class ThreadsCache {
-
-  constructor () {
+  constructor() {
     this.threads = new Map()
   }
 
-  getThread (key) {
+  getThread(key) {
     return this.threads.get(key)
   }
 
-  putThread (key, worker) {
+  putThread(key, worker) {
     this.threads.set(key, worker)
     return worker
   }
 
-  removeThread (key) {
+  removeThread(key) {
     this.threads.delete(key)
   }
-
 }

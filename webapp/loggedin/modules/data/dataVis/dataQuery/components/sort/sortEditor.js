@@ -1,36 +1,36 @@
 import './sortEditor.scss'
 
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useState, useEffect} from 'react'
+import {connect} from 'react-redux'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
 import Popup from '@webapp/commonComponents/popup'
 import * as ExpressionVariables from '@webapp/commonComponents/expression/expressionVariables'
-import { useI18n, usePrevious } from '@webapp/commonComponents/hooks'
-
-import SortRow from './sortRow'
+import {useI18n, usePrevious} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import SortRow from './sortRow'
 
 const SortExpressionComponent = props => {
+  const {lang} = useI18n()
 
-  const { lang } = useI18n()
-
-  const { onClose } = props
+  const {onClose} = props
 
   const [sortCriteria, setSortCriteria] = useState(props.sort)
 
-  // keep reference of old sortCriteria
+  // Keep reference of old sortCriteria
   const sortCriteriaStrPrev = usePrevious(DataSort.toString(props.sort), '')
 
   const [unchosenVariables, setUnchosenVariables] = useState([])
   const [updated, setUpdated] = useState(false)
 
-  useEffect(() => { refreshUnchosenVariables() }, [sortCriteria])
+  useEffect(() => {
+    refreshUnchosenVariables()
+  }, [sortCriteria])
 
   const onSelectVariable = (pos, variable) => {
     setSortCriteria(DataSort.updateVariable(pos, variable)(sortCriteria))
@@ -46,22 +46,23 @@ const SortExpressionComponent = props => {
     setUnchosenVariables(DataSort.getUnchosenVariables(availableVariables)(sortCriteria))
   }
 
-  const addCriteria = ({ value: variable, label }) => {
+  const addCriteria = ({value: variable, label}) => {
     setSortCriteria(DataSort.addCriteria(variable, label, DataSort.keys.order.asc)(sortCriteria))
     setUpdated(true)
   }
 
-  const deleteCriteria = (pos) => {
+  const deleteCriteria = pos => {
     setSortCriteria(DataSort.deleteCriteria(pos)(sortCriteria))
     setUpdated(true)
   }
 
-  const applyAndClose = (sortCriteria) => {
-    const { onChange, onClose } = props
+  const applyAndClose = sortCriteria => {
+    const {onChange, onClose} = props
 
     if (DataSort.toString(sortCriteria) !== sortCriteriaStrPrev) {
       onChange && onChange(sortCriteria)
     }
+
     onClose()
   }
 
@@ -82,7 +83,7 @@ const SortExpressionComponent = props => {
     } = props
 
     const variables = ExpressionVariables.getVariables(survey, nodeDefContext, null, mode, lang)
-    return variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1)
+    return variables.filter(v => nodeDefUuidCols.includes(v.uuid))
   }
 
   const availableVariables = getAvailableVariables()
@@ -107,7 +108,7 @@ const SortExpressionComponent = props => {
               isFirst={!pos}/>)}
 
           {
-            !!unchosenVariables.length &&
+            Boolean(unchosenVariables.length) &&
             <SortRow
               variables={unchosenVariables}
               onSelectVariable={item => addCriteria(item)}
@@ -117,14 +118,14 @@ const SortExpressionComponent = props => {
         </div>
         <div className="sort-editor__footer">
           <button className="btn btn-xs"
-                  onClick={() => reset()}
-                  aria-disabled={!sortCriteria.length}>
+            onClick={() => reset()}
+            aria-disabled={!sortCriteria.length}>
             <span className="icon icon-undo2 icon-16px"/> Reset
           </button>
 
           <button className="btn btn-xs"
-                  onClick={() => applyChange()}
-                  aria-disabled={!updated}>
+            onClick={() => applyChange()}
+            aria-disabled={!updated}>
             <span className="icon icon-checkmark icon-16px"/> Apply
           </button>
         </div>

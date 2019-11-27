@@ -1,7 +1,7 @@
 import './modal.scss'
 
 import React from 'react'
-import { KeyboardMap } from '@webapp/utils/keyboardMap'
+import {KeyboardMap} from '@webapp/utils/keyboardMap'
 import * as R from 'ramda'
 
 export const ModalClose = ({children, onClose}) =>
@@ -25,23 +25,22 @@ export const ModalFooter = ({children}) =>
   </div>
 
 export class Modal extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {closed: false}
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('keydown', this)
     this.setState({closed: false})
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('keydown', this)
   }
 
-  handleEvent (e) {
+  handleEvent(e) {
     const {onClose, closeOnEsc = true} = this.props
 
     if (e.type === 'keydown' && e.keyCode === KeyboardMap.Esc) {
@@ -51,16 +50,16 @@ export class Modal extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {children, isOpen = true, className = ''} = this.props
 
     return R.propEq('closed', true)(this.state)
       ? null
       : (
         <div className={`modal ${className}`}
-             tabIndex="-1"
-             role="dialog"
-             style={{display: isOpen ? 'block' : 'none'}}>
+          tabIndex="-1"
+          role="dialog"
+          style={{display: isOpen ? 'block' : 'none'}}>
           <div className="modal-content">
             {children}
           </div>

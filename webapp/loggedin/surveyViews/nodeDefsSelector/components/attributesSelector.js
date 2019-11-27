@@ -1,15 +1,13 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefUIProps'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-
-const AttributeSelector = (props) => {
-
+const AttributeSelector = props => {
   const {
     nodeDefContext, nodeDef, lang, nodeDefUuidsAttributes,
     onToggleAttribute,
@@ -26,16 +24,14 @@ const AttributeSelector = (props) => {
 
   return isVisible &&
     <button className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
-            onClick={() => onToggleAttribute(nodeDefUuid)}
-            disabled={!canSelectAttributes}>
+      onClick={() => onToggleAttribute(nodeDefUuid)}
+      disabled={!canSelectAttributes}>
       {NodeDef.getLabel(nodeDef, lang)}
       {NodeDefUiProps.getIconByType(nodeDefType)}
     </button>
-
 }
 
-const AttributesSelector = (props) => {
-
+const AttributesSelector = props => {
   const {
     nodeDefContext, nodeDefParent, childDefs, lang,
     nodeDefUuidsAttributes, onToggleAttribute,
@@ -77,7 +73,6 @@ const AttributesSelector = (props) => {
       }
 
     </React.Fragment>
-
 }
 
 AttributesSelector.defaultProps = {
@@ -92,15 +87,15 @@ AttributesSelector.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const { nodeDefUuidEntity } = props
+  const {nodeDefUuidEntity} = props
 
   const survey = SurveyState.getSurvey(state)
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
   const childDefs = nodeDefContext
-    ? NodeDef.isEntity(nodeDefContext)
+    ? (NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefChildren(nodeDefContext)(survey)
-      : [nodeDefContext] // multiple attribute
+      : [nodeDefContext]) // Multiple attribute
     : []
 
   return {

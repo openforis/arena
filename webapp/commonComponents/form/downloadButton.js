@@ -3,10 +3,9 @@ import axios from 'axios'
 import * as R from 'ramda'
 import * as FileSaver from 'file-saver'
 
-import { useI18n } from '../hooks'
+import {useI18n} from '../hooks'
 
 const DownloadButton = props => {
-
   const i18n = useI18n()
 
   const {
@@ -20,7 +19,7 @@ const DownloadButton = props => {
       aria-disabled={disabled}
       title={title}
       onClick={async () => {
-        const response = await axios({ url: href, method: 'GET', responseType: 'blob' })
+        const response = await axios({url: href, method: 'GET', responseType: 'blob'})
         const blob = new Blob([response.data])
         const contentDisposition = R.path(['headers', 'content-disposition'], response)
         const fileName = contentDisposition.substring('attachment; filename='.length)

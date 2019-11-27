@@ -8,7 +8,7 @@ const makeMultipart = fn => (url, data = {}, config = {}) =>
     ...config,
     transformRequest: data => {
       const formData = new FormData()
-      for (let [key, value] of Object.entries(data)) {
+      for (const [key, value] of Object.entries(data)) {
         formData.append(key, value)
       }
 

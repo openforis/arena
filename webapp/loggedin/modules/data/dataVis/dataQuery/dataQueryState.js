@@ -1,9 +1,9 @@
 import * as R from 'ramda'
-import * as DataVisState from '../dataVisState'
 
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
+import * as DataVisState from '../dataVisState'
 
 export const defaults = {
   offset: 0,
@@ -57,7 +57,7 @@ const hasTable = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
 const hasCols = R.pipe(getTableNodeDefUuidCols, R.isEmpty, R.not)
 export const hasTableAndCols = state => hasTable(state) && hasCols(state)
 
-// on nodeDefUuid table change, reset table data, sort and filter
+// On nodeDefUuid table change, reset table data, sort and filter
 export const assocNodeDefUuidTable = nodeDefUuidTable => R.pipe(
   R.assocPath([keys.table, tableKeys.nodeDefUuidTable], nodeDefUuidTable),
   assocTableData(defaults.offset, defaults.data),
@@ -66,7 +66,7 @@ export const assocNodeDefUuidTable = nodeDefUuidTable => R.pipe(
   assocTableFilter(defaults.filter),
 )
 
-export const assocNodeDefUuidCols = (nodeDefUuidCols) =>
+export const assocNodeDefUuidCols = nodeDefUuidCols =>
   R.assocPath([keys.table, tableKeys.nodeDefUuidCols], nodeDefUuidCols)
 
 export const assocTableDataCol = data => state => R.pipe(
@@ -88,7 +88,7 @@ export const dissocTableDataCols = cols => state => R.pipe(
 )(state)
 
 export const initTableData = (offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode) =>
-  R.assoc(keys.table, { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode })
+  R.assoc(keys.table, {offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode})
 
 export const assocTableData = (offset, data) => R.pipe(
   R.assocPath([keys.table, tableKeys.offset], offset),
@@ -102,7 +102,7 @@ export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], 
 // ===== Edit mode
 
 export const assocTableDataRecordNodes = nodes => state => {
-  // replace nodes in table rows
+  // Replace nodes in table rows
   const data = R.pathOr([], [keys.table, tableKeys.data], state)
 
   for (const node of R.values(nodes)) {
@@ -119,11 +119,11 @@ export const assocTableDataRecordNodes = nodes => state => {
             R.dissoc('node'),
             R.assoc('node', node)
           )(cell)
-
         }
       }
     }
   }
+
   return R.assocPath([keys.table, tableKeys.data], data, state)
 }
 

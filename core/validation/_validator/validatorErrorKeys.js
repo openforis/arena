@@ -30,7 +30,7 @@ export const ValidatorErrorKeys = {
   expressions: {
     cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
     cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
-    circularDependencyError:  'validationErrors.expressions.circularDependencyError',
+    circularDependencyError: 'validationErrors.expressions.circularDependencyError',
     expressionInvalid: 'validationErrors.expressions.expressionInvalid',
     unableToFindNode: 'validationErrors.expressions.unableToFindNode',
     unableToFindNodeChild: 'validationErrors.expressions.unableToFindNodeChild',
@@ -110,4 +110,4 @@ export const ValidatorErrorKeys = {
     NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
     CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
   }
-};
+}

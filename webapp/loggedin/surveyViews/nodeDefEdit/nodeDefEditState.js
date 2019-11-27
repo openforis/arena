@@ -6,7 +6,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyViewsState from '../surveyViewsState'
 
 const keys = {
-  nodeDefUuid: 'nodeDefUuid', // current nodeDef edit
+  nodeDefUuid: 'nodeDefUuid', // Current nodeDef edit
 }
 
 export const stateKey = 'nodeDefEdit'

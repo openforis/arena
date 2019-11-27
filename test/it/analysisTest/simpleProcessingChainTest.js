@@ -9,19 +9,19 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as ProcessingChainService from '@server/modules/analysis/service/processingChainService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-import { getContextUser } from '../../testContext';
+import {getContextUser} from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
 
 let survey = null
-let records = []
+const records = []
 let processingChain = null
 
 before(async () => {
   const user = getContextUser()
 
   survey = await SB.survey(user,
-    // cluster
+    // Cluster
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
 
@@ -29,7 +29,7 @@ before(async () => {
       SB.entity('plot',
         SB.attribute('plot_no', NodeDef.nodeDefType.integer).key(),
 
-        //--> tree
+        // --> tree
         SB.entity('tree',
           SB.attribute('tree_no', NodeDef.nodeDefType.integer).key(),
           SB.attribute('tree_dbh', NodeDef.nodeDefType.decimal),
@@ -53,7 +53,7 @@ before(async () => {
     ...R.range(1, noTrees + 1).map(newTree)
   )
 
-  // add 5 records
+  // Add 5 records
   for (let i = 0; i < 5; i++) {
     const record = await RB.record(
       user,
@@ -75,7 +75,7 @@ before(async () => {
     [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName('tree')(survey))
   })
   const calc1 = ProcessingChain.newProcessingStepCalculation(step1, NodeDef.getUuid(Survey.getNodeDefByName('tree_volume')(survey)), {
-    [ProcessingStepCalculation.keysProps.formula]: `tree_dbh * tree_height`
+    [ProcessingStepCalculation.keysProps.formula]: 'tree_dbh * tree_height'
   })
 
   step1 = ProcessingStep.assocCalculation(calc1)(step1)
@@ -83,12 +83,13 @@ before(async () => {
 })
 
 after(async () => {
-  if (survey)
+  if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+  }
 })
 
 export const simpleTest = async () => {
-  // console.log(JSON.stringify(survey))
+  // Console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))
 
   await ProcessingChainService.generateScript(Survey.getId(survey), processingChain)

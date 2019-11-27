@@ -7,7 +7,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import GoogleFontsPlugin from 'google-fonts-plugin'
 import GitRevisionPlugin from 'git-revision-webpack-plugin'
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import uuidv4 from 'uuid/v4'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
@@ -18,12 +18,12 @@ const buildReport = ProcessUtils.ENV.buildReport
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
 class CleanUpStatsPlugin {
-  shouldPickStatChild (child) {
+  shouldPickStatChild(child) {
     return child.name.indexOf('mini-css-extract-plugin') !== 0
   }
 
-  apply (compiler) {
-    compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
+  apply(compiler) {
+    compiler.hooks.done.tap('CleanUpStatsPlugin', stats => {
       const children = stats.compilation.children
       if (Array.isArray(children)) {
         // eslint-disable-next-line no-param-reassign
@@ -49,24 +49,24 @@ const plugins = [
   // In production, this is done upon container startup.
   new HtmlReplaceWebpackPlugin(
     ProcessUtils.isEnvProduction ? [] : [
-    {
-      pattern: '$COGNITO_USER_POOL_ID',
-      replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
-    },
-    {
-      pattern: '$COGNITO_CLIENT_ID',
-      replacement: ProcessUtils.ENV.cognitoClientId || '',
-    },
-  ]),
+      {
+        pattern: '$COGNITO_USER_POOL_ID',
+        replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
+      },
+      {
+        pattern: '$COGNITO_CLIENT_ID',
+        replacement: ProcessUtils.ENV.cognitoClientId || '',
+      },
+    ]),
   new webpack.DefinePlugin({
     __BUST__: JSON.stringify(uuidv4()),
-    'process': {
-      'env': {
-        'NODE_ENV': JSON.stringify(ProcessUtils.ENV.nodeEnv),
-        'APPLICATION_VERSION': JSON.stringify(gitRevisionPlugin.version()),
-        'GIT_COMMIT_HASH': JSON.stringify(gitRevisionPlugin.commithash()),
-        'GIT_BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
-        }
+    process: {
+      env: {
+        NODE_ENV: JSON.stringify(ProcessUtils.ENV.nodeEnv),
+        APPLICATION_VERSION: JSON.stringify(gitRevisionPlugin.version()),
+        GIT_COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
+        GIT_BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
+      }
     }
   }),
   new GoogleFontsPlugin({
@@ -129,10 +129,10 @@ const webPackConfig = {
       },
     ]
   },
-  plugins: plugins
+  plugins
 }
 
-// if (prodBuild) {
+// If (prodBuild) {
 
 webpack.optimization = {
   minimizer: [
@@ -140,7 +140,7 @@ webpack.optimization = {
       parallel: true,
       uglifyOptions: {
         compress: true,
-        output: { comments: false },
+        output: {comments: false},
       },
       sourceMap: true
     }),

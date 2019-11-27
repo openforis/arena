@@ -1,16 +1,15 @@
-import * as DBMigrate from 'db-migrate'
 import * as path from 'path'
+import * as DBMigrate from 'db-migrate'
 import * as R from 'ramda'
 
 import * as Log from '@server/log/log'
 const logger = Log.getLogger('DBMigrator')
 
-import { db } from '../db'
-import * as config from './migrationConfig'
-
 import * as ProcessUtils from '@core/processUtils'
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils';
-import { fetchAllSurveyIds } from '@server/modules/survey/repository/surveyRepository';
+import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {fetchAllSurveyIds} from '@server/modules/survey/repository/surveyRepository'
+import {db} from '../db'
+import * as config from './migrationConfig'
 
 const env = ProcessUtils.ENV.nodeEnv
 
@@ -22,7 +21,6 @@ const migrationFolders = {
 }
 
 const migrateSchema = async (schema = publicSchema) => {
-
   const migrationsFolder = schema === publicSchema
     ? migrationFolders.public
     : migrationFolders.survey
@@ -35,12 +33,12 @@ const migrateSchema = async (schema = publicSchema) => {
     // Required to work around an EventEmitter leak bug.
     // See: https://github.com/db-migrate/node-db-migrate/issues/421
     throwUncatched: true,
-}
+  }
 
   migrateOptions.config[env].schema = schema
 
   if (schema !== publicSchema) {
-    // first create db schema
+    // First create db schema
     await db.none(`CREATE SCHEMA IF NOT EXISTS ${schema}`)
   }
 
@@ -49,7 +47,7 @@ const migrateSchema = async (schema = publicSchema) => {
   await dbm.up()
 }
 
-export const migrateSurveySchema = async (surveyId) => {
+export const migrateSurveySchema = async surveyId => {
   logger.info(`starting db migrations for survey ${surveyId}`)
 
   const schema = getSurveyDBSchema(surveyId)
@@ -62,10 +60,11 @@ export const migrateSurveySchemas = async () => {
 
   logger.info(`starting data schemas migrations for ${surveyIds.length} surveys`)
 
-  for (let i = 0; i < surveyIds.length; i++) {
-    await migrateSurveySchema(surveyIds[i])
+  for (const element of surveyIds) {
+    await migrateSurveySchema(element)
   }
-  logger.info(`data schemas migrations completed`)
+
+  logger.info('data schemas migrations completed')
 }
 
 export const migrateAll = async () => {
@@ -77,8 +76,8 @@ export const migrateAll = async () => {
     await migrateSurveySchemas()
 
     logger.info('database migrations completed')
-  } catch (err) {
-    logger.error(`error running database migrations: ${err.toString()}`)
-    throw err;
+  } catch (error) {
+    logger.error(`error running database migrations: ${error.toString()}`)
+    throw error
   }
 }

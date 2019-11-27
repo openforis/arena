@@ -1,5 +1,5 @@
-import * as webpack from 'webpack'
 import * as path from 'path'
+import * as webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 import mainConfig from './webpack.config.babel'
 
@@ -28,7 +28,7 @@ export default {
   mode: 'development',
   devtool: isProduction ? false : 'source-map',
   externals: [
-    nodeExternals({ whitelist: ['webpack/hot/poll?1000'] }),
+    nodeExternals({whitelist: ['webpack/hot/poll?1000']}),
     // 'worker_threads',
   ],
   name: 'server',
@@ -43,7 +43,7 @@ export default {
     publicPath: 'dist/',
     path: path.resolve(__dirname, './'),
     filename: 'dist/[id].js',
-    // libraryTarget: 'commonjs2',
+    // LibraryTarget: 'commonjs2',
     hotUpdateChunkFilename: 'dist/hot-update-[id].js',
     hotUpdateMainFilename: 'dist/hot-update-[hash].json',
   },

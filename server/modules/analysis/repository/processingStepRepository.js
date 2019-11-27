@@ -1,8 +1,8 @@
 import camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
 export const insertStep = async (surveyId, processingChainUuid, processingStepIndex, client = db) =>
@@ -13,8 +13,8 @@ export const insertStep = async (surveyId, processingChainUuid, processingStepIn
         ($1, $2)
       RETURNING *
     `,
-    [processingChainUuid, processingStepIndex],
-    camelize
+  [processingChainUuid, processingStepIndex],
+  camelize
   )
 
 // ====== READ
@@ -37,8 +37,8 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
       s.uuid
     ORDER BY
       s.index`,
-    [processingChainUuid],
-    camelize
+  [processingChainUuid],
+  camelize
   )
 }
 
@@ -69,8 +69,8 @@ export const fetchStepByUuid = async (surveyId, processingStepUuid, client = db)
     GROUP BY
         s.uuid
     `,
-    [processingStepUuid],
-    camelize
+  [processingStepUuid],
+  camelize
   )
 
 export const fetchStepSummaryByUuid = async (surveyId, processingStepUuid, client = db) =>
@@ -79,8 +79,8 @@ export const fetchStepSummaryByUuid = async (surveyId, processingStepUuid, clien
     FROM ${getSurveyDBSchema(surveyId)}.processing_step
     WHERE uuid = $1
     `,
-    [processingStepUuid],
-    camelize
+  [processingStepUuid],
+  camelize
   )
 
 export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, index, client = db) =>
@@ -90,8 +90,8 @@ export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, ind
     WHERE processing_chain_uuid = $1
     AND index = $2
     `,
-    [processingChainUuid, index],
-    camelize
+  [processingChainUuid, index],
+  camelize
   )
 
 // ====== UPDATE
@@ -103,8 +103,8 @@ export const updateStepProps = async (surveyId, processingStepUuid, props, clien
     WHERE uuid = $1
     RETURNING *
     `,
-    [processingStepUuid, props],
-    camelize
+  [processingStepUuid, props],
+  camelize
   )
 
 // ====== DELETE
@@ -114,6 +114,6 @@ export const deleteStep = async (surveyId, processingStepUuid, client = db) =>
     DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_step
     WHERE uuid = $1
     `,
-    [processingStepUuid]
+  [processingStepUuid]
   )
 

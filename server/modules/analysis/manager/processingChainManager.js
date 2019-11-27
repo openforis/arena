@@ -1,4 +1,4 @@
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import SystemError from '@core/systemError'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -51,11 +51,11 @@ export const createProcessingStepCalculation = async (user, surveyId, processing
 
 // ====== READ - Chain
 
-export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '../repository/processingChainRepository'
+export {countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid} from '../repository/processingChainRepository'
 
 // ====== READ - Steps
 
-export { fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex } from '../repository/processingStepRepository'
+export {fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex} from '../repository/processingStepRepository'
 
 // ====== UPDATE - Chain
 
@@ -64,7 +64,7 @@ export const updateChainProp = async (user, surveyId, processingChainUuid, key, 
     ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
     ActivityLogRepository.insert(
       user, surveyId, ActivityLog.type.processingChainPropUpdate,
-      { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value }, false, t
+      {[ActivityLog.keysContent.uuid]: processingChainUuid, key, value}, false, t
     )
   ]))
 
@@ -116,8 +116,9 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 export const deleteStep = async (user, surveyId, processingStepUuid, client = db) => {
   const processingStep = await ProcessingStepRepository.fetchStepByUuid(surveyId, processingStepUuid)
   const processingStepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(surveyId, ProcessingStep.getProcessingChainUuid(processingStep), ProcessingStep.getIndex(processingStep) + 1)
-  if (!!processingStepNext)
+  if (processingStepNext) {
     throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
+  }
 
   const logContent = {
     [ActivityLog.keysContent.uuid]: processingStepUuid,

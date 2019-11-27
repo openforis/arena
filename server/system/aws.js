@@ -11,8 +11,11 @@ const _getAwsClient = () =>
 const _sendAwsRequest = request =>
   new Promise((resolve, reject) => {
     request.send((err, data) => {
-      if (err) reject(err)
-      else resolve(data)
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
     })
   })
 

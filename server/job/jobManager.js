@@ -1,9 +1,9 @@
-import { jobThreadMessageTypes } from './jobUtils';
 import ThreadsCache from '@server/threads/threadsCache'
 import ThreadManager from '@server/threads/threadManager'
 
 import * as WebSocket from '@server/utils/webSocket'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import {jobThreadMessageTypes} from './jobUtils'
 
 // USER JOB WORKERS
 
@@ -13,16 +13,21 @@ const _notifyJobUpdate = jobSerialized => {
   const userUuid = jobSerialized.userUuid
 
   WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
-  if (!jobSerialized.ended) return
+  if (!jobSerialized.ended) {
+    return
+  }
 
   const jobThread = userJobThreads.getThread(userUuid)
-  if (!jobThread) return
+  if (!jobThread) {
+    return
+  }
 
   const cleanupThread = () => {
     jobThread.terminate()
     userJobThreads.removeThread(userUuid)
   }
-  //delay thread termination by 1 second (give time to print debug info to the console)
+
+  // Delay thread termination by 1 second (give time to print debug info to the console)
   setTimeout(cleanupThread, 1000)
 }
 
@@ -30,18 +35,19 @@ const _notifyJobUpdate = jobSerialized => {
 
 export const cancelActiveJobByUserUuid = async userUuid => {
   const jobThread = userJobThreads.getThread(userUuid)
-  if (!jobThread) return
+  if (!jobThread) {
+    return
+  }
 
-  jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
+  jobThread.postMessage({type: jobThreadMessageTypes.cancelJob})
 }
 
 // ====== EXECUTE
 
 export const executeJobThread = job => {
-
   const thread = new ThreadManager(
     'jobThread.js',
-    { jobType: job.type, jobParams: job.params },
+    {jobType: job.type, jobParams: job.params},
     job => _notifyJobUpdate(job)
   )
 

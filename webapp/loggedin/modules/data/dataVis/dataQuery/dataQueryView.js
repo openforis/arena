@@ -1,21 +1,20 @@
 import './components/dataQueryView.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Table from './components/table'
 
-import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
+import {initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols} from './actions'
 
 import * as DataQueryState from './dataQueryState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 const DataQueryView = props => {
-
   const {
     hierarchy, nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
     initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols,
@@ -66,5 +65,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols }
+  {initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols}
 )(DataQueryView)

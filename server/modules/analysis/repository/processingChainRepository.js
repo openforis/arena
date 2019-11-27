@@ -1,9 +1,9 @@
 import camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {getSurveyDBSchema, dbTransformCallback} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, ${DbUtils.selectDate('date_executed')}`
 
@@ -15,8 +15,8 @@ export const insertChain = async (surveyId, cycle, client = db) =>
     VALUES ($1)
     RETURNING ${selectFields}
     `,
-    [cycle],
-    dbTransformCallback
+  [cycle],
+  dbTransformCallback
   )
 
 // ====== READ
@@ -27,7 +27,7 @@ export const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE cycle = $1
     `,
-    [cycle]
+  [cycle]
   )
 
 export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
@@ -39,8 +39,8 @@ export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit =
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}
     `,
-    [cycle],
-    dbTransformCallback
+  [cycle],
+  dbTransformCallback
   )
 
 export const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
@@ -49,8 +49,8 @@ export const fetchChainByUuid = async (surveyId, processingChainUuid, client = d
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1
     `,
-    [processingChainUuid],
-    camelize
+  [processingChainUuid],
+  camelize
   )
 
 // ====== UPDATE
@@ -63,7 +63,7 @@ export const updateChainProp = async (surveyId, processingChainUuid, key, value,
     WHERE uuid = $1
     RETURNING ${selectFields}
     `,
-    [processingChainUuid, value],
+  [processingChainUuid, value],
   )
 
 // ====== DELETE
@@ -74,7 +74,7 @@ export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
     WHERE uuid = $1
     RETURNING ${selectFields}
     `,
-    [processingChainUuid],
-    camelize
+  [processingChainUuid],
+  camelize
   )
 

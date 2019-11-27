@@ -2,7 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 
-import { isNotBlank } from '@core/stringUtils'
+import {isNotBlank} from '@core/stringUtils'
 
 export const parseQuery = (query, mode, canBeConstant) => {
   const exprQuery = Expression.fromString(query, mode)
@@ -15,9 +15,9 @@ export const parseQuery = (query, mode, canBeConstant) => {
     : Expression.newBinary(
       isCompound && canBeConstant
         ? Expression.newLiteral()
-        : isCompound
-        ? Expression.newIdentifier()
-        : exprQuery,
+        : (isCompound
+          ? Expression.newIdentifier()
+          : exprQuery),
       Expression.newLiteral()
     )
   return expr
@@ -31,30 +31,29 @@ export const isExprValid = (expr, canBeConstant) => {
       : expr
 
     return Expression.isValid(exprToValidate)
-  } catch (e) {
+  } catch (error) {
     return false
   }
 }
 
 export const getLiteralSearchParams = (survey, nodeDef, preferredLang) => {
-
   const surveyId = Survey.getId(survey)
 
-  const literalSearchParams = nodeDef && NodeDef.isCode(nodeDef) ?
-    {
+  const literalSearchParams = nodeDef && NodeDef.isCode(nodeDef)
+    ? {
       surveyId,
       type: NodeDef.nodeDefType.code,
       categoryUuid: NodeDef.getCategoryUuid(nodeDef),
       categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
       lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
     }
-    : nodeDef && NodeDef.isTaxon(nodeDef) ?
-      {
+    : (nodeDef && NodeDef.isTaxon(nodeDef)
+      ? {
         surveyId,
         type: NodeDef.nodeDefType.taxon,
         taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
       }
-      : null
+      : null)
 
   return literalSearchParams
 }

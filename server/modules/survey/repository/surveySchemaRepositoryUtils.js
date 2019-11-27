@@ -1,10 +1,10 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
-import { db } from '@server/db/db'
-import { now } from '@server/db/dbUtils';
+import {db} from '@server/db/db'
+import {now} from '@server/db/dbUtils'
 
 const mergeProps = (def, draft) => {
-  const { props, propsDraft } = def
+  const {props, propsDraft} = def
 
   const propsMerged = draft
     ? R.mergeRight(props, propsDraft)
@@ -17,14 +17,14 @@ const mergeProps = (def, draft) => {
 }
 
 export const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) => R.pipe(
-  // assoc published and draft properties based on props
+  // Assoc published and draft properties based on props
   def => assocPublishedDraft ? R.pipe(
     R.assoc('published', !R.isEmpty(def.props)),
     R.assoc('draft', !R.isEmpty(def.props_draft)),
-    )(def)
+  )(def)
     : def,
   camelize,
-  // apply db conversion
+  // Apply db conversion
   def => mergeProps(def, draft)
 )(def)
 
@@ -55,7 +55,7 @@ export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUui
      SET props_draft = props_draft || $1
      WHERE uuid = $2
      RETURNING *`
-    , [JSON.stringify({ [key]: value }), recordUuid]
+    , [JSON.stringify({[key]: value}), recordUuid]
     , def => dbTransformCallback(def, true)
   )
 
@@ -64,8 +64,8 @@ export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordU
     DELETE 
     FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
     WHERE uuid = $1 RETURNING *`
-    , [recordUuid]
-    , def => dbTransformCallback(def, true)
+  , [recordUuid]
+  , def => dbTransformCallback(def, true)
   )
 
 export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>

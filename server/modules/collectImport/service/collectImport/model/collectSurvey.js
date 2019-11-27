@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { nodeDefType } from '@core/survey/nodeDef'
+import {nodeDefType} from '@core/survey/nodeDef'
 
 const keys = {
   attributes: 'attributes',
@@ -26,30 +26,30 @@ const collectNodeDefTypes = {
 }
 
 const nodeDefFieldsExtractorByCollectType = {
-  [collectNodeDefTypes.boolean]: () => [{ type: nodeDefType.boolean }],
-  [collectNodeDefTypes.code]: () => [{ type: nodeDefType.code }],
-  [collectNodeDefTypes.coordinate]: () => [{ type: nodeDefType.coordinate }],
-  [collectNodeDefTypes.date]: () => [{ type: nodeDefType.date }],
-  [collectNodeDefTypes.entity]: () => [{ type: nodeDefType.entity }],
-  [collectNodeDefTypes.file]: () => [{ type: nodeDefType.file }],
+  [collectNodeDefTypes.boolean]: () => [{type: nodeDefType.boolean}],
+  [collectNodeDefTypes.code]: () => [{type: nodeDefType.code}],
+  [collectNodeDefTypes.coordinate]: () => [{type: nodeDefType.coordinate}],
+  [collectNodeDefTypes.date]: () => [{type: nodeDefType.date}],
+  [collectNodeDefTypes.entity]: () => [{type: nodeDefType.entity}],
+  [collectNodeDefTypes.file]: () => [{type: nodeDefType.file}],
   [collectNodeDefTypes.number]: collectNodeDef => {
     const type = getAttribute('type')(collectNodeDef) === 'real'
       ? nodeDefType.decimal
       : nodeDefType.integer
-    return [{ type }]
+    return [{type}]
   },
   [collectNodeDefTypes.range]: collectNodeDef => {
     const type = getAttribute('type')(collectNodeDef) === 'real'
       ? nodeDefType.decimal
       : nodeDefType.integer
     return [
-      { type, field: 'from' },
-      { type, field: 'to' }
+      {type, field: 'from'},
+      {type, field: 'to'}
     ]
   },
-  [collectNodeDefTypes.taxon]: () => [{ type: nodeDefType.taxon }],
-  [collectNodeDefTypes.text]: () => [{ type: nodeDefType.text }],
-  [collectNodeDefTypes.time]: () => [{ type: nodeDefType.time }],
+  [collectNodeDefTypes.taxon]: () => [{type: nodeDefType.taxon}],
+  [collectNodeDefTypes.text]: () => [{type: nodeDefType.text}],
+  [collectNodeDefTypes.time]: () => [{type: nodeDefType.time}],
 }
 
 export const layoutTypes = {
@@ -75,9 +75,9 @@ export const toLabels = (elName, defaultLang, typesFilter = [], suffix = '') =>
         if (!R.has(lang, labelsAcc) && (R.isEmpty(typesFilter) || R.includes(type, typesFilter))) {
           const text = getText(labelEl) + suffix
           return R.assoc(lang, text, labelsAcc)
-        } else {
-          return labelsAcc
         }
+
+        return labelsAcc
       }, {})
     )(xml)
 
@@ -91,19 +91,19 @@ export const getElementsByName = name => R.pipe(
 export const getElementsByPath = path =>
   xml =>
     R.reduce((acc, pathPart) =>
-        R.ifElse(
-          R.isNil,
-          R.identity,
-          R.pipe(
-            R.ifElse(
-              R.is(Array),
-              R.head,
-              R.identity
-            ),
-            getElementsByName(pathPart)
-          )
-        )(acc)
-      , xml, path
+      R.ifElse(
+        R.isNil,
+        R.identity,
+        R.pipe(
+          R.ifElse(
+            R.is(Array),
+            R.head,
+            R.identity
+          ),
+          getElementsByName(pathPart)
+        )
+      )(acc)
+    , xml, path
     )
 
 export const getElementByName = name => R.pipe(
@@ -168,10 +168,10 @@ export const getNodeDefByPath = collectNodeDefPath => collectSurvey => {
       R.find(R.pathEq(['attributes', 'name'], collectAncestorNodeName))
     )(currentCollectNode)
 
-    if (collectChildNodeDef)
+    if (collectChildNodeDef) {
       currentCollectNode = collectChildNodeDef
-    else {
-      return null //node def not found
+    } else {
+      return null // Node def not found
     }
   }
 

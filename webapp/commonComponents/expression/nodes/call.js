@@ -4,8 +4,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import Identifier from './identifier'
 
-const Call = ({ node, variables, onChange }) => {
-
+const Call = ({node, variables, onChange}) => {
   const nodeIdentifier = {
     type: Expression.types.Identifier,
     name: Expression.toString(node)
@@ -13,8 +12,8 @@ const Call = ({ node, variables, onChange }) => {
 
   return (
     <Identifier node={nodeIdentifier}
-                variables={variables}
-                onChange={onChange}/>
+      variables={variables}
+      onChange={onChange}/>
   )
 }
 

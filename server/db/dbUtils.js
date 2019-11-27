@@ -9,16 +9,17 @@ export const QueryStream = _QueryStream
 export const selectDate = (field, fieldAlias = null) =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias ? fieldAlias : field}`
 
-export const now = `timezone('UTC', now())`
+export const now = 'timezone(\'UTC\', now())'
 
 export const insertAllQuery = (schema, table, cols, itemsValues) => {
-  const columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
+  const columnSet = new pgp.helpers.ColumnSet(cols, {table: {schema, table}})
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}
-    for (let i = 0; i < cols.length; i++) {
-      item[cols[i]] = itemValues[i]
+    for (const [i, element] of cols.entries()) {
+      item[element] = itemValues[i]
     }
+
     return item
   })
   return pgp.helpers.insert(valuesIndexedByCol, columnSet)
@@ -43,16 +44,16 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
 
   const cols = [`?${idColName}`, ...updateCols]
 
-  const columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
+  const columnSet = new pgp.helpers.ColumnSet(cols, {table: {schema, table}})
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}
-    //id column is always the first among item values
+    // Id column is always the first among item values
     item[idColName] = itemValues[0]
-    for (let i = 0; i < updateCols.length; i++) {
-      const updateCol = updateCols[i]
+    for (const [i, updateCol] of updateCols.entries()) {
       item[getColName(updateCol)] = itemValues[i + 1]
     }
+
     return item
   })
 

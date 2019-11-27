@@ -14,7 +14,7 @@ export const keys = {
   published: 'published',
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
-  //props
+  // Props
   collectUri: 'collectUri',
   collectReport: 'collectReport',
   cycles: 'cycles',
@@ -75,10 +75,10 @@ export const getStatus = surveyInfo =>
   isPublished(surveyInfo) && isDraft(surveyInfo)
     ? 'PUBLISHED-DRAFT'
     : isPublished(surveyInfo)
-    ? 'PUBLISHED'
-    : isDraft(surveyInfo)
-      ? 'DRAFT'
-      : ''
+      ? 'PUBLISHED'
+      : (isDraft(surveyInfo)
+        ? 'DRAFT'
+        : '')
 
 export const getCycles = ObjectUtils.getProp(keys.cycles)
 

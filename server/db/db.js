@@ -6,7 +6,7 @@ import * as Log from '@server/log/log'
 const logger = Log.getLogger('DB')
 
 const debugOptions = {
-  query: (e) => {
+  query: e => {
     logger.debug(`QUERY: ${e.query}`)
     if (e.params) {
       logger.debug(`PARAMS: ${JSON.stringify(e.params)}`)
@@ -27,21 +27,21 @@ Promise.config({
   monitoring: true,
   // Enable async hooks
   asyncHooks: true,
-});
+})
 
 const initOptions = {
   promiseLib: Promise,
   ...(ProcessUtils.ENV.debug ? debugOptions : {}),
 }
 
-const pgp = pgPromise(initOptions);
+const pgp = pgPromise(initOptions)
 
 const configCommon = {
-  // how long a client is allowed to remain idle before being closed
+  // How long a client is allowed to remain idle before being closed
   idleTimeoutMillis: 30000,
-  // max number of clients in the pool
+  // Max number of clients in the pool
   max: 10,
-  // whether to use ssl connections
+  // Whether to use ssl connections
   ssl: ProcessUtils.ENV.pgSsl
 }
 

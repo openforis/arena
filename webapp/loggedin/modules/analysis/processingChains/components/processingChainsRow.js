@@ -4,19 +4,19 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as DateUtils from '@core/dateUtils'
 
 import ProgressBar from '@webapp/commonComponents/progressBar'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 const statusComponent = {
   [ProcessingChain.statusExec.success]:
-    <span className="icon icon-checkmark icon-14px"/>,
+  <span className="icon icon-checkmark icon-14px"/>,
   [ProcessingChain.statusExec.error]:
-    <span className="icon icon-cross icon-14px"/>,
+  <span className="icon icon-cross icon-14px"/>,
   [ProcessingChain.statusExec.running]:
-    <ProgressBar className="running progress-bar-striped" progress={100} showText={false}/>,
+  <ProgressBar className="running progress-bar-striped" progress={100} showText={false}/>,
 }
 
 const ProcessingChainsRow = props => {
-  const { row: processingChainsListItem } = props
+  const {row: processingChainsListItem} = props
   const i18n = useI18n()
 
   const statusExec = ProcessingChain.getStatusExec(processingChainsListItem)

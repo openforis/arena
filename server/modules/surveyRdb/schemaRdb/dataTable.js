@@ -4,9 +4,9 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as Node from '@core/record/node'
+import * as SurveyRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as DataRow from './dataRow'
 import * as DataCol from './dataCol'
-import * as SurveyRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils'
 
 export const colNameUuuid = 'uuid'
 export const colNameParentUuuid = 'parent_uuid'
@@ -22,7 +22,7 @@ export const getNodeDefColumns = (survey, nodeDef) =>
         R.sortBy(R.ascend(R.prop('id')))
       )(survey)
     )
-    // multiple attr table
+    // Multiple attr table
     : [nodeDef]
 
 export const getName = NodeDefTable.getTableName

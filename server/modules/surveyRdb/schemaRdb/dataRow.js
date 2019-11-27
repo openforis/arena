@@ -4,14 +4,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as DataCol from './dataCol'
 
 const getNodeCol = (nodeDefCol, nodeRow) => {
-
   const nodeDefUuidCol = NodeDef.getUuid(nodeDefCol)
-  const nodeDefUuidRow = nodeRow['node_def_uuid']
+  const nodeDefUuidRow = nodeRow.node_def_uuid
 
-  // attribute column in multiple attribute table (value of its own table)
-  const nodeCol = nodeDefUuidRow === nodeDefUuidCol ?
-    nodeRow :
-    R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
+  // Attribute column in multiple attribute table (value of its own table)
+  const nodeCol = nodeDefUuidRow === nodeDefUuidCol
+    ? nodeRow
+    : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
 
   return nodeCol
 }

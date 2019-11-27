@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as Category from '@core/survey/category'
@@ -22,8 +22,8 @@ export const insertCategory = async (surveyId, category, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props_draft)
         VALUES ($1, $2)
         RETURNING *`,
-    [Category.getUuid(category), category.props],
-    def => dbTransformCallback(def, true, true)
+  [Category.getUuid(category), category.props],
+  def => dbTransformCallback(def, true, true)
   )
 
 export const insertLevel = async (surveyId, level, client = db) =>
@@ -31,8 +31,8 @@ export const insertLevel = async (surveyId, level, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), level.props],
-    def => dbTransformCallback(def, true, true)
+  [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), level.props],
+  def => dbTransformCallback(def, true, true)
   )
 
 export const insertItem = async (surveyId, item, client = db) =>
@@ -40,8 +40,8 @@ export const insertItem = async (surveyId, item, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
-    def => dbTransformCallback(def, true, true)
+  [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
+  def => dbTransformCallback(def, true, true)
   )
 
 export const insertItems = async (surveyId, items, client = db) => {
@@ -72,7 +72,7 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
             'id', l.id, 
             'uuid', l.uuid, 
             'index', l.index, 
-            'props', l.props${draft ? ` || l.props_draft` : ''}
+            'props', l.props${draft ? ' || l.props_draft' : ''}
           )) AS levels
         FROM
           ${getSurveyDBSchema(surveyId)}.category_level l
@@ -83,10 +83,10 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
       'uuid', c.uuid,
-      'props', c.props${draft ? ` || c.props_draft` : ''},
+      'props', c.props${draft ? ' || c.props_draft' : ''},
       'published', c.published, 
       'levels', l.levels
-      ${includeValidation ? `, 'validation', c.validation` : ''}
+      ${includeValidation ? ', \'validation\', c.validation' : ''}
       )) AS categories
     FROM
       ${getSurveyDBSchema(surveyId)}.category c
@@ -96,12 +96,12 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
       c.uuid = l.category_uuid`
 
 export const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
-  const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
+  const {categories} = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
   return categories || {}
 }
 
 export const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = false, includeValidation = false, client = db) => {
-  const { categories } = await client.one(
+  const {categories} = await client.one(
     `${_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation)} WHERE c.uuid = $1`,
     [categoryUuid]
   )
@@ -117,8 +117,8 @@ export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = f
         AND l.category_uuid = $1
      ORDER BY i.id
     `,
-    [categoryUuid],
-    def => dbTransformCallback(def, draft, true)
+  [categoryUuid],
+  def => dbTransformCallback(def, draft, true)
   )
 
   return draft
@@ -134,14 +134,14 @@ export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid 
       ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $1 
       AND i.parent_uuid ${
-      parentUuid
-        ? `= '${parentUuid}'`
-        : 'IS NULL'
-      }
+  parentUuid
+    ? `= '${parentUuid}'`
+    : 'IS NULL'
+}
     ORDER BY i.id
   `,
-    [categoryUuid],
-    def => dbTransformCallback(def, draft, true)
+  [categoryUuid],
+  def => dbTransformCallback(def, draft, true)
   )
 
   return draft
@@ -177,8 +177,8 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     ON
       i.level_uuid = l.uuid
     `,
-    [],
-    indexItem => dbTransformCallback(indexItem, draft, true)
+  [],
+  indexItem => dbTransformCallback(indexItem, draft, true)
   )
 
 // ============== UPDATE
@@ -192,7 +192,7 @@ export const updateCategoryValidation = async (surveyId, categoryUuid, validatio
       SET validation = $1::jsonb 
       WHERE uuid = $2
     `,
-    [validation, categoryUuid]
+  [validation, categoryUuid]
   )
 
 export const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =>
@@ -215,8 +215,8 @@ export const updateItems = async (surveyId, items, client = db) => {
   await client.none(DbUtils.updateAllQuery(
     getSurveyDBSchema(surveyId),
     'category_item',
-    { name: 'uuid', cast: 'uuid' },
-    [{ name: 'props_draft', cast: 'jsonb' }],
+    {name: 'uuid', cast: 'uuid'},
+    [{name: 'props_draft', cast: 'jsonb'}],
     values
   ))
 }
@@ -234,7 +234,7 @@ export const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
       WHERE category_uuid = $1
     `,
-    [categoryUuid]
+  [categoryUuid]
   )
 
 export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) =>
@@ -249,8 +249,8 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
         )
       RETURNING l.uuid
     `,
-    [categoryUuid],
-    R.prop('uuid')
+  [categoryUuid],
+  R.prop('uuid')
   )
 
 export const deleteItem = async (surveyId, itemUuid, client = db) =>

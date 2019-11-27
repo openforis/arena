@@ -11,7 +11,7 @@ import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
 import * as AuthService from '../service/authService'
 
-const sendResponse = (res, user, survey = null) => res.json({ user, survey })
+const sendResponse = (res, user, survey = null) => res.json({user, survey})
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
@@ -19,10 +19,11 @@ const sendUserSurvey = async (res, user, surveyId) => {
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
       survey = await SurveyService.fetchSurveyById(surveyId, true, true)
     }
+
     sendResponse(res, user, survey)
-  } catch (e) {
-    Loggger.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
-    // survey not found with user pref
+  } catch (error) {
+    Loggger.error(`error loading survey with id ${surveyId}: ${error.toString()}`)
+    // Survey not found with user pref
     // removing user pref
     user = User.deletePrefSurvey(surveyId)(user)
     sendResponse(res, await UserService.updateUserPrefs(user))
@@ -30,7 +31,6 @@ const sendUserSurvey = async (res, user, surveyId) => {
 }
 
 export const init = app => {
-
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
@@ -39,14 +39,14 @@ export const init = app => {
       surveyId
         ? await sendUserSurvey(res, user, surveyId)
         : sendResponse(res, user)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
   app.post('/auth/logout', async (req, res, next) => {
     try {
-      // before logout checkOut record if there's an opened thread
+      // Before logout checkOut record if there's an opened thread
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromRecordThread(socketId)
 
@@ -55,9 +55,8 @@ export const init = app => {
       await AuthService.blacklistToken(token)
 
       Response.sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
-
-};
+}

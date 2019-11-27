@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
 import * as R from 'ramda'
 
@@ -15,7 +15,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
-  const { validation, children } = props
+  const {validation, children} = props
 
   const valid = Validation.isValid(validation)
 
@@ -23,7 +23,7 @@ const NodeDefErrorBadge = props => {
     ? (
       children
     )
-    : !valid
+    : (!valid
       ? (
         <ErrorBadge
           validation={validation}
@@ -33,19 +33,19 @@ const NodeDefErrorBadge = props => {
           {children}
         </ErrorBadge>
       )
-      : null
+      : null)
 }
 
 NodeDefErrorBadge.defaultProps = {
   nodeDef: null,
   parentNode: null,
   nodes: null,
-  node: null, // passed when validating a single node of a nodeDef multiple
+  node: null, // Passed when validating a single node of a nodeDef multiple
   edit: false,
 }
 
 const mapStateToProps = (state, props) => {
-  const { nodeDef, parentNode, nodes, node, edit } = props
+  const {nodeDef, parentNode, nodes, node, edit} = props
 
   let validation = Validation.newInstance()
 
@@ -59,14 +59,14 @@ const mapStateToProps = (state, props) => {
     )(state)
 
     if (NodeDef.isMultiple(nodeDef)) {
-      // showing validation for a single node instance of multiple nodeDef
+      // Showing validation for a single node instance of multiple nodeDef
       if (node) {
         validation = RecordValidation.getNodeValidation(node)(recordValidation)
       } else if (NodeDef.isEntity(nodeDef)) {
-        //only entities can have children with min/max count validation
+        // Only entities can have children with min/max count validation
         validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
-        validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])
+        validation = Validation.newInstance(false, {}, [{key: Validation.messageKeys.record.oneOrMoreInvalidValues}])
       }
     } else if (!R.isEmpty(nodes)) {
       validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)

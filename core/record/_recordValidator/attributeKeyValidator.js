@@ -2,19 +2,20 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '../record'
-import * as Node from '../node'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
+import * as Record from '../record'
+import * as Node from '../node'
 
 export const validateAttributeKey = (survey, record, attributeDef) => async (propName, node) => {
   const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
   if (!NodeDef.isRoot(nodeDefParent) && NodeDef.isKey(attributeDef)) {
     const entity = Record.getParentNode(node)(record)
     if (_isEntityDuplicate(survey, record, entity)) {
-      return { key: Validation.messageKeys.record.entityKeyDuplicate }
+      return {key: Validation.messageKeys.record.entityKeyDuplicate}
     }
   }
+
   return null
 }
 

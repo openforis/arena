@@ -1,11 +1,11 @@
+import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '../manager/surveyManager'
 
-import * as JobManager from '@server/job/jobManager'
 import SurveyPublishJob from './publish/surveyPublishJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
-  const job = new SurveyPublishJob({ user, surveyId })
+  const job = new SurveyPublishJob({user, surveyId})
 
   JobManager.executeJobThread(job)
 

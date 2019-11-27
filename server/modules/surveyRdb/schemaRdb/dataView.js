@@ -12,8 +12,8 @@ import * as DataCol from './dataCol'
 export const getName = NodeDefTable.getViewName
 export const getNameWithSchema = surveyId => nodeDef => `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDef)}`
 
-export const alias = `a`
-export const aliasParent = `p`
+export const alias = 'a'
+export const aliasParent = 'p'
 
 export const columns = {
   keys: '_keys'
@@ -42,7 +42,7 @@ export const getSelectFields = (survey, nodeDef) => {
     content => `jsonb_build_object(${content}) AS ${columns.keys}`
   )(survey)
 
-  // add record_uuid, date_created, date_modified, keys
+  // Add record_uuid, date_created, date_modified, keys
   fields.unshift(
     `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${DataTable.colNameRecordUuuid}`,
     `${alias}.${DataTable.colNameRecordCycle}`,
@@ -61,13 +61,15 @@ const getCols = (survey, nodeDef, isSelf) => {
     R.map(name => `${isSelf ? alias : aliasParent}.${name}`),
   )(DataTable.getNodeDefColumns(survey, nodeDef))
 
-  // if is not root, prepend parent uuid
-  if (!NodeDef.isRoot(nodeDef))
+  // If is not root, prepend parent uuid
+  if (!NodeDef.isRoot(nodeDef)) {
     fields.unshift(`${aliasParent}.${getColUuid(Survey.getNodeDefParent(nodeDef)(survey))}`)
+  }
 
-  // if nodeDef isSelf (starting nodeDef) prepend col uuid
-  if (isSelf)
+  // If nodeDef isSelf (starting nodeDef) prepend col uuid
+  if (isSelf) {
     fields.unshift(`${alias}.${DataTable.colNameUuuid} as ${getColUuid(nodeDef)}`)
+  }
 
   return fields
 }

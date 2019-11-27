@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 
-import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 import * as ObjectUtils from '@core/objectUtils'
+import {ValidatorErrorKeys} from './_validator/validatorErrorKeys'
 
-// const objectInvalid = {
+// Const objectInvalid = {
 //   [keys.valid]: false,
 //   [keys.errors]: [{ key: 'error_key', params }],
 //   [keys.warnings]: [{ key: 'error_key', params }],
@@ -34,13 +34,13 @@ export const keys = {
 
 export const messageKeys = ValidatorErrorKeys
 
-//====== UTILS
+// ====== UTILS
 
 /**
  * Removes valid fields validations and updates 'valid' attribute
  */
 export const cleanup = validation => {
-  //cleanup fields
+  // Cleanup fields
   let allFieldsValid = true
   const fieldsCleaned = Object.entries(getFieldValidations(validation)).reduce(
     (fieldsAcc, [field, fieldValidation]) => {
@@ -49,6 +49,7 @@ export const cleanup = validation => {
         allFieldsValid = false
         fieldsAcc[field] = fieldValidationCleaned
       }
+
       return fieldsAcc
     },
     {},
@@ -64,7 +65,7 @@ export const cleanup = validation => {
 
 export const recalculateValidity = validation => R.pipe(
   getFieldValidations,
-  // update validity in each field
+  // Update validity in each field
   R.map(recalculateValidity),
   fields => {
     const errors = getErrors(validation)
@@ -84,22 +85,23 @@ export const updateCounts = validation => {
   while (!R.isEmpty(stack)) {
     const validationCurrent = stack.pop()
 
-    // update total errors
+    // Update total errors
     totalErrors += R.pipe(
       getErrors,
       R.length
     )(validationCurrent)
 
-    // update total warnings
+    // Update total warnings
     totalWarnings += R.pipe(
       getWarnings,
       R.length
     )(validationCurrent)
 
-    // add field validations to stack
+    // Add field validations to stack
     const validationFields = getFieldValidations(validationCurrent)
-    if (!R.isEmpty(validationFields))
+    if (!R.isEmpty(validationFields)) {
       stack.push(...R.values(validationFields))
+    }
   }
 
   return {
@@ -111,7 +113,7 @@ export const updateCounts = validation => {
   }
 }
 
-//====== CREATE
+// ====== CREATE
 
 export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
   [keys.valid]: valid,
@@ -120,7 +122,7 @@ export const newInstance = (valid = true, fields = {}, errors = [], warnings = [
   [keys.warnings]: warnings,
 })
 
-//====== READ
+// ====== READ
 
 export const isValid = R.propOr(true, keys.valid)
 export const getFieldValidations = R.propOr({}, keys.fields)
@@ -136,7 +138,7 @@ export const getCounts = R.propOr({}, keys.counts)
 export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
 export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
 
-//====== UPDATE
+// ====== UPDATE
 
 export const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
 export const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)

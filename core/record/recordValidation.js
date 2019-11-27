@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
-import * as Node from './node'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from './node'
 
 export const keys = {
   recordKeys: 'recordKeys',
@@ -19,7 +19,7 @@ export const newValidationRecordDuplicate = (isUnique = false) => Validation.new
     [keys.recordKeys]: Validation.newInstance(
       isUnique,
       {},
-      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }]
+      isUnique ? [] : [{key: Validation.messageKeys.record.keyDuplicate}]
     )
   }
 )

@@ -24,7 +24,7 @@ const _hasSurveyPermission = permission => (user, surveyInfo) =>
   )
 
 // READ
-export const canViewSurvey = (user, surveyInfo) => !!_getSurveyUserGroup(user, surveyInfo)
+export const canViewSurvey = (user, surveyInfo) => Boolean(_getSurveyUserGroup(user, surveyInfo))
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
@@ -41,17 +41,19 @@ export const canViewRecord = _hasSurveyPermission(permissions.recordView)
 
 // UPDATE
 export const canEditRecord = (user, record) => {
-  if (!(user && record))
+  if (!(user && record)) {
     return false
+  }
 
-  if (User.isSystemAdmin(user))
+  if (User.isSystemAdmin(user)) {
     return true
+  }
 
   const recordDataStep = Record.getStep(record)
 
   const userAuthGroup = User.getAuthGroupBySurveyUuid(Record.getSurveyUuid(record))(user)
 
-  // level = 'all' or 'own'. If 'own', user can only edit the records that he created
+  // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
   const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
 
@@ -72,8 +74,8 @@ export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 // READ
 export const canViewUser = (user, surveyInfo, userToView) => {
   return User.isSystemAdmin(user) || (
-    !!_getSurveyUserGroup(user, surveyInfo, false) &&
-    !!_getSurveyUserGroup(userToView, surveyInfo, false)
+    Boolean(_getSurveyUserGroup(user, surveyInfo, false)) &&
+    Boolean(_getSurveyUserGroup(userToView, surveyInfo, false))
   )
 }
 
@@ -81,7 +83,7 @@ export const canViewUser = (user, surveyInfo, userToView) => {
 const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
   User.isSystemAdmin(user) || (
     _hasSurveyPermission(permissions.userEdit)(user, surveyInfo) &&
-    !!_getSurveyUserGroup(userToUpdate, surveyInfo, false)
+    Boolean(_getSurveyUserGroup(userToUpdate, surveyInfo, false))
   )
 
 export const canEditUser = (user, surveyInfo, userToUpdate) => (

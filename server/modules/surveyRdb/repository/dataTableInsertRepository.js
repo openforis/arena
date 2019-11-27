@@ -1,4 +1,4 @@
-import { insertAllQuery } from '@server/db/dbUtils';
+import {insertAllQuery} from '@server/db/dbUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -50,7 +50,6 @@ const getSelectQuery = (surveySchema, nodeDef) => {
 }
 
 export const populateTable = async (survey, nodeDef, client) => {
-
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
 
@@ -63,7 +62,7 @@ export const populateTable = async (survey, nodeDef, client) => {
   const selectQuery = getSelectQuery(surveySchema, nodeDef)
   await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [nodeDefUuid])
 
-  const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
+  const {count} = await client.one(`SELECT count(id) FROM ${viewName}`)
 
   const limit = 5000
   const noIter = Math.ceil(count / limit)
@@ -85,7 +84,6 @@ export const populateTable = async (survey, nodeDef, client) => {
       DataTable.getColumnNames(survey, nodeDef),
       nodesRowValues
     ))
-
   }
 
   // 5. drop materialized view

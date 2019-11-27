@@ -1,14 +1,15 @@
 import 'dotenv/config'
 
-// import * as cluster from 'cluster'
+// Import * as cluster from 'cluster'
+import * as ProcessUtils from '@core/processUtils'
 import * as dbMigrator from './db/migration/dbMigrator'
 import * as appCluster from './system/appCluster'
-import * as ProcessUtils from '@core/processUtils'
 
 const initialize = async () => {
   await dbMigrator.migrateAll()
-  if (ProcessUtils.ENV.migrateOnly)
-    process.exit();
+  if (ProcessUtils.ENV.migrateOnly) {
+    process.exit()
+  }
 
   await appCluster.run()
 }
@@ -46,5 +47,4 @@ initialize()
 //   serverCluster()
 //
 // }
-
 

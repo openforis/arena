@@ -1,12 +1,10 @@
 import './nodeDefEntityForm.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
-import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
-import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -15,10 +13,11 @@ import * as Node from '@core/record/node'
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
-import { setFormPageNode, getNodeKeyLabelValues } from '@webapp/loggedin/surveyViews/surveyForm/actions'
+import {setFormPageNode, getNodeKeyLabelValues} from '@webapp/loggedin/surveyViews/surveyForm/actions'
+import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
+import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 
 const NodeDefEntityForm = props => {
-
   const {
     nodeDef, nodes, parentNode, selectedNode,
     edit, entry, entryMultiple,
@@ -68,7 +67,7 @@ const NodeDefEntityForm = props => {
 
 NodeDefEntityForm.defaultProps = {
   nodeDef: null,
-  // entry props
+  // Entry props
   entry: false,
   entryMultiple: false,
   nodes: null,
@@ -76,7 +75,7 @@ NodeDefEntityForm.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const { nodeDef, nodes, entry } = props
+  const {nodeDef, nodes, entry} = props
 
   const getEntryProps = () => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)
@@ -103,5 +102,5 @@ const mapStateToProps = (state, props) => {
 
 export default connect(
   mapStateToProps,
-  { setFormPageNode, getNodeKeyLabelValues }
+  {setFormPageNode, getNodeKeyLabelValues}
 )(NodeDefEntityForm)

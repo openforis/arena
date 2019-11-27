@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
-import * as Node from '../node'
 import * as ObjectUtils from '@core/objectUtils'
+import * as Node from '../node'
 
 /**
  * Record nodes index.
@@ -91,17 +91,17 @@ export const addNodes = nodes => record =>
   )(nodes)
 
 export const addNode = node => R.pipe(
-  //rootUuid
+  // RootUuid
   R.ifElse(
     R.always(Node.isRoot(node)),
     R.assoc(keys.nodeRootUuid, Node.getUuid(node)),
     R.identity,
   ),
-  //parent index
+  // Parent index
   _assocToIndexPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
-  //node def index
+  // Node def index
   _assocToIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
-  //code dependent index
+  // Code dependent index
   _addNodeToCodeDependentsIndex(node),
 )
 
@@ -123,11 +123,11 @@ export const removeNode = node => R.pipe(
     R.dissoc(keys.nodeRootUuid),
     R.identity
   ),
-  //parent index
+  // Parent index
   _dissocFromIndexPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
-  //node def index
+  // Node def index
   _dissocFromIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
-  //code dependent index
+  // Code dependent index
   _removeNodeFromCodeDependentsIndex(node),
 )
 

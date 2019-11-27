@@ -1,13 +1,11 @@
 import './appHeader.scss'
 
-import React, { useState, useRef } from 'react'
-import { connect } from 'react-redux'
+import React, {useState, useRef} from 'react'
+import {connect} from 'react-redux'
 
-import { usePrevious } from '@webapp/commonComponents/hooks'
+import {usePrevious} from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import ProgressBar from '@webapp/commonComponents/progressBar'
-import UserPopupMenu from './components/userPopupMenu'
-import CycleSelector from './components/cycleSelector'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -15,7 +13,9 @@ import * as Survey from '@core/survey/survey'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import { updateUserPrefs } from '@webapp/app/actions'
+import {updateUserPrefs} from '@webapp/app/actions'
+import CycleSelector from './components/cycleSelector'
+import UserPopupMenu from './components/userPopupMenu'
 
 const AppHeader = props => {
   const {
@@ -62,9 +62,9 @@ const AppHeader = props => {
       </div>
 
       <div className="app-header__user"
-           onClick={() => {
-             setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
-           }}>
+        onClick={() => {
+          setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
+        }}>
 
         <ProfilePicture
           userUuid={User.getUuid(user)}
@@ -85,7 +85,6 @@ const AppHeader = props => {
 
     </div>
   )
-
 }
 
 const mapStateToProps = state => ({
@@ -96,4 +95,4 @@ const mapStateToProps = state => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(mapStateToProps, { updateUserPrefs })(AppHeader)
+export default connect(mapStateToProps, {updateUserPrefs})(AppHeader)

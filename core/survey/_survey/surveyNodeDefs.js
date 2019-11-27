@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import * as SurveyCategories from './surveyCategories'
 import * as NodeDef from '../nodeDef'
 import * as Category from '../category'
+import * as SurveyCategories from './surveyCategories'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -29,14 +29,14 @@ export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => R.pipe(
 )
 
 export const hasNodeDefChildrenEntities = nodeDef => survey => {
-  if (NodeDef.isAttribute(nodeDef))
+  if (NodeDef.isAttribute(nodeDef)) {
     return false
+  }
 
   return R.pipe(
     getNodeDefChildren(nodeDef),
     R.any(NodeDef.isEntity),
   )(survey)
-
 }
 
 export const getNodeDefChildByName = (nodeDef, childName) =>
@@ -59,17 +59,17 @@ export const isNodeDefRootKey = nodeDef => survey =>
   NodeDef.isKey(nodeDef) &&
   NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
-export const getNodeDefByName = (name) => R.pipe(
+export const getNodeDefByName = name => R.pipe(
   getNodeDefsArray,
   R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name))
 )
 
-export const getNodeDefsByCategoryUuid = (uuid) => R.pipe(
+export const getNodeDefsByCategoryUuid = uuid => R.pipe(
   getNodeDefsArray,
   R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid))
 )
 
-export const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
+export const getNodeDefsByTaxonomyUuid = uuid => R.pipe(
   getNodeDefsArray,
   R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid))
 )
@@ -92,13 +92,14 @@ export const visitAncestorsAndSelf = (nodeDef, visitorFn) => survey => {
   do {
     visitorFn(nodeDefCurrent)
     nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
-  } while (!!nodeDefCurrent)
+  } while (nodeDefCurrent)
 }
 
 export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
   survey => {
-    if (NodeDef.isRoot(nodeDefDescendant))
+    if (NodeDef.isRoot(nodeDefDescendant)) {
       return false
+    }
 
     const nodeDefParent = getNodeDefParent(nodeDefDescendant)(survey)
     return NodeDef.getUuid(nodeDefParent) === NodeDef.getUuid(nodeDefAncestor)
@@ -108,7 +109,6 @@ export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
 
 export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = false) =>
   survey => {
-
     let length = 1
     const h = (array, nodeDef) => {
       const childDefs = NodeDef.isEntity(nodeDef)
@@ -116,7 +116,7 @@ export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = fals
         : []
 
       length += childDefs.length
-      const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }
+      const item = {...nodeDef, children: R.reduce(h, [], childDefs)}
       return R.append(item, array)
     }
 
@@ -124,7 +124,6 @@ export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = fals
       root: h([], getNodeDefRoot(survey))[0],
       length
     }
-
   }
 
 export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
@@ -162,17 +161,16 @@ export const getNodeDefCodeCandidateParents = nodeDef => survey => {
       nodeDef,
       nodeDefAncestor => {
         if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
-
           const candidatesAncestor = R.pipe(
             getNodeDefChildren(nodeDefAncestor),
             R.reject(n =>
-              // reject multiple attributes
+              // Reject multiple attributes
               NodeDef.isMultiple(n) ||
-              // or different category nodeDef
+              // Or different category nodeDef
               NodeDef.getCategoryUuid(n) !== Category.getUuid(category) ||
-              // or itself
+              // Or itself
               NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef) ||
-              // or leaves nodeDef
+              // Or leaves nodeDef
               getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
             )
           )(survey)
@@ -182,9 +180,9 @@ export const getNodeDefCodeCandidateParents = nodeDef => survey => {
       }
     )(survey)
     return candidates
-  } else {
-    return []
   }
+
+  return []
 }
 
 export const getNodeDefCategoryLevelIndex = nodeDef =>

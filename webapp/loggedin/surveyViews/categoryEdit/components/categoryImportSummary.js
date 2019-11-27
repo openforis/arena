@@ -1,17 +1,17 @@
 import './categoryImportSummary.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
-import { Modal, ModalBody, ModalFooter } from '@webapp/commonComponents/modal'
+import {Modal, ModalBody, ModalFooter} from '@webapp/commonComponents/modal'
 
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
 
-import { importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType } from '../actions'
+import {importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType} from '../actions'
 
 const TableHeader = () => {
   const i18n = useI18n()
@@ -26,14 +26,14 @@ const TableHeader = () => {
   )
 }
 
-const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataType }) => {
+const TableRow = ({idx, columnName, column, setCategoryImportSummaryColumnDataType}) => {
   const i18n = useI18n()
 
   const columnSummaryKey = CategoryImportSummary.hasColumnLang(column)
     ? 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
-    : CategoryImportSummary.isColumnExtra(column)
+    : (CategoryImportSummary.isColumnExtra(column)
       ? 'categoryEdit.importSummary.columnTypeSummaryExtra'
-      : 'categoryEdit.importSummary.columnTypeSummary'
+      : 'categoryEdit.importSummary.columnTypeSummary')
 
   const dataType = CategoryImportSummary.getColumnDataType(column)
 
@@ -82,7 +82,7 @@ const CategoryImportSummaryView = props => {
 
   return (
     <Modal className="category-edit__import-summary"
-           onClose={hideCategoryImportSummary}>
+      onClose={hideCategoryImportSummary}>
 
       <ModalBody>
         <div className="table">
@@ -107,12 +107,12 @@ const CategoryImportSummaryView = props => {
 
       <ModalFooter>
         <button className="btn modal-footer__item"
-                onClick={() => importCategory()}>
+          onClick={() => importCategory()}>
           <span className="icon icon-upload2 icon-12px icon-left"/>
           {i18n.t('common.import')}
         </button>
         <button className="btn btn-close modal-footer__item"
-                onClick={() => hideCategoryImportSummary()}>
+          onClick={() => hideCategoryImportSummary()}>
           <span className="icon icon-cross icon-10px icon-left"/>
           {i18n.t('common.close')}
         </button>

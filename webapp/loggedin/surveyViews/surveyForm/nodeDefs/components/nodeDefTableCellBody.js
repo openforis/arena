@@ -1,10 +1,10 @@
 import './nodeDefTableCellBody.scss'
 
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,8 +13,8 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import * as NodeDefUiProps from '../nodeDefUIProps'
+import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 
 const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
@@ -23,11 +23,13 @@ const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
       const item = NodeRefData.getCategoryItem(node)
       const label = CategoryItem.getLabel(lang)(item)
       return label || CategoryItem.getCode(item)
-    } else if (NodeDef.isFile(nodeDef)) {
-      return Node.getFileName(node)
-    } else {
-      return Node.getValue(node)
     }
+
+    if (NodeDef.isFile(nodeDef)) {
+      return Node.getFileName(node)
+    }
+
+    return Node.getValue(node)
   }
 
   return R.reduce(
@@ -41,11 +43,10 @@ const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
 }
 
 const NodeDefMultipleTableCell = props => {
-
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [nodeValues, setNodeValues] = useState([])
 
-  const { surveyInfo, nodeDef, nodes, lang, canEditRecord } = props
+  const {surveyInfo, nodeDef, nodes, lang, canEditRecord} = props
 
   useEffect(() => {
     const nodeValuesUpdate = getNodeValues(surveyInfo, nodeDef, nodes, lang)
@@ -64,11 +65,11 @@ const NodeDefMultipleTableCell = props => {
     )
     : (
       <div className="survey-form__node-def-table-cell-body-multiple">
-          <span className="values-summary">
-            {nodeValues}
-          </span>
+        <span className="values-summary">
+          {nodeValues}
+        </span>
         <button className="btn-s"
-                onClick={() => setShowEditDialog(true)}>
+          onClick={() => setShowEditDialog(true)}>
           <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
         </button>
       </div>
@@ -98,17 +99,16 @@ const NodeDefTableCellBody = props => {
             />
           )
           : (
-            React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
+            React.createElement(NodeDefUiProps.getComponent(nodeDef), {...props})
           )
       }
 
     </NodeDefErrorBadge>
   )
-
 }
 
 NodeDefTableCellBody.defaultProps = {
-  entryDataQuery: false, // true when node is being edited in data query
+  entryDataQuery: false, // True when node is being edited in data query
 }
 
 export default NodeDefTableCellBody

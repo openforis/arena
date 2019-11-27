@@ -1,16 +1,15 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
-import TableColumn from './tableColumn'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
-import { appModuleUri, dataModules } from '../../../../../appModules'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import {appModuleUri, dataModules} from '../../../../../appModules'
+import TableColumn from './tableColumn'
 
-const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) => (
+const TableColumns = ({nodeDefCols, row, lang, colWidth, editMode = false}) => (
   nodeDefCols.map(nodeDef =>
     <TableColumn
       key={NodeDef.getUuid(nodeDef)}
@@ -23,7 +22,7 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
   )
 )
 
-const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth, editMode, history }) => {
+const TableRows = ({nodeDefCols, data, offset, lang, colWidth, defaultColWidth, editMode, history}) => {
   const i18n = useI18n()
 
   return (
@@ -31,7 +30,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
       <div className="table__rows">
 
         <div className="table__row-header">
-          <div style={{ width: defaultColWidth }}>{i18n.t('dataView.rowNum')}</div>
+          <div style={{width: defaultColWidth}}>{i18n.t('dataView.rowNum')}</div>
           <TableColumns
             nodeDefCols={nodeDefCols}
             lang={lang}
@@ -42,7 +41,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
         <div className="table__data-rows">
           {
             data.map((row, i) => {
-              const { parentNodeUuid, record } = row
+              const {parentNodeUuid, record} = row
 
               const recordUuid = Record.getUuid(record)
               const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
@@ -57,13 +56,13 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
                     className="error-badge-inverse"
                   />
 
-                  <div style={{ width: defaultColWidth }}>
+                  <div style={{width: defaultColWidth}}>
                     {i + offset + 1}
                     {
                       editMode &&
                       <button className="btn btn-s btn-edit"
-                              title="View record"
-                              onClick={() => history.push(recordEditUrl)}>
+                        title="View record"
+                        onClick={() => history.push(recordEditUrl)}>
                         <span className="icon icon-pencil2 icon-12px"/>
                       </button>
                     }

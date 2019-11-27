@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, {useRef} from 'react'
 import * as R from 'ramda'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -22,7 +22,7 @@ const keys = {
   children: 'children',
 }
 
-//==== Modules hierarchy
+// ==== Modules hierarchy
 const getModule = (module, children = null, root = true) => ({
   [keys.key]: module.key,
   [keys.uri]: appModuleUri(module),
@@ -45,9 +45,9 @@ export const getModulesHierarchy = (user, surveyInfo) => [
     [dataModules.records, dataModules.dataVis]
   ),
   ...(Authorizer.canAnalyzeRecords(user, surveyInfo) ? [getModule(
-      appModules.analysis,
-      [analysisModules.processingChains]
-    )] : []),
+    appModules.analysis,
+    [analysisModules.processingChains]
+  )] : []),
   getModule(
     appModules.users,
     [userModules.users]
@@ -62,7 +62,7 @@ export const getChildren = R.prop(keys.children)
 export const isRoot = R.propEq(keys.root, true)
 export const isHome = module => getKey(module) === appModules.home.key
 export const isActive = pathname => module => {
-  // module home is active when page is on dashboard
+  // Module home is active when page is on dashboard
   return isHome(module)
     ? pathname === appModuleUri(homeModules.dashboard)
     : R.startsWith(module.uri, pathname)

@@ -3,16 +3,15 @@ import * as R from 'ramda'
 
 import Tooltip from '@webapp/commonComponents/tooltip'
 import ExpressionEditor from '@webapp/commonComponents/expression/expressionEditor'
-import LabelsEditor from '../../../labelsEditor/labelsEditor'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as ValidationUtils from '@webapp/utils/validationUtils'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import LabelsEditor from '../../../labelsEditor/labelsEditor'
 
-const ExpressionProp = (props) => {
-
+const ExpressionProp = props => {
   const {
     nodeDefUuidContext, nodeDefUuidCurrent, validation,
     expression, applyIf, severity, showLabels, readOnly,
@@ -48,8 +47,8 @@ const ExpressionProp = (props) => {
         {
           !isPlaceholder &&
           <button className="btn btn-s btn-transparent btn-delete"
-                  aria-disabled={readOnly}
-                  onClick={() => onDelete(expression)}>
+            aria-disabled={readOnly}
+            onClick={() => onDelete(expression)}>
             <span className="icon icon-bin2 icon-12px"/>
           </button>
         }
@@ -123,9 +122,9 @@ ExpressionProp.defaultProps = {
   validation: null,
 
   expression: '',
-  applyIf: true, //show apply if expression editor
-  severity: false, //show severity (error/warning) button group
-  showLabels: false, //show error message labels editor
+  applyIf: true, // Show apply if expression editor
+  severity: false, // Show severity (error/warning) button group
+  showLabels: false, // Show error message labels editor
   readOnly: false,
 
   isContextParent: false,

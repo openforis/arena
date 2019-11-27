@@ -44,7 +44,7 @@ export const enTranslation = {
     name: 'Name',
     new: 'New',
     no: 'No',
-    noItems: `$t(common.no) $t(common.item,{'count':2})`,
+    noItems: '$t(common.no) $t(common.item,{\'count\':2})',
     of: 'of',
     ok: 'Ok',
     required: 'Required',
@@ -71,7 +71,7 @@ export const enTranslation = {
       minute_plural: 'minutes',
       week: 'week',
       week_plural: 'weeks',
-      timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
+      timeDiff: '{{count}} $t(common.date.{{unit}}, { \'count\': {{count}} }) ago',
     },
   },
 
@@ -161,7 +161,7 @@ export const enTranslation = {
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
-      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
+      confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
       editInfo: 'Edit info',
       publish: 'Publish',
       viewInfo: 'View info',
@@ -208,18 +208,18 @@ export const enTranslation = {
   activityLogView: {
     recentActivity: 'Recent activity',
     messages: {
-      //survey
+      // Survey
       [ActivityLog.type.surveyCreate]: 'created the survey',
       [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
       [ActivityLog.type.surveyPublish]: 'published the survey',
       [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
 
-      // nodeDef
+      // NodeDef
       [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
       [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
       [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
 
-      //category
+      // Category
       [ActivityLog.type.categoryInsert]: 'added category',
       [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
       [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
@@ -231,29 +231,29 @@ export const enTranslation = {
       [ActivityLog.type.categoryItemDelete]: 'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
       [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
 
-      //taxonomy
+      // Taxonomy
       [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
       [ActivityLog.type.taxonomyPropUpdate]: 'updated {{key}} of taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
 
-      //record
+      // Record
       [ActivityLog.type.recordCreate]: 'added record',
       [ActivityLog.type.recordDelete]: 'deleted record {{keys}}',
       [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
 
-      //node
+      // Node
       [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
       [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} to record {{recordKeys}}',
       [ActivityLog.type.nodeDelete]: 'deleted node {{name}} from record {{recordKeys}}',
 
-      // user
+      // User
       [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
       [ActivityLog.type.userUpdate]: 'updated user {{name}}',
       [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
 
-      // analysis
+      // Analysis
       [ActivityLog.type.processingChainCreate]: 'added processing chain',
       [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
@@ -390,7 +390,7 @@ export const enTranslation = {
     },
     formEntryActions: {
       confirmDemote: 'Are sure you want to demote this record to {{name}}?',
-      confirmPromote: `Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore`,
+      confirmPromote: 'Are sure you want to promote this record to {{name}}?\n\nYou won\'t be able to edit it anymore',
       confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
       step: 'Step {{id}} ({{name}})',
@@ -473,7 +473,7 @@ export const enTranslation = {
 
   // ===== All validation errors
   validationErrors: {
-    // common
+    // Common
     invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
     invalidDate: 'Invalid date',
@@ -550,7 +550,7 @@ export const enTranslation = {
       cyclesRequired: 'At least one cycle must be defined',
       cyclesExceedingMax: 'A survey can have at most 10 cycles',
       cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
-      cycleDateStartAfterPrevDateEnd: `Cycle start date must be after previous cycle end date`,
+      cycleDateStartAfterPrevDateEnd: 'Cycle start date must be after previous cycle end date',
       cycleDateStartInvalid: 'Cycle start date is invalid',
       cycleDateStartMandatory: 'Cycle start date is mandatory',
       cycleDateEndInvalid: 'Cycle end date is invalid',
@@ -580,7 +580,7 @@ export const enTranslation = {
       passwordRequired: 'Password is required',
       passwordInvalid: 'Password should not start nor end with white spaces',
       passwordUnsafe: 'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
-      passwordsDoNotMatch: `Passwords don't match`,
+      passwordsDoNotMatch: 'Passwords don\'t match',
       verificationCodeInvalid: 'Invalid verification code',
 
       userDoesNotExist: 'User does not exist',
@@ -619,25 +619,25 @@ export const enTranslation = {
   // ====== App Errors
 
   appErrors: {
-    cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
+    cannotGetChild: 'Cannot get child \'{{childName}}\' from attribute {{name}}',
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
-    cantUpdateStep: `Can't update step`,
+    cantUpdateStep: 'Can\'t update step',
     entryDataNotFound: 'Entry data not found: {{entryName}}',
     generic: '{{text}}',
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
-    processingStepOnlyLastCanBeDeleted: `Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted`,
+    processingStepOnlyLastCanBeDeleted: 'Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted',
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
-    undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
-    invalidSyntax: `Expression syntax is invalid`,
+    undefinedFunction: 'Undefined function \'{{fnName}}\' or wrong parameter types',
+    invalidSyntax: 'Expression syntax is invalid',
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
 
-    userHasPendingInvitation: `There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted`,
+    userHasPendingInvitation: 'There\'s already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it\'s accepted',
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',

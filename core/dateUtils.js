@@ -9,9 +9,9 @@ import {
   differenceInMinutes,
   format,
   isValid as fnsIsValid
-} from 'date-fns';
+} from 'date-fns'
 
-import { isBlank } from './stringUtils';
+import {isBlank} from './stringUtils'
 
 export {
   isBefore,
@@ -24,7 +24,7 @@ export {
   differenceInHours,
   subMonths,
   subYears
-} from 'date-fns';
+} from 'date-fns'
 
 const normalizeDateTimeValue = length => value => R.pipe(
   R.ifElse(
@@ -36,31 +36,36 @@ const normalizeDateTimeValue = length => value => R.pipe(
 )(value)
 
 export const getRelativeDate = (i18n, date) => {
-
-  if (R.isNil(date))
+  if (R.isNil(date)) {
     return null
+  }
 
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
     const count = fn(now, date)
-    return i18n.t('common.date.timeDiff', { count, unit })
+    return i18n.t('common.date.timeDiff', {count, unit})
   }
 
-  if (differenceInMonths(now, date) > 0)
+  if (differenceInMonths(now, date) > 0) {
     return format(date, 'dd MMM yyyy')
+  }
 
-  if (differenceInWeeks(now, date) > 0)
+  if (differenceInWeeks(now, date) > 0) {
     return formatDiff(differenceInWeeks, 'week')
+  }
 
-  if (differenceInDays(now, date) > 0)
+  if (differenceInDays(now, date) > 0) {
     return formatDiff(differenceInDays, 'day')
+  }
 
-  if (differenceInHours(now, date) > 0)
+  if (differenceInHours(now, date) > 0) {
     return formatDiff(differenceInHours, 'hour')
+  }
 
-  if (differenceInMinutes(now, date) > 10)
+  if (differenceInMinutes(now, date) > 10) {
     return formatDiff(differenceInMinutes, 'minute')
+  }
 
   return i18n.t('common.date.aMomentAgo')
 }
@@ -82,16 +87,16 @@ export const isValidDate = (year, month, day) => {
 
   const date = (new Date(year, month - 1, day))
 
-  return !!fnsIsValid(date) &&
-    date.getFullYear() === +year &&
-    date.getMonth() + 1 === +month &&
-    date.getDate() === +day
+  return Boolean(fnsIsValid(date)) &&
+    date.getFullYear() === Number(year) &&
+    date.getMonth() + 1 === Number(month) &&
+    date.getDate() === Number(day)
 }
 
 export const isValidTime = (hour = '', minutes = '') =>
   isBlank(hour) || isBlank(minutes)
     ? false
-    : +hour >= 0 && +hour < 24 && +minutes >= 0 && +minutes < 60
+    : Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60
 
 export const isValidDateInFormat = (dateStr, format) => {
   const parsed = parse(dateStr, format)

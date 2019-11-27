@@ -1,12 +1,12 @@
 import * as R from 'ramda'
 
-import { trim, isNotBlank } from '@core/stringUtils';
-import { types } from './types'
+import {trim, isNotBlank} from '@core/stringUtils'
+import {types} from './types'
 
-// toString
+// ToString
 const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
 
-// valid
+// Valid
 const propValid = prop => R.pipe(R.prop(prop), isNotBlank)
 const binaryValid = node => isValid(node.left) && propValid('operator')(node) && isValid(node.right)
 

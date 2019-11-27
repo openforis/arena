@@ -33,11 +33,11 @@ export default {
   [ActivityLog.type.processingStepPropsUpdate]: (survey, i18n) => activityLog => {
     const content = ActivityLog.getContent(activityLog)
 
-    // only one of entityUuid or categoryUuid can have a value associated
+    // Only one of entityUuid or categoryUuid can have a value associated
     const entityUuid = content[ProcessingStep.keysProps.entityUuid]
     const categoryUuid = content[ProcessingStep.keysProps.categoryUuid]
 
-    let key, value
+    let key; let value
     if (entityUuid) {
       key = i18n.t('nodeDefsTypes.entity')
       value = R.pipe(Survey.getNodeDefByUuid(entityUuid), entityDef => NodeDef.getLabel(entityDef, i18n.lang))(survey)
@@ -45,6 +45,7 @@ export default {
       key = i18n.t('processingStepView.category')
       value = R.pipe(Survey.getCategoryByUuid(categoryUuid), Category.getName)(survey)
     }
+
     return {
       key,
       value,

@@ -1,19 +1,18 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '../../record/actions'
+import {deleteRecord, deleteRecordUuidPreview, updateRecordStep} from '../../record/actions'
 
 import * as RecordState from '../../record/recordState'
 
-const RecordEntryButtons = (props) => {
-
+const RecordEntryButtons = props => {
   const {
     history,
     step, stepNext, stepPrev,
@@ -28,48 +27,48 @@ const RecordEntryButtons = (props) => {
   return (
     <React.Fragment>
 
-      <ErrorBadge validation={{ valid }} labelKey="dataView.invalidRecord"/>
+      <ErrorBadge validation={{valid}} labelKey="dataView.invalidRecord"/>
 
       <div className="survey-form-header__record-actions-steps">
         {
           stepPrev &&
           <button className="btn-s btn-transparent"
-                  onClick={() =>
-                    confirm(i18n.t('surveyForm.formEntryActions.confirmDemote', { name: getStepLabel(stepPrev) }))
-                      ? updateRecordStep(RecordStep.getId(stepPrev), history)
-                      : null
-                  }>
+            onClick={() =>
+              confirm(i18n.t('surveyForm.formEntryActions.confirmDemote', {name: getStepLabel(stepPrev)}))
+                ? updateRecordStep(RecordStep.getId(stepPrev), history)
+                : null
+            }>
             <span className="icon icon-reply icon-12px"/>
           </button>
         }
 
         <span>
           {
-            i18n.t('surveyForm.formEntryActions.step', { id: RecordStep.getId(step), name: getStepLabel(step) })
+            i18n.t('surveyForm.formEntryActions.step', {id: RecordStep.getId(step), name: getStepLabel(step)})
           }
         </span>
 
         {
           stepNext &&
           <button className="btn-s btn-transparent"
-                  aria-disabled={!valid}
-                  onClick={() =>
-                    confirm(i18n.t('surveyForm.formEntryActions.confirmPromote', { name: getStepLabel(stepNext) }))
-                      ? updateRecordStep(RecordStep.getId(stepNext), history)
-                      : null
-                  }>
+            aria-disabled={!valid}
+            onClick={() =>
+              confirm(i18n.t('surveyForm.formEntryActions.confirmPromote', {name: getStepLabel(stepNext)}))
+                ? updateRecordStep(RecordStep.getId(stepNext), history)
+                : null
+            }>
             <span className="icon icon-redo2 icon-12px"/>
           </button>
         }
       </div>
 
       <button className="btn-s btn-danger"
-              onClick={() =>
-                window.confirm(i18n.t('surveyForm.formEntryActions.confirmDelete'))
-                  ? deleteRecord(history)
-                  : null
-              }
-              aria-disabled={false}>
+        onClick={() =>
+          window.confirm(i18n.t('surveyForm.formEntryActions.confirmDelete'))
+            ? deleteRecord(history)
+            : null
+        }
+        aria-disabled={false}>
         <span className="icon icon-bin icon-12px icon-left"/>
         {i18n.t('common.delete')}
       </button>
@@ -77,8 +76,7 @@ const RecordEntryButtons = (props) => {
   )
 }
 
-const FormEntryActions = (props) => {
-
+const FormEntryActions = props => {
   const {
     history, preview,
     step, stepNext, stepPrev,
@@ -114,7 +112,7 @@ const FormEntryActions = (props) => {
   )
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const record = RecordState.getRecord(state)
   const stepId = Record.getStep(record)
 
@@ -128,5 +126,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  { deleteRecord, deleteRecordUuidPreview, updateRecordStep }
+  {deleteRecord, deleteRecordUuidPreview, updateRecordStep}
 )(FormEntryActions)

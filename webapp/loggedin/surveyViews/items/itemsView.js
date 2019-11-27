@@ -3,7 +3,7 @@ import './items.scss'
 import React from 'react'
 import ItemsTable from './itemsTable'
 
-const ItemsView = (props) => {
+const ItemsView = props => {
   const {editedItem, itemEditComponent, itemEditProp, onClose} = props
 
   const ItemEdit = itemEditComponent
@@ -26,9 +26,9 @@ const ItemsView = (props) => {
           onClose &&
           <div className="items__footer">
             <button className="btn"
-                    onClick={() => {
-                      onClose ? onClose() : null
-                    }}>
+              onClick={() => {
+                onClose ? onClose() : null
+              }}>
               Close
             </button>
           </div>

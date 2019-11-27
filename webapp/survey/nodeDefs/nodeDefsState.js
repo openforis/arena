@@ -27,12 +27,11 @@ export const mergeNodeDefs = R.mergeLeft
 
 export const dissocNodeDef = nodeDef =>
   nodeDefsState => {
-
     const state = NodeDef.isEntity(nodeDef)
       ? R.reduce(
         (s, n) => dissocNodeDef(n)(s),
         nodeDefsState,
-        Survey.getNodeDefChildren(nodeDef)({ nodeDefs: nodeDefsState })
+        Survey.getNodeDefChildren(nodeDef)({nodeDefs: nodeDefsState})
       )
       : nodeDefsState
 

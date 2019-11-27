@@ -7,7 +7,7 @@ import * as SurveyDependencies from '@core/survey/_survey/surveyDependencies'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '../node'
 
-import { keys } from './recordKeys'
+import {keys} from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
 
 /**
@@ -39,6 +39,7 @@ export const getAncestorsAndSelf = entity => record => {
     ancestors.push(entity)
     entity = getParentNode(entity)(record)
   }
+
   return ancestors
 }
 
@@ -49,7 +50,7 @@ export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
     R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
   )(record)
 
-// descendants
+// Descendants
 export const getNodeChildren = node => record => R.pipe(
   NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
   R.map(uuid => getNodeByUuid(uuid)(record))
@@ -89,16 +90,17 @@ export const visitDescendantsAndSelf = (node, visitor) => record => {
  * Returns true if a node and all its ancestors are applicable
  */
 export const isNodeApplicable = node => record => {
-  if (Node.isRoot(node))
+  if (Node.isRoot(node)) {
     return true
+  }
 
   const nodeParent = getParentNode(node)(record)
   const isApplicable = Node.isChildApplicable(Node.getNodeDefUuid(node))(nodeParent)
   if (isApplicable) {
     return isNodeApplicable(nodeParent)(record)
-  } else {
-    return false
   }
+
+  return false
 }
 
 /**
@@ -123,16 +125,16 @@ export const getDependentNodePointers = (survey, node, dependencyType, includeSe
     const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
 
     for (const dependentDef of dependentDefs) {
-      //1 find common parent def
+      // 1 find common parent def
       const commonParentDefUuid = R.pipe(
         R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
         R.last
       )(NodeDef.getMetaHierarchy(dependentDef))
 
-      //2 find common parent node
+      // 2 find common parent node
       const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
 
-      //3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
+      // 3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
       const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
 
       const nodeDefUuidDependent = isDependencyApplicable
@@ -157,6 +159,7 @@ export const getDependentNodePointers = (survey, node, dependencyType, includeSe
       }
     }
   }
+
   if (includeSelf) {
     const nodePointerSelf = {
       nodeDef,
@@ -170,7 +173,7 @@ export const getDependentNodePointers = (survey, node, dependencyType, includeSe
   return nodePointers
 }
 
-// code attributes
+// Code attributes
 export const getDependentCodeAttributes = node => record => R.pipe(
   NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
   R.map(uuid => getNodeByUuid(uuid)(record))
@@ -184,10 +187,12 @@ export const getParentCodeAttribute = (survey, parentNode, nodeDef) => record =>
     for (const ancestor of ancestors) {
       const children = getNodeChildren(ancestor)(record)
       const nodeFound = children.find(node => Node.getNodeDefUuid(node) === parentCodeDefUuid)
-      if (nodeFound)
+      if (nodeFound) {
         return nodeFound
+      }
     }
   }
+
   return null
 }
 

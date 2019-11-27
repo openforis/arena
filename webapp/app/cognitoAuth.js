@@ -1,4 +1,4 @@
-import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
+import {AuthenticationDetails, CognitoUser, CognitoUserPool} from 'amazon-cognito-identity-js'
 
 export const keysAction = {
   success: 'success',
@@ -8,9 +8,9 @@ export const keysAction = {
 const UserPoolId = window.cognitoUserPoolId
 const ClientId = window.cognitoClientId
 
-const _getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
+const _getUserPool = () => new CognitoUserPool({UserPoolId, ClientId})
 
-const _newCognitoUser = Username => new CognitoUser({ Username, Pool: _getUserPool() })
+const _newCognitoUser = Username => new CognitoUser({Username, Pool: _getUserPool()})
 
 // Global variables to handle completeNewPasswordChallenge flow
 let _cognitoUser
@@ -22,13 +22,14 @@ const _cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
       _cognitoUser = null
       _sessionUserAttributes = null
     }
+
     onSuccess(keysAction.success)
   },
 
   onFailure,
 
   newPasswordRequired: userAttributes => {
-    // the api doesn't accept this field back
+    // The api doesn't accept this field back
     delete userAttributes.email_verified
 
     _sessionUserAttributes = userAttributes
@@ -42,7 +43,7 @@ export const login = (Username, Password) =>
   new Promise((resolve, reject) => {
     _cognitoUser = _newCognitoUser(Username)
     _cognitoUser.authenticateUser(
-      new AuthenticationDetails({ Username, Password }),
+      new AuthenticationDetails({Username, Password}),
       _cognitoCallbacks(resolve, reject)
     )
   })
@@ -51,7 +52,7 @@ export const acceptInvitation = (name, password) =>
   new Promise((resolve, reject) => {
     _cognitoUser.completeNewPasswordChallenge(
       password,
-      { ..._sessionUserAttributes, name },
+      {..._sessionUserAttributes, name},
       _cognitoCallbacks(resolve, reject)
     )
   })
@@ -96,8 +97,8 @@ export const getJwtToken = () => new Promise((resolve, reject) => {
         const accessToken = session.getAccessToken()
         const jwtToken = accessToken.jwtToken
         resolve(jwtToken)
-      } catch (e) {
-        reject(e)
+      } catch (error) {
+        reject(error)
       }
     })
   } else {

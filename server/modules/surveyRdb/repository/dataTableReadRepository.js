@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
@@ -65,7 +65,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       )
     GROUP BY r.uuid, r.validation
     `,
-    [cycle]
+  [cycle]
   )
 }
 
@@ -84,7 +84,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUui
     WHERE
       ${DataTable.colNameRecordUuuid} = $1
       ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.colNameUuuid} = $2`}`,
-    [recordUuid, nodeUuid],
-    row => Object.values(row)
+  [recordUuid, nodeUuid],
+  row => Object.values(row)
   )
 }

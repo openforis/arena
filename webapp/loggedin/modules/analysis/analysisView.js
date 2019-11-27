@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { appModules, appModuleUri, analysisModules } from '../../appModules'
+import {appModules, appModuleUri, analysisModules} from '../../appModules'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'

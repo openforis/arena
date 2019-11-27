@@ -6,12 +6,11 @@ import * as R from 'ramda'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import { FormItem } from '@webapp/commonComponents/form/input'
+import {useI18n} from '@webapp/commonComponents/hooks'
+import {FormItem} from '@webapp/commonComponents/form/input'
 import ExpressionProp from './expressionProp'
 
 const ExpressionsProp = props => {
-
   const {
     values, label, validation,
     multiple,
@@ -20,12 +19,12 @@ const ExpressionsProp = props => {
 
   const i18n = useI18n()
 
-  const getExpressionIndex = (expression) => R.findIndex(
+  const getExpressionIndex = expression => R.findIndex(
     R.propEq('uuid', NodeDefExpression.getUuid(expression))
     , values
   )
 
-  const onDelete = (expression) => {
+  const onDelete = expression => {
     if (window.confirm(i18n.t('nodeDefEdit.expressionsProp.confirmDelete'))) {
       const index = getExpressionIndex(expression)
       const newValues = R.remove(index, 1, values)
@@ -83,7 +82,7 @@ ExpressionsProp.defaultProps = {
   readOnly: false,
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,
-  // array of expressions
+  // Array of expressions
   values: [],
 
   validation: null,

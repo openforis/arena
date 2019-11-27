@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import * as SurveyCycle from '../../survey/surveyCycle'
+import * as SurveyCycle from '../surveyCycle'
 import * as Validator from '../../validation/validator'
 import * as Validation from '../../validation/validation'
 import * as ValidationResult from '../../validation/validationResult'
@@ -17,8 +17,9 @@ const _validateDate = errorMessageKey => (propName, obj) => {
 }
 
 const _validateDateIsBefore = (dateStr, dateToCompareStr, errorMessageKey) => {
-  if (!dateStr || !dateToCompareStr)
+  if (!dateStr || !dateToCompareStr) {
     return null
+  }
 
   const date = DateUtils.parse(dateStr, SurveyCycle.dateFormat)
   const dateToCompare = DateUtils.parse(dateToCompareStr, SurveyCycle.dateFormat)
@@ -44,7 +45,7 @@ const _cycleValidators = (cyclePrev, isLast) => ({
     ...(cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : [])
   ],
   [SurveyCycle.keys.dateEnd]: [
-    //date end is required for all but the last cycle
+    // Date end is required for all but the last cycle
     ...(isLast ? [] : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)]),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateEndInvalid)
   ],

@@ -1,15 +1,14 @@
 import React from 'react'
-import { Route, Switch } from 'react-router'
+import {Route, Switch} from 'react-router'
 
+import {appModules, appModuleUri} from '../appModules'
 import DesignerView from './designer/designerView'
 import HomeView from './home/homeView'
 import DataView from './data/dataView'
 import UsersView from './users/usersView'
 import AnalysisView from './analysis/analysisView'
 
-import { appModules, appModuleUri } from '../appModules'
-
-const ModuleSwitch = (props) => (
+const ModuleSwitch = props => (
   <div className="app-module">
 
     <Switch location={props.location}>

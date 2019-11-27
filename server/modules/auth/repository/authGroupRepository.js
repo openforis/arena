@@ -1,5 +1,5 @@
 import * as camelize from 'camelize'
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 const dbTransformCallback = camelize
 
@@ -14,13 +14,13 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
     FROM survey s
     WHERE s.id = $2 
     RETURNING *`,
-    [
-      AuthGroup.getName(authGroup),
-      surveyId,
-      JSON.stringify(AuthGroup.getPermissions(authGroup)),
-      JSON.stringify(AuthGroup.getRecordSteps(authGroup)),
-    ],
-    dbTransformCallback
+  [
+    AuthGroup.getName(authGroup),
+    surveyId,
+    JSON.stringify(AuthGroup.getPermissions(authGroup)),
+    JSON.stringify(AuthGroup.getRecordSteps(authGroup)),
+  ],
+  dbTransformCallback
   )
 
 export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
@@ -33,8 +33,8 @@ export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
     INSERT INTO auth_group_user (group_uuid, user_uuid)
     VALUES ($1, $2)
     RETURNING *`,
-    [groupUuid, userUuid],
-    dbTransformCallback
+  [groupUuid, userUuid],
+  dbTransformCallback
   )
 
 // ==== READ
@@ -44,8 +44,8 @@ export const fetchGroupByUuid = async (groupUuid, client = db) =>
     SELECT auth_group.*
     FROM auth_group
     WHERE auth_group.uuid = $1`,
-    [groupUuid],
-    dbTransformCallback
+  [groupUuid],
+  dbTransformCallback
   )
 
 export const fetchSurveyGroups = async (surveyId, client = db) =>
@@ -55,8 +55,8 @@ export const fetchSurveyGroups = async (surveyId, client = db) =>
     JOIN survey s
     ON s.id = $1
     WHERE auth_group.survey_uuid = s.uuid`,
-    [surveyId],
-    dbTransformCallback
+  [surveyId],
+  dbTransformCallback
   )
 
 export const fetchUserGroups = async (userUuid, client = db) =>
@@ -68,8 +68,8 @@ export const fetchUserGroups = async (userUuid, client = db) =>
     WHERE
       gu.user_uuid = $1
     `,
-    [userUuid],
-    dbTransformCallback
+  [userUuid],
+  dbTransformCallback
   )
 
 // ==== UPDATE
@@ -88,8 +88,8 @@ export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db
       (gu.group_uuid = g.uuid AND g.name = '${AuthGroup.groupNames.systemAdmin}')
     ) 
     RETURNING *`,
-    [groupUuid, userUuid, surveyId],
-    dbTransformCallback
+  [groupUuid, userUuid, surveyId],
+  dbTransformCallback
   )
 }
 
@@ -99,7 +99,7 @@ export const deleteAllUserGroups = async (userUuid, client = db) =>
   await client.query(`
     DELETE FROM auth_group_user
     WHERE user_uuid = $1`,
-    userUuid)
+  userUuid)
 
 // ==== DELETE
 

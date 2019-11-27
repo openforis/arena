@@ -3,9 +3,9 @@ import './nodeDefCoordinate.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import {FormItem, Input} from '@webapp/commonComponents/form/input'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
@@ -17,7 +17,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefCoordinate = props => {
-
   const i18n = useI18n()
 
   const numberMask = createNumberMask({
@@ -29,14 +28,14 @@ const NodeDefCoordinate = props => {
   })
 
   const handleInputChange = (node, field, value) => {
-    const { nodeDef, updateNode } = props
+    const {nodeDef, updateNode} = props
 
     const newValue = R.assoc(field, value)(node.value)
 
     updateNode(nodeDef, node, newValue)
   }
 
-  const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly } = props
+  const {surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly} = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -47,21 +46,21 @@ const NodeDefCoordinate = props => {
   const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
 
   const xInput = <Input mask={numberMask}
-                        readOnly={entryDisabled}
-                        value={value.x}
-                        onChange={value => handleInputChange(node, 'x', value)}/>
+    readOnly={entryDisabled}
+    value={value.x}
+    onChange={value => handleInputChange(node, 'x', value)}/>
 
   const yInput = <Input mask={numberMask}
-                        readOnly={entryDisabled}
-                        value={value.y}
-                        onChange={value => handleInputChange(node, 'y', value)}/>
+    readOnly={entryDisabled}
+    value={value.y}
+    onChange={value => handleInputChange(node, 'y', value)}/>
 
   const srsDropdown = <Dropdown readOnly={entryDisabled}
-                                items={surveySrs}
-                                itemKeyProp="code"
-                                itemLabelProp="name"
-                                selection={selectedSrs}
-                                onChange={(selection) => handleInputChange(node, 'srs', R.prop('code')(selection))}/>
+    items={surveySrs}
+    itemKeyProp="code"
+    itemLabelProp="name"
+    selection={selectedSrs}
+    onChange={selection => handleInputChange(node, 'srs', R.prop('code')(selection))}/>
 
   if (renderType === NodeDefLayout.renderType.tableBody) {
     return <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">

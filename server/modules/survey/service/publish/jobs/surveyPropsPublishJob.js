@@ -16,19 +16,18 @@ const findDeletedLanguages = async (surveyId, t) => {
     const publishedSurvey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
     const publishedSurveyInfo = Survey.getSurveyInfo(publishedSurvey)
     return R.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfo))
-  } else {
-    return []
   }
+
+  return []
 }
 
 export default class SurveyPropsPublishJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(SurveyPropsPublishJob.type, params)
   }
 
-  async execute () {
-    const { surveyId, tx } = this
+  async execute() {
+    const {surveyId, tx} = this
 
     this.total = 6
 
@@ -50,7 +49,6 @@ export default class SurveyPropsPublishJob extends Job {
     await SurveyManager.publishSurveyProps(surveyId, langsDeleted, tx)
     this.incrementProcessedItems()
   }
-
 }
 
 SurveyPropsPublishJob.type = 'SurveyPropsPublishJob'

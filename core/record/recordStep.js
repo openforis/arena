@@ -9,9 +9,9 @@ const keys = {
 }
 
 const steps = [
-  { id: '1', name: 'entry' },
-  { id: '2', name: 'cleansing' },
-  { id: '3', name: 'analysis' },
+  {id: '1', name: 'entry'},
+  {id: '2', name: 'cleansing'},
+  {id: '3', name: 'analysis'},
 ]
 
 export const getDefaultStep = () => R.pipe(
@@ -42,8 +42,9 @@ export const getId = ObjectUtils.getId
 export const getName = R.prop(keys.name)
 
 export const areAdjacent = (step1, step2) => {
-  if (!(step1 || step2))
+  if (!(step1 || step2)) {
     return false
+  }
 
   const idx1 = getStepIndex(getId(step1))(steps)
   const idx2 = getStepIndex(getId(step2))(steps)

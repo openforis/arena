@@ -3,7 +3,6 @@ import './warningBadge.scss'
 import React from 'react'
 
 const WarningBadge = ({show, label, showLabel}) => {
-
   return show
     ? (
       <div className="badge warning-badge">

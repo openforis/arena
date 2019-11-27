@@ -4,19 +4,22 @@ const throttleLastRan = {}
 
 export const debounce = (func, id, delay = 500, immediate = false) => {
   return function () {
-    const context = this, args = arguments
+    const context = this; const
+      args = arguments
 
     const later = function () {
       delete debounceTimeouts[id]
-      if (!immediate)
+      if (!immediate) {
         func.apply(context, args)
+      }
     }
 
     const callNow = immediate && !debounceTimeouts[id]
     clearTimeout(debounceTimeouts[id])
     debounceTimeouts[id] = setTimeout(later, delay)
-    if (callNow)
+    if (callNow) {
       func.apply(context, args)
+    }
   }
 }
 
@@ -36,7 +39,7 @@ export const throttle = (func, id, limit = 500) => {
     if (lastRun) {
       clearTimeout(throttleTimeouts[id])
 
-      throttleTimeouts[id] = setTimeout(function () {
+      throttleTimeouts[id] = setTimeout(() => {
         if ((Date.now() - lastRun) >= limit) {
           runFunction()
         }
@@ -53,5 +56,6 @@ export const cancelThrottle = id => {
     clearTimeout(timeout)
     delete throttleTimeouts[id]
   }
+
   delete throttleLastRan[id]
 }

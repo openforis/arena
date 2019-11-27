@@ -1,7 +1,7 @@
 import * as sgMail from '@sendgrid/mail'
 
 import * as ProcessUtils from '@core/processUtils'
-import * as i18nFactory from '@core/i18n/i18nFactory';
+import * as i18nFactory from '@core/i18n/i18nFactory'
 
 sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
 

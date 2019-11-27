@@ -4,7 +4,6 @@ import * as R from 'ramda'
 import TablePaginator from './tablePaginator'
 
 const TableHeader = props => {
-
   const {
     module, moduleApiUri, restParams,
     headerLeftComponent,

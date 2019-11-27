@@ -9,7 +9,6 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 
 const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
-
   const nodeDefUuidCols = []
 
   Survey.visitAncestorsAndSelf(
@@ -46,8 +45,6 @@ export const generateScript = async (survey, cycle, processingStep, outputDir) =
   )(processingStep)
 
   if (nodeDefTable) {
-
     await _generateDataFile(survey, cycle, nodeDefTable, outputDir)
   }
-
 }

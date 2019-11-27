@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import { ValidatorErrorKeys } from './validatorErrorKeys'
-import * as ValidatorNameKeywords from './validatorNameKeywords'
 import * as ObjectUtils from '@core/objectUtils'
+import {ValidatorErrorKeys} from './validatorErrorKeys'
+import * as ValidatorNameKeywords from './validatorNameKeywords'
 
 /**
  * Internal names must contain only lowercase letters, numbers and underscores starting with a letter
@@ -18,7 +18,7 @@ export const validateRequired = errorKey => (propName, obj) => {
   )(obj)
 
   return R.isEmpty(value)
-    ? { key: errorKey }
+    ? {key: errorKey}
     : null
 }
 
@@ -29,21 +29,21 @@ export const validateItemPropUniqueness = errorKey => items => (propName, item) 
   )
 
   return hasDuplicates
-    ? { key: errorKey }
+    ? {key: errorKey}
     : null
 }
 
 export const validateNotKeyword = errorKey => (propName, item) => {
   const value = getProp(propName)(item)
   return ValidatorNameKeywords.isKeyword(value)
-    ? { key: errorKey, params: { value } }
+    ? {key: errorKey, params: {value}}
     : null
 }
 
 export const validateName = errorKey => (propName, item) => {
   const prop = getProp(propName)(item)
   return prop && !validNameRegex.test(prop)
-    ? { key: errorKey }
+    ? {key: errorKey}
     : null
 }
 
@@ -51,12 +51,14 @@ export const validatePositiveNumber = errorKey => (propName, item) => {
   const value = getProp(propName)(item)
 
   if (value && isNaN(value)) {
-    return { key: ValidatorErrorKeys.invalidNumber }
-  } else if (value && value <= 0) {
-    return { key: errorKey }
-  } else {
-    return null
+    return {key: ValidatorErrorKeys.invalidNumber}
   }
+
+  if (value && value <= 0) {
+    return {key: errorKey}
+  }
+
+  return null
 }
 
 export const isKeyword = ValidatorNameKeywords.isKeyword

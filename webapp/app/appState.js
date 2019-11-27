@@ -11,7 +11,7 @@ export const keys = {
   saving: 'saving',
   loaderVisible: 'loaderVisible',
 
-  // i18n
+  // I18n
   i18n: 'i18n',
   lang: 'lang',
 }
@@ -80,7 +80,7 @@ export const getLang = R.pipe(getI18n, R.prop(keys.lang))
 
 // ==== System ERRORS
 
-export const assocSystemError = (error) => R.assoc(keys.systemError, error)
+export const assocSystemError = error => R.assoc(keys.systemError, error)
 
 export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
 

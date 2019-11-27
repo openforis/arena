@@ -1,5 +1,4 @@
 export const init = app => {
-
   const bundleRegexp = /^\/bundle-.*\.js(\.map)?$|^\/styles-.*\.css(\.map)?$/
   const bustRegexp = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
   const apiRegexp = /^\/api\/.*/i
@@ -16,6 +15,7 @@ export const init = app => {
     } else {
       res.set('Cache-Control', 'no-store')
     }
+
     next()
   })
-};
+}

@@ -1,8 +1,8 @@
 import camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
 
@@ -14,8 +14,8 @@ export const insertCalculationStep = async (surveyId, processingStepUuid, index,
         ($1, $2)
       RETURNING *
     `,
-    [processingStepUuid, index],
-    camelize
+  [processingStepUuid, index],
+  camelize
   )
 
 // ====== UPDATE
@@ -31,23 +31,23 @@ export const updateCalculationIndex = async (surveyId, processingStepUuid, index
     AND index = $2
     RETURNING *
     `,
-    [processingStepUuid, indexCurrent]
+  [processingStepUuid, indexCurrent]
   )
 
-  // set index placeholder for element being edited
+  // Set index placeholder for element being edited
   queries.push(_getUpdate(indexFrom, indexPlaceholder))
 
-  // decrement previous calculations (element is moved forward)
+  // Decrement previous calculations (element is moved forward)
   for (let i = indexFrom + 1; i <= indexTo; i++) {
-    queries.push(_getUpdate(i, `index - 1`))
+    queries.push(_getUpdate(i, 'index - 1'))
   }
 
-  // increment next calculations (element is moved backward)
+  // Increment next calculations (element is moved backward)
   for (let i = indexFrom - 1; i >= indexTo; i--) {
-    queries.push(_getUpdate(i, `index + 1`))
+    queries.push(_getUpdate(i, 'index + 1'))
   }
 
-  // set index for element being edited
+  // Set index for element being edited
   queries.push(_getUpdate(indexPlaceholder, indexTo))
 
   const queriesRes = await client.batch(queries)

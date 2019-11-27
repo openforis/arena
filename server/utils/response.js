@@ -10,9 +10,9 @@ export const contentTypes = {
   csv: 'text/csv'
 }
 
-export const sendOk = res => res.json({ status: status.ok })
+export const sendOk = res => res.json({status: status.ok})
 
-const _getErr = ({ key, params }) => ({
+const _getErr = ({key, params}) => ({
   status: status.error,
   key,
   params,
@@ -26,7 +26,7 @@ export const sendErr = (res, err) => {
   } else {
     res.status(500).json(_getErr({
       key: 'appErrors.generic',
-      params: { text: `Could not serve: ${err.toString()}` },
+      params: {text: `Could not serve: ${err.toString()}`},
     }))
   }
 }
@@ -39,8 +39,11 @@ export const sendFile = (res, name, content, size) => {
 
 export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
-  if (fileSize)
+  if (fileSize) {
     res.setHeader('Content-Length', fileSize)
-  if (contentType)
+  }
+
+  if (contentType) {
     res.set('Content-Type', contentType)
+  }
 }

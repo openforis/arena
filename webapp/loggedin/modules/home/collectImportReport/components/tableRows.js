@@ -2,8 +2,8 @@ import React from 'react'
 
 import TableRow from './tableRow'
 
-const TableRows = (props) => {
-  const { reportItems } = props
+const TableRows = props => {
+  const {reportItems} = props
 
   return (
     <div className="table__content">

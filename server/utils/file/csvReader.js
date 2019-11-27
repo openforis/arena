@@ -1,11 +1,10 @@
-import { parse as csvParser } from 'csv'
 import * as fs from 'fs'
+import {parse as csvParser} from 'csv'
 
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
 
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
-
   let canceled = false
   const queue = new Queue()
 
@@ -13,7 +12,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     let ended = false
     let headers = null
     let total = 0
-    let processingRow = false //prevents the call to processNext when a row is already being processed
+    let processingRow = false // Prevents the call to processNext when a row is already being processed
 
     /**
      * Executes the specified function fn in a try catch.
@@ -22,9 +21,9 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     const _tryOrCancel = async fn => {
       try {
         await fn()
-      } catch (e) {
+      } catch (error) {
         cancel()
-        reject(e)
+        reject(error)
       }
     }
 
@@ -33,20 +32,21 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         processingRow = true
 
         if (queue.isEmpty()) {
-          if (ended)
+          if (ended) {
             resolve()
+          }
         } else if (!canceled) {
           const row = queue.dequeue()
 
           if (headers) {
-            //headers read, process rows
+            // Headers read, process rows
             if (onRow) {
               await _tryOrCancel(async () => {
                 await onRow(_indexRowByHeaders(row))
               })
             }
           } else {
-            //process headers
+            // Process headers
             headers = row
             if (onHeaders) {
               await _tryOrCancel(async () => {
@@ -54,6 +54,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
               })
             }
           }
+
           processNext()
         }
 
@@ -62,12 +63,13 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     }
 
     const onData = data => {
-      if (canceled)
+      if (canceled) {
         return resolve()
+      }
 
       ++total
       if (total > 0) {
-        // skip first row (headers)
+        // Skip first row (headers)
         onTotalChange && onTotalChange(total)
       }
 
@@ -80,13 +82,14 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
 
     const onEnd = () => {
       ended = true
-      if (queue.isEmpty())
+      if (queue.isEmpty()) {
         resolve()
+      }
     }
 
     const _indexRowByHeaders = row =>
       headers
-        ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: StringUtils.trim(row[index]) }), {})
+        ? headers.reduce((accRow, header, index) => Object.assign(accRow, {[header]: StringUtils.trim(row[index])}), {})
         : row
 
     stream
@@ -101,7 +104,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     stream && stream.destroy()
   }
 
-  return { start, cancel }
+  return {start, cancel}
 }
 
 export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>

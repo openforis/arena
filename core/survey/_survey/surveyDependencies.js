@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
 import * as NodeDefExpression from '../nodeDefExpression'
-import * as SurveyNodeDefs from './surveyNodeDefs'
 import * as NodeDef from '../nodeDef'
+import * as SurveyNodeDefs from './surveyNodeDefs'
 
 const keys = {
   dependencyGraph: 'dependencyGraph'
@@ -33,10 +33,11 @@ const addDeps = (survey, nodeDef, type, expressions) =>
       const nodeDefRef = SurveyNodeDefs.getNodeDefByName(refName)(survey)
       graph = _addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
     }
+
     return graph
   }
 
-//====== CREATE
+// ====== CREATE
 export const buildGraph = survey =>
   R.reduce(
     (graph, nodeDef) => R.pipe(
@@ -54,24 +55,24 @@ export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.
   getDependencyGraph,
   R.ifElse(
     R.always(R.isNil(dependencyType)),
-    //return all node def dependents
+    // Return all node def dependents
     R.pipe(
       R.values,
       R.reduce((accDependents, graph) =>
-          R.pipe(
-            R.propOr([], nodeDefUuid),
-            R.ifElse(
-              R.isEmpty,
-              R.always(accDependents),
-              R.concat(accDependents)
-            )
-          )(graph),
-        []
+        R.pipe(
+          R.propOr([], nodeDefUuid),
+          R.ifElse(
+            R.isEmpty,
+            R.always(accDependents),
+            R.concat(accDependents)
+          )
+        )(graph),
+      []
       ),
       R.flatten,
       R.uniq
     ),
-    //return dependents by dependency Type
+    // Return dependents by dependency Type
     R.pathOr([], [dependencyType, nodeDefUuid])
   )
 )
@@ -81,8 +82,9 @@ export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) => R.
  *
  */
 export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
-  if (nodeDefUuid === nodeDefSourceUuid)
+  if (nodeDefUuid === nodeDefSourceUuid) {
     return false
+  }
 
   const stack = []
   stack.push(nodeDefSourceUuid)
@@ -92,8 +94,9 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey =
   while (stack.length > 0) {
     const nodeDefUuidCurrent = stack.pop()
 
-    if (nodeDefUuid === nodeDefUuidCurrent)
+    if (nodeDefUuid === nodeDefUuidCurrent) {
       return true
+    }
 
     visitedUuids.add(nodeDefUuidCurrent)
 

@@ -1,8 +1,8 @@
-import { expect } from 'chai';
+import {expect} from 'chai'
 
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,7 +13,7 @@ import * as Node from '@core/record/node'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import { getContextUser, fetchFullContextSurvey } from '../../testContext';
+import {getContextUser, fetchFullContextSurvey} from '../../testContext'
 
 import * as RecordUtils from '../utils/recordUtils'
 
@@ -45,10 +45,10 @@ export const defaultValueAppliedTest = async () => {
   let survey = await fetchFullContextSurvey()
   const user = getContextUser()
 
-  //define default values
+  // Define default values
   const defaultValues = [
-    newDefaultValue(`'default value 1'`, 'false'), //should not be applied
-    newDefaultValue(`'default value 2'`)
+    newDefaultValue('\'default value 1\'', 'false'), // Should not be applied
+    newDefaultValue('\'default value 2\'')
   ]
   const nodeDef = Survey.getNodeDefByName('node_def_text')(survey)
 
@@ -56,7 +56,7 @@ export const defaultValueAppliedTest = async () => {
 
   survey = await fetchFullContextSurvey()
 
-  //create record
+  // Create record
 
   await db.tx(async t => {
     const record = await RecordUtils.insertAndInitRecord(user, survey, true, t)
@@ -67,10 +67,10 @@ export const defaultValueAppliedTest = async () => {
 
     const reloadedNode = R.head(nodes)
 
-    //compare value with default value
+    // Compare value with default value
     expect(Node.getValue(reloadedNode)).to.equal('default value 2')
   })
 }
 
-//==== helper methods
+// ==== helper methods
 const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)

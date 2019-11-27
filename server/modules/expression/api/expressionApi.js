@@ -3,18 +3,16 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
-import { isBlank, contains } from '@core/stringUtils';
-
-import * as CategoryManager from '../../category/manager/categoryManager'
-import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
+import {isBlank, contains} from '@core/stringUtils'
 
 import SystemError from '@core/systemError'
 import * as Request from '@server/utils/request'
+import * as CategoryManager from '../../category/manager/categoryManager'
+import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
 const toItem = (type, lang = null) =>
   item => item
-    ?
-    (
+    ? (
       type === NodeDef.nodeDefType.code
         ? {
           key: CategoryItem.getCode(item),
@@ -28,14 +26,13 @@ const toItem = (type, lang = null) =>
     : null
 
 export const init = app => {
-
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
     try {
-      const { surveyId, type, value } = Request.getParams(req)
+      const {surveyId, type, value} = Request.getParams(req)
 
       if (NodeDef.nodeDefType.code === type) {
-        const { categoryUuid, lang } = Request.getParams(req)
+        const {categoryUuid, lang} = Request.getParams(req)
 
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
 
@@ -44,29 +41,27 @@ export const init = app => {
           toItem(type, lang)
         )(itemsDb)
 
-        res.json({ item })
-
+        res.json({item})
       } else if (NodeDef.nodeDefType.taxon === type) {
-        const { taxonomyUuid } = Request.getParams(req)
+        const {taxonomyUuid} = Request.getParams(req)
 
         const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
 
-        res.json({ item: toItem(type)(itemDb) })
-
+        res.json({item: toItem(type)(itemDb)})
       } else {
-        throw new SystemError('invalidType', { type })
+        throw new SystemError('invalidType', {type})
       }
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
   app.get('/expression/literal/items', async (req, res, next) => {
     try {
-      const { surveyId, type, value } = Request.getParams(req)
+      const {surveyId, type, value} = Request.getParams(req)
 
       if (NodeDef.nodeDefType.code === type) {
-        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
+        const {categoryUuid, categoryLevelIndex, lang} = Request.getParams(req)
 
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
 
@@ -84,23 +79,20 @@ export const init = app => {
           R.map(toItem(type, lang))
         )(itemsDb)
 
-        res.json({ items })
-
+        res.json({items})
       } else if (NodeDef.nodeDefType.taxon === type) {
-        const { taxonomyUuid } = Request.getParams(req)
+        const {taxonomyUuid} = Request.getParams(req)
 
         const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, value, true)
 
         const items = itemsDb.map(toItem(type))
 
-        res.json({ items })
-
+        res.json({items})
       } else {
-        throw new SystemError('invalidType', { type })
+        throw new SystemError('invalidType', {type})
       }
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
-
-};
+}

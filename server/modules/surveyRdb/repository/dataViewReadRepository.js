@@ -1,10 +1,8 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as dbUtils from '@server/db/dbUtils'
-
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils';
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -17,19 +15,20 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 import * as DataFilter from '@common/surveyRdb/dataFilter'
+import {getSurveyDBSchema} from '../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as DataCol from '../schemaRdb/dataCol'
 import * as DataTable from '../schemaRdb/dataTable'
 
 export const runSelect = async (surveyId, cycle, tableName, cols, offset, limit, filterExpr, sort = [], queryStream = false, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  // columns
-  const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})
+  // Columns
+  const colParams = cols.reduce((params, col, i) => ({...params, [`col_${i}`]: col}), {})
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
   // WHERE clause
-  const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
+  const {clause: filterClause, params: filterParams} = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
   // SORT clause
-  const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
+  const {clause: sortClause, params: sortParams} = DataSort.getSortPreparedStatement(sort)
 
   const select = `
     SELECT 
@@ -44,7 +43,7 @@ export const runSelect = async (surveyId, cycle, tableName, cols, offset, limit,
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/`
 
-  const params = { cycle, ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset }
+  const params = {cycle, ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset}
 
   return queryStream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, params))
@@ -53,7 +52,7 @@ export const runSelect = async (surveyId, cycle, tableName, cols, offset, limit,
 
 export const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
+  const {clause: filterClause, params: filterParams} = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
 
   const countRS = await client.one(`
     SELECT 
@@ -64,12 +63,12 @@ export const runCount = async (surveyId, cycle, tableName, filterExpr, client = 
       ${DataTable.colNameRecordCycle} = $/cycle/
       ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
-    {
-      cycle,
-      ...filterParams,
-      schemaName,
-      tableName
-    }
+  {
+    cycle,
+    ...filterParams,
+    schemaName,
+    tableName
+  }
   )
 
   return Number(countRS.count)
@@ -153,8 +152,8 @@ export const fetchRecordsCountByKeys = async (survey, cycle, keyNodes, recordUui
       AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
     `,
-    [recordUuidExcluded, cycle],
-    camelize
+  [recordUuidExcluded, cycle],
+  camelize
   )
 }
 
@@ -173,7 +172,7 @@ export const fetchRecordKeysByRecordUuid = async (survey, recordUuid, client = d
       ${rootTable}
     WHERE
       ${DataTable.colNameRecordUuuid} = $1`,
-    [recordUuid],
-    row => Object.values(row)
+  [recordUuid],
+  row => Object.values(row)
   )
 }

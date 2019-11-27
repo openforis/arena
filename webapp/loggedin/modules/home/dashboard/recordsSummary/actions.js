@@ -11,7 +11,6 @@ const formatDate = date => DateUtils.format(date, 'yyyy-MM-dd')
 
 const getFromDate = (date, timeRange) => {
   switch (timeRange) {
-
     case RecordsSummaryState.timeRanges._2Weeks:
       return DateUtils.subDays(date, 14)
 
@@ -36,10 +35,10 @@ export const fetchRecordsSummary = (cycle, timeRange) => async (dispatch, getSta
   const from = formatDate(getFromDate(now, timeRange))
   const to = formatDate(now)
 
-  const { data: counts } = await axios.get(
+  const {data: counts} = await axios.get(
     `/api/survey/${surveyId}/records/summary/count`,
-    { params: { cycle, from, to } }
+    {params: {cycle, from, to}}
   )
 
-  dispatch({ type: recordsSummaryUpdate, timeRange, from, to, counts })
+  dispatch({type: recordsSummaryUpdate, timeRange, from, to, counts})
 }

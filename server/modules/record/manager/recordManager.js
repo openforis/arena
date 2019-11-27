@@ -7,15 +7,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as ObjectUtils from '@core/objectUtils'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-
-import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '../repository/recordRepository'
 import * as NodeRepository from '../repository/nodeRepository'
+import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 
 // ==== CREATE
 
@@ -25,13 +24,14 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
     if (!Record.isPreview(record)) {
       await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
     }
+
     return recordDb
   })
 
 export const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) => {
   const activities = nodeValues.map(nodeValues => {
     const node = NodeRepository.tableColumns.reduce(
-      (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
+      (accContent, key, index) => Object.assign(accContent, {[camelize(key)]: nodeValues[index]}),
       {}
     )
     return ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true)
@@ -73,7 +73,7 @@ export const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = tr
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export {fetchNodeByUuid, fetchChildNodesByNodeDefUuids} from '../repository/nodeRepository'
 
 // ==== UPDATE
 

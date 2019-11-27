@@ -6,7 +6,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as ObjectUtils from '@core/objectUtils'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 import {
   publishSurveySchemaTableProps,
@@ -70,9 +70,9 @@ export const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false,
   if (validate) {
     const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
     return await validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client)
-  } else {
-    return taxonomy
   }
+
+  return taxonomy
 }
 
 const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, includeUnlUnk, draft) =>
@@ -143,14 +143,14 @@ export const publishTaxonomiesProps = async (surveyId, client = db) => {
 
 export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) =>
   await client.tx(async t => (await Promise.all([
-      TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyPropUpdate, {
-        [ActivityLog.keysContent.uuid]: taxonomyUuid,
-        [ActivityLog.keysContent.key]: key,
-        [ActivityLog.keysContent.value]: value
-      }, system, t)
-    ]))[0]
+    TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
+    markSurveyDraft(surveyId, t),
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyPropUpdate, {
+      [ActivityLog.keysContent.uuid]: taxonomyUuid,
+      [ActivityLog.keysContent.key]: key,
+      [ActivityLog.keysContent.value]: value
+    }, system, t)
+  ]))[0]
   )
 
 export const updateTaxon = async (user, surveyId, taxon, client = db) =>
@@ -188,5 +188,5 @@ export const deleteTaxonomy = async (user, surveyId, taxonomyUuid, client = db) 
 export const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, t) =>
   await Promise.all([
     TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
-    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, { [ActivityLog.keysContent.uuid]: taxonomyUuid }, true, t)
+    ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyTaxaDelete, {[ActivityLog.keysContent.uuid]: taxonomyUuid}, true, t)
   ])

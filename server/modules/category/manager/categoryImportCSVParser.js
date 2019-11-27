@@ -13,7 +13,6 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
     stream,
     null,
     async row => {
-
       const codes = []
       const extra = {}
       const labelsByLevel = {}
@@ -29,20 +28,21 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
             if (CategoryImportSummary.isColumnExtra(column)) {
               extra[columnName] = columnValue
             } else {
-              // label or description
+              // Label or description
               const lang = CategoryImportSummary.getColumnLang(column)
               const levelName = CategoryImportSummary.getColumnLevelName(column)
 
-              if (CategoryImportSummary.isColumnLabel(column))
+              if (CategoryImportSummary.isColumnLabel(column)) {
                 ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
-              else if (CategoryImportSummary.isColumnDescription(column))
+              } else if (CategoryImportSummary.isColumnDescription(column)) {
                 ObjectUtils.setInPath([levelName, lang], columnValue)(descriptionsByLevel)
+              }
             }
           }
         }
       )
 
-      // determine level
+      // Determine level
       const levelIndex = R.findLastIndex(StringUtils.isNotBlank)(codes)
 
       await onRowItem({

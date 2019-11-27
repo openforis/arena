@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, {useRef, useEffect} from 'react'
 
 export default (effect, inputs = []) => {
   const isInitialMount = useRef(true)
@@ -9,6 +9,5 @@ export default (effect, inputs = []) => {
     } else {
       effect()
     }
-
   }, inputs)
 }

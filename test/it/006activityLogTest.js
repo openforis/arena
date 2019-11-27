@@ -1,7 +1,6 @@
 import * as R from 'ramda'
-import { expect } from 'chai';
-import { getContextUser } from '../testContext';
-import { uuidv4 } from '@core/uuid';
+import {expect} from 'chai'
+import {uuidv4} from '@core/uuid'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -11,12 +10,12 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import {getContextUser} from '../testContext'
 
 import * as SB from './utils/surveyBuilder'
 import * as RecordUtils from './utils/recordUtils'
 
-describe('Activity Log Test', async () => {
-
+describe('Activity Log Test', () => {
   it('Activity Log on Survey Creation', async () => {
     const surveyParam = {
       name: 'do_not_use__test_survey_' + uuidv4(),

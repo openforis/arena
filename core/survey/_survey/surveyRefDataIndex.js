@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 
-import * as SurveyNodeDefs from './surveyNodeDefs'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
@@ -10,9 +9,10 @@ import * as Node from '@core/record/node'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxon from '@core/survey/taxon'
+import * as SurveyNodeDefs from './surveyNodeDefs'
 
 /**
- * categoryItemUuidIndex : {
+ * CategoryItemUuidIndex : {
  *    [$categoryUuid] : {
  *      [$parentCategoryItemUuid] :{
  *        [$categoryItemCode] : $categoryItemUuid
@@ -43,9 +43,9 @@ import * as Taxon from '@core/survey/taxon'
  */
 
 const keys = {
-  // root path key
+  // Root path key
   indexRefData: '_indexRefData',
-  // ref data indexes
+  // Ref data indexes
   categoryItemUuidIndex: 'categoryItemUuidIndex',
   categoryItemIndex: 'categoryItemIndex',
   taxonUuidIndex: 'taxonUuidIndex',

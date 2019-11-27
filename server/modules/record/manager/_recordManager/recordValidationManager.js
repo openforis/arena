@@ -13,7 +13,6 @@ import * as RecordRepository from '../../repository/recordRepository'
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
 export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordKeysUniqueness, tx) => {
-
   // 1. validate nodes
   const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
 
@@ -43,10 +42,10 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
 const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
   R.values,
   R.any(n => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
-      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-      return NodeDef.isKey(nodeDef) && NodeDef.isRoot(parentDef)
-    },
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
+    const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+    return NodeDef.isKey(nodeDef) && NodeDef.isRoot(parentDef)
+  },
   )
 )(nodes)
 

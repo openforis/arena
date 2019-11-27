@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import {expect} from 'chai'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,7 +9,7 @@ import * as Node from '@core/record/node'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import { getContextUser } from '../testContext';
+import {getContextUser} from '../testContext'
 
 import * as SB from './utils/surveyBuilder'
 import * as RB from './utils/recordBuilder'
@@ -28,16 +28,16 @@ before(async () => {
       SB.attribute('num', NodeDef.nodeDefType.decimal),
       SB.attribute('num_double', NodeDef.nodeDefType.decimal)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression(`num * 2`)),
+        .defaultValues(NodeDefExpression.createExpression('num * 2')),
       SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression(`num_double * num_double`)),
+        .defaultValues(NodeDefExpression.createExpression('num_double * num_double')),
       SB.attribute('num_range')
         .readOnly()
         .defaultValues(
-          NodeDefExpression.createExpression('"a"', `num <= 0`),
-          NodeDefExpression.createExpression('"b"', `num <= 10`),
-          NodeDefExpression.createExpression('"c"', `num <= 20`),
+          NodeDefExpression.createExpression('"a"', 'num <= 0'),
+          NodeDefExpression.createExpression('"b"', 'num <= 10'),
+          NodeDefExpression.createExpression('"c"', 'num <= 20'),
           NodeDefExpression.createExpression('"z"')
         )
     )
@@ -52,12 +52,13 @@ before(async () => {
 })
 
 after(async () => {
-  if (survey)
+  if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+  }
 })
 
 const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourcePath, sourceValue, dependentPath, dependentExpectedValue) => {
-  // update source node value
+  // Update source node value
   const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
 
   const nodesUpdated = {
@@ -65,8 +66,8 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
   }
   record = Record.assocNodes(nodesUpdated)(record)
 
-  // update dependent nodes
-  const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+  // Update dependent nodes
+  const {record: recordUpdate} = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
   record = recordUpdate
 
   const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
@@ -75,14 +76,13 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
   return record
 }
 
-describe('Calculated value test', async () => {
-
+describe('Calculated value test', () => {
   it('Calculated value updated', async () => {
     await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double', 4)
   })
 
   it('Calculated value with apply if updated', async () => {
-    // test values, couples of expected values by input
+    // Test values, couples of expected values by input
     const testValues = [
       [-1, 'a'],
       [1, 'b'],

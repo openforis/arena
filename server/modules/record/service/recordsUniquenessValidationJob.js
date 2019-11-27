@@ -7,34 +7,33 @@ import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
+import Job from '@server/job/job'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as SurveyRdbManager from '../../surveyRdb/manager/surveyRdbManager'
 
-import Job from '@server/job/job'
-
 const recordValidationUpdateBatchSize = 1000
 
 export default class RecordsUniquenessValidationJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(RecordsUniquenessValidationJob.type, params)
 
-    //cache of record validations
+    // Cache of record validations
     this.validationByRecordUuid = {}
   }
 
-  async execute (tx) {
+  async execute(tx) {
     const survey = await SurveyManager.fetchSurveyById(this.surveyId, false, false, this.tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
 
     this.total = R.length(cycleKeys) * 2
 
-    for (const cycle of cycleKeys)
+    for (const cycle of cycleKeys) {
       await this.validateRecordsUniquenessByCycle(cycle)
+    }
   }
 
-  async validateRecordsUniquenessByCycle (cycle) {
+  async validateRecordsUniquenessByCycle(cycle) {
     // 1. fetch survey and node defs
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, cycle, true, true, false, false, this.tx)
     this.incrementProcessedItems()
@@ -53,11 +52,12 @@ export default class RecordsUniquenessValidationJob extends Job {
       const validationDuplicate = RecordValidation.newValidationRecordDuplicate()
 
       for (const rowRecordDuplicate of rowsRecordsDuplicate) {
-        if (this.isCanceled())
+        if (this.isCanceled()) {
           return
+        }
 
-        //2. for each duplicate node entity, update record validation
-        const { uuid: recordUuid, validation, node_duplicate_uuids } = rowRecordDuplicate
+        // 2. for each duplicate node entity, update record validation
+        const {uuid: recordUuid, validation, node_duplicate_uuids} = rowRecordDuplicate
         const nodeRootUuid = node_duplicate_uuids[0]
         const nodesKeyDuplicate = await RecordManager.fetchChildNodesByNodeDefUuids(this.surveyId, recordUuid, nodeRootUuid, nodeDefKeys.map(NodeDef.getUuid), this.tx)
         const validationRecord = this.validationByRecordUuid[recordUuid] || validation
@@ -68,7 +68,7 @@ export default class RecordsUniquenessValidationJob extends Job {
           , validationRecord
         )
 
-        //3. add record validation to batch update
+        // 3. add record validation to batch update
         await this.addRecordValidationToBatchUpdate(recordUuid, validationUpdated)
       }
     }
@@ -76,7 +76,7 @@ export default class RecordsUniquenessValidationJob extends Job {
     this.incrementProcessedItems()
   }
 
-  async addRecordValidationToBatchUpdate (recordUuid, validation) {
+  async addRecordValidationToBatchUpdate(recordUuid, validation) {
     this.validationByRecordUuid[recordUuid] = validation
 
     if (Object.keys(this.validationByRecordUuid).length === recordValidationUpdateBatchSize) {
@@ -84,7 +84,7 @@ export default class RecordsUniquenessValidationJob extends Job {
     }
   }
 
-  async flushRecordValidationBatchUpdate () {
+  async flushRecordValidationBatchUpdate() {
     if (Object.keys(this.validationByRecordUuid).length > 0) {
       const recordAndValidationValues = Object.entries(this.validationByRecordUuid)
       await RecordManager.updateRecordValidationsFromValues(this.surveyId, recordAndValidationValues, this.tx)
@@ -92,12 +92,11 @@ export default class RecordsUniquenessValidationJob extends Job {
     }
   }
 
-  async beforeEnd () {
+  async beforeEnd() {
     await super.beforeEnd()
 
     await this.flushRecordValidationBatchUpdate()
   }
-
 }
 
 RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
@@ -105,10 +104,10 @@ RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
 const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   const nodeValidation = Validation.getFieldValidation(nodeUuid)(validationRecord)
 
-  //merge new validation with node validation
+  // Merge new validation with node validation
   const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, validationNode)
 
-  //replace node validation in record validation
+  // Replace node validation in record validation
   return R.pipe(
     Validation.setValid(false),
     Validation.setField(nodeUuid, nodeValidationUpdated),

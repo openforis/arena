@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { initTestContext, getContextUser } from '../testContext';
+import {expect} from 'chai'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,6 +9,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import {initTestContext, getContextUser} from '../testContext'
 
 import * as SB from './utils/surveyBuilder'
 import * as RB from './utils/recordBuilder'
@@ -67,8 +67,9 @@ before(async () => {
 })
 
 after(async () => {
-  if (survey)
+  if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+  }
 })
 
 const _persistNode = async node =>
@@ -118,22 +119,22 @@ const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = tr
 }
 
 const addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
-  // add a new tree
+  // Add a new tree
   const nodeRoot = Record.getRootNode(record)
   const nodeDefTree = Survey.getNodeDefByName('tree')(survey)
   const nodeTree = Node.newNode(NodeDef.getUuid(nodeDefTree), Record.getUuid(record), nodeRoot)
   await _persistNode(nodeTree)
 
-  // update new tree num with a duplicate value
+  // Update new tree num with a duplicate value
   const nodeTreeNum = RecordUtils.findNodeByPath('cluster/tree[4]/tree_num')(survey, record)
-  const value = 2 //duplicate value
+  const value = 2 // Duplicate value
   await _persistNode(Node.assocValue(value)(nodeTreeNum))
 
-  // expect validation to be invalid
+  // Expect validation to be invalid
   const nodeTreeNumValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNum))(Record.getValidation(record))
   expect(Validation.isValid(nodeTreeNumValidation)).to.equal(false)
 
-  // expect duplicate node validation to be invalid
+  // Expect duplicate node validation to be invalid
   const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
   const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(Record.getValidation(record))
   expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(false)
@@ -149,10 +150,9 @@ const removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =>
   expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(true)
 }
 
-describe('Record Validation Test', async () => {
-
+describe('Record Validation Test', () => {
   /*
-    it('Invalid integer attribute value (text)', async () => {
+    It('Invalid integer attribute value (text)', async () => {
       await updateNodeAndExpectValidationToBe('cluster/numeric_attr', 'text value', false)
     })
   */
@@ -204,24 +204,24 @@ describe('Record Validation Test', async () => {
   // ========== min count
 
   it('Min count: missing nodes', async () => {
-    //3 trees before => 2 trees after
+    // 3 trees before => 2 trees after
     await deleteNodeAndExpectMinCountToBe('cluster', 'tree', 3, false)
   })
 
   it('Min count: correct number of nodes', async () => {
-    //2 trees before => 3 trees after
+    // 2 trees before => 3 trees after
     await addNodeAndExpectCountToBe('cluster', 'tree', true, true)
   })
 
   // ========== max count
 
   it('Max count: correct number of nodes', async () => {
-    //3 trees before => 4 trees after
+    // 3 trees before => 4 trees after
     await addNodeAndExpectCountToBe('cluster', 'tree', false, true)
   })
 
   it('Max count: exceeding maximum number of nodes', async () => {
-    //4 trees before => 5 trees after
+    // 4 trees before => 5 trees after
     await addNodeAndExpectCountToBe('cluster', 'tree', false, false)
   })
 
@@ -247,5 +247,4 @@ describe('Record Validation Test', async () => {
   it('Entity Keys Validator : remove entity with duplicate key and expect duplicate node key to be valid', async () => {
     await removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid()
   })
-
 })

@@ -43,6 +43,5 @@ export const generateScript = async (surveyId, processingChain) => {
   for (const processingStep of ProcessingChain.getProcessingSteps(processingChain)) {
     await ProcessingStepScriptGenerator.generateScript(survey, ProcessingChain.getCycle(processingChain), processingStep, outputDir)
   }
-
 }
 

@@ -1,21 +1,21 @@
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 import ReactDOM from 'react-dom'
 
 import AutocompleteDialog from '@webapp/commonComponents/form/autocompleteDialog'
-import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
+import {useAsyncGetRequest} from '@webapp/commonComponents/hooks'
 
 import * as Taxon from '@core/survey/taxon'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
-  const { item: taxon, ...otherProps } = props
+  const {item: taxon, ...otherProps} = props
 
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
     <div {...otherProps}
-         key={Taxon.getUuid(taxon)}
-         className="item"
-         tabIndex="1">
+      key={Taxon.getUuid(taxon)}
+      className="item"
+      tabIndex="1">
       <div>
         {Taxon.getCode(taxon)}
       </div>
@@ -23,7 +23,7 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
         {Taxon.getScientificName(taxon)}
       </div>
       {vernacularLang &&
-      <div style={{ gridColumn: 2 }}>
+      <div style={{gridColumn: 2}}>
         {`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}
       </div>
       }
@@ -46,9 +46,9 @@ const NodeDefTaxonAutocompleteDialog = props => {
     draft,
   }
 
-  const { data: { list = [] } = { list: [] }, dispatch } = useAsyncGetRequest(
+  const {data: {list = []} = {list: []}, dispatch} = useAsyncGetRequest(
     `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
-    { params }
+    {params}
   )
 
   useEffect(dispatch, [fieldValue])
@@ -67,7 +67,6 @@ const NodeDefTaxonAutocompleteDialog = props => {
     ,
     document.body
   )
-
 }
 
 NodeDefTaxonAutocompleteDialog.defaultProps = {
@@ -80,7 +79,7 @@ NodeDefTaxonAutocompleteDialog.defaultProps = {
   fieldValue: '',
   onItemSelect: null,
   onClose: null,
-  autocompleteSourceElement: null, // used as sourceElement for the autocompleteDialog when rendered in tableBody
+  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonAutocompleteDialog

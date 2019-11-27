@@ -1,20 +1,19 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Authorizer from '@core/auth/authorizer'
 
-import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
-
-import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
+import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
+
+import {createNodePlaceholder, removeNode, updateNode} from '../../../../../surveyViews/record/actions'
 
 class TableColumnEdit extends React.Component {
-
-  render () {
+  render() {
     const {
       surveyInfo, surveyCycleKey, canEditRecord,
       nodeDef, record, cell,
@@ -22,7 +21,7 @@ class TableColumnEdit extends React.Component {
     } = this.props
 
     if (cell) {
-      const { parentUuid, node } = cell
+      const {parentUuid, node} = cell
 
       const parentNode = {
         [Node.keys.recordUuid]: Record.getUuid(record),
@@ -47,14 +46,14 @@ class TableColumnEdit extends React.Component {
           windowed={false}
         />
       )
-    } else {
-      return null
     }
+
+    return null
   }
 }
 
 const mapStateToProps = (state, props) => {
-  const { record } = props
+  const {record} = props
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 

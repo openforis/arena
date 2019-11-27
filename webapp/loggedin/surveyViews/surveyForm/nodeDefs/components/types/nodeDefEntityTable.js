@@ -7,7 +7,6 @@ import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = props => {
-
   const {
     entry, edit,
     nodeDef, nodes, parentNode, label,
@@ -30,11 +29,11 @@ const NodeDefEntityTable = props => {
           {
             entry && canEditRecord &&
             <button className="btn btn-xs btn-add"
-                    onClick={() => {
-                      const entity = Node.newNodePlaceholder(nodeDef, parentNode)
-                      updateNode(nodeDef, entity)
-                    }}
-                    aria-disabled={!canAddNode}>
+              onClick={() => {
+                const entity = Node.newNodePlaceholder(nodeDef, parentNode)
+                updateNode(nodeDef, entity)
+              }}
+              aria-disabled={!canAddNode}>
               <span className="icon icon-plus icon-10px"/>
             </button>
           }

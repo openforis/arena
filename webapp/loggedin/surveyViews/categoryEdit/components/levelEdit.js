@@ -1,13 +1,12 @@
 import React from 'react'
 import * as R from 'ramda'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import {FormItem, Input} from '@webapp/commonComponents/form/input'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ItemEdit from './itemEdit'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
-import { normalizeName } from '@core/stringUtils'
+import {normalizeName} from '@core/stringUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -17,9 +16,8 @@ import * as Validation from '@core/validation/validation'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as CategoryEditState from '../categoryEditState'
-
 import * as Authorizer from '@core/auth/authorizer'
+import * as CategoryEditState from '../categoryEditState'
 
 import {
   createCategoryLevelItem,
@@ -29,11 +27,11 @@ import {
   deleteCategoryLevel,
   setCategoryItemForEdit,
 } from '../actions'
+import ItemEdit from './itemEdit'
 
 const LevelEdit = props => {
-
   const handleDelete = () => {
-    const { survey, category, level, deleteCategoryLevel } = props
+    const {survey, category, level, deleteCategoryLevel} = props
 
     const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
     if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
@@ -66,8 +64,8 @@ const LevelEdit = props => {
       {
         !readOnly &&
         <button className="btn btn-s"
-                onClick={() => handleDelete()}
-                aria-disabled={!canBeDeleted}>
+          onClick={() => handleDelete()}
+          aria-disabled={!canBeDeleted}>
           <span className="icon icon-bin2 icon-12px"/>
         </button>
       }
@@ -75,9 +73,9 @@ const LevelEdit = props => {
 
     <FormItem label={i18n.t('common.name')}>
       <Input value={CategoryLevel.getName(level)}
-             validation={Validation.getFieldValidation('name')(validation)}
-             onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
-             readOnly={readOnly}/>
+        validation={Validation.getFieldValidation('name')(validation)}
+        onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
+        readOnly={readOnly}/>
     </FormItem>
 
     <div className="category-edit__level-items-header">
@@ -85,8 +83,8 @@ const LevelEdit = props => {
       {
         !readOnly &&
         <button className="btn btn-s btn-add-item"
-                aria-disabled={!canAddItem}
-                onClick={() => createCategoryLevelItem(category, level, parentItem)}>
+          aria-disabled={!canAddItem}
+          onClick={() => createCategoryLevelItem(category, level, parentItem)}>
           <span className="icon icon-plus icon-12px icon-left"/>
           {i18n.t('common.add')}
         </button>
@@ -97,15 +95,15 @@ const LevelEdit = props => {
       {
         items.map(item =>
           <ItemEdit key={CategoryItem.getUuid(item)}
-                    lang={lang}
-                    category={category}
-                    level={level}
-                    item={item}
-                    active={CategoryItem.getUuid(item) === activeItemUuid}
-                    putCategoryItemProp={putCategoryItemProp}
-                    setCategoryItemForEdit={setCategoryItemForEdit}
-                    deleteCategoryItem={deleteCategoryItem}
-                    readOnly={readOnly}/>
+            lang={lang}
+            category={category}
+            level={level}
+            item={item}
+            active={CategoryItem.getUuid(item) === activeItemUuid}
+            putCategoryItemProp={putCategoryItemProp}
+            setCategoryItemForEdit={setCategoryItemForEdit}
+            deleteCategoryItem={deleteCategoryItem}
+            readOnly={readOnly}/>
         )
       }
     </div>
@@ -113,8 +111,8 @@ const LevelEdit = props => {
 }
 
 const mapStateToProps = (state, props) => {
-  const { level } = props
-  const { index } = level
+  const {level} = props
+  const {index} = level
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
 

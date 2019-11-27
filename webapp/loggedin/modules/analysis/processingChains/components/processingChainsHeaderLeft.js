@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
-const ProcessingChainsHeaderLeft = ({ createProcessingChain, history }) => {
+const ProcessingChainsHeaderLeft = ({createProcessingChain, history}) => {
   const i18n = useI18n()
 
   return (

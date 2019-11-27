@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid';
+import {uuidv4} from '@core/uuid'
 
 import * as ValidationResult from '@core/validation/validationResult'
 
@@ -66,16 +66,16 @@ const extractNodeDefNames = (jsExpr = '') =>
 export const findReferencedNodeDefs = nodeDefExpressions =>
   R.pipe(
     R.reduce((acc, nodeDefExpr) =>
-        R.pipe(
-          R.concat(extractNodeDefNames(getExpression(nodeDefExpr))),
-          R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr))),
-        )(acc),
-      []
+      R.pipe(
+        R.concat(extractNodeDefNames(getExpression(nodeDefExpr))),
+        R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr))),
+      )(acc),
+    []
     ),
     R.uniq
   )(nodeDefExpressions)
 
-//UPDATE
+// UPDATE
 export const assocExpression = expression => assocProp(keys.expression, expression)
 export const assocApplyIf = applyIf => assocProp(keys.applyIf, applyIf)
 export const assocMessages = messages => assocProp(keys.messages, messages)

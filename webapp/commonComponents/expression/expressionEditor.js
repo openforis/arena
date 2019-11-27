@@ -1,14 +1,12 @@
 import './expressionEditor.scss'
 
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import * as R from 'ramda'
 
+import * as Expression from '@core/expressionParser/expression'
 import ExpressionEditorPopup from './expressionEditorPopup'
 
-import * as Expression from '@core/expressionParser/expression'
-
 const ExpressionEditor = props => {
-
   const {
     query, nodeDefUuidContext, nodeDefUuidCurrent, mode,
     isContextParent, canBeConstant, isBoolean,
@@ -46,7 +44,7 @@ const ExpressionEditor = props => {
                 <div className="query">{query}</div>
               }
               <button className="btn btn-s btn-edit"
-                      onClick={() => setEdit(true)}>
+                onClick={() => setEdit(true)}>
                 <span className="icon icon-pencil2 icon-14px"/>
               </button>
             </div>

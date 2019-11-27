@@ -10,9 +10,9 @@ import * as ProcessUtils from '@core/processUtils'
 const Logger = Log.getLogger('TempFilesCleanup')
 
 const initSchedule = () =>
-  // execute the cron job every day at 2AM
+  // Execute the cron job every day at 2AM
   schedule.scheduleJob('0 2 * * *', async () => {
-    // cleanup temp files older than 6 hours
+    // Cleanup temp files older than 6 hours
     await cleanupTempFiles(6)
   })
 
@@ -37,7 +37,7 @@ const cleanupTempFiles = async (olderThanHours = null) => {
       }
     }
   } catch (error) {
-    //ignore errors
+    // ignore errors
     Logger.error('Error deleting temp files', error)
   }
 

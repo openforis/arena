@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-export const nbsp = '\xA0'
+export const nbsp = '\u00A0'
 
 export const isString = R.is(String)
 

@@ -16,16 +16,16 @@ export const getTableName = (nodeDef, nodeDefParent) => {
 
   return NodeDef.isEntity(nodeDef)
     ? composeTableName(nodeDefName)
-    : NodeDef.isMultiple(nodeDef)
+    : (NodeDef.isMultiple(nodeDef)
       ? composeTableName(nodeDefName, nodeDefParentName + parentTablePrefix)
-      : composeTableName(nodeDefParentName)
+      : composeTableName(nodeDefParentName))
 }
 
 export const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
 const cols = {
   [NodeDef.nodeDefType.code]: ['code', 'label'],
-  [NodeDef.nodeDefType.taxon]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
+  [NodeDef.nodeDefType.taxon]: ['code', 'scientific_name'], // ?, 'vernacular_names?'],
   [NodeDef.nodeDefType.file]: ['file_uuid', 'file_name'],
 }
 
@@ -57,7 +57,7 @@ export const getColNamesByUuids = nodeDefUuidCols => survey => R.reduce(
 )
 
 export const extractColName = (nodeDef, col) => R.replace(
-  //TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
+  // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
   toSnakeCase(NodeDef.getName(nodeDef)) + '_',
   '',
   col

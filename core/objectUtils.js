@@ -22,11 +22,11 @@ export const keysProps = {
   labels: 'labels',
 }
 
-//====== CHECK
+// ====== CHECK
 const isBlank = value => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
 export const isEqual = other => self => getUuid(other) === getUuid(self)
 
-//====== READ
+// ====== READ
 export const getId = R.prop(keys.id)
 export const getUuid = R.propOr(null, keys.uuid)
 
@@ -65,7 +65,7 @@ export const getIndex = R.propOr(null, keys.index)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.prop(keys.authGroups)
 
-//===== UPDATE
+// ===== UPDATE
 export const assocIndex = R.assoc(keys.index)
 
 export const mergeProps = props => obj => R.pipe(
@@ -89,13 +89,14 @@ export const setInPath = (pathArray, value, includeEmpty = true) => obj => {
       if (!objCurrent.hasOwnProperty(pathPart)) {
         objCurrent[pathPart] = {}
       }
+
       objCurrent = objCurrent[pathPart]
     }
   })
   return obj
 }
 
-//====== UTILS / uuid
+// ====== UTILS / uuid
 export const toIndexedObj = (array, propName) => array.reduce(
   (acc, item) => {
     const prop = R.path(propName.split('.'), item)

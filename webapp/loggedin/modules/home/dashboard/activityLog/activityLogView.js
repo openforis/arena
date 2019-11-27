@@ -1,25 +1,23 @@
 import './activityLogView.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import * as DateUtils from '@core/dateUtils'
 
-import * as ActivityLogMessage from './activityLogMessage'
-
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
-import { fetchActivityLogs, resetActivityLogs } from './actions'
 import Markdown from '@webapp/commonComponents/markdown'
+import {fetchActivityLogs, resetActivityLogs} from './actions'
+import * as ActivityLogMessage from './activityLogMessage'
 
 const ActivityLogView = props => {
-
-  const { activityLogMessages, fetchActivityLogs } = props
+  const {activityLogMessages, fetchActivityLogs} = props
 
   const i18n = useI18n()
 
@@ -62,7 +60,6 @@ const ActivityLogView = props => {
 
     </div>
   )
-
 }
 
 const mapStateToProps = state => ({
@@ -70,4 +67,4 @@ const mapStateToProps = state => ({
   activityLogMessages: ActivityLogState.getState(state),
 })
 
-export default connect(mapStateToProps, { fetchActivityLogs, resetActivityLogs })(ActivityLogView)
+export default connect(mapStateToProps, {fetchActivityLogs, resetActivityLogs})(ActivityLogView)

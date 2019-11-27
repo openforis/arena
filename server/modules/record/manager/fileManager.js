@@ -1,12 +1,12 @@
 import * as FileRepository from '../repository/fileRepository'
 
-//CREATE
+// CREATE
 export const insertFile = FileRepository.insertFile
 
-//READ
+// READ
 export const fetchFileByUuid = FileRepository.fetchFileByUuid
 export const fetchFileByNodeUuid = FileRepository.fetchFileByNodeUuid
 
-//DELETE
+// DELETE
 export const deleteFileByUuid = FileRepository.deleteFileByUuid
 export const deleteFilesByRecordUuids = FileRepository.deleteFilesByRecordUuids

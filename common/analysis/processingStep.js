@@ -13,7 +13,7 @@ export const keys = {
 export const keysProps = {
   entityUuid: 'entityUuid', // OR
   categoryUuid: 'categoryUuid', // OR
-  virtual: 'virtual', //true|false
+  virtual: 'virtual', // True|false
 }
 
 // ====== READ

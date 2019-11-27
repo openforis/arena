@@ -12,13 +12,12 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CollectSurvey from '../model/collectSurvey'
 
 export default class SurveyCreatorJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super('SurveyCreatorJob', params)
   }
 
-  async execute (tx) {
-    const { collectSurvey } = this.context
+  async execute(tx) {
+    const {collectSurvey} = this.context
 
     const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)
 
@@ -53,6 +52,6 @@ export default class SurveyCreatorJob extends Job {
 
     await ActivityLogManager.insert(this.user, surveyId, ActivityLog.type.surveyCollectImport, null, false, this.tx)
 
-    this.setContext({ survey, surveyId, defaultLanguage })
+    this.setContext({survey, surveyId, defaultLanguage})
   }
 }

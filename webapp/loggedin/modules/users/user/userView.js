@@ -1,30 +1,29 @@
 import './userView.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import { getUrlParam } from '@webapp/utils/routerUtils'
+import {getUrlParam} from '@webapp/utils/routerUtils'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import {FormItem, Input} from '@webapp/commonComponents/form/input'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import {showAppLoader, hideAppLoader, setUser} from '@webapp/app/actions'
+import {showNotification} from '@webapp/app/appNotification/actions'
 
-import { useUserViewState } from './useUserViewState'
+import {useUserViewState} from './useUserViewState'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
 
 const UserView = props => {
-
-  const { surveyInfo, lang, userUuid } = props
+  const {surveyInfo, lang, userUuid} = props
 
   const i18n = useI18n()
 
@@ -96,21 +95,21 @@ const UserView = props => {
           {
             canRemove &&
             <button className="btn-s btn-danger btn-remove-user"
-                    onClick={() => {
-                      const confirmMessage = i18n.t(
-                        'userView.confirmRemove',
-                        { user: name, survey: Survey.getLabel(surveyInfo, lang) }
-                      )
-                      window.confirm(confirmMessage) ? removeUser() : null
-                    }}>
+              onClick={() => {
+                const confirmMessage = i18n.t(
+                  'userView.confirmRemove',
+                  {user: name, survey: Survey.getLabel(surveyInfo, lang)}
+                )
+                window.confirm(confirmMessage) ? removeUser() : null
+              }}>
               <span className="icon icon-bin icon-left icon-10px"/>
               {i18n.t('userView.removeFromSurvey')}
             </button>
           }
 
           <button className="btn btn-save"
-                  aria-disabled={!objectValid}
-                  onClick={saveUser}>
+            aria-disabled={!objectValid}
+            onClick={saveUser}>
             <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
             {isInvitation ? i18n.t('userView.sendInvitation') : i18n.t('common.save')}
           </button>
@@ -121,7 +120,7 @@ const UserView = props => {
   )
 }
 
-const mapStateToProps = (state, { match }) => ({
+const mapStateToProps = (state, {match}) => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
@@ -131,5 +130,5 @@ const mapStateToProps = (state, { match }) => ({
 
 export default connect(
   mapStateToProps,
-  { showAppLoader, hideAppLoader, showNotification, setUser },
+  {showAppLoader, hideAppLoader, showNotification, setUser},
 )(UserView)

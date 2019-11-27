@@ -15,9 +15,9 @@ export const getDefaultAuthGroups = () => [
       AuthGroup.permissions.userInvite,
     ],
     recordSteps: {
-      '1': AuthGroup.keys.all,
-      '2': AuthGroup.keys.all,
-      '3': AuthGroup.keys.all,
+      1: AuthGroup.keys.all,
+      2: AuthGroup.keys.all,
+      3: AuthGroup.keys.all,
     },
   },
   {
@@ -31,9 +31,9 @@ export const getDefaultAuthGroups = () => [
       AuthGroup.permissions.recordAnalyse,
     ],
     recordSteps: {
-      '1': AuthGroup.keys.all,
-      '2': AuthGroup.keys.all,
-      '3': AuthGroup.keys.all,
+      1: AuthGroup.keys.all,
+      2: AuthGroup.keys.all,
+      3: AuthGroup.keys.all,
     },
   },
   {
@@ -46,9 +46,9 @@ export const getDefaultAuthGroups = () => [
       AuthGroup.permissions.recordAnalyse,
     ],
     recordSteps: {
-      '1': AuthGroup.keys.all,
-      '2': AuthGroup.keys.all,
-      '3': AuthGroup.keys.all,
+      1: AuthGroup.keys.all,
+      2: AuthGroup.keys.all,
+      3: AuthGroup.keys.all,
     },
   },
   {
@@ -60,8 +60,8 @@ export const getDefaultAuthGroups = () => [
       AuthGroup.permissions.recordCleanse,
     ],
     recordSteps: {
-      '1': AuthGroup.keys.all,
-      '2': AuthGroup.keys.all,
+      1: AuthGroup.keys.all,
+      2: AuthGroup.keys.all,
     },
   },
   {
@@ -72,7 +72,7 @@ export const getDefaultAuthGroups = () => [
       AuthGroup.permissions.recordEdit,
     ],
     recordSteps: {
-      '1': AuthGroup.keys.own,
+      1: AuthGroup.keys.own,
     },
   },
   // ,

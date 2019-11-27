@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid'
+import {uuidv4} from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
@@ -62,7 +62,7 @@ export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
 
 export const isEqual = ObjectUtils.isEqual
 
-//==== UPDATE
+// ==== UPDATE
 export const assocVernacularNames = (lang, vernacularNames) => R.assocPath([keys.vernacularNames, lang], vernacularNames)
 
 export const appendVernacularName = vernacularName => taxon => R.pipe(
@@ -77,8 +77,8 @@ const _mergeVernacularNames = vernacularNamesArrayNew => vernacularNamesArrayExi
       const vernacularNameNew = R.prop(index, vernacularNamesArrayNew)
       const vernacularNameExisting = R.prop(index, vernacularNamesArrayExisting)
       const vernacularNameUpdated = vernacularNameNew && vernacularNameExisting
-        ? TaxonVernacularName.mergeProps(vernacularNameNew)(vernacularNameExisting) // merge new vernacular name into existing one
-        : vernacularNameNew || vernacularNameExisting // there is no existing vernacular name, take the new one
+        ? TaxonVernacularName.mergeProps(vernacularNameNew)(vernacularNameExisting) // Merge new vernacular name into existing one
+        : vernacularNameNew || vernacularNameExisting // There is no existing vernacular name, take the new one
       return R.append(vernacularNameUpdated, accVernacularNames)
     },
     [],

@@ -1,6 +1,5 @@
 export default class SystemError extends Error {
-
-  constructor (key, params) {
+  constructor(key, params) {
     super(key)
 
     this.name = 'SystemError'
@@ -14,12 +13,11 @@ export default class SystemError extends Error {
     }
   }
 
-  get key () {
+  get key() {
     return this._key
   }
 
-  get params () {
+  get params() {
     return this._params
   }
-
 }

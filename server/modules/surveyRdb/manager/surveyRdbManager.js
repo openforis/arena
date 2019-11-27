@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as Survey from '@core/survey/survey'
@@ -23,9 +23,9 @@ export const dropSchema = SchemaRdbRepository.dropSchema
 export const createSchema = SchemaRdbRepository.createSchema
 export const createTableAndView = DataViewCreateRepository.createTableAndView
 
-export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
-export { createNodeHierarchyDisaggregatedView }from '../repository/nodeHierarchyDisaggregatedViewRepository'
-export { createNodeKeysHierarchyView }from '../repository/nodeKeysHierarchyViewRepository'
+export {createNodeKeysView} from '../repository/nodeKeysViewRepository'
+export {createNodeHierarchyDisaggregatedView} from '../repository/nodeHierarchyDisaggregatedViewRepository'
+export {createNodeKeysHierarchyView} from '../repository/nodeKeysHierarchyViewRepository'
 
 // ==== DML
 
@@ -44,46 +44,46 @@ export const queryTable = async (
   editMode = false, streamOutput = null
 ) => {
   const surveyId = Survey.getId(survey)
-  const { nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(survey, cycle, nodeDefUuidTable, nodeDefUuidCols)
+  const {nodeDefTable, tableName, colNames: colNamesParams} = await _getQueryData(survey, cycle, nodeDefUuidTable, nodeDefUuidCols)
 
-  // get hierarchy entities uuid col names
+  // Get hierarchy entities uuid col names
   const ancestorUuidColNames = []
   Survey.visitAncestorsAndSelf(
     nodeDefTable,
     nodeDefCurrent => ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
   )(survey)
 
-  // fetch data
+  // Fetch data
   const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
-  let rows = await DataViewReadRepository.runSelect(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort, !!streamOutput)
+  let rows = await DataViewReadRepository.runSelect(surveyId, cycle, tableName, colNames, offset, limit, filterExpr, sort, Boolean(streamOutput))
 
-  // edit mode, assoc nodes to columns
+  // Edit mode, assoc nodes to columns
   if (editMode) {
     rows = await Promise.all(rows.map(
       async row => {
         const recordUuid = row[DataTable.colNameRecordUuuid]
         const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
         const parentNodeUuid = R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
-        const resultRow = { ...row, cols: {}, record, parentNodeUuid }
+        const resultRow = {...row, cols: {}, record, parentNodeUuid}
 
-        //assoc nodes to each columns
+        // Assoc nodes to each columns
         for (const nodeDefUuidCol of nodeDefUuidCols) {
           const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
           const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
           const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
           const parentUuid = R.prop(parentUuidColName, row)
 
-          const node = NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // column is the multiple attribute
+          const node = NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // Column is the multiple attribute
             ? await NodeRepository.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefCol)}_uuid`])
             : (await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol]))[0]
 
-          resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
+          resultRow.cols[nodeDefUuidCol] = {parentUuid, node}
         }
 
         return resultRow
       }
     ))
-  } else if (!!streamOutput) {
+  } else if (streamOutput) {
     await db.stream(
       rows,
       stream => {
@@ -96,7 +96,7 @@ export const queryTable = async (
 
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
-  const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
+  const {tableName} = await _getQueryData(survey, cycle, nodeDefUuidTable)
   return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
 

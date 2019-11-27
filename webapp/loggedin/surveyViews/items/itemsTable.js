@@ -3,10 +3,9 @@ import * as R from 'ramda'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import WarningBadge from '@webapp/commonComponents/warningBadge'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 const TableRow = props => {
-
   const {
     item, selectedItemUuid, itemLabelFunction,
     canSelect, onSelect, onEdit, canDelete, onDelete, readOnly,
@@ -31,14 +30,14 @@ const TableRow = props => {
         {
           onSelect && (canSelect || selected) &&
           <button className={`btn btn-s${selected ? ' active' : ''}`}
-                  onClick={() => onSelect(item)}>
+            onClick={() => onSelect(item)}>
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}/>
             {selected ? 'Selected' : 'Select'}
           </button>
         }
 
         <button className="btn btn-s"
-                onClick={() => onEdit(item)}>
+          onClick={() => onEdit(item)}>
           <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`}/>
           {readOnly ? i18n.t('common.view') : i18n.t('common.edit')}
         </button>
@@ -46,11 +45,11 @@ const TableRow = props => {
         {
           !readOnly &&
           <button className="btn btn-s"
-                  onClick={() => {
-                    if (canDelete(item)) {
-                      onDelete(item)
-                    }
-                  }}>
+            onClick={() => {
+              if (canDelete(item)) {
+                onDelete(item)
+              }
+            }}>
             <span className="icon icon-bin2 icon-12px icon-left"/>
             {i18n.t('common.delete')}
           </button>
@@ -60,14 +59,14 @@ const TableRow = props => {
   )
 }
 
-const Header = ({ onAdd, readOnly }) => {
+const Header = ({onAdd, readOnly}) => {
   const i18n = useI18n()
 
   return !readOnly && (
     <div className="table__header">
 
       <button className="btn btn-s"
-              onClick={onAdd}>
+        onClick={onAdd}>
         <span className="icon icon-plus icon-12px icon-left"/>
         {i18n.t('common.add')}
       </button>
@@ -75,8 +74,8 @@ const Header = ({ onAdd, readOnly }) => {
   )
 }
 
-const ItemsTable = (props) => {
-  const { items } = props
+const ItemsTable = props => {
+  const {items} = props
   const i18n = useI18n()
 
   return (
@@ -97,8 +96,8 @@ const ItemsTable = (props) => {
                 {
                   items.map(item =>
                     <TableRow {...props}
-                              key={item.uuid}
-                              item={item}
+                      key={item.uuid}
+                      item={item}
                     />)
                 }
               </div>

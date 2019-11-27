@@ -2,10 +2,10 @@ import './sortEditor.scss'
 
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-const SortRow = (props) => {
+const SortRow = props => {
   const {
     variables,
     selectedVariable,
@@ -36,16 +36,16 @@ const SortRow = (props) => {
         !isPlaceholder &&
         <div className="sort-row__buttons">
           <button className={`btn btn-s btn-switch-operand${selectedOrder === 'asc' ? ' active' : ''}`}
-                  onClick={() => onSelectOrder('asc')}>
+            onClick={() => onSelectOrder('asc')}>
             {i18n.t('dataView.dataVis.dataSort.ascending')}
           </button>
           <button className={`btn btn-s btn-switch-operand${selectedOrder === 'desc' ? ' active' : ''}`}
-                  onClick={() => onSelectOrder('desc')}>
+            onClick={() => onSelectOrder('desc')}>
             {i18n.t('dataView.dataVis.dataSort.descending')}
           </button>
           <button className="btn btn-s btn-delete btns__last"
-                  onClick={onDelete}
-                  aria-disabled={isPlaceholder}>
+            onClick={onDelete}
+            aria-disabled={isPlaceholder}>
             <span className="icon icon-bin icon-10px" />
           </button>
         </div>

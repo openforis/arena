@@ -1,11 +1,11 @@
 import './processingStepCalculationEditor.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
-import { setProcessingStepCalculationForEdit } from '../actions'
+import {setProcessingStepCalculationForEdit} from '../actions'
 
 const ProcessingStepCalculationEditor = props => {
   const {
@@ -17,7 +17,7 @@ const ProcessingStepCalculationEditor = props => {
     <div className="processing-step__calculation-editor">
 
       <button className="btn btn-close"
-              onClick={() => setProcessingStepCalculationForEdit(null)}>
+        onClick={() => setProcessingStepCalculationForEdit(null)}>
         <span className="icon icon-cross icon-10px"/>
       </button>
 
@@ -29,12 +29,12 @@ ProcessingStepCalculationEditor.defaultProps = {
   calculation: null
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   calculation: ProcessingStepState.getProcessingStepCalculationForEdit(state),
 
 })
 
 export default connect(
   mapStateToProps,
-  { setProcessingStepCalculationForEdit }
+  {setProcessingStepCalculationForEdit}
 )(ProcessingStepCalculationEditor)

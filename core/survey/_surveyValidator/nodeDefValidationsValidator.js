@@ -26,7 +26,7 @@ export const validate = async (survey, nodeDef) => {
     ),
     R.when(
       validation => !Validation.isValid(validation) && !Validation.hasErrors(validation),
-      Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }])
+      Validation.setErrors([{key: Validation.messageKeys.nodeDefEdit.validationsInvalid}])
     )
   )(validation)
 }

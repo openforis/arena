@@ -1,10 +1,9 @@
 import * as R from 'ramda'
-import { uuidv4 } from '@core/uuid'
+import {uuidv4} from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as NodeDefValidations from './nodeDefValidations'
-
 import * as StringUtils from '@core/stringUtils'
+import * as NodeDefValidations from './nodeDefValidations'
 
 // ======== NODE DEF PROPERTIES
 
@@ -46,10 +45,10 @@ export const propKeys = {
   readOnly: 'readOnly',
   validations: 'validations',
 
-  //code
+  // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
-  //taxon
+  // Taxon
   taxonomyUuid: 'taxonomyUuid'
 }
 
@@ -129,7 +128,7 @@ export const getCategoryUuid = ObjectUtils.getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = ObjectUtils.getProp(propKeys.taxonomyUuid)
 export const getCycleFirst = R.pipe(getCycles, R.head)
 
-//advanced props
+// Advanced props
 export const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 
@@ -141,7 +140,6 @@ export const getValidationExpressions = R.pipe(
   NodeDefValidations.getExpressions,
 )
 export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
-
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -197,6 +195,6 @@ export const canHaveDefaultValue = nodeDef =>
       nodeDefType.text,
       nodeDefType.time,
     ]
-  )
-  // allow default value when parent code is null (for node def code)
-  && !getParentCodeDefUuid(nodeDef)
+  ) &&
+  // Allow default value when parent code is null (for node def code)
+  !getParentCodeDefUuid(nodeDef)

@@ -1,14 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import InputChips from '@webapp/commonComponents/form/inputChips'
 
-import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
+import {getLanguageLabel, languages as appLanguages} from '@core/app/languages'
 
 const LanguagesEditor = props => {
-
-  const { languages, setLanguages, readOnly } = props
+  const {languages, setLanguages, readOnly} = props
 
   const selection = languages.map(lang => ({
     key: lang, value: getLanguageLabel(lang)
@@ -34,10 +33,7 @@ const LanguagesEditor = props => {
 
     </div>
   )
-
 }
 
 export default LanguagesEditor
-
-
 

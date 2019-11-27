@@ -1,8 +1,8 @@
 import './uploadButton.scss'
 
-import React, { useRef } from 'react'
+import React, {useRef} from 'react'
 import * as R from 'ramda'
-import { useI18n } from '../hooks'
+import {useI18n} from '../hooks'
 
 const checkFilesSize = (files, maxSizeMB) =>
   R.find(file => file.size > maxSizeMB * 1024 * 1024, files)
@@ -27,7 +27,7 @@ const UploadButton = props => {
       <input
         ref={fileInput}
         type="file"
-        style={{ display: 'none' }}
+        style={{display: 'none'}}
         accept={accept}
         onChange={() => {
           const files = fileInput.current.files
@@ -40,7 +40,7 @@ const UploadButton = props => {
         className={className || 'btn btn-s'}
         aria-disabled={disabled}
         onClick={() => {
-          // first reset current value, then trigger click event
+          // First reset current value, then trigger click event
           fileInput.current.value = ''
           fileInput.current.dispatchEvent(new MouseEvent('click'))
         }}>
@@ -50,7 +50,6 @@ const UploadButton = props => {
 
     </React.Fragment>
   )
-
 }
 
 UploadButton.defaultProps = {
@@ -59,8 +58,8 @@ UploadButton.defaultProps = {
   onChange: null,
   showLabel: true,
   showIcon: true,
-  maxSize: 10, //mega bytes
-  accept: null, //e.g. .txt, .xls (null = all type of files are accepted)
+  maxSize: 10, // Mega bytes
+  accept: null, // E.g. .txt, .xls (null = all type of files are accepted)
   className: null, // Custom css class
 }
 

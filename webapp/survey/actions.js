@@ -2,11 +2,10 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 
+import {hideAppLoader, showAppLoader} from '../app/actions'
+import {showNotification} from '../app/appNotification/actions'
+import {showAppJobMonitor} from '../loggedin/appJob/actions'
 import * as SurveyState from './surveyState'
-
-import { hideAppLoader, showAppLoader } from '../app/actions'
-import { showNotification } from '../app/appNotification/actions'
-import { showAppJobMonitor } from '../loggedin/appJob/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
@@ -21,7 +20,7 @@ const defs = {
 }
 
 const _fetchDefs = (surveyId, defs, params = {}) =>
-  axios.get(`/api/survey/${surveyId}/${defs}`, { params })
+  axios.get(`/api/survey/${surveyId}/${defs}`, {params})
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
@@ -38,21 +37,21 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
     }
 
     const [
-      { data: { nodeDefs, nodeDefsValidation } },
-      { data: { categories } },
-      { data: { taxonomies } }
+      {data: {nodeDefs, nodeDefsValidation}},
+      {data: {categories}},
+      {data: {taxonomies}}
     ] = await Promise.all([
       _fetchDefs(surveyId, defs.nodeDefs, params),
       _fetchDefs(surveyId, defs.categories, params),
       _fetchDefs(surveyId, defs.taxonomies, params),
     ])
 
-    dispatch({ type: surveyDefsLoad, nodeDefs, nodeDefsValidation, categories, taxonomies, draft })
+    dispatch({type: surveyDefsLoad, nodeDefs, nodeDefsValidation, categories, taxonomies, draft})
     dispatch(hideAppLoader())
   }
 }
 
-export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
+export const resetSurveyDefs = () => dispatch => dispatch({type: surveyDefsReset})
 
 export const reloadSurveyDefs = (draft = false, validate = false) => async dispatch => {
   await dispatch(resetSurveyDefs())
@@ -61,10 +60,10 @@ export const reloadSurveyDefs = (draft = false, validate = false) => async dispa
 
 // ====== SET ACTIVE SURVEY
 export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate = false) => async dispatch => {
-  //load survey
-  const params = { draft: canEdit, validate: canEdit }
-  const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params })
-  dispatch({ type: dispatchSurveyCreate ? surveyCreate : surveyUpdate, survey })
+  // Load survey
+  const params = {draft: canEdit, validate: canEdit}
+  const {data: {survey}} = await axios.get(`/api/survey/${surveyId}`, {params})
+  dispatch({type: dispatchSurveyCreate ? surveyCreate : surveyUpdate, survey})
 }
 
 // ====== UPDATE
@@ -72,7 +71,7 @@ export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate =
 export const publishSurvey = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
 
-  const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
+  const {data} = await axios.put(`/api/survey/${surveyId}/publish`)
 
   dispatch(
     showAppJobMonitor(data.job, async () => {
@@ -91,7 +90,7 @@ export const deleteSurvey = () => async (dispatch, getState) => {
 
   await axios.delete(`/api/survey/${surveyId}`)
 
-  dispatch({ type: surveyDelete, surveyInfo })
-  dispatch(showNotification('homeView.surveyDeleted', { surveyName: Survey.getName(surveyInfo) }))
+  dispatch({type: surveyDelete, surveyInfo})
+  dispatch(showNotification('homeView.surveyDeleted', {surveyName: Survey.getName(surveyInfo)}))
 }
 

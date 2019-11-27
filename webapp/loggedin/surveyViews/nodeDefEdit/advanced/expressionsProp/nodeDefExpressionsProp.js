@@ -42,7 +42,6 @@ const NodeDefExpressionsProp = props => {
       isBoolean={isBoolean}
     />
   )
-
 }
 
 NodeDefExpressionsProp.defaultProps = {

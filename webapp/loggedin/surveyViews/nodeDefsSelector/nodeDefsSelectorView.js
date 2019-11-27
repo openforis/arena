@@ -1,22 +1,20 @@
 import './components/nodeDefsSelectorView.scss'
 
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import React, {useState} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
-import EntitySelector from './components/entitySelector'
-import AttributesSelector from './components/attributesSelector'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import AttributesSelector from './components/attributesSelector'
+import EntitySelector from './components/entitySelector'
 
 const NodeDefsSelectorView = props => {
-
   const {
     nodeDefUuidsAttributes, nodeDefUuidEntity,
     onChangeAttributes, onChangeEntity
@@ -48,8 +46,8 @@ const NodeDefsSelectorView = props => {
       <div className="node-defs-selector__container">
 
         <button className="btn btn-s btn-toggle-settings"
-                aria-disabled={R.isNil(nodeDefUuidEntity)}
-                onClick={() => setShowSettings(!showSettings)}>
+          aria-disabled={R.isNil(nodeDefUuidEntity)}
+          onClick={() => setShowSettings(!showSettings)}>
           <span className="icon icon-cog icon-12px"/>
         </button>
 
@@ -67,12 +65,12 @@ const NodeDefsSelectorView = props => {
               R.keys(NodeDef.nodeDefType).map(type =>
                 NodeDef.nodeDefType.entity !== type
                   ? <button key={type}
-                            className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
-                            onClick={() => {
-                              const idx = R.findIndex(R.equals(type), filterTypes)
-                              const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
-                              setFilterTypes(fn(filterTypes))
-                            }}>
+                    className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                    onClick={() => {
+                      const idx = R.findIndex(R.equals(type), filterTypes)
+                      const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
+                      setFilterTypes(fn(filterTypes))
+                    }}>
                     {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}</button>
                   : null
               )
@@ -90,7 +88,6 @@ const NodeDefsSelectorView = props => {
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
         />
-
 
       </div>
     </div>

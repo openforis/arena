@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils';
+import {getSurveyDBSchema, dbTransformCallback} from '../../survey/repository/surveySchemaRepositoryUtils'
 
 export const fetchItems = async (surveyId, client = db) =>
   await client.map(`
@@ -11,8 +11,8 @@ export const fetchItems = async (surveyId, client = db) =>
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
       ORDER BY id
     `,
-    [],
-    dbTransformCallback
+  [],
+  dbTransformCallback
   )
 
 export const countItems = async (surveyId, client = db) =>
@@ -20,8 +20,8 @@ export const countItems = async (surveyId, client = db) =>
       SELECT COUNT(*) as tot
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
     `,
-    [],
-    R.prop('tot')
+  [],
+  R.prop('tot')
   )
 
 export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
@@ -30,8 +30,8 @@ export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
       VALUES ($1, $2)
       RETURNING *
     `,
-    [nodeDefUuid, props],
-    dbTransformCallback
+  [nodeDefUuid, props],
+  dbTransformCallback
   )
 
 export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
@@ -44,6 +44,6 @@ export const updateItem = async (surveyId, itemId, props, resolved, client = db)
       WHERE id = $1
       RETURNING *
     `,
-    [itemId, props, resolved],
-    dbTransformCallback
+  [itemId, props, resolved],
+  dbTransformCallback
   )

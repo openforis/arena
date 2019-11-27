@@ -5,24 +5,24 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyViewsState from '../surveyViewsState'
 import * as RecordState from '../record/recordState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
 
 const keys = {
-  nodeDefUuidPage: 'nodeDefUuidPage', // current page nodeDef
-  nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // nodeDef (entity) selected to add children to
-  nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
+  nodeDefUuidPage: 'nodeDefUuidPage', // Current page nodeDef
+  nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // NodeDef (entity) selected to add children to
+  nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
 }
 
 // ====== nodeDefUuidPage
 
-export const assocFormActivePage = (nodeDef) => R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
+export const assocFormActivePage = nodeDef => R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
 
 export const getFormActivePageNodeDef = state => {
   const survey = SurveyState.getSurvey(state)
@@ -31,7 +31,6 @@ export const getFormActivePageNodeDef = state => {
   return nodeDefUuidPage
     ? Survey.getNodeDefByUuid(nodeDefUuidPage)(survey)
     : Survey.getNodeDefRoot(survey)
-
 }
 
 export const isNodeDefFormActivePage = nodeDef =>
@@ -84,14 +83,12 @@ export const getFormPageParentNode = nodeDef =>
 
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
     if (nodeDefParent) {
-
       if (NodeDef.isRoot(nodeDefParent)) {
         return Record.getRootNode(record)
-      } else {
-        const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
-        return Record.getNodeByUuid(parentNodeUuid)(record)
       }
 
+      const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
+      return Record.getNodeByUuid(parentNodeUuid)(record)
     }
 
     return null
@@ -107,13 +104,13 @@ export const setShowPageNavigation = showPageNavigation => R.assoc(keys.showPage
 
 // on nodeDef create init form state
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
-  // if is entity and renders in its own page, assoc active page
+  // If is entity and renders in its own page, assoc active page
   R.ifElse(
     () => NodeDef.isEntity(nodeDef) && NodeDefLayout.hasPage(NodeDef.getCycleFirst(nodeDef))(nodeDef),
     assocFormActivePage(nodeDef),
     R.identity,
   ),
-  // if is entity remove assocNodeDefAddChildTo
+  // If is entity remove assocNodeDefAddChildTo
   R.ifElse(
     () => NodeDef.isEntity(nodeDef),
     assocNodeDefAddChildTo(null),
@@ -121,7 +118,7 @@ export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   )
 )
 
-// on nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
+// On nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
 export const dissocParamsOnNodeDefDelete = nodeDef => surveyFormState => {
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   return R.pipe(

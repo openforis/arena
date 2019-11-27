@@ -5,8 +5,8 @@ import mainConfig from '../webpack.config.babel'
 
 export default {
   entry: ['core-js/stable', 'regenerator-runtime/runtime'],
-  target: 'node', // in order to ignore built-in modules like path, fs, etc.
-  externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+  target: 'node', // In order to ignore built-in modules like path, fs, etc.
+  externals: [nodeExternals()], // In order to ignore all modules in node_modules folder
   mode: 'development',
   devtool: 'source-map',
   node: {

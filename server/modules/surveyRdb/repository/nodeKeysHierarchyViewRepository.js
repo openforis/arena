@@ -1,4 +1,4 @@
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeKeys from '@core/record/nodeKeys'
@@ -7,10 +7,9 @@ import * as NodeKeysView from '../schemaRdb/nodeKeysView'
 import * as NodeHierarchyDisaggregatedView from '../schemaRdb/nodeHierarchyDisaggregatedView'
 import * as NodeKeysHierarchyView from '../schemaRdb/nodeKeysHierarchyView'
 
-//====== CREATE
+// ====== CREATE
 
 export const createNodeKeysHierarchyView = async (survey, client = db) => {
-
   const surveyId = Survey.getId(survey)
 
   await client.query(`

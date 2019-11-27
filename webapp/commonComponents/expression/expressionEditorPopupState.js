@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
@@ -17,11 +17,10 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = props => {
-
   const [state, setState] = useState(initialState)
-  const { query, expr, mode, canBeConstant } = props
+  const {query, expr, mode, canBeConstant} = props
 
-  // onMount initialize state
+  // OnMount initialize state
   useEffect(() => {
     // Either expr or query are passed by the parent component
     const exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)

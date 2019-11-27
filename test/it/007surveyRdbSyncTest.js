@@ -1,13 +1,12 @@
-import { expect } from 'chai';
+import {expect} from 'chai'
 
-import { db } from '@server/db/db'
-
-import { getContextUser } from '../testContext';
+import {db} from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import {getContextUser} from '../testContext'
 
 import * as SB from './utils/surveyBuilder'
 
@@ -17,15 +16,13 @@ const expectSchemaToExist = async (schemaName, exists = true) => {
      FROM information_schema.schemata 
      WHERE schema_name = $1
     `,
-    [schemaName]
+  [schemaName]
   )
-  expect(result['res'], `schema ${schemaName} ${exists ? 'exists' : 'not exists'}`).to.equal(exists)
+  expect(result.res, `schema ${schemaName} ${exists ? 'exists' : 'not exists'}`).to.equal(exists)
 }
 
-describe('Survey RDB Sync Test', async () => {
-
+describe('Survey RDB Sync Test', () => {
   it('Survey RDB created on survey creation', async () => {
-
     const survey = await SB.survey(getContextUser(),
       SB.entity('cluster',
         SB.attribute('cluster_no')
@@ -41,7 +38,6 @@ describe('Survey RDB Sync Test', async () => {
   })
 
   it('Survey RDB dropped on survey deletion', async () => {
-
     const survey = await SB.survey(getContextUser(),
       SB.entity('cluster',
         SB.attribute('cluster_no')
@@ -57,6 +53,5 @@ describe('Survey RDB Sync Test', async () => {
 
     await expectSchemaToExist(dataSchemaName, false)
   })
-
 })
 

@@ -1,20 +1,20 @@
-import React, { useEffect, useRef } from 'react'
+import React, {useEffect, useRef} from 'react'
 import ReactDOMServer from 'react-dom/server.browser'
 
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as DateUtils from '@core/dateUtils'
 
-const DataPointTooltip = ({ dataPoint, i18n }) => (
+const DataPointTooltip = ({dataPoint, i18n}) => (
   <>
     <div className="date">
       {DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}
     </div>
     <div className="count">
-      {i18n.t('homeView.recordsSummary.record', { count: Number(dataPoint.count) })}
+      {i18n.t('homeView.recordsSummary.record', {count: Number(dataPoint.count)})}
     </div>
   </>
 )
@@ -22,8 +22,8 @@ const DataPointTooltip = ({ dataPoint, i18n }) => (
 const DataPoints = props => {
   const i18n = useI18n()
 
-  const { counts, chartProps } = props
-  const { xScale, yScale, transitionDuration } = chartProps
+  const {counts, chartProps} = props
+  const {xScale, yScale, transitionDuration} = chartProps
   const radius = 4
   const elementRef = useRef(null)
   const tooltipRef = useRef(null)
@@ -33,7 +33,7 @@ const DataPoints = props => {
     tooltipRef.current = d3Tip()
       .attr('class', tooltipClassName)
       .offset([-10, 0])
-      .html((d) => ReactDOMServer.renderToString(
+      .html(d => ReactDOMServer.renderToString(
         <DataPointTooltip dataPoint={d} i18n={i18n}/>
       ))
 
@@ -49,7 +49,7 @@ const DataPoints = props => {
       .selectAll('circle')
       .data(counts)
 
-    //update
+    // Update
     circle
       .transition()
       .duration(transitionDuration)
@@ -59,7 +59,7 @@ const DataPoints = props => {
       .attr('r', radius)
       .style('opacity', '1')
 
-    //exit
+    // Exit
     circle.exit()
       .transition()
       .duration(transitionDuration)
@@ -68,7 +68,7 @@ const DataPoints = props => {
       .style('opacity', '0')
       .remove()
 
-    //enter
+    // Enter
     circle.enter().append('circle')
       .on('mouseover', tooltipRef.current.show)
       .on('mouseout', tooltipRef.current.hide)

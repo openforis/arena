@@ -19,12 +19,12 @@ export const getSortPreparedStatement = sortCriteria => {
 
     return {
       clause: `${prev.clause}${i ? ', ' : ''} $/${paramName}:name/ ${order}`,
-      params: { ...prev.params, [paramName]: curr.variable },
+      params: {...prev.params, [paramName]: curr.variable},
     }
-  }, { clause: '', params: {} })
+  }, {clause: '', params: {}})
 }
 
-export const findVariableByValue = (value) =>
+export const findVariableByValue = value =>
   R.find(v => v.value === value)
 
 export const getViewExpr = (ascLabel, descLabel) => R.pipe(
@@ -50,7 +50,7 @@ export const updateVariable = (pos, variable) => R.update(pos, {
 export const getUnchosenVariables = availableVariables => sortCriteria =>
   R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(availableVariables)
 
-export const addCriteria = (variable, label, order) => R.append({ variable, label, order })
+export const addCriteria = (variable, label, order) => R.append({variable, label, order})
 
 export const deleteCriteria = pos => R.remove(pos, 1)
 

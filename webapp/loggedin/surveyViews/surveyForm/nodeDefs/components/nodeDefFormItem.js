@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
+import {FormItem} from '@webapp/commonComponents/form/input'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -33,9 +33,9 @@ const NodeDefFormItemLabel = props => {
 }
 
 const NodeDefFormItem = props => {
-  const { nodeDef, entry } = props
+  const {nodeDef, entry} = props
 
-  const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
+  const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), {...props})
 
   return NodeDef.isEntity(nodeDef)
     ? (
@@ -52,7 +52,6 @@ const NodeDefFormItem = props => {
 
       </FormItem>
     )
-
 }
 
 export default NodeDefFormItem

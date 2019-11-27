@@ -5,13 +5,13 @@ import * as NumberUtils from '@core/numberUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-const { nodeDefType } = NodeDef
+const {nodeDefType} = NodeDef
 import * as Taxon from '@core/survey/taxon'
 
-import * as Node from '../node'
 import * as GeoUtils from '@core/geo/geoUtils'
 
 import * as Validation from '@core/validation/validation'
+import * as Node from '../node'
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
@@ -25,8 +25,7 @@ const typeValidatorFns = {
       Node.getCoordinateSrs(node),
       Node.getCoordinateX(node),
       Node.getCoordinateY(node)
-    )
-  ,
+    ),
 
   [nodeDefType.date]: (survey, nodeDef, node, value) => {
     const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
@@ -55,37 +54,42 @@ const typeValidatorFns = {
 
 const validateCode = (survey, nodeDef, node) => {
   const itemUuid = Node.getCategoryItemUuid(node)
-  if (!itemUuid)
+  if (!itemUuid) {
     return true
+  }
 
-  // item not found
+  // Item not found
   const item = Survey.getCategoryItemByUuid(itemUuid)(survey)
-  return !!item
+  return Boolean(item)
 }
 
 const validateTaxon = (survey, nodeDef, node) => {
   const taxonUuid = Node.getTaxonUuid(node)
-  if (!taxonUuid)
+  if (!taxonUuid) {
     return true
+  }
 
-  // taxon not found
+  // Taxon not found
   const taxon = Survey.getTaxonByUuid(taxonUuid)(survey)
-  if (!taxon)
+  if (!taxon) {
     return false
+  }
 
   const vernacularNameUuid = Node.getVernacularNameUuid(node)
-  if (!vernacularNameUuid)
+  if (!vernacularNameUuid) {
     return true
+  }
 
-  // vernacular name not found
+  // Vernacular name not found
   return Survey.includesTaxonVernacularName(nodeDef, Taxon.getCode(taxon), vernacularNameUuid)(survey)
 }
 
 export const validateValueType = (survey, nodeDef) => (propName, node) => {
-  if (Node.isValueBlank(node))
+  if (Node.isValueBlank(node)) {
     return null
+  }
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
-  return valid ? null : { key: Validation.messageKeys.record.valueInvalid }
+  return valid ? null : {key: Validation.messageKeys.record.valueInvalid}
 }

@@ -8,7 +8,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as DataTable from '../schemaRdb/dataTable'
 import * as DataCol from '../schemaRdb/dataCol'
 
-const types = { insert: 'insert', update: 'update', delete: 'delete' }
+const types = {insert: 'insert', update: 'update', delete: 'delete'}
 
 // ==== parsing
 
@@ -25,9 +25,9 @@ const _getType = (nodeDef, node) => {
       ? types.update
       : deleted && _hasTable(nodeDef)
         ? types.delete
-        : deleted
+        : (deleted
           ? types.update
-          : null
+          : null)
 }
 
 const _getColNames = (nodeDef, type) =>
@@ -38,9 +38,9 @@ const _getColNames = (nodeDef, type) =>
       DataTable.colNameRecordCycle,
       DataTable.colNameParentUuuid,
       ...(
-        NodeDef.isMultipleAttribute(nodeDef) //entity
-        ? DataCol.getNames(nodeDef)
-        : []
+        NodeDef.isMultipleAttribute(nodeDef) // Entity
+          ? DataCol.getNames(nodeDef)
+          : []
       )
     ]
     : DataCol.getNames(nodeDef)
@@ -53,9 +53,9 @@ const _getColValues = async (survey, cycle, nodeDef, node, type, client) =>
       cycle,
       Node.getParentUuid(node),
       ...(
-        NodeDef.isMultipleAttribute(nodeDef) //entity
-        ? await Promise.all(DataCol.getValues(survey, nodeDef, node))
-        : []
+        NodeDef.isMultipleAttribute(nodeDef) // Entity
+          ? await Promise.all(DataCol.getValues(survey, nodeDef, node))
+          : []
       )
     ]
     : await DataCol.getValues(survey, nodeDef, node)
@@ -72,13 +72,13 @@ const _toUpdates = async (survey, cycle, nodeDefs, nodes, client) => {
       const type = _getType(nodeDef, node)
 
       return type ? {
-          type,
-          schemaName: SchemaRdb.getName(Survey.getId(survey)),
-          tableName: DataTable.getName(nodeDef, nodeDefParent),
-          colNames: _getColNames(nodeDef, type),
-          colValues: await _getColValues(survey, cycle, nodeDef, node, type, client),
-          rowUuid: _getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
-        }
+        type,
+        schemaName: SchemaRdb.getName(Survey.getId(survey)),
+        tableName: DataTable.getName(nodeDef, nodeDefParent),
+        colNames: _getColNames(nodeDef, type),
+        colValues: await _getColValues(survey, cycle, nodeDef, node, type, client),
+        rowUuid: _getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
+      }
         : null
     })
   )

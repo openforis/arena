@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import {expect} from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -9,10 +9,10 @@ import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 
-import { getContextUser } from '../../testContext'
+import {getContextUser} from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
-import * as TaxonomyUtils from './taxonomyUtils'
 import * as SurveyUtils from '../utils/surveyUtils'
+import * as TaxonomyUtils from './taxonomyUtils'
 
 const taxonomyName = 'species_list'
 let survey = null
@@ -21,7 +21,7 @@ before(async () => {
   const user = getContextUser()
 
   survey = await SB.survey(user,
-    // cluster
+    // Cluster
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
     )
@@ -35,8 +35,9 @@ before(async () => {
 })
 
 after(async () => {
-  if (survey)
+  if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+  }
 })
 
 const _updateTaxonWithNewVernacularNames = async (taxonCode, lang, names) =>
@@ -51,21 +52,21 @@ export const taxonPublishedUpdateTest = async () => {
   const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyName, false)
   const taxonCode = 'ALB/GLA'
 
-  // load taxon
+  // Load taxon
   const taxonPublished = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, false)
 
-  // update taxon
+  // Update taxon
   const taxonNew = Taxon.newTaxon(taxonomyUuid, taxonCode, 'Fabaceae updated', 'Albizia updated', 'Albizia glaberrima updated')
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxonPublished)
   await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
 
-  // reload taxon
+  // Reload taxon
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
-  // check that it exists
+  // Check that it exists
   expect(taxonReloaded).to.be.not.undefined
-  // check that its props have been updated
+  // Check that its props have been updated
   expect(Taxon.getProps(taxonReloaded)).to.deep.equal(Taxon.getProps(taxonNew), 'Taxon props have not been updated')
-  // check that its published props haven't been updated
+  // Check that its published props haven't been updated
   const taxonPublishedReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, false)
   expect(Taxon.getProps(taxonPublishedReloaded)).to.deep.equal(Taxon.getProps(taxonPublished), 'Taxon published props have been updated')
 
@@ -78,19 +79,19 @@ export const taxonPublishedAddVernacularNameTest = async () => {
   const taxonCode = 'OLE/CAP'
   const lang = 'swa'
 
-  // add vernacular name
-  const { vernacularNamesNew } = await _updateTaxonWithNewVernacularNames(taxonCode, lang, ['Swahili Vernacular Name'])
+  // Add vernacular name
+  const {vernacularNamesNew} = await _updateTaxonWithNewVernacularNames(taxonCode, lang, ['Swahili Vernacular Name'])
   const vernacularNameNew = R.head(vernacularNamesNew)
 
-  // reload vernacular name
+  // Reload vernacular name
   const taxonReloaded = await TaxonomyUtils.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
   const vernacularNameReloaded = R.pipe(Taxon.getVernacularNamesByLang(lang), R.head)(taxonReloaded)
 
-  // check that new vernacular name exists
+  // Check that new vernacular name exists
   expect(vernacularNameReloaded).to.not.be.undefined
-  // check that its uuid is the same as the one passed to the manager
+  // Check that its uuid is the same as the one passed to the manager
   expect(TaxonVernacularName.getUuid(vernacularNameReloaded)).to.be.equal(TaxonVernacularName.getUuid(vernacularNameNew), 'Vernacular name inserted with different UUID')
-  // check that its properties are the same as the one passed to the manager
+  // Check that its properties are the same as the one passed to the manager
   expect(TaxonVernacularName.getName(vernacularNameReloaded)).to.equal(TaxonVernacularName.getName(vernacularNameNew), 'Vernacular name has not been inserted correctly')
 
   await _publishSurvey()
@@ -104,19 +105,19 @@ export const taxonPublishedUpdateVernacularNamesTest = async () => {
   const name1 = 'Mbambakofi updated'
   const name2 = 'New Swahili name'
 
-  // update taxon vernacular names
-  const { vernacularNamesOld } = await _updateTaxonWithNewVernacularNames(taxonCode, lang, [name1, name2])
+  // Update taxon vernacular names
+  const {vernacularNamesOld} = await _updateTaxonWithNewVernacularNames(taxonCode, lang, [name1, name2])
   const vernacularName1Old = R.head(vernacularNamesOld)
 
-  // reload vernacular name
+  // Reload vernacular name
   const taxonReloaded = await TaxonomyUtils.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
   const vernacularNamesReloaded = Taxon.getVernacularNamesByLang(lang)(taxonReloaded)
-  // check that the old vernacular name has been updated correctly
+  // Check that the old vernacular name has been updated correctly
   const vernacularName1Reloaded = R.find(vn => TaxonVernacularName.getName(vn) === name1)(vernacularNamesReloaded)
   expect(vernacularName1Reloaded).to.be.not.undefined
-  // check that the uuid of the old vernacular name has not changed
+  // Check that the uuid of the old vernacular name has not changed
   expect(TaxonVernacularName.getUuid(vernacularName1Reloaded)).to.be.equal(TaxonVernacularName.getUuid(vernacularName1Old), 'Existing vernacular name UUID changed')
-  // check that the new vernacular name has been inserted correctly
+  // Check that the new vernacular name has been inserted correctly
   const vernacularName2Reloaded = R.find(vn => TaxonVernacularName.getName(vn) === name2)(vernacularNamesReloaded)
   expect(vernacularName2Reloaded).to.be.not.undefined
 

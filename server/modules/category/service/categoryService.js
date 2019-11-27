@@ -1,5 +1,5 @@
-import * as CategoryManager from '../manager/categoryManager'
 import * as JobManager from '@server/job/jobManager'
+import * as CategoryManager from '../manager/categoryManager'
 import CategoryImportJob from './categoryImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 

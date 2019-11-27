@@ -1,27 +1,24 @@
 import './surveyInfoView.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
-import { Input } from '@webapp/commonComponents/form/input'
+import {Input} from '@webapp/commonComponents/form/input'
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+import * as SurveyState from '@webapp/survey/surveyState'
+import * as AppState from '@webapp/app/appState'
+import {updateSurveyInfoProps} from '@webapp/survey/surveyInfo/actions'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'
 import CyclesEditor from './components/cyclesEditor'
-import { useSurveyInfoViewState } from './components/surveyInfoViewState'
+import {useSurveyInfoViewState} from './components/surveyInfoViewState'
 
-import * as Authorizer from '@core/auth/authorizer'
-import * as Survey from '@core/survey/survey'
-
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as AppState from '@webapp/app/appState'
-
-import { updateSurveyInfoProps } from '@webapp/survey/surveyInfo/actions'
-
-const SurveyInfoView = (props) => {
-  const { surveyInfo, readOnly } = props
+const SurveyInfoView = props => {
+  const {surveyInfo, readOnly} = props
 
   const i18n = useI18n()
 
@@ -90,7 +87,7 @@ const SurveyInfoView = (props) => {
         {
           !readOnly &&
           <button className="btn btn-save"
-                  onClick={saveProps}>
+            onClick={saveProps}>
             <span className="icon icon-floppy-disk icon-12px icon-left"/>
             {i18n.t('common.save')}
           </button>
@@ -113,5 +110,5 @@ const mapStateToProps = state => {
 }
 
 export default connect(
-  mapStateToProps, { updateSurveyInfoProps }
+  mapStateToProps, {updateSurveyInfoProps}
 )(SurveyInfoView)

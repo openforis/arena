@@ -8,7 +8,7 @@ import * as ObjectUtils from '@core/objectUtils'
  * ====== TAXONOMY
  */
 const validateNotEmptyTaxa = taxaCount => () =>
-  taxaCount === 0 ? { key: Validation.messageKeys.taxonomyEdit.taxaEmpty } : null
+  taxaCount === 0 ? {key: Validation.messageKeys.taxonomyEdit.taxaEmpty} : null
 
 const taxonomyValidators = (taxonomies, taxaCount) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [
@@ -16,7 +16,7 @@ const taxonomyValidators = (taxonomies, taxaCount) => ({
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(taxonomies)
   ],
-  'taxa': [validateNotEmptyTaxa(taxaCount)]
+  taxa: [validateNotEmptyTaxa(taxaCount)]
 })
 
 export const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
@@ -25,7 +25,7 @@ export const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
 /**
  * ====== TAXON
  */
-const taxonValidators = (taxa) => ({
+const taxonValidators = taxa => ({
   [`${ObjectUtils.keys.props}.${Taxon.propKeys.code}`]: [
     Validator.validateRequired(Validation.messageKeys.taxonomyEdit.codeRequired),
     Validator.validateItemPropUniqueness(Validation.messageKeys.taxonomyEdit.codeDuplicate)(taxa)

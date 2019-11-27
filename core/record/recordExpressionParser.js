@@ -13,36 +13,42 @@ import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 const _getNodeValue = (survey, node) => {
-  if (Node.isValueBlank(node))
+  if (Node.isValueBlank(node)) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
   if (NodeDef.isCode(nodeDef)) {
     const itemUuid = Node.getCategoryItemUuid(node)
     return itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
-  } else if (NodeDef.isTaxon(nodeDef)) {
+  }
+
+  if (NodeDef.isTaxon(nodeDef)) {
     const taxonUuid = Node.getTaxonUuid(node)
     return taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : null
-  } else {
-    const value = Node.getValue(node)
-    return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
-      ? Number(value)
-      : NodeDef.isBoolean(nodeDef)
-        ? value === 'true'
-        : value
   }
+
+  const value = Node.getValue(node)
+  return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
+    ? Number(value)
+    : (NodeDef.isBoolean(nodeDef)
+      ? value === 'true'
+      : value)
 }
 
 const _getReferencedNodesParent = (record, nodeCtx, nodeDefContextH, nodeDefReferencedH) => {
   if (Node.isRoot(nodeCtx) && nodeDefReferencedH.length === 1) {
-    // nodeCtx is root and node referenced is its child
+    // NodeCtx is root and node referenced is its child
     return nodeCtx
-  } else if (R.startsWith(nodeDefReferencedH, nodeDefContextH)) {
-    // nodeDefReferenced belongs to an ancestor of nodeDefContext
+  }
+
+  if (R.startsWith(nodeDefReferencedH, nodeDefContextH)) {
+    // NodeDefReferenced belongs to an ancestor of nodeDefContext
     const nodeReferencedParentUuid = Node.getHierarchy(nodeCtx)[nodeDefReferencedH.length - 1]
     return Record.getNodeByUuid(nodeReferencedParentUuid)(record)
   }
+
   return null
 }
 
@@ -57,20 +63,21 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
   const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
 
   const nodeReferencedParent = _getReferencedNodesParent(record, nodeCtx, nodeDefContextH, nodeDefReferencedH)
-  if (nodeReferencedParent)
+  if (nodeReferencedParent) {
     return Record.getNodeChildrenByDefUuid(nodeReferencedParent, NodeDef.getUuid(nodeDefReferenced))(record)
+  }
 
   return []
 }
 
-const _identifierEval = (survey, record) => (expr, { node }) => {
+const _identifierEval = (survey, record) => (expr, {node}) => {
   const nodeName = R.prop('name')(expr)
   const referencedNodes = _getReferencedNodes(survey, record, node, nodeName)
 
   if (referencedNodes.length !== 1) {
     throw new SystemError(
       Validation.messageKeys.expressions.unableToFindNode,
-      { name: nodeName, multiple: referencedNodes.length > 1 }
+      {name: nodeName, multiple: referencedNodes.length > 1}
     )
   }
 
@@ -82,7 +89,7 @@ export const evalNodeQuery = (survey, record, node, query) => {
     [Expression.types.Identifier]: _identifierEval(survey, record),
   }
 
-  return Expression.evalString(query, { node, functions })
+  return Expression.evalString(query, {node, functions})
 }
 
 export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
@@ -107,9 +114,11 @@ const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtF
     if (StringUtils.isBlank(applyIfExpr) || evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
       applicableExpressions.push(expression)
 
-      if (stopAtFirstFound)
+      if (stopAtFirstFound) {
         return applicableExpressions
+      }
     }
   }
+
   return applicableExpressions
 }

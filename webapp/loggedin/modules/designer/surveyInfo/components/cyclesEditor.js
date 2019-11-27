@@ -1,16 +1,16 @@
 import './cyclesEditor.scss'
 
-import React, { useRef } from 'react'
+import React, {useRef} from 'react'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 
-const DateEditor = ({ date, onChange }) => {
+const DateEditor = ({date, onChange}) => {
   const [year, month, day] = R.pipe(
     R.defaultTo('--'),
     R.split('-')
@@ -24,14 +24,14 @@ const DateEditor = ({ date, onChange }) => {
 
   return (
     <span className="date">
-    <input type="text" ref={yearRef} size="4" maxLength="4" value={year} onChange={onChangeDate}/>-
-    <input type="text" ref={monthRef} size="2" maxLength="2" value={month} onChange={onChangeDate}/>-
-    <input type="text" ref={dayRef} size="2" maxLength="2" value={day} onChange={onChangeDate}/>
-  </span>
+      <input type="text" ref={yearRef} size="4" maxLength="4" value={year} onChange={onChangeDate}/>-
+      <input type="text" ref={monthRef} size="2" maxLength="2" value={month} onChange={onChangeDate}/>-
+      <input type="text" ref={dayRef} size="2" maxLength="2" value={day} onChange={onChangeDate}/>
+    </span>
   )
 }
 
-const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
+const DateContainer = ({date, i18n, keyLabel, readOnly, onChange}) => (
   <div className="date-container">
     <span className="date-label">{i18n.t(keyLabel)}</span>
     {
@@ -84,10 +84,10 @@ const CycleEditor = props => {
         {
           canDelete &&
           <button className="btn-s btn-transparent btn-delete"
-                  onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }))
-                    ? onDelete(cycleKey)
-                    : null
-                  }>
+            onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmDeleteCycle', {cycle: stepNum}))
+              ? onDelete(cycleKey)
+              : null
+            }>
             <span className="icon icon-bin2 icon-12px"/>
           </button>
         }
@@ -97,8 +97,7 @@ const CycleEditor = props => {
 }
 
 const CyclesEditor = props => {
-
-  const { cycles, readOnly, setCycles, validation } = props
+  const {cycles, readOnly, setCycles, validation} = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
@@ -133,9 +132,9 @@ const CyclesEditor = props => {
         {
           !readOnly &&
           <button className="btn-s btn-add"
-                  onClick={() => setCycles(
-                    R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
-                  )}>
+            onClick={() => setCycles(
+              R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles)
+            )}>
             <span className="icon icon-plus icon-10px"/>
           </button>
         }
@@ -143,7 +142,6 @@ const CyclesEditor = props => {
 
     </div>
   )
-
 }
 
 export default CyclesEditor

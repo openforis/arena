@@ -4,14 +4,14 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as AuthGroup from '@core/auth/authGroup'
 
-import { keys } from './_user/userKeys'
+import {keys} from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
 
-export { keys } from './_user/userKeys'
+export {keys} from './_user/userKeys'
 
 export const keysPrefs = UserPrefs.keysPrefs
 
-//====== READ
+// ====== READ
 export const isEqual = ObjectUtils.isEqual
 export const getUuid = ObjectUtils.getUuid
 export const getName = R.propOr('', keys.name)
@@ -21,11 +21,11 @@ export const getAuthGroups = ObjectUtils.getAuthGroups
 export const getPrefs = R.propOr({}, keys.prefs)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
-//====== CHECK
+// ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
 export const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
 
-//====== AUTH GROUP
+// ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user => R.pipe(
   getAuthGroups,
   R.ifElse(
@@ -48,7 +48,7 @@ export const dissocAuthGroup = authGroup => user => {
   return R.assoc(keys.authGroups, authGroups, user)
 }
 
-//PREFS
+// PREFS
 export const newPrefs = UserPrefs.newPrefs
 export const getPrefSurveyCurrent = UserPrefs.getPrefSurveyCurrent
 export const getPrefSurveyCycle = UserPrefs.getPrefSurveyCycle

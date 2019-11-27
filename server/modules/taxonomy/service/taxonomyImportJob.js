@@ -4,16 +4,16 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job from '@server/job/job'
 
-import { languageCodesISO636_2 } from '@core/app/languages'
+import {languageCodesISO636_2} from '@core/app/languages'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import TaxonCSVParser from './taxonCSVParser'
 
 const requiredColumns = [
@@ -24,27 +24,26 @@ const requiredColumns = [
 ]
 
 export default class TaxonomyImportJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(TaxonomyImportJob.type, params)
 
-    const { taxonomyUuid, filePath } = params
+    const {taxonomyUuid, filePath} = params
 
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
 
     this.csvReader = null
-    this.taxonomyImportManager = null //to be initialized in onHeaders
+    this.taxonomyImportManager = null // To be initialized in onHeaders
     this.vernacularLanguageCodes = null
     this.taxonCSVParser = null
   }
 
-  async execute () {
-    const { user, surveyId, taxonomyUuid, tx } = this
+  async execute() {
+    const {user, surveyId, taxonomyUuid, tx} = this
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
-    await ActivityLogManager.insert(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
+    await ActivityLogManager.insert(user, surveyId, ActivityLog.type.taxonomyTaxaImport, {uuid: taxonomyUuid}, false, tx)
 
     // 1. load taxonomy
 
@@ -81,14 +80,15 @@ export default class TaxonomyImportJob extends Job {
     }
   }
 
-  async cancel () {
+  async cancel() {
     await super.cancel()
 
-    if (this.csvReader)
+    if (this.csvReader) {
       this.csvReader.cancel()
+    }
   }
 
-  async _onHeaders (headers) {
+  async _onHeaders(headers) {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
@@ -102,7 +102,7 @@ export default class TaxonomyImportJob extends Job {
     }
   }
 
-  async _onRow (row) {
+  async _onRow(row) {
     const taxon = await this.taxonCSVParser.parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
@@ -110,28 +110,28 @@ export default class TaxonomyImportJob extends Job {
     } else {
       this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
+
     this.incrementProcessedItems()
   }
 
-  _validateHeaders (columns) {
+  _validateHeaders(columns) {
     this.logDebug('columns', columns)
     const missingColumns = R.difference(requiredColumns, columns)
     if (R.isEmpty(missingColumns)) {
       return true
-    } else {
-      this.addError({
-        all: {
-          valid: false,
-          errors: [{
-            key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
-            params: { columns: R.join(', ', missingColumns) }
-          }]
-        }
-      })
-      return false
     }
-  }
 
+    this.addError({
+      all: {
+        valid: false,
+        errors: [{
+          key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
+          params: {columns: R.join(', ', missingColumns)}
+        }]
+      }
+    })
+    return false
+  }
 }
 
 TaxonomyImportJob.type = 'TaxonomyImportJob'

@@ -1,11 +1,8 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
-import ItemsView from '../items/itemsView'
-import CategoryEditView from '../categoryEdit/categoryEditView'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -13,6 +10,8 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import CategoryEditView from '../categoryEdit/categoryEditView'
+import ItemsView from '../items/itemsView'
 import * as CategoryEditState from '../categoryEdit/categoryEditState'
 
 import {
@@ -22,7 +21,6 @@ import {
 } from '../categoryEdit/actions'
 
 const CategoriesView = props => {
-
   const {
     categories, category, selectedItemUuid,
     createCategory, deleteCategory, setCategoryForEdit,
@@ -66,7 +64,7 @@ const CategoriesView = props => {
   )
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)

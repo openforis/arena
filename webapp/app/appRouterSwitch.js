@@ -1,29 +1,27 @@
-import React, { useEffect } from 'react'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
-import { withRouter, Route } from 'react-router-dom'
+import React, {useEffect} from 'react'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
+import {withRouter, Route} from 'react-router-dom'
 
 import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
 import LoginView from '@webapp/login/loginView'
+import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import {activeJobUpdate} from '../loggedin/appJob/actions'
 import AppLoaderView from './appLoader/appLoaderView'
 import AppNotificationView from './appNotification/appNotificationView'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
-
 import * as AppWebSocket from './appWebSocket'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import AppContext from './appContext'
 
 import * as AppState from './appState'
 
-import { initApp, throwSystemError } from './actions'
-import { activeJobUpdate } from '../loggedin/appJob/actions'
+import {initApp, throwSystemError} from './actions'
 
 const AppRouterSwitch = props => {
-
   const {
     isReady, systemError, user,
     initApp, throwSystemError, activeJobUpdate,
@@ -69,7 +67,7 @@ const AppRouterSwitch = props => {
     )
     : isReady &&
     (
-      <AppContext.Provider value={{ i18n }}>
+      <AppContext.Provider value={{i18n}}>
 
         {
           user
@@ -91,7 +89,6 @@ const AppRouterSwitch = props => {
 
       </AppContext.Provider>
     )
-
 }
 
 const mapStateToProps = state => ({
@@ -105,7 +102,7 @@ const enhance = compose(
   withRouter,
   connect(
     mapStateToProps,
-    { initApp, throwSystemError, activeJobUpdate }
+    {initApp, throwSystemError, activeJobUpdate}
   )
 )
 

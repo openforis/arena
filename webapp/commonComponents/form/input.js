@@ -2,10 +2,10 @@ import './form.scss'
 
 import React from 'react'
 
+import {TextMask, InputAdapter} from 'react-text-mask-hoc'
 import ValidationTooltip from '../validationTooltip'
-import { TextMask, InputAdapter } from 'react-text-mask-hoc'
 
-export const FormItem = ({ label, children, className = '' }) => (
+export const FormItem = ({label, children, className = ''}) => (
   <div className={`form-item ${className}`}>
     <label className="form-label">{label}</label>
     {children}
@@ -13,7 +13,6 @@ export const FormItem = ({ label, children, className = '' }) => (
 )
 
 export const Input = React.forwardRef((props, ref) => {
-
   const {
     validation = {},
     disabled = false,
@@ -45,7 +44,7 @@ export const Input = React.forwardRef((props, ref) => {
               aria-disabled={disabled}
               isControlled={true}
               value={value}
-              onChange={(e, { value }) => onChangeValue(value)}
+              onChange={(e, {value}) => onChangeValue(value)}
               {...inputProps}
             />
           )

@@ -2,10 +2,10 @@ import './profilePicture.scss'
 
 import React from 'react'
 
-import { useProfilePicture } from './hooks'
+import {useProfilePicture} from './hooks'
 
 const ProfilePicture = props => {
-  const { userUuid, forceUpdateKey, thumbnail } = props
+  const {userUuid, forceUpdateKey, thumbnail} = props
 
   const src = useProfilePicture(userUuid, forceUpdateKey)
 
@@ -19,7 +19,7 @@ const ProfilePicture = props => {
 
 ProfilePicture.defaultProps = {
   userUuid: 'null',
-  forceUpdateKey: 0, // change it when picture of same user must be reloaded
+  forceUpdateKey: 0, // Change it when picture of same user must be reloaded
   thumbnail: false
 }
 

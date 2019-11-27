@@ -12,17 +12,17 @@ export const keys = {
   labels: ObjectUtils.keysProps.labels,
 }
 
-//====== CREATE
+// ====== CREATE
 export const newCycle = () => ({
   [keys.dateStart]: DateUtils.format(Date.now(), dateFormat)
 })
 
-//====== READ
+// ====== READ
 export const getDateStart = R.propOr(null, keys.dateStart)
 export const getDateEnd = R.propOr(null, keys.dateEnd)
 export const getDescriptions = R.propOr({}, keys.descriptions)
 export const getLabels = R.propOr({}, keys.labels)
 
-//====== UPDATE
+// ====== UPDATE
 export const setDateStart = R.assoc(keys.dateStart)
 export const setDateEnd = R.assoc(keys.dateEnd)

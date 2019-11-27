@@ -1,21 +1,20 @@
 import './collectImportReportView.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
 import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
+import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 import TableHeader from './components/tableHeader'
 import TableRows from './components/tableRows'
 
 import * as CollectImportReportState from './collectImportReportState'
-import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 
-import { fetchCollectImportReportItems } from './actions'
+import {fetchCollectImportReportItems} from './actions'
 
-const CollectImportReportView = (props) => {
-
+const CollectImportReportView = props => {
   const {
     reportItems, isNodeDefEditOpened,
     fetchCollectImportReportItems
@@ -46,11 +45,10 @@ const CollectImportReportView = (props) => {
         </div>
       </SurveyDefsLoader>
     )
-
 }
 
 const mapStateToProps = state => ({
   reportItems: CollectImportReportState.getState(state),
   isNodeDefEditOpened: NodeDefEditState.hasNodeDef(state),
 })
-export default connect(mapStateToProps, { fetchCollectImportReportItems })(CollectImportReportView)
+export default connect(mapStateToProps, {fetchCollectImportReportItems})(CollectImportReportView)

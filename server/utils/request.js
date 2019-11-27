@@ -8,7 +8,7 @@ export const getParams = req => R.pipe(
   R.mergeLeft(R.prop('query', req)),
   R.mergeLeft(R.prop('params', req)),
   R.mergeLeft(R.prop('body', req)),
-  // convert String boolean values to Boolean type
+  // Convert String boolean values to Boolean type
   R.mapObjIndexed(val =>
     R.ifElse(
       v => v === 'true' || v === 'false',
@@ -35,7 +35,7 @@ export const getUser = R.prop('user')
 export const getUserUuid = R.pipe(getUser, R.prop('uuid'))
 export const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
-// i18n
+// I18n
 
 export const getI18n = R.prop('i18n')
 

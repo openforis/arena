@@ -1,33 +1,32 @@
-import React, { useRef } from 'react'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import React, {useRef} from 'react'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 import * as R from 'ramda'
 
-import { elementOffset } from '@webapp/utils/domUtils'
+import {elementOffset} from '@webapp/utils/domUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as Authorizer from '@core/auth/authorizer'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
-import TableHeader from './tableHeader'
-import TableRows from './tableRows'
+import {useOnUpdate} from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
-import * as DataQueryState from '../dataQueryState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as DataQueryState from '../dataQueryState'
+import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { nodesUpdateCompleted } from '../../../../../surveyViews/record/actions'
+import {nodesUpdateCompleted} from '../../../../../surveyViews/record/actions'
+import TableRows from './tableRows'
+import TableHeader from './tableHeader'
 
 const defaultColWidth = 80
 
 const Table = props => {
-
   const {
     appSaving, lang, surveyId, surveyCycleKey, data, showTable,
     nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colsNumber,
@@ -39,7 +38,7 @@ const Table = props => {
   } = props
 
   const tableRef = useRef(null)
-  const { width = defaultColWidth } = elementOffset(tableRef.current)
+  const {width = defaultColWidth} = elementOffset(tableRef.current)
   const widthMax = width - defaultColWidth - 35
   const colWidthMin = 150
 
@@ -53,6 +52,7 @@ const Table = props => {
     if (editMode) {
       AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
     }
+
     return () => {
       AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
     }
@@ -137,6 +137,6 @@ const mapStateToProps = state => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps, { nodesUpdateCompleted })
+  connect(mapStateToProps, {nodesUpdateCompleted})
 )
 export default enhance(Table)

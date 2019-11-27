@@ -1,10 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 const TableContent = props => {
-
   const {
     list,
     gridTemplateColumns, noItemsLabelKey,
@@ -22,13 +21,12 @@ const TableContent = props => {
     )
     : (
       <div className="table__content">
-        <div className="table__row-header" style={{ gridTemplateColumns }}>
+        <div className="table__row-header" style={{gridTemplateColumns}}>
           {
             React.createElement(rowHeaderComponent, props)
           }
         </div>
         <div className="table__rows">
-
 
           {
             list.map((row, i) => {
@@ -38,13 +36,13 @@ const TableContent = props => {
 
               return (
                 <div onClick={() => onRowClick && onRowClick(row)}
-                     className={className}
-                     key={i}
-                     style={{ gridTemplateColumns }}>
+                  className={className}
+                  key={i}
+                  style={{gridTemplateColumns}}>
                   {
                     React.createElement(
                       rowComponent,
-                      { ...props, idx: i, row }
+                      {...props, idx: i, row}
                     )
                   }
                 </div>

@@ -4,7 +4,6 @@ import * as Response from '@server/utils/response'
 import * as JobManager from './jobManager'
 
 export const init = app => {
-
   /**
    * ====== DELETE
    */
@@ -13,5 +12,4 @@ export const init = app => {
 
     Response.sendOk(res)
   })
-
-};
+}

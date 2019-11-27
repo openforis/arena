@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import * as R from 'ramda'
 
 import * as User from '@core/user/user'
@@ -20,7 +20,7 @@ import {
   usePrevious,
 } from '@webapp/commonComponents/hooks'
 
-import { appModuleUri, userModules } from '../../../appModules'
+import {appModuleUri, userModules} from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
@@ -31,9 +31,9 @@ export const useUserViewState = props => {
 
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const i18n = useI18n()
-  const editingSelf = User.getUuid(user) === userUuid && !surveyId // this can happen for system administrator when they don't have an active survey
+  const editingSelf = User.getUuid(user) === userUuid && !surveyId // This can happen for system administrator when they don't have an active survey
 
-  const { data: userToUpdate = {}, dispatch: fetchUser, loaded } = useAsyncGetRequest(
+  const {data: userToUpdate = {}, dispatch: fetchUser, loaded} = useAsyncGetRequest(
     `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`
   )
 
@@ -43,7 +43,7 @@ export const useUserViewState = props => {
   // FormData object to be used for the multipart/form-data put request
   const [formData, setFormData] = useState(null)
 
-  // form fields edit permissions
+  // Form fields edit permissions
   const [editPermissions, setEditPermissions] = useState({
     name: false,
     group: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
@@ -51,12 +51,12 @@ export const useUserViewState = props => {
     remove: false,
   })
 
-  // local form object
+  // Local form object
   const {
     object: formObject, objectValid,
     setObjectField, enableValidation, getFieldValidation,
   } = useFormObject(
-    { name: '', email: '', groupUuid: null },
+    {name: '', email: '', groupUuid: null},
     isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
     !isInvitation
   )
@@ -74,14 +74,14 @@ export const useUserViewState = props => {
   const [surveyGroupsMenuItems, setSurveyGroupsMenuItems] = useState([])
 
   useEffect(() => {
-    // init form groups
+    // Init form groups
 
     // All groups if published, SurveyAdmin group otherwise
     const surveyGroups = editingSelf
       ? []
-      : Survey.isPublished(surveyInfo)
+      : (Survey.isPublished(surveyInfo)
         ? Survey.getAuthGroups(surveyInfo)
-        : [Survey.getAuthGroupAdmin(surveyInfo)]
+        : [Survey.getAuthGroupAdmin(surveyInfo)])
 
     // Add SystemAdmin group if current user is a SystemAdmin himself
     const menuGroups = R.when(
@@ -94,7 +94,7 @@ export const useUserViewState = props => {
       label: i18n.t(`authGroups.${AuthGroup.getName(g)}.label_plural`)
     })))
 
-    // init user
+    // Init user
     if (!isInvitation) {
       fetchUser()
     }
@@ -104,12 +104,12 @@ export const useUserViewState = props => {
 
   useEffect(() => {
     if (loaded) {
-      // set form object field from server side response
+      // Set form object field from server side response
       setName(isUserAcceptPending ? '' : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
       setEmail(User.getEmail(userToUpdate))
       setGroup(User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate))
 
-      // set edit form permissions
+      // Set edit form permissions
       const canEdit = Authorizer.canEditUser(user, surveyInfo, userToUpdate)
       setEditPermissions({
         name: !isUserAcceptPending && canEdit,
@@ -130,14 +130,14 @@ export const useUserViewState = props => {
   const pictureChanged = useRef(false)
 
   useEffect(() => {
-    setFormData(formDataPrev => ({ ...formDataPrev, ...formObject }))
+    setFormData(formDataPrev => ({...formDataPrev, ...formObject}))
   }, [formObject])
 
   useEffect(() => {
     if (prevProfilePicture) {
       pictureChanged.current = true
       // Only send the picture file if it has been edited by the user
-      setFormData(formDataPrev => ({ ...formDataPrev, file: profilePicture }))
+      setFormData(formDataPrev => ({...formDataPrev, file: profilePicture}))
     }
   }, [profilePicture])
 
@@ -161,17 +161,17 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.severity.error)
+      showNotification('appErrors.generic', {text: userSaveError}, NotificationState.severity.error)
     } else if (userSaved) {
-      // update user in redux state if self
+      // Update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
         setUser(userSaveResponse)
       }
 
       if (isInvitation) {
-        showNotification('usersView.inviteUserConfirmation', { email: formObject.email })
+        showNotification('usersView.inviteUserConfirmation', {email: formObject.email})
       } else {
-        showNotification('usersView.updateUserConfirmation', { name: formObject.name })
+        showNotification('usersView.updateUserConfirmation', {name: formObject.name})
       }
 
       if (!editingSelf) {
@@ -196,7 +196,7 @@ export const useUserViewState = props => {
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.severity.error)
+      showNotification('appErrors.generic', {text: removeUserError}, NotificationState.severity.error)
     }
   }, [removeUserLoaded, removeUserError])
 

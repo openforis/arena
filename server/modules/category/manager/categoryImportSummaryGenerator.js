@@ -10,9 +10,9 @@ import SystemError from '@core/systemError'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 const columnProps = {
-  [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
-  [CategoryImportSummary.columnTypes.label]: { suffix: '_label', lang: true },
-  [CategoryImportSummary.columnTypes.description]: { suffix: '_description', lang: true },
+  [CategoryImportSummary.columnTypes.code]: {suffix: '_code', lang: false},
+  [CategoryImportSummary.columnTypes.label]: {suffix: '_label', lang: true},
+  [CategoryImportSummary.columnTypes.description]: {suffix: '_description', lang: true},
 }
 
 const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suffix
@@ -44,22 +44,22 @@ export const createImportSummaryFromStream = async stream => {
         }
         levelsByName[name] = level
       }
+
       return level
-    } else {
-      return { name: null, index: -1 }
     }
+
+    return {name: null, index: -1}
   }
 
   const columns = columnNames.reduce(
     (acc, columnName) => {
-
       const columnType = columnName.endsWith(columnCodeSuffix)
         ? CategoryImportSummary.columnTypes.code
         : columnRegExpLabel.test(columnName)
           ? CategoryImportSummary.columnTypes.label
-          : columnRegExpDescription.test(columnName)
+          : (columnRegExpDescription.test(columnName)
             ? CategoryImportSummary.columnTypes.description
-            : CategoryImportSummary.columnTypes.extra
+            : CategoryImportSummary.columnTypes.extra)
 
       const level = getOrCreateLevel(columnName, columnType)
 
@@ -101,12 +101,12 @@ const _validateSummary = summary => {
       atLeastOneCodeColumn = true
     } else if (CategoryImportSummary.isColumnLabel(column) ||
       CategoryImportSummary.isColumnDescription(column)) {
-      //if column is label or description, a code in the same level must be defined
+      // If column is label or description, a code in the same level must be defined
 
       if (!CategoryImportSummary.hasColumn(CategoryImportSummary.columnTypes.code, CategoryImportSummary.getColumnLevelIndex(column))(summary)) {
         const levelName = CategoryImportSummary.getColumnLevelName(column)
         const columnNameMissing = `${levelName}${columnCodeSuffix}`
-        throw new SystemError(Validation.messageKeys.categoryImport.columnMissing, { columnNameMissing })
+        throw new SystemError(Validation.messageKeys.categoryImport.columnMissing, {columnNameMissing})
       }
     }
   })

@@ -1,15 +1,15 @@
 import './appNotification.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
-import { CSSTransition } from 'react-transition-group'
+import {CSSTransition} from 'react-transition-group'
 
 import * as AppState from '../appState'
 
 import * as NotificationState from './appNotificationState'
 
-import { hideNotification } from './actions'
+import {hideNotification} from './actions'
 
 const AppNotificationView = props => {
   const {
@@ -26,7 +26,7 @@ const AppNotificationView = props => {
 
       <div className={`app-notification ${severity}`}>
         <button className="btn-s btn-transparent app-notification__btn-close"
-                onClick={hideNotification}>
+          onClick={hideNotification}>
           <span className="icon icon-cross icon-8px"/>
         </button>
 
@@ -38,7 +38,6 @@ const AppNotificationView = props => {
 
     </CSSTransition>
   )
-
 }
 
 const mapStateToProps = state => ({
@@ -49,4 +48,4 @@ const mapStateToProps = state => ({
   i18n: AppState.getI18n(state),
 })
 
-export default connect(mapStateToProps, { hideNotification })(AppNotificationView)
+export default connect(mapStateToProps, {hideNotification})(AppNotificationView)

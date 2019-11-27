@@ -4,22 +4,22 @@ import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
   layout: 'layout',
-  // layout keys
-  pageUuid: 'pageUuid', // page uuid
-  renderType: 'renderType', // renderType
-  columnsNo: 'columnsNo', // number of columns
+  // Layout keys
+  pageUuid: 'pageUuid', // Page uuid
+  renderType: 'renderType', // RenderType
+  columnsNo: 'columnsNo', // Number of columns
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
 }
 
 export const renderType = {
-  // entity
+  // Entity
   form: 'form',
   table: 'table',
-  // code
+  // Code
   dropdown: 'dropdown',
   checkbox: 'checkbox',
 
-  // only components render
+  // Only components render
   tableHeader: 'tableHeader',
   tableBody: 'tableBody',
 }

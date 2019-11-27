@@ -1,9 +1,9 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid'
+import {uuidv4} from '@core/uuid'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
+import {debounceAction} from '@webapp/utils/reduxUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,10 +11,10 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '../surveyState'
 
-import { showNotification } from '@webapp/app/appNotification/actions'
+import {showNotification} from '@webapp/app/appNotification/actions'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
+import * as SurveyState from '../surveyState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
@@ -31,15 +31,16 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
   const cycle = SurveyState.getSurveyCycleKey(state)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const { data: { nodeDefsValidation, nodeDefsUpdated } } = await axios.put(
+  const {data: {nodeDefsValidation, nodeDefsUpdated}} = await axios.put(
     `/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`,
-    { cycle, props, propsAdvanced }
+    {cycle, props, propsAdvanced}
   )
 
-  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+  dispatch({type: nodeDefsValidationUpdate, nodeDefsValidation})
 
-  if (!!nodeDefsUpdated)
-    dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
+  if (nodeDefsUpdated) {
+    dispatch({type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated})
+  }
 }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) => debounceAction(
@@ -71,10 +72,10 @@ export const createNodeDef = (parent, type, props) => async (dispatch, getState)
 
   const nodeDef = NodeDef.newNodeDef(parent, type, cycle, props)
 
-  dispatch({ type: nodeDefCreate, nodeDef })
+  dispatch({type: nodeDefCreate, nodeDef})
 
-  const { data: { nodeDefsValidation } } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
-  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+  const {data: {nodeDefsValidation}} = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
+  dispatch({type: nodeDefsValidationUpdate, nodeDefsValidation})
 
   dispatch(_updateParentLayout(nodeDef))
 }
@@ -83,24 +84,26 @@ export const createNodeDef = (parent, type, props) => async (dispatch, getState)
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
-    // nodeDef has default values, cannot change into multiple
+    // NodeDef has default values, cannot change into multiple
     dispatch(showNotification('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, NotificationState.severity.warning))
     return false
   }
+
   return true
 }
 
 export const putNodeDefProp = (nodeDef, key, value = null, advanced = false, checkFormPageUuid = false) => async (dispatch, getState) => {
-  if (!_checkCanChangeProp(dispatch, nodeDef, key, value))
+  if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
     return
+  }
 
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
-  const props = advanced ? {} : { [key]: value }
-  const propsAdvanced = advanced ? { [key]: value } : {}
+  const props = advanced ? {} : {[key]: value}
+  const propsAdvanced = advanced ? {[key]: value} : {}
 
   if (key === NodeDef.propKeys.multiple) {
     // If setting "multiple", reset validations required or count
@@ -143,7 +146,7 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, ge
         if (isRenderTable) {
           layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
         } else if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
-          // entity rendered as form can only exists in its own page
+          // Entity rendered as form can only exists in its own page
           layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
         }
 
@@ -161,8 +164,8 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
 
-  //check if nodeDef is referenced by other node definitions
-  //dependency graph is not associated to the survey in UI, it's built every time it's needed
+  // Check if nodeDef is referenced by other node definitions
+  // dependency graph is not associated to the survey in UI, it's built every time it's needed
   const dependencyGraph = Survey.buildDependencyGraph(survey)
   const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(survey)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -170,7 +173,7 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   const i18n = AppState.getI18n(state)
 
   if (!(R.isEmpty(nodeDefDependentsUuids) || R.equals(nodeDefDependentsUuids, [nodeDefUuid]))) {
-    // node has not dependencies or it has expressions that depend on itself
+    // Node has not dependencies or it has expressions that depend on itself
     const nodeDefDependents = R.pipe(
       R.map(R.pipe(
         nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
@@ -183,16 +186,15 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
       nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
       nodeDefDependents
     }, NotificationState.severity.warning))
-
   } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
-    // delete confirmed
-    dispatch({ type: nodeDefDelete, nodeDef })
+    // Delete confirmed
+    dispatch({type: nodeDefDelete, nodeDef})
 
     const surveyId = Survey.getId(survey)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: cycle })
-    dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+    const {data: {nodeDefsValidation}} = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, {params: cycle})
+    dispatch({type: nodeDefsValidationUpdate, nodeDefsValidation})
 
     dispatch(_updateParentLayout(nodeDef, true))
   }

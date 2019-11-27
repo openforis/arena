@@ -1,43 +1,42 @@
-import { exportReducer } from '@webapp/utils/reduxUtils'
+import {exportReducer} from '@webapp/utils/reduxUtils'
 
 import * as Survey from '@core/survey/survey'
 
-import * as SurveyInfoState from './surveyInfoState'
+// App actions
+import {appPropsChange, appUserLogout} from '@webapp/app/actions'
 
-// app actions
-import { appPropsChange, appUserLogout } from '@webapp/app/actions'
+// Survey actions
+import {surveyCreate, surveyDelete, surveyUpdate} from '../actions'
 
-// survey actions
-import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
-
-// surveyInfo actions
-import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
+// SurveyInfo actions
 
 // nodeDefs actions
-import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '../nodeDefs/actions'
+import {nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate} from '../nodeDefs/actions'
 
-// category actions
-import { categoryCreate } from '../categories/actions'
+// Category actions
+import {categoryCreate} from '../categories/actions'
 
-// taxonomies actions
-import { taxonomyCreate } from '../taxonomies/actions'
-import { categoryDelete, categoryUpdate } from '../categories/actions'
-import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
+// Taxonomies actions
+import {taxonomyCreate} from '../taxonomies/actions'
+import {categoryDelete, categoryUpdate} from '../categories/actions'
+import {taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate} from '../taxonomies/actions'
+import {surveyInfoUpdate, surveyInfoValidationUpdate} from './actions'
+import * as SurveyInfoState from './surveyInfoState'
 
 const actionHandlers = {
-  // app initialization
-  [appPropsChange]: (state, { survey }) => survey ? Survey.getSurveyInfo(survey) : state,
+  // App initialization
+  [appPropsChange]: (state, {survey}) => survey ? Survey.getSurveyInfo(survey) : state,
   [appUserLogout]: () => ({}),
 
   // Survey Update
-  [surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),
-  [surveyUpdate]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [surveyCreate]: (state, {survey}) => Survey.getSurveyInfo(survey),
+  [surveyUpdate]: (state, {survey}) => Survey.getSurveyInfo(survey),
   [surveyDelete]: () => ({}),
 
-  // survey info update
-  [surveyInfoUpdate]: (state, { surveyInfo }) => surveyInfo,
+  // Survey info update
+  [surveyInfoUpdate]: (state, {surveyInfo}) => surveyInfo,
 
-  [surveyInfoValidationUpdate]: (state, { validation }) => SurveyInfoState.assocValidation(validation)(state),
+  [surveyInfoValidationUpdate]: (state, {validation}) => SurveyInfoState.assocValidation(validation)(state),
 
   // NodeDef
   [nodeDefCreate]: SurveyInfoState.markDraft,

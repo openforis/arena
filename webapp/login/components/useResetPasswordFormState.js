@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { useFormObject } from '@webapp/commonComponents/hooks'
+import {useFormObject} from '@webapp/commonComponents/hooks'
 
-import { validateResetPasswordObj, getFirstError } from './loginValidator'
+import {validateResetPasswordObj, getFirstError} from './loginValidator'
 
 export const useResetPasswordFormState = props => {
   const {

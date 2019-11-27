@@ -2,18 +2,18 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
-import * as CategoryRepository from '../repository/categoryRepository'
-import * as CategoryValidator from '../categoryValidator'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as CategoryValidator from '../categoryValidator'
+import * as CategoryRepository from '../repository/categoryRepository'
+import {publishSurveySchemaTableProps, markSurveyDraft} from '../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 
@@ -245,7 +245,7 @@ export const deleteLevelsEmptyByCategory = async (user, surveyId, category, clie
     const levelUuidsDeleted = await CategoryRepository.deleteLevelsEmptyByCategory(surveyId, Category.getUuid(category), t)
     const logActivities = levelUuidsDeleted.map(uuid => ActivityLog.newActivity(
       ActivityLog.type.categoryLevelDelete,
-      { [ActivityLog.keysContent.uuid]: uuid },
+      {[ActivityLog.keysContent.uuid]: uuid},
       true
     ))
     await Promise.all([
@@ -264,17 +264,17 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
   await client.tx(async t => {
     const categoryUuid = Category.getUuid(category)
     const levelsNew = levelNamesNew.map((levelName, index) =>
-      Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
+      Category.newLevel(category, {[CategoryLevel.keysProps.name]: levelName}, index)
     )
     const logContent = {
       [ActivityLog.keysContent.uuid]: categoryUuid
     }
     await Promise.all([
-        CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
-        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
-        ...levelsNew.map(level => insertLevel(user, surveyId, level, true, t)),
-        markSurveyDraft(surveyId, t)
-      ]
+      CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
+      ...levelsNew.map(level => insertLevel(user, surveyId, level, true, t)),
+      markSurveyDraft(surveyId, t)
+    ]
     )
     return Category.assocLevelsArray(levelsNew)(category)
   })

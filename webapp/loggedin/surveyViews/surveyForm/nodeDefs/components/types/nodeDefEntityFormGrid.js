@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Responsive, WidthProvider } from 'react-grid-layout'
+import React, {useEffect, useState} from 'react'
+import {Responsive, WidthProvider} from 'react-grid-layout'
 
 import NodeDefSwitch from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefSwitch'
 
@@ -25,7 +25,7 @@ const NodeDefEntityFormGrid = props => {
     }, 200)
   }, [])
 
-  const onChangeLayout = (layout) => {
+  const onChangeLayout = layout => {
     if (window.innerWidth >= 480 && layout.length > 0) {
       putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, layout)
     }
@@ -38,11 +38,11 @@ const NodeDefEntityFormGrid = props => {
   return innerPageChildren.length > 0
     ? (
       <ResponsiveGridLayout
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
         autoSize={false}
         rowHeight={70}
-        cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
-        layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
+        cols={{lg: columns, md: columns, sm: columns, xs: columns, xxs: 1}}
+        layouts={{lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout}}
         containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
         margin={[5, 5]}
         isDraggable={edit && canEditDef}
@@ -57,7 +57,7 @@ const NodeDefEntityFormGrid = props => {
         {
           innerPageChildren.map(childDef => (
             <div key={NodeDef.getUuid(childDef)}
-                 id={NodeDef.getUuid(childDef)}>
+              id={NodeDef.getUuid(childDef)}>
               <NodeDefSwitch
                 edit={edit}
                 entry={entry}

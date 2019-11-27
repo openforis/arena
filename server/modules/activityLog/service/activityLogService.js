@@ -1,1 +1,1 @@
-export { fetch } from '../manager/activityLogManager'
+export {fetch} from '../manager/activityLogManager'

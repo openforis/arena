@@ -4,17 +4,17 @@ import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
-import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as SurveyViewsState from '../surveyViewsState'
 
 // DOCS
 const stateDoc = {
   categoryEdit: {
     categoryUuid: '',
     levelItems: {
-      0: { 'itemUuid': {} },
-      1: { 'itemUuid': {} },
-      2: { 'itemUuid': {} },
+      0: {itemUuid: {}},
+      1: {itemUuid: {}},
+      2: {itemUuid: {}},
     },
     levelActiveItems: {
       0: 'itemUuid',
@@ -25,7 +25,7 @@ const stateDoc = {
 }
 
 const keys = {
-  categoryUuid: 'categoryUuid', // current editing category uuid
+  categoryUuid: 'categoryUuid', // Current editing category uuid
   levelItems: 'levelItems',
   levelActiveItems: 'levelActiveItems',
   importSummary: 'importSummary',
@@ -37,7 +37,7 @@ const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(de
 
 // ==== current editing category
 
-export const initCategoryEdit = categoryUuid => categoryUuid ? { categoryUuid } : null
+export const initCategoryEdit = categoryUuid => categoryUuid ? {categoryUuid} : null
 
 export const getCategoryForEdit = state => {
   const survey = SurveyState.getSurvey(state)
@@ -114,7 +114,7 @@ const resetNextLevels = (levelIndex, prop) =>
     R.pipe(
       R.prop(prop),
       R.keys,
-      R.map(k => +k)
+      R.map(k => Number(k))
     )(categoryEditState)
   )
 

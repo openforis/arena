@@ -2,7 +2,7 @@ const app = 'app'
 
 export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
 
-//==== App Root modules
+// ==== App Root modules
 export const appModules = {
   home: {
     key: 'home',
@@ -31,7 +31,7 @@ export const appModules = {
   },
 }
 
-//==== Inner modules
+// ==== Inner modules
 
 export const homeModules = {
   dashboard: {

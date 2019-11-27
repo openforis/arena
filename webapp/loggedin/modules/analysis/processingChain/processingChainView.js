@@ -1,19 +1,19 @@
 import './processingChainView.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import {useI18n, useOnUpdate} from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
-import ProcessingChainSteps from './components/processingChainSteps'
 
-import { getUrlParam } from '@webapp/utils/routerUtils'
+import {getUrlParam} from '@webapp/utils/routerUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import ProcessingChainSteps from './components/processingChainSteps'
 import * as ProcessingChainState from './processingChainState'
 
 import {
@@ -25,7 +25,6 @@ import {
 } from './actions'
 
 const ProcessingChainView = props => {
-
   const {
     surveyInfo, surveyCycleKey,
     processingChainUuid, processingChain,
@@ -72,7 +71,7 @@ const ProcessingChainView = props => {
           />
 
           <button className="btn-s btn-danger btn-delete"
-                  onClick={() => window.confirm(i18n.t('processingChainView.deleteConfirm')) &&
+            onClick={() => window.confirm(i18n.t('processingChainView.deleteConfirm')) &&
                     deleteProcessingChain(history)}>
             <span className="icon icon-bin icon-12px icon-left"/>
             {i18n.t('common.delete')}
@@ -81,10 +80,9 @@ const ProcessingChainView = props => {
         </div>
       </div>
     )
-
 }
 
-const mapStateToProps = (state, { match }) => ({
+const mapStateToProps = (state, {match}) => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   processingChainUuid: getUrlParam('processingChainUuid')(match),

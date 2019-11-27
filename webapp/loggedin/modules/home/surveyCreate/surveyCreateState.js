@@ -13,7 +13,7 @@ export const getState = R.pipe(
   R.prop(stateKey)
 )
 
-export const newSurveyDefault = { name: '', label: '', lang: 'en', validation: {} }
+export const newSurveyDefault = {name: '', label: '', lang: 'en', validation: {}}
 
 export const getNewSurvey = R.pipe(
   getState,

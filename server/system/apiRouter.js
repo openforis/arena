@@ -16,7 +16,7 @@ import * as expressionApi from '@server/modules/expression/api/expressionApi'
 
 export const router = express.Router()
 
-//init apis
+// Init apis
 userApi.init(router)
 
 activityLogApi.init(router)

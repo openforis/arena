@@ -4,12 +4,11 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
+import * as Validation from '@core/validation/validation'
+import * as NumberUtils from '@core/numberUtils'
 import * as Record from '../record'
 import * as Node from '../node'
 import * as RecordValidation from '../recordValidation'
-
-import * as Validation from '@core/validation/validation'
-import * as NumberUtils from '@core/numberUtils'
 
 export const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
   const validations = NodeDef.getValidations(nodeDefChild)
@@ -35,7 +34,7 @@ const _getNodePointers = (survey, record, nodes) => {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
     if (!NodeDef.isRoot(nodeDef)) {
-      // add a pointer for every node
+      // Add a pointer for every node
       const nodeParent = Record.getParentNode(node)(record)
       nodePointers.push({
         nodeCtx: nodeParent,
@@ -44,7 +43,7 @@ const _getNodePointers = (survey, record, nodes) => {
     }
 
     if (NodeDef.isEntity(nodeDef) && !Node.isDeleted(node)) {
-      // add children node pointers
+      // Add children node pointers
       const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
 
       for (const childDef of childDefs) {
@@ -61,25 +60,26 @@ const _getNodePointers = (survey, record, nodes) => {
 
 const _validateChildrenCountNodePointers = (survey, record, nodePointers) => {
   let validation = {}
-  for (const { nodeCtx, nodeDef } of nodePointers) {
+  for (const {nodeCtx, nodeDef} of nodePointers) {
     let nodeValidation = null
 
-    // check children count only for applicable nodes
+    // Check children count only for applicable nodes
     if (Node.isChildApplicable(NodeDef.getUuid(nodeDef))(nodeCtx)) {
       const count = _hasMinOrMaxCount(nodeDef)
         ? _countChildren(record, nodeCtx, nodeDef)
         : 0
       nodeValidation = validateChildrenCount(survey, nodeCtx, nodeDef, count)
     } else {
-      // not applicable nodes are always valid
+      // Not applicable nodes are always valid
       nodeValidation = _createValidationResult(nodeDef, true, true)
     }
 
-    // add node validation to output validation
+    // Add node validation to output validation
     validation = R.mergeDeepLeft({
       [Node.getUuid(nodeCtx)]: nodeValidation
     }, validation)
   }
+
   return validation
 }
 
@@ -115,7 +115,7 @@ const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, min
                 ? []
                 : [{
                   key: Validation.messageKeys.record.nodesMinCountNotReached,
-                  params: { minCount }
+                  params: {minCount}
                 }]
             ),
             [RecordValidation.keys.maxCount]: Validation.newInstance(
@@ -125,7 +125,7 @@ const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, min
                 ? []
                 : [{
                   key: Validation.messageKeys.record.nodesMaxCountExceeded,
-                  params: { maxCount }
+                  params: {maxCount}
                 }]
             )
           }

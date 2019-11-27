@@ -8,8 +8,8 @@ export const jobStatus = {
 
 export const jobEvents = {
   created: 'created',
-  statusChange: 'statusChange', //job has changed its status
-  progress: 'progress', //job is running and the processed items changed
+  statusChange: 'statusChange', // Job has changed its status
+  progress: 'progress', // Job is running and the processed items changed
 }
 
 export const jobThreadMessageTypes = {
@@ -18,17 +18,17 @@ export const jobThreadMessageTypes = {
 }
 
 const calculateJobProgress = job => {
-  const partialProgress = job.status === jobStatus.succeeded ?
-    100
-    : job.total > 0 ?
-      Math.floor(100 * job.processed / job.total)
-      : 0
+  const partialProgress = job.status === jobStatus.succeeded
+    ? 100
+    : (job.total > 0
+      ? Math.floor(100 * job.processed / job.total)
+      : 0)
 
   if (job.innerJobs.length === 0 || job.currentInnerJobIndex < 0 || partialProgress === 100) {
     return partialProgress
-  } else {
-    return partialProgress + Math.floor(calculateJobProgress(job.getCurrentInnerJob()) / job.total)
   }
+
+  return partialProgress + Math.floor(calculateJobProgress(job.getCurrentInnerJob()) / job.total)
 }
 
 const calculatedElapsedMillis = job =>
@@ -43,7 +43,7 @@ export const jobToJSON = job => ({
 
   innerJobs: job.innerJobs.map(j => jobToJSON(j)),
 
-  //status
+  // Status
   status: job.status,
   pending: job.status === jobStatus.pending,
   running: job.status === jobStatus.running,
@@ -57,7 +57,7 @@ export const jobToJSON = job => ({
   progressPercent: calculateJobProgress(job),
   elapsedMillis: calculatedElapsedMillis(job),
 
-  //output
+  // Output
   errors: jobStatus.failed ? job.errors : null,
   result: jobStatus.succeeded ? job.result : null,
 

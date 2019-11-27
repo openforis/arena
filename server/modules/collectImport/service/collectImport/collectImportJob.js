@@ -2,21 +2,20 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 
+import SurveyDependencyGraphsGenerationJob from '../../../survey/service/surveyDependencyGraphsGenerationJob'
+import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
+import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
 import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
 import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImportJob'
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
-import SurveyDependencyGraphsGenerationJob from '../../../survey/service/surveyDependencyGraphsGenerationJob'
 
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
-import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
-import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
 
 export default class CollectImportJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(CollectImportJob.type, params, [
       new CollectSurveyReaderJob(),
       new SurveyCreatorJob(),
@@ -31,21 +30,22 @@ export default class CollectImportJob extends Job {
     ])
   }
 
-  async beforeSuccess () {
-    const { surveyId } = this.context
+  async beforeSuccess() {
+    const {surveyId} = this.context
 
     this.setResult({
       surveyId
     })
   }
 
-  async onEnd () {
+  async onEnd() {
     await super.onEnd()
 
-    const { collectSurveyFileZip, surveyId } = this.context
+    const {collectSurveyFileZip, surveyId} = this.context
 
-    if (collectSurveyFileZip)
+    if (collectSurveyFileZip) {
       collectSurveyFileZip.close()
+    }
 
     if (!this.isSucceeded() && surveyId) {
       await SurveyManager.dropSurveySchema(surveyId)

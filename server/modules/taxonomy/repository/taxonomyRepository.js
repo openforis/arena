@@ -1,20 +1,19 @@
 import * as R from 'ramda'
 import * as toSnakeCase from 'to-snake-case'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 import * as DbUtils from '@server/db/dbUtils'
 
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   dbTransformCallback
 } from '../../survey/repository/surveySchemaRepositoryUtils'
-
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
@@ -29,8 +28,8 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props_draft)
         VALUES ($1, $2)
         RETURNING *`,
-    [Taxonomy.getUuid(taxonomy), taxonomy.props],
-    record => dbTransformCallback(record, true, true)
+  [Taxonomy.getUuid(taxonomy), taxonomy.props],
+  record => dbTransformCallback(record, true, true)
   )
 
 /**
@@ -50,16 +49,16 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
  */
 const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
   R.pipe(R.values, R.flatten, R.map(vernacularName =>
-      client.none(
-        `INSERT INTO 
+    client.none(
+      `INSERT INTO 
            ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props_draft)
         VALUES 
           ($1, $2, $3)
         ON CONFLICT (uuid) DO UPDATE SET 
           props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $3`,
-        [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)]
-      )
+      [TaxonVernacularName.getUuid(vernacularName), taxonUuid, TaxonVernacularName.getProps(vernacularName)]
     )
+  )
   )(vernacularNames)
 
 export const insertTaxon = async (surveyId, taxon, client = db) =>
@@ -101,8 +100,8 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
       SELECT COUNT(*) 
       FROM ${getSurveyDBSchema(surveyId)}.taxon
       WHERE taxonomy_uuid = $1`,
-    [taxonomyUuid],
-    r => parseInt(r.count)
+  [taxonomyUuid],
+  r => parseInt(r.count)
   )
 
 export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) =>
@@ -146,8 +145,8 @@ export const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft
       LIMIT ${limit ? limit : 'ALL'} 
       OFFSET $2
     `,
-    [taxonomyUuid, offset],
-    record => dbTransformCallback(record, draft, true)
+  [taxonomyUuid, offset],
+  record => dbTransformCallback(record, draft, true)
   )
 
 export const fetchTaxaWithVernacularNamesStream = (surveyId, taxonomyUuid, vernacularLangCodes, draft = false) => {
@@ -192,7 +191,7 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
          ${whereCondition ? ` AND (${whereCondition})` : ''}
        ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
        LIMIT 25`,
-    { taxonomyUuid, searchValue },
+    {taxonomyUuid, searchValue},
     taxon => dbTransformCallback(taxon, draft, true)
   )
 
@@ -240,7 +239,7 @@ export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterVal
       AND ${filterCondition}
      ORDER BY ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} ASC
      LIMIT 20`,
-    { taxonomyUuid, searchValue },
+    {taxonomyUuid, searchValue},
     record => dbTransformCallback(record, draft, true)
   )
 }
@@ -296,8 +295,8 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     ON
       v.taxon_uuid = t.uuid
     `,
-    [],
-    indexItem => dbTransformCallback(indexItem, draft, true)
+  [],
+  indexItem => dbTransformCallback(indexItem, draft, true)
   )
 
 // ============== UPDATE
@@ -336,8 +335,8 @@ export const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, clie
   )
 
 const toSearchValue = filterValue =>
-  filterValue ?
-    R.pipe(
+  filterValue
+    ? R.pipe(
       R.ifElse(
         R.is(String),
         R.identity,

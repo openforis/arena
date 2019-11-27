@@ -15,15 +15,15 @@ import * as projected from '@esri/proj-codes/pe_list_projcs.json'
  * format: same as projected
  */
 import * as geographic from '@esri/proj-codes/pe_list_geogcs.json'
-import proj4 from 'proj4';
+import proj4 from 'proj4'
 import * as isValidCoordinates from 'is-valid-coordinates'
 
-import * as Srs from './srs'
 import * as ObjectUtils from '@core/objectUtils'
 import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
+import * as Srs from './srs'
 
-const invalidLonLatCoordinates = [0, 90] //proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
+const invalidLonLatCoordinates = [0, 90] // Proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 
 const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 
@@ -61,19 +61,19 @@ export const isCoordinateValid = (srsCode, x, y) => {
     !NumberUtils.isFloat(x) ||
     !NumberUtils.isFloat(y)) {
     return false
-  } else {
-    x = NumberUtils.toNumber(x)
-    y = NumberUtils.toNumber(y)
-
-    const lonLat = Srs.isLatLon(srsCode)
-      ? [x, y] // SRS is lat-lon, projection is not needed
-      : proj4(
-        Srs.getWkt(srs), //from srs
-        Srs.getWkt(Srs.latLonSrs), //to lat lon
-        [x, y] //coordinates
-      )
-
-    return !R.equals(lonLat, invalidLonLatCoordinates) &&
-      isValidCoordinates(lonLat[0], lonLat[1])
   }
+
+  x = NumberUtils.toNumber(x)
+  y = NumberUtils.toNumber(y)
+
+  const lonLat = Srs.isLatLon(srsCode)
+    ? [x, y] // SRS is lat-lon, projection is not needed
+    : proj4(
+      Srs.getWkt(srs), // From srs
+      Srs.getWkt(Srs.latLonSrs), // To lat lon
+      [x, y] // Coordinates
+    )
+
+  return !R.equals(lonLat, invalidLonLatCoordinates) &&
+      isValidCoordinates(lonLat[0], lonLat[1])
 }

@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import React, {useState} from 'react'
+import {connect} from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import ExpressionEditorPopup from '@webapp/commonComponents/expression/expressionEditorPopup'
-import TablePaginator from '../../../../../tableViews/components/tablePaginator'
-import SortEditor from './sort/sortEditor'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 import Tooltip from '@webapp/commonComponents/tooltip'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
+import TablePaginator from '../../../../../tableViews/components/tablePaginator'
 
 import {
   updateTableFilter,
@@ -20,9 +19,9 @@ import {
   updateTableEditMode,
   toggleNodeDefsSelector,
 } from '../actions'
+import SortEditor from './sort/sortEditor'
 
 const TableHeader = props => {
-
   const [showExpressionEditor, setShowExpressionEditor] = useState(false)
   const [showSortEditor, setShowSortEditor] = useState(false)
 
@@ -57,13 +56,13 @@ const TableHeader = props => {
       <div className="data-operations">
 
         <button className={`btn btn-s${nodeDefSelectorsVisible ? ' highlight' : ''}`}
-                onClick={toggleNodeDefsSelector}>
+          onClick={toggleNodeDefsSelector}>
           <span className="icon icon-list icon-14px"/>
         </button>
 
         <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
           <button className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
-                  onClick={toggleExpressionEditor}>
+            onClick={toggleExpressionEditor}>
             <span className="icon icon-filter icon-14px"/>
           </button>
         </Tooltip>
@@ -80,6 +79,7 @@ const TableHeader = props => {
               } else {
                 resetTableFilter()
               }
+
               toggleExpressionEditor()
             }}
             onClose={toggleExpressionEditor}
@@ -89,7 +89,7 @@ const TableHeader = props => {
 
         <Tooltip messages={sortMsg && [sortMsg]}>
           <button className={`btn btn-s btn-edit${sort.length ? ' highlight' : ''}`}
-                  onClick={toggleSortEditor}>
+            onClick={toggleSortEditor}>
             <span className="icon icon-sort-amount-asc icon-14px"/>
           </button>
         </Tooltip>
@@ -116,8 +116,8 @@ const TableHeader = props => {
           canEdit &&
           <div>
             <button className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
-                    onClick={() => updateTableEditMode(!editMode)}
-                    aria-disabled={appSaving}>
+              onClick={() => updateTableEditMode(!editMode)}
+              aria-disabled={appSaving}>
               <span className="icon icon-pencil2 icon-14px"/>
             </button>
           </div>

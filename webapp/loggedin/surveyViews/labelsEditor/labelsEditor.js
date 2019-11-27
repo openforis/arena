@@ -1,19 +1,19 @@
 import './labelsEditor.scss'
 
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import React, {useState} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
-import { Input } from '@webapp/commonComponents/form/input'
+import {Input} from '@webapp/commonComponents/form/input'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import { getLanguageLabel } from '@core/app/languages'
+import {getLanguageLabel} from '@core/app/languages'
 
-const LanguageBadge = ({ lang, compact }) => (
+const LanguageBadge = ({lang, compact}) => (
   <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>
     {
       compact ? lang : getLanguageLabel(lang)
@@ -21,7 +21,7 @@ const LanguageBadge = ({ lang, compact }) => (
   </div>
 )
 
-const LabelRow = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
+const LabelRow = ({labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage}) => (
   <div className="labels-editor__label">
 
     {
@@ -30,19 +30,18 @@ const LabelRow = ({ labels, lang, onChange, readOnly, showLanguageBadge, compact
     }
 
     <Input value={R.propOr('', lang, labels)}
-           onChange={value => onChange(
-             R.ifElse(
-               R.always(R.isEmpty(value)),
-               R.dissoc(lang),
-               R.assoc(lang, value)
-             )(labels)
-           )}
-           readOnly={readOnly}/>
+      onChange={value => onChange(
+        R.ifElse(
+          R.always(R.isEmpty(value)),
+          R.dissoc(lang),
+          R.assoc(lang, value)
+        )(labels)
+      )}
+      readOnly={readOnly}/>
   </div>
 )
 
 const LabelsEditor = props => {
-
   const [preview, setPreview] = useState(true)
 
   const i18n = useI18n()
@@ -73,18 +72,18 @@ const LabelsEditor = props => {
         {
           showFormLabel &&
           <label className="form-label">
-            {i18n.t(formLabelKey, { count: languages.length })}
+            {i18n.t(formLabelKey, {count: languages.length})}
           </label>
         }
         {
           _canTogglePreview &&
           <button className="btn-s btn-toggle-labels"
-                  style={{ justifySelf: 'end' }}
-                  onClick={() => setPreview(!preview)}>
+            style={{justifySelf: 'end'}}
+            onClick={() => setPreview(!preview)}>
             <span className={`icon icon-${preview ? 'enlarge2' : 'shrink2'} icon-12px`}/>
-            {/*{*/}
-            {/*this.preview() ? '...more' : '...less'*/}
-            {/*}*/}
+            {/* { */}
+            {/* this.preview() ? '...more' : '...less' */}
+            {/* } */}
           </button>
         }
       </div>
@@ -92,12 +91,12 @@ const LabelsEditor = props => {
         {
           displayLangs.map(lang =>
             <LabelRow key={lang}
-                      lang={lang}
-                      labels={labels}
-                      onChange={onChange}
-                      readOnly={readOnly}
-                      showLanguageBadge={languages.length > 1}
-                      compactLanguage={compactLanguage}/>
+              lang={lang}
+              labels={labels}
+              onChange={onChange}
+              readOnly={readOnly}
+              showLanguageBadge={languages.length > 1}
+              compactLanguage={compactLanguage}/>
           )
         }
       </div>

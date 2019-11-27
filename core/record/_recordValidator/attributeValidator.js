@@ -4,13 +4,13 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Record from '../record'
-import * as Node from '../node'
-import * as RecordExpressionParser from '../recordExpressionParser'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as StringUtils from '@core/stringUtils'
+import * as RecordExpressionParser from '../recordExpressionParser'
+import * as Node from '../node'
+import * as Record from '../record'
 
 import * as AttributeTypeValidator from './attributeTypeValidator'
 import * as AttributeKeyValidator from './attributeKeyValidator'
@@ -21,7 +21,7 @@ const _validateRequired = (survey, nodeDef) => (propName, node) =>
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
   ) &&
   Node.isValueBlank(node)
-    ? { key: Validation.messageKeys.record.valueRequired }
+    ? {key: Validation.messageKeys.record.valueRequired}
     : null
 
 /**
@@ -32,14 +32,15 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
   if (Node.isValueBlank(node)) {
     return null
   }
+
   const validations = NodeDef.getValidations(nodeDef)
 
   const applicableExpressionsEval = RecordExpressionParser.evalApplicableExpressions(
-    survey, record, node, NodeDefValidations.getExpressions(validations) )
+    survey, record, node, NodeDefValidations.getExpressions(validations))
 
   let errorMessage = null
 
-  for (const { expression, value: valid } of applicableExpressionsEval) {
+  for (const {expression, value: valid} of applicableExpressionsEval) {
     if (!valid) {
       const messages = _getCustomValidationMessages(survey, expression)
 
@@ -68,21 +69,20 @@ export const validateAttribute = async (survey, record, attribute) => {
         AttributeKeyValidator.validateAttributeKey(survey, record, nodeDef)
       ]
     }, false)
-  } else {
-    return Validation.newInstance()
   }
+
+  return Validation.newInstance()
 }
 
 export const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
-  // output
+  // Output
   const attributeValidations = {}
 
   for (const node of Object.values(nodes)) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
     if (NodeDef.isAttribute(nodeDef)) {
-
-      // get dependents and attribute itself
+      // Get dependents and attribute itself
       const nodePointersAttributeAndDependents = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.validations, true)(record)
 
       const nodesToValidate = [
@@ -90,18 +90,19 @@ export const validateSelfAndDependentAttributes = async (survey, record, nodes) 
         ...(NodeDef.isKey(nodeDef) ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record)) : [])
       ]
 
-      // call validateAttribute for each attribute
+      // Call validateAttribute for each attribute
 
       for (const node of nodesToValidate) {
         const nodeUuid = Node.getUuid(node)
 
-        // validate only attributes not deleted and not validated already
+        // Validate only attributes not deleted and not validated already
         if (!Node.isDeleted(node) && !attributeValidations[nodeUuid]) {
           attributeValidations[nodeUuid] = await validateAttribute(survey, record, node)
         }
       }
     }
   }
+
   return attributeValidations
 }
 
@@ -113,10 +114,11 @@ const _getCustomValidationMessages = (survey, expression) => {
   for (const lang of languages) {
     const customMessage = messages[lang]
     if (StringUtils.isBlank(customMessage)) {
-      // when custom message is blank, use the expression itself
+      // When custom message is blank, use the expression itself
       messages[lang] = NodeDefExpression.getExpression(expression)
     }
   }
+
   return messages
 }
 
@@ -130,6 +132,7 @@ const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
     const nodesKey = Record.getEntityKeyNodes(survey, sibling)(record)
     siblingKeys.push.apply(siblingKeys, nodesKey)
   }
+
   return siblingKeys
 }
 

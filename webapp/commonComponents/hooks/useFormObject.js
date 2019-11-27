@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
@@ -10,7 +10,7 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     obj,
   })
 
-  // validation effect
+  // Validation effect
   useEffect(() => {
     (async () => {
       if (validatorFn) {
@@ -51,5 +51,4 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     getFieldValidation,
     validation: state.validation,
   }
-
 }

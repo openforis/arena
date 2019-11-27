@@ -1,20 +1,19 @@
 import './appSideBar.scss'
 
-import React, { useRef } from 'react'
-import { connect } from 'react-redux'
+import React, {useRef} from 'react'
+import {connect} from 'react-redux'
 
 import * as ProcessUtils from '@core/processUtils'
-import AppSideBarModules from './components/appSideBarModules'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
-import * as SideBarState from './appSidebarState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as SideBarState from './appSidebarState'
+import AppSideBarModules from './components/appSideBarModules'
 
-import { toggleSideBar } from './actions'
+import {toggleSideBar} from './actions'
 
-const AppSideBar = (props) => {
-
+const AppSideBar = props => {
   const {
     pathname,
     user, surveyInfo, isSideBarOpened,
@@ -27,12 +26,12 @@ const AppSideBar = (props) => {
 
   return (
     <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
-      {/*toggle sidebar */}
+      {/* toggle sidebar */}
       <a className="app-sidebar__btn-toggle"
-         onClick={() => {
-           element.current.classList.toggle('opened')
-           toggleSideBar()
-         }}>
+        onClick={() => {
+          element.current.classList.toggle('opened')
+          toggleSideBar()
+        }}>
         <span className="icon icon-16px icon-menu"/>
       </a>
 
@@ -54,7 +53,6 @@ const AppSideBar = (props) => {
 
     </div>
   )
-
 }
 
 const mapStateToProps = state => ({
@@ -63,4 +61,4 @@ const mapStateToProps = state => ({
   isSideBarOpened: SideBarState.isOpened(state),
 })
 
-export default connect(mapStateToProps, { toggleSideBar })(AppSideBar)
+export default connect(mapStateToProps, {toggleSideBar})(AppSideBar)

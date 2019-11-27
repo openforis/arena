@@ -9,8 +9,8 @@ import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import { sqlTypes } from '@common/surveyRdb/sqlTypes'
-const { nodeDefType } = NodeDef
+import {sqlTypes} from '@common/surveyRdb/sqlTypes'
+const {nodeDefType} = NodeDef
 
 import * as Point from '@core/geo/point'
 import * as GeoUtils from '@core/geo/geoUtils'
@@ -20,7 +20,7 @@ const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
 
 const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
-  //remove nodeDefName from col name
+  // Remove nodeDefName from col name
   const prop = camelize(NodeDefTable.extractColName(nodeDefCol, colName))
 
   return isInProps
@@ -87,24 +87,24 @@ const props = {
 
       return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
-        //'label'
+        // 'label'
         : ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     },
   },
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
-      // return (node, colName) => null
+      // Return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxon.getCode(taxon)
-          // scientific_name
-          : Taxon.isUnlistedTaxon(taxon)
-          ? Node.getScientificName(node) //from node value
-          : Taxon.getScientificName(taxon) //from taxon item
+          // Scientific_name
+          : (Taxon.isUnlistedTaxon(taxon)
+            ? Node.getScientificName(node) // From node value
+            : Taxon.getScientificName(taxon)) // From taxon item
     },
   },
 
@@ -126,7 +126,7 @@ const props = {
 }
 
 export const getColValueProcessor = nodeDef => R.propOr(
-  () => (node) => {
+  () => node => {
     return Node.isValueBlank(node)
       ? null
       : Node.getValue(node)
@@ -136,7 +136,7 @@ export const getColValueProcessor = nodeDef => R.propOr(
 )
 
 export const getColTypeProcessor = nodeDef => R.propOr(
-  nodeDef => colName => `VARCHAR`,
+  nodeDef => colName => 'VARCHAR',
   colTypeProcessor,
   props[NodeDef.getType(nodeDef)]
 )(nodeDef)

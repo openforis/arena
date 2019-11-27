@@ -1,16 +1,15 @@
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeHierarchyDisaggregatedView from '../schemaRdb/nodeHierarchyDisaggregatedView'
 
-const { columns } = NodeHierarchyDisaggregatedView
+const {columns} = NodeHierarchyDisaggregatedView
 
-//====== CREATE
+// ====== CREATE
 
 export const createNodeHierarchyDisaggregatedView = async (survey, client = db) => {
-
   const surveyId = Survey.getId(survey)
 
   await client.query(`

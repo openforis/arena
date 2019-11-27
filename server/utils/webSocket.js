@@ -1,7 +1,7 @@
 import * as socketIoServer from 'socket.io'
 import * as R from 'ramda'
 
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
 
 import * as Log from '@server/log/log'
 import * as Request from './request'
@@ -11,8 +11,8 @@ const Logger = Log.getLogger('WebSocket')
 
 const io = socketIoServer()
 
-const socketsById = new Map() //Map(<[socketId]:socket>)
-const socketIdsByUserUuid = new Map() //Map(<[userUuid]>:Set(socketIds))
+const socketsById = new Map() // Map(<[socketId]:socket>)
+const socketIdsByUserUuid = new Map() // Map(<[userUuid]>:Set(socketIds))
 
 const addSocket = (userUuid, socket) => {
   const socketId = socket.id
@@ -21,6 +21,7 @@ const addSocket = (userUuid, socket) => {
   if (!socketIdsByUserUuid.has(userUuid)) {
     socketIdsByUserUuid.set(userUuid, new Set())
   }
+
   socketIdsByUserUuid.get(userUuid).add(socketId)
 }
 
@@ -48,7 +49,6 @@ export const notifyUser = (userUuid, eventType, message) => {
 }
 
 export const init = (server, jwtMiddleware) => {
-
   io.attach(server)
 
   io.use((socket, next) => {
@@ -76,5 +76,4 @@ export const init = (server, jwtMiddleware) => {
       })
     }
   })
-
 }

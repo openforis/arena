@@ -1,21 +1,20 @@
-import { useState, useRef } from 'react'
-import { elementOffset } from '@webapp/utils/domUtils'
+import {useState, useRef} from 'react'
+import {elementOffset} from '@webapp/utils/domUtils'
 
 export default (placeholderRef, putProcessingStepCalculationIndex) => {
-
   const [dragging, setDragging] = useState(false)
 
-  // current element being dragged
+  // Current element being dragged
   const elementDragRef = useRef(null)
 
-  const onDragStart = (evt) => {
+  const onDragStart = evt => {
     setDragging(true)
 
-    const { currentTarget } = evt
+    const {currentTarget} = evt
     elementDragRef.current = currentTarget
     const placeholder = placeholderRef.current
 
-    const { width, height } = elementOffset(currentTarget)
+    const {width, height} = elementOffset(currentTarget)
     placeholder.style.width = `${width}px`
     placeholder.style.height = `${height}px`
 
@@ -25,7 +24,7 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
   }
 
   const onDragOver = evt => {
-    const { target } = evt
+    const {target} = evt
     const placeholder = placeholderRef.current
     const elementDrag = elementDragRef.current
 
@@ -33,8 +32,7 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
     placeholder.style.display = 'flex'
 
     if (target !== placeholder) {
-
-      const { top } = elementOffset(target)
+      const {top} = elementOffset(target)
       const relY = evt.clientY - top
       const height = target.offsetHeight / 2
       const parent = target.parentNode
@@ -69,5 +67,4 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
     onDragOver,
     onDragEnd,
   }
-
 }

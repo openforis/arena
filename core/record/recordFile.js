@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { truncate } from '@core/stringUtils';
+import {truncate} from '@core/stringUtils'
 
 const getProp = prop => R.path(['props', prop])
 
@@ -34,7 +34,6 @@ const getExtension = fileName => R.pipe(
 
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
-
     const extension = getExtension(fileName)
 
     return R.pipe(
@@ -42,9 +41,9 @@ export const truncateFileName = (fileName, maxLength = 10) => {
       truncate(maxLength),
       name => name + '.' + extension
     )(fileName)
-  } else {
-    return ''
   }
+
+  return ''
 }
 
 // READ

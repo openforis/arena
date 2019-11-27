@@ -1,17 +1,16 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
-import { getValidationFieldMessagesHTML } from '@webapp/utils/validationUtils'
+import {getValidationFieldMessagesHTML} from '@webapp/utils/validationUtils'
 
 const validationWrapper = fields => ({
   valid: false,
   fields,
 })
 
-const AppJobErrors = ({ job }) => {
-
+const AppJobErrors = ({job}) => {
   const errors = R.propOr([], 'errors', job)
 
   const i18n = useI18n()
@@ -21,7 +20,7 @@ const AppJobErrors = ({ job }) => {
       <div className="app-job-monitor__job-errors">
         <div className="header">
           <div>{i18n.t('common.item')}</div>
-          <div>{i18n.t('common.error', { count: errors.length })}</div>
+          <div>{i18n.t('common.error', {count: errors.length})}</div>
         </div>
         <div className="body">
           {
@@ -40,7 +39,6 @@ const AppJobErrors = ({ job }) => {
       </div>
     )
     : null
-
 }
 
 export default AppJobErrors

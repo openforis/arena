@@ -6,13 +6,12 @@ import InputChips from '@webapp/commonComponents/form/inputChips'
 import * as Srs from '@core/geo/srs'
 
 const SrsEditor = props => {
-
-  const { srs, validation, readOnly, setSrs } = props
+  const {srs, validation, readOnly, setSrs} = props
 
   const srsLookupFunction = async value => {
-    const { data } = await axios.get(
+    const {data} = await axios.get(
       '/api/geo/srs/find',
-      { params: { codeOrName: value } }
+      {params: {codeOrName: value}}
     )
     return data.srss
   }

@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
-import ItemsView from '../items/itemsView'
-import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Authorizer from '@core/auth/authorizer'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
 import * as AppState from '@webapp/app/appState'
+import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
+import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
+import ItemsView from '../items/itemsView'
 
 import {
   createTaxonomy,
@@ -21,9 +20,7 @@ import {
   deleteTaxonomy,
 } from '../taxonomyEdit/actions'
 
-
-const TaxonomiesView = (props) => {
-
+const TaxonomiesView = props => {
   const {
     taxonomy,
     taxonomies,
@@ -95,5 +92,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { createTaxonomy, setTaxonomyForEdit, deleteTaxonomy }
+  {createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
 )(TaxonomiesView)

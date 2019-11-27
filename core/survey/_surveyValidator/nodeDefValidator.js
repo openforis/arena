@@ -10,7 +10,7 @@ import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
 import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
-const { keys, propKeys } = NodeDef
+const {keys, propKeys} = NodeDef
 
 const keysValidationFields = {
   children: 'children',
@@ -32,9 +32,10 @@ const validateChildren = survey =>
     if (NodeDef.isEntity(nodeDef)) {
       const children = Survey.getNodeDefChildren(nodeDef)(survey)
       if (R.isEmpty(children)) {
-        return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
+        return {key: Validation.messageKeys.nodeDefEdit.childrenEmpty}
       }
     }
+
     return null
   }
 
@@ -55,11 +56,14 @@ const validateKeyAttributes = survey =>
           (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef))
         )
       ) {
-        return { key: Validation.messageKeys.nodeDefEdit.keysEmpty }
-      } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: Validation.messageKeys.nodeDefEdit.keysExceedingMax }
+        return {key: Validation.messageKeys.nodeDefEdit.keysEmpty}
+      }
+
+      if (keyAttributesCount > NodeDef.maxKeyAttributes) {
+        return {key: Validation.messageKeys.nodeDefEdit.keysExceedingMax}
       }
     }
+
     return null
   }
 
@@ -69,15 +73,16 @@ const validateKey = survey =>
       const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: Validation.messageKeys.nodeDefEdit.keysExceedingMax }
+        return {key: Validation.messageKeys.nodeDefEdit.keysExceedingMax}
       }
     }
+
     return null
   }
 
 const validateReadOnly = (propName, nodeDef) =>
   NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
-    ? { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
+    ? {key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified}
     : null
 
 const propsValidations = survey => ({
@@ -129,7 +134,7 @@ const validateNodeDef = async (survey, nodeDef) => {
 }
 
 export const validateNodeDefs = async survey => {
-  // build and assoc dependency graph to survey
+  // Build and assoc dependency graph to survey
   survey = R.pipe(
     Survey.buildDependencyGraph,
     graph => Survey.assocDependencyGraph(graph)(survey)

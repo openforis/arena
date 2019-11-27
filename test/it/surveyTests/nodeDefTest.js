@@ -1,11 +1,11 @@
-import { getContextSurvey } from '../../testContext';
-import { expect } from 'chai';
+import {expect} from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import {getContextSurvey} from '../../testContext'
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
@@ -52,15 +52,15 @@ export const updateNodeDefTest = async () => {
 
   const newName = 'node_def_1_new'
   const nodeDef1Uuid = NodeDef.getUuid(nodeDef1)
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDef1Uuid, { name: newName })
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDef1Uuid, {name: newName})
   expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, true)
 
-  //only one node def with that name
+  // Only one node def with that name
   expect(R.filter(n => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)
 
-  //do not modify existing nodes
+  // Do not modify existing nodes
   const reloadedNodeDef2 = R.find(n => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
   expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
   expect(NodeDef.getName(reloadedNodeDef2)).to.equal(NodeDef.getName(nodeDef2))

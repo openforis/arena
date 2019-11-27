@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 
 const RecordsHeaderLeft = props => {
-  const { surveyInfo, createRecord, history } = props
+  const {surveyInfo, createRecord, history} = props
   const i18n = useI18n()
 
   return Survey.isPublished(surveyInfo)

@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
-import { uuidv4 } from '@core/uuid';
+import {uuidv4} from '@core/uuid'
 
 import * as ProcessingStep from './processingStep'
 import * as ProcessingStepCalculation from './processingStepCalculation'

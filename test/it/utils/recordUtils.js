@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -34,13 +34,13 @@ export const getNodePath = node => (survey, record) => {
       const index = R.findIndex(n => Node.getUuid(n) === Node.getUuid(node), siblings)
       const position = index + 1
       return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${position}]`
-    } else {
-      return `${parentNodePath}/${NodeDef.getName(nodeDef)}`
     }
-  } else {
-    //is root
-    return NodeDef.getName(nodeDef)
+
+    return `${parentNodePath}/${NodeDef.getName(nodeDef)}`
   }
+
+  // Is root
+  return NodeDef.getName(nodeDef)
 }
 
 export const findNodeByPath = path => (survey, record) => {
@@ -57,7 +57,7 @@ export const findNodeByPath = path => (survey, record) => {
 
   for (const part of parts) {
     if (currentParentNode) {
-      //extract node name and position from path part
+      // Extract node name and position from path part
       const partMatch = /(\w+)(\[(\d+)\])?/.exec(part)
       const childName = partMatch[1]
       const childPosition = R.defaultTo(1, partMatch[3])
@@ -66,14 +66,16 @@ export const findNodeByPath = path => (survey, record) => {
 
       const children = Record.getNodeChildrenByDefUuid(currentParentNode, NodeDef.getUuid(currentNodeDef))(record)
 
-      if (children.length >= childPosition)
+      if (children.length >= childPosition) {
         currentNode = children[childPosition - 1]
-      else
+      } else {
         return null
+      }
     } else {
       currentNodeDef = Survey.getNodeDefRoot(survey)
       currentNode = Record.getRootNode(record)
     }
+
     currentParentDef = currentNodeDef
     currentParentNode = currentNode
   }

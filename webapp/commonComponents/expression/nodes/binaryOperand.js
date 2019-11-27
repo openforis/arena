@@ -1,10 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import ExpressionNode from './expressionNode'
-import { useI18n } from '../../hooks'
-
 import * as Expression from '@core/expressionParser/expression'
+import {useI18n} from '../../hooks'
+import ExpressionNode from './expressionNode'
 
 export const BinaryOperandType = {
   left: 'left',
@@ -14,7 +13,7 @@ BinaryOperandType.isLeft = R.equals(BinaryOperandType.left)
 BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 
 const BinaryOperand = props => {
-  const { node, type, isBoolean, onChange } = props
+  const {node, type, isBoolean, onChange} = props
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
 
@@ -34,8 +33,8 @@ const BinaryOperand = props => {
         className={`btn btn-s btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
         aria-disabled={isLeft && isBoolean}
         onClick={() => {
-          const nodeUpdate = isLeft && !isBoolean ?
-            R.pipe(
+          const nodeUpdate = isLeft && !isBoolean
+            ? R.pipe(
               R.assoc(type, Expression.newLiteral()),
               R.assoc('operator', ''),
               R.assoc(BinaryOperandType.right, Expression.newIdentifier()),

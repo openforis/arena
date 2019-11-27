@@ -44,8 +44,8 @@ const errorKeyByDependencyType = {
 
 const _getNodeValue = nodeDef =>
   NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
-    ? { props: { code: '' } }
-    : 1 //simulates node value
+    ? {props: {code: ''}}
+    : 1 // Simulates node value
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
@@ -55,6 +55,7 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
     const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
     reachableNodeDefs.unshift(...nodeDefChildren)
   }
+
   Survey.visitAncestorsAndSelf(nodeDefContext, visitorFn)(survey)
 
   return reachableNodeDefs
@@ -69,22 +70,29 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr, _ctx)
   const nodeName = R.prop('name')(expr)
   const def = reachableNodeDefs.find(x => NodeDef.getName(x) === nodeName)
 
-  if (!def)
+  if (!def) {
     throw new SystemError(
       Validation.messageKeys.expressions.unableToFindNode,
-      { name: nodeName })
-  if (!selfReferenceAllowed && NodeDef.isEqual(def)(nodeDefCurrent))
+      {name: nodeName})
+  }
+
+  if (!selfReferenceAllowed && NodeDef.isEqual(def)(nodeDefCurrent)) {
     throw new SystemError(
       Validation.messageKeys.expressions.cannotUseCurrentNode,
-      { name: nodeName })
-  if (!Expression.isValidExpressionType(def))
+      {name: nodeName})
+  }
+
+  if (!Expression.isValidExpressionType(def)) {
     throw new SystemError(
       Validation.messageKeys.expressions.unableToFindNode,
-      { name: nodeName, type: NodeDef.getType(def) })
-  if (Survey.isNodeDefDependentOn(NodeDef.getUuid(def), NodeDef.getUuid(nodeDefCurrent))(survey))
+      {name: nodeName, type: NodeDef.getType(def)})
+  }
+
+  if (Survey.isNodeDefDependentOn(NodeDef.getUuid(def), NodeDef.getUuid(nodeDefCurrent))(survey)) {
     throw new SystemError(
       Validation.messageKeys.expressions.circularDependencyError,
-      { name: nodeName })
+      {name: nodeName})
+  }
 
   return _getNodeValue(def)
 }
@@ -96,11 +104,11 @@ const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
 
   try {
     // NB: `node` not needed here
-    await Expression.evalString(expr, { functions })
+    await Expression.evalString(expr, {functions})
     return null
-  } catch (e) {
-    const details = R.is(SystemError, e) ? `$t(${e.key})` : e.toString()
-    return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, { details, ...e.params })
+  } catch (error) {
+    const details = R.is(SystemError, error) ? `$t(${error.key})` : error.toString()
+    return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, {details, ...error.params})
   }
 }
 
@@ -114,7 +122,7 @@ const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   async (propName, nodeDefExpression) => {
     const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
     return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
-      ? { key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
+      ? {key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty}
       : null
   }
 
@@ -123,13 +131,13 @@ const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
     NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
     NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
   )(nodeDefExpressions)
-    ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.expressionDuplicate }])
+    ? Validation.newInstance(false, {}, [{key: Validation.messageKeys.nodeDefEdit.expressionDuplicate}])
     : null
 
 const _validateExpression = async (survey, nodeDef, dependencyType, nodeDefExpressions, index) => {
   const nodeDefExpression = nodeDefExpressions[index]
   const validateApplyIfUniqueness = applyIfUniquenessByDependencyType[dependencyType]
-  
+
   const validation = await Validator.validate(
     nodeDefExpression,
     {
@@ -168,12 +176,14 @@ export const validate = async (survey, nodeDef, dependencyType) => {
 
   validations.forEach((validation, index) => {
     Validation.setField(String(index), validation)(result)
-    if (!Validation.isValid(validation))
+    if (!Validation.isValid(validation)) {
       Validation.setValid(false)(result)
+    }
   })
 
-  if (!Validation.isValid(result))
-    Validation.setErrors([{ key: errorKey }])(result)
+  if (!Validation.isValid(result)) {
+    Validation.setErrors([{key: errorKey}])(result)
+  }
 
   return result
 }

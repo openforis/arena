@@ -7,11 +7,10 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
+import {debounceAction} from '@webapp/utils/reduxUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
-import * as RecordState from './recordState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
 import {
@@ -20,9 +19,10 @@ import {
   showAppSaving,
   hideAppSaving
 } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import {showNotification} from '@webapp/app/appNotification/actions'
 
-import { appModules, appModuleUri, dataModules } from '../../appModules'
+import {appModules, appModuleUri, dataModules} from '../../appModules'
+import * as RecordState from './recordState'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
@@ -35,20 +35,21 @@ export const validationsUpdate = 'survey/record/validation/update'
 
 export const recordNodesUpdate = nodes => (dispatch, getState) => {
   const record = RecordState.getRecord(getState())
-  // hide app loader on record create
+  // Hide app loader on record create
   if (R.isEmpty(Record.getNodes(record))) {
     dispatch(hideAppLoader())
   }
-  dispatch({ type: nodesUpdate, nodes })
+
+  dispatch({type: nodesUpdate, nodes})
 }
 
-export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
-  dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
+export const nodeValidationsUpdate = ({recordUuid, recordValid, validations}) => dispatch =>
+  dispatch({type: validationsUpdate, recordUuid, recordValid, validations})
 
 const _navigateToModuleDataHome = history => history.push(appModuleUri(appModules.data))
 
 export const recordDeleted = history => dispatch => {
-  dispatch({ type: recordDelete })
+  dispatch({type: recordDelete})
   dispatch(showNotification('recordView.justDeleted'))
   _navigateToModuleDataHome(history)
 }
@@ -84,7 +85,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
 
   const recordUuid = Record.getUuid(record)
   if (preview) {
-    dispatch({ type: recordUuidPreviewUpdate, recordUuid })
+    dispatch({type: recordUuidPreviewUpdate, recordUuid})
   } else {
     history.push(`${appModuleUri(dataModules.record)}${recordUuid}`)
   }
@@ -92,7 +93,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => dispatch => {
   const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
-  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
+  dispatch(recordNodesUpdate({[Node.getUuid(node)]: node}))
 }
 
 /**
@@ -110,7 +111,7 @@ export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData
     R.assoc(Node.keys.dirty, true),
   )(node)
 
-  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
+  dispatch(recordNodesUpdate({[Node.getUuid(node)]: nodeToUpdate}))
   dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
@@ -121,8 +122,9 @@ const _updateNodeDebounced = (node, file, delay) => {
     const formData = new FormData()
     formData.append('node', JSON.stringify(node))
 
-    if (file)
+    if (file) {
       formData.append('file', file)
+    }
 
     const surveyId = SurveyState.getSurveyId(getState())
     await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData)
@@ -137,7 +139,7 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
   const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
-  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, { step })
+  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, {step})
 
   history.push(appModuleUri(appModules.data))
 }
@@ -151,13 +153,13 @@ export const nodesUpdateCompleted = () => dispatch => dispatch(hideAppSaving())
  */
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch(showAppSaving())
-  dispatch({ type: nodeDelete, node })
+  dispatch({type: nodeDelete, node})
 
   const surveyId = SurveyState.getSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
-export const deleteRecord = (history) => async (dispatch, getState) => {
+export const deleteRecord = history => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -168,7 +170,7 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
   dispatch(recordDeleted(history))
 }
 
-export const deleteRecordUuidPreview = () => dispatch => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
+export const deleteRecordUuidPreview = () => dispatch => dispatch({type: recordUuidPreviewUpdate, recordUuid: null})
 
 /**
  * ============
@@ -179,18 +181,17 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
   dispatch(showAppLoader())
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data: { record } } = await axios.post(
+  const {data: {record}} = await axios.post(
     `/api/survey/${surveyId}/record/${recordUuid}/checkin`,
-    { draft }
+    {draft}
   )
 
-  // this is used by dataQuery when user is editing a specific entity
+  // This is used by dataQuery when user is editing a specific entity
   if (entityUuid) {
-
     const state = getState()
     const survey = SurveyState.getSurvey(state)
 
-    // ancestors are needed to find the entity with a pageUuid specified
+    // Ancestors are needed to find the entity with a pageUuid specified
     const entity = Record.getNodeByUuid(entityUuid)(record)
     const ancestors = Record.getAncestorsAndSelf(entity)(record)
 
@@ -203,19 +204,19 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
       ))
     )(ancestors)
 
-    // getting the nodes associated to the nodeDef page
+    // Getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(
       (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
       [],
       ancestors
     )
 
-    dispatch({ type: recordLoad, record, nodeDefActivePage, formPageNodeUuidByNodeDefUuid })
+    dispatch({type: recordLoad, record, nodeDefActivePage, formPageNodeUuidByNodeDefUuid})
   } else {
-    dispatch({ type: recordLoad, record })
+    dispatch({type: recordLoad, record})
   }
 
-  // hide app loader on record edit
+  // Hide app loader on record edit
   if (!R.isEmpty(Record.getNodes(record))) {
     dispatch(hideAppLoader())
   }
@@ -223,7 +224,8 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  // checkout can be called after logout, therefore checking if survey still exists in state
-  if (surveyId)
+  // Checkout can be called after logout, therefore checking if survey still exists in state
+  if (surveyId) {
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
+  }
 }

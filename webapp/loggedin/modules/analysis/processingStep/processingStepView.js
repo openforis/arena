@@ -1,26 +1,24 @@
 import './processingStepView.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
-import { getUrlParam } from '@webapp/utils/routerUtils'
+import {getUrlParam} from '@webapp/utils/routerUtils'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import EntitySelector from './components/entitySelector'
-
-import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
-import ProcessingStepCalculationEditor from './components/processingStepCalculationEditor'
-
+import {useI18n} from '@webapp/commonComponents/hooks'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
-
 import {
   fetchProcessingStep,
   resetProcessingStepState,
   putProcessingStepProps,
   deleteProcessingStep,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import EntitySelector from './components/entitySelector'
+
+import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
+import ProcessingStepCalculationEditor from './components/processingStepCalculationEditor'
 
 const ProcessingStepView = props => {
   const {
@@ -37,7 +35,7 @@ const ProcessingStepView = props => {
     }
   }, [])
 
-  const calculationEditorOpened = !!processingStepCalculation
+  const calculationEditorOpened = Boolean(processingStepCalculation)
 
   const i18n = useI18n()
 
@@ -69,7 +67,7 @@ const ProcessingStepView = props => {
           {
             !processingStepNext && !calculationEditorOpened &&
             <button className="btn-s btn-danger btn-delete"
-                    onClick={() => window.confirm(i18n.t('processingStepView.deleteConfirm')) &&
+              onClick={() => window.confirm(i18n.t('processingStepView.deleteConfirm')) &&
                       deleteProcessingStep(history)}>
               <span className="icon icon-bin icon-12px icon-left"/>
               {i18n.t('common.delete')}
@@ -84,7 +82,7 @@ const ProcessingStepView = props => {
     )
 }
 
-const mapStateToProps = (state, { match }) => ({
+const mapStateToProps = (state, {match}) => ({
   processingStepUuid: getUrlParam('processingStepUuid')(match),
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
@@ -94,5 +92,5 @@ const mapStateToProps = (state, { match }) => ({
 
 export default connect(
   mapStateToProps,
-  { fetchProcessingStep, resetProcessingStepState, putProcessingStepProps, deleteProcessingStep }
+  {fetchProcessingStep, resetProcessingStepState, putProcessingStepProps, deleteProcessingStep}
 )(ProcessingStepView)

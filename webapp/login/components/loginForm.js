@@ -1,15 +1,14 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 
-import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
+import {useI18n, useFormObject} from '@webapp/commonComponents/hooks'
 
 import * as LoginState from '../loginState'
-import { setEmail, login, showForgotPasswordForm, setLoginError } from '../actions'
+import {setEmail, login, showForgotPasswordForm, setLoginError} from '../actions'
 
 import * as LoginValidator from './loginValidator'
 
 const LoginForm = props => {
-
   const {
     email: initialEmail,
     setEmail: setStateEmail, login, showForgotPasswordForm, setLoginError
@@ -43,30 +42,30 @@ const LoginForm = props => {
   return (
     <div className="login-form">
       <input value={formObject.email}
-             onChange={e => setEmail(e.target.value)}
-             type='text'
-             name='email'
-             className="login-form__input"
-             placeholder={i18n.t('loginView.yourEmail')}/>
+        onChange={e => setEmail(e.target.value)}
+        type="text"
+        name="email"
+        className="login-form__input"
+        placeholder={i18n.t('loginView.yourEmail')}/>
 
       <input value={formObject.password}
-             onChange={e => setObjectField('password', e.target.value)}
-             type='password'
-             name='password'
-             className="login-form__input"
-             placeholder={i18n.t('loginView.yourPassword')}/>
+        onChange={e => setObjectField('password', e.target.value)}
+        type="password"
+        name="password"
+        className="login-form__input"
+        placeholder={i18n.t('loginView.yourPassword')}/>
 
       <div className="login-form__buttons">
 
         <button type="button"
-                className="btn btn-login"
-                onClick={onClickLogin}>
+          className="btn btn-login"
+          onClick={onClickLogin}>
           {i18n.t('loginView.login')}
         </button>
 
         <button type="button"
-                className="btn btn-s btn-transparent btn-forgot-pwd"
-                onClick={showForgotPasswordForm}>
+          className="btn btn-s btn-transparent btn-forgot-pwd"
+          onClick={showForgotPasswordForm}>
           <span className="icon icon-question icon-left icon-12px"/>
           {i18n.t('loginView.forgotPassword')}
         </button>

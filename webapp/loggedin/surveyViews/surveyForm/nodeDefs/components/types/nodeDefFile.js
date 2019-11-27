@@ -1,15 +1,15 @@
 import './nodeDefFile.scss'
 
 import React from 'react'
-import { uuidv4 } from '@core/uuid'
+import {uuidv4} from '@core/uuid'
 
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
-import NodeDeleteButton from '../nodeDeleteButton'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
+import NodeDeleteButton from '../nodeDeleteButton'
 
 const handleFileChange = (nodeDef, node, file, updateNode) => {
   const value = {
@@ -24,7 +24,7 @@ const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
   if (NodeDef.isMultiple(nodeDef)) {
     removeNode(nodeDef, node)
   } else {
-    // do not delete single node, delete only its value
+    // Do not delete single node, delete only its value
     updateNode(nodeDef, node, null)
   }
 }
@@ -69,7 +69,7 @@ const FileInput = props => {
 }
 
 const MultipleFileInput = props => {
-  const { nodes } = props
+  const {nodes} = props
 
   return (
     <div>

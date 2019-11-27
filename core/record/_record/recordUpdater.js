@@ -1,39 +1,38 @@
 import * as R from 'ramda'
 
-import * as Node from '../node'
 import * as Validation from '@core/validation/validation'
+import * as Node from '../node'
 
-import { keys } from './recordKeys'
+import {keys} from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
 import * as RecordReader from './recordReader'
 
 // ====== UPDATE
 
 export const mergeNodes = nodes => record => {
-  let recordUpdated = { ...record }
-  if (!(keys.nodes in recordUpdated))
+  let recordUpdated = {...record}
+  if (!(keys.nodes in recordUpdated)) {
     recordUpdated[keys.nodes] = {}
+  }
 
   R.forEachObjIndexed((n, nodeUuid) => {
-
-    // remove deleted node
+    // Remove deleted node
     if (Node.isDeleted(n)) {
       recordUpdated = deleteNode(n)(recordUpdated)
     } else {
       const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(recordUpdated)
-      // exclude dirty nodes currently being edited by the user
-      const includes = !nodeExisting || // nodeExisting does not exist, n is new node
-        !Node.isDirty(nodeExisting) || //existing node is not dirty
-        Node.isDirty(n) || //new node is dirty, replace the existing one
-        R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || //new node is not dirty and has the same value of the existing (dirty) node
-        Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) //existing node has a blank value and n has a default value applied
+      // Exclude dirty nodes currently being edited by the user
+      const includes = !nodeExisting || // NodeExisting does not exist, n is new node
+        !Node.isDirty(nodeExisting) || // Existing node is not dirty
+        Node.isDirty(n) || // New node is dirty, replace the existing one
+        R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || // New node is not dirty and has the same value of the existing (dirty) node
+        Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) // Existing node has a blank value and n has a default value applied
 
       if (includes) {
-        const nodeUpdated = R.omit([Node.keys.updated, Node.keys.created], n) //exclude updated and created properties (used by Survey RDB generation)
+        const nodeUpdated = R.omit([Node.keys.updated, Node.keys.created], n) // Exclude updated and created properties (used by Survey RDB generation)
         recordUpdated[keys.nodes][nodeUuid] = nodeUpdated
         recordUpdated = NodesIndex.addNode(nodeUpdated)(recordUpdated)
       }
-
     }
   }, nodes)
 
@@ -41,9 +40,10 @@ export const mergeNodes = nodes => record => {
 }
 
 export const assocNodes = nodes => record => {
-  let recordUpdated = { ...record }
-  if (!(keys.nodes in recordUpdated))
+  let recordUpdated = {...record}
+  if (!(keys.nodes in recordUpdated)) {
     recordUpdated[keys.nodes] = {}
+  }
 
   R.forEachObjIndexed((node, nodeUuid) => {
     if (Node.isDeleted(node)) {
@@ -57,7 +57,7 @@ export const assocNodes = nodes => record => {
   return recordUpdated
 }
 
-export const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
+export const assocNode = node => assocNodes({[Node.getUuid(node)]: node})
 
 export const mergeNodeValidations = nodeValidations => record => R.pipe(
   Validation.getValidation,

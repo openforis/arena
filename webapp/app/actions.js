@@ -13,7 +13,7 @@ export const appUserLogout = 'app/user/logout'
 
 export const systemErrorThrow = 'system/error'
 
-export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
+export const throwSystemError = error => dispatch => dispatch({type: systemErrorThrow, error})
 
 // ====== INIT
 
@@ -22,7 +22,7 @@ export const initApp = () => async dispatch => {
   let user = null
   let survey = null
 
-  //get jwt token to check if user is already logged in
+  // Get jwt token to check if user is already logged in
   try {
     const token = await CognitoAuth.getJwtToken()
     if (token) {
@@ -30,9 +30,10 @@ export const initApp = () => async dispatch => {
       user = userSurvey.user
       survey = userSurvey.survey
     }
-    dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
-  } catch (e) {
-    dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n })
+
+    dispatch({type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey})
+  } catch (error) {
+    dispatch({type: appPropsChange, status: AppState.appStatus.ready, i18n})
     CognitoAuth.logout()
   }
 }
@@ -40,17 +41,17 @@ export const initApp = () => async dispatch => {
 // ====== USER
 
 const getUserSurvey = async () => {
-  const { data: { user, survey } } = await axios.get('/auth/user')
-  return { user, survey }
+  const {data: {user, survey}} = await axios.get('/auth/user')
+  return {user, survey}
 }
 
 export const initUser = () => async dispatch => {
-  const { user, survey } = await getUserSurvey()
-  dispatch({ type: appPropsChange, user, survey })
+  const {user, survey} = await getUserSurvey()
+  dispatch({type: appPropsChange, user, survey})
 }
 
 export const setUser = user => async dispatch => {
-  dispatch({ type: appPropsChange, user })
+  dispatch({type: appPropsChange, user})
 }
 
 export const updateUserPrefs = user => async dispatch => {
@@ -64,7 +65,7 @@ export const logout = () => async dispatch => {
   await axios.post('/auth/logout')
   CognitoAuth.logout()
 
-  dispatch({ type: appUserLogout })
+  dispatch({type: appUserLogout})
   dispatch(hideAppLoader())
 }
 
@@ -75,20 +76,21 @@ const appSavingCounter = new Counter()
 
 export const showAppSaving = () => dispatch => {
   if (appSavingCounter.count === 0) {
-    dispatch({ type: appSavingUpdate, saving: true })
+    dispatch({type: appSavingUpdate, saving: true})
   }
+
   appSavingCounter.increment()
 }
 
 export const hideAppSaving = () => dispatch => {
   appSavingCounter.decrement()
   if (appSavingCounter.count === 0) {
-    dispatch({ type: appSavingUpdate, saving: false })
+    dispatch({type: appSavingUpdate, saving: false})
   }
 }
 
 // ====== APP LOADER
 
-export const showAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
+export const showAppLoader = () => dispatch => dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: true})
 
-export const hideAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })
+export const hideAppLoader = () => dispatch => dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: false})

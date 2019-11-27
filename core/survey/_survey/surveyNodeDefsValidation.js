@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
-import * as NodeDef from '../nodeDef'
 import * as Validation from '@core/validation/validation'
+import * as NodeDef from '../nodeDef'
 
 const keys = {
   nodeDefsValidation: 'nodeDefsValidation'

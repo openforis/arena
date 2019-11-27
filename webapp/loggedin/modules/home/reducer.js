@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import {combineReducers} from 'redux'
 
 import surveyCreate from './surveyCreate/reducer'
 import collectImportReport from './collectImportReport/reducer'

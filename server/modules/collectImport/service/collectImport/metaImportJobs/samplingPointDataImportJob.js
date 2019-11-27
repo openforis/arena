@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 
-import * as CollectImportJobContext from '../collectImportJobContext'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Point from '@core/geo/point'
+import * as CollectImportJobContext from '../collectImportJobContext'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
 import CategoryImportJob from '../../../../category/service/categoryImportJob'
@@ -22,26 +22,25 @@ const keysItem = {
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
 export default class SamplingPointDataImportJob extends CategoryImportJob {
-
-  constructor (params) {
+  constructor(params) {
     super({
       ...params,
       [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName
     }, 'SamplingPointDataImportJob')
   }
 
-  async logCategoryImportActivity () {
-    //do not log category import activity for sampling point data category
+  async logCategoryImportActivity() {
+    // Do not log category import activity for sampling point data category
   }
 
-  async shouldExecute () {
-    //skip import if summary is not specified (csv file not found)
-    return !!this.summary
+  async shouldExecute() {
+    // Skip import if summary is not specified (csv file not found)
+    return Boolean(this.summary)
   }
 
-  async beforeSuccess () {
-    //delete empty levels
-    this.logDebug(`Deleting empty level(s)`)
+  async beforeSuccess() {
+    // Delete empty levels
+    this.logDebug('Deleting empty level(s)')
     const levelsCount = Category.getLevelsArray(this.category).length
     this.category = await CategoryManager.deleteLevelsEmptyByCategory(this.user, this.surveyId, this.category, this.tx)
     this.logDebug(`${levelsCount - Category.getLevelsArray(this.category).length} level(s) deleted`)
@@ -49,18 +48,18 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     await super.beforeSuccess()
   }
 
-  //start of overridden methods from CategoryImportJob
-  async createReadStream () {
+  // Start of overridden methods from CategoryImportJob
+  async createReadStream() {
     const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
     return await collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
   }
 
-  async getOrCreateSummary () {
+  async getOrCreateSummary() {
     const stream = await this.createReadStream()
     return stream ? await CategoryManager.createImportSummaryFromStream(stream) : null
   }
 
-  extractItemExtraDef () {
+  extractItemExtraDef() {
     return R.pipe(
       R.omit(R.keys(keysExtra)),
       R.assoc(keysItem.location, {
@@ -69,8 +68,8 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     )(super.extractItemExtraDef())
   }
 
-  extractItemExtraProps (extra) {
-    const { srs_id, x, y } = extra
+  extractItemExtraProps(extra) {
+    const {srs_id, x, y} = extra
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
@@ -80,12 +79,12 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     return super.extractItemExtraProps(extraUpdated)
   }
 
-  //end of overridden methods from CategoryImportJob
+  // End of overridden methods from CategoryImportJob
 
-  //overridden from Job
-  async beforeEnd () {
+  // overridden from Job
+  async beforeEnd() {
     await super.beforeEnd()
-    //assoc imported category to context categories (to be used by NodeDefsImportJob)
+    // Assoc imported category to context categories (to be used by NodeDefsImportJob)
     this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))
   }
 }

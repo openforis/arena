@@ -1,12 +1,12 @@
-import { db } from '@server/db/db'
+import {db} from '@server/db/db'
 import * as R from 'ramda'
 
-import { dbTransformCallback, getSurveyDBSchema } from './surveySchemaRepositoryUtils';
-import { selectDate } from '@server/db/dbUtils';
+import {selectDate} from '@server/db/dbUtils'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import {dbTransformCallback, getSurveyDBSchema} from './surveySchemaRepositoryUtils'
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? alias + '.' : ''
@@ -23,35 +23,34 @@ export const insertSurvey = async (survey, client = db) =>
       VALUES ($1, $2, $3)
       RETURNING ${surveySelectFields()}
     `,
-    [Survey.getUuid(survey), survey.props, survey.ownerUuid],
-    def => dbTransformCallback(def, true)
+  [Survey.getUuid(survey), survey.props, survey.ownerUuid],
+  def => dbTransformCallback(def, true)
   )
 
 // ============== READ
 
 export const fetchAllSurveyIds = async (client = db) =>
-  await client.map(`SELECT id FROM survey`, [], R.prop('id'))
+  await client.map('SELECT id FROM survey', [], R.prop('id'))
 
 export const fetchUserSurveys = async (user, offset = 0, limit = null, client = db) => {
   const checkAccess = !User.isSystemAdmin(user)
 
   return await client.map(`
     SELECT ${surveySelectFields('s')} 
-      ${checkAccess ? `, json_build_array(row_to_json(g.*)) AS auth_groups` : ''}
+      ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
     FROM survey s
     ${checkAccess ? `
     JOIN auth_group g
       ON s.uuid = g.survey_uuid
     JOIN auth_group_user gu
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
-    :
-    ''}
+    : ''}
     ORDER BY s.date_modified DESC
     LIMIT ${limit ? limit : 'ALL'}
     OFFSET ${offset}
   `,
-    [User.getUuid(user)],
-    def => dbTransformCallback(def, true)
+  [User.getUuid(user)],
+  def => dbTransformCallback(def, true)
   )
 }
 
@@ -66,10 +65,9 @@ export const countUserSurveys = async (user, client = db) => {
       ON s.uuid = g.survey_uuid
     JOIN auth_group_user gu
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
-    :
-    ''}
+    : ''}
     `,
-    [User.getUuid(user)]
+  [User.getUuid(user)]
   )
 }
 
@@ -89,14 +87,14 @@ export const fetchSurveyById = async (surveyId, draft = false, client = db) =>
 
 export const fetchDependencies = async (surveyId, client = db) =>
   await client.oneOrNone(
-      `SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1`,
+    'SELECT meta#>\'{dependencyGraphs}\' as dependencies FROM survey WHERE id = $1',
     [surveyId],
     R.prop('dependencies')
   )
 
 // ============== UPDATE
 export const updateSurveyProp = async (surveyId, key, value, client = db) => {
-  const prop = { [key]: value }
+  const prop = {[key]: value}
 
   return await client.one(`
     UPDATE survey
@@ -105,7 +103,7 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
     WHERE id = $2
     RETURNING ${surveySelectFields()}
   `, [JSON.stringify(prop), surveyId],
-    def => dbTransformCallback(def, true)
+  def => dbTransformCallback(def, true)
   )
 }
 
@@ -121,7 +119,7 @@ export const publishSurveyProps = async (surveyId, client = db) =>
     WHERE
         id = $1
     `,
-    [surveyId]
+  [surveyId]
   )
 
 export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
@@ -139,7 +137,7 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
 
 // ============== DELETE
 export const deleteSurvey = async (id, client = db) =>
-  await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
+  await client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
   const propsUpdateCond = R.pipe(
@@ -152,7 +150,7 @@ export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = 
     SET props = props ${propsUpdateCond}
     WHERE id = $1
   `,
-    [id]
+  [id]
   )
 }
 

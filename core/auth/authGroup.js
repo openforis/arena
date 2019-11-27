@@ -13,25 +13,25 @@ export const keys = {
 }
 
 export const permissions = {
-  // surveys
+  // Surveys
   surveyCreate: 'surveyCreate',
 
-  // only owner and administrator can delete survey
+  // Only owner and administrator can delete survey
   // edit survey info props, edit nodeDefs, edit categories, edit taxonomies, publishSurvey
   surveyEdit: 'surveyEdit',
 
-  // records
+  // Records
   recordCreate: 'recordCreate',
   recordEdit: 'recordEdit',
   recordView: 'recordView',
   recordCleanse: 'recordCleanse',
   recordAnalyse: 'recordAnalyse',
 
-  // users
+  // Users
   userEdit: 'userEdit',
   userInvite: 'userInvite',
 
-  // edit
+  // Edit
   // only owner and admin - for now
   permissionsEdit: 'permissionsEdit',
 }

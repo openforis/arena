@@ -13,12 +13,12 @@ export const getActiveJob = R.pipe(getState, R.propOr(null, keys.activeJob))
 
 export const startJob = (job, onComplete = null, autoHide = false) => R.assoc(
   keys.activeJob,
-  { ...job, onComplete, autoHide }
+  {...job, onComplete, autoHide}
 )
 
 export const updateActiveJob = job => state =>
-  job ?
-    R.assoc(
+  job
+    ? R.assoc(
       keys.activeJob,
       {
         ...R.propOr({}, keys.activeJob, state),

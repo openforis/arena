@@ -1,26 +1,25 @@
-import React, { useEffect, useRef } from 'react'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import React, {useEffect, useRef} from 'react'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
+import {withRouter} from 'react-router-dom'
 
-import { getUrlParam } from '@webapp/utils/routerUtils'
+import {getUrlParam} from '@webapp/utils/routerUtils'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import {useOnUpdate} from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 
-import SurveyFormView from '../surveyForm/surveyFormView'
-
 import * as Authorizer from '@core/auth/authorizer'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import SurveyFormView from '../surveyForm/surveyFormView'
+import {resetForm} from '../surveyForm/actions'
 import * as RecordState from './recordState'
 
-import { resetForm } from '../surveyForm/actions'
 import {
   checkInRecord,
   checkOutRecord,
@@ -49,10 +48,10 @@ const RecordView = props => {
       recordNodesUpdate, nodeValidationsUpdate, nodesUpdateCompleted, recordDeleted
     } = props
 
-    // check in record
+    // Check in record
     checkInRecord(recordUuidUrlParam, preview, parentNodeUuidUrlParam)
 
-    // add websocket event listeners
+    // Add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
@@ -66,12 +65,12 @@ const RecordView = props => {
       applicationError(history, key, params)
     })
 
-    // add beforeunload event listener
+    // Add beforeunload event listener
     window.addEventListener('beforeunload', componentUnload)
   }
 
   const componentUnload = () => {
-    // remove web socket listeners
+    // Remove web socket listeners
     AppWebSocket.off(WebSocketEvents.nodesUpdate)
     AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
     AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
@@ -79,16 +78,16 @@ const RecordView = props => {
     AppWebSocket.off(WebSocketEvents.recordSessionExpired)
     AppWebSocket.off(WebSocketEvents.applicationError)
 
-    const { recordUuidUrlParam, checkOutRecord, resetForm } = props
+    const {recordUuidUrlParam, checkOutRecord, resetForm} = props
 
     if (recordLoadedRef.current) {
       checkOutRecord(recordUuidUrlParam)
     }
 
-    // reset form
+    // Reset form
     resetForm()
 
-    // remove beforeunload event listener
+    // Remove beforeunload event listener
     window.removeEventListener('beforeunload', componentUnload)
   }
 
@@ -118,7 +117,7 @@ const RecordView = props => {
     : null
 }
 
-const mapStateToProps = (state, { match, location }) => {
+const mapStateToProps = (state, {match, location}) => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
@@ -128,11 +127,11 @@ const mapStateToProps = (state, { match, location }) => {
 
   return {
     canEditRecord: Authorizer.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
-    recordLoaded: !!record,
+    recordLoaded: Boolean(record),
     recordUuidUrlParam: getUrlParam('recordUuid')(match) || recordUuidPreview,
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
     surveyCycleKey,
-    preview: !!recordUuidPreview,
+    preview: Boolean(recordUuidPreview),
   }
 }
 

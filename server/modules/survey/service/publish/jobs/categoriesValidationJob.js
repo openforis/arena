@@ -6,12 +6,11 @@ import * as Validation from '@core/validation/validation'
 import * as CategoryManager from '../../../../category/manager/categoryManager'
 
 export default class CategoriesValidationJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(CategoriesValidationJob.type, params)
   }
 
-  async execute (tx) {
+  async execute(tx) {
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId, true, true, tx)
 
     const categoriesArr = Object.values(categories)
@@ -23,6 +22,7 @@ export default class CategoriesValidationJob extends Job {
       if (!Validation.isValid(validation)) {
         this.addError(Validation.getFieldValidations(validation), Category.getName(category))
       }
+
       this.incrementProcessedItems()
     }
 

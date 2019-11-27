@@ -1,4 +1,4 @@
-import { exportReducer } from '../../utils/reduxUtils'
+import {exportReducer} from '../../utils/reduxUtils'
 
 import {
   appErrorCreate,
@@ -8,9 +8,9 @@ import {
 import * as ErrorsState from './appErrorsState'
 
 const actionHandlers = {
-  [appErrorCreate]: (state, { error }) => ErrorsState.assocAppError(error)(state),
+  [appErrorCreate]: (state, {error}) => ErrorsState.assocAppError(error)(state),
 
-  [appErrorDelete]: (state, { error }) => ErrorsState.dissocAppError(error)(state),
+  [appErrorDelete]: (state, {error}) => ErrorsState.dissocAppError(error)(state),
 }
 
 export default exportReducer(actionHandlers)

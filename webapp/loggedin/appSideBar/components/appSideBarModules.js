@@ -1,15 +1,13 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 
+import * as SideBarModule from '../sidebarModule'
 import AppSideBarModule from './appSideBarModule'
 import AppSideBarPopupMenu from './appSideBarPopupMenu'
 
-import * as SideBarModule from '../sidebarModule'
-
 const AppSideBarModules = props => {
+  const {user, surveyInfo, pathname, sideBarOpened} = props
 
-  const { user, surveyInfo, pathname, sideBarOpened } = props
-
-  // popup menu module
+  // Popup menu module
   const [modulePopupMenu, setModulePopupMenu] = useState(null)
 
   return (

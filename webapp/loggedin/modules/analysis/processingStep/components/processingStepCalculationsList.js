@@ -1,15 +1,14 @@
-import React, { useRef } from 'react'
-import { connect } from 'react-redux'
+import React, {useRef} from 'react'
+import {connect} from 'react-redux'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import useI18n from '@webapp/commonComponents/hooks/useI18n'
+import {createProcessingStepCalculation, putProcessingStepCalculationIndex} from '../actions'
 import ProcessingStepCalculationsListItem from './processingStepCalculationsListItem'
 
 import useProcessingStepCalculationsListState from './useProcessingStepCalculationsListState'
-
-import { createProcessingStepCalculation, putProcessingStepCalculationIndex } from '../actions'
 
 const ProcessingStepCalculationsList = props => {
   const {
@@ -18,7 +17,7 @@ const ProcessingStepCalculationsList = props => {
   } = props
 
   const placeholderRef = useRef(null)
-  const { dragging, onDragStart, onDragEnd, onDragOver } = useProcessingStepCalculationsListState(placeholderRef, putProcessingStepCalculationIndex)
+  const {dragging, onDragStart, onDragEnd, onDragOver} = useProcessingStepCalculationsListState(placeholderRef, putProcessingStepCalculationIndex)
 
   const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
   const i18n = useI18n()
@@ -31,7 +30,7 @@ const ProcessingStepCalculationsList = props => {
         <div className="form-label processing-step__calculations-label">
           {i18n.t('processingStepView.calculationSteps')}
           <button className="btn-s btn-transparent"
-                  onClick={() => createProcessingStepCalculation()}>
+            onClick={() => createProcessingStepCalculation()}>
             <span className="icon icon-plus icon-14px"/>
           </button>
         </div>
@@ -67,5 +66,5 @@ ProcessingStepCalculationsList.defaultProps = {
 
 export default connect(
   null,
-  { createProcessingStepCalculation, putProcessingStepCalculationIndex }
+  {createProcessingStepCalculation, putProcessingStepCalculationIndex}
 )(ProcessingStepCalculationsList)

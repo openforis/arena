@@ -1,29 +1,27 @@
-import React, { useEffect, useRef } from 'react'
+import React, {useEffect, useRef} from 'react'
 import ReactDOM from 'react-dom'
 
+import {elementOffset} from '@webapp/utils/domUtils'
+import * as SideBarModule from '../sidebarModule'
 import AppSideBarSubModules from './appSideBarSubModules'
 
-import * as SideBarModule from '../sidebarModule'
-
-import { elementOffset } from '@webapp/utils/domUtils'
-
 const AppSideBarPopupMenu = props => {
-  const { module, pathname, onClose } = props
+  const {module, pathname, onClose} = props
   const moduleElement = SideBarModule.getDomElement(module)
   const key = SideBarModule.getKey(module)
 
-  // used to check if mouse is within popup-menu or module link
+  // Used to check if mouse is within popup-menu or module link
   const inPopupMenu = useRef(false)
   const inModuleLink = useRef(true)
 
-  // if after 200 ms mouse is neither within popup-menu or module link closes popup menu
+  // If after 200 ms mouse is neither within popup-menu or module link closes popup menu
   const closePopupMenuHandler = () => setTimeout(() => {
     if (!(inPopupMenu.current || inModuleLink.current)) {
       onClose(null)
     }
   }, 200)
 
-  // onMount or module change, attach onmouseleave and onmousenter event listener on popupMenuElement and moduleElement
+  // OnMount or module change, attach onmouseleave and onmousenter event listener on popupMenuElement and moduleElement
   useEffect(() => {
     inPopupMenu.current = false
     inModuleLink.current = true
@@ -31,8 +29,9 @@ const AppSideBarPopupMenu = props => {
     const onmouseenter = () => {
       inModuleLink.current = true
     }
-    const onmouseleave = (e) => {
-      // check why mouseleave fires on inner elements
+
+    const onmouseleave = e => {
+      // Check why mouseleave fires on inner elements
       if (e.target === moduleElement) {
         inModuleLink.current = false
         closePopupMenuHandler()
@@ -52,7 +51,7 @@ const AppSideBarPopupMenu = props => {
     ReactDOM.createPortal(
       <div
         className="app-sidebar__popup-menu"
-        style={{ top: elementOffset(moduleElement).top - 1 }}
+        style={{top: elementOffset(moduleElement).top - 1}}
         onMouseEnter={() => {
           inPopupMenu.current = true
         }}

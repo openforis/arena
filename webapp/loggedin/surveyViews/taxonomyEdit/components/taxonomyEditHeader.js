@@ -1,17 +1,17 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import {FormItem, Input} from '@webapp/commonComponents/form/input'
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 const TaxonomyEditHeader = props => {
-  const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props
+  const {surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile} = props
   const i18n = useI18n()
   const validation = Validation.getValidation(taxonomy)
 
@@ -34,7 +34,9 @@ const TaxonomyEditHeader = props => {
           <UploadButton
             label={i18n.t('common.csvImport')}
             accept=".csv"
-            onChange={async ([file]) => { await uploadTaxonomyFile(taxonomy, file) }}/>
+            onChange={async ([file]) => {
+              await uploadTaxonomyFile(taxonomy, file)
+            }}/>
 
         }
         <DownloadButton

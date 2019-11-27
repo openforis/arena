@@ -13,16 +13,16 @@ export const getCategories = R.pipe(
 export const getCategoriesArray = R.pipe(
   getCategories,
   R.values,
-  //sort by name
+  // Sort by name
   R.sort((category1, category2) => {
     const name1 = Category.getName(category1)
     const name2 = Category.getName(category2)
 
     return name1 < name2
       ? -1
-      : name1 > name2
+      : (name1 > name2
         ? 1
-        : 0
+        : 0)
   })
 )
 

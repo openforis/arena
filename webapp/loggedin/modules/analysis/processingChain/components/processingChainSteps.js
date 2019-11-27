@@ -1,15 +1,14 @@
 import './processingChainSteps.scss'
 
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import {useI18n} from '@webapp/commonComponents/hooks'
+import {createProcessingStep, fetchProcessingSteps} from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import ProcessingChainStep from './processingChainStep'
-
-import { createProcessingStep, fetchProcessingSteps } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainSteps = props => {
   const {
@@ -45,7 +44,6 @@ const ProcessingChainSteps = props => {
       </div>
     </div>
   )
-
 }
 
 ProcessingChainSteps.defaultProps = {
@@ -54,5 +52,5 @@ ProcessingChainSteps.defaultProps = {
 
 export default connect(
   null,
-  { createProcessingStep, fetchProcessingSteps }
+  {createProcessingStep, fetchProcessingSteps}
 )(ProcessingChainSteps)

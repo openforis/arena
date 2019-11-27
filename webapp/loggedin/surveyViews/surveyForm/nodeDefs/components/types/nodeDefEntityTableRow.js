@@ -1,26 +1,24 @@
 import React from 'react'
 
-import NodeDefEntityTableCell from './nodeDefEntityTableCell'
-import NodeDeleteButton from '../nodeDeleteButton'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { elementOffset } from '@webapp/utils/domUtils'
+import {elementOffset} from '@webapp/utils/domUtils'
+import NodeDeleteButton from '../nodeDeleteButton'
+import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 
 class NodeDefEntityTableRow extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.placeholderRef = React.createRef()
     this.rowRef = React.createRef()
-    this.state = { dragged: null }
+    this.state = {dragged: null}
   }
 
-  dragStart (evt) {
-    this.setState({ dragged: evt.currentTarget }, () => {
-      const { dragged } = this.state
+  dragStart(evt) {
+    this.setState({dragged: evt.currentTarget}, () => {
+      const {dragged} = this.state
       const placeholder = this.placeholderRef.current
 
       placeholder.style.width = `${dragged.clientWidth}px`
@@ -32,8 +30,8 @@ class NodeDefEntityTableRow extends React.Component {
     evt.dataTransfer.setData('text/html', evt.currentTarget)
   }
 
-  dragOver (evt) {
-    const { dragged } = this.state
+  dragOver(evt) {
+    const {dragged} = this.state
     const placeholder = this.placeholderRef.current
 
     evt.preventDefault()
@@ -44,7 +42,7 @@ class NodeDefEntityTableRow extends React.Component {
     if (evt.target !== placeholder) {
       const overElement = evt.target
 
-      const { left } = elementOffset(overElement)
+      const {left} = elementOffset(overElement)
       const relX = evt.clientX - left
       const width = overElement.offsetWidth / 2
       const parent = evt.target.parentNode
@@ -53,17 +51,17 @@ class NodeDefEntityTableRow extends React.Component {
     }
   }
 
-  dragEnd () {
-    const { nodeDef, putNodeDefLayoutProp } = this.props
+  dragEnd() {
+    const {nodeDef, putNodeDefLayoutProp} = this.props
 
-    const { dragged } = this.state
+    const {dragged} = this.state
     const placeholder = this.placeholderRef.current
 
     dragged.style.display = 'block'
     placeholder.style.display = 'none'
 
     placeholder.parentNode.insertBefore(dragged, placeholder)
-    this.setState({ dragged: null })
+    this.setState({dragged: null})
 
     const childNodes = this.rowRef.current.childNodes
     const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
@@ -71,8 +69,7 @@ class NodeDefEntityTableRow extends React.Component {
     putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, uuids)
   }
 
-  render () {
-
+  render() {
     const {
       edit, nodeDef, nodeDefColumns, node,
       canEditRecord, canEditDef,
@@ -80,16 +77,16 @@ class NodeDefEntityTableRow extends React.Component {
       removeNode,
     } = this.props
 
-    const { dragged } = this.state
+    const {dragged} = this.state
 
-    const className = `survey-form__node-def-entity-table-row` +
+    const className = 'survey-form__node-def-entity-table-row' +
       (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
       (dragged ? ' drag-in-progress' : '')
 
     return (
       <div ref={this.rowRef}
-           className={className}
-           id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
+        className={className}
+        id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
 
         {
           nodeDefColumns
@@ -112,7 +109,7 @@ class NodeDefEntityTableRow extends React.Component {
           edit &&
           <div
             className="react-grid-item"
-            style={{ width: 100 + 'px', display: 'none' }}
+            style={{width: 100 + 'px', display: 'none'}}
             ref={this.placeholderRef}
           />
         }
@@ -128,7 +125,6 @@ class NodeDefEntityTableRow extends React.Component {
 
       </div>
     )
-
   }
 }
 

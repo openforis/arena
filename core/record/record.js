@@ -1,17 +1,17 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import { uuidv4 } from '@core/uuid';
+import {uuidv4} from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
 import * as RecordStep from './recordStep'
 
-import { keys } from './_record/recordKeys'
+import {keys} from './_record/recordKeys'
 import * as RecordReader from './_record/recordReader'
 import * as RecordUpdater from './_record/recordUpdater'
 
-export { keys } from './_record/recordKeys'
+export {keys} from './_record/recordKeys'
 
 // ====== CREATE
 

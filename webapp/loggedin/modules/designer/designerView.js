@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 
 import * as Authorizer from '@core/auth/authorizer'
 
@@ -7,19 +7,19 @@ import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surv
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
-import FormDesignerView from './formDesigner/formDesignerView'
-import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
-
-import { appModules, appModuleUri, designerModules } from '../../appModules'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import {appModules, appModuleUri, designerModules} from '../../appModules'
 
-import { resetForm } from '../../surveyViews/surveyForm/actions'
+import {resetForm} from '../../surveyViews/surveyForm/actions'
+import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
+import FormDesignerView from './formDesigner/formDesignerView'
 
-const DesignerView = ({ canEditDef, resetForm }) => {
-
-  useEffect(() => { resetForm() }, [])
+const DesignerView = ({canEditDef, resetForm}) => {
+  useEffect(() => {
+    resetForm()
+  }, [])
 
   return (
     <SurveyDefsLoader
@@ -65,4 +65,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { resetForm })(DesignerView)
+export default connect(mapStateToProps, {resetForm})(DesignerView)

@@ -17,20 +17,17 @@ import * as JobState from './appJob/appJobState'
 import * as SideBarState from './appSideBar/appSidebarState'
 
 const reducers = [
-  { name: HomeState.stateKey, fn: homeReducer },
-  { name: AnalysisState.stateKey, fn: analysisReducer },
-  { name: DataState.stateKey, fn: dataReducer },
-  { name: SurveyViewsState.stateKey, fn: surveyViewsReducer },
-  { name: TableViewsState.stateKey, fn: tableViewsReducer },
-  { name: JobState.stateKey, fn: jobReducer },
-  { name: SideBarState.stateKey, fn: sidebarReducer },
+  {name: HomeState.stateKey, fn: homeReducer},
+  {name: AnalysisState.stateKey, fn: analysisReducer},
+  {name: DataState.stateKey, fn: dataReducer},
+  {name: SurveyViewsState.stateKey, fn: surveyViewsReducer},
+  {name: TableViewsState.stateKey, fn: tableViewsReducer},
+  {name: JobState.stateKey, fn: jobReducer},
+  {name: SideBarState.stateKey, fn: sidebarReducer},
 ]
 
 export {
   component,
   reducers,
 }
-
-
-
 

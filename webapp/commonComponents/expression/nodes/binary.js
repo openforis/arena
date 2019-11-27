@@ -3,11 +3,11 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import BinaryOperand, { BinaryOperandType } from './binaryOperand'
-import EditButtons from './editButtons'
 import Dropdown from '../../form/dropdown'
+import BinaryOperand, {BinaryOperandType} from './binaryOperand'
+import EditButtons from './editButtons'
 
-const Binary = (props) => {
+const Binary = props => {
   const {
     node, onChange,
     canDelete = false, onDelete,
@@ -29,7 +29,6 @@ const Binary = (props) => {
       {
         (isBoolean || !isLeftLiteral) &&
         <React.Fragment>
-
 
           <Dropdown
             className="operator"

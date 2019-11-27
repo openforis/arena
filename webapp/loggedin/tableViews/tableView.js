@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React, {useEffect} from 'react'
+import {connect} from 'react-redux'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import TableHeader from './components/tableHeader'
 import TableContent from './components/tableContent'
 
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as TableViewsState from './tableViewsState'
 
-import { initListItems, fetchListItems } from './actions'
+import {initListItems, fetchListItems} from './actions'
 
 const TableView = props => {
   const {
@@ -40,12 +40,12 @@ TableView.defaultProps = {
   rowHeaderComponent: () => <div></div>,
   rowComponent: () => <div></div>,
   noItemsLabelKey: 'common.noItems',
-  onRowClick: null, // function to be passed when an action has to be performed on row click
-  isRowActive: null, //function to be passed when a row must be highlighted
+  onRowClick: null, // Function to be passed when an action has to be performed on row click
+  isRowActive: null, // Function to be passed when a row must be highlighted
 }
 
 const mapStateToProps = (state, props) => {
-  let { module, moduleApiUri } = props
+  let {module, moduleApiUri} = props
   moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
 
   return {
@@ -59,5 +59,5 @@ const mapStateToProps = (state, props) => {
 
 export default connect(
   mapStateToProps,
-  { initListItems, fetchListItems }
+  {initListItems, fetchListItems}
 )(TableView)
