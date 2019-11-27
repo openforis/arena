@@ -1,3 +1,4 @@
+/* eslint-disable */
 //     JavaScript Expression Parser (JSEP) <%= version %>
 //     JSEP may be freely distributed under the MIT License
 //     http://jsep.from.so/
