@@ -1,8 +1,12 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -50,7 +54,7 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
       <div>
         {path}
       </div>
-      <div className='validation_report__message'>
+      <div className='validation-report__message'>
         <ValidationFieldMessages validation={row.validation} showKeys={false} showIcons={true} />
       </div>
       <div>
@@ -60,4 +64,9 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   )
 }
 
-export default ValidationReportRow
+const mapStateToProps = state => ({
+  user: AppState.getUser(state),
+  survey: SurveyState.getSurvey(state),
+})
+
+export default connect(mapStateToProps)(ValidationReportRow)

@@ -63,8 +63,9 @@ const getChildrenCountValidation = (validation, survey, showKeys, i18n) => {
   })
 }
 
-const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => validation => {
-  let ret = []
+const getValidationFieldMessages = (i18n, showKeys = true, survey) => validation => {
+  const messages = []
+
   R.pipe(
     Validation.getFieldValidations,
     Object.entries,
@@ -74,20 +75,20 @@ const getValidationFieldMessages = (i18n, showKeys = true, survey = {}) => valid
       // and add the nodeDefUuid name as param
       if (field === RecordValidations.keys.childrenCount) {
         const childrenCountValidation = getChildrenCountValidation(Validation.getFieldValidations(childValidation), survey, showKeys, i18n)
-        ret = ret.concat(childrenCountValidation)
+        messages.push(...childrenCountValidation)
       } else {
         const [severity, message] = getValidationFieldErrorMessage(i18n, field)(childValidation)
-        ret.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
+        messages.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
       }
     }),
   )(validation)
 
   R.pipe(
     getValidationErrorMessages(i18n),
-    x => { if (x.length) ret.push(x) }
+    x => { if (x.length) messages.push(x) }
   )(validation)
 
-  return ret
+  return messages
 }
 
 const ValidationFieldMessages = ({ validation, showKeys = true, showIcons = false, survey }) => {
@@ -96,9 +97,9 @@ const ValidationFieldMessages = ({ validation, showKeys = true, showIcons = fals
   return R.pipe(
     getValidationFieldMessages(i18n, showKeys, survey),
     R.addIndex(R.map)(([type, message], i) =>
-      <div className={`validation_field_message ${type}`} key={i}>
+      <div className={`validation-field_message ${type}`} key={i}>
         { showIcons && <span className="icon icon-warning icon-12px icon-left" /> }
-        <Markdown className="validation_field_message__text" source={message}/>
+        <Markdown className="validation-field-message__text" source={message}/>
       </div>
     )
   )(validation)

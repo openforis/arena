@@ -1,6 +1,6 @@
 @import "~@webapp/style/vars";
 
-.validation_field_message {
+.validation-field_message {
   color: white;
 
   .icon {
@@ -15,8 +15,8 @@
   &.error .icon {
     color: $red;
   }
+}
 
-  .validation_field_message__text {
-    display: inline-block;
-  }
+.validation-field-message__text {
+  display: inline-block;
 }

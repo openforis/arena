@@ -1,6 +1,6 @@
 @import "~@webapp/style/vars";
 
-.validation_report__table {
+.validation-report__table {
 
   .table__row {
     height: unset;
@@ -8,10 +8,10 @@
   }
 }
 
-.validation_report__message {
+.validation-report__message {
   justify-self: left;
 
-  .validation_field_message {
+  .validation-field_message {
     color: $black;
   }
 }
