@@ -2,6 +2,7 @@ import { parse as csvParser } from 'csv'
 import * as fs from 'fs'
 
 import Queue from '@core/queue'
+import * as StringUtils from '@core/stringUtils'
 
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
@@ -25,10 +26,12 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       }
     }
 
-    const _indexRowByHeaders = row =>
-      headers
-        ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: row[index] }), {})
-        : row
+    const _indexRowByHeaders = row => headers
+      ? headers.reduce(
+        (accRow, header, index) => Object.assign(accRow, { [header]: StringUtils.trim(row[index]) }),
+        {}
+      )
+      : row
 
     const processQueue = () => {
       (async () => {
