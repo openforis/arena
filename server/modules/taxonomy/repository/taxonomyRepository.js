@@ -42,6 +42,11 @@ export const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
  *   'swa': [TaxonVernacularNameObject1, TaxonVernacularNameObject2],
  *   'eng': [TaxonVernacularNameObject3, TaxonVernacularNameObject4]
  * }
+ * where every TaxonVernacularNameObject is like this:
+ * {
+ *   lang: 'eng',
+ *   name: 'English Name'
+ * }
  */
 const _insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
   R.pipe(R.values, R.flatten, R.map(vernacularName =>
