@@ -13,8 +13,9 @@ export default class Thread {
 
     this.logger = Log.getLogger('Thread')
 
-    if (!isMainThread)
-      {parentPort.on('message', this.messageHandler.bind(this))}
+    if (!isMainThread) {
+      parentPort.on('message', this.messageHandler.bind(this))
+    }
   }
 
   get user() {
@@ -37,10 +38,10 @@ export default class Thread {
     try {
       await this.onMessage(msg)
     } catch (error) {
-      const error = error.toString()
-      this.logger.error(`Error in thread:  ${error}`)
+      const errorMessage = error.toString()
+      this.logger.error(`Error in thread:  ${errorMessage}`)
       this.logger.error(error.stack)
-      this.postMessage({type: Thread.messageTypes.error, error})
+      this.postMessage({type: Thread.messageTypes.error, errorMessage})
     }
   }
 
@@ -48,7 +49,7 @@ export default class Thread {
    * Receive message from main event loop
    * @param msg
    */
-  async onMessage(msg) {
+  async onMessage(_msg) {
     // TO OVERRIDE
   }
 }

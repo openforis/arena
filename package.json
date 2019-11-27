@@ -18,18 +18,14 @@
     "dev:server": "npm run build:server:dev && npm-run-all --parallel nodemon:prod watch:server",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js --watch",
     "nodemon:prod": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
-    "test": "xo && mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
+    "test": "mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
     "test:docker": "test/run_docker_tests.sh",
     "postinstall": "webpack --display-error-details --config webpack.config.babel.js",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "lint-staged": {
-    "*.js": [
-      "xo --fix",
-      "git add"
-    ],
-    "*.jsx": [
+    "*.{js,jsx}": [
       "xo --fix",
       "git add"
     ]
@@ -47,6 +43,14 @@
       "unicorn/filename-case": "off",
       "comma-dangle": "off",
       "prefer-destructuring": "off",
+      "no-unused-vars": [
+        "warn",
+        {
+          "varsIgnorePattern": "^_",
+          "argsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ],
       "operator-linebreak": [
         "error",
         "after",
