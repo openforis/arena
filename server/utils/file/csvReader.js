@@ -2,7 +2,6 @@ import { parse as csvParser } from 'csv'
 import * as fs from 'fs'
 
 import Queue from '@core/queue'
-import * as StringUtils from '@core/stringUtils'
 
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
