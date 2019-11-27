@@ -1,21 +1,21 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
 
-import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import {setActiveSurvey} from '@webapp/survey/actions'
+import { setActiveSurvey } from '@webapp/survey/actions'
 import TableView from '../../../tableViews/tableView'
-import {appModuleUri, homeModules} from '../../../appModules'
+import { appModuleUri, homeModules } from '../../../appModules'
 import SurveyListHeaderLeft from './components/surveyListHeaderLeft'
 import SurveyListRowHeader from './components/surveyListRowHeader'
 import SurveyListRow from './components/surveyListRow'
 
 const SurveyListView = props => {
-  const {user, surveyInfo, history, setActiveSurvey} = props
+  const { user, surveyInfo, history, setActiveSurvey } = props
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -49,4 +49,4 @@ const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
-export default connect(mapStateToProps, {setActiveSurvey})(SurveyListView)
+export default connect(mapStateToProps, { setActiveSurvey })(SurveyListView)

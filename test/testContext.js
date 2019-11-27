@@ -8,7 +8,7 @@ import * as User from '@core/user/user'
 let user = null
 let survey = null
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 const createAdminUser = async () => {
   await db.multi(`

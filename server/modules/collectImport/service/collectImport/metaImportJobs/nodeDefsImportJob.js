@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -46,19 +46,19 @@ const checkExpressionParserByType = {
     return R.join(' and ', exprParts)
   },
   check: collectCheck => {
-    const {expr} = CollectSurvey.getAttributes(collectCheck)
+    const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
   distance: collectCheck => {
-    const {max, to} = CollectSurvey.getAttributes(collectCheck)
+    const { max, to } = CollectSurvey.getAttributes(collectCheck)
     return `distance from $this to ${to} must be <= ${max}m`
   },
   pattern: collectCheck => {
-    const {regex} = CollectSurvey.getAttributes(collectCheck)
+    const { regex } = CollectSurvey.getAttributes(collectCheck)
     return `$this must respect the pattern: ${regex}`
   },
   unique: collectCheck => {
-    const {expr} = CollectSurvey.getAttributes(collectCheck)
+    const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
 }
@@ -74,7 +74,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   async execute(tx) {
-    const {collectSurvey, surveyId, user} = this.context
+    const { collectSurvey, surveyId, user } = this.context
 
     this._calculateTotal()
 
@@ -135,7 +135,7 @@ export default class NodeDefsImportJob extends Job {
     tx,
     field = null,
   ) {
-    const {defaultLanguage} = this.context
+    const { defaultLanguage } = this.context
 
     // 1. determine basic props
     const collectNodeDefName = CollectSurvey.getAttribute('name')(
@@ -225,7 +225,7 @@ export default class NodeDefsImportJob extends Job {
 
         if (childDefFields) {
           for (const childDefField of childDefFields) {
-            const {type: childType, field = null} = childDefField
+            const { type: childType, field = null } = childDefField
             const childDef = await this.insertNodeDef(
               surveyId,
               nodeDef,
@@ -297,7 +297,7 @@ export default class NodeDefsImportJob extends Job {
 
     nodeDefsInfo.push({
       uuid: nodeDefUuid,
-      ...(field ? {field} : {}),
+      ...(field ? { field } : {}),
     })
 
     this.nodeDefs[nodeDefUuid] = nodeDef
@@ -407,7 +407,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   async parseNodeDefDefaultValues(nodeDefUuid, collectNodeDef, tx) {
-    const {defaultLanguage} = this.context
+    const { defaultLanguage } = this.context
 
     const collectDefaultValues = CollectSurvey.getElementsByName('default')(
       collectNodeDef,
@@ -416,7 +416,7 @@ export default class NodeDefsImportJob extends Job {
     const defaultValues = []
 
     for (const collectDefaultValue of collectDefaultValues) {
-      const {value, expr, applyIf} = CollectSurvey.getAttributes(
+      const { value, expr, applyIf } = CollectSurvey.getAttributes(
         collectDefaultValue,
       )
       if (StringUtils.isNotBlank(expr) || StringUtils.isNotBlank(applyIf)) {
@@ -446,7 +446,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   async parseNodeDefValidationRules(nodeDefUuid, collectNodeDef, tx) {
-    const {defaultLanguage} = this.context
+    const { defaultLanguage } = this.context
 
     const elements = CollectSurvey.getElements(collectNodeDef)
     for (const element of elements) {
@@ -458,7 +458,7 @@ export default class NodeDefsImportJob extends Job {
           'message',
           defaultLanguage,
         )(element)
-        const {condition} = CollectSurvey.getAttributes(element)
+        const { condition } = CollectSurvey.getAttributes(element)
 
         await this.addNodeDefImportIssue(
           nodeDefUuid,
@@ -595,7 +595,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   _calculateTotal() {
-    const {collectSurvey} = this.context
+    const { collectSurvey } = this.context
     let count = 0
 
     const collectNodeDefRoot = CollectSurvey.getNodeDefRoot(collectSurvey)

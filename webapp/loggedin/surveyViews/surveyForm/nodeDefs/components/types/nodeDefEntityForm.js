@@ -1,7 +1,7 @@
 import './nodeDefEntityForm.scss'
 
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefErrorBadge from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefErrorBadge'
@@ -79,7 +79,7 @@ NodeDefEntityForm.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDef, nodes, entry} = props
+  const { nodeDef, nodes, entry } = props
 
   const getEntryProps = () => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)

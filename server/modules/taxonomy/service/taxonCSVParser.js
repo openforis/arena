@@ -20,7 +20,13 @@ export default class TaxonCSVParser {
   }
 
   async parseTaxon(row) {
-    const {family, genus, scientific_name, code, ...vernacularNamesByLang} = row
+    const {
+      family,
+      genus,
+      scientific_name,
+      code,
+      ...vernacularNamesByLang
+    } = row
 
     const taxon = Taxon.newTaxon(
       this.taxonomyUuid,
@@ -72,7 +78,7 @@ export default class TaxonCSVParser {
           Validation.newInstance(false, {}, [
             {
               key: errorKeyDuplicate,
-              params: {row: this.processed + 1, duplicateRow},
+              params: { row: this.processed + 1, duplicateRow },
             },
           ]),
         ),

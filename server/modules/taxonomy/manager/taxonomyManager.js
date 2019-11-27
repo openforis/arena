@@ -6,7 +6,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as ObjectUtils from '@core/objectUtils'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import {
   publishSurveySchemaTableProps,
@@ -416,7 +416,7 @@ export const deleteDraftTaxaByTaxonomyUuid = async (
       user,
       surveyId,
       ActivityLog.type.taxonomyTaxaDelete,
-      {[ActivityLog.keysContent.uuid]: taxonomyUuid},
+      { [ActivityLog.keysContent.uuid]: taxonomyUuid },
       true,
       t,
     ),

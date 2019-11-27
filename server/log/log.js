@@ -3,11 +3,11 @@ import log4js from 'log4js'
 const logger = log4js.getLogger('arena')
 
 // Only display color for terminals:
-const layout = process.stdout.isTTY ? {type: 'colored'} : {type: 'basic'}
+const layout = process.stdout.isTTY ? { type: 'colored' } : { type: 'basic' }
 
 log4js.configure({
   appenders: {
-    console: {type: 'console', layout},
+    console: { type: 'console', layout },
     // { file: { type: 'file', filename: 'arena.log' }
   },
   categories: {

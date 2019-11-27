@@ -3,14 +3,14 @@ import * as R from 'ramda'
 import * as Validation from '@core/validation/validation'
 import * as Node from '../node'
 
-import {keys} from './recordKeys'
+import { keys } from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
 import * as RecordReader from './recordReader'
 
 // ====== UPDATE
 
 export const mergeNodes = nodes => record => {
-  let recordUpdated = {...record}
+  let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated)) {
     recordUpdated[keys.nodes] = {}
   }
@@ -41,7 +41,7 @@ export const mergeNodes = nodes => record => {
 }
 
 export const assocNodes = nodes => record => {
-  let recordUpdated = {...record}
+  let recordUpdated = { ...record }
   if (!(keys.nodes in recordUpdated)) {
     recordUpdated[keys.nodes] = {}
   }
@@ -58,7 +58,7 @@ export const assocNodes = nodes => record => {
   return recordUpdated
 }
 
-export const assocNode = node => assocNodes({[Node.getUuid(node)]: node})
+export const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
 export const mergeNodeValidations = nodeValidations => record =>
   R.pipe(

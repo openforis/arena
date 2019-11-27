@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 
 const keys = {

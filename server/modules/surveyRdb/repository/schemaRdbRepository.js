@@ -1,5 +1,5 @@
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import {db} from '../../../db/db'
+import { db } from '../../../db/db'
 
 export const dropSchema = async (surveyId, client = db) =>
   await client.query(

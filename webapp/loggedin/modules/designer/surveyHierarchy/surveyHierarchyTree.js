@@ -1,9 +1,9 @@
 import * as d3 from 'd3'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import {elementOffset} from '@webapp/utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
-const svgMargin = {top: 40, right: 100, bottom: 40, left: 0}
+const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 
 const nodeWidth = 150
 const nodeHeight = 40
@@ -236,7 +236,7 @@ export default class SurveyHierarchyTree {
       .insert('path', 'g')
       .attr('class', 'link')
       .attr('d', d => {
-        const o = {x: node.x0, y: node.y0}
+        const o = { x: node.x0, y: node.y0 }
         return diagonal(o, o)
       })
 
@@ -257,7 +257,7 @@ export default class SurveyHierarchyTree {
       .duration(transitionDuration)
       .ease(easeExit)
       .attr('d', d => {
-        const o = {x: node.x, y: node.y}
+        const o = { x: node.x, y: node.y }
         return diagonal(o, o)
       })
       .style('opacity', 0)

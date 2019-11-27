@@ -1,10 +1,10 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
-import {db} from '@server/db/db'
-import {now} from '@server/db/dbUtils'
+import { db } from '@server/db/db'
+import { now } from '@server/db/dbUtils'
 
 const mergeProps = (def, draft) => {
-  const {props, propsDraft} = def
+  const { props, propsDraft } = def
 
   const propsMerged = draft ? R.mergeRight(props, propsDraft) : props
 
@@ -71,7 +71,7 @@ export const updateSurveySchemaTableProp = async (
      SET props_draft = props_draft || $1
      WHERE uuid = $2
      RETURNING *`,
-    [JSON.stringify({[key]: value}), recordUuid],
+    [JSON.stringify({ [key]: value }), recordUuid],
     def => dbTransformCallback(def, true),
   )
 

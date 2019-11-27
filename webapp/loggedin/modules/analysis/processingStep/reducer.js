@@ -1,9 +1,13 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
-import {appUserLogout} from '@webapp/app/actions'
-import {surveyCreate, surveyDelete, surveyUpdate} from '@webapp/survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
 import {
   processingStepCalculationCreate,
   processingStepCalculationForEditUpdate,
@@ -21,21 +25,21 @@ const actionHandlers = {
 
   [processingStepUpdate]: (
     state,
-    {processingStep, processingStepPrev, processingStepNext},
+    { processingStep, processingStepPrev, processingStepNext },
   ) =>
     ProcessingStepState.assocProcessingStep(
       processingStep,
       processingStepPrev,
       processingStepNext,
     )(state),
-  [processingStepPropsUpdate]: (state, {props}) =>
+  [processingStepPropsUpdate]: (state, { props }) =>
     ProcessingStepState.mergeProcessingStepProps(props)(state),
 
-  [processingStepCalculationCreate]: (state, {calculation}) =>
+  [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
-  [processingStepCalculationForEditUpdate]: (state, {uuid}) =>
+  [processingStepCalculationForEditUpdate]: (state, { uuid }) =>
     ProcessingStepState.assocCalculationUuidForEdit(uuid)(state),
-  [processingStepCalculationIndexUpdate]: (state, {indexFrom, indexTo}) =>
+  [processingStepCalculationIndexUpdate]: (state, { indexFrom, indexTo }) =>
     ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
 }
 

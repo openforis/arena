@@ -20,10 +20,10 @@ export const getSortPreparedStatement = sortCriteria => {
 
       return {
         clause: `${prev.clause}${i ? ', ' : ''} $/${paramName}:name/ ${order}`,
-        params: {...prev.params, [paramName]: curr.variable},
+        params: { ...prev.params, [paramName]: curr.variable },
       }
     },
-    {clause: '', params: {}},
+    { clause: '', params: {} },
   )
 }
 
@@ -56,7 +56,7 @@ export const getUnchosenVariables = availableVariables => sortCriteria =>
   )
 
 export const addCriteria = (variable, label, order) =>
-  R.append({variable, label, order})
+  R.append({ variable, label, order })
 
 export const deleteCriteria = pos => R.remove(pos, 1)
 

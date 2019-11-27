@@ -3,16 +3,16 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as cookieParser from 'cookie-parser'
 import * as fileUpload from 'express-fileupload'
-import {createTerminus} from '@godaddy/terminus'
+import { createTerminus } from '@godaddy/terminus'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as authApi from '@server/modules/auth/api/authApi'
 import * as WebSocket from '@server/utils/webSocket'
 import * as headerMiddleware from './middleware/headerMiddleware'
-import {jwtMiddleware} from './middleware/jwtMiddleware'
+import { jwtMiddleware } from './middleware/jwtMiddleware'
 import * as errorMiddleware from './middleware/errorMiddleware'
 import * as apiRouter from './apiRouter'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
@@ -27,12 +27,12 @@ export const run = async () => {
   const app = express()
 
   // ====== app initializations
-  app.use(bodyParser.json({limit: '5000kb'}))
+  app.use(bodyParser.json({ limit: '5000kb' }))
   app.use(cookieParser())
   app.use(
     fileUpload({
       // Limit upload to 1 GB
-      limits: {fileSize: 1024 * 1024 * 1024},
+      limits: { fileSize: 1024 * 1024 * 1024 },
       abortOnLimit: true,
       useTempFiles: true,
       tempFileDir: ProcessUtils.ENV.tempFolder,
@@ -43,7 +43,7 @@ export const run = async () => {
 
   app.use(/^\/api.*|^\/auth.*/, jwtMiddleware)
 
-  app.use(compression({threshold: 512}))
+  app.use(compression({ threshold: 512 }))
 
   app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
 
@@ -83,7 +83,7 @@ export const run = async () => {
 
   createTerminus(server, {
     signal: 'SIGINT',
-    healthChecks: {'/healthcheck': onHealthCheck},
+    healthChecks: { '/healthcheck': onHealthCheck },
     onSignal,
   })
 

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as Category from '@core/survey/category'
@@ -124,7 +124,7 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
   includeValidation = false,
   client = db,
 ) => {
-  const {categories} = await client.one(
+  const { categories } = await client.one(
     _getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation),
   )
   return categories || {}
@@ -137,7 +137,7 @@ export const fetchCategoryAndLevelsByUuid = async (
   includeValidation = false,
   client = db,
 ) => {
-  const {categories} = await client.one(
+  const { categories } = await client.one(
     `${_getFetchCategoriesAndLevelsQuery(
       surveyId,
       draft,
@@ -316,8 +316,8 @@ export const updateItems = async (surveyId, items, client = db) => {
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'category_item',
-      {name: 'uuid', cast: 'uuid'},
-      [{name: 'props_draft', cast: 'jsonb'}],
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'props_draft', cast: 'jsonb' }],
       values,
     ),
   )

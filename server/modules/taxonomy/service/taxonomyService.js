@@ -1,5 +1,5 @@
 import * as CSVWriter from '@server/utils/file/csvWriter'
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 

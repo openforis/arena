@@ -18,7 +18,7 @@ const getStateProp = (prop, defaultValue = null) =>
 // ==== taxonomy for edit
 
 export const initTaxonomyEdit = taxonomyUuid =>
-  taxonomyUuid ? {taxonomyUuid} : null
+  taxonomyUuid ? { taxonomyUuid } : null
 
 export const getTaxonomy = state => {
   const survey = SurveyState.getSurvey(state)

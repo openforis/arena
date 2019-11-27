@@ -1,11 +1,11 @@
 import './userListView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
-import {Link} from 'react-router-dom'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
@@ -14,12 +14,12 @@ import * as User from '@core/user/user'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import {appModuleUri, userModules} from '../../../appModules'
+import { appModuleUri, userModules } from '../../../appModules'
 import TableView from '../../../tableViews/tableView'
 
 const UsersHeaderLeft = props => {
   const i18n = useI18n()
-  const {canInvite} = props
+  const { canInvite } = props
 
   return (
     <div>
@@ -47,7 +47,7 @@ const UsersRowHeader = () => {
 }
 
 const UsersRow = props => {
-  const {row: userListItem, user, surveyInfo} = props
+  const { row: userListItem, user, surveyInfo } = props
   const i18n = useI18n()
 
   const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(
@@ -84,7 +84,7 @@ const UsersRow = props => {
   )
 }
 
-const UsersListView = ({canInvite, user, surveyInfo, history}) => {
+const UsersListView = ({ canInvite, user, surveyInfo, history }) => {
   const onRowClick = user =>
     history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
 

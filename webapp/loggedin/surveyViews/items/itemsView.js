@@ -4,7 +4,7 @@ import React from 'react'
 import ItemsTable from './itemsTable'
 
 const ItemsView = props => {
-  const {editedItem, itemEditComponent, itemEditProp, onClose} = props
+  const { editedItem, itemEditComponent, itemEditProp, onClose } = props
 
   const ItemEdit = itemEditComponent
 

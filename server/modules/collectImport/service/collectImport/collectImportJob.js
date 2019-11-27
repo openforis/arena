@@ -31,7 +31,7 @@ export default class CollectImportJob extends Job {
   }
 
   async beforeSuccess() {
-    const {surveyId} = this.context
+    const { surveyId } = this.context
 
     this.setResult({
       surveyId,
@@ -41,7 +41,7 @@ export default class CollectImportJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const {collectSurveyFileZip, surveyId} = this.context
+    const { collectSurveyFileZip, surveyId } = this.context
 
     if (collectSurveyFileZip) {
       collectSurveyFileZip.close()

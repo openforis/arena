@@ -1,8 +1,8 @@
 import './uploadButton.scss'
 
-import React, {useRef} from 'react'
+import React, { useRef } from 'react'
 import * as R from 'ramda'
-import {useI18n} from '../hooks'
+import { useI18n } from '../hooks'
 
 const checkFilesSize = (files, maxSizeMB) =>
   R.find(file => file.size > maxSizeMB * 1024 * 1024, files)
@@ -30,7 +30,7 @@ const UploadButton = props => {
       <input
         ref={fileInput}
         type="file"
-        style={{display: 'none'}}
+        style={{ display: 'none' }}
         accept={accept}
         onChange={() => {
           const files = fileInput.current.files

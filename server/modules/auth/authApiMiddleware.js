@@ -19,7 +19,7 @@ const checkPermission = (req, next, permissionFn, ...args) => {
 
 const requireSurveyPermission = permissionFn => async (req, res, next) => {
   try {
-    const {surveyId} = Request.getParams(req)
+    const { surveyId } = Request.getParams(req)
     const survey = await SurveyManager.fetchSurveyById(surveyId)
     const surveyInfo = Survey.getSurveyInfo(survey)
 
@@ -31,7 +31,7 @@ const requireSurveyPermission = permissionFn => async (req, res, next) => {
 
 const requireRecordPermission = permissionFn => async (req, res, next) => {
   try {
-    const {surveyId, recordUuid} = Request.getParams(req)
+    const { surveyId, recordUuid } = Request.getParams(req)
 
     const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
 
@@ -43,7 +43,7 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
 
 const requireUserPermission = permissionFn => async (req, res, next) => {
   try {
-    const {surveyId, userUuid} = Request.getParams(req)
+    const { surveyId, userUuid } = Request.getParams(req)
     const survey = await SurveyManager.fetchSurveyById(surveyId)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const user = await UserService.fetchUserByUuid(userUuid)

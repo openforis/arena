@@ -1,12 +1,12 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as SideBarModule from '../sidebarModule'
 
 const AppSideBarModuleLink = props => {
-  const {module, pathname, showLabel, disabled} = props
+  const { module, pathname, showLabel, disabled } = props
 
   const active = SideBarModule.isActive(pathname)(module)
   const root = SideBarModule.isRoot(module)

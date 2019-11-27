@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -109,7 +109,7 @@ AttributesSelector.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDefUuidEntity} = props
+  const { nodeDefUuidEntity } = props
 
   const survey = SurveyState.getSurvey(state)
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)

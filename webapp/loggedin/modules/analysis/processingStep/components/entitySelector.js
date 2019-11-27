@@ -1,8 +1,8 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
 import * as Survey from '@core/survey/survey'
@@ -41,7 +41,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const {processingStep, entities, calculationEditorOpened, onChange} = props
+  const { processingStep, entities, calculationEditorOpened, onChange } = props
 
   const entity = entities.find(
     R.propEq('key', ProcessingStep.getEntityUuid(processingStep)),
@@ -69,7 +69,7 @@ const EntitySelector = props => {
   )
 }
 
-const mapStateToProps = (state, {processingStepPrev}) => {
+const mapStateToProps = (state, { processingStepPrev }) => {
   const survey = SurveyState.getSurvey(state)
   const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
     Survey.getNodeDefByUuid(entityUuid)(survey),

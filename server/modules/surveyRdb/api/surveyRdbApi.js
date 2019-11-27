@@ -3,7 +3,7 @@ import * as Response from '@server/utils/response'
 
 import * as SurveyRdbService from '../service/surveyRdbService'
 
-import {requireRecordListViewPermission} from '../../auth/authApiMiddleware'
+import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
 
 export const init = app => {
   app.post(
@@ -47,7 +47,7 @@ export const init = app => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, cycle, nodeDefUuidTable} = Request.getParams(req)
+        const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
         const filter = Request.getJsonParam(req, 'filter', null)
 
         const count = await SurveyRdbService.countTable(
@@ -69,7 +69,7 @@ export const init = app => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, cycle, nodeDefUuidTable} = Request.getParams(req)
+        const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
         const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
         const filter = Request.getJsonParam(req, 'filter')
         const sort = Request.getJsonParam(req, 'sort', '')

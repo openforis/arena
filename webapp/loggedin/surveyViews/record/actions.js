@@ -7,7 +7,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-import {debounceAction} from '@webapp/utils/reduxUtils'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
@@ -19,9 +19,9 @@ import {
   showAppSaving,
   hideAppSaving,
 } from '@webapp/app/actions'
-import {showNotification} from '@webapp/app/appNotification/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 
-import {appModules, appModuleUri, dataModules} from '../../appModules'
+import { appModules, appModuleUri, dataModules } from '../../appModules'
 import * as RecordState from './recordState'
 
 export const recordCreate = 'survey/record/create'
@@ -40,7 +40,7 @@ export const recordNodesUpdate = nodes => (dispatch, getState) => {
     dispatch(hideAppLoader())
   }
 
-  dispatch({type: nodesUpdate, nodes})
+  dispatch({ type: nodesUpdate, nodes })
 }
 
 export const nodeValidationsUpdate = ({
@@ -48,13 +48,13 @@ export const nodeValidationsUpdate = ({
   recordValid,
   validations,
 }) => dispatch =>
-  dispatch({type: validationsUpdate, recordUuid, recordValid, validations})
+  dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
 const _navigateToModuleDataHome = history =>
   history.push(appModuleUri(appModules.data))
 
 export const recordDeleted = history => dispatch => {
-  dispatch({type: recordDelete})
+  dispatch({ type: recordDelete })
   dispatch(showNotification('recordView.justDeleted'))
   _navigateToModuleDataHome(history)
 }
@@ -93,7 +93,7 @@ export const createRecord = (history, preview = false) => async (
 
   const recordUuid = Record.getUuid(record)
   if (preview) {
-    dispatch({type: recordUuidPreviewUpdate, recordUuid})
+    dispatch({ type: recordUuidPreviewUpdate, recordUuid })
   } else {
     history.push(`${appModuleUri(dataModules.record)}${recordUuid}`)
   }
@@ -105,7 +105,7 @@ export const createNodePlaceholder = (
   defaultValue,
 ) => dispatch => {
   const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
-  dispatch(recordNodesUpdate({[Node.getUuid(node)]: node}))
+  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
 }
 
 /**
@@ -130,7 +130,7 @@ export const updateNode = (
     R.assoc(Node.keys.dirty, true),
   )(node)
 
-  dispatch(recordNodesUpdate({[Node.getUuid(node)]: nodeToUpdate}))
+  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
   dispatch(
     _updateNodeDebounced(
       nodeToUpdate,
@@ -170,7 +170,9 @@ export const updateRecordStep = (step, history) => async (
   const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
-  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, {step})
+  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, {
+    step,
+  })
 
   history.push(appModuleUri(appModules.data))
 }
@@ -184,7 +186,7 @@ export const nodesUpdateCompleted = () => dispatch => dispatch(hideAppSaving())
  */
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch(showAppSaving())
-  dispatch({type: nodeDelete, node})
+  dispatch({ type: nodeDelete, node })
 
   const surveyId = SurveyState.getSurveyId(getState())
   await axios.delete(
@@ -206,7 +208,7 @@ export const deleteRecord = history => async (dispatch, getState) => {
 }
 
 export const deleteRecordUuidPreview = () => dispatch =>
-  dispatch({type: recordUuidPreviewUpdate, recordUuid: null})
+  dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
 
 /**
  * ============
@@ -221,7 +223,7 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (
 
   const surveyId = SurveyState.getSurveyId(getState())
   const {
-    data: {record},
+    data: { record },
   } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`, {
     draft,
   })
@@ -257,7 +259,7 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (
       formPageNodeUuidByNodeDefUuid,
     })
   } else {
-    dispatch({type: recordLoad, record})
+    dispatch({ type: recordLoad, record })
   }
 
   // Hide app loader on record edit

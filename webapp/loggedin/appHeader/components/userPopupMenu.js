@@ -1,22 +1,22 @@
 import './userPopupMenu.scss'
 
-import React, {useEffect, useRef} from 'react'
-import {connect} from 'react-redux'
-import {Link} from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
 import * as User from '@core/user/user'
 import * as AppState from '@webapp/app/appState'
 
-import {logout} from '@webapp/app/actions'
+import { logout } from '@webapp/app/actions'
 
-import {clickedOutside} from '@webapp/utils/domUtils'
-import {appModuleUri, homeModules, userModules} from '../../appModules'
+import { clickedOutside } from '@webapp/utils/domUtils'
+import { appModuleUri, homeModules, userModules } from '../../appModules'
 
 const UserPopupMenu = props => {
-  const {user, logout, onClose} = props
+  const { user, logout, onClose } = props
 
   const i18n = useI18n()
   const elementRef = useRef(null)
@@ -95,4 +95,4 @@ const mapStateToProps = state => ({
   user: AppState.getUser(state),
 })
 
-export default connect(mapStateToProps, {logout})(UserPopupMenu)
+export default connect(mapStateToProps, { logout })(UserPopupMenu)

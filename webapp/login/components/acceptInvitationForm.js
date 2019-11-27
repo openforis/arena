@@ -1,10 +1,10 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {acceptInvitation, setLoginError} from '../actions'
-import {useAcceptInvitationFormState} from './useAcceptInvitationFormState'
+import { acceptInvitation, setLoginError } from '../actions'
+import { useAcceptInvitationFormState } from './useAcceptInvitationFormState'
 
 const AcceptInvitationForm = props => {
   const i18n = useI18n()

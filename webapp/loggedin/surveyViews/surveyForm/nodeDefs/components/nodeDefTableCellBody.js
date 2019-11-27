@@ -1,10 +1,10 @@
 import './nodeDefTableCellBody.scss'
 
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -46,7 +46,7 @@ const NodeDefMultipleTableCell = props => {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [nodeValues, setNodeValues] = useState([])
 
-  const {surveyInfo, nodeDef, nodes, lang, canEditRecord} = props
+  const { surveyInfo, nodeDef, nodes, lang, canEditRecord } = props
 
   useEffect(() => {
     const nodeValuesUpdate = getNodeValues(surveyInfo, nodeDef, nodes, lang)
@@ -100,7 +100,7 @@ const NodeDefTableCellBody = props => {
       !entryDataQuery ? (
         <NodeDefMultipleTableCell {...props} lang={surveyLanguage} />
       ) : (
-        React.createElement(NodeDefUiProps.getComponent(nodeDef), {...props})
+        React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
       )}
     </NodeDefErrorBadge>
   )

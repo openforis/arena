@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import Tooltip from '@webapp/commonComponents/tooltip'
 import ExpressionEditor from '@webapp/commonComponents/expression/expressionEditor'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as ValidationResult from '@core/validation/validationResult'

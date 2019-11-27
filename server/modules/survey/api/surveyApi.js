@@ -25,9 +25,9 @@ export const init = app => {
           languages: [surveyReq.lang],
         })
 
-        res.json({survey})
+        res.json({ survey })
       } else {
-        res.json({validation})
+        res.json({ validation })
       }
     } catch (error) {
       next(error)
@@ -38,11 +38,11 @@ export const init = app => {
   app.get('/surveys', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const {offset, limit} = Request.getParams(req)
+      const { offset, limit } = Request.getParams(req)
 
       const list = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
 
-      res.json({list})
+      res.json({ list })
     } catch (error) {
       next(error)
     }
@@ -65,7 +65,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, draft, validate} = Request.getParams(req)
+        const { surveyId, draft, validate } = Request.getParams(req)
         const user = R.pipe(
           Request.getUser,
           User.assocPrefSurveyCurrent(surveyId),
@@ -76,7 +76,7 @@ export const init = app => {
           UserService.updateUserPrefs(user),
         ])
 
-        res.json({survey})
+        res.json({ survey })
       } catch (error) {
         next(error)
       }
@@ -93,7 +93,7 @@ export const init = app => {
         const user = Request.getUser(req)
         const props = Request.getBody(req)
 
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
         const survey = await SurveyService.updateSurveyProps(
           user,
@@ -112,12 +112,12 @@ export const init = app => {
     '/survey/:surveyId/publish',
     AuthMiddleware.requireSurveyEditPermission,
     (req, res) => {
-      const {surveyId} = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
       const job = SurveyService.startPublishJob(user, surveyId)
 
-      res.json({job: JobUtils.jobToJSON(job)})
+      res.json({ job: JobUtils.jobToJSON(job) })
     },
   )
 
@@ -128,7 +128,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
         await SurveyService.deleteSurvey(surveyId)
 

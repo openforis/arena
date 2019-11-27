@@ -1,9 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -22,7 +22,7 @@ const integerMask = createNumberMask({
 })
 
 const ValidationsProps = props => {
-  const {nodeDef, validation, nodeDefParent, readOnly, putNodeDefProp} = props
+  const { nodeDef, validation, nodeDefParent, readOnly, putNodeDefProp } = props
 
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 

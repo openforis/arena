@@ -2,8 +2,8 @@ import './autocompleteDialog.scss'
 
 import React from 'react'
 
-import {KeyboardMap} from '@webapp/utils/keyboardMap'
-import {clickedOutside, elementOffset} from '@webapp/utils/domUtils'
+import { KeyboardMap } from '@webapp/utils/keyboardMap'
+import { clickedOutside, elementOffset } from '@webapp/utils/domUtils'
 
 class AutocompleteDialog extends React.Component {
   constructor(props) {
@@ -16,14 +16,14 @@ class AutocompleteDialog extends React.Component {
   }
 
   componentDidMount() {
-    const {inputField} = this.props
+    const { inputField } = this.props
 
     inputField.addEventListener('keydown', this.onInputFieldKeyDown)
     window.addEventListener('click', this.onOutsideClick)
   }
 
   componentWillUnmount() {
-    const {inputField} = this.props
+    const { inputField } = this.props
 
     if (inputField) {
       inputField.removeEventListener('keydown', this.onInputFieldKeyDown)
@@ -33,7 +33,7 @@ class AutocompleteDialog extends React.Component {
   }
 
   onOutsideClick(evt) {
-    const {inputField} = this.props
+    const { inputField } = this.props
 
     if (
       clickedOutside(this.list.current, evt) &&
@@ -44,7 +44,7 @@ class AutocompleteDialog extends React.Component {
   }
 
   onInputFieldKeyDown(e) {
-    const {items, inputField} = this.props
+    const { items, inputField } = this.props
 
     switch (e.keyCode) {
       case KeyboardMap.Down:
@@ -69,7 +69,7 @@ class AutocompleteDialog extends React.Component {
     e.stopPropagation()
     e.preventDefault()
 
-    const {items, inputField} = this.props
+    const { items, inputField } = this.props
 
     const itemsSize = items.length
     if (itemsSize > 0) {
@@ -118,23 +118,23 @@ class AutocompleteDialog extends React.Component {
   }
 
   selectItem(item) {
-    const {onItemSelect} = this.props
+    const { onItemSelect } = this.props
     if (onItemSelect) {
       onItemSelect(item)
     }
   }
 
   close() {
-    const {onClose} = this.props
+    const { onClose } = this.props
     if (onClose) {
       onClose()
     }
   }
 
   calculatePosition() {
-    const {sourceElement, inputField} = this.props
+    const { sourceElement, inputField } = this.props
 
-    const {top, left, height, width} = elementOffset(
+    const { top, left, height, width } = elementOffset(
       sourceElement || inputField,
     )
 
@@ -146,7 +146,7 @@ class AutocompleteDialog extends React.Component {
   }
 
   render() {
-    const {items, itemRenderer, itemKeyFunction, className} = this.props
+    const { items, itemRenderer, itemKeyFunction, className } = this.props
 
     const ItemRenderer = itemRenderer
 
@@ -154,7 +154,7 @@ class AutocompleteDialog extends React.Component {
       <div
         ref={this.list}
         className={`autocomplete-list ${className}`}
-        style={{...this.calculatePosition()}}
+        style={{ ...this.calculatePosition() }}
       >
         {items.map(item => (
           <ItemRenderer

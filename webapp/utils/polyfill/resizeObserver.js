@@ -1,4 +1,4 @@
-import {elementOffset} from '../domUtils'
+import { elementOffset } from '../domUtils'
 
 // ResizeObserver polyfill
 
@@ -18,8 +18,10 @@ window.ResizeObserver = class ResizeObserver {
   }
 
   getElementSize(el) {
-    const {width, height, x, y} = el.getBBox ? el.getBBox() : elementOffset(el)
-    return {width, height, x, y}
+    const { width, height, x, y } = el.getBBox
+      ? el.getBBox()
+      : elementOffset(el)
+    return { width, height, x, y }
   }
 
   observe(el) {
@@ -43,7 +45,7 @@ window.ResizeObserver = class ResizeObserver {
   checkSize() {
     const changedEntries = this.observables
       .filter(obj => {
-        const {width, height, x, y} = this.getElementSize(obj.el)
+        const { width, height, x, y } = this.getElementSize(obj.el)
         const size = obj.size
 
         if (
@@ -52,7 +54,7 @@ window.ResizeObserver = class ResizeObserver {
           size.x !== x ||
           size.y !== y
         ) {
-          obj.size = {width, height, x, y}
+          obj.size = { width, height, x, y }
           return true
         }
       })

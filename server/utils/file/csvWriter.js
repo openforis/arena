@@ -1,20 +1,20 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
-import {transform, stringify} from 'csv'
+import { transform, stringify } from 'csv'
 
 import * as StringUtils from '@core/stringUtils'
 
 const _transformObj = obj =>
   Object.entries(obj).reduce(
     (objAcc, [key, value]) =>
-      Object.assign(objAcc, {[key]: StringUtils.removeNewLines(value)}),
+      Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),
     {},
   )
 
 export const transformToStream = (stream, columns) => {
   const transformer = transform(_transformObj)
   transformer
-    .pipe(stringify({quoted_string: true, header: true, columns}))
+    .pipe(stringify({ quoted_string: true, header: true, columns }))
     .pipe(stream)
   return transformer
 }

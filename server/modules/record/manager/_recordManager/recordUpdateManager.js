@@ -11,7 +11,7 @@ import * as Node from '@core/record/node'
 
 import SystemError from '@core/systemError'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileRepository from '@server/modules/record/repository/fileRepository'
@@ -260,7 +260,7 @@ const _beforeNodeUpdate = async (user, survey, record, node, t) => {
 
 const _onNodesUpdate = async (
   survey,
-  {record, nodes: updatedNodes},
+  { record, nodes: updatedNodes },
   nodesUpdateListener,
   nodesValidationListener,
   t,

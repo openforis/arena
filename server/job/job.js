@@ -1,13 +1,13 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 
 import * as User from '@core/user/user.js'
-import {throttle, cancelThrottle} from '@core/functionsDefer'
+import { throttle, cancelThrottle } from '@core/functionsDefer'
 
 import SystemError from '@core/systemError'
-import {jobEvents, jobStatus} from './jobUtils'
+import { jobEvents, jobStatus } from './jobUtils'
 
 class JobEvent {
   constructor(type, status, total, processed) {
@@ -87,7 +87,7 @@ export default class Job {
           error: {
             valid: false,
             errors: [
-              {key: 'appErrors.generic', params: {text: error.toString()}},
+              { key: 'appErrors.generic', params: { text: error.toString() } },
             ],
           },
         })

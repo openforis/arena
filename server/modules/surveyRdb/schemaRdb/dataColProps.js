@@ -9,8 +9,8 @@ import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import {sqlTypes} from '@common/surveyRdb/sqlTypes'
-const {nodeDefType} = NodeDef
+import { sqlTypes } from '@common/surveyRdb/sqlTypes'
+const { nodeDefType } = NodeDef
 
 import * as Point from '@core/geo/point'
 import * as GeoUtils from '@core/geo/geoUtils'

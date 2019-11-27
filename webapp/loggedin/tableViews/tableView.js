@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import TableHeader from './components/tableHeader'
@@ -7,10 +7,10 @@ import TableContent from './components/tableContent'
 
 import * as TableViewsState from './tableViewsState'
 
-import {initListItems, fetchListItems} from './actions'
+import { initListItems, fetchListItems } from './actions'
 
 const TableView = props => {
-  const {module, moduleApiUri, restParams, className, initListItems} = props
+  const { module, moduleApiUri, restParams, className, initListItems } = props
 
   useEffect(() => {
     initListItems(module, moduleApiUri, restParams)
@@ -40,7 +40,7 @@ TableView.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  let {module, moduleApiUri} = props
+  let { module, moduleApiUri } = props
   moduleApiUri =
     moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
 
@@ -53,6 +53,6 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps, {initListItems, fetchListItems})(
+export default connect(mapStateToProps, { initListItems, fetchListItems })(
   TableView,
 )

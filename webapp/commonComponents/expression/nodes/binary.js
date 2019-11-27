@@ -4,11 +4,11 @@ import * as R from 'ramda'
 import * as Expression from '@core/expressionParser/expression'
 
 import Dropdown from '../../form/dropdown'
-import BinaryOperand, {BinaryOperandType} from './binaryOperand'
+import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
 
 const Binary = props => {
-  const {node, onChange, canDelete = false, onDelete, isBoolean} = props
+  const { node, onChange, canDelete = false, onDelete, isBoolean } = props
 
   const isLeftLiteral = R.pipe(
     R.prop(BinaryOperandType.left),

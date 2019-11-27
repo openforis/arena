@@ -1,12 +1,12 @@
 import './expressionEditorPopup.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import Popup from '../popup'
-import {useI18n} from '../hooks'
+import { useI18n } from '../hooks'
 import ExpressionNode from './nodes/expressionNode'
 
 import {
@@ -15,7 +15,7 @@ import {
 } from './expressionEditorPopupState'
 
 const ExpressionEditorPopup = props => {
-  const {nodeDefCurrent, isBoolean, variables, onChange, onClose} = props
+  const { nodeDefCurrent, isBoolean, variables, onChange, onClose } = props
 
   const {
     query,

@@ -1,7 +1,7 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 import * as Record from '@core/record/record'
@@ -34,7 +34,7 @@ const RecordEntryButtons = props => {
 
   return (
     <React.Fragment>
-      <ErrorBadge validation={{valid}} labelKey="dataView.invalidRecord" />
+      <ErrorBadge validation={{ valid }} labelKey="dataView.invalidRecord" />
 
       <div className="survey-form-header__record-actions-steps">
         {stepPrev && (

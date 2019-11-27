@@ -1,6 +1,6 @@
 import 'dotenv/config'
 
-import {initTestContext, destroyTestContext} from '../testContext'
+import { initTestContext, destroyTestContext } from '../testContext'
 
 import * as SurveyIntegrationTest from './surveyTests/surveyTest'
 import * as CategoryTest from './surveyTests/categoryTest'

@@ -4,13 +4,13 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import * as R from 'ramda'
 
-import {elementOffset} from '@webapp/utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 class Tooltip extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = {messageElement: null}
+    this.state = { messageElement: null }
     this.tooltipRef = React.createRef()
   }
 
@@ -19,12 +19,12 @@ class Tooltip extends React.Component {
       this.tooltipRef.current && elementOffset(this.tooltipRef.current)
 
     return elemOffset
-      ? {top: elemOffset.top + elemOffset.height, left: elemOffset.left}
+      ? { top: elemOffset.top + elemOffset.height, left: elemOffset.left }
       : {}
   }
 
   mouseEnter() {
-    const {messages, type = ''} = this.props
+    const { messages, type = '' } = this.props
 
     if (!(R.isEmpty(messages) || R.isNil(messages))) {
       const style = this.getStyle()
@@ -43,12 +43,12 @@ class Tooltip extends React.Component {
   }
 
   mouseLeave() {
-    this.setState({messageElement: null})
+    this.setState({ messageElement: null })
   }
 
   render() {
-    const {children, className, type = ''} = this.props
-    const {messageElement} = this.state
+    const { children, className, type = '' } = this.props
+    const { messageElement } = this.state
 
     const tooltipClass =
       `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '')
@@ -59,7 +59,7 @@ class Tooltip extends React.Component {
         onMouseEnter={() => this.mouseEnter()}
         onMouseLeave={() => this.mouseLeave()}
         ref={this.tooltipRef}
-        onBlur={() => this.setState({messageElement: null})}
+        onBlur={() => this.setState({ messageElement: null })}
       >
         {children}
 

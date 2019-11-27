@@ -1,12 +1,12 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import {getContextUser} from '../testContext'
+import { getContextUser } from '../testContext'
 
 import * as SB from './utils/surveyBuilder'
 

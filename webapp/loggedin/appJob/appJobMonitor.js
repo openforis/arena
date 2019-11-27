@@ -1,9 +1,9 @@
 import './appJobMonitor.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import {
   Modal,
   ModalBody,
@@ -15,13 +15,13 @@ import AppJobErrors from './appJobErrors'
 
 import * as JobState from './appJobState'
 
-import {cancelActiveJob, hideAppJobMonitor} from './actions'
+import { cancelActiveJob, hideAppJobMonitor } from './actions'
 
-const JobProgress = ({job}) => (
+const JobProgress = ({ job }) => (
   <ProgressBar progress={job.progressPercent} className={job.status} />
 )
 
-const InnerJobs = ({innerJobs}) => {
+const InnerJobs = ({ innerJobs }) => {
   const i18n = useI18n()
 
   return (
@@ -44,7 +44,7 @@ const InnerJobs = ({innerJobs}) => {
 }
 
 const AppJobMonitor = props => {
-  const {job, cancelActiveJob, hideAppJobMonitor} = props
+  const { job, cancelActiveJob, hideAppJobMonitor } = props
   const innerJobs = job ? job.innerJobs : null
 
   const i18n = useI18n()
@@ -88,6 +88,6 @@ const mapStateToProps = state => ({
   job: JobState.getActiveJob(state),
 })
 
-export default connect(mapStateToProps, {cancelActiveJob, hideAppJobMonitor})(
+export default connect(mapStateToProps, { cancelActiveJob, hideAppJobMonitor })(
   AppJobMonitor,
 )

@@ -7,7 +7,7 @@ import * as SurveyDependencies from '@core/survey/_survey/surveyDependencies'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '../node'
 
-import {keys} from './recordKeys'
+import { keys } from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
 
 /**

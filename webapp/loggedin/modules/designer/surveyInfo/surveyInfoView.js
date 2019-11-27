@@ -1,24 +1,24 @@
 import './surveyInfoView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {Input} from '@webapp/commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
-import {updateSurveyInfoProps} from '@webapp/survey/surveyInfo/actions'
+import { updateSurveyInfoProps } from '@webapp/survey/surveyInfo/actions'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'
 import CyclesEditor from './components/cyclesEditor'
-import {useSurveyInfoViewState} from './components/surveyInfoViewState'
+import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
 const SurveyInfoView = props => {
-  const {surveyInfo, readOnly} = props
+  const { surveyInfo, readOnly } = props
 
   const i18n = useI18n()
 
@@ -116,4 +116,6 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {updateSurveyInfoProps})(SurveyInfoView)
+export default connect(mapStateToProps, { updateSurveyInfoProps })(
+  SurveyInfoView,
+)

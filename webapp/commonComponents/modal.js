@@ -1,24 +1,24 @@
 import './modal.scss'
 
 import React from 'react'
-import {KeyboardMap} from '@webapp/utils/keyboardMap'
+import { KeyboardMap } from '@webapp/utils/keyboardMap'
 import * as R from 'ramda'
 
-export const ModalClose = ({children, onClose}) => (
+export const ModalClose = ({ children, onClose }) => (
   <div className="modal-close" onClick={() => onClose()}>
     <span className="icon icon-cross icon-20px" />
   </div>
 )
 
-export const ModalHeader = ({children}) => (
+export const ModalHeader = ({ children }) => (
   <div className="modal-header">{children}</div>
 )
 
-export const ModalBody = ({children}) => (
+export const ModalBody = ({ children }) => (
   <div className="modal-body">{children}</div>
 )
 
-export const ModalFooter = ({children}) => (
+export const ModalFooter = ({ children }) => (
   <div className="modal-footer">{children}</div>
 )
 
@@ -26,12 +26,12 @@ export class Modal extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = {closed: false}
+    this.state = { closed: false }
   }
 
   componentDidMount() {
     window.addEventListener('keydown', this)
-    this.setState({closed: false})
+    this.setState({ closed: false })
   }
 
   componentWillUnmount() {
@@ -39,7 +39,7 @@ export class Modal extends React.Component {
   }
 
   handleEvent(e) {
-    const {onClose, closeOnEsc = true} = this.props
+    const { onClose, closeOnEsc = true } = this.props
 
     if (e.type === 'keydown' && e.keyCode === KeyboardMap.Esc) {
       if (closeOnEsc) {
@@ -49,14 +49,14 @@ export class Modal extends React.Component {
   }
 
   render() {
-    const {children, isOpen = true, className = ''} = this.props
+    const { children, isOpen = true, className = '' } = this.props
 
     return R.propEq('closed', true)(this.state) ? null : (
       <div
         className={`modal ${className}`}
         tabIndex="-1"
         role="dialog"
-        style={{display: isOpen ? 'block' : 'none'}}
+        style={{ display: isOpen ? 'block' : 'none' }}
       >
         <div className="modal-content">{children}</div>
       </div>

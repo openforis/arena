@@ -1,4 +1,4 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -70,7 +70,7 @@ const _userFetcher = fetchFn => async (...args) => {
     const authGroups = await AuthGroupRepository.fetchUserGroups(
       User.getUuid(user),
     )
-    return {...user, authGroups}
+    return { ...user, authGroups }
   }
 
   return null
@@ -139,7 +139,7 @@ const _updateUser = async (
         user,
         surveyId,
         ActivityLog.type.userUpdate,
-        {[ActivityLog.keysContent.uuid]: userUuid, name, email, groupUuid},
+        { [ActivityLog.keysContent.uuid]: userUuid, name, email, groupUuid },
         false,
         t,
       )
@@ -184,7 +184,7 @@ export const deleteUser = async (
           user,
           surveyId,
           ActivityLog.type.userRemove,
-          {[ActivityLog.keysContent.uuid]: userUuidToRemove},
+          { [ActivityLog.keysContent.uuid]: userUuidToRemove },
           false,
           t,
         ),

@@ -2,8 +2,8 @@ import ThreadsCache from '@server/threads/threadsCache'
 import ThreadManager from '@server/threads/threadManager'
 
 import * as WebSocket from '@server/utils/webSocket'
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
-import {jobThreadMessageTypes} from './jobUtils'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import { jobThreadMessageTypes } from './jobUtils'
 
 // USER JOB WORKERS
 
@@ -39,7 +39,7 @@ export const cancelActiveJobByUserUuid = async userUuid => {
     return
   }
 
-  jobThread.postMessage({type: jobThreadMessageTypes.cancelJob})
+  jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
 }
 
 // ====== EXECUTE
@@ -47,7 +47,7 @@ export const cancelActiveJobByUserUuid = async userUuid => {
 export const executeJobThread = job => {
   const thread = new ThreadManager(
     'jobThread.js',
-    {jobType: job.type, jobParams: job.params},
+    { jobType: job.type, jobParams: job.params },
     job => _notifyJobUpdate(job),
   )
 

@@ -12,7 +12,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, offset, limit} = Request.getParams(req)
+        const { surveyId, offset, limit } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const activityLogs = await ActivityLogService.fetch(
@@ -22,7 +22,7 @@ export const init = app => {
           R.clamp(30, 100, limit),
         )
 
-        res.json({activityLogs})
+        res.json({ activityLogs })
       } catch (error) {
         next(error)
       }

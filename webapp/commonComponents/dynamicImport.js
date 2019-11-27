@@ -1,17 +1,17 @@
 import React from 'react'
-import {injectReducers} from '@webapp/app/store'
+import { injectReducers } from '@webapp/app/store'
 
 export default class DynamicImport extends React.Component {
   constructor() {
     super()
-    this.state = {component: null}
+    this.state = { component: null }
   }
 
   componentDidMount() {
-    const {load} = this.props
+    const { load } = this.props
 
     load().then(module => {
-      const {component, reducers} = module
+      const { component, reducers } = module
 
       if (reducers) {
         reducers.forEach(reducer => {
@@ -26,8 +26,8 @@ export default class DynamicImport extends React.Component {
   }
 
   render() {
-    const {component} = this.state
-    const {module, ...rest} = this.props
+    const { component } = this.state
+    const { module, ...rest } = this.props
     return component ? React.createElement(component, rest) : null
   }
 }

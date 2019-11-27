@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import WarningBadge from '@webapp/commonComponents/warningBadge'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const TableRow = props => {
   const {
@@ -80,7 +80,7 @@ const TableRow = props => {
   )
 }
 
-const Header = ({onAdd, readOnly}) => {
+const Header = ({ onAdd, readOnly }) => {
   const i18n = useI18n()
 
   return (
@@ -96,7 +96,7 @@ const Header = ({onAdd, readOnly}) => {
 }
 
 const ItemsTable = props => {
-  const {items} = props
+  const { items } = props
   const i18n = useI18n()
 
   return (

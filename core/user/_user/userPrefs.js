@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 
-import {keys} from './userKeys'
+import { keys } from './userKeys'
 
 export const keysPrefs = {
   surveys: 'surveys',

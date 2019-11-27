@@ -12,10 +12,10 @@ export const keysAction = {
 const UserPoolId = window.cognitoUserPoolId
 const ClientId = window.cognitoClientId
 
-const _getUserPool = () => new CognitoUserPool({UserPoolId, ClientId})
+const _getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
 const _newCognitoUser = Username =>
-  new CognitoUser({Username, Pool: _getUserPool()})
+  new CognitoUser({ Username, Pool: _getUserPool() })
 
 // Global variables to handle completeNewPasswordChallenge flow
 let _cognitoUser
@@ -48,7 +48,7 @@ export const login = (Username, Password) =>
   new Promise((resolve, reject) => {
     _cognitoUser = _newCognitoUser(Username)
     _cognitoUser.authenticateUser(
-      new AuthenticationDetails({Username, Password}),
+      new AuthenticationDetails({ Username, Password }),
       _cognitoCallbacks(resolve, reject),
     )
   })
@@ -57,7 +57,7 @@ export const acceptInvitation = (name, password) =>
   new Promise((resolve, reject) => {
     _cognitoUser.completeNewPasswordChallenge(
       password,
-      {..._sessionUserAttributes, name},
+      { ..._sessionUserAttributes, name },
       _cognitoCallbacks(resolve, reject),
     )
   })

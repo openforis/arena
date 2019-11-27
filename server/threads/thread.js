@@ -1,4 +1,4 @@
-import {parentPort, workerData, isMainThread} from 'worker_threads'
+import { parentPort, workerData, isMainThread } from 'worker_threads'
 
 import * as Log from '@server/log/log'
 
@@ -9,7 +9,7 @@ import * as ThreadParams from './threadParams'
  */
 export default class Thread {
   constructor(params) {
-    this.params = params ? params : {...workerData}
+    this.params = params ? params : { ...workerData }
 
     this.logger = Log.getLogger('Thread')
 
@@ -31,7 +31,7 @@ export default class Thread {
    * @param msg
    */
   postMessage(msg) {
-    parentPort.postMessage({user: this.user, surveyId: this.surveyId, msg})
+    parentPort.postMessage({ user: this.user, surveyId: this.surveyId, msg })
   }
 
   async messageHandler(msg) {
@@ -41,7 +41,7 @@ export default class Thread {
       const errorMessage = error.toString()
       this.logger.error(`Error in thread:  ${errorMessage}`)
       this.logger.error(error.stack)
-      this.postMessage({type: Thread.messageTypes.error, errorMessage})
+      this.postMessage({ type: Thread.messageTypes.error, errorMessage })
     }
   }
 

@@ -10,8 +10,8 @@ import SystemError from '@core/systemError'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 const columnProps = {
-  [CategoryImportSummary.columnTypes.code]: {suffix: '_code', lang: false},
-  [CategoryImportSummary.columnTypes.label]: {suffix: '_label', lang: true},
+  [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
+  [CategoryImportSummary.columnTypes.label]: { suffix: '_label', lang: true },
   [CategoryImportSummary.columnTypes.description]: {
     suffix: '_description',
     lang: true,
@@ -63,7 +63,7 @@ export const createImportSummaryFromStream = async stream => {
       return level
     }
 
-    return {name: null, index: -1}
+    return { name: null, index: -1 }
   }
 
   const columns = columnNames.reduce((acc, columnName) => {
@@ -135,7 +135,7 @@ const _validateSummary = summary => {
         const columnNameMissing = `${levelName}${columnCodeSuffix}`
         throw new SystemError(
           Validation.messageKeys.categoryImport.columnMissing,
-          {columnNameMissing},
+          { columnNameMissing },
         )
       }
     }

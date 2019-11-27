@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 
@@ -33,7 +33,7 @@ const Checkbox = props => {
 }
 
 const NodeDefCodeCheckbox = props => {
-  const {items = [], edit, lang} = props
+  const { items = [], edit, lang } = props
 
   const i18n = useI18n()
 
@@ -49,7 +49,7 @@ const NodeDefCodeCheckbox = props => {
           item={{
             uuid: '0',
             props: {
-              labels: {[lang]: i18n.t('surveyForm.nodeDefCode.buttonCode')},
+              labels: { [lang]: i18n.t('surveyForm.nodeDefCode.buttonCode') },
             },
           }}
         />

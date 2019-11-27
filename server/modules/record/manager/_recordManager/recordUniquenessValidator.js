@@ -53,7 +53,7 @@ export const validateRecordsUniqueness = async (
   )
 
   if (!R.isEmpty(recordsCountRows)) {
-    for (const {recordUuid, count, nodesKeyUuids} of recordsCountRows) {
+    for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
       const isUnique = count === '1'
       const validationNodesKeyFields = {}
       for (const nodeKeyUuid of nodesKeyUuids) {

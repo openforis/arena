@@ -21,20 +21,20 @@ export const fetchActivityLogs = (offset = 0, limit = 30) => async (
     const i18n = AppState.getI18n(state)
 
     const {
-      data: {activityLogs},
+      data: { activityLogs },
     } = await axios.get(`/api/survey/${surveyId}/activity-log`, {
-      params: {offset, limit},
+      params: { offset, limit },
     })
 
     const activityLogMessages = activityLogs.map(
       ActivityLogMessageParser.toMessage(i18n, survey),
     )
 
-    dispatch({type: homeActivityMessagesUpdate, activityLogMessages})
+    dispatch({ type: homeActivityMessagesUpdate, activityLogMessages })
   } catch (error) {
     console.log(error)
   }
 }
 
 export const resetActivityLogs = () => dispatch =>
-  dispatch({type: homeActivityMessagesReset})
+  dispatch({ type: homeActivityMessagesReset })

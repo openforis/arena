@@ -1,18 +1,18 @@
 import './surveyFormView.scss'
 import './react-grid-layout.scss'
 
-import React, {useEffect} from 'react'
-import {compose} from 'redux'
-import {connect} from 'react-redux'
-import {withRouter} from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 
-import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import {dispatchWindowResize} from '@webapp/utils/domUtils'
+import { dispatchWindowResize } from '@webapp/utils/domUtils'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import * as RecordState from '../record/recordState'
 import FormHeader from './components/formHeader'
@@ -22,7 +22,7 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
 import * as SurveyFormState from './surveyFormState'
 
-import {setFormNodeDefAddChildTo, resetForm} from './actions'
+import { setFormNodeDefAddChildTo, resetForm } from './actions'
 
 const SurveyFormView = props => {
   const {
@@ -170,6 +170,6 @@ const mapStateToProps = (state, props) => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps, {setFormNodeDefAddChildTo, resetForm}),
+  connect(mapStateToProps, { setFormNodeDefAddChildTo, resetForm }),
 )
 export default enhance(SurveyFormView)

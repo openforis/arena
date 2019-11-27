@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -44,7 +44,7 @@ const NodeDefEntityFormNodeSelect = props => {
         <React.Fragment>
           <button
             className="btn btn-s"
-            style={{marginLeft: '5px'}}
+            style={{ marginLeft: '5px' }}
             aria-disabled={!selectedNode}
             onClick={() => {
               if (
@@ -62,7 +62,7 @@ const NodeDefEntityFormNodeSelect = props => {
           </button>
           <button
             className="btn btn-s"
-            style={{marginLeft: '50px'}}
+            style={{ marginLeft: '50px' }}
             onClick={() => {
               const entity = Node.newNode(
                 NodeDef.getUuid(nodeDef),

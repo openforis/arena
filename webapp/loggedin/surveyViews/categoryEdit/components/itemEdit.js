@@ -1,10 +1,10 @@
-import React, {useEffect, useRef} from 'react'
+import React, { useEffect, useRef } from 'react'
 
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {normalizeName} from '@core/stringUtils'
+import { normalizeName } from '@core/stringUtils'
 
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'

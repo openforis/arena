@@ -12,9 +12,9 @@ const stateDoc = {
   categoryEdit: {
     categoryUuid: '',
     levelItems: {
-      0: {itemUuid: {}},
-      1: {itemUuid: {}},
-      2: {itemUuid: {}},
+      0: { itemUuid: {} },
+      1: { itemUuid: {} },
+      2: { itemUuid: {} },
     },
     levelActiveItems: {
       0: 'itemUuid',
@@ -39,7 +39,7 @@ const getStateProp = (prop, defaultValue = null) =>
 // ==== current editing category
 
 export const initCategoryEdit = categoryUuid =>
-  categoryUuid ? {categoryUuid} : null
+  categoryUuid ? { categoryUuid } : null
 
 export const getCategoryForEdit = state => {
   const survey = SurveyState.getSurvey(state)

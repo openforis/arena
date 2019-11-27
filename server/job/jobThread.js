@@ -1,6 +1,6 @@
 import Thread from '@server/threads/thread'
 
-import {jobThreadMessageTypes, jobToJSON} from './jobUtils'
+import { jobThreadMessageTypes, jobToJSON } from './jobUtils'
 import * as JobCreator from './jobCreator'
 
 class JobThread extends Thread {
@@ -11,7 +11,7 @@ class JobThread extends Thread {
   }
 
   createJob() {
-    const {jobType, jobParams} = this.params
+    const { jobType, jobParams } = this.params
 
     this.job = JobCreator.createJob(jobType, jobParams)
 

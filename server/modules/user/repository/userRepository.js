@@ -1,4 +1,4 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as camelize from 'camelize'
 

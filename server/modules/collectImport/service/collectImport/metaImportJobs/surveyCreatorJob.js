@@ -17,7 +17,7 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute(tx) {
-    const {collectSurvey} = this.context
+    const { collectSurvey } = this.context
 
     const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)
 
@@ -59,6 +59,6 @@ export default class SurveyCreatorJob extends Job {
       this.tx,
     )
 
-    this.setContext({survey, surveyId, defaultLanguage})
+    this.setContext({ survey, surveyId, defaultLanguage })
   }
 }

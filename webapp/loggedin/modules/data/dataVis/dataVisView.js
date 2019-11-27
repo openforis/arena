@@ -1,17 +1,17 @@
 import './dataVisView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import DataQueryView from './dataQuery/dataQueryView'
 
-import {resetDataVis} from './actions'
+import { resetDataVis } from './actions'
 
 const DataVisView = props => {
-  const {surveyCycleKey, resetDataVis} = props
+  const { surveyCycleKey, resetDataVis } = props
 
   useOnUpdate(() => {
     resetDataVis()
@@ -28,4 +28,4 @@ const mapStateToProps = state => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(mapStateToProps, {resetDataVis})(DataVisView)
+export default connect(mapStateToProps, { resetDataVis })(DataVisView)

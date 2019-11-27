@@ -1,9 +1,13 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
-import {surveyCreate, surveyDelete, surveyUpdate} from '@webapp/survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
 import * as TableViewsState from './tableViewsState'
-import {tableViewsListUpdate} from './actions'
+import { tableViewsListUpdate } from './actions'
 
 const actionHandlers = {
   // Reset form
@@ -12,7 +16,7 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [tableViewsListUpdate]: (state, {type, ...actionProps}) =>
+  [tableViewsListUpdate]: (state, { type, ...actionProps }) =>
     TableViewsState.assocListUpdateProps(actionProps)(state),
 }
 

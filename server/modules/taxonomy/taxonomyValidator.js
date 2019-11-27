@@ -8,7 +8,9 @@ import * as ObjectUtils from '@core/objectUtils'
  * ====== TAXONOMY
  */
 const validateNotEmptyTaxa = taxaCount => () =>
-  taxaCount === 0 ? {key: Validation.messageKeys.taxonomyEdit.taxaEmpty} : null
+  taxaCount === 0
+    ? { key: Validation.messageKeys.taxonomyEdit.taxaEmpty }
+    : null
 
 const taxonomyValidators = (taxonomies, taxaCount) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [

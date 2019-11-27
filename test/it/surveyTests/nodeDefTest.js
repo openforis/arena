@@ -1,11 +1,11 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
-import {getContextSurvey} from '../../testContext'
+import { getContextSurvey } from '../../testContext'
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
@@ -66,7 +66,7 @@ export const updateNodeDefTest = async () => {
   const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(
     surveyId,
     nodeDef1Uuid,
-    {name: newName},
+    { name: newName },
   )
   expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 

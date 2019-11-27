@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as Node from '@core/record/node'
-import {getSurveyDBSchema} from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 export const tableColumns = [
   'uuid',
@@ -96,7 +96,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
     Node.getUuid(node),
     dbTransformCallback,
   )
-  return {...nodeAdded, [Node.keys.created]: true}
+  return { ...nodeAdded, [Node.keys.created]: true }
 }
 
 export const insertNodesFromValues = async (
@@ -183,7 +183,7 @@ export const updateNode = async (
     nodeUuid,
     dbTransformCallback,
   )
-  return {...node, [Node.keys.updated]: true}
+  return { ...node, [Node.keys.updated]: true }
 }
 
 export const updateChildrenApplicability = async (

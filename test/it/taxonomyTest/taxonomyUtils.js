@@ -99,7 +99,7 @@ export const importFile = async (
   if (taxonomyExisting) {
     taxonomy = taxonomyExisting
   } else {
-    taxonomy = Taxonomy.newTaxonomy({[Taxonomy.keysProps.name]: taxonomyName})
+    taxonomy = Taxonomy.newTaxonomy({ [Taxonomy.keysProps.name]: taxonomyName })
     await TaxonomyManager.insertTaxonomy(user, surveyId, taxonomy)
   }
 
@@ -112,5 +112,5 @@ export const importFile = async (
   })
   await job.start()
 
-  return {job, taxonomyUuid}
+  return { job, taxonomyUuid }
 }

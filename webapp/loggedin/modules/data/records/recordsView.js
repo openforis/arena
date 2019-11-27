@@ -1,17 +1,17 @@
 import './recordsView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Record from '@core/record/record'
 
-import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import TableView from '../../../tableViews/tableView'
-import {appModuleUri, dataModules} from '../../../appModules'
-import {createRecord} from '../../../surveyViews/record/actions'
-import {reloadListItems} from '../../../tableViews/actions'
+import { appModuleUri, dataModules } from '../../../appModules'
+import { createRecord } from '../../../surveyViews/record/actions'
+import { reloadListItems } from '../../../tableViews/actions'
 import RecordsHeaderLeft from './components/recordsHeaderLeft'
 import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
@@ -34,7 +34,7 @@ const RecordsView = props => {
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 /
     noCols}fr) 50px 80px 80px 50px`
 
-  const restParams = {cycle: surveyCycleKey}
+  const restParams = { cycle: surveyCycleKey }
 
   const onRowClick = record =>
     history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
@@ -72,6 +72,6 @@ const mapStateToProps = state => ({
   nodeDefKeys: RecordsState.getNodeDefKeys(state),
 })
 
-export default connect(mapStateToProps, {createRecord, reloadListItems})(
+export default connect(mapStateToProps, { createRecord, reloadListItems })(
   RecordsView,
 )

@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
@@ -31,7 +31,7 @@ class TableColumnEdit extends React.Component {
     } = this.props
 
     if (cell) {
-      const {parentUuid, node} = cell
+      const { parentUuid, node } = cell
 
       const parentNode = {
         [Node.keys.recordUuid]: Record.getUuid(record),
@@ -63,7 +63,7 @@ class TableColumnEdit extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const {record} = props
+  const { record } = props
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 

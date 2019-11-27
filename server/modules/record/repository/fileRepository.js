@@ -1,13 +1,13 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as RecordFile from '@core/record/recordFile'
 
-import {getSurveyDBSchema} from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 // ============== CREATE
 
 export const insertFile = async (surveyId, file, client = db) => {
-  const {uuid, props, content} = file
+  const { uuid, props, content } = file
 
   return await client.one(
     `

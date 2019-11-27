@@ -1,7 +1,7 @@
 import './nodeDefs.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -63,7 +63,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   componentDidMount() {
-    const {nodeDef, edit} = this.props
+    const { nodeDef, edit } = this.props
 
     if (edit && !nodeDef.id) {
       this.element.current.scrollIntoView()
@@ -124,7 +124,7 @@ NodeDefSwitch.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDef, parentNode, entry, canEditRecord} = props
+  const { nodeDef, parentNode, entry, canEditRecord } = props
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)

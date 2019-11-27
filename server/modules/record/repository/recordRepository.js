@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,7 +10,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import {getSurveyDBSchema} from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate(
   'date_created',
@@ -231,8 +231,8 @@ export const updateRecordValidationsFromValues = async (
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'record',
-      {name: 'uuid', cast: 'uuid'},
-      [{name: 'validation', cast: 'jsonb'}],
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'validation', cast: 'jsonb' }],
       recordUuidAndValidationValues,
     ),
   )

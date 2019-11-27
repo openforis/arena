@@ -11,7 +11,7 @@ import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
 import * as AuthService from '../service/authService'
 
-const sendResponse = (res, user, survey = null) => res.json({user, survey})
+const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {

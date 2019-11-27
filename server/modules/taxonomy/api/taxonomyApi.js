@@ -4,7 +4,7 @@ import * as Response from '@server/utils/response'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Taxon from '@core/survey/taxon'
 
-import {jobToJSON} from '@server/job/jobUtils'
+import { jobToJSON } from '@server/job/jobUtils'
 import * as TaxonomyService from '../service/taxonomyService'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -15,7 +15,7 @@ const sendTaxonomies = async (res, surveyId, draft, validate) => {
     draft,
     validate,
   )
-  res.json({taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies)})
+  res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
 export const init = app => {
@@ -25,7 +25,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
         const taxonomyReq = Request.getBody(req)
 
@@ -35,7 +35,7 @@ export const init = app => {
           taxonomyReq,
         )
 
-        res.json({taxonomy})
+        res.json({ taxonomy })
       } catch (error) {
         next(error)
       }
@@ -49,7 +49,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, draft, validate} = Request.getParams(req)
+        const { surveyId, draft, validate } = Request.getParams(req)
 
         await sendTaxonomies(res, surveyId, draft, validate)
       } catch (error) {
@@ -63,7 +63,9 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, taxonomyUuid, draft, validate} = Request.getParams(req)
+        const { surveyId, taxonomyUuid, draft, validate } = Request.getParams(
+          req,
+        )
 
         const taxonomy = await TaxonomyService.fetchTaxonomyByUuid(
           surveyId,
@@ -72,7 +74,7 @@ export const init = app => {
           validate,
         )
 
-        res.json({taxonomy})
+        res.json({ taxonomy })
       } catch (error) {
         next(error)
       }
@@ -84,7 +86,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, taxonomyUuid, draft} = Request.getParams(req)
+        const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
         const count = await TaxonomyService.countTaxaByTaxonomyUuid(
           surveyId,
@@ -92,7 +94,7 @@ export const init = app => {
           draft,
         )
 
-        res.json({count})
+        res.json({ count })
       } catch (error) {
         next(error)
       }
@@ -152,7 +154,7 @@ export const init = app => {
           )
         }
 
-        res.json({list})
+        res.json({ list })
       } catch (error) {
         next(error)
       }
@@ -179,7 +181,7 @@ export const init = app => {
             )
           : await TaxonomyService.fetchTaxonByUuid(surveyId, taxonUuid, draft)
 
-        res.json({taxon})
+        res.json({ taxon })
       } catch (error) {
         next(error)
       }
@@ -191,7 +193,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, taxonomyUuid, draft} = Request.getParams(req)
+        const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
         Response.setContentTypeFile(
           res,
@@ -214,7 +216,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, taxonomyUuid, key, value} = Request.getParams(req)
+        const { surveyId, taxonomyUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await TaxonomyService.updateTaxonomyProp(
@@ -236,7 +238,7 @@ export const init = app => {
     '/survey/:surveyId/taxonomies/:taxonomyUuid/upload',
     AuthMiddleware.requireSurveyEditPermission,
     (req, res) => {
-      const {surveyId, taxonomyUuid} = Request.getParams(req)
+      const { surveyId, taxonomyUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       const file = Request.getFile(req)
 
@@ -247,7 +249,7 @@ export const init = app => {
         file.tempFilePath,
       )
 
-      res.json({job: jobToJSON(job)})
+      res.json({ job: jobToJSON(job) })
     },
   )
 
@@ -258,7 +260,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, taxonomyUuid} = Request.getParams(req)
+        const { surveyId, taxonomyUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await TaxonomyService.deleteTaxonomy(user, surveyId, taxonomyUuid)

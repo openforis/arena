@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

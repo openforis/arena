@@ -1,7 +1,7 @@
 import './processingStepCalculationsListItem.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,7 +11,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
-import {setProcessingStepCalculationForEdit} from '../actions'
+import { setProcessingStepCalculationForEdit } from '../actions'
 
 const ProcessingStepCalculationsListItem = props => {
   const {
@@ -65,7 +65,7 @@ ProcessingStepCalculationsListItem.defaultProps = {
   calculation: null,
 }
 
-const mapStateToProps = (state, {calculation}) => {
+const mapStateToProps = (state, { calculation }) => {
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
   const survey = SurveyState.getSurvey(state)
   return {
@@ -77,6 +77,6 @@ const mapStateToProps = (state, {calculation}) => {
   }
 }
 
-export default connect(mapStateToProps, {setProcessingStepCalculationForEdit})(
-  ProcessingStepCalculationsListItem,
-)
+export default connect(mapStateToProps, {
+  setProcessingStepCalculationForEdit,
+})(ProcessingStepCalculationsListItem)

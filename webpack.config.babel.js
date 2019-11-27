@@ -7,7 +7,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import GoogleFontsPlugin from 'google-fonts-plugin'
 import GitRevisionPlugin from 'git-revision-webpack-plugin'
-import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import uuidv4 from 'uuid/v4'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
@@ -156,7 +156,7 @@ webpack.optimization = {
       parallel: true,
       uglifyOptions: {
         compress: true,
-        output: {comments: false},
+        output: { comments: false },
       },
       sourceMap: true,
     }),

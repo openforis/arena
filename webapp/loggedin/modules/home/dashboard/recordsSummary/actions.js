@@ -38,12 +38,12 @@ export const fetchRecordsSummary = (cycle, timeRange) => async (
   const from = formatDate(getFromDate(now, timeRange))
   const to = formatDate(now)
 
-  const {data: counts} = await axios.get(
+  const { data: counts } = await axios.get(
     `/api/survey/${surveyId}/records/summary/count`,
     {
-      params: {cycle, from, to},
+      params: { cycle, from, to },
     },
   )
 
-  dispatch({type: recordsSummaryUpdate, timeRange, from, to, counts})
+  dispatch({ type: recordsSummaryUpdate, timeRange, from, to, counts })
 }

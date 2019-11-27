@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import marked from 'marked'
 
 const Markdown = props => {
-  const {container: Container, className, source} = props
+  const { container: Container, className, source } = props
   const [output, setOutput] = useState('')
 
   useEffect(() => {
@@ -12,7 +12,7 @@ const Markdown = props => {
   return (
     <Container
       className={className}
-      dangerouslySetInnerHTML={{__html: output}}
+      dangerouslySetInnerHTML={{ __html: output }}
     />
   )
 }

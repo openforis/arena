@@ -13,27 +13,27 @@ import * as SurveyFormState from './surveyFormState'
 
 export const formReset = 'survey/form/reset'
 
-export const resetForm = () => dispatch => dispatch({type: formReset})
+export const resetForm = () => dispatch => dispatch({ type: formReset })
 
 export const formNodeDefAddChildToUpdate =
   'survey/form/nodeDef/addChildTo/update'
 
 // Set current nodeDef unlocked
 export const setFormNodeDefAddChildTo = nodeDef => dispatch =>
-  dispatch({type: formNodeDefAddChildToUpdate, nodeDef})
+  dispatch({ type: formNodeDefAddChildToUpdate, nodeDef })
 
 // Current nodeDef of active form page
 export const formActivePageNodeDefUpdate =
   'survey/form/activePageNodeDef/update'
 
 export const setFormActivePage = nodeDef => dispatch =>
-  dispatch({type: formActivePageNodeDefUpdate, nodeDef})
+  dispatch({ type: formActivePageNodeDefUpdate, nodeDef })
 
 // Current node of active form page
 export const formPageNodeUpdate = 'survey/form/pageNode/update'
 
 export const setFormPageNode = (nodeDef, node) => dispatch =>
-  dispatch({type: formPageNodeUpdate, nodeDef, node})
+  dispatch({ type: formPageNodeUpdate, nodeDef, node })
 
 // Toggle form page navigation
 export const formShowPageNavigationUpdate =
@@ -41,7 +41,7 @@ export const formShowPageNavigationUpdate =
 
 export const toggleFormPageNavigation = () => (dispatch, getState) => {
   const showPageNavigation = !SurveyFormState.showPageNavigation(getState())
-  dispatch({type: formShowPageNavigationUpdate, showPageNavigation})
+  dispatch({ type: formShowPageNavigationUpdate, showPageNavigation })
 }
 
 // ==== utils

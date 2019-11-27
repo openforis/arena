@@ -1,4 +1,4 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 export const blacklistToken = async (tokenJti, expiration, client = db) =>
   await client.query(

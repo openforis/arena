@@ -1,11 +1,11 @@
 import './categoryImportSummary.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
-import {Modal, ModalBody, ModalFooter} from '@webapp/commonComponents/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/commonComponents/modal'
 
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'

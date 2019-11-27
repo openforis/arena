@@ -1,15 +1,15 @@
 import React from 'react'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
-import {FormItem} from '@webapp/commonComponents/form/input'
+import { FormItem } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 
 const AdvancedProps = props => {
-  const {nodeDef, validation, nodeDefParent, putNodeDefProp, readOnly} = props
+  const { nodeDef, validation, nodeDefParent, putNodeDefProp, readOnly } = props
 
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 

@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import Dropdown from '../../form/dropdown'
 
-const Identifier = ({node, variables, onChange}) => (
+const Identifier = ({ node, variables, onChange }) => (
   <Dropdown
     items={variables}
     selection={R.find(R.propEq('value', node.name), variables)}

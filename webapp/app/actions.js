@@ -14,7 +14,7 @@ export const appUserLogout = 'app/user/logout'
 export const systemErrorThrow = 'system/error'
 
 export const throwSystemError = error => dispatch =>
-  dispatch({type: systemErrorThrow, error})
+  dispatch({ type: systemErrorThrow, error })
 
 // ====== INIT
 
@@ -40,7 +40,7 @@ export const initApp = () => async dispatch => {
       survey,
     })
   } catch (error) {
-    dispatch({type: appPropsChange, status: AppState.appStatus.ready, i18n})
+    dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n })
     CognitoAuth.logout()
   }
 }
@@ -49,18 +49,18 @@ export const initApp = () => async dispatch => {
 
 const getUserSurvey = async () => {
   const {
-    data: {user, survey},
+    data: { user, survey },
   } = await axios.get('/auth/user')
-  return {user, survey}
+  return { user, survey }
 }
 
 export const initUser = () => async dispatch => {
-  const {user, survey} = await getUserSurvey()
-  dispatch({type: appPropsChange, user, survey})
+  const { user, survey } = await getUserSurvey()
+  dispatch({ type: appPropsChange, user, survey })
 }
 
 export const setUser = user => async dispatch => {
-  dispatch({type: appPropsChange, user})
+  dispatch({ type: appPropsChange, user })
 }
 
 export const updateUserPrefs = user => async dispatch => {
@@ -74,7 +74,7 @@ export const logout = () => async dispatch => {
   await axios.post('/auth/logout')
   CognitoAuth.logout()
 
-  dispatch({type: appUserLogout})
+  dispatch({ type: appUserLogout })
   dispatch(hideAppLoader())
 }
 
@@ -85,7 +85,7 @@ const appSavingCounter = new Counter()
 
 export const showAppSaving = () => dispatch => {
   if (appSavingCounter.count === 0) {
-    dispatch({type: appSavingUpdate, saving: true})
+    dispatch({ type: appSavingUpdate, saving: true })
   }
 
   appSavingCounter.increment()
@@ -94,14 +94,14 @@ export const showAppSaving = () => dispatch => {
 export const hideAppSaving = () => dispatch => {
   appSavingCounter.decrement()
   if (appSavingCounter.count === 0) {
-    dispatch({type: appSavingUpdate, saving: false})
+    dispatch({ type: appSavingUpdate, saving: false })
   }
 }
 
 // ====== APP LOADER
 
 export const showAppLoader = () => dispatch =>
-  dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: true})
+  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
 
 export const hideAppLoader = () => dispatch =>
-  dispatch({type: appPropsChange, [AppState.keys.loaderVisible]: false})
+  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })

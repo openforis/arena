@@ -1,8 +1,8 @@
 import './deleteSurveyDialog.scss'
 
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import Markdown from '@webapp/commonComponents/markdown'
 
 import {
@@ -12,7 +12,7 @@ import {
   ModalFooter,
 } from '@webapp/commonComponents/modal'
 
-const DeleteSurveyDialog = ({surveyName, onDelete, onCancel}) => {
+const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const i18n = useI18n()
   const [confirmName, setConfirmName] = useState('')
 

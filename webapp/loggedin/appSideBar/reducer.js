@@ -1,11 +1,11 @@
-import {exportReducer} from '../../utils/reduxUtils'
+import { exportReducer } from '../../utils/reduxUtils'
 
-import {appSideBarOpenedUpdate} from './actions'
+import { appSideBarOpenedUpdate } from './actions'
 
 import * as SideBarState from './appSidebarState'
 
 const actionHandlers = {
-  [appSideBarOpenedUpdate]: (state, {opened}) =>
+  [appSideBarOpenedUpdate]: (state, { opened }) =>
     SideBarState.assocOpened(opened)(state),
 }
 

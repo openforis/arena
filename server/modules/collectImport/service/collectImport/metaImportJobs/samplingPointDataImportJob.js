@@ -88,7 +88,7 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   }
 
   extractItemExtraProps(extra) {
-    const {srs_id, x, y} = extra
+    const { srs_id, x, y } = extra
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),

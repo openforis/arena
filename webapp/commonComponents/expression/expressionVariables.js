@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import {sqlTypes} from '@common/surveyRdb/sqlTypes'
+import { sqlTypes } from '@common/surveyRdb/sqlTypes'
 
 import * as Expression from '@core/expressionParser/expression'
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import * as R from 'ramda'
 import * as d3 from 'd3'
@@ -19,7 +19,7 @@ const getAxisValues = (from, to) => {
   return axisValues
 }
 
-export const getScale = (counts, from, to, {width, left, right}) =>
+export const getScale = (counts, from, to, { width, left, right }) =>
   d3
     .scaleTime()
     .range([R.isEmpty(counts) ? 0 : left, width - right])
@@ -34,8 +34,8 @@ const getAxis = (from, to, counts, chartProps) =>
     .tickPadding(15)
 
 const XAxis = props => {
-  const {counts, from, to, chartProps} = props
-  const {height, bottom} = chartProps
+  const { counts, from, to, chartProps } = props
+  const { height, bottom } = chartProps
 
   const elementRef = useRef(null)
   const axisRef = useRef(null)

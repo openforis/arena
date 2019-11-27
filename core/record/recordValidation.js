@@ -18,7 +18,7 @@ export const newValidationRecordDuplicate = (isUnique = false) =>
     [keys.recordKeys]: Validation.newInstance(
       isUnique,
       {},
-      isUnique ? [] : [{key: Validation.messageKeys.record.keyDuplicate}],
+      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }],
     ),
   })
 

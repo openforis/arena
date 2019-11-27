@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import ProgressBar from '@webapp/commonComponents/progressBar'
 
@@ -21,7 +21,7 @@ const NodeDefEntityTableCell = props => {
   } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const {length} = NodeDefUiProps.getFormFields(nodeDef)
+  const { length } = NodeDefUiProps.getFormFields(nodeDef)
   const elementRef = useRef(null)
 
   // Table cell header is always visible
@@ -58,7 +58,7 @@ const NodeDefEntityTableCell = props => {
       ref={elementRef}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
-      style={{width: 160 * length + 'px'}}
+      style={{ width: 160 * length + 'px' }}
       onMouseDown={e => e.stopPropagation()}
       draggable={canEditDef}
       onDragStart={onDragStart}

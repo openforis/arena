@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as StringUtils from '@core/stringUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ProgressBar from '@webapp/commonComponents/progressBar'
 import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
@@ -13,7 +13,7 @@ import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDe
 import TableColumnEdit from './tableColumnEdit'
 
 const TableColumn = props => {
-  const {nodeDef, row, lang, colWidth, editMode} = props
+  const { nodeDef, row, lang, colWidth, editMode } = props
 
   const i18n = useI18n()
 
@@ -35,7 +35,7 @@ const TableColumn = props => {
   }
 
   return (
-    <div className="table__cell" style={{width: widthOuter}}>
+    <div className="table__cell" style={{ width: widthOuter }}>
       {isHeader && (
         <div className="width100">
           {editMode ? (
@@ -61,11 +61,13 @@ const TableColumn = props => {
         <div className="table__inner-cell">
           {colNames.map((col, i) =>
             isData ? (
-              <div key={i} style={{width: widthInner}} className="ellipsis">
+              <div key={i} style={{ width: widthInner }} className="ellipsis">
                 {row.hasOwnProperty(col) ? (
                   row[col]
                 ) : (
-                  <div style={{width: '20%', marginLeft: '40%', opacity: '.5'}}>
+                  <div
+                    style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}
+                  >
                     <ProgressBar
                       className="running progress-bar-striped"
                       progress={100}
@@ -75,7 +77,7 @@ const TableColumn = props => {
                 )}
               </div>
             ) : isHeader && noCols > 1 ? (
-              <div key={i} style={{width: widthInner}}>
+              <div key={i} style={{ width: widthInner }}>
                 {i18n.t(getColKey(nodeDef, col))}
               </div>
             ) : null,

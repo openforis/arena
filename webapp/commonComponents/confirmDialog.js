@@ -2,12 +2,12 @@ import './confirmDialog.scss'
 
 import React from 'react'
 
-import {Modal, ModalBody, ModalFooter} from '@webapp/commonComponents/modal'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { Modal, ModalBody, ModalFooter } from '@webapp/commonComponents/modal'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import Markdown from '@webapp/commonComponents/markdown'
 
 const ConfirmDialog = props => {
-  const {message, onOk, onCancel} = props
+  const { message, onOk, onCancel } = props
   const i18n = useI18n()
 
   return (

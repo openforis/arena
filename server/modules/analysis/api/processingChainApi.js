@@ -14,7 +14,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, surveyCycleKey} = Request.getParams(req)
+        const { surveyId, surveyCycleKey } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const processingChainUuid = await ProcessingChainService.createChain(
@@ -65,7 +65,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingStepUuid, index} = Request.getParams(req)
+        const { surveyId, processingStepUuid, index } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const calculationStep = await ProcessingChainService.createProcessingStepCalculation(
@@ -89,7 +89,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, surveyCycleKey} = Request.getParams(req)
+        const { surveyId, surveyCycleKey } = Request.getParams(req)
 
         const count = await ProcessingChainService.countChainsBySurveyId(
           surveyId,
@@ -108,7 +108,9 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, surveyCycleKey, offset, limit} = Request.getParams(req)
+        const { surveyId, surveyCycleKey, offset, limit } = Request.getParams(
+          req,
+        )
 
         const list = await ProcessingChainService.fetchChainsBySurveyId(
           surveyId,
@@ -117,7 +119,7 @@ export const init = app => {
           limit,
         )
 
-        res.json({list})
+        res.json({ list })
       } catch (error) {
         next(error)
       }
@@ -129,7 +131,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingChainUuid} = Request.getParams(req)
+        const { surveyId, processingChainUuid } = Request.getParams(req)
 
         const processingChain = await ProcessingChainService.fetchChainByUuid(
           surveyId,
@@ -150,7 +152,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingChainUuid} = Request.getParams(req)
+        const { surveyId, processingChainUuid } = Request.getParams(req)
 
         const processingSteps = await ProcessingChainService.fetchStepsByChainUuid(
           surveyId,
@@ -169,7 +171,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingStepUuid} = Request.getParams(req)
+        const { surveyId, processingStepUuid } = Request.getParams(req)
 
         const processingStep = await ProcessingChainService.fetchStepByUuid(
           surveyId,
@@ -193,7 +195,7 @@ export const init = app => {
           ),
         ])
 
-        res.json({processingStep, processingStepPrev, processingStepNext})
+        res.json({ processingStep, processingStepPrev, processingStepNext })
       } catch (error) {
         next(error)
       }
@@ -207,7 +209,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingChainUuid, key, value} = Request.getParams(
+        const { surveyId, processingChainUuid, key, value } = Request.getParams(
           req,
         )
         const user = Request.getUser(req)
@@ -234,7 +236,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingStepUuid, props} = Request.getParams(req)
+        const { surveyId, processingStepUuid, props } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await ProcessingChainService.updateStepProps(
@@ -286,7 +288,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingChainUuid} = Request.getParams(req)
+        const { surveyId, processingChainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await ProcessingChainService.deleteChain(
@@ -309,7 +311,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, processingStepUuid} = Request.getParams(req)
+        const { surveyId, processingStepUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await ProcessingChainService.deleteStep(

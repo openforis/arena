@@ -5,9 +5,9 @@ import * as Validation from '@core/validation/validation'
 
 import Tooltip from './tooltip'
 
-import {useI18n} from './hooks'
+import { useI18n } from './hooks'
 
-export default ({validation, className, showKeys, children}) => {
+export default ({ validation, className, showKeys, children }) => {
   const i18n = useI18n()
 
   const isValid = Validation.isValid(validation)

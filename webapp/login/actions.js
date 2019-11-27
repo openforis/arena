@@ -4,8 +4,8 @@ import * as CognitoAuth from '@webapp/app/cognitoAuth'
 
 import * as Validation from '@core/validation/validation'
 
-import {hideAppLoader, initUser, showAppLoader} from '../app/actions'
-import {showNotification} from '../app/appNotification/actions'
+import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
+import { showNotification } from '../app/appNotification/actions'
 import * as LoginState from './loginState'
 
 export const loginEmailUpdate = 'login/email/update'
@@ -13,10 +13,10 @@ export const loginUserActionUpdate = 'login/userAction/update'
 export const loginErrorUpdate = 'login/error'
 
 export const setEmail = email => dispatch =>
-  dispatch({type: loginEmailUpdate, email})
+  dispatch({ type: loginEmailUpdate, email })
 
 export const setLoginError = message => dispatch =>
-  dispatch({type: loginErrorUpdate, message})
+  dispatch({ type: loginErrorUpdate, message })
 
 const _createAction = cognitoResponseHandler => async dispatch => {
   try {

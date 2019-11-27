@@ -1,29 +1,29 @@
 import './userView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import {getUrlParam} from '@webapp/utils/routerUtils'
+import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {showAppLoader, hideAppLoader, setUser} from '@webapp/app/actions'
-import {showNotification} from '@webapp/app/appNotification/actions'
+import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 
-import {useUserViewState} from './useUserViewState'
+import { useUserViewState } from './useUserViewState'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
 
 const UserView = props => {
-  const {surveyInfo, lang, userUuid} = props
+  const { surveyInfo, lang, userUuid } = props
 
   const i18n = useI18n()
 
@@ -142,7 +142,7 @@ const UserView = props => {
   )
 }
 
-const mapStateToProps = (state, {match}) => ({
+const mapStateToProps = (state, { match }) => ({
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),

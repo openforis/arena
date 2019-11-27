@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as toSnakeCase from 'to-snake-case'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -299,7 +299,7 @@ const findTaxaByCondition = async (
          ${whereCondition ? ` AND (${whereCondition})` : ''}
        ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
        LIMIT 25`,
-    {taxonomyUuid, searchValue},
+    { taxonomyUuid, searchValue },
     taxon => dbTransformCallback(taxon, draft, true),
   )
 
@@ -436,7 +436,7 @@ export const findTaxaByVernacularName = async (
        'vn.',
      )} ASC
      LIMIT 20`,
-    {taxonomyUuid, searchValue},
+    { taxonomyUuid, searchValue },
     record => dbTransformCallback(record, draft, true),
   )
 }

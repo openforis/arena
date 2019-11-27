@@ -1,4 +1,4 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,7 +12,7 @@ export const createNodeKeysView = async (survey, client = db) => {
   const surveyId = Survey.getId(survey)
 
   const selectViews = []
-  const {root} = Survey.getHierarchy()(survey)
+  const { root } = Survey.getHierarchy()(survey)
   Survey.traverseHierarchyItemSync(root, nodeDef => {
     selectViews.push(`
         SELECT 

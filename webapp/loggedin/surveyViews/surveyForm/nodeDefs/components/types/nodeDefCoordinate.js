@@ -3,9 +3,9 @@ import './nodeDefCoordinate.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
@@ -28,7 +28,7 @@ const NodeDefCoordinate = props => {
   })
 
   const handleInputChange = (node, field, value) => {
-    const {nodeDef, updateNode} = props
+    const { nodeDef, updateNode } = props
 
     const newValue = R.assoc(field, value)(node.value)
 

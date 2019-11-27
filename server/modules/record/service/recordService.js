@@ -9,7 +9,7 @@ import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
 
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as WebSocket from '@server/utils/webSocket'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -17,7 +17,7 @@ import * as RecordManager from '../manager/recordManager'
 import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
-import {messageTypes as RecordThreadMessageTypes} from './update/thread/recordThreadMessageTypes'
+import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -47,7 +47,7 @@ export const createRecord = async (
     surveyId,
     Record.getUuid(recordToCreate),
   )
-  thread.postMessage({type: RecordThreadMessageTypes.recordInit})
+  thread.postMessage({ type: RecordThreadMessageTypes.recordInit })
 
   return record
 }

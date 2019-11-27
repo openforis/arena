@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import SystemError from '@core/systemError'
-import {types} from './types'
+import { types } from './types'
 
 // Built-in functions that can be called, i.e. the standard library.
 // Nothing outside of this set may be used.
@@ -72,11 +72,11 @@ const binaryOperators = {
 }
 
 const unaryEval = (expr, ctx) => {
-  const {argument, operator} = expr
+  const { argument, operator } = expr
 
   const fn = unaryOperators[operator]
   if (!fn) {
-    throw new SystemError('undefinedFunction', {fnName: operator})
+    throw new SystemError('undefinedFunction', { fnName: operator })
   }
 
   const res = evalExpression(argument, ctx)
@@ -84,11 +84,11 @@ const unaryEval = (expr, ctx) => {
 }
 
 const binaryEval = (expr, ctx) => {
-  const {left, right, operator} = expr
+  const { left, right, operator } = expr
 
   const fn = binaryOperators[operator]
   if (!fn) {
-    throw new SystemError('undefinedFunction', {fnName: operator})
+    throw new SystemError('undefinedFunction', { fnName: operator })
   }
 
   const leftResult = evalExpression(left, ctx)
@@ -120,7 +120,7 @@ const memberEval = _ => {
 
 const callEval = (expr, ctx) => {
   // Arguments is a reserved word in strict mode
-  const {callee, arguments: exprArgs} = expr
+  const { callee, arguments: exprArgs } = expr
 
   const fnName = callee.name
   const fnArity = exprArgs.length
@@ -128,12 +128,12 @@ const callEval = (expr, ctx) => {
   // No complex expressions may be put in place of a function body.
   // Only a plain identifier is allowed.
   if (callee.type !== types.Identifier) {
-    throw new SystemError('invalidSyntax', {fnType: callee.type})
+    throw new SystemError('invalidSyntax', { fnType: callee.type })
   }
 
   // The function must be found in the standard library.
   if (!(fnName in stdlib)) {
-    throw new SystemError('undefinedFunction', {fnName})
+    throw new SystemError('undefinedFunction', { fnName })
   }
 
   const [fn, minArity, maxArity] = stdlib[fnName]
@@ -169,15 +169,15 @@ const literalEval = (expr, _ctx) => R.prop('value')(expr)
 // "this" is a remnant of the JS that's not allowed in our simplified expression syntax.
 // We still have to handle "this" since the JSEP parser will produce these nodes.
 const thisEval = (expr, _ctx) => {
-  throw new SystemError('invalidSyntax', {keyword: 'this', expr})
+  throw new SystemError('invalidSyntax', { keyword: 'this', expr })
 }
 
 const identifierEval = (expr, ctx) => {
-  throw new SystemError('identifierEvalNotImplemented', {expr})
+  throw new SystemError('identifierEvalNotImplemented', { expr })
 }
 
 const groupEval = (expr, ctx) => {
-  const {argument} = expr
+  const { argument } = expr
   return evalExpression(argument, ctx)
 }
 
@@ -198,7 +198,7 @@ export const evalExpression = (expr, ctx) => {
 
   const fn = functions[expr.type]
   if (!fn) {
-    throw new SystemError('unsupportedFunctionType', {exprType: expr.type})
+    throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
   }
 
   return fn(expr, ctx)
@@ -212,6 +212,6 @@ export const getExpressionIdentifiers = expr => {
     },
   }
 
-  evalExpression(expr, {functions})
+  evalExpression(expr, { functions })
   return R.uniq(identifiers)
 }

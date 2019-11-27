@@ -1,8 +1,8 @@
 import camelize from 'camelize'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
-import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
 

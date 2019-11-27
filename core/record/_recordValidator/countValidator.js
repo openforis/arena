@@ -75,7 +75,7 @@ const _getNodePointers = (survey, record, nodes) => {
 
 const _validateChildrenCountNodePointers = (survey, record, nodePointers) => {
   let validation = {}
-  for (const {nodeCtx, nodeDef} of nodePointers) {
+  for (const { nodeCtx, nodeDef } of nodePointers) {
     let nodeValidation = null
 
     // Check children count only for applicable nodes
@@ -137,7 +137,7 @@ const _createValidationResult = (
               : [
                   {
                     key: Validation.messageKeys.record.nodesMinCountNotReached,
-                    params: {minCount},
+                    params: { minCount },
                   },
                 ],
           ),
@@ -149,7 +149,7 @@ const _createValidationResult = (
               : [
                   {
                     key: Validation.messageKeys.record.nodesMaxCountExceeded,
-                    params: {maxCount},
+                    params: { maxCount },
                   },
                 ],
           ),

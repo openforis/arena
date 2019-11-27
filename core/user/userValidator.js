@@ -11,7 +11,7 @@ const getProp = (propName, defaultValue) =>
 export const validateEmail = (propName, item) => {
   const email = getProp(propName)(item)
   return email && !validEmailRe.test(email)
-    ? {key: Validation.messageKeys.user.emailInvalid}
+    ? { key: Validation.messageKeys.user.emailInvalid }
     : null
 }
 

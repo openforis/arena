@@ -24,7 +24,7 @@ export default class RecordCheckJob extends Job {
 
     this.total = R.length(recordsUuidAndCycle)
 
-    for (const {uuid: recordUuid, cycle} of recordsUuidAndCycle) {
+    for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(
         cycle,
       )

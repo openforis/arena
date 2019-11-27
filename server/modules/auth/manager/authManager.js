@@ -1,4 +1,4 @@
-export {fetchGroupByUuid} from '../repository/authGroupRepository'
+export { fetchGroupByUuid } from '../repository/authGroupRepository'
 
 export {
   blacklistToken,

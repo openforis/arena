@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 import axios from 'axios'
 
@@ -9,11 +9,11 @@ import * as StringUtils from '@core/stringUtils'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
-import {useAsyncGetRequest} from '../../hooks'
+import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
-import {Input} from '../../form/input'
+import { Input } from '../../form/input'
 import Dropdown from '../../form/dropdown'
-import {BinaryOperandType} from './binaryOperand'
+import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>
   nodeDef
@@ -32,20 +32,20 @@ const getValue = (nodeDef, value) =>
 
 const loadItems = async params => {
   const {
-    data: {items},
-  } = await axios.get('/api/expression/literal/items', {params})
+    data: { items },
+  } = await axios.get('/api/expression/literal/items', { params })
   return items
 }
 
 const Literal = props => {
-  const {node, nodeDefCurrent, literalSearchParams, onChange, type} = props
+  const { node, nodeDefCurrent, literalSearchParams, onChange, type } = props
   const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
 
   const {
-    data: {item = {}} = {item: {}},
+    data: { item = {} } = { item: {} },
     dispatch: fetchItem,
   } = useAsyncGetRequest('/api/expression/literal/item', {
-    params: {...literalSearchParams, value: nodeValue},
+    params: { ...literalSearchParams, value: nodeValue },
   })
   const [items, setItems] = useState([])
 
@@ -58,7 +58,10 @@ const Literal = props => {
     useEffect(() => {
       ;(async () => {
         nodeValue && fetchItem()
-        const itemsUpdate = await loadItems({...literalSearchParams, value: ''})
+        const itemsUpdate = await loadItems({
+          ...literalSearchParams,
+          value: '',
+        })
         setItems(itemsUpdate)
       })()
     }, [])
@@ -70,7 +73,7 @@ const Literal = props => {
         <Dropdown
           items={items}
           itemsLookupFunction={value =>
-            loadItems({...literalSearchParams, value})
+            loadItems({ ...literalSearchParams, value })
           }
           itemKeyProp="key"
           itemLabelProp="label"
@@ -100,7 +103,7 @@ const Literal = props => {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const lang = AppState.getLang(state)
-  const {nodeDefCurrent, type} = props
+  const { nodeDefCurrent, type } = props
 
   const literalSearchParams =
     nodeDefCurrent && BinaryOperandType.isLeft(type)

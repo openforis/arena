@@ -6,7 +6,7 @@ export const tableViewsListUpdate = 'tableViews/list/update'
 
 const _getItems = (moduleApiUri, restParams, offset, limit) =>
   axios.get(moduleApiUri, {
-    params: {offset, limit, ...restParams},
+    params: { offset, limit, ...restParams },
   })
 
 const _initList = (module, moduleApiUri, restParams, offset) => async (
@@ -18,7 +18,7 @@ const _initList = (module, moduleApiUri, restParams, offset) => async (
   const limit = TableViewsState.getLimit(module)(state)
 
   const [countResp, itemsResp] = await Promise.all([
-    axios.get(`${moduleApiUri}/count`, {params: restParams}),
+    axios.get(`${moduleApiUri}/count`, { params: restParams }),
     _getItems(moduleApiUri, restParams, offset, limit),
   ])
 
@@ -50,7 +50,7 @@ export const fetchListItems = (
 ) => async (dispatch, getState) => {
   const limit = TableViewsState.getLimit(module)(getState())
 
-  const {data} = await _getItems(moduleApiUri, restParams, offset, limit)
+  const { data } = await _getItems(moduleApiUri, restParams, offset, limit)
 
   dispatch({
     type: tableViewsListUpdate,

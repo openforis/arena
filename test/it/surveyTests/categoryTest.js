@@ -1,18 +1,18 @@
 import * as R from 'ramda'
 
-import {expect} from 'chai'
+import { expect } from 'chai'
 
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import {getContextSurveyId, getContextUser} from '../../testContext'
+import { getContextSurveyId, getContextUser } from '../../testContext'
 
 export const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
-  const categoryReq = Category.newCategory({name: 'category_test'})
+  const categoryReq = Category.newCategory({ name: 'category_test' })
   const category = await CategoryManager.insertCategory(
     user,
     surveyId,
@@ -38,7 +38,7 @@ export const createCategoryLevelTest = async () => {
   const category = await _fetchFirstCategory(surveyId)
 
   const levelReq = Category.newLevel(category)
-  const {level} = await CategoryManager.insertLevel(user, surveyId, levelReq)
+  const { level } = await CategoryManager.insertLevel(user, surveyId, levelReq)
 
   expect(CategoryLevel.getName(level)).to.be.equal(
     CategoryLevel.getName(levelReq),
@@ -71,10 +71,10 @@ export const createCategoryItemTest = async () => {
 
   const itemReq = CategoryItem.newItem(CategoryLevel.getUuid(level), null, {
     code: itemCode,
-    labels: {en: itemLabel},
+    labels: { en: itemLabel },
   })
 
-  const {item} = await CategoryManager.insertItem(
+  const { item } = await CategoryManager.insertItem(
     user,
     surveyId,
     Category.getUuid(category),
@@ -92,7 +92,9 @@ export const updateCategoryTest = async () => {
   const category = await _fetchFirstCategory(surveyId)
 
   const newName = 'category_modified'
-  const {category: updatedCategory} = await CategoryManager.updateCategoryProp(
+  const {
+    category: updatedCategory,
+  } = await CategoryManager.updateCategoryProp(
     user,
     surveyId,
     Category.getUuid(category),

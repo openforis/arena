@@ -1,18 +1,18 @@
 import './popup.scss'
 
 import React from 'react'
-import {elementOffset} from '@webapp/utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 class Popup extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = {style: {}}
+    this.state = { style: {} }
     this.elementRef = React.createRef()
   }
 
   getStyle() {
-    const {padding} = this.props
+    const { padding } = this.props
     const elemOffset = elementOffset(this.elementRef.current)
 
     return {
@@ -23,12 +23,12 @@ class Popup extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.setState({style: this.getStyle()})
+    this.setState({ style: this.getStyle() })
   }
 
   render() {
-    const {children, onClose, className} = this.props
-    const {style} = this.state
+    const { children, onClose, className } = this.props
+    const { style } = this.state
 
     return (
       <div className={`popup ${className}`} ref={this.elementRef} style={style}>

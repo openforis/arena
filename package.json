@@ -129,6 +129,7 @@
     ]
   },
   "prettier": {
+    "bracketSpacing": true,
     "trailingComma": "all"
   },
   "devDependencies": {

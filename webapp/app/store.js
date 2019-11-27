@@ -1,4 +1,4 @@
-import {applyMiddleware, combineReducers, createStore} from 'redux'
+import { applyMiddleware, combineReducers, createStore } from 'redux'
 
 // == app reducer
 import createDebounce from 'redux-debounced'
@@ -34,7 +34,7 @@ const createReducer = asyncReducers =>
 const middlewares = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
 if (ProcessUtils.isEnvDevelopment) {
-  const {logger} = require('redux-logger')
+  const { logger } = require('redux-logger')
 
   middlewares.push(logger)
 }

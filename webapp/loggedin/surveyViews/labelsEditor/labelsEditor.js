@@ -1,19 +1,19 @@
 import './labelsEditor.scss'
 
-import React, {useState} from 'react'
-import {connect} from 'react-redux'
+import React, { useState } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {Input} from '@webapp/commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {getLanguageLabel} from '@core/app/languages'
+import { getLanguageLabel } from '@core/app/languages'
 
-const LanguageBadge = ({lang, compact}) => (
+const LanguageBadge = ({ lang, compact }) => (
   <div
     className="badge-of labels-editor__label-lang-badge"
     title={compact ? getLanguageLabel(lang) : null}
@@ -79,13 +79,13 @@ const LabelsEditor = props => {
       <div className="labels-editor-label">
         {showFormLabel && (
           <label className="form-label">
-            {i18n.t(formLabelKey, {count: languages.length})}
+            {i18n.t(formLabelKey, { count: languages.length })}
           </label>
         )}
         {_canTogglePreview && (
           <button
             className="btn-s btn-toggle-labels"
-            style={{justifySelf: 'end'}}
+            style={{ justifySelf: 'end' }}
             onClick={() => setPreview(!preview)}
           >
             <span

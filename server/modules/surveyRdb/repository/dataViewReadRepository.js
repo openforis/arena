@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as dbUtils from '@server/db/dbUtils'
 
 import * as Survey from '@core/survey/survey'
@@ -15,7 +15,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 import * as DataFilter from '@common/surveyRdb/dataFilter'
-import {getSurveyDBSchema} from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as DataCol from '../schemaRdb/dataCol'
 import * as DataTable from '../schemaRdb/dataTable'
@@ -35,12 +35,12 @@ export const runSelect = async (
   const schemaName = SchemaRdb.getName(surveyId)
   // Columns
   const colParams = cols.reduce(
-    (params, col, i) => ({...params, [`col_${i}`]: col}),
+    (params, col, i) => ({ ...params, [`col_${i}`]: col }),
     {},
   )
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
   // WHERE clause
-  const {clause: filterClause, params: filterParams} = filterExpr
+  const { clause: filterClause, params: filterParams } = filterExpr
     ? DataFilter.getWherePreparedStatement(filterExpr)
     : {}
   // SORT clause
@@ -88,7 +88,7 @@ export const runCount = async (
   client = db,
 ) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const {clause: filterClause, params: filterParams} = filterExpr
+  const { clause: filterClause, params: filterParams } = filterExpr
     ? DataFilter.getWherePreparedStatement(filterExpr)
     : {}
 

@@ -38,7 +38,7 @@ export const validate = async (survey, nodeDef) => {
       validation =>
         !Validation.isValid(validation) && !Validation.hasErrors(validation),
       Validation.setErrors([
-        {key: Validation.messageKeys.nodeDefEdit.validationsInvalid},
+        { key: Validation.messageKeys.nodeDefEdit.validationsInvalid },
       ]),
     ),
   )(validation)

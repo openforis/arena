@@ -1,11 +1,11 @@
 import './nodeDefEdit.scss'
 
-import React, {useState} from 'react'
-import {connect} from 'react-redux'
+import React, { useState } from 'react'
+import { connect } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
 
 import * as Survey from '@core/survey/survey'
@@ -26,7 +26,7 @@ import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
-import {closeNodeDefEdit} from './actions'
+import { closeNodeDefEdit } from './actions'
 
 const NodeDefEdit = props => {
   const {

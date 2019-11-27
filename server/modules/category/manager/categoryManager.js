@@ -9,7 +9,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryValidator from '../categoryValidator'
 import * as CategoryRepository from '../repository/categoryRepository'
@@ -467,7 +467,7 @@ export const deleteLevelsEmptyByCategory = async (
     const logActivities = levelUuidsDeleted.map(uuid =>
       ActivityLog.newActivity(
         ActivityLog.type.categoryLevelDelete,
-        {[ActivityLog.keysContent.uuid]: uuid},
+        { [ActivityLog.keysContent.uuid]: uuid },
         true,
       ),
     )
@@ -497,7 +497,7 @@ export const replaceLevels = async (
     const levelsNew = levelNamesNew.map((levelName, index) =>
       Category.newLevel(
         category,
-        {[CategoryLevel.keysProps.name]: levelName},
+        { [CategoryLevel.keysProps.name]: levelName },
         index,
       ),
     )

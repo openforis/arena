@@ -1,4 +1,4 @@
-import React, {useRef} from 'react'
+import React, { useRef } from 'react'
 import * as R from 'ramda'
 
 import * as Authorizer from '@core/auth/authorizer'

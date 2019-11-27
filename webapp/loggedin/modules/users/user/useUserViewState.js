@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
 import * as User from '@core/user/user'
@@ -20,7 +20,7 @@ import {
   usePrevious,
 } from '@webapp/commonComponents/hooks'
 
-import {appModuleUri, userModules} from '../../../appModules'
+import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
@@ -70,7 +70,7 @@ export const useUserViewState = props => {
     enableValidation,
     getFieldValidation,
   } = useFormObject(
-    {name: '', email: '', groupUuid: null},
+    { name: '', email: '', groupUuid: null },
     isInvitation || isUserAcceptPending
       ? UserValidator.validateInvitation
       : UserValidator.validateUser,
@@ -156,14 +156,14 @@ export const useUserViewState = props => {
   const pictureChanged = useRef(false)
 
   useEffect(() => {
-    setFormData(formDataPrev => ({...formDataPrev, ...formObject}))
+    setFormData(formDataPrev => ({ ...formDataPrev, ...formObject }))
   }, [formObject])
 
   useEffect(() => {
     if (prevProfilePicture) {
       pictureChanged.current = true
       // Only send the picture file if it has been edited by the user
-      setFormData(formDataPrev => ({...formDataPrev, file: profilePicture}))
+      setFormData(formDataPrev => ({ ...formDataPrev, file: profilePicture }))
     }
   }, [profilePicture])
 
@@ -197,7 +197,7 @@ export const useUserViewState = props => {
     if (userSaveError) {
       showNotification(
         'appErrors.generic',
-        {text: userSaveError},
+        { text: userSaveError },
         NotificationState.severity.error,
       )
     } else if (userSaved) {
@@ -242,7 +242,7 @@ export const useUserViewState = props => {
     } else if (removeUserError) {
       showNotification(
         'appErrors.generic',
-        {text: removeUserError},
+        { text: removeUserError },
         NotificationState.severity.error,
       )
     }

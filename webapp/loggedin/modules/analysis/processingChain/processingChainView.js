@@ -1,16 +1,16 @@
 import './processingChainView.scss'
 
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import {useI18n, useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
-import {getUrlParam} from '@webapp/utils/routerUtils'
+import { getUrlParam } from '@webapp/utils/routerUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import ProcessingChainSteps from './components/processingChainSteps'
@@ -95,7 +95,7 @@ const ProcessingChainView = props => {
   )
 }
 
-const mapStateToProps = (state, {match}) => ({
+const mapStateToProps = (state, { match }) => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   processingChainUuid: getUrlParam('processingChainUuid')(match),

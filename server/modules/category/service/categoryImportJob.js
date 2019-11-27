@@ -73,7 +73,7 @@ export default class CategoryImportJob extends Job {
       this.user,
       this.surveyId,
       ActivityLog.type.categoryImport,
-      {uuid: Category.getUuid(this.category)},
+      { uuid: Category.getUuid(this.category) },
       false,
       this.tx,
     )
@@ -374,7 +374,7 @@ export default class CategoryImportJob extends Job {
 
   _addError(key, params = {}) {
     this.addError({
-      error: Validation.newInstance(false, {}, [{key, params}]),
+      error: Validation.newInstance(false, {}, [{ key, params }]),
     })
   }
 

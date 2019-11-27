@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState, useMemo} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -7,12 +7,12 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {elementOffset} from '@webapp/utils/domUtils'
-import {debounce} from '@core/functionsDefer'
+import { elementOffset } from '@webapp/utils/domUtils'
+import { debounce } from '@core/functionsDefer'
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
 const NodeDefEntityTableRows = props => {
-  const {entry, edit, nodeDef, nodeDefColumns, nodes} = props
+  const { entry, edit, nodeDef, nodeDefColumns, nodes } = props
 
   const tableRowsRef = useRef(null)
   const tableDataRowsRef = useRef(null)
@@ -27,7 +27,7 @@ const NodeDefEntityTableRows = props => {
 
   const onScrollTableRows = () => {
     const onScroll = () => {
-      const {scrollLeft} = tableRowsRef.current
+      const { scrollLeft } = tableRowsRef.current
       if (scrollLeft !== gridSize.left) {
         setGridSize(gridSizePrev => ({
           ...gridSizePrev,
@@ -41,7 +41,7 @@ const NodeDefEntityTableRows = props => {
 
   const onScrollTableDataRows = () => {
     const onScroll = () => {
-      const {scrollTop} = tableDataRowsRef.current
+      const { scrollTop } = tableDataRowsRef.current
       if (scrollTop !== gridSize.top) {
         setGridSize(gridSizePrev => ({
           ...gridSizePrev,
@@ -61,8 +61,8 @@ const NodeDefEntityTableRows = props => {
       tableDataRowsRef.current.scrollTop = 0
 
       const updateGridSize = () => {
-        const {width} = elementOffset(tableRowsRef.current)
-        const {height} = elementOffset(tableDataRowsRef.current)
+        const { width } = elementOffset(tableRowsRef.current)
+        const { height } = elementOffset(tableDataRowsRef.current)
 
         setGridSize(gridSizePrev => ({
           ...gridSizePrev,
@@ -129,7 +129,7 @@ const NodeDefEntityTableRows = props => {
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDef} = props
+  const { nodeDef } = props
 
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)

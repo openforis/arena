@@ -1,11 +1,11 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import {FormItem} from '@webapp/commonComponents/form/input'
+import { FormItem } from '@webapp/commonComponents/form/input'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,10 +14,10 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import {putNodeDefProp} from '@webapp/survey/nodeDefs/actions'
+import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import {createCategory, deleteCategory} from '../../categoryEdit/actions'
+import { createCategory, deleteCategory } from '../../categoryEdit/actions'
 
 const CodeProps = props => {
   const {
@@ -81,7 +81,7 @@ const CodeProps = props => {
           />
           <button
             className="btn btn-s"
-            style={{justifySelf: 'center'}}
+            style={{ justifySelf: 'center' }}
             onClick={async () => {
               putCategoryProp(await createCategory())
               toggleCategoryEdit(true)
@@ -92,7 +92,7 @@ const CodeProps = props => {
           </button>
           <button
             className="btn btn-s"
-            style={{justifySelf: 'center'}}
+            style={{ justifySelf: 'center' }}
             onClick={() => toggleCategoryEdit(true)}
           >
             <span className="icon icon-list icon-12px icon-left" />

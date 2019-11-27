@@ -2,7 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 
-import {isNotBlank} from '@core/stringUtils'
+import { isNotBlank } from '@core/stringUtils'
 
 export const parseQuery = (query, mode, canBeConstant) => {
   const exprQuery = Expression.fromString(query, mode)

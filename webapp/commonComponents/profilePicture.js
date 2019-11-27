@@ -2,10 +2,10 @@ import './profilePicture.scss'
 
 import React from 'react'
 
-import {useProfilePicture} from './hooks'
+import { useProfilePicture } from './hooks'
 
 const ProfilePicture = props => {
-  const {userUuid, forceUpdateKey, thumbnail} = props
+  const { userUuid, forceUpdateKey, thumbnail } = props
 
   const src = useProfilePicture(userUuid, forceUpdateKey)
 

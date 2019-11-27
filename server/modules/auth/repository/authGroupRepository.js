@@ -1,5 +1,5 @@
 import * as camelize from 'camelize'
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 const dbTransformCallback = camelize
 

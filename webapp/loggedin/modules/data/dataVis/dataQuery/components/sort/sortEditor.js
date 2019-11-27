@@ -1,14 +1,14 @@
 import './sortEditor.scss'
 
-import React, {useState, useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
 import Popup from '@webapp/commonComponents/popup'
 import * as ExpressionVariables from '@webapp/commonComponents/expression/expressionVariables'
-import {useI18n, usePrevious} from '@webapp/commonComponents/hooks'
+import { useI18n, usePrevious } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 
@@ -16,9 +16,9 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import SortRow from './sortRow'
 
 const SortExpressionComponent = props => {
-  const {lang} = useI18n()
+  const { lang } = useI18n()
 
-  const {onClose} = props
+  const { onClose } = props
 
   const [sortCriteria, setSortCriteria] = useState(props.sort)
 
@@ -48,7 +48,7 @@ const SortExpressionComponent = props => {
     )
   }
 
-  const addCriteria = ({value: variable, label}) => {
+  const addCriteria = ({ value: variable, label }) => {
     setSortCriteria(
       DataSort.addCriteria(
         variable,
@@ -65,7 +65,7 @@ const SortExpressionComponent = props => {
   }
 
   const applyAndClose = sortCriteria => {
-    const {onChange, onClose} = props
+    const { onChange, onClose } = props
 
     if (DataSort.toString(sortCriteria) !== sortCriteriaStrPrev) {
       onChange && onChange(sortCriteria)
@@ -83,7 +83,7 @@ const SortExpressionComponent = props => {
   }
 
   const getAvailableVariables = () => {
-    const {survey, nodeDefUuidCols, nodeDefContext, mode} = props
+    const { survey, nodeDefUuidCols, nodeDefContext, mode } = props
 
     const variables = ExpressionVariables.getVariables(
       survey,
@@ -150,7 +150,7 @@ const SortExpressionComponent = props => {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
 
-  const {nodeDefUuidContext, nodeDefUuidCols} = props
+  const { nodeDefUuidContext, nodeDefUuidCols } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const mode = Expression.modes.sql

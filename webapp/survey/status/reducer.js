@@ -1,6 +1,6 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 
 import {
   surveyCreate,
@@ -22,7 +22,7 @@ const actionHandlers = {
 
   [surveyDefsReset]: SurveyState.resetDefsFetched,
 
-  [surveyDefsLoad]: (state, {draft}) =>
+  [surveyDefsLoad]: (state, { draft }) =>
     SurveyState.assocDefsFetched(draft)(state),
 }
 

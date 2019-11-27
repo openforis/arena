@@ -1,4 +1,4 @@
-import {insertAllQuery} from '@server/db/dbUtils'
+import { insertAllQuery } from '@server/db/dbUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -64,7 +64,7 @@ export const populateTable = async (survey, nodeDef, client) => {
     nodeDefUuid,
   ])
 
-  const {count} = await client.one(`SELECT count(id) FROM ${viewName}`)
+  const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
 
   const limit = 5000
   const noIter = Math.ceil(count / limit)

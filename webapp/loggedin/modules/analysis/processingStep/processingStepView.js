@@ -1,13 +1,13 @@
 import './processingStepView.scss'
 
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
-import {getUrlParam} from '@webapp/utils/routerUtils'
+import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import {
   fetchProcessingStep,
@@ -90,7 +90,7 @@ const ProcessingStepView = props => {
   )
 }
 
-const mapStateToProps = (state, {match}) => ({
+const mapStateToProps = (state, { match }) => ({
   processingStepUuid: getUrlParam('processingStepUuid')(match),
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),

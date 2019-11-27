@@ -1,10 +1,10 @@
 import * as path from 'path'
-import {Worker} from 'worker_threads'
+import { Worker } from 'worker_threads'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
 
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as Log from '@server/log/log'
 import * as WebSocket from '@server/utils/webSocket'
@@ -19,7 +19,7 @@ export default class ThreadManager {
   constructor(fileName, data, messageHandler, exitHandler = null) {
     const filePath = path.resolve(ProcessUtils.ENV.arenaDist, fileName)
 
-    this.worker = new Worker(filePath, {workerData: data})
+    this.worker = new Worker(filePath, { workerData: data })
     this.socketId = ThreadParams.getSocketId(data)
     this.threadId = this.worker.threadId
     this.logger = Log.getLogger(`ThreadManager - thread ID: ${this.threadId}`)
@@ -40,7 +40,7 @@ export default class ThreadManager {
   }
 
   messageHandlerWrapper(messageHandler) {
-    return ({user, msg}) => {
+    return ({ user, msg }) => {
       if (msg.type === Thread.messageTypes.error) {
         if (this.socketId) {
           WebSocket.notifySocket(

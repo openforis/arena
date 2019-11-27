@@ -1,13 +1,13 @@
 import './appLoaderView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
-import {CSSTransition} from 'react-transition-group'
+import { connect } from 'react-redux'
+import { CSSTransition } from 'react-transition-group'
 
 import * as AppState from '../appState'
 
 const AppLoaderView = props => {
-  const {visible} = props
+  const { visible } = props
 
   return (
     <CSSTransition

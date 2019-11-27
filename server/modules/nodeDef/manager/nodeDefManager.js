@@ -1,15 +1,15 @@
 import * as R from 'ramda'
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as ObjectUtils from '@core/objectUtils'
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
-import {markSurveyDraft} from '../../survey/repository/surveySchemaRepositoryUtils'
+import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 // ======= CREATE
 
@@ -173,8 +173,8 @@ export const updateNodeDefProps = async (
 
     const logContent = {
       uuid: nodeDefUuid,
-      ...(R.isEmpty(props) ? {} : {props}),
-      ...(R.isEmpty(propsAdvanced) ? {} : {propsAdvanced}),
+      ...(R.isEmpty(props) ? {} : { props }),
+      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
     const [nodeDef] = await Promise.all([
@@ -239,7 +239,7 @@ export const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
       t,
     )
 
-    const logContent = {uuid: nodeDefUuid, name: NodeDef.getName(nodeDef)}
+    const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
     await Promise.all([
       markSurveyDraft(surveyId, t),

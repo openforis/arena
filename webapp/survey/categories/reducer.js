@@ -1,6 +1,6 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 import {
   surveyCreate,
   surveyDefsLoad,
@@ -32,31 +32,31 @@ const actionHandlers = {
   [surveyDefsReset]: () => ({}),
 
   // Categories
-  [surveyDefsLoad]: (state, {categories}) => categories,
-  [categoriesUpdate]: (state, {categories}) => categories,
+  [surveyDefsLoad]: (state, { categories }) => categories,
+  [categoriesUpdate]: (state, { categories }) => categories,
 
   // Category
-  [categoryCreate]: (state, {category}) =>
+  [categoryCreate]: (state, { category }) =>
     CategoriesState.assocCategory(category)(state),
 
-  [categoryUpdate]: (state, {category}) =>
+  [categoryUpdate]: (state, { category }) =>
     CategoriesState.assocCategory(category)(state),
 
-  [categoryPropUpdate]: (state, {category, key, value}) =>
+  [categoryPropUpdate]: (state, { category, key, value }) =>
     CategoriesState.assocCategoryProp(category, key, value)(state),
 
-  [categoryDelete]: (state, {category}) =>
+  [categoryDelete]: (state, { category }) =>
     CategoriesState.dissocCategory(category)(state),
 
   // Category level
-  [categoryLevelPropUpdate]: (state, {category, level, key, value}) =>
+  [categoryLevelPropUpdate]: (state, { category, level, key, value }) =>
     CategoriesState.assocCategoryLevelProp(category, level, key, value)(state),
 
-  [categoryLevelDelete]: (state, {category, level}) =>
+  [categoryLevelDelete]: (state, { category, level }) =>
     CategoriesState.dissocCategoryLevel(category, level)(state),
 
   // Category level items
-  [categoryItemPropUpdate]: (state, {category, item, key}) =>
+  [categoryItemPropUpdate]: (state, { category, item, key }) =>
     CategoriesState.dissocCategoryLevelItemValidation(
       category,
       item,

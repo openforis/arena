@@ -1,4 +1,4 @@
-import {combineReducers} from 'redux'
+import { combineReducers } from 'redux'
 
 import processingChain from './processingChain/reducer'
 import processingStep from './processingStep/reducer'

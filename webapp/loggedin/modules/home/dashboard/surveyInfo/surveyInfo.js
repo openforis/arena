@@ -1,10 +1,10 @@
 import './surveyInfo.scss'
 
-import React, {useState} from 'react'
-import {connect} from 'react-redux'
-import {Link} from 'react-router-dom'
+import React, { useState } from 'react'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 
@@ -14,13 +14,13 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {deleteSurvey, publishSurvey} from '@webapp/survey/actions'
+import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
-import {appModuleUri, homeModules} from '../../../../appModules'
+import { appModuleUri, homeModules } from '../../../../appModules'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = props => {
-  const {surveyInfo, canEditDef, publishSurvey, deleteSurvey} = props
+  const { surveyInfo, canEditDef, publishSurvey, deleteSurvey } = props
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
@@ -127,6 +127,6 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(
+export default connect(mapStateToProps, { publishSurvey, deleteSurvey })(
   SurveyInfo,
 )

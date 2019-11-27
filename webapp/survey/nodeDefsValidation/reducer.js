@@ -1,6 +1,6 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 
 import {
   surveyCreate,
@@ -10,7 +10,7 @@ import {
   surveyUpdate,
 } from '../actions'
 
-import {nodeDefsValidationUpdate} from '../nodeDefs/actions'
+import { nodeDefsValidationUpdate } from '../nodeDefs/actions'
 
 const actionHandlers = {
   // Reset state
@@ -22,8 +22,8 @@ const actionHandlers = {
   [surveyDefsReset]: () => ({}),
 
   // NodeDefsValidation load
-  [surveyDefsLoad]: (state = {}, {nodeDefsValidation}) => nodeDefsValidation,
-  [nodeDefsValidationUpdate]: (state = {}, {nodeDefsValidation}) =>
+  [surveyDefsLoad]: (state = {}, { nodeDefsValidation }) => nodeDefsValidation,
+  [nodeDefsValidationUpdate]: (state = {}, { nodeDefsValidation }) =>
     nodeDefsValidation,
 }
 

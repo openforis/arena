@@ -1,21 +1,21 @@
 import './processingChainsView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import TableView from '../../../tableViews/tableView'
 
-import {reloadListItems} from '../../../tableViews/actions'
+import { reloadListItems } from '../../../tableViews/actions'
 import ProcessingChainsRow from './components/processingChainsRow'
 import ProcessingChainsRowHeader from './components/processingChainsRowHeader'
 import ProcessingChainsHeaderLeft from './components/processingChainsHeaderLeft'
 
-import {createProcessingChain, navigateToProcessingChainView} from './actions'
+import { createProcessingChain, navigateToProcessingChainView } from './actions'
 
 const processingChainsModule = 'processing-chains'
 
@@ -28,7 +28,7 @@ const ProcessingChainsView = props => {
     navigateToProcessingChainView,
   } = props
 
-  const restParams = {surveyCycleKey}
+  const restParams = { surveyCycleKey }
 
   useOnUpdate(() => {
     reloadListItems(processingChainsModule, restParams)

@@ -5,7 +5,7 @@ import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 const TaxaTableRow = props => {
-  const {row: taxon, idx, offset, vernacularLanguageCodes} = props
+  const { row: taxon, idx, offset, vernacularLanguageCodes } = props
 
   return (
     <>

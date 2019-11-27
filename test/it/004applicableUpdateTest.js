@@ -1,4 +1,4 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,7 +8,7 @@ import * as Node from '@core/record/node'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import {getContextUser} from '../testContext'
+import { getContextUser } from '../testContext'
 
 import * as SB from './utils/surveyBuilder'
 import * as RB from './utils/recordBuilder'
@@ -73,7 +73,9 @@ describe('Applicable Test', () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // Update dependent nodes
-      const {record: recordUpdate} = await RecordManager.updateNodesDependents(
+      const {
+        record: recordUpdate,
+      } = await RecordManager.updateNodesDependents(
         survey,
         record,
         nodesUpdated,

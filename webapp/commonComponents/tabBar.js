@@ -2,7 +2,7 @@ import './tabBar.scss'
 
 import React from 'react'
 
-const TabBarButtons = ({tabs, selection, onClick}) => (
+const TabBarButtons = ({ tabs, selection, onClick }) => (
   <div className="flex-center tab-bar__header">
     {tabs.map((tab, i) => {
       const active = i === selection
@@ -28,21 +28,21 @@ class TabBar extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = {selection: props.selection || TabBar.defaultProps.selection}
+    this.state = { selection: props.selection || TabBar.defaultProps.selection }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const {selection} = this.props
-    const {selection: selectionPrev} = prevProps
+    const { selection } = this.props
+    const { selection: selectionPrev } = prevProps
     if (selection !== selectionPrev) {
-      this.setState({selection})
+      this.setState({ selection })
     }
   }
 
   render() {
-    const {tabs, className, renderer, onClick} = this.props
+    const { tabs, className, renderer, onClick } = this.props
 
-    const {selection} = this.state
+    const { selection } = this.state
 
     const tab = tabs[selection]
 
@@ -52,14 +52,14 @@ class TabBar extends React.Component {
           tabs={tabs}
           selection={selection}
           onClick={tabIndex => {
-            this.setState({selection: tabIndex})
+            this.setState({ selection: tabIndex })
             onClick && onClick(tabs[tabIndex])
           }}
         />
 
         {renderer
-          ? React.createElement(renderer, {...this.props})
-          : React.createElement(tab.component, {...tab.props, ...this.props})}
+          ? React.createElement(renderer, { ...this.props })
+          : React.createElement(tab.component, { ...tab.props, ...this.props })}
       </div>
     )
   }

@@ -9,7 +9,7 @@ import AppJobMonitor from './appJob/appJobMonitor'
 import ModuleSwitch from './modules/moduleSwitch'
 
 const AppView = props => {
-  const {location} = props
+  const { location } = props
   const pathName = location.pathname
 
   return (

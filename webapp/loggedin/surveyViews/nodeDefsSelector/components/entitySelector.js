@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import {nbsp} from '@core/stringUtils'
+import { nbsp } from '@core/stringUtils'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
@@ -25,7 +25,7 @@ const getEntities = (hierarchy, lang) => {
 }
 
 const EntitySelector = props => {
-  const {hierarchy, nodeDefUuidEntity, lang, onChange} = props
+  const { hierarchy, nodeDefUuidEntity, lang, onChange } = props
 
   const entities = getEntities(hierarchy, lang)
   const selection = entities.find(R.propEq('key', nodeDefUuidEntity))

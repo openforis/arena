@@ -2,11 +2,11 @@ import './taxonomyEditView.scss'
 
 import React from 'react'
 import * as R from 'ramda'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Authorizer from '@core/auth/authorizer'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -52,7 +52,7 @@ const TaxonomyEditView = props => {
       <TableView
         module={TaxonomyEditState.keys.taxa}
         moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
-        restParams={{draft: canEdit}}
+        restParams={{ draft: canEdit }}
         gridTemplateColumns={gridTemplateColumns}
         rowHeaderComponent={TaxaTableRowHeader}
         rowComponent={TaxaTableRow}
@@ -65,7 +65,7 @@ const TaxonomyEditView = props => {
         readOnly={!canEdit}
       />
 
-      <div style={{justifySelf: 'center'}}>
+      <div style={{ justifySelf: 'center' }}>
         <button className="btn" onClick={() => setTaxonomyForEdit(null)}>
           {i18n.t('common.done')}
         </button>

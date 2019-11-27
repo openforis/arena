@@ -8,7 +8,7 @@ export const showAppJobMonitor = (
   job,
   onComplete = null,
   autoHide = false,
-) => dispatch => dispatch({type: appJobStart, job, onComplete, autoHide})
+) => dispatch => dispatch({ type: appJobStart, job, onComplete, autoHide })
 
 export const hideAppJobMonitor = () => dispatch =>
   dispatch(activeJobUpdate(null))
@@ -26,5 +26,5 @@ export const activeJobUpdate = job => (dispatch, getState) => {
     }
   }
 
-  dispatch({type: appJobActiveUpdate, job})
+  dispatch({ type: appJobActiveUpdate, job })
 }

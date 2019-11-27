@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 
@@ -11,7 +11,7 @@ import CollectImportJob from './collectImport/collectImportJob'
 
 // COLLECT SURVEY IMPORT
 export const startCollectImportJob = (user, filePath) => {
-  const job = new CollectImportJob({user, filePath})
+  const job = new CollectImportJob({ user, filePath })
 
   JobManager.executeJobThread(job)
 

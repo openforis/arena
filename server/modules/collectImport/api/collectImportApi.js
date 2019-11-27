@@ -18,7 +18,7 @@ export const init = app => {
         file.tempFilePath,
       )
 
-      res.json({job: JobUtils.jobToJSON(job)})
+      res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
       next(error)
     }
@@ -31,11 +31,11 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
         const items = await CollectImportService.fetchReportItems(surveyId)
 
-        res.json({items})
+        res.json({ items })
       } catch (error) {
         next(error)
       }
@@ -47,11 +47,11 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
         const count = await CollectImportService.countReportItems(surveyId)
 
-        res.json({count})
+        res.json({ count })
       } catch (error) {
         next(error)
       }
@@ -65,7 +65,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, itemId, resolved} = Request.getParams(req)
+        const { surveyId, itemId, resolved } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const item = await CollectImportService.updateReportItem(
@@ -76,7 +76,7 @@ export const init = app => {
           resolved,
         )
 
-        return res.json({item})
+        return res.json({ item })
       } catch (error) {
         next(error)
       }

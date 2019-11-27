@@ -1,12 +1,16 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
-import {surveyCreate, surveyDelete, surveyUpdate} from '@webapp/survey/actions'
-import {nodeDefCreate} from '@webapp/survey/nodeDefs/actions'
-import {formReset} from '../surveyForm/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
+import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
+import { formReset } from '../surveyForm/actions'
 import * as NodeDefEditState from './nodeDefEditState'
 
-import {nodeDefEditUpdate} from './actions'
+import { nodeDefEditUpdate } from './actions'
 
 const actionHandlers = {
   // Reset form
@@ -16,10 +20,10 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [nodeDefEditUpdate]: (state, {nodeDef}) =>
+  [nodeDefEditUpdate]: (state, { nodeDef }) =>
     NodeDefEditState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefCreate]: (state, {nodeDef}) =>
+  [nodeDefCreate]: (state, { nodeDef }) =>
     NodeDefEditState.assocNodeDef(nodeDef)(state),
 }
 

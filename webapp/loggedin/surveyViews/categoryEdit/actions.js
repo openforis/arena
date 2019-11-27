@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import {debounceAction} from '@webapp/utils/reduxUtils'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
@@ -23,7 +23,7 @@ import {
   categoriesUpdate,
 } from '@webapp/survey/categories/actions'
 
-import {showAppJobMonitor} from '@webapp/loggedin/appJob/actions'
+import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
 import * as CategoryEditState from './categoryEditState'
 
@@ -38,7 +38,7 @@ export const categoryEditImportSummaryColumnDataTypeUpdate =
   'surveyForm/categoryEdit/importSummary/column/dataType/update'
 
 export const dispatchCategoryUpdate = (dispatch, category) =>
-  dispatch({type: categoryUpdate, category})
+  dispatch({ type: categoryUpdate, category })
 
 // ======
 // ====== SET FOR EDIT
@@ -46,7 +46,7 @@ export const dispatchCategoryUpdate = (dispatch, category) =>
 
 export const setCategoryForEdit = category => async dispatch => {
   const categoryUuid = Category.getUuid(category)
-  dispatch({type: categoryEditUpdate, categoryUuid})
+  dispatch({ type: categoryEditUpdate, categoryUuid })
 
   // Load first level items
   if (category) {
@@ -62,7 +62,7 @@ export const setCategoryItemForEdit = (
 ) => async dispatch => {
   const itemUuid = edit ? CategoryItem.getUuid(item) : null
   const levelIndex = CategoryLevel.getIndex(level)
-  dispatch({type: categoryEditLevelActiveItemUpdate, levelIndex, itemUuid})
+  dispatch({ type: categoryEditLevelActiveItemUpdate, levelIndex, itemUuid })
 
   // Load child items
   dispatch(loadLevelItems(Category.getUuid(category), levelIndex + 1, itemUuid))
@@ -74,14 +74,14 @@ export const setCategoryItemForEdit = (
 
 export const createCategory = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data} = await axios.post(
+  const { data } = await axios.post(
     `/api/survey/${surveyId}/categories`,
     Category.newCategory(),
   )
 
   const category = data.category
 
-  dispatch({type: categoryCreate, category})
+  dispatch({ type: categoryCreate, category })
 
   return category
 }
@@ -94,12 +94,12 @@ export const uploadCategory = (categoryUuid, file) => async (
   formData.append('file', file)
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data: summary} = await axios.post(
+  const { data: summary } = await axios.post(
     `/api/survey/${surveyId}/categories/${categoryUuid}/upload`,
     formData,
   )
 
-  dispatch({type: categoryEditImportSummaryShow, summary})
+  dispatch({ type: categoryEditImportSummaryShow, summary })
 }
 
 export const importCategory = () => async (dispatch, getState) => {
@@ -110,7 +110,7 @@ export const importCategory = () => async (dispatch, getState) => {
   const importSummary = CategoryEditState.getImportSummary(state)
 
   const {
-    data: {job},
+    data: { job },
   } = await axios.post(
     `/api/survey/${surveyId}/categories/${categoryUuid}/import`,
     importSummary,
@@ -120,13 +120,13 @@ export const importCategory = () => async (dispatch, getState) => {
     showAppJobMonitor(job, jobCompleted => {
       // Reload category
       dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
-      dispatch(setCategoryForEdit({[Category.keys.uuid]: categoryUuid}))
+      dispatch(setCategoryForEdit({ [Category.keys.uuid]: categoryUuid }))
     }),
   )
 }
 
 export const hideCategoryImportSummary = () => dispatch =>
-  dispatch({type: categoryEditImportSummaryHide})
+  dispatch({ type: categoryEditImportSummaryHide })
 
 export const setCategoryImportSummaryColumnDataType = (
   columnName,
@@ -142,7 +142,7 @@ export const createCategoryLevel = category => async (dispatch, getState) => {
   const level = Category.newLevel(category)
   const surveyId = SurveyState.getSurveyId(getState())
 
-  const {data} = await axios.post(
+  const { data } = await axios.post(
     `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/levels`,
     level,
   )
@@ -157,16 +157,16 @@ export const createCategoryLevelItem = (category, level, parentItem) => async (
     CategoryLevel.getUuid(level),
     CategoryItem.getUuid(parentItem),
   )
-  dispatch({type: categoryItemCreate, level, item})
+  dispatch({ type: categoryItemCreate, level, item })
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data} = await axios.post(
+  const { data } = await axios.post(
     `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items`,
     item,
   )
 
   dispatchCategoryUpdate(dispatch, data.category)
-  dispatch({type: categoryItemUpdate, level, item: data.item})
+  dispatch({ type: categoryItemUpdate, level, item: data.item })
 }
 
 // ======
@@ -180,16 +180,16 @@ const loadLevelItems = (
   parentUuid = null,
 ) => async (dispatch, getState) => {
   // Reset level items first
-  dispatch({type: categoryItemsUpdate, levelIndex, items: null})
+  dispatch({ type: categoryItemsUpdate, levelIndex, items: null })
 
   const surveyId = SurveyState.getSurveyId(getState())
   const {
-    data: {items},
+    data: { items },
   } = await axios.get(
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    {params: {draft: true, parentUuid}},
+    { params: { draft: true, parentUuid } },
   )
-  dispatch({type: categoryItemsUpdate, levelIndex, items})
+  dispatch({ type: categoryItemsUpdate, levelIndex, items })
 }
 
 // ======
@@ -200,7 +200,7 @@ export const putCategoryProp = (category, key, value) => async (
   dispatch,
   getState,
 ) => {
-  dispatch({type: categoryPropUpdate, category, key, value})
+  dispatch({ type: categoryPropUpdate, category, key, value })
 
   const action = async () => {
     const surveyId = SurveyState.getSurveyId(getState())
@@ -208,9 +208,9 @@ export const putCategoryProp = (category, key, value) => async (
       data,
     } = await axios.put(
       `/api/survey/${surveyId}/categories/${Category.getUuid(category)}`,
-      {key, value},
+      { key, value },
     )
-    dispatch({type: categoriesUpdate, categories: data.categories})
+    dispatch({ type: categoriesUpdate, categories: data.categories })
   }
 
   dispatch(
@@ -225,7 +225,7 @@ export const putCategoryLevelProp = (category, level, key, value) => async (
   dispatch,
   getState,
 ) => {
-  dispatch({type: categoryLevelPropUpdate, category, level, key, value})
+  dispatch({ type: categoryLevelPropUpdate, category, level, key, value })
 
   const levelUuid = CategoryLevel.getUuid(level)
 
@@ -237,7 +237,7 @@ export const putCategoryLevelProp = (category, level, key, value) => async (
       `/api/survey/${surveyId}/categories/${Category.getUuid(
         category,
       )}/levels/${levelUuid}`,
-      {key, value},
+      { key, value },
     )
     dispatchCategoryUpdate(dispatch, data.category)
   }
@@ -252,13 +252,13 @@ export const putCategoryItemProp = (
   key,
   value,
 ) => async (dispatch, getState) => {
-  dispatch({type: categoryItemPropUpdate, category, level, item, key, value})
+  dispatch({ type: categoryItemPropUpdate, category, level, item, key, value })
 
   const itemUuid = CategoryItem.getUuid(item)
 
   const action = async () => {
     const surveyId = SurveyState.getSurveyId(getState())
-    const {data} = await axios.put(
+    const { data } = await axios.put(
       `/api/survey/${surveyId}/categories/${Category.getUuid(
         category,
       )}/items/${itemUuid}`,
@@ -278,24 +278,24 @@ export const putCategoryItemProp = (
 // ======
 
 export const deleteCategory = category => async (dispatch, getState) => {
-  dispatch({type: categoryDelete, category})
+  dispatch({ type: categoryDelete, category })
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data} = await axios.delete(
+  const { data } = await axios.delete(
     `/api/survey/${surveyId}/categories/${Category.getUuid(category)}`,
   )
-  dispatch({type: categoriesUpdate, categories: data.categories})
+  dispatch({ type: categoriesUpdate, categories: data.categories })
 }
 
 export const deleteCategoryLevel = (category, level) => async (
   dispatch,
   getState,
 ) => {
-  dispatch({type: categoryLevelDelete, category, level})
+  dispatch({ type: categoryLevelDelete, category, level })
 
   // Delete level and items from db
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data} = await axios.delete(
+  const { data } = await axios.delete(
     `/api/survey/${surveyId}/categories/${Category.getUuid(
       category,
     )}/levels/${CategoryLevel.getUuid(level)}`,
@@ -307,10 +307,10 @@ export const deleteCategoryItem = (category, level, item) => async (
   dispatch,
   getState,
 ) => {
-  dispatch({type: categoryItemDelete, item, level})
+  dispatch({ type: categoryItemDelete, item, level })
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data} = await axios.delete(
+  const { data } = await axios.delete(
     `/api/survey/${surveyId}/categories/${Category.getUuid(
       category,
     )}/items/${CategoryItem.getUuid(item)}`,

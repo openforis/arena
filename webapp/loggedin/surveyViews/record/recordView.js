@@ -1,23 +1,23 @@
-import React, {useEffect, useRef} from 'react'
-import {compose} from 'redux'
-import {connect} from 'react-redux'
-import {withRouter} from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
-import {getUrlParam} from '@webapp/utils/routerUtils'
+import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import {useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 
 import * as Authorizer from '@core/auth/authorizer'
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import SurveyFormView from '../surveyForm/surveyFormView'
-import {resetForm} from '../surveyForm/actions'
+import { resetForm } from '../surveyForm/actions'
 import * as RecordState from './recordState'
 
 import {
@@ -73,7 +73,7 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.recordSessionExpired, () => {
       sessionExpired(history)
     })
-    AppWebSocket.on(WebSocketEvents.applicationError, ({key, params}) => {
+    AppWebSocket.on(WebSocketEvents.applicationError, ({ key, params }) => {
       applicationError(history, key, params)
     })
 
@@ -90,7 +90,7 @@ const RecordView = props => {
     AppWebSocket.off(WebSocketEvents.recordSessionExpired)
     AppWebSocket.off(WebSocketEvents.applicationError)
 
-    const {recordUuidUrlParam, checkOutRecord, resetForm} = props
+    const { recordUuidUrlParam, checkOutRecord, resetForm } = props
 
     if (recordLoadedRef.current) {
       checkOutRecord(recordUuidUrlParam)
@@ -127,7 +127,7 @@ const RecordView = props => {
   ) : null
 }
 
-const mapStateToProps = (state, {match, location}) => {
+const mapStateToProps = (state, { match, location }) => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)

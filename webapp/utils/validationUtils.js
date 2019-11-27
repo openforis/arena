@@ -26,7 +26,7 @@ const getValidationFieldErrorMessage = (i18n, field) =>
         getErrorText(i18n)(
           ValidationResult.newInstance(
             Validation.messageKeys.invalidField, // Default error message
-            {field},
+            { field },
           ),
         ),
       R.join(', '),

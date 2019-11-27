@@ -1,4 +1,4 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import SystemError from '@core/systemError'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -140,7 +140,7 @@ export const updateChainProp = async (
           user,
           surveyId,
           ActivityLog.type.processingChainPropUpdate,
-          {[ActivityLog.keysContent.uuid]: processingChainUuid, key, value},
+          { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
           false,
           t,
         ),

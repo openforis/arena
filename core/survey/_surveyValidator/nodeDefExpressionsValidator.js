@@ -50,7 +50,9 @@ const errorKeyByDependencyType = {
 }
 
 const _getNodeValue = nodeDef =>
-  NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? {props: {code: ''}} : 1 // Simulates node value
+  NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
+    ? { props: { code: '' } }
+    : 1 // Simulates node value
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
@@ -91,7 +93,7 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (
   if (!selfReferenceAllowed && NodeDef.isEqual(def)(nodeDefCurrent)) {
     throw new SystemError(
       Validation.messageKeys.expressions.cannotUseCurrentNode,
-      {name: nodeName},
+      { name: nodeName },
     )
   }
 
@@ -110,7 +112,7 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (
   ) {
     throw new SystemError(
       Validation.messageKeys.expressions.circularDependencyError,
-      {name: nodeName},
+      { name: nodeName },
     )
   }
 
@@ -128,7 +130,7 @@ const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
 
   try {
     // NB: `node` not needed here
-    await Expression.evalString(expr, {functions})
+    await Expression.evalString(expr, { functions })
     return null
   } catch (error) {
     const details = R.is(SystemError, error)
@@ -136,7 +138,7 @@ const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
       : error.toString()
     return ValidationResult.newInstance(
       Validation.messageKeys.expressions.expressionInvalid,
-      {details, ...error.params},
+      { details, ...error.params },
     )
   }
 }
@@ -175,7 +177,7 @@ const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
         NodeDefExpression.getApplyIf(nodeDefExpression),
   )(nodeDefExpressions)
     ? Validation.newInstance(false, {}, [
-        {key: Validation.messageKeys.nodeDefEdit.expressionDuplicate},
+        { key: Validation.messageKeys.nodeDefEdit.expressionDuplicate },
       ])
     : null
 
@@ -243,7 +245,7 @@ export const validate = async (survey, nodeDef, dependencyType) => {
   })
 
   if (!Validation.isValid(result)) {
-    Validation.setErrors([{key: errorKey}])(result)
+    Validation.setErrors([{ key: errorKey }])(result)
   }
 
   return result

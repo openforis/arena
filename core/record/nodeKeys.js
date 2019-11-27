@@ -11,7 +11,7 @@ export const keys = {
 
 export const getKeysHierarchyPath = (survey, lang) =>
   R.pipe(
-    R.map(({nodeDefUuid, keys}) => {
+    R.map(({ nodeDefUuid, keys }) => {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const label = NodeDef.getLabel(nodeDef, lang)
       // Do not show keys for root entity

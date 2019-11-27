@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import {parse as csvParser} from 'csv'
+import { parse as csvParser } from 'csv'
 
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
@@ -97,7 +97,9 @@ export const createReaderFromStream = (
         headers
           ? headers.reduce(
               (accRow, header, index) =>
-                Object.assign(accRow, {[header]: StringUtils.trim(row[index])}),
+                Object.assign(accRow, {
+                  [header]: StringUtils.trim(row[index]),
+                }),
               {},
             )
           : row
@@ -114,7 +116,7 @@ export const createReaderFromStream = (
     stream && stream.destroy()
   }
 
-  return {start, cancel}
+  return { start, cancel }
 }
 
 export const createReaderFromFile = (

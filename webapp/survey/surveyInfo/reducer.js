@@ -1,12 +1,12 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as Survey from '@core/survey/survey'
 
 // App actions
-import {appPropsChange, appUserLogout} from '@webapp/app/actions'
+import { appPropsChange, appUserLogout } from '@webapp/app/actions'
 
 // Survey actions
-import {surveyCreate, surveyDelete, surveyUpdate} from '../actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
 
 // SurveyInfo actions
 
@@ -18,34 +18,34 @@ import {
 } from '../nodeDefs/actions'
 
 // Category actions
-import {categoryCreate} from '../categories/actions'
+import { categoryCreate } from '../categories/actions'
 
 // Taxonomies actions
-import {taxonomyCreate} from '../taxonomies/actions'
-import {categoryDelete, categoryUpdate} from '../categories/actions'
+import { taxonomyCreate } from '../taxonomies/actions'
+import { categoryDelete, categoryUpdate } from '../categories/actions'
 import {
   taxonomyDelete,
   taxonomyPropUpdate,
   taxonomyUpdate,
 } from '../taxonomies/actions'
-import {surveyInfoUpdate, surveyInfoValidationUpdate} from './actions'
+import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
 import * as SurveyInfoState from './surveyInfoState'
 
 const actionHandlers = {
   // App initialization
-  [appPropsChange]: (state, {survey}) =>
+  [appPropsChange]: (state, { survey }) =>
     survey ? Survey.getSurveyInfo(survey) : state,
   [appUserLogout]: () => ({}),
 
   // Survey Update
-  [surveyCreate]: (state, {survey}) => Survey.getSurveyInfo(survey),
-  [surveyUpdate]: (state, {survey}) => Survey.getSurveyInfo(survey),
+  [surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [surveyUpdate]: (state, { survey }) => Survey.getSurveyInfo(survey),
   [surveyDelete]: () => ({}),
 
   // Survey info update
-  [surveyInfoUpdate]: (state, {surveyInfo}) => surveyInfo,
+  [surveyInfoUpdate]: (state, { surveyInfo }) => surveyInfo,
 
-  [surveyInfoValidationUpdate]: (state, {validation}) =>
+  [surveyInfoValidationUpdate]: (state, { validation }) =>
     SurveyInfoState.assocValidation(validation)(state),
 
   // NodeDef

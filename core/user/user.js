@@ -4,10 +4,10 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as AuthGroup from '@core/auth/authGroup'
 
-import {keys} from './_user/userKeys'
+import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
 
-export {keys} from './_user/userKeys'
+export { keys } from './_user/userKeys'
 
 export const keysPrefs = UserPrefs.keysPrefs
 

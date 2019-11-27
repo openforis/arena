@@ -27,7 +27,7 @@ export default class CategoriesImportJob extends Job {
   }
 
   async execute(tx) {
-    const {collectSurvey, defaultLanguage} = this.context
+    const { collectSurvey, defaultLanguage } = this.context
 
     const categories = []
 
@@ -104,7 +104,7 @@ export default class CategoriesImportJob extends Job {
       const levels = hierarchyLevels.map((hierarchyLevel, index) =>
         Category.newLevel(
           categoryToCreate,
-          {[CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name},
+          { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name },
           index,
         ),
       )

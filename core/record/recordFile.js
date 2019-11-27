@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {truncate} from '@core/stringUtils'
+import { truncate } from '@core/stringUtils'
 
 const getProp = prop => R.path(['props', prop])
 

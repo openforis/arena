@@ -1,9 +1,13 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
-import {surveyCreate, surveyDelete, surveyUpdate} from '@webapp/survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
 import * as RecordsSummaryState from './recordsSummaryState'
-import {recordsSummaryUpdate} from './actions'
+import { recordsSummaryUpdate } from './actions'
 
 const actionHandlers = {
   // Reset state
@@ -13,7 +17,7 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // Records summary
-  [recordsSummaryUpdate]: (state, {timeRange, from, to, counts}) =>
+  [recordsSummaryUpdate]: (state, { timeRange, from, to, counts }) =>
     RecordsSummaryState.assocSummary(timeRange, from, to, counts)(state),
 }
 

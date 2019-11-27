@@ -1,7 +1,7 @@
 import './nodeDefFile.scss'
 
 import React from 'react'
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
@@ -80,7 +80,7 @@ const FileInput = props => {
 }
 
 const MultipleFileInput = props => {
-  const {nodes} = props
+  const { nodes } = props
 
   return (
     <div>

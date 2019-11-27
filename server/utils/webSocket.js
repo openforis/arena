@@ -1,7 +1,7 @@
 import * as socketIoServer from 'socket.io'
 import * as R from 'ramda'
 
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as Log from '@server/log/log'
 import * as Request from './request'

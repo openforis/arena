@@ -1,15 +1,15 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n, useFormObject} from '@webapp/commonComponents/hooks'
+import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from '../loginState'
-import {sendVerificationCode, setLoginError} from '../actions'
+import { sendVerificationCode, setLoginError } from '../actions'
 
 import * as LoginValidator from './loginValidator'
 
 const ForgotPasswordForm = props => {
-  const {email: initialEmail, sendVerificationCode, setLoginError} = props
+  const { email: initialEmail, sendVerificationCode, setLoginError } = props
 
   const i18n = useI18n()
 

@@ -1,6 +1,6 @@
 import './expressionEditor.scss'
 
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'

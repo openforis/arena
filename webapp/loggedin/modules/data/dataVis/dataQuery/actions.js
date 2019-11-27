@@ -69,7 +69,7 @@ const fetchData = async (
       filter,
     )
     const sortParam = R.defaultTo(DataQueryState.getTableSort(state), sort)
-    const {data} = await queryTable(
+    const { data } = await queryTable(
       surveyId,
       cycle,
       editMode,
@@ -84,7 +84,7 @@ const fetchData = async (
 }
 
 export const updateTableNodeDefUuid = nodeDefUuidTable => dispatch =>
-  dispatch({type: dataQueryTableNodeDefUuidUpdate, nodeDefUuidTable})
+  dispatch({ type: dataQueryTableNodeDefUuidUpdate, nodeDefUuidTable })
 
 export const updateTableNodeDefUuidCols = (
   nodeDefUuidCols,
@@ -93,14 +93,14 @@ export const updateTableNodeDefUuidCols = (
 ) => async (dispatch, getState) => {
   const state = getState()
 
-  dispatch({type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols})
+  dispatch({ type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols })
 
   const sort = DataQueryState.getTableSort(state)
   const newSort = DataSort.retainVariables(getColNames(state, nodeDefUuidCols))(
     sort,
   )
   if (DataSort.toString(sort) !== DataSort.toString(newSort)) {
-    dispatch({type: dataQueryTableSortUpdate, sort: newSort})
+    dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
   }
 
   const fetch =
@@ -113,14 +113,14 @@ export const updateTableNodeDefUuidCols = (
     if (hasTableAndCols) {
       const state = getState()
       const data = await fetchData(state, [nodeDefUuidCol])
-      dispatch({type: dataQueryTableDataColUpdate, data})
+      dispatch({ type: dataQueryTableDataColUpdate, data })
     } else {
       dispatch(initTableData(DataQueryState.getTableFilter(state)))
     }
   } else if (nodeDefUuidColDeleted) {
     // Reset data
     if (R.isEmpty(nodeDefUuidCols)) {
-      dispatch({type: dataQueryTableDataUpdate, offset: 0, data: []})
+      dispatch({ type: dataQueryTableDataUpdate, offset: 0, data: [] })
     }
     // Delete cols from data rows
     else {
@@ -154,7 +154,7 @@ export const initTableData = (
       editModeParam,
     )
 
-    const {offset, limit} = DataQueryState.defaults
+    const { offset, limit } = DataQueryState.defaults
 
     const [countResp, dataResp] = await Promise.all([
       axios.post(`/api/surveyRdb/${surveyId}/${nodeDefUuidTable}/query/count`, {
@@ -190,11 +190,11 @@ export const initTableData = (
 
 export const updateTableOffset = (offset = 0) => async (dispatch, getState) => {
   const data = await fetchData(getState(), null, offset)
-  dispatch({type: dataQueryTableDataUpdate, offset, data})
+  dispatch({ type: dataQueryTableDataUpdate, offset, data })
 }
 
 export const resetTableFilter = () => dispatch => {
-  dispatch({type: dataQueryTableFilterUpdate, filter: null})
+  dispatch({ type: dataQueryTableFilterUpdate, filter: null })
   dispatch(initTableData())
 }
 

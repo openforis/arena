@@ -2,8 +2,8 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import {db} from '@server/db/db'
-import {uuidv4} from '@core/uuid'
+import { db } from '@server/db/db'
+import { uuidv4 } from '@core/uuid'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
@@ -15,7 +15,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as AuthGroup from '@core/auth/authGroup'
 
-import {migrateSurveySchema} from '@server/db/migration/dbMigrator'
+import { migrateSurveySchema } from '@server/db/migration/dbMigrator'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as UserManager from '../../user/manager/userManager'
 import * as NodeDefManager from '../../nodeDef/manager/nodeDefManager'
@@ -27,7 +27,7 @@ import * as UserRepository from '../../user/repository/userRepository'
 import * as AuthGroupRepository from '../../auth/repository/authGroupRepository'
 import * as SchemaRdbRepository from '../../surveyRdb/repository/schemaRdbRepository'
 
-const assocSurveyInfo = info => ({info})
+const assocSurveyInfo = info => ({ info })
 
 // ====== VALIDATION
 
@@ -46,7 +46,7 @@ const validateSurveyInfo = async surveyInfo =>
 
 export const createSurvey = async (
   user,
-  {name, label, languages, collectUri = null},
+  { name, label, languages, collectUri = null },
   createRootEntityDef = true,
   system = false,
   client = db,
@@ -157,7 +157,7 @@ export const fetchSurveyById = async (
   ])
   const validation = validate ? await validateSurveyInfo(surveyInfo) : null
 
-  return assocSurveyInfo({...surveyInfo, authGroups, validation})
+  return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
 
 export const fetchSurveyAndNodeDefsBySurveyId = async (
@@ -241,7 +241,7 @@ export const updateSurveyProp = async (
         user,
         surveyId,
         ActivityLog.type.surveyPropUpdate,
-        {key, value},
+        { key, value },
         system,
         t,
       ),
@@ -252,7 +252,7 @@ export const updateSurveyProp = async (
 
 export const updateSurveyProps = async (user, surveyId, props, client = db) =>
   await client.tx(async t => {
-    const validation = await validateSurveyInfo({id: surveyId, props})
+    const validation = await validateSurveyInfo({ id: surveyId, props })
     if (Validation.isValid(validation)) {
       const surveyInfoPrev = Survey.getSurveyInfo(
         await fetchSurveyById(surveyId, true, false, t),
@@ -271,7 +271,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
               user,
               surveyId,
               ActivityLog.type.surveyPropUpdate,
-              {key, value},
+              { key, value },
               false,
               t,
             ),
@@ -307,7 +307,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       return await fetchSurveyById(surveyId, true, true, t)
     }
 
-    return assocSurveyInfo({validation})
+    return assocSurveyInfo({ validation })
   })
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>

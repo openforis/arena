@@ -1,12 +1,12 @@
 import './processingChainSteps.scss'
 
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import {
   createProcessingStep,
   fetchProcessingSteps,
@@ -57,6 +57,6 @@ ProcessingChainSteps.defaultProps = {
   processingChain: null,
 }
 
-export default connect(null, {createProcessingStep, fetchProcessingSteps})(
+export default connect(null, { createProcessingStep, fetchProcessingSteps })(
   ProcessingChainSteps,
 )

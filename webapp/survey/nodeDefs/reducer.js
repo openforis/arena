@@ -1,6 +1,6 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 
 import {
   surveyCreate,
@@ -29,19 +29,19 @@ const actionHandlers = {
 
   [surveyDefsReset]: () => ({}),
 
-  [surveyDefsLoad]: (state = {}, {nodeDefs}) => nodeDefs,
+  [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   // Single nodeDef actions
-  [nodeDefCreate]: (state, {nodeDef}) =>
+  [nodeDefCreate]: (state, { nodeDef }) =>
     NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropsUpdate]: (state, {nodeDefUuid, props, propsAdvanced}) =>
+  [nodeDefPropsUpdate]: (state, { nodeDefUuid, props, propsAdvanced }) =>
     NodeDefsState.assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
 
-  [nodeDefDelete]: (state, {nodeDef}) =>
+  [nodeDefDelete]: (state, { nodeDef }) =>
     NodeDefsState.dissocNodeDef(nodeDef)(state),
 
-  [nodeDefsUpdate]: (state, {nodeDefs}) =>
+  [nodeDefsUpdate]: (state, { nodeDefs }) =>
     NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 }
 

@@ -1,12 +1,12 @@
 import React from 'react'
 import * as R from 'ramda'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {normalizeName} from '@core/stringUtils'
+import { normalizeName } from '@core/stringUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -31,7 +31,7 @@ import ItemEdit from './itemEdit'
 
 const LevelEdit = props => {
   const handleDelete = () => {
-    const {survey, category, level, deleteCategoryLevel} = props
+    const { survey, category, level, deleteCategoryLevel } = props
 
     const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(
       Category.getUuid(category),
@@ -143,8 +143,8 @@ const LevelEdit = props => {
 }
 
 const mapStateToProps = (state, props) => {
-  const {level} = props
-  const {index} = level
+  const { level } = props
+  const { index } = level
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
 

@@ -1,7 +1,7 @@
 import './formPageNavigation.scss'
 
-import React, {useState} from 'react'
-import {connect} from 'react-redux'
+import React, { useState } from 'react'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,7 +10,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'
 
-import {setFormActivePage} from '../actions'
+import { setFormActivePage } from '../actions'
 
 const NavigationButton = props => {
   const {
@@ -35,19 +35,19 @@ const NavigationButton = props => {
   return (
     <div
       className={`survey-form__node-def-nav level${level}`}
-      style={{marginLeft: `${level === 0 ? 0 : 1}rem`}}
+      style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}
     >
       <div className="display-flex">
         {outerPageChildDefs.length > 0 ? (
           <button
             className="btn-xs btn-toggle"
-            style={{transform: `rotate(${showChildren ? '90' : '0'}deg)`}}
+            style={{ transform: `rotate(${showChildren ? '90' : '0'}deg)` }}
             onClick={() => setShowChildren(!showChildren)}
           >
             <span className="icon icon-play3 icon-12px" />
           </button>
         ) : (
-          <span style={{marginLeft: '21px'}} />
+          <span style={{ marginLeft: '21px' }} />
         )}
 
         <button
@@ -78,7 +78,7 @@ const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const rootNodeDef = Survey.getNodeDefRoot(survey)
 
-  const {edit, nodeDef = rootNodeDef} = props
+  const { edit, nodeDef = rootNodeDef } = props
 
   const parentNode = SurveyFormState.getFormPageParentNode(nodeDef)(state)
 
@@ -96,7 +96,7 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const FormPageNavigation = connect(mapStateToProps, {setFormActivePage})(
+const FormPageNavigation = connect(mapStateToProps, { setFormActivePage })(
   NavigationButton,
 )
 

@@ -1,15 +1,15 @@
 import React from 'react'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import {appModuleUri, dataModules} from '../../../../../appModules'
+import { appModuleUri, dataModules } from '../../../../../appModules'
 import TableColumn from './tableColumn'
 
-const TableColumns = ({nodeDefCols, row, lang, colWidth, editMode = false}) =>
+const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
   nodeDefCols.map(nodeDef => (
     <TableColumn
       key={NodeDef.getUuid(nodeDef)}
@@ -37,7 +37,7 @@ const TableRows = ({
     <div className="table__content">
       <div className="table__rows">
         <div className="table__row-header">
-          <div style={{width: defaultColWidth}}>
+          <div style={{ width: defaultColWidth }}>
             {i18n.t('dataView.rowNum')}
           </div>
           <TableColumns
@@ -50,7 +50,7 @@ const TableRows = ({
 
         <div className="table__data-rows">
           {data.map((row, i) => {
-            const {parentNodeUuid, record} = row
+            const { parentNodeUuid, record } = row
 
             const recordUuid = Record.getUuid(record)
             const recordEditUrl = `${appModuleUri(
@@ -66,7 +66,7 @@ const TableRows = ({
                   className="error-badge-inverse"
                 />
 
-                <div style={{width: defaultColWidth}}>
+                <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
                   {editMode && (
                     <button

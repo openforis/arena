@@ -2,7 +2,7 @@ import * as fs from 'fs'
 
 import * as passwordGenerator from 'generate-password'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as aws from '@server/system/aws'
 
 import * as Survey from '@core/survey/survey'
@@ -61,7 +61,7 @@ export const inviteUser = async (
     )
 
     if (!User.hasAccepted(dbUser)) {
-      throw new SystemError('appErrors.userHasPendingInvitation', {email})
+      throw new SystemError('appErrors.userHasPendingInvitation', { email })
     } else if (hasRoleInSurvey) {
       throw new SystemError('appErrors.userHasRole')
     } else if (User.isSystemAdmin(dbUser)) {
@@ -73,7 +73,7 @@ export const inviteUser = async (
       await Mailer.sendEmail(
         email,
         'emails.userInvite',
-        {serverUrl, surveyLabel, groupLabel},
+        { serverUrl, surveyLabel, groupLabel },
         lang,
       )
     })
@@ -88,7 +88,7 @@ export const inviteUser = async (
         })
         // Add user to cognito pool
         const {
-          User: {Username: userUuid},
+          User: { Username: userUuid },
         } = await aws.inviteUser(email, password)
         // Add user to db
         await UserManager.insertUser(

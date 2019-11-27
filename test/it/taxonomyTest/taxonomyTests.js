@@ -1,4 +1,4 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -10,9 +10,9 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
-import {jobStatus} from '@server/job/jobUtils'
+import { jobStatus } from '@server/job/jobUtils'
 
-import {getContextUser} from '../../testContext'
+import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as TaxonomyUtils from './taxonomyUtils'
 
@@ -198,7 +198,7 @@ const _importFile = async (taxonomyName, importFileName) =>
   )
 
 export const taxonomyImportErrorMissingColumnsTest = async () => {
-  const {job} = await _importFile(
+  const { job } = await _importFile(
     taxonomyName,
     'species list test (short with vernacular names) (errors) (missing columns).csv',
   )
@@ -209,7 +209,7 @@ export const taxonomyImportErrorMissingColumnsTest = async () => {
 }
 
 export const taxonomyImportErrorDuplicateItemsTest = async () => {
-  const {job} = await _importFile(
+  const { job } = await _importFile(
     taxonomyName,
     'species list test (short with vernacular names) (errors).csv',
   )
@@ -217,7 +217,7 @@ export const taxonomyImportErrorDuplicateItemsTest = async () => {
 }
 
 export const taxonomyImportNewTest = async () => {
-  const {job, taxonomyUuid} = await _importFile(
+  const { job, taxonomyUuid } = await _importFile(
     'New taxonomy',
     'species list test (short with vernacular names).csv',
   )

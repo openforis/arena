@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import {sendOk, sendFile} from '@server/utils/response'
+import { sendOk, sendFile } from '@server/utils/response'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
@@ -24,7 +24,7 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
         const record = Request.getBody(req)
         const socketId = Request.getSocketId(req)
 
@@ -47,7 +47,7 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
         const node = Request.getJsonParam(req, 'node')
         const file = Request.getFile(req)
         const socketId = Request.getSocketId(req)
@@ -68,7 +68,7 @@ export const init = app => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, cycle} = Request.getParams(req)
+        const { surveyId, cycle } = Request.getParams(req)
 
         const count = await RecordService.countRecordsBySurveyId(
           surveyId,
@@ -86,7 +86,7 @@ export const init = app => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, cycle, limit, offset} = Request.getParams(req)
+        const { surveyId, cycle, limit, offset } = Request.getParams(req)
 
         const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(
           surveyId,
@@ -106,7 +106,7 @@ export const init = app => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, cycle, from, to} = Request.getParams(req)
+        const { surveyId, cycle, from, to } = Request.getParams(req)
 
         const counts = await RecordService.fetchRecordCreatedCountsByDates(
           surveyId,
@@ -127,7 +127,7 @@ export const init = app => {
     requireRecordViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, nodeUuid} = Request.getParams(req)
+        const { surveyId, nodeUuid } = Request.getParams(req)
 
         const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
         const file = await FileService.fetchFileByUuid(
@@ -155,7 +155,7 @@ export const init = app => {
     requireRecordEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, recordUuid, step} = Request.getParams(req)
+        const { surveyId, recordUuid, step } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await RecordService.updateRecordStep(user, surveyId, recordUuid, step)
@@ -173,7 +173,7 @@ export const init = app => {
     requireRecordViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, recordUuid, draft} = Request.getParams(req)
+        const { surveyId, recordUuid, draft } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
@@ -185,7 +185,7 @@ export const init = app => {
           draft,
         )
 
-        res.json({record})
+        res.json({ record })
       } catch (error) {
         next(error)
       }
@@ -197,7 +197,7 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const {surveyId, recordUuid} = Request.getParams(req)
+        const { surveyId, recordUuid } = Request.getParams(req)
         const socketId = Request.getSocketId(req)
 
         await RecordService.checkOut(socketId, user, surveyId, recordUuid)
@@ -215,7 +215,7 @@ export const init = app => {
     requireRecordEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, recordUuid} = Request.getParams(req)
+        const { surveyId, recordUuid } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
@@ -232,7 +232,7 @@ export const init = app => {
     '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
     requireRecordEditPermission,
     (req, res) => {
-      const {surveyId, recordUuid, nodeUuid} = Request.getParams(req)
+      const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       const socketId = Request.getSocketId(req)
 

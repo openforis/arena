@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 
 import * as Authorizer from '@core/auth/authorizer'
 
@@ -10,13 +10,13 @@ import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSw
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import {appModules, appModuleUri, designerModules} from '../../appModules'
+import { appModules, appModuleUri, designerModules } from '../../appModules'
 
-import {resetForm} from '../../surveyViews/surveyForm/actions'
+import { resetForm } from '../../surveyViews/surveyForm/actions'
 import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
 import FormDesignerView from './formDesigner/formDesignerView'
 
-const DesignerView = ({canEditDef, resetForm}) => {
+const DesignerView = ({ canEditDef, resetForm }) => {
   useEffect(() => {
     resetForm()
   }, [])
@@ -61,4 +61,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {resetForm})(DesignerView)
+export default connect(mapStateToProps, { resetForm })(DesignerView)

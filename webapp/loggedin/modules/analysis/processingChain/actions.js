@@ -2,12 +2,12 @@ import axios from 'axios'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import {debounceAction} from '@webapp/utils/reduxUtils'
-import {analysisModules, appModuleUri} from '@webapp/loggedin/appModules'
+import { debounceAction } from '@webapp/utils/reduxUtils'
+import { analysisModules, appModuleUri } from '@webapp/loggedin/appModules'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {showNotification} from '@webapp/app/appNotification/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 import {
   hideAppLoader,
   hideAppSaving,
@@ -22,7 +22,7 @@ export const processingChainPropUpdate = 'survey/processingChain/prop/update'
 export const processingChainStepsLoad = 'survey/processingChain/steps/load'
 
 export const resetProcessingChainState = () => dispatch =>
-  dispatch({type: processingChainUpdate, processingChain: {}})
+  dispatch({ type: processingChainUpdate, processingChain: {} })
 
 export const navigateToProcessingChainsView = history => dispatch => {
   dispatch(resetProcessingChainState())
@@ -54,7 +54,7 @@ export const createProcessingStep = history => async (dispatch, getState) => {
     data: processingStepUuid,
   } = await axios.post(
     `/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-step`,
-    {processingStepIndex},
+    { processingStepIndex },
   )
 
   dispatch(navigateToProcessingStepView(history, processingStepUuid))
@@ -69,11 +69,11 @@ export const fetchProcessingChain = processingChainUuid => async (
 ) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data: processingChain} = await axios.get(
+  const { data: processingChain } = await axios.get(
     `/api/survey/${surveyId}/processing-chain/${processingChainUuid}`,
   )
 
-  dispatch({type: processingChainUpdate, processingChain})
+  dispatch({ type: processingChainUpdate, processingChain })
   dispatch(hideAppSaving())
 }
 
@@ -82,11 +82,11 @@ export const fetchProcessingSteps = processingChainUuid => async (
   getState,
 ) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  const {data: processingSteps} = await axios.get(
+  const { data: processingSteps } = await axios.get(
     `/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-steps`,
   )
 
-  dispatch({type: processingChainStepsLoad, processingSteps})
+  dispatch({ type: processingChainStepsLoad, processingSteps })
 }
 
 // ====== UPDATE
@@ -98,7 +98,7 @@ export const putProcessingChainProp = (key, value) => async (
 
   const processingChain = ProcessingChainState.getProcessingChain(state)
 
-  dispatch({type: processingChainPropUpdate, key, value})
+  dispatch({ type: processingChainPropUpdate, key, value })
 
   const action = async () => {
     dispatch(showAppSaving())
@@ -107,7 +107,7 @@ export const putProcessingChainProp = (key, value) => async (
       `/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(
         processingChain,
       )}`,
-      {key, value},
+      { key, value },
     )
     dispatch(hideAppSaving())
   }

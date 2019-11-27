@@ -1,6 +1,6 @@
-import React, {useRef, useState} from 'react'
+import React, { useRef, useState } from 'react'
 
-import {Input} from '@webapp/commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 
 import * as Node from '@core/record/node'
 import * as StringUtils from '@core/stringUtils'

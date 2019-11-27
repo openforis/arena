@@ -12,7 +12,7 @@ import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 const _checkSelf = req => {
-  const {userUuid} = Request.getParams(req)
+  const { userUuid } = Request.getParams(req)
   const user = Request.getUser(req)
   if (userUuid !== User.getUuid(user)) {
     throw new UnauthorizedError(user && User.getName(user))
@@ -29,9 +29,12 @@ export const init = app => {
       try {
         const user = Request.getUser(req)
 
-        const {surveyId, email, groupUuid, surveyCycleKey} = Request.getParams(
-          req,
-        )
+        const {
+          surveyId,
+          email,
+          groupUuid,
+          surveyCycleKey,
+        } = Request.getParams(req)
         const validation = await UserValidator.validateInvitation(
           Request.getBody(req),
         )
@@ -59,7 +62,7 @@ export const init = app => {
   // ==== READ
 
   const _getUser = async (req, res) => {
-    const {userUuid} = Request.getParams(req)
+    const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
     res.json(user)
   }
@@ -91,7 +94,7 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
         const count = await UserService.countUsersBySurveyId(user, surveyId)
         res.json(count)
@@ -107,7 +110,7 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const {surveyId, offset, limit} = Request.getParams(req)
+        const { surveyId, offset, limit } = Request.getParams(req)
 
         const list = await UserService.fetchUsersBySurveyId(
           user,
@@ -116,7 +119,7 @@ export const init = app => {
           limit,
         )
 
-        res.json({list})
+        res.json({ list })
       } catch (error) {
         next(error)
       }
@@ -125,7 +128,7 @@ export const init = app => {
 
   app.get('/user/:userUuid/profilePicture', async (req, res, next) => {
     try {
-      const {userUuid} = Request.getParams(req)
+      const { userUuid } = Request.getParams(req)
 
       const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
 
@@ -151,7 +154,7 @@ export const init = app => {
   app.put('/user/:userUuid/accept-invitation', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const {userUuid, name} = Request.getParams(req)
+      const { userUuid, name } = Request.getParams(req)
 
       await UserService.acceptInvitation(user, userUuid, name)
 
@@ -169,7 +172,9 @@ export const init = app => {
     }
 
     const user = Request.getUser(req)
-    const {surveyId, userUuid, name, email, groupUuid} = Request.getParams(req)
+    const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(
+      req,
+    )
 
     const fileReq = Request.getFile(req)
 
@@ -230,7 +235,7 @@ export const init = app => {
     AuthMiddleware.requireUserRemovePermission,
     async (req, res, next) => {
       try {
-        const {surveyId, userUuid} = Request.getParams(req)
+        const { surveyId, userUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         await UserService.deleteUser(user, surveyId, userUuid)

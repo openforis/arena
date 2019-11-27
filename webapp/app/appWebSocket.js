@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as CognitoAuth from './cognitoAuth'
 
@@ -14,12 +14,12 @@ export const openSocket = async throwErrorFn => {
 
   const token = await CognitoAuth.getJwtToken()
   socket = io(window.location.origin, {
-    query: {token},
+    query: { token },
   })
 
   on(WebSocketEvents.reconnectAttempt, async () => {
     const token = await CognitoAuth.getJwtToken()
-    socket.io.opts.query = {token}
+    socket.io.opts.query = { token }
   })
 
   on(WebSocketEvents.connectError, error => throwError(error.stack))

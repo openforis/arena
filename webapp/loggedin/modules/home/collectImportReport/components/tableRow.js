@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,8 +11,8 @@ import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
 
-import {updateCollectImportReportItem} from '../actions'
-import {setNodeDefForEdit} from '../../../../surveyViews/nodeDefEdit/actions'
+import { updateCollectImportReportItem } from '../actions'
+import { setNodeDefForEdit } from '../../../../surveyViews/nodeDefEdit/actions'
 
 const TableRow = props => {
   const {
@@ -79,7 +79,7 @@ const _getNodeDefPath = (survey, nodeDef, lang) => {
 }
 
 const mapStateToProps = (state, props) => {
-  const {item} = props
+  const { item } = props
 
   const survey = SurveyState.getSurvey(state)
   const appLang = AppState.getLang(state)

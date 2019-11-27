@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -7,11 +7,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
-import {uuidv4} from '@core/uuid'
-import {normalizeName} from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid'
+import { normalizeName } from '@core/stringUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import * as SurveyState from '@webapp/survey/surveyState'

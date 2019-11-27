@@ -15,7 +15,7 @@ export const validateAttributeKey = (survey, record, attributeDef) => async (
   if (!NodeDef.isRoot(nodeDefParent) && NodeDef.isKey(attributeDef)) {
     const entity = Record.getParentNode(node)(record)
     if (_isEntityDuplicate(survey, record, entity)) {
-      return {key: Validation.messageKeys.record.entityKeyDuplicate}
+      return { key: Validation.messageKeys.record.entityKeyDuplicate }
     }
   }
 

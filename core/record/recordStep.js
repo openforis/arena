@@ -9,9 +9,9 @@ const keys = {
 }
 
 const steps = [
-  {id: '1', name: 'entry'},
-  {id: '2', name: 'cleansing'},
-  {id: '3', name: 'analysis'},
+  { id: '1', name: 'entry' },
+  { id: '2', name: 'cleansing' },
+  { id: '3', name: 'analysis' },
 ]
 
 export const getDefaultStep = () => R.pipe(R.head, R.prop(keys.id))(steps)

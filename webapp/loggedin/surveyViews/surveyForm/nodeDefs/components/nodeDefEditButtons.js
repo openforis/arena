@@ -1,10 +1,10 @@
 import './nodeDefEditButtons.scss'
 
-import React, {useEffect, useRef, useState} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect, useRef, useState } from 'react'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
-import {elementOffset} from '@webapp/utils/domUtils'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -15,8 +15,8 @@ import {
   putNodeDefLayoutProp,
   removeNodeDef,
 } from '@webapp/survey/nodeDefs/actions'
-import {setFormNodeDefAddChildTo} from '../../actions'
-import {setNodeDefForEdit} from '../../../nodeDefEdit/actions'
+import { setFormNodeDefAddChildTo } from '../../actions'
+import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditButtons = props => {
   const {
@@ -39,11 +39,11 @@ const NodeDefEditButtons = props => {
 
   useEffect(() => {
     if (show) {
-      const {parentNode} = elementRef.current
+      const { parentNode } = elementRef.current
       if (parentNode.classList.contains('survey-form__node-def-page')) {
         const right = hasNodeDefAddChildTo ? 225 : 25
-        const {top} = elementOffset(parentNode)
-        setStyle({position: 'fixed', top: `${top}px`, right: `${right}px`})
+        const { top } = elementOffset(parentNode)
+        setStyle({ position: 'fixed', top: `${top}px`, right: `${right}px` })
       }
     }
   }, [hasNodeDefAddChildTo])

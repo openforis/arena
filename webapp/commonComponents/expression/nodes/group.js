@@ -5,8 +5,8 @@ import ExpressionNode from './expressionNode'
 import EditButtons from './editButtons'
 
 const Group = props => {
-  const {node, onChange, level = 0} = props
-  const {argument} = node
+  const { node, onChange, level = 0 } = props
+  const { argument } = node
 
   return (
     <div className="group">

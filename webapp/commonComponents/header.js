@@ -2,7 +2,7 @@ import './header.scss'
 
 import React from 'react'
 
-const Header = ({children}) => (
+const Header = ({ children }) => (
   <header>
     <div className="separator" />
     {children}

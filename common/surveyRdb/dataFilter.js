@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {types} from '@core/expressionParser/expression'
+import { types } from '@core/expressionParser/expression'
 import SystemError from '@core/systemError'
 
 const js2sqlOperators = {
@@ -35,14 +35,14 @@ END
 `.trim()
 
 const binaryToString = (node, paramsArr) => {
-  const {operator, left, right} = node
+  const { operator, left, right } = node
   const clauseLeft = toPreparedStatement(left, paramsArr)
   const clauseRight = toPreparedStatement(right, paramsArr)
 
   const sqlOperator = js2sqlOperators[operator]
 
   if (!sqlOperator) {
-    throw new SystemError('undefinedFunction', {fnName: operator})
+    throw new SystemError('undefinedFunction', { fnName: operator })
   }
 
   // Logical OR returns a non-null value if either of its parameters is not null.
@@ -86,12 +86,12 @@ const converters = {
   },
   [types.CallExpression]: (node, paramsArr) => {
     // Arguments is a reserved word in strict mode
-    const {callee, arguments: exprArgs} = node
+    const { callee, arguments: exprArgs } = node
 
     const fnName = callee.name
     const sqlFnName = stdlib2sql[callee.name]
     if (!sqlFnName) {
-      throw new SystemError('undefinedFunction', {fnName})
+      throw new SystemError('undefinedFunction', { fnName })
     }
 
     const clauses = exprArgs.map(arg => toPreparedStatement(arg, paramsArr))
@@ -106,9 +106,9 @@ export const getWherePreparedStatement = expr => {
   const paramsArr = []
   const prepStatement = toPreparedStatement(expr, paramsArr)
   const params = paramsArr.reduce(
-    (acc, cur, i) => ({...acc, [`_${i}`]: cur}),
+    (acc, cur, i) => ({ ...acc, [`_${i}`]: cur }),
     {},
   )
 
-  return {clause: prepStatement, params}
+  return { clause: prepStatement, params }
 }

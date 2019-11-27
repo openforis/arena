@@ -1,7 +1,7 @@
-import React, {useState} from 'react'
-import {connect} from 'react-redux'
+import React, { useState } from 'react'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import ExpressionEditorPopup from '@webapp/commonComponents/expression/expressionEditorPopup'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'

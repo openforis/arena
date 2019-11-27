@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {nodeDefType} from '@core/survey/nodeDef'
+import { nodeDefType } from '@core/survey/nodeDef'
 
 const keys = {
   attributes: 'attributes',
@@ -26,18 +26,18 @@ const collectNodeDefTypes = {
 }
 
 const nodeDefFieldsExtractorByCollectType = {
-  [collectNodeDefTypes.boolean]: () => [{type: nodeDefType.boolean}],
-  [collectNodeDefTypes.code]: () => [{type: nodeDefType.code}],
-  [collectNodeDefTypes.coordinate]: () => [{type: nodeDefType.coordinate}],
-  [collectNodeDefTypes.date]: () => [{type: nodeDefType.date}],
-  [collectNodeDefTypes.entity]: () => [{type: nodeDefType.entity}],
-  [collectNodeDefTypes.file]: () => [{type: nodeDefType.file}],
+  [collectNodeDefTypes.boolean]: () => [{ type: nodeDefType.boolean }],
+  [collectNodeDefTypes.code]: () => [{ type: nodeDefType.code }],
+  [collectNodeDefTypes.coordinate]: () => [{ type: nodeDefType.coordinate }],
+  [collectNodeDefTypes.date]: () => [{ type: nodeDefType.date }],
+  [collectNodeDefTypes.entity]: () => [{ type: nodeDefType.entity }],
+  [collectNodeDefTypes.file]: () => [{ type: nodeDefType.file }],
   [collectNodeDefTypes.number]: collectNodeDef => {
     const type =
       getAttribute('type')(collectNodeDef) === 'real'
         ? nodeDefType.decimal
         : nodeDefType.integer
-    return [{type}]
+    return [{ type }]
   },
   [collectNodeDefTypes.range]: collectNodeDef => {
     const type =
@@ -45,13 +45,13 @@ const nodeDefFieldsExtractorByCollectType = {
         ? nodeDefType.decimal
         : nodeDefType.integer
     return [
-      {type, field: 'from'},
-      {type, field: 'to'},
+      { type, field: 'from' },
+      { type, field: 'to' },
     ]
   },
-  [collectNodeDefTypes.taxon]: () => [{type: nodeDefType.taxon}],
-  [collectNodeDefTypes.text]: () => [{type: nodeDefType.text}],
-  [collectNodeDefTypes.time]: () => [{type: nodeDefType.time}],
+  [collectNodeDefTypes.taxon]: () => [{ type: nodeDefType.taxon }],
+  [collectNodeDefTypes.text]: () => [{ type: nodeDefType.text }],
+  [collectNodeDefTypes.time]: () => [{ type: nodeDefType.time }],
 }
 
 export const layoutTypes = {

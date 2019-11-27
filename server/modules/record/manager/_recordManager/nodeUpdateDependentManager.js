@@ -27,7 +27,7 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
 
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
-  for (const {nodeCtx, nodeDef} of nodePointersToUpdate) {
+  for (const { nodeCtx, nodeDef } of nodePointersToUpdate) {
     // 3. evaluate applicable expression
     const exprEval = RecordExpressionParser.evalApplicableExpression(
       survey,
@@ -54,7 +54,7 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
           tx,
         )),
         // Preserve 'created' flag (used by rdb generator)
-        ...(Node.isCreated(nodeCtx) ? {[Node.keys.created]: true} : {}),
+        ...(Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}),
       }
 
       const nodeCtxChildren = Record.getNodeChildrenByDefUuid(
@@ -86,7 +86,7 @@ export const updateDependentsDefaultValues = async (
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
   // therefore attributes with user defined values are excluded
   const nodeDependentPointersFilterFn = nodePointer => {
-    const {nodeCtx, nodeDef} = nodePointer
+    const { nodeCtx, nodeDef } = nodePointer
 
     return (
       NodeDef.isAttribute(nodeDef) &&
@@ -104,7 +104,7 @@ export const updateDependentsDefaultValues = async (
 
   // 2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
-    nodePointersToUpdate.map(async ({nodeCtx, nodeDef}) => {
+    nodePointersToUpdate.map(async ({ nodeCtx, nodeDef }) => {
       // 3. evaluate applicable default value expression
       const exprEval = RecordExpressionParser.evalApplicableExpression(
         survey,
@@ -140,7 +140,7 @@ export const updateDependentsDefaultValues = async (
           Survey.getId(survey),
           nodeCtxUuid,
           exprValue,
-          {[Node.metaKeys.defaultValue]: !R.isNil(exprEval)},
+          { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
           Record.isPreview(record),
           tx,
         ),

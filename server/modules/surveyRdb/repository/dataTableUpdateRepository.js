@@ -8,7 +8,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as DataTable from '../schemaRdb/dataTable'
 import * as DataCol from '../schemaRdb/dataCol'
 
-const types = {insert: 'insert', update: 'update', delete: 'delete'}
+const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
 // ==== parsing
 

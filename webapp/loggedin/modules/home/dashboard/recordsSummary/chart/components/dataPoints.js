@@ -1,14 +1,14 @@
-import React, {useEffect, useRef} from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactDOMServer from 'react-dom/server.browser'
 
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as DateUtils from '@core/dateUtils'
 
-const DataPointTooltip = ({dataPoint, i18n}) => (
+const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>
     <div className="date">
       {DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}
@@ -24,8 +24,8 @@ const DataPointTooltip = ({dataPoint, i18n}) => (
 const DataPoints = props => {
   const i18n = useI18n()
 
-  const {counts, chartProps} = props
-  const {xScale, yScale, transitionDuration} = chartProps
+  const { counts, chartProps } = props
+  const { xScale, yScale, transitionDuration } = chartProps
   const radius = 4
   const elementRef = useRef(null)
   const tooltipRef = useRef(null)

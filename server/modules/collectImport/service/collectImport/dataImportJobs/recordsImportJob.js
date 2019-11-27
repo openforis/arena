@@ -41,7 +41,7 @@ export default class RecordsImportJob extends Job {
   }
 
   async execute() {
-    const {surveyId, user, tx} = this
+    const { surveyId, user, tx } = this
 
     const cycle = Survey.cycleOneKey
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
@@ -67,7 +67,7 @@ export default class RecordsImportJob extends Job {
 
       // this.logDebug(`${entryName} findCollectRecordData start`)
       const collectRecordData = this.findCollectRecordData(entryName)
-      const {collectRecordXml, step} = collectRecordData
+      const { collectRecordXml, step } = collectRecordData
       // This.logDebug(`${entryName} findCollectRecordData done`)
 
       // this.logDebug(`${entryName} parseToJson start`)
@@ -120,7 +120,7 @@ export default class RecordsImportJob extends Job {
   }
 
   getEntryNames() {
-    const {collectSurveyFileZip} = this.context
+    const { collectSurveyFileZip } = this.context
 
     const steps = [1, 2, 3]
 
@@ -135,7 +135,7 @@ export default class RecordsImportJob extends Job {
   }
 
   findCollectRecordData(entryName) {
-    const {collectSurveyFileZip} = this.context
+    const { collectSurveyFileZip } = this.context
 
     const steps = [3, 2, 1]
 
@@ -144,11 +144,11 @@ export default class RecordsImportJob extends Job {
         `data/${step}/${entryName}`,
       )
       if (collectRecordXml) {
-        return {collectRecordXml, step}
+        return { collectRecordXml, step }
       }
     }
 
-    throw new SystemError('entryDataNotFound', {entryName})
+    throw new SystemError('entryDataNotFound', { entryName })
   }
 
   async traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson) {
@@ -184,11 +184,16 @@ export default class RecordsImportJob extends Job {
 
     while (!queue.isEmpty()) {
       const item = queue.dequeue()
-      const {nodeParent, collectNodeDef, collectNodeDefPath, collectNode} = item
+      const {
+        nodeParent,
+        collectNodeDef,
+        collectNodeDefPath,
+        collectNode,
+      } = item
 
       const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
 
-      for (const {uuid: nodeDefUuid, field} of nodeDefsInfo) {
+      for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
         let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
@@ -207,7 +212,7 @@ export default class RecordsImportJob extends Job {
               this.tx,
             )
           : {}
-        const {value = null, meta = {}} = valueAndMeta || {}
+        const { value = null, meta = {} } = valueAndMeta || {}
 
         nodeToInsert = R.pipe(
           Node.assocValue(value),
@@ -258,7 +263,7 @@ export default class RecordsImportJob extends Job {
     node,
     recordValidation,
   ) {
-    const {nodeDefsInfoByCollectPath} = this.context
+    const { nodeDefsInfoByCollectPath } = this.context
 
     // Output
     const nodesToInsert = []
@@ -305,7 +310,7 @@ export default class RecordsImportJob extends Job {
         }
 
         // Get nodeDefUuid from first nodeDef field
-        const {uuid: nodeDefChildUuid} = nodeDefsInfo[0]
+        const { uuid: nodeDefChildUuid } = nodeDefsInfo[0]
         const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
 
         // Validate min/max count

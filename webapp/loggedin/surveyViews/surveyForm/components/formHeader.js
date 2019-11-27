@@ -1,17 +1,17 @@
 import './formHeader.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import * as SurveyState from '@webapp/survey/surveyState'
-import {createNodeDef} from '@webapp/survey/nodeDefs/actions'
+import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
 import * as SurveyFormState from '../surveyFormState'
-import {toggleFormPageNavigation} from '../actions'
+import { toggleFormPageNavigation } from '../actions'
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 

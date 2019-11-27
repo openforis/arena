@@ -2,7 +2,7 @@ import './nodeDefText.scss'
 
 import React from 'react'
 
-import {Input} from '@webapp/commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
@@ -29,7 +29,7 @@ const TextInput = ({
 )
 
 const MultipleTextInput = props => {
-  const {nodeDef, parentNode, nodes, removeNode, canEditRecord} = props
+  const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
 
   return (
     <div>
@@ -69,7 +69,7 @@ const MultipleTextInput = props => {
 }
 
 const NodeDefText = props => {
-  const {edit, entryDataQuery, nodeDef, nodes} = props
+  const { edit, entryDataQuery, nodeDef, nodes } = props
 
   return edit ? (
     <TextInput {...props} />

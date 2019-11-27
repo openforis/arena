@@ -1,4 +1,4 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Survey from '@core/survey/survey'
@@ -7,7 +7,7 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
-import {fetchFullContextSurvey} from '../testContext'
+import { fetchFullContextSurvey } from '../testContext'
 
 const validateExpression = async (survey, nodeDefName, expression) => {
   const nodeDef = Survey.getNodeDefByName(nodeDefName)(survey)
@@ -16,7 +16,7 @@ const validateExpression = async (survey, nodeDefName, expression) => {
     ...NodeDef.getProps(nodeDef),
     [NodeDef.propKeys.validations]: {
       [NodeDefValidations.keys.expressions]: [
-        {[NodeDefExpression.keys.expression]: expression},
+        { [NodeDefExpression.keys.expression]: expression },
       ],
     },
   }

@@ -1,4 +1,4 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as LoginState from './loginState'
 
@@ -9,12 +9,12 @@ import {
 } from './actions'
 
 const actionHandlers = {
-  [loginEmailUpdate]: (state, {email}) => LoginState.assocEmail(email)(state),
+  [loginEmailUpdate]: (state, { email }) => LoginState.assocEmail(email)(state),
 
-  [loginUserActionUpdate]: (state, {action}) =>
+  [loginUserActionUpdate]: (state, { action }) =>
     LoginState.assocUserAction(action)(state),
 
-  [loginErrorUpdate]: (state, {message}) =>
+  [loginErrorUpdate]: (state, { message }) =>
     LoginState.assocError(message)(state),
 }
 

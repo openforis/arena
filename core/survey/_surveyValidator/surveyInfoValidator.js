@@ -8,7 +8,7 @@ import * as SurveyCyclesValidator from './surveyCyclesValidator'
 
 const validateSurveyNameUniqueness = surveyInfos => (propName, survey) => {
   return !R.isEmpty(surveyInfos) && R.find(s => s.id !== survey.id, surveyInfos)
-    ? {key: Validation.messageKeys.nameDuplicate}
+    ? { key: Validation.messageKeys.nameDuplicate }
     : null
 }
 

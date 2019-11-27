@@ -1,7 +1,7 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as R from 'ramda'
 
-import {selectDate} from '@server/db/dbUtils'
+import { selectDate } from '@server/db/dbUtils'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -113,7 +113,7 @@ export const fetchDependencies = async (surveyId, client = db) =>
 
 // ============== UPDATE
 export const updateSurveyProp = async (surveyId, key, value, client = db) => {
-  const prop = {[key]: value}
+  const prop = { [key]: value }
 
   return await client.one(
     `

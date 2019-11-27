@@ -6,10 +6,10 @@ import jsep from './helpers/jsep'
 import * as Evaluator from './helpers/evaluator'
 import * as ExpressionUtils from './helpers/utils'
 
-import {types} from './helpers/types'
+import { types } from './helpers/types'
 
-export {types} from './helpers/types'
-export {operators} from './helpers/operators'
+export { types } from './helpers/types'
+export { operators } from './helpers/operators'
 
 export const modes = {
   json: 'json',

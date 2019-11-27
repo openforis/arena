@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import {ValidatorErrorKeys} from './_validator/validatorErrorKeys'
+import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 
 // Const objectInvalid = {
 //   [keys.valid]: false,

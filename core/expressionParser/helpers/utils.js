@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
-import {trim, isNotBlank} from '@core/stringUtils'
-import {types} from './types'
+import { trim, isNotBlank } from '@core/stringUtils'
+import { types } from './types'
 
 // ToString
 const binaryToString = node =>

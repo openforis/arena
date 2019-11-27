@@ -25,7 +25,7 @@ exports.up = function(db) {
     '20191004132253-create-analysis-table-up.sql',
   )
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
+    fs.readFile(filePath, { encoding: 'utf-8' }, (err, data) => {
       if (err) {
         return reject(err)
       }
@@ -46,7 +46,7 @@ exports.down = function(db) {
     '20191004132253-create-analysis-table-down.sql',
   )
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
+    fs.readFile(filePath, { encoding: 'utf-8' }, (err, data) => {
       if (err) {
         return reject(err)
       }

@@ -2,7 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
-import {useI18n} from '../../hooks'
+import { useI18n } from '../../hooks'
 import ExpressionNode from './expressionNode'
 
 export const BinaryOperandType = {
@@ -13,7 +13,7 @@ BinaryOperandType.isLeft = R.equals(BinaryOperandType.left)
 BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 
 const BinaryOperand = props => {
-  const {node, type, isBoolean, onChange} = props
+  const { node, type, isBoolean, onChange } = props
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
 

@@ -4,7 +4,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job from '@server/job/job'
 
-import {languageCodesISO636_2} from '@core/app/languages'
+import { languageCodesISO636_2 } from '@core/app/languages'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -22,7 +22,7 @@ export default class TaxonomyImportJob extends Job {
   constructor(params) {
     super(TaxonomyImportJob.type, params)
 
-    const {taxonomyUuid, filePath} = params
+    const { taxonomyUuid, filePath } = params
 
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
@@ -34,7 +34,7 @@ export default class TaxonomyImportJob extends Job {
   }
 
   async execute() {
-    const {user, surveyId, taxonomyUuid, tx} = this
+    const { user, surveyId, taxonomyUuid, tx } = this
 
     this.logDebug(
       `starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`,
@@ -44,7 +44,7 @@ export default class TaxonomyImportJob extends Job {
       user,
       surveyId,
       ActivityLog.type.taxonomyTaxaImport,
-      {uuid: taxonomyUuid},
+      { uuid: taxonomyUuid },
       false,
       tx,
     )
@@ -158,7 +158,7 @@ export default class TaxonomyImportJob extends Job {
           {
             key:
               Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
-            params: {columns: R.join(', ', missingColumns)},
+            params: { columns: R.join(', ', missingColumns) },
           },
         ],
       },

@@ -69,7 +69,7 @@ export const persistNode = async (user, survey, record, node, system, t) => {
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // Output
-  const nodesUpdated = {...nodes}
+  const nodesUpdated = { ...nodes }
 
   const nodesArray = Object.values(nodes)
   const nodesToVisit = new Queue(nodesArray)
@@ -282,7 +282,7 @@ export const deleteNodesByNodeDefUuids = async (
     const activities = nodesDeleted.map(node =>
       ActivityLog.newActivity(
         ActivityLog.type.nodeDelete,
-        {uuid: Node.getUuid(node)},
+        { uuid: Node.getUuid(node) },
         true,
       ),
     )
@@ -327,7 +327,7 @@ const _createUpdateResult = (record, node, nodes) => {
     nodes: {
       [Node.getUuid(node)]: node,
       // Always assoc parentNode, used in surveyRdbManager.updateTableNodes
-      ...(parentNode ? {[Node.getUuid(parentNode)]: parentNode} : {}),
+      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
       ...nodes,
     },
   }

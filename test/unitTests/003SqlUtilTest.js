@@ -1,39 +1,39 @@
-import {assert, expect} from 'chai'
+import { assert, expect } from 'chai'
 
 import jsep from '@core/expressionParser/helpers/jsep'
-import {getWherePreparedStatement} from '@common/surveyRdb/dataFilter'
+import { getWherePreparedStatement } from '@common/surveyRdb/dataFilter'
 
 const goodExpressions = [
-  {q: '1', r: {clause: '$/_0/', params: {_0: '1'}}},
-  {q: '1 / 1', r: {clause: '$/_0/ / $/_1/', params: {_0: '1', _1: '1'}}},
+  { q: '1', r: { clause: '$/_0/', params: { _0: '1' } } },
+  { q: '1 / 1', r: { clause: '$/_0/ / $/_1/', params: { _0: '1', _1: '1' } } },
   {
     q: '1 + 1 == 2',
     r: {
       clause: '$/_0/ + $/_1/ IS NOT DISTINCT FROM $/_2/',
-      params: {_0: '1', _1: '1', _2: '2'},
+      params: { _0: '1', _1: '1', _2: '2' },
     },
   },
-  {q: 'a', r: {clause: '$/_0:name/', params: {_0: 'a'}}},
-  {q: '-a', r: {clause: '- $/_0:name/', params: {_0: 'a'}}},
+  { q: 'a', r: { clause: '$/_0:name/', params: { _0: 'a' } } },
+  { q: '-a', r: { clause: '- $/_0:name/', params: { _0: 'a' } } },
   {
     q: 'a == 1',
     r: {
       clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/',
-      params: {_0: 'a', _1: '1'},
+      params: { _0: 'a', _1: '1' },
     },
   },
   {
     q: "a != 'a'",
     r: {
       clause: '$/_0:name/ IS DISTINCT FROM $/_1/',
-      params: {_0: 'a', _1: "'a'"},
+      params: { _0: 'a', _1: "'a'" },
     },
   },
   {
     q: 'a != "a"',
     r: {
       clause: '$/_0:name/ IS DISTINCT FROM $/_1/',
-      params: {_0: 'a', _1: '"a"'},
+      params: { _0: 'a', _1: '"a"' },
     },
   },
   {
@@ -41,7 +41,7 @@ const goodExpressions = [
     r: {
       clause:
         '$/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/',
-      params: {_0: 'a', _1: '1', _2: 'b', _3: "'b'"},
+      params: { _0: 'a', _1: '1', _2: 'b', _3: "'b'" },
     },
   },
 
@@ -51,7 +51,7 @@ const goodExpressions = [
     r: {
       clause:
         'CASE\n  WHEN ($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/) IS NULL AND $/_4:name/ > $/_5/ IS NULL\n  THEN NULL\n  ELSE coalesce({left}, false) OR coalesce({right}, false)\nEND',
-      params: {_0: 'a', _1: '1', _2: 'b', _3: "'b'", _4: 'c', _5: '1'},
+      params: { _0: 'a', _1: '1', _2: 'b', _3: "'b'", _4: 'c', _5: '1' },
     },
   },
 
@@ -76,22 +76,22 @@ const goodExpressions = [
 ]
 
 const badExpressions = [
-  {q: '1 z 1'}, // Compound expressions are not converted
-  {q: 'a b c d e'}, // Compound expressions are not converted
+  { q: '1 z 1' }, // Compound expressions are not converted
+  { q: 'a b c d e' }, // Compound expressions are not converted
 
   // Unknown operators raise an error:
-  {q: '1 & 1'},
+  { q: '1 & 1' },
 ]
 
 describe('dataFilter test', () => {
-  goodExpressions.forEach(({q, r}) =>
+  goodExpressions.forEach(({ q, r }) =>
     it(q, () => {
       const ps = getWherePreparedStatement(jsep(q))
       assert.deepEqual(ps, r)
     }),
   )
 
-  badExpressions.forEach(({q}) =>
+  badExpressions.forEach(({ q }) =>
     it(q, () => {
       const ps = () => getWherePreparedStatement(jsep(q))
       expect(ps).to.throw()

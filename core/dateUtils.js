@@ -11,7 +11,7 @@ import {
   isValid as fnsIsValid,
 } from 'date-fns'
 
-import {isBlank} from './stringUtils'
+import { isBlank } from './stringUtils'
 
 export {
   isBefore,
@@ -40,7 +40,7 @@ export const getRelativeDate = (i18n, date) => {
 
   const formatDiff = (fn, unit) => {
     const count = fn(now, date)
-    return i18n.t('common.date.timeDiff', {count, unit})
+    return i18n.t('common.date.timeDiff', { count, unit })
   }
 
   if (differenceInMonths(now, date) > 0) {

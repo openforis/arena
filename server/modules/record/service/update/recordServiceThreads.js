@@ -4,12 +4,12 @@ import ThreadManager from '@server/threads/threadManager'
 import * as ThreadParams from '@server/threads/threadParams'
 
 import * as WebSocket from '@server/utils/webSocket'
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as RecordThreadsMap from './recordThreadsMap'
 import * as RecordSocketsMap from './recordSocketsMap'
 import * as RecordUpdateThreadParams from './thread/recordUpdateThreadParams'
-import {messageTypes as RecordThreadMessageTypes} from './thread/recordThreadMessageTypes'
+import { messageTypes as RecordThreadMessageTypes } from './thread/recordThreadMessageTypes'
 
 const recordThreadTimeouts = {}
 
@@ -107,7 +107,7 @@ export const killRecordThread = recordUuid => {
   const thread = getRecordThread(recordUuid)
 
   RecordThreadsMap.markZombie(recordUuid)
-  thread.postMessage({type: RecordThreadMessageTypes.threadKill})
+  thread.postMessage({ type: RecordThreadMessageTypes.threadKill })
 }
 
 // ======

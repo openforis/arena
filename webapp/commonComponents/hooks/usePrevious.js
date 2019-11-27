@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react'
+import React, { useRef, useEffect } from 'react'
 
 export default (value, initialValue = null) => {
   // The ref object is a generic container whose current property is mutable ...

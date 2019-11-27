@@ -1,5 +1,5 @@
-import React, {useRef} from 'react'
-import {connect} from 'react-redux'
+import React, { useRef } from 'react'
+import { connect } from 'react-redux'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'

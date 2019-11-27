@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const TableContent = props => {
   const {
@@ -20,7 +20,7 @@ const TableContent = props => {
     <div className="table__empty-rows">{i18n.t(noItemsLabelKey)}</div>
   ) : (
     <div className="table__content">
-      <div className="table__row-header" style={{gridTemplateColumns}}>
+      <div className="table__row-header" style={{ gridTemplateColumns }}>
         {React.createElement(rowHeaderComponent, props)}
       </div>
       <div className="table__rows">
@@ -34,9 +34,9 @@ const TableContent = props => {
               onClick={() => onRowClick && onRowClick(row)}
               className={className}
               key={i}
-              style={{gridTemplateColumns}}
+              style={{ gridTemplateColumns }}
             >
-              {React.createElement(rowComponent, {...props, idx: i, row})}
+              {React.createElement(rowComponent, { ...props, idx: i, row })}
             </div>
           )
         })}

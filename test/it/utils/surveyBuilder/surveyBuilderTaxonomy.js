@@ -27,7 +27,7 @@ export class TaxonomyBuilder {
   }
 
   async buildAndStore(user, surveyId, t) {
-    const {taxonomy, taxa} = this.build()
+    const { taxonomy, taxa } = this.build()
 
     await TaxonomyManager.insertTaxonomy(user, surveyId, taxonomy, false, t)
     await TaxonomyManager.insertTaxa(user, surveyId, taxa, t)

@@ -1,12 +1,12 @@
-import React, {useEffect, useRef} from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactDOM from 'react-dom'
 
-import {elementOffset} from '@webapp/utils/domUtils'
+import { elementOffset } from '@webapp/utils/domUtils'
 import * as SideBarModule from '../sidebarModule'
 import AppSideBarSubModules from './appSideBarSubModules'
 
 const AppSideBarPopupMenu = props => {
-  const {module, pathname, onClose} = props
+  const { module, pathname, onClose } = props
   const moduleElement = SideBarModule.getDomElement(module)
   const key = SideBarModule.getKey(module)
 
@@ -51,7 +51,7 @@ const AppSideBarPopupMenu = props => {
   return ReactDOM.createPortal(
     <div
       className="app-sidebar__popup-menu"
-      style={{top: elementOffset(moduleElement).top - 1}}
+      style={{ top: elementOffset(moduleElement).top - 1 }}
       onMouseEnter={() => {
         inPopupMenu.current = true
       }}

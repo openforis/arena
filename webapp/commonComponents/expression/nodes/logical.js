@@ -3,14 +3,14 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import {useI18n} from '../../hooks'
+import { useI18n } from '../../hooks'
 
 import ExpressionNode from './expressionNode'
 
 const Logical = props => {
-  const {node, onChange, canDelete = false} = props
-  const {left, right, operator} = node
-  const {logical} = Expression.operators
+  const { node, onChange, canDelete = false } = props
+  const { left, right, operator } = node
+  const { logical } = Expression.operators
 
   const i18n = useI18n()
 

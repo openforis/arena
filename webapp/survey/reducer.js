@@ -1,4 +1,4 @@
-import {combineReducers} from 'redux'
+import { combineReducers } from 'redux'
 
 import info from './surveyInfo/reducer'
 import nodeDefs from './nodeDefs/reducer'

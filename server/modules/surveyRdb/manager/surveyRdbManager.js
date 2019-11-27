@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as Survey from '@core/survey/survey'
@@ -23,9 +23,9 @@ export const dropSchema = SchemaRdbRepository.dropSchema
 export const createSchema = SchemaRdbRepository.createSchema
 export const createTableAndView = DataViewCreateRepository.createTableAndView
 
-export {createNodeKeysView} from '../repository/nodeKeysViewRepository'
-export {createNodeHierarchyDisaggregatedView} from '../repository/nodeHierarchyDisaggregatedViewRepository'
-export {createNodeKeysHierarchyView} from '../repository/nodeKeysHierarchyViewRepository'
+export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
+export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
+export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
 
 // ==== DML
 
@@ -102,7 +102,7 @@ export const queryTable = async (
           `${NodeDef.getName(nodeDefTable)}_uuid`,
           row,
         )
-        const resultRow = {...row, cols: {}, record, parentNodeUuid}
+        const resultRow = { ...row, cols: {}, record, parentNodeUuid }
 
         // Assoc nodes to each columns
         for (const nodeDefUuidCol of nodeDefUuidCols) {
@@ -127,7 +127,7 @@ export const queryTable = async (
                   )
                 )[0]
 
-          resultRow.cols[nodeDefUuidCol] = {parentUuid, node}
+          resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
         }
 
         return resultRow
@@ -144,7 +144,7 @@ export const queryTable = async (
 
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
-  const {tableName} = await _getQueryData(survey, cycle, nodeDefUuidTable)
+  const { tableName } = await _getQueryData(survey, cycle, nodeDefUuidTable)
   return await DataViewReadRepository.runCount(
     surveyId,
     cycle,

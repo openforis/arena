@@ -1,13 +1,13 @@
 import React from 'react'
-import {compose} from 'redux'
-import {connect} from 'react-redux'
-import {withRouter} from 'react-router-dom'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-import {createRecord} from '@webapp/loggedin/surveyViews/record/actions'
+import { createRecord } from '@webapp/loggedin/surveyViews/record/actions'
 
-const FormEditActions = ({history, createRecord}) => {
+const FormEditActions = ({ history, createRecord }) => {
   const i18n = useI18n()
 
   return (
@@ -23,6 +23,6 @@ const FormEditActions = ({history, createRecord}) => {
   )
 }
 
-const enhance = compose(withRouter, connect(null, {createRecord}))
+const enhance = compose(withRouter, connect(null, { createRecord }))
 
 export default enhance(FormEditActions)

@@ -15,14 +15,14 @@ const getProp = (propName, defaultValue) =>
 const _validatePassword = (propName, item) => {
   const password = getProp(propName)(item)
   return !validPasswordRe.test(password)
-    ? {key: Validation.messageKeys.user.passwordInvalid}
+    ? { key: Validation.messageKeys.user.passwordInvalid }
     : null
 }
 
 const _validatePasswordStrength = (propName, item) => {
   const password = getProp(propName)(item)
   return !passwordStrengthRe.test(password)
-    ? {key: Validation.messageKeys.user.passwordUnsafe}
+    ? { key: Validation.messageKeys.user.passwordUnsafe }
     : null
 }
 
@@ -30,7 +30,7 @@ const _validatePasswordConfirm = (propName, item) => {
   const password = item.password
   const passwordConfirm = getProp(propName)(item)
   return password !== passwordConfirm
-    ? {key: Validation.messageKeys.user.passwordsDoNotMatch}
+    ? { key: Validation.messageKeys.user.passwordsDoNotMatch }
     : null
 }
 
@@ -38,7 +38,7 @@ const _validateVerificationCode = (propName, item) => {
   const verificationCodeRe = new RegExp(/^[\S]+$/)
   const verificationCode = item[propName]
   return !verificationCodeRe.test(verificationCode)
-    ? {key: Validation.messageKeys.user.CodeMismatchException}
+    ? { key: Validation.messageKeys.user.CodeMismatchException }
     : null
 }
 

@@ -6,9 +6,9 @@ import * as Log from '@server/log/log'
 const logger = Log.getLogger('DBMigrator')
 
 import * as ProcessUtils from '@core/processUtils'
-import {getSurveyDBSchema} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import {fetchAllSurveyIds} from '@server/modules/survey/repository/surveyRepository'
-import {db} from '../db'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { fetchAllSurveyIds } from '@server/modules/survey/repository/surveyRepository'
+import { db } from '../db'
 import * as config from './migrationConfig'
 
 const env = ProcessUtils.ENV.nodeEnv

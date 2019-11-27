@@ -1,17 +1,17 @@
 import React from 'react'
 
-import {getLanguageLabel, languages} from '@core/app/languages'
+import { getLanguageLabel, languages } from '@core/app/languages'
 
-import {useI18n} from '../hooks'
+import { useI18n } from '../hooks'
 import Dropdown from './dropdown'
 
 const LanguageDropdown = props => {
-  const {selection, onChange, validation} = props
+  const { selection, onChange, validation } = props
 
   const i18n = useI18n()
 
   const selectedItem = selection
-    ? {key: selection, value: getLanguageLabel(selection)}
+    ? { key: selection, value: getLanguageLabel(selection) }
     : null
 
   return (

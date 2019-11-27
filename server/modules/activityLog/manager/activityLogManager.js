@@ -88,4 +88,4 @@ export const fetch = async (user, surveyId, offset, limit) => {
   )
 }
 
-export const {insert} = ActivityLogRepository
+export const { insert } = ActivityLogRepository

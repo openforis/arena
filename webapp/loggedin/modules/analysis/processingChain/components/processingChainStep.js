@@ -1,7 +1,7 @@
 import './processingChainStep.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,7 +10,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {navigateToProcessingStepView} from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { navigateToProcessingStepView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainStep = props => {
   const {
@@ -42,7 +42,7 @@ const ProcessingChainStep = props => {
   )
 }
 
-const mapStateToProps = (state, {processingStep}) => {
+const mapStateToProps = (state, { processingStep }) => {
   const entityUuid = ProcessingStep.getEntityUuid(processingStep)
   const survey = SurveyState.getSurvey(state)
   return {
@@ -51,6 +51,6 @@ const mapStateToProps = (state, {processingStep}) => {
   }
 }
 
-export default connect(mapStateToProps, {navigateToProcessingStepView})(
+export default connect(mapStateToProps, { navigateToProcessingStepView })(
   ProcessingChainStep,
 )

@@ -1,20 +1,20 @@
 import './surveyCreateView.scss'
 
-import React, {useEffect} from 'react'
-import {connect} from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import {Input} from '@webapp/commonComponents/form/input'
+import { Input } from '@webapp/commonComponents/form/input'
 import LanguageDropdown from '@webapp/commonComponents/form/languageDropdown'
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
-import {useI18n, useOnUpdate} from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import {appModuleUri, homeModules} from '../../../appModules'
+import { appModuleUri, homeModules } from '../../../appModules'
 import * as SurveyCreateState from './surveyCreateState'
 
 import {
@@ -35,7 +35,7 @@ const SurveyCreateView = props => {
     importCollectSurvey,
   } = props
 
-  const {name, label, lang, validation} = newSurvey
+  const { name, label, lang, validation } = newSurvey
 
   const i18n = useI18n()
 
@@ -76,7 +76,10 @@ const SurveyCreateView = props => {
           validation={Validation.getFieldValidation('lang')(validation)}
         />
       </div>
-      <button className="btn" onClick={() => createSurvey({name, label, lang})}>
+      <button
+        className="btn"
+        onClick={() => createSurvey({ name, label, lang })}
+      >
         <span className="icon icon-plus icon-left icon-12px" />
         {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>

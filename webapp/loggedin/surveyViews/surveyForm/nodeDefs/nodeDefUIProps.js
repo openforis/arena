@@ -75,7 +75,7 @@ const propsUI = {
           <span
             key={i}
             className="icon icon-text-color"
-            style={{margin: '0 -3px'}}
+            style={{ margin: '0 -3px' }}
           />
         ))}
       </span>
@@ -124,11 +124,11 @@ const propsUI = {
   [coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left" />,
-    defaultValue: {x: '', y: '', srs: ''},
+    defaultValue: { x: '', y: '', srs: '' },
     formFields: [
-      {field: 'x', labelKey: 'surveyForm.nodeDefCoordinate.x'},
-      {field: 'y', labelKey: 'surveyForm.nodeDefCoordinate.y'},
-      {field: 'srs', labelKey: 'common.srs'},
+      { field: 'x', labelKey: 'surveyForm.nodeDefCoordinate.x' },
+      { field: 'y', labelKey: 'surveyForm.nodeDefCoordinate.y' },
+      { field: 'srs', labelKey: 'common.srs' },
     ],
   },
 
@@ -140,7 +140,7 @@ const propsUI = {
       vernacularNameUuid: null,
     },
     formFields: [
-      {field: 'code', labelKey: 'common.code'},
+      { field: 'code', labelKey: 'common.code' },
       {
         field: 'scientific_name',
         labelKey: 'surveyForm.nodeDefTaxon.scientificName',
@@ -178,7 +178,7 @@ const getProp = (prop, defaultValue) =>
 
 export const getIconByType = getPropByType('icon')
 
-export const getInputTextProps = getProp('inputText', {mask: false})
+export const getInputTextProps = getProp('inputText', { mask: false })
 
 export const getComponent = getProp('component', NodeDefText)
 

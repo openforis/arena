@@ -35,7 +35,7 @@ export default class SurveyPropsPublishJob extends Job {
   }
 
   async execute() {
-    const {surveyId, tx} = this
+    const { surveyId, tx } = this
 
     this.total = 6
 

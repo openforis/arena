@@ -14,7 +14,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
         const categoryReq = Request.getBody(req)
 
@@ -23,7 +23,7 @@ export const init = app => {
           surveyId,
           categoryReq,
         )
-        res.json({category})
+        res.json({ category })
       } catch (error) {
         next(error)
       }
@@ -35,7 +35,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid} = Request.getParams(req)
+        const { surveyId, categoryUuid } = Request.getParams(req)
 
         const category = await CategoryService.fetchCategoryAndLevelsByUuid(
           surveyId,
@@ -66,7 +66,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid} = Request.getParams(req)
+        const { surveyId, categoryUuid } = Request.getParams(req)
         const user = Request.getUser(req)
         const summary = Request.getBody(req)
 
@@ -76,7 +76,7 @@ export const init = app => {
           categoryUuid,
           summary,
         )
-        res.json({job})
+        res.json({ job })
       } catch (error) {
         next(error)
       }
@@ -88,17 +88,17 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId} = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
         const level = Request.getBody(req)
 
-        const {category} = await CategoryService.insertLevel(
+        const { category } = await CategoryService.insertLevel(
           user,
           surveyId,
           level,
         )
 
-        res.json({category})
+        res.json({ category })
       } catch (error) {
         next(error)
       }
@@ -110,18 +110,18 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid} = Request.getParams(req)
+        const { surveyId, categoryUuid } = Request.getParams(req)
         const user = Request.getUser(req)
         const itemReq = Request.getBody(req)
 
-        const {category, item} = await CategoryService.insertItem(
+        const { category, item } = await CategoryService.insertItem(
           user,
           surveyId,
           categoryUuid,
           itemReq,
         )
 
-        res.json({category, item})
+        res.json({ category, item })
       } catch (error) {
         next(error)
       }
@@ -135,7 +135,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, draft, validate} = Request.getParams(req)
+        const { surveyId, draft, validate } = Request.getParams(req)
 
         const categories = await CategoryService.fetchCategoriesAndLevelsBySurveyId(
           surveyId,
@@ -143,7 +143,7 @@ export const init = app => {
           validate,
         )
 
-        res.json({categories})
+        res.json({ categories })
       } catch (error) {
         next(error)
       }
@@ -156,7 +156,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid, parentUuid, draft} = Request.getParams(
+        const { surveyId, categoryUuid, parentUuid, draft } = Request.getParams(
           req,
         )
 
@@ -169,7 +169,7 @@ export const init = app => {
           ),
         )
 
-        res.json({items})
+        res.json({ items })
       } catch (error) {
         next(error)
       }
@@ -183,10 +183,10 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid, key, value} = Request.getParams(req)
+        const { surveyId, categoryUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const {categories} = await CategoryService.updateCategoryProp(
+        const { categories } = await CategoryService.updateCategoryProp(
           user,
           surveyId,
           categoryUuid,
@@ -194,7 +194,7 @@ export const init = app => {
           value,
         )
 
-        res.json({categories})
+        res.json({ categories })
       } catch (error) {
         next(error)
       }
@@ -215,7 +215,7 @@ export const init = app => {
         } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const {category} = await CategoryService.updateLevelProp(
+        const { category } = await CategoryService.updateLevelProp(
           user,
           surveyId,
           categoryUuid,
@@ -224,7 +224,7 @@ export const init = app => {
           value,
         )
 
-        res.json({category})
+        res.json({ category })
       } catch (error) {
         next(error)
       }
@@ -245,7 +245,7 @@ export const init = app => {
         } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const {category} = await CategoryService.updateItemProp(
+        const { category } = await CategoryService.updateItemProp(
           user,
           surveyId,
           categoryUuid,
@@ -254,7 +254,7 @@ export const init = app => {
           value,
         )
 
-        res.json({category})
+        res.json({ category })
       } catch (error) {
         next(error)
       }
@@ -268,7 +268,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid} = Request.getParams(req)
+        const { surveyId, categoryUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const categories = await CategoryService.deleteCategory(
@@ -277,7 +277,7 @@ export const init = app => {
           categoryUuid,
         )
 
-        res.json({categories})
+        res.json({ categories })
       } catch (error) {
         next(error)
       }
@@ -289,7 +289,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid, levelUuid} = Request.getParams(req)
+        const { surveyId, categoryUuid, levelUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const category = await CategoryService.deleteLevel(
@@ -299,7 +299,7 @@ export const init = app => {
           levelUuid,
         )
 
-        res.json({category})
+        res.json({ category })
       } catch (error) {
         next(error)
       }
@@ -311,7 +311,7 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const {surveyId, categoryUuid, itemUuid} = Request.getParams(req)
+        const { surveyId, categoryUuid, itemUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const category = await CategoryService.deleteItem(
@@ -321,7 +321,7 @@ export const init = app => {
           itemUuid,
         )
 
-        res.json({category})
+        res.json({ category })
       } catch (error) {
         next(error)
       }

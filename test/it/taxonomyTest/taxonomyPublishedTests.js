@@ -1,4 +1,4 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -9,7 +9,7 @@ import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 
-import {getContextUser} from '../../testContext'
+import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as SurveyUtils from '../utils/surveyUtils'
 import * as TaxonomyUtils from './taxonomyUtils'

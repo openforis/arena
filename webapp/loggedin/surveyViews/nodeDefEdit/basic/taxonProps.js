@@ -1,9 +1,9 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {FormItem} from '@webapp/commonComponents/form/input'
+import { FormItem } from '@webapp/commonComponents/form/input'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,12 +11,12 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import {putNodeDefProp} from '@webapp/survey/nodeDefs/actions'
+import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import {createTaxonomy, deleteTaxonomy} from '../../taxonomyEdit/actions'
+import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
-const {propKeys} = NodeDef
+const { propKeys } = NodeDef
 
 const TaxonProps = props => {
   const {
@@ -58,7 +58,7 @@ const TaxonProps = props => {
           />
           <button
             className="btn btn-s"
-            style={{justifySelf: 'center'}}
+            style={{ justifySelf: 'center' }}
             onClick={async () => {
               putTaxonomyProp(await createTaxonomy())
               toggleTaxonomyEdit(true)
@@ -69,7 +69,7 @@ const TaxonProps = props => {
           </button>
           <button
             className="btn btn-s"
-            style={{justifySelf: 'center'}}
+            style={{ justifySelf: 'center' }}
             onClick={() => toggleTaxonomyEdit(true)}
           >
             <span className="icon icon-list icon-12px icon-left" />

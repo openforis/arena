@@ -25,6 +25,6 @@ export default class CollectSurveyReaderJob extends Job {
     const idmlJsonObj = FileXml.parseToJson(idmlXml, false)
     const collectSurvey = CollectSurvey.getElementByName('survey')(idmlJsonObj)
 
-    this.setContext({collectSurveyFileZip, collectSurvey})
+    this.setContext({ collectSurveyFileZip, collectSurvey })
   }
 }

@@ -5,7 +5,7 @@ import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 
-const {permissions, keys} = AuthGroup
+const { permissions, keys } = AuthGroup
 
 // ======
 // ====== Survey

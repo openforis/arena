@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 

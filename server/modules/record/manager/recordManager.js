@@ -7,7 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as ObjectUtils from '@core/objectUtils'
 
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
@@ -50,7 +50,7 @@ export const insertNodesFromValues = async (
   const activities = nodeValues.map(nodeValues => {
     const node = NodeRepository.tableColumns.reduce(
       (accContent, key, index) =>
-        Object.assign(accContent, {[camelize(key)]: nodeValues[index]}),
+        Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
       {},
     )
     return ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true)

@@ -6,12 +6,12 @@ import * as R from 'ramda'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
-import {FormItem} from '@webapp/commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/commonComponents/form/input'
 import ExpressionProp from './expressionProp'
 
 const ExpressionsProp = props => {
-  const {values, label, validation, multiple, onChange} = props
+  const { values, label, validation, multiple, onChange } = props
 
   const i18n = useI18n()
 

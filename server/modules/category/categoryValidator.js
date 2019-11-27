@@ -39,8 +39,8 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
   return valid
     ? null
-    : Validation.newInstance(false, {...validations}, [
-        {key: Validation.messageKeys.categoryEdit.levelsInvalid},
+    : Validation.newInstance(false, { ...validations }, [
+        { key: Validation.messageKeys.categoryEdit.levelsInvalid },
       ])
 }
 
@@ -50,7 +50,7 @@ const validateItemCodeUniqueness = itemsByCode => (propName, item) => {
   const itemsWithSameCode = itemsByCode[CategoryItem.getCode(item)]
 
   return itemsWithSameCode.length > 1
-    ? {key: Validation.messageKeys.categoryEdit.codeDuplicate}
+    ? { key: Validation.messageKeys.categoryEdit.codeDuplicate }
     : null
 }
 
@@ -76,7 +76,7 @@ const validateNotEmptyChildrenItems = (isLeaf, itemsByParentUuid) => (
 ) =>
   !isLeaf &&
   R.isEmpty(getChildrenItems(itemsByParentUuid, CategoryItem.getUuid(item)))
-    ? {key: Validation.messageKeys.categoryEdit.childrenEmpty}
+    ? { key: Validation.messageKeys.categoryEdit.childrenEmpty }
     : null
 
 const validateNotEmptyFirstLevelItems = itemsByParentUuid => (
@@ -85,7 +85,7 @@ const validateNotEmptyFirstLevelItems = itemsByParentUuid => (
 ) =>
   CategoryLevel.getIndex(level) === 0 &&
   R.isEmpty(getChildrenItems(itemsByParentUuid, null))
-    ? {key: Validation.messageKeys.categoryEdit.itemsEmpty}
+    ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
     : null
 
 const validateItem = (
@@ -110,7 +110,7 @@ const validateItem = (
       Validation.getFieldValidation(keys.children)(validation),
     )
   ) {
-    return {[itemUuid]: validation}
+    return { [itemUuid]: validation }
   }
   // Children are not empty, validate each item
 
@@ -127,7 +127,7 @@ const validateItem = (
         Validation.setField(
           keys.children,
           Validation.newInstance(false, {}, [
-            {key: Validation.messageKeys.categoryEdit.itemsInvalid},
+            { key: Validation.messageKeys.categoryEdit.itemsInvalid },
           ]),
         ),
       )(validation)
@@ -181,7 +181,7 @@ const validateItemsByParentUuid = async (
     childrenValidationsMerged,
     childrenValid
       ? []
-      : [{key: Validation.messageKeys.categoryEdit.childrenInvalid}],
+      : [{ key: Validation.messageKeys.categoryEdit.childrenInvalid }],
   )
 }
 

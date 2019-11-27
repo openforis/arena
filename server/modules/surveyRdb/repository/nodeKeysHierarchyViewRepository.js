@@ -1,4 +1,4 @@
-import {db} from '@server/db/db'
+import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeKeys from '@core/record/nodeKeys'

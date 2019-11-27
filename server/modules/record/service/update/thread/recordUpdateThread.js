@@ -9,13 +9,13 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import Queue from '@core/queue'
 
-import {WebSocketEvents} from '@common/webSocket/webSocketEvents'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import SystemError from '@core/systemError'
 import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordUpdateThreadParams from './recordUpdateThreadParams'
-import {messageTypes} from './recordThreadMessageTypes'
+import { messageTypes } from './recordThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordUpdateThread')
 
@@ -33,7 +33,7 @@ class RecordUpdateThread extends Thread {
 
   sendThreadInitMsg() {
     ;(async () => {
-      await this.messageHandler({type: messageTypes.threadInit})
+      await this.messageHandler({ type: messageTypes.threadInit })
     })()
   }
 
@@ -165,7 +165,7 @@ class RecordUpdateThread extends Thread {
     if (
       R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])
     ) {
-      this.postMessage({type: WebSocketEvents.nodesUpdateCompleted})
+      this.postMessage({ type: WebSocketEvents.nodesUpdateCompleted })
     }
   }
 }

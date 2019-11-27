@@ -1,11 +1,11 @@
 import './nodeDefTaxon.scss'
 
-import React, {useState, useEffect, useRef} from 'react'
-import {connect} from 'react-redux'
+import React, { useState, useEffect, useRef } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import {FormItem} from '@webapp/commonComponents/form/input'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Taxon from '@core/survey/taxon'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -73,7 +73,7 @@ const NodeDefTaxon = props => {
       nodeValue,
       null,
       {},
-      {[NodeRefData.keys.taxon]: taxon},
+      { [NodeRefData.keys.taxon]: taxon },
     )
 
   const onChangeTaxon = taxon => {
@@ -107,16 +107,19 @@ const NodeDefTaxon = props => {
         selection[code] === Taxon.unlistedCode
       ) {
         // If current code is UNL and vernacular name is reset, do not clear node value
-        updateNodeValue({...Node.getValue(node), [field]: value}, taxonRefData)
+        updateNodeValue(
+          { ...Node.getValue(node), [field]: value },
+          taxonRefData,
+        )
       } else {
         // Clear node value
         updateNodeValue({})
       }
     } else if (field !== code && selection[code] === Taxon.unlistedCode) {
       // If input field is not code and current code is UNL, update node value field
-      updateNodeValue({...Node.getValue(node), [field]: value}, taxonRefData)
+      updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
     } else {
-      setSelection({...selectionDefault, [field]: value})
+      setSelection({ ...selectionDefault, [field]: value })
     }
   }
 
@@ -170,7 +173,7 @@ const NodeDefTaxon = props => {
 
 const mapStateToProps = (state, props) => {
   const surveyId = SurveyState.getSurveyId(state)
-  const {nodeDef, edit, preview, nodes} = props
+  const { nodeDef, edit, preview, nodes } = props
 
   return {
     taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),

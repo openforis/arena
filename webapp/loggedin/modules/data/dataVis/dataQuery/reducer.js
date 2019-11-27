@@ -1,9 +1,13 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
-import {surveyCreate, surveyDelete, surveyUpdate} from '@webapp/survey/actions'
+import { appUserLogout } from '@webapp/app/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
 
-import {dataVisReset} from '../actions'
+import { dataVisReset } from '../actions'
 
 import {
   nodesUpdate,
@@ -30,16 +34,16 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // Table
-  [dataQueryTableNodeDefUuidUpdate]: (state, {nodeDefUuidTable}) =>
+  [dataQueryTableNodeDefUuidUpdate]: (state, { nodeDefUuidTable }) =>
     DataQueryState.assocNodeDefUuidTable(nodeDefUuidTable)(state),
 
-  [dataQueryTableNodeDefUuidColsUpdate]: (state, {nodeDefUuidCols}) =>
+  [dataQueryTableNodeDefUuidColsUpdate]: (state, { nodeDefUuidCols }) =>
     DataQueryState.assocNodeDefUuidCols(nodeDefUuidCols)(state),
 
-  [dataQueryTableDataColUpdate]: (state, {data}) =>
+  [dataQueryTableDataColUpdate]: (state, { data }) =>
     DataQueryState.assocTableDataCol(data)(state),
 
-  [dataQueryTableDataColDelete]: (state, {cols}) =>
+  [dataQueryTableDataColDelete]: (state, { cols }) =>
     DataQueryState.dissocTableDataCols(cols)(state),
 
   [dataQueryTableInit]: (
@@ -68,30 +72,30 @@ const actionHandlers = {
       editMode,
     )(state),
 
-  [dataQueryTableDataUpdate]: (state, {offset, data}) =>
+  [dataQueryTableDataUpdate]: (state, { offset, data }) =>
     DataQueryState.assocTableData(offset, data)(state),
 
-  [dataQueryTableFilterUpdate]: (state, {filter}) =>
+  [dataQueryTableFilterUpdate]: (state, { filter }) =>
     DataQueryState.assocTableFilter(filter)(state),
 
-  [dataQueryTableSortUpdate]: (state, {sort}) =>
+  [dataQueryTableSortUpdate]: (state, { sort }) =>
     DataQueryState.assocTableSort(sort)(state),
 
   // Data vis
   [dataVisReset]: () => ({}),
 
   // Record nodes update
-  [nodesUpdate]: (state, {nodes}) =>
+  [nodesUpdate]: (state, { nodes }) =>
     DataQueryState.assocTableDataRecordNodes(nodes)(state),
 
-  [validationsUpdate]: (state, {recordUuid, recordValid}) =>
+  [validationsUpdate]: (state, { recordUuid, recordValid }) =>
     DataQueryState.assocTableDataRecordNodeValidations(
       recordUuid,
       recordValid,
     )(state),
 
   // NodeDefsSelector
-  [dataQueryNodeDefSelectorsShowUpdate]: (state, {show}) =>
+  [dataQueryNodeDefSelectorsShowUpdate]: (state, { show }) =>
     DataQueryState.assocShowNodeDefSelectors(show)(state),
 }
 

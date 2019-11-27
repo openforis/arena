@@ -2,7 +2,7 @@ import React from 'react'
 import camelize from 'camelize'
 import * as R from 'ramda'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
@@ -14,7 +14,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Date from '@core/dateUtils'
 
 const RecordsRow = props => {
-  const {row: record, nodeDefKeys, surveyInfo, user, idx, offset} = props
+  const { row: record, nodeDefKeys, surveyInfo, user, idx, offset } = props
 
   const i18n = useI18n()
 

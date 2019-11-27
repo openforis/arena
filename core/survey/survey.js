@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import {uuidv4} from '@core/uuid'
+import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
 import * as SurveyInfo from './_survey/surveyInfo'
@@ -23,10 +23,10 @@ export const newSurvey = (
   [SurveyInfo.keys.uuid]: uuidv4(),
   [SurveyInfo.keys.props]: {
     [SurveyInfo.keys.name]: name,
-    [SurveyInfo.keys.labels]: label ? {[languages[0]]: label} : {},
+    [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    ...(collectUri ? {collectUri} : {}),
+    ...(collectUri ? { collectUri } : {}),
     [SurveyInfo.keys.cycles]: {
       [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
     },

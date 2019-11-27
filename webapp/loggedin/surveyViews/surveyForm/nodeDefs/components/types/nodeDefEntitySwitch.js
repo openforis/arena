@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -14,7 +14,7 @@ const componentsByRenderType = {
 }
 
 const NodeDefEntitySwitch = props => {
-  const {surveyCycleKey, nodeDef} = props
+  const { surveyCycleKey, nodeDef } = props
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 
   return (

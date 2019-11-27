@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
@@ -7,11 +7,11 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordView from '../../surveyViews/record/recordView'
-import {appModules, appModuleUri, dataModules} from '../../appModules'
+import { appModules, appModuleUri, dataModules } from '../../appModules'
 import RecordsView from './records/recordsView'
 import DataVisView from './dataVis/dataVisView'
 
-const DataView = ({surveyInfo}) => {
+const DataView = ({ surveyInfo }) => {
   const draftDefs =
     Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
@@ -34,7 +34,7 @@ const DataView = ({surveyInfo}) => {
           {
             component: RecordView,
             path: appModuleUri(dataModules.record) + ':recordUuid/',
-            props: {draftDefs},
+            props: { draftDefs },
           },
           // Data visualization
           {

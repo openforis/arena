@@ -14,7 +14,9 @@ export const selectDate = (field, fieldAlias = null) =>
 export const now = "timezone('UTC', now())"
 
 export const insertAllQuery = (schema, table, cols, itemsValues) => {
-  const columnSet = new pgp.helpers.ColumnSet(cols, {table: {schema, table}})
+  const columnSet = new pgp.helpers.ColumnSet(cols, {
+    table: { schema, table },
+  })
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}
@@ -52,7 +54,9 @@ export const updateAllQuery = (
 
   const cols = [`?${idColName}`, ...updateCols]
 
-  const columnSet = new pgp.helpers.ColumnSet(cols, {table: {schema, table}})
+  const columnSet = new pgp.helpers.ColumnSet(cols, {
+    table: { schema, table },
+  })
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}

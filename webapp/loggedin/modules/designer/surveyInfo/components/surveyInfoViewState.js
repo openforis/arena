@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import * as R from 'ramda'
 
-import {useFormObject} from '@webapp/commonComponents/hooks'
+import { useFormObject } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as StringUtils from '@core/stringUtils'
@@ -9,7 +9,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
 export const useSurveyInfoViewState = props => {
-  const {surveyInfo, updateSurveyInfoProps} = props
+  const { surveyInfo, updateSurveyInfoProps } = props
 
   const {
     object,

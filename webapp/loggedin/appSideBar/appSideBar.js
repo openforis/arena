@@ -1,20 +1,20 @@
 import './appSideBar.scss'
 
-import React, {useRef} from 'react'
-import {connect} from 'react-redux'
+import React, { useRef } from 'react'
+import { connect } from 'react-redux'
 
 import * as ProcessUtils from '@core/processUtils'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as SideBarState from './appSidebarState'
 import AppSideBarModules from './components/appSideBarModules'
 
-import {toggleSideBar} from './actions'
+import { toggleSideBar } from './actions'
 
 const AppSideBar = props => {
-  const {pathname, user, surveyInfo, isSideBarOpened, toggleSideBar} = props
+  const { pathname, user, surveyInfo, isSideBarOpened, toggleSideBar } = props
 
   const element = useRef(null)
 
@@ -64,4 +64,4 @@ const mapStateToProps = state => ({
   isSideBarOpened: SideBarState.isOpened(state),
 })
 
-export default connect(mapStateToProps, {toggleSideBar})(AppSideBar)
+export default connect(mapStateToProps, { toggleSideBar })(AppSideBar)

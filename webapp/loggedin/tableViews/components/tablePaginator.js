@@ -1,8 +1,8 @@
 import React from 'react'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
-const TablePaginator = ({offset, limit, count, fetchFn}) => {
+const TablePaginator = ({ offset, limit, count, fetchFn }) => {
   const currentPage = offset / limit + 1
   const totalPage = Math.ceil(count / limit)
 
@@ -21,7 +21,7 @@ const TablePaginator = ({offset, limit, count, fetchFn}) => {
         className="btn btn-transparent"
         aria-disabled={currentPage === 1}
         onClick={() => fetchFn(offset - limit)}
-        style={{transform: 'scaleX(-1)'}}
+        style={{ transform: 'scaleX(-1)' }}
       >
         <span className="icon icon-play3 icon-14px" />
       </button>

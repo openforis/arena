@@ -1,16 +1,16 @@
 import './cyclesEditor.scss'
 
-import React, {useRef} from 'react'
+import React, { useRef } from 'react'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 
-const DateEditor = ({date, onChange}) => {
+const DateEditor = ({ date, onChange }) => {
   const [year, month, day] = R.pipe(R.defaultTo('--'), R.split('-'))(date)
 
   const yearRef = useRef(null)
@@ -54,7 +54,7 @@ const DateEditor = ({date, onChange}) => {
   )
 }
 
-const DateContainer = ({date, i18n, keyLabel, readOnly, onChange}) => (
+const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
   <div className="date-container">
     <span className="date-label">{i18n.t(keyLabel)}</span>
     {readOnly ? (
@@ -122,7 +122,7 @@ const CycleEditor = props => {
 }
 
 const CyclesEditor = props => {
-  const {cycles, readOnly, setCycles, validation} = props
+  const { cycles, readOnly, setCycles, validation } = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()

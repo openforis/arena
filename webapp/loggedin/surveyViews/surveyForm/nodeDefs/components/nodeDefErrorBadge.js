@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
@@ -15,7 +15,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
-  const {validation, children} = props
+  const { validation, children } = props
 
   const valid = Validation.isValid(validation)
 
@@ -42,7 +42,7 @@ NodeDefErrorBadge.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDef, parentNode, nodes, node, edit} = props
+  const { nodeDef, parentNode, nodes, node, edit } = props
 
   let validation = Validation.newInstance()
 
@@ -67,7 +67,7 @@ const mapStateToProps = (state, props) => {
         )(recordValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
         validation = Validation.newInstance(false, {}, [
-          {key: Validation.messageKeys.record.oneOrMoreInvalidValues},
+          { key: Validation.messageKeys.record.oneOrMoreInvalidValues },
         ])
       }
     } else if (!R.isEmpty(nodes)) {

@@ -1,9 +1,9 @@
 import './loginView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from './loginState'
 
@@ -20,7 +20,7 @@ const forms = {
 }
 
 const LoginView = props => {
-  const {userAction, error} = props
+  const { userAction, error } = props
 
   const i18n = useI18n()
 

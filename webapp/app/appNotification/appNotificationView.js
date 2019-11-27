@@ -1,15 +1,15 @@
 import './appNotification.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {CSSTransition} from 'react-transition-group'
+import { CSSTransition } from 'react-transition-group'
 
 import * as AppState from '../appState'
 
 import * as NotificationState from './appNotificationState'
 
-import {hideNotification} from './actions'
+import { hideNotification } from './actions'
 
 const AppNotificationView = props => {
   const {
@@ -45,4 +45,6 @@ const mapStateToProps = state => ({
   i18n: AppState.getI18n(state),
 })
 
-export default connect(mapStateToProps, {hideNotification})(AppNotificationView)
+export default connect(mapStateToProps, { hideNotification })(
+  AppNotificationView,
+)

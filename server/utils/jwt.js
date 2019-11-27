@@ -30,7 +30,7 @@ const _indexKeys = keyList =>
     return keys
   }, {})
 
-const _decode = token => jsonwebtoken.decode(token, {complete: true})
+const _decode = token => jsonwebtoken.decode(token, { complete: true })
 
 // Now we need to decode our token, to find the verification key
 const _findVerificationKey = (token, pemList) => {

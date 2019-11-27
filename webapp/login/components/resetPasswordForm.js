@@ -1,18 +1,18 @@
 import React from 'react'
 
-import {compose} from 'redux'
-import {connect} from 'react-redux'
-import {withRouter} from 'react-router-dom'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from '../loginState'
-import {resetPassword, setLoginError} from '../actions'
+import { resetPassword, setLoginError } from '../actions'
 
-import {useResetPasswordFormState} from './useResetPasswordFormState'
+import { useResetPasswordFormState } from './useResetPasswordFormState'
 
 const ResetPasswordForm = props => {
-  const {email} = props
+  const { email } = props
 
   const i18n = useI18n()
 
@@ -78,7 +78,7 @@ const mapStateToProps = state => ({
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps, {resetPassword, setLoginError}),
+  connect(mapStateToProps, { resetPassword, setLoginError }),
 )
 
 export default enhance(ResetPasswordForm)

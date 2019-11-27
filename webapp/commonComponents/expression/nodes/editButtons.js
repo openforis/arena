@@ -2,10 +2,10 @@ import React from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import {useI18n} from '../../hooks'
+import { useI18n } from '../../hooks'
 
 const EditButtons = props => {
-  const {node, onChange, canDelete = false, onDelete} = props
+  const { node, onChange, canDelete = false, onDelete } = props
 
   const i18n = useI18n()
 
@@ -17,12 +17,12 @@ const EditButtons = props => {
       right: {
         type: Expression.types.BinaryExpression,
         operator: '',
-        left: {type: Expression.types.Identifier, name: ''},
-        right: {type: Expression.types.Literal, value: null, raw: ''},
+        left: { type: Expression.types.Identifier, name: '' },
+        right: { type: Expression.types.Literal, value: null, raw: '' },
       },
     })
 
-  const {logical} = Expression.operators
+  const { logical } = Expression.operators
 
   return (
     <div className="btns">

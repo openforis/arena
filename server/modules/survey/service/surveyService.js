@@ -5,7 +5,7 @@ import SurveyPublishJob from './publish/surveyPublishJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
-  const job = new SurveyPublishJob({user, surveyId})
+  const job = new SurveyPublishJob({ user, surveyId })
 
   JobManager.executeJobThread(job)
 

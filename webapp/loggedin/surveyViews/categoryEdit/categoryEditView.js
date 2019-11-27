@@ -1,12 +1,12 @@
 import './components/categoryEditView.scss'
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 
 import * as Category from '@core/survey/category'
@@ -93,7 +93,7 @@ const CategoryEditView = props => {
           )}
         </div>
 
-        <div style={{justifySelf: 'center'}}>
+        <div style={{ justifySelf: 'center' }}>
           <button className="btn" onClick={() => setCategoryForEdit(null)}>
             {i18n.t('common.done')}
           </button>

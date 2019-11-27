@@ -1,6 +1,6 @@
-import {exportReducer} from '@webapp/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import {appUserLogout} from '@webapp/app/actions'
+import { appUserLogout } from '@webapp/app/actions'
 
 import {
   surveyCreate,
@@ -30,22 +30,22 @@ const actionHandlers = {
   [surveyDefsReset]: () => ({}),
 
   // Taxonomies
-  [surveyDefsLoad]: (state, {taxonomies}) => taxonomies,
-  [taxonomiesUpdate]: (state, {taxonomies}) => taxonomies,
+  [surveyDefsLoad]: (state, { taxonomies }) => taxonomies,
+  [taxonomiesUpdate]: (state, { taxonomies }) => taxonomies,
 
   // Create
-  [taxonomyCreate]: (state, {taxonomy}) =>
+  [taxonomyCreate]: (state, { taxonomy }) =>
     TaxonomiesState.assocTaxonomy(taxonomy)(state),
 
   // Update
-  [taxonomyUpdate]: (state, {taxonomy}) =>
+  [taxonomyUpdate]: (state, { taxonomy }) =>
     TaxonomiesState.assocTaxonomy(taxonomy)(state),
 
-  [taxonomyPropUpdate]: (state, {taxonomy, key, value}) =>
+  [taxonomyPropUpdate]: (state, { taxonomy, key, value }) =>
     TaxonomiesState.assocTaxonomyProp(taxonomy, key, value)(state),
 
   // Delete
-  [taxonomyDelete]: (state, {taxonomy}) =>
+  [taxonomyDelete]: (state, { taxonomy }) =>
     TaxonomiesState.dissocTaxonomy(taxonomy)(state),
 }
 

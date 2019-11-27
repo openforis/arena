@@ -2,7 +2,7 @@ import './profilePictureEditor.scss'
 
 import * as FileTypes from '@webapp/utils/fileTypes'
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
 import {
@@ -13,7 +13,7 @@ import {
 
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 
-const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
+const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
   const i18n = useI18n()
 
   const initialProfilePicture = useProfilePicture(userUuid)
@@ -27,11 +27,11 @@ const ProfilePictureEditor = ({userUuid, onPictureUpdate, enabled}) => {
     rotate: 0,
   })
 
-  const setImage = image => setState(statePrev => ({...statePrev, image}))
+  const setImage = image => setState(statePrev => ({ ...statePrev, image }))
 
-  const setScale = scale => setState(statePrev => ({...statePrev, scale}))
+  const setScale = scale => setState(statePrev => ({ ...statePrev, scale }))
 
-  const setRotate = rotate => setState(statePrev => ({...statePrev, rotate}))
+  const setRotate = rotate => setState(statePrev => ({ ...statePrev, rotate }))
 
   useEffect(() => {
     setImage(initialProfilePicture)

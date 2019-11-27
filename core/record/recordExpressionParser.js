@@ -85,7 +85,7 @@ const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
   return []
 }
 
-const _identifierEval = (survey, record) => (expr, {node}) => {
+const _identifierEval = (survey, record) => (expr, { node }) => {
   const nodeName = R.prop('name')(expr)
   const referencedNodes = _getReferencedNodes(survey, record, node, nodeName)
 
@@ -104,7 +104,7 @@ export const evalNodeQuery = (survey, record, node, query) => {
     [Expression.types.Identifier]: _identifierEval(survey, record),
   }
 
-  return Expression.evalString(query, {node, functions})
+  return Expression.evalString(query, { node, functions })
 }
 
 export const evalApplicableExpression = (

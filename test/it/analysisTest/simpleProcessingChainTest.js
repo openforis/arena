@@ -9,7 +9,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as ProcessingChainService from '@server/modules/analysis/service/processingChainService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-import {getContextUser} from '../../testContext'
+import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
 

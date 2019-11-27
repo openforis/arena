@@ -5,7 +5,7 @@ import * as NumberUtils from '@core/numberUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-const {nodeDefType} = NodeDef
+const { nodeDefType } = NodeDef
 import * as Taxon from '@core/survey/taxon'
 
 import * as GeoUtils from '@core/geo/geoUtils'
@@ -98,5 +98,5 @@ export const validateValueType = (survey, nodeDef) => (propName, node) => {
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
-  return valid ? null : {key: Validation.messageKeys.record.valueInvalid}
+  return valid ? null : { key: Validation.messageKeys.record.valueInvalid }
 }

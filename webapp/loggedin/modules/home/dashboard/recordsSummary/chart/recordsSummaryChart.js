@@ -1,25 +1,25 @@
 import './recordsSummaryChart.scss'
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
-import {useOnResize} from '@webapp/commonComponents/hooks'
-import {elementOffset} from '@webapp/utils/domUtils'
-import YAxis, {getScale as getYScale} from './components/yAxis'
-import XAxis, {getScale as getXScale} from './components/xAxis'
+import { useOnResize } from '@webapp/commonComponents/hooks'
+import { elementOffset } from '@webapp/utils/domUtils'
+import YAxis, { getScale as getYScale } from './components/yAxis'
+import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
 
 const RecordsSummaryChart = props => {
-  const {counts, from, to} = props
+  const { counts, from, to } = props
 
   const chartRef = useRef(null)
 
   const [chartProps, setChartProps] = useState(null)
 
   const updateChartProps = () => {
-    const {width, height} = elementOffset(chartRef.current)
+    const { width, height } = elementOffset(chartRef.current)
 
     const chartPropsUpdate = {
       width,

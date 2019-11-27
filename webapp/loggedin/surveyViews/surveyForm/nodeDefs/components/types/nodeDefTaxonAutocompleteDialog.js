@@ -1,13 +1,13 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 import AutocompleteDialog from '@webapp/commonComponents/form/autocompleteDialog'
-import {useAsyncGetRequest} from '@webapp/commonComponents/hooks'
+import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
 
 import * as Taxon from '@core/survey/taxon'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
-  const {item: taxon, ...otherProps} = props
+  const { item: taxon, ...otherProps } = props
 
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
@@ -21,7 +21,7 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>
       {vernacularLang && (
-        <div style={{gridColumn: 2}}>
+        <div style={{ gridColumn: 2 }}>
           {`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}
         </div>
       )}
@@ -50,11 +50,11 @@ const NodeDefTaxonAutocompleteDialog = props => {
   }
 
   const {
-    data: {list = []} = {list: []},
+    data: { list = [] } = { list: [] },
     dispatch,
   } = useAsyncGetRequest(
     `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
-    {params},
+    { params },
   )
 
   useEffect(dispatch, [fieldValue])

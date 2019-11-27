@@ -3,10 +3,10 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 import * as DateUtils from '@core/dateUtils'
 
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 const SurveyListRow = props => {
-  const {row: surveyRow, isRowActive} = props
+  const { row: surveyRow, isRowActive } = props
   const surveyInfoRow = Survey.getSurveyInfo(surveyRow)
 
   const i18n = useI18n()

@@ -1,10 +1,10 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {FormItem, Input} from '@webapp/commonComponents/form/input'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
-import {useI18n} from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'

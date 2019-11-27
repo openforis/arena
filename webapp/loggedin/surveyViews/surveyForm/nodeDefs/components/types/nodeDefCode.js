@@ -1,10 +1,10 @@
 import './nodeDefCode.scss'
 
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import * as R from 'ramda'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {useAsyncGetRequest} from '@webapp/commonComponents/hooks'
+import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -40,12 +40,12 @@ const NodeDefCode = props => {
   } = props
 
   const {
-    data: {items = []} = {items: []},
+    data: { items = [] } = { items: [] },
     dispatch: fetchItems,
     setState: setItems,
   } = useAsyncGetRequest(
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    {params: {draft, parentUuid: nodeParentCodeUuid}},
+    { params: { draft, parentUuid: nodeParentCodeUuid } },
   )
   const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
@@ -56,7 +56,7 @@ const NodeDefCode = props => {
       if (categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)) {
         fetchItems()
       } else {
-        setItems({data: {items: []}})
+        setItems({ data: { items: [] } })
       }
     }, [categoryUuid, nodeParentCodeUuid])
 
@@ -80,9 +80,9 @@ const NodeDefCode = props => {
             parentNode,
           )
 
-    const value = {[Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(item)}
-    const meta = {[Node.metaKeys.hierarchyCode]: codeUuidsHierarchy}
-    const refData = {[NodeRefData.keys.categoryItem]: item}
+    const value = { [Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(item) }
+    const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
+    const refData = { [NodeRefData.keys.categoryItem]: item }
 
     updateNode(nodeDef, node, value, null, meta, refData)
   }
@@ -125,7 +125,7 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
   const record = RecordState.getRecord(state)
-  const {nodeDef, parentNode} = props
+  const { nodeDef, parentNode } = props
 
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(
     survey,
