@@ -11,6 +11,8 @@ export const keysProps = {
   name: 'name',
 }
 
+export const NAMES_SEPARATOR = ' / '
+
 // ===== CREATE
 export const newTaxonVernacularName = (lang, name) => ({
   [keys.uuid]: uuidv4(),
@@ -24,6 +26,7 @@ export const newTaxonVernacularName = (lang, name) => ({
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
 export const getName = ObjectUtils.getProp(keysProps.name)
+export const getLang = ObjectUtils.getProp(keysProps.lang)
 
 // ===== UTILS
 export const mergeProps = vernacularNameNew => vernacularName => ({

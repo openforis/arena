@@ -1,4 +1,5 @@
 import React from 'react'
+import * as R from 'ramda'
 
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
@@ -16,9 +17,12 @@ const TaxaTableRow = props => {
       <div>{Taxon.getScientificName(taxon)}</div>
       {
         vernacularLanguageCodes.map(lang => {
-            const vernacularName = Taxon.getVernacularNameByLang(lang)(taxon)
-            return <div key={TaxonVernacularName.getUuid(vernacularName)}>
-              {TaxonVernacularName.getName(vernacularName)}
+            const vernacularNames = Taxon.getVernacularNamesByLang(lang)(taxon)
+            return <div key={`${Taxon.getUuid(taxon)}_vernacular_name_${lang}`}>
+              {R.pipe(
+                R.map(TaxonVernacularName.getName),
+                R.join(TaxonVernacularName.NAMES_SEPARATOR)
+              )(vernacularNames)}
             </div>
           }
         )
