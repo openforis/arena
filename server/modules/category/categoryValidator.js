@@ -5,7 +5,6 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
-import Queue from '@core/queue'
 
 const keys = {
   children: 'children',
@@ -47,22 +46,24 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
 // ====== ITEMS
 
-const validateItemCodeUniqueness = itemSiblingsAndSelf =>
+const validateItemCodeUniqueness = siblingsByCode =>
   (propName, item) => {
-    const isUnique = R.none(
-      itemSibling => itemSibling !== item && CategoryItem.getCode(itemSibling) === CategoryItem.getCode(item)
-    )(itemSiblingsAndSelf)
+    const isUnique = R.pipe(
+      R.prop(CategoryItem.getCode(item)),
+      R.length,
+      R.equals(1)
+    )(siblingsByCode)
 
     return isUnique
       ? null
       : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
   }
 
-const itemValidators = (isLeaf, itemChildren, itemSiblingsAndSelf) => ({
+const itemValidators = (isLeaf, itemChildren, siblingsByCode) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.props.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
-    validateItemCodeUniqueness(itemSiblingsAndSelf)
+    validateItemCodeUniqueness(siblingsByCode)
   ],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
 })
@@ -84,16 +85,32 @@ const validateNotEmptyFirstLevelItems = itemsByParentUuid => (propName, level) =
 const validateItems = async (category, itemsByParentUuid) => {
   const itemsValidationsByUuid = {}
 
-  // visit the items from the first to the lowest level
-  // validate first the leaf items, then the 
+  // visit the items from the first to the lowest level (DFS)
+  // validate first the leaf items, then up to the first level
+  const stack = []
+
+  // keep track of already visited items: if not leaf, they will be validated only when already visited
   const visitedUuids = new Set()
-  const queue = new Queue()
+
+  const addItemsToStack = items => {
+    // group sibling items by code to optimize item code uniqueness check
+    // do it only one time for every sibling
+    const siblingsByCode = R.groupBy(CategoryItem.getCode, items)
+    stack.push(...R.map(
+      item => ({
+        item,
+        siblingsByCode
+      }),
+      items
+    ))
+  }
 
   // start with the first level items
-  queue.enqueueItems(getItemChildren(null)(itemsByParentUuid))
+  const itemsFirstLevel = getItemChildren(null)(itemsByParentUuid)
+  addItemsToStack(itemsFirstLevel)
 
-  while (!queue.isEmpty()) {
-    const item = queue.dequeue()
+  while (!R.isEmpty(stack)) {
+    const { item, siblingsByCode } = stack[stack.length - 1] // do not pop item: it can be visited again
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
@@ -103,31 +120,28 @@ const validateItems = async (category, itemsByParentUuid) => {
 
     if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // validate leaf items or items without children or items already visited (all descendants have been already visited)
-      const itemSiblingsAndSelf = getItemChildren(CategoryItem.getParentUuid(item))(itemsByParentUuid)
-
-      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, itemSiblingsAndSelf))
+      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsByCode))
     }
 
-    if (!isLeaf) {
-      if (visited) {
-        // all descendants have been validate, add children validation to the item validation
-        const childrenValid = R.all(
-          item => Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(item)])
-        )(itemChildren)
+    if (isLeaf || R.isEmpty(itemChildren)) {
+      stack.pop() // it won't be visited again, remove it from stack
+    } else if (visited) {
+      // all descendants have been validated, add children validation to the item validation
+      const childrenValid = R.all(
+        itemChild => Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)])
+      )(itemChildren)
 
-        if (!childrenValid) {
-          validation = R.pipe(
-            R.defaultTo(Validation.newInstance()),
-            Validation.setValid(false),
-            Validation.setErrors([{ key: Validation.messageKeys.categoryEdit.childrenInvalid }])
-          )(validation)
-        }
-      } else {
-        // postpone item validation, validate descendant items first
-        queue.enqueueItems(itemChildren)
-        // enque item again: it will be visited and validater later on
-        queue.enqueue(item)
+      if (!childrenValid) {
+        validation = R.pipe(
+          R.defaultTo(Validation.newInstance()),
+          Validation.setValid(false),
+          Validation.setErrors([{ key: Validation.messageKeys.categoryEdit.childrenInvalid }])
+        )(validation)
       }
+      stack.pop()
+    } else {
+      // keep the item in the stack, postpone item validation, validate descendant items first
+      addItemsToStack(itemChildren)
     }
     // keep only invalid validations
     if (!Validation.isValid(validation))
