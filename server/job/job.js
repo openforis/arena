@@ -115,7 +115,7 @@ export default class Job {
         if (this.innerJobs.length > 0) {
           await this._executeInnerJobs()
         } else {
-          await this.execute(tx)
+          await this.execute()
         }
 
         // 3. execution completed, prepare result
@@ -157,11 +157,8 @@ export default class Job {
 
   /**
    * Abstract method to be extended by subclasses
-   *
-   * @param tx DB transaction
-   *
    */
-  async execute(_tx) {}
+  async execute() {}
 
   onEvent(listener) {
     this.eventListener = listener

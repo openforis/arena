@@ -22,7 +22,7 @@ export default class RecordsUniquenessValidationJob extends Job {
     this.validationByRecordUuid = {}
   }
 
-  async execute(tx) {
+  async execute() {
     const survey = await SurveyManager.fetchSurveyById(
       this.surveyId,
       false,

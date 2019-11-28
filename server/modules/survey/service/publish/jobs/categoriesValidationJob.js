@@ -10,12 +10,12 @@ export default class CategoriesValidationJob extends Job {
     super(CategoriesValidationJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(
       this.surveyId,
       true,
       true,
-      tx,
+      this.tx,
     )
 
     const categoriesArr = Object.values(categories)

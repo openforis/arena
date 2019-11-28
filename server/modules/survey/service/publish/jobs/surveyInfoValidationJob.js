@@ -10,12 +10,12 @@ export default class SurveyInfoValidationJob extends Job {
     super(SurveyInfoValidationJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
     const survey = await SurveyManager.fetchSurveyById(
       this.surveyId,
       true,
       true,
-      tx,
+      this.tx,
     )
     const surveyInfo = Survey.getSurveyInfo(survey)
     const validation = Validation.getValidation(surveyInfo)

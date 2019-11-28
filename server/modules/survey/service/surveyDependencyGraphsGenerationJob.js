@@ -13,7 +13,7 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
     super(SurveyDependencyGraphsGenerationJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
     // TODO build a new graph for each survey cycle
     const survey =
       this.contextSurvey ||
@@ -24,12 +24,16 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
         true,
         false,
         false,
-        tx,
+        this.tx,
       ))
 
     const graph = Survey.buildDependencyGraph(survey)
 
-    await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, tx)
+    await SurveyManager.updateSurveyDependencyGraphs(
+      this.surveyId,
+      graph,
+      this.tx,
+    )
   }
 }
 

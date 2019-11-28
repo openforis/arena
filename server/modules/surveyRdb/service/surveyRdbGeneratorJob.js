@@ -11,7 +11,8 @@ export default class SurveyRdbGeneratorJob extends Job {
     super(SurveyRdbGeneratorJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
+    const { tx } = this
     const survey = await this.fetchSurvey(tx)
     const surveyId = Survey.getId(survey)
 

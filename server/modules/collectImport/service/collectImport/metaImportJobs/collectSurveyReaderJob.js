@@ -15,7 +15,7 @@ export default class CollectSurveyReaderJob extends Job {
     super('CollectSurveyReaderJob', params)
   }
 
-  async execute(tx) {
+  async execute() {
     const filePath = this.getContextProp('filePath')
 
     const collectSurveyFileZip = new FileZip(filePath)

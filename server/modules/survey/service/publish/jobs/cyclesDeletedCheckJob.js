@@ -14,7 +14,7 @@ export default class CyclesDeletedCheckJob extends Job {
     super(CyclesDeletedCheckJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
     this.total = 4
 
     // 1. find deleted cycles

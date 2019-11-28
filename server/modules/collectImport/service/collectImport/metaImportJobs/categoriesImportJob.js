@@ -26,7 +26,8 @@ export default class CategoriesImportJob extends Job {
     this.qualifiableItemCodesByCategoryAndLevel = {}
   }
 
-  async execute(tx) {
+  async execute() {
+    const { tx } = this
     const { collectSurvey, defaultLanguage } = this.context
 
     const categories = []

@@ -13,12 +13,12 @@ export default class NodeDefsValidationJob extends Job {
     super(NodeDefsValidationJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
     const survey = await SurveyManager.fetchSurveyById(
       this.surveyId,
       true,
       false,
-      tx,
+      this.tx,
     )
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
     for (const cycle of cycleKeys) {
@@ -29,7 +29,7 @@ export default class NodeDefsValidationJob extends Job {
         true,
         true,
         false,
-        tx,
+        this.tx,
       )
 
       R.pipe(

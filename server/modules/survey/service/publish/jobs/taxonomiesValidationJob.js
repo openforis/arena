@@ -12,12 +12,12 @@ export default class TaxonomiesValidationJob extends Job {
     super(TaxonomiesValidationJob.type, params)
   }
 
-  async execute(tx) {
+  async execute() {
     const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(
       this.surveyId,
       true,
       true,
-      tx,
+      this.tx,
     )
 
     const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)

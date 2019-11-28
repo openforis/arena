@@ -31,7 +31,8 @@ export default class TaxonomiesImportJob extends Job {
     this.currentRow = 0 // Current file row number
   }
 
-  async execute(tx) {
+  async execute() {
+    const { tx } = this
     const { collectSurveyFileZip } = this.context
 
     const taxonomies = []

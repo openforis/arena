@@ -16,7 +16,8 @@ export default class SurveyCreatorJob extends Job {
     super('SurveyCreatorJob', params)
   }
 
-  async execute(tx) {
+  async execute() {
+    const { tx } = this
     const { collectSurvey } = this.context
 
     const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)

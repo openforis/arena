@@ -16,7 +16,7 @@ export default class RecordCheckJob extends Job {
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
   }
 
-  async execute(tx) {
+  async execute() {
     const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle(
       this.surveyId,
       this.tx,

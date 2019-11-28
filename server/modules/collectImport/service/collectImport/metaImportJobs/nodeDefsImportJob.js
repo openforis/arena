@@ -73,7 +73,8 @@ export default class NodeDefsImportJob extends Job {
     this.issuesCount = 0
   }
 
-  async execute(tx) {
+  async execute() {
+    const { tx } = this
     const { collectSurvey, surveyId, user } = this.context
 
     this._calculateTotal()
