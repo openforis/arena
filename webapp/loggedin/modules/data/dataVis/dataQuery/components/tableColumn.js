@@ -21,7 +21,7 @@ const TableColumn = props => {
   const isHeader = !row
   const isData = Boolean(row)
   const noCols = editMode
-    ? NodeDefUIProps.getFormFields(nodeDef).length > 0
+    ? NodeDefUIProps.getFormFields(nodeDef).length
     : colNames.length
   const widthOuter = colWidth * noCols
   const widthInner = (1 / noCols) * 100 + '%'
