@@ -18,7 +18,7 @@ const actionHandlers = {
   [systemErrorThrow]: (state, { error }) =>
     AppState.assocSystemError(error)(state),
 
-  [appPropsChange]: (state, { survey, ...props }) =>
+  [appPropsChange]: (state, { survey: _survey, ...props }) =>
     assocActionProps(state, props),
 
   // ====== user

@@ -110,7 +110,6 @@ export const validateSelfAndDependentAttributes = async (
         ...(NodeDef.isKey(nodeDef)
           ? _getSiblingNodeKeys(
               survey,
-              nodeDef,
               record,
               Record.getParentNode(node)(record),
             )
@@ -153,7 +152,7 @@ const _getCustomValidationMessages = (survey, expression) => {
   return messages
 }
 
-const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
+const _getSiblingNodeKeys = (survey, record, node) => {
   const siblingKeys = []
 
   const nodeParent = Record.getParentNode(node)(record)

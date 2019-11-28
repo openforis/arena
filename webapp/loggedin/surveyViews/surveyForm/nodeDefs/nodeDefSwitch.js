@@ -72,7 +72,7 @@ class NodeDefSwitch extends React.Component {
     this.checkNodePlaceholder()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     this.checkNodePlaceholder()
   }
 

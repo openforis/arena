@@ -7,7 +7,7 @@ export const applyReducerFunction = (actionHandlers, state, action) => {
 export const exportReducer = actionHandlers => (state, action) =>
   applyReducerFunction(actionHandlers, state, action)
 
-export const assocActionProps = (state, { type, ...props }) => ({
+export const assocActionProps = (state, { type: _type, ...props }) => ({
   ...state,
   ...props,
 })

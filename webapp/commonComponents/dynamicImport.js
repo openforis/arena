@@ -26,8 +26,7 @@ export default class DynamicImport extends React.Component {
 
   render() {
     const { component } = this.state
-    // eslint-disable-next-line no-unused-vars
-    const { module, ...rest } = this.props
+    const { module: _module, ...rest } = this.props
     return component ? React.createElement(component, rest) : null
   }
 }

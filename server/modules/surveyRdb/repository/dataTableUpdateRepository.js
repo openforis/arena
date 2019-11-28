@@ -43,7 +43,7 @@ const _getColNames = (nodeDef, type) =>
       ]
     : DataCol.getNames(nodeDef)
 
-const _getColValues = async (survey, cycle, nodeDef, node, type, client) =>
+const _getColValues = async (survey, cycle, nodeDef, node, type) =>
   type === types.insert
     ? [
         Node.getUuid(node),
@@ -59,7 +59,7 @@ const _getColValues = async (survey, cycle, nodeDef, node, type, client) =>
 const _getRowUuid = (nodeDef, node, nodeParent) =>
   _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(nodeParent)
 
-const _toUpdates = async (survey, cycle, nodeDefs, nodes, client) => {
+const _toUpdates = async (survey, cycle, nodeDefs, nodes) => {
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
       const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
@@ -72,14 +72,7 @@ const _toUpdates = async (survey, cycle, nodeDefs, nodes, client) => {
             schemaName: SchemaRdb.getName(Survey.getId(survey)),
             tableName: DataTable.getName(nodeDef, nodeDefParent),
             colNames: _getColNames(nodeDef, type),
-            colValues: await _getColValues(
-              survey,
-              cycle,
-              nodeDef,
-              node,
-              type,
-              client,
-            ),
+            colValues: await _getColValues(survey, cycle, nodeDef, node, type),
             rowUuid: _getRowUuid(
               nodeDef,
               node,
@@ -107,7 +100,7 @@ const _insert = (update, client) =>
     `INSERT INTO ${update.schemaName}.${update.tableName}
       (${update.colNames.join(',')})
       VALUES 
-      (${update.colNames.map((col, i) => `$${i + 1}`).join(',')})`,
+      (${update.colNames.map((_col, i) => `$${i + 1}`).join(',')})`,
     update.colValues,
   )
 
@@ -124,7 +117,7 @@ const queryByType = {
 }
 
 export const updateTable = async (survey, cycle, nodeDefs, nodes, client) => {
-  const updates = await _toUpdates(survey, cycle, nodeDefs, nodes, client)
+  const updates = await _toUpdates(survey, cycle, nodeDefs, nodes)
 
   await client.batch(
     updates.map(update => queryByType[update.type](update, client)),

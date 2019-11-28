@@ -16,7 +16,7 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [tableViewsListUpdate]: (state, { type, ...actionProps }) =>
+  [tableViewsListUpdate]: (state, { type: _type, ...actionProps }) =>
     TableViewsState.assocListUpdateProps(actionProps)(state),
 }
 

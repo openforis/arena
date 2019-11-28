@@ -57,6 +57,7 @@
             "**/*.css",
             "**/*.scss",
             "**/*.sass",
+            "**/polyfill",
             "dotenv/config",
             "core-js/stable",
             "regenerator-runtime/runtime"

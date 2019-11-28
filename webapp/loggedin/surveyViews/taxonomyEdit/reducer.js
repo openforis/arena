@@ -23,14 +23,14 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [taxonomyEditUpdate]: (state, { taxonomyUuid }) =>
+  [taxonomyEditUpdate]: (_state, { taxonomyUuid }) =>
     TaxonomyEditState.initTaxonomyEdit(taxonomyUuid),
 
   [taxonomyEditPropsUpdate]: (state, { type, ...props }) =>
     TaxonomyEditState.mergeTaxonomyEditProps(props)(state),
 
   // Create
-  [taxonomyCreate]: (state, { taxonomy }) =>
+  [taxonomyCreate]: (_state, { taxonomy }) =>
     TaxonomyEditState.initTaxonomyEdit(Taxonomy.getUuid(taxonomy)),
 }
 
