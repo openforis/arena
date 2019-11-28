@@ -17,33 +17,33 @@ import * as RecordUtils from './utils/recordUtils'
 let survey
 let record
 
-before(async () => {
-  const user = getContextUser()
-
-  survey = await SB.survey(
-    user,
-    SB.entity(
-      'cluster',
-      SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
-      SB.attribute('num', NodeDef.nodeDefType.decimal),
-      SB.attribute('dependent_node').applyIf('num > 100'),
-    ),
-  ).buildAndStore()
-
-  record = await RB.record(
-    user,
-    survey,
-    RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
-  ).buildAndStore()
-})
-
-after(async () => {
-  if (survey) {
-    await SurveyManager.deleteSurvey(Survey.getId(survey))
-  }
-})
-
 describe('Applicable Test', () => {
+  before(async () => {
+    const user = getContextUser()
+
+    survey = await SB.survey(
+      user,
+      SB.entity(
+        'cluster',
+        SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
+        SB.attribute('num', NodeDef.nodeDefType.decimal),
+        SB.attribute('dependent_node').applyIf('num > 100'),
+      ),
+    ).buildAndStore()
+
+    record = await RB.record(
+      user,
+      survey,
+      RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
+    ).buildAndStore()
+  })
+
+  after(async () => {
+    if (survey) {
+      await SurveyManager.deleteSurvey(Survey.getId(survey))
+    }
+  })
+
   it('Applicable update', async () => {
     const nodeSource = RecordUtils.findNodeByPath('root/num')(survey, record)
     const nodeDependent = RecordUtils.findNodeByPath('root/dependent_node')(

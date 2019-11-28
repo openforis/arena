@@ -14,10 +14,10 @@ const queries = [
 ]
 
 describe('ExpressionParser test', () => {
-  queries.forEach(query =>
+  for (const query of queries) {
     it(query.q, () => {
       const res = Expression.evalString(query.q)
       assert.equal(res, query.r)
-    }),
-  )
+    })
+  }
 })

@@ -106,7 +106,10 @@ const expressions = [
   },
 ]
 
+// eslint-disable-next-line mocha/no-async-describe
 describe('NodeDefExpressions Validation Test', async () => {
+  // Somehow the obvious alternatives to this don't work:
+  // eslint-disable-next-line mocha/no-setup-in-describe
   const survey = await fetchFullContextSurvey()
 
   for (const expr of expressions) {

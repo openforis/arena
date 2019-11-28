@@ -145,7 +145,8 @@
           "mocha"
         ],
         "rules": {
-          "mocha/no-mocha-arrows": "off"
+          "mocha/no-mocha-arrows": "off",
+          "mocha/no-hooks-for-single-case": "off"
         }
       }
     ]

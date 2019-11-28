@@ -15,30 +15,30 @@ let record = {}
 let node = {}
 // Let dbh = {}
 
-before(async () => {
-  const user = getContextUser()
-
-  survey = SB.survey(
-    user,
-    SB.entity(
-      'cluster',
-      SB.attribute('tree', NodeDef.nodeDefType.integer),
-      SB.attribute('dbh', NodeDef.nodeDefType.integer),
-    ),
-  ).build()
-
-  record = RB.record(
-    user,
-    survey,
-    RB.entity('cluster', RB.attribute('tree', 12), RB.attribute('dbh', 18)),
-  ).build()
-
-  // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
-  node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
-  // Dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
-})
-
 describe('RecordExpressionParser Test', () => {
+  before(async () => {
+    const user = getContextUser()
+
+    survey = SB.survey(
+      user,
+      SB.entity(
+        'cluster',
+        SB.attribute('tree', NodeDef.nodeDefType.integer),
+        SB.attribute('dbh', NodeDef.nodeDefType.integer),
+      ),
+    ).build()
+
+    record = RB.record(
+      user,
+      survey,
+      RB.entity('cluster', RB.attribute('tree', 12), RB.attribute('dbh', 18)),
+    ).build()
+
+    // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
+    node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
+    // Dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
+  })
+
   // ====== nodes hierarchy tests
   // it('this.parent()', async () => {
   //   const res = RecordExpressionParser.evalNodeQuery(survey, record, node, 'this.parent()')
@@ -88,11 +88,9 @@ describe('RecordExpressionParser Test', () => {
     { q: '(dbh * 0.5) >= pow(tree, 3)', r: false },
   ]
 
-  queries.forEach(query => {
-    const { q, r } = query
-    const resKeys = R.keys(r)
-
+  for (const { q, r } of queries) {
     it(q, () => {
+      const resKeys = R.keys(r)
       const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
 
       if (R.isEmpty(resKeys)) {
@@ -101,5 +99,5 @@ describe('RecordExpressionParser Test', () => {
         resKeys.forEach(key => assert.equal(res[key], r[key]))
       }
     })
-  })
+  }
 })

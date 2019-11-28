@@ -18,56 +18,6 @@ import * as RecordUtils from './utils/recordUtils'
 let survey = null
 let record = null
 
-before(async () => {
-  await initTestContext()
-  const user = getContextUser()
-
-  survey = await SB.survey(
-    user,
-    SB.entity(
-      'cluster',
-      SB.attribute('cluster_no').key(),
-      SB.attribute('required_attr').required(),
-      SB.attribute('not_required_attr').required(false),
-      SB.attribute('numeric_attr', NodeDef.nodeDefType.integer),
-      SB.attribute('date_attr', NodeDef.nodeDefType.date),
-      SB.entity(
-        'tree',
-        SB.attribute('tree_num', NodeDef.nodeDefType.integer).key(),
-      )
-        .multiple()
-        .minCount(3)
-        .maxCount(4),
-      SB.attribute('percent_attr', NodeDef.nodeDefType.integer).expressions(
-        NodeDefExpression.createExpression('percent_attr > 0'),
-        NodeDefExpression.createExpression('percent_attr <= 100'),
-      ),
-    ),
-  ).buildAndStore()
-
-  record = await RB.record(
-    user,
-    survey,
-    RB.entity(
-      'cluster',
-      RB.attribute('cluster_no', '1'),
-      RB.attribute('required_attr', 'some value'),
-      RB.attribute('not_required_attr', 'some other value'),
-      RB.attribute('numeric_attr', 1),
-      RB.attribute('date_attr', '01/01/2019'),
-      RB.entity('tree', RB.attribute('tree_num', 1)),
-      RB.entity('tree', RB.attribute('tree_num', 2)),
-      RB.entity('tree', RB.attribute('tree_num', 3)),
-    ),
-  ).buildAndStore()
-})
-
-after(async () => {
-  if (survey) {
-    await SurveyManager.deleteSurvey(Survey.getId(survey))
-  }
-})
-
 const _persistNode = async node => {
   record = await RecordManager.persistNode(
     getContextUser(),
@@ -201,6 +151,56 @@ const removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =>
 }
 
 describe('Record Validation Test', () => {
+  before(async () => {
+    await initTestContext()
+    const user = getContextUser()
+
+    survey = await SB.survey(
+      user,
+      SB.entity(
+        'cluster',
+        SB.attribute('cluster_no').key(),
+        SB.attribute('required_attr').required(),
+        SB.attribute('not_required_attr').required(false),
+        SB.attribute('numeric_attr', NodeDef.nodeDefType.integer),
+        SB.attribute('date_attr', NodeDef.nodeDefType.date),
+        SB.entity(
+          'tree',
+          SB.attribute('tree_num', NodeDef.nodeDefType.integer).key(),
+        )
+          .multiple()
+          .minCount(3)
+          .maxCount(4),
+        SB.attribute('percent_attr', NodeDef.nodeDefType.integer).expressions(
+          NodeDefExpression.createExpression('percent_attr > 0'),
+          NodeDefExpression.createExpression('percent_attr <= 100'),
+        ),
+      ),
+    ).buildAndStore()
+
+    record = await RB.record(
+      user,
+      survey,
+      RB.entity(
+        'cluster',
+        RB.attribute('cluster_no', '1'),
+        RB.attribute('required_attr', 'some value'),
+        RB.attribute('not_required_attr', 'some other value'),
+        RB.attribute('numeric_attr', 1),
+        RB.attribute('date_attr', '01/01/2019'),
+        RB.entity('tree', RB.attribute('tree_num', 1)),
+        RB.entity('tree', RB.attribute('tree_num', 2)),
+        RB.entity('tree', RB.attribute('tree_num', 3)),
+      ),
+    ).buildAndStore()
+  })
+
+  after(async () => {
+    if (survey) {
+      await SurveyManager.deleteSurvey(Survey.getId(survey))
+    }
+  })
+
   /*
     It('Invalid integer attribute value (text)', async () => {
       await updateNodeAndExpectValidationToBe('cluster/numeric_attr', 'text value', false)

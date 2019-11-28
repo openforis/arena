@@ -18,47 +18,6 @@ import * as RecordUtils from './utils/recordUtils'
 let survey
 let record
 
-before(async () => {
-  const user = getContextUser()
-
-  survey = await SB.survey(
-    user,
-    SB.entity(
-      'cluster',
-      SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
-      SB.attribute('num', NodeDef.nodeDefType.decimal),
-      SB.attribute('num_double', NodeDef.nodeDefType.decimal)
-        .readOnly()
-        .defaultValues(NodeDefExpression.createExpression('num * 2')),
-      SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
-        .readOnly()
-        .defaultValues(
-          NodeDefExpression.createExpression('num_double * num_double'),
-        ),
-      SB.attribute('num_range')
-        .readOnly()
-        .defaultValues(
-          NodeDefExpression.createExpression('"a"', 'num <= 0'),
-          NodeDefExpression.createExpression('"b"', 'num <= 10'),
-          NodeDefExpression.createExpression('"c"', 'num <= 20'),
-          NodeDefExpression.createExpression('"z"'),
-        ),
-    ),
-  ).buildAndStore()
-
-  record = await RB.record(
-    user,
-    survey,
-    RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
-  ).buildAndStore()
-})
-
-after(async () => {
-  if (survey) {
-    await SurveyManager.deleteSurvey(Survey.getId(survey))
-  }
-})
-
 const updateNodeAndExpectDependentNodeValueToBe = async (
   survey,
   record,
@@ -93,6 +52,47 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
 }
 
 describe('Calculated value test', () => {
+  before(async () => {
+    const user = getContextUser()
+
+    survey = await SB.survey(
+      user,
+      SB.entity(
+        'cluster',
+        SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
+        SB.attribute('num', NodeDef.nodeDefType.decimal),
+        SB.attribute('num_double', NodeDef.nodeDefType.decimal)
+          .readOnly()
+          .defaultValues(NodeDefExpression.createExpression('num * 2')),
+        SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
+          .readOnly()
+          .defaultValues(
+            NodeDefExpression.createExpression('num_double * num_double'),
+          ),
+        SB.attribute('num_range')
+          .readOnly()
+          .defaultValues(
+            NodeDefExpression.createExpression('"a"', 'num <= 0'),
+            NodeDefExpression.createExpression('"b"', 'num <= 10'),
+            NodeDefExpression.createExpression('"c"', 'num <= 20'),
+            NodeDefExpression.createExpression('"z"'),
+          ),
+      ),
+    ).buildAndStore()
+
+    record = await RB.record(
+      user,
+      survey,
+      RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
+    ).buildAndStore()
+  })
+
+  after(async () => {
+    if (survey) {
+      await SurveyManager.deleteSurvey(Survey.getId(survey))
+    }
+  })
+
   it('Calculated value updated', async () => {
     await updateNodeAndExpectDependentNodeValueToBe(
       survey,
