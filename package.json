@@ -50,6 +50,7 @@
       "no-return-await": "off",
       "new-cap": "off",
       "no-alert": "off",
+      "max-params": ["warn", {"max": 6}],
       "import/no-unassigned-import": [
         "warn",
         {
