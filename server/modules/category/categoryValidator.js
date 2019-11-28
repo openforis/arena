@@ -46,24 +46,24 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
 // ====== ITEMS
 
-const validateItemCodeUniqueness = siblingsByCode =>
+const validateItemCodeUniqueness = siblingsAndSelfByCode =>
   (propName, item) => {
     const isUnique = R.pipe(
       R.prop(CategoryItem.getCode(item)),
       R.length,
       R.equals(1)
-    )(siblingsByCode)
+    )(siblingsAndSelfByCode)
 
     return isUnique
       ? null
       : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
   }
 
-const itemValidators = (isLeaf, itemChildren, siblingsByCode) => ({
+const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.props.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
-    validateItemCodeUniqueness(siblingsByCode)
+    validateItemCodeUniqueness(siblingsAndSelfByCode)
   ],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
 })
@@ -95,11 +95,11 @@ const validateItems = async (category, itemsByParentUuid) => {
   const addItemsToStack = items => {
     // group sibling items by code to optimize item code uniqueness check
     // do it only one time for every sibling
-    const siblingsByCode = R.groupBy(CategoryItem.getCode, items)
+    const siblingsAndSelfByCode = R.groupBy(CategoryItem.getCode, items)
     stack.push(...R.map(
       item => ({
         item,
-        siblingsByCode
+        siblingsAndSelfByCode
       }),
       items
     ))
@@ -110,7 +110,7 @@ const validateItems = async (category, itemsByParentUuid) => {
   addItemsToStack(itemsFirstLevel)
 
   while (!R.isEmpty(stack)) {
-    const { item, siblingsByCode } = stack[stack.length - 1] // do not pop item: it can be visited again
+    const { item, siblingsAndSelfByCode } = stack[stack.length - 1] // do not pop item: it can be visited again
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
@@ -120,7 +120,7 @@ const validateItems = async (category, itemsByParentUuid) => {
 
     if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // validate leaf items or items without children or items already visited (all descendants have been already visited)
-      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsByCode))
+      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
 
     if (isLeaf || R.isEmpty(itemChildren)) {
