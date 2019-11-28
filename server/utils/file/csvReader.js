@@ -7,57 +7,49 @@ import * as StringUtils from '@core/stringUtils'
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
   let canceled = false
-  const queue = new Queue()
 
   const start = () => new Promise((resolve, reject) => {
-    let ended = false
+    const queue = new Queue()
     let headers = null
     let total = 0
-    let processingRow = false //prevents the call to processNext when a row is already being processed
 
     /**
      * Executes the specified function fn in a try catch.
      * Calls "reject" if the execution throws an error.
      */
-    const _tryOrCancel = async fn => {
+    const _tryOrCancel = async fnPromise => {
       try {
-        await fn()
+        await fnPromise
       } catch (e) {
         cancel()
         reject(e)
       }
     }
 
-    const processNext = () => {
+    const _indexRowByHeaders = row => headers
+      ? headers.reduce(
+        (accRow, header, index) => Object.assign(accRow, { [header]: StringUtils.trim(row[index]) }),
+        {}
+      )
+      : row
+
+    const processQueue = () => {
       (async () => {
-        processingRow = true
 
-        if (queue.isEmpty()) {
-          if (ended)
-            resolve()
-        } else if (!canceled) {
-          const row = queue.dequeue()
-
+        let row
+        // run until there's a row in the queue and it's not been canceled
+        while (!!(row = queue.dequeue()) && !canceled) {
           if (headers) {
-            //headers read, process rows
-            if (onRow) {
-              await _tryOrCancel(async () => {
-                await onRow(_indexRowByHeaders(row))
-              })
-            }
+            //headers have been read, process row
+            onRow && await _tryOrCancel(onRow(_indexRowByHeaders(row)))
           } else {
             //process headers
             headers = row
-            if (onHeaders) {
-              await _tryOrCancel(async () => {
-                await onHeaders(headers)
-              })
-            }
+            onHeaders && await _tryOrCancel(onHeaders(headers))
           }
-          processNext()
         }
 
-        processingRow = false
+        return resolve()
       })()
     }
 
@@ -65,29 +57,19 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       if (canceled)
         return resolve()
 
-      ++total
-      if (total > 0) {
-        // skip first row (headers)
+      // skip first row (headers)
+      if (total++ > 0)
         onTotalChange && onTotalChange(total)
-      }
 
-      const wasEmpty = queue.isEmpty()
       queue.enqueue(data)
-      if (!processingRow && wasEmpty) {
-        processNext()
-      }
     }
 
     const onEnd = () => {
-      ended = true
       if (queue.isEmpty())
         resolve()
+      else
+        processQueue()
     }
-
-    const _indexRowByHeaders = row =>
-      headers
-        ? headers.reduce((accRow, header, index) => Object.assign(accRow, { [header]: StringUtils.trim(row[index]) }), {})
-        : row
 
     stream
       .pipe(csvParser())
