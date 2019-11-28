@@ -8,6 +8,7 @@ import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
@@ -64,7 +65,7 @@ const mapStateToProps = (state, props) => {
         validation = RecordValidation.getNodeValidation(node)(recordValidation)
       } else if (NodeDef.isEntity(nodeDef)) {
         // only entities can have children with min/max count validation
-        const fieldValidation = Validation.getFieldValidation(NodeDef.getUuid(parentNode))(recordValidation)
+        const fieldValidation = Validation.getFieldValidation(Node.getUuid(parentNode))(recordValidation)
         validation = RecordValidation.getValidationChildrenCount(NodeDef.getUuid(nodeDef))(fieldValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
         validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])

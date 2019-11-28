@@ -189,6 +189,7 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
     const ancestors = Record.getAncestorsAndSelf(entity)(record)
 
     const nodeDefActivePage = R.pipe(
+      R.reverse,
       R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
       R.find(R.pipe(
         NodeDefLayout.getPageUuid,
@@ -200,7 +201,7 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
     // getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(
       (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
-      [],
+      {},
       ancestors
     )
 

@@ -105,8 +105,8 @@ const ValidationFieldMessages = ({ validation, showKeys = true, showIcons = fals
   )(validation)
 }
 
-const mapStateToProps = state => {
-  return { survey: SurveyState.getSurvey(state) }
-}
+const mapStateToProps = state => ({
+  survey: SurveyState.getSurvey(state)
+})
 
 export default connect(mapStateToProps)(ValidationFieldMessages)

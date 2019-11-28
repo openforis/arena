@@ -33,6 +33,9 @@ export const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
 // ancestors
 export const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
+/**
+ * Returns the list of ancestors from the given entity to the root entity
+ */
 export const getAncestorsAndSelf = entity => record => {
   const ancestors = []
   while (entity) {
