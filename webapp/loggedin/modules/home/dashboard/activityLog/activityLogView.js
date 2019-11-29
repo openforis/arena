@@ -26,8 +26,12 @@ const ActivityLogView = props => {
   useEffect(() => {
     fetchActivityLogs()
 
+    const pollingInterval = setInterval(fetchActivityLogs, 10000)
+
     return () => {
       resetActivityLogs()
+
+      clearInterval(pollingInterval)
     }
   }, [])
 
