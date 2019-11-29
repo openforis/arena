@@ -40,7 +40,7 @@ export const fetchActivityLogs = (offset = 0, limit = 30) => async (dispatch, ge
       R.map(ActivityLogMessageParser.toMessage(i18n, survey)),
       R.concat(messagesState),
       R.uniq,
-      R.sortBy(R.compose(ActivityLogMessage.getId, Number)),
+      R.sortBy(R.compose(Number, ActivityLogMessage.getId)),
       R.reverse
     )(activityLogs)  
 
