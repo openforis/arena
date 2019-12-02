@@ -38,7 +38,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
 
         let row
         // run until there's a row in the queue and it's not been canceled
-        while (!!(row = queue.dequeue()) && !canceled) {
+        while ((row = queue.dequeue()) && !canceled) {
           if (headers) {
             //headers have been read, process row
             onRow && await _tryOrCancel(onRow(_indexRowByHeaders(row)))
