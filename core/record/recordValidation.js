@@ -27,8 +27,14 @@ export const newValidationRecordDuplicate = (isUnique = false) => Validation.new
 export const getValidationChildrenCount = childDefUuid => R.pipe(
   Validation.getFieldValidation(keys.childrenCount),
   Validation.getFieldValidation(childDefUuid),
-  v => Validation.newInstance(false, { [childDefUuid]: v }),
-  v => Validation.newInstance(false, { [keys.childrenCount]: v })
+  R.ifElse(
+    Validation.isValid,
+    () => {},
+    R.pipe(
+      v => Validation.newInstance(false, { [childDefUuid]: v }),
+      v => Validation.newInstance(false, { [keys.childrenCount]: v })
+    )
+  )
 )
 
 export const getNodeValidation = node =>
