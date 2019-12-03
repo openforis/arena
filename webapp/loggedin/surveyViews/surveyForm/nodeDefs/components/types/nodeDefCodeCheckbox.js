@@ -24,7 +24,8 @@ const Checkbox = props => {
       className={`btn btn-s deselectable${selected ? ' active' : ''}`}
       aria-disabled={edit || !canEditRecord || readOnly}
       onClick={() => {
-        selected ? onItemRemove(item) : onItemAdd(item)
+        if (selected) onItemRemove(item)
+        else onItemAdd(item)
       }}
     >
       {CategoryItem.getLabel(lang)(item)}

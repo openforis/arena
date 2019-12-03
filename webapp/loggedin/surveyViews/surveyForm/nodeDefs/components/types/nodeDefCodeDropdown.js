@@ -47,7 +47,9 @@ const NodeDefCodeDropdown = props => {
           itemLabelFunction={CategoryItem.getLabel(lang)}
           selection={R.head(selectedItems)}
           onChange={item => {
-            item ? onItemAdd(item) : onItemRemove(item)
+            // NB: onItemRemove is not possible?
+            if (item) onItemAdd(item)
+            else onItemRemove(item)
           }}
         />
       )}
