@@ -38,21 +38,32 @@ const _getNodeValue = (survey, node) => {
 }
 
 const _getReferencedNodesParent = (
+  survey,
   record,
   nodeCtx,
-  nodeDefContextH,
-  nodeDefReferencedH,
+  nodeDefReferenced,
 ) => {
+  const nodeDefUuidCtx = Node.getNodeDefUuid(nodeCtx)
+  const nodeDefCtx = Survey.getNodeDefByUuid(nodeDefUuidCtx)(survey)
+  const nodeDefCtxH = NodeDef.getMetaHierarchy(nodeDefCtx)
+  const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
+
   if (Node.isRoot(nodeCtx) && nodeDefReferencedH.length === 1) {
     // NodeCtx is root and node referenced is its child
     return nodeCtx
   }
 
-  if (R.startsWith(nodeDefReferencedH, nodeDefContextH)) {
+  if (R.startsWith(nodeDefCtxH, nodeDefReferencedH)) {
     // NodeDefReferenced belongs to an ancestor of nodeDefContext
-    const nodeReferencedParentUuid = Node.getHierarchy(nodeCtx)[
-      nodeDefReferencedH.length - 1
-    ]
+    const nodeCtxH = R.pipe(
+      Node.getHierarchy,
+      // When nodeDefCtx is entity, expression is type applicableIf (and context always starts from parent)
+      R.when(
+        R.always(NodeDef.isEntity(nodeDefCtx)),
+        R.append(Node.getUuid(nodeCtx)),
+      ),
+    )(nodeCtx)
+    const nodeReferencedParentUuid = nodeCtxH[nodeDefReferencedH.length - 1]
     return Record.getNodeByUuid(nodeReferencedParentUuid)(record)
   }
 
@@ -62,25 +73,19 @@ const _getReferencedNodesParent = (
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
 const _getReferencedNodes = (survey, record, nodeCtx, nodeReferencedName) => {
-  const nodeDefUuidContext = Node.getNodeDefUuid(nodeCtx)
-  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
-  const nodeDefContextH = NodeDef.getMetaHierarchy(nodeDefContext)
-
   const nodeDefReferenced = Survey.getNodeDefByName(nodeReferencedName)(survey)
-  const nodeDefReferencedH = NodeDef.getMetaHierarchy(nodeDefReferenced)
 
   const nodeReferencedParent = _getReferencedNodesParent(
+    survey,
     record,
     nodeCtx,
-    nodeDefContextH,
-    nodeDefReferencedH,
+    nodeDefReferenced,
   )
-  if (nodeReferencedParent) {
+  if (nodeReferencedParent)
     return Record.getNodeChildrenByDefUuid(
       nodeReferencedParent,
       NodeDef.getUuid(nodeDefReferenced),
     )(record)
-  }
 
   return []
 }
