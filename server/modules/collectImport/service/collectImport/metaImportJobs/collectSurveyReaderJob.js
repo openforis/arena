@@ -11,12 +11,11 @@ const idmlXmlFileName = 'idml.xml'
  * Reads the schema from a Collect backup file and saves it into the job context under idmlSource property
  */
 export default class CollectSurveyReaderJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super('CollectSurveyReaderJob', params)
   }
 
-  async execute (tx) {
+  async execute() {
     const filePath = this.getContextProp('filePath')
 
     const collectSurveyFileZip = new FileZip(filePath)

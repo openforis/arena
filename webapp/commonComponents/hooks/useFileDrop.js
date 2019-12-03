@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 export default (handler, elemRef, acceptedTypes) => {
   const eventTypes = ['dragenter', 'dragover', 'dragleave', 'drop']
@@ -14,9 +14,11 @@ export default (handler, elemRef, acceptedTypes) => {
 
     const fileItems = [...evt.dataTransfer.items]
 
-    const fileItem = fileItems.find(item =>
-      !acceptedTypes ||
-      acceptedTypes.find(acceptedType => acceptedType.test(item.type)))
+    const fileItem = fileItems.find(
+      item =>
+        !acceptedTypes ||
+        acceptedTypes.find(acceptedType => acceptedType.test(item.type)),
+    )
 
     if (fileItem) {
       handler(fileItem.getAsFile())

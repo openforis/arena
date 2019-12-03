@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
@@ -17,14 +17,14 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = props => {
-
   const [state, setState] = useState(initialState)
   const { query, expr, mode, canBeConstant } = props
 
-  // onMount initialize state
+  // OnMount initialize state
   useEffect(() => {
     // Either expr or query are passed by the parent component
-    const exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
+    const exprDraft =
+      expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
     const queryDraft = Expression.toString(exprDraft, mode)
 
     setState({
@@ -37,16 +37,21 @@ export const useExpressionEditorPopupState = props => {
 
   const updateDraft = exprDraft => {
     const queryDraft = Expression.toString(exprDraft, mode)
-    const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
+    const exprDraftValid = ExpressionParser.isExprValid(
+      exprDraft,
+      canBeConstant,
+    )
     setState(statePrev => ({
       ...statePrev,
-      queryDraft, exprDraft, exprDraftValid
+      queryDraft,
+      exprDraft,
+      exprDraftValid,
     }))
   }
 
   return {
     ...state,
-    updateDraft
+    updateDraft,
   }
 }
 
@@ -61,9 +66,17 @@ export const mapStateToProps = (state, props) => {
   } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
-  const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
+  const nodeDefCurrent = nodeDefUuidCurrent
+    ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey)
+    : null
 
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, lang)
+  const variables = ExpressionVariables.getVariables(
+    survey,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    lang,
+  )
 
   return {
     nodeDefContext,

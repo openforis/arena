@@ -6,9 +6,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 const _toPrimitive = (val, TypeTo) =>
-  R.is(String, val) || R.is(Number, val)
-    ? TypeTo(val)
-    : null
+  R.is(String, val) || R.is(Number, val) ? TypeTo(val) : null
 
 const _toBoolean = (survey, record, nodeCtx, valueExpr) =>
   R.is(Boolean, valueExpr)
@@ -18,24 +16,32 @@ const _toBoolean = (survey, record, nodeCtx, valueExpr) =>
     : null
 
 const _toCode = (survey, record, nodeCtx, valueExpr) => {
-  // valueExpr is the code of a category item
+  // ValueExpr is the code of a category item
   const code = _toPrimitive(valueExpr, String)
-  if (code === null)
+  if (code === null) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const parentNode = Record.getParentNode(nodeCtx)(record)
 
-  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy(
+    survey,
+    nodeDef,
+    record,
+    parentNode,
+    code,
+  )(survey)
 
   return itemUuid ? { [Node.valuePropKeys.itemUuid]: itemUuid } : null
 }
 
 const _toTaxon = (survey, record, nodeCtx, valueExpr) => {
-  // valueExpr is the code of a taxon
+  // ValueExpr is the code of a taxon
   const taxonCode = _toPrimitive(valueExpr, String)
-  if (taxonCode === null)
+  if (taxonCode === null) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
@@ -47,15 +53,22 @@ const _valueExprToValueNodeFns = {
   [NodeDef.nodeDefType.boolean]: _toBoolean,
   [NodeDef.nodeDefType.code]: _toCode,
   [NodeDef.nodeDefType.date]: (survey, record, nodeCtx, valueExpr) => valueExpr,
-  [NodeDef.nodeDefType.decimal]: (survey, record, nodeCtx, valueExpr) => _toPrimitive(valueExpr, Number),
-  [NodeDef.nodeDefType.integer]: (survey, record, nodeCtx, valueExpr) => _toPrimitive(valueExpr, Number),
+  [NodeDef.nodeDefType.decimal]: (survey, record, nodeCtx, valueExpr) =>
+    _toPrimitive(valueExpr, Number),
+  [NodeDef.nodeDefType.integer]: (survey, record, nodeCtx, valueExpr) =>
+    _toPrimitive(valueExpr, Number),
   [NodeDef.nodeDefType.taxon]: _toTaxon,
-  [NodeDef.nodeDefType.text]: (survey, record, nodeCtx, valueExpr) => _toPrimitive(valueExpr, String),
+  [NodeDef.nodeDefType.text]: (survey, record, nodeCtx, valueExpr) =>
+    _toPrimitive(valueExpr, String),
   [NodeDef.nodeDefType.time]: (survey, record, nodeCtx, valueExpr) => valueExpr,
 }
 
 export const toNodeValue = (survey, record, nodeCtx, valueExpr) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
-  return _valueExprToValueNodeFns[NodeDef.getType(nodeDef)](survey, record, nodeCtx, valueExpr)
+  return _valueExprToValueNodeFns[NodeDef.getType(nodeDef)](
+    survey,
+    record,
+    nodeCtx,
+    valueExpr,
+  )
 }
-

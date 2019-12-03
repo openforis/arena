@@ -19,31 +19,44 @@ import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  */
-export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
+export const fetchRecordsWithDuplicateEntities = async (
+  survey,
+  cycle,
+  nodeDefEntity,
+  nodeDefKeys,
+  client,
+) => {
   const surveyId = Survey.getId(survey)
 
-  const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
+  const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(
+    nodeDefEntity,
+  )}`
 
   const aliasA = 'e1'
   const aliasB = 'e2'
 
-  const getColEqualCondition = colName => `${aliasA}.${colName} = ${aliasB}.${colName}`
+  const getColEqualCondition = colName =>
+    `${aliasA}.${colName} = ${aliasB}.${colName}`
 
   const getNullableColEqualCondition = colName =>
-    `(${aliasA}.${colName} IS NULL AND ${aliasB}.${colName} IS NULL OR ${getColEqualCondition(colName)})`
+    `(${aliasA}.${colName} IS NULL AND ${aliasB}.${colName} IS NULL OR ${getColEqualCondition(
+      colName,
+    )})`
 
   const equalKeysCondition = R.pipe(
-    R.map(nodeDefKey => getNullableColEqualCondition(NodeDefTable.getColName(nodeDefKey))),
+    R.map(nodeDefKey =>
+      getNullableColEqualCondition(NodeDefTable.getColName(nodeDefKey)),
+    ),
     R.join(' AND '),
   )(nodeDefKeys)
 
-  const recordAndParentEqualCondition =
-    NodeDef.isRoot(nodeDefEntity)
-      ? ''
-      : `AND ${getColEqualCondition(DataTable.colNameRecordUuuid)}
+  const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
+    ? ''
+    : `AND ${getColEqualCondition(DataTable.colNameRecordUuuid)}
          AND ${getColEqualCondition(DataTable.colNameParentUuuid)}`
 
-  return await client.any(`
+  return await client.any(
+    `
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
     FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
@@ -58,25 +71,39 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
         --same cycle
         ${aliasB}.${DataTable.colNameRecordCycle} = $1
         --different node uuid 
-        AND ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
+        AND ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${
+      DataTable.colNameUuuid
+    }
         ${recordAndParentEqualCondition}
         --same key node(s) values
         AND (${equalKeysCondition})
       )
     GROUP BY r.uuid, r.validation
     `,
-    [cycle]
+    [cycle],
   )
 }
 
-export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, recordUuid, nodeUuid = null, client = db) => {
+export const fetchEntityKeysByRecordAndNodeDefUuid = async (
+  survey,
+  entityDefUuid,
+  recordUuid,
+  nodeUuid = null,
+  client = db,
+) => {
   const surveyId = Survey.getId(survey)
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
+  const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(
+    entityDef,
+  )}`
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
-  const keyColumns = R.pipe(R.map(NodeDefTable.getColName), R.join(', '))(entityDefKeys)
+  const keyColumns = R.pipe(
+    R.map(NodeDefTable.getColName),
+    R.join(', '),
+  )(entityDefKeys)
 
-  return await client.oneOrNone(`
+  return await client.oneOrNone(
+    `
     SELECT
       ${keyColumns}
     FROM
@@ -85,6 +112,6 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUui
       ${DataTable.colNameRecordUuuid} = $1
       ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.colNameUuuid} = $2`}`,
     [recordUuid, nodeUuid],
-    row => Object.values(row)
+    row => Object.values(row),
   )
 }

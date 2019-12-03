@@ -7,7 +7,7 @@ import Tooltip from './tooltip'
 
 import { useI18n } from './hooks'
 
-export default ({ validation, className, showKeys, children }) => {
+const ValidationTooltip = ({ validation, className, showKeys, children }) => {
   const i18n = useI18n()
 
   const isValid = Validation.isValid(validation)
@@ -15,19 +15,18 @@ export default ({ validation, className, showKeys, children }) => {
   const type = isValid
     ? ''
     : Validation.isWarning(validation)
-      ? 'warning'
-      : 'error'
+    ? 'warning'
+    : 'error'
 
   const messagesHtml = isValid
     ? null
     : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
 
   return (
-    <Tooltip
-      type={type}
-      messages={messagesHtml}
-      className={className}>
+    <Tooltip type={type} messages={messagesHtml} className={className}>
       {children}
     </Tooltip>
   )
 }
+
+export default ValidationTooltip

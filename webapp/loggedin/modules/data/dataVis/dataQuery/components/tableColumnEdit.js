@@ -6,19 +6,28 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Authorizer from '@core/auth/authorizer'
 
-import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
-
-import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
+import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
+
+import {
+  createNodePlaceholder,
+  removeNode,
+  updateNode,
+} from '../../../../../surveyViews/record/actions'
 
 class TableColumnEdit extends React.Component {
-
-  render () {
+  render() {
     const {
-      surveyInfo, surveyCycleKey, canEditRecord,
-      nodeDef, record, cell,
-      updateNode, removeNode, createNodePlaceholder
+      surveyInfo,
+      surveyCycleKey,
+      canEditRecord,
+      nodeDef,
+      record,
+      cell,
+      updateNode,
+      removeNode,
+      createNodePlaceholder,
     } = this.props
 
     if (cell) {
@@ -26,7 +35,7 @@ class TableColumnEdit extends React.Component {
 
       const parentNode = {
         [Node.keys.recordUuid]: Record.getUuid(record),
-        [Node.keys.parentUuid]: parentUuid
+        [Node.keys.parentUuid]: parentUuid,
       }
 
       return (
@@ -47,9 +56,9 @@ class TableColumnEdit extends React.Component {
           windowed={false}
         />
       )
-    } else {
-      return null
     }
+
+    return null
   }
 }
 
@@ -65,9 +74,8 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    updateNode, removeNode, createNodePlaceholder
-  }
-)(TableColumnEdit)
+export default connect(mapStateToProps, {
+  updateNode,
+  removeNode,
+  createNodePlaceholder,
+})(TableColumnEdit)

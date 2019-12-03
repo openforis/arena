@@ -10,14 +10,17 @@ const Markdown = props => {
   }, [source])
 
   return (
-    <Container className={className} dangerouslySetInnerHTML={{ __html: output }}/>
+    <Container
+      className={className}
+      dangerouslySetInnerHTML={{ __html: output }}
+    />
   )
 }
 
 Markdown.defaultProps = {
-  source: '', // markdown text to render
-  container: 'div', // the container element to use
-  className: '', // the class name to apply to the container element
+  source: '', // Markdown text to render
+  container: 'div', // The container element to use
+  className: '', // The class name to apply to the container element
 }
 
 export default Markdown

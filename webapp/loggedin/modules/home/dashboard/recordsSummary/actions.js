@@ -11,7 +11,6 @@ const formatDate = date => DateUtils.format(date, 'yyyy-MM-dd')
 
 const getFromDate = (date, timeRange) => {
   switch (timeRange) {
-
     case RecordsSummaryState.timeRanges._2Weeks:
       return DateUtils.subDays(date, 14)
 
@@ -26,10 +25,16 @@ const getFromDate = (date, timeRange) => {
 
     case RecordsSummaryState.timeRanges._1Year:
       return DateUtils.subYears(date, 1)
+
+    default:
+      throw new Error(`Unknown timeRange: ${timeRange}`)
   }
 }
 
-export const fetchRecordsSummary = (cycle, timeRange) => async (dispatch, getState) => {
+export const fetchRecordsSummary = (cycle, timeRange) => async (
+  dispatch,
+  getState,
+) => {
   const surveyId = SurveyState.getSurveyId(getState())
 
   const now = Date.now()
@@ -38,7 +43,9 @@ export const fetchRecordsSummary = (cycle, timeRange) => async (dispatch, getSta
 
   const { data: counts } = await axios.get(
     `/api/survey/${surveyId}/records/summary/count`,
-    { params: { cycle, from, to } }
+    {
+      params: { cycle, from, to },
+    },
   )
 
   dispatch({ type: recordsSummaryUpdate, timeRange, from, to, counts })

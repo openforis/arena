@@ -12,21 +12,21 @@ const _getParams = (survey, i18n) => activityLog => {
 
   const parentPath = R.pipe(
     ActivityLog.getKeysHierarchy,
-    NodeKeys.getKeysHierarchyPath(survey, i18n.lang)
+    NodeKeys.getKeysHierarchyPath(survey, i18n.lang),
   )(activityLog)
 
-  // get record keys from parent path first item (root)
+  // Get record keys from parent path first item (root)
   const recordKeys = R.pipe(
     ActivityLog.getKeysHierarchy,
     R.head,
     R.prop(NodeKeys.keys.keys),
-    R.values
+    R.values,
   )(activityLog)
 
   return {
     name: NodeDef.getLabel(nodeDef, i18n.lang),
     recordKeys,
-    parentPath
+    parentPath,
   }
 }
 

@@ -1,11 +1,12 @@
 const socketIdsByRecordUuid = new Map()
 
-export const getSocketIds = recordUuid => socketIdsByRecordUuid.get(recordUuid) || new Set()
+export const getSocketIds = recordUuid =>
+  socketIdsByRecordUuid.get(recordUuid) || new Set()
 
 export const hasSockets = recordUuid => getSocketIds(recordUuid).size !== 0
 
 export const getRecordUuid = socketId => {
-  const recordUuids = Array.from(socketIdsByRecordUuid.keys())
+  const recordUuids = [...socketIdsByRecordUuid.keys()]
   return recordUuids.find(recordUuid => getSocketIds(recordUuid).has(socketId))
 }
 
@@ -25,4 +26,5 @@ export const dissocSocket = (recordUuid, socketId) => {
   }
 }
 
-export const dissocSockets = recordUuid => socketIdsByRecordUuid.delete(recordUuid)
+export const dissocSockets = recordUuid =>
+  socketIdsByRecordUuid.delete(recordUuid)

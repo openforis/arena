@@ -1,19 +1,16 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import TableHeader from './components/tableHeader'
 import TableContent from './components/tableContent'
 
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as TableViewsState from './tableViewsState'
 
 import { initListItems, fetchListItems } from './actions'
 
 const TableView = props => {
-  const {
-    module, moduleApiUri, restParams, className,
-    initListItems
-  } = props
+  const { module, moduleApiUri, restParams, className, initListItems } = props
 
   useEffect(() => {
     initListItems(module, moduleApiUri, restParams)
@@ -21,14 +18,14 @@ const TableView = props => {
 
   return (
     <div className={`table ${className}`}>
+      <TableHeader {...props} />
 
-      <TableHeader {...props}/>
-
-      <TableContent {...props}/>
-
+      <TableContent {...props} />
     </div>
   )
 }
+
+const DummyComponent = () => <div></div>
 
 TableView.defaultProps = {
   module: '',
@@ -36,17 +33,18 @@ TableView.defaultProps = {
   restParams: {},
   className: '',
   gridTemplateColumns: '1fr',
-  headerLeftComponent: () => <div></div>,
-  rowHeaderComponent: () => <div></div>,
-  rowComponent: () => <div></div>,
+  headerLeftComponent: DummyComponent,
+  rowHeaderComponent: DummyComponent,
+  rowComponent: DummyComponent,
   noItemsLabelKey: 'common.noItems',
-  onRowClick: null, // function to be passed when an action has to be performed on row click
-  isRowActive: null, //function to be passed when a row must be highlighted
+  onRowClick: null, // Function to be passed when an action has to be performed on row click
+  isRowActive: null, // Function to be passed when a row must be highlighted
 }
 
 const mapStateToProps = (state, props) => {
   let { module, moduleApiUri } = props
-  moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
+  moduleApiUri =
+    moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
 
   return {
     moduleApiUri,
@@ -57,7 +55,6 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { initListItems, fetchListItems }
-)(TableView)
+export default connect(mapStateToProps, { initListItems, fetchListItems })(
+  TableView,
+)

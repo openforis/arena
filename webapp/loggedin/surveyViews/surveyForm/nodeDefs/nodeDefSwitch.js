@@ -4,11 +4,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefFormItem from './components/nodeDefFormItem'
-import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
-import NodeDefTableCellBody from './components/nodeDefTableCellBody'
-import NodeDefEditButtons from './components/nodeDefEditButtons'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
@@ -17,58 +12,88 @@ import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import {
+  putNodeDefProp,
+  putNodeDefLayoutProp,
+} from '@webapp/survey/nodeDefs/actions'
 import * as RecordState from '../../record/recordState'
 
+import {
+  createNodePlaceholder,
+  updateNode,
+  removeNode,
+} from '../../record/actions'
 import * as NodeDefUiProps from './nodeDefUIProps'
 
-// edit actions
-import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
-// entry actions
-import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
+// Edit actions
+// Entry actions
+import NodeDefEditButtons from './components/nodeDefEditButtons'
+import NodeDefTableCellBody from './components/nodeDefTableCellBody'
+import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
+import NodeDefFormItem from './components/nodeDefFormItem'
 
 class NodeDefSwitch extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.element = React.createRef()
   }
 
-  checkNodePlaceholder () {
-    const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
+  checkNodePlaceholder() {
+    const {
+      nodes,
+      nodeDef,
+      parentNode,
+      createNodePlaceholder,
+      canAddNode,
+    } = this.props
 
-    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
-      createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getDefaultValue(nodeDef))
+    if (
+      canAddNode &&
+      NodeDef.isAttribute(nodeDef) &&
+      !NodeDef.isCode(nodeDef) &&
+      R.none(Node.isPlaceholder, nodes)
+    ) {
+      createNodePlaceholder(
+        nodeDef,
+        parentNode,
+        NodeDefUiProps.getDefaultValue(nodeDef),
+      )
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { nodeDef, edit } = this.props
 
-    if (edit && !nodeDef.id)
+    if (edit && !nodeDef.id) {
       this.element.current.scrollIntoView()
+    }
 
     this.checkNodePlaceholder()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate() {
     this.checkNodePlaceholder()
   }
 
-  render () {
+  render() {
     const {
-      surveyCycleKey, nodeDef, label,
-      edit, canEditDef,
-      renderType, applicable,
+      surveyCycleKey,
+      nodeDef,
+      label,
+      edit,
+      canEditDef,
+      renderType,
+      applicable,
     } = this.props
 
-    const className = 'survey-form__node-def-page'
-      + (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item')
-      + (applicable ? '' : ' not-applicable')
+    const className =
+      'survey-form__node-def-page' +
+      (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item') +
+      (applicable ? '' : ' not-applicable')
 
     return (
       <div className={className} ref={this.element}>
-
         <NodeDefEditButtons
           surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
@@ -76,26 +101,24 @@ class NodeDefSwitch extends React.Component {
           canEditDef={canEditDef}
         />
 
-        {
-          renderType === NodeDefLayout.renderType.tableHeader
-            ? <NodeDefTableCellHeader nodeDef={nodeDef} label={label}/>
-            : renderType === NodeDefLayout.renderType.tableBody
-            ? <NodeDefTableCellBody {...this.props} label={label}/>
-            : <NodeDefFormItem {...this.props} label={label}/>
-        }
-
+        {renderType === NodeDefLayout.renderType.tableHeader ? (
+          <NodeDefTableCellHeader nodeDef={nodeDef} label={label} />
+        ) : renderType === NodeDefLayout.renderType.tableBody ? (
+          <NodeDefTableCellBody {...this.props} label={label} />
+        ) : (
+          <NodeDefFormItem {...this.props} label={label} />
+        )}
       </div>
     )
-
   }
 }
 
 NodeDefSwitch.defaultProps = {
-  // specified when can edit node definition
+  // Specified when can edit node definition
   canEditDef: false,
   valid: true,
 
-  // entry default props
+  // Entry default props
   nodes: [],
   canAddNode: false,
 }
@@ -111,8 +134,11 @@ const mapStateToProps = (state, props) => {
     const nodes = NodeDef.isRoot(nodeDef)
       ? [Record.getRootNode(record)]
       : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
-        : []
+      ? Record.getNodeChildrenByDefUuid(
+          parentNode,
+          NodeDef.getUuid(nodeDef),
+        )(record)
+      : []
 
     const nodesValidated = R.pipe(
       R.map(n =>
@@ -120,23 +146,26 @@ const mapStateToProps = (state, props) => {
           R.pipe(
             Validation.getValidation,
             Validation.getFieldValidation(Node.getUuid(n)),
-          )(record)
-        )(n)
-      )
+          )(record),
+        )(n),
+      ),
     )(nodes)
 
-    const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
+    const maxCount = R.pipe(
+      NodeDef.getValidations,
+      NodeDefValidations.getMaxCount,
+    )(nodeDef)
 
     const canAddNode =
-      canEditRecord
-      && parentNode
-      && NodeDef.isMultiple(nodeDef)
-      && (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
+      canEditRecord &&
+      parentNode &&
+      NodeDef.isMultiple(nodeDef) &&
+      (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
 
     return {
       nodes: nodesValidated,
       canAddNode,
-      readOnly: NodeDef.isReadOnly(nodeDef)
+      readOnly: NodeDef.isReadOnly(nodeDef),
     }
   }
 
@@ -147,13 +176,13 @@ const mapStateToProps = (state, props) => {
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,
     ...(entry ? mapEntryProps() : {}),
-  };
+  }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    putNodeDefProp, putNodeDefLayoutProp,
-    updateNode, removeNode, createNodePlaceholder
-  }
-)(NodeDefSwitch)
+export default connect(mapStateToProps, {
+  putNodeDefProp,
+  putNodeDefLayoutProp,
+  updateNode,
+  removeNode,
+  createNodePlaceholder,
+})(NodeDefSwitch)

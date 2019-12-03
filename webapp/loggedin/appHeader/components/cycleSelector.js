@@ -10,14 +10,16 @@ const CycleSelector = props => {
   const { surveyInfo, surveyCycleKey, onChange } = props
   const cycleKeys = Survey.getCycleKeys(surveyInfo)
 
-  if (cycleKeys.length === 1)
+  if (cycleKeys.length === 1) {
     return null
+  }
 
   const i18n = useI18n()
 
-  const cycleItems = cycleKeys.map(key =>
-    ({ key, value: `${i18n.t(`common.cycle`)} ${Number(key) + 1}` })
-  )
+  const cycleItems = cycleKeys.map(key => ({
+    key,
+    value: `${i18n.t('common.cycle')} ${Number(key) + 1}`,
+  }))
   const cycleSelection = R.find(R.propEq('key', surveyCycleKey), cycleItems)
 
   return (
@@ -28,7 +30,6 @@ const CycleSelector = props => {
       readOnlyInput={true}
     />
   )
-
 }
 
 export default CycleSelector

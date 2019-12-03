@@ -1,13 +1,11 @@
 import React from 'react'
 
-import Dropdown from './dropdown'
-
 import { getLanguageLabel, languages } from '@core/app/languages'
 
 import { useI18n } from '../hooks'
+import Dropdown from './dropdown'
 
-const LanguageDropdown = (props) => {
-
+const LanguageDropdown = props => {
   const { selection, onChange, validation } = props
 
   const i18n = useI18n()
@@ -16,12 +14,15 @@ const LanguageDropdown = (props) => {
     ? { key: selection, value: getLanguageLabel(selection) }
     : null
 
-  return <Dropdown placeholder={i18n.t('common.language')}
-                   items={languages}
-                   selection={selectedItem}
-                   onChange={e => onChange(e ? e.key : null)}
-                   validation={validation}/>
-
+  return (
+    <Dropdown
+      placeholder={i18n.t('common.language')}
+      items={languages}
+      selection={selectedItem}
+      onChange={e => onChange(e ? e.key : null)}
+      validation={validation}
+    />
+  )
 }
 
 export default LanguageDropdown

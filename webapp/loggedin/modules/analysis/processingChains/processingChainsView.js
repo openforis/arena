@@ -7,25 +7,25 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import TableView from '../../../tableViews/tableView'
 
+import { reloadListItems } from '../../../tableViews/actions'
 import ProcessingChainsRow from './components/processingChainsRow'
 import ProcessingChainsRowHeader from './components/processingChainsRowHeader'
 import ProcessingChainsHeaderLeft from './components/processingChainsHeaderLeft'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-
-import { reloadListItems } from '../../../tableViews/actions'
 import { createProcessingChain, navigateToProcessingChainView } from './actions'
 
 const processingChainsModule = 'processing-chains'
 
 const ProcessingChainsView = props => {
-
   const {
     surveyCycleKey,
     history,
-    reloadListItems, createProcessingChain, navigateToProcessingChainView
+    reloadListItems,
+    createProcessingChain,
+    navigateToProcessingChainView,
   } = props
 
   const restParams = { surveyCycleKey }
@@ -43,8 +43,12 @@ const ProcessingChainsView = props => {
       rowHeaderComponent={ProcessingChainsRowHeader}
       headerLeftComponent={ProcessingChainsHeaderLeft}
       rowComponent={ProcessingChainsRow}
-      onRowClick={processingChain => navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain))}
-
+      onRowClick={processingChain =>
+        navigateToProcessingChainView(
+          history,
+          ProcessingChain.getUuid(processingChain),
+        )
+      }
       history={history}
       createProcessingChain={createProcessingChain}
     />
@@ -55,11 +59,8 @@ const mapStateToProps = state => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    reloadListItems,
-    createProcessingChain,
-    navigateToProcessingChainView
-  }
-)(ProcessingChainsView)
+export default connect(mapStateToProps, {
+  reloadListItems,
+  createProcessingChain,
+  navigateToProcessingChainView,
+})(ProcessingChainsView)

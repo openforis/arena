@@ -9,20 +9,32 @@ import * as SurveyManager from '../manager/surveyManager'
  * (It requires the survey to be set in the context or it loads it with "published" props)
  */
 export default class SurveyDependencyGraphsGenerationJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(SurveyDependencyGraphsGenerationJob.type, params)
   }
 
-  async execute (tx) {
-    //TODO build a new graph for each survey cycle
-    const survey = this.contextSurvey || await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, Survey.cycleOneKey, false, true, false, false, tx)
+  async execute() {
+    // TODO build a new graph for each survey cycle
+    const survey =
+      this.contextSurvey ||
+      (await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        this.surveyId,
+        Survey.cycleOneKey,
+        false,
+        true,
+        false,
+        false,
+        this.tx,
+      ))
 
     const graph = Survey.buildDependencyGraph(survey)
 
-    await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, tx)
+    await SurveyManager.updateSurveyDependencyGraphs(
+      this.surveyId,
+      graph,
+      this.tx,
+    )
   }
-
 }
 
 SurveyDependencyGraphsGenerationJob.type = 'SurveyDependencyGraphsGenerationJob'

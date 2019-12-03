@@ -5,16 +5,14 @@ import ReactDOM from 'react-dom'
 
 import * as R from 'ramda'
 
+import { contains, trim } from '@core/stringUtils'
 import { Input } from './input'
 import AutocompleteDialog from './autocompleteDialog'
-
-import { contains, trim } from '@core/stringUtils'
 
 const dropdownListItemClassName = 'dropdown__list-item'
 
 class Dropdown extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { items, selection, autocompleteMinChars } = this.props
@@ -31,7 +29,7 @@ class Dropdown extends React.Component {
     this.input = React.createRef()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { items, selection, autocompleteMinChars } = this.props
     const { items: prevItems, selection: prevSelection } = prevProps
 
@@ -43,27 +41,28 @@ class Dropdown extends React.Component {
     }
 
     if (!R.equals(selection, prevSelection)) {
-      const displayValue = selection
-        ? this.getItemLabel(selection)
-        : null
+      const displayValue = selection ? this.getItemLabel(selection) : null
 
       this.setState({ displayValue })
     }
   }
 
-  toggleOpened (callback = null) {
+  toggleOpened(callback = null) {
     if (!(this.props.readOnly || this.props.disabled)) {
-      this.setState({
-        opened: !this.state.opened,
-      }, callback)
+      this.setState(
+        {
+          opened: !this.state.opened,
+        },
+        callback,
+      )
     }
   }
 
-  isOpened () {
+  isOpened() {
     return this.state.opened
   }
 
-  onSelectionChange (item) {
+  onSelectionChange(item) {
     const { onChange, clearOnSelection, itemsLookupFunction } = this.props
     const { items } = this.state
 
@@ -76,29 +75,32 @@ class Dropdown extends React.Component {
     })
   }
 
-  async onInputChange (value = '') {
-    const { items, autocompleteMinChars, itemsLookupFunction, onChange } = this.props
+  async onInputChange(value = '') {
+    const {
+      items,
+      autocompleteMinChars,
+      itemsLookupFunction,
+      onChange,
+    } = this.props
 
     const searchValue = R.trim(value)
 
     const filteredItems =
-      autocompleteMinChars <= 0 && searchValue.length === 0 ?
-        items
-        : autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars ?
-        []
-        : itemsLookupFunction ?
-          await itemsLookupFunction(searchValue)
-          : items.filter(item => {
-              if (R.is(Object)(item)) {
-                const key = this.getItemKey(item)
-                const label = this.getItemLabel(item)
-                return contains(searchValue, key)
-                  || contains(searchValue, label)
-              } else {
-                return contains(searchValue, item)
-              }
+      autocompleteMinChars <= 0 && searchValue.length === 0
+        ? items
+        : autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars
+        ? []
+        : itemsLookupFunction
+        ? await itemsLookupFunction(searchValue)
+        : items.filter(item => {
+            if (R.is(Object)(item)) {
+              const key = this.getItemKey(item)
+              const label = this.getItemLabel(item)
+              return contains(searchValue, key) || contains(searchValue, label)
             }
-          )
+
+            return contains(searchValue, item)
+          })
 
     this.setState({
       items: filteredItems,
@@ -109,78 +111,93 @@ class Dropdown extends React.Component {
     onChange(null)
   }
 
-  onInputFocus () {
+  onInputFocus() {
     if (!this.isOpened() && !R.isEmpty(this.state.items)) {
       this.toggleOpened()
     }
   }
 
-  onBlur (e) {
-    const itemFocused = R.prop('className')(e.relatedTarget) === dropdownListItemClassName
+  onBlur(e) {
+    const itemFocused =
+      R.prop('className')(e.relatedTarget) === dropdownListItemClassName
     if (this.isOpened() && !itemFocused) {
       this.toggleOpened()
     }
   }
 
-  getItemLabel (item = '') {
+  getItemLabel(item = '') {
     const { itemLabelFunction, itemLabelProp } = this.props
-    return R.defaultTo('', this.extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value'))
+    return R.defaultTo(
+      '',
+      this.extractValueFromFunctionOrProp(
+        item,
+        itemLabelFunction,
+        itemLabelProp,
+        'value',
+      ),
+    )
   }
 
-  getItemKey (item) {
+  getItemKey(item) {
     const { itemKeyFunction, itemKeyProp } = this.props
-    return this.extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
+    return this.extractValueFromFunctionOrProp(
+      item,
+      itemKeyFunction,
+      itemKeyProp,
+      'key',
+    )
   }
 
-  getInputField () {
+  getInputField() {
     return this.input.current
   }
 
-  extractValueFromFunctionOrProp (item, func, prop, defaultProp) {
+  extractValueFromFunctionOrProp(item, func, prop, defaultProp) {
     return R.isNil(item)
       ? null
       : func
-        ? func(item)
-        : R.is(Object, item)
-          ? prop ?
-            R.prop(prop)(item)
-            : R.has(defaultProp)(item) ?
-              R.prop(defaultProp)(item)
-              : item
-          : item //primitive
+      ? func(item)
+      : R.is(Object, item)
+      ? prop
+        ? R.prop(prop)(item)
+        : R.has(defaultProp)(item)
+        ? R.prop(defaultProp)(item)
+        : item
+      : item // Primitive
   }
 
-  render () {
+  render() {
     const {
       placeholder,
       className = '',
       style = {},
       validation = {},
-      readOnly, readOnlyInput, disabled,
+      readOnly,
+      readOnlyInput,
+      disabled,
       autocompleteDialogClassName,
       sourceElement,
     } = this.props
 
-    const {
-      items,
-      displayValue,
-    } = this.state
+    const { items, displayValue } = this.state
 
     const DropdownItemRenderer = props => {
       const { item, ...otherProps } = props
 
-      return <div {...otherProps}
-                  className={dropdownListItemClassName}>
-        {this.getItemLabel(item)}
-      </div>
+      return (
+        <div {...otherProps} className={dropdownListItemClassName}>
+          {this.getItemLabel(item)}
+        </div>
+      )
     }
 
     return (
-      <div ref={this.dropdown}
-           className={`dropdown ${className}`}
-           style={style}
-           onBlur={e => this.onBlur(e)}>
-
+      <div
+        ref={this.dropdown}
+        className={`dropdown ${className}`}
+        style={style}
+        onBlur={e => this.onBlur(e)}
+      >
         <Input
           ref={this.input}
           placeholder={placeholder}
@@ -192,16 +209,17 @@ class Dropdown extends React.Component {
           onFocus={e => this.onInputFocus(e)}
         />
 
-        <span className="icon icon-play3 icon-12px"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                this.toggleOpened()
-              }}
-              aria-disabled={disabled}/>
-        {
-          this.isOpened() ?
-            ReactDOM.createPortal(
+        <span
+          className="icon icon-play3 icon-12px"
+          onClick={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            this.toggleOpened()
+          }}
+          aria-disabled={disabled}
+        />
+        {this.isOpened()
+          ? ReactDOM.createPortal(
               <AutocompleteDialog
                 items={items}
                 itemRenderer={DropdownItemRenderer}
@@ -210,12 +228,11 @@ class Dropdown extends React.Component {
                 sourceElement={sourceElement || this.dropdown.current}
                 onItemSelect={item => this.onSelectionChange(item)}
                 onClose={() => this.toggleOpened()}
-                className={autocompleteDialogClassName}/>,
-              document.body
+                className={autocompleteDialogClassName}
+              />,
+              document.body,
             )
-            : null
-
-        }
+          : null}
       </div>
     )
   }
@@ -236,7 +253,7 @@ Dropdown.defaultProps = {
   itemLabelProp: null,
   itemLabelFunction: null,
   autocompleteDialogClassName: null,
-  sourceElement: null, // used to calculate the size of the autocomplete-dialog if available, otherwise the this.dropdown.current is used
+  sourceElement: null, // Used to calculate the size of the autocomplete-dialog if available, otherwise the this.dropdown.current is used
 }
 
 export default Dropdown

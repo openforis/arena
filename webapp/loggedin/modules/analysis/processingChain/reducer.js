@@ -2,29 +2,34 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 
+import { appUserLogout } from '@webapp/app/actions'
+
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
 import {
   processingChainUpdate,
   processingChainPropUpdate,
   processingChainStepsLoad,
 } from './actions'
 
-import { appUserLogout } from '@webapp/app/actions'
-
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-
 const actionHandlers = {
-  // reset state
+  // Reset state
   [appUserLogout]: () => ({}),
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  // chain
+  // Chain
   [processingChainUpdate]: (state, { processingChain }) => processingChain,
-  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChain.assocProp(key, value)(state),
+  [processingChainPropUpdate]: (state, { key, value }) =>
+    ProcessingChain.assocProp(key, value)(state),
 
-  // steps
-  [processingChainStepsLoad]: (state, { processingSteps }) => ProcessingChain.assocProcessingSteps(processingSteps)(state)
+  // Steps
+  [processingChainStepsLoad]: (state, { processingSteps }) =>
+    ProcessingChain.assocProcessingSteps(processingSteps)(state),
 }
 
 export default exportReducer(actionHandlers)

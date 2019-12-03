@@ -5,14 +5,12 @@ import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import Tree from './surveyHierarchyTree'
-import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
-
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import Tree from './surveyHierarchyTree'
 
 const SurveyHierarchy = props => {
-
   const { lang, hierarchy } = props
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
@@ -30,22 +28,19 @@ const SurveyHierarchy = props => {
 
   return (
     <div className="survey-hierarchy">
-
-      <div className="survey-hierarchy__tree" ref={treeRef}/>
+      <div className="survey-hierarchy__tree" ref={treeRef} />
 
       <div className="survey-hierarchy__attributes">
         <NodeDefsSelectorView
           hierarchy={hierarchy}
           nodeDefUuidEntity={selectedNodeDefUuid}
-          onChangeEntity={
-            nodeDefUuidEntity => tree.expandToNode(nodeDefUuidEntity)
+          onChangeEntity={nodeDefUuidEntity =>
+            tree.expandToNode(nodeDefUuidEntity)
           }
           canSelectAttributes={false}
           showAncestors={false}
         />
-
       </div>
-
     </div>
   )
 }

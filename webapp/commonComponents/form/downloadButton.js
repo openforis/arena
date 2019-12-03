@@ -6,12 +6,15 @@ import * as FileSaver from 'file-saver'
 import { useI18n } from '../hooks'
 
 const DownloadButton = props => {
-
   const i18n = useI18n()
 
   const {
-    href, label = i18n.t('common.download'), title,
-    className, showLabel, disabled
+    href,
+    label = i18n.t('common.download'),
+    title,
+    className,
+    showLabel,
+    disabled,
   } = props
 
   return (
@@ -20,13 +23,27 @@ const DownloadButton = props => {
       aria-disabled={disabled}
       title={title}
       onClick={async () => {
-        const response = await axios({ url: href, method: 'GET', responseType: 'blob' })
+        const response = await axios({
+          url: href,
+          method: 'GET',
+          responseType: 'blob',
+        })
         const blob = new Blob([response.data])
-        const contentDisposition = R.path(['headers', 'content-disposition'], response)
-        const fileName = contentDisposition.substring('attachment; filename='.length)
+        const contentDisposition = R.path(
+          ['headers', 'content-disposition'],
+          response,
+        )
+        const fileName = contentDisposition.slice(
+          'attachment; filename='.length,
+        )
         FileSaver.saveAs(blob, fileName)
-      }}>
-      <span className={`icon icon-download2 icon-14px${showLabel && label ? ' icon-left' : ''}`}/>
+      }}
+    >
+      <span
+        className={`icon icon-download2 icon-14px${
+          showLabel && label ? ' icon-left' : ''
+        }`}
+      />
       {showLabel && label}
     </a>
   )

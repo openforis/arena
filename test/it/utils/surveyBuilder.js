@@ -13,64 +13,81 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 
 import * as SurveyUtils from './surveyUtils'
 
-import { TaxonomyBuilder, TaxonBuilder } from './surveyBuilder/surveyBuilderTaxonomy'
+import {
+  TaxonomyBuilder,
+  TaxonBuilder,
+} from './surveyBuilder/surveyBuilderTaxonomy'
 
 class NodeDefBuilder {
-
-  constructor (name, type) {
+  constructor(name, type) {
     this.type = type
     this.props = {
-      [NodeDef.propKeys.name]: name
+      [NodeDef.propKeys.name]: name,
     }
   }
 
-  _setProp (prop, value) {
+  _setProp(prop, value) {
     this.props[prop] = value
     return this
   }
 
-  _createNodeDef (survey, parentDef) {
-    return NodeDef.newNodeDef(parentDef, this.type, Survey.cycleOneKey, this.props)
+  _createNodeDef(survey, parentDef) {
+    return NodeDef.newNodeDef(
+      parentDef,
+      this.type,
+      Survey.cycleOneKey,
+      this.props,
+    )
   }
 
-  applyIf (expr) {
-    return this._setProp(NodeDef.propKeys.applicable, [NodeDefExpression.createExpression(expr)])
+  applyIf(expr) {
+    return this._setProp(NodeDef.propKeys.applicable, [
+      NodeDefExpression.createExpression(expr),
+    ])
   }
 
-  multiple () {
+  multiple() {
     return this._setProp(NodeDef.propKeys.multiple, true)
   }
 
-  minCount (count) {
-    return this._setProp(NodeDef.propKeys.validations, R.pipe(
-      NodeDef.getValidations,
-      NodeDefValidations.assocMinCount(count)
-    )(this))
+  minCount(count) {
+    return this._setProp(
+      NodeDef.propKeys.validations,
+      R.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.assocMinCount(count),
+      )(this),
+    )
   }
 
-  maxCount (count) {
-    return this._setProp(NodeDef.propKeys.validations, R.pipe(
-      NodeDef.getValidations,
-      NodeDefValidations.assocMaxCount(count)
-    )(this))
+  maxCount(count) {
+    return this._setProp(
+      NodeDef.propKeys.validations,
+      R.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.assocMaxCount(count),
+      )(this),
+    )
   }
 
-  expressions (...expressions) {
-    return this._setProp(NodeDef.propKeys.validations, R.pipe(
-      NodeDef.getValidations,
-      NodeDefValidations.assocExpressions(expressions)
-    )(this))
+  expressions(...expressions) {
+    return this._setProp(
+      NodeDef.propKeys.validations,
+      R.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.assocExpressions(expressions),
+      )(this),
+    )
   }
 }
 
 class EntityDefBuilder extends NodeDefBuilder {
-
-  constructor (name, ...childBuilders) {
+  constructor(name, ...childBuilders) {
     super(name, NodeDef.nodeDefType.entity)
     this.childBuilders = childBuilders
   }
 
-  build (survey, parentDef = null) {
+  build(survey, parentDef = null) {
     const def = this._createNodeDef(survey, parentDef)
 
     return R.pipe(
@@ -82,48 +99,48 @@ class EntityDefBuilder extends NodeDefBuilder {
 }
 
 class AttributeDefBuilder extends NodeDefBuilder {
-
-  constructor (name, type = NodeDef.nodeDefType.text) {
+  constructor(name, type = NodeDef.nodeDefType.text) {
     super(name, type)
     this._analysis = false
   }
 
-  key () {
+  key() {
     return this._setProp(NodeDef.propKeys.key, true)
   }
 
-  readOnly () {
+  readOnly() {
     return this._setProp(NodeDef.propKeys.readOnly, true)
   }
 
-  defaultValues (...defaultValues) {
+  defaultValues(...defaultValues) {
     return this._setProp(NodeDef.propKeys.defaultValues, defaultValues)
   }
 
-  required (required = true) {
+  required(required = true) {
     const validations = NodeDef.getValidations(this)
-    const validationsUpdated = NodeDefValidations.assocRequired(required)(validations)
+    const validationsUpdated = NodeDefValidations.assocRequired(required)(
+      validations,
+    )
     return this._setProp(NodeDef.propKeys.validations, validationsUpdated)
   }
 
-  analysis () {
+  analysis() {
     this._analysis = true
     return this
   }
 
-  build (survey, parentDef = null) {
+  build(survey, parentDef = null) {
     const def = this._createNodeDef(survey, parentDef)
     def[NodeDef.keys.analysis] = this._analysis
 
     return {
-      [NodeDef.getUuid(def)]: def
+      [NodeDef.getUuid(def)]: def,
     }
   }
 }
 
 class SurveyBuilder {
-
-  constructor (user, rootDefBuilder) {
+  constructor(user, rootDefBuilder) {
     this.user = user
     this.name = `do_not_use__test_${new Date().getTime()}`
     this.label = 'DO NOT USE! Test'
@@ -133,17 +150,21 @@ class SurveyBuilder {
     this.taxonomyBuilders = []
   }
 
-  build () {
-    const survey = Survey.newSurvey(User.getUuid(this.user), this.name, this.label, [this.lang])
+  build() {
+    const survey = Survey.newSurvey(
+      User.getUuid(this.user),
+      this.name,
+      this.label,
+      [this.lang],
+    )
     const nodeDefs = this.rootDefBuilder.build(survey)
 
-    return R.pipe(
-      Survey.assocNodeDefs(nodeDefs),
-      s => Survey.assocDependencyGraph(Survey.buildDependencyGraph(s))(s)
+    return R.pipe(Survey.assocNodeDefs(nodeDefs), s =>
+      Survey.assocDependencyGraph(Survey.buildDependencyGraph(s))(s),
     )(survey)
   }
 
-  taxonomy (name, ...taxonBuilders) {
+  taxonomy(name, ...taxonBuilders) {
     const taxonomyBuilder = new TaxonomyBuilder(name, ...taxonBuilders)
     this.taxonomyBuilders.push(taxonomyBuilder)
     return this
@@ -153,21 +174,29 @@ class SurveyBuilder {
    * Builds the survey and saves it as draft.
    * If 'publish' is true, publishes the survey.
    */
-  async buildAndStore (publish = true, client = db) {
+  async buildAndStore(publish = true, client = db) {
     const surveyParam = this.build()
 
     return await client.tx(async t => {
-      const survey = await SurveyManager.insertSurvey(this.user, surveyParam, false, true, t)
+      const survey = await SurveyManager.insertSurvey(
+        this.user,
+        surveyParam,
+        false,
+        true,
+        t,
+      )
 
       const surveyId = Survey.getId(survey)
 
-      // node defs
+      // Node defs
       const { root } = Survey.getHierarchy(R.always, true)(surveyParam)
-      await Survey.traverseHierarchyItem(root, async nodeDef =>
-        await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
+      await Survey.traverseHierarchyItem(
+        root,
+        async nodeDef =>
+          await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t),
       )
 
-      // taxonomies
+      // Taxonomies
       for (const taxonomyBuilder of this.taxonomyBuilders) {
         await taxonomyBuilder.buildAndStore(this.user, surveyId, t)
       }
@@ -175,15 +204,35 @@ class SurveyBuilder {
       if (publish) {
         await SurveyUtils.publishSurvey(this.user, surveyId, t)
       }
-      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, !publish, true, false, false, t)
-      return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)
+
+      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        surveyId,
+        Survey.cycleOneKey,
+        !publish,
+        true,
+        false,
+        false,
+        t,
+      )
+      return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(
+        surveyDb,
+      )
     })
   }
 }
 
 // ==== survey
-export const survey = (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder)
-export const entity = (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders)
-export const attribute = (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)
+export const survey = (user, rootDefBuilder) =>
+  new SurveyBuilder(user, rootDefBuilder)
+export const entity = (name, ...childBuilders) =>
+  new EntityDefBuilder(name, ...childBuilders)
+export const attribute = (name, type = NodeDef.nodeDefType.text) =>
+  new AttributeDefBuilder(name, type)
 // ==== taxonomy
-export const taxon = (code, family, genus, scientificName, ...vernacularNames) => new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)
+export const taxon = (
+  code,
+  family,
+  genus,
+  scientificName,
+  ...vernacularNames
+) => new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)

@@ -3,11 +3,11 @@ import UnauthorizedError from './unauthorizedError'
 
 const status = {
   ok: 'ok',
-  error: 'error'
+  error: 'error',
 }
 
 export const contentTypes = {
-  csv: 'text/csv'
+  csv: 'text/csv',
 }
 
 export const sendOk = res => res.json({ status: status.ok })
@@ -24,10 +24,12 @@ export const sendErr = (res, err) => {
   } else if (err instanceof SystemError) {
     res.status(500).json(_getErr(err))
   } else {
-    res.status(500).json(_getErr({
-      key: 'appErrors.generic',
-      params: { text: `Could not serve: ${err.toString()}` },
-    }))
+    res.status(500).json(
+      _getErr({
+        key: 'appErrors.generic',
+        params: { text: `Could not serve: ${err.toString()}` },
+      }),
+    )
   }
 }
 
@@ -37,10 +39,18 @@ export const sendFile = (res, name, content, size) => {
   res.end(null, 'binary')
 }
 
-export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
+export const setContentTypeFile = (
+  res,
+  fileName,
+  fileSize = null,
+  contentType = null,
+) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
-  if (fileSize)
+  if (fileSize) {
     res.setHeader('Content-Length', fileSize)
-  if (contentType)
+  }
+
+  if (contentType) {
     res.set('Content-Type', contentType)
+  }
 }

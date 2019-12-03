@@ -3,7 +3,7 @@ import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
-  props: ObjectUtils.keys.props
+  props: ObjectUtils.keys.props,
 }
 
 export const keysProps = {
@@ -19,7 +19,7 @@ export const newTaxonVernacularName = (lang, name) => ({
   [keys.props]: {
     [keysProps.lang]: lang,
     [keysProps.name]: name,
-  }
+  },
 })
 
 // ===== READ
@@ -33,6 +33,6 @@ export const mergeProps = vernacularNameNew => vernacularName => ({
   ...vernacularName,
   [keys.props]: {
     ...getProps(vernacularName),
-    [keysProps.name]: getName(vernacularNameNew)
-  }
+    [keysProps.name]: getName(vernacularNameNew),
+  },
 })

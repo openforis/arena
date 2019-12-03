@@ -1,16 +1,14 @@
 import React from 'react'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
+import SurveyInfoView from '../designer/surveyInfo/surveyInfoView'
+import { appModules, appModuleUri, homeModules } from '../../appModules'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
-import SurveyInfoView from '../designer/surveyInfo/surveyInfoView'
 import CollectImportReportView from './collectImportReport/collectImportReportView'
 
-import { appModules, appModuleUri, homeModules } from '../../appModules'
-
 const HomeView = () => {
-
   return (
     <InnerModuleSwitch
       moduleRoot={appModules.home}

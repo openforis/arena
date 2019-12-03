@@ -1,6 +1,6 @@
+import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '../manager/surveyManager'
 
-import * as JobManager from '@server/job/jobManager'
 import SurveyPublishJob from './publish/surveyPublishJob'
 
 // JOBS
@@ -20,7 +20,8 @@ export const validateNewSurvey = SurveyManager.validateNewSurvey
 export const fetchUserSurveysInfo = SurveyManager.fetchUserSurveysInfo
 export const countUserSurveys = SurveyManager.countUserSurveys
 export const fetchSurveyById = SurveyManager.fetchSurveyById
-export const fetchSurveyAndNodeDefsBySurveyId = SurveyManager.fetchSurveyAndNodeDefsBySurveyId
+export const fetchSurveyAndNodeDefsBySurveyId =
+  SurveyManager.fetchSurveyAndNodeDefsBySurveyId
 
 // UPDATE
 export const updateSurveyProps = SurveyManager.updateSurveyProps

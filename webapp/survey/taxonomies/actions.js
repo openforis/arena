@@ -1,4 +1,4 @@
-// taxonomy actions
+// Taxonomy actions
 export const taxonomyCreate = 'survey/taxonomy/create'
 export const taxonomyUpdate = 'survey/taxonomy/update'
 export const taxonomiesUpdate = 'survey/taxonomies/update'

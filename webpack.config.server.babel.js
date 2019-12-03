@@ -1,5 +1,5 @@
-import * as webpack from 'webpack'
 import * as path from 'path'
+import * as webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 import mainConfig from './webpack.config.babel'
 
@@ -14,14 +14,14 @@ const plugins = [
     'process.env.ARENA_DIST': JSON.stringify(path.resolve(__dirname, 'dist')),
   }),
   new webpack.NamedModulesPlugin(),
-  ...isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]
+  ...(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
 ]
 
 const entry = entryPath => [
-  ...isProduction ? [] : ['webpack/hot/poll?1000'],
+  ...(isProduction ? [] : ['webpack/hot/poll?1000']),
   'core-js/stable',
   'regenerator-runtime/runtime',
-  path.resolve(path.join(__dirname, entryPath))
+  path.resolve(path.join(__dirname, entryPath)),
 ]
 
 export default {
@@ -37,21 +37,27 @@ export default {
   entry: {
     server: entry('server/server.js'),
     jobThread: entry('server/job/jobThread.js'),
-    recordUpdateThread: entry('server/modules/record/service/update/thread/recordUpdateThread.js'),
+    recordUpdateThread: entry(
+      'server/modules/record/service/update/thread/recordUpdateThread.js',
+    ),
   },
   output: {
     publicPath: 'dist/',
     path: path.resolve(__dirname, './'),
     filename: 'dist/[id].js',
-    // libraryTarget: 'commonjs2',
+    // LibraryTarget: 'commonjs2',
     hotUpdateChunkFilename: 'dist/hot-update-[id].js',
     hotUpdateMainFilename: 'dist/hot-update-[hash].json',
   },
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
-    modules: [
-      path.resolve(__dirname, 'node_modules')
+    extensions: [
+      '.webpack-loader.js',
+      '.web-loader.js',
+      '.loader.js',
+      '.js',
+      '.jsx',
     ],
+    modules: [path.resolve(__dirname, 'node_modules')],
     alias: mainConfig.resolve.alias,
   },
   module: {
@@ -63,7 +69,10 @@ export default {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
+            plugins: [
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-syntax-dynamic-import',
+            ],
           },
         },
       },
@@ -76,5 +85,5 @@ export default {
     Buffer: false,
     __filename: true,
     __dirname: true,
-  }
+  },
 }

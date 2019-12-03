@@ -1,4 +1,4 @@
-import * as express from 'express'
+import { Router as expressRouter } from 'express'
 
 import * as userApi from '@server/modules/user/api/userApi'
 import * as activityLogApi from '@server/modules/activityLog/api/activityLogApi'
@@ -14,9 +14,9 @@ import * as processingChainApi from '@server/modules/analysis/api/processingChai
 import * as jobApi from '@server/job/jobApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
 
-export const router = express.Router()
+export const router = expressRouter()
 
-//init apis
+// Init apis
 userApi.init(router)
 
 activityLogApi.init(router)

@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import { uuidv4 } from '@core/uuid';
+import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
@@ -15,7 +15,13 @@ export { keys } from './_record/recordKeys'
 
 // ====== CREATE
 
-export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
+export const newRecord = (
+  user,
+  cycle,
+  preview = false,
+  dateCreated = null,
+  step = null,
+) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
   [keys.step]: step || RecordStep.getDefaultStep(),
@@ -55,7 +61,8 @@ export const isNodeApplicable = RecordReader.isNodeApplicable
 // ==== dependency
 export const getDependentNodePointers = RecordReader.getDependentNodePointers
 export const getParentCodeAttribute = RecordReader.getParentCodeAttribute
-export const getDependentCodeAttributes = RecordReader.getDependentCodeAttributes
+export const getDependentCodeAttributes =
+  RecordReader.getDependentCodeAttributes
 
 // ====== Keys
 export const getEntityKeyNodes = RecordReader.getEntityKeyNodes
@@ -72,4 +79,3 @@ export const deleteNode = RecordUpdater.deleteNode
 // ====== VALIDATION
 export const mergeNodeValidations = RecordUpdater.mergeNodeValidations
 export const getValidation = Validation.getValidation
-

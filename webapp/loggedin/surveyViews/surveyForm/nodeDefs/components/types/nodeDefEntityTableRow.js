@@ -1,16 +1,14 @@
 import React from 'react'
 
-import NodeDefEntityTableCell from './nodeDefEntityTableCell'
-import NodeDeleteButton from '../nodeDeleteButton'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { elementOffset } from '@webapp/utils/domUtils'
+import NodeDeleteButton from '../nodeDeleteButton'
+import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 
 class NodeDefEntityTableRow extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.placeholderRef = React.createRef()
@@ -18,7 +16,7 @@ class NodeDefEntityTableRow extends React.Component {
     this.state = { dragged: null }
   }
 
-  dragStart (evt) {
+  dragStart(evt) {
     this.setState({ dragged: evt.currentTarget }, () => {
       const { dragged } = this.state
       const placeholder = this.placeholderRef.current
@@ -32,7 +30,7 @@ class NodeDefEntityTableRow extends React.Component {
     evt.dataTransfer.setData('text/html', evt.currentTarget)
   }
 
-  dragOver (evt) {
+  dragOver(evt) {
     const { dragged } = this.state
     const placeholder = this.placeholderRef.current
 
@@ -49,11 +47,14 @@ class NodeDefEntityTableRow extends React.Component {
       const width = overElement.offsetWidth / 2
       const parent = evt.target.parentNode
 
-      parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
+      parent.insertBefore(
+        placeholder,
+        relX > width ? evt.target.nextElementSibling : evt.target,
+      )
     }
   }
 
-  dragEnd () {
+  dragEnd() {
     const { nodeDef, putNodeDefLayoutProp } = this.props
 
     const { dragged } = this.state
@@ -66,69 +67,70 @@ class NodeDefEntityTableRow extends React.Component {
     this.setState({ dragged: null })
 
     const childNodes = this.rowRef.current.childNodes
-    const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
+    const uuids = [...childNodes]
+      .map(node => node.dataset.uuid)
+      .filter(uuid => uuid)
 
     putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, uuids)
   }
 
-  render () {
-
+  render() {
     const {
-      edit, nodeDef, nodeDefColumns, node,
-      canEditRecord, canEditDef,
-      renderType, i = 'header',
+      edit,
+      nodeDef,
+      nodeDefColumns,
+      node,
+      canEditRecord,
+      canEditDef,
+      renderType,
+      i = 'header',
       removeNode,
     } = this.props
 
     const { dragged } = this.state
 
-    const className = `survey-form__node-def-entity-table-row` +
+    const className =
+      'survey-form__node-def-entity-table-row' +
       (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
       (dragged ? ' drag-in-progress' : '')
 
     return (
-      <div ref={this.rowRef}
-           className={className}
-           id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
+      <div
+        ref={this.rowRef}
+        className={className}
+        id={`${NodeDef.getUuid(nodeDef)}_${i}`}
+      >
+        {nodeDefColumns.map(nodeDefChild => (
+          <NodeDefEntityTableCell
+            key={NodeDef.getUuid(nodeDefChild)}
+            {...this.props}
+            nodeDef={nodeDefChild}
+            parentNode={node}
+            canEditDef={canEditDef}
+            renderType={renderType}
+            onDragStart={e => this.dragStart(e)}
+            onDragOver={e => this.dragOver(e)}
+            onDragEnd={e => this.dragEnd(e)}
+          />
+        ))}
 
-        {
-          nodeDefColumns
-            .map(nodeDefChild => (
-              <NodeDefEntityTableCell
-                key={NodeDef.getUuid(nodeDefChild)}
-                {...this.props}
-                nodeDef={nodeDefChild}
-                parentNode={node}
-                canEditDef={canEditDef}
-                renderType={renderType}
-                onDragStart={e => this.dragStart(e)}
-                onDragOver={e => this.dragOver(e)}
-                onDragEnd={e => this.dragEnd(e)}
-              />
-            ))
-        }
-
-        {
-          edit &&
+        {edit && (
           <div
             className="react-grid-item"
             style={{ width: 100 + 'px', display: 'none' }}
             ref={this.placeholderRef}
           />
-        }
+        )}
 
-        {
-          renderType === NodeDefLayout.renderType.tableBody && canEditRecord &&
+        {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
           <NodeDeleteButton
             nodeDef={nodeDef}
             node={node}
             removeNode={removeNode}
           />
-        }
-
+        )}
       </div>
     )
-
   }
 }
 

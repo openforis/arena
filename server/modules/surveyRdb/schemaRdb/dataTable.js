@@ -4,9 +4,9 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as Node from '@core/record/node'
+import * as SurveyRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as DataRow from './dataRow'
 import * as DataCol from './dataCol'
-import * as SurveyRepositoryUtils from '../../survey/repository/surveySchemaRepositoryUtils'
 
 export const colNameUuuid = 'uuid'
 export const colNameParentUuuid = 'parent_uuid'
@@ -15,15 +15,12 @@ export const colNameRecordCycle = 'record_cycle'
 
 export const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
-    ? (
-      R.pipe(
+    ? R.pipe(
         Survey.getNodeDefChildren(nodeDef),
         R.filter(NodeDef.isSingleAttribute),
-        R.sortBy(R.ascend(R.prop('id')))
+        R.sortBy(R.ascend(R.prop('id'))),
       )(survey)
-    )
-    // multiple attr table
-    : [nodeDef]
+    : [nodeDef] // Multiple attr table
 
 export const getName = NodeDefTable.getTableName
 
@@ -32,7 +29,7 @@ export const getColumnNames = (survey, nodeDef) => [
   colNameRecordUuuid,
   colNameRecordCycle,
   colNameParentUuuid,
-  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames))
+  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames)),
 ]
 
 export const getColumnNamesAndType = (survey, nodeDef) => [
@@ -40,7 +37,7 @@ export const getColumnNamesAndType = (survey, nodeDef) => [
   colNameRecordUuuid + ' uuid NOT NULL',
   colNameRecordCycle + ' varchar(2) NOT NULL',
   colNameParentUuuid + ' uuid',
-  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
+  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType)),
 ]
 
 export const getRecordForeignKey = (surveyId, nodeDef) =>
@@ -48,32 +45,50 @@ export const getRecordForeignKey = (surveyId, nodeDef) =>
     SurveyRepositoryUtils.getSurveyDBSchema(surveyId),
     'record',
     NodeDef.getName(nodeDef) + '_record',
-    colNameRecordUuuid
+    colNameRecordUuuid,
   )
 
-export const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null) =>
+export const getParentForeignKey = (
+  surveyId,
+  schemaName,
+  nodeDef,
+  nodeDefParent = null,
+) =>
   _getConstraintFk(
     schemaName,
     getName(nodeDefParent),
     NodeDef.getName(nodeDef) + '_' + NodeDef.getName(nodeDefParent),
-    colNameParentUuuid
+    colNameParentUuuid,
   )
 
-export const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
+export const getUuidUniqueConstraint = nodeDef =>
+  `CONSTRAINT ${NodeDef.getName(
+    nodeDef,
+  )}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
 
 export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
-  const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
+  const rowValues = DataRow.getValues(
+    survey,
+    nodeDefRow,
+    nodeRow,
+    nodeDefColumns,
+  )
 
   return [
     Node.getUuid(nodeRow),
     nodeRow[colNameRecordUuuid],
     nodeRow[colNameRecordCycle],
     nodeRow[colNameParentUuuid],
-    ...rowValues
+    ...rowValues,
   ]
 }
 
-const _getConstraintFk = (schemaName, referencedTableName, constraint, foreignKey) => `
+const _getConstraintFk = (
+  schemaName,
+  referencedTableName,
+  constraint,
+  foreignKey,
+) => `
     CONSTRAINT ${constraint}_fk 
     FOREIGN KEY (${foreignKey}) 
     REFERENCES ${schemaName}.${referencedTableName} (uuid) 

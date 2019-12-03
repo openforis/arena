@@ -1,4 +1,4 @@
-import { assert } from 'chai';
+import { assert } from 'chai'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -14,12 +14,10 @@ const queries = [
 ]
 
 describe('ExpressionParser test', () => {
-
-  queries.forEach(query =>
+  for (const query of queries) {
     it(query.q, () => {
       const res = Expression.evalString(query.q)
       assert.equal(res, query.r)
     })
-  )
-
+  }
 })

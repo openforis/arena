@@ -6,8 +6,7 @@ import { KeyboardMap } from '@webapp/utils/keyboardMap'
 import { clickedOutside, elementOffset } from '@webapp/utils/domUtils'
 
 class AutocompleteDialog extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.onInputFieldKeyDown = this.onInputFieldKeyDown.bind(this)
@@ -16,14 +15,14 @@ class AutocompleteDialog extends React.Component {
     this.list = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { inputField } = this.props
 
     inputField.addEventListener('keydown', this.onInputFieldKeyDown)
     window.addEventListener('click', this.onOutsideClick)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { inputField } = this.props
 
     if (inputField) {
@@ -33,15 +32,18 @@ class AutocompleteDialog extends React.Component {
     window.removeEventListener('click', this.onOutsideClick)
   }
 
-  onOutsideClick (evt) {
+  onOutsideClick(evt) {
     const { inputField } = this.props
 
-    if (clickedOutside(this.list.current, evt) && clickedOutside(inputField, evt)) {
+    if (
+      clickedOutside(this.list.current, evt) &&
+      clickedOutside(inputField, evt)
+    ) {
       this.close()
     }
   }
 
-  onInputFieldKeyDown (e) {
+  onInputFieldKeyDown(e) {
     const { items, inputField } = this.props
 
     switch (e.keyCode) {
@@ -49,20 +51,23 @@ class AutocompleteDialog extends React.Component {
       case KeyboardMap.Tab:
         if (items.length > 0) {
           e.preventDefault()
-          //focus first item
+          // Focus first item
           this.focusItem(0)
         } else {
           this.close()
         }
+
         break
       case KeyboardMap.Esc:
         this.close()
         inputField.focus()
         break
+      default:
+      // Do nothing
     }
   }
 
-  onListItemKeyDown (e) {
+  onListItemKeyDown(e) {
     e.stopPropagation()
     e.preventDefault()
 
@@ -92,73 +97,78 @@ class AutocompleteDialog extends React.Component {
         case KeyboardMap.Down:
           offset = 1
           break
+        default:
+        // Do nothing
       }
+
       if (offset) {
         let index = this.focusedItemIndex + offset
-        if (index < 0)
+        if (index < 0) {
           index = 0
-        else if (index >= itemsSize)
+        } else if (index >= itemsSize) {
           index = itemsSize - 1
+        }
 
         this.focusItem(index)
       }
     }
   }
 
-  focusItem (index) {
+  focusItem(index) {
     const itemEl = this.list.current.children[index]
     itemEl.focus()
 
     this.focusedItemIndex = index
   }
 
-  selectItem (item) {
+  selectItem(item) {
     const { onItemSelect } = this.props
-    if (onItemSelect)
+    if (onItemSelect) {
       onItemSelect(item)
-  }
-
-  close () {
-    const { onClose } = this.props
-    if (onClose)
-      onClose()
-  }
-
-  calculatePosition () {
-    const { sourceElement, inputField } = this.props
-
-    const {
-      top,
-      left,
-      height,
-      width,
-    } = elementOffset(sourceElement || inputField)
-
-    return {
-      top: (top + height),
-      left,
-      width
     }
   }
 
-  render () {
+  close() {
+    const { onClose } = this.props
+    if (onClose) {
+      onClose()
+    }
+  }
+
+  calculatePosition() {
+    const { sourceElement, inputField } = this.props
+
+    const { top, left, height, width } = elementOffset(
+      sourceElement || inputField,
+    )
+
+    return {
+      top: top + height,
+      left,
+      width,
+    }
+  }
+
+  render() {
     const { items, itemRenderer, itemKeyFunction, className } = this.props
 
     const ItemRenderer = itemRenderer
 
     return (
-      <div ref={this.list}
-           className={`autocomplete-list ${className}`}
-           style={{ ...this.calculatePosition() }}>
-        {
-          items.map(item => (
-            <ItemRenderer key={itemKeyFunction(item)}
-                          tabIndex="1"
-                          item={item}
-                          onKeyDown={e => this.onListItemKeyDown(e)}
-                          onMouseDown={() => this.selectItem(item)}/>
-          ))
-        }
+      <div
+        ref={this.list}
+        className={`autocomplete-list ${className}`}
+        style={{ ...this.calculatePosition() }}
+      >
+        {items.map(item => (
+          <ItemRenderer
+            key={itemKeyFunction(item)}
+            tabIndex="1"
+            item={item}
+            onKeyDown={e => this.onListItemKeyDown(e)}
+            onMouseDown={() => this.selectItem(item)}
+          />
+        ))}
       </div>
     )
   }
@@ -169,7 +179,7 @@ AutocompleteDialog.defaultProps = {
   itemRenderer: null,
   itemKeyFunction: null,
   inputField: null,
-  sourceElement: null, // used to calculate the size of the dialog if available, otherwise the input field is used
+  sourceElement: null, // Used to calculate the size of the dialog if available, otherwise the input field is used
   className: '',
 }
 
