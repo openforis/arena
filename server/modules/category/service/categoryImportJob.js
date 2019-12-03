@@ -332,7 +332,7 @@ export default class CategoryImportJob extends Job {
     }
 
     item.placeholder = !lastLevel
-    this.itemsByCodes[String(itemCodes)] = item
+    this._putItemToCache(itemCodes, item)
   }
 
   _checkCodesNotEmpty(codes) {
@@ -382,6 +382,13 @@ export default class CategoryImportJob extends Job {
 
   _getItemCachedByCodes(itemCodes) {
     return this.itemsByCodes[String(itemCodes)]
+  }
+
+  _putItemToCache(itemCodes, item) {
+    this.itemsByCodes[String(itemCodes)] = R.omit(
+      [CategoryItem.keys.props],
+      item,
+    )
   }
 
   _getParentItemUuid(itemCodes) {

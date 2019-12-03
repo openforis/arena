@@ -10,86 +10,24 @@ export const createReaderFromStream = (
   onRow = null,
   onTotalChange = null,
 ) => {
-  let canceled = false
-  const queue = new Queue()
+  const jobStatus = { canceled: false }
 
   const start = () =>
     new Promise((resolve, reject) => {
-      let ended = false
+      const queue = new Queue()
       let headers = null
       let total = 0
-      let processingRow = false // Prevents the call to processNext when a row is already being processed
 
       /**
        * Executes the specified function fn in a try catch.
        * Calls "reject" if the execution throws an error.
        */
-      const _tryOrCancel = async fn => {
+      const _tryOrCancel = async fnPromise => {
         try {
-          await fn()
+          await fnPromise
         } catch (error) {
           cancel()
           reject(error)
-        }
-      }
-
-      const processNext = () => {
-        ;(async () => {
-          processingRow = true
-
-          if (queue.isEmpty()) {
-            if (ended) {
-              resolve()
-            }
-          } else if (!canceled) {
-            const row = queue.dequeue()
-
-            if (headers) {
-              // Headers read, process rows
-              if (onRow) {
-                await _tryOrCancel(async () => {
-                  await onRow(_indexRowByHeaders(row))
-                })
-              }
-            } else {
-              // Process headers
-              headers = row
-              if (onHeaders) {
-                await _tryOrCancel(async () => {
-                  await onHeaders(headers)
-                })
-              }
-            }
-
-            processNext()
-          }
-
-          processingRow = false
-        })()
-      }
-
-      const onData = data => {
-        if (canceled) {
-          return resolve()
-        }
-
-        ++total
-        if (total > 0 && onTotalChange) {
-          // Skip first row (headers)
-          onTotalChange(total)
-        }
-
-        const wasEmpty = queue.isEmpty()
-        queue.enqueue(data)
-        if (!processingRow && wasEmpty) {
-          processNext()
-        }
-      }
-
-      const onEnd = () => {
-        ended = true
-        if (queue.isEmpty()) {
-          resolve()
         }
       }
 
@@ -104,6 +42,39 @@ export const createReaderFromStream = (
             )
           : row
 
+      const processQueue = () => {
+        ;(async () => {
+          let row
+          // Run until there's a row in the queue and it's not been canceled
+          while ((row = queue.dequeue()) && !jobStatus.canceled) {
+            if (headers) {
+              // Headers have been read, process row
+              if (onRow) await _tryOrCancel(onRow(_indexRowByHeaders(row)))
+            } else {
+              // Process headers
+              headers = row
+              if (onHeaders) await _tryOrCancel(onHeaders(headers))
+            }
+          }
+
+          return resolve()
+        })()
+      }
+
+      const onData = data => {
+        if (jobStatus.canceled) return resolve()
+
+        // Skip first row (headers)
+        if (total++ > 0 && onTotalChange) onTotalChange(total)
+
+        queue.enqueue(data)
+      }
+
+      const onEnd = () => {
+        if (queue.isEmpty()) resolve()
+        else processQueue()
+      }
+
       stream
         .pipe(csvParser())
         .on('data', onData)
@@ -112,7 +83,7 @@ export const createReaderFromStream = (
     })
 
   const cancel = () => {
-    canceled = true
+    jobStatus.canceled = true
     if (stream) stream.destroy()
   }
 
