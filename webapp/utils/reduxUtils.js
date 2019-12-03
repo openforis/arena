@@ -1,5 +1,6 @@
-export const applyReducerFunction = (actionHandlers, state, action) => {
+const applyReducerFunction = (actionHandlers, nullableState, action) => {
   const actionHandler = actionHandlers[action.type]
+  const state = nullableState || {}
 
   return actionHandler ? actionHandler(state, action) : state
 }
