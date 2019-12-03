@@ -3,6 +3,11 @@ import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as random from "@pulumi/random";
 
+
+const gitCommitHash = require('child_process')
+  .execSync('git rev-parse HEAD')
+  .toString().trim()
+
 const name = pulumi.getStack();
 const isProduction = name === 'arena-prod';
 
@@ -11,6 +16,7 @@ const results: { [k: string]: Object } = {};
 
 const pulumiConfig = new pulumi.Config();
 
+const ecrRepositoryBase = "407725983764.dkr.ecr.eu-west-1.amazonaws.com";
 const certificateArn = pulumiConfig.require('certificateArn');
 const cognitoUserPoolArn = pulumiConfig.require('cognitoUserPoolArn');
 const targetDomain = pulumiConfig.require('targetDomain');
@@ -142,38 +148,80 @@ const environment = hosts.apply(postgresHost => [
     { name: "ARENA_HOST", value: "localhost:9090" },
 ])
 
+const ecsPolicy: aws.iam.PolicyDocument = {
+    Version: "2012-10-17",
+    Statement: [
+        {
+            Action: "sts:AssumeRole",
+            Principal: {"Service": "ecs-tasks.amazonaws.com"},
+            Effect: "Allow",
+            Sid: "",
+        },
+    ],
+};
+
+const taskRole = new aws.iam.Role(`${name}-task-role`, {
+    assumeRolePolicy: ecsPolicy,
+    tags,
+});
+
+const arenaServerPolicy: aws.iam.PolicyDocument = {
+    Version: "2012-10-17",
+    Statement: [
+        // Cognito requirements:
+        // At least the following:
+        // - AdminUpdateUserAttributes
+        // - AdminDeleteUser
+        {
+            Action: "cognito-idp:*",
+            Effect: "Allow",
+            Resource: cognitoUserPoolArn,
+        },
+    ],
+};
+
+results.taskRolePolicy = new aws.iam.RolePolicy(`${name}-task-role-policy`, {
+    role: taskRole,
+    policy: arenaServerPolicy,
+});
+
+results.serviceLambdaPolicy = new aws.iam.PolicyAttachment(`${name}-service-lambda-policy`, {
+    policyArn: "arn:aws:iam::aws:policy/AWSLambdaFullAccess",
+    roles: [taskRole],
+});
+results.serviceEC2ContainerPolicy = new aws.iam.PolicyAttachment(`${name}-service-ec2-container-policy`, {
+    policyArn: "arn:aws:iam::aws:policy/AmazonEC2ContainerServiceFullAccess",
+    roles: [taskRole],
+});
+
+// ECS resources can easily timeout:
+const ecsResourceOpts = { customTimeouts: { create: '30m', update: '30m', delete: '30m' } }
+
+const taskDefinition = new awsx.ecs.FargateTaskDefinition(`${name}-service-task`, {
+    taskRole,
+    tags,
+    containers: {
+        arena_server: {
+            image: `${ecrRepositoryBase}/arena-server:${gitCommitHash}`,
+            environment,
+            // 512MB is too definitely too little for heavy things like Collect import jobs.
+            memory: 1024,
+            cpu: 512,
+        },
+        arena_web: {
+            image: `${ecrRepositoryBase}/arena-web:${gitCommitHash}`,
+            environment,
+            memory: 512,
+            cpu: 256,
+            portMappings: [httpsListener],
+        },
+    },
+}, ecsResourceOpts);
 
 // NB: This often causes a timeout past the 10 minute default limit.
 results.ecsService = new awsx.ecs.FargateService(`${name}-service`, {
     cluster,
     desiredCount: 1,
-    taskDefinitionArgs: {
-        // TODO: figure out how to add Cognito IAM permissions here
-        // taskRole,
-        containers: {
-            arena_server: {
-                image: awsx.ecs.Image.fromDockerBuild("arena-server", {
-                    context: '..',
-                    dockerfile: "../Dockerfile",
-                    extraOptions: ['--target=prod'],
-                }),
-                environment,
-                // 512MB is too definitely too little for heavy things like Collect import jobs.
-                memory: 1024,
-                cpu: 512,
-            },
-            arena_web: {
-                image: awsx.ecs.Image.fromDockerBuild("arena-web", {
-                    context: '..',
-                    dockerfile: "../Dockerfile",
-                    extraOptions: ['--target=prod_web'],
-                }),
-                environment,
-                memory: 512,
-                cpu: 256,
-                portMappings: [httpsListener],
-            },
-        },
-    },
     tags,
-});
+    taskDefinition,
+}, ecsResourceOpts)

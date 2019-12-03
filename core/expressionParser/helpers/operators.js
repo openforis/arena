@@ -25,10 +25,7 @@ const arithmetic = {
 const binary = R.mergeLeft(arithmetic, comparison)
 const binaryValues = R.values(binary)
 
-const findBinary = operator => R.find(
-  R.propEq('key', operator),
-  binaryValues
-)
+const findBinary = operator => R.find(R.propEq('key', operator), binaryValues)
 
 export const operators = {
   logical,

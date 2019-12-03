@@ -21,21 +21,17 @@ const AppSideBarModuleLink = props => {
   className += active ? ' active' : ''
 
   return (
-    <Link
-      to={uri}
-      className={className}
-      aria-disabled={disabled || active}>
-      {
-        icon &&
-        <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`}></span>
-      }
-      {
-        showLabel &&
-        <span>{i18n.t(`appModules.${key}`)}</span>
-      }
+    <Link to={uri} className={className} aria-disabled={disabled || active}>
+      {icon && (
+        <span
+          className={`icon icon-${icon} icon-16px${
+            showLabel ? ' icon-left-2x' : ''
+          }`}
+        ></span>
+      )}
+      {showLabel && <span>{i18n.t(`appModules.${key}`)}</span>}
     </Link>
   )
-
 }
 
 AppSideBarModuleLink.defaultProps = {

@@ -11,21 +11,14 @@ import { FormItem } from '@webapp/commonComponents/form/input'
 import ExpressionProp from './expressionProp'
 
 const ExpressionsProp = props => {
-
-  const {
-    values, label, validation,
-    multiple,
-    onChange,
-  } = props
+  const { values, label, validation, multiple, onChange } = props
 
   const i18n = useI18n()
 
-  const getExpressionIndex = (expression) => R.findIndex(
-    R.propEq('uuid', NodeDefExpression.getUuid(expression))
-    , values
-  )
+  const getExpressionIndex = expression =>
+    R.findIndex(R.propEq('uuid', NodeDefExpression.getUuid(expression)), values)
 
-  const onDelete = (expression) => {
+  const onDelete = expression => {
     if (window.confirm(i18n.t('nodeDefEdit.expressionsProp.confirmDelete'))) {
       const index = getExpressionIndex(expression)
       const newValues = R.remove(index, 1, values)
@@ -38,7 +31,10 @@ const ExpressionsProp = props => {
       onDelete(expression)
     } else {
       const index = getExpressionIndex(expression)
-      const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
+      const newValues =
+        index >= 0
+          ? R.update(index, expression, values)
+          : R.append(expression, values)
       onChange(newValues)
     }
   }
@@ -46,21 +42,18 @@ const ExpressionsProp = props => {
   return (
     <FormItem label={label}>
       <div className="node-def-edit__expressions">
-        {
-          values.map((value, i) =>
-            <ExpressionProp
-              key={i}
-              {...props}
-              expression={value}
-              validation={Validation.getFieldValidation(i)(validation)}
-              onDelete={onDelete}
-              onUpdate={onUpdate}
-            />
-          )
-        }
+        {values.map((value, i) => (
+          <ExpressionProp
+            key={i}
+            {...props}
+            expression={value}
+            validation={Validation.getFieldValidation(i)(validation)}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
+        ))}
 
-        {
-          (multiple || R.isEmpty(values)) &&
+        {(multiple || R.isEmpty(values)) && (
           <ExpressionProp
             {...props}
             expression={NodeDefExpression.createExpressionPlaceholder()}
@@ -68,7 +61,7 @@ const ExpressionsProp = props => {
             onDelete={onDelete}
             onUpdate={onUpdate}
           />
-        }
+        )}
       </div>
     </FormItem>
   )
@@ -83,7 +76,7 @@ ExpressionsProp.defaultProps = {
   readOnly: false,
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,
-  // array of expressions
+  // Array of expressions
   values: [],
 
   validation: null,

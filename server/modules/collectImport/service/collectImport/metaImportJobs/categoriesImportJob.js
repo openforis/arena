@@ -17,38 +17,56 @@ import * as CollectSurvey from '../model/collectSurvey'
  * Saves the list of inserted categories in the "categories" context property
  */
 export default class CategoriesImportJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super('CategoriesImportJob', params)
 
-    this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))
+    this.itemBatchPersister = new BatchPersister(
+      this.itemsInsertHandler.bind(this),
+    )
     this.qualifiableItemCodesByCategoryAndLevel = {}
   }
 
-  async execute (tx) {
+  async execute() {
+    const { tx } = this
     const { collectSurvey, defaultLanguage } = this.context
 
     const categories = []
 
-    const collectCodeLists = CollectSurvey.getElementsByPath(['codeLists', 'list'])(collectSurvey)
+    const collectCodeLists = CollectSurvey.getElementsByPath([
+      'codeLists',
+      'list',
+    ])(collectSurvey)
 
     this.total = collectCodeLists.length
 
     for (const collectCodeList of collectCodeLists) {
-      if (this.isCanceled())
+      if (this.isCanceled()) {
         break
+      }
 
       // 1. insert a category for each collectCodeList
       const categoryName = collectCodeList.attributes.name
 
-      if (!R.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)) {
-        // skip sampling_design (sampling point data) code list, imported by SamplingPointDataImportJob
+      if (
+        !R.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)
+      ) {
+        // Skip sampling_design (sampling point data) code list, imported by SamplingPointDataImportJob
 
         const category = await this._insertCategory(collectCodeList)
 
-        // insert items
-        const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
-        await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
+        // Insert items
+        const collectFirstLevelItems = CollectSurvey.getElementsByPath([
+          'items',
+          'item',
+        ])(collectCodeList)
+        await this.insertItems(
+          category,
+          0,
+          null,
+          defaultLanguage,
+          collectFirstLevelItems,
+          tx,
+        )
 
         categories.push(category)
       }
@@ -56,48 +74,74 @@ export default class CategoriesImportJob extends Job {
       this.incrementProcessedItems()
     }
 
-    // flush items batch persister
+    // Flush items batch persister
     await this.itemBatchPersister.flush(tx)
 
-    // validate categories (after all items have been persisted)
+    // Validate categories (after all items have been persisted)
     await CategoryManager.validateCategories(this.surveyId, this.tx)
 
-    // set categories in context
+    // Set categories in context
     this.setContext({
       categories,
-      qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel
+      qualifiableItemCodesByCategoryAndLevel: this
+        .qualifiableItemCodesByCategoryAndLevel,
     })
   }
 
-  async _insertCategory (collectCodeList) {
+  async _insertCategory(collectCodeList) {
     const categoryName = collectCodeList.attributes.name
 
-    // create category
+    // Create category
     let categoryToCreate = Category.newCategory({
-      [Category.props.name]: categoryName
+      [Category.props.name]: categoryName,
     })
 
-    // create levels
-    const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(collectCodeList)
+    // Create levels
+    const hierarchyLevels = CollectSurvey.getElementsByPath([
+      'hierarchy',
+      'level',
+    ])(collectCodeList)
     if (!R.isEmpty(hierarchyLevels)) {
       const levels = hierarchyLevels.map((hierarchyLevel, index) =>
-        Category.newLevel(categoryToCreate, { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name }, index))
+        Category.newLevel(
+          categoryToCreate,
+          { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name },
+          index,
+        ),
+      )
       categoryToCreate = Category.assocLevelsArray(levels)(categoryToCreate)
     }
 
-    // insert category and levels
-    return await CategoryManager.insertCategory(this.user, this.surveyId, categoryToCreate, true, this.tx)
+    // Insert category and levels
+    return await CategoryManager.insertCategory(
+      this.user,
+      this.surveyId,
+      categoryToCreate,
+      true,
+      this.tx,
+    )
   }
 
-  async insertItems (category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
+  async insertItems(
+    category,
+    levelIndex,
+    parentItem,
+    defaultLanguage,
+    collectItems,
+    tx,
+  ) {
     const level = Category.getLevelByIndex(levelIndex)(category)
     const levelUuid = CategoryLevel.getUuid(level)
 
     for (const collectItem of collectItems) {
-      if (this.isCanceled())
+      if (this.isCanceled()) {
         break
+      }
 
-      const labels = CollectSurvey.toLabels('label', defaultLanguage)(collectItem)
+      const labels = CollectSurvey.toLabels(
+        'label',
+        defaultLanguage,
+      )(collectItem)
 
       const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
       const item = {
@@ -105,34 +149,43 @@ export default class CategoriesImportJob extends Job {
           [CategoryItem.props.code]: itemCode,
           [ObjectUtils.keysProps.labels]: labels,
         }),
-        categoryUuid: Category.getUuid(category) //used to revalidate categories after items import
+        categoryUuid: Category.getUuid(category), // Used to revalidate categories after items import
       }
       await this.itemBatchPersister.addItem(item, tx)
 
-      // update qualifiable item codes cache
+      // Update qualifiable item codes cache
       if (CollectSurvey.getAttribute('qualifiable')(collectItem) === 'true') {
         const code = CollectSurvey.getChildElementText('code')(collectItem)
         this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
           R.pathOr([], [Category.getName(category), String(levelIndex)]),
-          R.ifElse(
-            R.includes(code),
-            R.identity,
-            R.append(code)
-          ),
-          codes => R.assocPath([Category.getName(category), String(levelIndex)], codes, this.qualifiableItemCodesByCategoryAndLevel)
+          R.ifElse(R.includes(code), R.identity, R.append(code)),
+          codes =>
+            R.assocPath(
+              [Category.getName(category), String(levelIndex)],
+              codes,
+              this.qualifiableItemCodesByCategoryAndLevel,
+            ),
         )(this.qualifiableItemCodesByCategoryAndLevel)
       }
 
-      // insert child items recursively
-      const collectChildItems = CollectSurvey.getElementsByName('item')(collectItem)
+      // Insert child items recursively
+      const collectChildItems = CollectSurvey.getElementsByName('item')(
+        collectItem,
+      )
       if (!R.isEmpty(collectChildItems)) {
-        await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
+        await this.insertItems(
+          category,
+          levelIndex + 1,
+          item,
+          defaultLanguage,
+          collectChildItems,
+          tx,
+        )
       }
     }
   }
 
-  async itemsInsertHandler (items, tx) {
+  async itemsInsertHandler(items, tx) {
     await CategoryManager.insertItems(this.user, this.surveyId, items, tx)
   }
-
 }

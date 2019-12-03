@@ -15,15 +15,15 @@ import * as projected from '@esri/proj-codes/pe_list_projcs.json'
  * format: same as projected
  */
 import * as geographic from '@esri/proj-codes/pe_list_geogcs.json'
-import proj4 from 'proj4';
+import proj4 from 'proj4'
 import * as isValidCoordinates from 'is-valid-coordinates'
 
-import * as Srs from './srs'
 import * as ObjectUtils from '@core/objectUtils'
 import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
+import * as Srs from './srs'
 
-const invalidLonLatCoordinates = [0, 90] //proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
+const invalidLonLatCoordinates = [0, 90] // Proj4 returns [0,90] when a wrong coordinate is projected into lat-lon
 
 const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 
@@ -34,8 +34,10 @@ const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 const srsArray = R.pipe(
   R.concat(projected.ProjectedCoordinateSystems),
   R.concat(geographic.GeographicCoordinateSystems),
-  R.map(item => Srs.newSrs(item.wkid.toString(), formatName(item.name), item.wkt)),
-  R.sortBy(R.prop(Srs.keys.name))
+  R.map(item =>
+    Srs.newSrs(item.wkid.toString(), formatName(item.name), item.wkt),
+  ),
+  R.sortBy(R.prop(Srs.keys.name)),
 )([])
 
 const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
@@ -45,11 +47,12 @@ const srsByCode = ObjectUtils.toIndexedObj(srsArray, Srs.keys.code)
  */
 export const findSrsByCodeOrName = (codeOrName, limit = 200) =>
   R.pipe(
-    R.filter(item =>
-      StringUtils.contains(codeOrName, item.code) ||
-      StringUtils.contains(codeOrName, item.name)
+    R.filter(
+      item =>
+        StringUtils.contains(codeOrName, item.code) ||
+        StringUtils.contains(codeOrName, item.name),
     ),
-    R.take(limit)
+    R.take(limit),
   )(srsArray)
 
 const getSrsByCode = code => srsByCode[code]
@@ -57,23 +60,23 @@ const getSrsByCode = code => srsByCode[code]
 export const isCoordinateValid = (srsCode, x, y) => {
   const srs = getSrsByCode(srsCode)
 
-  if (!srs ||
-    !NumberUtils.isFloat(x) ||
-    !NumberUtils.isFloat(y)) {
+  if (!srs || !NumberUtils.isFloat(x) || !NumberUtils.isFloat(y)) {
     return false
-  } else {
-    x = NumberUtils.toNumber(x)
-    y = NumberUtils.toNumber(y)
+  }
 
-    const lonLat = Srs.isLatLon(srsCode)
-      ? [x, y] // SRS is lat-lon, projection is not needed
-      : proj4(
-        Srs.getWkt(srs), //from srs
-        Srs.getWkt(Srs.latLonSrs), //to lat lon
-        [x, y] //coordinates
+  x = NumberUtils.toNumber(x)
+  y = NumberUtils.toNumber(y)
+
+  const lonLat = Srs.isLatLon(srsCode)
+    ? [x, y] // SRS is lat-lon, projection is not needed
+    : proj4(
+        Srs.getWkt(srs), // From srs
+        Srs.getWkt(Srs.latLonSrs), // To lat lon
+        [x, y], // Coordinates
       )
 
-    return !R.equals(lonLat, invalidLonLatCoordinates) &&
-      isValidCoordinates(lonLat[0], lonLat[1])
-  }
+  return (
+    !R.equals(lonLat, invalidLonLatCoordinates) &&
+    isValidCoordinates(lonLat[0], lonLat[1])
+  )
 }

@@ -16,7 +16,7 @@ const verificationOptions = {
 
 let indexedKeys = {}
 
-const _getKeys = async (region, poolId) => {
+const _getKeys = async () => {
   const jwksUrl = `${issuer}/.well-known/jwks.json`
   const response = await axios.get(jwksUrl)
 
@@ -24,10 +24,11 @@ const _getKeys = async (region, poolId) => {
 }
 
 // Index keys by kid, and convert to PEM
-const _indexKeys = keyList => keyList.reduce((keys, jwk) => {
-  keys[jwk.kid] = jwkToPem(jwk)
-  return keys
-}, {})
+const _indexKeys = keyList =>
+  keyList.reduce((keys, jwk) => {
+    keys[jwk.kid] = jwkToPem(jwk)
+    return keys
+  }, {})
 
 const _decode = token => jsonwebtoken.decode(token, { complete: true })
 
@@ -46,7 +47,7 @@ export const validate = async token => {
 
   // Refresh verification keys if none was found and search again
   if (!verificationKey) {
-    indexedKeys = _indexKeys(await _getKeys(region, poolId))
+    indexedKeys = _indexKeys(await _getKeys())
     verificationKey = _findVerificationKey(token, indexedKeys)
   }
 

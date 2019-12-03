@@ -13,25 +13,25 @@ export const keys = {
 }
 
 export const permissions = {
-  // surveys
+  // Surveys
   surveyCreate: 'surveyCreate',
 
-  // only owner and administrator can delete survey
+  // Only owner and administrator can delete survey
   // edit survey info props, edit nodeDefs, edit categories, edit taxonomies, publishSurvey
   surveyEdit: 'surveyEdit',
 
-  // records
+  // Records
   recordCreate: 'recordCreate',
   recordEdit: 'recordEdit',
   recordView: 'recordView',
   recordCleanse: 'recordCleanse',
   recordAnalyse: 'recordAnalyse',
 
-  // users
+  // Users
   userEdit: 'userEdit',
   userInvite: 'userInvite',
 
-  // edit
+  // Edit
   // only owner and admin - for now
   permissionsEdit: 'permissionsEdit',
 }
@@ -58,14 +58,11 @@ export const getPermissions = R.propOr([], keys.permissions)
 
 export const getRecordSteps = R.propOr([], keys.recordSteps)
 
-export const getRecordEditLevel = step => R.pipe(
-  getRecordSteps,
-  R.prop(step),
-)
+export const getRecordEditLevel = step => R.pipe(getRecordSteps, R.prop(step))
 
 export const isSystemAdminGroup = R.pipe(
   getName,
-  R.equals(groupNames.systemAdmin)
+  R.equals(groupNames.systemAdmin),
 )
 
 export const isEqual = ObjectUtils.isEqual

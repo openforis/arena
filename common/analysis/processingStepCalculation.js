@@ -22,7 +22,10 @@ const aggregateFn = {
 }
 // ====== READ
 
-export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, aggregateFn.sum)
+export const getAggregateFunction = ObjectUtils.getProp(
+  keysProps.aggregateFn,
+  aggregateFn.sum,
+)
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 

@@ -4,16 +4,15 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import ItemsView from '../items/itemsView'
-import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
-
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Authorizer from '@core/auth/authorizer'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
 import * as AppState from '@webapp/app/appState'
+import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
+import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
+import ItemsView from '../items/itemsView'
 
 import {
   createTaxonomy,
@@ -21,9 +20,7 @@ import {
   deleteTaxonomy,
 } from '../taxonomyEdit/actions'
 
-
-const TaxonomiesView = (props) => {
-
+const TaxonomiesView = props => {
   const {
     taxonomy,
     taxonomies,
@@ -37,21 +34,26 @@ const TaxonomiesView = (props) => {
     readOnly,
   } = props
 
-  useEffect(() =>
-    () => {
+  useEffect(
+    () => () => {
       if (taxonomy) {
         setTaxonomyForEdit(null)
       }
-    }, [Taxonomy.getUuid(taxonomy)]
+    },
+    [Taxonomy.getUuid(taxonomy)],
   )
 
   const i18n = useI18n()
 
-  const canDelete = taxonomy => taxonomy.usedByNodeDefs
-    ? alert(i18n.t('taxonomy.cantBeDeleted'))
-    : window.confirm(i18n.t('taxonomy.confirmDelete', {
-      taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
-    }))
+  const canDelete = taxonomy =>
+    taxonomy.usedByNodeDefs
+      ? alert(i18n.t('taxonomy.cantBeDeleted'))
+      : window.confirm(
+          i18n.t('taxonomy.confirmDelete', {
+            taxonomyName:
+              Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
+          }),
+        )
 
   return (
     <ItemsView
@@ -69,7 +71,8 @@ const TaxonomiesView = (props) => {
       canSelect={canSelect}
       onSelect={onSelect}
       onClose={onClose}
-      readOnly={readOnly}/>
+      readOnly={readOnly}
+    />
   )
 }
 
@@ -82,8 +85,10 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
-    }))
+      usedByNodeDefs: !R.isEmpty(
+        Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey),
+      ),
+    })),
   )(survey)
 
   return {
@@ -93,7 +98,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { createTaxonomy, setTaxonomyForEdit, deleteTaxonomy }
-)(TaxonomiesView)
+export default connect(mapStateToProps, {
+  createTaxonomy,
+  setTaxonomyForEdit,
+  deleteTaxonomy,
+})(TaxonomiesView)

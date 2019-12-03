@@ -8,82 +8,93 @@ import * as NodeDef from '@core/survey/nodeDef'
 const { nodeDefType } = NodeDef
 import * as Taxon from '@core/survey/taxon'
 
-import * as Node from '../node'
 import * as GeoUtils from '@core/geo/geoUtils'
 
 import * as Validation from '@core/validation/validation'
+import * as Node from '../node'
 
 const typeValidatorFns = {
-  [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
+  [nodeDefType.boolean]: (_survey, _nodeDef, _node, value) =>
     R.includes(value, ['true', 'false']),
 
-  [nodeDefType.code]: (survey, nodeDef, node, value) =>
+  [nodeDefType.code]: (survey, nodeDef, node, _value) =>
     validateCode(survey, nodeDef, node),
 
-  [nodeDefType.coordinate]: (survey, nodeDef, node, value) =>
+  [nodeDefType.coordinate]: (_survey, _nodeDef, node, _value) =>
     GeoUtils.isCoordinateValid(
       Node.getCoordinateSrs(node),
       Node.getCoordinateX(node),
-      Node.getCoordinateY(node)
-    )
-  ,
+      Node.getCoordinateY(node),
+    ),
 
-  [nodeDefType.date]: (survey, nodeDef, node, value) => {
-    const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
+  [nodeDefType.date]: (_survey, _nodeDef, node, _value) => {
+    const [year, month, day] = [
+      Node.getDateYear(node),
+      Node.getDateMonth(node),
+      Node.getDateDay(node),
+    ]
     return DateTimeUtils.isValidDate(year, month, day)
   },
 
-  [nodeDefType.decimal]: (survey, nodeDef, node, value) =>
+  [nodeDefType.decimal]: (_survey, _nodeDef, _node, value) =>
     NumberUtils.isFloat(value),
 
-  [nodeDefType.file]: (survey, nodeDef, node, value) => true,
+  [nodeDefType.file]: (_survey, _nodeDef, _node, _value) => true,
 
-  [nodeDefType.integer]: (survey, nodeDef, node, value) =>
+  [nodeDefType.integer]: (_survey, _nodeDef, _node, value) =>
     NumberUtils.isInteger(value),
 
-  [nodeDefType.taxon]: (survey, nodeDef, node, value) =>
+  [nodeDefType.taxon]: (survey, nodeDef, node, _value) =>
     validateTaxon(survey, nodeDef, node),
 
-  [nodeDefType.text]: (survey, nodeDef, node, value) =>
-    R.is(String, value),
+  [nodeDefType.text]: (_survey, _nodeDef, _node, value) => R.is(String, value),
 
-  [nodeDefType.time]: (survey, nodeDef, node, value) => {
+  [nodeDefType.time]: (_survey, _nodeDef, node, _value) => {
     const [hour, minute] = [Node.getTimeHour(node), Node.getTimeMinute(node)]
     return DateTimeUtils.isValidTime(hour, minute)
   },
 }
 
-const validateCode = (survey, nodeDef, node) => {
+const validateCode = (survey, _nodeDef, node) => {
   const itemUuid = Node.getCategoryItemUuid(node)
-  if (!itemUuid)
+  if (!itemUuid) {
     return true
+  }
 
-  // item not found
+  // Item not found
   const item = Survey.getCategoryItemByUuid(itemUuid)(survey)
-  return !!item
+  return Boolean(item)
 }
 
 const validateTaxon = (survey, nodeDef, node) => {
   const taxonUuid = Node.getTaxonUuid(node)
-  if (!taxonUuid)
+  if (!taxonUuid) {
     return true
+  }
 
-  // taxon not found
+  // Taxon not found
   const taxon = Survey.getTaxonByUuid(taxonUuid)(survey)
-  if (!taxon)
+  if (!taxon) {
     return false
+  }
 
   const vernacularNameUuid = Node.getVernacularNameUuid(node)
-  if (!vernacularNameUuid)
+  if (!vernacularNameUuid) {
     return true
+  }
 
-  // vernacular name not found
-  return Survey.includesTaxonVernacularName(nodeDef, Taxon.getCode(taxon), vernacularNameUuid)(survey)
+  // Vernacular name not found
+  return Survey.includesTaxonVernacularName(
+    nodeDef,
+    Taxon.getCode(taxon),
+    vernacularNameUuid,
+  )(survey)
 }
 
-export const validateValueType = (survey, nodeDef) => (propName, node) => {
-  if (Node.isValueBlank(node))
+export const validateValueType = (survey, nodeDef) => (_propName, node) => {
+  if (Node.isValueBlank(node)) {
     return null
+  }
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))

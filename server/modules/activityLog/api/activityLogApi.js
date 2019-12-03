@@ -7,16 +7,25 @@ import * as ActivityLogService from '../service/activityLogService'
 export const init = app => {
   // ==== READ
 
-  app.get(`/survey/:surveyId/activity-log`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, offset, limit } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.get(
+    '/survey/:surveyId/activity-log',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, offset, limit } = Request.getParams(req)
+        const user = Request.getUser(req)
 
-      const activityLogs = await ActivityLogService.fetch(user, surveyId, R.clamp(0, NaN, offset), R.clamp(30, 100, limit))
+        const activityLogs = await ActivityLogService.fetch(
+          user,
+          surveyId,
+          R.clamp(0, NaN, offset),
+          R.clamp(30, 100, limit),
+        )
 
-      res.json({ activityLogs })
-    } catch (err) {
-      next(err)
-    }
-  })
+        res.json({ activityLogs })
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 }

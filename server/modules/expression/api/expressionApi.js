@@ -3,32 +3,27 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
-import { isBlank, contains } from '@core/stringUtils';
-
-import * as CategoryManager from '../../category/manager/categoryManager'
-import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
+import { isBlank, contains } from '@core/stringUtils'
 
 import SystemError from '@core/systemError'
 import * as Request from '@server/utils/request'
+import * as CategoryManager from '../../category/manager/categoryManager'
+import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
-const toItem = (type, lang = null) =>
-  item => item
-    ?
-    (
-      type === NodeDef.nodeDefType.code
-        ? {
+const toItem = (type, lang = null) => item =>
+  item
+    ? type === NodeDef.nodeDefType.code
+      ? {
           key: CategoryItem.getCode(item),
           label: CategoryItem.getLabel(lang)(item),
         }
-        : {
+      : {
           key: Taxon.getCode(item),
           label: Taxon.getScientificName(item),
         }
-    )
     : null
 
 export const init = app => {
-
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
     try {
@@ -37,27 +32,35 @@ export const init = app => {
       if (NodeDef.nodeDefType.code === type) {
         const { categoryUuid, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(
+          surveyId,
+          categoryUuid,
+          0,
+          true,
+        )
 
         const item = R.pipe(
           R.find(item => CategoryItem.getCode(item) === value),
-          toItem(type, lang)
+          toItem(type, lang),
         )(itemsDb)
 
         res.json({ item })
-
       } else if (NodeDef.nodeDefType.taxon === type) {
         const { taxonomyUuid } = Request.getParams(req)
 
-        const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
+        const itemDb = await TaxonomyManager.fetchTaxonByCode(
+          surveyId,
+          taxonomyUuid,
+          value,
+          true,
+        )
 
         res.json({ item: toItem(type)(itemDb) })
-
       } else {
         throw new SystemError('invalidType', { type })
       }
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -66,9 +69,16 @@ export const init = app => {
       const { surveyId, type, value } = Request.getParams(req)
 
       if (NodeDef.nodeDefType.code === type) {
-        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
+        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(
+          req,
+        )
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(
+          surveyId,
+          categoryUuid,
+          categoryLevelIndex,
+          true,
+        )
 
         const items = R.pipe(
           R.ifElse(
@@ -78,29 +88,31 @@ export const init = app => {
               const code = CategoryItem.getCode(item)
               const label = CategoryItem.getLabel(lang)(item)
               return contains(value, code) || contains(value, label)
-            })
+            }),
           ),
           R.take(25),
-          R.map(toItem(type, lang))
+          R.map(toItem(type, lang)),
         )(itemsDb)
 
         res.json({ items })
-
       } else if (NodeDef.nodeDefType.taxon === type) {
         const { taxonomyUuid } = Request.getParams(req)
 
-        const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, value, true)
+        const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(
+          surveyId,
+          taxonomyUuid,
+          value,
+          true,
+        )
 
         const items = itemsDb.map(toItem(type))
 
         res.json({ items })
-
       } else {
         throw new SystemError('invalidType', { type })
       }
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
-
-};
+}

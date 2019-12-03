@@ -11,10 +11,10 @@ export const keys = {
 }
 
 export const keysProps = {
-  name: 'name'
+  name: 'name',
 }
 
-//READ
+// READ
 export const getUuid = ObjectUtils.getUuid
 export const getIndex = R.prop(keys.index)
 export const getName = ObjectUtils.getProp(keysProps.name)

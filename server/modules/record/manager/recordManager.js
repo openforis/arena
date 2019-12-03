@@ -10,51 +10,101 @@ import * as ObjectUtils from '@core/objectUtils'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
-import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
-
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '../repository/recordRepository'
 import * as NodeRepository from '../repository/nodeRepository'
+import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 
 // ==== CREATE
 
-export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
+export const insertRecord = async (
+  user,
+  surveyId,
+  record,
+  system = false,
+  client = db,
+) =>
   await client.tx(async t => {
     const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
     if (!Record.isPreview(record)) {
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
+      await ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.recordCreate,
+        record,
+        system,
+        t,
+      )
     }
+
     return recordDb
   })
 
-export const insertNodesFromValues = async (user, surveyId, nodeValues, client = db) => {
+export const insertNodesFromValues = async (
+  user,
+  surveyId,
+  nodeValues,
+  client = db,
+) => {
   const activities = nodeValues.map(nodeValues => {
     const node = NodeRepository.tableColumns.reduce(
-      (accContent, key, index) => Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
-      {}
+      (accContent, key, index) =>
+        Object.assign(accContent, { [camelize(key)]: nodeValues[index] }),
+      {},
     )
     return ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, true)
   })
 
-  await client.tx(async t => await Promise.all([
-    NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
-    ActivityLogRepository.insertMany(user, surveyId, activities, t)
-  ]))
+  await client.tx(
+    async t =>
+      await Promise.all([
+        NodeRepository.insertNodesFromValues(surveyId, nodeValues, t),
+        ActivityLogRepository.insertMany(user, surveyId, activities, t),
+      ]),
+  )
 }
 
 export const insertNode = RecordUpdateManager.insertNode
 
 // ==== READ
 
-export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, limit, client = db) => {
-  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+export const fetchRecordsSummaryBySurveyId = async (
+  surveyId,
+  cycle,
+  offset,
+  limit,
+  client = db,
+) => {
+  const surveyInfo = await SurveyRepository.fetchSurveyById(
+    surveyId,
+    true,
+    client,
+  )
+  const nodeDefsDraft =
+    Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
-  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, NodeDef.getUuid(nodeDefRoot), nodeDefsDraft, client)
+  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(
+    surveyId,
+    nodeDefsDraft,
+    client,
+  )
+  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
+    surveyId,
+    NodeDef.getUuid(nodeDefRoot),
+    nodeDefsDraft,
+    client,
+  )
 
-  const list = await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, client)
+  const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
+    surveyId,
+    cycle,
+    nodeDefRoot,
+    nodeDefKeys,
+    offset,
+    limit,
+    client,
+  )
 
   return {
     nodeDefKeys,
@@ -63,36 +113,66 @@ export const fetchRecordsSummaryBySurveyId = async (surveyId, cycle, offset, lim
 }
 
 export {
-  fetchRecordByUuid, fetchRecordsUuidAndCycle, countRecordsBySurveyId, fetchRecordCreatedCountsByDates
+  fetchRecordByUuid,
+  fetchRecordsUuidAndCycle,
+  countRecordsBySurveyId,
+  fetchRecordCreatedCountsByDates,
 } from '../repository/recordRepository'
 
-export const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client = db) => {
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, draft, client)
+export const fetchRecordAndNodesByUuid = async (
+  surveyId,
+  recordUuid,
+  draft = true,
+  client = db,
+) => {
+  const record = await RecordRepository.fetchRecordByUuid(
+    surveyId,
+    recordUuid,
+    client,
+  )
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(
+    surveyId,
+    recordUuid,
+    draft,
+    client,
+  )
 
   return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodes))(record)
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export {
+  fetchNodeByUuid,
+  fetchChildNodesByNodeDefUuids,
+} from '../repository/nodeRepository'
 
 // ==== UPDATE
 
 export {
-  initNewRecord, updateRecordStep, persistNode, updateNodesDependents
+  initNewRecord,
+  updateRecordStep,
+  persistNode,
+  updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
 
 // ==== DELETE
 
 export {
-  deleteRecord, deleteRecordPreview, deleteRecordsPreview, deleteRecordsByCycles,
-  deleteNode, deleteNodesByNodeDefUuids,
+  deleteRecord,
+  deleteRecordPreview,
+  deleteRecordsPreview,
+  deleteRecordsByCycles,
+  deleteNode,
+  deleteNodesByNodeDefUuids,
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION
 export {
-  persistValidation, updateRecordValidationsFromValues, validateNodesAndPersistValidation
+  persistValidation,
+  updateRecordValidationsFromValues,
+  validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
 
 export {
-  fetchValidationReport, countValidationReports
+  fetchValidationReport,
+  countValidationReports,
 } from './_recordManager/validationReportManager'

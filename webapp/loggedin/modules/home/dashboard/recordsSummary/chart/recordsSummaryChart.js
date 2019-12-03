@@ -4,14 +4,12 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
+import { useOnResize } from '@webapp/commonComponents/hooks'
+import { elementOffset } from '@webapp/utils/domUtils'
 import YAxis, { getScale as getYScale } from './components/yAxis'
 import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
-
-import { useOnResize } from '@webapp/commonComponents/hooks'
-
-import { elementOffset } from '@webapp/utils/domUtils'
 
 const RecordsSummaryChart = props => {
   const { counts, from, to } = props
@@ -35,8 +33,9 @@ const RecordsSummaryChart = props => {
 
     setChartProps({
       ...chartPropsUpdate,
-      xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
-      yScale: getYScale(counts, chartPropsUpdate)
+      xScale: date =>
+        getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
+      yScale: getYScale(counts, chartPropsUpdate),
     })
   }
 
@@ -45,27 +44,15 @@ const RecordsSummaryChart = props => {
   useEffect(updateChartProps, [counts, from, to])
 
   return (
-    <div className="home-dashboard__records-summary__chart"
-         ref={chartRef}>
-
-      {
-        chartProps &&
+    <div className="home-dashboard__records-summary__chart" ref={chartRef}>
+      {chartProps && (
         <svg width={chartProps.width} height={chartProps.height}>
-          <YAxis
-            {...props}
-            chartProps={chartProps}/>
-          <XAxis
-            {...props}
-            chartProps={chartProps}/>
-          <DataPath
-            {...props}
-            chartProps={chartProps}/>
-          <DataPoints
-            {...props}
-            chartProps={chartProps}/>
+          <YAxis {...props} chartProps={chartProps} />
+          <XAxis {...props} chartProps={chartProps} />
+          <DataPath {...props} chartProps={chartProps} />
+          <DataPoints {...props} chartProps={chartProps} />
         </svg>
-      }
-
+      )}
     </div>
   )
 }

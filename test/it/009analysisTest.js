@@ -3,4 +3,3 @@ import * as SimpleProcessingChainTest from './analysisTest/simpleProcessingChain
 describe('Processing chains test', () => {
   it('Simple processing chain test', SimpleProcessingChainTest.simpleTest)
 })
-

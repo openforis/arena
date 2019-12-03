@@ -1,9 +1,16 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
 
-import { homeCollectImportReportUpdate, homeCollectImportReportItemUpdate } from './actions'
+import {
+  homeCollectImportReportUpdate,
+  homeCollectImportReportItemUpdate,
+} from './actions'
 
 import * as CollectImportReportState from './collectImportReportState'
 
@@ -15,7 +22,8 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   [homeCollectImportReportUpdate]: (state, { items }) => items,
-  [homeCollectImportReportItemUpdate]: (state, { item }) => CollectImportReportState.updateItem(item)(state)
+  [homeCollectImportReportItemUpdate]: (state, { item }) =>
+    CollectImportReportState.updateItem(item)(state),
 }
 
 export default exportReducer(actionHandlers)

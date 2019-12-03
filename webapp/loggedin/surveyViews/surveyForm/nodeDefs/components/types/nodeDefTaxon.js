@@ -6,7 +6,6 @@ import * as R from 'ramda'
 
 import { FormItem } from '@webapp/commonComponents/form/input'
 import { useI18n } from '@webapp/commonComponents/hooks'
-import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 import * as Taxon from '@core/survey/taxon'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -16,6 +15,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as StringUtils from '@core/stringUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 const code = Node.valuePropKeys.code
 const scientificName = Node.valuePropKeys.scientificName
@@ -31,9 +31,15 @@ const selectionDefault = {
 
 const NodeDefTaxon = props => {
   const {
-    surveyId, nodeDef, taxonomyUuid, node,
-    edit, draft, renderType,
-    canEditRecord, readOnly,
+    surveyId,
+    nodeDef,
+    taxonomyUuid,
+    node,
+    edit,
+    draft,
+    renderType,
+    canEditRecord,
+    readOnly,
     updateNode,
   } = props
 
@@ -45,40 +51,49 @@ const NodeDefTaxon = props => {
 
   const updateSelectionFromNode = () => {
     const unlisted = taxonRefData && Taxon.isUnlistedTaxon(taxonRefData)
-    const selectionUpdate = taxonRefData ?
-      {
-        [code]: Taxon.getCode(taxonRefData),
-        [scientificName]: unlisted
-          ? Node.getScientificName(node)
-          : Taxon.getScientificName(taxonRefData),
-        [vernacularName]: unlisted
-          ? Node.getVernacularName(node)
-          : R.defaultTo('', taxonRefData[vernacularName]),
-      }
+    const selectionUpdate = taxonRefData
+      ? {
+          [code]: Taxon.getCode(taxonRefData),
+          [scientificName]: unlisted
+            ? Node.getScientificName(node)
+            : Taxon.getScientificName(taxonRefData),
+          [vernacularName]: unlisted
+            ? Node.getVernacularName(node)
+            : R.defaultTo('', taxonRefData[vernacularName]),
+        }
       : selectionDefault
 
     setSelection(selectionUpdate)
   }
 
   const updateNodeValue = (nodeValue, taxon = null) =>
-    updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
+    updateNode(
+      nodeDef,
+      node,
+      nodeValue,
+      null,
+      {},
+      { [NodeRefData.keys.taxon]: taxon },
+    )
 
   const onChangeTaxon = taxon => {
     if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
       const nodeValue = {
         [taxonUuid]: Taxon.getUuid(taxon),
-        [scientificName]: Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
-          ? selection[scientificName]
-          : Taxon.getScientificName(taxon),
-        [vernacularName]: Taxon.isUnlistedTaxon(taxon) && selection[vernacularName]
-          ? selection[vernacularName]
-          : '',
-        [vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon)
+        [scientificName]:
+          Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
+            ? selection[scientificName]
+            : Taxon.getScientificName(taxon),
+        [vernacularName]:
+          Taxon.isUnlistedTaxon(taxon) && selection[vernacularName]
+            ? selection[vernacularName]
+            : '',
+        [vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
       }
 
       updateNodeValue(nodeValue, taxon)
     } else {
-      // reset to last node value
+      // Reset to last node value
       updateSelectionFromNode()
     }
   }
@@ -87,15 +102,21 @@ const NodeDefTaxon = props => {
     if (StringUtils.isBlank(value)) {
       if (Node.isValueBlank(node)) {
         setSelection(selectionDefault)
-      } else if (field === vernacularName && selection[code] === Taxon.unlistedCode) {
-        // if current code is UNL and vernacular name is reset, do not clear node value
-        updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
+      } else if (
+        field === vernacularName &&
+        selection[code] === Taxon.unlistedCode
+      ) {
+        // If current code is UNL and vernacular name is reset, do not clear node value
+        updateNodeValue(
+          { ...Node.getValue(node), [field]: value },
+          taxonRefData,
+        )
       } else {
-        // clear node value
+        // Clear node value
         updateNodeValue({})
       }
     } else if (field !== code && selection[code] === Taxon.unlistedCode) {
-      // if input field is not code and current code is UNL, update node value field
+      // If input field is not code and current code is UNL, update node value field
       updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
     } else {
       setSelection({ ...selectionDefault, [field]: value })
@@ -103,10 +124,11 @@ const NodeDefTaxon = props => {
   }
 
   if (!edit) {
-    useEffect(
-      updateSelectionFromNode,
-      [Taxon.getUuid(taxonRefData), Node.getScientificName(node), Node.getVernacularName(node)]
-    )
+    useEffect(updateSelectionFromNode, [
+      Taxon.getUuid(taxonRefData),
+      Node.getScientificName(node),
+      Node.getVernacularName(node),
+    ])
   }
 
   const isTableBody = renderType === NodeDefLayout.renderType.tableBody
@@ -116,38 +138,35 @@ const NodeDefTaxon = props => {
 
   return (
     <div className={className} ref={elementRef}>
-      {
-        R.keys(selectionDefault).map(field => {
-            const inputField = (
-              <NodeDefTaxonInputField
-                key={field}
-                surveyId={surveyId}
-                taxonomyUuid={taxonomyUuid}
-                edit={edit}
-                draft={draft}
-                canEditRecord={canEditRecord}
-                readOnly={readOnly}
-
-                field={field}
-                selection={selection}
-                onChangeTaxon={onChangeTaxon}
-                onChangeSelectionField={onChangeSelectionField}
-                autocompleteSourceElement={isTableBody ? elementRef.current : null}
-              />
-            )
-
-            return isTableBody
-              ? inputField
-              : (
-                <FormItem
-                  key={field}
-                  label={i18n.t(`surveyForm.nodeDefTaxon.${field}`)}>
-                  {inputField}
-                </FormItem>
-              )
-          }
+      {R.keys(selectionDefault).map(field => {
+        const inputField = (
+          <NodeDefTaxonInputField
+            key={field}
+            surveyId={surveyId}
+            taxonomyUuid={taxonomyUuid}
+            edit={edit}
+            draft={draft}
+            canEditRecord={canEditRecord}
+            readOnly={readOnly}
+            field={field}
+            selection={selection}
+            onChangeTaxon={onChangeTaxon}
+            onChangeSelectionField={onChangeSelectionField}
+            autocompleteSourceElement={isTableBody ? elementRef.current : null}
+          />
         )
-      }
+
+        return isTableBody ? (
+          inputField
+        ) : (
+          <FormItem
+            key={field}
+            label={i18n.t(`surveyForm.nodeDefTaxon.${field}`)}
+          >
+            {inputField}
+          </FormItem>
+        )
+      })}
     </div>
   )
 }
@@ -160,7 +179,7 @@ const mapStateToProps = (state, props) => {
     taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
     surveyId,
     draft: preview,
-    node: edit ? null : nodes[0]
+    node: edit ? null : nodes[0],
   }
 }
 

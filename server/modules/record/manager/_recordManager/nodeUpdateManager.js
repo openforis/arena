@@ -8,13 +8,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 
-import * as NodeUpdateDependentManager from './nodeUpdateDependentManager'
-import * as NodeRepository from '../../repository/nodeRepository'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { db } from '@server/db/db'
+import * as NodeRepository from '../../repository/nodeRepository'
+import * as NodeUpdateDependentManager from './nodeUpdateDependentManager'
 
-//==== UPDATE
+// ==== UPDATE
 
 export const persistNode = async (user, survey, record, node, system, t) => {
   const nodeUuid = Node.getUuid(node)
@@ -22,77 +22,104 @@ export const persistNode = async (user, survey, record, node, system, t) => {
   const existingNode = Record.getNodeByUuid(nodeUuid)(record)
 
   if (existingNode) {
-    // updating existing node
+    // Updating existing node
     const surveyId = Survey.getId(survey)
     const nodeValue = Node.getValue(node)
     const meta = {
       ...Node.getMeta(node),
-      [Node.metaKeys.defaultValue]: false
+      [Node.metaKeys.defaultValue]: false,
     }
     if (!Record.isPreview(record)) {
-      // keep only node uuid, recordUuid, meta and value
+      // Keep only node uuid, recordUuid, meta and value
       const logContent = R.pipe(
-        R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
-        R.assoc(Node.keys.meta, meta)
+        R.pick([
+          Node.keys.uuid,
+          Node.keys.recordUuid,
+          Node.keys.nodeDefUuid,
+          Node.keys.value,
+        ]),
+        R.assoc(Node.keys.meta, meta),
       )(node)
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
+      await ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.nodeValueUpdate,
+        logContent,
+        system,
+        t,
+      )
     }
 
-    const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, Record.isPreview(record), t)
+    const nodeUpdate = await NodeRepository.updateNode(
+      surveyId,
+      nodeUuid,
+      nodeValue,
+      meta,
+      Record.isPreview(record),
+      t,
+    )
 
     record = Record.assocNode(nodeUpdate)(record)
 
     return await _onNodeUpdate(survey, record, nodeUpdate, {}, t)
-
-  } else {
-    // inserting new node
-    return await insertNode(user, survey, record, node, system, t)
   }
+
+  // Inserting new node
+  return await insertNode(user, survey, record, node, system, t)
 }
 
 export const updateNodesDependents = async (survey, record, nodes, tx) => {
-  // output
-  let nodesUpdated = { ...nodes }
+  // Output
+  const nodesUpdated = { ...nodes }
 
   const nodesArray = Object.values(nodes)
   const nodesToVisit = new Queue(nodesArray)
 
-  const nodesVisitedByUuid = {} //used to avoid visiting the same node 2 times
+  const nodesVisitedByUuid = {} // Used to avoid visiting the same node 2 times
 
   while (!nodesToVisit.isEmpty()) {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
 
-    // visit only unvisited nodes
+    // Visit only unvisited nodes
     if (!nodesVisitedByUuid[nodeUuid]) {
-
-      // update node dependents
+      // Update node dependents
       const [nodesApplicability, nodesDefaultValues] = await Promise.all([
-        NodeUpdateDependentManager.updateDependentsApplicable(survey, record, node, tx),
-        NodeUpdateDependentManager.updateDependentsDefaultValues(survey, record, node, tx)
+        NodeUpdateDependentManager.updateDependentsApplicable(
+          survey,
+          record,
+          node,
+          tx,
+        ),
+        NodeUpdateDependentManager.updateDependentsDefaultValues(
+          survey,
+          record,
+          node,
+          tx,
+        ),
       ])
 
-      // update record nodes
+      // Update record nodes
       const nodesUpdatedCurrent = {
         ...nodesApplicability,
-        ...nodesDefaultValues
+        ...nodesDefaultValues,
       }
       record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
-      // mark updated nodes to visit
+      // Mark updated nodes to visit
       nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
 
-      // update nodes to return
+      // Update nodes to return
       Object.assign(nodesUpdated, nodesUpdatedCurrent)
 
-      // mark node visited
+      // Mark node visited
       nodesVisitedByUuid[nodeUuid] = true
     }
   }
 
   return {
     record,
-    nodes: nodesUpdated
+    nodes: nodesUpdated,
   }
 }
 
@@ -104,50 +131,98 @@ export const insertNode = async (user, survey, record, node, system, t) => {
   // If it's a code, don't insert if it has been inserted already (by another user)
   if (NodeDef.isCode(nodeDef)) {
     const nodeParent = Record.getParentNode(node)(record)
-    const siblings = Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(node))(record)
-    if (R.any(sibling => R.equals(Node.getValue(sibling), Node.getValue(node)))(siblings)) {
+    const siblings = Record.getNodeChildrenByDefUuid(
+      nodeParent,
+      Node.getNodeDefUuid(node),
+    )(record)
+    if (
+      R.any(sibling => R.equals(Node.getValue(sibling), Node.getValue(node)))(
+        siblings,
+      )
+    ) {
       return {}
     }
   }
 
-  const nodesToReturn = await _insertNodeRecursively(user, survey, nodeDef, record, node, system, t)
+  const nodesToReturn = await _insertNodeRecursively(
+    user,
+    survey,
+    nodeDef,
+    record,
+    node,
+    system,
+    t,
+  )
 
   return _createUpdateResult(record, node, nodesToReturn)
 }
 
-const _insertNodeRecursively = async (user, survey, nodeDef, record, nodeToInsert, system, t) => {
+const _insertNodeRecursively = async (
+  user,
+  survey,
+  nodeDef,
+  record,
+  nodeToInsert,
+  system,
+  t,
+) => {
   const surveyId = Survey.getId(survey)
 
-  if (!Record.isPreview(record))
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
+  if (!Record.isPreview(record)) {
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.nodeCreate,
+      nodeToInsert,
+      system,
+      t,
+    )
+  }
 
-  // insert node
-  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
+  // Insert node
+  const node = await NodeRepository.insertNode(
+    surveyId,
+    nodeToInsert,
+    Record.isPreview(record),
+    t,
+  )
 
   record = Record.assocNode(node)(record)
 
-  // add children if entity
+  // Add children if entity
   const childDefs = NodeDef.isEntity(nodeDef)
     ? Survey.getNodeDefChildren(nodeDef)(survey)
     : []
 
-  // insert only child single nodes (it allows to apply default values)
+  // Insert only child single nodes (it allows to apply default values)
   const childNodes = {}
   for (const childDef of childDefs) {
     if (NodeDef.isSingle(childDef)) {
-      const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-      const childNodesInserted = await _insertNodeRecursively(user, survey, childDef, record, childNode, true, t)
+      const childNode = Node.newNode(
+        NodeDef.getUuid(childDef),
+        Node.getRecordUuid(node),
+        node,
+      )
+      const childNodesInserted = await _insertNodeRecursively(
+        user,
+        survey,
+        childDef,
+        record,
+        childNode,
+        true,
+        t,
+      )
       Object.assign(childNodes, childNodesInserted)
     }
   }
 
   return {
     ...childNodes,
-    [Node.getUuid(node)]: node
+    [Node.getUuid(node)]: node,
   }
 }
 
-//==== DELETE
+// ==== DELETE
 
 export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const surveyId = Survey.getId(survey)
@@ -160,47 +235,82 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
       [ActivityLog.keysContent.recordUuid]: Node.getRecordUuid(node),
       [ActivityLog.keysContent.nodeDefUuid]: Node.getNodeDefUuid(node),
       [Node.keys.meta]: {
-        [Node.metaKeys.hierarchy]: Node.getHierarchy(node)
+        [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
       },
     }
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDelete, logContent, false, t)
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.nodeDelete,
+      logContent,
+      false,
+      t,
+    )
   }
 
-  // get dependent key attributes before node is removed from record
+  // Get dependent key attributes before node is removed from record
   // and return them so they will be re-validated later on
-  const nodeDependentKeyAttributes = _getNodeDependentKeyAttributes(survey, record, node)
+  const nodeDependentKeyAttributes = _getNodeDependentKeyAttributes(
+    survey,
+    record,
+    node,
+  )
 
   record = Record.assocNode(node)(record)
 
-  return await _onNodeUpdate(survey, record, node, nodeDependentKeyAttributes, t)
+  return await _onNodeUpdate(
+    survey,
+    record,
+    node,
+    nodeDependentKeyAttributes,
+    t,
+  )
 }
 
-export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefsUuids, record, client = db) =>
+export const deleteNodesByNodeDefUuids = async (
+  user,
+  surveyId,
+  nodeDefsUuids,
+  record,
+  client = db,
+) =>
   await client.tx(async t => {
-    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefsUuids, t)
-    const activities = nodesDeleted.map(node => ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true))
+    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(
+      surveyId,
+      nodeDefsUuids,
+      t,
+    )
+    const activities = nodesDeleted.map(node =>
+      ActivityLog.newActivity(
+        ActivityLog.type.nodeDelete,
+        { uuid: Node.getUuid(node) },
+        true,
+      ),
+    )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
     return Record.assocNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
   })
 
-const _onNodeUpdate = async (survey, record, node, nodeDependents = {}, t) => {
+const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
   // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
 
-  let updatedNodes = nodeDependents
+  let updatedNodes = nodeDependents || {}
 
-  // delete dependent code nodes
+  // Delete dependent code nodes
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.isCode(nodeDef)) {
     const dependentCodes = Record.getDependentCodeAttributes(node)(record)
 
     if (!R.isEmpty(dependentCodes)) {
       const deletedNodesArray = await Promise.all(
-        dependentCodes.map(nodeCode => NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
+        dependentCodes.map(nodeCode =>
+          NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t),
+        ),
       )
       updatedNodes = {
         ...updatedNodes,
-        ...ObjectUtils.toUuidIndexedObj(deletedNodesArray)
+        ...ObjectUtils.toUuidIndexedObj(deletedNodesArray),
       }
     }
   }
@@ -217,37 +327,40 @@ const _createUpdateResult = (record, node, nodes) => {
     record,
     nodes: {
       [Node.getUuid(node)]: node,
-      //always assoc parentNode, used in surveyRdbManager.updateTableNodes
+      // Always assoc parentNode, used in surveyRdbManager.updateTableNodes
       ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
-      ...nodes
-    }
-  };
+      ...nodes,
+    },
+  }
 }
 
 const _getNodeDependentKeyAttributes = (survey, record, node) => {
   const nodeDependentKeyAttributes = {}
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.isMultipleEntity(nodeDef)) {
-    //find sibling entities with same key values
+    // Find sibling entities with same key values
     const nodeDeletedKeyValues = Record.getEntityKeyValues(survey, node)(record)
     if (!R.isEmpty(nodeDeletedKeyValues)) {
       const nodeParent = Record.getParentNode(node)(record)
       const nodeSiblings = R.pipe(
         Record.getNodeChildrenByDefUuid(nodeParent, NodeDef.getUuid(nodeDef)),
-        R.reject(ObjectUtils.isEqual(node))
+        R.reject(ObjectUtils.isEqual(node)),
       )(record)
 
       nodeSiblings.forEach(nodeSibling => {
         const nodeKeys = Record.getEntityKeyNodes(survey, nodeSibling)(record)
-        // if key nodes are the same as the ones of the deleted node,
+        // If key nodes are the same as the ones of the deleted node,
         // add them to the accumulator
         const nodeKeyValues = R.map(Node.getValue)(nodeKeys)
 
         if (R.equals(nodeKeyValues, nodeDeletedKeyValues)) {
-          nodeKeys.forEach(nodeKey => nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey)
+          for (const nodeKey of nodeKeys) {
+            nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey
+          }
         }
       })
     }
   }
+
   return nodeDependentKeyAttributes
 }

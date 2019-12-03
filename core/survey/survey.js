@@ -1,7 +1,8 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid';
+import { uuidv4 } from '@core/uuid'
 
+import * as Srs from '@core/geo/srs'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -12,9 +13,13 @@ import * as SurveyDefaults from './_survey/surveyDefaults'
 import * as SurveyDependencies from './_survey/surveyDependencies'
 import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
 
-import * as Srs from '@core/geo/srs'
-
-export const newSurvey = (ownerUuid, name, label, languages, collectUri = null) => ({
+export const newSurvey = (
+  ownerUuid,
+  name,
+  label,
+  languages,
+  collectUri = null,
+) => ({
   [SurveyInfo.keys.uuid]: uuidv4(),
   [SurveyInfo.keys.props]: {
     [SurveyInfo.keys.name]: name,
@@ -23,8 +28,8 @@ export const newSurvey = (ownerUuid, name, label, languages, collectUri = null) 
     [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
     ...(collectUri ? { collectUri } : {}),
     [SurveyInfo.keys.cycles]: {
-      [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle()
-    }
+      [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
+    },
   },
   [SurveyInfo.keys.ownerUuid]: ownerUuid,
 })
@@ -81,23 +86,27 @@ export const getNodeDefsByUuids = SurveyNodeDefs.getNodeDefsByUuids
 export const getNodeDefRoot = SurveyNodeDefs.getNodeDefRoot
 export const getNodeDefByUuid = SurveyNodeDefs.getNodeDefByUuid
 export const getNodeDefChildren = SurveyNodeDefs.getNodeDefChildren
-export const hasNodeDefChildrenEntities = SurveyNodeDefs.hasNodeDefChildrenEntities
+export const hasNodeDefChildrenEntities =
+  SurveyNodeDefs.hasNodeDefChildrenEntities
 export const getNodeDefChildByName = SurveyNodeDefs.getNodeDefChildByName
 export const getNodeDefSiblingByName = SurveyNodeDefs.getNodeDefSiblingByName
 export const getNodeDefByName = SurveyNodeDefs.getNodeDefByName
-export const getNodeDefsByCategoryUuid = SurveyNodeDefs.getNodeDefsByCategoryUuid
-export const getNodeDefsByTaxonomyUuid = SurveyNodeDefs.getNodeDefsByTaxonomyUuid
+export const getNodeDefsByCategoryUuid =
+  SurveyNodeDefs.getNodeDefsByCategoryUuid
+export const getNodeDefsByTaxonomyUuid =
+  SurveyNodeDefs.getNodeDefsByTaxonomyUuid
 export const getNodeDefParent = SurveyNodeDefs.getNodeDefParent
 export const getNodeDefKeys = SurveyNodeDefs.getNodeDefKeys
 export const isNodeDefRootKey = SurveyNodeDefs.isNodeDefRootKey
 export const findNodeDef = SurveyNodeDefs.findNodeDef
 
-// hierarchy
+// Hierarchy
 export const isNodeDefAncestor = SurveyNodeDefs.isNodeDefAncestor
 export const visitAncestorsAndSelf = SurveyNodeDefs.visitAncestorsAndSelf
 export const getHierarchy = SurveyNodeDefs.getHierarchy
 export const traverseHierarchyItem = SurveyNodeDefs.traverseHierarchyItem
-export const traverseHierarchyItemSync = SurveyNodeDefs.traverseHierarchyItemSync
+export const traverseHierarchyItemSync =
+  SurveyNodeDefs.traverseHierarchyItemSync
 
 // ====== READ dependencies
 export const getNodeDefDependencies = SurveyDependencies.getNodeDefDependencies
@@ -109,16 +118,21 @@ export const assocDependencyGraph = SurveyDependencies.assocDependencyGraph
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 
 // ====== NodeDefsValidation
-export const getNodeDefsValidation = SurveyNodeDefsValidation.getNodeDefsValidation
-export const assocNodeDefsValidation = SurveyNodeDefsValidation.assocNodeDefsValidation
-export const getNodeDefValidation = SurveyNodeDefsValidation.getNodeDefValidation
+export const getNodeDefsValidation =
+  SurveyNodeDefsValidation.getNodeDefsValidation
+export const assocNodeDefsValidation =
+  SurveyNodeDefsValidation.assocNodeDefsValidation
+export const getNodeDefValidation =
+  SurveyNodeDefsValidation.getNodeDefValidation
 
 // ====== NodeDef Code
-export const getNodeDefCategoryLevelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex
+export const getNodeDefCategoryLevelIndex =
+  SurveyNodeDefs.getNodeDefCategoryLevelIndex
 export const getNodeDefParentCode = SurveyNodeDefs.getNodeDefParentCode
-export const getNodeDefCodeCandidateParents = SurveyNodeDefs.getNodeDefCodeCandidateParents
+export const getNodeDefCodeCandidateParents =
+  SurveyNodeDefs.getNodeDefCodeCandidateParents
 
-//TODO check where used
+// TODO check where used
 export const canUpdateCategory = SurveyNodeDefs.canUpdateCategory
 export const isNodeDefParentCode = SurveyNodeDefs.isNodeDefParentCode
 
@@ -136,12 +150,15 @@ export const canUpdateTaxonomy = SurveyNodeDefs.canUpdateTaxonomy
 
 // ====== Survey Reference data index
 // category index
-export const getCategoryItemUuidAndCodeHierarchy = SurveyRefDataIndex.getCategoryItemUuidAndCodeHierarchy
+export const getCategoryItemUuidAndCodeHierarchy =
+  SurveyRefDataIndex.getCategoryItemUuidAndCodeHierarchy
 export const getCategoryItemByUuid = SurveyRefDataIndex.getCategoryItemByUuid
-// taxon index
+// Taxon index
 export const getTaxonUuid = SurveyRefDataIndex.getTaxonUuid
-export const getTaxonVernacularNameUuid = SurveyRefDataIndex.getTaxonVernacularNameUuid
+export const getTaxonVernacularNameUuid =
+  SurveyRefDataIndex.getTaxonVernacularNameUuid
 export const getTaxonByUuid = SurveyRefDataIndex.getTaxonByUuid
-export const includesTaxonVernacularName = SurveyRefDataIndex.includesTaxonVernacularName
+export const includesTaxonVernacularName =
+  SurveyRefDataIndex.includesTaxonVernacularName
 
 export const assocRefData = SurveyRefDataIndex.assocRefData

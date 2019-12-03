@@ -13,31 +13,35 @@ export default {
   }),
 
   [ActivityLog.type.nodeDefCreate]: survey => activityLog => {
-    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
+    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(
+      activityLog,
+    )
     const nodeDefParent = R.pipe(
       ActivityLog.getContentParentUuid,
-      nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     )(activityLog)
 
     return {
       type: NodeDef.getType(nodeDef),
-      parentName: NodeDef.getName(nodeDefParent)
+      parentName: NodeDef.getName(nodeDefParent),
     }
   },
 
   [ActivityLog.type.nodeDefUpdate]: survey => activityLog => {
     const content = ActivityLog.getContent(activityLog)
-    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
+    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(
+      activityLog,
+    )
     return {
       keys: Object.keys({
         ...content.props,
         ...content.propsAdvanced,
       }),
-      name: NodeDef.getName(nodeDef)
+      name: NodeDef.getName(nodeDef),
     }
   },
 
   [ActivityLog.type.nodeDefMarkDeleted]: () => activityLog => ({
-    name: ActivityLog.getContentName(activityLog)
+    name: ActivityLog.getContentName(activityLog),
   }),
 }

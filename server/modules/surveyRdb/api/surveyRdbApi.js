@@ -3,50 +3,98 @@ import * as Response from '@server/utils/response'
 
 import * as SurveyRdbService from '../service/surveyRdbService'
 
-import { requireRecordListViewPermission } from '../../auth/authApiMiddleware';
+import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
 
 export const init = app => {
+  app.post(
+    '/surveyRdb/:surveyId/:nodeDefUuidTable/query',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const {
+          surveyId,
+          nodeDefUuidTable,
+          cycle,
+          offset,
+          limit,
+          editMode = false,
+        } = Request.getParams(req)
+        const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
+        const filter = Request.getJsonParam(req, 'filter')
+        const sort = Request.getJsonParam(req, 'sort')
 
-  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, nodeDefUuidTable, cycle, offset, limit, editMode = false } = Request.getParams(req)
-      const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
-      const filter = Request.getJsonParam(req, 'filter')
-      const sort = Request.getJsonParam(req, 'sort')
+        const rows = await SurveyRdbService.queryTable(
+          surveyId,
+          cycle,
+          nodeDefUuidTable,
+          nodeDefUuidCols,
+          offset,
+          limit,
+          filter,
+          sort,
+          editMode,
+        )
 
-      const rows = await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode)
+        res.json(rows)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-      res.json(rows)
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.post(
+    '/surveyRdb/:surveyId/:nodeDefUuidTable/query/count',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
+        const filter = Request.getJsonParam(req, 'filter', null)
 
-  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query/count', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
-      const filter = Request.getJsonParam(req, 'filter', null)
+        const count = await SurveyRdbService.countTable(
+          surveyId,
+          cycle,
+          nodeDefUuidTable,
+          filter,
+        )
 
-      const count = await SurveyRdbService.countTable(surveyId, cycle, nodeDefUuidTable, filter)
+        res.json(count)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-      res.json(count)
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.get(
+    '/surveyRdb/:surveyId/:nodeDefUuidTable/export',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
+        const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
+        const filter = Request.getJsonParam(req, 'filter')
+        const sort = Request.getJsonParam(req, 'sort', '')
 
-  app.get('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
-      const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
-      const filter = Request.getJsonParam(req, 'filter')
-      const sort = Request.getJsonParam(req, 'sort', '')
-
-      Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
-      await SurveyRdbService.queryTable(surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, 0, null, filter, sort, false, res)
-    } catch (err) {
-      next(err)
-    }
-  })
-
-};
+        Response.setContentTypeFile(
+          res,
+          'data.csv',
+          null,
+          Response.contentTypes.csv,
+        )
+        await SurveyRdbService.queryTable(
+          surveyId,
+          cycle,
+          nodeDefUuidTable,
+          nodeDefUuidCols,
+          0,
+          null,
+          filter,
+          sort,
+          false,
+          res,
+        )
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+}

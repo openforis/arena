@@ -1,4 +1,4 @@
-import Promise from 'bluebird'
+import BluebirdPromise from 'bluebird'
 import * as pgPromise from 'pg-promise'
 import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
@@ -6,17 +6,17 @@ import * as Log from '@server/log/log'
 const logger = Log.getLogger('DB')
 
 const debugOptions = {
-  query: (e) => {
+  query: e => {
     logger.debug(`QUERY: ${e.query}`)
     if (e.params) {
       logger.debug(`PARAMS: ${JSON.stringify(e.params)}`)
     }
-  }
+  },
 }
 
 // Enable all options that help with debugging.
 // TODO: Re-consider these later when the app matures.
-Promise.config({
+BluebirdPromise.config({
   // Enable warnings
   warnings: true,
   // Enable long stack traces
@@ -27,36 +27,36 @@ Promise.config({
   monitoring: true,
   // Enable async hooks
   asyncHooks: true,
-});
+})
 
 const initOptions = {
-  promiseLib: Promise,
+  promiseLib: BluebirdPromise,
   ...(ProcessUtils.ENV.debug ? debugOptions : {}),
 }
 
-const pgp = pgPromise(initOptions);
+const pgp = pgPromise(initOptions)
 
 const configCommon = {
-  // how long a client is allowed to remain idle before being closed
+  // How long a client is allowed to remain idle before being closed
   idleTimeoutMillis: 30000,
-  // max number of clients in the pool
+  // Max number of clients in the pool
   max: 10,
-  // whether to use ssl connections
-  ssl: ProcessUtils.ENV.pgSsl
+  // Whether to use ssl connections
+  ssl: ProcessUtils.ENV.pgSsl,
 }
 
 const config = ProcessUtils.ENV.dbUrl
   ? {
-    connectionString: ProcessUtils.ENV.dbUrl,
-    ...configCommon
-  }
+      connectionString: ProcessUtils.ENV.dbUrl,
+      ...configCommon,
+    }
   : {
-    user: ProcessUtils.ENV.pgUser,
-    database: ProcessUtils.ENV.pgDatabase,
-    password: ProcessUtils.ENV.pgPassword,
-    host: ProcessUtils.ENV.pgHost,
-    port: ProcessUtils.ENV.pgPort,
-    ...configCommon
-  }
+      user: ProcessUtils.ENV.pgUser,
+      database: ProcessUtils.ENV.pgDatabase,
+      password: ProcessUtils.ENV.pgPassword,
+      host: ProcessUtils.ENV.pgHost,
+      port: ProcessUtils.ENV.pgPort,
+      ...configCommon,
+    }
 
 export const db = pgp(config)

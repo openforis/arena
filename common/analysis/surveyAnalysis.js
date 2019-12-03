@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 const keys = {
-  processingChains: 'processingChains'
+  processingChains: 'processingChains',
 }
 
 // ====== READ

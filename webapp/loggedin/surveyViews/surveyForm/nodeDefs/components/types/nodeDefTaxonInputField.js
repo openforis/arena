@@ -1,18 +1,23 @@
 import React, { useRef, useState } from 'react'
 
 import { Input } from '@webapp/commonComponents/form/input'
-import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
 import * as Node from '@core/record/node'
 import * as StringUtils from '@core/stringUtils'
+import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
 const NodeDefTaxonInputField = props => {
-
   const {
-    surveyId, taxonomyUuid, edit, draft,
-    canEditRecord, readOnly,
-    field, selection,
-    onChangeTaxon, onChangeSelectionField,
+    surveyId,
+    taxonomyUuid,
+    edit,
+    draft,
+    canEditRecord,
+    readOnly,
+    field,
+    selection,
+    onChangeTaxon,
+    onChangeSelectionField,
     autocompleteSourceElement,
   } = props
 
@@ -33,7 +38,6 @@ const NodeDefTaxonInputField = props => {
 
   return (
     <React.Fragment>
-
       <Input
         ref={inputRef}
         aria-disabled={entryDisabled}
@@ -42,13 +46,11 @@ const NodeDefTaxonInputField = props => {
         onChange={onChangeInput}
       />
 
-      {
-        autocompleteOpened &&
+      {autocompleteOpened && (
         <NodeDefTaxonAutocompleteDialog
           surveyId={surveyId}
           taxonomyUuid={taxonomyUuid}
           draft={draft}
-
           inputRef={inputRef}
           field={field}
           fieldValue={inputRef.current.value}
@@ -56,8 +58,7 @@ const NodeDefTaxonInputField = props => {
           onClose={onItemSelectAutocomplete}
           autocompleteSourceElement={autocompleteSourceElement}
         />
-      }
-
+      )}
     </React.Fragment>
   )
 }
@@ -76,9 +77,9 @@ NodeDefTaxonInputField.defaultProps = {
     [Node.valuePropKeys.scientificName]: '',
     [Node.valuePropKeys.vernacularName]: '',
   },
-  onChangeTaxon: null, // function to call when the taxon value changed
-  onChangeSelectionField: null, // function to call when local selection changes
-  autocompleteSourceElement: null, // used as sourceElement for the autocompleteDialog when rendered in tableBody
+  onChangeTaxon: null, // Function to call when the taxon value changed
+  onChangeSelectionField: null, // Function to call when local selection changes
+  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonInputField

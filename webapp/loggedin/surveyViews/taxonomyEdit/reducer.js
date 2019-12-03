@@ -1,17 +1,21 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as TaxonomyEditState from './taxonomyEditState'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import {
+  surveyCreate,
+  surveyDelete,
+  surveyUpdate,
+} from '@webapp/survey/actions'
+import { taxonomyCreate } from '@webapp/survey/taxonomies/actions'
 import { formReset } from '../surveyForm/actions'
 
 import { taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
-import { taxonomyCreate } from '@webapp/survey/taxonomies/actions'
+import * as TaxonomyEditState from './taxonomyEditState'
 
 const actionHandlers = {
-  // reset form
+  // Reset form
   [appUserLogout]: () => ({}),
 
   [surveyCreate]: () => ({}),
@@ -19,12 +23,15 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [taxonomyEditUpdate]: (state, { taxonomyUuid }) => TaxonomyEditState.initTaxonomyEdit(taxonomyUuid),
+  [taxonomyEditUpdate]: (_state, { taxonomyUuid }) =>
+    TaxonomyEditState.initTaxonomyEdit(taxonomyUuid),
 
-  [taxonomyEditPropsUpdate]: (state, { type, ...props }) => TaxonomyEditState.mergeTaxonomyEditProps(props)(state),
+  [taxonomyEditPropsUpdate]: (state, { type, ...props }) =>
+    TaxonomyEditState.mergeTaxonomyEditProps(props)(state),
 
-  // create
-  [taxonomyCreate]: (state, { taxonomy }) => TaxonomyEditState.initTaxonomyEdit(Taxonomy.getUuid(taxonomy)),
+  // Create
+  [taxonomyCreate]: (_state, { taxonomy }) =>
+    TaxonomyEditState.initTaxonomyEdit(Taxonomy.getUuid(taxonomy)),
 }
 
 export default exportReducer(actionHandlers)

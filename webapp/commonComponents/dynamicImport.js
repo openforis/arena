@@ -2,37 +2,31 @@ import React from 'react'
 import { injectReducers } from '@webapp/app/store'
 
 export default class DynamicImport extends React.Component {
-
-  constructor () {
+  constructor() {
     super()
     this.state = { component: null }
   }
 
-  componentDidMount () {
-
+  async componentDidMount() {
     const { load } = this.props
 
-    load().then((module) => {
-      const { component, reducers } = module
+    const module = await load()
+    const { component, reducers } = module
 
-      if (reducers) {
-        reducers.forEach((reducer) => {
-          injectReducers(reducer.name, reducer.fn)
-        })
-      }
-
-      this.setState({
-        component: (component) ? component : module.default
+    if (reducers) {
+      reducers.forEach(reducer => {
+        injectReducers(reducer.name, reducer.fn)
       })
+    }
 
+    this.setState({
+      component: component ? component : module.default,
     })
   }
 
-  render () {
+  render() {
     const { component } = this.state
-    const { module, ...rest } = this.props
-    return component
-      ? React.createElement(component, rest)
-      : null
+    const { module: _module, ...rest } = this.props
+    return component ? React.createElement(component, rest) : null
   }
 }

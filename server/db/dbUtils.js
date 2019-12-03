@@ -7,18 +7,23 @@ const pgp = pgPromise()
 export const QueryStream = _QueryStream
 
 export const selectDate = (field, fieldAlias = null) =>
-  `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias ? fieldAlias : field}`
+  `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${
+    fieldAlias ? fieldAlias : field
+  }`
 
-export const now = `timezone('UTC', now())`
+export const now = "timezone('UTC', now())"
 
 export const insertAllQuery = (schema, table, cols, itemsValues) => {
-  const columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
+  const columnSet = new pgp.helpers.ColumnSet(cols, {
+    table: { schema, table },
+  })
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}
-    for (let i = 0; i < cols.length; i++) {
-      item[cols[i]] = itemValues[i]
+    for (const [i, element] of cols.entries()) {
+      item[element] = itemValues[i]
     }
+
     return item
   })
   return pgp.helpers.insert(valuesIndexedByCol, columnSet)
@@ -35,7 +40,13 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  *        The first value in every array of values must be the value of the identifier column
  * @returns Generated query string
  */
-export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
+export const updateAllQuery = (
+  schema,
+  table,
+  idCol,
+  updateCols,
+  itemsValues,
+) => {
   const getColName = col => R.propOr(col, 'name', col)
 
   const idColName = getColName(idCol)
@@ -43,20 +54,25 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
 
   const cols = [`?${idColName}`, ...updateCols]
 
-  const columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
+  const columnSet = new pgp.helpers.ColumnSet(cols, {
+    table: { schema, table },
+  })
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}
-    //id column is always the first among item values
+    // Id column is always the first among item values
     item[idColName] = itemValues[0]
-    for (let i = 0; i < updateCols.length; i++) {
-      const updateCol = updateCols[i]
+    for (const [i, updateCol] of updateCols.entries()) {
       item[getColName(updateCol)] = itemValues[i + 1]
     }
+
     return item
   })
 
-  return pgp.helpers.update(valuesIndexedByCol, columnSet) + ` WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
+  return (
+    pgp.helpers.update(valuesIndexedByCol, columnSet) +
+    ` WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
+  )
 }
 
 /**
@@ -64,20 +80,33 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
  */
 export const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
   draft
-    ? `${columnPrefix}props || ${columnPrefix}props_draft${alias ? ` AS ${alias}` : ''}`
+    ? `${columnPrefix}props || ${columnPrefix}props_draft${
+        alias ? ` AS ${alias}` : ''
+      }`
     : `${columnPrefix}props${alias ? ` AS ${alias}` : ''}`
 
 /**
  * Combines a draft and a published column prop, if needed
  */
-export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true) =>
-  `(${columnPrefix}props${draft ? ` || ${columnPrefix}props_draft` : ''})${asText ? '->>' : '->'}'${propName}'`
+export const getPropColCombined = (
+  propName,
+  draft,
+  columnPrefix = '',
+  asText = true,
+) =>
+  `(${columnPrefix}props${draft ? ` || ${columnPrefix}props_draft` : ''})${
+    asText ? '->>' : '->'
+  }'${propName}'`
 
 /**
  * Generates a filter condition (LIKE) with a named parameter.
  * E.g. "lower(col) LIKE $/searchValue/ where "col" is a json prop column
  */
 export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
-  `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`
+  `lower(${getPropColCombined(
+    propName,
+    draft,
+    columnPrefix,
+  )}) LIKE $/searchValue/`
 
 export const formatQuery = pgp.as.format

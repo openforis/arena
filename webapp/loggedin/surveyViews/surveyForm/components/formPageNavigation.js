@@ -8,50 +8,59 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as SurveyFormState from '../../surveyForm/surveyFormState'
+import * as SurveyFormState from '../surveyFormState'
 
-import { setFormActivePage } from '../../surveyForm/actions'
+import { setFormActivePage } from '../actions'
 
-const NavigationButton = (props) => {
+const NavigationButton = props => {
   const {
-    surveyCycleKey, nodeDef, label, childDefs,
-    edit, canEditDef,
-    level, active, enabled,
+    surveyCycleKey,
+    nodeDef,
+    label,
+    childDefs,
+    edit,
+    canEditDef,
+    level,
+    active,
+    enabled,
     setFormActivePage,
   } = props
 
   const [showChildren, setShowChildren] = useState(level === 0)
 
-  const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
+  const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(
+    surveyCycleKey,
+  )(childDefs)
 
   return (
-    <div className={`survey-form__node-def-nav level${level}`}
-         style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}>
-
+    <div
+      className={`survey-form__node-def-nav level${level}`}
+      style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}
+    >
       <div className="display-flex">
-        {
-          outerPageChildDefs.length > 0 ?
-            (
-              <button className="btn-xs btn-toggle"
-                      style={{ transform: `rotate(${showChildren ? '90' : '0'}deg)` }}
-                      onClick={() => setShowChildren(!showChildren)}>
-                <span className="icon icon-play3 icon-12px"/>
-              </button>
-            )
-            : (
-              <span style={{ marginLeft: '21px' }}/>
-            )
-        }
+        {outerPageChildDefs.length > 0 ? (
+          <button
+            className="btn-xs btn-toggle"
+            style={{ transform: `rotate(${showChildren ? '90' : '0'}deg)` }}
+            onClick={() => setShowChildren(!showChildren)}
+          >
+            <span className="icon icon-play3 icon-12px" />
+          </button>
+        ) : (
+          <span style={{ marginLeft: '21px' }} />
+        )}
 
-        <button className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
-                onClick={() => setFormActivePage(nodeDef)}
-                aria-disabled={!enabled}>
+        <button
+          className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
+          onClick={() => setFormActivePage(nodeDef)}
+          aria-disabled={!enabled}
+        >
           {label}
         </button>
       </div>
 
-      {
-        showChildren && outerPageChildDefs.map(child =>
+      {showChildren &&
+        outerPageChildDefs.map(child => (
           <FormPageNavigation
             key={NodeDef.getUuid(child)}
             surveyCycleKey={surveyCycleKey}
@@ -60,9 +69,7 @@ const NavigationButton = (props) => {
             edit={edit}
             canEditDef={canEditDef}
           />
-        )
-      }
-
+        ))}
     </div>
   )
 }
@@ -81,13 +88,16 @@ const mapStateToProps = (state, props) => {
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
 
     active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
-    enabled: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
+    enabled:
+      edit ||
+      NodeDef.isRoot(nodeDef) ||
+      rootNodeDef.id === nodeDef.parentId ||
+      parentNode,
   }
 }
 
-const FormPageNavigation = connect(
-  mapStateToProps,
-  { setFormActivePage }
-)(NavigationButton)
+const FormPageNavigation = connect(mapStateToProps, { setFormActivePage })(
+  NavigationButton,
+)
 
 export default FormPageNavigation

@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { sendOk, sendFile } from '@server/utils/response';
+import { sendOk, sendFile } from '@server/utils/response'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
@@ -15,188 +15,270 @@ import {
   requireRecordCreatePermission,
   requireRecordViewPermission,
   requireRecordCleansePermission,
-} from '../../auth/authApiMiddleware';
+} from '../../auth/authApiMiddleware'
 
 export const init = app => {
-
   // ==== CREATE
-  app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
-      const record = Request.getBody(req)
-      const socketId = Request.getSocketId(req)
+  app.post(
+    '/survey/:surveyId/record',
+    requireRecordCreatePermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const record = Request.getBody(req)
+        const socketId = Request.getSocketId(req)
 
-      if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
-        throw new Error('Error record create. User is different')
+        if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
+          throw new Error('Error record create. User is different')
+        }
+
+        await RecordService.createRecord(socketId, user, surveyId, record)
+
+        sendOk(res)
+      } catch (error) {
+        next(error)
       }
+    },
+  )
 
-      await RecordService.createRecord(socketId, user, surveyId, record)
+  app.post(
+    '/survey/:surveyId/record/:recordUuid/node',
+    requireRecordEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const node = Request.getJsonParam(req, 'node')
+        const file = Request.getFile(req)
+        const socketId = Request.getSocketId(req)
 
-      sendOk(res)
-    } catch (err) {
-      next(err)
-    }
-  })
+        await RecordService.persistNode(socketId, user, surveyId, node, file)
 
-  app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
-      const node = Request.getJsonParam(req, 'node')
-      const file = Request.getFile(req)
-      const socketId = Request.getSocketId(req)
-
-      await RecordService.persistNode(socketId, user, surveyId, node, file)
-
-      sendOk(res)
-    } catch (err) {
-      next(err)
-    }
-  })
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ==== READ
 
-  app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle } = Request.getParams(req)
+  app.get(
+    '/survey/:surveyId/records/count',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle } = Request.getParams(req)
 
-      const count = await RecordService.countRecordsBySurveyId(surveyId, cycle)
-      res.json(count)
+        const count = await RecordService.countRecordsBySurveyId(
+          surveyId,
+          cycle,
+        )
+        res.json(count)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.get(
+    '/survey/:surveyId/records',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, limit, offset } = Request.getParams(req)
 
-  app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, limit, offset } = Request.getParams(req)
+        const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(
+          surveyId,
+          cycle,
+          offset,
+          limit,
+        )
+        res.json(recordsSummary)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-      const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(surveyId, cycle, offset, limit)
-      res.json(recordsSummary)
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.get(
+    '/survey/:surveyId/records/summary/count',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, from, to } = Request.getParams(req)
 
-  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, from, to } = Request.getParams(req)
+        const counts = await RecordService.fetchRecordCreatedCountsByDates(
+          surveyId,
+          cycle,
+          from,
+          to,
+        )
 
-      const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
+        res.json(counts)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-      res.json(counts)
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
+    requireRecordViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, nodeUuid } = Request.getParams(req)
 
-  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, nodeUuid } = Request.getParams(req)
+        const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
+        const file = await FileService.fetchFileByUuid(
+          surveyId,
+          Node.getFileUuid(node),
+        )
 
-      const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-      const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
+        sendFile(
+          res,
+          RecordFile.getName(file),
+          RecordFile.getContent(file),
+          RecordFile.getSize(file),
+        )
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-      sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.get(
+    '/survey/:surveyId/validationReport',
+    requireRecordCleansePermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, offset, limit, cycle } = Request.getParams(req)
 
-  app.get('/survey/:surveyId/validationReport', requireRecordCleansePermission, async (req, res, next) => {
-    try {
-      const { surveyId, offset, limit, cycle } = Request.getParams(req)
+        const list = await RecordService.fetchValidationReport(
+          surveyId,
+          cycle,
+          offset,
+          limit,
+        )
 
-      const list = await RecordService.fetchValidationReport(surveyId, cycle, offset, limit)
+        res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-      res.json({ list })
-    } catch (err) {
-      next(err)
-    }
-  })
+  app.get(
+    '/survey/:surveyId/validationReport/count',
+    requireRecordCleansePermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle } = Request.getParams(req)
 
-  app.get('/survey/:surveyId/validationReport/count', requireRecordCleansePermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle } = Request.getParams(req)
+        const count = await RecordService.countValidationReports(
+          surveyId,
+          cycle,
+        )
 
-      const count = await RecordService.countValidationReports(surveyId, cycle)
-
-      res.json(count)
-    } catch (err) {
-      next(err)
-    }
-  })
+        res.json(count)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ==== UPDATE
 
   // RECORD promote / demote
-  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
-    try {
-      const { surveyId, recordUuid, step } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.post(
+    '/survey/:surveyId/record/:recordUuid/step',
+    requireRecordEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, recordUuid, step } = Request.getParams(req)
+        const user = Request.getUser(req)
 
-      await RecordService.updateRecordStep(user, surveyId, recordUuid, step)
+        await RecordService.updateRecordStep(user, surveyId, recordUuid, step)
 
-      sendOk(res)
-    } catch (err) {
-      next(err)
-    }
-  })
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, recordUuid, draft } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const socketId = Request.getSocketId(req)
+  app.post(
+    '/survey/:surveyId/record/:recordUuid/checkin',
+    requireRecordViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, recordUuid, draft } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const socketId = Request.getSocketId(req)
 
-      const record = await RecordService.checkIn(socketId, user, surveyId, recordUuid, draft)
+        const record = await RecordService.checkIn(
+          socketId,
+          user,
+          surveyId,
+          recordUuid,
+          draft,
+        )
 
-      res.json({ record })
-    } catch (err) {
-      next(err)
-    }
-  })
+        res.json({ record })
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
-  app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid } = Request.getParams(req)
-      const socketId = Request.getSocketId(req)
+  app.post(
+    '/survey/:surveyId/record/:recordUuid/checkout',
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid } = Request.getParams(req)
+        const socketId = Request.getSocketId(req)
 
-      await RecordService.checkOut(socketId, user, surveyId, recordUuid)
+        await RecordService.checkOut(socketId, user, surveyId, recordUuid)
 
-      sendOk(res)
-    } catch (err) {
-      next(err)
-    }
-  })
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ==== DELETE
-  app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res, next) => {
-    try {
-      const { surveyId, recordUuid } = Request.getParams(req)
+  app.delete(
+    '/survey/:surveyId/record/:recordUuid',
+    requireRecordEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, recordUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const socketId = Request.getSocketId(req)
+
+        await RecordService.deleteRecord(socketId, user, surveyId, recordUuid)
+
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
+  app.delete(
+    '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
+    requireRecordEditPermission,
+    (req, res) => {
+      const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       const socketId = Request.getSocketId(req)
 
-      await RecordService.deleteRecord(socketId, user, surveyId, recordUuid)
-
+      RecordService.deleteNode(socketId, user, surveyId, recordUuid, nodeUuid)
       sendOk(res)
-    } catch (err) {
-      next(err)
-    }
-  })
-
-  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
-    const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const socketId = Request.getSocketId(req)
-
-    RecordService.deleteNode(socketId, user, surveyId, recordUuid, nodeUuid)
-    sendOk(res)
-  })
-
-};
-
+    },
+  )
+}

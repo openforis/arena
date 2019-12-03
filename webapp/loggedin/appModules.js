@@ -1,8 +1,9 @@
 const app = 'app'
 
-export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
+export const appModuleUri = (module = appModules.home) =>
+  `/${[app, module.path].join('/')}/`
 
-//==== App Root modules
+// ==== App Root modules
 export const appModules = {
   home: {
     key: 'home',
@@ -22,16 +23,16 @@ export const appModules = {
   users: {
     key: 'users',
     path: 'users',
-    icon: 'users'
+    icon: 'users',
   },
   analysis: {
     key: 'analysis',
     path: 'analysis',
-    icon: 'stats-dots'
+    icon: 'stats-dots',
   },
 }
 
-//==== Inner modules
+// ==== Inner modules
 
 export const homeModules = {
   dashboard: {
@@ -102,7 +103,7 @@ export const userModules = {
   user: {
     key: 'view',
     path: `${appModules.users.path}/user`,
-  }
+  },
 }
 
 export const analysisModules = {

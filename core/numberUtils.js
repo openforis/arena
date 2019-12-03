@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
-export const toNumber = num => R.isNil(num) || R.isEmpty(num) ? NaN : Number(num)
+export const toNumber = num =>
+  R.isNil(num) || R.isEmpty(num) ? NaN : Number(num)
 
 export const isInteger = R.pipe(toNumber, Number.isInteger)
 

@@ -1,5 +1,5 @@
-import * as CategoryManager from '../manager/categoryManager'
 import * as JobManager from '@server/job/jobManager'
+import * as CategoryManager from '../manager/categoryManager'
 import CategoryImportJob from './categoryImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 
@@ -18,12 +18,15 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 
 export const insertCategory = CategoryManager.insertCategory
 export const createImportSummary = CategoryManager.createImportSummary
-export const createImportSummaryFromStream = CategoryManager.createImportSummaryFromStream
+export const createImportSummaryFromStream =
+  CategoryManager.createImportSummaryFromStream
 export const insertLevel = CategoryManager.insertLevel
 export const insertItem = CategoryManager.insertItem
 
-export const fetchCategoriesAndLevelsBySurveyId = CategoryManager.fetchCategoriesAndLevelsBySurveyId
-export const fetchCategoryAndLevelsByUuid = CategoryManager.fetchCategoryAndLevelsByUuid
+export const fetchCategoriesAndLevelsBySurveyId =
+  CategoryManager.fetchCategoriesAndLevelsBySurveyId
+export const fetchCategoryAndLevelsByUuid =
+  CategoryManager.fetchCategoryAndLevelsByUuid
 export const fetchItemsByParentUuid = CategoryManager.fetchItemsByParentUuid
 
 export const updateCategoryProp = CategoryManager.updateCategoryProp

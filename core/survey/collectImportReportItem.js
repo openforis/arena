@@ -12,7 +12,7 @@ const propKeys = {
   expressionType: 'expressionType',
   expression: 'expression',
   applyIf: 'applyIf',
-  messages: 'messages'
+  messages: 'messages',
 }
 
 export const exprTypes = {
@@ -22,7 +22,12 @@ export const exprTypes = {
   validationRules: 'validationRules',
 }
 
-export const newReportItem = (expressionType, expression, applyIf, messages) => ({
+export const newReportItem = (
+  expressionType,
+  expression,
+  applyIf,
+  messages,
+) => ({
   [propKeys.expressionType]: expressionType,
   [propKeys.expression]: expression,
   [propKeys.applyIf]: applyIf,

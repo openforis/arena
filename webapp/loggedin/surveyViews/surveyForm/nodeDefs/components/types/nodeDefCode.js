@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import NodeDefCodeDropdown from './nodeDefCodeDropdown'
-import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -20,47 +18,67 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as RecordState from '../../../../record/recordState'
+import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
+import NodeDefCodeDropdown from './nodeDefCodeDropdown'
 
 const NodeDefCode = props => {
-
   const {
-    surveyId, surveyCycleKey, nodeDef,
-    categoryUuid, categoryLevelIndex, nodeParentCodeUuid, codeUuidsHierarchy,
-    parentNode, nodes,
-    edit, draft, entryDataQuery,
-    updateNode, removeNode,
+    surveyId,
+    surveyCycleKey,
+    nodeDef,
+    categoryUuid,
+    categoryLevelIndex,
+    nodeParentCodeUuid,
+    codeUuidsHierarchy,
+    parentNode,
+    nodes,
+    edit,
+    draft,
+    entryDataQuery,
+    updateNode,
+    removeNode,
   } = props
 
-  const { data: { items = [] } = { items: [] }, dispatch: fetchItems, setState: setItems } = useAsyncGetRequest(
+  const {
+    data: { items = [] } = { items: [] },
+    dispatch: fetchItems,
+    setState: setItems,
+  } = useAsyncGetRequest(
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    { params: { draft, parentUuid: nodeParentCodeUuid } }
+    { params: { draft, parentUuid: nodeParentCodeUuid } },
   )
   const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
 
   if (!edit) {
-
-    // fetch code items on categoryUuid or nodeParentCodeUuid update
+    // Fetch code items on categoryUuid or nodeParentCodeUuid update
     useEffect(() => {
-      if (categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0))
+      if (categoryUuid && (nodeParentCodeUuid || categoryLevelIndex === 0)) {
         fetchItems()
-      else
+      } else {
         setItems({ data: { items: [] } })
+      }
     }, [categoryUuid, nodeParentCodeUuid])
 
-    // on items or nodes change, update selectedItems
+    // On items or nodes change, update selectedItems
     useEffect(() => {
       const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = itemsArray.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
+      const selectedItemsUpdate = itemsArray.filter(item =>
+        selectedItemUuids.includes(CategoryItem.getUuid(item)),
+      )
       setSelectedItems(selectedItemsUpdate)
     }, [items, nodes])
-
   }
 
   const onItemAdd = item => {
-    const node = NodeDef.isSingle(nodeDef) || entryDataQuery
-      ? nodes[0]
-      : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+    const node =
+      NodeDef.isSingle(nodeDef) || entryDataQuery
+        ? nodes[0]
+        : Node.newNode(
+            NodeDef.getUuid(nodeDef),
+            Node.getRecordUuid(parentNode),
+            parentNode,
+          )
 
     const value = { [Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(item) }
     const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
@@ -73,30 +91,31 @@ const NodeDefCode = props => {
     if (NodeDef.isSingle(nodeDef) || entryDataQuery) {
       updateNode(nodeDef, nodes[0], {}, null, {}, {})
     } else {
-      const nodeToRemove = nodes.find(node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
+      const nodeToRemove = nodes.find(
+        node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item),
+      )
       removeNode(nodeDef, nodeToRemove)
     }
   }
 
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery
-    ? (
-      <NodeDefCodeDropdown
-        {...props}
-        items={itemsArray}
-        selectedItems={selectedItems}
-        onItemAdd={onItemAdd}
-        onItemRemove={onItemRemove}
-      />
-    )
-    : (
-      <NodeDefCodeCheckbox
-        {...props}
-        items={itemsArray}
-        selectedItems={selectedItems}
-        onItemAdd={onItemAdd}
-        onItemRemove={onItemRemove}
-      />
-    )
+  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) ||
+    entryDataQuery ? (
+    <NodeDefCodeDropdown
+      {...props}
+      items={itemsArray}
+      selectedItems={selectedItems}
+      onItemAdd={onItemAdd}
+      onItemRemove={onItemRemove}
+    />
+  ) : (
+    <NodeDefCodeCheckbox
+      {...props}
+      items={itemsArray}
+      selectedItems={selectedItems}
+      onItemAdd={onItemAdd}
+      onItemRemove={onItemRemove}
+    />
+  )
 }
 
 const mapStateToProps = (state, props) => {
@@ -108,13 +127,24 @@ const mapStateToProps = (state, props) => {
   const record = RecordState.getRecord(state)
   const { nodeDef, parentNode } = props
 
-  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(
+    survey,
+  )
+  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(
+    survey,
+  )
 
-  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+  const nodeParentCode = Record.getParentCodeAttribute(
+    survey,
+    parentNode,
+    nodeDef,
+  )(record)
 
   const codeUuidsHierarchy = nodeParentCode
-    ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
+    ? R.append(
+        Node.getUuid(nodeParentCode),
+        Node.getHierarchyCode(nodeParentCode),
+      )
     : []
 
   return {
@@ -126,9 +156,9 @@ const mapStateToProps = (state, props) => {
 
     parentCodeDefUuid: NodeDef.getParentCodeDefUuid(nodeDef),
     categoryUuid: category ? Category.getUuid(category) : null,
-    categoryLevelIndex: categoryLevelIndex,
+    categoryLevelIndex,
     nodeParentCodeUuid: Node.getCategoryItemUuid(nodeParentCode),
-    codeUuidsHierarchy
+    codeUuidsHierarchy,
   }
 }
 

@@ -33,10 +33,25 @@ const query = surveyId =>
   LIMIT $2
   OFFSET $3`
 
-export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
-  await client.map(query(surveyId), [cycle, limit, offset], R.pipe(
-    R.toPairs,
-    R.reduce((obj, [k, v]) => R.assoc(camelize(k), v, obj), {})))
+export const fetchValidationReport = async (
+  surveyId,
+  cycle,
+  offset = 0,
+  limit = null,
+  client = db,
+) =>
+  await client.map(
+    query(surveyId),
+    [cycle, limit, offset],
+    R.pipe(
+      R.toPairs,
+      R.reduce((obj, [k, v]) => R.assoc(camelize(k), v, obj), {}),
+    ),
+  )
 
 export const countValidationReports = async (surveyId, cycle, client = db) =>
-  await client.one(`SELECT count(*) from(${query(surveyId)}) AS v`, [cycle, null, null])
+  await client.one(`SELECT count(*) from(${query(surveyId)}) AS v`, [
+    cycle,
+    null,
+    null,
+  ])

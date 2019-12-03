@@ -1,25 +1,24 @@
-import React from 'react'
-
 import { useFormObject } from '@webapp/commonComponents/hooks'
 
 import { validateResetPasswordObj, getFirstError } from './loginValidator'
 
 export const useResetPasswordFormState = props => {
-  const {
-    setLoginError,
-    resetPassword,
-  } = props
+  const { setLoginError, resetPassword } = props
 
   const {
     object: formObject,
     setObjectField,
     objectValid,
     validation,
-  } = useFormObject({
-    password: '',
-    passwordConfirm: '',
-    verificationCode: '',
-  }, validateResetPasswordObj, true)
+  } = useFormObject(
+    {
+      password: '',
+      passwordConfirm: '',
+      verificationCode: '',
+    },
+    validateResetPasswordObj,
+    true,
+  )
 
   const password = formObject.password
   const passwordConfirm = formObject.passwordConfirm
@@ -29,7 +28,13 @@ export const useResetPasswordFormState = props => {
     if (objectValid) {
       resetPassword(verificationCode, password)
     } else {
-      setLoginError(getFirstError(validation, ['password', 'passwordConfirm', 'verificationCode']))
+      setLoginError(
+        getFirstError(validation, [
+          'password',
+          'passwordConfirm',
+          'verificationCode',
+        ]),
+      )
     }
   }
 
@@ -39,7 +44,8 @@ export const useResetPasswordFormState = props => {
     passwordConfirm,
     setPasswordConfirm: password => setObjectField('passwordConfirm', password),
     verificationCode,
-    setVerificationCode: verificationCode => setObjectField('verificationCode', verificationCode),
+    setVerificationCode: verificationCode =>
+      setObjectField('verificationCode', verificationCode),
     onClickReset,
   }
 }

@@ -11,10 +11,10 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '../surveyState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
+import * as SurveyState from '../surveyState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
@@ -25,29 +25,40 @@ export const nodeDefsUpdate = 'survey/nodeDefs/update'
 
 // ==== Internal update nodeDefs actions
 
-const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, getState) => {
+const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (
+  dispatch,
+  getState,
+) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const { data: { nodeDefsValidation, nodeDefsUpdated } } = await axios.put(
-    `/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`,
-    { cycle, props, propsAdvanced }
-  )
+  const {
+    data: { nodeDefsValidation, nodeDefsUpdated },
+  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
+    cycle,
+    props,
+    propsAdvanced,
+  })
 
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
-  if (!!nodeDefsUpdated)
+  if (nodeDefsUpdated) {
     dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
+  }
 }
 
-const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) => debounceAction(
-  _putNodeDefProps(nodeDef, props, propsAdvanced),
-  `${nodeDefPropsUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`
-)
+const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
+  debounceAction(
+    _putNodeDefProps(nodeDef, props, propsAdvanced),
+    `${nodeDefPropsUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`,
+  )
 
-const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
+const _updateParentLayout = (nodeDef, deleted = false) => async (
+  dispatch,
+  getState,
+) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
@@ -55,16 +66,29 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 
   if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefParent)) {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
-    const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDefParent)
+    const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(
+      nodeDefParent,
+    )
 
-    const layoutChildrenUpdated = deleted ? R.without([nodeDefUuid])(layoutChildren) : R.append(nodeDefUuid)(layoutChildren)
-    dispatch(putNodeDefLayoutProp(nodeDefParent, NodeDefLayout.keys.layoutChildren, layoutChildrenUpdated))
+    const layoutChildrenUpdated = deleted
+      ? R.without([nodeDefUuid])(layoutChildren)
+      : R.append(nodeDefUuid)(layoutChildren)
+    dispatch(
+      putNodeDefLayoutProp(
+        nodeDefParent,
+        NodeDefLayout.keys.layoutChildren,
+        layoutChildrenUpdated,
+      ),
+    )
   }
 }
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props) => async (
+  dispatch,
+  getState,
+) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
@@ -73,7 +97,9 @@ export const createNodeDef = (parent, type, props) => async (dispatch, getState)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  const { data: { nodeDefsValidation } } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
+  const {
+    data: { nodeDefsValidation },
+  } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
   dispatch(_updateParentLayout(nodeDef))
@@ -82,17 +108,35 @@ export const createNodeDef = (parent, type, props) => async (dispatch, getState)
 // ==== UPDATE
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
-  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
-    // nodeDef has default values, cannot change into multiple
-    dispatch(showNotification('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, NotificationState.severity.warning))
+  if (
+    key === NodeDef.propKeys.multiple &&
+    value &&
+    NodeDef.hasDefaultValues(nodeDef)
+  ) {
+    // NodeDef has default values, cannot change into multiple
+    dispatch(
+      showNotification(
+        'nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues',
+        null,
+        NotificationState.severity.warning,
+      ),
+    )
     return false
   }
+
   return true
 }
 
-export const putNodeDefProp = (nodeDef, key, value = null, advanced = false, checkFormPageUuid = false) => async (dispatch, getState) => {
-  if (!_checkCanChangeProp(dispatch, nodeDef, key, value))
+export const putNodeDefProp = (
+  nodeDef,
+  key,
+  value = null,
+  advanced = false,
+  checkFormPageUuid = false,
+) => async (dispatch, getState) => {
+  if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
     return
+  }
 
   const state = getState()
   const survey = SurveyState.getSurvey(state)
@@ -123,37 +167,55 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false, che
   dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
 }
 
-export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
+export const putNodeDefLayoutProp = (nodeDef, key, value) => async (
+  dispatch,
+  getState,
+) => {
   const state = getState()
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
   const layoutUpdate = R.pipe(
     NodeDefLayout.getLayout,
     R.assocPath([surveyCycleKey, key], value),
-    R.when(
-      R.always(key === NodeDefLayout.keys.renderType),
-      layout => {
-        const survey = SurveyState.getSurvey(state)
-        const layoutCycle = layout[surveyCycleKey]
+    R.when(R.always(key === NodeDefLayout.keys.renderType), layout => {
+      const survey = SurveyState.getSurvey(state)
+      const layoutCycle = layout[surveyCycleKey]
 
-        // If setting layout render mode (table | form), set the the proper layout
-        const isRenderTable = value === NodeDefLayout.renderType.table
-        const isRenderForm = value === NodeDefLayout.renderType.form
+      // If setting layout render mode (table | form), set the the proper layout
+      const isRenderTable = value === NodeDefLayout.renderType.table
+      const isRenderForm = value === NodeDefLayout.renderType.form
 
-        if (isRenderTable) {
-          layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
-        } else if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
-          // entity rendered as form can only exists in its own page
-          layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
-        }
-
-        return layout
+      if (isRenderTable) {
+        layoutCycle[
+          NodeDefLayout.keys.layoutChildren
+        ] = Survey.getNodeDefChildren(nodeDef)(survey).map(n =>
+          NodeDef.getUuid(n),
+        )
+      } else if (
+        isRenderForm &&
+        NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)
+      ) {
+        // Entity rendered as form can only exists in its own page
+        layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
       }
-    )
+
+      return layout
+    }),
   )(nodeDef)
 
-  const checkFormPageUuid = R.includes(key, [NodeDefLayout.keys.renderType, NodeDefLayout.keys.pageUuid])
-  dispatch(putNodeDefProp(nodeDef, NodeDefLayout.keys.layout, layoutUpdate, false, checkFormPageUuid))
+  const checkFormPageUuid = R.includes(key, [
+    NodeDefLayout.keys.renderType,
+    NodeDefLayout.keys.pageUuid,
+  ])
+  dispatch(
+    putNodeDefProp(
+      nodeDef,
+      NodeDefLayout.keys.layout,
+      layoutUpdate,
+      false,
+      checkFormPageUuid,
+    ),
+  )
 }
 
 // ==== DELETE
@@ -161,37 +223,59 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
 
-  //check if nodeDef is referenced by other node definitions
-  //dependency graph is not associated to the survey in UI, it's built every time it's needed
+  // Check if nodeDef is referenced by other node definitions
+  // dependency graph is not associated to the survey in UI, it's built every time it's needed
   const dependencyGraph = Survey.buildDependencyGraph(survey)
-  const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(survey)
+  const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(
+    survey,
+  )
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
+  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(nodeDefUuid)(
+    surveyWithDependencies,
+  )
   const i18n = AppState.getI18n(state)
 
-  if (!(R.isEmpty(nodeDefDependentsUuids) || R.equals(nodeDefDependentsUuids, [nodeDefUuid]))) {
-    // node has not dependencies or it has expressions that depend on itself
+  if (
+    !(
+      R.isEmpty(nodeDefDependentsUuids) ||
+      R.equals(nodeDefDependentsUuids, [nodeDefUuid])
+    )
+  ) {
+    // Node has not dependencies or it has expressions that depend on itself
     const nodeDefDependents = R.pipe(
-      R.map(R.pipe(
-        nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-        nodeDef => NodeDef.getLabel(nodeDef, i18n.lang)
-      )),
-      R.join(', ')
+      R.map(
+        R.pipe(
+          nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+          nodeDef => NodeDef.getLabel(nodeDef, i18n.lang),
+        ),
+      ),
+      R.join(', '),
     )(nodeDefDependentsUuids)
 
-    dispatch(showNotification('nodeDefEdit.cannotDeleteNodeDefReferenced', {
-      nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
-      nodeDefDependents
-    }, NotificationState.severity.warning))
-
-  } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
-    // delete confirmed
+    dispatch(
+      showNotification(
+        'nodeDefEdit.cannotDeleteNodeDefReferenced',
+        {
+          nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
+          nodeDefDependents,
+        },
+        NotificationState.severity.warning,
+      ),
+    )
+  } else if (
+    window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
+  ) {
+    // Delete confirmed
     dispatch({ type: nodeDefDelete, nodeDef })
 
     const surveyId = Survey.getId(survey)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: cycle })
+    const {
+      data: { nodeDefsValidation },
+    } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, {
+      params: cycle,
+    })
     dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
     dispatch(_updateParentLayout(nodeDef, true))

@@ -10,8 +10,9 @@ const RecordsRowHeader = ({ nodeDefKeys, lang }) => {
   return (
     <>
       <div>#</div>
-      {
-        nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, lang)}</div>) //TODO use SurveyState.getNodeDefLabel
+      {nodeDefKeys.map((k, i) => (
+        <div key={i}>{NodeDef.getLabel(k, lang)}</div>
+      )) // TODO use SurveyState.getNodeDefLabel
       }
       <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>

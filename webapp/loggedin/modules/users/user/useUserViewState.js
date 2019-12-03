@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
 import * as User from '@core/user/user'
@@ -24,17 +24,28 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, surveyCycleKey, lang, userUuid,
-    showAppLoader, hideAppLoader, showNotification, setUser,
+    user,
+    surveyInfo,
+    surveyCycleKey,
+    lang,
+    userUuid,
+    showAppLoader,
+    hideAppLoader,
+    showNotification,
+    setUser,
     history,
   } = props
 
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const i18n = useI18n()
-  const editingSelf = User.getUuid(user) === userUuid && !surveyId // this can happen for system administrator when they don't have an active survey
+  const editingSelf = User.getUuid(user) === userUuid && !surveyId // This can happen for system administrator when they don't have an active survey
 
-  const { data: userToUpdate = {}, dispatch: fetchUser, loaded } = useAsyncGetRequest(
-    `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`
+  const {
+    data: userToUpdate = {},
+    dispatch: fetchUser,
+    loaded,
+  } = useAsyncGetRequest(
+    `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`,
   )
 
   const isInvitation = !userUuid
@@ -43,7 +54,7 @@ export const useUserViewState = props => {
   // FormData object to be used for the multipart/form-data put request
   const [formData, setFormData] = useState(null)
 
-  // form fields edit permissions
+  // Form fields edit permissions
   const [editPermissions, setEditPermissions] = useState({
     name: false,
     group: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
@@ -51,14 +62,19 @@ export const useUserViewState = props => {
     remove: false,
   })
 
-  // local form object
+  // Local form object
   const {
-    object: formObject, objectValid,
-    setObjectField, enableValidation, getFieldValidation,
+    object: formObject,
+    objectValid,
+    setObjectField,
+    enableValidation,
+    getFieldValidation,
   } = useFormObject(
     { name: '', email: '', groupUuid: null },
-    isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
-    !isInvitation
+    isInvitation || isUserAcceptPending
+      ? UserValidator.validateInvitation
+      : UserValidator.validateUser,
+    !isInvitation,
   )
 
   // USER ATTRIBUTES
@@ -74,27 +90,29 @@ export const useUserViewState = props => {
   const [surveyGroupsMenuItems, setSurveyGroupsMenuItems] = useState([])
 
   useEffect(() => {
-    // init form groups
+    // Init form groups
 
     // All groups if published, SurveyAdmin group otherwise
     const surveyGroups = editingSelf
       ? []
       : Survey.isPublished(surveyInfo)
-        ? Survey.getAuthGroups(surveyInfo)
-        : [Survey.getAuthGroupAdmin(surveyInfo)]
+      ? Survey.getAuthGroups(surveyInfo)
+      : [Survey.getAuthGroupAdmin(surveyInfo)]
 
     // Add SystemAdmin group if current user is a SystemAdmin himself
     const menuGroups = R.when(
       R.always(User.isSystemAdmin(user)),
-      R.concat(User.getAuthGroups(user))
+      R.concat(User.getAuthGroups(user)),
     )(surveyGroups)
 
-    setSurveyGroupsMenuItems(menuGroups.map(g => ({
-      uuid: AuthGroup.getUuid(g),
-      label: i18n.t(`authGroups.${AuthGroup.getName(g)}.label_plural`)
-    })))
+    setSurveyGroupsMenuItems(
+      menuGroups.map(g => ({
+        uuid: AuthGroup.getUuid(g),
+        label: i18n.t(`authGroups.${AuthGroup.getName(g)}.label_plural`),
+      })),
+    )
 
-    // init user
+    // Init user
     if (!isInvitation) {
       fetchUser()
     }
@@ -104,18 +122,26 @@ export const useUserViewState = props => {
 
   useEffect(() => {
     if (loaded) {
-      // set form object field from server side response
+      // Set form object field from server side response
       setName(isUserAcceptPending ? '' : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
       setEmail(User.getEmail(userToUpdate))
-      setGroup(User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate))
+      setGroup(
+        User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate),
+      )
 
-      // set edit form permissions
+      // Set edit form permissions
       const canEdit = Authorizer.canEditUser(user, surveyInfo, userToUpdate)
       setEditPermissions({
         name: !isUserAcceptPending && canEdit,
-        email: !isUserAcceptPending && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
-        group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
-        remove: !isUserAcceptPending && Authorizer.canRemoveUser(user, surveyInfo, userToUpdate),
+        email:
+          !isUserAcceptPending &&
+          Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
+        group:
+          !isUserAcceptPending &&
+          Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
+        remove:
+          !isUserAcceptPending &&
+          Authorizer.canRemoveUser(user, surveyInfo, userToUpdate),
       })
 
       ready.current = true
@@ -146,7 +172,7 @@ export const useUserViewState = props => {
   // persist user/invitation actions
   const userInviteParams = R.pipe(
     R.omit(['name']),
-    R.assoc('surveyCycleKey', surveyCycleKey)
+    R.assoc('surveyCycleKey', surveyCycleKey),
   )(formObject)
 
   const {
@@ -155,23 +181,39 @@ export const useUserViewState = props => {
     data: userSaveResponse,
     error: userSaveError,
   } = isInvitation
-    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, userInviteParams)
-    : useAsyncMultipartPutRequest(`/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${User.getUuid(userToUpdate)}`, formData)
+    ? useAsyncPostRequest(
+        `/api/survey/${surveyId}/users/invite`,
+        userInviteParams,
+      )
+    : useAsyncMultipartPutRequest(
+        `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${User.getUuid(
+          userToUpdate,
+        )}`,
+        formData,
+      )
 
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.severity.error)
+      showNotification(
+        'appErrors.generic',
+        { text: userSaveError },
+        NotificationState.severity.error,
+      )
     } else if (userSaved) {
-      // update user in redux state if self
+      // Update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
         setUser(userSaveResponse)
       }
 
       if (isInvitation) {
-        showNotification('usersView.inviteUserConfirmation', { email: formObject.email })
+        showNotification('usersView.inviteUserConfirmation', {
+          email: formObject.email,
+        })
       } else {
-        showNotification('usersView.updateUserConfirmation', { name: formObject.name })
+        showNotification('usersView.updateUserConfirmation', {
+          name: formObject.name,
+        })
       }
 
       if (!editingSelf) {
@@ -185,18 +227,24 @@ export const useUserViewState = props => {
     dispatch: removeUser,
     loaded: removeUserLoaded,
     error: removeUserError,
-  } = useAsyncDeleteRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`)
+  } = useAsyncDeleteRequest(
+    `/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`,
+  )
 
   useOnUpdate(() => {
     hideAppLoader()
     if (removeUserLoaded) {
       showNotification('userView.removeUserConfirmation', {
         user: formObject.name,
-        survey: Survey.getLabel(surveyInfo, lang)
+        survey: Survey.getLabel(surveyInfo, lang),
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.severity.error)
+      showNotification(
+        'appErrors.generic',
+        { text: removeUserError },
+        NotificationState.severity.error,
+      )
     }
   }, [removeUserLoaded, removeUserError])
 
@@ -207,12 +255,14 @@ export const useUserViewState = props => {
     isUserAcceptPending,
     isInvitation,
 
-    canEdit: editPermissions.name || editPermissions.group || editPermissions.email,
+    canEdit:
+      editPermissions.name || editPermissions.group || editPermissions.email,
     canEditName: editPermissions.name,
     canEditGroup: editPermissions.group,
     canEditEmail: editPermissions.email,
     canRemove: editPermissions.remove,
-    pictureEditorEnabled: User.hasProfilePicture(userToUpdate) || pictureChanged.current,
+    pictureEditorEnabled:
+      User.hasProfilePicture(userToUpdate) || pictureChanged.current,
 
     name: formObject.name,
     email: formObject.email,
@@ -233,6 +283,6 @@ export const useUserViewState = props => {
     removeUser: () => {
       showAppLoader()
       removeUser()
-    }
+    },
   }
 }

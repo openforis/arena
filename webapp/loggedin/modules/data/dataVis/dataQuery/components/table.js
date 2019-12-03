@@ -12,30 +12,42 @@ import * as Authorizer from '@core/auth/authorizer'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
-import TableHeader from './tableHeader'
-import TableRows from './tableRows'
 
 import * as AppState from '@webapp/app/appState'
-import * as DataQueryState from '../dataQueryState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as DataQueryState from '../dataQueryState'
+import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { nodesUpdateCompleted } from '../../../../../surveyViews/record/actions'
+import TableRows from './tableRows'
+import TableHeader from './tableHeader'
 
 const defaultColWidth = 80
 
 const Table = props => {
-
   const {
-    appSaving, lang, surveyId, surveyCycleKey, data, showTable,
-    nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colsNumber,
-    offset, limit, filter, sort, count,
+    appSaving,
+    lang,
+    surveyId,
+    surveyCycleKey,
+    data,
+    showTable,
+    nodeDefUuidContext,
+    nodeDefCols,
+    nodeDefUuidCols,
+    colsNumber,
+    offset,
+    limit,
+    filter,
+    sort,
+    count,
     nodeDefSelectorsVisible,
-    editMode, canEdit,
+    editMode,
+    canEdit,
     history,
-    nodesUpdateCompleted
+    nodesUpdateCompleted,
   } = props
 
   const tableRef = useRef(null)
@@ -43,27 +55,33 @@ const Table = props => {
   const widthMax = width - defaultColWidth - 35
   const colWidthMin = 150
 
-  const colWidth = widthMax > colsNumber * colWidthMin
-    ? Math.floor(widthMax / colsNumber)
-    : colWidthMin
+  const colWidth =
+    widthMax > colsNumber * colWidthMin
+      ? Math.floor(widthMax / colsNumber)
+      : colWidthMin
 
   const hasData = !R.isEmpty(data)
 
   useOnUpdate(() => {
     if (editMode) {
-      AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
+      AppWebSocket.on(
+        WebSocketEvents.nodesUpdateCompleted,
+        nodesUpdateCompleted,
+      )
     }
+
     return () => {
       AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted)
     }
   }, [editMode])
 
   return (
-    <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={tableRef}>
-      {
-        showTable &&
+    <div
+      className={`data-query__table table${editMode ? ' edit' : ''}`}
+      ref={tableRef}
+    >
+      {showTable && (
         <React.Fragment>
-
           <TableHeader
             appSaving={appSaving}
             surveyId={surveyId}
@@ -81,8 +99,7 @@ const Table = props => {
             nodeDefSelectorsVisible={nodeDefSelectorsVisible}
           />
 
-          {
-            hasData &&
+          {hasData && (
             <TableRows
               lang={lang}
               nodeDefCols={nodeDefCols}
@@ -91,10 +108,11 @@ const Table = props => {
               colWidth={colWidth}
               defaultColWidth={defaultColWidth}
               editMode={editMode}
-              history={history}/>
-          }
+              history={history}
+            />
+          )}
         </React.Fragment>
-      }
+      )}
     </div>
   )
 }
@@ -110,7 +128,11 @@ const mapStateToProps = state => {
   const editMode = DataQueryState.getTableEditMode(state)
 
   const colsNumber = editMode
-    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
+    ? nodeDefCols.reduce(
+        (tot, nodeDefCol) =>
+          tot + NodeDefUIProps.getFormFields(nodeDefCol).length,
+        0,
+      )
     : colNames.length
 
   return {
@@ -137,6 +159,6 @@ const mapStateToProps = state => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps, { nodesUpdateCompleted })
+  connect(mapStateToProps, { nodesUpdateCompleted }),
 )
 export default enhance(Table)

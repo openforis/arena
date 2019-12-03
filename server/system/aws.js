@@ -11,8 +11,11 @@ const _getAwsClient = () =>
 const _sendAwsRequest = request =>
   new Promise((resolve, reject) => {
     request.send((err, data) => {
-      if (err) reject(err)
-      else resolve(data)
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
     })
   })
 
@@ -25,13 +28,16 @@ export const inviteUser = (email, temporaryPassword) => {
     // Message will be sent by us
     MessageAction: 'SUPPRESS',
     ForceAliasCreation: false,
-    UserAttributes: [{
-      Name: 'email',
-      Value: email
-    }, {
-      Name: 'email_verified',
-      Value: 'true',
-    }]
+    UserAttributes: [
+      {
+        Name: 'email',
+        Value: email,
+      },
+      {
+        Name: 'email_verified',
+        Value: 'true',
+      },
+    ],
   }
 
   return _sendAwsRequest(_getAwsClient().adminCreateUser(params))
@@ -42,15 +48,19 @@ export const updateUser = (oldEmail, email, name) => {
     return
   }
 
-  const UserAttributes = email === null
-    ? []
-    : [{
-      Name: 'email',
-      Value: email,
-    }, {
-      Name: 'email_verified',
-      Value: 'true',
-    }]
+  const UserAttributes =
+    email === null
+      ? []
+      : [
+          {
+            Name: 'email',
+            Value: email,
+          },
+          {
+            Name: 'email_verified',
+            Value: 'true',
+          },
+        ]
 
   if (name !== null) {
     UserAttributes.push({
@@ -62,7 +72,7 @@ export const updateUser = (oldEmail, email, name) => {
   const params = {
     UserAttributes,
     Username: oldEmail,
-    UserPoolId: ProcessUtils.ENV.cognitoUserPoolId
+    UserPoolId: ProcessUtils.ENV.cognitoUserPoolId,
   }
 
   return _sendAwsRequest(_getAwsClient().adminUpdateUserAttributes(params))
@@ -71,7 +81,7 @@ export const updateUser = (oldEmail, email, name) => {
 export const deleteUser = email => {
   const params = {
     UserPoolId: ProcessUtils.ENV.cognitoUserPoolId,
-    Username: email
+    Username: email,
   }
   return _sendAwsRequest(_getAwsClient().adminDeleteUser(params))
 }

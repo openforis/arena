@@ -12,7 +12,7 @@ export const newSrs = (code, name, wkt) => ({
   [keys.wkt]: wkt,
 })
 
-//EPSG:4326 WGS84 Lat Lon Spatial Reference System
+// EPSG:4326 WGS84 Lat Lon Spatial Reference System
 export const latLonSrs = newSrs(
   '4326',
   'GCS WGS 1984',
@@ -25,7 +25,7 @@ export const latLonSrs = newSrs(
           AUTHORITY["EPSG","8901"]],
       UNIT["degree",0.01745329251994328,
           AUTHORITY["EPSG","9122"]],
-      AUTHORITY["EPSG","4326"]]`
+      AUTHORITY["EPSG","4326"]]`,
 )
 
 export const isLatLon = code => getCode(latLonSrs) === code

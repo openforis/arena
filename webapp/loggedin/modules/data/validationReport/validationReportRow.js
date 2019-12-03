@@ -24,41 +24,53 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === nodeDefUuid) {
     keysHierarchy = keysHierarchy.slice(1)
   }
-  keysHierarchy = keysHierarchy.concat({ keys: row.keysSelf || {}, nodeDefUuid: row.nodeDefUuid })
+
+  keysHierarchy = keysHierarchy.concat({
+    keys: row.keysSelf || {},
+    nodeDefUuid: row.nodeDefUuid,
+  })
 
   const path = R.pipe(
     R.map(hierarchyPart => {
-      const keyValues = R.reject(R.isNil)(R.values((hierarchyPart.keys)))
-      const keyValuesStr = keyValues.length ? `[${keyValues.join(', ')}]` : ''
-      const parentNodeDef = Survey.getNodeDefByUuid(hierarchyPart.nodeDefUuid)(survey)
+      const keyValues = R.reject(R.isNil)(R.values(hierarchyPart.keys))
+      const keyValuesStr =
+        keyValues.length > 0 ? `[${keyValues.join(', ')}]` : ''
+      const parentNodeDef = Survey.getNodeDefByUuid(hierarchyPart.nodeDefUuid)(
+        survey,
+      )
       const parentNodeDefLabel = NodeDef.getLabel(parentNodeDef, i18n.lang)
 
       return `${parentNodeDefLabel} ${keyValuesStr}`
     }),
-    R.join(' / ')
+    R.join(' / '),
   )(keysHierarchy)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const canEdit = Survey.isPublished(surveyInfo) &&
+  const canEdit =
+    Survey.isPublished(surveyInfo) &&
     Authorizer.canEditRecord(user, {
       [Record.keys.step]: Record.getStep(row),
       [Record.keys.surveyUuid]: Survey.getUuid(surveyInfo),
-      [Record.keys.ownerUuid]: Record.getOwnerUuid(row)
+      [Record.keys.ownerUuid]: Record.getOwnerUuid(row),
     })
 
   return (
     <>
-      <div>
-        {idx + offset + 1}
+      <div>{idx + offset + 1}</div>
+      <div>{path}</div>
+      <div className="validation-report__message">
+        <ValidationFieldMessages
+          validation={row.validation}
+          showKeys={false}
+          showIcons={true}
+        />
       </div>
       <div>
-        {path}
-      </div>
-      <div className='validation-report__message'>
-        <ValidationFieldMessages validation={row.validation} showKeys={false} showIcons={true} />
-      </div>
-      <div>
-        <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
+        <span
+          className={`icon icon-12px icon-action ${
+            canEdit ? 'icon-pencil2' : 'icon-eye'
+          }`}
+        />
       </div>
     </>
   )

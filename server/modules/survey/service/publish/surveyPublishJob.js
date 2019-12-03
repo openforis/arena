@@ -3,27 +3,26 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
+import RecordCheckJob from '../recordCheckJob'
+import SurveyDependencyGraphsGenerationJob from '../surveyDependencyGraphsGenerationJob'
+import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
+import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
 import NodeDefsValidationJob from './jobs/nodeDefsValidationJob'
 import CategoriesValidationJob from './jobs/categoriesValidationJob'
 import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
-import RecordCheckJob from '../recordCheckJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
 import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
-import SurveyDependencyGraphsGenerationJob from '../surveyDependencyGraphsGenerationJob'
-import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
-import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
 
 export default class SurveyPublishJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(SurveyPublishJob.type, params, [
       new NodeDefsValidationJob(),
       new CategoriesValidationJob(),
       new TaxonomiesValidationJob(),
       new SurveyInfoValidationJob(),
       new CyclesDeletedCheckJob(),
-      // record check must be executed before publishing survey props
+      // Record check must be executed before publishing survey props
       new RecordCheckJob(),
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
@@ -32,10 +31,17 @@ export default class SurveyPublishJob extends Job {
     ])
   }
 
-  async onStart () {
+  async onStart() {
     await super.onStart()
 
-    await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
+    await ActivityLogManager.insert(
+      this.user,
+      this.surveyId,
+      ActivityLog.type.surveyPublish,
+      null,
+      false,
+      this.tx,
+    )
   }
 }
 

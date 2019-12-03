@@ -1,7 +1,7 @@
+/* eslint-disable camelcase */
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 export const enTranslation = {
-
   common: {
     add: 'Add',
     apply: 'Apply',
@@ -45,7 +45,7 @@ export const enTranslation = {
     name: 'Name',
     new: 'New',
     no: 'No',
-    noItems: `$t(common.no) $t(common.item,{'count':2})`,
+    noItems: "$t(common.no) $t(common.item,{'count':2})",
     of: 'of',
     ok: 'Ok',
     path: 'Path',
@@ -73,7 +73,8 @@ export const enTranslation = {
       minute_plural: 'minutes',
       week: 'week',
       week_plural: 'weeks',
-      timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
+      timeDiff:
+        "{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago",
     },
   },
 
@@ -164,20 +165,22 @@ export const enTranslation = {
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
-      confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)`,
+      confirmDeleteCycle:
+        'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
       editInfo: 'Edit info',
       publish: 'Publish',
       viewInfo: 'View info',
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
-      deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
+      deleteWarning:
+        'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
     surveyList: {
       status: 'Status',
       active: 'Active',
-      activate: 'Activate'
+      activate: 'Activate',
     },
     surveyCreate: {
       createSurvey: 'Create Survey',
@@ -191,7 +194,7 @@ export const enTranslation = {
         codeParent: 'Parent code',
         defaultValue: 'Default value',
         validationRules: 'Validation rules',
-      }
+      },
     },
     recordsSummary: {
       recordsAdded: 'Records added from {{from}} to {{to}}',
@@ -209,61 +212,87 @@ export const enTranslation = {
   activityLogView: {
     recentActivity: 'Recent activity',
     messages: {
-      //survey
+      // Survey
       [ActivityLog.type.surveyCreate]: 'created the survey',
       [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
       [ActivityLog.type.surveyPublish]: 'published the survey',
-      [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
+      [ActivityLog.type.surveyCollectImport]:
+        'imported the survey from Collect',
 
-      // nodeDef
-      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
-      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
+      // NodeDef
+      [ActivityLog.type.nodeDefCreate]:
+        'added node definition {{type}} in entity {{parentName}}',
+      [ActivityLog.type.nodeDefUpdate]:
+        'updated {{keys}} of node definition {{name}}',
       [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
 
-      //category
+      // Category
       [ActivityLog.type.categoryInsert]: 'added category',
-      [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
+      [ActivityLog.type.categoryPropUpdate]:
+        'updated {{key}} of category {{categoryName}}',
       [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
-      [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
-      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemInsert]: 'added item to level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemDelete]: 'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
+      [ActivityLog.type.categoryLevelInsert]:
+        'added level at index {{index}} to category {{categoryName}}',
+      [ActivityLog.type.categoryLevelPropUpdate]:
+        'updated level {{index}} {{key}} of category {{categoryName}}',
+      [ActivityLog.type.categoryLevelDelete]:
+        'deleted level {{index}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemInsert]:
+        'added item to level {{levelIndex}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemPropUpdate]:
+        'updated item {{code}} {{key}} of category {{categoryName}}',
+      [ActivityLog.type.categoryItemDelete]:
+        'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
+      [ActivityLog.type.categoryImport]:
+        'imported CSV file to category {{categoryName}}',
 
-      //taxonomy
+      // Taxonomy
       [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
-      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{key}} of taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyPropUpdate]:
+        'updated {{key}} of taxonomy {{taxonomyName}}',
       [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonomyTaxaImport]:
+        'imported CSV file to taxonomy {{taxonomyName}}',
+      [ActivityLog.type.taxonInsert]:
+        'added taxon to taxonomy {{taxonomyName}}',
 
-      //record
+      // Record
       [ActivityLog.type.recordCreate]: 'added record',
       [ActivityLog.type.recordDelete]: 'deleted record {{keys}}',
-      [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
+      [ActivityLog.type.recordStepUpdate]:
+        'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
 
-      //node
-      [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
-      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} to record {{recordKeys}}',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} from record {{recordKeys}}',
+      // Node
+      [ActivityLog.type.nodeCreate]:
+        'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
+      [ActivityLog.type.nodeValueUpdate]:
+        'updated node {{name}} in {{parentPath}} to record {{recordKeys}}',
+      [ActivityLog.type.nodeDelete]:
+        'deleted node {{name}} from record {{recordKeys}}',
 
-      // user
-      [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
+      // User
+      [ActivityLog.type.userInvite]:
+        'invited user {{email}} with role {{groupName}}',
       [ActivityLog.type.userUpdate]: 'updated user {{name}}',
       [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
 
-      // analysis
+      // Analysis
       [ActivityLog.type.processingChainCreate]: 'added processing chain',
-      [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
-      [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
-      [ActivityLog.type.processingStepCreate]: 'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      [ActivityLog.type.processingStepPropsUpdate]: 'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
-      [ActivityLog.type.processingStepDelete]: 'deleted processing chain {{processingChainLabel}} step {{index}}',
-      [ActivityLog.type.processingStepCalculationCreate]: 'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
-      [ActivityLog.type.processingStepCalculationIndexUpdate]: 'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
-    }
+      [ActivityLog.type.processingChainPropUpdate]:
+        'updated {{key}} of processing chain {{label}}',
+      [ActivityLog.type.processingChainDelete]:
+        'deleted processing chain {{label}}',
+      [ActivityLog.type.processingStepCreate]:
+        'added processing step {{index}} to processing chain {{processingChainLabel}}',
+      [ActivityLog.type.processingStepPropsUpdate]:
+        'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
+      [ActivityLog.type.processingStepDelete]:
+        'deleted processing chain {{processingChainLabel}} step {{index}}',
+      [ActivityLog.type.processingStepCalculationCreate]:
+        'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
+      [ActivityLog.type.processingStepCalculationIndexUpdate]:
+        'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
+    },
   },
 
   designerView: {
@@ -308,8 +337,10 @@ export const enTranslation = {
     upload: 'click here to upload',
     sendInvitation: 'Send invitation',
     removeFromSurvey: 'Remove from survey',
-    confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
-    removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+    confirmRemove:
+      'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
+    removeUserConfirmation:
+      'User {{user}} has been removed from survey {{survey}}',
   },
 
   processingChainView: {
@@ -360,21 +391,23 @@ export const enTranslation = {
         checkbox: 'Checkbox',
         dropdown: 'Dropdown',
       },
-      parentCode: 'Parent Code'
+      parentCode: 'Parent Code',
     },
     expressionsProp: {
       expression: 'Expression',
       applyIf: 'Apply If',
       confirmDelete: 'Delete this expression?',
-      severity: 'Severity'
+      severity: 'Severity',
     },
     validationsProps: {
       minCount: 'Min count',
       maxCount: 'Max count',
       expressions: 'Expressions',
     },
-    cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.',
-    cannotDeleteNodeDefReferenced: 'Cannot delete "{{nodeDef}}": it\'s referenced by these node definitions: {{nodeDefDependents}}'
+    cannotChangeIntoMultipleWithDefaultValues:
+      'This node cannot be converted to multiple because it has default values.',
+    cannotDeleteNodeDefReferenced:
+      'Cannot delete "{{nodeDef}}": it\'s referenced by these node definitions: {{nodeDefDependents}}',
   },
 
   languagesEditor: {
@@ -391,14 +424,17 @@ export const enTranslation = {
     },
     formEntryActions: {
       confirmDemote: 'Are sure you want to demote this record to {{name}}?',
-      confirmPromote: `Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore`,
-      confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
+      confirmPromote:
+        "Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore",
+      confirmDelete:
+        'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
       step: 'Step {{id}} ({{name}})',
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
-      confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
+      confirmDelete:
+        'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
     },
     nodeDefCode: {
       buttonCode: 'Button code',
@@ -431,8 +467,10 @@ export const enTranslation = {
   },
 
   taxonomy: {
-    cantBeDeleted: 'This taxonomy is used by some node definitions and cannot be deleted',
-    confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cantBeDeleted:
+      'This taxonomy is used by some node definitions and cannot be deleted',
+    confirmDelete:
+      'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     edit: {
       taxonomyName: 'Taxonomy name',
       taxaNotImported: 'Taxa not imported',
@@ -445,48 +483,56 @@ export const enTranslation = {
   categoryEdit: {
     addLevel: 'Add level',
     categoryName: 'Category name',
-    cantBeDeleted: 'This category is used by some node definitions and cannot be removed',
-    cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
-    confirmDelete: 'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
-    confirmDeleteItem: 'Delete the item with all children?\n$t(common.cantUndoWarning)',
+    cantBeDeleted:
+      'This category is used by some node definitions and cannot be removed',
+    cantImportCsvIntoPublishedCategory:
+      'Cannot import CSV into a published category.',
+    confirmDelete:
+      'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
+    confirmDeleteItem:
+      'Delete the item with all children?\n$t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
     level: 'Level',
 
     importSummary: {
       column: 'Column',
-      columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
+      columnTypeSummary:
+        'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
       columnTypeSummaryExtra: '{{type}}',
-      columnTypeSummaryWithLanguage: '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
+      columnTypeSummaryWithLanguage:
+        '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
       columnType: {
         code: 'code',
         description: 'description',
         label: 'label',
-        extra: 'extra'
+        extra: 'extra',
       },
       columnDataType: {
         geometryPoint: 'Geometry Point',
         number: 'Number',
-        text: 'Text'
+        text: 'Text',
       },
       dataType: 'Data Type',
-    }
+    },
   },
 
   // ===== All validation errors
   validationErrors: {
-    // common
+    // Common
     invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
     invalidDate: 'Invalid date',
     nameDuplicate: 'Name is duplicate',
-    nameCannotBeKeyword: 'Name "{{value}}" cannot be used: it\'s a reserved word',
+    nameCannotBeKeyword:
+      'Name "{{value}}" cannot be used: it\'s a reserved word',
     nameRequired: 'Name is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
     categoryEdit: {
       childrenEmpty: '$t(common.childrenEmpty)',
       childrenInvalid: 'At least one invalid child',
-      codeCannotBeKeyword: 'Code "{{value}}" cannot be used: it\'s a reserved word',
+      codeCannotBeKeyword:
+        'Code "{{value}}" cannot be used: it\'s a reserved word',
       codeDuplicate: 'Code is duplicate',
       codeRequired: 'Code is required',
       itemsInvalid: 'At least one invalid item',
@@ -501,13 +547,16 @@ export const enTranslation = {
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
-      emptyFile: 'The file you are trying to import is empty'
+      emptyFile: 'The file you are trying to import is empty',
     },
 
     expressions: {
-      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
-      cannotUseCurrentNode: 'cannot use current node {{name}} in this expression',
-      circularDependencyError: 'cannot reference node {{name}} because it references the current node',
+      cannotGetChildOfAttribute:
+        'cannot get child node {{childName}} of attribute {{parentName}}',
+      cannotUseCurrentNode:
+        'cannot use current node {{name}} in this expression',
+      circularDependencyError:
+        'cannot reference node {{name}} because it references the current node',
       expressionInvalid: 'Invalid expression: {{details}}',
       unableToFindNode: 'unable to find node: {{name}}',
       unableToFindNodeChild: 'unable to find child node: {{name}}',
@@ -524,12 +573,14 @@ export const enTranslation = {
       childrenEmpty: '$t(common.childrenEmpty)',
       defaultValuesInvalid: 'Invalid "Default Values"',
       defaultValuesNotSpecified: 'Default value not specified',
-      expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
+      expressionApplyIfOnlyLastOneCanBeEmpty:
+        'Only last expression can have empty "Apply if" condition',
       expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',
-      nameInvalid: 'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
+      nameInvalid:
+        'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
       taxonomyRequired: 'Taxonomy is required',
       validationsInvalid: 'Invalid "Validations"',
     },
@@ -539,8 +590,10 @@ export const enTranslation = {
       oneOrMoreInvalidValues: 'One or more values are invalid',
 
       entityKeyDuplicate: 'Duplicate entity key',
-      nodesMaxCountExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
-      nodesMinCountNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
+      nodesMaxCountExceeded:
+        '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
+      nodesMinCountNotReached:
+        '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
     },
@@ -550,26 +603,31 @@ export const enTranslation = {
       srsRequired: 'Spatial Reference System is required',
       cyclesRequired: 'At least one cycle must be defined',
       cyclesExceedingMax: 'A survey can have at most 10 cycles',
-      cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
-      cycleDateStartAfterPrevDateEnd: `Cycle start date must be after previous cycle end date`,
+      cycleDateStartBeforeDateEnd:
+        'Cycle start date must be before its end date',
+      cycleDateStartAfterPrevDateEnd:
+        'Cycle start date must be after previous cycle end date',
       cycleDateStartInvalid: 'Cycle start date is invalid',
       cycleDateStartMandatory: 'Cycle start date is mandatory',
       cycleDateEndInvalid: 'Cycle end date is invalid',
-      cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
+      cycleDateEndMandatoryExceptForLastCycle:
+        'Cycle end date is mandatory for all but the last cycle',
     },
 
     taxonomyEdit: {
-      codeDuplicate: 'Duplicate code {{code}}; $t(validationErrors.rowsDuplicate)',
+      codeDuplicate:
+        'Duplicate code {{code}}; $t(validationErrors.rowsDuplicate)',
       codeRequired: 'Code is required',
       familyRequired: 'Family is required',
       genusRequired: 'Genus is required',
-      scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(validationErrors.rowsDuplicate)',
+      scientificNameDuplicate:
+        'Duplicate scientific name {{scientificName}}; $t(validationErrors.rowsDuplicate)',
       scientificNameRequired: 'Scientific name is required',
       taxaEmpty: 'Empty taxa',
     },
 
     taxonomyImportJob: {
-      missingRequiredColumns: 'Missing required column(s): {{columns}}'
+      missingRequiredColumns: 'Missing required column(s): {{columns}}',
     },
 
     user: {
@@ -580,14 +638,16 @@ export const enTranslation = {
       userNameRequired: 'User name is required',
       passwordRequired: 'Password is required',
       passwordInvalid: 'Password should not start nor end with white spaces',
-      passwordUnsafe: 'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
-      passwordsDoNotMatch: `Passwords don't match`,
+      passwordUnsafe:
+        'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
+      passwordsDoNotMatch: "Passwords don't match",
       verificationCodeInvalid: 'Invalid verification code',
 
       userDoesNotExist: 'User does not exist',
       userNotAuthorized: 'Incorrect username or password',
-      verificationCodeMismatch: 'Invalid verification code provided, please try again',
-    }
+      verificationCodeMismatch:
+        'Invalid verification code provided, please try again',
+    },
   },
 
   // ====== Jobs
@@ -620,25 +680,31 @@ export const enTranslation = {
   // ====== App Errors
 
   appErrors: {
-    cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
+    cannotGetChild: "Cannot get child '{{childName}}' from attribute {{name}}",
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
-    cantUpdateStep: `Can't update step`,
+    cantUpdateStep: "Can't update step",
     entryDataNotFound: 'Entry data not found: {{entryName}}',
     generic: '{{text}}',
     invalidType: 'Invalid type {{type}}',
-    jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+    jobCanceledOrErrorsFound:
+      'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
-    processingStepOnlyLastCanBeDeleted: `Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted`,
+    processingStepOnlyLastCanBeDeleted:
+      'Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted',
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
-    undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
-    invalidSyntax: `Expression syntax is invalid`,
+    undefinedFunction:
+      "Undefined function '{{fnName}}' or wrong parameter types",
+    invalidSyntax: 'Expression syntax is invalid',
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+    functionHasTooFewArguments:
+      'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
+    functionHasTooManyArguments:
+      'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
 
-    userHasPendingInvitation: `There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted`,
+    userHasPendingInvitation:
+      "There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted",
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
@@ -647,7 +713,8 @@ export const enTranslation = {
   },
 
   systemErrors: {
-    somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.'
+    somethingWentWrong:
+      'Oooops! Something went wrong. Try to refresh the page.',
   },
 
   // ====== Common components
@@ -712,7 +779,8 @@ export const enTranslation = {
              <br>
              The OpenForis Arena team
              </p>`,
-      temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
-    }
-  }
+      temporaryPasswordMsg:
+        '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
+    },
+  },
 }

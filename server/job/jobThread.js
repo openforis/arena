@@ -1,18 +1,11 @@
 import Thread from '@server/threads/thread'
 
-import { jobThreadMessageTypes, jobToJSON } from './jobUtils';
+import { jobThreadMessageTypes, jobToJSON } from './jobUtils'
 import * as JobCreator from './jobCreator'
 
 class JobThread extends Thread {
-
-  constructor () {
-    super()
-
-    this.createJob()
-  }
-
-  createJob () {
-    const {jobType, jobParams} = this.params
+  createJob() {
+    const { jobType, jobParams } = this.params
 
     this.job = JobCreator.createJob(jobType, jobParams)
 
@@ -20,7 +13,7 @@ class JobThread extends Thread {
     this.job.start()
   }
 
-  async onMessage (msg) {
+  async onMessage(msg) {
     switch (msg.type) {
       case jobThreadMessageTypes.fetchJob:
         this.sendJobToParentThread()
@@ -28,12 +21,15 @@ class JobThread extends Thread {
       case jobThreadMessageTypes.cancelJob:
         this.job.cancel()
         break
+      default:
+        console.log(`Skipping unknown message type: ${msg.type}`)
     }
   }
 
-  sendJobToParentThread () {
+  sendJobToParentThread() {
     this.postMessage(jobToJSON(this.job))
   }
 }
 
-new JobThread()
+const thread = new JobThread()
+thread.createJob()

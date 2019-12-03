@@ -1,37 +1,47 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import * as SideBarModule from '../sidebarModule'
 import AppSideBarModuleLink from './appSideBarModuleLink'
 import AppSideBarSubModules from './appSideBarSubModules'
 
-import * as SideBarModule from '../sidebarModule'
-
 const AppSideBarModule = props => {
-  const { surveyInfo, module, pathname, sideBarOpened, isOver, onMouseEnter } = props
+  const {
+    surveyInfo,
+    module,
+    pathname,
+    sideBarOpened,
+    isOver,
+    onMouseEnter,
+  } = props
 
   const elementRef = SideBarModule.getElementRef(module)
   const isModuleHome = SideBarModule.isHome(module)
 
   const active = SideBarModule.isActive(pathname)(module)
-  // all modules except home require the survey
-  const disabledRequiredSurvey = !isModuleHome && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
-  // module home is disabled when page is on dashboard, other modules are disabled when there's no active survey
+  // All modules except home require the survey
+  const disabledRequiredSurvey =
+    !isModuleHome && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
+  // Module home is disabled when page is on dashboard, other modules are disabled when there's no active survey
   const disabledModule = isModuleHome ? active : disabledRequiredSurvey
-  // link to home is disabled when page is on dashboard, other root module links are always disabled
+  // Link to home is disabled when page is on dashboard, other root module links are always disabled
   const disabledModuleLink = isModuleHome ? active : true
 
   return (
-    <div className={`app-sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
-         ref={elementRef}
-         onMouseEnter={
-           isModuleHome || sideBarOpened
-             ? null
-             : () => {
-               onMouseEnter(module)
-             }
-         }
-         aria-disabled={disabledModule}>
-
+    <div
+      className={`app-sidebar__module${active ? ' active' : ''}${
+        isOver ? ' over' : ''
+      }`}
+      ref={elementRef}
+      onMouseEnter={
+        isModuleHome || sideBarOpened
+          ? null
+          : () => {
+              onMouseEnter(module)
+            }
+      }
+      aria-disabled={disabledModule}
+    >
       <AppSideBarModuleLink
         module={module}
         pathname={pathname}
@@ -39,16 +49,14 @@ const AppSideBarModule = props => {
         disabled={disabledModuleLink || disabledRequiredSurvey}
       />
 
-      {
-        sideBarOpened &&
+      {sideBarOpened && (
         <AppSideBarSubModules
           module={module}
           pathname={pathname}
           sideBarOpened={sideBarOpened}
           disabled={disabledRequiredSurvey}
         />
-      }
-
+      )}
     </div>
   )
 }

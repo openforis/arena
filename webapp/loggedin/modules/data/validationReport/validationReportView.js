@@ -28,9 +28,14 @@ const ValidationReportView = ({ surveyCycleKey, reloadListItems, history }) => {
   }, [surveyCycleKey])
 
   const onRowClick = record => {
-    const parentEntityUuid = R.prop(NodeKeys.keys.nodeUuid, R.last(record.keysHierarchy))
+    const parentEntityUuid = R.prop(
+      NodeKeys.keys.nodeUuid,
+      R.last(record.keysHierarchy),
+    )
     const recordUuid = Record.getUuid(record)
-    const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentEntityUuid}`
+    const recordEditUrl = `${appModuleUri(
+      dataModules.record,
+    )}${recordUuid}?parentNodeUuid=${parentEntityUuid}`
 
     history.push(recordEditUrl)
   }
@@ -39,21 +44,23 @@ const ValidationReportView = ({ surveyCycleKey, reloadListItems, history }) => {
 
   const restParams = { cycle: surveyCycleKey }
 
-  return <TableView
-    className='validation-report__table'
-    module={validationReportModule}
-    restParams={restParams}
-
-    gridTemplateColumns={gridTemplateColumns}
-    rowHeaderComponent={ValidationReportRowHeader}
-    rowComponent={ValidationReportRow}
-
-    onRowClick={onRowClick}
-  />
+  return (
+    <TableView
+      className="validation-report__table"
+      module={validationReportModule}
+      restParams={restParams}
+      gridTemplateColumns={gridTemplateColumns}
+      rowHeaderComponent={ValidationReportRowHeader}
+      rowComponent={ValidationReportRow}
+      onRowClick={onRowClick}
+    />
+  )
 }
 
 const mapStateToProps = state => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(mapStateToProps, { reloadListItems })(ValidationReportView)
+export default connect(mapStateToProps, { reloadListItems })(
+  ValidationReportView,
+)

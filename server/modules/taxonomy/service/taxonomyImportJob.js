@@ -4,31 +4,22 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job from '@server/job/job'
 
-import { languageCodesISO636_2 } from '@core/app/languages'
-import * as StringUtils from '@core/stringUtils'
+import { languageCodesISO639part2 } from '@core/app/languages'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 
-import * as TaxonomyValidator from '../taxonomyValidator'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import TaxonCSVParser from './taxonCSVParser'
 
-const requiredColumns = [
-  'code',
-  'family',
-  'genus',
-  'scientific_name',
-]
+const requiredColumns = ['code', 'family', 'genus', 'scientific_name']
 
 export default class TaxonomyImportJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(TaxonomyImportJob.type, params)
 
     const { taxonomyUuid, filePath } = params
@@ -36,31 +27,47 @@ export default class TaxonomyImportJob extends Job {
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
 
-    this.rowsByField = {
-      [Taxon.propKeys.code]: {}, //maps codes to csv file rows
-      [Taxon.propKeys.scientificName]: {} //maps scientific names to csv file rows
-    }
-
-    this.taxonomyImportManager = null //to be initialized in onHeaders
-
     this.csvReader = null
+    this.taxonomyImportManager = null // To be initialized in onHeaders
+    this.vernacularLanguageCodes = null
+    this.taxonCSVParser = null
   }
 
-  async execute () {
+  async execute() {
     const { user, surveyId, taxonomyUuid, tx } = this
 
-    this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
+    this.logDebug(
+      `starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`,
+    )
 
-    await ActivityLogManager.insert(user, surveyId, ActivityLog.type.taxonomyTaxaImport, { uuid: taxonomyUuid }, false, tx)
+    await ActivityLogManager.insert(
+      user,
+      surveyId,
+      ActivityLog.type.taxonomyTaxaImport,
+      { uuid: taxonomyUuid },
+      false,
+      tx,
+    )
 
     // 1. load taxonomy
 
-    this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
+    this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(
+      surveyId,
+      taxonomyUuid,
+      true,
+      false,
+      tx,
+    )
 
     if (!Taxonomy.isPublished(this.taxonomy)) {
       // 2. delete old draft taxa (only if taxonomy is not published)
       this.logDebug('delete old draft taxa')
-      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
+      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(
+        user,
+        surveyId,
+        taxonomyUuid,
+        tx,
+      )
     }
 
     // 3. start CSV row parsing
@@ -70,7 +77,9 @@ export default class TaxonomyImportJob extends Job {
       this.filePath,
       async headers => await this._onHeaders(headers),
       async row => await this._onRow(row),
-      total => this.total = total
+      total => {
+        this.total = total
+      },
     )
     await this.csvReader.start()
 
@@ -88,19 +97,34 @@ export default class TaxonomyImportJob extends Job {
     }
   }
 
-  async cancel () {
+  async cancel() {
     await super.cancel()
 
-    if (this.csvReader)
+    if (this.csvReader) {
       this.csvReader.cancel()
+    }
   }
 
-  async _onHeaders (headers) {
+  async _onHeaders(headers) {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
-      this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
-      this.taxonomyImportManager = new TaxonomyImportManager(this.user, this.surveyId, this.taxonomy, this.vernacularLanguageCodes, this.tx)
+      this.vernacularLanguageCodes = R.innerJoin(
+        (a, b) => a === b,
+        languageCodesISO639part2,
+        headers,
+      )
+      this.taxonomyImportManager = new TaxonomyImportManager(
+        this.user,
+        this.surveyId,
+        this.taxonomy,
+        this.vernacularLanguageCodes,
+        this.tx,
+      )
       await this.taxonomyImportManager.init()
+      this.taxonCSVParser = new TaxonCSVParser(
+        this.taxonomyUuid,
+        this.vernacularLanguageCodes,
+      )
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
       this.csvReader.cancel()
@@ -108,95 +132,40 @@ export default class TaxonomyImportJob extends Job {
     }
   }
 
-  async _onRow (row) {
-    const taxon = await this._parseTaxon(row)
+  async _onRow(row) {
+    const taxon = await this.taxonCSVParser.parseTaxon(row)
 
     if (Validation.isObjValid(taxon)) {
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     } else {
-      this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
+      this.addError(
+        R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon),
+      )
     }
+
     this.incrementProcessedItems()
   }
 
-  _validateHeaders (columns) {
+  _validateHeaders(columns) {
     this.logDebug('columns', columns)
     const missingColumns = R.difference(requiredColumns, columns)
     if (R.isEmpty(missingColumns)) {
       return true
-    } else {
-      this.addError({
-        all: {
-          valid: false,
-          errors: [{
-            key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
-            params: { columns: R.join(', ', missingColumns) }
-          }]
-        }
-      })
-      return false
-    }
-  }
-
-  async _parseTaxon (data) {
-    const { family, genus, scientific_name, code, ...vernacularNames } = data
-
-    const taxon = Taxon.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this._parseVernacularNames(vernacularNames))
-
-    return await this._validateTaxon(taxon)
-  }
-
-  async _validateTaxon (taxon) {
-    const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
-
-    //validate taxon uniqueness among inserted values
-    if (Validation.isValid(validation)) {
-      const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
-      this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
-
-      const scientificName = Taxon.getScientificName(taxon)
-      this._addValueToIndex(Taxon.propKeys.scientificName, scientificName, Validation.messageKeys.taxonomyEdit.scientificNameDuplicate, validation)
     }
 
-    return {
-      ...taxon,
-      validation,
-    }
-  }
-
-  _addValueToIndex (field, value, errorKeyDuplicate, validation) {
-    const duplicateRow = this.rowsByField[field][value]
-    if (duplicateRow) {
-      R.pipe(
-        Validation.setValid(false),
-        Validation.setField(
-          field,
-          Validation.newInstance(
-            false,
-            {},
-            [{
-              key: errorKeyDuplicate,
-              params: { row: this.processed + 1, duplicateRow }
-            }]
-          ))
-      )(validation)
-    } else {
-      this.rowsByField[field][value] = this.processed + 1
-    }
-  }
-
-  _parseVernacularNames (vernacularNames) {
-    return R.reduce(
-      (accVernacularNames, langCode) => {
-        const name = vernacularNames[langCode]
-        return R.when(
-          R.always(StringUtils.isNotBlank(name)),
-          R.assoc(langCode, TaxonVernacularName.newTaxonVernacularName(langCode, name))
-        )(accVernacularNames)
+    this.addError({
+      all: {
+        valid: false,
+        errors: [
+          {
+            key:
+              Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
+            params: { columns: R.join(', ', missingColumns) },
+          },
+        ],
       },
-      {},
-      this.vernacularLanguageCodes
-    )
+    })
+    return false
   }
 }
 

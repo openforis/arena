@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
 export const keys = {
-  categoryUuid: 'categoryUuid', //if category already exists
-  categoryName: 'categoryName', //if category must be created
+  categoryUuid: 'categoryUuid', // If category already exists
+  categoryName: 'categoryName', // If category must be created
   summary: 'summary',
 }
 

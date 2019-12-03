@@ -2,8 +2,8 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as SurveyViewsState from '../surveyViewsState'
 
 export const keys = {
   taxa: 'taxa',
@@ -12,11 +12,13 @@ export const keys = {
 
 export const stateKey = 'taxonomyEdit'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
+const getStateProp = (prop, defaultValue = null) =>
+  R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ==== taxonomy for edit
 
-export const initTaxonomyEdit = taxonomyUuid => taxonomyUuid ? { taxonomyUuid } : null
+export const initTaxonomyEdit = taxonomyUuid =>
+  taxonomyUuid ? { taxonomyUuid } : null
 
 export const getTaxonomy = state => {
   const survey = SurveyState.getSurvey(state)

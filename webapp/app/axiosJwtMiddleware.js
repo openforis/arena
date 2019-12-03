@@ -8,7 +8,7 @@ const requestHandler = async request => {
   const jwtToken = await CognitoAuth.getJwtToken()
 
   if (jwtToken) {
-    request.headers['Authorization'] = `${JwtConstants.bearer}${jwtToken}`
+    request.headers.Authorization = `${JwtConstants.bearer}${jwtToken}`
   }
 
   return request
