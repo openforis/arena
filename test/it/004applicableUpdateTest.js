@@ -46,10 +46,7 @@ describe('Applicable Test', () => {
 
   it('Applicable update', async () => {
     const nodeSource = RecordUtils.findNodeByPath('root/num')(survey, record)
-    const nodeDependent = RecordUtils.findNodeByPath('root/dependent_node')(
-      survey,
-      record,
-    )
+    const nodeDependent = RecordUtils.findNodeByPath('root/dependent_node')(survey, record)
     const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
     const nodeDependentParentUuid = Node.getUuid(nodeDependentParent)
     const nodeDependentDefUuid = Node.getNodeDefUuid(nodeDependent)
@@ -73,22 +70,12 @@ describe('Applicable Test', () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // Update dependent nodes
-      const {
-        record: recordUpdate,
-      } = await RecordManager.updateNodesDependents(
-        survey,
-        record,
-        nodesUpdated,
-      )
+      const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
       record = recordUpdate
 
-      const nodeDependentParentUpdated = Record.getNodeByUuid(
-        nodeDependentParentUuid,
-      )(record)
+      const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)
 
-      const applicable = Node.isChildApplicable(nodeDependentDefUuid)(
-        nodeDependentParentUpdated,
-      )
+      const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
 
       expect(applicable).to.equal(expectedValue, sourceValue)
     }

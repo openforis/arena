@@ -21,20 +21,12 @@ const extractTextValueAndMeta = (collectNode, collectNodeField = 'value') => {
   return value ? { value } : null
 }
 
-const extractCodeValueAndMeta = (
-  survey,
-  nodeDef,
-  record,
-  node,
-) => collectNode => {
+const extractCodeValueAndMeta = (survey, nodeDef, record, node) => collectNode => {
   const code = CollectRecord.getTextValue('code')(collectNode)
 
   if (code) {
     const parentNode = Record.getParentNode(node)(record)
-    const {
-      itemUuid,
-      hierarchyCode,
-    } = Survey.getCategoryItemUuidAndCodeHierarchy(
+    const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy(
       survey,
       nodeDef,
       record,
@@ -61,11 +53,7 @@ const extractCoordinateValueAndMeta = collectNode => {
   const { x, y, srs } = CollectRecord.getTextValues(collectNode)
 
   if (x && y && srs) {
-    const srsId = R.ifElse(
-      R.isEmpty,
-      R.identity,
-      R.pipe(R.split(':'), R.last),
-    )(srs)
+    const srsId = R.ifElse(R.isEmpty, R.identity, R.pipe(R.split(':'), R.last))(srs)
 
     return {
       value: {
@@ -86,22 +74,11 @@ const extractDateValueAndMeta = collectNode => {
   }
 }
 
-const extractFileValueAndMeta = (
-  survey,
-  node,
-  collectSurveyFileZip,
-  collectNodeDef,
-  tx,
-) => async collectNode => {
-  const {
-    file_name: fileName,
-    file_size: fileSize,
-  } = CollectRecord.getTextValues(collectNode)
+const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNodeDef, tx) => async collectNode => {
+  const { file_name: fileName, file_size: fileSize } = CollectRecord.getTextValues(collectNode)
 
   const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
-  const content = collectSurveyFileZip.getEntryData(
-    `upload/${collectNodeDefId}/${fileName}`,
-  )
+  const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${fileName}`)
 
   if (content) {
     const fileUuid = uuidv4()
@@ -128,11 +105,9 @@ const extractFileValueAndMeta = (
 }
 
 const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
-  const {
-    code,
-    scientific_name: scientificName,
-    vernacular_name: vernacularName,
-  } = CollectRecord.getTextValues(collectNode)
+  const { code, scientific_name: scientificName, vernacular_name: vernacularName } = CollectRecord.getTextValues(
+    collectNode,
+  )
   const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
 
   if (taxonUuid) {
@@ -145,11 +120,7 @@ const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
     }
 
     if (vernacularName) {
-      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(
-        nodeDef,
-        code,
-        vernacularName,
-      )(survey)
+      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(nodeDef, code, vernacularName)(survey)
       if (vernacularNameUuid) {
         value[Node.valuePropKeys.vernacularNameUuid] = vernacularNameUuid
       } else {
@@ -200,13 +171,7 @@ export const extractAttributeValueAndMeta = async (
       return extractDateValueAndMeta(collectNode)
 
     case nodeDefType.file:
-      return await extractFileValueAndMeta(
-        survey,
-        node,
-        collectSurveyFileZip,
-        collectNodeDef,
-        tx,
-      )(collectNode)
+      return await extractFileValueAndMeta(survey, node, collectSurveyFileZip, collectNodeDef, tx)(collectNode)
 
     case nodeDefType.taxon:
       return extractTaxonValueAndMeta(survey, nodeDef)(collectNode)

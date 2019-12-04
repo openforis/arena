@@ -17,7 +17,4 @@ export const newSurveyDefault = {
   validation: {},
 }
 
-export const getNewSurvey = R.pipe(
-  getState,
-  R.propOr(newSurveyDefault, keys.newSurvey),
-)
+export const getNewSurvey = R.pipe(getState, R.propOr(newSurveyDefault, keys.newSurvey))

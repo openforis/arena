@@ -9,9 +9,7 @@ const Identifier = ({ node, variables, onChange }) => (
     selection={R.find(R.propEq('value', node.name), variables)}
     itemLabelProp="label"
     itemKeyProp="value"
-    onChange={item =>
-      onChange(R.assoc('name', R.propOr('', 'value', item), node))
-    }
+    onChange={item => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
   />
 )
 

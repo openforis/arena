@@ -40,11 +40,7 @@ export const useUserViewState = props => {
   const i18n = useI18n()
   const editingSelf = User.getUuid(user) === userUuid && !surveyId // This can happen for system administrator when they don't have an active survey
 
-  const {
-    data: userToUpdate = {},
-    dispatch: fetchUser,
-    loaded,
-  } = useAsyncGetRequest(
+  const { data: userToUpdate = {}, dispatch: fetchUser, loaded } = useAsyncGetRequest(
     `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`,
   )
 
@@ -63,17 +59,9 @@ export const useUserViewState = props => {
   })
 
   // Local form object
-  const {
-    object: formObject,
-    objectValid,
-    setObjectField,
-    enableValidation,
-    getFieldValidation,
-  } = useFormObject(
+  const { object: formObject, objectValid, setObjectField, enableValidation, getFieldValidation } = useFormObject(
     { name: '', email: '', groupUuid: null },
-    isInvitation || isUserAcceptPending
-      ? UserValidator.validateInvitation
-      : UserValidator.validateUser,
+    isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
     !isInvitation,
   )
 
@@ -100,10 +88,7 @@ export const useUserViewState = props => {
       : [Survey.getAuthGroupAdmin(surveyInfo)]
 
     // Add SystemAdmin group if current user is a SystemAdmin himself
-    const menuGroups = R.when(
-      R.always(User.isSystemAdmin(user)),
-      R.concat(User.getAuthGroups(user)),
-    )(surveyGroups)
+    const menuGroups = R.when(R.always(User.isSystemAdmin(user)), R.concat(User.getAuthGroups(user)))(surveyGroups)
 
     setSurveyGroupsMenuItems(
       menuGroups.map(g => ({
@@ -125,23 +110,15 @@ export const useUserViewState = props => {
       // Set form object field from server side response
       setName(isUserAcceptPending ? '' : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
       setEmail(User.getEmail(userToUpdate))
-      setGroup(
-        User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate),
-      )
+      setGroup(User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate))
 
       // Set edit form permissions
       const canEdit = Authorizer.canEditUser(user, surveyInfo, userToUpdate)
       setEditPermissions({
         name: !isUserAcceptPending && canEdit,
-        email:
-          !isUserAcceptPending &&
-          Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
-        group:
-          !isUserAcceptPending &&
-          Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
-        remove:
-          !isUserAcceptPending &&
-          Authorizer.canRemoveUser(user, surveyInfo, userToUpdate),
+        email: !isUserAcceptPending && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
+        group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
+        remove: !isUserAcceptPending && Authorizer.canRemoveUser(user, surveyInfo, userToUpdate),
       })
 
       ready.current = true
@@ -170,36 +147,19 @@ export const useUserViewState = props => {
   // SAVE
 
   // persist user/invitation actions
-  const userInviteParams = R.pipe(
-    R.omit(['name']),
-    R.assoc('surveyCycleKey', surveyCycleKey),
-  )(formObject)
+  const userInviteParams = R.pipe(R.omit(['name']), R.assoc('surveyCycleKey', surveyCycleKey))(formObject)
 
-  const {
-    dispatch: saveUser,
-    loaded: userSaved,
-    data: userSaveResponse,
-    error: userSaveError,
-  } = isInvitation
-    ? useAsyncPostRequest(
-        `/api/survey/${surveyId}/users/invite`,
-        userInviteParams,
-      )
+  const { dispatch: saveUser, loaded: userSaved, data: userSaveResponse, error: userSaveError } = isInvitation
+    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, userInviteParams)
     : useAsyncMultipartPutRequest(
-        `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${User.getUuid(
-          userToUpdate,
-        )}`,
+        `/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${User.getUuid(userToUpdate)}`,
         formData,
       )
 
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotification(
-        'appErrors.generic',
-        { text: userSaveError },
-        NotificationState.severity.error,
-      )
+      showNotification('appErrors.generic', { text: userSaveError }, NotificationState.severity.error)
     } else if (userSaved) {
       // Update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -223,11 +183,7 @@ export const useUserViewState = props => {
   }, [userSaved, userSaveError])
 
   // REMOVE
-  const {
-    dispatch: removeUser,
-    loaded: removeUserLoaded,
-    error: removeUserError,
-  } = useAsyncDeleteRequest(
+  const { dispatch: removeUser, loaded: removeUserLoaded, error: removeUserError } = useAsyncDeleteRequest(
     `/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`,
   )
 
@@ -240,11 +196,7 @@ export const useUserViewState = props => {
       })
       history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
-      showNotification(
-        'appErrors.generic',
-        { text: removeUserError },
-        NotificationState.severity.error,
-      )
+      showNotification('appErrors.generic', { text: removeUserError }, NotificationState.severity.error)
     }
   }, [removeUserLoaded, removeUserError])
 
@@ -255,14 +207,12 @@ export const useUserViewState = props => {
     isUserAcceptPending,
     isInvitation,
 
-    canEdit:
-      editPermissions.name || editPermissions.group || editPermissions.email,
+    canEdit: editPermissions.name || editPermissions.group || editPermissions.email,
     canEditName: editPermissions.name,
     canEditGroup: editPermissions.group,
     canEditEmail: editPermissions.email,
     canRemove: editPermissions.remove,
-    pictureEditorEnabled:
-      User.hasProfilePicture(userToUpdate) || pictureChanged.current,
+    pictureEditorEnabled: User.hasProfilePicture(userToUpdate) || pictureChanged.current,
 
     name: formObject.name,
     email: formObject.email,

@@ -14,11 +14,7 @@ import CategoryEditView from '../categoryEdit/categoryEditView'
 import ItemsView from '../items/itemsView'
 import * as CategoryEditState from '../categoryEdit/categoryEditState'
 
-import {
-  createCategory,
-  deleteCategory,
-  setCategoryForEdit,
-} from '../categoryEdit/actions'
+import { createCategory, deleteCategory, setCategoryForEdit } from '../categoryEdit/actions'
 
 const CategoriesView = props => {
   const {
@@ -50,8 +46,7 @@ const CategoriesView = props => {
       ? alert(i18n.t('categoryEdit.cantBeDeleted'))
       : window.confirm(
           i18n.t('categoryEdit.confirmDelete', {
-            categoryName:
-              Category.getName(category) || i18n.t('common.undefinedName'),
+            categoryName: Category.getName(category) || i18n.t('common.undefinedName'),
           }),
         )
 
@@ -85,9 +80,7 @@ const mapStateToProps = state => {
     Survey.getCategoriesArray,
     R.map(category => ({
       ...category,
-      usedByNodeDefs: !R.isEmpty(
-        Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey),
-      ),
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)),
     })),
   )(survey)
 

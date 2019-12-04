@@ -4,16 +4,9 @@ import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
 const _fetchSurvey = async (surveyId, cycle) => {
-  const surveyInfo = Survey.getSurveyInfo(
-    await SurveyManager.fetchSurveyById(surveyId, true),
-  )
-  const loadDraftDefs =
-    Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
-  return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    surveyId,
-    cycle,
-    loadDraftDefs,
-  )
+  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId, true))
+  const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
 }
 
 export const queryTable = async (
@@ -45,10 +38,5 @@ export const queryTable = async (
 
 export const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {
   const survey = await _fetchSurvey(surveyId, cycle)
-  return await SurveyRdbManager.countTable(
-    survey,
-    cycle,
-    nodeDefUuidTable,
-    filter,
-  )
+  return await SurveyRdbManager.countTable(survey, cycle, nodeDefUuidTable, filter)
 }

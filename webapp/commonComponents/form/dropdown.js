@@ -76,12 +76,7 @@ class Dropdown extends React.Component {
   }
 
   async onInputChange(value = '') {
-    const {
-      items,
-      autocompleteMinChars,
-      itemsLookupFunction,
-      onChange,
-    } = this.props
+    const { items, autocompleteMinChars, itemsLookupFunction, onChange } = this.props
 
     const searchValue = R.trim(value)
 
@@ -118,8 +113,7 @@ class Dropdown extends React.Component {
   }
 
   onBlur(e) {
-    const itemFocused =
-      R.prop('className')(e.relatedTarget) === dropdownListItemClassName
+    const itemFocused = R.prop('className')(e.relatedTarget) === dropdownListItemClassName
     if (this.isOpened() && !itemFocused) {
       this.toggleOpened()
     }
@@ -127,25 +121,12 @@ class Dropdown extends React.Component {
 
   getItemLabel(item = '') {
     const { itemLabelFunction, itemLabelProp } = this.props
-    return R.defaultTo(
-      '',
-      this.extractValueFromFunctionOrProp(
-        item,
-        itemLabelFunction,
-        itemLabelProp,
-        'value',
-      ),
-    )
+    return R.defaultTo('', this.extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value'))
   }
 
   getItemKey(item) {
     const { itemKeyFunction, itemKeyProp } = this.props
-    return this.extractValueFromFunctionOrProp(
-      item,
-      itemKeyFunction,
-      itemKeyProp,
-      'key',
-    )
+    return this.extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
   }
 
   getInputField() {
@@ -192,12 +173,7 @@ class Dropdown extends React.Component {
     }
 
     return (
-      <div
-        ref={this.dropdown}
-        className={`dropdown ${className}`}
-        style={style}
-        onBlur={e => this.onBlur(e)}
-      >
+      <div ref={this.dropdown} className={`dropdown ${className}`} style={style} onBlur={e => this.onBlur(e)}>
         <Input
           ref={this.input}
           placeholder={placeholder}

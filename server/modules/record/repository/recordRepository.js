@@ -12,14 +12,9 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate(
-  'date_created',
-)}, preview, validation`
+const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 
-const dbTransformCallback = (
-  surveyId,
-  includeValidationFields = true,
-) => record => {
+const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
   return R.pipe(
     R.dissoc(Validation.keys.validation),
@@ -86,9 +81,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefKeysSelect = nodeDefKeys
     .map(
       nodeDefKey =>
-        `${rootEntityTableAlias}.${getNodeDefKeyColName(
-          nodeDefKey,
-        )} as "${getNodeDefKeyColAlias(nodeDefKey)}"`,
+        `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`,
     )
     .join(',')
 
@@ -125,10 +118,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     -- GET LAST MODIFIED NODE DATE
     LEFT OUTER JOIN (
          SELECT 
-           record_uuid, ${DbUtils.selectDate(
-             'MAX(date_modified)',
-             'date_modified',
-           )}
+           record_uuid, ${DbUtils.selectDate('MAX(date_modified)', 'date_modified')}
          FROM ${getSurveyDBSchema(surveyId)}.node
          WHERE
            record_uuid IN (select uuid from r)
@@ -137,9 +127,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       ON r.uuid = n.record_uuid
     -- join with root entity table to get node key values 
     LEFT OUTER JOIN
-      ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(
-      nodeDefRoot,
-    )} as ${rootEntityTableAlias}
+      ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
     ORDER BY r.date_created DESC
   `,
@@ -164,13 +152,7 @@ export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
     WHERE preview = FALSE
   `)
 
-export const fetchRecordCreatedCountsByDates = async (
-  surveyId,
-  cycle,
-  from,
-  to,
-  client = db,
-) =>
+export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
   await client.any(
     `
     SELECT
@@ -194,12 +176,7 @@ export const fetchRecordCreatedCountsByDates = async (
 
 // ============== UPDATE
 
-export const updateValidation = async (
-  surveyId,
-  recordUuid,
-  validation,
-  client = db,
-) =>
+export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.record 
      SET validation = $1::jsonb
@@ -208,12 +185,7 @@ export const updateValidation = async (
     [validation, recordUuid],
   )
 
-export const updateRecordStep = async (
-  surveyId,
-  recordUuid,
-  step,
-  client = db,
-) =>
+export const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
   await client.none(
     `
       UPDATE ${getSurveyDBSchema(surveyId)}.record
@@ -222,11 +194,7 @@ export const updateRecordStep = async (
     [step, recordUuid],
   )
 
-export const updateRecordValidationsFromValues = async (
-  surveyId,
-  recordUuidAndValidationValues,
-  client = db,
-) =>
+export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
   await client.none(
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
@@ -248,11 +216,7 @@ export const deleteRecord = async (surveyId, recordUuid, client = db) =>
     [recordUuid],
   )
 
-export const deleteRecordsPreview = async (
-  surveyId,
-  olderThan24Hours = false,
-  client = db,
-) =>
+export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, client = db) =>
   await client.map(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record

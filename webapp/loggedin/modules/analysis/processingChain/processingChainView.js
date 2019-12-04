@@ -58,34 +58,21 @@ const ProcessingChainView = props => {
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingChain.getLabels(processingChain)}
-          onChange={labels =>
-            putProcessingChainProp(ProcessingChain.keysProps.labels, labels)
-          }
+          onChange={labels => putProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
         />
 
         <LabelsEditor
           formLabelKey="common.description"
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingChain.getDescriptions(processingChain)}
-          onChange={descriptions =>
-            putProcessingChainProp(
-              ProcessingChain.keysProps.descriptions,
-              descriptions,
-            )
-          }
+          onChange={descriptions => putProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
         />
 
-        <ProcessingChainSteps
-          history={history}
-          processingChain={processingChain}
-        />
+        <ProcessingChainSteps history={history} processingChain={processingChain} />
 
         <button
           className="btn-s btn-danger btn-delete"
-          onClick={() =>
-            window.confirm(i18n.t('processingChainView.deleteConfirm')) &&
-            deleteProcessingChain(history)
-          }
+          onClick={() => window.confirm(i18n.t('processingChainView.deleteConfirm')) && deleteProcessingChain(history)}
         >
           <span className="icon icon-bin icon-12px icon-left" />
           {i18n.t('common.delete')}

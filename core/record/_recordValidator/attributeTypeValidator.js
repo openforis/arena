@@ -14,38 +14,25 @@ import * as Validation from '@core/validation/validation'
 import * as Node from '../node'
 
 const typeValidatorFns = {
-  [nodeDefType.boolean]: (_survey, _nodeDef, _node, value) =>
-    R.includes(value, ['true', 'false']),
+  [nodeDefType.boolean]: (_survey, _nodeDef, _node, value) => R.includes(value, ['true', 'false']),
 
-  [nodeDefType.code]: (survey, nodeDef, node, _value) =>
-    validateCode(survey, nodeDef, node),
+  [nodeDefType.code]: (survey, nodeDef, node, _value) => validateCode(survey, nodeDef, node),
 
   [nodeDefType.coordinate]: (_survey, _nodeDef, node, _value) =>
-    GeoUtils.isCoordinateValid(
-      Node.getCoordinateSrs(node),
-      Node.getCoordinateX(node),
-      Node.getCoordinateY(node),
-    ),
+    GeoUtils.isCoordinateValid(Node.getCoordinateSrs(node), Node.getCoordinateX(node), Node.getCoordinateY(node)),
 
   [nodeDefType.date]: (_survey, _nodeDef, node, _value) => {
-    const [year, month, day] = [
-      Node.getDateYear(node),
-      Node.getDateMonth(node),
-      Node.getDateDay(node),
-    ]
+    const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
     return DateTimeUtils.isValidDate(year, month, day)
   },
 
-  [nodeDefType.decimal]: (_survey, _nodeDef, _node, value) =>
-    NumberUtils.isFloat(value),
+  [nodeDefType.decimal]: (_survey, _nodeDef, _node, value) => NumberUtils.isFloat(value),
 
   [nodeDefType.file]: (_survey, _nodeDef, _node, _value) => true,
 
-  [nodeDefType.integer]: (_survey, _nodeDef, _node, value) =>
-    NumberUtils.isInteger(value),
+  [nodeDefType.integer]: (_survey, _nodeDef, _node, value) => NumberUtils.isInteger(value),
 
-  [nodeDefType.taxon]: (survey, nodeDef, node, _value) =>
-    validateTaxon(survey, nodeDef, node),
+  [nodeDefType.taxon]: (survey, nodeDef, node, _value) => validateTaxon(survey, nodeDef, node),
 
   [nodeDefType.text]: (_survey, _nodeDef, _node, value) => R.is(String, value),
 
@@ -84,11 +71,7 @@ const validateTaxon = (survey, nodeDef, node) => {
   }
 
   // Vernacular name not found
-  return Survey.includesTaxonVernacularName(
-    nodeDef,
-    Taxon.getCode(taxon),
-    vernacularNameUuid,
-  )(survey)
+  return Survey.includesTaxonVernacularName(nodeDef, Taxon.getCode(taxon), vernacularNameUuid)(survey)
 }
 
 export const validateValueType = (survey, nodeDef) => (_propName, node) => {

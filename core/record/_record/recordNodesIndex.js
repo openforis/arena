@@ -58,8 +58,7 @@ export const getNodeRootUuid = R.prop(keys.nodeRootUuid)
 /**
  * Returns the list of node uuids having the specified nodeDefUuid
  */
-export const getNodeUuidsByDef = nodeDefUuid =>
-  R.pathOr([], [keys.nodesByDef, nodeDefUuid])
+export const getNodeUuidsByDef = nodeDefUuid => R.pathOr([], [keys.nodesByDef, nodeDefUuid])
 
 /**
  * Returns the list of node uuids having the specified parentNodeUuid and nodeDefUuid
@@ -71,14 +70,9 @@ export const getNodeUuidsByParentAndDef = (parentNodeUuid, childDefUuid) =>
  * Returns the list of all node uuids having the specified parentNodeUuid
  */
 export const getNodeUuidsByParent = parentNodeUuid =>
-  R.pipe(
-    R.pathOr({}, [keys.nodesByParentAndDef, parentNodeUuid]),
-    R.values,
-    R.flatten,
-  )
+  R.pipe(R.pathOr({}, [keys.nodesByParentAndDef, parentNodeUuid]), R.values, R.flatten)
 
-export const getNodeCodeDependentUuids = nodeUuid =>
-  R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
+export const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
 
 // ==== ADD
 /**
@@ -94,25 +88,14 @@ export const addNodes = nodes => record =>
 export const addNode = node =>
   R.pipe(
     // RootUuid
-    R.ifElse(
-      R.always(Node.isRoot(node)),
-      R.assoc(keys.nodeRootUuid, Node.getUuid(node)),
-      R.identity,
-    ),
+    R.ifElse(R.always(Node.isRoot(node)), R.assoc(keys.nodeRootUuid, Node.getUuid(node)), R.identity),
     // Parent index
     _assocToIndexPath(
-      [
-        keys.nodesByParentAndDef,
-        Node.getParentUuid(node),
-        Node.getNodeDefUuid(node),
-      ],
+      [keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)],
       Node.getUuid(node),
     ),
     // Node def index
-    _assocToIndexPath(
-      [keys.nodesByDef, Node.getNodeDefUuid(node)],
-      Node.getUuid(node),
-    ),
+    _assocToIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
     // Code dependent index
     _addNodeToCodeDependentsIndex(node),
   )
@@ -120,10 +103,7 @@ export const addNode = node =>
 const _addNodeToCodeDependentsIndex = node => record =>
   R.reduce(
     (recordAcc, ancestorCodeAttributeUuid) =>
-      _assocToIndexPath(
-        [keys.nodeCodeDependents, ancestorCodeAttributeUuid],
-        Node.getUuid(node),
-      )(recordAcc),
+      _assocToIndexPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
     record,
     Node.getHierarchyCode(node),
   )
@@ -134,25 +114,14 @@ const _addNodeToCodeDependentsIndex = node => record =>
  */
 export const removeNode = node =>
   R.pipe(
-    R.ifElse(
-      R.always(Node.isRoot(node)),
-      R.dissoc(keys.nodeRootUuid),
-      R.identity,
-    ),
+    R.ifElse(R.always(Node.isRoot(node)), R.dissoc(keys.nodeRootUuid), R.identity),
     // Parent index
     _dissocFromIndexPath(
-      [
-        keys.nodesByParentAndDef,
-        Node.getParentUuid(node),
-        Node.getNodeDefUuid(node),
-      ],
+      [keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)],
       Node.getUuid(node),
     ),
     // Node def index
-    _dissocFromIndexPath(
-      [keys.nodesByDef, Node.getNodeDefUuid(node)],
-      Node.getUuid(node),
-    ),
+    _dissocFromIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
     // Code dependent index
     _removeNodeFromCodeDependentsIndex(node),
   )
@@ -162,23 +131,16 @@ const _removeNodeFromCodeDependentsIndex = node => record =>
     Node.getHierarchyCode,
     R.reduce(
       (recordAcc, ancestorCodeAttributeUuid) =>
-        _dissocFromIndexPath(
-          [keys.nodeCodeDependents, ancestorCodeAttributeUuid],
-          Node.getUuid(node),
-        )(recordAcc),
+        _dissocFromIndexPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
       record,
     ),
     R.dissocPath([keys.nodeCodeDependents, Node.getUuid(node)]),
   )(node)
 
 const _assocToIndexPath = (path, value) => record =>
-  R.pipe(
-    R.pathOr([], path),
-    R.ifElse(R.includes(value), R.identity, R.append(value)),
-    valuesArray => ObjectUtils.setInPath(path, valuesArray)(record),
+  R.pipe(R.pathOr([], path), R.ifElse(R.includes(value), R.identity, R.append(value)), valuesArray =>
+    ObjectUtils.setInPath(path, valuesArray)(record),
   )(record)
 
 const _dissocFromIndexPath = (path, value) => record =>
-  R.pipe(R.pathOr([], path), R.without(value), valuesArray =>
-    ObjectUtils.setInPath(path, valuesArray)(record),
-  )(record)
+  R.pipe(R.pathOr([], path), R.without(value), valuesArray => ObjectUtils.setInPath(path, valuesArray)(record))(record)

@@ -55,19 +55,13 @@ const Table = props => {
   const widthMax = width - defaultColWidth - 35
   const colWidthMin = 150
 
-  const colWidth =
-    widthMax > colsNumber * colWidthMin
-      ? Math.floor(widthMax / colsNumber)
-      : colWidthMin
+  const colWidth = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
 
   const hasData = !R.isEmpty(data)
 
   useOnUpdate(() => {
     if (editMode) {
-      AppWebSocket.on(
-        WebSocketEvents.nodesUpdateCompleted,
-        nodesUpdateCompleted,
-      )
+      AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
     }
 
     return () => {
@@ -76,10 +70,7 @@ const Table = props => {
   }, [editMode])
 
   return (
-    <div
-      className={`data-query__table table${editMode ? ' edit' : ''}`}
-      ref={tableRef}
-    >
+    <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={tableRef}>
       {showTable && (
         <React.Fragment>
           <TableHeader
@@ -128,11 +119,7 @@ const mapStateToProps = state => {
   const editMode = DataQueryState.getTableEditMode(state)
 
   const colsNumber = editMode
-    ? nodeDefCols.reduce(
-        (tot, nodeDefCol) =>
-          tot + NodeDefUIProps.getFormFields(nodeDefCol).length,
-        0,
-      )
+    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
     : colNames.length
 
   return {
@@ -157,8 +144,5 @@ const mapStateToProps = state => {
   }
 }
 
-const enhance = compose(
-  withRouter,
-  connect(mapStateToProps, { nodesUpdateCompleted }),
-)
+const enhance = compose(withRouter, connect(mapStateToProps, { nodesUpdateCompleted }))
 export default enhance(Table)

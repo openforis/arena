@@ -23,20 +23,14 @@ const AppError = ({ error, closeAppError }) => {
         <span className="icon icon-cross icon-12px" />
       </button>
 
-      <div className="status">
-        ERROR {R.path(['response', 'status'], error)}
-      </div>
+      <div className="status">ERROR {R.path(['response', 'status'], error)}</div>
       <Markdown className="message" source={i18n.t(key, params)} />
     </div>
   )
 }
 
 const AppErrors = ({ errors, closeAppError }) => (
-  <TransitionGroup
-    className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`}
-    enter={true}
-    appear={true}
-  >
+  <TransitionGroup className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter={true} appear={true}>
     {errors.map(error => (
       <CSSTransition key={error.id} timeout={500} classNames="fade">
         <AppError error={error} closeAppError={closeAppError} />

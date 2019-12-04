@@ -22,20 +22,14 @@ const BinaryOperand = props => {
   return (
     <>
       <button
-        className={`btn btn-s btn-switch-operand${
-          !Expression.isLiteral(nodeOperand) ? ' active' : ''
-        }`}
-        onClick={() =>
-          onChange(R.assoc(type, Expression.newIdentifier(), node))
-        }
+        className={`btn btn-s btn-switch-operand${!Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        onClick={() => onChange(R.assoc(type, Expression.newIdentifier(), node))}
       >
         {i18n.t('expressionEditor.var')}
       </button>
 
       <button
-        className={`btn btn-s btn-switch-operand${
-          Expression.isLiteral(nodeOperand) ? ' active' : ''
-        }`}
+        className={`btn btn-s btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
         aria-disabled={isLeft && isBoolean}
         onClick={() => {
           const nodeUpdate =

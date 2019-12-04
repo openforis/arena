@@ -5,17 +5,7 @@ import React from 'react'
 import * as Node from '@core/record/node'
 
 const Button = props => {
-  const {
-    nodeDef,
-    nodes,
-    value,
-    label,
-    readOnly,
-    disabled,
-    updateNode,
-    entry,
-    canEditRecord,
-  } = props
+  const { nodeDef, nodes, value, label, readOnly, disabled, updateNode, entry, canEditRecord } = props
 
   const node = entry ? nodes[0] : null
 
@@ -28,11 +18,7 @@ const Button = props => {
       aria-disabled={disabled || !canEditRecord || readOnly}
       onClick={() => updateNode(nodeDef, node, checked ? null : value)}
     >
-      <span
-        className={`icon icon-12px icon-radio-${
-          checked ? 'checked2' : 'unchecked'
-        } icon-left`}
-      />
+      <span className={`icon icon-12px icon-radio-${checked ? 'checked2' : 'unchecked'} icon-left`} />
       {label}
     </button>
   )

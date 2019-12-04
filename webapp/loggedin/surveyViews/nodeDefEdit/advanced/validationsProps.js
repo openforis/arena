@@ -46,11 +46,7 @@ const ValidationsProps = props => {
                 Validation.getFieldValidation(NodeDefValidations.keys.min),
               )(validation)}
               mask={integerMask}
-              onChange={value =>
-                handleValidationsUpdate(
-                  NodeDefValidations.assocMinCount(value)(nodeDefValidations),
-                )
-              }
+              onChange={value => handleValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
             />
           </FormItem>
           <FormItem label={i18n.t('nodeDefEdit.validationsProps.maxCount')}>
@@ -62,11 +58,7 @@ const ValidationsProps = props => {
                 Validation.getFieldValidation(NodeDefValidations.keys.max),
               )(validation)}
               mask={integerMask}
-              onChange={value =>
-                handleValidationsUpdate(
-                  NodeDefValidations.assocMaxCount(value)(nodeDefValidations),
-                )
-              }
+              onChange={value => handleValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
             />
           </FormItem>
         </React.Fragment>
@@ -75,11 +67,7 @@ const ValidationsProps = props => {
           <Checkbox
             checked={NodeDefValidations.isRequired(nodeDefValidations)}
             disabled={readOnly}
-            onChange={checked =>
-              handleValidationsUpdate(
-                NodeDefValidations.assocRequired(checked)(nodeDefValidations),
-              )
-            }
+            onChange={checked => handleValidationsUpdate(NodeDefValidations.assocRequired(checked)(nodeDefValidations))}
           />
         </FormItem>
       ) : null}
@@ -96,11 +84,7 @@ const ValidationsProps = props => {
             Validation.getFieldValidation(NodeDefValidations.keys.expressions),
           )(validation)}
           onChange={expressions =>
-            handleValidationsUpdate(
-              NodeDefValidations.assocExpressions(expressions)(
-                nodeDefValidations,
-              ),
-            )
+            handleValidationsUpdate(NodeDefValidations.assocExpressions(expressions)(nodeDefValidations))
           }
           nodeDefUuidContext={nodeDefUuidContext}
           nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}

@@ -20,10 +20,7 @@ export const createSurveyTest = async () => {
 
   assert.equal(Survey.getName(surveyInfo), testSurvey.name)
   const expectedDefaultLanguage = testSurvey.languages[0]
-  assert.equal(
-    Survey.getLanguage(expectedDefaultLanguage)(surveyInfo),
-    expectedDefaultLanguage,
-  )
+  assert.equal(Survey.getLanguage(expectedDefaultLanguage)(surveyInfo), expectedDefaultLanguage)
   assert.equal(Survey.getDefaultLabel(surveyInfo), testSurvey.label)
 }
 

@@ -10,14 +10,7 @@ import NodeDeleteButton from '../nodeDeleteButton'
 
 import * as NodeDefUIProps from '../../nodeDefUIProps'
 
-const TextInput = ({
-  nodeDef,
-  readOnly,
-  node,
-  edit,
-  updateNode,
-  canEditRecord,
-}) => (
+const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       aria-disabled={edit || !canEditRecord || readOnly}
@@ -42,25 +35,13 @@ const MultipleTextInput = props => {
                 nodeDef,
               )} survey-form__node-def-text-multiple-container`}
             >
-              <NodeDefErrorBadge
-                nodeDef={nodeDef}
-                edit={false}
-                parentNode={parentNode}
-                node={n}
-              />
+              <NodeDefErrorBadge nodeDef={nodeDef} edit={false} parentNode={parentNode} node={n} />
 
               <TextInput {...props} node={n} />
 
-              {!n.placeholder &&
-                NodeDef.isMultiple(nodeDef) &&
-                canEditRecord && (
-                  <NodeDeleteButton
-                    nodeDef={nodeDef}
-                    node={n}
-                    showConfirm={true}
-                    removeNode={removeNode}
-                  />
-                )}
+              {!n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord && (
+                <NodeDeleteButton nodeDef={nodeDef} node={n} showConfirm={true} removeNode={removeNode} />
+              )}
             </div>
           ),
       )}

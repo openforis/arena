@@ -9,21 +9,12 @@ import Popup from '../popup'
 import { useI18n } from '../hooks'
 import ExpressionNode from './nodes/expressionNode'
 
-import {
-  useExpressionEditorPopupState,
-  mapStateToProps,
-} from './expressionEditorPopupState'
+import { useExpressionEditorPopupState, mapStateToProps } from './expressionEditorPopupState'
 
 const ExpressionEditorPopup = props => {
   const { nodeDefCurrent, isBoolean, variables, onChange, onClose } = props
 
-  const {
-    query,
-    queryDraft,
-    exprDraft,
-    exprDraftValid,
-    updateDraft,
-  } = useExpressionEditorPopupState(props)
+  const { query, queryDraft, exprDraft, exprDraftValid, updateDraft } = useExpressionEditorPopupState(props)
 
   const i18n = useI18n()
 
@@ -31,11 +22,7 @@ const ExpressionEditorPopup = props => {
     <Popup className="expression-editor-popup" onClose={onClose} padding={20}>
       <div className="expression-editor__query-container">
         <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
-          {R.isEmpty(queryDraft) ? (
-            <span className="placeholder">- {i18n.t('common.empty')} -</span>
-          ) : (
-            queryDraft
-          )}
+          {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
         </div>
       </div>
 
@@ -52,11 +39,7 @@ const ExpressionEditorPopup = props => {
       </div>
 
       <div className="expression-editor-popup__footer">
-        <button
-          className="btn btn-xs"
-          onClick={() => onChange('')}
-          aria-disabled={R.isEmpty(query)}
-        >
+        <button className="btn btn-xs" onClick={() => onChange('')} aria-disabled={R.isEmpty(query)}>
           <span className="icon icon-undo2 icon-12px" />
           {i18n.t('common.reset')}
         </button>

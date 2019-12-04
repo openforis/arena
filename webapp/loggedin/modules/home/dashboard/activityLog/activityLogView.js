@@ -31,9 +31,7 @@ const ActivityLogView = props => {
 
   return (
     <div className="activity-log">
-      <div className="activity-log__header">
-        {i18n.t('activityLogView.recentActivity')}
-      </div>
+      <div className="activity-log__header">{i18n.t('activityLogView.recentActivity')}</div>
 
       <div className="activity-log__messages">
         {R.isEmpty(activityLogMessages)
@@ -41,28 +39,16 @@ const ActivityLogView = props => {
           : activityLogMessages.map(message => (
               <div key={ActivityLogMessage.getId(message)}>
                 <div
-                  className={`activity-log__message${
-                    ActivityLogMessage.isItemDeleted(message)
-                      ? ' item-deleted'
-                      : ''
-                  }`}
+                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`}
                 >
                   <div className="activity">
-                    <ProfilePicture
-                      userUuid={ActivityLogMessage.getUserUuid(message)}
-                      thumbnail={true}
-                    />
+                    <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true} />
                     <Markdown
-                      source={`${ActivityLogMessage.getUserName(
-                        message,
-                      )} ${ActivityLogMessage.getMessage(message)}`}
+                      source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
                     />
                   </div>
                   <div className="date">
-                    {DateUtils.getRelativeDate(
-                      i18n,
-                      ActivityLogMessage.getDateCreated(message),
-                    )}
+                    {DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}
                   </div>
                 </div>
                 <div className="activity-log__message-separator" />

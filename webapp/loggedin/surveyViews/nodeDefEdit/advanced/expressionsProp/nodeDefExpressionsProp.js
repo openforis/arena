@@ -27,12 +27,7 @@ const NodeDefExpressionsProp = props => {
   const values = NodeDef.getProp(propName, [])(nodeDef)
 
   const onChange = expressions => {
-    putNodeDefProp(
-      nodeDef,
-      propName,
-      R.reject(NodeDefExpression.isPlaceholder, expressions),
-      true,
-    )
+    putNodeDefProp(nodeDef, propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true)
   }
 
   return (

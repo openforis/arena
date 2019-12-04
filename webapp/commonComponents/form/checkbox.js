@@ -13,11 +13,7 @@ class Checkbox extends React.Component {
             onClick={() => onChange(!checked)}
             aria-disabled={disabled}
           >
-            <span
-              className={`icon icon-${radio ? 'radio' : 'checkbox'}-${
-                !checked ? 'un' : ''
-              }checked icon-18px`}
-            />
+            <span className={`icon icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked icon-18px`} />
             {label}
           </button>
         </ValidationTooltip>

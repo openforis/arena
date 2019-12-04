@@ -22,13 +22,7 @@ export const tableColumns = [
 
 // camelize all but "meta"
 const dbTransformCallback = node =>
-  node
-    ? R.pipe(
-        R.dissoc(Node.keys.meta),
-        camelize,
-        R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)),
-      )(node)
-    : null
+  node ? R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node) : null
 
 const _getNodeSelectQuery = (surveyId, draft) => {
   const schema = getSurveyDBSchema(surveyId)
@@ -99,28 +93,12 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
-export const insertNodesFromValues = async (
-  surveyId,
-  nodeValues,
-  client = db,
-) =>
-  await client.none(
-    DbUtils.insertAllQuery(
-      getSurveyDBSchema(surveyId),
-      'node',
-      tableColumns,
-      nodeValues,
-    ),
-  )
+export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
+  await client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumns, nodeValues))
 
 // ============== READ
 
-export const fetchNodesByRecordUuid = async (
-  surveyId,
-  recordUuid,
-  draft,
-  client = db,
-) =>
+export const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
   await client.map(
     `
     ${_getNodeSelectQuery(surveyId, draft)}
@@ -139,13 +117,7 @@ export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback,
   )
 
-export const fetchChildNodesByNodeDefUuids = async (
-  surveyId,
-  recordUuid,
-  nodeUuid,
-  childDefUUids,
-  client = db,
-) =>
+export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   await client.map(
     `
     ${_getNodeSelectQuery(surveyId, false)}
@@ -157,14 +129,7 @@ export const fetchChildNodesByNodeDefUuids = async (
   )
 
 // ============== UPDATE
-export const updateNode = async (
-  surveyId,
-  nodeUuid,
-  value,
-  meta,
-  draft,
-  client = db,
-) => {
+export const updateNode = async (surveyId, nodeUuid, value, meta, draft, client = db) => {
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
@@ -186,19 +151,11 @@ export const updateNode = async (
   return { ...node, [Node.keys.updated]: true }
 }
 
-export const updateChildrenApplicability = async (
-  surveyId,
-  parentNodeUuid,
-  childDefUuid,
-  applicable,
-  client = db,
-) =>
+export const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET meta = jsonb_set(meta, '{"${
-      Node.metaKeys.childApplicability
-    }", "${childDefUuid}"}', '${applicable}')
+    SET meta = jsonb_set(meta, '{"${Node.metaKeys.childApplicability}", "${childDefUuid}"}', '${applicable}')
     WHERE uuid = $1
     RETURNING *`,
     [parentNodeUuid],
@@ -217,11 +174,7 @@ export const deleteNode = async (surveyId, nodeUuid, client = db) =>
     dbTransformCallback,
   )
 
-export const deleteNodesByNodeDefUuids = async (
-  surveyId,
-  nodeDefUuids,
-  client = db,
-) =>
+export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
   await client.manyOrNone(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node

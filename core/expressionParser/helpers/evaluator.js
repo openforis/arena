@@ -98,9 +98,7 @@ const binaryEval = (expr, ctx) => {
 
   // Arithmetic operators will always return nulls for any non-numeric inputs
   if (operator in arithmeticOperators) {
-    return R.is(Number, leftResult) && R.is(Number, rightResult)
-      ? fn(leftResult, rightResult)
-      : null
+    return R.is(Number, leftResult) && R.is(Number, rightResult) ? fn(leftResult, rightResult) : null
   }
 
   // Boolean operators:

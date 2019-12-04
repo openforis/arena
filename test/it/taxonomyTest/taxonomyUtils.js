@@ -11,21 +11,13 @@ import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJo
 
 // ==== READ (getters)
 export const getTaxonVernacularNamesText = lang =>
-  R.pipe(
-    Taxon.getVernacularNamesByLang(lang),
-    R.map(TaxonVernacularName.getName),
-    names => names.sort(),
-  )
+  R.pipe(Taxon.getVernacularNamesByLang(lang), R.map(TaxonVernacularName.getName), names => names.sort())
 
-export const getTaxonSingleVernacularNameText = lang =>
-  R.pipe(getTaxonVernacularNamesText(lang), R.head)
+export const getTaxonSingleVernacularNameText = lang => R.pipe(getTaxonVernacularNamesText(lang), R.head)
 
 // ==== READ (fetch from DB)
 export const fetchTaxonomyByName = async (surveyId, name, draft) => {
-  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(
-    surveyId,
-    draft,
-  )
+  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, draft)
   return R.find(taxonomy => Taxonomy.getName(taxonomy) === name)(taxonomies)
 }
 
@@ -35,40 +27,20 @@ export const fetchTaxonomyUuidByName = async (surveyId, name, draft) => {
 }
 
 export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft) => {
-  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(
-    surveyId,
-    taxonomyUuid,
-    draft,
-  )
+  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft)
   return R.find(taxon => Taxon.getCode(taxon) === code)(taxa)
 }
 
 // ==== UPDATE
-export const updateTaxonWithNewVernacularNames = async (
-  user,
-  surveyId,
-  taxonomyName,
-  taxonCode,
-  lang,
-  names,
-) => {
-  const taxonomyUuid = await fetchTaxonomyUuidByName(
-    surveyId,
-    taxonomyName,
-    true,
-  )
+export const updateTaxonWithNewVernacularNames = async (user, surveyId, taxonomyName, taxonCode, lang, names) => {
+  const taxonomyUuid = await fetchTaxonomyUuidByName(surveyId, taxonomyName, true)
 
   // Load taxon
   const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
 
   // Create new vernacular name or updated existing one
-  const vernacularNamesArrayNew = R.map(name =>
-    TaxonVernacularName.newTaxonVernacularName(lang, name),
-  )(names)
-  const taxonNew = Taxon.assocVernacularNames(
-    lang,
-    vernacularNamesArrayNew,
-  )(taxon)
+  const vernacularNamesArrayNew = R.map(name => TaxonVernacularName.newTaxonVernacularName(lang, name))(names)
+  const taxonNew = Taxon.assocVernacularNames(lang, vernacularNamesArrayNew)(taxon)
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
 
   // Update taxon
@@ -81,20 +53,10 @@ export const updateTaxonWithNewVernacularNames = async (
 }
 
 // Import
-export const importFile = async (
-  user,
-  surveyId,
-  taxonomyName,
-  importFileName,
-) => {
+export const importFile = async (user, surveyId, taxonomyName, importFileName) => {
   // Fetch or create new taxonomy
-  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(
-    surveyId,
-    true,
-  )
-  const taxonomyExisting = R.find(
-    taxonomy => Taxonomy.getName(taxonomy) === taxonomyName,
-  )(taxonomies)
+  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, true)
+  const taxonomyExisting = R.find(taxonomy => Taxonomy.getName(taxonomy) === taxonomyName)(taxonomies)
   let taxonomy = null
   if (taxonomyExisting) {
     taxonomy = taxonomyExisting

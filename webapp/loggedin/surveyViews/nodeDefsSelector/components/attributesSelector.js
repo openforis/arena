@@ -19,13 +19,10 @@ const AttributeSelector = props => {
     showMultipleAttributes,
   } = props
 
-  const isAttributeFn = showMultipleAttributes
-    ? NodeDef.isAttribute
-    : NodeDef.isSingleAttribute
+  const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
   const isVisible =
     (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
-    (R.isEmpty(filterTypes) ||
-      R.includes(NodeDef.getType(nodeDef), filterTypes))
+    (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
@@ -78,9 +75,7 @@ const AttributesSelector = props => {
 
         {showAncestors && nodeDefParent && (
           <React.Fragment>
-            <div className="node-def-label">
-              {NodeDef.getLabel(nodeDefParent, lang)}
-            </div>
+            <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
             <AttributesSelectorConnect
               lang={lang}
               nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}

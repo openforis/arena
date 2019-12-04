@@ -12,17 +12,10 @@ import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import {
-  putNodeDefProp,
-  putNodeDefLayoutProp,
-} from '@webapp/survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 import * as RecordState from '../../record/recordState'
 
-import {
-  createNodePlaceholder,
-  updateNode,
-  removeNode,
-} from '../../record/actions'
+import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 import * as NodeDefUiProps from './nodeDefUIProps'
 
 // Edit actions
@@ -40,25 +33,10 @@ class NodeDefSwitch extends React.Component {
   }
 
   checkNodePlaceholder() {
-    const {
-      nodes,
-      nodeDef,
-      parentNode,
-      createNodePlaceholder,
-      canAddNode,
-    } = this.props
+    const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
 
-    if (
-      canAddNode &&
-      NodeDef.isAttribute(nodeDef) &&
-      !NodeDef.isCode(nodeDef) &&
-      R.none(Node.isPlaceholder, nodes)
-    ) {
-      createNodePlaceholder(
-        nodeDef,
-        parentNode,
-        NodeDefUiProps.getDefaultValue(nodeDef),
-      )
+    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
+      createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getDefaultValue(nodeDef))
     }
   }
 
@@ -77,15 +55,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   render() {
-    const {
-      surveyCycleKey,
-      nodeDef,
-      label,
-      edit,
-      canEditDef,
-      renderType,
-      applicable,
-    } = this.props
+    const { surveyCycleKey, nodeDef, label, edit, canEditDef, renderType, applicable } = this.props
 
     const className =
       'survey-form__node-def-page' +
@@ -94,12 +64,7 @@ class NodeDefSwitch extends React.Component {
 
     return (
       <div className={className} ref={this.element}>
-        <NodeDefEditButtons
-          surveyCycleKey={surveyCycleKey}
-          nodeDef={nodeDef}
-          edit={edit}
-          canEditDef={canEditDef}
-        />
+        <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
 
         {renderType === NodeDefLayout.renderType.tableHeader ? (
           <NodeDefTableCellHeader nodeDef={nodeDef} label={label} />
@@ -134,27 +99,18 @@ const mapStateToProps = (state, props) => {
     const nodes = NodeDef.isRoot(nodeDef)
       ? [Record.getRootNode(record)]
       : parentNode
-      ? Record.getNodeChildrenByDefUuid(
-          parentNode,
-          NodeDef.getUuid(nodeDef),
-        )(record)
+      ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
       : []
 
     const nodesValidated = R.pipe(
       R.map(n =>
         Validation.assocValidation(
-          R.pipe(
-            Validation.getValidation,
-            Validation.getFieldValidation(Node.getUuid(n)),
-          )(record),
+          R.pipe(Validation.getValidation, Validation.getFieldValidation(Node.getUuid(n)))(record),
         )(n),
       ),
     )(nodes)
 
-    const maxCount = R.pipe(
-      NodeDef.getValidations,
-      NodeDefValidations.getMaxCount,
-    )(nodeDef)
+    const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
 
     const canAddNode =
       canEditRecord &&
@@ -172,9 +128,7 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     label,
-    applicable: parentNode
-      ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
-      : true,
+    applicable: parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true,
     ...(entry ? mapEntryProps() : {}),
   }
 }

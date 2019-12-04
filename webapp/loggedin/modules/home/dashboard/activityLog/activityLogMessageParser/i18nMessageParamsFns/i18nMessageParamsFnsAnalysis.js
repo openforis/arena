@@ -8,14 +8,10 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-const _getProcessingChainLabel = lang =>
-  R.pipe(ActivityLog.getProcessingChainLabels, R.prop(lang))
+const _getProcessingChainLabel = lang => R.pipe(ActivityLog.getProcessingChainLabels, R.prop(lang))
 
 export default {
-  [ActivityLog.type.processingChainPropUpdate]: (
-    survey,
-    i18n,
-  ) => activityLog => ({
+  [ActivityLog.type.processingChainPropUpdate]: (survey, i18n) => activityLog => ({
     key: ActivityLog.getContentKey(activityLog),
     label: _getProcessingChainLabel(i18n.lang)(activityLog),
   }),
@@ -32,10 +28,7 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepPropsUpdate]: (
-    survey,
-    i18n,
-  ) => activityLog => {
+  [ActivityLog.type.processingStepPropsUpdate]: (survey, i18n) => activityLog => {
     const content = ActivityLog.getContent(activityLog)
 
     // Only one of entityUuid or categoryUuid can have a value associated
@@ -46,15 +39,10 @@ export default {
     let value
     if (entityUuid) {
       key = i18n.t('nodeDefsTypes.entity')
-      value = R.pipe(Survey.getNodeDefByUuid(entityUuid), entityDef =>
-        NodeDef.getLabel(entityDef, i18n.lang),
-      )(survey)
+      value = R.pipe(Survey.getNodeDefByUuid(entityUuid), entityDef => NodeDef.getLabel(entityDef, i18n.lang))(survey)
     } else {
       key = i18n.t('processingStepView.category')
-      value = R.pipe(
-        Survey.getCategoryByUuid(categoryUuid),
-        Category.getName,
-      )(survey)
+      value = R.pipe(Survey.getCategoryByUuid(categoryUuid), Category.getName)(survey)
     }
 
     return {
@@ -70,10 +58,7 @@ export default {
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.processingStepCalculationCreate]: (
-    survey,
-    i18n,
-  ) => activityLog => {
+  [ActivityLog.type.processingStepCalculationCreate]: (survey, i18n) => activityLog => {
     const calculation = ActivityLog.getContent(activityLog)
     return {
       index: ProcessingStepCalculation.getIndex(calculation),
@@ -82,10 +67,7 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepCalculationIndexUpdate]: (
-    survey,
-    i18n,
-  ) => activityLog => ({
+  [ActivityLog.type.processingStepCalculationIndexUpdate]: (survey, i18n) => activityLog => ({
     indexFrom: ActivityLog.getContentIndexFrom(activityLog),
     indexTo: ActivityLog.getContentIndexTo(activityLog),
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),

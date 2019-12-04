@@ -22,7 +22,8 @@
     "test:docker": "test/run_docker_tests.sh",
     "postinstall": "webpack --display-error-details --config webpack.config.babel.js",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
-    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\""
+    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
+    "format": "yarn run xo --fix"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -50,7 +51,12 @@
       "no-return-await": "off",
       "new-cap": "off",
       "no-alert": "off",
-      "max-params": ["warn", {"max": 6}],
+      "max-params": [
+        "warn",
+        {
+          "max": 6
+        }
+      ],
       "import/no-unassigned-import": [
         "warn",
         {
@@ -153,7 +159,8 @@
   },
   "prettier": {
     "bracketSpacing": true,
-    "trailingComma": "all"
+    "trailingComma": "all",
+    "printWidth": 120
   },
   "devDependencies": {
     "@babel/cli": "^7.6.3",

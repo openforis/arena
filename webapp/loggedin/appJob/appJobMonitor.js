@@ -4,12 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import {
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from '@webapp/commonComponents/modal'
+import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/commonComponents/modal'
 import ProgressBar from '@webapp/commonComponents/progressBar'
 import AppJobErrors from './appJobErrors'
 
@@ -17,9 +12,7 @@ import * as JobState from './appJobState'
 
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 
-const JobProgress = ({ job }) => (
-  <ProgressBar progress={job.progressPercent} className={job.status} />
-)
+const JobProgress = ({ job }) => <ProgressBar progress={job.progressPercent} className={job.status} />
 
 const InnerJobs = ({ innerJobs }) => {
   const i18n = useI18n()
@@ -63,19 +56,11 @@ const AppJobMonitor = props => {
         </ModalBody>
 
         <ModalFooter>
-          <button
-            className="btn modal-footer__item"
-            onClick={() => cancelActiveJob()}
-            aria-disabled={!job.running}
-          >
+          <button className="btn modal-footer__item" onClick={() => cancelActiveJob()} aria-disabled={!job.running}>
             {i18n.t('common.cancel')}
           </button>
 
-          <button
-            className="btn modal-footer__item"
-            onClick={() => hideAppJobMonitor()}
-            aria-disabled={!job.ended}
-          >
+          <button className="btn modal-footer__item" onClick={() => hideAppJobMonitor()} aria-disabled={!job.ended}>
             {i18n.t('common.close')}
           </button>
         </ModalFooter>
@@ -88,6 +73,4 @@ const mapStateToProps = state => ({
   job: JobState.getActiveJob(state),
 })
 
-export default connect(mapStateToProps, { cancelActiveJob, hideAppJobMonitor })(
-  AppJobMonitor,
-)
+export default connect(mapStateToProps, { cancelActiveJob, hideAppJobMonitor })(AppJobMonitor)

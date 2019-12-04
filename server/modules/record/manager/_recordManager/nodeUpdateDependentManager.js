@@ -14,21 +14,12 @@ import * as NodeRepository from '../../repository/nodeRepository'
  * Module responsible for updating applicable and default values
  */
 
-export const updateSelfAndDependentsApplicable = async (
-  survey,
-  record,
-  node,
-  tx,
-) => {
+export const updateSelfAndDependentsApplicable = async (survey, record, node, tx) => {
   // Output
   const nodesUpdated = {} // Updated nodes indexed by uuid
 
   // 1. fetch dependent nodes
-  const nodePointersToUpdate = Record.getDependentNodePointers(
-    survey,
-    node,
-    Survey.dependencyTypes.applicable,
-  )(record)
+  const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
@@ -72,10 +63,7 @@ export const updateSelfAndDependentsApplicable = async (
         ...(Node.isCreated(nodeCtx) ? { [Node.keys.created]: true } : {}),
       }
 
-      const nodeCtxChildren = Record.getNodeChildrenByDefUuid(
-        nodeCtx,
-        nodeDefUuid,
-      )(record)
+      const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
 
       for (const nodeCtxChild of nodeCtxChildren) {
         // 5. add nodeCtxChild and its descendants to nodesUpdated
@@ -89,12 +77,7 @@ export const updateSelfAndDependentsApplicable = async (
   return nodesUpdated
 }
 
-export const updateSelfAndDependentsDefaultValues = async (
-  survey,
-  record,
-  node,
-  tx,
-) => {
+export const updateSelfAndDependentsDefaultValues = async (survey, record, node, tx) => {
   // 1. fetch dependent nodes
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
@@ -102,10 +85,7 @@ export const updateSelfAndDependentsDefaultValues = async (
   const nodeDependentPointersFilterFn = nodePointer => {
     const { nodeCtx, nodeDef } = nodePointer
 
-    return (
-      NodeDef.isAttribute(nodeDef) &&
-      (Node.isValueBlank(nodeCtx) || Node.isDefaultValueApplied(nodeCtx))
-    )
+    return NodeDef.isAttribute(nodeDef) && (Node.isValueBlank(nodeCtx) || Node.isDefaultValueApplied(nodeCtx))
   }
 
   const nodePointersToUpdate = Record.getDependentNodePointers(
@@ -131,14 +111,7 @@ export const updateSelfAndDependentsDefaultValues = async (
 
       const exprValue = R.pipe(
         R.propOr(null, 'value'),
-        R.unless(R.isNil, value =>
-          RecordExpressionValueConverter.toNodeValue(
-            survey,
-            record,
-            nodeCtx,
-            value,
-          ),
-        ),
+        R.unless(R.isNil, value => RecordExpressionValueConverter.toNodeValue(survey, record, nodeCtx, value)),
       )(exprEval)
 
       // 4. persist updated node value if changed, and return updated node

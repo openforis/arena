@@ -17,20 +17,11 @@ import { getContextUser, fetchFullContextSurvey } from '../../testContext'
 
 import * as RecordUtils from '../utils/recordUtils'
 
-const updateDefaultValues = async (
-  survey,
-  nodeDef,
-  defaultValueExpressions,
-) => {
+const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
     [NodeDef.propKeys.defaultValues]: defaultValueExpressions,
   }
-  await NodeDefRepository.updateNodeDefProps(
-    Survey.getId(survey),
-    NodeDef.getUuid(nodeDef),
-    {},
-    propsAdvanced,
-  )
+  await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef), {}, propsAdvanced)
 }
 
 export const recordCreationTest = async () => {
@@ -42,10 +33,7 @@ export const recordCreationTest = async () => {
 
   const nodes = Record.getNodes(record)
 
-  const reloadedRecord = await RecordManager.fetchRecordByUuid(
-    surveyId,
-    Record.getUuid(record),
-  )
+  const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(record))
 
   expect(reloadedRecord).to.not.be.undefined
 
@@ -74,10 +62,7 @@ export const defaultValueAppliedTest = async () => {
 
     const root = Record.getRootNode(record)
 
-    const nodes = Record.getNodeChildrenByDefUuid(
-      root,
-      NodeDef.getUuid(nodeDef),
-    )(record)
+    const nodes = Record.getNodeChildrenByDefUuid(root, NodeDef.getUuid(nodeDef))(record)
 
     const reloadedNode = R.head(nodes)
 
@@ -87,5 +72,4 @@ export const defaultValueAppliedTest = async () => {
 }
 
 // ==== helper methods
-const newDefaultValue = (expression, applyIf = null) =>
-  NodeDefExpression.createExpression(expression, applyIf)
+const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)

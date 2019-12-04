@@ -39,10 +39,7 @@ if (ProcessUtils.isEnvDevelopment) {
   middlewares.push(logger)
 }
 
-export const store = createStore(
-  createReducer({}),
-  applyMiddleware(...middlewares),
-)
+export const store = createStore(createReducer({}), applyMiddleware(...middlewares))
 
 store.asyncReducers = {}
 

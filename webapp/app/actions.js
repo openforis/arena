@@ -13,8 +13,7 @@ export const appUserLogout = 'app/user/logout'
 
 export const systemErrorThrow = 'system/error'
 
-export const throwSystemError = error => dispatch =>
-  dispatch({ type: systemErrorThrow, error })
+export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
 
 // ====== INIT
 
@@ -100,8 +99,6 @@ export const hideAppSaving = () => dispatch => {
 
 // ====== APP LOADER
 
-export const showAppLoader = () => dispatch =>
-  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
+export const showAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
 
-export const hideAppLoader = () => dispatch =>
-  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })
+export const hideAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })

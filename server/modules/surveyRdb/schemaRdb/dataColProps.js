@@ -19,22 +19,14 @@ import * as DateTimeUtils from '@core/dateUtils'
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
 
-const getValueFromItem = (
-  nodeDefCol,
-  colName,
-  item = {},
-  isInProps = false,
-) => {
+const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
   // Remove nodeDefName from col name
   const prop = camelize(NodeDefTable.extractColName(nodeDefCol, colName))
 
   return isInProps ? NodeDef.getProp(prop)(item) : R.propOr(null, prop, item)
 }
 
-const nodeValuePropProcessor = (_survey, nodeDefCol, _nodeCol) => (
-  node,
-  colName,
-) => {
+const nodeValuePropProcessor = (_survey, nodeDefCol, _nodeCol) => (node, colName) => {
   const nodeValue = Node.getValue(node)
   return getValueFromItem(nodeDefCol, colName, nodeValue)
 }
@@ -71,27 +63,16 @@ const props = {
   [nodeDefType.date]: {
     [colTypeProcessor]: () => () => sqlTypes.date,
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
-      const [year, month, day] = [
-        Node.getDateYear(nodeCol),
-        Node.getDateMonth(nodeCol),
-        Node.getDateDay(nodeCol),
-      ]
-      return () =>
-        DateTimeUtils.isValidDate(year, month, day)
-          ? `${year}-${month}-${day}`
-          : null
+      const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
+      return () => (DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null)
     },
   },
 
   [nodeDefType.time]: {
     [colTypeProcessor]: () => () => sqlTypes.time,
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
-      const [hour, minute] = [
-        Node.getTimeHour(nodeCol),
-        Node.getTimeMinute(nodeCol),
-      ]
-      return () =>
-        DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null
+      const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
+      return () => (DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null)
     },
   },
 
@@ -99,9 +80,7 @@ const props = {
     [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid
-        ? Survey.getCategoryItemByUuid(itemUuid)(survey)
-        : {}
+      const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
 
       return (_node, colName) =>
         R.endsWith('code', colName)
@@ -133,18 +112,14 @@ const props = {
         Node.getCoordinateSrs(nodeCol),
       ]
 
-      return () =>
-        GeoUtils.isCoordinateValid(srsCode, x, y)
-          ? Point.newPoint(srsCode, x, y)
-          : null
+      return () => (GeoUtils.isCoordinateValid(srsCode, x, y) ? Point.newPoint(srsCode, x, y) : null)
     },
     [colTypeProcessor]: () => () => sqlTypes.point,
   },
 
   [nodeDefType.file]: {
     [colValueProcessor]: nodeValuePropProcessor,
-    [colTypeProcessor]: () => colName =>
-      R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar,
+    [colTypeProcessor]: () => colName => (R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar),
   },
 }
 
@@ -158,8 +133,4 @@ export const getColValueProcessor = nodeDef =>
   )
 
 export const getColTypeProcessor = nodeDef =>
-  R.propOr(
-    _nodeDef => _colName => 'VARCHAR',
-    colTypeProcessor,
-    props[NodeDef.getType(nodeDef)],
-  )(nodeDef)
+  R.propOr(_nodeDef => _colName => 'VARCHAR', colTypeProcessor, props[NodeDef.getType(nodeDef)])(nodeDef)

@@ -22,14 +22,9 @@ const _validateDateIsBefore = (dateStr, dateToCompareStr, errorMessageKey) => {
   }
 
   const date = DateUtils.parse(dateStr, SurveyCycle.dateFormat)
-  const dateToCompare = DateUtils.parse(
-    dateToCompareStr,
-    SurveyCycle.dateFormat,
-  )
+  const dateToCompare = DateUtils.parse(dateToCompareStr, SurveyCycle.dateFormat)
 
-  return DateUtils.isBefore(date, dateToCompare)
-    ? null
-    : ValidationResult.newInstance(errorMessageKey)
+  return DateUtils.isBefore(date, dateToCompare) ? null : ValidationResult.newInstance(errorMessageKey)
 }
 
 const _validateCycleStartDateBeforeEndDate = (propName, item) =>
@@ -48,9 +43,7 @@ const _validateDateStartAfterPrevDateEnd = cyclePrev => (propName, item) =>
 
 const _cycleValidators = (cyclePrev, isLast) => ({
   [SurveyCycle.keys.dateStart]: [
-    Validator.validateRequired(
-      Validation.messageKeys.surveyInfoEdit.cycleDateStartMandatory,
-    ),
+    Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateStartMandatory),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateStartInvalid),
     _validateCycleStartDateBeforeEndDate,
     ...(cyclePrev ? [_validateDateStartAfterPrevDateEnd(cyclePrev)] : []),
@@ -59,12 +52,7 @@ const _cycleValidators = (cyclePrev, isLast) => ({
     // Date end is required for all but the last cycle
     ...(isLast
       ? []
-      : [
-          Validator.validateRequired(
-            Validation.messageKeys.surveyInfoEdit
-              .cycleDateEndMandatoryExceptForLastCycle,
-          ),
-        ]),
+      : [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle)]),
     _validateDate(Validation.messageKeys.surveyInfoEdit.cycleDateEndInvalid),
   ],
 })
@@ -91,10 +79,7 @@ export const validateCycles = async cycles => {
     const cycle = cyclesArray[index]
 
     const isLast = index === cyclesSize - 1
-    const cycleValidation = await Validator.validate(
-      cycle,
-      _cycleValidators(cyclePrev, isLast),
-    )
+    const cycleValidation = await Validator.validate(cycle, _cycleValidators(cyclePrev, isLast))
 
     if (!Validation.isValid(cycleValidation)) {
       Validation.setField(String(index), cycleValidation)(result)

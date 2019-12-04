@@ -18,9 +18,7 @@ const InnerModuleSwitch = props => {
           key={i}
           exact
           path={module.path}
-          render={props =>
-            React.createElement(module.component, { ...module.props, ...props })
-          }
+          render={props => React.createElement(module.component, { ...module.props, ...props })}
         />
       ))}
     </Switch>

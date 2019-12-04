@@ -25,10 +25,7 @@ export const nodeDefsUpdate = 'survey/nodeDefs/update'
 
 // ==== Internal update nodeDefs actions
 
-const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (
-  dispatch,
-  getState,
-) => {
+const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
@@ -55,10 +52,7 @@ const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
     `${nodeDefPropsUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`,
   )
 
-const _updateParentLayout = (nodeDef, deleted = false) => async (
-  dispatch,
-  getState,
-) => {
+const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
@@ -66,29 +60,18 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (
 
   if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefParent)) {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
-    const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(
-      nodeDefParent,
-    )
+    const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDefParent)
 
     const layoutChildrenUpdated = deleted
       ? R.without([nodeDefUuid])(layoutChildren)
       : R.append(nodeDefUuid)(layoutChildren)
-    dispatch(
-      putNodeDefLayoutProp(
-        nodeDefParent,
-        NodeDefLayout.keys.layoutChildren,
-        layoutChildrenUpdated,
-      ),
-    )
+    dispatch(putNodeDefLayoutProp(nodeDefParent, NodeDefLayout.keys.layoutChildren, layoutChildrenUpdated))
   }
 }
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props) => async (
-  dispatch,
-  getState,
-) => {
+export const createNodeDef = (parent, type, props) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
@@ -108,11 +91,7 @@ export const createNodeDef = (parent, type, props) => async (
 // ==== UPDATE
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
-  if (
-    key === NodeDef.propKeys.multiple &&
-    value &&
-    NodeDef.hasDefaultValues(nodeDef)
-  ) {
+  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // NodeDef has default values, cannot change into multiple
     dispatch(
       showNotification(
@@ -127,13 +106,10 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   return true
 }
 
-export const putNodeDefProp = (
-  nodeDef,
-  key,
-  value = null,
-  advanced = false,
-  checkFormPageUuid = false,
-) => async (dispatch, getState) => {
+export const putNodeDefProp = (nodeDef, key, value = null, advanced = false, checkFormPageUuid = false) => async (
+  dispatch,
+  getState,
+) => {
   if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
     return
   }
@@ -167,10 +143,7 @@ export const putNodeDefProp = (
   dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
 }
 
-export const putNodeDefLayoutProp = (nodeDef, key, value) => async (
-  dispatch,
-  getState,
-) => {
+export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
   const state = getState()
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
@@ -186,15 +159,10 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (
       const isRenderForm = value === NodeDefLayout.renderType.form
 
       if (isRenderTable) {
-        layoutCycle[
-          NodeDefLayout.keys.layoutChildren
-        ] = Survey.getNodeDefChildren(nodeDef)(survey).map(n =>
+        layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n =>
           NodeDef.getUuid(n),
         )
-      } else if (
-        isRenderForm &&
-        NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)
-      ) {
+      } else if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
         // Entity rendered as form can only exists in its own page
         layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
       }
@@ -203,19 +171,8 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (
     }),
   )(nodeDef)
 
-  const checkFormPageUuid = R.includes(key, [
-    NodeDefLayout.keys.renderType,
-    NodeDefLayout.keys.pageUuid,
-  ])
-  dispatch(
-    putNodeDefProp(
-      nodeDef,
-      NodeDefLayout.keys.layout,
-      layoutUpdate,
-      false,
-      checkFormPageUuid,
-    ),
-  )
+  const checkFormPageUuid = R.includes(key, [NodeDefLayout.keys.renderType, NodeDefLayout.keys.pageUuid])
+  dispatch(putNodeDefProp(nodeDef, NodeDefLayout.keys.layout, layoutUpdate, false, checkFormPageUuid))
 }
 
 // ==== DELETE
@@ -226,21 +183,12 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
   const dependencyGraph = Survey.buildDependencyGraph(survey)
-  const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(
-    survey,
-  )
+  const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(survey)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(nodeDefUuid)(
-    surveyWithDependencies,
-  )
+  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
   const i18n = AppState.getI18n(state)
 
-  if (
-    !(
-      R.isEmpty(nodeDefDependentsUuids) ||
-      R.equals(nodeDefDependentsUuids, [nodeDefUuid])
-    )
-  ) {
+  if (!(R.isEmpty(nodeDefDependentsUuids) || R.equals(nodeDefDependentsUuids, [nodeDefUuid]))) {
     // Node has not dependencies or it has expressions that depend on itself
     const nodeDefDependents = R.pipe(
       R.map(
@@ -262,9 +210,7 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
         NotificationState.severity.warning,
       ),
     )
-  } else if (
-    window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
-  ) {
+  } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
     // Delete confirmed
     dispatch({ type: nodeDefDelete, nodeDef })
 

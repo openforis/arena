@@ -55,48 +55,27 @@ const NodeDefMultipleTableCell = props => {
 
   return showEditDialog ? (
     ReactDOM.createPortal(
-      <NodeDefMultipleEditDialog
-        {...props}
-        onClose={() => setShowEditDialog(false)}
-      />,
+      <NodeDefMultipleEditDialog {...props} onClose={() => setShowEditDialog(false)} />,
       document.body,
     )
   ) : (
     <div className="survey-form__node-def-table-cell-body-multiple">
       <span className="values-summary">{nodeValues}</span>
       <button className="btn-s" onClick={() => setShowEditDialog(true)}>
-        <span
-          className={`icon icon-12px ${
-            canEditRecord ? 'icon-pencil2' : 'icon-eye'
-          }`}
-        />
+        <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`} />
       </button>
     </div>
   )
 }
 
 const NodeDefTableCellBody = props => {
-  const {
-    surveyInfo,
-    surveyCycleKey,
-    nodeDef,
-    parentNode,
-    nodes,
-    edit,
-    entryDataQuery,
-  } = props
+  const { surveyInfo, surveyCycleKey, nodeDef, parentNode, nodes, edit, entryDataQuery } = props
   const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
   return (
-    <NodeDefErrorBadge
-      nodeDef={nodeDef}
-      parentNode={parentNode}
-      nodes={nodes}
-      edit={edit}
-    >
+    <NodeDefErrorBadge nodeDef={nodeDef} parentNode={parentNode} nodes={nodes} edit={edit}>
       {(NodeDef.isMultiple(nodeDef) ||
-        (NodeDef.isCode(nodeDef) &&
-          NodeDefLayout.isRenderCheckbox(surveyCycleKey)(nodeDef))) &&
+        (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(surveyCycleKey)(nodeDef))) &&
       !entryDataQuery ? (
         <NodeDefMultipleTableCell {...props} lang={surveyLanguage} />
       ) : (

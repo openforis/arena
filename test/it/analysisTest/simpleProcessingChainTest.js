@@ -53,11 +53,7 @@ before(async () => {
     )
 
   const newPlot = (plotNo, noTrees) =>
-    RB.entity(
-      'plot',
-      RB.attribute('plot_no', 1),
-      ...R.range(1, noTrees + 1).map(newTree),
-    )
+    RB.entity('plot', RB.attribute('plot_no', 1), ...R.range(1, noTrees + 1).map(newTree))
 
   // Add 5 records
   for (let i = 0; i < 5; i++) {
@@ -79,9 +75,7 @@ before(async () => {
 
   processingChain = ProcessingChain.newProcessingChain('0', {})
   let step1 = ProcessingChain.newProcessingStep(processingChain, {
-    [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(
-      Survey.getNodeDefByName('tree')(survey),
-    ),
+    [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName('tree')(survey)),
   })
   const calc1 = ProcessingChain.newProcessingStepCalculation(
     step1,
@@ -105,8 +99,5 @@ export const simpleTest = async () => {
   // Console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))
 
-  await ProcessingChainService.generateScript(
-    Survey.getId(survey),
-    processingChain,
-  )
+  await ProcessingChainService.generateScript(Survey.getId(survey), processingChain)
 }

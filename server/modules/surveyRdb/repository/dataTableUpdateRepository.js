@@ -56,8 +56,7 @@ const _getColValues = async (survey, cycle, nodeDef, node, type) =>
       ]
     : await DataCol.getValues(survey, nodeDef, node)
 
-const _getRowUuid = (nodeDef, node, nodeParent) =>
-  _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(nodeParent)
+const _getRowUuid = (nodeDef, node, nodeParent) => (_hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(nodeParent))
 
 const _toUpdates = async (survey, cycle, nodeDefs, nodes) => {
   const updates = await Promise.all(
@@ -73,11 +72,7 @@ const _toUpdates = async (survey, cycle, nodeDefs, nodes) => {
             tableName: DataTable.getName(nodeDef, nodeDefParent),
             colNames: _getColNames(nodeDef, type),
             colValues: await _getColValues(survey, cycle, nodeDef, node, type),
-            rowUuid: _getRowUuid(
-              nodeDef,
-              node,
-              nodes[Node.getParentUuid(node)],
-            ),
+            rowUuid: _getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)]),
           }
         : null
     }),
@@ -105,10 +100,7 @@ const _insert = (update, client) =>
   )
 
 const _delete = (update, client) =>
-  client.query(
-    `DELETE FROM ${update.schemaName}.${update.tableName} WHERE uuid = $1`,
-    update.rowUuid,
-  )
+  client.query(`DELETE FROM ${update.schemaName}.${update.tableName} WHERE uuid = $1`, update.rowUuid)
 
 const queryByType = {
   [types.delete]: _delete,
@@ -119,7 +111,5 @@ const queryByType = {
 export const updateTable = async (survey, cycle, nodeDefs, nodes, client) => {
   const updates = await _toUpdates(survey, cycle, nodeDefs, nodes)
 
-  await client.batch(
-    updates.map(update => queryByType[update.type](update, client)),
-  )
+  await client.batch(updates.map(update => queryByType[update.type](update, client)))
 }

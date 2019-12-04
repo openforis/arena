@@ -52,11 +52,7 @@ const CodeProps = props => {
 
   const putCategoryProp = category => {
     putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
-    putNodeDefProp(
-      nodeDef,
-      NodeDef.propKeys.categoryUuid,
-      Category.getUuid(category),
-    )
+    putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
 
   return (
@@ -73,9 +69,7 @@ const CodeProps = props => {
             items={categories}
             itemKeyProp={'uuid'}
             itemLabelFunction={Category.getName}
-            validation={Validation.getFieldValidation(
-              NodeDef.propKeys.categoryUuid,
-            )(validation)}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
             selection={category}
             onChange={putCategoryProp}
           />
@@ -90,11 +84,7 @@ const CodeProps = props => {
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <button
-            className="btn btn-s"
-            style={{ justifySelf: 'center' }}
-            onClick={() => toggleCategoryEdit(true)}
-          >
+          <button className="btn btn-s" style={{ justifySelf: 'center' }} onClick={() => toggleCategoryEdit(true)}>
             <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
           </button>
@@ -114,13 +104,7 @@ const CodeProps = props => {
             selection={parentCodeDef}
             itemKeyProp={'uuid'}
             itemLabelFunction={NodeDef.getName}
-            onChange={def =>
-              putNodeDefProp(
-                nodeDef,
-                NodeDef.propKeys.parentCodeDefUuid,
-                NodeDef.getUuid(def),
-              )
-            }
+            onChange={def => putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
           />
         </div>
       </FormItem>
@@ -128,9 +112,7 @@ const CodeProps = props => {
       <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
         <ButtonGroup
           selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-          onChange={render =>
-            putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)
-          }
+          onChange={render => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)}
           items={displayAsItems}
         />
       </FormItem>
@@ -145,12 +127,8 @@ const mapStateToProps = state => {
   return {
     categories: Survey.getCategoriesArray(survey),
     canUpdateCategory: Survey.canUpdateCategory(nodeDef)(survey),
-    category: Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(
-      survey,
-    ),
-    candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(
-      survey,
-    ),
+    category: Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey),
+    candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(survey),
     parentCodeDef: Survey.getNodeDefParentCode(nodeDef)(survey),
   }
 }

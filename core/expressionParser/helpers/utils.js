@@ -4,13 +4,11 @@ import { trim, isNotBlank } from '@core/stringUtils'
 import { types } from './types'
 
 // ToString
-const binaryToString = node =>
-  `${toString(node.left)} ${node.operator} ${toString(node.right)}`
+const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
 
 // Valid
 const propValid = prop => R.pipe(R.prop(prop), isNotBlank)
-const binaryValid = node =>
-  isValid(node.left) && propValid('operator')(node) && isValid(node.right)
+const binaryValid = node => isValid(node.left) && propValid('operator')(node) && isValid(node.right)
 
 const typeProps = {
   [types.Identifier]: {
@@ -30,8 +28,7 @@ const typeProps = {
     isValid: () => true,
   },
   [types.CallExpression]: {
-    toString: node =>
-      `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
+    toString: node => `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
     isValid: node => isValid(node.callee),
   },
   [types.UnaryExpression]: {

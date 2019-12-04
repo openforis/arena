@@ -21,10 +21,7 @@ const AppSideBar = props => {
   const i18n = useI18n()
 
   return (
-    <div
-      className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`}
-      ref={element}
-    >
+    <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
       {/* toggle sidebar */}
       <a
         className="app-sidebar__btn-toggle"
@@ -36,12 +33,7 @@ const AppSideBar = props => {
         <span className="icon icon-16px icon-menu" />
       </a>
 
-      <AppSideBarModules
-        user={user}
-        surveyInfo={surveyInfo}
-        pathname={pathname}
-        sideBarOpened={isSideBarOpened}
-      />
+      <AppSideBarModules user={user} surveyInfo={surveyInfo} pathname={pathname} sideBarOpened={isSideBarOpened} />
 
       {isSideBarOpened && (
         <div

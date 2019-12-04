@@ -47,9 +47,7 @@ const binaryToString = (node, paramsArr) => {
 
   // Logical OR returns a non-null value if either of its parameters is not null.
   if (sqlOperator === 'OR') {
-    return logicalOrTemplate
-      .replace('{left}', clauseLeft)
-      .replace('{right}', clauseRight)
+    return logicalOrTemplate.replace('{left}', clauseLeft).replace('{right}', clauseRight)
   }
 
   // Logical OR returns a non-null value if either of its parameters is not null.
@@ -99,16 +97,12 @@ const converters = {
   },
 }
 
-const toPreparedStatement = (expr, paramsArr) =>
-  converters[expr.type](expr, paramsArr)
+const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
 export const getWherePreparedStatement = expr => {
   const paramsArr = []
   const prepStatement = toPreparedStatement(expr, paramsArr)
-  const params = paramsArr.reduce(
-    (acc, cur, i) => ({ ...acc, [`_${i}`]: cur }),
-    {},
-  )
+  const params = paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
   return { clause: prepStatement, params }
 }

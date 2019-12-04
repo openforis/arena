@@ -40,18 +40,13 @@ const ItemEdit = props => {
   return (
     <div
       className={`category-edit__item ${active ? 'active' : ''}`}
-      onClick={() =>
-        active ? null : setCategoryItemForEdit(category, level, item, true)
-      }
+      onClick={() => (active ? null : setCategoryItemForEdit(category, level, item, true))}
       ref={elemRef}
     >
       <ErrorBadge validation={validation} showLabel={false} />
       {active ? (
         <React.Fragment>
-          <button
-            className="btn btn-s btn-close"
-            onClick={() => setCategoryItemForEdit(category, level, item, false)}
-          >
+          <button className="btn btn-s btn-close" onClick={() => setCategoryItemForEdit(category, level, item, false)}>
             <span className="icon icon-arrow-up icon-12px" />
           </button>
 
@@ -59,17 +54,9 @@ const ItemEdit = props => {
             <Input
               value={CategoryItem.getCode(item)}
               disabled={disabled}
-              validation={Validation.getFieldValidation(
-                CategoryItem.props.code,
-              )(validation)}
+              validation={Validation.getFieldValidation(CategoryItem.props.code)(validation)}
               onChange={value =>
-                putCategoryItemProp(
-                  category,
-                  level,
-                  item,
-                  CategoryItem.props.code,
-                  normalizeName(value),
-                )
+                putCategoryItemProp(category, level, item, CategoryItem.props.code, normalizeName(value))
               }
               readOnly={readOnly}
             />
@@ -77,9 +64,7 @@ const ItemEdit = props => {
 
           <LabelsEditor
             labels={CategoryItem.getLabels(item)}
-            onChange={labels =>
-              putCategoryItemProp(category, level, item, 'labels', labels)
-            }
+            onChange={labels => putCategoryItemProp(category, level, item, 'labels', labels)}
             readOnly={readOnly}
           />
 

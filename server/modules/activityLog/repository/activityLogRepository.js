@@ -18,9 +18,7 @@ import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/node
 export const insert = async (user, surveyId, type, content, system, client) =>
   await client.none(
     `
-    INSERT INTO ${getSurveyDBSchema(
-      surveyId,
-    )}.activity_log (type, user_uuid, content, system)
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
     [type, User.getUuid(user), content || {}, system],
   )
@@ -40,13 +38,7 @@ export const insertMany = async (user, surveyId, activities, client) =>
   )
 
 // ===== READ
-export const fetch = async (
-  surveyInfo,
-  activityTypes = null,
-  offset = 0,
-  limit = 30,
-  client = db,
-) => {
+export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
@@ -111,9 +103,7 @@ export const fetch = async (
       agu.user_uuid AS target_user_uuid, -- null if user has been removed from survey
       
       -- analysis activities keys
-      processing_chain.props->'${
-        ProcessingChain.keysProps.labels
-      }' AS processing_chain_labels,
+      processing_chain.props->'${ProcessingChain.keysProps.labels}' AS processing_chain_labels,
       processing_step.index AS processing_step_index,
       processing_step_calculation.index AS processing_step_calculation_index
       
@@ -164,9 +154,7 @@ export const fetch = async (
     LEFT OUTER JOIN 
       ${schema}.processing_chain
     ON 
-      processing_chain.uuid IN (l.content_uuid, (l.content->>'${
-        ProcessingStep.keys.processingChainUuid
-      }')::uuid)
+      processing_chain.uuid IN (l.content_uuid, (l.content->>'${ProcessingStep.keys.processingChainUuid}')::uuid)
     LEFT OUTER JOIN 
       ${schema}.processing_step
     ON 

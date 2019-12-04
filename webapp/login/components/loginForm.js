@@ -4,32 +4,16 @@ import { connect } from 'react-redux'
 import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from '../loginState'
-import {
-  setEmail,
-  login,
-  showForgotPasswordForm,
-  setLoginError,
-} from '../actions'
+import { setEmail, login, showForgotPasswordForm, setLoginError } from '../actions'
 
 import * as LoginValidator from './loginValidator'
 
 const LoginForm = props => {
-  const {
-    email: initialEmail,
-    setEmail: setStateEmail,
-    login,
-    showForgotPasswordForm,
-    setLoginError,
-  } = props
+  const { email: initialEmail, setEmail: setStateEmail, login, showForgotPasswordForm, setLoginError } = props
 
   const i18n = useI18n()
 
-  const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    validation,
-  } = useFormObject(
+  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     {
       email: initialEmail,
       password: '',
@@ -42,9 +26,7 @@ const LoginForm = props => {
     if (objectValid) {
       login(formObject.email, formObject.password)
     } else {
-      setLoginError(
-        LoginValidator.getFirstError(validation, ['email', 'password']),
-      )
+      setLoginError(LoginValidator.getFirstError(validation, ['email', 'password']))
     }
   }
 
@@ -78,11 +60,7 @@ const LoginForm = props => {
           {i18n.t('loginView.login')}
         </button>
 
-        <button
-          type="button"
-          className="btn btn-s btn-transparent btn-forgot-pwd"
-          onClick={showForgotPasswordForm}
-        >
+        <button type="button" className="btn btn-s btn-transparent btn-forgot-pwd" onClick={showForgotPasswordForm}>
           <span className="icon icon-question icon-left icon-12px" />
           {i18n.t('loginView.forgotPassword')}
         </button>

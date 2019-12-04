@@ -10,13 +10,7 @@ const Call = ({ node, variables, onChange }) => {
     name: Expression.toString(node),
   }
 
-  return (
-    <Identifier
-      node={nodeIdentifier}
-      variables={variables}
-      onChange={onChange}
-    />
-  )
+  return <Identifier node={nodeIdentifier} variables={variables} onChange={onChange} />
 }
 
 export default Call

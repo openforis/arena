@@ -39,8 +39,7 @@ const goodExpressions = [
   {
     q: "a == 1 && b != 'b'",
     r: {
-      clause:
-        '$/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/',
+      clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/',
       params: { _0: 'a', _1: '1', _2: 'b', _3: "'b'" },
     },
   },

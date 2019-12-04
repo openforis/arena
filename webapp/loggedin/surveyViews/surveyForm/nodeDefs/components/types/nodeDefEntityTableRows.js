@@ -87,11 +87,7 @@ const NodeDefEntityTableRows = props => {
   }
 
   return (
-    <div
-      className="survey-form__node-def-entity-table-rows"
-      ref={tableRowsRef}
-      onScroll={onScrollTableRows}
-    >
+    <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>
       {(edit || !R.isEmpty(nodes)) && (
         <NodeDefEntityTableRow
           {...props}
@@ -133,9 +129,7 @@ const mapStateToProps = (state, props) => {
 
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(
-    nodeDef,
-  )
+  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
 
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {

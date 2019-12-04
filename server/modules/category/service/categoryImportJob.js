@@ -83,11 +83,7 @@ export default class CategoryImportJob extends Job {
     await super.beforeSuccess()
 
     // Validate category
-    this.category = await CategoryManager.validateCategory(
-      this.surveyId,
-      Category.getUuid(this.category),
-      this.tx,
-    )
+    this.category = await CategoryManager.validateCategory(this.surveyId, Category.getUuid(this.category), this.tx)
 
     this.setResult({
       category: this.category,
@@ -106,19 +102,15 @@ export default class CategoryImportJob extends Job {
   extractItemExtraDef() {
     const columns = CategoryImportSummary.getColumns(this.summary)
 
-    return Object.entries(columns).reduce(
-      (accExtraDef, [columnName, column]) => {
-        if (CategoryImportSummary.isColumnExtra(column)) {
-          accExtraDef[columnName] = {
-            [CategoryItem.keysExtraDef
-              .dataType]: CategoryImportSummary.getColumnDataType(column),
-          }
+    return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
+      if (CategoryImportSummary.isColumnExtra(column)) {
+        accExtraDef[columnName] = {
+          [CategoryItem.keysExtraDef.dataType]: CategoryImportSummary.getColumnDataType(column),
         }
+      }
 
-        return accExtraDef
-      },
-      {},
-    )
+      return accExtraDef
+    }, {})
   }
 
   extractItemExtraProps(extra) {
@@ -130,27 +122,13 @@ export default class CategoryImportJob extends Job {
   async _fetchOrCreateCategory() {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
-      return await CategoryManager.fetchCategoryAndLevelsByUuid(
-        this.surveyId,
-        categoryUuid,
-        true,
-        false,
-        this.tx,
-      )
+      return await CategoryManager.fetchCategoryAndLevelsByUuid(this.surveyId, categoryUuid, true, false, this.tx)
     }
 
     const category = Category.newCategory({
-      [Category.props.name]: CategoryImportJobParams.getCategoryName(
-        this.params,
-      ),
+      [Category.props.name]: CategoryImportJobParams.getCategoryName(this.params),
     })
-    return await CategoryManager.insertCategory(
-      this.user,
-      this.surveyId,
-      category,
-      true,
-      this.tx,
-    )
+    return await CategoryManager.insertCategory(this.user, this.surveyId, category, true, this.tx)
   }
 
   async _importLevels() {
@@ -158,13 +136,7 @@ export default class CategoryImportJob extends Job {
 
     const levelNames = CategoryImportSummary.getLevelNames(this.summary)
     // Delete existing levels and insert new ones using level names from summary
-    this.category = await CategoryManager.replaceLevels(
-      this.user,
-      this.surveyId,
-      this.category,
-      levelNames,
-      this.tx,
-    )
+    this.category = await CategoryManager.replaceLevels(this.user, this.surveyId, this.category, levelNames, this.tx)
 
     this.logDebug(`levels imported: ${levelNames}`)
   }
@@ -194,13 +166,7 @@ export default class CategoryImportJob extends Job {
     this.logDebug('reading CSV file rows')
 
     this.itemsBatchInserter = new BatchPersister(
-      async items =>
-        await CategoryManager.insertItems(
-          this.user,
-          this.surveyId,
-          items,
-          this.tx,
-        ),
+      async items => await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx),
     )
     this.itemsBatchUpdater = new BatchPersister(
       async items =>
@@ -235,13 +201,7 @@ export default class CategoryImportJob extends Job {
   }
 
   async _onRow(itemRow) {
-    const {
-      levelIndex: levelIndexItem,
-      codes,
-      labelsByLevel,
-      descriptionsByLevel,
-      extra,
-    } = itemRow
+    const { levelIndex: levelIndexItem, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
 
     const levels = Category.getLevelsArray(this.category)
 
@@ -259,14 +219,7 @@ export default class CategoryImportJob extends Job {
         } else if (!itemCached || lastLevel) {
           // Insert new items if not inserted already
           // update existing items (only when last level is reached)
-          await this._insertOrUpdateItem(
-            itemCodes,
-            level,
-            lastLevel,
-            labelsByLevel,
-            descriptionsByLevel,
-            extra,
-          )
+          await this._insertOrUpdateItem(itemCodes, level, lastLevel, labelsByLevel, descriptionsByLevel, extra)
         }
       }
     }
@@ -277,14 +230,7 @@ export default class CategoryImportJob extends Job {
   /**
    * Insert new item if not already created or update already inserted item if in last level
    */
-  async _insertOrUpdateItem(
-    itemCodes,
-    level,
-    lastLevel,
-    labelsByLevel,
-    descriptionsByLevel,
-    extra,
-  ) {
+  async _insertOrUpdateItem(itemCodes, level, lastLevel, labelsByLevel, descriptionsByLevel, extra) {
     const itemCached = this._getItemCachedByCodes(itemCodes)
 
     let item = null
@@ -293,21 +239,9 @@ export default class CategoryImportJob extends Job {
       [CategoryItem.props.code]: itemCodes[itemCodes.length - 1],
     }
     const levelName = CategoryLevel.getName(level)
-    ObjectUtils.setInPath(
-      [ObjectUtils.keysProps.labels],
-      labelsByLevel[levelName],
-      false,
-    )(itemProps)
-    ObjectUtils.setInPath(
-      [ObjectUtils.keysProps.descriptions],
-      descriptionsByLevel[levelName],
-      false,
-    )(itemProps)
-    ObjectUtils.setInPath(
-      [CategoryItem.props.extra],
-      this.extractItemExtraProps(extra),
-      false,
-    )(itemProps)
+    ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
+    ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
+    ObjectUtils.setInPath([CategoryItem.props.extra], this.extractItemExtraProps(extra), false)(itemProps)
 
     if (itemCached) {
       // Update existing item if extra props are changed
@@ -322,11 +256,7 @@ export default class CategoryImportJob extends Job {
       }
     } else {
       // Insert new item
-      item = CategoryItem.newItem(
-        CategoryLevel.getUuid(level),
-        this._getParentItemUuid(itemCodes),
-        itemProps,
-      )
+      item = CategoryItem.newItem(CategoryLevel.getUuid(level), this._getParentItemUuid(itemCodes), itemProps)
       await this.itemsBatchInserter.addItem(item)
       this.totalItemsInserted++
     }
@@ -385,17 +315,12 @@ export default class CategoryImportJob extends Job {
   }
 
   _putItemToCache(itemCodes, item) {
-    this.itemsByCodes[String(itemCodes)] = R.omit(
-      [CategoryItem.keys.props],
-      item,
-    )
+    this.itemsByCodes[String(itemCodes)] = R.omit([CategoryItem.keys.props], item)
   }
 
   _getParentItemUuid(itemCodes) {
     if (itemCodes.length > 1) {
-      const itemParent = this._getItemCachedByCodes(
-        itemCodes.slice(0, itemCodes.length - 1),
-      )
+      const itemParent = this._getItemCachedByCodes(itemCodes.slice(0, itemCodes.length - 1))
       return CategoryItem.getUuid(itemParent)
     }
 

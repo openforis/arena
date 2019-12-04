@@ -6,8 +6,7 @@ import * as StringUtils from '@core/stringUtils'
 
 const _transformObj = obj =>
   Object.entries(obj).reduce(
-    (objAcc, [key, value]) =>
-      Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),
+    (objAcc, [key, value]) => Object.assign(objAcc, { [key]: StringUtils.removeNewLines(value) }),
     {},
   )
 
@@ -29,5 +28,4 @@ export const writeToStream = (stream, data) =>
     transformer.end()
   })
 
-export const writeToFile = (filePath, data) =>
-  writeToStream(fs.createWriteStream(filePath), data)
+export const writeToFile = (filePath, data) => writeToStream(fs.createWriteStream(filePath), data)

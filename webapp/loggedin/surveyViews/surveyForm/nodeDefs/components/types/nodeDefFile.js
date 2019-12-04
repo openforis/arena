@@ -30,16 +30,7 @@ const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
 }
 
 const FileInput = props => {
-  const {
-    surveyInfo,
-    nodeDef,
-    node,
-    readOnly,
-    edit,
-    canEditRecord,
-    updateNode,
-    removeNode,
-  } = props
+  const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
 
   const fileName = Node.getFileName(node)
   const truncatedFileName = RecordFile.truncateFileName(fileName)
@@ -50,17 +41,13 @@ const FileInput = props => {
       <UploadButton
         disabled={edit || !canEditRecord || readOnly}
         showLabel={false}
-        onChange={files =>
-          handleFileChange(nodeDef, node, files[0], updateNode)
-        }
+        onChange={files => handleFileChange(nodeDef, node, files[0], updateNode)}
       />
 
       {fileUploaded && (
         <React.Fragment>
           <DownloadButton
-            href={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(
-              node,
-            )}/nodes/${Node.getUuid(node)}/file`}
+            href={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
             label={fileName}
             title={fileName}
             className="ellipsis"
@@ -69,9 +56,7 @@ const FileInput = props => {
           <NodeDeleteButton
             nodeDef={nodeDef}
             node={node}
-            removeNode={(nodeDef, node) =>
-              handleNodeDelete(nodeDef, node, removeNode, updateNode)
-            }
+            removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}
           />
         </React.Fragment>
       )}
@@ -91,7 +76,6 @@ const MultipleFileInput = props => {
   )
 }
 
-const NodeDefFile = props =>
-  props.edit ? <FileInput {...props} /> : <MultipleFileInput {...props} />
+const NodeDefFile = props => (props.edit ? <FileInput {...props} /> : <MultipleFileInput {...props} />)
 
 export default NodeDefFile

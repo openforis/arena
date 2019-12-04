@@ -10,11 +10,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
-import {
-  createNodePlaceholder,
-  removeNode,
-  updateNode,
-} from '../../../../../surveyViews/record/actions'
+import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
 
 class TableColumnEdit extends React.Component {
   render() {

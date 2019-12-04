@@ -62,10 +62,7 @@ const RecordView = props => {
 
     // Add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
-    AppWebSocket.on(
-      WebSocketEvents.nodeValidationsUpdate,
-      nodeValidationsUpdate,
-    )
+    AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, nodesUpdateCompleted)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       recordDeleted(history)
@@ -117,13 +114,7 @@ const RecordView = props => {
   }, [surveyCycleKey])
 
   return recordLoaded ? (
-    <SurveyFormView
-      draft={preview}
-      preview={preview}
-      edit={false}
-      entry={true}
-      canEditRecord={canEditRecord}
-    />
+    <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={canEditRecord} />
   ) : null
 }
 
@@ -137,8 +128,7 @@ const mapStateToProps = (state, { match, location }) => {
 
   return {
     canEditRecord:
-      Authorizer.canEditRecord(user, record) &&
-      (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
+      Authorizer.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
     recordLoaded: Boolean(record),
     recordUuidUrlParam: getUrlParam('recordUuid')(match) || recordUuidPreview,
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),

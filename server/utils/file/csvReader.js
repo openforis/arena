@@ -4,12 +4,7 @@ import { parse as csvParser } from 'csv'
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
 
-export const createReaderFromStream = (
-  stream,
-  onHeaders = null,
-  onRow = null,
-  onTotalChange = null,
-) => {
+export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
   const jobStatus = { canceled: false }
 
   const start = () =>
@@ -90,18 +85,8 @@ export const createReaderFromStream = (
   return { start, cancel }
 }
 
-export const createReaderFromFile = (
-  filePath,
-  onHeaders = null,
-  onRow = null,
-  onTotalChange = null,
-) =>
-  createReaderFromStream(
-    fs.createReadStream(filePath),
-    onHeaders,
-    onRow,
-    onTotalChange,
-  )
+export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
+  createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
 
 export const readHeadersFromStream = async stream => {
   let result = []

@@ -31,8 +31,7 @@ const TaxonProps = props => {
     toggleTaxonomyEdit,
   } = props
 
-  const putTaxonomyProp = taxonomy =>
-    putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
+  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
 
   const i18n = useI18n()
 
@@ -49,9 +48,7 @@ const TaxonProps = props => {
             items={taxonomies}
             itemKeyProp={'uuid'}
             itemLabelFunction={Taxonomy.getName}
-            validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(
-              validation,
-            )}
+            validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={putTaxonomyProp}
@@ -67,11 +64,7 @@ const TaxonProps = props => {
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <button
-            className="btn btn-s"
-            style={{ justifySelf: 'center' }}
-            onClick={() => toggleTaxonomyEdit(true)}
-          >
+          <button className="btn btn-s" style={{ justifySelf: 'center' }} onClick={() => toggleTaxonomyEdit(true)}>
             <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
           </button>
@@ -86,9 +79,7 @@ const mapStateToProps = state => {
   const nodeDef = NodeDefEditState.getNodeDef(state)
 
   return {
-    taxonomy: Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(
-      survey,
-    ),
+    taxonomy: Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey),
     taxonomies: Survey.getTaxonomiesArray(survey),
     canUpdateTaxonomy: Survey.canUpdateTaxonomy(nodeDef)(survey),
   }

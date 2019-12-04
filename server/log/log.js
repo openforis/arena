@@ -26,10 +26,7 @@ const levels = {
   error: 'error',
 }
 
-const _stringifyMsgs = msgs =>
-  msgs
-    .map(msg => (typeof msg === 'object' ? JSON.stringify(msg) : msg))
-    .join(' ')
+const _stringifyMsgs = msgs => msgs.map(msg => (typeof msg === 'object' ? JSON.stringify(msg) : msg)).join(' ')
 
 /**
  * Logger class with custom prefix
@@ -76,8 +73,7 @@ class Logger {
   }
 
   _log(level, msgs) {
-    if (this._isLevelEnabled(level))
-      logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
+    if (this._isLevelEnabled(level)) logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
   }
 }
 

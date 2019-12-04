@@ -3,10 +3,7 @@ import * as R from 'ramda'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import {
-  getSurveyDBSchema,
-  dbTransformCallback,
-} from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 export const fetchItems = async (surveyId, client = db) =>
   await client.map(
@@ -32,9 +29,7 @@ export const countItems = async (surveyId, client = db) =>
 export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
   await client.one(
     `
-      INSERT INTO ${getSurveyDBSchema(
-        surveyId,
-      )}.collect_import_report (node_def_uuid, props)
+      INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props)
       VALUES ($1, $2)
       RETURNING *
     `,
@@ -42,13 +37,7 @@ export const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
     dbTransformCallback,
   )
 
-export const updateItem = async (
-  surveyId,
-  itemId,
-  props,
-  resolved,
-  client = db,
-) =>
+export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
   await client.one(
     `
       UPDATE ${getSurveyDBSchema(surveyId)}.collect_import_report

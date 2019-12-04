@@ -40,9 +40,7 @@ export const generateScript = async (surveyId, processingChain) => {
   )
 
   const outputDir = ProcessUtils.ENV.analysisOutputDir
-  for (const processingStep of ProcessingChain.getProcessingSteps(
-    processingChain,
-  )) {
+  for (const processingStep of ProcessingChain.getProcessingSteps(processingChain)) {
     await ProcessingStepScriptGenerator.generateScript(
       survey,
       ProcessingChain.getCycle(processingChain),

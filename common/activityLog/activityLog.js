@@ -141,9 +141,7 @@ export const getTargetUserUuid = R.prop(keys.targetUserUuid)
 export const getTargetUserEmail = R.prop(keys.targetUserEmail)
 export const getProcessingChainLabels = R.prop(keys.processingChainLabels)
 export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
-export const getProcessingStepCalculationIndex = R.prop(
-  keys.processingStepCalculationIndex,
-)
+export const getProcessingStepCalculationIndex = R.prop(keys.processingStepCalculationIndex)
 
 // Content props
 const _getContentProp = prop => R.path([keys.content, prop])

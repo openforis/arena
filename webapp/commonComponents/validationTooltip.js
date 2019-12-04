@@ -12,15 +12,9 @@ const ValidationTooltip = ({ validation, className, showKeys, children }) => {
 
   const isValid = Validation.isValid(validation)
 
-  const type = isValid
-    ? ''
-    : Validation.isWarning(validation)
-    ? 'warning'
-    : 'error'
+  const type = isValid ? '' : Validation.isWarning(validation) ? 'warning' : 'error'
 
-  const messagesHtml = isValid
-    ? null
-    : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
+  const messagesHtml = isValid ? null : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
 
   return (
     <Tooltip type={type} messages={messagesHtml} className={className}>

@@ -163,9 +163,7 @@ class RecordUpdateThread extends Thread {
         Logger.debug(`Skipping unknown message type: ${msg.type}`)
     }
 
-    if (
-      R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])
-    ) {
+    if (R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])) {
       this.postMessage({ type: WebSocketEvents.nodesUpdateCompleted })
     }
   }

@@ -3,16 +3,11 @@ import camelize from 'camelize'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import {
-  getSurveyDBSchema,
-  dbTransformCallback,
-} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate(
-  'date_created',
-)}, ${DbUtils.selectDate('date_modified')}, ${DbUtils.selectDate(
-  'date_executed',
-)}`
+const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
+  'date_modified',
+)}, ${DbUtils.selectDate('date_executed')}`
 
 // ====== CREATE
 
@@ -39,13 +34,7 @@ export const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
     [cycle],
   )
 
-export const fetchChainsBySurveyId = async (
-  surveyId,
-  cycle,
-  offset = 0,
-  limit = null,
-  client = db,
-) =>
+export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
   await client.map(
     `
     SELECT ${selectFields}
@@ -59,11 +48,7 @@ export const fetchChainsBySurveyId = async (
     dbTransformCallback,
   )
 
-export const fetchChainByUuid = async (
-  surveyId,
-  processingChainUuid,
-  client = db,
-) =>
+export const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
   await client.one(
     `
     SELECT ${selectFields}
@@ -76,13 +61,7 @@ export const fetchChainByUuid = async (
 
 // ====== UPDATE
 
-export const updateChainProp = async (
-  surveyId,
-  processingChainUuid,
-  key,
-  value,
-  client = db,
-) =>
+export const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain

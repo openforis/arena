@@ -30,18 +30,7 @@ const selectionDefault = {
 }
 
 const NodeDefTaxon = props => {
-  const {
-    surveyId,
-    nodeDef,
-    taxonomyUuid,
-    node,
-    edit,
-    draft,
-    renderType,
-    canEditRecord,
-    readOnly,
-    updateNode,
-  } = props
+  const { surveyId, nodeDef, taxonomyUuid, node, edit, draft, renderType, canEditRecord, readOnly, updateNode } = props
 
   const [selection, setSelection] = useState(selectionDefault)
   const elementRef = useRef(null)
@@ -54,12 +43,8 @@ const NodeDefTaxon = props => {
     const selectionUpdate = taxonRefData
       ? {
           [code]: Taxon.getCode(taxonRefData),
-          [scientificName]: unlisted
-            ? Node.getScientificName(node)
-            : Taxon.getScientificName(taxonRefData),
-          [vernacularName]: unlisted
-            ? Node.getVernacularName(node)
-            : R.defaultTo('', taxonRefData[vernacularName]),
+          [scientificName]: unlisted ? Node.getScientificName(node) : Taxon.getScientificName(taxonRefData),
+          [vernacularName]: unlisted ? Node.getVernacularName(node) : R.defaultTo('', taxonRefData[vernacularName]),
         }
       : selectionDefault
 
@@ -67,14 +52,7 @@ const NodeDefTaxon = props => {
   }
 
   const updateNodeValue = (nodeValue, taxon = null) =>
-    updateNode(
-      nodeDef,
-      node,
-      nodeValue,
-      null,
-      {},
-      { [NodeRefData.keys.taxon]: taxon },
-    )
+    updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
 
   const onChangeTaxon = taxon => {
     if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
@@ -84,10 +62,7 @@ const NodeDefTaxon = props => {
           Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
             ? selection[scientificName]
             : Taxon.getScientificName(taxon),
-        [vernacularName]:
-          Taxon.isUnlistedTaxon(taxon) && selection[vernacularName]
-            ? selection[vernacularName]
-            : '',
+        [vernacularName]: Taxon.isUnlistedTaxon(taxon) && selection[vernacularName] ? selection[vernacularName] : '',
         [vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
       }
 
@@ -102,15 +77,9 @@ const NodeDefTaxon = props => {
     if (StringUtils.isBlank(value)) {
       if (Node.isValueBlank(node)) {
         setSelection(selectionDefault)
-      } else if (
-        field === vernacularName &&
-        selection[code] === Taxon.unlistedCode
-      ) {
+      } else if (field === vernacularName && selection[code] === Taxon.unlistedCode) {
         // If current code is UNL and vernacular name is reset, do not clear node value
-        updateNodeValue(
-          { ...Node.getValue(node), [field]: value },
-          taxonRefData,
-        )
+        updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
       } else {
         // Clear node value
         updateNodeValue({})
@@ -159,10 +128,7 @@ const NodeDefTaxon = props => {
         return isTableBody ? (
           inputField
         ) : (
-          <FormItem
-            key={field}
-            label={i18n.t(`surveyForm.nodeDefTaxon.${field}`)}
-          >
+          <FormItem key={field} label={i18n.t(`surveyForm.nodeDefTaxon.${field}`)}>
             {inputField}
           </FormItem>
         )

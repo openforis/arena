@@ -17,11 +17,7 @@ export const init = app => {
         const { surveyId, surveyCycleKey } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const processingChainUuid = await ProcessingChainService.createChain(
-          user,
-          surveyId,
-          surveyCycleKey,
-        )
+        const processingChainUuid = await ProcessingChainService.createChain(user, surveyId, surveyCycleKey)
 
         res.json(processingChainUuid)
       } catch (error) {
@@ -37,11 +33,7 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {
-          surveyId,
-          processingChainUuid,
-          processingStepIndex,
-        } = Request.getParams(req)
+        const { surveyId, processingChainUuid, processingStepIndex } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const processingStepUuid = await ProcessingChainService.createProcessingStep(
@@ -91,10 +83,7 @@ export const init = app => {
       try {
         const { surveyId, surveyCycleKey } = Request.getParams(req)
 
-        const count = await ProcessingChainService.countChainsBySurveyId(
-          surveyId,
-          surveyCycleKey,
-        )
+        const count = await ProcessingChainService.countChainsBySurveyId(surveyId, surveyCycleKey)
 
         res.json(count)
       } catch (error) {
@@ -108,16 +97,9 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, surveyCycleKey, offset, limit } = Request.getParams(
-          req,
-        )
+        const { surveyId, surveyCycleKey, offset, limit } = Request.getParams(req)
 
-        const list = await ProcessingChainService.fetchChainsBySurveyId(
-          surveyId,
-          surveyCycleKey,
-          offset,
-          limit,
-        )
+        const list = await ProcessingChainService.fetchChainsBySurveyId(surveyId, surveyCycleKey, offset, limit)
 
         res.json({ list })
       } catch (error) {
@@ -133,10 +115,7 @@ export const init = app => {
       try {
         const { surveyId, processingChainUuid } = Request.getParams(req)
 
-        const processingChain = await ProcessingChainService.fetchChainByUuid(
-          surveyId,
-          processingChainUuid,
-        )
+        const processingChain = await ProcessingChainService.fetchChainByUuid(surveyId, processingChainUuid)
 
         res.json(processingChain)
       } catch (error) {
@@ -154,10 +133,7 @@ export const init = app => {
       try {
         const { surveyId, processingChainUuid } = Request.getParams(req)
 
-        const processingSteps = await ProcessingChainService.fetchStepsByChainUuid(
-          surveyId,
-          processingChainUuid,
-        )
+        const processingSteps = await ProcessingChainService.fetchStepsByChainUuid(surveyId, processingChainUuid)
 
         res.json(processingSteps)
       } catch (error) {
@@ -173,26 +149,13 @@ export const init = app => {
       try {
         const { surveyId, processingStepUuid } = Request.getParams(req)
 
-        const processingStep = await ProcessingChainService.fetchStepByUuid(
-          surveyId,
-          processingStepUuid,
-        )
-        const processingChainUuid = ProcessingStep.getProcessingChainUuid(
-          processingStep,
-        )
+        const processingStep = await ProcessingChainService.fetchStepByUuid(surveyId, processingStepUuid)
+        const processingChainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
         const index = ProcessingStep.getIndex(processingStep)
 
         const [processingStepPrev, processingStepNext] = await Promise.all([
-          ProcessingChainService.fetchStepSummaryByIndex(
-            surveyId,
-            processingChainUuid,
-            index - 1,
-          ),
-          ProcessingChainService.fetchStepSummaryByIndex(
-            surveyId,
-            processingChainUuid,
-            index + 1,
-          ),
+          ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index - 1),
+          ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index + 1),
         ])
 
         res.json({ processingStep, processingStepPrev, processingStepNext })
@@ -209,18 +172,10 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid, key, value } = Request.getParams(
-          req,
-        )
+        const { surveyId, processingChainUuid, key, value } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.updateChainProp(
-          user,
-          surveyId,
-          processingChainUuid,
-          key,
-          value,
-        )
+        await ProcessingChainService.updateChainProp(user, surveyId, processingChainUuid, key, value)
 
         Response.sendOk(res)
       } catch (error) {
@@ -239,12 +194,7 @@ export const init = app => {
         const { surveyId, processingStepUuid, props } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.updateStepProps(
-          user,
-          surveyId,
-          processingStepUuid,
-          props,
-        )
+        await ProcessingChainService.updateStepProps(user, surveyId, processingStepUuid, props)
 
         Response.sendOk(res)
       } catch (error) {
@@ -258,21 +208,10 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const {
-          surveyId,
-          processingStepUuid,
-          indexFrom,
-          indexTo,
-        } = Request.getParams(req)
+        const { surveyId, processingStepUuid, indexFrom, indexTo } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.updateStepCalculationIndex(
-          user,
-          surveyId,
-          processingStepUuid,
-          indexFrom,
-          indexTo,
-        )
+        await ProcessingChainService.updateStepCalculationIndex(user, surveyId, processingStepUuid, indexFrom, indexTo)
 
         Response.sendOk(res)
       } catch (error) {
@@ -291,11 +230,7 @@ export const init = app => {
         const { surveyId, processingChainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.deleteChain(
-          user,
-          surveyId,
-          processingChainUuid,
-        )
+        await ProcessingChainService.deleteChain(user, surveyId, processingChainUuid)
 
         Response.sendOk(res)
       } catch (error) {
@@ -314,11 +249,7 @@ export const init = app => {
         const { surveyId, processingStepUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.deleteStep(
-          user,
-          surveyId,
-          processingStepUuid,
-        )
+        await ProcessingChainService.deleteStep(user, surveyId, processingStepUuid)
 
         Response.sendOk(res)
       } catch (error) {

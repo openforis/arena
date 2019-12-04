@@ -28,11 +28,7 @@ const addDeps = (survey, nodeDef, type, expressions) => graph => {
 
   for (const refName of refNames) {
     const nodeDefRef = SurveyNodeDefs.getNodeDefByName(refName)(survey)
-    graph = _addDep(
-      type,
-      NodeDef.getUuid(nodeDefRef),
-      NodeDef.getUuid(nodeDef),
-    )(graph)
+    graph = _addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
   }
 
   return graph
@@ -43,24 +39,9 @@ export const buildGraph = survey =>
   R.reduce(
     (graph, nodeDef) =>
       R.pipe(
-        addDeps(
-          survey,
-          nodeDef,
-          dependencyTypes.defaultValues,
-          NodeDef.getDefaultValues(nodeDef),
-        ),
-        addDeps(
-          survey,
-          nodeDef,
-          dependencyTypes.applicable,
-          NodeDef.getApplicable(nodeDef),
-        ),
-        addDeps(
-          survey,
-          nodeDef,
-          dependencyTypes.validations,
-          NodeDef.getValidationExpressions(nodeDef),
-        ),
+        addDeps(survey, nodeDef, dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
+        addDeps(survey, nodeDef, dependencyTypes.applicable, NodeDef.getApplicable(nodeDef)),
+        addDeps(survey, nodeDef, dependencyTypes.validations, NodeDef.getValidationExpressions(nodeDef)),
       )(graph),
     {},
     SurveyNodeDefs.getNodeDefsArray(survey),
@@ -80,11 +61,7 @@ export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) =>
           (accDependents, graph) =>
             R.pipe(
               R.propOr([], nodeDefUuid),
-              R.ifElse(
-                R.isEmpty,
-                R.always(accDependents),
-                R.concat(accDependents),
-              ),
+              R.ifElse(R.isEmpty, R.always(accDependents), R.concat(accDependents)),
             )(graph),
           [],
         ),
@@ -100,10 +77,7 @@ export const getNodeDefDependencies = (nodeDefUuid, dependencyType = null) =>
  * Returns true if nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
  *
  */
-export const isNodeDefDependentOn = (
-  nodeDefUuid,
-  nodeDefSourceUuid,
-) => survey => {
+export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey => {
   if (nodeDefUuid === nodeDefSourceUuid) {
     return false
   }
@@ -134,5 +108,4 @@ export const isNodeDefDependentOn = (
 }
 
 // UPDATE
-export const assocDependencyGraph = dependencyGraph =>
-  R.assoc(keys.dependencyGraph, dependencyGraph)
+export const assocDependencyGraph = dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)

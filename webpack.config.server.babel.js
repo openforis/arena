@@ -37,9 +37,7 @@ export default {
   entry: {
     server: entry('server/server.js'),
     jobThread: entry('server/job/jobThread.js'),
-    recordUpdateThread: entry(
-      'server/modules/record/service/update/thread/recordUpdateThread.js',
-    ),
+    recordUpdateThread: entry('server/modules/record/service/update/thread/recordUpdateThread.js'),
   },
   output: {
     publicPath: 'dist/',
@@ -50,13 +48,7 @@ export default {
     hotUpdateMainFilename: 'dist/hot-update-[hash].json',
   },
   resolve: {
-    extensions: [
-      '.webpack-loader.js',
-      '.web-loader.js',
-      '.loader.js',
-      '.js',
-      '.jsx',
-    ],
+    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
     modules: [path.resolve(__dirname, 'node_modules')],
     alias: mainConfig.resolve.alias,
   },
@@ -69,10 +61,7 @@ export default {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env'],
-            plugins: [
-              '@babel/plugin-proposal-object-rest-spread',
-              '@babel/plugin-syntax-dynamic-import',
-            ],
+            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
           },
         },
       },

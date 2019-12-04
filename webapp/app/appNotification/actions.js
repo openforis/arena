@@ -10,9 +10,7 @@ export const showNotification = (key, params, severity) => dispatch => {
     notification: NotificationState.newNotification(key, params, severity),
   })
 
-  dispatch(
-    debounceAction({ type: appNotificationHide }, appNotificationHide, 10000),
-  )
+  dispatch(debounceAction({ type: appNotificationHide }, appNotificationHide, 10000))
 }
 
 export const hideNotification = () => dispatch => {

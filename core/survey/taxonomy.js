@@ -21,8 +21,5 @@ export const newTaxonomy = (props = {}) => ({
 // READ
 export const getUuid = ObjectUtils.getUuid
 export const getName = ObjectUtils.getProp(keysProps.name, '')
-export const getVernacularLanguageCodes = ObjectUtils.getProp(
-  keysProps.vernacularLanguageCodes,
-  [],
-)
+export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
 export const isPublished = R.propOr(false, keys.published)

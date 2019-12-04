@@ -39,13 +39,11 @@ const NodeDefCode = props => {
     removeNode,
   } = props
 
-  const {
-    data: { items = [] } = { items: [] },
-    dispatch: fetchItems,
-    setState: setItems,
-  } = useAsyncGetRequest(
+  const { data: { items = [] } = { items: [] }, dispatch: fetchItems, setState: setItems } = useAsyncGetRequest(
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    { params: { draft, parentUuid: nodeParentCodeUuid } },
+    {
+      params: { draft, parentUuid: nodeParentCodeUuid },
+    },
   )
   const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
@@ -63,9 +61,7 @@ const NodeDefCode = props => {
     // On items or nodes change, update selectedItems
     useEffect(() => {
       const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = itemsArray.filter(item =>
-        selectedItemUuids.includes(CategoryItem.getUuid(item)),
-      )
+      const selectedItemsUpdate = itemsArray.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
       setSelectedItems(selectedItemsUpdate)
     }, [items, nodes])
   }
@@ -74,11 +70,7 @@ const NodeDefCode = props => {
     const node =
       NodeDef.isSingle(nodeDef) || entryDataQuery
         ? nodes[0]
-        : Node.newNode(
-            NodeDef.getUuid(nodeDef),
-            Node.getRecordUuid(parentNode),
-            parentNode,
-          )
+        : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
     const value = { [Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(item) }
     const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
@@ -91,15 +83,12 @@ const NodeDefCode = props => {
     if (NodeDef.isSingle(nodeDef) || entryDataQuery) {
       updateNode(nodeDef, nodes[0], {}, null, {}, {})
     } else {
-      const nodeToRemove = nodes.find(
-        node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item),
-      )
+      const nodeToRemove = nodes.find(node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
       removeNode(nodeDef, nodeToRemove)
     }
   }
 
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) ||
-    entryDataQuery ? (
+  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (
     <NodeDefCodeDropdown
       {...props}
       items={itemsArray}
@@ -127,24 +116,13 @@ const mapStateToProps = (state, props) => {
   const record = RecordState.getRecord(state)
   const { nodeDef, parentNode } = props
 
-  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(
-    survey,
-  )
-  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(
-    survey,
-  )
+  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
 
-  const nodeParentCode = Record.getParentCodeAttribute(
-    survey,
-    parentNode,
-    nodeDef,
-  )(record)
+  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
 
   const codeUuidsHierarchy = nodeParentCode
-    ? R.append(
-        Node.getUuid(nodeParentCode),
-        Node.getHierarchyCode(nodeParentCode),
-      )
+    ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
     : []
 
   return {

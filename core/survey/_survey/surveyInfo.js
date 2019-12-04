@@ -98,11 +98,7 @@ export const hasCollectReportIssues = R.pipe(
 export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
 export const getLanguage = preferredLang => surveyInfo =>
-  R.pipe(
-    getLanguages,
-    R.find(R.equals(preferredLang)),
-    R.defaultTo(getDefaultLanguage(surveyInfo)),
-  )(surveyInfo)
+  R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)
 
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)
@@ -115,12 +111,8 @@ export const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 export const getAuthGroups = ObjectUtils.getAuthGroups
 
-const _getAuthGroupByName = name =>
-  R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
+const _getAuthGroupByName = name => R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
 
-export const getAuthGroupAdmin = _getAuthGroupByName(
-  AuthGroup.groupNames.surveyAdmin,
-)
+export const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
 
-export const isAuthGroupAdmin = group => surveyInfo =>
-  AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
+export const isAuthGroupAdmin = group => surveyInfo => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))

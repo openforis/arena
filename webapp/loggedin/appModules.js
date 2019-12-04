@@ -1,7 +1,6 @@
 const app = 'app'
 
-export const appModuleUri = (module = appModules.home) =>
-  `/${[app, module.path].join('/')}/`
+export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
 
 // ==== App Root modules
 export const appModules = {

@@ -29,18 +29,11 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 
 // ==== DML
 
-const _getQueryData = async (
-  survey,
-  nodeDefUuidTable,
-  nodeDefUuidCols = [],
-) => {
+const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => {
   const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
   return {
     nodeDefTable,
-    tableName: NodeDefTable.getViewName(
-      nodeDefTable,
-      Survey.getNodeDefParent(nodeDefTable)(survey),
-    ),
+    tableName: NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey)),
     colNames: NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey),
   }
 }
@@ -58,11 +51,11 @@ export const queryTable = async (
   streamOutput = null,
 ) => {
   const surveyId = Survey.getId(survey)
-  const {
-    nodeDefTable,
-    tableName,
-    colNames: colNamesParams,
-  } = await _getQueryData(survey, nodeDefUuidTable, nodeDefUuidCols)
+  const { nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(
+    survey,
+    nodeDefUuidTable,
+    nodeDefUuidCols,
+  )
 
   // Get hierarchy entities uuid col names
   const ancestorUuidColNames = []
@@ -71,11 +64,7 @@ export const queryTable = async (
   )(survey)
 
   // Fetch data
-  const colNames = [
-    DataTable.colNameRecordUuuid,
-    ...ancestorUuidColNames,
-    ...colNamesParams,
-  ]
+  const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
   let rows = await DataViewReadRepository.runSelect(
     surveyId,
     cycle,
@@ -93,14 +82,8 @@ export const queryTable = async (
     rows = await Promise.all(
       rows.map(async row => {
         const recordUuid = row[DataTable.colNameRecordUuuid]
-        const record = await RecordRepository.fetchRecordByUuid(
-          surveyId,
-          recordUuid,
-        )
-        const parentNodeUuid = R.prop(
-          `${NodeDef.getName(nodeDefTable)}_uuid`,
-          row,
-        )
+        const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+        const parentNodeUuid = R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
         const resultRow = { ...row, cols: {}, record, parentNodeUuid }
 
         // Assoc nodes to each columns
@@ -111,19 +94,10 @@ export const queryTable = async (
           const parentUuid = R.prop(parentUuidColName, row)
 
           const node =
-            NodeDef.isMultiple(nodeDefTable) &&
-            NodeDef.isEqual(nodeDefCol)(nodeDefTable) // Column is the multiple attribute
-              ? await NodeRepository.fetchNodeByUuid(
-                  surveyId,
-                  row[`${NodeDef.getName(nodeDefCol)}_uuid`],
-                )
+            NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // Column is the multiple attribute
+              ? await NodeRepository.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefCol)}_uuid`])
               : (
-                  await NodeRepository.fetchChildNodesByNodeDefUuids(
-                    surveyId,
-                    recordUuid,
-                    parentUuid,
-                    [nodeDefUuidCol],
-                  )
+                  await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
                 )[0]
 
           resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
@@ -144,20 +118,12 @@ export const queryTable = async (
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, nodeDefUuidTable)
-  return await DataViewReadRepository.runCount(
-    surveyId,
-    cycle,
-    tableName,
-    filter,
-  )
+  return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
 
 export const populateTable = DataTableInsertRepository.populateTable
 export const updateTable = DataTableUpdateRepository.updateTable
 
-export const countDuplicateRecords =
-  DataViewReadRepository.countDuplicateRecords
-export const fetchRecordsCountByKeys =
-  DataViewReadRepository.fetchRecordsCountByKeys
-export const fetchRecordsWithDuplicateEntities =
-  DataTableReadRepository.fetchRecordsWithDuplicateEntities
+export const countDuplicateRecords = DataViewReadRepository.countDuplicateRecords
+export const fetchRecordsCountByKeys = DataViewReadRepository.fetchRecordsCountByKeys
+export const fetchRecordsWithDuplicateEntities = DataTableReadRepository.fetchRecordsWithDuplicateEntities

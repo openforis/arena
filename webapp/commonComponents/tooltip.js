@@ -15,12 +15,9 @@ class Tooltip extends React.Component {
   }
 
   getStyle() {
-    const elemOffset =
-      this.tooltipRef.current && elementOffset(this.tooltipRef.current)
+    const elemOffset = this.tooltipRef.current && elementOffset(this.tooltipRef.current)
 
-    return elemOffset
-      ? { top: elemOffset.top + elemOffset.height, left: elemOffset.left }
-      : {}
+    return elemOffset ? { top: elemOffset.top + elemOffset.height, left: elemOffset.left } : {}
   }
 
   mouseEnter() {
@@ -50,8 +47,7 @@ class Tooltip extends React.Component {
     const { children, className, type = '' } = this.props
     const { messageElement } = this.state
 
-    const tooltipClass =
-      `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '')
+    const tooltipClass = `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '')
 
     return (
       <div

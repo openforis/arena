@@ -21,31 +21,15 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
     />
   ))
 
-const TableRows = ({
-  nodeDefCols,
-  data,
-  offset,
-  lang,
-  colWidth,
-  defaultColWidth,
-  editMode,
-  history,
-}) => {
+const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth, editMode, history }) => {
   const i18n = useI18n()
 
   return (
     <div className="table__content">
       <div className="table__rows">
         <div className="table__row-header">
-          <div style={{ width: defaultColWidth }}>
-            {i18n.t('dataView.rowNum')}
-          </div>
-          <TableColumns
-            nodeDefCols={nodeDefCols}
-            lang={lang}
-            colWidth={colWidth}
-            editMode={editMode}
-          />
+          <div style={{ width: defaultColWidth }}>{i18n.t('dataView.rowNum')}</div>
+          <TableColumns nodeDefCols={nodeDefCols} lang={lang} colWidth={colWidth} editMode={editMode} />
         </div>
 
         <div className="table__data-rows">
@@ -53,18 +37,12 @@ const TableRows = ({
             const { parentNodeUuid, record } = row
 
             const recordUuid = Record.getUuid(record)
-            const recordEditUrl = `${appModuleUri(
-              dataModules.record,
-            )}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+            const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
             const validation = Record.getValidation(record)
 
             return (
               <div key={i} className="table__row">
-                <ErrorBadge
-                  validation={validation}
-                  showLabel={false}
-                  className="error-badge-inverse"
-                />
+                <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
 
                 <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
@@ -78,12 +56,7 @@ const TableRows = ({
                     </button>
                   )}
                 </div>
-                <TableColumns
-                  nodeDefCols={nodeDefCols}
-                  row={row}
-                  colWidth={colWidth}
-                  editMode={editMode}
-                />
+                <TableColumns nodeDefCols={nodeDefCols} row={row} colWidth={colWidth} editMode={editMode} />
               </div>
             )
           })}

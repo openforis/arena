@@ -12,11 +12,9 @@ export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'
 export const loginErrorUpdate = 'login/error'
 
-export const setEmail = email => dispatch =>
-  dispatch({ type: loginEmailUpdate, email })
+export const setEmail = email => dispatch => dispatch({ type: loginEmailUpdate, email })
 
-export const setLoginError = message => dispatch =>
-  dispatch({ type: loginErrorUpdate, message })
+export const setLoginError = message => dispatch => dispatch({ type: loginErrorUpdate, message })
 
 const _createAction = cognitoResponseHandler => async dispatch => {
   try {
@@ -76,9 +74,7 @@ export const sendVerificationCode = email =>
   _createAction(async dispatch => {
     const responseType = await CognitoAuth.forgotPassword(email)
     if (responseType === CognitoAuth.keysAction.success) {
-      dispatch(
-        showNotification('An email with the verification code has been sent'),
-      )
+      dispatch(showNotification('An email with the verification code has been sent'))
       dispatch({
         type: loginUserActionUpdate,
         action: LoginState.userActions.resetPassword,
@@ -88,10 +84,7 @@ export const sendVerificationCode = email =>
 
 export const resetPassword = (verificationCode, newPassword) =>
   _createAction(async dispatch => {
-    const responseType = await CognitoAuth.resetPassword(
-      verificationCode,
-      newPassword,
-    )
+    const responseType = await CognitoAuth.resetPassword(verificationCode, newPassword)
     if (responseType === CognitoAuth.keysAction.success) {
       dispatch(setEmail(''))
       dispatch(showNotification('Your password has been reset'))

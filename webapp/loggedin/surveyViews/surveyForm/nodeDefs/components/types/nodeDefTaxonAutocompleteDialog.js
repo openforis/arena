@@ -12,19 +12,10 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
-    <div
-      {...otherProps}
-      key={Taxon.getUuid(taxon)}
-      className="item"
-      tabIndex="1"
-    >
+    <div {...otherProps} key={Taxon.getUuid(taxon)} className="item" tabIndex="1">
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>
-      {vernacularLang && (
-        <div style={{ gridColumn: 2 }}>
-          {`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}
-        </div>
-      )}
+      {vernacularLang && <div style={{ gridColumn: 2 }}>{`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}</div>}
     </div>
   )
 }
@@ -52,10 +43,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
   const {
     data: { list = [] } = { list: [] },
     dispatch,
-  } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
-    { params },
-  )
+  } = useAsyncGetRequest(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, { params })
 
   useEffect(dispatch, [fieldValue])
 
@@ -64,9 +52,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
       className="survey-form__node-def-taxon-autocomplete-list"
       items={list}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
-      itemKeyFunction={taxon =>
-        `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`
-      }
+      itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}

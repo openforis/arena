@@ -27,17 +27,13 @@ const Logical = props => {
       <div className="btns">
         <div className="btns__add">
           <button
-            className={`btn btn-s${
-              operator === logical.or.key ? ' active' : ''
-            }`}
+            className={`btn btn-s${operator === logical.or.key ? ' active' : ''}`}
             onClick={() => onChange(R.assoc('operator', logical.or.key, node))}
           >
             {i18n.t('expressionEditor.or')}
           </button>
           <button
-            className={`btn btn-s${
-              operator === logical.and.key ? ' active' : ''
-            }`}
+            className={`btn btn-s${operator === logical.and.key ? ' active' : ''}`}
             onClick={() => onChange(R.assoc('operator', logical.and.key, node))}
           >
             {i18n.t('expressionEditor.and')}

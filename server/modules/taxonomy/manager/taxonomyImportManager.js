@@ -9,20 +9,8 @@ import * as Validation from '@core/validation/validation'
 import * as TaxonomyManager from './taxonomyManager'
 
 const createPredefinedTaxa = taxonomy => [
-  Taxon.newTaxon(
-    Taxonomy.getUuid(taxonomy),
-    Taxon.unknownCode,
-    'Unknown',
-    'Unknown',
-    'Unknown',
-  ),
-  Taxon.newTaxon(
-    Taxonomy.getUuid(taxonomy),
-    Taxon.unlistedCode,
-    'Unlisted',
-    'Unlisted',
-    'Unlisted',
-  ),
+  Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
+  Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted'),
 ]
 
 export default class TaxonomyImportManager {
@@ -34,22 +22,10 @@ export default class TaxonomyImportManager {
     this.tx = tx
 
     this.batchPersisterInsert = new BatchPersister(
-      async items =>
-        await TaxonomyManager.insertTaxa(
-          this.user,
-          this.surveyId,
-          items,
-          this.tx,
-        ),
+      async items => await TaxonomyManager.insertTaxa(this.user, this.surveyId, items, this.tx),
     )
     this.batchPersisterUpdate = new BatchPersister(
-      async items =>
-        await TaxonomyManager.updateTaxa(
-          this.user,
-          this.surveyId,
-          items,
-          this.tx,
-        ),
+      async items => await TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx),
     )
     this.insertedCodes = new Set() // Inserted taxa codes
     this.existingUuidAndVernacularNamesByCode = {} // Existing taxon uuids and vernacular names (indexed by code)
@@ -68,20 +44,14 @@ export default class TaxonomyImportManager {
   }
 
   async addTaxonToUpdateBuffer(taxon) {
-    const taxonExisting = this.existingUuidAndVernacularNamesByCode[
-      Taxon.getCode(taxon)
-    ]
+    const taxonExisting = this.existingUuidAndVernacularNamesByCode[Taxon.getCode(taxon)]
     if (taxonExisting) {
       // Update existing item
       const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
-      await this.batchPersisterUpdate.addItem(
-        R.omit([Validation.keys.validation], taxonUpdated),
-      )
+      await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
     } else {
       // Insert new one
-      await this.batchPersisterInsert.addItem(
-        R.omit([Validation.keys.validation], taxon),
-      )
+      await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
     }
 
     this.insertedCodes.add(Taxon.getCode(taxon))

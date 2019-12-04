@@ -61,10 +61,8 @@ export const assocNodes = nodes => record => {
 export const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
 export const mergeNodeValidations = nodeValidations => record =>
-  R.pipe(
-    Validation.getValidation,
-    Validation.mergeValidation(nodeValidations),
-    validationMerged => Validation.assocValidation(validationMerged)(record),
+  R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), validationMerged =>
+    Validation.assocValidation(validationMerged)(record),
   )(record)
 
 // ====== DELETE
@@ -79,17 +77,11 @@ export const deleteNode = node => record => {
   let recordUpdated = NodesIndex.removeNode(node)(record)
 
   // 3. delete children
-  recordUpdated = R.reduce(
-    (recordAcc, child) => deleteNode(child)(recordAcc),
-    record,
-    children,
-  )
+  recordUpdated = R.reduce((recordAcc, child) => deleteNode(child)(recordAcc), record, children)
 
   // 4. update validation
-  recordUpdated = R.pipe(
-    Validation.getValidation,
-    Validation.dissocFieldValidation(nodeUuid),
-    newValidation => Validation.assocValidation(newValidation)(recordUpdated),
+  recordUpdated = R.pipe(Validation.getValidation, Validation.dissocFieldValidation(nodeUuid), newValidation =>
+    Validation.assocValidation(newValidation)(recordUpdated),
   )(recordUpdated)
 
   // 5. remove node from record

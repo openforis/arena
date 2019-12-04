@@ -42,9 +42,7 @@ export const toMessage = (i18n, survey) => activityLog => {
   const type = ActivityLog.getType(activityLog)
 
   const i18nMessageParamsFn = i18nMessageParamsFns[type]
-  const i18nMessageParams = i18nMessageParamsFn
-    ? i18nMessageParamsFn(survey, i18n)(activityLog)
-    : {}
+  const i18nMessageParams = i18nMessageParamsFn ? i18nMessageParamsFn(survey, i18n)(activityLog) : {}
   const message = i18n.t(`activityLogView.messages.${type}`, i18nMessageParams)
 
   const isItemDeletedFn = isItemDeletedFns[type]

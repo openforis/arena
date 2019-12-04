@@ -13,13 +13,7 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // CREATE
 
-export const insertUser = async (
-  surveyId,
-  surveyCycleKey,
-  uuid,
-  email,
-  client = db,
-) =>
+export const insertUser = async (surveyId, surveyCycleKey, uuid, email, client = db) =>
   await client.one(
     `
     INSERT INTO "user" AS u (uuid, email, prefs)
@@ -31,11 +25,7 @@ export const insertUser = async (
 
 // READ
 
-export const countUsersBySurveyId = async (
-  surveyId,
-  countSystemAdmins = false,
-  client = db,
-) =>
+export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
   await client.one(
     `
     SELECT count(*)
@@ -65,9 +55,7 @@ export const fetchUsersBySurveyId = async (
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-      AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${
-        AuthGroup.groupNames.systemAdmin
-      }'))
+      AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))
     GROUP BY u.uuid, g.name
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}
@@ -108,13 +96,7 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async (
-  uuid,
-  name,
-  email,
-  profilePicture,
-  client = db,
-) =>
+export const updateUser = async (uuid, name, email, profilePicture, client = db) =>
   await client.one(
     `
     UPDATE "user" u
@@ -173,11 +155,7 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 /**
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
  */
-export const resetUsersPrefsSurveyCycle = async (
-  surveyId,
-  cycleKeysDeleted,
-  client = db,
-) => {
+export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
   const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysPrefs.cycle}}'`
   await client.query(
     `

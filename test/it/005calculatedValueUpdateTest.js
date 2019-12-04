@@ -35,17 +35,10 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
   record = Record.assocNodes(nodesUpdated)(record)
 
   // Update dependent nodes
-  const { record: recordUpdate } = await RecordManager.updateNodesDependents(
-    survey,
-    record,
-    nodesUpdated,
-  )
+  const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
   record = recordUpdate
 
-  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(
-    survey,
-    record,
-  )
+  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
 
   expect(Node.getValue(nodeDependent)).to.equal(dependentExpectedValue)
   return record
@@ -66,9 +59,7 @@ describe('Calculated value test', () => {
           .defaultValues(NodeDefExpression.createExpression('num * 2')),
         SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
           .readOnly()
-          .defaultValues(
-            NodeDefExpression.createExpression('num_double * num_double'),
-          ),
+          .defaultValues(NodeDefExpression.createExpression('num_double * num_double')),
         SB.attribute('num_range')
           .readOnly()
           .defaultValues(
@@ -94,14 +85,7 @@ describe('Calculated value test', () => {
   })
 
   it('Calculated value updated', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(
-      survey,
-      record,
-      'root/num',
-      2,
-      'root/num_double',
-      4,
-    )
+    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double', 4)
   })
 
   it('Calculated value with apply if updated', async () => {
@@ -130,13 +114,6 @@ describe('Calculated value test', () => {
   })
 
   it('Calculated value cascade update', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(
-      survey,
-      record,
-      'root/num',
-      2,
-      'root/num_double_square',
-      16,
-    )
+    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double_square', 16)
   })
 })

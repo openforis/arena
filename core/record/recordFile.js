@@ -16,14 +16,7 @@ export const propKeys = {
   nodeUuid: 'nodeUuid',
 }
 
-export const createFile = (
-  uuid,
-  fileName,
-  fileSize,
-  content,
-  recordUuid,
-  nodeUuid,
-) => ({
+export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUuid) => ({
   uuid,
   [keys.props]: {
     [propKeys.name]: fileName,
@@ -40,11 +33,7 @@ export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
     const extension = getExtension(fileName)
 
-    return R.pipe(
-      R.dropLast(extension.length + 1),
-      truncate(maxLength),
-      name => name + '.' + extension,
-    )(fileName)
+    return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), name => name + '.' + extension)(fileName)
   }
 
   return ''

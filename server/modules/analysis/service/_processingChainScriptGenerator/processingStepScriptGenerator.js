@@ -15,9 +15,7 @@ const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
     const nodeDefChildren = Survey.getNodeDefChildren(nodeDefCurrent)(survey)
     const nodeDefChildrenUuidCols = nodeDefChildren.reduce(
       (uuidsAcc, nodeDef) =>
-        NodeDef.isSingleAttribute(nodeDef)
-          ? R.append(NodeDef.getUuid(nodeDef), uuidsAcc)
-          : uuidsAcc,
+        NodeDef.isSingleAttribute(nodeDef) ? R.append(NodeDef.getUuid(nodeDef), uuidsAcc) : uuidsAcc,
       [],
     )
     nodeDefUuidCols.push(...nodeDefChildrenUuidCols)
@@ -42,15 +40,10 @@ const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
   )
 }
 
-export const generateScript = async (
-  survey,
-  cycle,
-  processingStep,
-  outputDir,
-) => {
-  const nodeDefTable = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
-    Survey.getNodeDefByUuid(entityUuid)(survey),
-  )(processingStep)
+export const generateScript = async (survey, cycle, processingStep, outputDir) => {
+  const nodeDefTable = R.pipe(ProcessingStep.getEntityUuid, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey))(
+    processingStep,
+  )
 
   if (nodeDefTable) {
     await _generateDataFile(survey, cycle, nodeDefTable, outputDir)

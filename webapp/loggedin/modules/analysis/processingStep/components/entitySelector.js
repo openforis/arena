@@ -18,18 +18,11 @@ const getEntities = (survey, entityStepPrev, lang) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    if (
-      !entityStepPrev ||
-      NodeDef.isRoot(nodeDef) ||
-      Survey.isNodeDefAncestor(nodeDef, entityStepPrev)(survey)
-    ) {
+    if (!entityStepPrev || NodeDef.isRoot(nodeDef) || Survey.isNodeDefAncestor(nodeDef, entityStepPrev)(survey)) {
       const label = NodeDef.getLabel(nodeDef, lang)
       entities.push({
         key: NodeDef.getUuid(nodeDef),
-        value:
-          StringUtils.nbsp +
-          R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') +
-          label,
+        value: StringUtils.nbsp + R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') + label,
       })
     }
   }
@@ -43,18 +36,14 @@ const getEntities = (survey, entityStepPrev, lang) => {
 const EntitySelector = props => {
   const { processingStep, entities, calculationEditorOpened, onChange } = props
 
-  const entity = entities.find(
-    R.propEq('key', ProcessingStep.getEntityUuid(processingStep)),
-  )
+  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
   const i18n = useI18n()
 
   return (
     <div className="form-item">
       {!calculationEditorOpened && (
-        <div className="form-label processing-chain__steps-label">
-          {i18n.t('nodeDefsTypes.entity')}
-        </div>
+        <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>
       )}
 
       <Dropdown

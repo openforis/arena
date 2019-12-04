@@ -1,10 +1,6 @@
 import * as R from 'ramda'
 
-export const getRootEntityName = R.pipe(
-  R.keys,
-  R.reject(R.equals('_declaration')),
-  R.head,
-)
+export const getRootEntityName = R.pipe(R.keys, R.reject(R.equals('_declaration')), R.head)
 
 export const getRootEntity = (collectRecord, rootEntityName = null) =>
   collectRecord[rootEntityName || getRootEntityName(collectRecord)]

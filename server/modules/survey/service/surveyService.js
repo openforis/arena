@@ -20,8 +20,7 @@ export const validateNewSurvey = SurveyManager.validateNewSurvey
 export const fetchUserSurveysInfo = SurveyManager.fetchUserSurveysInfo
 export const countUserSurveys = SurveyManager.countUserSurveys
 export const fetchSurveyById = SurveyManager.fetchSurveyById
-export const fetchSurveyAndNodeDefsBySurveyId =
-  SurveyManager.fetchSurveyAndNodeDefsBySurveyId
+export const fetchSurveyAndNodeDefsBySurveyId = SurveyManager.fetchSurveyAndNodeDefsBySurveyId
 
 // UPDATE
 export const updateSurveyProps = SurveyManager.updateSurveyProps

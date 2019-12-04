@@ -5,12 +5,7 @@ import CollectImportJob from '@server/modules/collectImport/service/collectImpor
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 
-const jobClasses = [
-  CategoryImportJob,
-  CollectImportJob,
-  SurveyPublishJob,
-  TaxonomyImportJob,
-]
+const jobClasses = [CategoryImportJob, CollectImportJob, SurveyPublishJob, TaxonomyImportJob]
 
 const getJobClass = jobType => R.find(R.propEq('type', jobType), jobClasses)
 

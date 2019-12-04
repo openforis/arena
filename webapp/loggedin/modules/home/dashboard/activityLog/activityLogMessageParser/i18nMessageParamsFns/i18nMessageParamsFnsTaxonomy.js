@@ -6,9 +6,7 @@ import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils
 
 export default {
   [ActivityLog.type.taxonomyPropUpdate]: survey => activityLog => {
-    const taxonomy = ActivityLogMessageParserUtils.getTaxonomy(survey)(
-      activityLog,
-    )
+    const taxonomy = ActivityLogMessageParserUtils.getTaxonomy(survey)(activityLog)
 
     return {
       key: ActivityLog.getContentKey(activityLog),
@@ -21,9 +19,7 @@ export default {
   }),
 
   [ActivityLog.type.taxonomyTaxaImport]: survey => activityLog => {
-    const taxonomy = ActivityLogMessageParserUtils.getTaxonomy(survey)(
-      activityLog,
-    )
+    const taxonomy = ActivityLogMessageParserUtils.getTaxonomy(survey)(activityLog)
 
     return {
       taxonomyName: Taxonomy.getName(taxonomy),

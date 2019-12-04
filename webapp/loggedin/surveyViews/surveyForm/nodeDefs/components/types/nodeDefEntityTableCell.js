@@ -8,17 +8,7 @@ import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCell = props => {
-  const {
-    nodeDef,
-    parentNode,
-    canEditDef,
-    renderType,
-    onDragStart,
-    onDragOver,
-    onDragEnd,
-    gridSize,
-    windowed,
-  } = props
+  const { nodeDef, parentNode, canEditDef, renderType, onDragStart, onDragOver, onDragEnd, gridSize, windowed } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const { length } = NodeDefUiProps.getFormFields(nodeDef)
@@ -66,20 +56,10 @@ const NodeDefEntityTableCell = props => {
       onDragEnd={onDragEnd}
     >
       {visible ? (
-        <NodeDefSwitch
-          {...props}
-          node={null}
-          nodeDef={nodeDef}
-          parentNode={parentNode}
-          renderType={renderType}
-        />
+        <NodeDefSwitch {...props} node={null} nodeDef={nodeDef} parentNode={parentNode} renderType={renderType} />
       ) : (
         <div className="survey-form__node-def-entity-table-cell-placeholder">
-          <ProgressBar
-            className="running progress-bar-striped"
-            progress={100}
-            showText={false}
-          />
+          <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
         </div>
       )}
     </div>
