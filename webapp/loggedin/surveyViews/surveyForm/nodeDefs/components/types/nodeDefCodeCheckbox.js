@@ -6,16 +6,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 const Checkbox = props => {
-  const {
-    lang,
-    item,
-    selectedItems,
-    edit,
-    canEditRecord,
-    readOnly,
-    onItemAdd,
-    onItemRemove,
-  } = props
+  const { lang, item, selectedItems, edit, canEditRecord, readOnly, onItemAdd, onItemRemove } = props
 
   const selected = Boolean(selectedItems.find(CategoryItem.isEqual(item)))
 
@@ -55,14 +46,7 @@ const NodeDefCodeCheckbox = props => {
           }}
         />
       ) : (
-        items.map(item => (
-          <Checkbox
-            {...props}
-            disabled={disabled}
-            key={CategoryItem.getUuid(item)}
-            item={item}
-          />
-        ))
+        items.map(item => <Checkbox {...props} disabled={disabled} key={CategoryItem.getUuid(item)} item={item} />)
       )}
     </div>
   )

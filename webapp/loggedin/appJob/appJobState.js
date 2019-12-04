@@ -22,7 +22,4 @@ export const updateActiveJob = job => state =>
       })(state)
     : R.dissoc(keys.activeJob)(state)
 
-export const getActiveJobOnCompleteCallback = R.pipe(
-  getActiveJob,
-  R.propOr(null, keys.onComplete),
-)
+export const getActiveJobOnCompleteCallback = R.pipe(getActiveJob, R.propOr(null, keys.onComplete))

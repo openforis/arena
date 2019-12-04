@@ -4,17 +4,7 @@ import * as R from 'ramda'
 import TablePaginator from './tablePaginator'
 
 const TableHeader = props => {
-  const {
-    module,
-    moduleApiUri,
-    restParams,
-    headerLeftComponent,
-    list,
-    offset,
-    limit,
-    count,
-    fetchListItems,
-  } = props
+  const { module, moduleApiUri, restParams, headerLeftComponent, list, offset, limit, count, fetchListItems } = props
 
   return (
     <div className="table__header">
@@ -25,9 +15,7 @@ const TableHeader = props => {
           offset={offset}
           limit={limit}
           count={count}
-          fetchFn={offset =>
-            fetchListItems(module, moduleApiUri, offset, restParams)
-          }
+          fetchFn={offset => fetchListItems(module, moduleApiUri, offset, restParams)}
         />
       )}
     </div>

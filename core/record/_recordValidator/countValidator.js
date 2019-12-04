@@ -10,31 +10,16 @@ import * as Record from '../record'
 import * as Node from '../node'
 import * as RecordValidation from '../recordValidation'
 
-export const validateChildrenCount = (
-  survey,
-  nodeParent,
-  nodeDefChild,
-  count,
-) => {
+export const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
   const validations = NodeDef.getValidations(nodeDefChild)
 
-  const minCount = NumberUtils.toNumber(
-    NodeDefValidations.getMinCount(validations),
-  )
-  const maxCount = NumberUtils.toNumber(
-    NodeDefValidations.getMaxCount(validations),
-  )
+  const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
+  const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
 
   const minCountValid = isNaN(minCount) || count >= minCount
   const maxCountValid = isNaN(maxCount) || count <= maxCount
 
-  return _createValidationResult(
-    nodeDefChild,
-    minCountValid,
-    maxCountValid,
-    minCount,
-    maxCount,
-  )
+  return _createValidationResult(nodeDefChild, minCountValid, maxCountValid, minCount, maxCount)
 }
 
 export const validateChildrenCountNodes = (survey, record, nodes) => {
@@ -80,9 +65,7 @@ const _validateChildrenCountNodePointers = (survey, record, nodePointers) => {
 
     // Check children count only for applicable nodes
     if (Node.isChildApplicable(NodeDef.getUuid(nodeDef))(nodeCtx)) {
-      const count = _hasMinOrMaxCount(nodeDef)
-        ? _countChildren(record, nodeCtx, nodeDef)
-        : 0
+      const count = _hasMinOrMaxCount(nodeDef) ? _countChildren(record, nodeCtx, nodeDef) : 0
       nodeValidation = validateChildrenCount(survey, nodeCtx, nodeDef, count)
     } else {
       // Not applicable nodes are always valid
@@ -107,53 +90,39 @@ const _hasMinOrMaxCount = nodeDef => {
 }
 
 const _countChildren = (record, parentNode, childDef) => {
-  const nodes = Record.getNodeChildrenByDefUuid(
-    parentNode,
-    NodeDef.getUuid(childDef),
-  )(record)
+  const nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
 
-  return NodeDef.isEntity(childDef)
-    ? nodes.length
-    : R.pipe(R.reject(Node.isValueBlank), R.length)(nodes)
+  return NodeDef.isEntity(childDef) ? nodes.length : R.pipe(R.reject(Node.isValueBlank), R.length)(nodes)
 }
 
-const _createValidationResult = (
-  nodeDefChild,
-  minCountValid,
-  maxCountValid,
-  minCount,
-  maxCount,
-) =>
+const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, minCount, maxCount) =>
   Validation.newInstance(true, {
     [RecordValidation.keys.childrenCount]: Validation.newInstance(true, {
-      [NodeDef.getUuid(nodeDefChild)]: Validation.newInstance(
-        minCountValid && maxCountValid,
-        {
-          [RecordValidation.keys.minCount]: Validation.newInstance(
-            minCountValid,
-            {},
-            minCountValid
-              ? []
-              : [
-                  {
-                    key: Validation.messageKeys.record.nodesMinCountNotReached,
-                    params: { minCount },
-                  },
-                ],
-          ),
-          [RecordValidation.keys.maxCount]: Validation.newInstance(
-            maxCountValid,
-            {},
-            maxCountValid
-              ? []
-              : [
-                  {
-                    key: Validation.messageKeys.record.nodesMaxCountExceeded,
-                    params: { maxCount },
-                  },
-                ],
-          ),
-        },
-      ),
+      [NodeDef.getUuid(nodeDefChild)]: Validation.newInstance(minCountValid && maxCountValid, {
+        [RecordValidation.keys.minCount]: Validation.newInstance(
+          minCountValid,
+          {},
+          minCountValid
+            ? []
+            : [
+                {
+                  key: Validation.messageKeys.record.nodesMinCountNotReached,
+                  params: { minCount },
+                },
+              ],
+        ),
+        [RecordValidation.keys.maxCount]: Validation.newInstance(
+          maxCountValid,
+          {},
+          maxCountValid
+            ? []
+            : [
+                {
+                  key: Validation.messageKeys.record.nodesMaxCountExceeded,
+                  params: { maxCount },
+                },
+              ],
+        ),
+      }),
     }),
   })

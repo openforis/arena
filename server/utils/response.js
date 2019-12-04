@@ -39,12 +39,7 @@ export const sendFile = (res, name, content, size) => {
   res.end(null, 'binary')
 }
 
-export const setContentTypeFile = (
-  res,
-  fileName,
-  fileSize = null,
-  contentType = null,
-) => {
+export const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize) {
     res.setHeader('Content-Length', fileSize)

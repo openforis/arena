@@ -36,9 +36,7 @@ export default class TaxonomyImportJob extends Job {
   async execute() {
     const { user, surveyId, taxonomyUuid, tx } = this
 
-    this.logDebug(
-      `starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`,
-    )
+    this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
     await ActivityLogManager.insert(
       user,
@@ -51,23 +49,12 @@ export default class TaxonomyImportJob extends Job {
 
     // 1. load taxonomy
 
-    this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(
-      surveyId,
-      taxonomyUuid,
-      true,
-      false,
-      tx,
-    )
+    this.taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
     if (!Taxonomy.isPublished(this.taxonomy)) {
       // 2. delete old draft taxa (only if taxonomy is not published)
       this.logDebug('delete old draft taxa')
-      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(
-        user,
-        surveyId,
-        taxonomyUuid,
-        tx,
-      )
+      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(user, surveyId, taxonomyUuid, tx)
     }
 
     // 3. start CSV row parsing
@@ -108,11 +95,7 @@ export default class TaxonomyImportJob extends Job {
   async _onHeaders(headers) {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
-      this.vernacularLanguageCodes = R.innerJoin(
-        (a, b) => a === b,
-        languageCodesISO639part2,
-        headers,
-      )
+      this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
       this.taxonomyImportManager = new TaxonomyImportManager(
         this.user,
         this.surveyId,
@@ -121,10 +104,7 @@ export default class TaxonomyImportJob extends Job {
         this.tx,
       )
       await this.taxonomyImportManager.init()
-      this.taxonCSVParser = new TaxonCSVParser(
-        this.taxonomyUuid,
-        this.vernacularLanguageCodes,
-      )
+      this.taxonCSVParser = new TaxonCSVParser(this.taxonomyUuid, this.vernacularLanguageCodes)
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
       this.csvReader.cancel()
@@ -138,9 +118,7 @@ export default class TaxonomyImportJob extends Job {
     if (Validation.isObjValid(taxon)) {
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     } else {
-      this.addError(
-        R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon),
-      )
+      this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
 
     this.incrementProcessedItems()
@@ -158,8 +136,7 @@ export default class TaxonomyImportJob extends Job {
         valid: false,
         errors: [
           {
-            key:
-              Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
+            key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
             params: { columns: R.join(', ', missingColumns) },
           },
         ],

@@ -39,14 +39,10 @@ const SurveyDefsLoader = props => {
   const i18n = useI18n()
 
   return ready ? (
-    !requirePublish ||
-    Survey.isPublished(surveyInfo) ||
-    Survey.isFromCollect(surveyInfo) ? (
+    !requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) ? (
       children
     ) : (
-      <div className="table__empty-rows">
-        {i18n.t('surveyDefsLoader.requireSurveyPublish')}
-      </div>
+      <div className="table__empty-rows">{i18n.t('surveyDefsLoader.requireSurveyPublish')}</div>
     )
   ) : null
 }
@@ -65,6 +61,4 @@ SurveyDefsLoader.defaultProps = {
   requirePublish: false,
 }
 
-export default connect(mapStateToProps, { initSurveyDefs, reloadSurveyDefs })(
-  SurveyDefsLoader,
-)
+export default connect(mapStateToProps, { initSurveyDefs, reloadSurveyDefs })(SurveyDefsLoader)

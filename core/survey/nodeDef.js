@@ -60,13 +60,7 @@ export const maxKeyAttributes = 3
 
 // ==== CREATE
 
-export const newNodeDef = (
-  nodeDefParent,
-  type,
-  cycle,
-  props,
-  analysis = false,
-) => ({
+export const newNodeDef = (nodeDefParent, type, cycle, props, analysis = false) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: getUuid(nodeDefParent),
   [keys.type]: type,
@@ -76,9 +70,7 @@ export const newNodeDef = (
     [propKeys.cycles]: [cycle],
   },
   [keys.meta]: {
-    [metaKeys.h]: nodeDefParent
-      ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)]
-      : [],
+    [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
   },
 })
 
@@ -91,26 +83,19 @@ export const getCycles = ObjectUtils.getProp(propKeys.cycles, [])
 
 export const isKey = R.pipe(ObjectUtils.getProp(propKeys.key), R.equals(true))
 export const isRoot = R.pipe(getParentUuid, R.isNil)
-export const isMultiple = R.pipe(
-  ObjectUtils.getProp(propKeys.multiple),
-  R.equals(true),
-)
+export const isMultiple = R.pipe(ObjectUtils.getProp(propKeys.multiple), R.equals(true))
 export const isSingle = R.pipe(isMultiple, R.not)
 
 const isType = type => R.pipe(getType, R.equals(type))
 
 export const isEntity = isType(nodeDefType.entity)
 export const isSingleEntity = nodeDef => isEntity(nodeDef) && isSingle(nodeDef)
-export const isMultipleEntity = nodeDef =>
-  isEntity(nodeDef) && isMultiple(nodeDef)
-export const isEntityOrMultiple = nodeDef =>
-  isEntity(nodeDef) || isMultiple(nodeDef)
+export const isMultipleEntity = nodeDef => isEntity(nodeDef) && isMultiple(nodeDef)
+export const isEntityOrMultiple = nodeDef => isEntity(nodeDef) || isMultiple(nodeDef)
 
 export const isAttribute = R.pipe(isEntity, R.not)
-export const isSingleAttribute = nodeDef =>
-  isAttribute(nodeDef) && isSingle(nodeDef)
-export const isMultipleAttribute = nodeDef =>
-  isAttribute(nodeDef) && isMultiple(nodeDef)
+export const isSingleAttribute = nodeDef => isAttribute(nodeDef) && isSingle(nodeDef)
+export const isMultipleAttribute = nodeDef => isAttribute(nodeDef) && isMultiple(nodeDef)
 export const isReadOnly = ObjectUtils.getProp(propKeys.readOnly, false)
 
 export const isBoolean = isType(nodeDefType.boolean)
@@ -148,24 +133,15 @@ export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 export const getValidations = ObjectUtils.getProp(propKeys.validations, {})
 
 export const getApplicable = ObjectUtils.getProp(propKeys.applicable, [])
-export const getValidationExpressions = R.pipe(
-  getValidations,
-  NodeDefValidations.getExpressions,
-)
-export const hasAdvancedPropsDraft = R.pipe(
-  R.prop(keys.draftAdvanced),
-  R.isEmpty,
-  R.not,
-)
+export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
+export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
 
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
-export const getParentCodeDefUuid = ObjectUtils.getProp(
-  propKeys.parentCodeDefUuid,
-)
+export const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 

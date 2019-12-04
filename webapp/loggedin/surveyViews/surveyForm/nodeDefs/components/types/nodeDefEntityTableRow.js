@@ -47,10 +47,7 @@ class NodeDefEntityTableRow extends React.Component {
       const width = overElement.offsetWidth / 2
       const parent = evt.target.parentNode
 
-      parent.insertBefore(
-        placeholder,
-        relX > width ? evt.target.nextElementSibling : evt.target,
-      )
+      parent.insertBefore(placeholder, relX > width ? evt.target.nextElementSibling : evt.target)
     }
   }
 
@@ -67,9 +64,7 @@ class NodeDefEntityTableRow extends React.Component {
     this.setState({ dragged: null })
 
     const childNodes = this.rowRef.current.childNodes
-    const uuids = [...childNodes]
-      .map(node => node.dataset.uuid)
-      .filter(uuid => uuid)
+    const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
 
     putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, uuids)
   }
@@ -95,11 +90,7 @@ class NodeDefEntityTableRow extends React.Component {
       (dragged ? ' drag-in-progress' : '')
 
     return (
-      <div
-        ref={this.rowRef}
-        className={className}
-        id={`${NodeDef.getUuid(nodeDef)}_${i}`}
-      >
+      <div ref={this.rowRef} className={className} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
         {nodeDefColumns.map(nodeDefChild => (
           <NodeDefEntityTableCell
             key={NodeDef.getUuid(nodeDefChild)}
@@ -115,19 +106,11 @@ class NodeDefEntityTableRow extends React.Component {
         ))}
 
         {edit && (
-          <div
-            className="react-grid-item"
-            style={{ width: 100 + 'px', display: 'none' }}
-            ref={this.placeholderRef}
-          />
+          <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={this.placeholderRef} />
         )}
 
         {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && (
-          <NodeDeleteButton
-            nodeDef={nodeDef}
-            node={node}
-            removeNode={removeNode}
-          />
+          <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode} />
         )}
       </div>
     )

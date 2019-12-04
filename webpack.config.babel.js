@@ -26,9 +26,7 @@ class CleanUpStatsPlugin {
     compiler.hooks.done.tap('CleanUpStatsPlugin', stats => {
       const children = stats.compilation.children
       if (Array.isArray(children)) {
-        stats.compilation.children = children.filter(child =>
-          this.shouldPickStatChild(child),
-        )
+        stats.compilation.children = children.filter(child => this.shouldPickStatChild(child))
       }
     })
   }
@@ -93,16 +91,7 @@ const webPackConfig = {
   entry: ['./webapp/main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
   resolve: {
-    extensions: [
-      '.webpack-loader.js',
-      '.web-loader.js',
-      '.loader.js',
-      '.js',
-      '.jsx',
-      '.scss',
-      '.sass',
-      '.css',
-    ],
+    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
     alias: {
       '@common': path.resolve(__dirname, 'common/'),
       '@core': path.resolve(__dirname, 'core/'),
@@ -125,10 +114,7 @@ const webPackConfig = {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env', '@babel/react'],
-            plugins: [
-              '@babel/plugin-proposal-object-rest-spread',
-              '@babel/plugin-syntax-dynamic-import',
-            ],
+            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
           },
         },
       },

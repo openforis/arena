@@ -27,11 +27,7 @@ const ProcessingStepCalculationsListItem = props => {
   } = props
 
   let className = 'processing-step__calculation'
-  className += ProcessingStepCalculation.isEqual(calculationForEdit)(
-    calculation,
-  )
-    ? ' editing'
-    : ''
+  className += ProcessingStepCalculation.isEqual(calculationForEdit)(calculation) ? ' editing' : ''
   className += dragging ? ' dragging' : ''
 
   const index = ProcessingStepCalculation.getIndex(calculation)
@@ -71,9 +67,7 @@ const mapStateToProps = (state, { calculation }) => {
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-    calculationForEdit: ProcessingStepState.getProcessingStepCalculationForEdit(
-      state,
-    ),
+    calculationForEdit: ProcessingStepState.getProcessingStepCalculationForEdit(state),
   }
 }
 

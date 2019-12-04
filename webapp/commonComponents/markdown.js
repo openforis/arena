@@ -9,12 +9,7 @@ const Markdown = props => {
     setOutput(marked(source))
   }, [source])
 
-  return (
-    <Container
-      className={className}
-      dangerouslySetInnerHTML={{ __html: output }}
-    />
-  )
+  return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />
 }
 
 Markdown.defaultProps = {

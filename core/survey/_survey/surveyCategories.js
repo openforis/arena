@@ -22,5 +22,4 @@ export const getCategoriesArray = R.pipe(
 export const getCategoryByUuid = uuid => R.pipe(getCategories, R.prop(uuid))
 
 // ====== UPDATE
-export const assocCategories = newCategories =>
-  R.assoc(categories, newCategories)
+export const assocCategories = newCategories => R.assoc(categories, newCategories)

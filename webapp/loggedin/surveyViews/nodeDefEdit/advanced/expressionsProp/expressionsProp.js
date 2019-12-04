@@ -15,8 +15,7 @@ const ExpressionsProp = props => {
 
   const i18n = useI18n()
 
-  const getExpressionIndex = expression =>
-    R.findIndex(R.propEq('uuid', NodeDefExpression.getUuid(expression)), values)
+  const getExpressionIndex = expression => R.findIndex(R.propEq('uuid', NodeDefExpression.getUuid(expression)), values)
 
   const onDelete = expression => {
     if (window.confirm(i18n.t('nodeDefEdit.expressionsProp.confirmDelete'))) {
@@ -31,10 +30,7 @@ const ExpressionsProp = props => {
       onDelete(expression)
     } else {
       const index = getExpressionIndex(expression)
-      const newValues =
-        index >= 0
-          ? R.update(index, expression, values)
-          : R.append(expression, values)
+      const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
       onChange(newValues)
     }
   }

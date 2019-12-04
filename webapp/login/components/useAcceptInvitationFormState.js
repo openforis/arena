@@ -5,12 +5,7 @@ import { validateAcceptInvitationObj, getFirstError } from './loginValidator'
 export const useAcceptInvitationFormState = props => {
   const { acceptInvitation, setLoginError } = props
 
-  const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    validation,
-  } = useFormObject(
+  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     {
       userName: '',
       password: '',
@@ -28,9 +23,7 @@ export const useAcceptInvitationFormState = props => {
     if (objectValid) {
       acceptInvitation(userName, password)
     } else {
-      setLoginError(
-        getFirstError(validation, ['userName', 'password', 'passwordConfirm']),
-      )
+      setLoginError(getFirstError(validation, ['userName', 'password', 'passwordConfirm']))
     }
   }
 

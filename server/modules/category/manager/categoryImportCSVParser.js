@@ -6,12 +6,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as CSVReader from '@server/utils/file/csvReader'
 
-export const createRowsReaderFromStream = async (
-  stream,
-  summary,
-  onRowItem,
-  onTotalChange,
-) => {
+export const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   return CSVReader.createReaderFromStream(
@@ -37,15 +32,9 @@ export const createRowsReaderFromStream = async (
             const levelName = CategoryImportSummary.getColumnLevelName(column)
 
             if (CategoryImportSummary.isColumnLabel(column)) {
-              ObjectUtils.setInPath(
-                [levelName, lang],
-                columnValue,
-              )(labelsByLevel)
+              ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
             } else if (CategoryImportSummary.isColumnDescription(column)) {
-              ObjectUtils.setInPath(
-                [levelName, lang],
-                columnValue,
-              )(descriptionsByLevel)
+              ObjectUtils.setInPath([levelName, lang], columnValue)(descriptionsByLevel)
             }
           }
         }

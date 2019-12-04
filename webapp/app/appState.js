@@ -34,24 +34,15 @@ export const assocUserPropsOnSurveyCreate = survey => appState => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(
     R.prop(keys.user),
-    User.assocPrefSurveyCurrentAndCycle(
-      Survey.getIdSurveyInfo(surveyInfo),
-      Survey.cycleOneKey,
-    ),
-    R.unless(
-      User.isSystemAdmin,
-      User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo)),
-    ),
+    User.assocPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.cycleOneKey),
+    R.unless(User.isSystemAdmin, User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo))),
   )(appState)
   return R.assoc(keys.user, user, appState)
 }
 
 export const assocUserPropsOnSurveyUpdate = survey => appState => {
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const user = R.pipe(
-    R.prop(keys.user),
-    User.assocPrefSurveyCurrent(Survey.getIdSurveyInfo(surveyInfo)),
-  )(appState)
+  const user = R.pipe(R.prop(keys.user), User.assocPrefSurveyCurrent(Survey.getIdSurveyInfo(surveyInfo)))(appState)
   return R.assoc(keys.user, user, appState)
 }
 
@@ -87,7 +78,4 @@ export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
 
 // ==== App Loader
 
-export const isLoaderVisible = R.pipe(
-  getState,
-  R.propEq(keys.loaderVisible, true),
-)
+export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))

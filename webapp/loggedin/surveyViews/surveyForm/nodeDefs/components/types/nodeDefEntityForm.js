@@ -13,10 +13,7 @@ import * as Node from '@core/record/node'
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
-import {
-  setFormPageNode,
-  getNodeKeyLabelValues,
-} from '@webapp/loggedin/surveyViews/surveyForm/actions'
+import { setFormPageNode, getNodeKeyLabelValues } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 
@@ -42,27 +39,18 @@ const NodeDefEntityForm = props => {
 
   return (
     <div>
-      <NodeDefErrorBadge
-        nodeDef={nodeDef}
-        edit={edit}
-        parentNode={parentNode}
-        nodes={nodes}
-      />
+      <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes} />
 
       {entryMultiple && (
         <NodeDefEntityFormNodeSelect
           {...props}
           selectedNode={selectedNode}
           getNodeKeyLabelValues={getNodeKeyLabelValues}
-          onChange={selectedNodeUuid =>
-            setFormPageNode(nodeDef, selectedNodeUuid)
-          }
+          onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}
         />
       )}
 
-      {entry && selectedNode && (
-        <NodeDefEntityFormGrid {...props} node={selectedNode} />
-      )}
+      {entry && selectedNode && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
 
       {edit && <NodeDefEntityFormGrid {...props} node={null} />}
     </div>
@@ -89,9 +77,7 @@ const mapStateToProps = (state, props) => {
       ? SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
       : Node.getUuid(nodes[0])
 
-    const selectedNode = selectedNodeUuid
-      ? Record.getNodeByUuid(selectedNodeUuid)(record)
-      : null
+    const selectedNode = selectedNodeUuid ? Record.getNodeByUuid(selectedNodeUuid)(record) : null
 
     return {
       entryMultiple,

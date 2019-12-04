@@ -19,12 +19,7 @@ const Group = props => {
       />
       <div className="footer">
         <h3>)</h3>
-        <EditButtons
-          node={node}
-          onChange={onChange}
-          onDelete={() => onChange(argument)}
-          canDelete={true}
-        />
+        <EditButtons node={node} onChange={onChange} onDelete={() => onChange(argument)} canDelete={true} />
       </div>
     </div>
   )

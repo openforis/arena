@@ -11,8 +11,7 @@ import * as RecordState from '../record/recordState'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = (prop, defaultTo = null) =>
-  R.pipe(getState, R.propOr(defaultTo, prop))
+const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
 
 const keys = {
   nodeDefUuidPage: 'nodeDefUuidPage', // Current page nodeDef
@@ -23,28 +22,21 @@ const keys = {
 
 // ====== nodeDefUuidPage
 
-export const assocFormActivePage = nodeDef =>
-  R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
+export const assocFormActivePage = nodeDef => R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
 
 export const getFormActivePageNodeDef = state => {
   const survey = SurveyState.getSurvey(state)
   const nodeDefUuidPage = getStateProp(keys.nodeDefUuidPage)(state)
 
-  return nodeDefUuidPage
-    ? Survey.getNodeDefByUuid(nodeDefUuidPage)(survey)
-    : Survey.getNodeDefRoot(survey)
+  return nodeDefUuidPage ? Survey.getNodeDefByUuid(nodeDefUuidPage)(survey) : Survey.getNodeDefRoot(survey)
 }
 
 export const isNodeDefFormActivePage = nodeDef =>
-  R.pipe(
-    getFormActivePageNodeDef,
-    R.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef)),
-  )
+  R.pipe(getFormActivePageNodeDef, R.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef)))
 
 // ====== nodeDefUuidAddChildTo
 
-export const assocNodeDefAddChildTo = nodeDef =>
-  R.assoc(keys.nodeDefUuidAddChildTo, NodeDef.getUuid(nodeDef))
+export const assocNodeDefAddChildTo = nodeDef => R.assoc(keys.nodeDefUuidAddChildTo, NodeDef.getUuid(nodeDef))
 
 export const getNodeDefAddChildTo = state => {
   const survey = SurveyState.getSurvey(state)
@@ -70,10 +62,7 @@ export const assocFormPageNodes = formPageNodeUuidByNodeDefUuid => state =>
   )(formPageNodeUuidByNodeDefUuid)
 
 export const getFormPageNodeUuid = nodeDef =>
-  R.pipe(
-    getStateProp(keys.nodeDefUuidPageNodeUuid),
-    R.prop(NodeDef.getUuid(nodeDef)),
-  )
+  R.pipe(getStateProp(keys.nodeDefUuidPageNodeUuid), R.prop(NodeDef.getUuid(nodeDef)))
 
 export const getFormPageParentNode = nodeDef => state => {
   const survey = SurveyState.getSurvey(state)
@@ -96,8 +85,7 @@ export const getFormPageParentNode = nodeDef => state => {
 
 export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
 
-export const setShowPageNavigation = showPageNavigation =>
-  R.assoc(keys.showPageNavigation, showPageNavigation)
+export const setShowPageNavigation = showPageNavigation => R.assoc(keys.showPageNavigation, showPageNavigation)
 
 // ====== NodeDef update actions
 
@@ -106,33 +94,19 @@ export const assocParamsOnNodeDefCreate = nodeDef =>
   R.pipe(
     // If is entity and renders in its own page, assoc active page
     R.ifElse(
-      () =>
-        NodeDef.isEntity(nodeDef) &&
-        NodeDefLayout.hasPage(NodeDef.getCycleFirst(nodeDef))(nodeDef),
+      () => NodeDef.isEntity(nodeDef) && NodeDefLayout.hasPage(NodeDef.getCycleFirst(nodeDef))(nodeDef),
       assocFormActivePage(nodeDef),
       R.identity,
     ),
     // If is entity remove assocNodeDefAddChildTo
-    R.ifElse(
-      () => NodeDef.isEntity(nodeDef),
-      assocNodeDefAddChildTo(null),
-      R.identity,
-    ),
+    R.ifElse(() => NodeDef.isEntity(nodeDef), assocNodeDefAddChildTo(null), R.identity),
   )
 
 // On nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
 export const dissocParamsOnNodeDefDelete = nodeDef => surveyFormState => {
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   return R.pipe(
-    R.ifElse(
-      R.propEq(keys.nodeDefUuidPage, nodeDefUuid),
-      R.dissoc(keys.nodeDefUuidPage),
-      R.identity,
-    ),
-    R.ifElse(
-      R.propEq(keys.nodeDefUuidAddChildTo, nodeDefUuid),
-      R.dissoc(keys.nodeDefUuidAddChildTo),
-      R.identity,
-    ),
+    R.ifElse(R.propEq(keys.nodeDefUuidPage, nodeDefUuid), R.dissoc(keys.nodeDefUuidPage), R.identity),
+    R.ifElse(R.propEq(keys.nodeDefUuidAddChildTo, nodeDefUuid), R.dissoc(keys.nodeDefUuidAddChildTo), R.identity),
   )(surveyFormState)
 }

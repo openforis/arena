@@ -12,32 +12,13 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import Queue from '@core/queue'
 
-export const newRecord = (user, preview = false) =>
-  Record.newRecord(user, Survey.cycleOneKey, preview)
+export const newRecord = (user, preview = false) => Record.newRecord(user, Survey.cycleOneKey, preview)
 
-export const insertAndInitRecord = async (
-  user,
-  survey,
-  preview = false,
-  client = db,
-) =>
+export const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
   await client.tx(async t => {
     const record = newRecord(user, preview)
-    const recordDb = await RecordManager.insertRecord(
-      user,
-      Survey.getId(survey),
-      record,
-      true,
-      t,
-    )
-    return await RecordManager.initNewRecord(
-      user,
-      survey,
-      recordDb,
-      null,
-      null,
-      t,
-    )
+    const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, true, t)
+    return await RecordManager.initNewRecord(user, survey, recordDb, null, null, t)
   })
 
 export const getNodePath = node => (survey, record) => {
@@ -49,14 +30,8 @@ export const getNodePath = node => (survey, record) => {
     const parentNodePath = getNodePath(parentNode)(survey, record)
 
     if (NodeDef.isMultiple(nodeDef)) {
-      const siblings = Record.getNodeChildrenByDefUuid(
-        parentNode,
-        nodeDefUuid,
-      )(record)
-      const index = R.findIndex(
-        n => Node.getUuid(n) === Node.getUuid(node),
-        siblings,
-      )
+      const siblings = Record.getNodeChildrenByDefUuid(parentNode, nodeDefUuid)(record)
+      const index = R.findIndex(n => Node.getUuid(n) === Node.getUuid(node), siblings)
       const position = index + 1
       return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${position}]`
     }
@@ -83,15 +58,9 @@ export const findNodeByPath = path => (survey, record) => {
       const childName = partMatch[1]
       const childPosition = R.defaultTo(1, partMatch[3])
 
-      currentNodeDef = Survey.getNodeDefChildByName(
-        currentParentDef,
-        childName,
-      )(survey)
+      currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, childName)(survey)
 
-      const children = Record.getNodeChildrenByDefUuid(
-        currentParentNode,
-        NodeDef.getUuid(currentNodeDef),
-      )(record)
+      const children = Record.getNodeChildrenByDefUuid(currentParentNode, NodeDef.getUuid(currentNodeDef))(record)
 
       if (children.length >= childPosition) {
         currentNode = children[childPosition - 1]

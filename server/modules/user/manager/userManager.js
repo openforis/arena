@@ -11,39 +11,15 @@ import * as UserRepository from '@server/modules/user/repository/userRepository'
 
 // ==== CREATE
 
-export const insertUser = async (
-  user,
-  surveyId,
-  surveyCycleKey,
-  uuid,
-  email,
-  groupUuid,
-  client = db,
-) =>
+export const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid, client = db) =>
   await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(
-      surveyId,
-      surveyCycleKey,
-      uuid,
-      email,
-      t,
-    )
+    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, uuid, email, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
-export const addUserToGroup = async (
-  user,
-  surveyId,
-  groupUuid,
-  userToAdd,
-  client = db,
-) =>
+export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
   await client.tx(async t => {
-    await AuthGroupRepository.insertUserGroup(
-      groupUuid,
-      User.getUuid(userToAdd),
-      t,
-    )
+    await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
     const group = await AuthGroupRepository.fetchGroupByUuid(groupUuid, t)
 
     if (!AuthGroup.isSystemAdminGroup(group)) {
@@ -67,9 +43,7 @@ const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
 
   if (user) {
-    const authGroups = await AuthGroupRepository.fetchUserGroups(
-      User.getUuid(user),
-    )
+    const authGroups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
     return { ...user, authGroups }
   }
 
@@ -84,21 +58,9 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
 export const fetchUserProfilePicture = UserRepository.fetchUserProfilePicture
 
-export const fetchUsersBySurveyId = async (
-  surveyId,
-  offset,
-  limit,
-  fetchSystemAdmins,
-  client = db,
-) =>
+export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
-    const users = await UserRepository.fetchUsersBySurveyId(
-      surveyId,
-      offset,
-      limit,
-      fetchSystemAdmins,
-      t,
-    )
+    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
 
     return await Promise.all(
       users.map(async u => ({
@@ -110,16 +72,7 @@ export const fetchUsersBySurveyId = async (
 
 // ==== UPDATE
 
-const _updateUser = async (
-  user,
-  surveyId,
-  userUuid,
-  name,
-  email,
-  groupUuid,
-  profilePicture,
-  client = db,
-) =>
+const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, profilePicture, client = db) =>
   await client.tx(async t => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
 
@@ -128,12 +81,7 @@ const _updateUser = async (
       await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
       await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
     } else {
-      await AuthGroupRepository.updateUserGroup(
-        surveyId,
-        userUuid,
-        groupUuid,
-        t,
-      )
+      await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
       // Log user update activity only for non system admin users
       await ActivityLogRepository.insert(
         user,
@@ -145,13 +93,7 @@ const _updateUser = async (
       )
     }
 
-    return await UserRepository.updateUser(
-      userUuid,
-      name,
-      email,
-      profilePicture,
-      t,
-    )
+    return await UserRepository.updateUser(userUuid, name, email, profilePicture, t)
   })
 
 export const updateUser = _userFetcher(_updateUser)
@@ -160,22 +102,14 @@ export const updateUsername = UserRepository.updateUsername
 
 export const updateUserPrefs = async user => ({
   ...(await UserRepository.updateUserPrefs(user)),
-  [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(
-    User.getUuid(user),
-  ),
+  [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
 
-export const resetUsersPrefsSurveyCycle =
-  UserRepository.resetUsersPrefsSurveyCycle
+export const resetUsersPrefsSurveyCycle = UserRepository.resetUsersPrefsSurveyCycle
 
 // ==== DELETE
 
-export const deleteUser = async (
-  user,
-  surveyId,
-  userUuidToRemove,
-  client = db,
-) =>
+export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
   await client.tx(
     async t =>
       await Promise.all([

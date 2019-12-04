@@ -9,11 +9,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 // TODO: match all nodeDefTypes and throw an error if unknown:
 const toSqlType = nodeDef =>
-  NodeDef.isInteger(nodeDef)
-    ? sqlTypes.integer
-    : NodeDef.isDecimal(nodeDef)
-    ? sqlTypes.decimal
-    : sqlTypes.varchar
+  NodeDef.isInteger(nodeDef) ? sqlTypes.integer : NodeDef.isDecimal(nodeDef) ? sqlTypes.decimal : sqlTypes.varchar
 
 const getJsVariables = (nodeDef, lang) => [
   {
@@ -29,10 +25,7 @@ const getSqlVariables = (nodeDef, lang) => {
 
   // TODO: Explain what getLabel does and why
   const getLabel = col =>
-    NodeDef.getLabel(nodeDef, lang) +
-    (colNames.length === 1
-      ? ''
-      : ' - ' + NodeDefTable.extractColName(nodeDef, col))
+    NodeDef.getLabel(nodeDef, lang) + (colNames.length === 1 ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col))
 
   return colNames.map(col => ({
     value: col,
@@ -42,13 +35,7 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = (
-  survey,
-  nodeDefContext,
-  nodeDefCurrent,
-  mode,
-  lang,
-) =>
+const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, lang) =>
   R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
     R.map(childDef => {
@@ -58,10 +45,7 @@ const getChildDefVariables = (
 
       if (
         nodeDefCurrent !== null &&
-        Survey.isNodeDefDependentOn(
-          NodeDef.getUuid(childDef),
-          NodeDef.getUuid(nodeDefCurrent),
-        )(survey)
+        Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
       ) {
         // Exclude nodes that reference the current one
         return null
@@ -81,13 +65,7 @@ const getChildDefVariables = (
     R.reject(R.isNil),
   )(survey)
 
-export const getVariables = (
-  survey,
-  nodeDefContext,
-  nodeDefCurrent,
-  mode,
-  preferredLang,
-) => {
+export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, preferredLang) => {
   const lang = Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey))
   const surveyWithDependencies = R.pipe(Survey.buildDependencyGraph, graph =>
     Survey.assocDependencyGraph(graph)(survey),
@@ -95,13 +73,7 @@ export const getVariables = (
 
   const variables = []
   Survey.visitAncestorsAndSelf(nodeDefContext, nodeDef => {
-    const childVariables = getChildDefVariables(
-      surveyWithDependencies,
-      nodeDef,
-      nodeDefCurrent,
-      mode,
-      lang,
-    )
+    const childVariables = getChildDefVariables(surveyWithDependencies, nodeDef, nodeDefCurrent, mode, lang)
     variables.push(...childVariables)
   })(surveyWithDependencies)
 

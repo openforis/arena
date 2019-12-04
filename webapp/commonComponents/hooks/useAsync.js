@@ -9,10 +9,10 @@ const useAsyncActionHandlers = [
 ]
 
 export default (promiseFn, promiseArgs) => {
-  const [state, _dispatch] = useReducer(
-    (state, { type, payload }) => useAsyncActionHandlers[type](payload),
-    { loading: false, loaded: false },
-  )
+  const [state, _dispatch] = useReducer((state, { type, payload }) => useAsyncActionHandlers[type](payload), {
+    loading: false,
+    loaded: false,
+  })
   const isMounted = useIsMounted()
 
   const dispatch = () => {

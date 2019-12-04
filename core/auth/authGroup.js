@@ -60,9 +60,6 @@ export const getRecordSteps = R.propOr([], keys.recordSteps)
 
 export const getRecordEditLevel = step => R.pipe(getRecordSteps, R.prop(step))
 
-export const isSystemAdminGroup = R.pipe(
-  getName,
-  R.equals(groupNames.systemAdmin),
-)
+export const isSystemAdminGroup = R.pipe(getName, R.equals(groupNames.systemAdmin))
 
 export const isEqual = ObjectUtils.isEqual

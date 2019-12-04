@@ -5,12 +5,7 @@ import { db } from '@server/db/db'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
-export const insertStep = async (
-  surveyId,
-  processingChainUuid,
-  processingStepIndex,
-  client = db,
-) =>
+export const insertStep = async (surveyId, processingChainUuid, processingStepIndex, client = db) =>
   await client.one(
     `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_step
@@ -24,11 +19,7 @@ export const insertStep = async (
   )
 
 // ====== READ
-export const fetchStepsByChainUuid = async (
-  surveyId,
-  processingChainUuid,
-  client = db,
-) => {
+export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, client = db) => {
   const schema = getSurveyDBSchema(surveyId)
 
   return await client.map(
@@ -53,11 +44,7 @@ export const fetchStepsByChainUuid = async (
   )
 }
 
-export const fetchStepByUuid = async (
-  surveyId,
-  processingStepUuid,
-  client = db,
-) =>
+export const fetchStepByUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.one(
     `
     SELECT
@@ -89,11 +76,7 @@ export const fetchStepByUuid = async (
     camelize,
   )
 
-export const fetchStepSummaryByUuid = async (
-  surveyId,
-  processingStepUuid,
-  client = db,
-) =>
+export const fetchStepSummaryByUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.oneOrNone(
     `
     SELECT *
@@ -104,12 +87,7 @@ export const fetchStepSummaryByUuid = async (
     camelize,
   )
 
-export const fetchStepSummaryByIndex = async (
-  surveyId,
-  processingChainUuid,
-  index,
-  client = db,
-) =>
+export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, index, client = db) =>
   await client.oneOrNone(
     `
     SELECT *
@@ -123,12 +101,7 @@ export const fetchStepSummaryByIndex = async (
 
 // ====== UPDATE
 
-export const updateStepProps = async (
-  surveyId,
-  processingStepUuid,
-  props,
-  client = db,
-) =>
+export const updateStepProps = async (surveyId, processingStepUuid, props, client = db) =>
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_step

@@ -17,13 +17,7 @@ const sendRespNodeDefs = async (
   validate = true,
   nodeDefsUpdated = null,
 ) => {
-  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(
-    surveyId,
-    cycle,
-    draft,
-    advanced,
-    validate,
-  )
+  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, draft, advanced, validate)
 
   res.json({
     nodeDefs: sendNodeDefs ? Survey.getNodeDefs(survey) : null,
@@ -35,50 +29,34 @@ const sendRespNodeDefs = async (
 export const init = app => {
   // ==== CREATE
 
-  app.post(
-    '/survey/:surveyId/nodeDef',
-    AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const nodeDefRequest = Request.getBody(req)
-        const { surveyId } = Request.getParams(req)
-        const user = Request.getUser(req)
+  app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const nodeDefRequest = Request.getBody(req)
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-        await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
+      await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
 
-        const cycle = NodeDef.getCycleFirst(nodeDefRequest)
-        await sendRespNodeDefs(res, surveyId, cycle)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+      const cycle = NodeDef.getCycleFirst(nodeDefRequest)
+      await sendRespNodeDefs(res, surveyId, cycle)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   // ==== READ
 
-  app.get(
-    '/survey/:surveyId/nodeDefs',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, draft, validate } = Request.getParams(req)
-        const advanced = true // Always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
-        const sendNodeDefs = true
+  app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, draft, validate } = Request.getParams(req)
+      const advanced = true // Always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
+      const sendNodeDefs = true
 
-        await sendRespNodeDefs(
-          res,
-          surveyId,
-          cycle,
-          sendNodeDefs,
-          draft,
-          advanced,
-          validate,
-        )
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+      await sendRespNodeDefs(res, surveyId, cycle, sendNodeDefs, draft, advanced, validate)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   // ==== UPDATE
 
@@ -100,16 +78,7 @@ export const init = app => {
         )
         delete nodeDefsUpdated[nodeDefUuid]
 
-        await sendRespNodeDefs(
-          res,
-          surveyId,
-          cycle,
-          false,
-          true,
-          true,
-          true,
-          nodeDefsUpdated,
-        )
+        await sendRespNodeDefs(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
       } catch (error) {
         next(error)
       }

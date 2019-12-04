@@ -37,9 +37,7 @@ export default class TaxonomiesImportJob extends Job {
 
     const taxonomies = []
 
-    const speciesFileNames = collectSurveyFileZip.getEntryNames(
-      speciesFilesPath,
-    )
+    const speciesFileNames = collectSurveyFileZip.getEntryNames(speciesFilesPath)
 
     for (const speciesFileName of speciesFileNames) {
       if (this.isCanceled()) {
@@ -75,19 +73,11 @@ export default class TaxonomiesImportJob extends Job {
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,
     })
-    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(
-      this.user,
-      surveyId,
-      taxonomyParam,
-      true,
-      tx,
-    )
+    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, true, tx)
     const taxonomyUuid = Taxonomy.getUuid(this.taxonomyCurrent)
 
     // 3. parse CSV file
-    const speciesFileStream = await collectSurveyFileZip.getEntryStream(
-      `${speciesFilesPath}${speciesFileName}`,
-    )
+    const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
     const totalPrevious = this.total
 
@@ -108,11 +98,7 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async onHeaders(headers) {
-    this.vernacularLangCodes = R.innerJoin(
-      (a, b) => a === b,
-      languageCodesISO639part2,
-      headers,
-    )
+    this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
 
     this.taxonomyImportManager = new TaxonomyImportManager(
       this.user,
@@ -138,28 +124,14 @@ export default class TaxonomiesImportJob extends Job {
           R.pipe(
             R.prop(lang),
             R.split(/[,/]/),
-            R.map(name =>
-              TaxonVernacularName.newTaxonVernacularName(
-                lang,
-                StringUtils.trim(name),
-              ),
-            ),
-            R.ifElse(R.isEmpty, R.always(accVernacularNames), names =>
-              R.assoc(lang, names)(accVernacularNames),
-            ),
+            R.map(name => TaxonVernacularName.newTaxonVernacularName(lang, StringUtils.trim(name))),
+            R.ifElse(R.isEmpty, R.always(accVernacularNames), names => R.assoc(lang, names)(accVernacularNames)),
           )(row),
         {},
         this.vernacularLangCodes,
       )
 
-      const taxon = Taxon.newTaxon(
-        taxonomyUuid,
-        code,
-        family,
-        genus,
-        scientificName,
-        vernacularNames,
-      )
+      const taxon = Taxon.newTaxon(taxonomyUuid, code, family, genus, scientificName, vernacularNames)
 
       await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
     }
@@ -211,8 +183,7 @@ export default class TaxonomiesImportJob extends Job {
             valid: false,
             errors: [
               {
-                key:
-                  Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
+                key: Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
                 params: {
                   scientificName,
                   row: this.currentRow,

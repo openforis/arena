@@ -17,10 +17,7 @@ const ConfirmDialog = props => {
       </ModalBody>
 
       <ModalFooter>
-        <button
-          className="btn btn-cancel modal-footer__item"
-          onClick={onCancel}
-        >
+        <button className="btn btn-cancel modal-footer__item" onClick={onCancel}>
           {i18n.t('common.cancel')}
         </button>
 

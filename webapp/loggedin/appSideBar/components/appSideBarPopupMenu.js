@@ -60,12 +60,7 @@ const AppSideBarPopupMenu = props => {
         closePopupMenuHandler()
       }}
     >
-      <AppSideBarSubModules
-        module={module}
-        pathname={pathname}
-        sideBarOpened={true}
-        disabled={false}
-      />
+      <AppSideBarSubModules module={module} pathname={pathname} sideBarOpened={true} disabled={false} />
     </div>,
     document.body,
   )

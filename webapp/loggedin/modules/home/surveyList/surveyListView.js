@@ -27,8 +27,7 @@ const SurveyListView = props => {
     setActiveSurvey(Survey.getId(surveyRow), canEdit)
   }
 
-  const isRowActive = surveyRow =>
-    Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
+  const isRowActive = surveyRow => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
 
   return (
     <TableView

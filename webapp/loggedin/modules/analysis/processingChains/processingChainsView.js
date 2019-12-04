@@ -20,13 +20,7 @@ import { createProcessingChain, navigateToProcessingChainView } from './actions'
 const processingChainsModule = 'processing-chains'
 
 const ProcessingChainsView = props => {
-  const {
-    surveyCycleKey,
-    history,
-    reloadListItems,
-    createProcessingChain,
-    navigateToProcessingChainView,
-  } = props
+  const { surveyCycleKey, history, reloadListItems, createProcessingChain, navigateToProcessingChainView } = props
 
   const restParams = { surveyCycleKey }
 
@@ -43,12 +37,7 @@ const ProcessingChainsView = props => {
       rowHeaderComponent={ProcessingChainsRowHeader}
       headerLeftComponent={ProcessingChainsHeaderLeft}
       rowComponent={ProcessingChainsRow}
-      onRowClick={processingChain =>
-        navigateToProcessingChainView(
-          history,
-          ProcessingChain.getUuid(processingChain),
-        )
-      }
+      onRowClick={processingChain => navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain))}
       history={history}
       createProcessingChain={createProcessingChain}
     />

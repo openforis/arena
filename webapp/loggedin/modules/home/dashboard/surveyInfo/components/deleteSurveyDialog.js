@@ -5,12 +5,7 @@ import React, { useState } from 'react'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Markdown from '@webapp/commonComponents/markdown'
 
-import {
-  Modal,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-} from '@webapp/commonComponents/modal'
+import { Modal, ModalBody, ModalHeader, ModalFooter } from '@webapp/commonComponents/modal'
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const i18n = useI18n()
@@ -19,9 +14,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   return (
     <Modal isOpen={true} onClose={() => onCancel()}>
       <ModalHeader>
-        <h5 className="survey-delete-dialog__header">
-          {i18n.t('homeView.deleteSurveyDialog.confirmDelete')}
-        </h5>
+        <h5 className="survey-delete-dialog__header">{i18n.t('homeView.deleteSurveyDialog.confirmDelete')}</h5>
       </ModalHeader>
 
       <ModalBody>
@@ -35,9 +28,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
             <div>{i18n.t('common.cantUndoWarning')}</div>
           </div>
 
-          <div className="text-center">
-            {i18n.t('homeView.deleteSurveyDialog.confirmName')}
-          </div>
+          <div className="text-center">{i18n.t('homeView.deleteSurveyDialog.confirmName')}</div>
 
           <input
             type="text"
@@ -50,11 +41,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
 
       <ModalFooter>
         <div>
-          <button
-            className="btn modal-footer__item"
-            onClick={onCancel}
-            aria-disabled={false}
-          >
+          <button className="btn modal-footer__item" onClick={onCancel} aria-disabled={false}>
             <span className="icon icon-cross icon-12px icon-left" />
             {i18n.t('common.cancel')}
           </button>

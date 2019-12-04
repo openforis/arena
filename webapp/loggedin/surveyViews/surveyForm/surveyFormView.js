@@ -143,17 +143,13 @@ const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
-  const hasNodeDefAddChildTo = Boolean(
-    SurveyFormState.getNodeDefAddChildTo(state),
-  )
+  const hasNodeDefAddChildTo = Boolean(SurveyFormState.getNodeDefAddChildTo(state))
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
   const isSideBarOpened = SideBarState.isOpened(state)
 
   const mapEntryProps = () => ({
-    parentNode: nodeDef
-      ? SurveyFormState.getFormPageParentNode(nodeDef)(state)
-      : null,
+    parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
     recordUuid: Record.getUuid(record),
   })
 
@@ -168,8 +164,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const enhance = compose(
-  withRouter,
-  connect(mapStateToProps, { setFormNodeDefAddChildTo, resetForm }),
-)
+const enhance = compose(withRouter, connect(mapStateToProps, { setFormNodeDefAddChildTo, resetForm }))
 export default enhance(SurveyFormView)

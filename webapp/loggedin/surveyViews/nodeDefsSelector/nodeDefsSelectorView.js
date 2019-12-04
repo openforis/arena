@@ -15,12 +15,7 @@ import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'
 
 const NodeDefsSelectorView = props => {
-  const {
-    nodeDefUuidsAttributes,
-    nodeDefUuidEntity,
-    onChangeAttributes,
-    onChangeEntity,
-  } = props
+  const { nodeDefUuidsAttributes, nodeDefUuidEntity, onChangeAttributes, onChangeEntity } = props
 
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
@@ -34,13 +29,7 @@ const NodeDefsSelectorView = props => {
     onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
 
-  const {
-    surveyInfo,
-    hierarchy,
-    canSelectAttributes,
-    showAncestors,
-    showMultipleAttributes,
-  } = props
+  const { surveyInfo, hierarchy, canSelectAttributes, showAncestors, showMultipleAttributes } = props
 
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
@@ -69,9 +58,7 @@ const NodeDefsSelectorView = props => {
               NodeDef.nodeDefType.entity !== type ? (
                 <button
                   key={type}
-                  className={`btn btn-s btn-node-def-type${
-                    R.includes(type, filterTypes) ? ' active' : ''
-                  }`}
+                  className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
                   onClick={() => {
                     const idx = R.findIndex(R.equals(type), filterTypes)
                     const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)

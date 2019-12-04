@@ -18,10 +18,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import TaxonomiesView from '../taxonomies/taxonomiesView'
 import CategoriesView from '../categories/categoriesView'
 
-import {
-  putNodeDefProp,
-  putNodeDefLayoutProp,
-} from '../../../survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp } from '../../../survey/nodeDefs/actions'
 import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
@@ -53,26 +50,14 @@ const NodeDefEdit = props => {
       {editingCategory ? (
         <CategoriesView
           canSelect={canUpdateCategory}
-          onSelect={category =>
-            putNodeDefProp(
-              nodeDef,
-              NodeDef.propKeys.categoryUuid,
-              Category.getUuid(category),
-            )
-          }
+          onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
           selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
           onClose={() => setEditingCategory(false)}
         />
       ) : editingTaxonomy ? (
         <TaxonomiesView
           canSelect={true}
-          onSelect={taxonomy =>
-            putNodeDefProp(
-              nodeDef,
-              NodeDef.propKeys.taxonomyUuid,
-              Taxonomy.getUuid(taxonomy),
-            )
-          }
+          onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
           selectedItemUuid={NodeDef.getTaxonomyUuid(nodeDef)}
           onClose={() => setEditingTaxonomy(false)}
         />
@@ -144,8 +129,7 @@ const isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   NodeDef.isRoot(nodeDef) ||
   NodeDef.isMultiple(nodeDef) ||
   (!NodeDef.isKey(nodeDef) &&
-    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey)
-      .length >= NodeDef.maxKeyAttributes) ||
+    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes) ||
   NodeDef.isReadOnly(nodeDef)
 
 const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
@@ -159,16 +143,11 @@ const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
-  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(
-    survey,
-  )
+  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const validation = Survey.getNodeDefValidation(nodeDef)(survey)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
-  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(
-    survey,
-    nodeDef,
-  )
+  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
 
   return {
     nodeDef,
@@ -176,8 +155,7 @@ const mapStateToProps = state => {
     validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
-    canUpdateCategory:
-      NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey),
+    canUpdateCategory: NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey),
   }
 }
 

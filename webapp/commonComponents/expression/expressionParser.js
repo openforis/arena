@@ -14,11 +14,7 @@ export const parseQuery = (query, mode, canBeConstant) => {
     isBinary || isLogical
       ? exprQuery
       : Expression.newBinary(
-          isCompound && canBeConstant
-            ? Expression.newLiteral()
-            : isCompound
-            ? Expression.newIdentifier()
-            : exprQuery,
+          isCompound && canBeConstant ? Expression.newLiteral() : isCompound ? Expression.newIdentifier() : exprQuery,
           Expression.newLiteral(),
         )
   return expr
@@ -27,10 +23,7 @@ export const parseQuery = (query, mode, canBeConstant) => {
 export const isExprValid = (expr, canBeConstant) => {
   try {
     const exprString = Expression.toString(expr)
-    const exprToValidate =
-      canBeConstant && isNotBlank(exprString)
-        ? Expression.fromString(exprString)
-        : expr
+    const exprToValidate = canBeConstant && isNotBlank(exprString) ? Expression.fromString(exprString) : expr
 
     return Expression.isValid(exprToValidate)
   } catch (error) {
@@ -47,9 +40,7 @@ export const getLiteralSearchParams = (survey, nodeDef, preferredLang) => {
           surveyId,
           type: NodeDef.nodeDefType.code,
           categoryUuid: NodeDef.getCategoryUuid(nodeDef),
-          categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(
-            survey,
-          ),
+          categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
           lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
         }
       : nodeDef && NodeDef.isTaxon(nodeDef)

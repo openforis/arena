@@ -22,16 +22,12 @@ describe('Activity Log Test', () => {
       label: 'DO NOT USE! Test Survey',
       languages: ['en'],
     }
-    const survey = await SurveyManager.createSurvey(
-      getContextUser(),
-      surveyParam,
-    )
+    const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
     const surveyId = Survey.getId(survey)
 
-    const surveyCreateLogs = await ActivityLogRepository.fetch(
-      Survey.getSurveyInfo(survey),
-      [ActivityLog.type.surveyCreate],
-    )
+    const surveyCreateLogs = await ActivityLogRepository.fetch(Survey.getSurveyInfo(survey), [
+      ActivityLog.type.surveyCreate,
+    ])
 
     expect(surveyCreateLogs).to.have.lengthOf(1)
 
@@ -41,31 +37,19 @@ describe('Activity Log Test', () => {
   it('Activity Log on Record Creation', async () => {
     const user = getContextUser()
 
-    const survey = await SB.survey(
-      user,
-      SB.entity('cluster', SB.attribute('cluster_no').key()),
-    ).buildAndStore()
+    const survey = await SB.survey(user, SB.entity('cluster', SB.attribute('cluster_no').key())).buildAndStore()
 
     const surveyId = Survey.getId(survey)
 
     const recordToCreate = RecordUtils.newRecord(user)
 
-    const record = await RecordManager.insertRecord(
-      user,
-      surveyId,
-      recordToCreate,
-    )
+    const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
-    const logs = await ActivityLogRepository.fetch(
-      Survey.getSurveyInfo(survey),
-      [ActivityLog.type.recordCreate],
-    )
+    const logs = await ActivityLogRepository.fetch(Survey.getSurveyInfo(survey), [ActivityLog.type.recordCreate])
     expect(logs.length).to.be.at.least(1)
 
     const recordCreateLogs = R.filter(
-      activity =>
-        ObjectUtils.getUuid(ActivityLog.getContent(activity)) ===
-        Record.getUuid(record),
+      activity => ObjectUtils.getUuid(ActivityLog.getContent(activity)) === Record.getUuid(record),
     )(logs)
 
     expect(recordCreateLogs).to.have.lengthOf(1)

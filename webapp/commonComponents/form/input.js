@@ -13,14 +13,7 @@ export const FormItem = ({ label, children, className = '' }) => (
 )
 
 const InputComponent = (props, ref) => {
-  const {
-    validation = {},
-    disabled = false,
-    mask = false,
-    onChange,
-    value,
-    ...inputProps
-  } = props
+  const { validation = {}, disabled = false, mask = false, onChange, value, ...inputProps } = props
 
   const onChangeValue = newValue => {
     if (onChange && value !== newValue) {

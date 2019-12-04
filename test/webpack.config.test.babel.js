@@ -25,10 +25,7 @@ export default {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/env', '@babel/react'],
-            plugins: [
-              '@babel/plugin-proposal-object-rest-spread',
-              '@babel/plugin-syntax-dynamic-import',
-            ],
+            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
           },
         },
       },

@@ -39,8 +39,7 @@ const _findVerificationKey = (token, pemList) => {
 }
 
 // Verify our token
-const _verifyToken = (token, pem) =>
-  jsonwebtoken.verify(token, pem, verificationOptions)
+const _verifyToken = (token, pem) => jsonwebtoken.verify(token, pem, verificationOptions)
 
 export const validate = async token => {
   let verificationKey = _findVerificationKey(token, indexedKeys)

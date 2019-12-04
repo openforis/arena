@@ -39,6 +39,4 @@ export const assocSurvey = R.assoc(keys.survey)
 const assocCategories = R.assoc(keys.categories)
 
 export const assocCategory = category => context =>
-  R.pipe(getCategories, R.append(category), categories =>
-    assocCategories(categories)(context),
-  )(context)
+  R.pipe(getCategories, R.append(category), categories => assocCategories(categories)(context))(context)

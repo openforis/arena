@@ -31,22 +31,16 @@ const getFromDate = (date, timeRange) => {
   }
 }
 
-export const fetchRecordsSummary = (cycle, timeRange) => async (
-  dispatch,
-  getState,
-) => {
+export const fetchRecordsSummary = (cycle, timeRange) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
 
   const now = Date.now()
   const from = formatDate(getFromDate(now, timeRange))
   const to = formatDate(now)
 
-  const { data: counts } = await axios.get(
-    `/api/survey/${surveyId}/records/summary/count`,
-    {
-      params: { cycle, from, to },
-    },
-  )
+  const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/summary/count`, {
+    params: { cycle, from, to },
+  })
 
   dispatch({ type: recordsSummaryUpdate, timeRange, from, to, counts })
 }

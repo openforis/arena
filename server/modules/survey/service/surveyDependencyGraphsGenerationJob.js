@@ -29,11 +29,7 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
 
     const graph = Survey.buildDependencyGraph(survey)
 
-    await SurveyManager.updateSurveyDependencyGraphs(
-      this.surveyId,
-      graph,
-      this.tx,
-    )
+    await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, this.tx)
   }
 }
 

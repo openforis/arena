@@ -47,11 +47,7 @@ const ProcessingStepView = props => {
   const i18n = useI18n()
 
   return R.isEmpty(processingStep) ? null : (
-    <div
-      className={`processing-step${
-        calculationEditorOpened ? ' calculation-editor-opened' : ''
-      }`}
-    >
+    <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
       <div className="form">
         <EntitySelector
           processingStep={processingStep}
@@ -74,10 +70,7 @@ const ProcessingStepView = props => {
         {!processingStepNext && !calculationEditorOpened && (
           <button
             className="btn-s btn-danger btn-delete"
-            onClick={() =>
-              window.confirm(i18n.t('processingStepView.deleteConfirm')) &&
-              deleteProcessingStep(history)
-            }
+            onClick={() => window.confirm(i18n.t('processingStepView.deleteConfirm')) && deleteProcessingStep(history)}
           >
             <span className="icon icon-bin icon-12px icon-left" />
             {i18n.t('common.delete')}
@@ -95,9 +88,7 @@ const mapStateToProps = (state, { match }) => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
-  processingStepCalculation: ProcessingStepState.getProcessingStepCalculationForEdit(
-    state,
-  ),
+  processingStepCalculation: ProcessingStepState.getProcessingStepCalculationForEdit(state),
 })
 
 export default connect(mapStateToProps, {

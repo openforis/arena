@@ -19,16 +19,12 @@ const keysValidationFields = {
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
-    ? Validator.validateRequired(
-        Validation.messageKeys.nodeDefEdit.categoryRequired,
-      )(propName, nodeDef)
+    ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.categoryRequired)(propName, nodeDef)
     : null
 
 const validateTaxonomy = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.taxon
-    ? Validator.validateRequired(
-        Validation.messageKeys.nodeDefEdit.taxonomyRequired,
-      )(propName, nodeDef)
+    ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.taxonomyRequired)(propName, nodeDef)
     : null
 
 const validateChildren = survey => (propName, nodeDef) => {
@@ -43,11 +39,7 @@ const validateChildren = survey => (propName, nodeDef) => {
 }
 
 const countKeyAttributes = (survey, nodeDefEntity) =>
-  R.pipe(
-    Survey.getNodeDefChildren(nodeDefEntity),
-    R.filter(NodeDef.isKey),
-    R.length,
-  )(survey)
+  R.pipe(Survey.getNodeDefChildren(nodeDefEntity), R.filter(NodeDef.isKey), R.length)(survey)
 
 const validateKeyAttributes = survey => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef)) {
@@ -55,8 +47,7 @@ const validateKeyAttributes = survey => (propName, nodeDef) => {
 
     if (
       keyAttributesCount === 0 &&
-      (NodeDef.isRoot(nodeDef) ||
-        (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef)))
+      (NodeDef.isRoot(nodeDef) || (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef)))
     ) {
       return { key: Validation.messageKeys.nodeDefEdit.keysEmpty }
     }
@@ -91,9 +82,7 @@ const propsValidations = survey => ({
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateName(Validation.messageKeys.nodeDefEdit.nameInvalid),
-    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(
-      Survey.getNodeDefsArray(survey),
-    ),
+    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey)),
   ],
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
@@ -105,16 +94,8 @@ const propsValidations = survey => ({
 
 const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = await Promise.all([
-    NodeDefExpressionsValidator.validate(
-      survey,
-      nodeDef,
-      Survey.dependencyTypes.defaultValues,
-    ),
-    NodeDefExpressionsValidator.validate(
-      survey,
-      nodeDef,
-      Survey.dependencyTypes.applicable,
-    ),
+    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
+    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
     NodeDefValidationsValidator.validate(survey, nodeDef),
   ])
 
@@ -129,19 +110,13 @@ const validateAdvancedProps = async (survey, nodeDef) => {
 }
 
 const validateNodeDef = async (survey, nodeDef) => {
-  const nodeDefValidation = await Validator.validate(
-    nodeDef,
-    propsValidations(survey),
-  )
+  const nodeDefValidation = await Validator.validate(nodeDef, propsValidations(survey))
 
   const advancedPropsValidation = await validateAdvancedProps(survey, nodeDef)
 
   const validation = R.pipe(
     R.mergeDeepLeft(advancedPropsValidation),
-    Validation.setValid(
-      Validation.isValid(nodeDefValidation) &&
-        Validation.isValid(advancedPropsValidation),
-    ),
+    Validation.setValid(Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation)),
   )(nodeDefValidation)
 
   return Validation.isValid(validation) ? null : validation
@@ -149,9 +124,7 @@ const validateNodeDef = async (survey, nodeDef) => {
 
 export const validateNodeDefs = async survey => {
   // Build and assoc dependency graph to survey
-  survey = R.pipe(Survey.buildDependencyGraph, graph =>
-    Survey.assocDependencyGraph(graph)(survey),
-  )(survey)
+  survey = R.pipe(Survey.buildDependencyGraph, graph => Survey.assocDependencyGraph(graph)(survey))(survey)
 
   const validation = Validation.newInstance()
 

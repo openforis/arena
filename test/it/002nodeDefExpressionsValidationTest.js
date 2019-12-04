@@ -15,17 +15,11 @@ const validateExpression = async (survey, nodeDefName, expression) => {
   nodeDef[NodeDef.keys.props] = {
     ...NodeDef.getProps(nodeDef),
     [NodeDef.propKeys.validations]: {
-      [NodeDefValidations.keys.expressions]: [
-        { [NodeDefExpression.keys.expression]: expression },
-      ],
+      [NodeDefValidations.keys.expressions]: [{ [NodeDefExpression.keys.expression]: expression }],
     },
   }
 
-  return await SurveyValidator.validateNodeDefExpressions(
-    survey,
-    nodeDef,
-    Survey.dependencyTypes.validations,
-  )
+  return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, Survey.dependencyTypes.validations)
 }
 
 /**
@@ -74,8 +68,7 @@ const expressions = [
     v: false,
   },
   {
-    t:
-      'Test using a node that exists but is not reachable in the ancestor hierarchy',
+    t: 'Test using a node that exists but is not reachable in the ancestor hierarchy',
     n: 'node_def_text',
     e: 'unreachable_node',
     v: false,
@@ -116,9 +109,7 @@ describe('NodeDefExpressions Validation Test', async () => {
     it(expr.t, async () => {
       const validation = await validateExpression(survey, expr.n, expr.e)
       expect(expr.v).to.equal(Validation.isValid(validation))
-      expect(expr.v).to.equal(
-        Validation.isValid(Validation.getFieldValidation('0')(validation)),
-      )
+      expect(expr.v).to.equal(Validation.isValid(Validation.getFieldValidation('0')(validation)))
     })
   }
 })

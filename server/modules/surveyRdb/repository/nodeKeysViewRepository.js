@@ -16,12 +16,8 @@ export const createNodeKeysView = async (survey, client = db) => {
   Survey.traverseHierarchyItemSync(root, nodeDef => {
     selectViews.push(`
         SELECT 
-            ${RDBDataView.getColUuid(nodeDef)} AS ${
-      NodeKeysView.columns.nodeUuid
-    },
-            '${NodeDef.getUuid(nodeDef)}' AS ${
-      NodeKeysView.columns.nodeDefUuid
-    },
+            ${RDBDataView.getColUuid(nodeDef)} AS ${NodeKeysView.columns.nodeUuid},
+            '${NodeDef.getUuid(nodeDef)}' AS ${NodeKeysView.columns.nodeDefUuid},
             ${RDBDataView.columns.keys} AS ${NodeKeysView.columns.keys}
         FROM
             ${RDBDataView.getNameWithSchema(surveyId)(nodeDef)}  

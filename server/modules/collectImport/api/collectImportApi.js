@@ -13,10 +13,7 @@ export const init = app => {
       const user = Request.getUser(req)
       const file = Request.getFile(req)
 
-      const job = CollectImportService.startCollectImportJob(
-        user,
-        file.tempFilePath,
-      )
+      const job = CollectImportService.startCollectImportJob(user, file.tempFilePath)
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
@@ -68,13 +65,7 @@ export const init = app => {
         const { surveyId, itemId, resolved } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const item = await CollectImportService.updateReportItem(
-          user,
-          surveyId,
-          itemId,
-          {},
-          resolved,
-        )
+        const item = await CollectImportService.updateReportItem(user, surveyId, itemId, {}, resolved)
 
         return res.json({ item })
       } catch (error) {

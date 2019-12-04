@@ -6,12 +6,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import {
-  hideAppLoader,
-  hideAppSaving,
-  showAppLoader,
-  showAppSaving,
-} from '@webapp/app/actions'
+import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { navigateToProcessingChainView } from '@webapp/loggedin/modules/analysis/processingChains/actions'
 
@@ -20,12 +15,9 @@ import * as ProcessingStepState from './processingStepState'
 
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
-export const processingStepCalculationCreate =
-  'analysis/processingStep/calculation/create'
-export const processingStepCalculationForEditUpdate =
-  'analysis/processingStep/calculation/forEdit/update'
-export const processingStepCalculationIndexUpdate =
-  'analysis/processingStep/calculation/index/update'
+export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
+export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
+export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
 
 export const resetProcessingStepState = () => dispatch =>
   dispatch({
@@ -43,10 +35,7 @@ export const setProcessingStepCalculationForEdit = calculation => dispatch =>
 
 // ====== CREATE
 
-export const createProcessingStepCalculation = () => async (
-  dispatch,
-  getState,
-) => {
+export const createProcessingStepCalculation = () => async (dispatch, getState) => {
   dispatch(showAppLoader())
 
   const state = getState()
@@ -54,12 +43,8 @@ export const createProcessingStepCalculation = () => async (
   const processingStep = ProcessingStepState.getProcessingStep(state)
   const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
 
-  const {
-    data: calculation,
-  } = await axios.post(
-    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
-      processingStep,
-    )}/calculation`,
+  const { data: calculation } = await axios.post(
+    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
     { index: calculationSteps.length },
   )
 
@@ -68,18 +53,13 @@ export const createProcessingStepCalculation = () => async (
 }
 // ====== READ
 
-export const fetchProcessingStep = processingStepUuid => async (
-  dispatch,
-  getState,
-) => {
+export const fetchProcessingStep = processingStepUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
 
   const surveyId = SurveyState.getSurveyId(getState())
   const {
     data: { processingStep, processingStepPrev, processingStepNext },
-  } = await axios.get(
-    `/api/survey/${surveyId}/processing-step/${processingStepUuid}`,
-  )
+  } = await axios.get(`/api/survey/${surveyId}/processing-step/${processingStepUuid}`)
 
   dispatch({
     type: processingStepUpdate,
@@ -95,10 +75,7 @@ export const fetchProcessingStep = processingStepUuid => async (
 export const putProcessingStepProps = props => async (dispatch, getState) => {
   const state = getState()
 
-  const processingStepUuid = R.pipe(
-    ProcessingStepState.getProcessingStep,
-    ProcessingStep.getUuid,
-  )(state)
+  const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
 
   dispatch({ type: processingStepPropsUpdate, props })
 
@@ -106,41 +83,27 @@ export const putProcessingStepProps = props => async (dispatch, getState) => {
     dispatch(showAppSaving())
 
     const surveyId = SurveyState.getSurveyId(state)
-    await axios.put(
-      `/api/survey/${surveyId}/processing-step/${processingStepUuid}`,
-      { props },
-    )
+    await axios.put(`/api/survey/${surveyId}/processing-step/${processingStepUuid}`, { props })
 
     dispatch(hideAppSaving())
   }
 
-  dispatch(
-    debounceAction(
-      action,
-      `${processingStepPropsUpdate}_${processingStepUuid}`,
-    ),
-  )
+  dispatch(debounceAction(action, `${processingStepPropsUpdate}_${processingStepUuid}`))
 }
 
-export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async (
-  dispatch,
-  getState,
-) => {
+export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async (dispatch, getState) => {
   dispatch(showAppSaving())
 
   dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
-  const processingStepUuid = R.pipe(
-    ProcessingStepState.getProcessingStep,
-    ProcessingStep.getUuid,
-  )(state)
+  const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
 
-  await axios.put(
-    `/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculation-index`,
-    { indexFrom, indexTo },
-  )
+  await axios.put(`/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculation-index`, {
+    indexFrom,
+    indexTo,
+  })
 
   dispatch(hideAppSaving())
 }
@@ -154,18 +117,9 @@ export const deleteProcessingStep = history => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
 
-  await axios.delete(
-    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
-      processingStep,
-    )}`,
-  )
+  await axios.delete(`/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}`)
 
-  dispatch(
-    navigateToProcessingChainView(
-      history,
-      ProcessingStep.getProcessingChainUuid(processingStep),
-    ),
-  )
+  dispatch(navigateToProcessingChainView(history, ProcessingStep.getProcessingChainUuid(processingStep)))
   dispatch(showNotification('processingStepView.deleteComplete'))
   dispatch(hideAppSaving())
 }

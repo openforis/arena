@@ -20,15 +20,11 @@ const AnalysisView = () => (
         },
         {
           component: ProcessingChainView,
-          path: `${appModuleUri(
-            analysisModules.processingChain,
-          )}:processingChainUuid/`,
+          path: `${appModuleUri(analysisModules.processingChain)}:processingChainUuid/`,
         },
         {
           component: ProcessingStepView,
-          path: `${appModuleUri(
-            analysisModules.processingStep,
-          )}:processingStepUuid/`,
+          path: `${appModuleUri(analysisModules.processingStep)}:processingStepUuid/`,
         },
       ]}
     />

@@ -22,22 +22,14 @@ export const clickedOutside = (el, evt) => !el.contains(evt.target)
 
 export const getViewportDimensions = () => ({
   width: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-  height: Math.max(
-    document.documentElement.clientHeight,
-    window.innerHeight || 0,
-  ),
+  height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
 })
 
 export const isElementInViewport = el => {
   const rect = el.getBoundingClientRect()
   const viewportDim = getViewportDimensions()
 
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= viewportDim.height &&
-    rect.right <= viewportDim.width
-  )
+  return rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportDim.height && rect.right <= viewportDim.width
 }
 
 export const dispatchWindowResize = () => {

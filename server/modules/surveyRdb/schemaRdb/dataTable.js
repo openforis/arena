@@ -48,12 +48,7 @@ export const getRecordForeignKey = (surveyId, nodeDef) =>
     colNameRecordUuuid,
   )
 
-export const getParentForeignKey = (
-  surveyId,
-  schemaName,
-  nodeDef,
-  nodeDefParent = null,
-) =>
+export const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null) =>
   _getConstraintFk(
     schemaName,
     getName(nodeDefParent),
@@ -62,17 +57,10 @@ export const getParentForeignKey = (
   )
 
 export const getUuidUniqueConstraint = nodeDef =>
-  `CONSTRAINT ${NodeDef.getName(
-    nodeDef,
-  )}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
+  `CONSTRAINT ${NodeDef.getName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
 
 export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
-  const rowValues = DataRow.getValues(
-    survey,
-    nodeDefRow,
-    nodeRow,
-    nodeDefColumns,
-  )
+  const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
 
   return [
     Node.getUuid(nodeRow),
@@ -83,12 +71,7 @@ export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
   ]
 }
 
-const _getConstraintFk = (
-  schemaName,
-  referencedTableName,
-  constraint,
-  foreignKey,
-) => `
+const _getConstraintFk = (schemaName, referencedTableName, constraint, foreignKey) => `
     CONSTRAINT ${constraint}_fk 
     FOREIGN KEY (${foreignKey}) 
     REFERENCES ${schemaName}.${referencedTableName} (uuid) 

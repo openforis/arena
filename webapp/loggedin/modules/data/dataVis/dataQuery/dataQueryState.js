@@ -48,10 +48,7 @@ export const getTableCount = getTableProp(tableKeys.count)
 export const getTableFilter = getTableProp(tableKeys.filter)
 export const getTableSort = getTableProp(tableKeys.sort, [])
 export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
-export const getTableNodeDefUuidCols = getTableProp(
-  tableKeys.nodeDefUuidCols,
-  [],
-)
+export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, [])
 export const getTableEditMode = getTableProp(tableKeys.editMode, false)
 
 const hasTable = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
@@ -75,35 +72,17 @@ export const assocTableDataCol = data => state =>
   R.pipe(
     R.pathOr([{}], [keys.table, tableKeys.data]),
     dataState => dataState.map((d, i) => R.mergeDeepLeft(d, data[i])),
-    dataUpdate =>
-      assocTableData(
-        R.pathOr(0, [keys.table, tableKeys.offset], state),
-        dataUpdate,
-      )(state),
+    dataUpdate => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state),
   )(state)
 
 export const dissocTableDataCols = cols => state =>
   R.pipe(
     R.pathOr([{}], [keys.table, tableKeys.data]),
     dataState => dataState.map(R.omit(cols)),
-    dataUpdate =>
-      assocTableData(
-        R.pathOr(0, [keys.table, tableKeys.offset], state),
-        dataUpdate,
-      )(state),
+    dataUpdate => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state),
   )(state)
 
-export const initTableData = (
-  offset,
-  limit,
-  filter,
-  sort,
-  count,
-  data,
-  nodeDefUuidTable,
-  nodeDefUuidCols,
-  editMode,
-) =>
+export const initTableData = (offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode) =>
   R.assoc(keys.table, {
     offset,
     limit,
@@ -117,16 +96,11 @@ export const initTableData = (
   })
 
 export const assocTableData = (offset, data) =>
-  R.pipe(
-    R.assocPath([keys.table, tableKeys.offset], offset),
-    R.assocPath([keys.table, tableKeys.data], data),
-  )
+  R.pipe(R.assocPath([keys.table, tableKeys.offset], offset), R.assocPath([keys.table, tableKeys.data], data))
 
-export const assocTableFilter = filter =>
-  R.assocPath([keys.table, tableKeys.filter], filter)
+export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.filter], filter)
 
-export const assocTableSort = sort =>
-  R.assocPath([keys.table, tableKeys.sort], sort)
+export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)
 
 // ===== Edit mode
 
@@ -156,19 +130,13 @@ export const assocTableDataRecordNodes = nodes => state => {
   return R.assocPath([keys.table, tableKeys.data], data, state)
 }
 
-export const assocTableDataRecordNodeValidations = (
-  recordUuid,
-  recordValid,
-) => state =>
+export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) => state =>
   R.pipe(
     R.pathOr([], [keys.table, tableKeys.data]),
     R.map(row =>
       R.ifElse(
         R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
-        R.assocPath(
-          [rowKeys.record, Validation.keys.validation, Validation.keys.valid],
-          recordValid,
-        ),
+        R.assocPath([rowKeys.record, Validation.keys.validation, Validation.keys.valid], recordValid),
         R.identity,
       )(row),
     ),
@@ -177,8 +145,5 @@ export const assocTableDataRecordNodeValidations = (
 
 // ====== nodeDefSelectors
 
-export const isNodeDefSelectorsVisible = R.pipe(
-  getState,
-  R.propOr(true, keys.showNodeDefSelectors),
-)
+export const isNodeDefSelectorsVisible = R.pipe(getState, R.propOr(true, keys.showNodeDefSelectors))
 export const assocShowNodeDefSelectors = R.assoc(keys.showNodeDefSelectors)

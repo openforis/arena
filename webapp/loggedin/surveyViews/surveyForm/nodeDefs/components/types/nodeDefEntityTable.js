@@ -7,27 +7,12 @@ import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = props => {
-  const {
-    entry,
-    edit,
-    nodeDef,
-    nodes,
-    parentNode,
-    label,
-    updateNode,
-    canEditRecord,
-    canAddNode,
-  } = props
+  const { entry, edit, nodeDef, nodes, parentNode, label, updateNode, canEditRecord, canAddNode } = props
 
   return (
     <div className="survey-form__node-def-entity-table">
       <div className="survey-form__node-def-entity-table-header">
-        <NodeDefErrorBadge
-          nodeDef={nodeDef}
-          edit={edit}
-          parentNode={parentNode}
-          nodes={nodes}
-        >
+        <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes}>
           <div>{label}</div>
 
           {entry && canEditRecord && (

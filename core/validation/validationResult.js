@@ -14,12 +14,7 @@ export const severities = {
   warning: 'warning',
 }
 
-export const newInstance = (
-  key,
-  params = null,
-  severity = null,
-  messages = null,
-) => ({
+export const newInstance = (key, params = null, severity = null, messages = null) => ({
   [keys.key]: key,
   ...(params ? { [keys.params]: params } : {}),
   ...(severity ? { [keys.severity]: severity } : {}),

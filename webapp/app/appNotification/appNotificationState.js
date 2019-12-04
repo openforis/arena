@@ -24,14 +24,8 @@ export const newNotification = (key, params, severity) => ({
 })
 
 export const getMessageKey = R.pipe(getState, R.propOr(null, keys.messageKey))
-export const getMessageParams = R.pipe(
-  getState,
-  R.propOr({}, keys.messageParams),
-)
-export const getSeverity = R.pipe(
-  getState,
-  R.propOr(severity.info, keys.severity),
-)
+export const getMessageParams = R.pipe(getState, R.propOr({}, keys.messageParams))
+export const getSeverity = R.pipe(getState, R.propOr(severity.info, keys.severity))
 export const isVisible = R.pipe(getState, R.propEq(keys.visible, true))
 
 export const show = notification => ({

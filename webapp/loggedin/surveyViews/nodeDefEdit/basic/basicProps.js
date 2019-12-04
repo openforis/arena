@@ -58,28 +58,20 @@ const BasicProps = props => {
       <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
-          validation={Validation.getFieldValidation(NodeDef.propKeys.name)(
-            validation,
-          )}
-          onChange={value =>
-            putNodeDefProp(nodeDef, NodeDef.propKeys.name, normalizeName(value))
-          }
+          validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+          onChange={value => putNodeDefProp(nodeDef, NodeDef.propKeys.name, normalizeName(value))}
         />
       </FormItem>
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={labels =>
-          putNodeDefProp(nodeDef, NodeDef.propKeys.labels, labels)
-        }
+        onChange={labels => putNodeDefProp(nodeDef, NodeDef.propKeys.labels, labels)}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={descriptions =>
-          putNodeDefProp(nodeDef, NodeDef.propKeys.descriptions, descriptions)
-        }
+        onChange={descriptions => putNodeDefProp(nodeDef, NodeDef.propKeys.descriptions, descriptions)}
       />
 
       {NodeDef.isCode(nodeDef) && (
@@ -107,9 +99,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
-            onChange={checked =>
-              putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)
-            }
+            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}
           />
         </FormItem>
       )}
@@ -119,9 +109,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
-            onChange={checked =>
-              putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)
-            }
+            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}
           />
         </FormItem>
       )}
@@ -130,13 +118,7 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={renderType =>
-              putNodeDefLayoutProp(
-                nodeDef,
-                NodeDefLayout.keys.renderType,
-                renderType,
-              )
-            }
+            onChange={renderType => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, renderType)}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
@@ -161,9 +143,7 @@ const BasicProps = props => {
               putNodeDefLayoutProp(
                 nodeDef,
                 NodeDefLayout.keys.pageUuid,
-                displayIn === NodeDefLayout.displayIn.parentPage
-                  ? null
-                  : uuidv4(),
+                displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4(),
               )
             }
             items={[
@@ -214,27 +194,17 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
-  const isEntityAndNotRoot =
-    NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
+  const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
 
   const displayAsFormDisabled = false
-  const displayAsTableDisabled =
-    Survey.hasNodeDefChildrenEntities(nodeDef)(survey) ||
-    NodeDef.isSingle(nodeDef)
+  const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
 
-  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(
-    surveyCycleKey,
-  )(nodeDef)
+  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
   const displayInOwnPageDisabled = false
 
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const cyclesKeysSurvey = R.pipe(
-    Survey.getSurveyInfo,
-    Survey.getCycleKeys,
-  )(survey)
-  const cyclesKeysParent = NodeDef.isRoot(nodeDef)
-    ? cyclesKeysSurvey
-    : NodeDef.getCycles(nodeDefParent)
+  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
+  const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
 
   return {
     surveyCycleKey,

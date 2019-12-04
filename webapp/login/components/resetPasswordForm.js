@@ -28,13 +28,7 @@ const ResetPasswordForm = props => {
 
   return (
     <div className="login-form">
-      <input
-        value={email}
-        readOnly={true}
-        type="text"
-        name="email"
-        className="login-form__input"
-      />
+      <input value={email} readOnly={true} type="text" name="email" className="login-form__input" />
 
       <input
         value={password}
@@ -76,9 +70,6 @@ const mapStateToProps = state => ({
   email: LoginState.getEmail(state),
 })
 
-const enhance = compose(
-  withRouter,
-  connect(mapStateToProps, { resetPassword, setLoginError }),
-)
+const enhance = compose(withRouter, connect(mapStateToProps, { resetPassword, setLoginError }))
 
 export default enhance(ResetPasswordForm)

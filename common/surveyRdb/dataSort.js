@@ -7,10 +7,7 @@ export const keys = {
   },
 }
 
-export const toHttpParams = R.pipe(
-  R.map(R.pick(['variable', 'order'])),
-  JSON.stringify,
-)
+export const toHttpParams = R.pipe(R.map(R.pick(['variable', 'order'])), JSON.stringify)
 
 export const getSortPreparedStatement = sortCriteria => {
   return sortCriteria.reduce(
@@ -31,9 +28,7 @@ export const findVariableByValue = value => R.find(v => v.value === value)
 
 export const getViewExpr = (ascLabel, descLabel) =>
   R.pipe(
-    R.map(
-      c => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`,
-    ),
+    R.map(c => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
     R.join(', '),
   )
 
@@ -51,14 +46,10 @@ export const updateVariable = (pos, variable) =>
   })
 
 export const getUnchosenVariables = availableVariables => sortCriteria =>
-  R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(
-    availableVariables,
-  )
+  R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(availableVariables)
 
-export const addCriteria = (variable, label, order) =>
-  R.append({ variable, label, order })
+export const addCriteria = (variable, label, order) => R.append({ variable, label, order })
 
 export const deleteCriteria = pos => R.remove(pos, 1)
 
-export const retainVariables = variables =>
-  R.reject(c => R.none(v => c.variable === v, variables))
+export const retainVariables = variables => R.reject(c => R.none(v => c.variable === v, variables))

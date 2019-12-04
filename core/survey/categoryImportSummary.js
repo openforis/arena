@@ -34,13 +34,7 @@ export const getFilePath = R.prop(keys.filePath)
 
 // ===== COLUMN
 
-export const newColumn = (
-  type,
-  levelName = null,
-  levelIndex = -1,
-  lang = null,
-  dataType = null,
-) => ({
+export const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
   [keysColumn.type]: type,
   [keysColumn.levelName]: levelName,
   [keysColumn.levelIndex]: levelIndex,
@@ -65,32 +59,21 @@ export const isColumnExtra = isColumnType(columnTypes.extra)
 export const isColumnLabel = isColumnType(columnTypes.label)
 export const isColumnDescription = isColumnType(columnTypes.description)
 
-export const hasColumnLang = column =>
-  isColumnLabel(column) || isColumnDescription(column)
+export const hasColumnLang = column => isColumnLabel(column) || isColumnDescription(column)
 
 // ===== UTILS
 
-export const getLevelNames = R.pipe(
-  getColumns,
-  R.values,
-  R.filter(isColumnCode),
-  R.map(getColumnLevelName),
-)
+export const getLevelNames = R.pipe(getColumns, R.values, R.filter(isColumnCode), R.map(getColumnLevelName))
 
 export const getColumnName = (type, levelIndex) =>
   R.pipe(
     getColumns,
     Object.entries,
-    R.find(
-      ([_columnName, column]) =>
-        getColumnType(column) === type &&
-        getColumnLevelIndex(column) === levelIndex,
-    ),
+    R.find(([_columnName, column]) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
     entry => (entry ? entry[0] : null),
   )
 
-export const hasColumn = (type, levelIndex) =>
-  R.pipe(getColumnName(type, levelIndex), R.isNil, R.not)
+export const hasColumn = (type, levelIndex) => R.pipe(getColumnName(type, levelIndex), R.isNil, R.not)
 
 // UPDATE
 export const assocColumns = R.assoc(keys.columns)

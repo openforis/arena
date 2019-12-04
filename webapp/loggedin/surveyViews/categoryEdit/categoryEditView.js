@@ -20,12 +20,7 @@ import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'
 import * as CategoryEditState from './categoryEditState'
 
-import {
-  putCategoryProp,
-  createCategoryLevel,
-  setCategoryForEdit,
-  uploadCategory,
-} from './actions'
+import { putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory } from './actions'
 
 const CategoryEditView = props => {
   const {
@@ -50,16 +45,8 @@ const CategoryEditView = props => {
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
               value={Category.getName(category)}
-              validation={Validation.getFieldValidation(Category.props.name)(
-                validation,
-              )}
-              onChange={value =>
-                putCategoryProp(
-                  category,
-                  Category.props.name,
-                  StringUtils.normalizeName(value),
-                )
-              }
+              validation={Validation.getFieldValidation(Category.props.name)(validation)}
+              onChange={value => putCategoryProp(category, Category.props.name, StringUtils.normalizeName(value))}
               readOnly={readOnly}
             />
           </FormItem>
@@ -68,9 +55,7 @@ const CategoryEditView = props => {
             <UploadButton
               label={i18n.t('common.csvImport')}
               accept=".csv"
-              onChange={files =>
-                uploadCategory(Category.getUuid(category), files[0])
-              }
+              onChange={files => uploadCategory(Category.getUuid(category), files[0])}
               disabled={Category.isPublished(category)}
             />
           )}
@@ -106,10 +91,7 @@ const CategoryEditView = props => {
 }
 
 const mapStateToProps = state => ({
-  readOnly: !Authorizer.canEditSurvey(
-    AppState.getUser(state),
-    SurveyState.getSurveyInfo(state),
-  ),
+  readOnly: !Authorizer.canEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
   importSummary: CategoryEditState.getImportSummary(state),
 })
 

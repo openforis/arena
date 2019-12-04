@@ -27,8 +27,7 @@ const TablePaginator = ({ offset, limit, count, fetchFn }) => {
       </button>
 
       <span className="counts">
-        {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')}{' '}
-        {count}
+        {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')} {count}
       </span>
 
       <button

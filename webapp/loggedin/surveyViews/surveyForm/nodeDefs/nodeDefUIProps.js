@@ -13,19 +13,7 @@ import NodeDefCode from './components/types/nodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 
-const {
-  integer,
-  decimal,
-  text,
-  date,
-  time,
-  boolean,
-  code,
-  coordinate,
-  taxon,
-  file,
-  entity,
-} = NodeDef.nodeDefType
+const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
 
 const propsUI = {
   [integer]: {
@@ -72,11 +60,7 @@ const propsUI = {
     icon: (
       <span className="icon-left display-flex">
         {R.range(0, 3).map(i => (
-          <span
-            key={i}
-            className="icon icon-text-color"
-            style={{ margin: '0 -3px' }}
-          />
+          <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
         ))}
       </span>
     ),
@@ -114,10 +98,7 @@ const propsUI = {
     icon: <span className="icon icon-list icon-left" />,
     defaultValue: '',
     defaultProps: cycle => ({
-      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-        cycle,
-        NodeDefLayout.renderType.checkbox,
-      ),
+      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox),
     }),
   },
 
@@ -162,19 +143,14 @@ const propsUI = {
     icon: <span className="icon icon-table2 icon-left" />,
     defaultProps: cycle => ({
       [NodeDef.propKeys.multiple]: true,
-      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-        cycle,
-        NodeDefLayout.renderType.table,
-      ),
+      [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
     }),
   },
 }
 
-const getPropByType = (prop, defaultValue = null) => nodeDefType =>
-  R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+const getPropByType = (prop, defaultValue = null) => nodeDefType => R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
-const getProp = (prop, defaultValue) =>
-  R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
+const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
 export const getIconByType = getPropByType('icon')
 

@@ -9,8 +9,7 @@ import * as ValidatorNameKeywords from './validatorNameKeywords'
  */
 const validNameRegex = /^[a-z][a-z0-9_]*$/
 
-const getProp = (propName, defaultValue = null) =>
-  R.pathOr(defaultValue, propName.split('.'))
+const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
 
 export const validateRequired = errorKey => (propName, obj) => {
   const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
@@ -18,14 +17,9 @@ export const validateRequired = errorKey => (propName, obj) => {
   return R.isEmpty(value) ? { key: errorKey } : null
 }
 
-export const validateItemPropUniqueness = errorKey => items => (
-  propName,
-  item,
-) => {
+export const validateItemPropUniqueness = errorKey => items => (propName, item) => {
   const hasDuplicates = R.any(
-    i =>
-      !ObjectUtils.isEqual(i)(item) &&
-      getProp(propName)(i) === getProp(propName)(item),
+    i => !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
     items,
   )
 
@@ -34,9 +28,7 @@ export const validateItemPropUniqueness = errorKey => items => (
 
 export const validateNotKeyword = errorKey => (propName, item) => {
   const value = getProp(propName)(item)
-  return ValidatorNameKeywords.isKeyword(value)
-    ? { key: errorKey, params: { value } }
-    : null
+  return ValidatorNameKeywords.isKeyword(value) ? { key: errorKey, params: { value } } : null
 }
 
 export const validateName = errorKey => (propName, item) => {

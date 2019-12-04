@@ -29,9 +29,7 @@ const getModule = (module, children = null, root = true) => ({
   [keys.icon]: module.icon,
   [keys.root]: root,
   [keys.elementRef]: useRef(null),
-  [keys.children]: children
-    ? children.map(childModule => getModule(childModule, null, false))
-    : [],
+  [keys.children]: children ? children.map(childModule => getModule(childModule, null, false)) : [],
 })
 
 export const getModulesHierarchy = (user, surveyInfo) => [
@@ -58,9 +56,7 @@ export const isRoot = R.propEq(keys.root, true)
 export const isHome = module => getKey(module) === appModules.home.key
 export const isActive = pathname => module => {
   // Module home is active when page is on dashboard
-  return isHome(module)
-    ? pathname === appModuleUri(homeModules.dashboard)
-    : R.startsWith(module.uri, pathname)
+  return isHome(module) ? pathname === appModuleUri(homeModules.dashboard) : R.startsWith(module.uri, pathname)
 }
 
 export const getElementRef = R.prop(keys.elementRef)

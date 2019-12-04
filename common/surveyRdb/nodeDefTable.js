@@ -8,8 +8,7 @@ const viewSuffix = '_view'
 const tablePrefix = 'data_'
 const parentTablePrefix = '_$parent$_'
 
-const composeTableName = (nodeDefName, nodeDefParentName = '') =>
-  `${tablePrefix}${nodeDefParentName}${nodeDefName}`
+const composeTableName = (nodeDefName, nodeDefParentName = '') => `${tablePrefix}${nodeDefParentName}${nodeDefName}`
 
 export const getTableName = (nodeDef, nodeDefParent) => {
   const nodeDefName = NodeDef.getName(nodeDef)
@@ -22,8 +21,7 @@ export const getTableName = (nodeDef, nodeDefParent) => {
     : composeTableName(nodeDefParentName)
 }
 
-export const getViewName = (nodeDef, nodeDefParent) =>
-  getTableName(nodeDef, nodeDefParent) + viewSuffix
+export const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
 const cols = {
   [NodeDef.nodeDefType.code]: ['code', 'label'],
@@ -34,27 +32,18 @@ const cols = {
 const getCols = nodeDef => R.propOr([], NodeDef.getType(nodeDef), cols)
 
 const getDefaultColumnName = nodeDef =>
-  NodeDef.isEntity(nodeDef)
-    ? `${NodeDef.getName(nodeDef)}_uuid`
-    : `${NodeDef.getName(nodeDef)}`
+  NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
 
 export const getColNames = nodeDef => {
   const cols = getCols(nodeDef)
-  return R.isEmpty(cols)
-    ? [getDefaultColumnName(nodeDef)]
-    : cols.map(col => NodeDef.getName(nodeDef) + '_' + col)
+  return R.isEmpty(cols) ? [getDefaultColumnName(nodeDef)] : cols.map(col => NodeDef.getName(nodeDef) + '_' + col)
 }
 
 export const getColName = R.pipe(getColNames, R.head)
 
 export const getColNamesByUuids = nodeDefUuidCols => survey =>
   R.reduce(
-    (cols, uuid) =>
-      R.pipe(
-        Survey.getNodeDefByUuid(uuid),
-        getColNames,
-        R.concat(cols),
-      )(survey),
+    (cols, uuid) => R.pipe(Survey.getNodeDefByUuid(uuid), getColNames, R.concat(cols))(survey),
     [],
     nodeDefUuidCols,
   )

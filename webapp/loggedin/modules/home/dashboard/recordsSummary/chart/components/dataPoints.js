@@ -10,9 +10,7 @@ import * as DateUtils from '@core/dateUtils'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>
-    <div className="date">
-      {DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}
-    </div>
+    <div className="date">{DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}</div>
     <div className="count">
       {i18n.t('homeView.recordsSummary.record', {
         count: Number(dataPoint.count),
@@ -31,16 +29,11 @@ const DataPoints = props => {
   const tooltipRef = useRef(null)
 
   useEffect(() => {
-    const tooltipClassName =
-      'home-dashboard__records-summary__chart-data-point-tip'
+    const tooltipClassName = 'home-dashboard__records-summary__chart-data-point-tip'
     tooltipRef.current = d3Tip()
       .attr('class', tooltipClassName)
       .offset([-10, 0])
-      .html(d =>
-        ReactDOMServer.renderToString(
-          <DataPointTooltip dataPoint={d} i18n={i18n} />,
-        ),
-      )
+      .html(d => ReactDOMServer.renderToString(<DataPointTooltip dataPoint={d} i18n={i18n} />))
 
     d3.select(elementRef.current).call(tooltipRef.current)
 

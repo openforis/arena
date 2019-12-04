@@ -11,19 +11,12 @@ const mergeProps = (def, draft) => {
   return R.pipe(R.assoc('props', propsMerged), R.dissoc('propsDraft'))(def)
 }
 
-export const dbTransformCallback = (
-  def,
-  draft = false,
-  assocPublishedDraft = false,
-) =>
+export const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) =>
   R.pipe(
     // Assoc published and draft properties based on props
     def =>
       assocPublishedDraft
-        ? R.pipe(
-            R.assoc('published', !R.isEmpty(def.props)),
-            R.assoc('draft', !R.isEmpty(def.props_draft)),
-          )(def)
+        ? R.pipe(R.assoc('published', !R.isEmpty(def.props)), R.assoc('draft', !R.isEmpty(def.props_draft)))(def)
         : def,
     camelize,
     // Apply db conversion
@@ -45,11 +38,7 @@ export const markSurveyDraft = async (surveyId, client = db) =>
     [surveyId],
   )
 
-export const publishSurveySchemaTableProps = async (
-  surveyId,
-  tableName,
-  client = db,
-) =>
+export const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
   await client.query(`
     UPDATE
       ${getSurveyDBSchema(surveyId)}.${tableName}
@@ -58,14 +47,7 @@ export const publishSurveySchemaTableProps = async (
       props_draft = '{}'::jsonb
   `)
 
-export const updateSurveySchemaTableProp = async (
-  surveyId,
-  tableName,
-  recordUuid,
-  key,
-  value,
-  client = db,
-) =>
+export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
      SET props_draft = props_draft || $1
@@ -75,12 +57,7 @@ export const updateSurveySchemaTableProp = async (
     def => dbTransformCallback(def, true),
   )
 
-export const deleteSurveySchemaTableRecord = async (
-  surveyId,
-  tableName,
-  recordUuid,
-  client = db,
-) =>
+export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) =>
   await client.one(
     `
     DELETE 
@@ -90,13 +67,6 @@ export const deleteSurveySchemaTableRecord = async (
     def => dbTransformCallback(def, true),
   )
 
-export const deleteSurveySchemaTableProp = async (
-  surveyId,
-  tableName,
-  deletePath,
-  client = db,
-) =>
+export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
   await client.none(`
-    UPDATE ${getSurveyDBSchema(
-      surveyId,
-    )}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
+    UPDATE ${getSurveyDBSchema(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)

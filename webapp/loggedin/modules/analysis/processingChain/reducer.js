@@ -4,16 +4,8 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { appUserLogout } from '@webapp/app/actions'
 
-import {
-  surveyCreate,
-  surveyDelete,
-  surveyUpdate,
-} from '@webapp/survey/actions'
-import {
-  processingChainUpdate,
-  processingChainPropUpdate,
-  processingChainStepsLoad,
-} from './actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import { processingChainUpdate, processingChainPropUpdate, processingChainStepsLoad } from './actions'
 
 const actionHandlers = {
   // Reset state
@@ -24,8 +16,7 @@ const actionHandlers = {
 
   // Chain
   [processingChainUpdate]: (state, { processingChain }) => processingChain,
-  [processingChainPropUpdate]: (state, { key, value }) =>
-    ProcessingChain.assocProp(key, value)(state),
+  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChain.assocProp(key, value)(state),
 
   // Steps
   [processingChainStepsLoad]: (state, { processingSteps }) =>

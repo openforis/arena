@@ -45,9 +45,7 @@ const LoginView = props => {
         </div>
       </div>
 
-      {error && (
-        <div className="login-form__error text-center">{i18n.t(error)}</div>
-      )}
+      {error && <div className="login-form__error text-center">{i18n.t(error)}</div>}
 
       {React.createElement(forms[userAction], props)}
     </>

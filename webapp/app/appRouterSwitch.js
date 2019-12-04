@@ -22,15 +22,7 @@ import * as AppState from './appState'
 import { initApp, throwSystemError } from './actions'
 
 const AppRouterSwitch = props => {
-  const {
-    isReady,
-    systemError,
-    user,
-    initApp,
-    throwSystemError,
-    activeJobUpdate,
-    i18n,
-  } = props
+  const { isReady, systemError, user, initApp, throwSystemError, activeJobUpdate, i18n } = props
 
   const openSocket = () => {
     ;(async () => {
@@ -73,12 +65,7 @@ const AppRouterSwitch = props => {
         {user ? (
           <Route
             path="/app"
-            render={props => (
-              <DynamicImport
-                {...props}
-                load={() => import('@webapp/loggedin/appViewExport')}
-              />
-            )}
+            render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}
           />
         ) : (
           <LoginView />
@@ -98,9 +85,6 @@ const mapStateToProps = state => ({
   i18n: AppState.getI18n(state),
 })
 
-const enhance = compose(
-  withRouter,
-  connect(mapStateToProps, { initApp, throwSystemError, activeJobUpdate }),
-)
+const enhance = compose(withRouter, connect(mapStateToProps, { initApp, throwSystemError, activeJobUpdate }))
 
 export default enhance(AppRouterSwitch)

@@ -16,19 +16,11 @@ import Dropdown from '../../form/dropdown'
 import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>
-  nodeDef
-    ? !(
-        NodeDef.isInteger(nodeDef) ||
-        NodeDef.isDecimal(nodeDef) ||
-        StringUtils.isBlank(value)
-      )
-    : false
+  nodeDef ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value)) : false
 
-const parseValue = (nodeDef, value) =>
-  isValueText(nodeDef, value) ? JSON.parse(value) : value
+const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? JSON.parse(value) : value)
 
-const getValue = (nodeDef, value) =>
-  isValueText(nodeDef, value) ? JSON.stringify(value) : value
+const getValue = (nodeDef, value) => (isValueText(nodeDef, value) ? JSON.stringify(value) : value)
 
 const loadItems = async params => {
   const {
@@ -41,12 +33,12 @@ const Literal = props => {
   const { node, nodeDefCurrent, literalSearchParams, onChange, type } = props
   const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
 
-  const {
-    data: { item = {} } = { item: {} },
-    dispatch: fetchItem,
-  } = useAsyncGetRequest('/api/expression/literal/item', {
-    params: { ...literalSearchParams, value: nodeValue },
-  })
+  const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
+    '/api/expression/literal/item',
+    {
+      params: { ...literalSearchParams, value: nodeValue },
+    },
+  )
   const [items, setItems] = useState([])
 
   const onChangeValue = val => {
@@ -72,29 +64,20 @@ const Literal = props => {
       {literalSearchParams ? (
         <Dropdown
           items={items}
-          itemsLookupFunction={value =>
-            loadItems({ ...literalSearchParams, value })
-          }
+          itemsLookupFunction={value => loadItems({ ...literalSearchParams, value })}
           itemKeyProp="key"
           itemLabelProp="label"
           onChange={item => item && onChangeValue(item.key)}
           selection={item}
         />
-      ) : BinaryOperandType.isLeft(type) &&
-        (NodeDef.isInteger(nodeDefCurrent) ||
-          NodeDef.isDecimal(nodeDefCurrent)) ? (
+      ) : BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent)) ? (
         <Input
           {...NodeDefUIProps.getInputTextProps(nodeDefCurrent)}
           value={nodeValue}
           onChange={value => onChangeValue(value)}
         />
       ) : (
-        <input
-          className="form-input"
-          value={nodeValue}
-          size={25}
-          onChange={e => onChangeValue(e.target.value)}
-        />
+        <input className="form-input" value={nodeValue} size={25} onChange={e => onChangeValue(e.target.value)} />
       )}
     </div>
   )

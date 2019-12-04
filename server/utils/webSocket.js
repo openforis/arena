@@ -63,9 +63,7 @@ export const init = (server, jwtMiddleware) => {
   io.on(WebSocketEvents.connection, async socket => {
     const userUuid = R.pipe(R.prop('request'), Request.getUserUuid)(socket)
 
-    Logger.debug(
-      `socket connection with id: ${socket.id} for userUuid ${userUuid}`,
-    )
+    Logger.debug(`socket connection with id: ${socket.id} for userUuid ${userUuid}`)
 
     if (userUuid) {
       addSocket(userUuid, socket)

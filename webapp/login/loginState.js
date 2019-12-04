@@ -15,8 +15,7 @@ export const userActions = {
   resetPassword: 'resetPassword',
 }
 
-const getStateProp = (key, defaultValue = null) =>
-  R.pathOr(defaultValue, [stateKey, key])
+const getStateProp = (key, defaultValue = null) => R.pathOr(defaultValue, [stateKey, key])
 
 export const getEmail = getStateProp(keys.email, '')
 

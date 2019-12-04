@@ -14,11 +14,7 @@ import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
 import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
 import ItemsView from '../items/itemsView'
 
-import {
-  createTaxonomy,
-  setTaxonomyForEdit,
-  deleteTaxonomy,
-} from '../taxonomyEdit/actions'
+import { createTaxonomy, setTaxonomyForEdit, deleteTaxonomy } from '../taxonomyEdit/actions'
 
 const TaxonomiesView = props => {
   const {
@@ -50,8 +46,7 @@ const TaxonomiesView = props => {
       ? alert(i18n.t('taxonomy.cantBeDeleted'))
       : window.confirm(
           i18n.t('taxonomy.confirmDelete', {
-            taxonomyName:
-              Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
+            taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
           }),
         )
 
@@ -85,9 +80,7 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: !R.isEmpty(
-        Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey),
-      ),
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
     })),
   )(survey)
 

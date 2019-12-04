@@ -27,9 +27,7 @@ export {
 } from 'date-fns'
 
 const normalizeDateTimeValue = length => value =>
-  R.pipe(R.ifElse(R.is(String), R.identity, R.toString), val =>
-    val.padStart(length, '0'),
-  )(value)
+  R.pipe(R.ifElse(R.is(String), R.identity, R.toString), val => val.padStart(length, '0'))(value)
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
@@ -94,10 +92,7 @@ export const isValidDate = (year, month, day) => {
 export const isValidTime = (hour = '', minutes = '') =>
   isBlank(hour) || isBlank(minutes)
     ? false
-    : Number(hour) >= 0 &&
-      Number(hour) < 24 &&
-      Number(minutes) >= 0 &&
-      Number(minutes) < 60
+    : Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60
 
 export const isValidDateInFormat = (dateStr, format) => {
   const parsed = parse(dateStr, format)
@@ -105,12 +100,8 @@ export const isValidDateInFormat = (dateStr, format) => {
 }
 
 export const formatDate = (day, month, year) =>
-  `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(
-    month,
-  )}/${normalizeDateTimeValue(4)(year)}`
+  `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
 
-export const formatTime = (hour, minute) =>
-  `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
-export const parse = (dateStr, format) =>
-  dateFnsParse(dateStr, format, new Date())
+export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())

@@ -6,12 +6,7 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 
 // ====== CREATE
 
-export const insertCalculationStep = async (
-  surveyId,
-  processingStepUuid,
-  index,
-  client = db,
-) =>
+export const insertCalculationStep = async (surveyId, processingStepUuid, index, client = db) =>
   await client.one(
     `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_step_calculation
@@ -26,13 +21,7 @@ export const insertCalculationStep = async (
 
 // ====== UPDATE
 
-export const updateCalculationIndex = async (
-  surveyId,
-  processingStepUuid,
-  indexFrom,
-  indexTo,
-  client = db,
-) => {
+export const updateCalculationIndex = async (surveyId, processingStepUuid, indexFrom, indexTo, client = db) => {
   const indexPlaceholder = -1
   const queries = []
 

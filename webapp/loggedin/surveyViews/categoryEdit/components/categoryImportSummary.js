@@ -11,11 +11,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
 
-import {
-  importCategory,
-  hideCategoryImportSummary,
-  setCategoryImportSummaryColumnDataType,
-} from '../actions'
+import { importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType } from '../actions'
 
 const TableHeader = () => {
   const i18n = useI18n()
@@ -30,12 +26,7 @@ const TableHeader = () => {
   )
 }
 
-const TableRow = ({
-  idx,
-  columnName,
-  column,
-  setCategoryImportSummaryColumnDataType,
-}) => {
+const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataType }) => {
   const i18n = useI18n()
 
   const columnSummaryKey = CategoryImportSummary.hasColumnLang(column)
@@ -54,10 +45,7 @@ const TableRow = ({
         {i18n.t(columnSummaryKey, {
           type: CategoryImportSummary.getColumnType(column),
           level: CategoryImportSummary.getColumnLevelIndex(column) + 1,
-          language: Languages.getLanguageLabel(
-            CategoryImportSummary.getColumnLang(column),
-            i18n.lang,
-          ),
+          language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.lang),
         })}
       </div>
       <div>
@@ -65,13 +53,9 @@ const TableRow = ({
           <Dropdown
             readOnlyInput={true}
             items={Object.keys(Category.itemExtraDefDataTypes)}
-            itemLabelFunction={dataType =>
-              i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)
-            }
+            itemLabelFunction={dataType => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
             selection={dataType}
-            onChange={dataType =>
-              setCategoryImportSummaryColumnDataType(columnName, dataType)
-            }
+            onChange={dataType => setCategoryImportSummaryColumnDataType(columnName, dataType)}
           />
         )}
       </div>
@@ -80,22 +64,14 @@ const TableRow = ({
 }
 
 const CategoryImportSummaryView = props => {
-  const {
-    summary,
-    importCategory,
-    hideCategoryImportSummary,
-    setCategoryImportSummaryColumnDataType,
-  } = props
+  const { summary, importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType } = props
 
   const i18n = useI18n()
 
   const columns = CategoryImportSummary.getColumns(summary)
 
   return (
-    <Modal
-      className="category-edit__import-summary"
-      onClose={hideCategoryImportSummary}
-    >
+    <Modal className="category-edit__import-summary" onClose={hideCategoryImportSummary}>
       <ModalBody>
         <div className="table">
           <div className="table__content">
@@ -107,9 +83,7 @@ const CategoryImportSummaryView = props => {
                   idx={idx}
                   columnName={columnName}
                   column={column}
-                  setCategoryImportSummaryColumnDataType={
-                    setCategoryImportSummaryColumnDataType
-                  }
+                  setCategoryImportSummaryColumnDataType={setCategoryImportSummaryColumnDataType}
                 />
               ))}
             </div>
@@ -118,17 +92,11 @@ const CategoryImportSummaryView = props => {
       </ModalBody>
 
       <ModalFooter>
-        <button
-          className="btn modal-footer__item"
-          onClick={() => importCategory()}
-        >
+        <button className="btn modal-footer__item" onClick={() => importCategory()}>
           <span className="icon icon-upload2 icon-12px icon-left" />
           {i18n.t('common.import')}
         </button>
-        <button
-          className="btn btn-close modal-footer__item"
-          onClick={() => hideCategoryImportSummary()}
-        >
+        <button className="btn btn-close modal-footer__item" onClick={() => hideCategoryImportSummary()}>
           <span className="icon icon-cross icon-10px icon-left" />
           {i18n.t('common.close')}
         </button>

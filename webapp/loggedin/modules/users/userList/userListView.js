@@ -50,43 +50,27 @@ const UsersRow = props => {
   const { row: userListItem, user, surveyInfo } = props
   const i18n = useI18n()
 
-  const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(
-    userListItem,
-  )
+  const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userListItem)
   const canEditUser = Authorizer.canEditUser(user, surveyInfo, userListItem)
 
   return (
     <>
       <div className="users-list__cell-profile-picture">
-        <ProfilePicture
-          userUuid={User.getUuid(userListItem)}
-          thumbnail={true}
-        />
+        <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail={true} />
       </div>
       <div>{User.getName(userListItem)}</div>
       <div>{User.getEmail(userListItem)}</div>
+      <div>{i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}</div>
+      <div>{User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}</div>
       <div>
-        {i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}
-      </div>
-      <div>
-        {User.hasAccepted(userListItem) && (
-          <span className="icon icon-user-check icon-16px" />
-        )}
-      </div>
-      <div>
-        <span
-          className={`icon icon-12px icon-action ${
-            canEditUser ? 'icon-pencil2' : 'icon-eye'
-          }`}
-        />
+        <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
     </>
   )
 }
 
 const UsersListView = ({ canInvite, user, surveyInfo, history }) => {
-  const onRowClick = user =>
-    history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
+  const onRowClick = user => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
 
   return (
     <TableView

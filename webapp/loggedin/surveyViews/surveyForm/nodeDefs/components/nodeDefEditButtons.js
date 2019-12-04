@@ -11,10 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
-import {
-  putNodeDefLayoutProp,
-  removeNodeDef,
-} from '@webapp/survey/nodeDefs/actions'
+import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../../actions'
 import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
@@ -50,11 +47,7 @@ const NodeDefEditButtons = props => {
 
   return (
     show && (
-      <div
-        className="survey-form__node-def-edit-buttons"
-        ref={elementRef}
-        style={style}
-      >
+      <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style}>
         {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (
           <div className="survey-form__node-def-edit-page-props">
             {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
@@ -66,11 +59,7 @@ const NodeDefEditButtons = props => {
               step="1"
               onChange={e =>
                 e.target.value > 0
-                  ? putNodeDefLayoutProp(
-                      nodeDef,
-                      NodeDefLayout.keys.columnsNo,
-                      Number(e.target.value),
-                    )
+                  ? putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
                   : null
               }
             />

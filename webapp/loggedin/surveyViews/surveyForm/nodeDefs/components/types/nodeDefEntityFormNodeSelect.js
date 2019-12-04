@@ -47,11 +47,7 @@ const NodeDefEntityFormNodeSelect = props => {
             style={{ marginLeft: '5px' }}
             aria-disabled={!selectedNode}
             onClick={() => {
-              if (
-                window.confirm(
-                  i18n.t('surveyForm.nodeDefEntityForm.confirmDelete'),
-                )
-              ) {
+              if (window.confirm(i18n.t('surveyForm.nodeDefEntityForm.confirmDelete'))) {
                 onChange(null)
                 removeNode(nodeDef, selectedNode)
               }
@@ -64,11 +60,7 @@ const NodeDefEntityFormNodeSelect = props => {
             className="btn btn-s"
             style={{ marginLeft: '50px' }}
             onClick={() => {
-              const entity = Node.newNode(
-                NodeDef.getUuid(nodeDef),
-                Node.getRecordUuid(parentNode),
-                parentNode,
-              )
+              const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
               updateNode(nodeDef, entity)
               onChange(Node.getUuid(entity))
             }}

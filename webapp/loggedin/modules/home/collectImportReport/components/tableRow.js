@@ -15,28 +15,13 @@ import { updateCollectImportReportItem } from '../actions'
 import { setNodeDefForEdit } from '../../../../surveyViews/nodeDefEdit/actions'
 
 const TableRow = props => {
-  const {
-    i18n,
-    item,
-    idx,
-    nodeDef,
-    nodeDefPath,
-    languages,
-    updateCollectImportReportItem,
-    setNodeDefForEdit,
-  } = props
+  const { i18n, item, idx, nodeDef, nodeDefPath, languages, updateCollectImportReportItem, setNodeDefForEdit } = props
 
   return (
     <div key={idx} className="table__row">
       <div>{idx + 1}</div>
       <div>{nodeDefPath}</div>
-      <div>
-        {i18n.t(
-          `homeView.collectImportReport.exprType.${CollectImportReportItem.getExpressionType(
-            item,
-          )}`,
-        )}
-      </div>
+      <div>{i18n.t(`homeView.collectImportReport.exprType.${CollectImportReportItem.getExpressionType(item)}`)}</div>
       <div>{CollectImportReportItem.getExpression(item)}</div>
       <div>{CollectImportReportItem.getApplyIf(item)}</div>
       <div>
@@ -71,9 +56,7 @@ const TableRow = props => {
 
 const _getNodeDefPath = (survey, nodeDef, lang) => {
   const nodeDefPathParts = []
-  Survey.visitAncestorsAndSelf(nodeDef, def =>
-    nodeDefPathParts.unshift(NodeDef.getLabel(def, lang)),
-  )(survey)
+  Survey.visitAncestorsAndSelf(nodeDef, def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang)))(survey)
 
   return nodeDefPathParts.join(' > ')
 }
