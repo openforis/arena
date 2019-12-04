@@ -72,26 +72,25 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
   // Output
   const nodesUpdated = { ...nodes }
 
-  const nodesArray = Object.values(nodes)
-  const nodesToVisit = new Queue(nodesArray)
+  const nodesToVisit = new Queue(R.values(nodes))
 
-  const nodesVisitedByUuid = {} // Used to avoid visiting the same node 2 times
+  const nodesVisitedUuids = new Set() // Used to avoid visiting the same node 2 times
 
   while (!nodesToVisit.isEmpty()) {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
 
     // Visit only unvisited nodes
-    if (!nodesVisitedByUuid[nodeUuid]) {
+    if (!nodesVisitedUuids.has(nodeUuid)) {
       // Update node dependents
       const [nodesApplicability, nodesDefaultValues] = await Promise.all([
-        NodeUpdateDependentManager.updateDependentsApplicable(
+        NodeUpdateDependentManager.updateSelfAndDependentsApplicable(
           survey,
           record,
           node,
           tx,
         ),
-        NodeUpdateDependentManager.updateDependentsDefaultValues(
+        NodeUpdateDependentManager.updateSelfAndDependentsDefaultValues(
           survey,
           record,
           node,
@@ -113,7 +112,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
       Object.assign(nodesUpdated, nodesUpdatedCurrent)
 
       // Mark node visited
-      nodesVisitedByUuid[nodeUuid] = true
+      nodesVisitedUuids.add(nodeUuid)
     }
   }
 

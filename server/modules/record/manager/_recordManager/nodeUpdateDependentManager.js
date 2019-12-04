@@ -14,7 +14,12 @@ import * as NodeRepository from '../../repository/nodeRepository'
  * Module responsible for updating applicable and default values
  */
 
-export const updateDependentsApplicable = async (survey, record, node, tx) => {
+export const updateSelfAndDependentsApplicable = async (
+  survey,
+  record,
+  node,
+  tx,
+) => {
   // Output
   const nodesUpdated = {} // Updated nodes indexed by uuid
 
@@ -24,6 +29,16 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
     node,
     Survey.dependencyTypes.applicable,
   )(record)
+
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
+  if (Node.isCreated(node) && !R.isEmpty(NodeDef.getApplicable(nodeDef))) {
+    // Include a pointer to node itself if it has just been created and it has an "applicable if" expression
+    nodePointersToUpdate.push({
+      nodeDef,
+      nodeCtx: Record.getParentNode(node)(record),
+    })
+  }
 
   // 2. update expr to node and dependent nodes
   // NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
@@ -39,12 +54,12 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
 
     // 4. persist updated node value if changed, and return updated node
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
-    const nodeCtxUuid = Node.getUuid(nodeCtx)
 
     if (Node.isChildApplicable(nodeDefUuid)(nodeCtx) !== applicable) {
       // Applicability changed
 
       // update node and add it to nodesUpdated
+      const nodeCtxUuid = Node.getUuid(nodeCtx)
       nodesUpdated[nodeCtxUuid] = {
         ...(await NodeRepository.updateChildrenApplicability(
           Survey.getId(survey),
@@ -74,7 +89,7 @@ export const updateDependentsApplicable = async (survey, record, node, tx) => {
   return nodesUpdated
 }
 
-export const updateDependentsDefaultValues = async (
+export const updateSelfAndDependentsDefaultValues = async (
   survey,
   record,
   node,
