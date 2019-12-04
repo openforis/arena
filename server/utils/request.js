@@ -10,13 +10,7 @@ export const getParams = req =>
     R.mergeLeft(R.prop('params', req)),
     R.mergeLeft(R.prop('body', req)),
     // Convert String boolean values to Boolean type
-    R.mapObjIndexed(val =>
-      R.ifElse(
-        v => v === 'true' || v === 'false',
-        R.always(val === 'true'),
-        R.identity,
-      )(val),
-    ),
+    R.mapObjIndexed(val => R.ifElse(v => v === 'true' || v === 'false', R.always(val === 'true'), R.identity)(val)),
   )({})
 
 export const getJsonParam = (req, param, defaultValue = null) => {

@@ -60,9 +60,7 @@ const TableHeader = props => {
 
   const csvDownloadLink = `/api/surveyRdb/${surveyId}/${nodeDefUuidContext}/export?filter=${JSON.stringify(
     filter,
-  )}&sort=${DataSort.toHttpParams(sort)}&nodeDefUuidCols=${JSON.stringify(
-    nodeDefUuidCols,
-  )}&cycle=${surveyCycleKey}`
+  )}&sort=${DataSort.toHttpParams(sort)}&nodeDefUuidCols=${JSON.stringify(nodeDefUuidCols)}&cycle=${surveyCycleKey}`
 
   const i18n = useI18n()
   const sortMsg = DataSort.getViewExpr(
@@ -73,22 +71,12 @@ const TableHeader = props => {
   return (
     <div className="table__header">
       <div className="data-operations">
-        <button
-          className={`btn btn-s${nodeDefSelectorsVisible ? ' highlight' : ''}`}
-          onClick={toggleNodeDefsSelector}
-        >
+        <button className={`btn btn-s${nodeDefSelectorsVisible ? ' highlight' : ''}`} onClick={toggleNodeDefsSelector}>
           <span className="icon icon-list icon-14px" />
         </button>
 
-        <Tooltip
-          messages={
-            filter && [Expression.toString(filter, Expression.modes.sql)]
-          }
-        >
-          <button
-            className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
-            onClick={toggleExpressionEditor}
-          >
+        <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
+          <button className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`} onClick={toggleExpressionEditor}>
             <span className="icon icon-filter icon-14px" />
           </button>
         </Tooltip>
@@ -112,12 +100,7 @@ const TableHeader = props => {
         )}
 
         <Tooltip messages={sortMsg && [sortMsg]}>
-          <button
-            className={`btn btn-s btn-edit${
-              sort.length > 0 ? ' highlight' : ''
-            }`}
-            onClick={toggleSortEditor}
-          >
+          <button className={`btn btn-s btn-edit${sort.length > 0 ? ' highlight' : ''}`} onClick={toggleSortEditor}>
             <span className="icon icon-sort-amount-asc icon-14px" />
           </button>
         </Tooltip>
@@ -149,14 +132,7 @@ const TableHeader = props => {
         )}
       </div>
 
-      {showPaginator && (
-        <TablePaginator
-          offset={offset}
-          limit={limit}
-          count={count}
-          fetchFn={updateTableOffset}
-        />
-      )}
+      {showPaginator && <TablePaginator offset={offset} limit={limit} count={count} fetchFn={updateTableOffset} />}
     </div>
   )
 }

@@ -46,12 +46,7 @@ export const setContextSurvey = s => {
 }
 
 export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
-  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    Survey.getId(survey),
-    Survey.cycleOneKey,
-    draft,
-    advanced,
-  )
+  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), Survey.cycleOneKey, draft, advanced)
 
 export const getContextUser = () => user
 export const getContextSurvey = () => survey

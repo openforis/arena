@@ -10,11 +10,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Table from './components/table'
 
-import {
-  initTableData,
-  updateTableNodeDefUuid,
-  updateTableNodeDefUuidCols,
-} from './actions'
+import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
 
 import * as DataQueryState from './dataQueryState'
 
@@ -34,11 +30,7 @@ const DataQueryView = props => {
   }, [])
 
   return (
-    <div
-      className={`data-query${
-        nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'
-      }`}
-    >
+    <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
       {nodeDefSelectorsVisible && (
         <NodeDefsSelectorView
           hierarchy={hierarchy}

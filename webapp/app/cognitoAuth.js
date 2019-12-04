@@ -1,8 +1,4 @@
-import {
-  AuthenticationDetails,
-  CognitoUser,
-  CognitoUserPool,
-} from 'amazon-cognito-identity-js'
+import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
 
 export const keysAction = {
   success: 'success',
@@ -14,8 +10,7 @@ const ClientId = window.cognitoClientId
 
 const _getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
-const _newCognitoUser = Username =>
-  new CognitoUser({ Username, Pool: _getUserPool() })
+const _newCognitoUser = Username => new CognitoUser({ Username, Pool: _getUserPool() })
 
 // Global variables to handle completeNewPasswordChallenge flow
 let _cognitoUser
@@ -47,10 +42,7 @@ export const getUser = () => _getUserPool().getCurrentUser()
 export const login = (Username, Password) =>
   new Promise((resolve, reject) => {
     _cognitoUser = _newCognitoUser(Username)
-    _cognitoUser.authenticateUser(
-      new AuthenticationDetails({ Username, Password }),
-      _cognitoCallbacks(resolve, reject),
-    )
+    _cognitoUser.authenticateUser(new AuthenticationDetails({ Username, Password }), _cognitoCallbacks(resolve, reject))
   })
 
 export const acceptInvitation = (name, password) =>
@@ -82,11 +74,7 @@ export const forgotPassword = username =>
 
 export const resetPassword = (verificationCode, password) =>
   new Promise((resolve, reject) => {
-    _cognitoUser.confirmPassword(
-      verificationCode,
-      password,
-      _cognitoCallbacks(resolve, reject),
-    )
+    _cognitoUser.confirmPassword(verificationCode, password, _cognitoCallbacks(resolve, reject))
   })
 
 /**

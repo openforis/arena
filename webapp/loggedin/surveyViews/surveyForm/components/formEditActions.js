@@ -12,10 +12,7 @@ const FormEditActions = ({ history, createRecord }) => {
 
   return (
     <div className="survey-form-header__actions">
-      <button
-        className="btn-s btn-transparent"
-        onClick={() => createRecord(history, true)}
-      >
+      <button className="btn-s btn-transparent" onClick={() => createRecord(history, true)}>
         <span className="icon icon-eye icon-12px icon-left" />
         {i18n.t('surveyForm.formEditActions.preview')}
       </button>

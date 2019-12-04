@@ -18,10 +18,7 @@ const TaxaTableRow = props => {
         const vernacularNames = Taxon.getVernacularNamesByLang(lang)(taxon)
         return (
           <div key={`${Taxon.getUuid(taxon)}_vernacular_name_${lang}`}>
-            {R.pipe(
-              R.map(TaxonVernacularName.getName),
-              R.join(TaxonVernacularName.NAMES_SEPARATOR),
-            )(vernacularNames)}
+            {R.pipe(R.map(TaxonVernacularName.getName), R.join(TaxonVernacularName.NAMES_SEPARATOR))(vernacularNames)}
           </div>
         )
       })}

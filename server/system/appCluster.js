@@ -62,9 +62,7 @@ export const run = async () => {
 
   // ====== server
   const server = app.listen(ProcessUtils.ENV.port, () => {
-    logger.info(
-      `server initialization end - listening on port ${ProcessUtils.ENV.port}`,
-    )
+    logger.info(`server initialization end - listening on port ${ProcessUtils.ENV.port}`)
   })
 
   // ====== socket middleware

@@ -20,12 +20,7 @@ export const toString = (expr, exprMode = modes.json) => {
   const string = ExpressionUtils.toString(expr)
 
   return exprMode === modes.sql
-    ? R.pipe(
-        R.replace(/&&/g, 'AND'),
-        R.replace(/\|\|/g, 'OR'),
-        R.replace(/==/g, '='),
-        R.replace(/!=/g, '!='),
-      )(string)
+    ? R.pipe(R.replace(/&&/g, 'AND'), R.replace(/\|\|/g, 'OR'), R.replace(/==/g, '='), R.replace(/!=/g, '!='))(string)
     : string
 }
 
@@ -45,8 +40,7 @@ export const fromString = (string, exprMode = modes.json) => {
   return jsep(exprString)
 }
 
-export const evalString = (query, ctx) =>
-  Evaluator.evalExpression(fromString(query), ctx)
+export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
 
 export const isValid = ExpressionUtils.isValid
 export const getExpressionIdentifiers = Evaluator.getExpressionIdentifiers

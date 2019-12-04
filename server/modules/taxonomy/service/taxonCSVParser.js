@@ -20,13 +20,7 @@ export default class TaxonCSVParser {
   }
 
   async parseTaxon(row) {
-    const {
-      family,
-      genus,
-      scientific_name: scientificName,
-      code,
-      ...vernacularNamesByLang
-    } = row
+    const { family, genus, scientific_name: scientificName, code, ...vernacularNamesByLang } = row
 
     const taxon = Taxon.newTaxon(
       this.taxonomyUuid,
@@ -46,12 +40,7 @@ export default class TaxonCSVParser {
     // validate taxon uniqueness among inserted values
     if (Validation.isValid(validation)) {
       const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
-      this._addValueToIndex(
-        Taxon.propKeys.code,
-        code,
-        Validation.messageKeys.taxonomyEdit.codeDuplicate,
-        validation,
-      )
+      this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
 
       const scientificName = Taxon.getScientificName(taxon)
       this._addValueToIndex(
@@ -96,15 +85,8 @@ export default class TaxonCSVParser {
           R.always(accVernacularNames),
           R.pipe(
             R.split(TaxonVernacularName.NAMES_SEPARATOR),
-            R.map(name =>
-              TaxonVernacularName.newTaxonVernacularName(
-                langCode,
-                StringUtils.trim(name),
-              ),
-            ),
-            R.ifElse(R.isEmpty, R.always(accVernacularNames), names =>
-              R.assoc(langCode, names)(accVernacularNames),
-            ),
+            R.map(name => TaxonVernacularName.newTaxonVernacularName(langCode, StringUtils.trim(name))),
+            R.ifElse(R.isEmpty, R.always(accVernacularNames), names => R.assoc(langCode, names)(accVernacularNames)),
           ),
         )(nameOriginal),
       {},

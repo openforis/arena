@@ -2,13 +2,7 @@ import React from 'react'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-const NodeDeleteButton = ({
-  nodeDef,
-  node,
-  disabled = false,
-  showConfirm = true,
-  removeNode,
-}) => {
+const NodeDeleteButton = ({ nodeDef, node, disabled = false, showConfirm = true, removeNode }) => {
   const i18n = useI18n()
 
   return (

@@ -15,18 +15,10 @@ import * as RecordsSummaryState from './recordsSummaryState'
 
 import { fetchRecordsSummary } from './actions'
 
-const formatDate = dateStr =>
-  dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : ''
+const formatDate = dateStr => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : '')
 
 const RecordsSummary = props => {
-  const {
-    surveyCycleKey,
-    timeRange,
-    from,
-    to,
-    counts,
-    fetchRecordsSummary,
-  } = props
+  const { surveyCycleKey, timeRange, from, to, counts, fetchRecordsSummary } = props
 
   const i18n = useI18n()
 
@@ -82,9 +74,7 @@ const RecordsSummary = props => {
         </div>
       </div>
 
-      {from && to && (
-        <RecordsSummaryChart counts={counts} from={from} to={to} />
-      )}
+      {from && to && <RecordsSummaryChart counts={counts} from={from} to={to} />}
     </div>
   )
 }

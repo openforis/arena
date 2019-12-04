@@ -28,15 +28,10 @@ const NavigationButton = props => {
 
   const [showChildren, setShowChildren] = useState(level === 0)
 
-  const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(
-    surveyCycleKey,
-  )(childDefs)
+  const outerPageChildDefs = NodeDefLayout.filterNodeDefsWithPage(surveyCycleKey)(childDefs)
 
   return (
-    <div
-      className={`survey-form__node-def-nav level${level}`}
-      style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}
-    >
+    <div className={`survey-form__node-def-nav level${level}`} style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}>
       <div className="display-flex">
         {outerPageChildDefs.length > 0 ? (
           <button
@@ -88,16 +83,10 @@ const mapStateToProps = (state, props) => {
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
 
     active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
-    enabled:
-      edit ||
-      NodeDef.isRoot(nodeDef) ||
-      rootNodeDef.id === nodeDef.parentId ||
-      parentNode,
+    enabled: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
   }
 }
 
-const FormPageNavigation = connect(mapStateToProps, { setFormActivePage })(
-  NavigationButton,
-)
+const FormPageNavigation = connect(mapStateToProps, { setFormActivePage })(NavigationButton)
 
 export default FormPageNavigation

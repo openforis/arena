@@ -36,9 +36,7 @@ export default class FileZip {
   }
 
   getEntryData(entryName) {
-    return this.hasEntry(entryName)
-      ? this.streamZip.entryDataSync(entryName)
-      : null
+    return this.hasEntry(entryName) ? this.streamZip.entryDataSync(entryName) : null
   }
 
   getEntryAsText(entryName) {
@@ -49,9 +47,7 @@ export default class FileZip {
   async getEntryStream(entryName) {
     return this.hasEntry(entryName)
       ? new Promise((resolve, reject) =>
-          this.streamZip.stream(entryName, (err, stm) =>
-            err ? reject(err) : resolve(stm),
-          ),
+          this.streamZip.stream(entryName, (err, stm) => (err ? reject(err) : resolve(stm))),
         )
       : null
   }

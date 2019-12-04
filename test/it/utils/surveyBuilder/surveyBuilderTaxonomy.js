@@ -16,9 +16,7 @@ export class TaxonomyBuilder {
       [Taxonomy.keysProps.name]: this.name,
     })
 
-    const taxa = this.taxonBuilders.map(taxonBuilder =>
-      taxonBuilder.build(taxonomy),
-    )
+    const taxa = this.taxonBuilders.map(taxonBuilder => taxonBuilder.build(taxonomy))
 
     return {
       taxonomy,

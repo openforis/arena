@@ -10,17 +10,11 @@ export const ModalClose = ({ _children, onClose }) => (
   </div>
 )
 
-export const ModalHeader = ({ children }) => (
-  <div className="modal-header">{children}</div>
-)
+export const ModalHeader = ({ children }) => <div className="modal-header">{children}</div>
 
-export const ModalBody = ({ children }) => (
-  <div className="modal-body">{children}</div>
-)
+export const ModalBody = ({ children }) => <div className="modal-body">{children}</div>
 
-export const ModalFooter = ({ children }) => (
-  <div className="modal-footer">{children}</div>
-)
+export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
 
 export class Modal extends React.Component {
   constructor(props) {
@@ -50,12 +44,7 @@ export class Modal extends React.Component {
     const { children, isOpen = true, className = '' } = this.props
 
     return R.propEq('closed', true)(this.state) ? null : (
-      <div
-        className={`modal ${className}`}
-        tabIndex="-1"
-        role="dialog"
-        style={{ display: isOpen ? 'block' : 'none' }}
-      >
+      <div className={`modal ${className}`} tabIndex="-1" role="dialog" style={{ display: isOpen ? 'block' : 'none' }}>
         <div className="modal-content">{children}</div>
       </div>
     )

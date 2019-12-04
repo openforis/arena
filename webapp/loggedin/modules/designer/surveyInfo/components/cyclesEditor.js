@@ -17,39 +17,15 @@ const DateEditor = ({ date, onChange }) => {
   const monthRef = useRef(null)
   const dayRef = useRef(null)
 
-  const onChangeDate = () =>
-    onChange(
-      `${yearRef.current.value}-${monthRef.current.value}-${dayRef.current.value}`,
-    )
+  const onChangeDate = () => onChange(`${yearRef.current.value}-${monthRef.current.value}-${dayRef.current.value}`)
 
   return (
     <span className="date">
-      <input
-        type="text"
-        ref={yearRef}
-        size="4"
-        maxLength="4"
-        value={year}
-        onChange={onChangeDate}
-      />
+      <input type="text" ref={yearRef} size="4" maxLength="4" value={year} onChange={onChangeDate} />
       -
-      <input
-        type="text"
-        ref={monthRef}
-        size="2"
-        maxLength="2"
-        value={month}
-        onChange={onChangeDate}
-      />
+      <input type="text" ref={monthRef} size="2" maxLength="2" value={month} onChange={onChangeDate} />
       -
-      <input
-        type="text"
-        ref={dayRef}
-        size="2"
-        maxLength="2"
-        value={day}
-        onChange={onChangeDate}
-      />
+      <input type="text" ref={dayRef} size="2" maxLength="2" value={day} onChange={onChangeDate} />
     </span>
   )
 }
@@ -57,25 +33,12 @@ const DateEditor = ({ date, onChange }) => {
 const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
   <div className="date-container">
     <span className="date-label">{i18n.t(keyLabel)}</span>
-    {readOnly ? (
-      <span className="date">{date}</span>
-    ) : (
-      <DateEditor date={date} onChange={onChange} />
-    )}
+    {readOnly ? <span className="date">{date}</span> : <DateEditor date={date} onChange={onChange} />}
   </div>
 )
 
 const CycleEditor = props => {
-  const {
-    cycleKey,
-    cycle,
-    i18n,
-    readOnly,
-    validation,
-    canDelete,
-    onChange,
-    onDelete,
-  } = props
+  const { cycleKey, cycle, i18n, readOnly, validation, canDelete, onChange, onDelete } = props
 
   const stepNum = Number(cycleKey) + 1
 
@@ -143,14 +106,8 @@ const CyclesEditor = props => {
             i18n={i18n}
             readOnly={readOnly}
             validation={Validation.getFieldValidation(cycleKey)(validation)}
-            onChange={cycleUpdate =>
-              setCycles(R.assoc(cycleKey, cycleUpdate)(cycles))
-            }
-            canDelete={
-              !readOnly &&
-              cycleKey !== Survey.cycleOneKey &&
-              i === cycleEntries.length - 1
-            }
+            onChange={cycleUpdate => setCycles(R.assoc(cycleKey, cycleUpdate)(cycles))}
+            canDelete={!readOnly && cycleKey !== Survey.cycleOneKey && i === cycleEntries.length - 1}
             onDelete={onDelete}
           />
         ))}
@@ -158,11 +115,7 @@ const CyclesEditor = props => {
         {!readOnly && (
           <button
             className="btn-s btn-add"
-            onClick={() =>
-              setCycles(
-                R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles),
-              )
-            }
+            onClick={() => setCycles(R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles))}
           >
             <span className="icon icon-plus icon-10px" />
           </button>

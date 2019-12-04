@@ -52,12 +52,7 @@ const SurveyInfoView = props => {
           />
         </div>
 
-        <LabelsEditor
-          readOnly={readOnly}
-          languages={languages}
-          labels={labels}
-          onChange={setLabels}
-        />
+        <LabelsEditor readOnly={readOnly} languages={languages} labels={labels} onChange={setLabels} />
 
         <LabelsEditor
           readOnly={readOnly}
@@ -67,20 +62,11 @@ const SurveyInfoView = props => {
           onChange={setDescriptions}
         />
 
-        <LanguagesEditor
-          readOnly={readOnly}
-          languages={languages}
-          setLanguages={setLanguages}
-        />
+        <LanguagesEditor readOnly={readOnly} languages={languages} setLanguages={setLanguages} />
 
         <div className="form-item">
           <label className="form-label">{i18n.t('common.srs')}</label>
-          <SrsEditor
-            readOnly={readOnly}
-            srs={srs}
-            setSrs={setSrs}
-            validation={getFieldValidation('srs')}
-          />
+          <SrsEditor readOnly={readOnly} srs={srs} setSrs={setSrs} validation={getFieldValidation('srs')} />
         </div>
 
         <div className="form-item">
@@ -116,6 +102,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { updateSurveyInfoProps })(
-  SurveyInfoView,
-)
+export default connect(mapStateToProps, { updateSurveyInfoProps })(SurveyInfoView)

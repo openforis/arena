@@ -4,10 +4,7 @@ import * as R from 'ramda'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import InputChips from '@webapp/commonComponents/form/inputChips'
 
-import {
-  getLanguageLabel,
-  languages as appLanguages,
-} from '@core/app/languages'
+import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
 
 const LanguagesEditor = props => {
   const { languages, setLanguages, readOnly } = props
@@ -21,9 +18,7 @@ const LanguagesEditor = props => {
 
   return (
     <div className="form-item">
-      <label className="form-label">
-        {i18n.t('languagesEditor.languages')}
-      </label>
+      <label className="form-label">{i18n.t('languagesEditor.languages')}</label>
 
       <InputChips
         items={appLanguages}

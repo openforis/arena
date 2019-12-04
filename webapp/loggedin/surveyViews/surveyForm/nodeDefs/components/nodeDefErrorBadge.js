@@ -51,10 +51,7 @@ const mapStateToProps = (state, props) => {
     const survey = SurveyState.getSurvey(state)
     validation = Survey.getNodeDefValidation(nodeDef)(survey)
   } else {
-    const recordValidation = R.pipe(
-      RecordState.getRecord,
-      Record.getValidation,
-    )(state)
+    const recordValidation = R.pipe(RecordState.getRecord, Record.getValidation)(state)
 
     if (NodeDef.isMultiple(nodeDef)) {
       // Showing validation for a single node instance of multiple nodeDef
@@ -62,21 +59,13 @@ const mapStateToProps = (state, props) => {
         validation = RecordValidation.getNodeValidation(node)(recordValidation)
       } else if (NodeDef.isEntity(nodeDef)) {
         // Only entities can have children with min/max count validation
-        const fieldValidation = Validation.getFieldValidation(
-          Node.getUuid(parentNode),
-        )(recordValidation)
-        validation = RecordValidation.getValidationChildrenCount(
-          NodeDef.getUuid(nodeDef),
-        )(fieldValidation)
+        const fieldValidation = Validation.getFieldValidation(Node.getUuid(parentNode))(recordValidation)
+        validation = RecordValidation.getValidationChildrenCount(NodeDef.getUuid(nodeDef))(fieldValidation)
       } else if (!R.all(Validation.isValid)(nodes)) {
-        validation = Validation.newInstance(false, {}, [
-          { key: Validation.messageKeys.record.oneOrMoreInvalidValues },
-        ])
+        validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])
       }
     } else if (!R.isEmpty(nodes)) {
-      validation = RecordValidation.getNodeValidation(nodes[0])(
-        recordValidation,
-      )
+      validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
     }
   }
 

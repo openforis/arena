@@ -11,14 +11,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 const TaxonomyEditHeader = props => {
-  const {
-    surveyId,
-    taxonomy,
-    taxa,
-    canEdit,
-    putTaxonomyProp,
-    uploadTaxonomyFile,
-  } = props
+  const { surveyId, taxonomy, taxa, canEdit, putTaxonomyProp, uploadTaxonomyFile } = props
   const i18n = useI18n()
   const validation = Validation.getValidation(taxonomy)
 
@@ -29,13 +22,7 @@ const TaxonomyEditHeader = props => {
           <Input
             value={Taxonomy.getName(taxonomy)}
             validation={Validation.getFieldValidation('name')(validation)}
-            onChange={value =>
-              putTaxonomyProp(
-                taxonomy,
-                'name',
-                StringUtils.normalizeName(value),
-              )
-            }
+            onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
             readOnly={!canEdit}
           />
         </div>
@@ -52,9 +39,7 @@ const TaxonomyEditHeader = props => {
           />
         )}
         <DownloadButton
-          href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(
-            taxonomy,
-          )}/export?draft=${canEdit}`}
+          href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=${canEdit}`}
           disabled={R.isEmpty(taxa)}
           label={i18n.t('common.csvExport')}
         />

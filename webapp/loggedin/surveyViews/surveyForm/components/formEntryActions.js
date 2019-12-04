@@ -8,29 +8,16 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import {
-  deleteRecord,
-  deleteRecordUuidPreview,
-  updateRecordStep,
-} from '../../record/actions'
+import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '../../record/actions'
 
 import * as RecordState from '../../record/recordState'
 
 const RecordEntryButtons = props => {
-  const {
-    history,
-    step,
-    stepNext,
-    stepPrev,
-    valid,
-    deleteRecord,
-    updateRecordStep,
-  } = props
+  const { history, step, stepNext, stepPrev, valid, deleteRecord, updateRecordStep } = props
 
   const i18n = useI18n()
 
-  const getStepLabel = step =>
-    i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
+  const getStepLabel = step => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
 
   return (
     <React.Fragment>
@@ -83,9 +70,7 @@ const RecordEntryButtons = props => {
       <button
         className="btn-s btn-danger"
         onClick={() =>
-          window.confirm(i18n.t('surveyForm.formEntryActions.confirmDelete'))
-            ? deleteRecord(history)
-            : null
+          window.confirm(i18n.t('surveyForm.formEntryActions.confirmDelete')) ? deleteRecord(history) : null
         }
         aria-disabled={false}
       >
@@ -114,10 +99,7 @@ const FormEntryActions = props => {
   return (
     <div className="survey-form-header__actions">
       {preview ? (
-        <button
-          className="btn-s btn-transparent"
-          onClick={deleteRecordUuidPreview}
-        >
+        <button className="btn-s btn-transparent" onClick={deleteRecordUuidPreview}>
           <span className="icon icon-eye-blocked icon-12px icon-left" />
           {i18n.t('surveyForm.formEntryActions.closePreview')}
         </button>

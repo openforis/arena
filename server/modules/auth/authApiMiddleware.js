@@ -55,43 +55,19 @@ const requireUserPermission = permissionFn => async (req, res, next) => {
 }
 
 // Survey
-export const requireSurveyViewPermission = requireSurveyPermission(
-  Authorizer.canViewSurvey,
-)
-export const requireSurveyEditPermission = requireSurveyPermission(
-  Authorizer.canEditSurvey,
-)
-export const requireRecordCleansePermission = requireSurveyPermission(
-  Authorizer.canCleanseRecords,
-)
+export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
+export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
+export const requireRecordCleansePermission = requireSurveyPermission(Authorizer.canCleanseRecords)
 
 // Record
-export const requireRecordListViewPermission = requireSurveyPermission(
-  Authorizer.canViewSurvey,
-)
-export const requireRecordCreatePermission = requireSurveyPermission(
-  Authorizer.canCreateRecord,
-)
-export const requireRecordEditPermission = requireRecordPermission(
-  Authorizer.canEditRecord,
-)
-export const requireRecordViewPermission = requireSurveyPermission(
-  Authorizer.canViewRecord,
-)
-export const requireRecordAnalysisPermission = requireSurveyPermission(
-  Authorizer.canAnalyzeRecords,
-)
+export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
+export const requireRecordCreatePermission = requireSurveyPermission(Authorizer.canCreateRecord)
+export const requireRecordEditPermission = requireRecordPermission(Authorizer.canEditRecord)
+export const requireRecordViewPermission = requireSurveyPermission(Authorizer.canViewRecord)
+export const requireRecordAnalysisPermission = requireSurveyPermission(Authorizer.canAnalyzeRecords)
 
 // User
-export const requireUserInvitePermission = requireSurveyPermission(
-  Authorizer.canInviteUsers,
-)
-export const requireUserViewPermission = requireUserPermission(
-  Authorizer.canViewUser,
-)
-export const requireUserEditPermission = requireUserPermission(
-  Authorizer.canEditUser,
-)
-export const requireUserRemovePermission = requireUserPermission(
-  Authorizer.canRemoveUser,
-)
+export const requireUserInvitePermission = requireSurveyPermission(Authorizer.canInviteUsers)
+export const requireUserViewPermission = requireUserPermission(Authorizer.canViewUser)
+export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
+export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)

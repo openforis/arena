@@ -23,8 +23,7 @@ const createParams = lang => ({
 
 export const createI18nPromise = lang => {
   // Import and require return different objects
-  const createInstance =
-    i18next.createInstance || i18next.default.createInstance
+  const createInstance = i18next.createInstance || i18next.default.createInstance
 
   return new Promise((resolve, reject) => {
     createInstance(createParams(lang), (err, t) => {

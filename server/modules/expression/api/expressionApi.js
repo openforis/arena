@@ -32,12 +32,7 @@ export const init = app => {
       if (NodeDef.nodeDefType.code === type) {
         const { categoryUuid, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(
-          surveyId,
-          categoryUuid,
-          0,
-          true,
-        )
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
 
         const item = R.pipe(
           R.find(item => CategoryItem.getCode(item) === value),
@@ -48,12 +43,7 @@ export const init = app => {
       } else if (NodeDef.nodeDefType.taxon === type) {
         const { taxonomyUuid } = Request.getParams(req)
 
-        const itemDb = await TaxonomyManager.fetchTaxonByCode(
-          surveyId,
-          taxonomyUuid,
-          value,
-          true,
-        )
+        const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
 
         res.json({ item: toItem(type)(itemDb) })
       } else {
@@ -69,16 +59,9 @@ export const init = app => {
       const { surveyId, type, value } = Request.getParams(req)
 
       if (NodeDef.nodeDefType.code === type) {
-        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(
-          req,
-        )
+        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(
-          surveyId,
-          categoryUuid,
-          categoryLevelIndex,
-          true,
-        )
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
 
         const items = R.pipe(
           R.ifElse(
@@ -98,12 +81,7 @@ export const init = app => {
       } else if (NodeDef.nodeDefType.taxon === type) {
         const { taxonomyUuid } = Request.getParams(req)
 
-        const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(
-          surveyId,
-          taxonomyUuid,
-          value,
-          true,
-        )
+        const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, value, true)
 
         const items = itemsDb.map(toItem(type))
 

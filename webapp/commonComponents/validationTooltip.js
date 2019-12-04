@@ -10,26 +10,14 @@ const ValidationTooltip = props => {
 
   const isValid = Validation.isValid(validation)
 
-  const type = Validation.isError(validation)
-    ? 'error'
-    : Validation.isWarning(validation)
-    ? 'warning'
-    : ''
+  const type = Validation.isError(validation) ? 'error' : Validation.isWarning(validation) ? 'warning' : ''
 
-  const content = isValid
-    ? null
-    : React.createElement(ValidationFieldMessages, { validation, showKeys })
+  const content = isValid ? null : React.createElement(ValidationFieldMessages, { validation, showKeys })
 
-  const showContent =
-    Validation.isWarning(validation) || Validation.isError(validation)
+  const showContent = Validation.isWarning(validation) || Validation.isError(validation)
 
   return (
-    <Tooltip
-      type={type}
-      messageComponent={content}
-      className={className}
-      showContent={showContent}
-    >
+    <Tooltip type={type} messageComponent={content} className={className} showContent={showContent}>
       {children}
     </Tooltip>
   )

@@ -71,10 +71,7 @@ export const recalculateValidity = validation =>
     fields => {
       const errors = getErrors(validation)
       const warnings = getWarnings(validation)
-      const valid =
-        R.all(isValid, R.values(fields)) &&
-        R.isEmpty(errors) &&
-        R.isEmpty(warnings)
+      const valid = R.all(isValid, R.values(fields)) && R.isEmpty(errors) && R.isEmpty(warnings)
       return newInstance(valid, fields, errors, warnings)
     },
   )(validation)
@@ -113,12 +110,7 @@ export const updateCounts = validation => {
 
 // ====== CREATE
 
-export const newInstance = (
-  valid = true,
-  fields = {},
-  errors = [],
-  warnings = [],
-) => ({
+export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
   [keys.valid]: valid,
   [keys.fields]: fields,
   [keys.errors]: errors,
@@ -129,20 +121,17 @@ export const newInstance = (
 
 export const isValid = R.propOr(true, keys.valid)
 export const getFieldValidations = R.propOr({}, keys.fields)
-export const getFieldValidation = field =>
-  R.pathOr(newInstance(), [keys.fields, field])
+export const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
 
 export const getErrors = R.propOr([], keys.errors)
 export const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
 export const isError = validation =>
-  hasErrors(validation) ||
-  R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
+  hasErrors(validation) || R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
 
 export const getWarnings = R.propOr([], keys.warnings)
 export const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
 export const isWarning = validation =>
-  hasWarnings(validation) ||
-  R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
+  hasWarnings(validation) || R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
 
 export const getCounts = R.propOr({}, keys.counts)
 export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
@@ -151,23 +140,18 @@ export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
 // ====== UPDATE
 
 export const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
-export const setField = (field, fieldValidation) =>
-  ObjectUtils.setInPath([keys.fields, field], fieldValidation)
+export const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
 export const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
 
 export const assocFieldValidation = (field, fieldValidation) =>
   R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
 
-export const dissocFieldValidation = field =>
-  R.pipe(R.dissocPath([keys.fields, field]), cleanup)
+export const dissocFieldValidation = field => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
 
 export const mergeValidation = validationNew => validationOld =>
   R.pipe(
     validation => ({
-      [keys.fields]: R.mergeDeepRight(
-        getFieldValidations(validation),
-        getFieldValidations(validationNew),
-      ),
+      [keys.fields]: R.mergeDeepRight(getFieldValidations(validation), getFieldValidations(validationNew)),
     }),
     cleanup,
   )(validationOld)

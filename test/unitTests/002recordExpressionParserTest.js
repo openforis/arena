@@ -28,11 +28,7 @@ describe('RecordExpressionParser Test', () => {
       ),
     ).build()
 
-    record = RB.record(
-      user,
-      survey,
-      RB.entity('cluster', RB.attribute('tree', 12), RB.attribute('dbh', 18)),
-    ).build()
+    record = RB.record(user, survey, RB.entity('cluster', RB.attribute('tree', 12), RB.attribute('dbh', 18))).build()
 
     // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
     node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)

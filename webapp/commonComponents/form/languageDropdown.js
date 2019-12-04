@@ -10,9 +10,7 @@ const LanguageDropdown = props => {
 
   const i18n = useI18n()
 
-  const selectedItem = selection
-    ? { key: selection, value: getLanguageLabel(selection) }
-    : null
+  const selectedItem = selection ? { key: selection, value: getLanguageLabel(selection) } : null
 
   return (
     <Dropdown

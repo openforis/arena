@@ -17,15 +17,11 @@ const NodeDefEntitySwitch = props => {
   const { surveyCycleKey, nodeDef } = props
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 
-  return (
-    renderType && React.createElement(componentsByRenderType[renderType], props)
-  )
+  return renderType && React.createElement(componentsByRenderType[renderType], props)
 }
 
 const mapStateToProps = (state, props) => ({
-  childDefs: Survey.getNodeDefChildren(props.nodeDef)(
-    SurveyState.getSurvey(state),
-  ),
+  childDefs: Survey.getNodeDefChildren(props.nodeDef)(SurveyState.getSurvey(state)),
 })
 
 export default connect(mapStateToProps)(NodeDefEntitySwitch)

@@ -18,8 +18,7 @@ const keys = {
 
 const getState = R.pipe(AnalysisState.getState, R.prop(stateKey))
 
-const _getStep = (stepKey, defaultTo = null) =>
-  R.pipe(getState, R.propOr(defaultTo, stepKey))
+const _getStep = (stepKey, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, stepKey))
 
 export const getProcessingStep = _getStep(keys.step, {})
 
@@ -42,11 +41,7 @@ export const getProcessingStepCalculationForEdit = state =>
 
 // ====== UPDATE
 
-export const assocProcessingStep = (
-  processingStep,
-  processingStepPrev,
-  processingStepNext,
-) =>
+export const assocProcessingStep = (processingStep, processingStepPrev, processingStepNext) =>
   R.pipe(
     R.assoc(keys.step, processingStep),
     R.assoc(keys.stepPrev, processingStepPrev),
@@ -58,8 +53,7 @@ const _updateProcessingStep = updateFn => processingStepState =>
     R.assoc(keys.step, processingStepUpdate, processingStepState),
   )(processingStepState)
 
-export const mergeProcessingStepProps = props =>
-  _updateProcessingStep(ProcessingStep.mergeProps(props))
+export const mergeProcessingStepProps = props => _updateProcessingStep(ProcessingStep.mergeProps(props))
 
 export const assocCalculationUuidForEdit = R.assoc(keys.calculationUuidForEdit)
 
@@ -69,20 +63,10 @@ export const assocCalculation = calculation =>
     assocCalculationUuidForEdit(ProcessingStepCalculation.getUuid(calculation)),
   )
 
-export const updateCalculationIndex = (
-  indexFrom,
-  indexTo,
-) => processingStepState =>
-  R.pipe(
-    R.prop(keys.step),
-    ProcessingStep.getCalculationSteps,
-    R.move(indexFrom, indexTo),
-    calculations => {
-      const calculationsUpdate = calculations.map((calculation, idx) =>
-        ProcessingStepCalculation.assocIndex(idx)(calculation),
-      )
-      return _updateProcessingStep(
-        ProcessingStep.assocCalculations(calculationsUpdate),
-      )(processingStepState)
-    },
-  )(processingStepState)
+export const updateCalculationIndex = (indexFrom, indexTo) => processingStepState =>
+  R.pipe(R.prop(keys.step), ProcessingStep.getCalculationSteps, R.move(indexFrom, indexTo), calculations => {
+    const calculationsUpdate = calculations.map((calculation, idx) =>
+      ProcessingStepCalculation.assocIndex(idx)(calculation),
+    )
+    return _updateProcessingStep(ProcessingStep.assocCalculations(calculationsUpdate))(processingStepState)
+  })(processingStepState)

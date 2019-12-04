@@ -12,16 +12,7 @@ const checkFilesSize = (files, maxSizeMB) =>
 const UploadButton = props => {
   const i18n = useI18n()
 
-  const {
-    label = i18n.t('common.upload'),
-    disabled,
-    showLabel,
-    showIcon,
-    maxSize,
-    accept,
-    onChange,
-    className,
-  } = props
+  const { label = i18n.t('common.upload'), disabled, showLabel, showIcon, maxSize, accept, onChange, className } = props
 
   const fileInput = useRef(null)
 
@@ -49,13 +40,7 @@ const UploadButton = props => {
           fileInput.current.dispatchEvent(new MouseEvent('click'))
         }}
       >
-        {showIcon && (
-          <span
-            className={`icon icon-upload2 icon-14px${
-              showLabel ? ' icon-left' : ''
-            }`}
-          />
-        )}
+        {showIcon && <span className={`icon icon-upload2 icon-14px${showLabel ? ' icon-left' : ''}`} />}
         {showLabel && label}
       </button>
     </React.Fragment>

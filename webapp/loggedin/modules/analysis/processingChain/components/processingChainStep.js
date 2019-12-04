@@ -13,27 +13,14 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { navigateToProcessingStepView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainStep = props => {
-  const {
-    history,
-    processingStep,
-    lang,
-    entity,
-    navigateToProcessingStepView,
-  } = props
+  const { history, processingStep, lang, entity, navigateToProcessingStepView } = props
 
   return (
     <div
       className="processing-chain__step"
-      onClick={() =>
-        navigateToProcessingStepView(
-          history,
-          ProcessingStep.getUuid(processingStep),
-        )
-      }
+      onClick={() => navigateToProcessingStepView(history, ProcessingStep.getUuid(processingStep))}
     >
-      <div className="processing-chain__step-index">
-        {ProcessingStep.getIndex(processingStep) + 1}
-      </div>
+      <div className="processing-chain__step-index">{ProcessingStep.getIndex(processingStep) + 1}</div>
       <div className="processing-chain__step-content">
         <div>{entity && NodeDef.getLabel(entity, lang)}</div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />
@@ -51,6 +38,4 @@ const mapStateToProps = (state, { processingStep }) => {
   }
 }
 
-export default connect(mapStateToProps, { navigateToProcessingStepView })(
-  ProcessingChainStep,
-)
+export default connect(mapStateToProps, { navigateToProcessingStepView })(ProcessingChainStep)

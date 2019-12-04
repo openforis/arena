@@ -38,16 +38,10 @@ const FormHeader = props => {
         <button
           className="btn-s survey-form-header__btn-page-toggle"
           onClick={toggleFormPageNavigation}
-          title={i18n.t(
-            `surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`,
-          )}
+          title={i18n.t(`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`)}
         >
           <span className="icon icon-stack icon-12px icon-left" />
-          <span
-            className={`icon icon-${
-              showPageNavigation ? 'shrink2' : 'enlarge2'
-            } icon-12px icon-left`}
-          />
+          <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px icon-left`} />
         </button>
 
         <h5>{nodeDefPageLabel}</h5>

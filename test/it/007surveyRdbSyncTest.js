@@ -19,10 +19,7 @@ const expectSchemaToExist = async (schemaName, exists = true) => {
     `,
     [schemaName],
   )
-  expect(
-    result.res,
-    `schema ${schemaName} ${exists ? 'exists' : 'not exists'}`,
-  ).to.equal(exists)
+  expect(result.res, `schema ${schemaName} ${exists ? 'exists' : 'not exists'}`).to.equal(exists)
 }
 
 describe('Survey RDB Sync Test', () => {

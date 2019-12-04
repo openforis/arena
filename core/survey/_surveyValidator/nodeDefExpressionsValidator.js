@@ -14,18 +14,14 @@ import SystemError from '@core/systemError'
 
 const contextByDependencyTypeFns = {
   [Survey.dependencyTypes.defaultValues]: (survey, nodeDef) => nodeDef,
-  [Survey.dependencyTypes.applicable]: (survey, nodeDef) =>
-    Survey.getNodeDefParent(nodeDef)(survey),
+  [Survey.dependencyTypes.applicable]: (survey, nodeDef) => Survey.getNodeDefParent(nodeDef)(survey),
   [Survey.dependencyTypes.validations]: (survey, nodeDef) => nodeDef,
 }
 
 const expressionsByDependencyTypeFns = {
   [Survey.dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
   [Survey.dependencyTypes.applicable]: NodeDef.getApplicable,
-  [Survey.dependencyTypes.validations]: R.pipe(
-    NodeDef.getValidations,
-    NodeDefValidations.getExpressions,
-  ),
+  [Survey.dependencyTypes.validations]: R.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
 }
 
 const selfReferenceAllowedByDependencyType = {
@@ -41,18 +37,12 @@ const applyIfUniquenessByDependencyType = {
 }
 
 const errorKeyByDependencyType = {
-  [Survey.dependencyTypes.defaultValues]:
-    Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
-  [Survey.dependencyTypes.applicable]:
-    Validation.messageKeys.nodeDefEdit.applyIfInvalid,
-  [Survey.dependencyTypes.validations]:
-    Validation.messageKeys.nodeDefEdit.validationsInvalid,
+  [Survey.dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
+  [Survey.dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
+  [Survey.dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
 }
 
-const _getNodeValue = nodeDef =>
-  NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
-    ? { props: { code: '' } }
-    : 1 // Simulates node value
+const _getNodeValue = nodeDef => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value
 
 // Get reachable nodes, i.e. the children of the node's ancestors.
 // NOTE: The root node is excluded, but it _should_ be an entity, so that is fine.
@@ -68,16 +58,9 @@ const _getReachableNodeDefs = (survey, nodeDefContext) => {
   return reachableNodeDefs
 }
 
-const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (
-  expr,
-  _ctx,
-) => {
-  const nodeDefContext = contextByDependencyTypeFns[dependencyType](
-    survey,
-    nodeDefCurrent,
-  )
-  const selfReferenceAllowed =
-    selfReferenceAllowedByDependencyType[dependencyType]
+const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (expr, _ctx) => {
+  const nodeDefContext = contextByDependencyTypeFns[dependencyType](survey, nodeDefCurrent)
+  const selfReferenceAllowed = selfReferenceAllowedByDependencyType[dependencyType]
 
   const reachableNodeDefs = _getReachableNodeDefs(survey, nodeDefContext)
 
@@ -91,10 +74,7 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (
   }
 
   if (!selfReferenceAllowed && NodeDef.isEqual(def)(nodeDefCurrent)) {
-    throw new SystemError(
-      Validation.messageKeys.expressions.cannotUseCurrentNode,
-      { name: nodeName },
-    )
+    throw new SystemError(Validation.messageKeys.expressions.cannotUseCurrentNode, { name: nodeName })
   }
 
   if (!Expression.isValidExpressionType(def)) {
@@ -104,16 +84,8 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (
     })
   }
 
-  if (
-    Survey.isNodeDefDependentOn(
-      NodeDef.getUuid(def),
-      NodeDef.getUuid(nodeDefCurrent),
-    )(survey)
-  ) {
-    throw new SystemError(
-      Validation.messageKeys.expressions.circularDependencyError,
-      { name: nodeName },
-    )
+  if (Survey.isNodeDefDependentOn(NodeDef.getUuid(def), NodeDef.getUuid(nodeDefCurrent))(survey)) {
+    throw new SystemError(Validation.messageKeys.expressions.circularDependencyError, { name: nodeName })
   }
 
   return _getNodeValue(def)
@@ -121,11 +93,7 @@ const _identifierEval = (survey, nodeDefCurrent, dependencyType) => (
 
 const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
   const functions = {
-    [Expression.types.Identifier]: _identifierEval(
-      survey,
-      nodeDef,
-      dependencyType,
-    ),
+    [Expression.types.Identifier]: _identifierEval(survey, nodeDef, dependencyType),
   }
 
   try {
@@ -133,36 +101,24 @@ const _validateNodeDefExpr = async (survey, nodeDef, dependencyType, expr) => {
     await Expression.evalString(expr, { functions })
     return null
   } catch (error) {
-    const details = R.is(SystemError, error)
-      ? `$t(${error.key})`
-      : error.toString()
-    return ValidationResult.newInstance(
-      Validation.messageKeys.expressions.expressionInvalid,
-      { details, ...error.params },
-    )
+    const details = R.is(SystemError, error) ? `$t(${error.key})` : error.toString()
+    return ValidationResult.newInstance(Validation.messageKeys.expressions.expressionInvalid, {
+      details,
+      ...error.params,
+    })
   }
 }
 
-const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (
-  propName,
-  item,
-) => {
+const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
   const expr = R.pathOr(null, propName.split('.'), item)
-  return expr
-    ? await _validateNodeDefExpr(survey, nodeDef, dependencyType, expr)
-    : null
+  return expr ? await _validateNodeDefExpr(survey, nodeDef, dependencyType, expr) : null
 }
 
-const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (
-  propName,
-  nodeDefExpression,
-) => {
+const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName, nodeDefExpression) => {
   const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
   return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
     ? {
-        key:
-          Validation.messageKeys.nodeDefEdit
-            .expressionApplyIfOnlyLastOneCanBeEmpty,
+        key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty,
       }
     : null
 }
@@ -171,41 +127,28 @@ const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
   R.any(
     nodeDefExpr =>
       !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
-      NodeDefExpression.getExpression(nodeDefExpr) ===
-        NodeDefExpression.getExpression(nodeDefExpression) &&
-      NodeDefExpression.getApplyIf(nodeDefExpr) ===
-        NodeDefExpression.getApplyIf(nodeDefExpression),
+      NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
+      NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression),
   )(nodeDefExpressions)
-    ? Validation.newInstance(false, {}, [
-        { key: Validation.messageKeys.nodeDefEdit.expressionDuplicate },
-      ])
+    ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.expressionDuplicate }])
     : null
 
-const _validateExpression = async (
-  survey,
-  nodeDef,
-  dependencyType,
-  nodeDefExpressions,
-  index,
-) => {
+const _validateExpression = async (survey, nodeDef, dependencyType, nodeDefExpressions, index) => {
   const nodeDefExpression = nodeDefExpressions[index]
-  const validateApplyIfUniqueness =
-    applyIfUniquenessByDependencyType[dependencyType]
+  const validateApplyIfUniqueness = applyIfUniquenessByDependencyType[dependencyType]
 
   const validation = await Validator.validate(nodeDefExpression, {
     [NodeDefExpression.keys.expression]: [
-      Validator.validateRequired(
-        Validation.messageKeys.nodeDefEdit.expressionRequired,
-      ),
+      Validator.validateRequired(Validation.messageKeys.nodeDefEdit.expressionRequired),
       _validateExpressionProp(survey, nodeDef, dependencyType),
     ],
     [NodeDefExpression.keys.applyIf]: [
       _validateExpressionProp(survey, nodeDef, dependencyType),
       ...(validateApplyIfUniqueness
         ? [
-            Validator.validateItemPropUniqueness(
-              Validation.messageKeys.nodeDefEdit.applyIfDuplicate,
-            )(nodeDefExpressions),
+            Validator.validateItemPropUniqueness(Validation.messageKeys.nodeDefEdit.applyIfDuplicate)(
+              nodeDefExpressions,
+            ),
             _validateOnlyLastApplyIfEmpty(nodeDefExpressions, index),
           ]
         : []),
@@ -220,20 +163,12 @@ const _validateExpression = async (
 export const validate = async (survey, nodeDef, dependencyType) => {
   const result = Validation.newInstance()
 
-  const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](
-    nodeDef,
-  )
+  const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](nodeDef)
   const errorKey = errorKeyByDependencyType[dependencyType]
 
   const validations = await Promise.all(
     nodeDefExpressions.map((nodeDefExpression, index) =>
-      _validateExpression(
-        survey,
-        nodeDef,
-        dependencyType,
-        nodeDefExpressions,
-        index,
-      ),
+      _validateExpression(survey, nodeDef, dependencyType, nodeDefExpressions, index),
     ),
   )
 

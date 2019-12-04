@@ -13,23 +13,14 @@ export default class TaxonomiesValidationJob extends Job {
   }
 
   async execute() {
-    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(
-      this.surveyId,
-      true,
-      true,
-      this.tx,
-    )
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, this.tx)
 
     const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)
 
     if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
         (acc, taxonomy) =>
-          R.assoc(
-            Taxonomy.getName(taxonomy),
-            Validation.getFieldValidations(taxonomy.validation),
-            acc,
-          ),
+          R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
         {},
         invalidTaxonomies,
       )

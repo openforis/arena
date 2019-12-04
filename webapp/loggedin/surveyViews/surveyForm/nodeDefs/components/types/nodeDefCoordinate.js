@@ -35,16 +35,7 @@ const NodeDefCoordinate = props => {
     updateNode(nodeDef, node, newValue)
   }
 
-  const {
-    surveyInfo,
-    nodeDef,
-    nodes,
-    edit,
-    entry,
-    renderType,
-    canEditRecord,
-    readOnly,
-  } = props
+  const { surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -79,9 +70,7 @@ const NodeDefCoordinate = props => {
       itemKeyProp="code"
       itemLabelProp="name"
       selection={selectedSrs}
-      onChange={selection =>
-        handleInputChange(node, 'srs', R.prop('code')(selection))
-      }
+      onChange={selection => handleInputChange(node, 'srs', R.prop('code')(selection))}
     />
   )
 
@@ -97,12 +86,8 @@ const NodeDefCoordinate = props => {
 
   return (
     <div className="survey-form__node-def-coordinate">
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>
-        {xInput}
-      </FormItem>
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>
-        {yInput}
-      </FormItem>
+      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
+      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
       <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
     </div>
   )

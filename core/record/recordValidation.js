@@ -37,7 +37,4 @@ export const getValidationChildrenCount = childDefUuid =>
   )
 
 export const getNodeValidation = node =>
-  R.pipe(
-    Validation.getFieldValidation(Node.getUuid(node)),
-    Validation.dissocFieldValidation(keys.childrenCount),
-  )
+  R.pipe(Validation.getFieldValidation(Node.getUuid(node)), Validation.dissocFieldValidation(keys.childrenCount))

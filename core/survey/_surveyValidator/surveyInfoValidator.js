@@ -19,11 +19,7 @@ export const validateNewSurvey = async (survey, surveyInfos) =>
       Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       validateSurveyNameUniqueness(surveyInfos),
     ],
-    lang: [
-      Validator.validateRequired(
-        Validation.messageKeys.surveyInfoEdit.langRequired,
-      ),
-    ],
+    lang: [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
   })
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
@@ -33,24 +29,11 @@ export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
       Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       validateSurveyNameUniqueness(surveyInfos),
     ],
-    'props.languages': [
-      Validator.validateRequired(
-        Validation.messageKeys.surveyInfoEdit.langRequired,
-      ),
-    ],
-    'props.srs': [
-      Validator.validateRequired(
-        Validation.messageKeys.surveyInfoEdit.srsRequired,
-      ),
-    ],
+    'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
+    'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
   })
 
-  const cyclesValidation = await SurveyCyclesValidator.validateCycles(
-    Survey.getCycles(surveyInfo),
-  )
+  const cyclesValidation = await SurveyCyclesValidator.validateCycles(Survey.getCycles(surveyInfo))
 
-  return Validation.assocFieldValidation(
-    Survey.infoKeys.cycles,
-    cyclesValidation,
-  )(validation)
+  return Validation.assocFieldValidation(Survey.infoKeys.cycles, cyclesValidation)(validation)
 }

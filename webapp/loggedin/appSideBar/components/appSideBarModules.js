@@ -11,11 +11,7 @@ const AppSideBarModules = props => {
   const [modulePopupMenu, setModulePopupMenu] = useState(null)
 
   return (
-    <div
-      className={`app-sidebar__modules${
-        modulePopupMenu ? ' popup-menu-opened' : ''
-      }`}
-    >
+    <div className={`app-sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}>
       <div className="app-sidebar__module-placeholder" />
       {SideBarModule.getModulesHierarchy(user, surveyInfo).map(module => (
         <AppSideBarModule
@@ -24,11 +20,7 @@ const AppSideBarModules = props => {
           module={module}
           pathname={pathname}
           sideBarOpened={sideBarOpened}
-          isOver={
-            modulePopupMenu &&
-            SideBarModule.getKey(module) ===
-              SideBarModule.getKey(modulePopupMenu)
-          }
+          isOver={modulePopupMenu && SideBarModule.getKey(module) === SideBarModule.getKey(modulePopupMenu)}
           onMouseEnter={() => {
             setModulePopupMenu(module)
           }}

@@ -20,16 +20,12 @@ const TableColumn = props => {
   const colNames = NodeDefTable.getColNames(nodeDef)
   const isHeader = !row
   const isData = Boolean(row)
-  const noCols = editMode
-    ? NodeDefUIProps.getFormFields(nodeDef).length
-    : colNames.length
+  const noCols = editMode ? NodeDefUIProps.getFormFields(nodeDef).length : colNames.length
   const widthOuter = colWidth * noCols
   const widthInner = (1 / noCols) * 100 + '%'
 
   const getColKey = (nodeDef, col) => {
-    const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(
-      NodeDef.getType(nodeDef),
-    )}`
+    const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
     const colName = camelize(NodeDefTable.extractColName(nodeDef, col))
     return `surveyForm.${nodeDefTypePrefix}.${colName}`
   }
@@ -39,10 +35,7 @@ const TableColumn = props => {
       {isHeader && (
         <div className="width100">
           {editMode ? (
-            <NodeDefTableCellHeader
-              nodeDef={nodeDef}
-              label={NodeDef.getLabel(nodeDef, lang)}
-            />
+            <NodeDefTableCellHeader nodeDef={nodeDef} label={NodeDef.getLabel(nodeDef, lang)} />
           ) : (
             <div>{NodeDef.getLabel(nodeDef, lang)}</div>
           )}
@@ -51,11 +44,7 @@ const TableColumn = props => {
 
       {editMode ? (
         isData ? (
-          <TableColumnEdit
-            nodeDef={nodeDef}
-            record={row.record}
-            cell={row.cols[NodeDef.getUuid(nodeDef)]}
-          />
+          <TableColumnEdit nodeDef={nodeDef} record={row.record} cell={row.cols[NodeDef.getUuid(nodeDef)]} />
         ) : null
       ) : (
         <div className="table__inner-cell">
@@ -65,14 +54,8 @@ const TableColumn = props => {
                 {Object.prototype.hasOwnProperty.call(row, col) ? (
                   row[col]
                 ) : (
-                  <div
-                    style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}
-                  >
-                    <ProgressBar
-                      className="running progress-bar-striped"
-                      progress={100}
-                      showText={false}
-                    />
+                  <div style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}>
+                    <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
                   </div>
                 )}
               </div>

@@ -39,21 +39,10 @@ const SurveyInfo = props => {
         </Header>
 
         <div>
-          <Link
-            to={appModuleUri(homeModules.surveyInfo)}
-            className="btn-s btn-transparent"
-          >
+          <Link to={appModuleUri(homeModules.surveyInfo)} className="btn-s btn-transparent">
             <div className="triangle-left" />
-            <span
-              className={`icon icon-${
-                canEditDef ? 'pencil2' : 'eye'
-              } icon-12px icon-left`}
-            />
-            {i18n.t(
-              canEditDef
-                ? 'homeView.surveyInfo.editInfo'
-                : 'homeView.surveyInfo.viewInfo',
-            )}
+            <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`} />
+            {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
           {canEditDef && (
@@ -69,27 +58,20 @@ const SurveyInfo = props => {
           )}
 
           {canEditDef && (
-            <a
-              className="btn-s btn-transparent"
-              onClick={() => setShowDeleteDialog(true)}
-            >
+            <a className="btn-s btn-transparent" onClick={() => setShowDeleteDialog(true)}>
               <div className="triangle-left" />
               <span className="icon icon-bin icon-12px icon-left" />
               {i18n.t('common.delete')}
             </a>
           )}
 
-          {Survey.isFromCollect(surveyInfo) &&
-            Survey.hasCollectReportIssues(surveyInfo) && (
-              <Link
-                to={appModuleUri(homeModules.collectImportReport)}
-                className="btn-s btn-transparent"
-              >
-                <div className="triangle-left" />
-                <span className="icon icon-clipboard icon-12px icon-left" />
-                {i18n.t('appModules.collectImportReport')}
-              </Link>
-            )}
+          {Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
+            <Link to={appModuleUri(homeModules.collectImportReport)} className="btn-s btn-transparent">
+              <div className="triangle-left" />
+              <span className="icon icon-clipboard icon-12px icon-left" />
+              {i18n.t('appModules.collectImportReport')}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -127,6 +109,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { publishSurvey, deleteSurvey })(
-  SurveyInfo,
-)
+export default connect(mapStateToProps, { publishSurvey, deleteSurvey })(SurveyInfo)

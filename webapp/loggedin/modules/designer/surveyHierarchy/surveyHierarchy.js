@@ -34,9 +34,7 @@ const SurveyHierarchy = props => {
         <NodeDefsSelectorView
           hierarchy={hierarchy}
           nodeDefUuidEntity={selectedNodeDefUuid}
-          onChangeEntity={nodeDefUuidEntity =>
-            tree.expandToNode(nodeDefUuidEntity)
-          }
+          onChangeEntity={nodeDefUuidEntity => tree.expandToNode(nodeDefUuidEntity)}
           canSelectAttributes={false}
           showAncestors={false}
         />

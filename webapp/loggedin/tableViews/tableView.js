@@ -43,8 +43,7 @@ TableView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   let { module, moduleApiUri } = props
-  moduleApiUri =
-    moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
+  moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
 
   return {
     moduleApiUri,
@@ -55,6 +54,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps, { initListItems, fetchListItems })(
-  TableView,
-)
+export default connect(mapStateToProps, { initListItems, fetchListItems })(TableView)

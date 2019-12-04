@@ -81,10 +81,7 @@ export default class SurveyHierarchyTree {
     svgEl.setAttribute('width', `${newWidth}`)
     svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
 
-    d3.select(this.rootG).attr(
-      'transform',
-      `translate(${svgMargin.left}, ${-bBox.y})`,
-    )
+    d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
 
     if (newWidth > oldWidth) {
       treeEl.scrollLeft = newWidth
@@ -94,8 +91,7 @@ export default class SurveyHierarchyTree {
   initSvg() {
     // Set the dimensions and margins of the diagram
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
-    const height =
-      this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
+    const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
 
     // Append the svg object to the body of the page
     // appends a 'group' element to 'svg'
@@ -112,9 +108,7 @@ export default class SurveyHierarchyTree {
     this.rootG = document.querySelector('#survey-hierarchy__root-g')
 
     // InitObserver
-    this.resizeObserver = new ResizeObserver(
-      this.resizeObserverCallback.bind(this),
-    )
+    this.resizeObserver = new ResizeObserver(this.resizeObserverCallback.bind(this))
     this.resizeObserver.observe(this.rootG)
 
     // Declares a tree layout and assigns the size

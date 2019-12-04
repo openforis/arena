@@ -39,11 +39,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
       // Notify all sockets that have checked in the record
       const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
       socketIds.forEach(socketIdCurrent => {
-        WebSocket.notifySocket(
-          socketIdCurrent,
-          msg.type,
-          R.prop('content', msg),
-        )
+        WebSocket.notifySocket(socketIdCurrent, msg.type, R.prop('content', msg))
       })
     }
   }
@@ -53,12 +49,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
     RecordThreadsMap.remove(recordUuid)
   }
 
-  const thread = new ThreadManager(
-    'recordUpdateThread.js',
-    data,
-    messageHandler,
-    exitHandler,
-  )
+  const thread = new ThreadManager('recordUpdateThread.js', data, messageHandler, exitHandler)
 
   return RecordThreadsMap.put(recordUuid, thread)
 }
@@ -73,31 +64,18 @@ const _resetThreadInactivityTimeout = recordUuid => {
     killRecordThread(recordUuid)
 
     const userUuids = RecordSocketsMap.getSocketIds(recordUuid)
-    userUuids.forEach(userUuid =>
-      WebSocket.notifyUser(
-        userUuid,
-        WebSocketEvents.recordSessionExpired,
-        recordUuid,
-      ),
-    )
+    userUuids.forEach(userUuid => WebSocket.notifyUser(userUuid, WebSocketEvents.recordSessionExpired, recordUuid))
   }, 60 * 60 * 1000)
 }
 
 export const getRecordThread = RecordThreadsMap.get
 
-export const getOrCreatedRecordThread = (
-  socketId,
-  user,
-  surveyId,
-  recordUuid,
-) => {
+export const getOrCreatedRecordThread = (socketId, user, surveyId, recordUuid) => {
   if (RecordThreadsMap.isZombie(recordUuid)) {
     RecordThreadsMap.reviveZombie(recordUuid)
   }
 
-  const thread =
-    getRecordThread(recordUuid) ||
-    _createRecordThread(socketId, user, surveyId, recordUuid)
+  const thread = getRecordThread(recordUuid) || _createRecordThread(socketId, user, surveyId, recordUuid)
   _resetThreadInactivityTimeout(recordUuid)
   return thread
 }

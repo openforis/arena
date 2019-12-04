@@ -25,9 +25,7 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
   )
 
 export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
-  await Promise.all(
-    surveyGroups.map(authGroup => insertGroup(authGroup, surveyId, client)),
-  )
+  await Promise.all(surveyGroups.map(authGroup => insertGroup(authGroup, surveyId, client)))
 
 export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
   await client.one(
@@ -79,12 +77,7 @@ export const fetchUserGroups = async (userUuid, client = db) =>
 
 // ==== UPDATE
 
-export const updateUserGroup = async (
-  surveyId,
-  userUuid,
-  groupUuid,
-  client = db,
-) => {
+export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
   await client.one(
     `
     UPDATE auth_group_user gu

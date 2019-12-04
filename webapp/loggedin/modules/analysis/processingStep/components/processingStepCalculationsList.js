@@ -5,10 +5,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import useI18n from '@webapp/commonComponents/hooks/useI18n'
-import {
-  createProcessingStepCalculation,
-  putProcessingStepCalculationIndex,
-} from '../actions'
+import { createProcessingStepCalculation, putProcessingStepCalculationIndex } from '../actions'
 import ProcessingStepCalculationsListItem from './processingStepCalculationsListItem'
 
 import useProcessingStepCalculationsListState from './useProcessingStepCalculationsListState'
@@ -22,12 +19,7 @@ const ProcessingStepCalculationsList = props => {
   } = props
 
   const placeholderRef = useRef(null)
-  const {
-    dragging,
-    onDragStart,
-    onDragEnd,
-    onDragOver,
-  } = useProcessingStepCalculationsListState(
+  const { dragging, onDragStart, onDragEnd, onDragOver } = useProcessingStepCalculationsListState(
     placeholderRef,
     putProcessingStepCalculationIndex,
   )
@@ -40,10 +32,7 @@ const ProcessingStepCalculationsList = props => {
       {!calculationEditorOpened && (
         <div className="form-label processing-step__calculations-label">
           {i18n.t('processingStepView.calculationSteps')}
-          <button
-            className="btn-s btn-transparent"
-            onClick={() => createProcessingStepCalculation()}
-          >
+          <button className="btn-s btn-transparent" onClick={() => createProcessingStepCalculation()}>
             <span className="icon icon-plus icon-14px" />
           </button>
         </div>
@@ -61,10 +50,7 @@ const ProcessingStepCalculationsList = props => {
           />
         ))}
 
-        <div
-          className="processing-step__calculation placeholder"
-          ref={placeholderRef}
-        >
+        <div className="processing-step__calculation placeholder" ref={placeholderRef}>
           <div className="processing-step__calculation-index" />
           <div className="processing-step__calculation-content" />
         </div>

@@ -19,9 +19,7 @@ const TaxaTableRowHeader = props => {
       <div>{i18n.t('taxonomy.edit.genus')}</div>
       <div>{i18n.t('taxonomy.edit.scientificName')}</div>
       {vernacularLanguageCodes.map(lang => (
-        <div
-          key={`vernacular_name_header_${Taxonomy.getUuid(taxonomy)}_${lang}`}
-        >
+        <div key={`vernacular_name_header_${Taxonomy.getUuid(taxonomy)}_${lang}`}>
           {R.propOr(lang, lang)(languages)}
         </div>
       ))}

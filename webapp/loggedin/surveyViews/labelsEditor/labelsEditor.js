@@ -14,38 +14,18 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { getLanguageLabel } from '@core/app/languages'
 
 const LanguageBadge = ({ lang, compact }) => (
-  <div
-    className="badge-of labels-editor__label-lang-badge"
-    title={compact ? getLanguageLabel(lang) : null}
-  >
+  <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>
     {compact ? lang : getLanguageLabel(lang)}
   </div>
 )
 
-const LabelRow = ({
-  labels,
-  lang,
-  onChange,
-  readOnly,
-  showLanguageBadge,
-  compactLanguage,
-}) => (
+const LabelRow = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
   <div className="labels-editor__label">
-    {showLanguageBadge && (
-      <LanguageBadge lang={lang} compact={compactLanguage} />
-    )}
+    {showLanguageBadge && <LanguageBadge lang={lang} compact={compactLanguage} />}
 
     <Input
       value={R.propOr('', lang, labels)}
-      onChange={value =>
-        onChange(
-          R.ifElse(
-            R.always(R.isEmpty(value)),
-            R.dissoc(lang),
-            R.assoc(lang, value),
-          )(labels),
-        )
-      }
+      onChange={value => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
       readOnly={readOnly}
     />
   </div>
@@ -77,22 +57,14 @@ const LabelsEditor = props => {
   return (
     <div className={className}>
       <div className="labels-editor-label">
-        {showFormLabel && (
-          <label className="form-label">
-            {i18n.t(formLabelKey, { count: languages.length })}
-          </label>
-        )}
+        {showFormLabel && <label className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</label>}
         {_canTogglePreview && (
           <button
             className="btn-s btn-toggle-labels"
             style={{ justifySelf: 'end' }}
             onClick={() => setPreview(!preview)}
           >
-            <span
-              className={`icon icon-${
-                preview ? 'enlarge2' : 'shrink2'
-              } icon-12px`}
-            />
+            <span className={`icon icon-${preview ? 'enlarge2' : 'shrink2'} icon-12px`} />
             {/* { */}
             {/* this.preview() ? '...more' : '...less' */}
             {/* } */}
@@ -129,8 +101,7 @@ LabelsEditor.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => ({
-  languages:
-    props.languages || Survey.getLanguages(SurveyState.getSurveyInfo(state)),
+  languages: props.languages || Survey.getLanguages(SurveyState.getSurveyInfo(state)),
 })
 
 export default connect(mapStateToProps)(LabelsEditor)

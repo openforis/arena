@@ -14,15 +14,10 @@ import ValidationReportView from './validationReport/validationReportView'
 import RecordsView from './records/recordsView'
 
 const DataView = ({ surveyInfo }) => {
-  const draftDefs =
-    Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   return (
-    <SurveyDefsLoader
-      draft={draftDefs}
-      validate={draftDefs}
-      requirePublish={true}
-    >
+    <SurveyDefsLoader draft={draftDefs} validate={draftDefs} requirePublish={true}>
       <InnerModuleSwitch
         moduleRoot={appModules.data}
         moduleDefault={dataModules.records}

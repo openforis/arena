@@ -13,12 +13,7 @@ const ForgotPasswordForm = props => {
 
   const i18n = useI18n()
 
-  const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    validation,
-  } = useFormObject(
+  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     {
       email: initialEmail,
     },

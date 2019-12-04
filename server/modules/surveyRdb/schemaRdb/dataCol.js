@@ -7,9 +7,7 @@ export const getNames = NodeDefTable.getColNames
 export const getName = NodeDefTable.getColName
 
 export const getNamesAndType = nodeDefCol =>
-  getNames(nodeDefCol).map(
-    col => `${col} ${ColProps.getColTypeProcessor(nodeDefCol)(col)}`,
-  )
+  getNames(nodeDefCol).map(col => `${col} ${ColProps.getColTypeProcessor(nodeDefCol)(col)}`)
 
 export const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)

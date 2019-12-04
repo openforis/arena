@@ -12,7 +12,4 @@ export const getNodeDefsValidation = R.propOr({}, keys.nodeDefsValidation)
 export const assocNodeDefsValidation = R.assoc(keys.nodeDefsValidation)
 
 export const getNodeDefValidation = nodeDef =>
-  R.pipe(
-    getNodeDefsValidation,
-    Validation.getFieldValidation(NodeDef.getUuid(nodeDef)),
-  )
+  R.pipe(getNodeDefsValidation, Validation.getFieldValidation(NodeDef.getUuid(nodeDef)))

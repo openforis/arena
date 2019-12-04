@@ -25,9 +25,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
 
     sendResponse(res, user, survey)
   } catch (error) {
-    Logger.error(
-      `error loading survey with id ${surveyId}: ${error.toString()}`,
-    )
+    Logger.error(`error loading survey with id ${surveyId}: ${error.toString()}`)
     // Survey not found with user pref
     // removing user pref
     user = User.deletePrefSurvey(surveyId)(user)

@@ -11,13 +11,9 @@ export const getNodeDefs = R.propOr({}, nodeDefsKey)
 
 export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-export const getNodeDefRoot = R.pipe(
-  getNodeDefsArray,
-  R.find(R.propEq(NodeDef.keys.parentUuid, null)),
-)
+export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(R.propEq(NodeDef.keys.parentUuid, null)))
 
-export const getNodeDefByUuid = uuid =>
-  R.pipe(getNodeDefs, R.propOr(null, uuid))
+export const getNodeDefByUuid = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 export const getNodeDefsByUuids = (uuids = []) =>
   R.pipe(
@@ -30,11 +26,7 @@ export const getNodeDefChildren = (nodeDef, includeAnalysis = false) =>
     getNodeDefsArray,
     R.filter(
       nodeDefCurrent =>
-        R.propEq(
-          NodeDef.keys.parentUuid,
-          NodeDef.getUuid(nodeDef),
-          nodeDefCurrent,
-        ) &&
+        R.propEq(NodeDef.keys.parentUuid, NodeDef.getUuid(nodeDef), nodeDefCurrent) &&
         (includeAnalysis || !NodeDef.isAnalysis(nodeDefCurrent)),
     ),
   )
@@ -68,29 +60,15 @@ export const isNodeDefRootKey = nodeDef => survey =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
 export const getNodeDefByName = name =>
-  R.pipe(
-    getNodeDefsArray,
-    R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name)),
-  )
+  R.pipe(getNodeDefsArray, R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name)))
 
 export const getNodeDefsByCategoryUuid = uuid =>
-  R.pipe(
-    getNodeDefsArray,
-    R.filter(
-      R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid),
-    ),
-  )
+  R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid)))
 
 export const getNodeDefsByTaxonomyUuid = uuid =>
-  R.pipe(
-    getNodeDefsArray,
-    R.filter(
-      R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid),
-    ),
-  )
+  R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid)))
 
-export const findNodeDef = predicate =>
-  R.pipe(getNodeDefsArray, R.find(predicate))
+export const findNodeDef = predicate => R.pipe(getNodeDefsArray, R.find(predicate))
 
 // ====== UPDATE
 
@@ -98,8 +76,7 @@ export const assocNodeDefs = nodeDefs => R.assoc(nodeDefsKey, nodeDefs)
 
 // ====== HIERARCHY
 
-export const getNodeDefParent = nodeDef =>
-  getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))
+export const getNodeDefParent = nodeDef => getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => survey => {
   let nodeDefCurrent = nodeDef
@@ -109,10 +86,7 @@ export const visitAncestorsAndSelf = (nodeDef, visitorFn) => survey => {
   } while (nodeDefCurrent)
 }
 
-export const isNodeDefAncestor = (
-  nodeDefAncestor,
-  nodeDefDescendant,
-) => survey => {
+export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => survey => {
   if (NodeDef.isRoot(nodeDefDescendant)) {
     return false
   }
@@ -123,17 +97,11 @@ export const isNodeDefAncestor = (
     : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
 }
 
-export const getHierarchy = (
-  filterFn = NodeDef.isEntity,
-  includeAnalysis = false,
-) => survey => {
+export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = false) => survey => {
   let length = 1
   const h = (array, nodeDef) => {
     const childDefs = NodeDef.isEntity(nodeDef)
-      ? R.pipe(
-          getNodeDefChildren(nodeDef, includeAnalysis),
-          R.filter(filterFn),
-        )(survey)
+      ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
       : []
 
     length += childDefs.length
@@ -147,11 +115,7 @@ export const getHierarchy = (
   }
 }
 
-export const traverseHierarchyItem = async (
-  nodeDefItem,
-  visitorFn,
-  depth = 0,
-) => {
+export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
   await visitorFn(nodeDefItem, depth)
   const children = R.propOr([], 'children', nodeDefItem)
   for (const child of children) {
@@ -159,11 +123,7 @@ export const traverseHierarchyItem = async (
   }
 }
 
-export const traverseHierarchyItemSync = (
-  nodeDefItem,
-  visitorFn,
-  depth = 0,
-) => {
+export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => {
   visitorFn(nodeDefItem, depth)
   const children = R.propOr([], 'children', nodeDefItem)
   for (const child of children) {
@@ -172,21 +132,16 @@ export const traverseHierarchyItemSync = (
 }
 
 // ====== NODE DEFS CODE UTILS
-export const getNodeDefParentCode = nodeDef =>
-  getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))
+export const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))
 
 export const isNodeDefParentCode = nodeDef =>
   R.pipe(
     getNodeDefsArray,
-    R.any(
-      def => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef),
-    ),
+    R.any(def => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef)),
   )
 
 export const getNodeDefCodeCandidateParents = nodeDef => survey => {
-  const category = SurveyCategories.getCategoryByUuid(
-    NodeDef.getCategoryUuid(nodeDef),
-  )(survey)
+  const category = SurveyCategories.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
 
   if (category) {
     const levelsLength = Category.getLevelsArray(category).length
@@ -220,9 +175,7 @@ export const getNodeDefCodeCandidateParents = nodeDef => survey => {
 
 export const getNodeDefCategoryLevelIndex = nodeDef => survey => {
   const parentCodeNodeDef = getNodeDefParentCode(nodeDef)(survey)
-  return parentCodeNodeDef
-    ? 1 + getNodeDefCategoryLevelIndex(parentCodeNodeDef)(survey)
-    : 0
+  return parentCodeNodeDef ? 1 + getNodeDefCategoryLevelIndex(parentCodeNodeDef)(survey) : 0
 }
 
 export const canUpdateCategory = nodeDef => survey =>

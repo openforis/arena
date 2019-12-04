@@ -13,12 +13,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
-import {
-  showAppLoader,
-  hideAppLoader,
-  showAppSaving,
-  hideAppSaving,
-} from '@webapp/app/actions'
+import { showAppLoader, hideAppLoader, showAppSaving, hideAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
 import { appModules, appModuleUri, dataModules } from '../../appModules'
@@ -43,15 +38,10 @@ export const recordNodesUpdate = nodes => (dispatch, getState) => {
   dispatch({ type: nodesUpdate, nodes })
 }
 
-export const nodeValidationsUpdate = ({
-  recordUuid,
-  recordValid,
-  validations,
-}) => dispatch =>
+export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-const _navigateToModuleDataHome = history =>
-  history.push(appModuleUri(appModules.data))
+const _navigateToModuleDataHome = history => history.push(appModuleUri(appModules.data))
 
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
@@ -76,10 +66,7 @@ export const cycleChanged = history => () => _navigateToModuleDataHome(history)
  * CREATE
  * ============
  */
-export const createRecord = (history, preview = false) => async (
-  dispatch,
-  getState,
-) => {
+export const createRecord = (history, preview = false) => async (dispatch, getState) => {
   dispatch(showAppLoader())
 
   const state = getState()
@@ -99,11 +86,7 @@ export const createRecord = (history, preview = false) => async (
   }
 }
 
-export const createNodePlaceholder = (
-  nodeDef,
-  parentNode,
-  defaultValue,
-) => dispatch => {
+export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => dispatch => {
   const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
   dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
 }
@@ -114,14 +97,7 @@ export const createNodePlaceholder = (
  * ============
  */
 
-export const updateNode = (
-  nodeDef,
-  node,
-  value,
-  file = null,
-  meta = {},
-  refData = null,
-) => dispatch => {
+export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => dispatch => {
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
     Node.assocValue(value),
@@ -131,13 +107,7 @@ export const updateNode = (
   )(node)
 
   dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
-  dispatch(
-    _updateNodeDebounced(
-      nodeToUpdate,
-      file,
-      Node.isPlaceholder(node) ? 0 : 500,
-    ),
-  )
+  dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
 const _updateNodeDebounced = (node, file, delay) => {
@@ -152,19 +122,13 @@ const _updateNodeDebounced = (node, file, delay) => {
     }
 
     const surveyId = SurveyState.getSurveyId(getState())
-    await axios.post(
-      `/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`,
-      formData,
-    )
+    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData)
   }
 
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
 }
 
-export const updateRecordStep = (step, history) => async (
-  dispatch,
-  getState,
-) => {
+export const updateRecordStep = (step, history) => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -189,11 +153,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch({ type: nodeDelete, node })
 
   const surveyId = SurveyState.getSurveyId(getState())
-  await axios.delete(
-    `/api/survey/${surveyId}/record/${Node.getRecordUuid(
-      node,
-    )}/node/${Node.getUuid(node)}`,
-  )
+  await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
 export const deleteRecord = history => async (dispatch, getState) => {
@@ -207,18 +167,14 @@ export const deleteRecord = history => async (dispatch, getState) => {
   dispatch(recordDeleted(history))
 }
 
-export const deleteRecordUuidPreview = () => dispatch =>
-  dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
+export const deleteRecordUuidPreview = () => dispatch => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
 
 /**
  * ============
  * Check in / check out record
  * ============
  */
-export const checkInRecord = (recordUuid, draft, entityUuid) => async (
-  dispatch,
-  getState,
-) => {
+export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch, getState) => {
   dispatch(showAppLoader())
 
   const surveyId = SurveyState.getSurveyId(getState())
@@ -239,17 +195,14 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (
 
     const nodeDefActivePage = R.pipe(
       R.reverse,
-      R.map(ancestor =>
-        Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey),
-      ),
+      R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
       R.find(R.pipe(NodeDefLayout.getPageUuid, R.isNil, R.not)),
     )(ancestors)
 
     // Getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(
-      (acc, ancestor) =>
-        R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
-      {},
+      (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
+      [],
       ancestors,
     )
 

@@ -19,13 +19,9 @@ const defs = {
   taxonomies: 'taxonomies',
 }
 
-const _fetchDefs = (surveyId, defs, params = {}) =>
-  axios.get(`/api/survey/${surveyId}/${defs}`, { params })
+const _fetchDefs = (surveyId, defs, params = {}) => axios.get(`/api/survey/${surveyId}/${defs}`, { params })
 
-export const initSurveyDefs = (draft = false, validate = false) => async (
-  dispatch,
-  getState,
-) => {
+export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
 
   if (!SurveyState.areDefsFetched(draft)(state)) {
@@ -67,23 +63,15 @@ export const initSurveyDefs = (draft = false, validate = false) => async (
   }
 }
 
-export const resetSurveyDefs = () => dispatch =>
-  dispatch({ type: surveyDefsReset })
+export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
 
-export const reloadSurveyDefs = (
-  draft = false,
-  validate = false,
-) => async dispatch => {
+export const reloadSurveyDefs = (draft = false, validate = false) => async dispatch => {
   await dispatch(resetSurveyDefs())
   await dispatch(initSurveyDefs(draft, validate))
 }
 
 // ====== SET ACTIVE SURVEY
-export const setActiveSurvey = (
-  surveyId,
-  canEdit = true,
-  dispatchSurveyCreate = false,
-) => async dispatch => {
+export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate = false) => async dispatch => {
   // Load survey
   const params = { draft: canEdit, validate: canEdit }
   const {

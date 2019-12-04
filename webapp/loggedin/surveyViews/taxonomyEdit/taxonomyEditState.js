@@ -12,13 +12,11 @@ export const keys = {
 
 export const stateKey = 'taxonomyEdit'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = (prop, defaultValue = null) =>
-  R.pipe(getState, R.propOr(defaultValue, prop))
+const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ==== taxonomy for edit
 
-export const initTaxonomyEdit = taxonomyUuid =>
-  taxonomyUuid ? { taxonomyUuid } : null
+export const initTaxonomyEdit = taxonomyUuid => (taxonomyUuid ? { taxonomyUuid } : null)
 
 export const getTaxonomy = state => {
   const survey = SurveyState.getSurvey(state)

@@ -9,12 +9,7 @@ const ProfilePicture = props => {
 
   const src = useProfilePicture(userUuid, forceUpdateKey)
 
-  return (
-    <img
-      src={src}
-      className={`profile-picture${thumbnail ? '-thumbnail' : ''}`}
-    />
-  )
+  return <img src={src} className={`profile-picture${thumbnail ? '-thumbnail' : ''}`} />
 }
 
 ProfilePicture.defaultProps = {

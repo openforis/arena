@@ -5,11 +5,7 @@ import * as FileTypes from '@webapp/utils/fileTypes'
 import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
-import {
-  useProfilePicture,
-  useFileDrop,
-  useI18n,
-} from '@webapp/commonComponents/hooks'
+import { useProfilePicture, useFileDrop, useI18n } from '@webapp/commonComponents/hooks'
 
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 

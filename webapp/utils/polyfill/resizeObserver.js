@@ -16,9 +16,7 @@ export default class ResizeObserver {
   }
 
   getElementSize(el) {
-    const { width, height, x, y } = el.getBBox
-      ? el.getBBox()
-      : elementOffset(el)
+    const { width, height, x, y } = el.getBBox ? el.getBBox() : elementOffset(el)
     return { width, height, x, y }
   }
 
@@ -46,12 +44,7 @@ export default class ResizeObserver {
         const { width, height, x, y } = this.getElementSize(obj.el)
         const size = obj.size
 
-        if (
-          size.height !== height ||
-          size.width !== width ||
-          size.x !== x ||
-          size.y !== y
-        ) {
+        if (size.height !== height || size.width !== width || size.x !== x || size.y !== y) {
           obj.size = { width, height, x, y }
           return true
         }

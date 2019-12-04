@@ -8,10 +8,7 @@ const getNodeCol = (nodeDefCol, nodeRow) => {
   const nodeDefUuidRow = nodeRow.node_def_uuid
 
   // Attribute column in multiple attribute table (value of its own table)
-  const nodeCol =
-    nodeDefUuidRow === nodeDefUuidCol
-      ? nodeRow
-      : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
+  const nodeCol = nodeDefUuidRow === nodeDefUuidCol ? nodeRow : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
 
   return nodeCol
 }

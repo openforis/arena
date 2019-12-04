@@ -27,11 +27,7 @@ export const hasMinOrMaxCount = validations => {
 
 const assocCountProp = key => value =>
   R.pipe(
-    R.ifElse(
-      R.always(R.isEmpty(value)),
-      R.dissocPath([keys.count, key]),
-      R.assocPath([keys.count, key], value),
-    ),
+    R.ifElse(R.always(R.isEmpty(value)), R.dissocPath([keys.count, key]), R.assocPath([keys.count, key], value)),
     // If validations count obj is empty, it gets removed from validations
     R.ifElse(R.pipe(R.prop(keys.count), R.isEmpty), dissocCount, R.identity),
   )
@@ -46,5 +42,4 @@ export const dissocRequired = R.dissoc(keys.required)
 
 // EXPRESSIONS
 export const getExpressions = R.propOr([], keys.expressions)
-export const assocExpressions = expressions =>
-  R.assoc(keys.expressions, expressions)
+export const assocExpressions = expressions => R.assoc(keys.expressions, expressions)

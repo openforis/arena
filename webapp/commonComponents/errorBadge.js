@@ -8,14 +8,7 @@ import { useI18n } from './hooks'
 import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = props => {
-  const {
-    validation,
-    children,
-    className: classNameProps,
-    showLabel,
-    labelKey,
-    showKeys,
-  } = props
+  const { validation, children, className: classNameProps, showLabel, labelKey, showKeys } = props
 
   const i18n = useI18n()
   const invalid = !Validation.isValid(validation)
@@ -29,19 +22,11 @@ const ErrorBadge = props => {
   }
 
   return invalid ? (
-    <ValidationTooltip
-      validation={validation}
-      showKeys={showKeys}
-      className={`badge error-badge ${className}`}
-    >
+    <ValidationTooltip validation={validation} showKeys={showKeys} className={`badge error-badge ${className}`}>
       <div className="badge__content">
         {children}
 
-        <span
-          className={`icon icon-warning icon-12px${
-            showLabel ? ' icon-left' : ''
-          }`}
-        />
+        <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`} />
 
         {showLabel && <span>{i18n.t(labelKey)}</span>}
       </div>

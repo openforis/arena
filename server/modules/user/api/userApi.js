@@ -22,42 +22,24 @@ const _checkSelf = req => {
 export const init = app => {
   // ==== CREATE
 
-  app.post(
-    '/survey/:surveyId/users/invite',
-    AuthMiddleware.requireUserInvitePermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
+  app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
 
-        const {
-          surveyId,
-          email,
-          groupUuid,
-          surveyCycleKey,
-        } = Request.getParams(req)
-        const validation = await UserValidator.validateInvitation(
-          Request.getBody(req),
-        )
+      const { surveyId, email, groupUuid, surveyCycleKey } = Request.getParams(req)
+      const validation = await UserValidator.validateInvitation(Request.getBody(req))
 
-        if (!Validation.isValid(validation)) {
-          throw new SystemError('appErrors.userInvalid')
-        }
-
-        const serverUrl = Request.getServerUrl(req)
-        await UserService.inviteUser(
-          user,
-          surveyId,
-          surveyCycleKey,
-          email,
-          groupUuid,
-          serverUrl,
-        )
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
+      if (!Validation.isValid(validation)) {
+        throw new SystemError('appErrors.userInvalid')
       }
-    },
-  )
+
+      const serverUrl = Request.getServerUrl(req)
+      await UserService.inviteUser(user, surveyId, surveyCycleKey, email, groupUuid, serverUrl)
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   // ==== READ
 
@@ -67,17 +49,13 @@ export const init = app => {
     res.json(user)
   }
 
-  app.get(
-    '/survey/:surveyId/user/:userUuid',
-    AuthMiddleware.requireUserViewPermission,
-    async (req, res, next) => {
-      try {
-        await _getUser(req, res)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+  app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
+    try {
+      await _getUser(req, res)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   app.get('/user/:userUuid', async (req, res, next) => {
     try {
@@ -88,43 +66,30 @@ export const init = app => {
     }
   })
 
-  app.get(
-    '/survey/:surveyId/users/count',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId } = Request.getParams(req)
+  app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId } = Request.getParams(req)
 
-        const count = await UserService.countUsersBySurveyId(user, surveyId)
-        res.json(count)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+      const count = await UserService.countUsersBySurveyId(user, surveyId)
+      res.json(count)
+    } catch (error) {
+      next(error)
+    }
+  })
 
-  app.get(
-    '/survey/:surveyId/users',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, offset, limit } = Request.getParams(req)
+  app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, offset, limit } = Request.getParams(req)
 
-        const list = await UserService.fetchUsersBySurveyId(
-          user,
-          surveyId,
-          offset,
-          limit,
-        )
+      const list = await UserService.fetchUsersBySurveyId(user, surveyId, offset, limit)
 
-        res.json({ list })
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+      res.json({ list })
+    } catch (error) {
+      next(error)
+    }
+  })
 
   app.get('/user/:userUuid/profilePicture', async (req, res, next) => {
     try {
@@ -172,36 +137,22 @@ export const init = app => {
     }
 
     const user = Request.getUser(req)
-    const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(
-      req,
-    )
+    const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
 
     const fileReq = Request.getFile(req)
 
-    const updatedUser = await UserService.updateUser(
-      user,
-      surveyId,
-      userUuid,
-      name,
-      email,
-      groupUuid,
-      fileReq,
-    )
+    const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid, fileReq)
 
     res.json(updatedUser)
   }
 
-  app.put(
-    '/survey/:surveyId/user/:userUuid',
-    AuthMiddleware.requireUserEditPermission,
-    async (req, res, next) => {
-      try {
-        await _updateUser(req, res)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+  app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
+    try {
+      await _updateUser(req, res)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   app.put('/user/:userUuid', async (req, res, next) => {
     try {
@@ -230,20 +181,16 @@ export const init = app => {
   })
 
   // ==== DELETE
-  app.delete(
-    '/survey/:surveyId/user/:userUuid',
-    AuthMiddleware.requireUserRemovePermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, userUuid } = Request.getParams(req)
-        const user = Request.getUser(req)
+  app.delete('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserRemovePermission, async (req, res, next) => {
+    try {
+      const { surveyId, userUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-        await UserService.deleteUser(user, surveyId, userUuid)
+      await UserService.deleteUser(user, surveyId, userUuid)
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
 }

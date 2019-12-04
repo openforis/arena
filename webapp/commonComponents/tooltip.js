@@ -15,29 +15,22 @@ class Tooltip extends React.Component {
   }
 
   getStyle() {
-    const elemOffset =
-      this.tooltipRef.current && elementOffset(this.tooltipRef.current)
+    const elemOffset = this.tooltipRef.current && elementOffset(this.tooltipRef.current)
 
-    return elemOffset
-      ? { top: elemOffset.top + elemOffset.height, left: elemOffset.left }
-      : {}
+    return elemOffset ? { top: elemOffset.top + elemOffset.height, left: elemOffset.left } : {}
   }
 
   mouseEnter() {
     const { messages, messageComponent, showContent, type } = this.props
 
-    if (
-      showContent &&
-      (messageComponent || !(R.isEmpty(messages) || R.isNil(messages)))
-    ) {
+    if (showContent && (messageComponent || !(R.isEmpty(messages) || R.isNil(messages)))) {
       const style = this.getStyle()
       const className = `tooltip__message${type ? '-' + type : ''}`
 
       this.setState({
         messageElement: (
           <div className={className} style={style}>
-            {messageComponent ||
-              messages.map((msg, i) => <div key={i}>{msg}</div>)}
+            {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
           </div>
         ),
       })
@@ -53,9 +46,7 @@ class Tooltip extends React.Component {
     const { messageElement } = this.state
 
     const tooltipClass =
-      `tooltip${type ? '-' + type : ''}` +
-      (className ? ` ${className}` : '') +
-      (showContent ? ' hoverable' : '')
+      `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '') + (showContent ? ' hoverable' : '')
 
     return (
       <div

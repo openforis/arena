@@ -31,7 +31,4 @@ export const assocSummary = (timeRange, from, to, counts) =>
 export const getFrom = R.pipe(getState, R.prop(keys.from))
 export const getTo = R.pipe(getState, R.prop(keys.to))
 export const getCounts = R.pipe(getState, R.propOr([], keys.counts))
-export const getTimeRange = R.pipe(
-  getState,
-  R.propOr(timeRanges._2Weeks, keys.timeRange),
-)
+export const getTimeRange = R.pipe(getState, R.propOr(timeRanges._2Weeks, keys.timeRange))

@@ -1,11 +1,7 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
-import {
-  surveyCreate,
-  surveyDelete,
-  surveyUpdate,
-} from '@webapp/survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import {
   homeActivityMessagesReset,
   homeActivityMessagesUpdate,
@@ -17,8 +13,7 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [homeActivityMessagesUpdate]: (state, { activityLogMessages }) =>
-    activityLogMessages,
+  [homeActivityMessagesUpdate]: (state, { activityLogMessages }) => activityLogMessages,
   [homeActivityMessagesReset]: () => ({}),
 }
 

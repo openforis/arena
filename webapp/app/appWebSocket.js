@@ -26,8 +26,7 @@ export const openSocket = async throwErrorFn => {
   on(WebSocketEvents.error, throwError)
 }
 
-export const on = (eventName, eventHandler) =>
-  socket && socket.on(eventName, eventHandler)
+export const on = (eventName, eventHandler) => socket && socket.on(eventName, eventHandler)
 
 export const off = eventName => socket && socket.off(eventName)
 

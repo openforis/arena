@@ -20,10 +20,7 @@ const TableRow = props => {
 
   const i18n = useI18n()
 
-  const name = R.defaultTo(
-    `--- ${i18n.t('common.undefinedName')} ---`,
-    itemLabelFunction(item),
-  )
+  const name = R.defaultTo(`--- ${i18n.t('common.undefinedName')} ---`, itemLabelFunction(item))
 
   const selected = item.uuid === selectedItemUuid
 
@@ -32,33 +29,19 @@ const TableRow = props => {
       <div className="name">
         {name}
         <ErrorBadge validation={item.validation} />
-        <WarningBadge
-          show={!item.usedByNodeDefs}
-          label={i18n.t('itemsTable.unused')}
-        />
+        <WarningBadge show={!item.usedByNodeDefs} label={i18n.t('itemsTable.unused')} />
       </div>
 
       <div className="buttons">
         {onSelect && (canSelect || selected) && (
-          <button
-            className={`btn btn-s${selected ? ' active' : ''}`}
-            onClick={() => onSelect(item)}
-          >
-            <span
-              className={`icon icon-checkbox-${
-                selected ? '' : 'un'
-              }checked icon-12px icon-left`}
-            />
+          <button className={`btn btn-s${selected ? ' active' : ''}`} onClick={() => onSelect(item)}>
+            <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
             {selected ? 'Selected' : 'Select'}
           </button>
         )}
 
         <button className="btn btn-s" onClick={() => onEdit(item)}>
-          <span
-            className={`icon icon-${
-              readOnly ? 'eye' : 'pencil2'
-            } icon-12px icon-left`}
-          />
+          <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`} />
           {readOnly ? i18n.t('common.view') : i18n.t('common.edit')}
         </button>
 
@@ -104,9 +87,7 @@ const ItemsTable = props => {
       <Header {...props} />
 
       {R.isEmpty(items) ? (
-        <div className="table__empty-rows">
-          {i18n.t('itemsTable.noItemsAdded')}
-        </div>
+        <div className="table__empty-rows">{i18n.t('itemsTable.noItemsAdded')}</div>
       ) : (
         <div className="table__content">
           <div className="table__row-header">

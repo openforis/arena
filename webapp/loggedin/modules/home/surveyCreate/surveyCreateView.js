@@ -17,12 +17,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { appModuleUri, homeModules } from '../../../appModules'
 import * as SurveyCreateState from './surveyCreateState'
 
-import {
-  updateNewSurveyProp,
-  resetNewSurvey,
-  createSurvey,
-  importCollectSurvey,
-} from './actions'
+import { updateNewSurveyProp, resetNewSurvey, createSurvey, importCollectSurvey } from './actions'
 
 const SurveyCreateView = props => {
   const {
@@ -56,9 +51,7 @@ const SurveyCreateView = props => {
           placeholder={i18n.t('common.name')}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
-          onChange={value =>
-            updateNewSurveyProp('name', StringUtils.normalizeName(value))
-          }
+          onChange={value => updateNewSurveyProp('name', StringUtils.normalizeName(value))}
         />
       </div>
       <div>
@@ -76,10 +69,7 @@ const SurveyCreateView = props => {
           validation={Validation.getFieldValidation('lang')(validation)}
         />
       </div>
-      <button
-        className="btn"
-        onClick={() => createSurvey({ name, label, lang })}
-      >
+      <button className="btn" onClick={() => createSurvey({ name, label, lang })}>
         <span className="icon icon-plus icon-left icon-12px" />
         {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>

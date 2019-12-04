@@ -20,9 +20,7 @@ export default class CategoriesImportJob extends Job {
   constructor(params) {
     super('CategoriesImportJob', params)
 
-    this.itemBatchPersister = new BatchPersister(
-      this.itemsInsertHandler.bind(this),
-    )
+    this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))
     this.qualifiableItemCodesByCategoryAndLevel = {}
   }
 
@@ -32,10 +30,7 @@ export default class CategoriesImportJob extends Job {
 
     const categories = []
 
-    const collectCodeLists = CollectSurvey.getElementsByPath([
-      'codeLists',
-      'list',
-    ])(collectSurvey)
+    const collectCodeLists = CollectSurvey.getElementsByPath(['codeLists', 'list'])(collectSurvey)
 
     this.total = collectCodeLists.length
 
@@ -47,26 +42,14 @@ export default class CategoriesImportJob extends Job {
       // 1. insert a category for each collectCodeList
       const categoryName = collectCodeList.attributes.name
 
-      if (
-        !R.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)
-      ) {
+      if (!R.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)) {
         // Skip sampling_design (sampling point data) code list, imported by SamplingPointDataImportJob
 
         const category = await this._insertCategory(collectCodeList)
 
         // Insert items
-        const collectFirstLevelItems = CollectSurvey.getElementsByPath([
-          'items',
-          'item',
-        ])(collectCodeList)
-        await this.insertItems(
-          category,
-          0,
-          null,
-          defaultLanguage,
-          collectFirstLevelItems,
-          tx,
-        )
+        const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
+        await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
 
         categories.push(category)
       }
@@ -83,8 +66,7 @@ export default class CategoriesImportJob extends Job {
     // Set categories in context
     this.setContext({
       categories,
-      qualifiableItemCodesByCategoryAndLevel: this
-        .qualifiableItemCodesByCategoryAndLevel,
+      qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel,
     })
   }
 
@@ -97,39 +79,19 @@ export default class CategoriesImportJob extends Job {
     })
 
     // Create levels
-    const hierarchyLevels = CollectSurvey.getElementsByPath([
-      'hierarchy',
-      'level',
-    ])(collectCodeList)
+    const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(collectCodeList)
     if (!R.isEmpty(hierarchyLevels)) {
       const levels = hierarchyLevels.map((hierarchyLevel, index) =>
-        Category.newLevel(
-          categoryToCreate,
-          { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name },
-          index,
-        ),
+        Category.newLevel(categoryToCreate, { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name }, index),
       )
       categoryToCreate = Category.assocLevelsArray(levels)(categoryToCreate)
     }
 
     // Insert category and levels
-    return await CategoryManager.insertCategory(
-      this.user,
-      this.surveyId,
-      categoryToCreate,
-      true,
-      this.tx,
-    )
+    return await CategoryManager.insertCategory(this.user, this.surveyId, categoryToCreate, true, this.tx)
   }
 
-  async insertItems(
-    category,
-    levelIndex,
-    parentItem,
-    defaultLanguage,
-    collectItems,
-    tx,
-  ) {
+  async insertItems(category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
     const level = Category.getLevelByIndex(levelIndex)(category)
     const levelUuid = CategoryLevel.getUuid(level)
 
@@ -138,10 +100,7 @@ export default class CategoriesImportJob extends Job {
         break
       }
 
-      const labels = CollectSurvey.toLabels(
-        'label',
-        defaultLanguage,
-      )(collectItem)
+      const labels = CollectSurvey.toLabels('label', defaultLanguage)(collectItem)
 
       const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
       const item = {
@@ -169,18 +128,9 @@ export default class CategoriesImportJob extends Job {
       }
 
       // Insert child items recursively
-      const collectChildItems = CollectSurvey.getElementsByName('item')(
-        collectItem,
-      )
+      const collectChildItems = CollectSurvey.getElementsByName('item')(collectItem)
       if (!R.isEmpty(collectChildItems)) {
-        await this.insertItems(
-          category,
-          levelIndex + 1,
-          item,
-          defaultLanguage,
-          collectChildItems,
-          tx,
-        )
+        await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
       }
     }
   }

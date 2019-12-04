@@ -86,9 +86,7 @@ export default class Job {
         this.addError({
           error: {
             valid: false,
-            errors: [
-              { key: 'appErrors.generic', params: { text: error.toString() } },
-            ],
+            errors: [{ key: 'appErrors.generic', params: { text: error.toString() } }],
           },
         })
         await this.setStatusFailed()
@@ -210,8 +208,7 @@ export default class Job {
     this.processed += incrementBy
 
     throttle(
-      async () =>
-        await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
+      async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
       1000,
     )()

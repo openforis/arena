@@ -33,8 +33,7 @@ const RecordsSummaryChart = props => {
 
     setChartProps({
       ...chartPropsUpdate,
-      xScale: date =>
-        getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
+      xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
       yScale: getYScale(counts, chartPropsUpdate),
     })
   }

@@ -12,10 +12,7 @@ const ProcessingStepCalculationEditor = props => {
 
   return (
     <div className="processing-step__calculation-editor">
-      <button
-        className="btn btn-close"
-        onClick={() => setProcessingStepCalculationForEdit(null)}
-      >
+      <button className="btn btn-close" onClick={() => setProcessingStepCalculationForEdit(null)}>
         <span className="icon icon-cross icon-10px" />
       </button>
     </div>

@@ -17,17 +17,12 @@ export default class RecordCheckJob extends Job {
   }
 
   async execute() {
-    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle(
-      this.surveyId,
-      this.tx,
-    )
+    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle(this.surveyId, this.tx)
 
     this.total = R.length(recordsUuidAndCycle)
 
     for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
-      const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(
-        cycle,
-      )
+      const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
       await this._checkRecord(surveyAndNodeDefs, recordUuid)
 
@@ -80,30 +75,14 @@ export default class RecordCheckJob extends Job {
   }
 
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
-    const {
-      survey,
-      nodeDefAddedUuids,
-      nodeDefUpdatedUuids,
-      nodeDefDeletedUuids,
-    } = surveyAndNodeDefs
+    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
 
-    if (
-      R.all(R.isEmpty)([
-        nodeDefAddedUuids,
-        nodeDefUpdatedUuids,
-        nodeDefDeletedUuids,
-      ])
-    ) {
+    if (R.all(R.isEmpty)([nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids])) {
       return
     } // Nothing to update
 
     // 1. fetch record and nodes
-    let record = await RecordManager.fetchRecordAndNodesByUuid(
-      this.surveyId,
-      recordUuid,
-      true,
-      this.tx,
-    )
+    let record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, true, this.tx)
 
     // 2. remove deleted nodes
     if (!R.isEmpty(nodeDefDeletedUuids)) {
@@ -118,10 +97,7 @@ export default class RecordCheckJob extends Job {
     }
 
     // 3. insert missing nodes
-    const {
-      record: recordUpdateInsert,
-      nodes: missingNodes = {},
-    } = await _insertMissingSingleNodes(
+    const { record: recordUpdateInsert, nodes: missingNodes = {} } = await _insertMissingSingleNodes(
       survey,
       nodeDefAddedUuids,
       record,
@@ -131,10 +107,7 @@ export default class RecordCheckJob extends Job {
     record = recordUpdateInsert || record
 
     // 4. apply default values and recalculate applicability
-    const {
-      record: recordUpdate,
-      nodes: nodesUpdatedDefaultValues = {},
-    } = await _applyDefaultValuesAndApplicability(
+    const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
       survey,
       nodeDefUpdatedUuids,
       record,
@@ -149,13 +122,7 @@ export default class RecordCheckJob extends Job {
       ...nodesUpdatedDefaultValues,
     }
 
-    await _validateNodes(
-      survey,
-      R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids),
-      record,
-      nodesToValidate,
-      this.tx,
-    )
+    await _validateNodes(survey, R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids), record, nodesToValidate, this.tx)
   }
 }
 
@@ -164,33 +131,12 @@ export default class RecordCheckJob extends Job {
  *
  * Returns an indexed object with all the inserted nodes.
  */
-const _insertMissingSingleNode = async (
-  survey,
-  childDef,
-  record,
-  parentNode,
-  user,
-  tx,
-) => {
+const _insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
   if (NodeDef.isSingle(childDef)) {
-    const children = Record.getNodeChildrenByDefUuid(
-      parentNode,
-      NodeDef.getUuid(childDef),
-    )(record)
+    const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
-      const childNode = Node.newNode(
-        NodeDef.getUuid(childDef),
-        Record.getUuid(record),
-        parentNode,
-      )
-      return await RecordManager.insertNode(
-        user,
-        survey,
-        record,
-        childNode,
-        true,
-        tx,
-      )
+      const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+      return await RecordManager.insertNode(user, survey, record, childNode, true, tx)
     }
   }
 
@@ -202,73 +148,36 @@ const _insertMissingSingleNode = async (
  *
  * Returns an indexed object with all the inserted nodes.
  */
-const _insertMissingSingleNodes = async (
-  survey,
-  nodeDefAddedUuids,
-  record,
-  user,
-  tx,
-) => {
+const _insertMissingSingleNodes = async (survey, nodeDefAddedUuids, record, user, tx) => {
   const nodesAdded = {}
   for (const nodeDefUuid of nodeDefAddedUuids) {
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const parentNodes = Record.getNodesByDefUuid(
-      NodeDef.getParentUuid(nodeDef),
-    )(record)
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
     for (const parentNode of parentNodes) {
-      Object.assign(
-        nodesAdded,
-        await _insertMissingSingleNode(
-          survey,
-          nodeDef,
-          record,
-          parentNode,
-          user,
-          tx,
-        ),
-      )
+      Object.assign(nodesAdded, await _insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx))
     }
   }
 
   return nodesAdded
 }
 
-const _applyDefaultValuesAndApplicability = async (
-  survey,
-  nodeDefUpdatedUuids,
-  record,
-  newNodes,
-  tx,
-) => {
+const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {
   const nodesToUpdate = {
     ...newNodes,
   }
 
   // Include nodes associated to updated node defs
   for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
-    const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(
-      record,
-    )
+    const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
     for (const nodeUpdated of nodesToUpdatePartial) {
       nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
     }
   }
 
-  return await RecordManager.updateNodesDependents(
-    survey,
-    record,
-    nodesToUpdate,
-    tx,
-  )
+  return await RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
 }
 
-const _validateNodes = async (
-  survey,
-  nodeDefAddedUpdatedUuids,
-  record,
-  nodes,
-  tx,
-) => {
+const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, tx) => {
   const nodesToValidate = {
     ...nodes,
   }
@@ -276,22 +185,14 @@ const _validateNodes = async (
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
   for (const nodeDefUuid of nodeDefAddedUpdatedUuids) {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(
-      record,
-    )
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {
       nodesToValidate[Node.getUuid(parentNode)] = parentNode
     }
   }
 
   // Record keys uniqueness must be validated after RDB generation
-  await RecordManager.validateNodesAndPersistValidation(
-    survey,
-    record,
-    nodesToValidate,
-    false,
-    tx,
-  )
+  await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
 }
 
 RecordCheckJob.type = 'RecordCheckJob'

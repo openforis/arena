@@ -17,25 +17,15 @@ import * as SurveyFormState from '../surveyFormState'
 import { setFormNodeDefAddChildTo } from '../actions'
 
 const AddNodeDefButtons = props => {
-  const {
-    surveyCycleKey,
-    nodeDef,
-    addNodeDef,
-    setFormNodeDefAddChildTo,
-  } = props
+  const { surveyCycleKey, nodeDef, addNodeDef, setFormNodeDefAddChildTo } = props
 
   return (
     <React.Fragment>
       {R.values(NodeDef.nodeDefType).map(type => {
-        const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(
-          type,
-          surveyCycleKey,
-        )
+        const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
         // Cannot add entities when entity is rendered as table
-        const disabled =
-          type === NodeDef.nodeDefType.entity &&
-          NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
+        const disabled = type === NodeDef.nodeDefType.entity && NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
 
         return (
           <button
@@ -57,23 +47,14 @@ const AddNodeDefButtons = props => {
 }
 
 const AddNodeDefPanel = props => {
-  const {
-    surveyCycleKey,
-    nodeDef,
-    nodeDefLabel,
-    createNodeDef,
-    setFormNodeDefAddChildTo,
-  } = props
+  const { surveyCycleKey, nodeDef, nodeDefLabel, createNodeDef, setFormNodeDefAddChildTo } = props
 
   const i18n = useI18n()
 
   return (
     nodeDef && (
       <div className="survey-form__add-node-def-panel">
-        <button
-          className="btn btn-s no-border btn-toggle"
-          onClick={() => setFormNodeDefAddChildTo(null)}
-        >
+        <button className="btn btn-s no-border btn-toggle" onClick={() => setFormNodeDefAddChildTo(null)}>
           <span className="icon icon-cross icon-12px" />
         </button>
 

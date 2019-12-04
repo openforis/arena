@@ -13,12 +13,9 @@ export default {
   }),
 
   [ActivityLog.type.nodeDefCreate]: survey => activityLog => {
-    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(
-      activityLog,
-    )
-    const nodeDefParent = R.pipe(
-      ActivityLog.getContentParentUuid,
-      nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
+    const nodeDefParent = R.pipe(ActivityLog.getContentParentUuid, nodeDefUuid =>
+      Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     )(activityLog)
 
     return {
@@ -29,9 +26,7 @@ export default {
 
   [ActivityLog.type.nodeDefUpdate]: survey => activityLog => {
     const content = ActivityLog.getContent(activityLog)
-    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(
-      activityLog,
-    )
+    const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
     return {
       keys: Object.keys({
         ...content.props,

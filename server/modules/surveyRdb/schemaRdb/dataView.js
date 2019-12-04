@@ -20,37 +20,25 @@ export const columns = {
   keys: '_keys',
 }
 
-export const getColUuid = nodeDef =>
-  `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
+export const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
 export const getSelectFields = (survey, nodeDef) => {
   const fields = []
   Survey.visitAncestorsAndSelf(nodeDef, nodeDefCurrent => {
-    const cols = getCols(
-      survey,
-      nodeDefCurrent,
-      NodeDef.isEqual(nodeDefCurrent)(nodeDef),
-    )
+    const cols = getCols(survey, nodeDefCurrent, NodeDef.isEqual(nodeDefCurrent)(nodeDef))
     fields.unshift(...cols)
   })(survey)
 
   const fieldKey = R.pipe(
     Survey.getNodeDefKeys(nodeDef),
-    R.map(
-      nodeDefKey =>
-        `'${NodeDef.getUuid(nodeDefKey)}', ${alias}.${DataCol.getName(
-          nodeDefKey,
-        )}`,
-    ),
+    R.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}', ${alias}.${DataCol.getName(nodeDefKey)}`),
     R.join(', '),
     content => `jsonb_build_object(${content}) AS ${columns.keys}`,
   )(survey)
 
   // Add record_uuid, date_created, date_modified, keys
   fields.unshift(
-    `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${
-      DataTable.colNameRecordUuuid
-    }`,
+    `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${DataTable.colNameRecordUuuid}`,
     `${alias}.${DataTable.colNameRecordCycle}`,
     `${alias}.date_created`,
     `${alias}.date_modified`,
@@ -69,16 +57,12 @@ const getCols = (survey, nodeDef, isSelf) => {
 
   // If is not root, prepend parent uuid
   if (!NodeDef.isRoot(nodeDef)) {
-    fields.unshift(
-      `${aliasParent}.${getColUuid(Survey.getNodeDefParent(nodeDef)(survey))}`,
-    )
+    fields.unshift(`${aliasParent}.${getColUuid(Survey.getNodeDefParent(nodeDef)(survey))}`)
   }
 
   // If nodeDef isSelf (starting nodeDef) prepend col uuid
   if (isSelf) {
-    fields.unshift(
-      `${alias}.${DataTable.colNameUuuid} as ${getColUuid(nodeDef)}`,
-    )
+    fields.unshift(`${alias}.${DataTable.colNameUuuid} as ${getColUuid(nodeDef)}`)
   }
 
   return fields
@@ -88,8 +72,6 @@ export const getJoin = (schemaName, nodeDefParent) =>
   nodeDefParent
     ? `JOIN 
        ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
-       ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${
-        DataTable.colNameParentUuuid
-      }
+       ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
       `
     : ''

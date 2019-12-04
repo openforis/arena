@@ -15,13 +15,7 @@ export { keys } from './_record/recordKeys'
 
 // ====== CREATE
 
-export const newRecord = (
-  user,
-  cycle,
-  preview = false,
-  dateCreated = null,
-  step = null,
-) => ({
+export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
   [keys.step]: step || RecordStep.getDefaultStep(),
@@ -61,8 +55,7 @@ export const isNodeApplicable = RecordReader.isNodeApplicable
 // ==== dependency
 export const getDependentNodePointers = RecordReader.getDependentNodePointers
 export const getParentCodeAttribute = RecordReader.getParentCodeAttribute
-export const getDependentCodeAttributes =
-  RecordReader.getDependentCodeAttributes
+export const getDependentCodeAttributes = RecordReader.getDependentCodeAttributes
 
 // ====== Keys
 export const getEntityKeyNodes = RecordReader.getEntityKeyNodes

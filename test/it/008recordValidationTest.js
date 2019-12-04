@@ -19,41 +19,22 @@ let survey = null
 let record = null
 
 const _persistNode = async node => {
-  record = await RecordManager.persistNode(
-    getContextUser(),
-    survey,
-    record,
-    node,
-  )
+  record = await RecordManager.persistNode(getContextUser(), survey, record, node)
 }
 
 const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
-  const children = Record.getNodeChildrenByDefUuid(
-    parentNode,
-    NodeDef.getUuid(childDef),
-  )(record)
+  const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
   const node = children[childNodePosition - 1]
-  record = await RecordManager.deleteNode(
-    getContextUser(),
-    survey,
-    record,
-    Node.getUuid(node),
-  )
+  record = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
 }
 
-const updateNodeAndExpectValidationToBe = async (
-  nodePath,
-  value,
-  validationExpected,
-) => {
+const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
   const node = RecordUtils.findNodeByPath(nodePath)(survey, record)
 
   await _persistNode(Node.assocValue(value)(node))
 
-  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(
-    Record.getValidation(record),
-  )
+  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
 
   expect(Validation.isValid(nodeValidation)).to.equal(validationExpected)
 }
@@ -69,28 +50,16 @@ const deleteNodeAndExpectMinCountToBe = async (
 
   await _deleteNode(parentNode, childNodeName, childNodePosition)
 
-  const minCountValidation = RecordUtils.getValidationMinCount(
-    parentNode,
-    childDef,
-  )(record)
+  const minCountValidation = RecordUtils.getValidationMinCount(parentNode, childDef)(record)
 
   expect(Validation.isValid(minCountValidation)).to.equal(expectedValidation)
 }
 
-const addNodeAndExpectCountToBe = async (
-  parentNodePath,
-  childNodeName,
-  min = true,
-  expectedValidation = true,
-) => {
+const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = true, expectedValidation = true) => {
   const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
-  const node = Node.newNode(
-    NodeDef.getUuid(childDef),
-    Record.getUuid(record),
-    parentNode,
-  )
+  const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
 
   await _persistNode(node)
 
@@ -105,34 +74,23 @@ const addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   // Add a new tree
   const nodeRoot = Record.getRootNode(record)
   const nodeDefTree = Survey.getNodeDefByName('tree')(survey)
-  const nodeTree = Node.newNode(
-    NodeDef.getUuid(nodeDefTree),
-    Record.getUuid(record),
-    nodeRoot,
-  )
+  const nodeTree = Node.newNode(NodeDef.getUuid(nodeDefTree), Record.getUuid(record), nodeRoot)
   await _persistNode(nodeTree)
 
   // Update new tree num with a duplicate value
-  const nodeTreeNum = RecordUtils.findNodeByPath('cluster/tree[4]/tree_num')(
-    survey,
-    record,
-  )
+  const nodeTreeNum = RecordUtils.findNodeByPath('cluster/tree[4]/tree_num')(survey, record)
   const value = 2 // Duplicate value
   await _persistNode(Node.assocValue(value)(nodeTreeNum))
 
   // Expect validation to be invalid
-  const nodeTreeNumValidation = Validation.getFieldValidation(
-    Node.getUuid(nodeTreeNum),
-  )(Record.getValidation(record))
+  const nodeTreeNumValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNum))(Record.getValidation(record))
   expect(Validation.isValid(nodeTreeNumValidation)).to.equal(false)
 
   // Expect duplicate node validation to be invalid
-  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath(
-    'cluster/tree[2]/tree_num',
-  )(survey, record)
-  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(
-    Node.getUuid(nodeTreeNumDuplicate),
-  )(Record.getValidation(record))
+  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
+  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(
+    Record.getValidation(record),
+  )
   expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(false)
 }
 
@@ -141,12 +99,10 @@ const removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =>
 
   await _deleteNode(Record.getRootNode(record), 'tree', 4)
 
-  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath(
-    'cluster/tree[2]/tree_num',
-  )(survey, record)
-  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(
-    Node.getUuid(nodeTreeNumDuplicate),
-  )(Record.getValidation(record))
+  const nodeTreeNumDuplicate = RecordUtils.findNodeByPath('cluster/tree[2]/tree_num')(survey, record)
+  const nodeTreeNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodeTreeNumDuplicate))(
+    Record.getValidation(record),
+  )
   expect(Validation.isValid(nodeTreeNumDuplicateValidation)).to.equal(true)
 }
 
@@ -164,10 +120,7 @@ describe('Record Validation Test', () => {
         SB.attribute('not_required_attr').required(false),
         SB.attribute('numeric_attr', NodeDef.nodeDefType.integer),
         SB.attribute('date_attr', NodeDef.nodeDefType.date),
-        SB.entity(
-          'tree',
-          SB.attribute('tree_num', NodeDef.nodeDefType.integer).key(),
-        )
+        SB.entity('tree', SB.attribute('tree_num', NodeDef.nodeDefType.integer).key())
           .multiple()
           .minCount(3)
           .maxCount(4),
@@ -214,37 +167,21 @@ describe('Record Validation Test', () => {
   })
 
   it('Correct date attribute value', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/date_attr',
-      '02/11/2019',
-      true,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/date_attr', '02/11/2019', true)
   })
 
   it('Invalid date attribute value (day)', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/date_attr',
-      '32/01/2019',
-      false,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/date_attr', '32/01/2019', false)
   })
 
   it('Invalid date attribute value (month)', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/date_attr',
-      '01/13/2019',
-      false,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/date_attr', '01/13/2019', false)
   })
 
   // ========== required
 
   it('Required attribute: missing value', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/required_attr',
-      null,
-      false,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/required_attr', null, false)
   })
 
   it('Required attribute: empty value', async () => {
@@ -252,35 +189,19 @@ describe('Record Validation Test', () => {
   })
 
   it('Required attribute: not empty value', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/required_attr',
-      'some value',
-      true,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/required_attr', 'some value', true)
   })
 
   it('Not required attribute: missing value', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/not_required_attr',
-      null,
-      true,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/not_required_attr', null, true)
   })
 
   it('Not required attribute: empty value', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/not_required_attr',
-      '',
-      true,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/not_required_attr', '', true)
   })
 
   it('Not required attribute: not empty value', async () => {
-    await updateNodeAndExpectValidationToBe(
-      'cluster/not_required_attr',
-      'some value',
-      true,
-    )
+    await updateNodeAndExpectValidationToBe('cluster/not_required_attr', 'some value', true)
   })
 
   // ========== min count

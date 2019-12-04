@@ -68,11 +68,7 @@ const UserView = props => {
           <FormItem label={i18n.t('common.name')}>
             <Input
               disabled={!canEditName}
-              placeholder={
-                canEditName
-                  ? i18n.t('common.name')
-                  : i18n.t('usersView.notAcceptedYet')
-              }
+              placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
               value={name}
               validation={canEditName ? getFieldValidation('name') : {}}
               maxLength="128"
@@ -121,19 +117,9 @@ const UserView = props => {
               </button>
             )}
 
-            <button
-              className="btn btn-save"
-              aria-disabled={!objectValid}
-              onClick={saveUser}
-            >
-              <span
-                className={`icon icon-${
-                  isInvitation ? 'envelop' : 'floppy-disk'
-                } icon-left icon-12px`}
-              />
-              {isInvitation
-                ? i18n.t('userView.sendInvitation')
-                : i18n.t('common.save')}
+            <button className="btn btn-save" aria-disabled={!objectValid} onClick={saveUser}>
+              <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`} />
+              {isInvitation ? i18n.t('userView.sendInvitation') : i18n.t('common.save')}
             </button>
           </div>
         )}

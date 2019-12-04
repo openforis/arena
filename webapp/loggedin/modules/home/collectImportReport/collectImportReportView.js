@@ -15,11 +15,7 @@ import * as CollectImportReportState from './collectImportReportState'
 import { fetchCollectImportReportItems } from './actions'
 
 const CollectImportReportView = props => {
-  const {
-    reportItems,
-    isNodeDefEditOpened,
-    fetchCollectImportReportItems,
-  } = props
+  const { reportItems, isNodeDefEditOpened, fetchCollectImportReportItems } = props
 
   useEffect(() => {
     fetchCollectImportReportItems()
@@ -42,6 +38,4 @@ const mapStateToProps = state => ({
   reportItems: CollectImportReportState.getState(state),
   isNodeDefEditOpened: NodeDefEditState.hasNodeDef(state),
 })
-export default connect(mapStateToProps, { fetchCollectImportReportItems })(
-  CollectImportReportView,
-)
+export default connect(mapStateToProps, { fetchCollectImportReportItems })(CollectImportReportView)

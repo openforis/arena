@@ -1,11 +1,10 @@
-export const applyReducerFunction = (actionHandlers, state, action) => {
+const applyReducerFunction = (actionHandlers, action, state = {}) => {
   const actionHandler = actionHandlers[action.type]
 
   return actionHandler ? actionHandler(state, action) : state
 }
 
-export const exportReducer = actionHandlers => (state, action) =>
-  applyReducerFunction(actionHandlers, state, action)
+export const exportReducer = actionHandlers => (state, action) => applyReducerFunction(actionHandlers, action, state)
 
 export const assocActionProps = (state, { type: _type, ...props }) => ({
   ...state,

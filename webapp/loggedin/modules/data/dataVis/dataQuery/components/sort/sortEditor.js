@@ -43,19 +43,11 @@ const SortExpressionComponent = props => {
 
   const refreshUnchosenVariables = () => {
     const availableVariables = getAvailableVariables(props, lang)
-    setUnchosenVariables(
-      DataSort.getUnchosenVariables(availableVariables)(sortCriteria),
-    )
+    setUnchosenVariables(DataSort.getUnchosenVariables(availableVariables)(sortCriteria))
   }
 
   const addCriteria = ({ value: variable, label }) => {
-    setSortCriteria(
-      DataSort.addCriteria(
-        variable,
-        label,
-        DataSort.keys.order.asc,
-      )(sortCriteria),
-    )
+    setSortCriteria(DataSort.addCriteria(variable, label, DataSort.keys.order.asc)(sortCriteria))
     setUpdated(true)
   }
 
@@ -85,13 +77,7 @@ const SortExpressionComponent = props => {
   const getAvailableVariables = () => {
     const { survey, nodeDefUuidCols, nodeDefContext, mode } = props
 
-    const variables = ExpressionVariables.getVariables(
-      survey,
-      nodeDefContext,
-      null,
-      mode,
-      lang,
-    )
+    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, null, mode, lang)
     return variables.filter(v => nodeDefUuidCols.includes(v.uuid))
   }
 
@@ -105,9 +91,7 @@ const SortExpressionComponent = props => {
             <SortRow
               key={criteria.variable}
               variables={unchosenVariables}
-              selectedVariable={DataSort.findVariableByValue(criteria.variable)(
-                availableVariables,
-              )}
+              selectedVariable={DataSort.findVariableByValue(criteria.variable)(availableVariables)}
               onSelectVariable={item => onSelectVariable(pos, item)}
               selectedOrder={criteria.order}
               onSelectOrder={order => onSelectOrder(pos, order)}
@@ -126,19 +110,11 @@ const SortExpressionComponent = props => {
           )}
         </div>
         <div className="sort-editor__footer">
-          <button
-            className="btn btn-xs"
-            onClick={() => reset()}
-            aria-disabled={!sortCriteria.length}
-          >
+          <button className="btn btn-xs" onClick={() => reset()} aria-disabled={!sortCriteria.length}>
             <span className="icon icon-undo2 icon-16px" /> Reset
           </button>
 
-          <button
-            className="btn btn-xs"
-            onClick={() => applyChange()}
-            aria-disabled={!updated}
-          >
+          <button className="btn btn-xs" onClick={() => applyChange()} aria-disabled={!updated}>
             <span className="icon icon-checkmark icon-16px" /> Apply
           </button>
         </div>

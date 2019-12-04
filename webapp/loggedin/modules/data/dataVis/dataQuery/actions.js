@@ -8,10 +8,8 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as DataQueryState from './dataQueryState'
 
 // ====== table
-export const dataQueryTableNodeDefUuidUpdate =
-  'dataQuery/table/nodeDefUuid/update'
-export const dataQueryTableNodeDefUuidColsUpdate =
-  'dataQuery/table/nodeDefUuidCols/update'
+export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
+export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
 export const dataQueryTableInit = 'dataQuery/table/init'
 export const dataQueryTableDataUpdate = 'dataQuery/table/data/update'
 export const dataQueryTableDataColUpdate = 'dataQuery/table/data/col/update'
@@ -44,30 +42,15 @@ const queryTable = (
     editMode,
   })
 
-const fetchData = async (
-  state,
-  nodeDefUuidCols = null,
-  offset = null,
-  filter = null,
-  sort = null,
-) => {
+const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = null, sort = null) => {
   if (DataQueryState.hasTableAndCols(state)) {
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
     const editMode = DataQueryState.getTableEditMode(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
-    const nodeDefUuidColsParam = R.defaultTo(
-      DataQueryState.getTableNodeDefUuidCols(state),
-      nodeDefUuidCols,
-    )
-    const offsetParam = R.defaultTo(
-      DataQueryState.getTableOffset(state),
-      offset,
-    )
-    const filterParam = R.defaultTo(
-      DataQueryState.getTableFilter(state),
-      filter,
-    )
+    const nodeDefUuidColsParam = R.defaultTo(DataQueryState.getTableNodeDefUuidCols(state), nodeDefUuidCols)
+    const offsetParam = R.defaultTo(DataQueryState.getTableOffset(state), offset)
+    const filterParam = R.defaultTo(DataQueryState.getTableFilter(state), filter)
     const sortParam = R.defaultTo(DataQueryState.getTableSort(state), sort)
     const { data } = await queryTable(
       surveyId,
@@ -96,17 +79,12 @@ export const updateTableNodeDefUuidCols = (
   dispatch({ type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols })
 
   const sort = DataQueryState.getTableSort(state)
-  const newSort = DataSort.retainVariables(getColNames(state, nodeDefUuidCols))(
-    sort,
-  )
+  const newSort = DataSort.retainVariables(getColNames(state, nodeDefUuidCols))(sort)
   if (DataSort.toString(sort) !== DataSort.toString(newSort)) {
     dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
   }
 
-  const fetch =
-    !R.isEmpty(nodeDefUuidCols) &&
-    Boolean(nodeDefUuidCol) &&
-    !nodeDefUuidColDeleted
+  const fetch = !R.isEmpty(nodeDefUuidCols) && Boolean(nodeDefUuidCol) && !nodeDefUuidColDeleted
 
   if (fetch) {
     const hasTableAndCols = DataQueryState.hasTableAndCols(state)
@@ -132,11 +110,10 @@ export const updateTableNodeDefUuidCols = (
   }
 }
 
-export const initTableData = (
-  queryFilter = null,
-  querySort = null,
-  editModeParam = null,
-) => async (dispatch, getState) => {
+export const initTableData = (queryFilter = null, querySort = null, editModeParam = null) => async (
+  dispatch,
+  getState,
+) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
 
@@ -144,15 +121,9 @@ export const initTableData = (
     const cycle = SurveyState.getSurveyCycleKey(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
     const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
-    const filter = R.defaultTo(
-      DataQueryState.getTableFilter(state),
-      queryFilter,
-    )
+    const filter = R.defaultTo(DataQueryState.getTableFilter(state), queryFilter)
     const sort = R.defaultTo(DataQueryState.getTableSort(state), querySort)
-    const editMode = R.defaultTo(
-      DataQueryState.getTableEditMode(state),
-      editModeParam,
-    )
+    const editMode = R.defaultTo(DataQueryState.getTableEditMode(state), editModeParam)
 
     const { offset, limit } = DataQueryState.defaults
 
@@ -161,16 +132,7 @@ export const initTableData = (
         cycle,
         filter: filter && JSON.stringify(filter),
       }),
-      queryTable(
-        surveyId,
-        cycle,
-        editMode,
-        nodeDefUuidTable,
-        nodeDefUuidCols,
-        offset,
-        filter,
-        sort,
-      ),
+      queryTable(surveyId, cycle, editMode, nodeDefUuidTable, nodeDefUuidCols, offset, filter, sort),
     ])
 
     dispatch({
@@ -198,18 +160,14 @@ export const resetTableFilter = () => dispatch => {
   dispatch(initTableData())
 }
 
-export const updateTableFilter = filter => dispatch =>
-  dispatch(initTableData(filter))
+export const updateTableFilter = filter => dispatch => dispatch(initTableData(filter))
 
-export const updateTableSort = sort => dispatch =>
-  dispatch(initTableData(null, sort))
+export const updateTableSort = sort => dispatch => dispatch(initTableData(null, sort))
 
-export const updateTableEditMode = editMode => dispatch =>
-  dispatch(initTableData(null, null, editMode))
+export const updateTableEditMode = editMode => dispatch => dispatch(initTableData(null, null, editMode))
 
 // ====== nodeDefSelectors
-export const dataQueryNodeDefSelectorsShowUpdate =
-  'dataQuery/nodeDefSelectors/show/update'
+export const dataQueryNodeDefSelectorsShowUpdate = 'dataQuery/nodeDefSelectors/show/update'
 
 export const toggleNodeDefsSelector = () => (dispatch, getState) =>
   dispatch({
