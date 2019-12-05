@@ -22,6 +22,7 @@ const NodeDefExpressionsProp = props => {
     isContextParent,
     canBeConstant,
     isBoolean,
+    hideAdvanced,
   } = props
 
   const values = NodeDef.getProp(propName, [])(nodeDef)
@@ -45,6 +46,7 @@ const NodeDefExpressionsProp = props => {
       isContextParent={isContextParent}
       canBeConstant={canBeConstant}
       isBoolean={isBoolean}
+      hideAdvanced={hideAdvanced}
     />
   )
 }

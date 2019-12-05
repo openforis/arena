@@ -11,15 +11,43 @@ import ExpressionNode from './nodes/expressionNode'
 
 import { useExpressionEditorPopupState, mapStateToProps } from './expressionEditorPopupState'
 
-const ExpressionEditorPopup = props => {
-  const { nodeDefCurrent, isBoolean, variables, onChange, onClose } = props
+import AdvancedExpressionEditorPopup from './advancedExpressionEditor'
 
-  const { query, queryDraft, exprDraft, exprDraftValid, updateDraft } = useExpressionEditorPopupState(props)
+const ExpressionEditorPopup = props => {
+  // IsGeneralExpression: this not just a boolean expression, i.e. the advanced mode can be used
+  const { nodeDefCurrent, isBoolean, variables, onChange, onClose, hideAdvanced } = props
+
+  const {
+    query,
+    queryDraft,
+    exprDraft,
+    exprDraftValid,
+    updateDraft,
+    resetDraft,
+    advanced,
+    setAdvancedEditor,
+  } = useExpressionEditorPopupState(props)
 
   const i18n = useI18n()
 
+  if (advanced)
+    return (
+      <AdvancedExpressionEditorPopup
+        setAdvancedEditor={setAdvancedEditor}
+        revertToBasicMode={() => {
+          resetDraft()
+          setAdvancedEditor(false)
+        }}
+        {...props}
+      />
+    )
+
   return (
     <Popup className="expression-editor-popup" onClose={onClose} padding={20}>
+      <button hidden={hideAdvanced} onClick={() => setAdvancedEditor(true)} style={{ position: 'absolute', right: 0 }}>
+        {i18n.t('nodeDefEdit.expressionsProp.advanced')}
+      </button>
+
       <div className="expression-editor__query-container">
         <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
           {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
@@ -67,6 +95,7 @@ ExpressionEditorPopup.defaultProps = {
   isContextParent: false,
   canBeConstant: false, // True if expression can be a constant value like a number or a string
   isBoolean: true, // True if expression returns a boolean condition
+  hideAdvanced: false,
 
   literalSearchParams: null,
   onClose: _ => {},

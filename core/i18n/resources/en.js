@@ -342,6 +342,11 @@ export const enTranslation = {
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
+    functionDescriptions: {
+      min: 'Take the minimum of the arguments',
+      max: 'Take the maximum of the arguments',
+      pow: 'Raise a number X to the power P',
+    },
     basicProps: {
       key: 'Key',
       multiple: 'Multiple',
@@ -371,6 +376,8 @@ export const enTranslation = {
       applyIf: 'Apply If',
       confirmDelete: 'Delete this expression?',
       severity: 'Severity',
+      advanced: 'Advanced',
+      basicMode: 'Basic mode',
     },
     validationsProps: {
       minCount: 'Min count',

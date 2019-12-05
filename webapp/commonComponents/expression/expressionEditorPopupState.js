@@ -17,8 +17,15 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = props => {
-  const [state, setState] = useState(initialState)
   const { query, expr, mode, canBeConstant } = props
+
+  // An encoding trick. Newlines can only appear in a textarea,
+  // so denote advanced mode expressions as anything that contains a newline.
+  // The editing component ensures that all intermediate values will contain one.
+  const initialAdvanced = /\n/.test(query)
+  const [advanced, setAdvancedEditor] = useState(initialAdvanced)
+
+  const [state, setState] = useState(initialState)
 
   // OnMount initialize state
   useEffect(() => {
@@ -43,6 +50,61 @@ export const useExpressionEditorPopupState = props => {
       exprDraft,
       exprDraftValid,
     }))
+  }
+
+  const resetDraft = () => {
+    setState(statePrev => ({
+      ...statePrev,
+      queryDraft: '',
+      exprDraft: ExpressionParser.parseQuery('', mode, canBeConstant),
+      exprDraftValid: true,
+    }))
+  }
+
+  return {
+    ...state,
+    updateDraft,
+    resetDraft,
+    advanced,
+    setAdvancedEditor,
+  }
+}
+
+export const useAdvancedExpressionEditorPopupState = props => {
+  const { query, expr, mode, canBeConstant } = props
+
+  const [state, setState] = useState(initialState)
+
+  // OnMount initialize state
+  useEffect(() => {
+    // Either expr or query are passed by the parent component
+    const exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
+    setState({
+      query: query.trimRight(),
+      queryDraft: query.trimRight(),
+      exprDraft,
+      exprDraftValid: true,
+    })
+  }, [])
+
+  const updateDraft = queryDraft => {
+    if (queryDraft === '') {
+      setState(statePrev => ({
+        ...statePrev,
+        queryDraft,
+        exprDraft: null,
+        exprDraftValid: true,
+      }))
+    } else {
+      const exprDraft = Expression.fromString(queryDraft)
+      const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
+      setState(statePrev => ({
+        ...statePrev,
+        queryDraft,
+        exprDraft,
+        exprDraftValid,
+      }))
+    }
   }
 
   return {

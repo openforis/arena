@@ -86,6 +86,7 @@ const TableHeader = props => {
             nodeDefUuidContext={nodeDefUuidContext}
             expr={filter}
             mode={Expression.modes.sql}
+            hideAdvanced={true}
             onChange={(_, expr) => {
               if (expr) {
                 updateTableFilter(expr)

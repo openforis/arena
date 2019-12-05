@@ -76,6 +76,7 @@ const ValidationsProps = props => {
           label={i18n.t('nodeDefEdit.validationsProps.expressions')}
           readOnly={readOnly}
           applyIf={true}
+          hideAdvanced={true}
           showLabels={true}
           severity={true}
           values={NodeDefValidations.getExpressions(nodeDefValidations)}

@@ -11,8 +11,16 @@
 }
 
 .expression-editor-popup__expr-container {
-  overflow: auto;
+  margin-top: 1.5rem;
   position: relative;
+
+  // These must match, for the autocomplete to work properly.
+  textarea {
+    border: 1px solid black;
+  }
+  textarea, span {
+    font-size: 1rem;
+  }
 
   //common
   .btns {
