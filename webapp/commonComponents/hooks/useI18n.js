@@ -1,8 +1,4 @@
-import { useContext } from 'react'
+import * as AppState from '@webapp/app/appState'
+import useStoreState from './useStoreState'
 
-import AppContext from '@webapp/app/appContext'
-
-export default () => {
-  const { i18n } = useContext(AppContext)
-  return i18n
-}
+export default () => AppState.getI18n(useStoreState())
