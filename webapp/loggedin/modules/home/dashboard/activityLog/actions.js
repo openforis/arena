@@ -1,4 +1,5 @@
 import axios from 'axios'
+import util from 'util'
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -15,10 +16,9 @@ import * as ActivityLogMessageParser from './activityLogMessageParser'
 export const homeActivityMessagesUpdate = 'home/activityLog/messages/update'
 export const homeActivityMessagesReset = 'home/activityLog/messages/reset'
 
-const _fetchActivityLogs = async (state, offset = 0, limit = 10) => {
+const fetchActivityLogs = async (state, offset = 0, limit = 30) => {
   try {
-    const activityLogState = ActivityLogState.getState(state)
-    const activityLogMessagesState = ActivityLogState.getMessages(activityLogState)
+    const activityLogMessagesState = ActivityLogState.getMessages(state)
     const survey = SurveyState.getSurvey(state)
     const surveyId = Survey.getId(survey)
     const i18n = AppState.getI18n(state)
@@ -30,11 +30,14 @@ const _fetchActivityLogs = async (state, offset = 0, limit = 10) => {
     
     // add new messages to messages already in state and sort them by creation date in reverse order
     const activityLogMessages = R.pipe(
+      // exclude activities already loaded
+      R.reject(activity => R.includes(ActivityLog.getId(activity), R.pluck(ActivityLogMessage.keys.id, activityLogMessagesState))),
+      // parse ActivityLog into ActivityLogMessage
       R.map(ActivityLogMessageParser.toMessage(i18n, survey)),
+      // append new messages to old ones
       R.concat(activityLogMessagesState),
-      R.uniq,
-      R.sortBy(R.compose(Number, ActivityLogMessage.getId)),
-      R.reverse
+      // sort by id in reverse order
+      R.sortBy(R.compose(R.negate, Number, ActivityLogMessage.getId)),
     )(activityLogs)
 
     return R.length(activityLogMessages) === R.length(activityLogMessagesState)
@@ -46,18 +49,19 @@ const _fetchActivityLogs = async (state, offset = 0, limit = 10) => {
 }
 
 export const fetchActivityLogsNewest = () => async (dispatch, getState) => {
-  const activityLogMessages = await _fetchActivityLogs(getState())
+  const activityLogMessages = await fetchActivityLogs(getState())
   if (activityLogMessages)
     dispatch({ type: homeActivityMessagesUpdate, activityLogMessages, offset: 0, limit: activityLogMessages.length })
 }
 
 export const fetchActivityLogsNext = () => async (dispatch, getState) => {
   const state = getState()
-  const activityLogState = ActivityLogState.getState(state)
-  const offsetOld = ActivityLogState.getOffset(activityLogState)
-  const limit = ActivityLogState.getLimit(activityLogState)
+  const offsetOld = ActivityLogState.getOffset(state)
+  const limit = ActivityLogState.getLimit(state)
   const offset = offsetOld + limit
-  const activityLogMessages = await _fetchActivityLogs(state, offset, limit)
+  const activityLogMessages = await fetchActivityLogs(state, offset, limit)
+
+  // when the activity of type "surveyCreate" is loaded, activity logs load is complete
   const loadComplete = R.any(message => ActivityLogMessage.getType(message) === ActivityLog.type.surveyCreate, activityLogMessages)
 
   activityLogMessages && (await dispatch({ type: homeActivityMessagesUpdate, activityLogMessages, offset, limit, loadComplete }))

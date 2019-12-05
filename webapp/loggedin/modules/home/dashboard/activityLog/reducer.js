@@ -21,7 +21,10 @@ const actionHandlers = {
     ActivityLogState.assocOffset(offset),
     ActivityLogState.assocLimit(limit),
     ActivityLogState.assocMessages(activityLogMessages),
-    ActivityLogState.assocLoadComplete(loadComplete)
+    R.when(
+      R.always(loadComplete),
+      ActivityLogState.assocLoadComplete(loadComplete)
+    )
   )(state),
 
   [homeActivityMessagesReset]: () => ({}),

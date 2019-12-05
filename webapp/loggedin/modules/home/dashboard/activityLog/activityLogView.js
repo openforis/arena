@@ -8,7 +8,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import * as ActivityLogMessage from './activityLogMessage'
 
-import { useI18n, useIntersection } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnIntersect, useInterval } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -21,37 +21,16 @@ const ActivityLogView = props => {
 
   const { 
     activityLogMessages, activityLogLoadComplete, 
-    fetchActivityLogsNewest, fetchActivityLogsNext 
+    fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs 
   } = props
 
   const i18n = useI18n()
 
-  const [setIntersectionTrigger] = useIntersection(([intersectionEntry]) => {
-    intersectionEntry.intersectionRatio > 0 && fetchActivityLogsNext()
-  })
+  const [setNextActivitiesFetchTrigger] = useOnIntersect(fetchActivityLogsNext)
+  useInterval(fetchActivityLogsNewest, 3000)
 
   useEffect(() => {
-    // fetch newest activities on mount
-    fetchActivityLogsNewest()
-
-    // fetch new activities with polling (every 3 seconds)
-    let timeoutPolling
-    const setTimeoutPolling = () => {
-      timeoutPolling = setTimeout(
-        async () => {
-          await fetchActivityLogsNewest()
-          setTimeoutPolling()
-        }, 
-        3000
-      )
-    }
-    setTimeoutPolling()
-
-    return () => {
-      resetActivityLogs()
-
-      clearTimeout(timeoutPolling)
-    }
+    return () => resetActivityLogs()
   }, [])
 
   return (
@@ -66,10 +45,11 @@ const ActivityLogView = props => {
           R.isEmpty(activityLogMessages)
             ? null
             : activityLogMessages.map((message, index) => (
-              <div key={ActivityLogMessage.getId(message)}>
+              <div 
+                key={ActivityLogMessage.getId(message)} 
+                ref={el => (!activityLogLoadComplete) && index === activityLogMessages.length - 25 ? setNextActivitiesFetchTrigger(el) : null}>
                 <div
-                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`} 
-                  ref={el => (!activityLogLoadComplete) && index === activityLogMessages.length - 10 ? setIntersectionTrigger(el) : null}>
+                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`} >
                   <div className="activity">
                     <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true}/>
                     <Markdown source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}/>
@@ -83,20 +63,18 @@ const ActivityLogView = props => {
             ))
         }
       </div>
-
+      
     </div>
   )
-
 }
 
-const mapStateToProps = state => {
-  const activityLogState = ActivityLogState.getState(state)
-  
-  return {
-    surveyId: SurveyState.getSurveyId(state),
-    activityLogMessages: ActivityLogState.getMessages(activityLogState),
-    activityLogLoadComplete: ActivityLogState.isLoadComplete(activityLogState),
-  }
-}
+const mapStateToProps = state => ({
+  surveyId: SurveyState.getSurveyId(state),
+  activityLogMessages: ActivityLogState.getMessages(state),
+  activityLogLoadComplete: ActivityLogState.isLoadComplete(state),
+})
 
-export default connect(mapStateToProps, { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs })(ActivityLogView)
+export default connect(
+  mapStateToProps, 
+  { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs }
+)(ActivityLogView)

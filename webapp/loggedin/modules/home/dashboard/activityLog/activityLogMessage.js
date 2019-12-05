@@ -1,7 +1,8 @@
 import * as R from 'ramda'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const keys = {
+export const keys = {
+  id: ActivityLog.keys.id,
   message: 'message',
   itemDeleted: 'itemDeleted',
 }

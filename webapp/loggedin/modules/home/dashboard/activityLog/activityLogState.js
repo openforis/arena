@@ -14,10 +14,10 @@ export const stateKey = 'activityLog'
 export const getState = R.pipe(HomeState.getState, R.prop(stateKey))
 
 // ===== READ
-export const getOffset = R.propOr(0, keys.offset)
-export const getLimit = R.propOr(30, keys.limit)
-export const getMessages = R.propOr([], keys.messages)
-export const isLoadComplete = R.propOr(false, keys.loadComplete)
+export const getOffset = R.pipe(getState, R.propOr(0, keys.offset))
+export const getLimit = R.pipe(getState, R.propOr(30, keys.limit))
+export const getMessages = R.pipe(getState, R.propOr([], keys.messages))
+export const isLoadComplete = R.pipe(getState, R.propOr(false, keys.loadComplete))
 
 // ===== UPDATE
 export const assocOffset = R.assoc(keys.offset)
