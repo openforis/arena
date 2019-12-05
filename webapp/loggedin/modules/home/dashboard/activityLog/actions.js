@@ -28,20 +28,26 @@ const fetchActivityLogs = async (state, offset = 0, limit = 30) => {
     } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params: { offset, limit } })
 
     // Add new messages to messages already in state and sort them by creation date in reverse order
-    const activityLogMessages = R.pipe(
+    const activityLogMessagesNew = R.pipe(
       // Exclude activities already loaded
       R.reject(activity =>
         R.includes(ActivityLog.getId(activity), R.pluck(ActivityLogMessage.keys.id, activityLogMessagesState)),
       ),
       // Parse ActivityLog into ActivityLogMessage
       R.map(ActivityLogMessageParser.toMessage(i18n, survey)),
-      // Append new messages to old ones
-      R.concat(activityLogMessagesState),
-      // Sort by id in reverse order
-      R.sortBy(R.compose(R.negate, Number, ActivityLogMessage.getId)),
     )(activityLogs)
 
-    return R.length(activityLogMessages) === R.length(activityLogMessagesState) ? null : activityLogMessages
+    // If there aren't any new messages, return null, otherwise merge the new messages with the old ones
+    return R.ifElse(
+      R.isEmpty,
+      R.always(null),
+      R.pipe(
+        // Append new messages to old ones
+        R.concat(activityLogMessagesState),
+        // Sort by id in reverse order
+        R.sortBy(R.compose(R.negate, Number, ActivityLogMessage.getId)),
+      ),
+    )(activityLogMessagesNew)
   } catch (error) {
     console.log(error)
   }
