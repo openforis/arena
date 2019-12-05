@@ -11,7 +11,6 @@ export const timeRanges = {
   _3Months: '3Months',
   _6Months: '6Months',
   _1Year: '1Year',
-
 }
 
 const keys = {
@@ -21,12 +20,13 @@ const keys = {
   timeRange: 'timeRange',
 }
 
-export const assocSummary = (timeRange, from, to, counts) => R.pipe(
-  R.assoc(keys.timeRange, timeRange),
-  R.assoc(keys.from, from),
-  R.assoc(keys.to, to),
-  R.assoc(keys.counts, counts),
-)
+export const assocSummary = (timeRange, from, to, counts) =>
+  R.pipe(
+    R.assoc(keys.timeRange, timeRange),
+    R.assoc(keys.from, from),
+    R.assoc(keys.to, to),
+    R.assoc(keys.counts, counts),
+  )
 
 export const getFrom = R.pipe(getState, R.prop(keys.from))
 export const getTo = R.pipe(getState, R.prop(keys.to))

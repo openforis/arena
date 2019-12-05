@@ -2,13 +2,12 @@ import { useState, useRef } from 'react'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 export default (placeholderRef, putProcessingStepCalculationIndex) => {
-
   const [dragging, setDragging] = useState(false)
 
-  // current element being dragged
+  // Current element being dragged
   const elementDragRef = useRef(null)
 
-  const onDragStart = (evt) => {
+  const onDragStart = evt => {
     setDragging(true)
 
     const { currentTarget } = evt
@@ -33,7 +32,6 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
     placeholder.style.display = 'flex'
 
     if (target !== placeholder) {
-
       const { top } = elementOffset(target)
       const relY = evt.clientY - top
       const height = target.offsetHeight / 2
@@ -69,5 +67,4 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
     onDragOver,
     onDragEnd,
   }
-
 }

@@ -7,7 +7,7 @@ import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpda
 import * as SurveyState from '../surveyState'
 
 const actionHandlers = {
-  // reset state
+  // Reset state
   [appUserLogout]: () => ({}),
 
   [surveyCreate]: () => ({}),

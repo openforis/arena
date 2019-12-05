@@ -32,31 +32,24 @@ const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataT
   const columnSummaryKey = CategoryImportSummary.hasColumnLang(column)
     ? 'categoryEdit.importSummary.columnTypeSummaryWithLanguage'
     : CategoryImportSummary.isColumnExtra(column)
-      ? 'categoryEdit.importSummary.columnTypeSummaryExtra'
-      : 'categoryEdit.importSummary.columnTypeSummary'
+    ? 'categoryEdit.importSummary.columnTypeSummaryExtra'
+    : 'categoryEdit.importSummary.columnTypeSummary'
 
   const dataType = CategoryImportSummary.getColumnDataType(column)
 
   return (
     <div className="table__row">
+      <div>{idx + 1}</div>
+      <div>{columnName}</div>
       <div>
-        {idx + 1}
+        {i18n.t(columnSummaryKey, {
+          type: CategoryImportSummary.getColumnType(column),
+          level: CategoryImportSummary.getColumnLevelIndex(column) + 1,
+          language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.lang),
+        })}
       </div>
       <div>
-        {columnName}
-      </div>
-      <div>
-        {
-          i18n.t(columnSummaryKey, {
-            type: CategoryImportSummary.getColumnType(column),
-            level: CategoryImportSummary.getColumnLevelIndex(column) + 1,
-            language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.lang),
-          })
-        }
-      </div>
-      <div>
-        {
-          CategoryImportSummary.isColumnExtra(column) &&
+        {CategoryImportSummary.isColumnExtra(column) && (
           <Dropdown
             readOnlyInput={true}
             items={Object.keys(Category.itemExtraDefDataTypes)}
@@ -64,69 +57,56 @@ const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataT
             selection={dataType}
             onChange={dataType => setCategoryImportSummaryColumnDataType(columnName, dataType)}
           />
-        }
+        )}
       </div>
     </div>
   )
 }
 
 const CategoryImportSummaryView = props => {
-  const {
-    summary,
-    importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType
-  } = props
+  const { summary, importCategory, hideCategoryImportSummary, setCategoryImportSummaryColumnDataType } = props
 
   const i18n = useI18n()
 
   const columns = CategoryImportSummary.getColumns(summary)
 
   return (
-    <Modal className="category-edit__import-summary"
-           onClose={hideCategoryImportSummary}>
-
+    <Modal className="category-edit__import-summary" onClose={hideCategoryImportSummary}>
       <ModalBody>
         <div className="table">
           <div className="table__content">
-            <TableHeader/>
+            <TableHeader />
             <div className="table__rows">
-              {
-                Object.entries(columns).map(([columnName, column], idx) =>
-                  <TableRow
-                    key={columnName}
-                    idx={idx}
-                    columnName={columnName}
-                    column={column}
-                    setCategoryImportSummaryColumnDataType={setCategoryImportSummaryColumnDataType}
-                  />
-                )
-              }
+              {Object.entries(columns).map(([columnName, column], idx) => (
+                <TableRow
+                  key={columnName}
+                  idx={idx}
+                  columnName={columnName}
+                  column={column}
+                  setCategoryImportSummaryColumnDataType={setCategoryImportSummaryColumnDataType}
+                />
+              ))}
             </div>
           </div>
         </div>
       </ModalBody>
 
       <ModalFooter>
-        <button className="btn modal-footer__item"
-                onClick={() => importCategory()}>
-          <span className="icon icon-upload2 icon-12px icon-left"/>
+        <button className="btn modal-footer__item" onClick={() => importCategory()}>
+          <span className="icon icon-upload2 icon-12px icon-left" />
           {i18n.t('common.import')}
         </button>
-        <button className="btn btn-close modal-footer__item"
-                onClick={() => hideCategoryImportSummary()}>
-          <span className="icon icon-cross icon-10px icon-left"/>
+        <button className="btn btn-close modal-footer__item" onClick={() => hideCategoryImportSummary()}>
+          <span className="icon icon-cross icon-10px icon-left" />
           {i18n.t('common.close')}
         </button>
       </ModalFooter>
-
     </Modal>
   )
 }
 
-export default connect(
-  null,
-  {
-    hideCategoryImportSummary,
-    importCategory,
-    setCategoryImportSummaryColumnDataType
-  }
-)(CategoryImportSummaryView)
+export default connect(null, {
+  hideCategoryImportSummary,
+  importCategory,
+  setCategoryImportSummaryColumnDataType,
+})(CategoryImportSummaryView)

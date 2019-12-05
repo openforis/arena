@@ -17,15 +17,13 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [homeActivityMessagesUpdate]: (state, { offset, limit, activityLogMessages, loadComplete }) => R.pipe(
-    ActivityLogState.assocOffset(offset),
-    ActivityLogState.assocLimit(limit),
-    ActivityLogState.assocMessages(activityLogMessages),
-    R.when(
-      R.always(loadComplete),
-      ActivityLogState.assocLoadComplete(loadComplete)
-    )
-  )(state),
+  [homeActivityMessagesUpdate]: (state, { offset, limit, activityLogMessages, loadComplete }) =>
+    R.pipe(
+      ActivityLogState.assocOffset(offset),
+      ActivityLogState.assocLimit(limit),
+      ActivityLogState.assocMessages(activityLogMessages),
+      R.when(R.always(loadComplete), ActivityLogState.assocLoadComplete(loadComplete)),
+    )(state),
 
   [homeActivityMessagesReset]: () => ({}),
 }

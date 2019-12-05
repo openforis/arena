@@ -18,11 +18,149 @@
     "dev:server": "npm run build:server:dev && npm-run-all --parallel nodemon:prod watch:server",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js --watch",
     "nodemon:prod": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
-    "test": "mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
+    "test": "xo && mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
     "test:docker": "test/run_docker_tests.sh",
     "postinstall": "webpack --display-error-details --config webpack.config.babel.js",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
-    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\""
+    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
+    "format": "yarn run xo --fix"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "xo --fix",
+      "git add"
+    ]
+  },
+  "xo": {
+    "semicolon": false,
+    "prettier": true,
+    "space": 2,
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
+    "rules": {
+      "unicorn/filename-case": "off",
+      "comma-dangle": "off",
+      "prefer-destructuring": "off",
+      "react/prop-types": "off",
+      "prefer-named-capture-group": "off",
+      "no-negated-condition": "off",
+      "no-await-in-loop": "off",
+      "no-return-await": "off",
+      "new-cap": "off",
+      "no-alert": "off",
+      "max-params": [
+        "warn",
+        {
+          "max": 6
+        }
+      ],
+      "import/no-unassigned-import": [
+        "warn",
+        {
+          "allow": [
+            "**/*.css",
+            "**/*.scss",
+            "**/*.sass",
+            "**/polyfill",
+            "dotenv/config",
+            "core-js/stable",
+            "regenerator-runtime/runtime"
+          ]
+        }
+      ],
+      "no-unused-vars": [
+        "warn",
+        {
+          "varsIgnorePattern": "^_",
+          "argsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ],
+      "operator-linebreak": [
+        "error",
+        "after",
+        {
+          "overrides": {
+            "?": "before",
+            ":": "before"
+          }
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "files": [
+          "*.js"
+        ],
+        "env": [
+          "node"
+        ]
+      },
+      {
+        "files": [
+          "common/**/*.js",
+          "core/**/*.js"
+        ],
+        "env": [
+          "shared-node-browser",
+          "commonjs"
+        ]
+      },
+      {
+        "files": [
+          "server/**/*.js"
+        ],
+        "env": [
+          "node"
+        ]
+      },
+      {
+        "files": [
+          "webapp/**/*.js",
+          "webapp/**/*.jsx"
+        ],
+        "env": [
+          "browser",
+          "commonjs"
+        ],
+        "extends": [
+          "plugin:react/recommended",
+          "prettier/react"
+        ],
+        "plugins": [
+          "react"
+        ]
+      },
+      {
+        "files": [
+          "test/**/*.js"
+        ],
+        "env": [
+          "node",
+          "mocha"
+        ],
+        "extends": [
+          "plugin:chai-friendly/recommended",
+          "plugin:mocha/recommended"
+        ],
+        "plugins": [
+          "chai-friendly",
+          "mocha"
+        ],
+        "rules": {
+          "mocha/no-mocha-arrows": "off",
+          "mocha/no-hooks-for-single-case": "off"
+        }
+      }
+    ]
+  },
+  "prettier": {
+    "bracketSpacing": true,
+    "trailingComma": "all",
+    "printWidth": 120
   },
   "devDependencies": {
     "@babel/cli": "^7.6.3",
@@ -37,10 +175,18 @@
     "chai": "^4.2.0",
     "cross-env": "^6.0.3",
     "css-loader": "^3.2.0",
+    "eslint": "^6.7.1",
+    "eslint-config-xo-react": "^0.20.0",
+    "eslint-plugin-chai-friendly": "^0.5.0",
+    "eslint-plugin-mocha": "^6.2.2",
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^2.3.0",
     "git-revision-webpack-plugin": "^3.0.4",
     "google-fonts-plugin": "^4.1.0",
     "html-replace-webpack-plugin": "^2.5.6",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^3.1.0",
+    "lint-staged": "^9.5.0",
     "mini-css-extract-plugin": "^0.8.0",
     "mocha": "^6.2.1",
     "mochapack": "^1.1.11",
@@ -50,6 +196,7 @@
     "npm-run-all": "^4.1.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "redux-logger": "^3.0.6",
+    "regenerator-runtime": "^0.13.3",
     "sass-loader": "^8.0.0",
     "skeleton-loader": "^2.0.0",
     "style-loader": "^1.0.0",
@@ -58,7 +205,8 @@
     "webpack-bundle-analyzer": "^3.5.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.8.2",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "xo": "^0.25.3"
   },
   "dependencies": {
     "@esri/proj-codes": "^2.2.0",
@@ -144,5 +292,10 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "version": "0.1.0"
+  "version": "0.1.1",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
 }

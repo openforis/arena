@@ -1,10 +1,6 @@
 import { exportReducer } from '../../utils/reduxUtils'
 
-import {
-  appJobActiveUpdate,
-  appJobStart,
-} from './actions'
-
+import { appJobActiveUpdate, appJobStart } from './actions'
 
 import * as JobState from './appJobState'
 

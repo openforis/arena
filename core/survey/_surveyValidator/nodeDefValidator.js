@@ -27,53 +27,50 @@ const validateTaxonomy = async (propName, nodeDef) =>
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.taxonomyRequired)(propName, nodeDef)
     : null
 
-const validateChildren = survey =>
-  (propName, nodeDef) => {
-    if (NodeDef.isEntity(nodeDef)) {
-      const children = Survey.getNodeDefChildren(nodeDef)(survey)
-      if (R.isEmpty(children)) {
-        return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
-      }
+const validateChildren = survey => (propName, nodeDef) => {
+  if (NodeDef.isEntity(nodeDef)) {
+    const children = Survey.getNodeDefChildren(nodeDef)(survey)
+    if (R.isEmpty(children)) {
+      return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
     }
-    return null
   }
 
-const countKeyAttributes = (survey, nodeDefEntity) => R.pipe(
-  Survey.getNodeDefChildren(nodeDefEntity),
-  R.filter(NodeDef.isKey),
-  R.length
-)(survey)
+  return null
+}
 
-const validateKeyAttributes = survey =>
-  (propName, nodeDef) => {
-    if (NodeDef.isEntity(nodeDef)) {
-      const keyAttributesCount = countKeyAttributes(survey, nodeDef)
+const countKeyAttributes = (survey, nodeDefEntity) =>
+  R.pipe(Survey.getNodeDefChildren(nodeDefEntity), R.filter(NodeDef.isKey), R.length)(survey)
 
-      if (keyAttributesCount === 0 &&
-        (
-          NodeDef.isRoot(nodeDef) ||
-          (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef))
-        )
-      ) {
-        return { key: Validation.messageKeys.nodeDefEdit.keysEmpty }
-      } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: Validation.messageKeys.nodeDefEdit.keysExceedingMax }
-      }
+const validateKeyAttributes = survey => (propName, nodeDef) => {
+  if (NodeDef.isEntity(nodeDef)) {
+    const keyAttributesCount = countKeyAttributes(survey, nodeDef)
+
+    if (
+      keyAttributesCount === 0 &&
+      (NodeDef.isRoot(nodeDef) || (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef)))
+    ) {
+      return { key: Validation.messageKeys.nodeDefEdit.keysEmpty }
     }
-    return null
+
+    if (keyAttributesCount > NodeDef.maxKeyAttributes) {
+      return { key: Validation.messageKeys.nodeDefEdit.keysExceedingMax }
+    }
   }
 
-const validateKey = survey =>
-  (propName, nodeDef) => {
-    if (!NodeDef.isEntity(nodeDef) && NodeDef.isKey(nodeDef)) {
-      const keyAttributesCount = countKeyAttributes(survey, nodeDef)
+  return null
+}
 
-      if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: Validation.messageKeys.nodeDefEdit.keysExceedingMax }
-      }
+const validateKey = survey => (propName, nodeDef) => {
+  if (!NodeDef.isEntity(nodeDef) && NodeDef.isKey(nodeDef)) {
+    const keyAttributesCount = countKeyAttributes(survey, nodeDef)
+
+    if (keyAttributesCount > NodeDef.maxKeyAttributes) {
+      return { key: Validation.messageKeys.nodeDefEdit.keysExceedingMax }
     }
-    return null
   }
+
+  return null
+}
 
 const validateReadOnly = (propName, nodeDef) =>
   NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
@@ -85,7 +82,7 @@ const propsValidations = survey => ({
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateName(Validation.messageKeys.nodeDefEdit.nameInvalid),
-    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey))
+    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey)),
   ],
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
@@ -99,19 +96,16 @@ const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = await Promise.all([
     NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
     NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
-    NodeDefValidationsValidator.validate(survey, nodeDef)
+    NodeDefValidationsValidator.validate(survey, nodeDef),
   ])
 
   return Validation.newInstance(
     R.all(Validation.isValid, validations),
-    R.reject(
-      Validation.isValid,
-      {
-        [NodeDef.propKeys.defaultValues]: validations[0],
-        [NodeDef.propKeys.applicable]: validations[1],
-        [NodeDef.propKeys.validations]: validations[2],
-      }
-    )
+    R.reject(Validation.isValid, {
+      [NodeDef.propKeys.defaultValues]: validations[0],
+      [NodeDef.propKeys.applicable]: validations[1],
+      [NodeDef.propKeys.validations]: validations[2],
+    }),
   )
 }
 
@@ -122,18 +116,15 @@ const validateNodeDef = async (survey, nodeDef) => {
 
   const validation = R.pipe(
     R.mergeDeepLeft(advancedPropsValidation),
-    Validation.setValid(Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation))
+    Validation.setValid(Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation)),
   )(nodeDefValidation)
 
   return Validation.isValid(validation) ? null : validation
 }
 
 export const validateNodeDefs = async survey => {
-  // build and assoc dependency graph to survey
-  survey = R.pipe(
-    Survey.buildDependencyGraph,
-    graph => Survey.assocDependencyGraph(graph)(survey)
-  )(survey)
+  // Build and assoc dependency graph to survey
+  survey = R.pipe(Survey.buildDependencyGraph, graph => Survey.assocDependencyGraph(graph)(survey))(survey)
 
   const validation = Validation.newInstance()
 

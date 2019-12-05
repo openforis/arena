@@ -1,9 +1,6 @@
 import { exportReducer } from '../../utils/reduxUtils'
 
-import {
-  appNotificationShow,
-  appNotificationHide,
-} from './actions'
+import { appNotificationShow, appNotificationHide } from './actions'
 
 import * as NotificationState from './appNotificationState'
 

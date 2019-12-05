@@ -6,19 +6,26 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
-import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as SurveyManager from '../../../manager/surveyManager'
 
 export default class NodeDefsValidationJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super(NodeDefsValidationJob.type, params)
   }
 
-  async execute (tx) {
-    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
+  async execute() {
+    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, false, this.tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
     for (const cycle of cycleKeys) {
-      const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, cycle, true, true, true, false, tx)
+      const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        this.surveyId,
+        cycle,
+        true,
+        true,
+        true,
+        false,
+        this.tx,
+      )
 
       R.pipe(
         Survey.getNodeDefsValidation,
@@ -26,9 +33,10 @@ export default class NodeDefsValidationJob extends Job {
         R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
           const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(surveyAndNodeDefs)
           this.errors[NodeDef.getName(nodeDef)] = Validation.getFieldValidations(nodeDefValidation)
-        })
+        }),
       )(surveyAndNodeDefs)
     }
+
     if (!R.isEmpty(this.errors)) {
       await this.setStatusFailed()
     }

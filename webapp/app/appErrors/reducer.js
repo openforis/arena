@@ -1,9 +1,6 @@
 import { exportReducer } from '../../utils/reduxUtils'
 
-import {
-  appErrorCreate,
-  appErrorDelete,
-} from './actions'
+import { appErrorCreate, appErrorDelete } from './actions'
 
 import * as ErrorsState from './appErrorsState'
 

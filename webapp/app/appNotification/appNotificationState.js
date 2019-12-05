@@ -30,7 +30,7 @@ export const isVisible = R.pipe(getState, R.propEq(keys.visible, true))
 
 export const show = notification => ({
   ...notification,
-  [keys.visible]: true
+  [keys.visible]: true,
 })
 
 export const hide = () => ({})

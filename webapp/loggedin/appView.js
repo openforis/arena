@@ -2,10 +2,10 @@ import './appView.scss'
 
 import React from 'react'
 
+import AppErrors from '../app/appErrors/appErrors'
 import AppHeader from './appHeader/appHeader'
 import AppSideBar from './appSideBar/appSideBar'
 import AppJobMonitor from './appJob/appJobMonitor'
-import AppErrors from '../app/appErrors/appErrors'
 import ModuleSwitch from './modules/moduleSwitch'
 
 const AppView = props => {
@@ -14,17 +14,15 @@ const AppView = props => {
 
   return (
     <>
-
-      <AppHeader/>
+      <AppHeader />
 
       <div className="app__container">
-        <AppSideBar pathname={pathName}/>
-        <ModuleSwitch location={location}/>
+        <AppSideBar pathname={pathName} />
+        <ModuleSwitch location={location} />
       </div>
 
-      <AppJobMonitor/>
-      <AppErrors/>
-
+      <AppJobMonitor />
+      <AppErrors />
     </>
   )
 }

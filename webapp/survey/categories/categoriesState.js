@@ -7,58 +7,46 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
 
-// category
+// Category
 
 export const assocCategory = category => R.assoc(Category.getUuid(category), category)
 
 export const dissocCategory = category => R.dissoc(Category.getUuid(category))
 
-export const assocCategoryProp = (category, key, value) => R.pipe(
-  R.assocPath([
-      Category.getUuid(category),
-      ObjectUtils.keys.props,
-      key
-    ],
-    value
-  ),
-  R.dissocPath([
-    Category.getUuid(category),
-    Validation.keys.validation,
-    Validation.keys.fields,
-    key
-  ]),
-)
+export const assocCategoryProp = (category, key, value) =>
+  R.pipe(
+    R.assocPath([Category.getUuid(category), ObjectUtils.keys.props, key], value),
+    R.dissocPath([Category.getUuid(category), Validation.keys.validation, Validation.keys.fields, key]),
+  )
 
-// category level
+// Category level
 
-export const assocCategoryLevelProp = (category, level, key, value) => R.pipe(
-  R.assocPath([
+export const assocCategoryLevelProp = (category, level, key, value) =>
+  R.pipe(
+    R.assocPath(
+      [
+        Category.getUuid(category),
+        Category.keys.levels,
+        String(CategoryLevel.getIndex(level)),
+        ObjectUtils.keys.props,
+        key,
+      ],
+      value,
+    ),
+    R.dissocPath([
       Category.getUuid(category),
       Category.keys.levels,
-      CategoryLevel.getIndex(level) + '',
-      ObjectUtils.keys.props,
-      key
-    ],
-    value
-  ),
-  R.dissocPath([
-    Category.getUuid(category),
-    Category.keys.levels,
-    CategoryLevel.getIndex(level) + '',
-    Validation.keys.validation,
-    Validation.keys.fields,
-    key
-  ])
-)
+      String(CategoryLevel.getIndex(level)),
+      Validation.keys.validation,
+      Validation.keys.fields,
+      key,
+    ]),
+  )
 
 export const dissocCategoryLevel = (category, level) =>
-  R.dissocPath([
-    Category.getUuid(category),
-    Category.keys.levels,
-    level.index + ''
-  ])
+  R.dissocPath([Category.getUuid(category), Category.keys.levels, String(level.index)])
 
-// category level items
+// Category level items
 
 export const dissocCategoryLevelItemValidation = (category, item, key) =>
   R.dissocPath([
@@ -69,6 +57,5 @@ export const dissocCategoryLevelItemValidation = (category, item, key) =>
     Validation.keys.fields,
     CategoryItem.getUuid(item),
     Validation.keys.fields,
-    key
+    key,
   ])
-

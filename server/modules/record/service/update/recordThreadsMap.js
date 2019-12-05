@@ -1,7 +1,7 @@
 import ThreadsCache from '@server/threads/threadsCache'
 
 const threads = new ThreadsCache()
-const threadZombies = new Set() // set of threads marked to be killed
+const threadZombies = new Set() // Set of threads marked to be killed
 
 // thread cache
 export const get = recordUuid => threads.getThread(recordUuid)
@@ -13,7 +13,7 @@ export const remove = recordUuid => {
   threadZombies.delete(recordUuid)
 }
 
-// thread zombies
+// Thread zombies
 export const markZombie = recordUuid => threadZombies.add(recordUuid)
 
 export const reviveZombie = recordUuid => threadZombies.delete(recordUuid)

@@ -9,15 +9,21 @@ const DataPath = props => {
   const { xScale, yScale, transitionDuration } = chartProps
   const elementRef = useRef(null)
 
-  const getPath = d3.line()
-    .x((d) => xScale(d.date))
-    .y((d) => yScale(d.count))
+  const getPath = d3
+    .line()
+    .x(d => xScale(d.date))
+    .y(d => yScale(d.count))
     .curve(d3.curveMonotoneX)
 
-  const getEmptyPath = () => getPath([{ date: from, count: 0 }, { date: to, count: 0 }])
+  const getEmptyPath = () =>
+    getPath([
+      { date: from, count: 0 },
+      { date: to, count: 0 },
+    ])
 
   const interpolatePath = (previous, current) =>
-    d3.select(elementRef.current)
+    d3
+      .select(elementRef.current)
       .transition()
       .ease(d3.easePolyOut)
       .duration(transitionDuration)
@@ -31,15 +37,10 @@ const DataPath = props => {
     const dataEmpty = R.isEmpty(counts)
     const previous = elementRef.current.getAttribute('d')
     const current = dataEmpty ? getEmptyPath() : getPath(counts)
-    interpolatePath(previous, current)
-      .style('opacity', dataEmpty ? 0 : 1)
+    interpolatePath(previous, current).style('opacity', dataEmpty ? 0 : 1)
   }, [chartProps])
 
-  return (
-    <path className="data-path"
-          style={{ opacity: 0 }}
-          ref={elementRef}/>
-  )
+  return <path className="data-path" style={{ opacity: 0 }} ref={elementRef} />
 }
 
 export default DataPath

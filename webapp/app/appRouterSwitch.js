@@ -7,31 +7,25 @@ import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
 import LoginView from '@webapp/login/loginView'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import { activeJobUpdate } from '../loggedin/appJob/actions'
 import AppLoaderView from './appLoader/appLoaderView'
 import AppNotificationView from './appNotification/appNotificationView'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
-
 import * as AppWebSocket from './appWebSocket'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import AppContext from './appContext'
 
 import * as AppState from './appState'
 
 import { initApp, throwSystemError } from './actions'
-import { activeJobUpdate } from '../loggedin/appJob/actions'
 
 const AppRouterSwitch = props => {
-
-  const {
-    isReady, systemError, user,
-    initApp, throwSystemError, activeJobUpdate,
-    i18n
-  } = props
+  const { isReady, systemError, user, initApp, throwSystemError, activeJobUpdate, i18n } = props
 
   const openSocket = () => {
-    (async () => {
+    ;(async () => {
       await AppWebSocket.openSocket(throwSystemError)
       AppWebSocket.on(WebSocketEvents.jobUpdate, activeJobUpdate)
     })()
@@ -57,41 +51,31 @@ const AppRouterSwitch = props => {
     }
   }, [isReady, User.getUuid(user)])
 
-  return systemError
-    ? (
-      <div className="main__system-error">
-        <div className="main__system-error-container">
-          <span className="icon icon-warning icon-24px icon-left"/>
-          {i18n.t('systemErrors.somethingWentWrong')}
-          <div className="error">{systemError}</div>
-        </div>
+  return systemError ? (
+    <div className="main__system-error">
+      <div className="main__system-error-container">
+        <span className="icon icon-warning icon-24px icon-left" />
+        {i18n.t('systemErrors.somethingWentWrong')}
+        <div className="error">{systemError}</div>
       </div>
-    )
-    : isReady &&
-    (
+    </div>
+  ) : (
+    isReady && (
       <AppContext.Provider value={{ i18n }}>
+        {user ? (
+          <Route
+            path="/app"
+            render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}
+          />
+        ) : (
+          <LoginView />
+        )}
 
-        {
-          user
-            ? (
-              <Route
-                path="/app"
-                render={props => (
-                  <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')}/>
-                )}
-              />
-            )
-            : (
-              <LoginView/>
-            )
-        }
-
-        <AppLoaderView/>
-        <AppNotificationView/>
-
+        <AppLoaderView />
+        <AppNotificationView />
       </AppContext.Provider>
     )
-
+  )
 }
 
 const mapStateToProps = state => ({
@@ -101,12 +85,6 @@ const mapStateToProps = state => ({
   i18n: AppState.getI18n(state),
 })
 
-const enhance = compose(
-  withRouter,
-  connect(
-    mapStateToProps,
-    { initApp, throwSystemError, activeJobUpdate }
-  )
-)
+const enhance = compose(withRouter, connect(mapStateToProps, { initApp, throwSystemError, activeJobUpdate }))
 
 export default enhance(AppRouterSwitch)

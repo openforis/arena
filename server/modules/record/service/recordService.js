@@ -1,5 +1,5 @@
-import * as R from 'ramda'
 import * as fs from 'fs'
+import * as R from 'ramda'
 
 import * as Log from '@server/log/log'
 
@@ -31,7 +31,7 @@ export const createRecord = async (socketId, user, surveyId, recordToCreate) => 
 
   const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
-  // create record thread and initialize record
+  // Create record thread and initialize record
   const thread = RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, Record.getUuid(recordToCreate))
   thread.postMessage({ type: RecordThreadMessageTypes.recordInit })
 
@@ -56,7 +56,7 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Record.getCycle(record))
   await RecordManager.deleteRecord(user, survey, recordUuid)
 
-  // notify other users viewing or editing the record it has been deleted
+  // Notify other users viewing or editing the record it has been deleted
   const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
   socketIds.forEach(socketIdCurrent => {
     if (socketIdCurrent !== socketId) {
@@ -68,9 +68,9 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
 
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const counts = await Promise.all(surveyIds.map(
-    surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
-  ))
+  const counts = await Promise.all(
+    surveyIds.map(surveyId => RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)),
+  )
   return R.sum(counts)
 }
 
@@ -83,6 +83,7 @@ export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
     RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, recordUuid)
   }
+
   RecordServiceThreads.assocSocket(recordUuid, socketId)
 
   return record
@@ -124,16 +125,28 @@ export const persistNode = async (socketId, user, surveyId, node, file) => {
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
-    //save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile(Node.getFileUuid(node), file.name, file.size, fs.readFileSync(file.tempFilePath), recordUuid, Node.getUuid(node))
+    // Save file to "file" table and set fileUuid and fileName into node value
+    const fileObj = RecordFile.createFile(
+      Node.getFileUuid(node),
+      file.name,
+      file.size,
+      fs.readFileSync(file.tempFilePath),
+      recordUuid,
+      Node.getUuid(node),
+    )
     await FileManager.insertFile(surveyId, fileObj)
   }
 
-  _sendNodeUpdateMessage(
-    socketId, user, surveyId, recordUuid, { type: RecordThreadMessageTypes.nodePersist, node, user }
-  )
+  _sendNodeUpdateMessage(socketId, user, surveyId, recordUuid, {
+    type: RecordThreadMessageTypes.nodePersist,
+    node,
+    user,
+  })
 }
 
-export const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) => _sendNodeUpdateMessage(
-  socketId, user, surveyId, recordUuid, { type: RecordThreadMessageTypes.nodeDelete, nodeUuid, user }
-)
+export const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) =>
+  _sendNodeUpdateMessage(socketId, user, surveyId, recordUuid, {
+    type: RecordThreadMessageTypes.nodeDelete,
+    nodeUuid,
+    user,
+  })

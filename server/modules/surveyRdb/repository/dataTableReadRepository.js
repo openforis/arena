@@ -37,13 +37,13 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
     R.join(' AND '),
   )(nodeDefKeys)
 
-  const recordAndParentEqualCondition =
-    NodeDef.isRoot(nodeDefEntity)
-      ? ''
-      : `AND ${getColEqualCondition(DataTable.colNameRecordUuuid)}
+  const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
+    ? ''
+    : `AND ${getColEqualCondition(DataTable.colNameRecordUuuid)}
          AND ${getColEqualCondition(DataTable.colNameParentUuuid)}`
 
-  return await client.any(`
+  return await client.any(
+    `
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
     FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
@@ -65,18 +65,25 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       )
     GROUP BY r.uuid, r.validation
     `,
-    [cycle]
+    [cycle],
   )
 }
 
-export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUuid, recordUuid, nodeUuid = null, client = db) => {
+export const fetchEntityKeysByRecordAndNodeDefUuid = async (
+  survey,
+  entityDefUuid,
+  recordUuid,
+  nodeUuid = null,
+  client = db,
+) => {
   const surveyId = Survey.getId(survey)
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
   const keyColumns = R.pipe(R.map(NodeDefTable.getColName), R.join(', '))(entityDefKeys)
 
-  return await client.oneOrNone(`
+  return await client.oneOrNone(
+    `
     SELECT
       ${keyColumns}
     FROM
@@ -85,6 +92,6 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (survey, entityDefUui
       ${DataTable.colNameRecordUuuid} = $1
       ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.colNameUuuid} = $2`}`,
     [recordUuid, nodeUuid],
-    row => Object.values(row)
+    row => Object.values(row),
   )
 }

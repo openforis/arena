@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { uuidv4 } from '@core/uuid';
+import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -7,7 +7,7 @@ export const keys = {
   uuid: 'uuid',
   props: 'props',
   parentUuid: 'parentUuid',
-  levelUuid: 'levelUuid'
+  levelUuid: 'levelUuid',
 }
 
 export const props = {
@@ -16,7 +16,7 @@ export const props = {
 }
 
 export const keysExtraDef = {
-  dataType: 'dataType'
+  dataType: 'dataType',
 }
 
 // ====== CREATE
@@ -41,7 +41,4 @@ export const getProps = ObjectUtils.getProps
 export const isEqual = ObjectUtils.isEqual
 
 // NOT USED YET
-export const getExtraProp = prop => R.pipe(
-  ObjectUtils.getProp(keys.extra),
-  R.propOr('', prop),
-)
+export const getExtraProp = prop => R.pipe(ObjectUtils.getProp(keys.extra), R.propOr('', prop))

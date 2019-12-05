@@ -6,7 +6,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyViewsState from '../surveyViewsState'
 
 const keys = {
-  nodeDefUuid: 'nodeDefUuid', // current nodeDef edit
+  nodeDefUuid: 'nodeDefUuid', // Current nodeDef edit
 }
 
 export const stateKey = 'nodeDefEdit'
@@ -22,8 +22,4 @@ export const getNodeDef = state => {
   return Survey.getNodeDefByUuid(nodeDefUuidEdit)(survey)
 }
 
-export const hasNodeDef = R.pipe(
-  getNodeDef,
-  R.isNil,
-  R.not
-)
+export const hasNodeDef = R.pipe(getNodeDef, R.isNil, R.not)

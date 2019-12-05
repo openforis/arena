@@ -13,26 +13,34 @@ import { normalizeName } from '@core/stringUtils'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
-import LabelsEditor from '../../labelsEditor/labelsEditor'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import * as SurveyState from '@webapp/survey/surveyState'
+import LabelsEditor from '../../labelsEditor/labelsEditor'
+import * as NodeDefEditState from '../nodeDefEditState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefEditState from '../nodeDefEditState'
-
 const BasicProps = props => {
   const {
-    surveyCycleKey, nodeDef, validation,
-    nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
+    surveyCycleKey,
+    nodeDef,
+    validation,
+    nodeDefKeyEditDisabled,
+    nodeDefMultipleEditDisabled,
 
-    cyclesKeysSurvey, cyclesKeysParent,
-    displayAsEnabled, displayInEnabled,
-    displayAsFormDisabled, displayAsTableDisabled,
-    displayInParentPageDisabled, displayInOwnPageDisabled,
+    cyclesKeysSurvey,
+    cyclesKeysParent,
+    displayAsEnabled,
+    displayInEnabled,
+    displayAsFormDisabled,
+    displayAsTableDisabled,
+    displayInParentPageDisabled,
+    displayInOwnPageDisabled,
 
-    putNodeDefProp, putNodeDefLayoutProp,
-    toggleTaxonomyEdit, toggleCategoryEdit
+    putNodeDefProp,
+    putNodeDefLayoutProp,
+    toggleTaxonomyEdit,
+    toggleCategoryEdit,
   } = props
 
   const i18n = useI18n()
@@ -51,60 +59,62 @@ const BasicProps = props => {
         <Input
           value={NodeDef.getName(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-          onChange={value => putNodeDefProp(nodeDef, NodeDef.propKeys.name, normalizeName(value))}/>
+          onChange={value => putNodeDefProp(nodeDef, NodeDef.propKeys.name, normalizeName(value))}
+        />
       </FormItem>
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={labels => putNodeDefProp(nodeDef, NodeDef.propKeys.labels, labels)}/>
+        onChange={labels => putNodeDefProp(nodeDef, NodeDef.propKeys.labels, labels)}
+      />
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={descriptions => putNodeDefProp(nodeDef, NodeDef.propKeys.descriptions, descriptions)}/>
+        onChange={descriptions => putNodeDefProp(nodeDef, NodeDef.propKeys.descriptions, descriptions)}
+      />
 
-      {
-        NodeDef.isCode(nodeDef) &&
+      {NodeDef.isCode(nodeDef) && (
         <CodeProps
           surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           validation={validation}
           toggleCategoryEdit={toggleCategoryEdit}
           putNodeDefProp={putNodeDefProp}
-          putNodeDefLayoutProp={putNodeDefLayoutProp}/>
-      }
+          putNodeDefLayoutProp={putNodeDefLayoutProp}
+        />
+      )}
 
-      {
-        NodeDef.isTaxon(nodeDef) &&
+      {NodeDef.isTaxon(nodeDef) && (
         <TaxonProps
           nodeDef={nodeDef}
           validation={validation}
           toggleTaxonomyEdit={toggleTaxonomyEdit}
-          putNodeDefProp={putNodeDefProp}/>
-      }
+          putNodeDefProp={putNodeDefProp}
+        />
+      )}
 
-      {
-        NodeDef.canNodeDefBeKey(nodeDef) &&
+      {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
-            onChange={(checked) => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}/>
+            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}
+          />
         </FormItem>
-      }
+      )}
 
-      {
-        NodeDef.canNodeDefBeMultiple(nodeDef) &&
+      {NodeDef.canNodeDefBeMultiple(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
-            onChange={(checked) => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}/>
+            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}
+          />
         </FormItem>
-      }
+      )}
 
-      {
-        displayAsEnabled &&
+      {displayAsEnabled && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
@@ -123,18 +133,19 @@ const BasicProps = props => {
             ]}
           />
         </FormItem>
-      }
+      )}
 
-      {
-        displayInEnabled &&
+      {displayInEnabled && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={displayIn}
-            onChange={displayIn => putNodeDefLayoutProp(
-              nodeDef,
-              NodeDefLayout.keys.pageUuid,
-              displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4()
-            )}
+            onChange={displayIn =>
+              putNodeDefLayoutProp(
+                nodeDef,
+                NodeDefLayout.keys.pageUuid,
+                displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4(),
+              )
+            }
             items={[
               {
                 key: NodeDefLayout.displayIn.parentPage,
@@ -149,31 +160,32 @@ const BasicProps = props => {
             ]}
           />
         </FormItem>
-      }
+      )}
 
-      {
-        cyclesKeysSurvey.length > 1 &&
+      {cyclesKeysSurvey.length > 1 && (
         <FormItem label={i18n.t('common.cycle_plural')}>
           <ButtonGroup
             multiple={true}
             deselectable={true}
             selectedItemKey={cyclesNodeDef}
-            onChange={cycles => putNodeDefProp(
-              nodeDef,
-              NodeDef.propKeys.cycles,
-              cycles.sort((a, b) => Number(a) - Number(b)),
-            )}
+            onChange={cycles =>
+              putNodeDefProp(
+                nodeDef,
+                NodeDef.propKeys.cycles,
+                cycles.sort((a, b) => Number(a) - Number(b)),
+              )
+            }
             items={cyclesKeysParent.map(cycle => ({
               key: cycle,
               label: Number(cycle) + 1,
               disabled:
-                cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0] || // disabled if current cycle is the only one selected in nodeDef
-                cycle === surveyCycleKey // cannot remove nodeDef from current cycle
+                (cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0]) || // Disabled if current cycle is the only one selected in nodeDef
+                cycle === surveyCycleKey, // Cannot remove nodeDef from current cycle
             }))}
             disabled={NodeDef.isRoot(nodeDef)}
           />
         </FormItem>
-      }
+      )}
     </div>
   )
 }

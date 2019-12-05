@@ -14,14 +14,13 @@ export default {
 
   [ActivityLog.type.nodeDefCreate]: survey => activityLog => {
     const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
-    const nodeDefParent = R.pipe(
-      ActivityLog.getContentParentUuid,
-      nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const nodeDefParent = R.pipe(ActivityLog.getContentParentUuid, nodeDefUuid =>
+      Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     )(activityLog)
 
     return {
       type: NodeDef.getType(nodeDef),
-      parentName: NodeDef.getName(nodeDefParent)
+      parentName: NodeDef.getName(nodeDefParent),
     }
   },
 
@@ -33,11 +32,11 @@ export default {
         ...content.props,
         ...content.propsAdvanced,
       }),
-      name: NodeDef.getName(nodeDef)
+      name: NodeDef.getName(nodeDef),
     }
   },
 
   [ActivityLog.type.nodeDefMarkDeleted]: () => activityLog => ({
-    name: ActivityLog.getContentName(activityLog)
+    name: ActivityLog.getContentName(activityLog),
   }),
 }

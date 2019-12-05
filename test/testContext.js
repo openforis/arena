@@ -11,7 +11,7 @@ let survey = null
 import { db } from '@server/db/db'
 
 const createAdminUser = async () => {
-    await db.multi(`
+  await db.multi(`
     -- Insert the admin user to be used in the test suite:
     INSERT INTO "user" (name, email)
     values ('Admin', 'admin@openforis.org')
@@ -35,8 +35,9 @@ export const initTestContext = async () => {
 }
 
 export const destroyTestContext = async () => {
-  if (survey)
+  if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+  }
 }
 
 export const setContextSurvey = s => {
@@ -50,4 +51,3 @@ export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
 export const getContextUser = () => user
 export const getContextSurvey = () => survey
 export const getContextSurveyId = () => Survey.getId(survey)
-

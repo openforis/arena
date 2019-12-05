@@ -18,30 +18,33 @@ import {
 // ============== CREATE
 
 export const insertCategory = async (surveyId, category, client = db) =>
-  await client.one(`
+  await client.one(
+    `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props_draft)
         VALUES ($1, $2)
         RETURNING *`,
     [Category.getUuid(category), category.props],
-    def => dbTransformCallback(def, true, true)
+    def => dbTransformCallback(def, true, true),
   )
 
 export const insertLevel = async (surveyId, level, client = db) =>
-  await client.one(`
+  await client.one(
+    `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), level.props],
-    def => dbTransformCallback(def, true, true)
+    def => dbTransformCallback(def, true, true),
   )
 
 export const insertItem = async (surveyId, item, client = db) =>
-  await client.one(`
+  await client.one(
+    `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
-    def => dbTransformCallback(def, true, true)
+    def => dbTransformCallback(def, true, true),
   )
 
 export const insertItems = async (surveyId, items, client = db) => {
@@ -49,15 +52,17 @@ export const insertItems = async (surveyId, items, client = db) => {
     CategoryItem.getUuid(item),
     CategoryItem.getLevelUuid(item),
     CategoryItem.getParentUuid(item),
-    item.props
+    item.props,
   ])
 
-  await client.none(DbUtils.insertAllQuery(
-    getSurveyDBSchema(surveyId),
-    'category_item',
-    ['uuid', 'level_uuid', 'parent_uuid', 'props_draft'],
-    values
-  ))
+  await client.none(
+    DbUtils.insertAllQuery(
+      getSurveyDBSchema(surveyId),
+      'category_item',
+      ['uuid', 'level_uuid', 'parent_uuid', 'props_draft'],
+      values,
+    ),
+  )
 }
 
 // ============== READ
@@ -72,7 +77,7 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
             'id', l.id, 
             'uuid', l.uuid, 
             'index', l.index, 
-            'props', l.props${draft ? ` || l.props_draft` : ''}
+            'props', l.props${draft ? ' || l.props_draft' : ''}
           )) AS levels
         FROM
           ${getSurveyDBSchema(surveyId)}.category_level l
@@ -83,10 +88,10 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
       json_object_agg(c.uuid, json_build_object( 
       'id', c.id,
       'uuid', c.uuid,
-      'props', c.props${draft ? ` || c.props_draft` : ''},
+      'props', c.props${draft ? ' || c.props_draft' : ''},
       'published', c.published, 
       'levels', l.levels
-      ${includeValidation ? `, 'validation', c.validation` : ''}
+      ${includeValidation ? ", 'validation', c.validation" : ''}
       )) AS categories
     FROM
       ${getSurveyDBSchema(surveyId)}.category c
@@ -95,21 +100,33 @@ const _getFetchCategoriesAndLevelsQuery = (surveyId, draft, includeValidation) =
     ON
       c.uuid = l.category_uuid`
 
-export const fetchCategoriesAndLevelsBySurveyId = async (surveyId, draft = false, includeValidation = false, client = db) => {
+export const fetchCategoriesAndLevelsBySurveyId = async (
+  surveyId,
+  draft = false,
+  includeValidation = false,
+  client = db,
+) => {
   const { categories } = await client.one(_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation))
   return categories || {}
 }
 
-export const fetchCategoryAndLevelsByUuid = async (surveyId, categoryUuid, draft = false, includeValidation = false, client = db) => {
+export const fetchCategoryAndLevelsByUuid = async (
+  surveyId,
+  categoryUuid,
+  draft = false,
+  includeValidation = false,
+  client = db,
+) => {
   const { categories } = await client.one(
     `${_getFetchCategoriesAndLevelsQuery(surveyId, draft, includeValidation)} WHERE c.uuid = $1`,
-    [categoryUuid]
+    [categoryUuid],
   )
   return R.pipe(R.values, R.head)(categories)
 }
 
 export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
-  const items = await client.map(`
+  const items = await client.map(
+    `
       SELECT i.* 
       FROM ${getSurveyDBSchema(surveyId)}.category_item i
       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
@@ -118,35 +135,28 @@ export const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = f
      ORDER BY i.id
     `,
     [categoryUuid],
-    def => dbTransformCallback(def, draft, true)
+    def => dbTransformCallback(def, draft, true),
   )
 
-  return draft
-    ? items
-    : R.filter(item => item.published)(items)
+  return draft ? items : R.filter(item => item.published)(items)
 }
 
 export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
-  const items = await client.map(`
+  const items = await client.map(
+    `
     SELECT i.* 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
       ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $1 
-      AND i.parent_uuid ${
-      parentUuid
-        ? `= '${parentUuid}'`
-        : 'IS NULL'
-      }
+      AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
     ORDER BY i.id
   `,
     [categoryUuid],
-    def => dbTransformCallback(def, draft, true)
+    def => dbTransformCallback(def, draft, true),
   )
 
-  return draft
-    ? items
-    : R.filter(item => item.published)(items)
+  return draft ? items : R.filter(item => item.published)(items)
 }
 
 export const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
@@ -158,11 +168,12 @@ export const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex,
      WHERE l.category_uuid = $1
        AND l.index = $2`,
     [categoryUuid, levelIndex],
-    item => dbTransformCallback(item, draft, true)
+    item => dbTransformCallback(item, draft, true),
   )
 
 export const fetchIndex = async (surveyId, draft = false, client = db) =>
-  await client.map(`
+  await client.map(
+    `
     SELECT 
       l.category_uuid,
       i.parent_uuid,
@@ -178,7 +189,7 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
       i.level_uuid = l.uuid
     `,
     [],
-    indexItem => dbTransformCallback(indexItem, draft, true)
+    indexItem => dbTransformCallback(indexItem, draft, true),
   )
 
 // ============== UPDATE
@@ -187,12 +198,13 @@ export const updateCategoryProp = async (surveyId, categoryUuid, key, value, cli
   await updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
 
 export const updateCategoryValidation = async (surveyId, categoryUuid, validation, client = db) =>
-  await client.none(`
+  await client.none(
+    `
       UPDATE ${getSurveyDBSchema(surveyId)}.category 
       SET validation = $1::jsonb 
       WHERE uuid = $2
     `,
-    [validation, categoryUuid]
+    [validation, categoryUuid],
   )
 
 export const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =>
@@ -208,17 +220,16 @@ export const updateItemProp = async (surveyId, itemUuid, key, value, client = db
   await updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
 export const updateItems = async (surveyId, items, client = db) => {
-  const values = items.map(item => [
-    CategoryItem.getUuid(item),
-    CategoryItem.getProps(item)
-  ])
-  await client.none(DbUtils.updateAllQuery(
-    getSurveyDBSchema(surveyId),
-    'category_item',
-    { name: 'uuid', cast: 'uuid' },
-    [{ name: 'props_draft', cast: 'jsonb' }],
-    values
-  ))
+  const values = items.map(item => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
+  await client.none(
+    DbUtils.updateAllQuery(
+      getSurveyDBSchema(surveyId),
+      'category_item',
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'props_draft', cast: 'jsonb' }],
+      values,
+    ),
+  )
 }
 
 // ============== DELETE
@@ -230,15 +241,17 @@ export const deleteLevel = async (surveyId, levelUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelUuid, client)
 
 export const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
-  await client.none(`
+  await client.none(
+    `
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
       WHERE category_uuid = $1
     `,
-    [categoryUuid]
+    [categoryUuid],
   )
 
 export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) =>
-  await client.map(`
+  await client.map(
+    `
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level l
       WHERE 
         l.category_uuid = $1
@@ -250,7 +263,7 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
       RETURNING l.uuid
     `,
     [categoryUuid],
-    R.prop('uuid')
+    R.prop('uuid'),
   )
 
 export const deleteItem = async (surveyId, itemUuid, client = db) =>

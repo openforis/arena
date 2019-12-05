@@ -4,49 +4,41 @@ import React from 'react'
 
 const TabBarButtons = ({ tabs, selection, onClick }) => (
   <div className="flex-center tab-bar__header">
-    {
-      tabs.map((tab, i) => {
-        const active = i === selection
+    {tabs.map((tab, i) => {
+      const active = i === selection
 
-        return tab.showTab === false
-          ? null
-          : (
-            <button key={i}
-                    className={`btn${active ? ' active' : ''}`}
-                    onClick={() => onClick(i)}
-                    aria-disabled={!!tab.disabled}>
-              {
-                tab.icon &&
-                <span className={`icon ${tab.icon} icon-12px icon-left`}/>
-              }
-              {tab.label}
-            </button>
-          )
-      })
-    }
+      return tab.showTab === false ? null : (
+        <button
+          key={i}
+          className={`btn${active ? ' active' : ''}`}
+          onClick={() => onClick(i)}
+          aria-disabled={Boolean(tab.disabled)}
+        >
+          {tab.icon && <span className={`icon ${tab.icon} icon-12px icon-left`} />}
+          {tab.label}
+        </button>
+      )
+    })}
   </div>
 )
 
 class TabBar extends React.Component {
-
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = { selection: props.selection || TabBar.defaultProps.selection }
   }
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps) {
     const { selection } = this.props
     const { selection: selectionPrev } = prevProps
-    if (selection !== selectionPrev)
+    if (selection !== selectionPrev) {
       this.setState({ selection })
+    }
   }
 
-  render () {
-    const {
-      tabs, className,
-      renderer, onClick,
-    } = this.props
+  render() {
+    const { tabs, className, renderer, onClick } = this.props
 
     const { selection } = this.state
 
@@ -54,26 +46,21 @@ class TabBar extends React.Component {
 
     return (
       <div className={`tab-bar ${className}`}>
-
         <TabBarButtons
           tabs={tabs}
           selection={selection}
           onClick={tabIndex => {
             this.setState({ selection: tabIndex })
-            onClick && onClick(tabs[tabIndex])
+            if (onClick) onClick(tabs[tabIndex])
           }}
         />
 
-        {
-          renderer
-            ? React.createElement(renderer, { ...this.props })
-            : React.createElement(tab.component, { ...tab.props, ...this.props })
-        }
-
+        {renderer
+          ? React.createElement(renderer, { ...this.props })
+          : React.createElement(tab.component, { ...tab.props, ...this.props })}
       </div>
     )
   }
-
 }
 
 TabBar.defaultProps = {

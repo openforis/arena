@@ -6,22 +6,24 @@ import * as R from 'ramda'
 
 import * as DateUtils from '@core/dateUtils'
 
-import * as ActivityLogMessage from './activityLogMessage'
-
 import { useI18n, useOnIntersect, useInterval } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
-import { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs } from './actions'
 import Markdown from '@webapp/commonComponents/markdown'
 
-const ActivityLogView = props => {
+import { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs } from './actions'
+import * as ActivityLogMessage from './activityLogMessage'
 
-  const { 
-    activityLogMessages, activityLogLoadComplete, 
-    fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs 
+const ActivityLogView = props => {
+  const {
+    activityLogMessages,
+    activityLogLoadComplete,
+    fetchActivityLogsNewest,
+    fetchActivityLogsNext,
+    resetActivityLogs,
   } = props
 
   const i18n = useI18n()
@@ -35,35 +37,37 @@ const ActivityLogView = props => {
 
   return (
     <div className="activity-log">
-
-      <div className="activity-log__header">
-        {i18n.t('activityLogView.recentActivity')}
-      </div>
+      <div className="activity-log__header">{i18n.t('activityLogView.recentActivity')}</div>
 
       <div className="activity-log__messages">
-        {
-          R.isEmpty(activityLogMessages)
-            ? null
-            : activityLogMessages.map((message, index) => (
-              <div 
-                key={ActivityLogMessage.getId(message)} 
-                ref={el => (!activityLogLoadComplete) && index === activityLogMessages.length - 25 ? setNextActivitiesFetchTrigger(el) : null}>
+        {R.isEmpty(activityLogMessages)
+          ? null
+          : activityLogMessages.map((message, index) => (
+              <div
+                key={ActivityLogMessage.getId(message)}
+                ref={el =>
+                  !activityLogLoadComplete && index === activityLogMessages.length - 25
+                    ? setNextActivitiesFetchTrigger(el)
+                    : null
+                }
+              >
                 <div
-                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`} >
+                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`}
+                >
                   <div className="activity">
-                    <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true}/>
-                    <Markdown source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}/>
+                    <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true} />
+                    <Markdown
+                      source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
+                    />
                   </div>
                   <div className="date">
                     {DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}
                   </div>
                 </div>
-                <div className="activity-log__message-separator"/>
+                <div className="activity-log__message-separator" />
               </div>
-            ))
-        }
+            ))}
       </div>
-      
     </div>
   )
 }
@@ -74,7 +78,6 @@ const mapStateToProps = state => ({
   activityLogLoadComplete: ActivityLogState.isLoadComplete(state),
 })
 
-export default connect(
-  mapStateToProps, 
-  { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs }
-)(ActivityLogView)
+export default connect(mapStateToProps, { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs })(
+  ActivityLogView,
+)

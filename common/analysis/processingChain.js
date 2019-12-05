@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
-import { uuidv4 } from '@core/uuid';
+import { uuidv4 } from '@core/uuid'
 
 import * as ProcessingStep from './processingStep'
 import * as ProcessingStepCalculation from './processingStepCalculation'
@@ -69,20 +69,15 @@ export const getLabel = ObjectUtils.getLabel
 
 // ====== CHECK
 
-export const isDraft = R.ifElse(
-  R.pipe(getDateExecuted, R.isNil),
-  R.always(true),
-  chain => DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
+export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), chain =>
+  DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain)),
 )
 
 // ====== UPDATE
 
 export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
-export const assocProcessingStep = step => chain => R.pipe(
-  getProcessingSteps,
-  R.append(step),
-  steps => R.assoc(keys.processingSteps, steps, chain)
-)(chain)
+export const assocProcessingStep = step => chain =>
+  R.pipe(getProcessingSteps, R.append(step), steps => R.assoc(keys.processingSteps, steps, chain))(chain)
 
 export const assocProp = ObjectUtils.setProp

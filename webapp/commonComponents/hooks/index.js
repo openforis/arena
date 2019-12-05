@@ -1,5 +1,3 @@
-import React from 'react'
-
 export { default as usePrevious } from './usePrevious'
 export { default as useOnUpdate } from './useOnUpdate'
 export { default as useIsMounted } from './useIsMounted'

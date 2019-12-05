@@ -20,46 +20,34 @@ const forms = {
 }
 
 const LoginView = props => {
-
   const { userAction, error } = props
 
   const i18n = useI18n()
 
   return (
     <>
-      <div className="login__bg"/>
+      <div className="login__bg" />
 
       <div className="login__openforis">
         <div className="openforis">
-          {
-            'open'.split('').map((letter, i) =>
-              <div key={i}>{letter}</div>
-            )
-          }
+          {'open'.split('').map((letter, i) => (
+            <div key={i}>{letter}</div>
+          ))}
           <div className="separator">∞</div>
-          {
-            'foris'.split('').map((letter, i) =>
-              <div key={i}>{letter}</div>
-            )
-          }
+          {'foris'.split('').map((letter, i) => (
+            <div key={i}>{letter}</div>
+          ))}
         </div>
         <div className="arena">
-          {
-            'arena'.split('').map((letter, i) =>
-              <div key={i}>{letter}</div>
-            )
-          }
+          {'arena'.split('').map((letter, i) => (
+            <div key={i}>{letter}</div>
+          ))}
         </div>
       </div>
 
-      {
-        error &&
-        <div className="login-form__error text-center">{i18n.t(error)}</div>
-      }
+      {error && <div className="login-form__error text-center">{i18n.t(error)}</div>}
 
-      {
-        React.createElement(forms[userAction], props)
-      }
+      {React.createElement(forms[userAction], props)}
     </>
   )
 }

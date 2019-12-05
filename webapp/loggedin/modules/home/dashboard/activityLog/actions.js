@@ -1,5 +1,5 @@
-import axios from 'axios'
 import util from 'util'
+import axios from 'axios'
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -23,35 +23,39 @@ const fetchActivityLogs = async (state, offset = 0, limit = 30) => {
     const surveyId = Survey.getId(survey)
     const i18n = AppState.getI18n(state)
 
-    const { data: { activityLogs } } = await axios.get(
-      `/api/survey/${surveyId}/activity-log`,
-      { params: { offset, limit } }
-    )
-    
-    // add new messages to messages already in state and sort them by creation date in reverse order
+    const {
+      data: { activityLogs },
+    } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params: { offset, limit } })
+
+    // Add new messages to messages already in state and sort them by creation date in reverse order
     const activityLogMessages = R.pipe(
-      // exclude activities already loaded
-      R.reject(activity => R.includes(ActivityLog.getId(activity), R.pluck(ActivityLogMessage.keys.id, activityLogMessagesState))),
-      // parse ActivityLog into ActivityLogMessage
+      // Exclude activities already loaded
+      R.reject(activity =>
+        R.includes(ActivityLog.getId(activity), R.pluck(ActivityLogMessage.keys.id, activityLogMessagesState)),
+      ),
+      // Parse ActivityLog into ActivityLogMessage
       R.map(ActivityLogMessageParser.toMessage(i18n, survey)),
-      // append new messages to old ones
+      // Append new messages to old ones
       R.concat(activityLogMessagesState),
-      // sort by id in reverse order
+      // Sort by id in reverse order
       R.sortBy(R.compose(R.negate, Number, ActivityLogMessage.getId)),
     )(activityLogs)
 
-    return R.length(activityLogMessages) === R.length(activityLogMessagesState)
-      ? null
-      : activityLogMessages
-  } catch (e) {
-    console.log(e)
+    return R.length(activityLogMessages) === R.length(activityLogMessagesState) ? null : activityLogMessages
+  } catch (error) {
+    console.log(error)
   }
 }
 
 export const fetchActivityLogsNewest = () => async (dispatch, getState) => {
   const activityLogMessages = await fetchActivityLogs(getState())
   if (activityLogMessages)
-    dispatch({ type: homeActivityMessagesUpdate, activityLogMessages, offset: 0, limit: activityLogMessages.length })
+    await dispatch({
+      type: homeActivityMessagesUpdate,
+      activityLogMessages,
+      offset: 0,
+      limit: activityLogMessages.length,
+    })
 }
 
 export const fetchActivityLogsNext = () => async (dispatch, getState) => {
@@ -61,10 +65,14 @@ export const fetchActivityLogsNext = () => async (dispatch, getState) => {
   const offset = offsetOld + limit
   const activityLogMessages = await fetchActivityLogs(state, offset, limit)
 
-  // when the activity of type "surveyCreate" is loaded, activity logs load is complete
-  const loadComplete = R.any(message => ActivityLogMessage.getType(message) === ActivityLog.type.surveyCreate, activityLogMessages)
+  // When the activity of type "surveyCreate" is loaded, activity logs load is complete
+  const loadComplete = R.any(
+    message => ActivityLogMessage.getType(message) === ActivityLog.type.surveyCreate,
+    activityLogMessages,
+  )
 
-  activityLogMessages && (await dispatch({ type: homeActivityMessagesUpdate, activityLogMessages, offset, limit, loadComplete }))
+  if (activityLogMessages)
+    await dispatch({ type: homeActivityMessagesUpdate, activityLogMessages, offset, limit, loadComplete })
 }
 
 export const resetActivityLogs = () => dispatch => dispatch({ type: homeActivityMessagesReset })

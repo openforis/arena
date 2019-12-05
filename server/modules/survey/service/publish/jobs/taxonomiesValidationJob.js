@@ -8,20 +8,21 @@ import * as Validation from '@core/validation/validation'
 import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 
 export default class TaxonomiesValidationJob extends Job {
-  constructor (params) {
+  constructor(params) {
     super(TaxonomiesValidationJob.type, params)
   }
 
-  async execute (tx) {
-    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, tx)
+  async execute() {
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, this.tx)
 
     const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)
 
     if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
-        (acc, taxonomy) => R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
+        (acc, taxonomy) =>
+          R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
         {},
-        invalidTaxonomies
+        invalidTaxonomies,
       )
       await this.setStatusFailed()
     }

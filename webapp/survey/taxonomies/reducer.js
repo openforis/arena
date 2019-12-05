@@ -1,15 +1,14 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as TaxonomiesState from './taxonomiesState'
-
 import { appUserLogout } from '@webapp/app/actions'
 
 import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
+import * as TaxonomiesState from './taxonomiesState'
 
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate, taxonomiesUpdate } from './actions'
 
 const actionHandlers = {
-  // reset state
+  // Reset state
   [appUserLogout]: () => ({}),
 
   [surveyCreate]: () => ({}),
@@ -18,19 +17,20 @@ const actionHandlers = {
 
   [surveyDefsReset]: () => ({}),
 
-  // taxonomies
+  // Taxonomies
   [surveyDefsLoad]: (state, { taxonomies }) => taxonomies,
   [taxonomiesUpdate]: (state, { taxonomies }) => taxonomies,
 
-  // create
+  // Create
   [taxonomyCreate]: (state, { taxonomy }) => TaxonomiesState.assocTaxonomy(taxonomy)(state),
 
-  // update
+  // Update
   [taxonomyUpdate]: (state, { taxonomy }) => TaxonomiesState.assocTaxonomy(taxonomy)(state),
 
-  [taxonomyPropUpdate]: (state, { taxonomy, key, value }) => TaxonomiesState.assocTaxonomyProp(taxonomy, key, value)(state),
+  [taxonomyPropUpdate]: (state, { taxonomy, key, value }) =>
+    TaxonomiesState.assocTaxonomyProp(taxonomy, key, value)(state),
 
-  // delete
+  // Delete
   [taxonomyDelete]: (state, { taxonomy }) => TaxonomiesState.dissocTaxonomy(taxonomy)(state),
 }
 

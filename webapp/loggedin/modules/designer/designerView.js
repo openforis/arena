@@ -7,25 +7,22 @@ import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surv
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
-import FormDesignerView from './formDesigner/formDesignerView'
-import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
-
-import { appModules, appModuleUri, designerModules } from '../../appModules'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import { appModules, appModuleUri, designerModules } from '../../appModules'
 
 import { resetForm } from '../../surveyViews/surveyForm/actions'
+import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
+import FormDesignerView from './formDesigner/formDesignerView'
 
 const DesignerView = ({ canEditDef, resetForm }) => {
-
-  useEffect(() => { resetForm() }, [])
+  useEffect(() => {
+    resetForm()
+  }, [])
 
   return (
-    <SurveyDefsLoader
-      draft={canEditDef}
-      validate={canEditDef}>
-
+    <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
       <InnerModuleSwitch
         moduleRoot={appModules.designer}
         moduleDefault={designerModules.formDesigner}
@@ -49,7 +46,6 @@ const DesignerView = ({ canEditDef, resetForm }) => {
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
           },
-
         ]}
       />
     </SurveyDefsLoader>

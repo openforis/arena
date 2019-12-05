@@ -7,18 +7,17 @@ import InputChips from '@webapp/commonComponents/form/inputChips'
 import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
 
 const LanguagesEditor = props => {
-
   const { languages, setLanguages, readOnly } = props
 
   const selection = languages.map(lang => ({
-    key: lang, value: getLanguageLabel(lang)
+    key: lang,
+    value: getLanguageLabel(lang),
   }))
 
   const i18n = useI18n()
 
   return (
     <div className="form-item">
-
       <label className="form-label">{i18n.t('languagesEditor.languages')}</label>
 
       <InputChips
@@ -31,13 +30,8 @@ const LanguagesEditor = props => {
         requiredItems={1}
         readOnly={readOnly}
       />
-
     </div>
   )
-
 }
 
 export default LanguagesEditor
-
-
-

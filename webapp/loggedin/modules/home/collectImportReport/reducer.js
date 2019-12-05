@@ -15,7 +15,7 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   [homeCollectImportReportUpdate]: (state, { items }) => items,
-  [homeCollectImportReportItemUpdate]: (state, { item }) => CollectImportReportState.updateItem(item)(state)
+  [homeCollectImportReportItemUpdate]: (state, { item }) => CollectImportReportState.updateItem(item)(state),
 }
 
 export default exportReducer(actionHandlers)

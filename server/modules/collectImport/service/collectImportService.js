@@ -4,9 +4,9 @@ import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 
+import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as CollectImportReportManager from '../manager/collectImportReportManager'
-import * as JobManager from '@server/job/jobManager'
 import CollectImportJob from './collectImport/collectImportJob'
 
 // COLLECT SURVEY IMPORT
@@ -30,10 +30,10 @@ export const countReportItems = CollectImportReportManager.countItems
 // UPDATE
 export const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
   await client.tx(async tx => {
-    //1. update import report item
+    // 1. update import report item
     const itemUpdated = await CollectImportReportManager.updateItem(surveyId, itemId, props, resolved, tx)
 
-    //2. update survey collect report items count
+    // 2. update survey collect report items count
     const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const collectReport = Survey.getCollectReport(surveyInfo)
@@ -42,7 +42,7 @@ export const updateReportItem = async (user, surveyId, itemId, props, resolved, 
 
     const collectReportUpdated = {
       ...collectReport,
-      [Survey.collectReportKeys.issuesResolved]: issuesResolvedUpdated
+      [Survey.collectReportKeys.issuesResolved]: issuesResolvedUpdated,
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReportUpdated, false, tx)
 

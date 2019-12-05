@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import { uuidv4 } from '@core/uuid';
+import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
@@ -72,4 +72,3 @@ export const deleteNode = RecordUpdater.deleteNode
 // ====== VALIDATION
 export const mergeNodeValidations = RecordUpdater.mergeNodeValidations
 export const getValidation = Validation.getValidation
-

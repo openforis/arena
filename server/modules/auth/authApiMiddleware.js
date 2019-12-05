@@ -1,13 +1,11 @@
 import * as Request from '@server/utils/request'
 
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '../survey/manager/surveyManager'
 import * as RecordService from '../record/service/recordService'
 import * as UserService from '../user/service/userService'
-
-import * as Authorizer from '@core/auth/authorizer'
-import * as Survey from '@core/survey/survey'
-
-import UnauthorizedError from '@server/utils/unauthorizedError'
 
 const checkPermission = (req, next, permissionFn, ...args) => {
   const user = Request.getUser(req)
@@ -17,7 +15,6 @@ const checkPermission = (req, next, permissionFn, ...args) => {
   } else {
     next(new UnauthorizedError(user && user.name))
   }
-
 }
 
 const requireSurveyPermission = permissionFn => async (req, res, next) => {
@@ -27,8 +24,8 @@ const requireSurveyPermission = permissionFn => async (req, res, next) => {
     const surveyInfo = Survey.getSurveyInfo(survey)
 
     checkPermission(req, next, permissionFn, surveyInfo)
-  } catch (e) {
-    next(e)
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -39,8 +36,8 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
     const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
 
     checkPermission(req, next, permissionFn, record)
-  } catch (e) {
-    next(e)
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -52,8 +49,8 @@ const requireUserPermission = permissionFn => async (req, res, next) => {
     const user = await UserService.fetchUserByUuid(userUuid)
 
     checkPermission(req, next, permissionFn, surveyInfo, user)
-  } catch (e) {
-    next(e)
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -73,4 +70,3 @@ export const requireUserInvitePermission = requireSurveyPermission(Authorizer.ca
 export const requireUserViewPermission = requireUserPermission(Authorizer.canViewUser)
 export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
 export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)
-

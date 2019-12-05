@@ -12,7 +12,6 @@ import * as SurveyService from '../service/surveyService'
 import * as UserService from '../../user/service/userService'
 
 export const init = app => {
-
   // ==== CREATE
   app.post('/survey', async (req, res, next) => {
     try {
@@ -21,16 +20,18 @@ export const init = app => {
       const validation = await SurveyService.validateNewSurvey(surveyReq)
 
       if (Validation.isValid(validation)) {
-        const survey = await SurveyService.createSurvey(user, { ...surveyReq, languages: [surveyReq.lang] })
+        const survey = await SurveyService.createSurvey(user, {
+          ...surveyReq,
+          languages: [surveyReq.lang],
+        })
 
         res.json({ survey })
       } else {
         res.json({ validation })
       }
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
-
   })
 
   // ==== READ
@@ -42,8 +43,8 @@ export const init = app => {
       const list = await SurveyService.fetchUserSurveysInfo(user, offset, limit)
 
       res.json({ list })
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -54,27 +55,24 @@ export const init = app => {
       const count = await SurveyService.countUserSurveys(user)
 
       res.json(count)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
-      const user = R.pipe(
-        Request.getUser,
-        User.assocPrefSurveyCurrent(surveyId)
-      )(req)
+      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const [survey] = await Promise.all([
         SurveyService.fetchSurveyById(surveyId, draft, validate),
-        UserService.updateUserPrefs(user)
+        UserService.updateUserPrefs(user),
       ])
 
       res.json({ survey })
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -90,8 +88,8 @@ export const init = app => {
       const survey = await SurveyService.updateSurveyProps(user, surveyId, props)
 
       res.json(survey)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -113,10 +111,8 @@ export const init = app => {
       await SurveyService.deleteSurvey(surveyId)
 
       Response.sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
-
-};
-
+}

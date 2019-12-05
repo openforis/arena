@@ -30,7 +30,7 @@ export const ValidatorErrorKeys = {
   expressions: {
     cannotGetChildOfAttribute: 'validationErrors.expressions.cannotGetChildOfAttribute',
     cannotUseCurrentNode: 'validationErrors.expressions.cannotUseCurrentNode',
-    circularDependencyError:  'validationErrors.expressions.circularDependencyError',
+    circularDependencyError: 'validationErrors.expressions.circularDependencyError',
     expressionInvalid: 'validationErrors.expressions.expressionInvalid',
     unableToFindNode: 'validationErrors.expressions.unableToFindNode',
     unableToFindNodeChild: 'validationErrors.expressions.unableToFindNodeChild',
@@ -91,7 +91,7 @@ export const ValidatorErrorKeys = {
   },
 
   taxonomyImportJob: {
-    missingRequiredColumns: 'validationErrors.taxonomyImportJob.missingRequiredColumns'
+    missingRequiredColumns: 'validationErrors.taxonomyImportJob.missingRequiredColumns',
   },
 
   user: {
@@ -109,5 +109,5 @@ export const ValidatorErrorKeys = {
     UserNotFoundException: 'validationErrors.user.userDoesNotExist',
     NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
     CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
-  }
-};
+  },
+}

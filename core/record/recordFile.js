@@ -1,19 +1,19 @@
 import * as R from 'ramda'
 
-import { truncate } from '@core/stringUtils';
+import { truncate } from '@core/stringUtils'
 
 const getProp = prop => R.path(['props', prop])
 
 const keys = {
   props: 'props',
-  content: 'content'
+  content: 'content',
 }
 
 export const propKeys = {
   name: 'name',
   size: 'size',
   recordUuid: 'recordUuid',
-  nodeUuid: 'nodeUuid'
+  nodeUuid: 'nodeUuid',
 }
 
 export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUuid) => ({
@@ -22,29 +22,21 @@ export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUu
     [propKeys.name]: fileName,
     [propKeys.size]: fileSize,
     [propKeys.recordUuid]: recordUuid,
-    [propKeys.nodeUuid]: nodeUuid
+    [propKeys.nodeUuid]: nodeUuid,
   },
-  [keys.content]: content
+  [keys.content]: content,
 })
 
-const getExtension = fileName => R.pipe(
-  R.split('.'),
-  R.tail,
-)(fileName)
+const getExtension = fileName => R.pipe(R.split('.'), R.tail)(fileName)
 
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
-
     const extension = getExtension(fileName)
 
-    return R.pipe(
-      R.dropLast(extension.length + 1),
-      truncate(maxLength),
-      name => name + '.' + extension
-    )(fileName)
-  } else {
-    return ''
+    return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), name => name + '.' + extension)(fileName)
   }
+
+  return ''
 }
 
 // READ

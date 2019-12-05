@@ -12,31 +12,25 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
-    <div {...otherProps}
-         key={Taxon.getUuid(taxon)}
-         className="item"
-         tabIndex="1">
-      <div>
-        {Taxon.getCode(taxon)}
-      </div>
-      <div>
-        {Taxon.getScientificName(taxon)}
-      </div>
-      {vernacularLang &&
-      <div style={{ gridColumn: 2 }}>
-        {`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}
-      </div>
-      }
+    <div {...otherProps} key={Taxon.getUuid(taxon)} className="item" tabIndex="1">
+      <div>{Taxon.getCode(taxon)}</div>
+      <div>{Taxon.getScientificName(taxon)}</div>
+      {vernacularLang && <div style={{ gridColumn: 2 }}>{`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}</div>}
     </div>
   )
 }
 
 const NodeDefTaxonAutocompleteDialog = props => {
   const {
-    surveyId, taxonomyUuid, draft,
-    inputRef, field, fieldValue,
+    surveyId,
+    taxonomyUuid,
+    draft,
+    inputRef,
+    field,
+    fieldValue,
     autocompleteSourceElement,
-    onItemSelect, onClose,
+    onItemSelect,
+    onClose,
   } = props
 
   const params = {
@@ -46,10 +40,10 @@ const NodeDefTaxonAutocompleteDialog = props => {
     draft,
   }
 
-  const { data: { list = [] } = { list: [] }, dispatch } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
-    { params }
-  )
+  const {
+    data: { list = [] } = { list: [] },
+    dispatch,
+  } = useAsyncGetRequest(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, { params })
 
   useEffect(dispatch, [fieldValue])
 
@@ -63,11 +57,9 @@ const NodeDefTaxonAutocompleteDialog = props => {
       onItemSelect={onItemSelect}
       onClose={onClose}
       sourceElement={autocompleteSourceElement}
-    />
-    ,
-    document.body
+    />,
+    document.body,
   )
-
 }
 
 NodeDefTaxonAutocompleteDialog.defaultProps = {
@@ -80,7 +72,7 @@ NodeDefTaxonAutocompleteDialog.defaultProps = {
   fieldValue: '',
   onItemSelect: null,
   onClose: null,
-  autocompleteSourceElement: null, // used as sourceElement for the autocompleteDialog when rendered in tableBody
+  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonAutocompleteDialog

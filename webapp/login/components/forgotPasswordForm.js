@@ -9,21 +9,17 @@ import { sendVerificationCode, setLoginError } from '../actions'
 import * as LoginValidator from './loginValidator'
 
 const ForgotPasswordForm = props => {
-
-  const {
-    email: initialEmail, sendVerificationCode, setLoginError,
-  } = props
+  const { email: initialEmail, sendVerificationCode, setLoginError } = props
 
   const i18n = useI18n()
 
-  const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    validation,
-  } = useFormObject({
-    email: initialEmail,
-  }, LoginValidator.validateEmail, true)
+  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
+    {
+      email: initialEmail,
+    },
+    LoginValidator.validateEmail,
+    true,
+  )
 
   const onClickReset = () => {
     if (objectValid) {
@@ -35,18 +31,18 @@ const ForgotPasswordForm = props => {
 
   return (
     <div className="login-form">
-      <input value={formObject.email}
-             onChange={e => setObjectField('email', e.target.value)}
-             type='text'
-             name='username'
-             className="login-form__input"
-             placeholder={i18n.t('loginView.yourEmail')}/>
+      <input
+        value={formObject.email}
+        onChange={e => setObjectField('email', e.target.value)}
+        type="text"
+        name="username"
+        className="login-form__input"
+        placeholder={i18n.t('loginView.yourEmail')}
+      />
 
       <div className="login-form__buttons">
-        <button type="button"
-                className="btn btn-login"
-                onClick={onClickReset}>
-          <span className="icon icon-envelop icon-12px icon-left"/>
+        <button type="button" className="btn btn-login" onClick={onClickReset}>
+          <span className="icon icon-envelop icon-12px icon-left" />
           {i18n.t('loginView.sendVerificationCode')}
         </button>
       </div>

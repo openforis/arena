@@ -9,10 +9,7 @@ import ProcessingChainView from './processingChain/processingChainView'
 import ProcessingStepView from './processingStep/processingStepView'
 
 const AnalysisView = () => (
-  <SurveyDefsLoader
-    draft={false}
-    validate={false}
-    requirePublish={true}>
+  <SurveyDefsLoader draft={false} validate={false} requirePublish={true}>
     <InnerModuleSwitch
       moduleRoot={appModules.analysis}
       moduleDefault={analysisModules.processingChains}

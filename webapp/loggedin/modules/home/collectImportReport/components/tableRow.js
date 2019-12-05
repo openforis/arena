@@ -5,27 +5,20 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
-import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
 
 import { updateCollectImportReportItem } from '../actions'
 import { setNodeDefForEdit } from '../../../../surveyViews/nodeDefEdit/actions'
 
 const TableRow = props => {
-  const {
-    i18n,
-    item, idx,
-    nodeDef, nodeDefPath, languages,
-    updateCollectImportReportItem, setNodeDefForEdit
-  } = props
+  const { i18n, item, idx, nodeDef, nodeDefPath, languages, updateCollectImportReportItem, setNodeDefForEdit } = props
 
   return (
-    <div
-      key={idx}
-      className="table__row">
+    <div key={idx} className="table__row">
       <div>{idx + 1}</div>
       <div>{nodeDefPath}</div>
       <div>{i18n.t(`homeView.collectImportReport.exprType.${CollectImportReportItem.getExpressionType(item)}`)}</div>
@@ -48,9 +41,13 @@ const TableRow = props => {
         />
       </div>
       <div>
-        <a className=""
-           onClick={() => { setNodeDefForEdit(nodeDef) }}>
-          <span className="icon icon-12px icon-pencil2"/>
+        <a
+          className=""
+          onClick={() => {
+            setNodeDefForEdit(nodeDef)
+          }}
+        >
+          <span className="icon icon-12px icon-pencil2" />
         </a>
       </div>
     </div>
@@ -59,10 +56,7 @@ const TableRow = props => {
 
 const _getNodeDefPath = (survey, nodeDef, lang) => {
   const nodeDefPathParts = []
-  Survey.visitAncestorsAndSelf(
-    nodeDef,
-    def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang))
-  )(survey)
+  Survey.visitAncestorsAndSelf(nodeDef, def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang)))(survey)
 
   return nodeDefPathParts.join(' > ')
 }
@@ -86,7 +80,7 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { updateCollectImportReportItem, setNodeDefForEdit }
-)(TableRow)
+export default connect(mapStateToProps, {
+  updateCollectImportReportItem,
+  setNodeDefForEdit,
+})(TableRow)

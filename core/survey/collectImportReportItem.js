@@ -12,7 +12,7 @@ const propKeys = {
   expressionType: 'expressionType',
   expression: 'expression',
   applyIf: 'applyIf',
-  messages: 'messages'
+  messages: 'messages',
 }
 
 export const exprTypes = {

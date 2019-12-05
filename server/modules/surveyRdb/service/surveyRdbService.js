@@ -10,12 +10,30 @@ const _fetchSurvey = async (surveyId, cycle) => {
 }
 
 export const queryTable = async (
-  surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols = [],
-  offset = 0, limit = null, filter = null, sort = [],
-  editMode = false, streamOutput = null
+  surveyId,
+  cycle,
+  nodeDefUuidTable,
+  nodeDefUuidCols = [],
+  offset = 0,
+  limit = null,
+  filter = null,
+  sort = [],
+  editMode = false,
+  streamOutput = null,
 ) => {
   const survey = await _fetchSurvey(surveyId, cycle)
-  return await SurveyRdbManager.queryTable(survey, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode, streamOutput)
+  return await SurveyRdbManager.queryTable(
+    survey,
+    cycle,
+    nodeDefUuidTable,
+    nodeDefUuidCols,
+    offset,
+    limit,
+    filter,
+    sort,
+    editMode,
+    streamOutput,
+  )
 }
 
 export const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {

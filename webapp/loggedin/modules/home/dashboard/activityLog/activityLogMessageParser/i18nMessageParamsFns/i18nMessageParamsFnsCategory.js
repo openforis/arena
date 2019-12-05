@@ -8,7 +8,6 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils'
 
 export default {
-
   // ===== CATEGORY
 
   [ActivityLog.type.categoryPropUpdate]: survey => activityLog => {
@@ -17,7 +16,7 @@ export default {
 
     return {
       key: ActivityLog.getContentKey(activityLog),
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 
@@ -33,7 +32,7 @@ export default {
 
     return {
       index: CategoryLevel.getIndex(categoryLevelInserted),
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 
@@ -45,7 +44,7 @@ export default {
     return {
       index: CategoryLevel.getIndex(level),
       key: ActivityLog.getContentKey(activityLog),
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 
@@ -55,7 +54,7 @@ export default {
 
     return {
       index,
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 
@@ -79,7 +78,7 @@ export default {
     return {
       code: ActivityLog.getContentCode(activityLog),
       key: ActivityLog.getContentKey(activityLog),
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 
@@ -91,7 +90,7 @@ export default {
     return {
       code: ActivityLog.getContentCode(activityLog),
       levelIndex: CategoryLevel.getIndex(level),
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 
@@ -101,8 +100,7 @@ export default {
     const category = ActivityLogMessageParserUtils.getItemCategory(survey)(activityLog)
 
     return {
-      categoryName: Category.getName(category)
+      categoryName: Category.getName(category),
     }
   },
 }
-

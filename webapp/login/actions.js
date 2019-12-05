@@ -4,9 +4,9 @@ import * as CognitoAuth from '@webapp/app/cognitoAuth'
 
 import * as Validation from '@core/validation/validation'
 
-import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
 import { showNotification } from '../app/appNotification/actions'
+import * as LoginState from './loginState'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'
@@ -29,55 +29,68 @@ const _createAction = cognitoResponseHandler => async dispatch => {
   }
 }
 
-export const login = (email, password) => _createAction(
-  async dispatch => {
+export const login = (email, password) =>
+  _createAction(async dispatch => {
     const responseType = await CognitoAuth.login(email, password)
 
     if (responseType === CognitoAuth.keysAction.success) {
       dispatch(setEmail(''))
       dispatch(initUser())
     } else if (responseType === CognitoAuth.keysAction.newPasswordRequired) {
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.setNewPassword })
+      dispatch({
+        type: loginUserActionUpdate,
+        action: LoginState.userActions.setNewPassword,
+      })
     }
-  }
-)
+  })
 
-export const acceptInvitation = (name, password) => _createAction(
-  async dispatch => {
+export const acceptInvitation = (name, password) =>
+  _createAction(async dispatch => {
     const responseType = await CognitoAuth.acceptInvitation(name, password)
 
     if (responseType === CognitoAuth.keysAction.success) {
       const cognitoUser = CognitoAuth.getUser()
-      await axios.put(`/api/user/${cognitoUser.username}/accept-invitation`, { name })
+      await axios.put(`/api/user/${cognitoUser.username}/accept-invitation`, {
+        name,
+      })
       dispatch(setEmail(''))
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
+      dispatch({
+        type: loginUserActionUpdate,
+        action: LoginState.userActions.login,
+      })
       dispatch(initUser())
     }
-  }
-)
+  })
 
 export const showForgotPasswordForm = () => dispatch => {
   dispatch(setLoginError(null))
-  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
+  dispatch({
+    type: loginUserActionUpdate,
+    action: LoginState.userActions.forgotPassword,
+  })
 }
 
-export const sendVerificationCode = email => _createAction(
-  async dispatch => {
+export const sendVerificationCode = email =>
+  _createAction(async dispatch => {
     const responseType = await CognitoAuth.forgotPassword(email)
     if (responseType === CognitoAuth.keysAction.success) {
       dispatch(showNotification('An email with the verification code has been sent'))
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.resetPassword })
+      dispatch({
+        type: loginUserActionUpdate,
+        action: LoginState.userActions.resetPassword,
+      })
     }
-  }
-)
+  })
 
-export const resetPassword = (verificationCode, newPassword) => _createAction(
-  async dispatch => {
+export const resetPassword = (verificationCode, newPassword) =>
+  _createAction(async dispatch => {
     const responseType = await CognitoAuth.resetPassword(verificationCode, newPassword)
     if (responseType === CognitoAuth.keysAction.success) {
       dispatch(setEmail(''))
       dispatch(showNotification('Your password has been reset'))
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
+      dispatch({
+        type: loginUserActionUpdate,
+        action: LoginState.userActions.login,
+      })
     }
-  }
-)
+  })

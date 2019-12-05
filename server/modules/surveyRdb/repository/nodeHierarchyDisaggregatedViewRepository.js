@@ -7,10 +7,9 @@ import * as NodeHierarchyDisaggregatedView from '../schemaRdb/nodeHierarchyDisag
 
 const { columns } = NodeHierarchyDisaggregatedView
 
-//====== CREATE
+// ====== CREATE
 
 export const createNodeHierarchyDisaggregatedView = async (survey, client = db) => {
-
   const surveyId = Survey.getId(survey)
 
   await client.query(`

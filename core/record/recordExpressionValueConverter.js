@@ -5,10 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
-const _toPrimitive = (val, TypeTo) =>
-  R.is(String, val) || R.is(Number, val)
-    ? TypeTo(val)
-    : null
+const _toPrimitive = (val, TypeTo) => (R.is(String, val) || R.is(Number, val) ? TypeTo(val) : null)
 
 const _toBoolean = (survey, record, nodeCtx, valueExpr) =>
   R.is(Boolean, valueExpr)
@@ -18,10 +15,11 @@ const _toBoolean = (survey, record, nodeCtx, valueExpr) =>
     : null
 
 const _toCode = (survey, record, nodeCtx, valueExpr) => {
-  // valueExpr is the code of a category item
+  // ValueExpr is the code of a category item
   const code = _toPrimitive(valueExpr, String)
-  if (code === null)
+  if (code === null) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const parentNode = Record.getParentNode(nodeCtx)(record)
@@ -32,10 +30,11 @@ const _toCode = (survey, record, nodeCtx, valueExpr) => {
 }
 
 const _toTaxon = (survey, record, nodeCtx, valueExpr) => {
-  // valueExpr is the code of a taxon
+  // ValueExpr is the code of a taxon
   const taxonCode = _toPrimitive(valueExpr, String)
-  if (taxonCode === null)
+  if (taxonCode === null) {
     return null
+  }
 
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
@@ -58,4 +57,3 @@ export const toNodeValue = (survey, record, nodeCtx, valueExpr) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeCtx))(survey)
   return _valueExprToValueNodeFns[NodeDef.getType(nodeDef)](survey, record, nodeCtx, valueExpr)
 }
-

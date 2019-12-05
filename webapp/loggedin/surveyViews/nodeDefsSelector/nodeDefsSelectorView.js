@@ -6,21 +6,16 @@ import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import EntitySelector from './components/entitySelector'
-import AttributesSelector from './components/attributesSelector'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import AttributesSelector from './components/attributesSelector'
+import EntitySelector from './components/entitySelector'
 
 const NodeDefsSelectorView = props => {
-
-  const {
-    nodeDefUuidsAttributes, nodeDefUuidEntity,
-    onChangeAttributes, onChangeEntity
-  } = props
+  const { nodeDefUuidsAttributes, nodeDefUuidEntity, onChangeAttributes, onChangeEntity } = props
 
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
@@ -34,11 +29,7 @@ const NodeDefsSelectorView = props => {
     onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
 
-  const {
-    surveyInfo,
-    hierarchy,
-    canSelectAttributes, showAncestors, showMultipleAttributes,
-  } = props
+  const { surveyInfo, hierarchy, canSelectAttributes, showAncestors, showMultipleAttributes } = props
 
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
@@ -46,11 +37,12 @@ const NodeDefsSelectorView = props => {
   return (
     <div className="node-defs-selector">
       <div className="node-defs-selector__container">
-
-        <button className="btn btn-s btn-toggle-settings"
-                aria-disabled={R.isNil(nodeDefUuidEntity)}
-                onClick={() => setShowSettings(!showSettings)}>
-          <span className="icon icon-cog icon-12px"/>
+        <button
+          className="btn btn-s btn-toggle-settings"
+          aria-disabled={R.isNil(nodeDefUuidEntity)}
+          onClick={() => setShowSettings(!showSettings)}
+        >
+          <span className="icon icon-cog icon-12px" />
         </button>
 
         <EntitySelector
@@ -60,25 +52,25 @@ const NodeDefsSelectorView = props => {
           onChange={onChangeEntity}
         />
 
-        {
-          showSettings &&
+        {showSettings && (
           <div className="node-defs-selector__settings">
-            {
-              R.keys(NodeDef.nodeDefType).map(type =>
-                NodeDef.nodeDefType.entity !== type
-                  ? <button key={type}
-                            className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
-                            onClick={() => {
-                              const idx = R.findIndex(R.equals(type), filterTypes)
-                              const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
-                              setFilterTypes(fn(filterTypes))
-                            }}>
-                    {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}</button>
-                  : null
-              )
-            }
+            {R.keys(NodeDef.nodeDefType).map(type =>
+              NodeDef.nodeDefType.entity !== type ? (
+                <button
+                  key={type}
+                  className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                  onClick={() => {
+                    const idx = R.findIndex(R.equals(type), filterTypes)
+                    const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
+                    setFilterTypes(fn(filterTypes))
+                  }}
+                >
+                  {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}
+                </button>
+              ) : null,
+            )}
           </div>
-        }
+        )}
 
         <AttributesSelector
           lang={lang}
@@ -90,8 +82,6 @@ const NodeDefsSelectorView = props => {
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
         />
-
-
       </div>
     </div>
   )

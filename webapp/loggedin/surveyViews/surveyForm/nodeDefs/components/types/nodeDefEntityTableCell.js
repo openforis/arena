@@ -1,26 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import NodeDefSwitch from '../../nodeDefSwitch'
 import ProgressBar from '@webapp/commonComponents/progressBar'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCell = props => {
-
-  const {
-    nodeDef, parentNode,
-    canEditDef, renderType,
-    onDragStart, onDragOver, onDragEnd,
-    gridSize, windowed,
-  } = props
+  const { nodeDef, parentNode, canEditDef, renderType, onDragStart, onDragOver, onDragEnd, gridSize, windowed } = props
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const { length } = NodeDefUiProps.getFormFields(nodeDef)
   const elementRef = useRef(null)
 
-  // table cell header is always visible
+  // Table cell header is always visible
   const isHeader = renderType === NodeDefLayout.renderType.tableHeader
   const [visible, setVisible] = useState(isHeader || !windowed)
 
@@ -39,55 +33,42 @@ const NodeDefEntityTableCell = props => {
         const gridLeft = gridSize.left
         const gridRight = gridSize.width + gridLeft
 
-        const elemVisible = (
-          elemtTop <= gridBottom && elemBottom >= gridTop // vertical visibility
-          &&
-          elemLeft <= gridRight && elemRight >= gridLeft // horizontal visibility
-        )
+        const elemVisible =
+          elemtTop <= gridBottom &&
+          elemBottom >= gridTop && // Vertical visibility
+          elemLeft <= gridRight &&
+          elemRight >= gridLeft // Horizontal visibility
         setVisible(elemVisible)
       }
-
     }, [gridSize])
   }
 
   return (
-    <div ref={elementRef}
-         data-uuid={nodeDefUuid}
-         className="react-grid-item draggable-item"
-         style={{ width: 160 * length + 'px' }}
-         onMouseDown={e => e.stopPropagation()}
-         draggable={canEditDef}
-         onDragStart={onDragStart}
-         onDragOver={onDragOver}
-         onDragEnd={onDragEnd}>
-      {
-        visible
-          ? (
-            <NodeDefSwitch
-              {...props}
-              node={null}
-              nodeDef={nodeDef}
-              parentNode={parentNode}
-              renderType={renderType}
-            />
-          )
-          : (
-            <div className="survey-form__node-def-entity-table-cell-placeholder">
-              <ProgressBar
-                className="running progress-bar-striped"
-                progress={100}
-                showText={false}/>
-            </div>
-          )
-      }
+    <div
+      ref={elementRef}
+      data-uuid={nodeDefUuid}
+      className="react-grid-item draggable-item"
+      style={{ width: 160 * length + 'px' }}
+      onMouseDown={e => e.stopPropagation()}
+      draggable={canEditDef}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
+    >
+      {visible ? (
+        <NodeDefSwitch {...props} node={null} nodeDef={nodeDef} parentNode={parentNode} renderType={renderType} />
+      ) : (
+        <div className="survey-form__node-def-entity-table-cell-placeholder">
+          <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
+        </div>
+      )}
     </div>
   )
-
 }
 
 NodeDefEntityTableCell.defaultProps = {
-  gridSize: {}, // coordinates of the grid size where it's contained
-  windowed: true, // used to load component only when visible in parent grid
+  gridSize: {}, // Coordinates of the grid size where it's contained
+  windowed: true, // Used to load component only when visible in parent grid
 }
 
 export default NodeDefEntityTableCell

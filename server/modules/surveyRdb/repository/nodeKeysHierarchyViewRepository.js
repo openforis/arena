@@ -7,10 +7,9 @@ import * as NodeKeysView from '../schemaRdb/nodeKeysView'
 import * as NodeHierarchyDisaggregatedView from '../schemaRdb/nodeHierarchyDisaggregatedView'
 import * as NodeKeysHierarchyView from '../schemaRdb/nodeKeysHierarchyView'
 
-//====== CREATE
+// ====== CREATE
 
 export const createNodeKeysHierarchyView = async (survey, client = db) => {
-
   const surveyId = Survey.getId(survey)
 
   await client.query(`

@@ -1,8 +1,6 @@
 import { exportReducer } from '../../utils/reduxUtils'
 
-import {
-  appSideBarOpenedUpdate,
-} from './actions'
+import { appSideBarOpenedUpdate } from './actions'
 
 import * as SideBarState from './appSidebarState'
 

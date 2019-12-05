@@ -1,10 +1,6 @@
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
-
-import * as UserService from '../service/userService'
-
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
@@ -12,6 +8,8 @@ import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
+import * as UserService from '../service/userService'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 const _checkSelf = req => {
   const { userUuid } = Request.getParams(req)
@@ -22,7 +20,6 @@ const _checkSelf = req => {
 }
 
 export const init = app => {
-
   // ==== CREATE
 
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
@@ -39,8 +36,8 @@ export const init = app => {
       const serverUrl = Request.getServerUrl(req)
       await UserService.inviteUser(user, surveyId, surveyCycleKey, email, groupUuid, serverUrl)
       Response.sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -55,8 +52,8 @@ export const init = app => {
   app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
       await _getUser(req, res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -64,8 +61,8 @@ export const init = app => {
     try {
       _checkSelf(req)
       await _getUser(req, res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -76,9 +73,8 @@ export const init = app => {
 
       const count = await UserService.countUsersBySurveyId(user, surveyId)
       res.json(count)
-
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -90,8 +86,8 @@ export const init = app => {
       const list = await UserService.fetchUsersBySurveyId(user, surveyId, offset, limit)
 
       res.json({ list })
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -109,10 +105,12 @@ export const init = app => {
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
-        res.sendFile(`${__dirname}/avatar.png`, { root: ProcessUtils.ENV.arenaRoot })
+        res.sendFile(`${__dirname}/avatar.png`, {
+          root: ProcessUtils.ENV.arenaRoot,
+        })
       }
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -126,8 +124,8 @@ export const init = app => {
       await UserService.acceptInvitation(user, userUuid, name)
 
       Response.sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -151,8 +149,8 @@ export const init = app => {
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
       await _updateUser(req, res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -160,8 +158,8 @@ export const init = app => {
     try {
       _checkSelf(req)
       await _updateUser(req, res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -177,10 +175,9 @@ export const init = app => {
       await UserService.updateUserPrefs(userToUpdate)
 
       Response.sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
-
   })
 
   // ==== DELETE
@@ -192,9 +189,8 @@ export const init = app => {
       await UserService.deleteUser(user, surveyId, userUuid)
 
       Response.sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
-
 }

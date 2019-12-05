@@ -1,6 +1,6 @@
+import * as JobManager from '@server/job/jobManager'
 import * as SurveyManager from '../manager/surveyManager'
 
-import * as JobManager from '@server/job/jobManager'
 import SurveyPublishJob from './publish/surveyPublishJob'
 
 // JOBS

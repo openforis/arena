@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { sendOk, sendFile } from '@server/utils/response';
+import { sendOk, sendFile } from '@server/utils/response'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
@@ -9,10 +9,14 @@ import * as Node from '@core/record/node'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
-import { requireRecordListViewPermission, requireRecordEditPermission, requireRecordCreatePermission, requireRecordViewPermission } from '../../auth/authApiMiddleware';
+import {
+  requireRecordListViewPermission,
+  requireRecordEditPermission,
+  requireRecordCreatePermission,
+  requireRecordViewPermission,
+} from '../../auth/authApiMiddleware'
 
 export const init = app => {
-
   // ==== CREATE
   app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
     try {
@@ -28,8 +32,8 @@ export const init = app => {
       await RecordService.createRecord(socketId, user, surveyId, record)
 
       sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -44,8 +48,8 @@ export const init = app => {
       await RecordService.persistNode(socketId, user, surveyId, node, file)
 
       sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -57,9 +61,8 @@ export const init = app => {
 
       const count = await RecordService.countRecordsBySurveyId(surveyId, cycle)
       res.json(count)
-
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -69,8 +72,8 @@ export const init = app => {
 
       const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(surveyId, cycle, offset, limit)
       res.json(recordsSummary)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -81,23 +84,27 @@ export const init = app => {
       const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
 
       res.json(counts)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, nodeUuid } = Request.getParams(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
+    requireRecordViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, nodeUuid } = Request.getParams(req)
 
-      const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-      const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
+        const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
+        const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
 
-      sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
-    } catch (err) {
-      next(err)
-    }
-  })
+        sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ==== UPDATE
 
@@ -110,8 +117,8 @@ export const init = app => {
       await RecordService.updateRecordStep(user, surveyId, recordUuid, step)
 
       sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -125,8 +132,8 @@ export const init = app => {
       const record = await RecordService.checkIn(socketId, user, surveyId, recordUuid, draft)
 
       res.json({ record })
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -139,8 +146,8 @@ export const init = app => {
       await RecordService.checkOut(socketId, user, surveyId, recordUuid)
 
       sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -154,8 +161,8 @@ export const init = app => {
       await RecordService.deleteRecord(socketId, user, surveyId, recordUuid)
 
       sendOk(res)
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   })
 
@@ -167,6 +174,4 @@ export const init = app => {
     RecordService.deleteNode(socketId, user, surveyId, recordUuid, nodeUuid)
     sendOk(res)
   })
-
-};
-
+}

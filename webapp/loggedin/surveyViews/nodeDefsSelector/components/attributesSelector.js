@@ -4,48 +4,62 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefUIProps'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-
-const AttributeSelector = (props) => {
-
+const AttributeSelector = props => {
   const {
-    nodeDefContext, nodeDef, lang, nodeDefUuidsAttributes,
+    nodeDefContext,
+    nodeDef,
+    lang,
+    nodeDefUuidsAttributes,
     onToggleAttribute,
-    filterTypes, canSelectAttributes, showMultipleAttributes
+    filterTypes,
+    canSelectAttributes,
+    showMultipleAttributes,
   } = props
 
   const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
-  const isVisible = (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
+  const isVisible =
+    (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
   const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
 
-  return isVisible &&
-    <button className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
-            onClick={() => onToggleAttribute(nodeDefUuid)}
-            disabled={!canSelectAttributes}>
-      {NodeDef.getLabel(nodeDef, lang)}
-      {NodeDefUiProps.getIconByType(nodeDefType)}
-    </button>
-
+  return (
+    isVisible && (
+      <button
+        className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
+        onClick={() => onToggleAttribute(nodeDefUuid)}
+        disabled={!canSelectAttributes}
+      >
+        {NodeDef.getLabel(nodeDef, lang)}
+        {NodeDefUiProps.getIconByType(nodeDefType)}
+      </button>
+    )
+  )
 }
 
-const AttributesSelector = (props) => {
-
+const AttributesSelector = props => {
   const {
-    nodeDefContext, nodeDefParent, childDefs, lang,
-    nodeDefUuidsAttributes, onToggleAttribute,
-    filterTypes, canSelectAttributes, showAncestors, showMultipleAttributes,
+    nodeDefContext,
+    nodeDefParent,
+    childDefs,
+    lang,
+    nodeDefUuidsAttributes,
+    onToggleAttribute,
+    filterTypes,
+    canSelectAttributes,
+    showAncestors,
+    showMultipleAttributes,
   } = props
 
-  return childDefs &&
-    <React.Fragment>
-      {
-        childDefs.map((childDef, i) => (
+  return (
+    childDefs && (
+      <React.Fragment>
+        {childDefs.map((childDef, i) => (
           <AttributeSelector
             key={i}
             nodeDefContext={nodeDefContext}
@@ -57,27 +71,25 @@ const AttributesSelector = (props) => {
             canSelectAttributes={canSelectAttributes}
             showMultipleAttributes={showMultipleAttributes}
           />
-        ))
-      }
+        ))}
 
-      {
-        showAncestors && nodeDefParent &&
-        <React.Fragment>
-          <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
-          <AttributesSelectorConnect
-            lang={lang}
-            nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            onToggleAttribute={onToggleAttribute}
-            filterTypes={filterTypes}
-            canSelectAttributes={canSelectAttributes}
-            showMultipleAttributes={showMultipleAttributes}
-          />
-        </React.Fragment>
-      }
-
-    </React.Fragment>
-
+        {showAncestors && nodeDefParent && (
+          <React.Fragment>
+            <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
+            <AttributesSelectorConnect
+              lang={lang}
+              nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
+              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+              onToggleAttribute={onToggleAttribute}
+              filterTypes={filterTypes}
+              canSelectAttributes={canSelectAttributes}
+              showMultipleAttributes={showMultipleAttributes}
+            />
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    )
+  )
 }
 
 AttributesSelector.defaultProps = {
@@ -100,7 +112,7 @@ const mapStateToProps = (state, props) => {
   const childDefs = nodeDefContext
     ? NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefChildren(nodeDefContext)(survey)
-      : [nodeDefContext] // multiple attribute
+      : [nodeDefContext] // Multiple attribute
     : []
 
   return {

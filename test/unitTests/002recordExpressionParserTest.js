@@ -1,44 +1,39 @@
 import * as R from 'ramda'
-import { assert } from 'chai';
+import { assert } from 'chai'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import * as RecordUtils from '../it/utils/recordUtils'
 import * as SB from '../it/utils/surveyBuilder'
 import * as RB from '../it/utils/recordBuilder'
-import { getContextUser } from '../testContext';
-
-import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import { getContextUser } from '../testContext'
 
 let survey = {}
 let record = {}
-// let root = {}
+// Let root = {}
 let node = {}
-// let dbh = {}
-
-before(async () => {
-  const user = getContextUser()
-
-  survey = SB.survey(user,
-    SB.entity('cluster',
-      SB.attribute('tree', NodeDef.nodeDefType.integer),
-      SB.attribute('dbh', NodeDef.nodeDefType.integer),
-    )
-  ).build()
-
-  record = RB.record(user, survey,
-    RB.entity('cluster',
-      RB.attribute('tree', 12),
-      RB.attribute('dbh', 18),
-    )
-  ).build()
-
-  // root = RecordUtils.findNodeByPath('cluster')(survey, record)
-  node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
-  // dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
-})
+// Let dbh = {}
 
 describe('RecordExpressionParser Test', () => {
+  before(async () => {
+    const user = getContextUser()
+
+    survey = SB.survey(
+      user,
+      SB.entity(
+        'cluster',
+        SB.attribute('tree', NodeDef.nodeDefType.integer),
+        SB.attribute('dbh', NodeDef.nodeDefType.integer),
+      ),
+    ).build()
+
+    record = RB.record(user, survey, RB.entity('cluster', RB.attribute('tree', 12), RB.attribute('dbh', 18))).build()
+
+    // Root = RecordUtils.findNodeByPath('cluster')(survey, record)
+    node = RecordUtils.findNodeByPath('cluster/tree')(survey, record)
+    // Dbh = RecordUtils.findNodeByPath('cluster/dbh')(survey, record)
+  })
 
   // ====== nodes hierarchy tests
   // it('this.parent()', async () => {
@@ -71,41 +66,34 @@ describe('RecordExpressionParser Test', () => {
     // Number + String is invalid -> null
     { q: 'tree + "1"', r: null },
     { q: '!(tree == 1)', r: true },
-    //18 + 1
+    // 18 + 1
     { q: 'dbh + 1', r: 19 },
-    //18 + 1
-    { q: `dbh + 1`, r: 19 },
-    //18 + 1 + 12
+    // 18 + 1
+    { q: 'dbh + 1', r: 19 },
+    // 18 + 1 + 12
     { q: 'dbh + 1 + tree', r: 31 },
-    //18 + 12
+    // 18 + 12
     { q: 'dbh + tree', r: 30 },
-    //19 >= 12
+    // 19 >= 12
     { q: 'dbh + 1 >= tree', r: true },
-    //18 * 0.5 >= 12
-    { q: `(dbh * 0.5) >= tree`, r: false },
-    //1728
-    { q: `pow(tree, 3)`, r: 1728 },
+    // 18 * 0.5 >= 12
+    { q: '(dbh * 0.5) >= tree', r: false },
+    // 1728
+    { q: 'pow(tree, 3)', r: 1728 },
     // 18 * 0.5 >= 1728
-    { q: `(dbh * 0.5) >= pow(tree, 3)`, r: false },
+    { q: '(dbh * 0.5) >= pow(tree, 3)', r: false },
   ]
 
-  queries.forEach(query => {
-    const { q, r } = query
-    const resKeys = R.keys(r)
-
+  for (const { q, r } of queries) {
     it(q, () => {
+      const resKeys = R.keys(r)
       const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
 
       if (R.isEmpty(resKeys)) {
         assert.equal(res, r)
       } else {
-        resKeys.forEach(key =>
-          assert.equal(res[key], r[key])
-        )
+        resKeys.forEach(key => assert.equal(res[key], r[key]))
       }
-
     })
-
-  })
-
+  }
 })

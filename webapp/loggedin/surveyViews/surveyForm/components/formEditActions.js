@@ -13,16 +13,13 @@ const FormEditActions = ({ history, createRecord }) => {
   return (
     <div className="survey-form-header__actions">
       <button className="btn-s btn-transparent" onClick={() => createRecord(history, true)}>
-        <span className="icon icon-eye icon-12px icon-left"/>
+        <span className="icon icon-eye icon-12px icon-left" />
         {i18n.t('surveyForm.formEditActions.preview')}
       </button>
     </div>
   )
 }
 
-const enhance = compose(
-  withRouter,
-  connect(null, { createRecord })
-)
+const enhance = compose(withRouter, connect(null, { createRecord }))
 
 export default enhance(FormEditActions)

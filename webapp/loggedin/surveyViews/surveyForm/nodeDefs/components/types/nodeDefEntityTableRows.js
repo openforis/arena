@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
-
-import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,18 +9,20 @@ import * as SurveyState from '@webapp/survey/surveyState'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { debounce } from '@core/functionsDefer'
+import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
 const NodeDefEntityTableRows = props => {
-
-  const {
-    entry, edit,
-    nodeDef, nodeDefColumns, nodes,
-  } = props
+  const { entry, edit, nodeDef, nodeDefColumns, nodes } = props
 
   const tableRowsRef = useRef(null)
   const tableDataRowsRef = useRef(null)
 
-  const [gridSize, setGridSize] = useState({ width: 0, height: 0, top: 0, left: 0 })
+  const [gridSize, setGridSize] = useState({
+    width: 0,
+    height: 0,
+    top: 0,
+    left: 0,
+  })
   const debounceDelayOnScroll = 100
 
   const onScrollTableRows = () => {
@@ -35,6 +35,7 @@ const NodeDefEntityTableRows = props => {
         }))
       }
     }
+
     debounce(onScroll, 'scroll-table-rows', debounceDelayOnScroll)()
   }
 
@@ -48,14 +49,14 @@ const NodeDefEntityTableRows = props => {
         }))
       }
     }
+
     debounce(onScroll, 'scroll-table-data-rows', debounceDelayOnScroll)()
   }
 
-  // nodeDef update effect entry mode
+  // NodeDef update effect entry mode
   if (!edit) {
     useEffect(() => {
-
-      // reset scrolls and set grid size
+      // Reset scrolls and set grid size
       tableRowsRef.current.scrollLeft = 0
       tableDataRowsRef.current.scrollTop = 0
 
@@ -64,16 +65,19 @@ const NodeDefEntityTableRows = props => {
         const { height } = elementOffset(tableDataRowsRef.current)
 
         setGridSize(gridSizePrev => ({
-          ...gridSizePrev, width, height
+          ...gridSizePrev,
+          width,
+          height,
         }))
       }
 
       updateGridSize()
 
-      //add resize event listener
+      // Add resize event listener
       const onWindowResize = () => {
         debounce(updateGridSize, 'upgrade-grid-size', 200)()
       }
+
       window.addEventListener('resize', onWindowResize)
 
       return () => {
@@ -83,28 +87,26 @@ const NodeDefEntityTableRows = props => {
   }
 
   return (
-    <div className="survey-form__node-def-entity-table-rows"
-         ref={tableRowsRef}
-         onScroll={onScrollTableRows}>
-
-      {
-        (edit || !R.isEmpty(nodes)) &&
+    <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>
+      {(edit || !R.isEmpty(nodes)) && (
         <NodeDefEntityTableRow
           {...props}
           node={null}
           renderType={NodeDefLayout.renderType.tableHeader}
           gridSize={gridSize}
-          nodeDefColumns={nodeDefColumns}/>
-      }
+          nodeDefColumns={nodeDefColumns}
+        />
+      )}
 
-      {
-        entry &&
-        <div className="survey-form__node-def-entity-table-data-rows"
-             ref={tableDataRowsRef}
-             onScroll={onScrollTableDataRows}>
-          {
-            gridSize.height > 0 && gridSize.width > 0 &&
-            nodes.map((node, i) =>
+      {entry && (
+        <div
+          className="survey-form__node-def-entity-table-data-rows"
+          ref={tableDataRowsRef}
+          onScroll={onScrollTableDataRows}
+        >
+          {gridSize.height > 0 &&
+            gridSize.width > 0 &&
+            nodes.map((node, i) => (
               <NodeDefEntityTableRow
                 key={i}
                 i={i}
@@ -115,12 +117,9 @@ const NodeDefEntityTableRows = props => {
                 gridSize={gridSize}
                 nodeDefColumns={nodeDefColumns}
               />
-            )
-          }
+            ))}
         </div>
-
-      }
-
+      )}
     </div>
   )
 }
@@ -135,15 +134,15 @@ const mapStateToProps = (state, props) => {
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
       const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
-      nodeDefChild && nodeDefColumnsAgg.push(nodeDefChild)
+      if (nodeDefChild) nodeDefColumnsAgg.push(nodeDefChild)
       return nodeDefColumnsAgg
     },
     [],
-    nodeDefColumnUuids
+    nodeDefColumnUuids,
   )
 
   return {
-    nodeDefColumns
+    nodeDefColumns,
   }
 }
 

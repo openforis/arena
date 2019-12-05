@@ -5,33 +5,38 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, ${DbUtils.selectDate('date_executed')}`
+const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
+  'date_modified',
+)}, ${DbUtils.selectDate('date_executed')}`
 
 // ====== CREATE
 
 export const insertChain = async (surveyId, cycle, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (cycle)
     VALUES ($1)
     RETURNING ${selectFields}
     `,
     [cycle],
-    dbTransformCallback
+    dbTransformCallback,
   )
 
 // ====== READ
 
 export const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     SELECT COUNT(*) 
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE cycle = $1
     `,
-    [cycle]
+    [cycle],
   )
 
 export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
-  await client.map(`
+  await client.map(
+    `
     SELECT ${selectFields}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE cycle = $1
@@ -40,23 +45,25 @@ export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit =
     OFFSET ${offset}
     `,
     [cycle],
-    dbTransformCallback
+    dbTransformCallback,
   )
 
 export const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     SELECT ${selectFields}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1
     `,
     [processingChainUuid],
-    camelize
+    camelize,
   )
 
 // ====== UPDATE
 
 export const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
-  await client.query(`
+  await client.query(
+    `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
     SET props = jsonb_set("props", '{${key}}', $2::jsonb),
         date_modified = ${DbUtils.now}
@@ -69,12 +76,12 @@ export const updateChainProp = async (surveyId, processingChainUuid, key, value,
 // ====== DELETE
 
 export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
-  await client.one(`
+  await client.one(
+    `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1
     RETURNING ${selectFields}
     `,
     [processingChainUuid],
-    camelize
+    camelize,
   )
-

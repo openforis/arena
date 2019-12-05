@@ -1,4 +1,4 @@
-import { insertAllQuery } from '@server/db/dbUtils';
+import { insertAllQuery } from '@server/db/dbUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -50,7 +50,6 @@ const getSelectQuery = (surveySchema, nodeDef) => {
 }
 
 export const populateTable = async (survey, nodeDef, client) => {
-
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
 
@@ -74,18 +73,17 @@ export const populateTable = async (survey, nodeDef, client) => {
     const nodes = await client.any(`select * from ${viewName} ORDER BY id OFFSET ${offset} LIMIT ${limit}  `)
 
     // 3. convert nodes into values
-    const nodesRowValues = nodes.map(
-      nodeRow => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns)
-    )
+    const nodesRowValues = nodes.map(nodeRow => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns))
 
     // 4. insert node values
-    await client.none(insertAllQuery(
-      SchemaRdb.getName(surveyId),
-      NodeDefTable.getTableName(nodeDef, nodeDefParent),
-      DataTable.getColumnNames(survey, nodeDef),
-      nodesRowValues
-    ))
-
+    await client.none(
+      insertAllQuery(
+        SchemaRdb.getName(surveyId),
+        NodeDefTable.getTableName(nodeDef, nodeDefParent),
+        DataTable.getColumnNames(survey, nodeDef),
+        nodesRowValues,
+      ),
+    )
   }
 
   // 5. drop materialized view

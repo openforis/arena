@@ -8,7 +8,8 @@ export const assocTaxonomy = taxonomy => R.assoc(Taxonomy.getUuid(taxonomy), tax
 
 export const dissocTaxonomy = taxonomy => R.dissoc(Taxonomy.getUuid(taxonomy))
 
-export const assocTaxonomyProp = (taxonomy, key, value) => R.pipe(
-  R.assocPath([Taxonomy.getUuid(taxonomy), ObjectUtils.keys.props, key], value),
-  R.dissocPath([Taxonomy.getUuid(taxonomy), Validation.keys.validation, Validation.keys.fields, key]),
-)
+export const assocTaxonomyProp = (taxonomy, key, value) =>
+  R.pipe(
+    R.assocPath([Taxonomy.getUuid(taxonomy), ObjectUtils.keys.props, key], value),
+    R.dissocPath([Taxonomy.getUuid(taxonomy), Validation.keys.validation, Validation.keys.fields, key]),
+  )

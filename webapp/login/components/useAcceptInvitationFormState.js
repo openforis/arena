@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { useFormObject } from '@webapp/commonComponents/hooks'
 
 import { validateAcceptInvitationObj, getFirstError } from './loginValidator'
@@ -7,16 +5,15 @@ import { validateAcceptInvitationObj, getFirstError } from './loginValidator'
 export const useAcceptInvitationFormState = props => {
   const { acceptInvitation, setLoginError } = props
 
-  const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    validation,
-  } = useFormObject({
-    userName: '',
-    password: '',
-    passwordConfirm: '',
-  }, validateAcceptInvitationObj, true)
+  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
+    {
+      userName: '',
+      password: '',
+      passwordConfirm: '',
+    },
+    validateAcceptInvitationObj,
+    true,
+  )
 
   const userName = formObject.userName
   const password = formObject.password

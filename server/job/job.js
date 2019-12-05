@@ -1,17 +1,16 @@
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
-import { uuidv4 } from '@core/uuid';
-import { jobEvents, jobStatus } from './jobUtils';
+import { uuidv4 } from '@core/uuid'
 
-import * as User from '@core/user/user.js'
-import { throttle, cancelThrottle } from '@core/functionsDefer';
+import * as User from '@core/user/user'
+import { throttle, cancelThrottle } from '@core/functionsDefer'
 
 import SystemError from '@core/systemError'
+import { jobEvents, jobStatus } from './jobUtils'
 
 class JobEvent {
-
-  constructor (type, status, total, processed) {
+  constructor(type, status, total, processed) {
     this.type = type
     this.status = status
     this.total = total
@@ -36,13 +35,12 @@ class JobEvent {
  * - onEnd
  */
 export default class Job {
-
-  constructor (type, params = {}, innerJobs = []) {
+  constructor(type, params = {}, innerJobs = []) {
     this.params = params
 
-    // context object (shared among nested jobs)
+    // Context object (shared among nested jobs)
     this.context = {
-      ...params
+      ...params,
     }
 
     this.uuid = uuidv4()
@@ -70,7 +68,7 @@ export default class Job {
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
    */
-  async start (client = db) {
+  async start(client = db) {
     this.logDebug('start')
 
     // 1. crates a db transaction and run '_executeInTransaction' into it
@@ -81,14 +79,14 @@ export default class Job {
       if (this.isRunning()) {
         await this._setStatusSucceeded()
       }
-    } catch (e) {
+    } catch (error) {
       if (this.isRunning()) {
-        // error found, change status only if not changed already
-        this.logError(`${e.stack || e}`)
+        // Error found, change status only if not changed already
+        this.logError(`${error.stack || error}`)
         this.addError({
           error: {
             valid: false,
-            errors: [{ key: 'appErrors.generic', params: { text: e.toString() } }],
+            errors: [{ key: 'appErrors.generic', params: { text: error.toString() } }],
           },
         })
         await this.setStatusFailed()
@@ -96,11 +94,11 @@ export default class Job {
     }
   }
 
-  async shouldExecute () {
+  async shouldExecute() {
     return true
   }
 
-  async _executeInTransaction (tx) {
+  async _executeInTransaction(tx) {
     try {
       this.tx = tx
 
@@ -115,7 +113,7 @@ export default class Job {
         if (this.innerJobs.length > 0) {
           await this._executeInnerJobs()
         } else {
-          await this.execute(tx)
+          await this.execute()
         }
 
         // 3. execution completed, prepare result
@@ -133,54 +131,55 @@ export default class Job {
         await this.beforeEnd()
         this.logDebug('beforeEnd run')
       }
+
       this.tx = null
     }
+
     // 5. if errors found or job has been canceled, throw an error to rollback transaction
     if (!this.isRunning()) {
       throw new SystemError('jobCanceledOrErrorsFound')
     }
   }
 
-  addError (error, errorKey = null) {
-    if (!errorKey)
-      errorKey = '' + (this.processed + 1)
+  addError(error, errorKey = null) {
+    if (!errorKey) {
+      errorKey = String(this.processed + 1)
+    }
+
     this.errors[errorKey] = error
   }
 
-  hasErrors () {
+  hasErrors() {
     return Object.keys(this.errors).length > 0
   }
 
   /**
    * Abstract method to be extended by subclasses
-   *
-   * @param tx DB transaction
-   *
    */
-  async execute (tx) {}
+  async execute() {}
 
-  onEvent (listener) {
+  onEvent(listener) {
     this.eventListener = listener
     return this
   }
 
-  isCanceled () {
+  isCanceled() {
     return this.status === jobStatus.canceled
   }
 
-  isRunning () {
+  isRunning() {
     return this.status === jobStatus.running
   }
 
-  isSucceeded () {
+  isSucceeded() {
     return this.status === jobStatus.succeeded
   }
 
-  isFailed () {
+  isFailed() {
     return this.status === jobStatus.failed
   }
 
-  isEnded () {
+  isEnded() {
     switch (this.status) {
       case jobStatus.succeeded:
       case jobStatus.failed:
@@ -192,12 +191,12 @@ export default class Job {
   }
 
   // DO NOT OVERWRITE IT
-  async cancel () {
+  async cancel() {
     if (this.currentInnerJobIndex >= 0) {
       const innerJob = this.getCurrentInnerJob()
       if (innerJob.isRunning()) {
         await innerJob.cancel()
-        //parent job will be canceled by the inner job event listener
+        // Parent job will be canceled by the inner job event listener
       }
     } else {
       await this.beforeEnd()
@@ -205,13 +204,13 @@ export default class Job {
     }
   }
 
-  incrementProcessedItems (incrementBy = 1) {
+  incrementProcessedItems(incrementBy = 1) {
     this.processed += incrementBy
 
     throttle(
       async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
-      1000
+      1000,
     )()
   }
 
@@ -219,7 +218,7 @@ export default class Job {
    * Called when the job just has been started
    * (it runs INSIDE the current db transaction)
    */
-  async onStart () {
+  async onStart() {
     this.startTime = new Date()
     await this._setStatus(jobStatus.running)
   }
@@ -229,8 +228,8 @@ export default class Job {
    * Prepares the result
    * (it runs INSIDE the current db transaction)
    */
-  async beforeSuccess () {
-    //to be extended by subclasses
+  async beforeSuccess() {
+    // To be extended by subclasses
   }
 
   /**
@@ -238,64 +237,64 @@ export default class Job {
    * Used to flushes the resources used by the job before it terminates completely.
    * (it runs INSIDE the current db transaction)
    */
-  async beforeEnd () {
-    //to be extended by subclasses
+  async beforeEnd() {
+    // To be extended by subclasses
   }
 
   /**
    * Called when the job status changes to success, failed or canceled
    * (it runs OUTSIDE of the current db transaction)
    */
-  async onEnd () {
+  async onEnd() {
     this.endTime = new Date()
     cancelThrottle(this._getProgressThrottleId())
   }
 
   // UTILS
-  getContextProp (prop, defaultValue = null) {
+  getContextProp(prop, defaultValue = null) {
     const value = this.context[prop]
     return value ? value : defaultValue
   }
 
-  setContext (context) {
+  setContext(context) {
     Object.assign(this.context, context)
   }
 
-  setResult (result) {
+  setResult(result) {
     Object.assign(this.result, result)
   }
 
-  get contextSurvey () {
+  get contextSurvey() {
     return this.getContextProp(Job.keysContext.survey)
   }
 
-  get surveyId () {
+  get surveyId() {
     return this.getContextProp(Job.keysContext.surveyId)
   }
 
-  get user () {
+  get user() {
     return this.getContextProp(Job.keysContext.user)
   }
 
-  get userUuid () {
+  get userUuid() {
     return User.getUuid(this.user)
   }
 
-  getCurrentInnerJob () {
+  getCurrentInnerJob() {
     return this.innerJobs[this.currentInnerJobIndex]
   }
 
-  async setStatusFailed () {
+  async setStatusFailed() {
     await this._setStatus(jobStatus.failed)
   }
 
   // INTERNAL METHODS
-  async _executeInnerJobs () {
+  async _executeInnerJobs() {
     this.total = this.innerJobs.length
 
     this.logDebug(`- ${this.total} inner jobs found`)
 
-    //start each inner job and wait for it's completion before starting next one
+    // Start each inner job and wait for it's completion before starting next one
     for (const innerJob of this.innerJobs) {
       ++this.currentInnerJobIndex
 
@@ -307,29 +306,33 @@ export default class Job {
 
       await innerJob.start(this.tx)
 
-      if (innerJob.isSucceeded())
+      if (innerJob.isSucceeded()) {
         this.incrementProcessedItems()
-      else
+      } else {
         break
+      }
     }
+
     this.logDebug(`- ${this.processed} inner jobs processed successfully`)
   }
 
-  async _handleInnerJobEvent (event) {
+  async _handleInnerJobEvent(event) {
     switch (event.status) {
       case jobStatus.failed:
       case jobStatus.canceled:
-        //cancel or fail even parent job
+        // Cancel or fail even parent job
         await this._setStatus(event.status)
         break
       case jobStatus.running:
-        //propagate progress event to parent job
+        // Propagate progress event to parent job
         await this._notifyEvent(this._createJobEvent(jobEvents.progress))
         break
+      default:
+        this.logDebug(`Unknown event status: ${event.status}`)
     }
   }
 
-  async _setStatus (status) {
+  async _setStatus(status) {
     this.logDebug(`set status: ${status}`)
 
     this.status = status
@@ -345,38 +348,38 @@ export default class Job {
       await this.onEnd()
       this.logDebug('onEnd run')
     }
+
     await this._notifyEvent(event)
   }
 
-  async _setStatusSucceeded () {
+  async _setStatusSucceeded() {
     await this._setStatus(jobStatus.succeeded)
   }
 
-  async _notifyEvent (event) {
+  async _notifyEvent(event) {
     if (this.eventListener) {
       this.eventListener(event)
     }
   }
 
-  _createJobEvent (type) {
+  _createJobEvent(type) {
     return new JobEvent(type, this.status, this.total, this.processed)
   }
 
-  _getProgressThrottleId () {
+  _getProgressThrottleId() {
     return `job-${this.uuid}-progress`
   }
 
-  logDebug (...msgs) {
+  logDebug(...msgs) {
     this._logger.debug(...msgs)
   }
 
-  logError (...msgs) {
+  logError(...msgs) {
     this._logger.error(...msgs)
   }
-
 }
 
-// static context keys
+// Static context keys
 Job.keysContext = {
   surveyId: 'surveyId',
   survey: 'survey',

@@ -14,8 +14,8 @@ const initSchedule = () =>
       const count = await RecordService.deleteRecordsPreview(true)
 
       Logger.debug(`${count} stale preview records deleted`)
-    } catch (err) {
-      Logger.error(`Error deleting stale preview records: ${err.toString()}`)
+    } catch (error) {
+      Logger.error(`Error deleting stale preview records: ${error.toString()}`)
     }
   })
 
@@ -24,8 +24,8 @@ export const init = async () => {
     Logger.debug('Deleting stale preview records')
     const count = await RecordService.deleteRecordsPreview()
     Logger.debug(`${count} stale preview records deleted`)
-  } catch (err) {
-    Logger.error(`Error deleting stale preview records: ${err.toString()}`)
+  } catch (error) {
+    Logger.error(`Error deleting stale preview records: ${error.toString()}`)
   }
 
   initSchedule()

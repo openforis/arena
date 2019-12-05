@@ -13,7 +13,7 @@ export const keys = {
 export const keysProps = {
   entityUuid: 'entityUuid', // OR
   categoryUuid: 'categoryUuid', // OR
-  virtual: 'virtual', //true|false
+  virtual: 'virtual', // True|false
 }
 
 // ====== READ
@@ -30,10 +30,9 @@ export const getUuid = ObjectUtils.getUuid
 
 export const assocCalculations = R.assoc(keys.calculationSteps)
 
-export const assocCalculation = processingStepCalculation => processingStep => R.pipe(
-  getCalculationSteps,
-  R.append(processingStepCalculation),
-  calculationSteps => R.assoc(keys.calculationSteps, calculationSteps, processingStep)
-)(processingStep)
+export const assocCalculation = processingStepCalculation => processingStep =>
+  R.pipe(getCalculationSteps, R.append(processingStepCalculation), calculationSteps =>
+    R.assoc(keys.calculationSteps, calculationSteps, processingStep),
+  )(processingStep)
 
 export const mergeProps = ObjectUtils.mergeProps

@@ -1,25 +1,19 @@
-import React from 'react'
-
 import { useFormObject } from '@webapp/commonComponents/hooks'
 
 import { validateResetPasswordObj, getFirstError } from './loginValidator'
 
 export const useResetPasswordFormState = props => {
-  const {
-    setLoginError,
-    resetPassword,
-  } = props
+  const { setLoginError, resetPassword } = props
 
-  const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    validation,
-  } = useFormObject({
-    password: '',
-    passwordConfirm: '',
-    verificationCode: '',
-  }, validateResetPasswordObj, true)
+  const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
+    {
+      password: '',
+      passwordConfirm: '',
+      verificationCode: '',
+    },
+    validateResetPasswordObj,
+    true,
+  )
 
   const password = formObject.password
   const passwordConfirm = formObject.passwordConfirm

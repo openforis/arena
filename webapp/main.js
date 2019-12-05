@@ -1,5 +1,5 @@
 import './utils/polyfill/polyfill'
-// import 'core-js/stable'
+// Import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 
 import './style/main.scss'
@@ -15,20 +15,17 @@ import * as AxiosJwtMiddleware from './app/axiosJwtMiddleware'
 
 import { store } from './app/store'
 
-function renderApp () {
-
+function renderApp() {
   AxiosJwtMiddleware.init()
 
   ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>
-        <AppRouterSwitch/>
+        <AppRouterSwitch />
       </BrowserRouter>
-    </Provider>
-    ,
-    document.getElementById('main')
+    </Provider>,
+    document.querySelector('#main'),
   )
-
 }
 
 renderApp()

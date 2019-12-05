@@ -2,9 +2,8 @@ import * as R from 'ramda'
 import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as NodeDefValidations from './nodeDefValidations'
-
 import * as StringUtils from '@core/stringUtils'
+import * as NodeDefValidations from './nodeDefValidations'
 
 // ======== NODE DEF PROPERTIES
 
@@ -46,11 +45,11 @@ export const propKeys = {
   readOnly: 'readOnly',
   validations: 'validations',
 
-  //code
+  // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
-  //taxon
-  taxonomyUuid: 'taxonomyUuid'
+  // Taxon
+  taxonomyUuid: 'taxonomyUuid',
 }
 
 const metaKeys = {
@@ -68,10 +67,10 @@ export const newNodeDef = (nodeDefParent, type, cycle, props, analysis = false) 
   [keys.analysis]: analysis,
   [keys.props]: {
     ...props,
-    [propKeys.cycles]: [cycle]
+    [propKeys.cycles]: [cycle],
   },
   [keys.meta]: {
-    [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : []
+    [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
   },
 })
 
@@ -113,9 +112,7 @@ export const isAnalysis = R.propEq(keys.analysis, true)
 
 export const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-  return StringUtils.isBlank(label)
-    ? getName(nodeDef)
-    : label
+  return StringUtils.isBlank(label) ? getName(nodeDef) : label
 }
 
 export const getUuid = ObjectUtils.getUuid
@@ -129,19 +126,15 @@ export const getCategoryUuid = ObjectUtils.getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = ObjectUtils.getProp(propKeys.taxonomyUuid)
 export const getCycleFirst = R.pipe(getCycles, R.head)
 
-//advanced props
+// Advanced props
 export const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 
 export const getValidations = ObjectUtils.getProp(propKeys.validations, {})
 
 export const getApplicable = ObjectUtils.getProp(propKeys.applicable, [])
-export const getValidationExpressions = R.pipe(
-  getValidations,
-  NodeDefValidations.getExpressions,
-)
+export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
-
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -157,46 +150,38 @@ export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 // ==== UTILS
 export const canNodeDefBeMultiple = nodeDef =>
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
-  R.includes(
-    getType(nodeDef),
-    [
-      nodeDefType.decimal,
-      nodeDefType.code,
-      nodeDefType.file,
-      nodeDefType.integer,
-      nodeDefType.text
-    ]
-  )
+  R.includes(getType(nodeDef), [
+    nodeDefType.decimal,
+    nodeDefType.code,
+    nodeDefType.file,
+    nodeDefType.integer,
+    nodeDefType.text,
+  ])
 
 export const canNodeDefBeKey = nodeDef => canNodeDefTypeBeKey(getType(nodeDef))
 
 export const canNodeDefTypeBeKey = type =>
-  R.includes(type,
-    [
-      nodeDefType.date,
-      nodeDefType.decimal,
-      nodeDefType.code,
-      nodeDefType.integer,
-      nodeDefType.taxon,
-      nodeDefType.text,
-      nodeDefType.time
-    ]
-  )
+  R.includes(type, [
+    nodeDefType.date,
+    nodeDefType.decimal,
+    nodeDefType.code,
+    nodeDefType.integer,
+    nodeDefType.taxon,
+    nodeDefType.text,
+    nodeDefType.time,
+  ])
 
 export const canHaveDefaultValue = nodeDef =>
   isSingleAttribute(nodeDef) &&
-  R.includes(
-    getType(nodeDef),
-    [
-      nodeDefType.boolean,
-      nodeDefType.code,
-      nodeDefType.date,
-      nodeDefType.decimal,
-      nodeDefType.integer,
-      nodeDefType.taxon,
-      nodeDefType.text,
-      nodeDefType.time,
-    ]
-  )
-  // allow default value when parent code is null (for node def code)
-  && !getParentCodeDefUuid(nodeDef)
+  R.includes(getType(nodeDef), [
+    nodeDefType.boolean,
+    nodeDefType.code,
+    nodeDefType.date,
+    nodeDefType.decimal,
+    nodeDefType.integer,
+    nodeDefType.taxon,
+    nodeDefType.text,
+    nodeDefType.time,
+  ]) &&
+  // Allow default value when parent code is null (for node def code)
+  !getParentCodeDefUuid(nodeDef)

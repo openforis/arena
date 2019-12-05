@@ -5,20 +5,17 @@ import * as ValidationResult from './validationResult'
 import * as ValidatorFunctions from './_validator/validatorFunctions'
 
 const validateProp = async (obj, prop, validations = []) => {
-  const validationsEvaluated = await Promise.all(
-    validations.map(validationFn => validationFn(prop, obj))
-  )
+  const validationsEvaluated = await Promise.all(validations.map(validationFn => validationFn(prop, obj)))
 
   const errors = []
   const warnings = []
   validationsEvaluated.forEach(validationResult => {
-      if (validationResult) {
-        // add validation result to errors or warnings
-        const arr = ValidationResult.isError(validationResult) ? errors : warnings
-        arr.push(R.omit([ValidationResult.keys.severity], validationResult))
-      }
+    if (validationResult) {
+      // Add validation result to errors or warnings
+      const arr = ValidationResult.isError(validationResult) ? errors : warnings
+      arr.push(R.omit([ValidationResult.keys.severity], validationResult))
     }
-  )
+  })
 
   return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
 }
@@ -43,7 +40,7 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
   return validation
 }
 
-// validator functions
+// Validator functions
 export const validateRequired = ValidatorFunctions.validateRequired
 export const validateItemPropUniqueness = ValidatorFunctions.validateItemPropUniqueness
 export const validateNotKeyword = ValidatorFunctions.validateNotKeyword

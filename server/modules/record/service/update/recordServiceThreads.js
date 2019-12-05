@@ -1,14 +1,14 @@
 import * as R from 'ramda'
 
 import ThreadManager from '@server/threads/threadManager'
-import * as RecordUpdateThreadParams from './thread/recordUpdateThreadParams'
 import * as ThreadParams from '@server/threads/threadParams'
 
 import * as WebSocket from '@server/utils/webSocket'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
+import * as RecordThreadsMap from './recordThreadsMap'
 import * as RecordSocketsMap from './recordSocketsMap'
-import * as RecordThreadsMap from '../update/recordThreadsMap'
+import * as RecordUpdateThreadParams from './thread/recordUpdateThreadParams'
 import { messageTypes as RecordThreadMessageTypes } from './thread/recordThreadMessageTypes'
 
 const recordThreadTimeouts = {}
@@ -36,7 +36,7 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
         thread.terminate()
       }
     } else {
-      // notify all sockets that have checked in the record
+      // Notify all sockets that have checked in the record
       const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
       socketIds.forEach(socketIdCurrent => {
         WebSocket.notifySocket(socketIdCurrent, msg.type, R.prop('content', msg))
@@ -64,9 +64,7 @@ const _resetThreadInactivityTimeout = recordUuid => {
     killRecordThread(recordUuid)
 
     const userUuids = RecordSocketsMap.getSocketIds(recordUuid)
-    userUuids.forEach(userUuid =>
-      WebSocket.notifyUser(userUuid, WebSocketEvents.recordSessionExpired, recordUuid)
-    )
+    userUuids.forEach(userUuid => WebSocket.notifyUser(userUuid, WebSocketEvents.recordSessionExpired, recordUuid))
   }, 60 * 60 * 1000)
 }
 
@@ -100,7 +98,7 @@ export const assocSocket = RecordSocketsMap.assocSocket
 
 const _terminateThreadIfNoSockets = recordUuid => {
   const thread = getRecordThread(recordUuid)
-  // terminate thread if there are no more users editing the record
+  // Terminate thread if there are no more users editing the record
   if (thread && !RecordSocketsMap.hasSockets(recordUuid)) {
     killRecordThread(recordUuid)
   }

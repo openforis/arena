@@ -29,15 +29,13 @@ export const assocListUpdateProps = props => state => {
     ...state,
     [module]: {
       ...state[module],
-      ...R.omit([keys.module], props)
-    }
+      ...R.omit([keys.module], props),
+    },
   }
 }
 
-export const getModuleProp = (module, prop, defaultValue = null) => R.pipe(
-  getState,
-  R.pathOr(defaultValue, [module, prop])
-)
+export const getModuleProp = (module, prop, defaultValue = null) =>
+  R.pipe(getState, R.pathOr(defaultValue, [module, prop]))
 
 export const getLimit = module => getModuleProp(module, keys.limit, defaults[keys.limit])
 

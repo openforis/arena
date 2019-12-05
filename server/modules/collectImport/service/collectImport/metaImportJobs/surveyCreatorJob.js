@@ -12,29 +12,23 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CollectSurvey from '../model/collectSurvey'
 
 export default class SurveyCreatorJob extends Job {
-
-  constructor (params) {
+  constructor(params) {
     super('SurveyCreatorJob', params)
   }
 
-  async execute (tx) {
+  async execute() {
+    const { tx } = this
     const { collectSurvey } = this.context
 
     const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)
 
     const name = R.pipe(R.split('/'), R.last)(collectUri)
 
-    const languages = R.pipe(
-      CollectSurvey.getElementsByName('language'),
-      R.map(CollectSurvey.getText)
-    )(collectSurvey)
+    const languages = R.pipe(CollectSurvey.getElementsByName('language'), R.map(CollectSurvey.getText))(collectSurvey)
 
     const defaultLanguage = languages[0]
 
-    const label = R.pipe(
-      CollectSurvey.toLabels('project', defaultLanguage),
-      R.prop(defaultLanguage)
-    )(collectSurvey)
+    const label = R.pipe(CollectSurvey.toLabels('project', defaultLanguage), R.prop(defaultLanguage))(collectSurvey)
 
     const survey = await SurveyManager.createSurvey(
       this.user,
@@ -42,11 +36,11 @@ export default class SurveyCreatorJob extends Job {
         name,
         label,
         languages,
-        collectUri
+        collectUri,
       },
       false,
       true,
-      tx
+      tx,
     )
 
     const surveyId = Survey.getId(survey)

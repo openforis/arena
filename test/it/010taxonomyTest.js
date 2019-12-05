@@ -13,4 +13,3 @@ describe('Taxonomy test', () => {
   it('Taxon published add vernacular name test', TaxonomyPublishedTests.taxonPublishedAddVernacularNameTest)
   it('Taxon published update vernacular names test', TaxonomyPublishedTests.taxonPublishedUpdateVernacularNamesTest)
 })
-

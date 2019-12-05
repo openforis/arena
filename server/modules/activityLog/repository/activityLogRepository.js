@@ -14,27 +14,38 @@ import * as DbUtils from '@server/db/dbUtils'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 
-//===== CREATE
+// ===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
-  await client.none(`
+  await client.none(
+    `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
-    [type, User.getUuid(user), content || {}, system]
+    [type, User.getUuid(user), content || {}, system],
   )
 
 export const insertMany = async (user, surveyId, activities, client) =>
-  await client.batch(activities.map(activity =>
-    insert(user, surveyId, ActivityLog.getType(activity), ActivityLog.getContent(activity), ActivityLog.isSystem(activity), client)
-  ))
+  await client.batch(
+    activities.map(activity =>
+      insert(
+        user,
+        surveyId,
+        ActivityLog.getType(activity),
+        ActivityLog.getContent(activity),
+        ActivityLog.isSystem(activity),
+        client,
+      ),
+    ),
+  )
 
-//===== READ
+// ===== READ
 export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
   const schema = getSurveyDBSchema(surveyId)
 
-  return await client.map(`
+  return await client.map(
+    `
   WITH
       log_days AS 
       (
@@ -79,10 +90,12 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
       
       -- node activities keys
     ${
-      published ? `
+      published
+        ? `
       n_h.${NodeKeysHierarchyView.columns.nodeDefUuid},
       n_h.${NodeKeysHierarchyView.columns.keysHierarchy},
-      ` : ''
+      `
+        : ''
     }
       -- user activities keys
       user_target.name AS target_user_name,
@@ -107,12 +120,14 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
 
     -- start of node activities part
     ${
-      published ? `
+      published
+        ? `
     LEFT OUTER JOIN
       ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} n_h
     ON
       l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeUuid}
-    ` : ''
+    `
+        : ''
     }
     -- end of node activities part
 
@@ -143,7 +158,9 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     LEFT OUTER JOIN 
       ${schema}.processing_step
     ON 
-      processing_step.uuid IN (l.content_uuid, (l.content->>'${ProcessingStepCalculation.keys.processingStepUuid}')::uuid)
+      processing_step.uuid IN (l.content_uuid, (l.content->>'${
+        ProcessingStepCalculation.keys.processingStepUuid
+      }')::uuid)
     LEFT OUTER JOIN 
       ${schema}.processing_step_calculation
     ON 
@@ -153,6 +170,6 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     ORDER BY
       l.date_created DESC`,
     [surveyUuid, activityTypes, offset, limit],
-    camelize
+    camelize,
   )
 }

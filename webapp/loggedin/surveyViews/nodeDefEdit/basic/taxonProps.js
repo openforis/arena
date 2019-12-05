@@ -11,16 +11,17 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
 const { propKeys } = NodeDef
 
-const TaxonProps = (props) => {
+const TaxonProps = props => {
   const {
-    nodeDef, validation,
+    nodeDef,
+    validation,
     taxonomies,
     taxonomy,
     canUpdateTaxonomy,
@@ -36,32 +37,35 @@ const TaxonProps = (props) => {
 
   return (
     <React.Fragment>
-
       <FormItem label={'Taxonomy'}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr repeat(2, 100px)',
-        }}>
-          <Dropdown items={taxonomies}
-                    itemKeyProp={'uuid'}
-                    itemLabelFunction={Taxonomy.getName}
-                    validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
-                    selection={taxonomy}
-                    disabled={!canUpdateTaxonomy}
-                    onChange={putTaxonomyProp}/>
-          <button className="btn btn-s"
-                  style={{ justifySelf: 'center' }}
-                  onClick={async () => {
-                    putTaxonomyProp(await createTaxonomy())
-                    toggleTaxonomyEdit(true)
-                  }}>
-            <span className="icon icon-plus icon-12px icon-left"/>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr repeat(2, 100px)',
+          }}
+        >
+          <Dropdown
+            items={taxonomies}
+            itemKeyProp={'uuid'}
+            itemLabelFunction={Taxonomy.getName}
+            validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
+            selection={taxonomy}
+            disabled={!canUpdateTaxonomy}
+            onChange={putTaxonomyProp}
+          />
+          <button
+            className="btn btn-s"
+            style={{ justifySelf: 'center' }}
+            onClick={async () => {
+              putTaxonomyProp(await createTaxonomy())
+              toggleTaxonomyEdit(true)
+            }}
+          >
+            <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <button className="btn btn-s"
-                  style={{ justifySelf: 'center' }}
-                  onClick={() => toggleTaxonomyEdit(true)}>
-            <span className="icon icon-list icon-12px icon-left"/>
+          <button className="btn btn-s" style={{ justifySelf: 'center' }} onClick={() => toggleTaxonomyEdit(true)}>
+            <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
           </button>
         </div>
@@ -81,11 +85,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    putNodeDefProp,
-    createTaxonomy,
-    deleteTaxonomy,
-  }
-)(TaxonProps)
+export default connect(mapStateToProps, {
+  putNodeDefProp,
+  createTaxonomy,
+  deleteTaxonomy,
+})(TaxonProps)

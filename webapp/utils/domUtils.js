@@ -29,12 +29,7 @@ export const isElementInViewport = el => {
   const rect = el.getBoundingClientRect()
   const viewportDim = getViewportDimensions()
 
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= viewportDim.height &&
-    rect.right <= viewportDim.width
-  )
+  return rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportDim.height && rect.right <= viewportDim.width
 }
 
 export const dispatchWindowResize = () => {

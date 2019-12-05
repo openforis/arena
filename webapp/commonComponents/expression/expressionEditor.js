@@ -3,55 +3,50 @@ import './expressionEditor.scss'
 import React, { useState } from 'react'
 import * as R from 'ramda'
 
+import * as Expression from '@core/expressionParser/expression'
 import ExpressionEditorPopup from './expressionEditorPopup'
 
-import * as Expression from '@core/expressionParser/expression'
-
 const ExpressionEditor = props => {
-
   const {
-    query, nodeDefUuidContext, nodeDefUuidCurrent, mode,
-    isContextParent, canBeConstant, isBoolean,
+    query,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
+    mode,
+    isContextParent,
+    canBeConstant,
+    isBoolean,
     onChange,
   } = props
 
   const [edit, setEdit] = useState(false)
 
   const applyChange = query => {
-    onChange && onChange(query)
+    if (onChange) onChange(query)
     setEdit(false)
   }
 
   return (
     <div className="expression-editor">
-      {
-        edit
-          ? (
-            <ExpressionEditorPopup
-              query={query}
-              nodeDefUuidContext={nodeDefUuidContext}
-              nodeDefUuidCurrent={nodeDefUuidCurrent}
-              mode={mode}
-              isContextParent={isContextParent}
-              canBeConstant={canBeConstant}
-              isBoolean={isBoolean}
-              onClose={() => setEdit(false)}
-              onChange={query => applyChange(query)}
-            />
-          )
-          : (
-            <div className="expression-editor__query-container">
-              {
-                !R.isEmpty(query) &&
-                <div className="query">{query}</div>
-              }
-              <button className="btn btn-s btn-edit"
-                      onClick={() => setEdit(true)}>
-                <span className="icon icon-pencil2 icon-14px"/>
-              </button>
-            </div>
-          )
-      }
+      {edit ? (
+        <ExpressionEditorPopup
+          query={query}
+          nodeDefUuidContext={nodeDefUuidContext}
+          nodeDefUuidCurrent={nodeDefUuidCurrent}
+          mode={mode}
+          isContextParent={isContextParent}
+          canBeConstant={canBeConstant}
+          isBoolean={isBoolean}
+          onClose={() => setEdit(false)}
+          onChange={query => applyChange(query)}
+        />
+      ) : (
+        <div className="expression-editor__query-container">
+          {!R.isEmpty(query) && <div className="query">{query}</div>}
+          <button className="btn btn-s btn-edit" onClick={() => setEdit(true)}>
+            <span className="icon icon-pencil2 icon-14px" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

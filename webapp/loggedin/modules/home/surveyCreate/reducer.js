@@ -7,7 +7,7 @@ import { surveyCreateNewSurveyUpdate } from './actions'
 const actionHandlers = {
   [appUserLogout]: () => ({}),
 
-  [surveyCreate]: (state, _) => ({}),
+  [surveyCreate]: (_state, _) => ({}),
 
   [surveyCreateNewSurveyUpdate]: assocActionProps,
 }

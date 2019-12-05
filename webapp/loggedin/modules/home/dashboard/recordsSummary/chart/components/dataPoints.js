@@ -10,11 +10,11 @@ import * as DateUtils from '@core/dateUtils'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>
-    <div className="date">
-      {DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}
-    </div>
+    <div className="date">{DateUtils.format(DateUtils.parseISO(dataPoint.date), 'dd MMMM yyyy')}</div>
     <div className="count">
-      {i18n.t('homeView.recordsSummary.record', { count: Number(dataPoint.count) })}
+      {i18n.t('homeView.recordsSummary.record', {
+        count: Number(dataPoint.count),
+      })}
     </div>
   </>
 )
@@ -33,23 +33,22 @@ const DataPoints = props => {
     tooltipRef.current = d3Tip()
       .attr('class', tooltipClassName)
       .offset([-10, 0])
-      .html((d) => ReactDOMServer.renderToString(
-        <DataPointTooltip dataPoint={d} i18n={i18n}/>
-      ))
+      .html(d => ReactDOMServer.renderToString(<DataPointTooltip dataPoint={d} i18n={i18n} />))
 
     d3.select(elementRef.current).call(tooltipRef.current)
 
     return () => {
-      document.getElementsByClassName(tooltipClassName)[0].remove()
+      document.querySelector(`.${tooltipClassName}`).remove()
     }
   }, [])
 
   useEffect(() => {
-    const circle = d3.select(elementRef.current)
+    const circle = d3
+      .select(elementRef.current)
       .selectAll('circle')
       .data(counts)
 
-    //update
+    // Update
     circle
       .transition()
       .duration(transitionDuration)
@@ -59,8 +58,9 @@ const DataPoints = props => {
       .attr('r', radius)
       .style('opacity', '1')
 
-    //exit
-    circle.exit()
+    // Exit
+    circle
+      .exit()
       .transition()
       .duration(transitionDuration)
       .ease(d3.easePolyOut)
@@ -68,8 +68,10 @@ const DataPoints = props => {
       .style('opacity', '0')
       .remove()
 
-    //enter
-    circle.enter().append('circle')
+    // Enter
+    circle
+      .enter()
+      .append('circle')
       .on('mouseover', tooltipRef.current.show)
       .on('mouseout', tooltipRef.current.hide)
       .attr('r', 0)
@@ -84,9 +86,7 @@ const DataPoints = props => {
       .style('opacity', '1')
   }, [chartProps])
 
-  return (
-    <g className="data-points" ref={elementRef}/>
-  )
+  return <g className="data-points" ref={elementRef} />
 }
 
 export default DataPoints

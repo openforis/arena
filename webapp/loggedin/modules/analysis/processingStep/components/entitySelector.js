@@ -22,7 +22,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
       const label = NodeDef.getLabel(nodeDef, lang)
       entities.push({
         key: NodeDef.getUuid(nodeDef),
-        value: StringUtils.nbsp + R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') + label
+        value: StringUtils.nbsp + R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') + label,
       })
     }
   }
@@ -34,11 +34,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const {
-    processingStep, entities,
-    calculationEditorOpened,
-    onChange
-  } = props
+  const { processingStep, entities, calculationEditorOpened, onChange } = props
 
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
@@ -46,13 +42,9 @@ const EntitySelector = props => {
 
   return (
     <div className="form-item">
-
-      {
-        !calculationEditorOpened &&
-        <div className="form-label processing-chain__steps-label">
-          {i18n.t('nodeDefsTypes.entity')}
-        </div>
-      }
+      {!calculationEditorOpened && (
+        <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>
+      )}
 
       <Dropdown
         className="processing-step__entity-selector"
@@ -60,20 +52,16 @@ const EntitySelector = props => {
         items={entities}
         selection={entity}
         readOnly={calculationEditorOpened}
-        onChange={
-          item => onChange(R.prop('key', item))
-        }
+        onChange={item => onChange(R.prop('key', item))}
       />
-
     </div>
   )
 }
 
 const mapStateToProps = (state, { processingStepPrev }) => {
   const survey = SurveyState.getSurvey(state)
-  const entityStepPrev = R.pipe(
-    ProcessingStep.getEntityUuid,
-    entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey)
+  const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
+    Survey.getNodeDefByUuid(entityUuid)(survey),
   )(processingStepPrev)
 
   return {

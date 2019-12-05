@@ -9,9 +9,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
-const activityTypesCommon = [
-  ActivityLog.type.surveyCreate,
-]
+const activityTypesCommon = [ActivityLog.type.surveyCreate]
 
 const activityTypesByPermission = {
   [AuthGroups.permissions.surveyEdit]: [
@@ -35,15 +33,13 @@ const activityTypesByPermission = {
     ActivityLog.type.taxonomyPropUpdate,
     ActivityLog.type.taxonomyTaxaImport,
   ],
-  [AuthGroups.permissions.recordView]: [
-    ActivityLog.type.recordCreate,
-  ],
+  [AuthGroups.permissions.recordView]: [ActivityLog.type.recordCreate],
   [AuthGroups.permissions.recordEdit]: [
     ActivityLog.type.nodeCreate,
     ActivityLog.type.nodeDelete,
     ActivityLog.type.nodeValueUpdate,
     ActivityLog.type.recordStepUpdate,
-    ActivityLog.type.recordDelete
+    ActivityLog.type.recordDelete,
   ],
   [AuthGroups.permissions.recordAnalyse]: [
     ActivityLog.type.processingChainCreate,
@@ -51,31 +47,30 @@ const activityTypesByPermission = {
     ActivityLog.type.processingChainPropUpdate,
     ActivityLog.type.processingStepCreate,
   ],
-  [AuthGroups.permissions.userEdit]: [
-    ActivityLog.type.userEdit,
-  ],
-  [AuthGroups.permissions.userInvite]: [
-    ActivityLog.type.userInvite,
-  ],
+  [AuthGroups.permissions.userEdit]: [ActivityLog.type.userEdit],
+  [AuthGroups.permissions.userInvite]: [ActivityLog.type.userInvite],
 }
 
 const _getAvailableActivityTypes = async (surveyUuid, user) => {
-  if (User.isSystemAdmin(user))
+  if (User.isSystemAdmin(user)) {
     return null
+  }
 
   return R.pipe(
     User.getAuthGroupBySurveyUuid(surveyUuid),
     AuthGroups.getPermissions,
-    //for each permission in group, get available activity types
+    // For each permission in group, get available activity types
     R.reduce(
       (accActivityTypes, permission) => {
         const activityTypes = activityTypesByPermission[permission]
-        if (activityTypes)
+        if (activityTypes) {
           accActivityTypes.push(...activityTypes)
+        }
+
         return accActivityTypes
       },
-      [...activityTypesCommon]
-    )
+      [...activityTypesCommon],
+    ),
   )(user)
 }
 

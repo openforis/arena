@@ -1,19 +1,17 @@
 export default class Counter {
-
-  constructor () {
+  constructor() {
     this._count = 0
   }
 
-  get count () {
+  get count() {
     return this._count
   }
 
-  increment () {
+  increment() {
     this._count++
   }
 
-  decrement () {
+  decrement() {
     this._count--
   }
-
 }

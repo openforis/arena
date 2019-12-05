@@ -5,7 +5,7 @@ export const getSocketIds = recordUuid => socketIdsByRecordUuid.get(recordUuid) 
 export const hasSockets = recordUuid => getSocketIds(recordUuid).size !== 0
 
 export const getRecordUuid = socketId => {
-  const recordUuids = Array.from(socketIdsByRecordUuid.keys())
+  const recordUuids = [...socketIdsByRecordUuid.keys()]
   return recordUuids.find(recordUuid => getSocketIds(recordUuid).has(socketId))
 }
 

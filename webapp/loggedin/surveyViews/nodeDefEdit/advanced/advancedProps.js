@@ -17,8 +17,7 @@ const AdvancedProps = props => {
 
   return (
     <div className="form">
-      {
-        NodeDef.canHaveDefaultValue(nodeDef) &&
+      {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
             <Checkbox
@@ -41,7 +40,7 @@ const AdvancedProps = props => {
             isBoolean={NodeDef.isBoolean(nodeDef)}
           />
         </>
-      }
+      )}
 
       <NodeDefExpressionsProp
         nodeDef={nodeDef}
@@ -55,8 +54,6 @@ const AdvancedProps = props => {
         nodeDefUuidContext={nodeDefUuidContext}
         isContextParent={true}
       />
-
-
     </div>
   )
 }

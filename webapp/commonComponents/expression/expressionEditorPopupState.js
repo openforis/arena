@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
@@ -17,11 +17,10 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = props => {
-
   const [state, setState] = useState(initialState)
   const { query, expr, mode, canBeConstant } = props
 
-  // onMount initialize state
+  // OnMount initialize state
   useEffect(() => {
     // Either expr or query are passed by the parent component
     const exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
@@ -40,13 +39,15 @@ export const useExpressionEditorPopupState = props => {
     const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
     setState(statePrev => ({
       ...statePrev,
-      queryDraft, exprDraft, exprDraftValid
+      queryDraft,
+      exprDraft,
+      exprDraftValid,
     }))
   }
 
   return {
     ...state,
-    updateDraft
+    updateDraft,
   }
 }
 
@@ -54,11 +55,7 @@ export const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const lang = AppState.getLang(state)
 
-  const {
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    mode = Expression.modes.json,
-  } = props
+  const { nodeDefUuidContext, nodeDefUuidCurrent, mode = Expression.modes.json } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null

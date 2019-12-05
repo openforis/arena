@@ -6,19 +6,23 @@ import { connect } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Table from './components/table'
 
 import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
 
 import * as DataQueryState from './dataQueryState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 const DataQueryView = props => {
-
   const {
-    hierarchy, nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
-    initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols,
+    hierarchy,
+    nodeDefUuidEntity,
+    nodeDefUuidsAttributes,
+    nodeDefSelectorsVisible,
+    initTableData,
+    updateTableNodeDefUuid,
+    updateTableNodeDefUuidCols,
   } = props
 
   useEffect(() => {
@@ -27,9 +31,7 @@ const DataQueryView = props => {
 
   return (
     <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
-
-      {
-        nodeDefSelectorsVisible &&
+      {nodeDefSelectorsVisible && (
         <NodeDefsSelectorView
           hierarchy={hierarchy}
           nodeDefUuidEntity={nodeDefUuidEntity}
@@ -38,10 +40,9 @@ const DataQueryView = props => {
           onChangeAttributes={updateTableNodeDefUuidCols}
           showMultipleAttributes={false}
         />
-      }
+      )}
 
-      <Table/>
-
+      <Table />
     </div>
   )
 }
@@ -64,7 +65,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols }
-)(DataQueryView)
+export default connect(mapStateToProps, {
+  initTableData,
+  updateTableNodeDefUuid,
+  updateTableNodeDefUuidCols,
+})(DataQueryView)

@@ -3,27 +3,23 @@ import { db } from '@server/db/db'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import * as TaxonomyManager from '../manager/taxonomyManager'
 import * as JobManager from '@server/job/jobManager'
+import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportJob from './taxonomyImportJob'
 
 export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
-  const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(surveyId, taxonomyUuid, draft)
+  const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
+    surveyId,
+    taxonomyUuid,
+    draft,
+  )
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
-  const headers = [
-    'code',
-    'family',
-    'genus',
-    'scientific_name',
-    ...vernacularLangCodes
-  ]
+  const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes]
 
-  await db.stream(
-    taxaStream,
-    stream => {
-      stream.pipe(CSVWriter.transformToStream(output, headers))
-    })
+  await db.stream(taxaStream, stream => {
+    stream.pipe(CSVWriter.transformToStream(output, headers))
+  })
 }
 
 export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
@@ -31,7 +27,7 @@ export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
     user,
     surveyId,
     taxonomyUuid,
-    filePath
+    filePath,
   })
 
   JobManager.executeJobThread(job)
@@ -54,8 +50,8 @@ export const fetchTaxaWithVernacularNames = TaxonomyManager.fetchTaxaWithVernacu
 export const fetchTaxonByUuid = TaxonomyManager.fetchTaxonByUuid
 export const fetchTaxonVernacularNameByUuid = TaxonomyManager.fetchTaxonVernacularNameByUuid
 
-// update
+// Update
 export const updateTaxonomyProp = TaxonomyManager.updateTaxonomyProp
 
-// delete
+// Delete
 export const deleteTaxonomy = TaxonomyManager.deleteTaxonomy

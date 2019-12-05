@@ -9,12 +9,17 @@ import * as SurveyState from '@webapp/survey/surveyState'
 
 import { initSurveyDefs, reloadSurveyDefs } from '@webapp/survey/actions'
 
-const SurveyDefsLoader = (props) => {
-
+const SurveyDefsLoader = props => {
   const {
-    surveyInfo, surveyCycleKey, draft, validate,
-    ready, requirePublish, children,
-    initSurveyDefs, reloadSurveyDefs
+    surveyInfo,
+    surveyCycleKey,
+    draft,
+    validate,
+    ready,
+    requirePublish,
+    children,
+    initSurveyDefs,
+    reloadSurveyDefs,
   } = props
 
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -33,22 +38,19 @@ const SurveyDefsLoader = (props) => {
 
   const i18n = useI18n()
 
-  return ready
-    ? !requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
-      ? children
-      : (
-        <div className="table__empty-rows">
-          {i18n.t('surveyDefsLoader.requireSurveyPublish')}
-        </div>
-      )
-    : null
-
+  return ready ? (
+    !requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) ? (
+      children
+    ) : (
+      <div className="table__empty-rows">{i18n.t('surveyDefsLoader.requireSurveyPublish')}</div>
+    )
+  ) : null
 }
 
 const mapStateToProps = (state, { draft }) => ({
   ready: SurveyState.areDefsFetched(draft)(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state)
+  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
 SurveyDefsLoader.defaultProps = {

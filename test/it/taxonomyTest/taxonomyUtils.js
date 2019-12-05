@@ -10,7 +10,8 @@ import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManag
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 
 // ==== READ (getters)
-export const getTaxonVernacularNamesText = lang => R.pipe(Taxon.getVernacularNamesByLang(lang), R.map(TaxonVernacularName.getName), names => names.sort())
+export const getTaxonVernacularNamesText = lang =>
+  R.pipe(Taxon.getVernacularNamesByLang(lang), R.map(TaxonVernacularName.getName), names => names.sort())
 
 export const getTaxonSingleVernacularNameText = lang => R.pipe(getTaxonVernacularNamesText(lang), R.head)
 
@@ -34,26 +35,26 @@ export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft) => {
 export const updateTaxonWithNewVernacularNames = async (user, surveyId, taxonomyName, taxonCode, lang, names) => {
   const taxonomyUuid = await fetchTaxonomyUuidByName(surveyId, taxonomyName, true)
 
-  // load taxon
+  // Load taxon
   const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
 
-  // create new vernacular name or updated existing one
+  // Create new vernacular name or updated existing one
   const vernacularNamesArrayNew = R.map(name => TaxonVernacularName.newTaxonVernacularName(lang, name))(names)
   const taxonNew = Taxon.assocVernacularNames(lang, vernacularNamesArrayNew)(taxon)
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
 
-  // update taxon
+  // Update taxon
   await TaxonomyManager.updateTaxon(user, surveyId, taxonUpdated)
 
   return {
     vernacularNamesNew: Taxon.getVernacularNamesByLang(lang)(taxonUpdated),
-    vernacularNamesOld: Taxon.getVernacularNamesByLang(lang)(taxon)
+    vernacularNamesOld: Taxon.getVernacularNamesByLang(lang)(taxon),
   }
 }
 
-// import
+// Import
 export const importFile = async (user, surveyId, taxonomyName, importFileName) => {
-  // fetch or create new taxonomy
+  // Fetch or create new taxonomy
   const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, true)
   const taxonomyExisting = R.find(taxonomy => Taxonomy.getName(taxonomy) === taxonomyName)(taxonomies)
   let taxonomy = null
@@ -63,6 +64,7 @@ export const importFile = async (user, surveyId, taxonomyName, importFileName) =
     taxonomy = Taxonomy.newTaxonomy({ [Taxonomy.keysProps.name]: taxonomyName })
     await TaxonomyManager.insertTaxonomy(user, surveyId, taxonomy)
   }
+
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const job = new TaxonomyImportJob({
     user,

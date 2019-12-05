@@ -16,8 +16,8 @@ export const init = () => {
       // Give one hour margin
       const deleted = await AuthService.deleteExpiredJwtTokens(timeSeconds - 60 * 60)
       logger.debug(`${deleted.length} expired jwt tokens deleted`)
-    } catch (err) {
-      logger.error(`Error deleting expired jwt tokens: ${err.toString()}`)
+    } catch (error) {
+      logger.error(`Error deleting expired jwt tokens: ${error.toString()}`)
     }
   })
 }

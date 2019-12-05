@@ -13,22 +13,18 @@ const NodeDefMultipleEditDialog = props => {
   const i18n = useI18n()
 
   return (
-    <Modal isOpen={true}
-           className="survey-form__node-def-multiple-edit-dialog"
-           closeOnEsc={true}
-           onClose={onClose}>
+    <Modal isOpen={true} className="survey-form__node-def-multiple-edit-dialog" closeOnEsc={true} onClose={onClose}>
       <ModalHeader>{label}</ModalHeader>
 
       <ModalBody>
-        {
-          React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
-        }
+        {React.createElement(NodeDefUiProps.getComponent(nodeDef), {
+          ...props,
+        })}
       </ModalBody>
 
       <ModalFooter>
         <div>
-          <button className="btn modal-footer__item"
-                  onClick={onClose}>
+          <button className="btn modal-footer__item" onClick={onClose}>
             {i18n.t('common.close')}
           </button>
         </div>

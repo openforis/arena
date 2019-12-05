@@ -11,18 +11,13 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
-import * as RecordState from './recordState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
-import {
-  showAppLoader,
-  hideAppLoader,
-  showAppSaving,
-  hideAppSaving
-} from '@webapp/app/actions'
+import { showAppLoader, hideAppLoader, showAppSaving, hideAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
 import { appModules, appModuleUri, dataModules } from '../../appModules'
+import * as RecordState from './recordState'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
@@ -35,10 +30,11 @@ export const validationsUpdate = 'survey/record/validation/update'
 
 export const recordNodesUpdate = nodes => (dispatch, getState) => {
   const record = RecordState.getRecord(getState())
-  // hide app loader on record create
+  // Hide app loader on record create
   if (R.isEmpty(Record.getNodes(record))) {
     dispatch(hideAppLoader())
   }
+
   dispatch({ type: nodesUpdate, nodes })
 }
 
@@ -121,8 +117,9 @@ const _updateNodeDebounced = (node, file, delay) => {
     const formData = new FormData()
     formData.append('node', JSON.stringify(node))
 
-    if (file)
+    if (file) {
       formData.append('file', file)
+    }
 
     const surveyId = SurveyState.getSurveyId(getState())
     await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData)
@@ -137,7 +134,9 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
   const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
-  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, { step })
+  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, {
+    step,
+  })
 
   history.push(appModuleUri(appModules.data))
 }
@@ -157,7 +156,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
-export const deleteRecord = (history) => async (dispatch, getState) => {
+export const deleteRecord = history => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -179,43 +178,44 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
   dispatch(showAppLoader())
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data: { record } } = await axios.post(
-    `/api/survey/${surveyId}/record/${recordUuid}/checkin`,
-    { draft }
-  )
+  const {
+    data: { record },
+  } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`, {
+    draft,
+  })
 
-  // this is used by dataQuery when user is editing a specific entity
+  // This is used by dataQuery when user is editing a specific entity
   if (entityUuid) {
-
     const state = getState()
     const survey = SurveyState.getSurvey(state)
 
-    // ancestors are needed to find the entity with a pageUuid specified
+    // Ancestors are needed to find the entity with a pageUuid specified
     const entity = Record.getNodeByUuid(entityUuid)(record)
     const ancestors = Record.getAncestorsAndSelf(entity)(record)
 
     const nodeDefActivePage = R.pipe(
       R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
-      R.find(R.pipe(
-        NodeDefLayout.getPageUuid,
-        R.isNil,
-        R.not
-      ))
+      R.find(R.pipe(NodeDefLayout.getPageUuid, R.isNil, R.not)),
     )(ancestors)
 
-    // getting the nodes associated to the nodeDef page
+    // Getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(
       (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
       [],
-      ancestors
+      ancestors,
     )
 
-    dispatch({ type: recordLoad, record, nodeDefActivePage, formPageNodeUuidByNodeDefUuid })
+    dispatch({
+      type: recordLoad,
+      record,
+      nodeDefActivePage,
+      formPageNodeUuidByNodeDefUuid,
+    })
   } else {
     dispatch({ type: recordLoad, record })
   }
 
-  // hide app loader on record edit
+  // Hide app loader on record edit
   if (!R.isEmpty(Record.getNodes(record))) {
     dispatch(hideAppLoader())
   }
@@ -223,7 +223,8 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  // checkout can be called after logout, therefore checking if survey still exists in state
-  if (surveyId)
+  // Checkout can be called after logout, therefore checking if survey still exists in state
+  if (surveyId) {
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
+  }
 }
