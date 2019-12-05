@@ -26,10 +26,7 @@ const AppJobErrors = ({ job }) => {
           <div key={errorKey} className="row">
             <div className="item">{i18n.t(errorKey)}</div>
             <div className="item-error">
-              <ValidationFieldMessages
-                validation={validationWrapper(error)}
-                showKeys={false}
-              />
+              <ValidationFieldMessages validation={validationWrapper(error)} showKeys={false} />
             </div>
           </div>
         ))}

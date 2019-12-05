@@ -33,11 +33,8 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   const path = R.pipe(
     R.map(hierarchyPart => {
       const keyValues = R.reject(R.isNil)(R.values(hierarchyPart.keys))
-      const keyValuesStr =
-        keyValues.length > 0 ? `[${keyValues.join(', ')}]` : ''
-      const parentNodeDef = Survey.getNodeDefByUuid(hierarchyPart.nodeDefUuid)(
-        survey,
-      )
+      const keyValuesStr = keyValues.length > 0 ? `[${keyValues.join(', ')}]` : ''
+      const parentNodeDef = Survey.getNodeDefByUuid(hierarchyPart.nodeDefUuid)(survey)
       const parentNodeDefLabel = NodeDef.getLabel(parentNodeDef, i18n.lang)
 
       return `${parentNodeDefLabel} ${keyValuesStr}`
@@ -59,18 +56,10 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
       <div>{idx + offset + 1}</div>
       <div>{path}</div>
       <div className="validation-report__message">
-        <ValidationFieldMessages
-          validation={row.validation}
-          showKeys={false}
-          showIcons={true}
-        />
+        <ValidationFieldMessages validation={row.validation} showKeys={false} showIcons={true} />
       </div>
       <div>
-        <span
-          className={`icon icon-12px icon-action ${
-            canEdit ? 'icon-pencil2' : 'icon-eye'
-          }`}
-        />
+        <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
     </>
   )

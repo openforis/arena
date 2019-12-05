@@ -33,13 +33,7 @@ const query = surveyId =>
   LIMIT $2
   OFFSET $3`
 
-export const fetchValidationReport = async (
-  surveyId,
-  cycle,
-  offset = 0,
-  limit = null,
-  client = db,
-) =>
+export const fetchValidationReport = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
   await client.map(
     query(surveyId),
     [cycle, limit, offset],
@@ -50,8 +44,4 @@ export const fetchValidationReport = async (
   )
 
 export const countValidationReports = async (surveyId, cycle, client = db) =>
-  await client.one(`SELECT count(*) from(${query(surveyId)}) AS v`, [
-    cycle,
-    null,
-    null,
-  ])
+  await client.one(`SELECT count(*) from(${query(surveyId)}) AS v`, [cycle, null, null])
