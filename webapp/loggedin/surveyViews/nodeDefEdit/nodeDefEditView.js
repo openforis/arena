@@ -1,4 +1,4 @@
-import './nodeDefEdit.scss'
+import './nodeDefEditView.scss'
 
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
@@ -25,7 +25,7 @@ import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
 import { closeNodeDefEdit } from './actions'
 
-const NodeDefEdit = props => {
+const NodeDefEditView = props => {
   const {
     nodeDef,
     nodeDefParent,
@@ -119,7 +119,7 @@ const NodeDefEdit = props => {
   ) : null
 }
 
-NodeDefEdit.defaultProps = {
+NodeDefEditView.defaultProps = {
   nodeDef: null,
   nodeDefParent: null,
 }
@@ -163,4 +163,4 @@ export default connect(mapStateToProps, {
   putNodeDefProp,
   putNodeDefLayoutProp,
   closeNodeDefEdit,
-})(NodeDefEdit)
+})(NodeDefEditView)

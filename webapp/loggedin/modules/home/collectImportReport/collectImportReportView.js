@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
+import NodeDefEditView from '../../../surveyViews/nodeDefEdit/nodeDefEditView'
 import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 import TableHeader from './components/tableHeader'
@@ -23,7 +23,7 @@ const CollectImportReportView = props => {
 
   return R.isEmpty(reportItems) ? null : (
     <SurveyDefsLoader draft={true} validate={true}>
-      {isNodeDefEditOpened && <NodeDefEdit />}
+      {isNodeDefEditOpened && <NodeDefEditView />}
 
       <div className="collect-import-report table">
         <TableHeader />
