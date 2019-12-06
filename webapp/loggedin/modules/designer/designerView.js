@@ -7,6 +7,7 @@ import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSw
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import NodeDefEditView from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditView'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
+import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 
 import * as AppState from '@webapp/app/appState'
@@ -51,6 +52,11 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           {
             component: CategoriesView,
             path: appModuleUri(designerModules.categories),
+          },
+
+          {
+            component: CategoryView,
+            path: `${appModuleUri(designerModules.category)}:categoryUuid`,
           },
 
           {

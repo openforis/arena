@@ -95,15 +95,15 @@ export const assocLevelActiveItem = (levelIndex, itemUuid) =>
       : R.dissocPath([keys.levelActiveItems, levelIndex], state),
   )
 
-const resetNextLevels = (levelIndex, prop) => categoryEditState =>
+const resetNextLevels = (levelIndex, prop) => categoryState =>
   R.reduce(
     (acc, idx) => (idx > levelIndex ? R.dissocPath([prop, idx], acc) : acc),
-    categoryEditState,
+    categoryState,
     R.pipe(
       R.prop(prop),
       R.keys,
       R.map(k => Number(k)),
-    )(categoryEditState),
+    )(categoryState),
   )
 
 // ==== import summary
@@ -114,9 +114,7 @@ export const assocImportSummary = summary => state => R.assoc(keys.importSummary
 
 export const dissocImportSummary = state => R.dissoc(keys.importSummary)(state)
 
-export const assocImportSummaryColumnDataType = (columnName, dataType) => categoryEditState =>
+export const assocImportSummaryColumnDataType = (columnName, dataType) => categoryState =>
   R.pipe(R.prop(keys.importSummary), summary => {
-    return assocImportSummary(CategoryImportSummary.assocColumnDataType(columnName, dataType)(summary))(
-      categoryEditState,
-    )
-  })(categoryEditState)
+    return assocImportSummary(CategoryImportSummary.assocColumnDataType(columnName, dataType)(summary))(categoryState)
+  })(categoryState)

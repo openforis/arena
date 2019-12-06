@@ -17,7 +17,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { createCategory, deleteCategory } from '../../categoryEdit/actions'
+import { createCategory, deleteCategory } from '../../category/actions'
 
 const CodeProps = props => {
   const {

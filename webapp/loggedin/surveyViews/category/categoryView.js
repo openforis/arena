@@ -1,4 +1,4 @@
-import './components/categoryEditView.scss'
+import './categoryView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -18,11 +18,11 @@ import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'
-import * as CategoryEditState from './categoryEditState'
+import * as CategoryState from './categoryState'
 
 import { putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory } from './actions'
 
-const CategoryEditView = props => {
+const CategoryView = props => {
   const {
     category,
     readOnly,
@@ -92,7 +92,7 @@ const CategoryEditView = props => {
 
 const mapStateToProps = state => ({
   readOnly: !Authorizer.canEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
-  importSummary: CategoryEditState.getImportSummary(state),
+  importSummary: CategoryState.getImportSummary(state),
 })
 
 export default connect(mapStateToProps, {
@@ -100,4 +100,4 @@ export default connect(mapStateToProps, {
   createCategoryLevel,
   setCategoryForEdit,
   uploadCategory,
-})(CategoryEditView)
+})(CategoryView)

@@ -10,11 +10,11 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import CategoryEditView from '../categoryEdit/categoryEditView'
+import CategoryView from '../category/categoryView'
 import ItemsView from '../items/itemsView'
-import * as CategoryEditState from '../categoryEdit/categoryEditState'
+import * as CategoryState from '../category/categoryState'
 
-import { createCategory, deleteCategory, setCategoryForEdit } from '../categoryEdit/actions'
+import { createCategory, deleteCategory, setCategoryForEdit } from '../category/actions'
 
 const CategoriesView = props => {
   const {
@@ -53,7 +53,7 @@ const CategoriesView = props => {
   return (
     <ItemsView
       headerText="Categories"
-      itemEditComponent={CategoryEditView}
+      itemEditComponent={CategoryView}
       itemEditProp="category"
       itemLabelFunction={category => Category.getName(category)}
       editedItem={category}
@@ -86,7 +86,7 @@ const mapStateToProps = state => {
 
   return {
     categories,
-    category: CategoryEditState.getCategoryForEdit(state),
+    category: CategoryState.getCategoryForEdit(state),
     readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }

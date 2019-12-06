@@ -17,7 +17,7 @@ import * as Validation from '@core/validation/validation'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as Authorizer from '@core/auth/authorizer'
-import * as CategoryEditState from '../categoryEditState'
+import * as CategoryState from '../categoryState'
 
 import {
   createCategoryLevelItem,
@@ -126,12 +126,12 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
-  const category = CategoryEditState.getCategoryForEdit(state)
-  const activeItem = CategoryEditState.getLevelActiveItem(index)(state)
-  const parentItem = CategoryEditState.getLevelActiveItem(index - 1)(state)
+  const category = CategoryState.getCategoryForEdit(state)
+  const activeItem = CategoryState.getLevelActiveItem(index)(state)
+  const parentItem = CategoryState.getLevelActiveItem(index - 1)(state)
 
   const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? CategoryEditState.getLevelItemsArray(index)(state) : []
+  const items = canAddItem ? CategoryState.getLevelItemsArray(index)(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
 
   const user = AppState.getUser(state)

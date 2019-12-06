@@ -25,14 +25,13 @@ import {
 
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
-import * as CategoryEditState from './categoryEditState'
+import * as CategoryState from './categoryState'
 
-export const categoryEditUpdate = 'surveyForm/categoryEdit/update'
-export const categoryEditLevelActiveItemUpdate = 'surveyForm/categoryEdit/levelActiveItem/update'
-export const categoryEditImportSummaryShow = 'surveyForm/categoryEdit/importSummary/show'
-export const categoryEditImportSummaryHide = 'surveyForm/categoryEdit/importSummary/hide'
-export const categoryEditImportSummaryColumnDataTypeUpdate =
-  'surveyForm/categoryEdit/importSummary/column/dataType/update'
+export const categoryViewCategoryUpdate = 'categoryView/category/update'
+export const categoryViewLevelActiveItemUpdate = 'categoryView/levelActiveItem/update'
+export const categoryViewImportSummaryShow = 'categoryView/importSummary/show'
+export const categoryViewImportSummaryHide = 'categoryView/importSummary/hide'
+export const categoryViewImportSummaryColumnDataTypeUpdate = 'categoryView/importSummary/column/dataType/update'
 
 export const dispatchCategoryUpdate = (dispatch, category) => dispatch({ type: categoryUpdate, category })
 
@@ -42,7 +41,7 @@ export const dispatchCategoryUpdate = (dispatch, category) => dispatch({ type: c
 
 export const setCategoryForEdit = category => async dispatch => {
   const categoryUuid = Category.getUuid(category)
-  dispatch({ type: categoryEditUpdate, categoryUuid })
+  dispatch({ type: categoryViewCategoryUpdate, categoryUuid })
 
   // Load first level items
   if (category) {
@@ -53,7 +52,7 @@ export const setCategoryForEdit = category => async dispatch => {
 export const setCategoryItemForEdit = (category, level, item, edit = true) => async dispatch => {
   const itemUuid = edit ? CategoryItem.getUuid(item) : null
   const levelIndex = CategoryLevel.getIndex(level)
-  dispatch({ type: categoryEditLevelActiveItemUpdate, levelIndex, itemUuid })
+  dispatch({ type: categoryViewLevelActiveItemUpdate, levelIndex, itemUuid })
 
   // Load child items
   dispatch(loadLevelItems(Category.getUuid(category), levelIndex + 1, itemUuid))
@@ -65,9 +64,9 @@ export const setCategoryItemForEdit = (category, level, item, edit = true) => as
 
 export const createCategory = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
-
-  const category = data.category
+  const {
+    data: { category },
+  } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
 
   dispatch({ type: categoryCreate, category })
 
@@ -81,37 +80,8 @@ export const uploadCategory = (categoryUuid, file) => async (dispatch, getState)
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData)
 
-  dispatch({ type: categoryEditImportSummaryShow, summary })
+  dispatch({ type: categoryViewImportSummaryShow, summary })
 }
-
-export const importCategory = () => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const category = CategoryEditState.getCategoryForEdit(state)
-  const categoryUuid = Category.getUuid(category)
-  const importSummary = CategoryEditState.getImportSummary(state)
-
-  const {
-    data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, importSummary)
-
-  dispatch(
-    showAppJobMonitor(job, jobCompleted => {
-      // Reload category
-      dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
-      dispatch(setCategoryForEdit({ [Category.keys.uuid]: categoryUuid }))
-    }),
-  )
-}
-
-export const hideCategoryImportSummary = () => dispatch => dispatch({ type: categoryEditImportSummaryHide })
-
-export const setCategoryImportSummaryColumnDataType = (columnName, dataType) => dispatch =>
-  dispatch({
-    type: categoryEditImportSummaryColumnDataTypeUpdate,
-    columnName,
-    dataType,
-  })
 
 export const createCategoryLevel = category => async (dispatch, getState) => {
   const level = Category.newLevel(category)
@@ -235,3 +205,36 @@ export const deleteCategoryItem = (category, level, item) => async (dispatch, ge
   )
   dispatchCategoryUpdate(dispatch, data.category)
 }
+
+// ======
+// ====== IMPORT
+// ======
+
+export const importCategory = () => async (dispatch, getState) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const category = CategoryState.getCategoryForEdit(state)
+  const categoryUuid = Category.getUuid(category)
+  const importSummary = CategoryState.getImportSummary(state)
+
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, importSummary)
+
+  dispatch(
+    showAppJobMonitor(job, jobCompleted => {
+      // Reload category
+      dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
+      dispatch(setCategoryForEdit({ [Category.keys.uuid]: categoryUuid }))
+    }),
+  )
+}
+
+export const hideCategoryImportSummary = () => dispatch => dispatch({ type: categoryViewImportSummaryHide })
+
+export const setCategoryImportSummaryColumnDataType = (columnName, dataType) => dispatch =>
+  dispatch({
+    type: categoryViewImportSummaryColumnDataTypeUpdate,
+    columnName,
+    dataType,
+  })
