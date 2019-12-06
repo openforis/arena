@@ -8,17 +8,22 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 export default (effect, duration = 1000) => {
   let run = true
 
-  const stop = () => run = false
+  const stop = () => {
+    run = false
+  }
+
+  // Used to avoid the ESLint error: no-unmodified-loop-condition
+  const isRunning = () => run
 
   useEffect(() => {
-    (async ()=> {
+    ;(async () => {
       const start = async () => {
-        while (run) {
+        while (isRunning()) {
           await effect()
           await sleep(duration)
         }
       }
-      
+
       start()
     })()
 
