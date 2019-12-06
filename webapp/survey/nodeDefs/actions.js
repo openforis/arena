@@ -81,12 +81,12 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
-
   const {
     data: { nodeDefsValidation },
   } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+  history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 
   dispatch(_updateParentLayout(nodeDef))
 }
