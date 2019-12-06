@@ -62,7 +62,7 @@ export const designerModules = {
     path: `${appModules.designer.path}/formDesigner`,
   },
   nodeDef: {
-    key: 'formDesigner',
+    key: 'nodeDef',
     path: `${appModules.designer.path}/nodeDef`,
   },
 
