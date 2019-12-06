@@ -77,8 +77,8 @@
   0% {
     background-color: inherit;
   }
-  50% {
-    background-color: $yellow;
+  30% {
+    background-color: rgba($yellow, .7);
   }
   100% {
     background-color: inherit;

@@ -42,32 +42,35 @@ const ActivityLogView = props => {
       <div className="activity-log__messages">
         {R.isEmpty(activityLogMessages)
           ? null
-          : activityLogMessages.map((message, index) => (
-              <div
-                key={ActivityLogMessage.getId(message)}
-                ref={el =>
-                  !activityLogLoadComplete && index === activityLogMessages.length - 25
-                    ? setNextActivitiesFetchTrigger(el)
-                    : null
-                }
-              >
-                <div
-                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''} 
-                    ${ActivityLogMessage.isHighlighted(message) ? ' highlighted' : ''}`}
-                >
-                  <div className="activity">
-                    <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true} />
-                    <Markdown
-                      source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
-                    />
+          : activityLogMessages.map((message, index) => {
+              const className = R.pipe(
+                R.when(R.always(ActivityLogMessage.isItemDeleted(message)), R.append('item-deleted')),
+                R.when(R.always(ActivityLogMessage.isHighlighted(message)), R.append('highlighted')),
+                R.join(' '),
+              )(['activity-log__message'])
+
+              const setRef = el =>
+                !activityLogLoadComplete && index === activityLogMessages.length - 25
+                  ? setNextActivitiesFetchTrigger(el)
+                  : null
+
+              return (
+                <React.Fragment key={ActivityLogMessage.getId(message)}>
+                  <div ref={setRef} className={className}>
+                    <div className="activity">
+                      <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true} />
+                      <Markdown
+                        source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
+                      />
+                    </div>
+                    <div className="date">
+                      {DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}
+                    </div>
                   </div>
-                  <div className="date">
-                    {DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}
-                  </div>
-                </div>
-                <div className="activity-log__message-separator" />
-              </div>
-            ))}
+                  <div className="activity-log__message-separator" />
+                </React.Fragment>
+              )
+            })}
       </div>
     </div>
   )
