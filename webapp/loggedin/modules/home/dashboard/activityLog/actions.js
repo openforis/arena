@@ -44,7 +44,7 @@ const fetchActivityLogs = async (state, offset = 0, limit = 30) => {
       R.always(null),
       R.pipe(
         // Append new messages to old ones
-        R.concat(activityLogMessagesState),
+        R.concat(R.map(ActivityLogMessage.dissocHighlighted, activityLogMessagesState)),
         // Sort by id in reverse order
         R.sortBy(R.compose(R.negate, Number, ActivityLogMessage.getId)),
       ),

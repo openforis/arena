@@ -74,10 +74,13 @@
 }
 
 @keyframes animate-highlight {
-  from {
+  0% {
+    background-color: inherit;
+  }
+  50% {
     background-color: $yellow;
   }
-  to {
+  100% {
     background-color: inherit;
   }
 }

@@ -27,3 +27,7 @@ export const getDateCreated = ActivityLog.getDateCreated
 export const getMessage = R.prop(keys.message)
 export const isItemDeleted = R.propEq(keys.itemDeleted, true)
 export const isHighlighted = R.propEq(keys.highlighted, true)
+
+// ====== UPDATE
+
+export const dissocHighlighted = R.dissoc(keys.highlighted)
