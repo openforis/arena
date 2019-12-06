@@ -4,8 +4,8 @@ import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { formReset } from '../surveyForm/actions'
 
-import { taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
-import * as TaxonomyEditState from './taxonomyEditState'
+import { taxonomyViewTaxonomyPropsUpdate, taxonomyViewTaxonomyUpdate } from './actions'
+import * as TaxonomyState from './taxonomyState'
 
 const actionHandlers = {
   // Reset form
@@ -16,9 +16,9 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [taxonomyEditUpdate]: (_state, { taxonomyUuid }) => TaxonomyEditState.initTaxonomyEdit(taxonomyUuid),
+  [taxonomyViewTaxonomyUpdate]: (_state, { taxonomyUuid }) => TaxonomyState.initTaxonomyEdit(taxonomyUuid),
 
-  [taxonomyEditPropsUpdate]: (state, { type, ...props }) => TaxonomyEditState.mergeTaxonomyEditProps(props)(state),
+  [taxonomyViewTaxonomyPropsUpdate]: (state, { type, ...props }) => TaxonomyState.mergeTaxonomyEditProps(props)(state),
 }
 
 export default exportReducer(actionHandlers)

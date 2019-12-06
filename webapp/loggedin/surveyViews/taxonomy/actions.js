@@ -15,15 +15,16 @@ import {
 } from '@webapp/survey/taxonomies/actions'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import { reloadListItems } from '../../tableViews/actions'
-import * as TaxonomyEditState from './taxonomyEditState'
+import * as TaxonomyState from './taxonomyState'
 
 // Taxonomy editor actions
-export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
-export const taxonomyEditPropsUpdate = 'survey/taxonomyEdit/props/update'
+export const taxonomyViewTaxonomyUpdate = 'taxonomyView/taxonomy/update'
+export const taxonomyViewTaxonomyPropsUpdate = 'taxonomyView/taxonomy/props/update'
 
 // ====== SET TAXONOMY FOR EDIT
 
-export const setTaxonomyForEdit = taxonomyUuid => dispatch => dispatch({ type: taxonomyEditUpdate, taxonomyUuid })
+export const setTaxonomyForEdit = taxonomyUuid => dispatch =>
+  dispatch({ type: taxonomyViewTaxonomyUpdate, taxonomyUuid })
 
 // ====== CREATE
 
@@ -75,7 +76,7 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
     showAppJobMonitor(data.job, () => {
       // On import complete validate taxonomy and reload taxa
       dispatch(fetchTaxonomy(Taxonomy.getUuid(taxonomy)))
-      dispatch(reloadListItems(TaxonomyEditState.keys.taxa, { draft: true }))
+      dispatch(reloadListItems(TaxonomyState.keys.taxa, { draft: true }))
     }),
   )
 }

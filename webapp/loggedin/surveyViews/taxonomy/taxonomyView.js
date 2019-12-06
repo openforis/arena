@@ -1,4 +1,4 @@
-import './taxonomyEditView.scss'
+import './taxonomyView.scss'
 
 import React, { useEffect } from 'react'
 import * as R from 'ramda'
@@ -16,11 +16,11 @@ import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
 
-import * as TaxonomyEditState from './taxonomyEditState'
+import * as TaxonomyState from './taxonomyState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
 
-const TaxonomyEditView = props => {
+const TaxonomyView = props => {
   const { surveyId, taxonomy, canEdit, setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile } = props
 
   const history = useHistory()
@@ -38,11 +38,11 @@ const TaxonomyEditView = props => {
   }, [])
 
   return taxonomy ? (
-    <div className="taxonomy-edit">
+    <div className="taxonomy">
       <TaxonomyEditHeader {...props} />
 
       <TableView
-        module={TaxonomyEditState.keys.taxa}
+        module={TaxonomyState.keys.taxa}
         moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
         restParams={{ draft: canEdit }}
         gridTemplateColumns={gridTemplateColumns}
@@ -78,7 +78,7 @@ const mapStateToProps = state => {
 
   return {
     surveyId: SurveyState.getSurveyId(state),
-    taxonomy: TaxonomyEditState.getTaxonomy(state),
+    taxonomy: TaxonomyState.getTaxonomy(state),
     canEdit: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
@@ -87,4 +87,4 @@ export default connect(mapStateToProps, {
   setTaxonomyForEdit,
   putTaxonomyProp,
   uploadTaxonomyFile,
-})(TaxonomyEditView)
+})(TaxonomyView)

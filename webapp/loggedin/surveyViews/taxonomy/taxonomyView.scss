@@ -1,6 +1,6 @@
 @import "~@webapp/style/vars";
 
-.taxonomy-edit {
+.taxonomy {
   display: grid;
   grid-template-rows: 3rem 1fr 3rem;
   align-items: center;
@@ -13,7 +13,7 @@
 
 }
 
-.taxonomy-edit__header {
+.taxonomy__header {
   display: grid;
   grid-template-columns: .75fr .25fr;
   position: relative;

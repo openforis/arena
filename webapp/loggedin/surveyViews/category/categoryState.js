@@ -31,7 +31,7 @@ const keys = {
   importSummary: 'importSummary',
 }
 
-export const stateKey = 'categoryEdit'
+export const stateKey = 'category'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 

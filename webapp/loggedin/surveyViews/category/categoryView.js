@@ -47,8 +47,8 @@ const CategoryView = props => {
 
   return category ? (
     <>
-      <div className="category-edit">
-        <div className="category-edit__header">
+      <div className="category">
+        <div className="category__header">
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
               value={Category.getName(category)}
@@ -68,7 +68,7 @@ const CategoryView = props => {
           )}
         </div>
 
-        <div className="category-edit__levels">
+        <div className="category__levels">
           {levels.map(level => (
             <LevelEdit key={CategoryLevel.getUuid(level)} level={level} />
           ))}

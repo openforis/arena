@@ -11,10 +11,10 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
-import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
+import * as TaxonomyState from '../taxonomy/taxonomyState'
 import ItemsView from '../items/itemsView'
 
-import { createTaxonomy, deleteTaxonomy } from '../taxonomyEdit/actions'
+import { createTaxonomy, deleteTaxonomy } from '../taxonomy/actions'
 
 const TaxonomiesView = props => {
   const { taxonomies, selectedItemUuid, createTaxonomy, deleteTaxonomy, canSelect, onSelect, onClose, readOnly } = props

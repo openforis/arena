@@ -10,7 +10,7 @@ export const keys = {
   taxonomyUuid: 'taxonomyUuid',
 }
 
-export const stateKey = 'taxonomyEdit'
+export const stateKey = 'taxonomy'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 

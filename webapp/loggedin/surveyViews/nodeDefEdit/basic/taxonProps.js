@@ -14,7 +14,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
+import { createTaxonomy, deleteTaxonomy } from '../../taxonomy/actions'
 
 const { propKeys } = NodeDef
 

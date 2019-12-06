@@ -64,8 +64,8 @@ const LevelEdit = props => {
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return (
-    <div className="category-edit__level">
-      <div className="category-edit__level-header">
+    <div className="category__level">
+      <div className="category__level-header">
         <h4 className="label">
           <ErrorBadge validation={validation} />
           {i18n.t('categoryEdit.level')} {level.index + 1}
@@ -86,7 +86,7 @@ const LevelEdit = props => {
         />
       </FormItem>
 
-      <div className="category-edit__level-items-header">
+      <div className="category__level-items-header">
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
         {!readOnly && (
           <button
@@ -100,7 +100,7 @@ const LevelEdit = props => {
         )}
       </div>
 
-      <div className="category-edit__level-items">
+      <div className="category__level-items">
         {items.map(item => (
           <ItemEdit
             key={CategoryItem.getUuid(item)}
