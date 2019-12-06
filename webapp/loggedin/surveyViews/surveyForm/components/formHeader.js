@@ -10,6 +10,7 @@ import { uuidv4 } from '@core/uuid'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import * as SurveyState from '@webapp/survey/surveyState'
 import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
+import { useHistory } from 'react-router'
 import * as SurveyFormState from '../surveyFormState'
 import { toggleFormPageNavigation } from '../actions'
 import FormEntryActions from './formEntryActions'
@@ -50,13 +51,18 @@ const FormHeader = props => {
           <button
             className="btn-s btn-transparent btn-add-sub-page"
             onClick={() =>
-              createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, {
-                [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-                  surveyCycleKey,
-                  NodeDefLayout.renderType.form,
-                  uuidv4(),
-                ),
-              })
+              createNodeDef(
+                nodeDefPage,
+                NodeDef.nodeDefType.entity,
+                {
+                  [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+                    surveyCycleKey,
+                    NodeDefLayout.renderType.form,
+                    uuidv4(),
+                  ),
+                },
+                history,
+              )
             }
           >
             <span className="icon icon-plus icon-10px icon-left" />

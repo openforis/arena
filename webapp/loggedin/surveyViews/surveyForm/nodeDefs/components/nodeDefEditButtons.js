@@ -69,7 +69,7 @@ const NodeDefEditButtons = props => {
 
         <button
           className="btn btn-s btn-transparent"
-          onClick={() => history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}`)}
+          onClick={() => history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
         >
           <span className="icon icon-pencil2 icon-12px" />
         </button>
