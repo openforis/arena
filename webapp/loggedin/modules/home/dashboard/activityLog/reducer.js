@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
@@ -7,13 +9,22 @@ import {
   homeActivityMessagesUpdate,
 } from '@webapp/loggedin/modules/home/dashboard/activityLog/actions'
 
+import * as ActivityLogState from './activityLogState'
+
 const actionHandlers = {
   [appUserLogout]: () => ({}),
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [homeActivityMessagesUpdate]: (state, { activityLogMessages }) => activityLogMessages,
+  [homeActivityMessagesUpdate]: (state, { offset, limit, activityLogMessages, loadComplete }) =>
+    R.pipe(
+      ActivityLogState.assocOffset(offset),
+      ActivityLogState.assocLimit(limit),
+      ActivityLogState.assocMessages(activityLogMessages),
+      R.when(R.always(loadComplete), ActivityLogState.assocLoadComplete(loadComplete)),
+    )(state),
+
   [homeActivityMessagesReset]: () => ({}),
 }
 
