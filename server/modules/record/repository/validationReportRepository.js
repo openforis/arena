@@ -1,10 +1,13 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as RecordValidation from '@core/record/recordValidation'
 
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
-import * as SchemaRdb from '../../../../common/surveyRdb/schemaRdb'
+import * as Validation from '@core/validation/validation'
+
+import { db } from '@server/db/db'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ============== READ
 
@@ -14,18 +17,30 @@ const query = surveyId =>
     r.step,
     r.owner_uuid,
 
-    k.key AS node_uuid,
-    k.value AS validation,
+    node_validation.key AS node_uuid,
+    node_validation.value::jsonb #- '{${Validation.keys.fields}, ${
+    RecordValidation.keys.childrenCount
+  }}' AS validation, --exclude childrenCountValidation
 
     h.node_def_uuid,
     h.keys_self,
-    h.keys_hierarchy
+    h.keys_hierarchy,
+
+    -- children count validation
+    validation_count.key AS validation_count_child_uuid,
+    validation_count.value AS validation_count
   FROM
     ${getSurveyDBSchema(surveyId)}.record r,
-    jsonb_each(r.validation #> '{"fields"}' ) k
+    jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) node_validation
   JOIN
     ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
-  ON k.key::uuid = h.node_uuid
+  ON node_validation.key::uuid = h.node_uuid
+  
+  LEFT OUTER JOIN
+    jsonb_each(node_validation.value #> '{${Validation.keys.fields}, ${RecordValidation.keys.childrenCount}, ${
+    Validation.keys.fields
+  }}') validation_count
+  ON true
   WHERE 
     r.cycle = $1
     AND NOT r.preview

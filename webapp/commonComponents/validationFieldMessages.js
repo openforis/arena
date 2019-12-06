@@ -91,11 +91,12 @@ const getValidationFieldMessages = (i18n, survey, showKeys = true) => validation
   return messages
 }
 
-const ValidationFieldMessages = ({ validation, survey, showKeys = true, showIcons = false }) => {
+const ValidationFieldMessages = props => {
+  const { validation, survey, showKeys, showIcons } = props
   const i18n = useI18n()
 
   return R.pipe(
-    getValidationFieldMessages(i18n, showKeys, survey),
+    getValidationFieldMessages(i18n, survey, showKeys),
     R.addIndex(R.map)(([type, message], i) => (
       <div className={`validation-field_message ${type}`} key={i}>
         {showIcons && <span className="icon icon-warning icon-12px icon-left" />}
@@ -103,6 +104,13 @@ const ValidationFieldMessages = ({ validation, survey, showKeys = true, showIcon
       </div>
     )),
   )(validation)
+}
+
+ValidationFieldMessages.defaultProps = {
+  validation: null,
+  survey: null,
+  showKeys: true, // Show the key of the fields' validations
+  showIcons: false, // Show error or warning icon
 }
 
 const mapStateToProps = state => ({

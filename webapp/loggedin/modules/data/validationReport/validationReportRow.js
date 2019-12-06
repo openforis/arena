@@ -39,6 +39,14 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
 
       return `${parentNodeDefLabel} ${keyValuesStr}`
     }),
+    R.unless(
+      R.always(R.isNil(row.validationCount)),
+      R.append(
+        R.pipe(Survey.getNodeDefByUuid(row.validationCountChildUuid), nodeDef => NodeDef.getLabel(nodeDef, i18n.lang))(
+          survey,
+        ),
+      ),
+    ),
     R.join(' / '),
   )(keysHierarchy)
 
@@ -51,12 +59,14 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
       [Record.keys.ownerUuid]: Record.getOwnerUuid(row),
     })
 
+  const validation = row.validationCount ? row.validationCount : row.validation
+
   return (
     <>
       <div>{idx + offset + 1}</div>
       <div>{path}</div>
       <div className="validation-report__message">
-        <ValidationFieldMessages validation={row.validation} showKeys={false} showIcons={true} />
+        <ValidationFieldMessages validation={validation} showKeys={false} showIcons={true} />
       </div>
       <div>
         <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
