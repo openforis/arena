@@ -42,6 +42,11 @@
     text-decoration: line-through;
   }
 
+  &.highlighted {
+    animation-name: animate-highlight;
+    animation-duration: 4s;
+  }
+
   .activity {
     display: flex;
     align-items: center;
@@ -66,4 +71,13 @@
   height: 1px;
   margin: 8px 15%;
   border-bottom: 1px dotted $greyBorder;
+}
+
+@keyframes animate-highlight {
+  from {
+    background-color: $yellow;
+  }
+  to {
+    background-color: inherit;
+  }
 }

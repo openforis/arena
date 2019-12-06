@@ -27,13 +27,15 @@ const fetchActivityLogs = async (state, offset = 0, limit = 30) => {
     } = await axios.get(`/api/survey/${surveyId}/activity-log`, { params: { offset, limit } })
 
     // Add new messages to messages already in state and sort them by creation date in reverse order
+    // Highlight new messages when fetching newest ones
+    const highlighted = !R.isEmpty(activityLogMessagesState) && offset === 0
     const activityLogMessagesNew = R.pipe(
       // Exclude activities already loaded
       R.reject(activity =>
         R.includes(ActivityLog.getId(activity), R.pluck(ActivityLogMessage.keys.id, activityLogMessagesState)),
       ),
       // Parse ActivityLog into ActivityLogMessage
-      R.map(ActivityLogMessageParser.toMessage(i18n, survey)),
+      R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted)),
     )(activityLogs)
 
     // If there aren't any new messages, return null, otherwise merge the new messages with the old ones

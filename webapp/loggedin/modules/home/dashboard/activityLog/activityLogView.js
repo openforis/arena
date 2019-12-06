@@ -52,7 +52,8 @@ const ActivityLogView = props => {
                 }
               >
                 <div
-                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''}`}
+                  className={`activity-log__message${ActivityLogMessage.isItemDeleted(message) ? ' item-deleted' : ''} 
+                    ${ActivityLogMessage.isHighlighted(message) ? ' highlighted' : ''}`}
                 >
                   <div className="activity">
                     <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true} />
