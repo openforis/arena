@@ -13,7 +13,6 @@ import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import NodeDefEditView from '../nodeDefEdit/nodeDefEditView'
 import * as RecordState from '../record/recordState'
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'
@@ -81,8 +80,6 @@ const SurveyFormView = props => {
 
   return nodeDef ? (
     <div>
-      {editAllowed && <NodeDefEditView />}
-
       <FormHeader
         surveyCycleKey={surveyCycleKey}
         edit={edit}

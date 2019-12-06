@@ -16,7 +16,7 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [nodeDefEditUpdate]: (state, { nodeDef }) => NodeDefEditState.assocNodeDef(nodeDef)(state),
+  [nodeDefEditUpdate]: (state, { nodeDefUuid }) => NodeDefEditState.assocNodeDef(nodeDefUuid)(state),
 
   [nodeDefCreate]: (state, { nodeDef }) => NodeDefEditState.assocNodeDef(nodeDef)(state),
 }
