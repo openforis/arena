@@ -24,7 +24,7 @@ import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
-import { setNodeDefForEdit } from './actions'
+import { setNodeDefUuidForEdit } from './actions'
 
 const NodeDefEditView = props => {
   const {
@@ -36,7 +36,7 @@ const NodeDefEditView = props => {
     putNodeDefProp,
     putNodeDefLayoutProp,
     canUpdateCategory,
-    setNodeDefForEdit,
+    setNodeDefUuidForEdit,
   } = props
 
   const i18n = useI18n()
@@ -49,7 +49,7 @@ const NodeDefEditView = props => {
   useEffect(() => {
     // Editing a nodeDef
     if (nodeDefUuid) {
-      setNodeDefForEdit(nodeDefUuid)
+      setNodeDefUuidForEdit(nodeDefUuid)
     }
   }, [])
 
@@ -118,7 +118,7 @@ const NodeDefEditView = props => {
             className="btn btn-close"
             onClick={() => {
               history.goBack()
-              setNodeDefForEdit(null)
+              setNodeDefUuidForEdit(null)
             }}
             aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
           >
@@ -173,5 +173,5 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   putNodeDefProp,
   putNodeDefLayoutProp,
-  setNodeDefForEdit,
+  setNodeDefUuidForEdit,
 })(NodeDefEditView)

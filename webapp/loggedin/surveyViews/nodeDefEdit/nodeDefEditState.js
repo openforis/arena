@@ -12,7 +12,7 @@ export const stateKey = 'nodeDefEdit'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = prop => R.pipe(getState, R.prop(prop))
 
-export const assocNodeDef = R.assoc(keys.nodeDefUuid)
+export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
 
 export const getNodeDef = state => {
   const survey = SurveyState.getSurvey(state)
@@ -20,5 +20,3 @@ export const getNodeDef = state => {
 
   return Survey.getNodeDefByUuid(nodeDefUuidEdit)(survey)
 }
-
-export const hasNodeDef = R.pipe(getNodeDef, R.isNil, R.not)
