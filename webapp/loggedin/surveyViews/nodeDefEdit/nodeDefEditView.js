@@ -16,7 +16,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import TaxonomiesView from '../taxonomies/taxonomiesView'
 import CategoriesView from '../categories/categoriesView'
 
@@ -24,7 +24,7 @@ import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
-import { closeNodeDefEdit, setNodeDefForEdit } from './actions'
+import { setNodeDefForEdit } from './actions'
 
 const NodeDefEditView = props => {
   const {
@@ -37,18 +37,20 @@ const NodeDefEditView = props => {
     putNodeDefLayoutProp,
     canUpdateCategory,
     setNodeDefForEdit,
-    closeNodeDefEdit,
   } = props
 
   const i18n = useI18n()
   const { nodeDefUuid } = useParams()
+  const history = useHistory()
 
   const [editingCategory, setEditingCategory] = useState(false)
   const [editingTaxonomy, setEditingTaxonomy] = useState(false)
 
   useEffect(() => {
     // Editing a nodeDef
-    if (nodeDefUuid) setNodeDefForEdit(nodeDefUuid)
+    if (nodeDefUuid) {
+      setNodeDefForEdit(nodeDefUuid)
+    }
   }, [])
 
   return nodeDef ? (
@@ -114,7 +116,10 @@ const NodeDefEditView = props => {
 
           <button
             className="btn btn-close"
-            onClick={() => closeNodeDefEdit()}
+            onClick={() => {
+              history.goBack()
+              setNodeDefForEdit(null)
+            }}
             aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
           >
             {i18n.t('common.done')}
@@ -169,5 +174,4 @@ export default connect(mapStateToProps, {
   putNodeDefProp,
   putNodeDefLayoutProp,
   setNodeDefForEdit,
-  closeNodeDefEdit,
 })(NodeDefEditView)
