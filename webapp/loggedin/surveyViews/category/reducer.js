@@ -1,13 +1,11 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import {
-  categoryCreate,
   categoryItemCreate,
   categoryItemDelete,
   categoryItemPropUpdate,
@@ -39,7 +37,6 @@ const actionHandlers = {
   [categoryViewCategoryUpdate]: (state, { categoryUuid }) => CategoryState.initCategoryEdit(categoryUuid),
 
   // Category
-  [categoryCreate]: (state, { category }) => CategoryState.initCategoryEdit(Category.getUuid(category)),
 
   // ===== category level
   [categoryLevelDelete]: (state, { level }) => CategoryState.dissocLevel(CategoryLevel.getIndex(level))(state),

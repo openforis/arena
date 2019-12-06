@@ -9,6 +9,7 @@ import NodeDefEditView from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEdi
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
+import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomyEdit/taxonomyEditView'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -62,6 +63,11 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           {
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
+          },
+
+          {
+            component: TaxonomyView,
+            path: `${appModuleUri(designerModules.taxonomy)}:taxonomyUuid`,
           },
         ]}
       />

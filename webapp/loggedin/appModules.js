@@ -82,6 +82,10 @@ export const designerModules = {
     key: 'taxonomies',
     path: `${appModules.designer.path}/taxonomies`,
   },
+  taxonomy: {
+    key: 'taxonomy',
+    path: `${appModules.designer.path}/taxonomy`,
+  },
 }
 
 export const dataModules = {

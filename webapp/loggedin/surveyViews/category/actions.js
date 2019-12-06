@@ -25,6 +25,7 @@ import {
 
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as CategoryState from './categoryState'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
@@ -39,12 +40,11 @@ export const dispatchCategoryUpdate = (dispatch, category) => dispatch({ type: c
 // ====== SET FOR EDIT
 // ======
 
-export const setCategoryForEdit = category => async dispatch => {
-  const categoryUuid = Category.getUuid(category)
+export const setCategoryForEdit = categoryUuid => async dispatch => {
   dispatch({ type: categoryViewCategoryUpdate, categoryUuid })
 
   // Load first level items
-  if (category) {
+  if (categoryUuid) {
     dispatch(loadLevelItems(categoryUuid))
   }
 }
@@ -62,13 +62,14 @@ export const setCategoryItemForEdit = (category, level, item, edit = true) => as
 // ====== CREATE
 // ======
 
-export const createCategory = () => async (dispatch, getState) => {
+export const createCategory = history => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
   const {
     data: { category },
   } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
 
   dispatch({ type: categoryCreate, category })
+  history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(category)}/`)
 
   return category
 }
@@ -225,7 +226,7 @@ export const importCategory = () => async (dispatch, getState) => {
     showAppJobMonitor(job, jobCompleted => {
       // Reload category
       dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
-      dispatch(setCategoryForEdit({ [Category.keys.uuid]: categoryUuid }))
+      dispatch(setCategoryForEdit(categoryUuid))
     }),
   )
 }

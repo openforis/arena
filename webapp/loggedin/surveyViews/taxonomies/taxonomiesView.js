@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -10,34 +10,14 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
-import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
 import ItemsView from '../items/itemsView'
 
-import { createTaxonomy, setTaxonomyForEdit, deleteTaxonomy } from '../taxonomyEdit/actions'
+import { createTaxonomy, deleteTaxonomy } from '../taxonomyEdit/actions'
 
 const TaxonomiesView = props => {
-  const {
-    taxonomy,
-    taxonomies,
-    selectedItemUuid,
-    createTaxonomy,
-    setTaxonomyForEdit,
-    deleteTaxonomy,
-    canSelect,
-    onSelect,
-    onClose,
-    readOnly,
-  } = props
-
-  useEffect(
-    () => () => {
-      if (taxonomy) {
-        setTaxonomyForEdit(null)
-      }
-    },
-    [Taxonomy.getUuid(taxonomy)],
-  )
+  const { taxonomies, selectedItemUuid, createTaxonomy, deleteTaxonomy, canSelect, onSelect, onClose, readOnly } = props
 
   const i18n = useI18n()
 
@@ -52,15 +32,11 @@ const TaxonomiesView = props => {
 
   return (
     <ItemsView
-      headerText="Taxonomies"
-      itemEditComponent={TaxonomyEdit}
-      itemEditProp="taxonomy"
       itemLabelFunction={taxonomy => Taxonomy.getName(taxonomy)}
-      editedItem={taxonomy}
+      itemLink={appModuleUri(designerModules.taxonomy)}
       items={taxonomies}
       selectedItemUuid={selectedItemUuid}
       onAdd={createTaxonomy}
-      onEdit={setTaxonomyForEdit}
       canDelete={canDelete}
       onDelete={deleteTaxonomy}
       canSelect={canSelect}
@@ -86,13 +62,11 @@ const mapStateToProps = state => {
 
   return {
     taxonomies,
-    taxonomy: TaxonomyEditState.getTaxonomy(state),
     readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 
 export default connect(mapStateToProps, {
   createTaxonomy,
-  setTaxonomyForEdit,
   deleteTaxonomy,
 })(TaxonomiesView)

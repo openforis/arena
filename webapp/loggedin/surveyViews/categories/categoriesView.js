@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -10,34 +10,13 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import CategoryView from '../category/categoryView'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import ItemsView from '../items/itemsView'
-import * as CategoryState from '../category/categoryState'
 
-import { createCategory, deleteCategory, setCategoryForEdit } from '../category/actions'
+import { createCategory, deleteCategory } from '../category/actions'
 
 const CategoriesView = props => {
-  const {
-    categories,
-    category,
-    selectedItemUuid,
-    createCategory,
-    deleteCategory,
-    setCategoryForEdit,
-    onSelect,
-    onClose,
-    canSelect,
-    readOnly,
-  } = props
-
-  useEffect(
-    () => () => {
-      if (category) {
-        setCategoryForEdit(null)
-      }
-    },
-    [Category.getUuid(category)],
-  )
+  const { categories, selectedItemUuid, createCategory, deleteCategory, onSelect, onClose, canSelect, readOnly } = props
 
   const i18n = useI18n()
 
@@ -52,15 +31,11 @@ const CategoriesView = props => {
 
   return (
     <ItemsView
-      headerText="Categories"
-      itemEditComponent={CategoryView}
-      itemEditProp="category"
       itemLabelFunction={category => Category.getName(category)}
-      editedItem={category}
+      itemLink={appModuleUri(designerModules.category)}
       items={categories}
       selectedItemUuid={selectedItemUuid}
       onAdd={createCategory}
-      onEdit={setCategoryForEdit}
       canDelete={canDeleteCategory}
       onDelete={deleteCategory}
       canSelect={canSelect}
@@ -86,7 +61,6 @@ const mapStateToProps = state => {
 
   return {
     categories,
-    category: CategoryState.getCategoryForEdit(state),
     readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
@@ -94,5 +68,4 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   createCategory,
   deleteCategory,
-  setCategoryForEdit,
 })(CategoriesView)

@@ -13,6 +13,7 @@ import {
   taxonomyUpdate,
   taxonomiesUpdate,
 } from '@webapp/survey/taxonomies/actions'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import { reloadListItems } from '../../tableViews/actions'
 import * as TaxonomyEditState from './taxonomyEditState'
 
@@ -22,21 +23,18 @@ export const taxonomyEditPropsUpdate = 'survey/taxonomyEdit/props/update'
 
 // ====== SET TAXONOMY FOR EDIT
 
-export const setTaxonomyForEdit = taxonomy => dispatch =>
-  dispatch({
-    type: taxonomyEditUpdate,
-    taxonomyUuid: Taxonomy.getUuid(taxonomy),
-  })
+export const setTaxonomyForEdit = taxonomyUuid => dispatch => dispatch({ type: taxonomyEditUpdate, taxonomyUuid })
 
 // ====== CREATE
 
-export const createTaxonomy = () => async (dispatch, getState) => {
+export const createTaxonomy = history => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
-
-  const taxonomy = data.taxonomy
+  const {
+    data: { taxonomy },
+  } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
 
   dispatch({ type: taxonomyCreate, taxonomy })
+  history.push(`${appModuleUri(designerModules.taxonomy)}${Taxonomy.getUuid(taxonomy)}/`)
 
   return taxonomy
 }
