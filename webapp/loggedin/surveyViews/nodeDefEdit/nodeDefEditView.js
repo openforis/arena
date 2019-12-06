@@ -10,15 +10,11 @@ import TabBar from '@webapp/commonComponents/tabBar'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 import { useHistory, useParams } from 'react-router'
-import TaxonomiesView from '../taxonomies/taxonomiesView'
-import CategoriesView from '../categories/categoriesView'
 
 import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
@@ -35,7 +31,6 @@ const NodeDefEditView = props => {
     nodeDefMultipleEditDisabled,
     putNodeDefProp,
     putNodeDefLayoutProp,
-    canUpdateCategory,
     setNodeDefUuidForEdit,
   } = props
 
@@ -55,77 +50,59 @@ const NodeDefEditView = props => {
 
   return nodeDef ? (
     <div className="node-def-edit">
-      {editingCategory ? (
-        <CategoriesView
-          canSelect={canUpdateCategory}
-          onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
-          selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
-          onClose={() => setEditingCategory(false)}
-        />
-      ) : editingTaxonomy ? (
-        <TaxonomiesView
-          canSelect={true}
-          onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
-          selectedItemUuid={NodeDef.getTaxonomyUuid(nodeDef)}
-          onClose={() => setEditingTaxonomy(false)}
-        />
-      ) : (
-        <div className="node-def-edit__container">
-          <TabBar
-            tabs={[
-              {
-                label: i18n.t('nodeDefEdit.basic'),
-                component: BasicProps,
-                props: {
-                  nodeDef,
-                  validation,
-                  nodeDefKeyEditDisabled,
-                  nodeDefMultipleEditDisabled,
-                  putNodeDefProp,
-                  putNodeDefLayoutProp,
-                  toggleCategoryEdit: editing => setEditingCategory(editing),
-                  toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
-                },
+      <div className="node-def-edit__container">
+        <TabBar
+          tabs={[
+            {
+              label: i18n.t('nodeDefEdit.basic'),
+              component: BasicProps,
+              props: {
+                nodeDef,
+                validation,
+                nodeDefKeyEditDisabled,
+                nodeDefMultipleEditDisabled,
+                putNodeDefProp,
+                putNodeDefLayoutProp,
               },
-              ...(NodeDef.isRoot(nodeDef)
-                ? []
-                : [
-                    {
-                      label: i18n.t('nodeDefEdit.advanced'),
-                      component: AdvancedProps,
-                      props: {
-                        nodeDef,
-                        validation,
-                        nodeDefParent,
-                        putNodeDefProp,
-                      },
+            },
+            ...(NodeDef.isRoot(nodeDef)
+              ? []
+              : [
+                  {
+                    label: i18n.t('nodeDefEdit.advanced'),
+                    component: AdvancedProps,
+                    props: {
+                      nodeDef,
+                      validation,
+                      nodeDefParent,
+                      putNodeDefProp,
                     },
-                    {
-                      label: i18n.t('nodeDefEdit.validations'),
-                      component: ValidationsProps,
-                      props: {
-                        nodeDef,
-                        validation,
-                        nodeDefParent,
-                        putNodeDefProp,
-                      },
+                  },
+                  {
+                    label: i18n.t('nodeDefEdit.validations'),
+                    component: ValidationsProps,
+                    props: {
+                      nodeDef,
+                      validation,
+                      nodeDefParent,
+                      putNodeDefProp,
                     },
-                  ]),
-            ]}
-          />
+                  },
+                ]),
+          ]}
+        />
 
-          <button
-            className="btn btn-close"
-            onClick={() => {
-              history.goBack()
-              setNodeDefUuidForEdit(null)
-            }}
-            aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
-          >
-            {i18n.t('common.done')}
-          </button>
-        </div>
-      )}
+        <button
+          className="btn btn-close"
+          onClick={() => {
+            history.goBack()
+            setNodeDefUuidForEdit(null)
+          }}
+          aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
+        >
+          {i18n.t('common.done')}
+        </button>
+      </div>
     </div>
   ) : null
 }
@@ -166,7 +143,6 @@ const mapStateToProps = state => {
     validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
-    canUpdateCategory: NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey),
   }
 }
 
