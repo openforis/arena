@@ -1,8 +1,4 @@
-import { useContext } from 'react'
+import * as AppState from '@webapp/app/appState'
+import { useSelector } from 'react-redux'
 
-import AppContext from '@webapp/app/appContext'
-
-export default () => {
-  const { i18n } = useContext(AppContext)
-  return i18n
-}
+export default () => useSelector(AppState.getI18n)

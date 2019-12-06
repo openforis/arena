@@ -7,7 +7,7 @@ import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
 import LoginView from '@webapp/login/loginView'
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import { activeJobUpdate } from '../loggedin/appJob/actions'
 import AppLoaderView from './appLoader/appLoaderView'
@@ -15,14 +15,14 @@ import AppNotificationView from './appNotification/appNotificationView'
 
 import * as AppWebSocket from './appWebSocket'
 
-import AppContext from './appContext'
-
 import * as AppState from './appState'
 
 import { initApp, throwSystemError } from './actions'
 
 const AppRouterSwitch = props => {
-  const { isReady, systemError, user, initApp, throwSystemError, activeJobUpdate, i18n } = props
+  const { isReady, systemError, user, initApp, throwSystemError, activeJobUpdate } = props
+
+  const i18n = useI18n()
 
   const openSocket = () => {
     ;(async () => {
@@ -61,7 +61,7 @@ const AppRouterSwitch = props => {
     </div>
   ) : (
     isReady && (
-      <AppContext.Provider value={{ i18n }}>
+      <>
         {user ? (
           <Route
             path="/app"
@@ -73,7 +73,7 @@ const AppRouterSwitch = props => {
 
         <AppLoaderView />
         <AppNotificationView />
-      </AppContext.Provider>
+      </>
     )
   )
 }
@@ -82,7 +82,6 @@ const mapStateToProps = state => ({
   isReady: AppState.isReady(state),
   user: AppState.getUser(state),
   systemError: AppState.getSystemError(state),
-  i18n: AppState.getI18n(state),
 })
 
 const enhance = compose(withRouter, connect(mapStateToProps, { initApp, throwSystemError, activeJobUpdate }))
