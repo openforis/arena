@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -19,15 +20,15 @@ export const validate = async (survey, nodeDef) => {
           Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber),
         ],
       })
-    : {}
+    : Validation.newInstance()
 
   return R.pipe(
     Validation.assocFieldValidation(
-      NodeDefExpression.keys.expressions,
+      NodeDefValidations.keys.expressions,
       await NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations),
     ),
-    R.when(
-      validation => !Validation.isValid(validation) && !Validation.hasErrors(validation),
+    R.unless(
+      Validation.isValid,
       Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }]),
     ),
   )(validation)
