@@ -3,10 +3,7 @@ import './validationReportView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import * as R from 'ramda'
-
-import * as Record from '@core/record/record'
-import * as NodeKeys from '@core/record/nodeKeys'
+import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 
 import TableView from '@webapp/loggedin/tableViews/tableView'
 import { appModuleUri, dataModules } from '@webapp/loggedin/appModules'
@@ -22,15 +19,20 @@ import ValidationReportRow from './validationReportRow'
 
 const validationReportModule = 'validationReport'
 
-const ValidationReportView = ({ surveyCycleKey, reloadListItems, history }) => {
+const ValidationReportView = props => {
+  const { surveyCycleKey, reloadListItems, history } = props
+
   useOnUpdate(() => {
     reloadListItems(validationReportModule, { cycle: surveyCycleKey })
   }, [surveyCycleKey])
 
-  const onRowClick = record => {
-    const parentEntityUuid = R.prop(NodeKeys.keys.nodeUuid, R.last(record.keysHierarchy))
-    const recordUuid = Record.getUuid(record)
-    const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentEntityUuid}`
+  const onRowClick = row => {
+    const focusNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
+    const focusNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
+    const recordUuid = RecordValidationReportItem.getRecordUuid(row)
+    const recordEditUrl = `${appModuleUri(
+      dataModules.record,
+    )}${recordUuid}?focusNodeUuid=${focusNodeUuid}&focusNodeDefUuid=${focusNodeDefUuid}`
 
     history.push(recordEditUrl)
   }

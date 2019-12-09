@@ -13,9 +13,9 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 
 const query = surveyId =>
   `SELECT
-    r.uuid,
-    r.step,
-    r.owner_uuid,
+    r.uuid as record_uuid,
+    r.step as record_step,
+    r.owner_uuid as record_owner_uuid,
 
     node_validation.key AS node_uuid,
     node_validation.value::jsonb #- '{${Validation.keys.fields}, ${

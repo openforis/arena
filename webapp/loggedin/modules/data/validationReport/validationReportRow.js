@@ -1,16 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import * as R from 'ramda'
-
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as Authorizer from '@core/auth/authorizer'
 
 import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
@@ -18,48 +16,20 @@ import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMes
 const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   const i18n = useI18n()
 
-  const nodeDefUuid = row.nodeDefUuid
-
-  let keysHierarchy = row.keysHierarchy
-  if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === nodeDefUuid) {
-    keysHierarchy = keysHierarchy.slice(1)
-  }
-
-  keysHierarchy = keysHierarchy.concat({
-    keys: row.keysSelf || {},
-    nodeDefUuid: row.nodeDefUuid,
-  })
-
-  const path = R.pipe(
-    R.map(hierarchyPart => {
-      const keyValues = R.reject(R.isNil)(R.values(hierarchyPart.keys))
-      const keyValuesStr = keyValues.length > 0 ? `[${keyValues.join(', ')}]` : ''
-      const parentNodeDef = Survey.getNodeDefByUuid(hierarchyPart.nodeDefUuid)(survey)
-      const parentNodeDefLabel = NodeDef.getLabel(parentNodeDef, i18n.lang)
-
-      return `${parentNodeDefLabel} ${keyValuesStr}`
-    }),
-    R.unless(
-      R.always(R.isNil(row.validationCount)),
-      R.append(
-        R.pipe(Survey.getNodeDefByUuid(row.validationCountChildUuid), nodeDef => NodeDef.getLabel(nodeDef, i18n.lang))(
-          survey,
-        ),
-      ),
-    ),
-    R.join(' / '),
-  )(keysHierarchy)
+  const path = RecordValidationReportItem.getPath(survey, i18n.lang)(row)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const canEdit =
     Survey.isPublished(surveyInfo) &&
     Authorizer.canEditRecord(user, {
-      [Record.keys.step]: Record.getStep(row),
       [Record.keys.surveyUuid]: Survey.getUuid(surveyInfo),
-      [Record.keys.ownerUuid]: Record.getOwnerUuid(row),
+      [Record.keys.uuid]: RecordValidationReportItem.getRecordUuid(row),
+      [Record.keys.step]: RecordValidationReportItem.getRecordStep(row),
+      [Record.keys.ownerUuid]: RecordValidationReportItem.getRecordOwnerUuid(row),
     })
 
-  const validation = row.validationCount ? row.validationCount : row.validation
+  // The validation object can be a childrenCount validation
+  const validation = RecordValidationReportItem.getValidation(row)
 
   return (
     <>

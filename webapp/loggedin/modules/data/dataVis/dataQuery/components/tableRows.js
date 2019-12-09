@@ -37,7 +37,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
             const { parentNodeUuid, record } = row
 
             const recordUuid = Record.getUuid(record)
-            const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+            const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?focusNodeUuid=${parentNodeUuid}`
             const validation = Record.getValidation(record)
 
             return (
