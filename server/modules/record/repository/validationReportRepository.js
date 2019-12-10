@@ -17,30 +17,38 @@ const query = surveyId =>
     r.step as record_step,
     r.owner_uuid as record_owner_uuid,
 
-    node_validation.key AS node_uuid,
-    node_validation.value::jsonb #- '{${Validation.keys.fields}, ${
-    RecordValidation.keys.childrenCount
-  }}' AS validation, --exclude childrenCountValidation
+    -- node_uuid
+    CASE WHEN LENGTH(node_validation.key) = 36 
+        THEN 
+          node_validation.key
+        ELSE 
+          -- count validation
+          SUBSTRING(node_validation.key, ${RecordValidation.prefixValidationFieldChildrenCount.length + 1}, 36)
+        END 
+        AS node_uuid,
+    
+    -- validation_count_child_def_uuid
+    CASE WHEN LENGTH(node_validation.key) > 36 
+      THEN SUBSTRING(node_validation.key, ${RecordValidation.prefixValidationFieldChildrenCount.length + 38}, 36)
+      ELSE NULL
+      END 
+      AS validation_count_child_def_uuid,
+    
+    node_validation.value::jsonb AS validation,
 
     h.node_def_uuid,
     h.keys_self,
-    h.keys_hierarchy,
-
-    -- children count validation
-    validation_count.key AS validation_count_child_uuid,
-    validation_count.value AS validation_count
+    h.keys_hierarchy
   FROM
     ${getSurveyDBSchema(surveyId)}.record r,
     jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) node_validation
   JOIN
     ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
-  ON node_validation.key::uuid = h.node_uuid
-  
-  LEFT OUTER JOIN
-    jsonb_each(node_validation.value #> '{${Validation.keys.fields}, ${RecordValidation.keys.childrenCount}, ${
-    Validation.keys.fields
-  }}') validation_count
-  ON true
+  ON LENGTH(node_validation.key) = 36 AND node_validation.key::uuid = h.node_uuid 
+  -- count validation
+  OR LENGTH(node_validation.key) > 36 AND SUBSTRING(node_validation.key, ${RecordValidation
+    .prefixValidationFieldChildrenCount.length + 1}, 36)::uuid = h.node_uuid --children count
+    
   WHERE 
     r.cycle = $1
     AND NOT r.preview

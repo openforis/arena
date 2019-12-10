@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as NodeKeys from '@core/record/nodeKeys'
-import * as ObjectUtils from '@core/objectUtils'
 
 const keys = {
   recordUuid: 'recordUuid',
@@ -15,8 +14,7 @@ const keys = {
   keysHierarchy: 'keysHierarchy',
   keysSelf: 'keysSelf',
   validation: 'validation',
-  validationCount: 'validationCount',
-  validationCountChildUuid: 'validationCountChildUuid',
+  validationCountChildDefUuid: 'validationCountChildDefUuid',
 }
 
 export const getRecordUuid = R.prop(keys.recordUuid)
@@ -24,11 +22,10 @@ export const getRecordStep = R.prop(keys.recordStep)
 export const getRecordOwnerUuid = R.prop(keys.recordOwnerUuid)
 const getNodeUuid = R.prop(keys.nodeUuid)
 const getNodeDefUuid = R.prop(keys.nodeDefUuid)
+const getValidationCountChildDefUuid = R.prop(keys.validationCountChildDefUuid)
 const getKeysSelf = R.propOr({}, keys.keysSelf)
-const getValidationCount = R.prop(keys.validationCount)
-const getValidationCountChildUuid = R.prop(keys.validationCountChildUuid)
 
-const isValidationCount = R.pipe(getValidationCount, R.isNil, R.not)
+const isValidationCount = R.pipe(getValidationCountChildDefUuid, R.isNil, R.not)
 
 const getNodeDef = survey => item => Survey.getNodeDefByUuid(getNodeDefUuid(item))(survey)
 
@@ -47,7 +44,7 @@ const getKeysHierarchy = survey => item =>
       R.always(isValidationCount(item)),
       R.append({
         keys: [],
-        nodeDefUuid: getValidationCountChildUuid(item),
+        nodeDefUuid: getValidationCountChildDefUuid(item),
       }),
     ),
   )(item)
@@ -60,9 +57,7 @@ export const getNodeContextUuid = item =>
     ? getNodeUuid(item) // Node is an entity
     : R.prop(NodeKeys.keys.nodeUuid, R.last(item.keysHierarchy)) // Node is an attribute, its parent is the last item of its hierarchy
 
-export const getNodeDefContextUuid = R.ifElse(isValidationCount, getValidationCountChildUuid, getNodeDefUuid)
-
-export const getValidation = item => R.pipe(getValidationCount, R.defaultTo(R.prop(keys.validation, item)))(item)
-
+export const getNodeDefContextUuid = R.ifElse(isValidationCount, getValidationCountChildDefUuid, getNodeDefUuid)
+export const getValidation = R.prop(keys.validation)
 export const getStep = Record.getStep
 export const getOwnerUuid = Record.getOwnerUuid

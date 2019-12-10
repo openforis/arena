@@ -12,81 +12,72 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as RecordValidations from '@core/record/recordValidation'
+import * as RecordValidation from '@core/record/recordValidation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
 import Markdown from '@webapp/commonComponents/markdown'
 
-const getErrorText = i18n => error =>
-  ValidationResult.hasMessages(error)
-    ? ValidationResult.getMessage(i18n.lang)(error)
-    : i18n.t(ValidationResult.getKey(error), ValidationResult.getParams(error))
-
-const getMessages = (fn, severity) => i18n =>
-  R.pipe(fn, R.map(getErrorText(i18n)), R.join(', '), msg => (msg ? [severity, msg] : []))
-
-const getValidationErrorMessages = i18n =>
-  R.converge(R.concat, [
-    getMessages(Validation.getWarnings, ValidationResult.severity.warning)(i18n),
-    getMessages(Validation.getErrors, ValidationResult.severity.error)(i18n),
-  ])
-
-const getValidationFieldErrorMessage = (i18n, field) =>
-  R.pipe(
-    getValidationErrorMessages(i18n),
-    R.ifElse(
-      R.isEmpty,
-      () =>
-        getErrorText(i18n)(
-          ValidationResult.newInstance(
-            Validation.messageKeys.invalidField, // Default error message
-            { field },
-          ),
-        ),
-      R.identity,
-    ),
-  )
-
-const getChildrenCountValidation = (validation, survey, showKeys, i18n) => {
-  return Object.entries(validation).map(([nodeDefUuid, nodeValidation]) => {
-    const [field, fieldValidation] = Object.entries(Validation.getFieldValidations(nodeValidation))[0]
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    fieldValidation.errors[0].params.nodeDefName = NodeDef.getLabel(nodeDef, i18n.lang)
-    const [severity, message] = getValidationFieldErrorMessage(i18n, field)(fieldValidation)
-
-    return [severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`]
+const getValidationCountErrorText = (survey, i18n) => validationResult => {
+  const nodeDef = Survey.getNodeDefByUuid(ValidationResult.getParams(validationResult).nodeDefUuid)(survey)
+  const nodeDefName = NodeDef.getLabel(nodeDef, i18n.lang)
+  return i18n.t(ValidationResult.getKey(validationResult), {
+    ...ValidationResult.getParams(validationResult),
+    nodeDefName,
   })
 }
 
-const getValidationFieldMessages = (i18n, survey, showKeys = true) => validation => {
-  const messages = []
+const getErrorText = (survey, i18n) => validationResult =>
+  ValidationResult.hasMessages(validationResult)
+    ? ValidationResult.getMessage(i18n.lang)(validationResult)
+    : RecordValidation.isValidationResultErrorCount(validationResult)
+    ? getValidationCountErrorText(survey, i18n)(validationResult)
+    : i18n.t(ValidationResult.getKey(validationResult), ValidationResult.getParams(validationResult))
 
+const getMessages = (survey, fn, severity) => i18n =>
+  R.pipe(fn, R.map(getErrorText(survey, i18n)), R.join(', '), msg => (msg ? [severity, msg] : []))
+
+const getValidationErrorMessages = (survey, i18n) =>
+  R.converge(R.concat, [
+    getMessages(survey, Validation.getWarnings, ValidationResult.severity.warning)(i18n),
+    getMessages(survey, Validation.getErrors, ValidationResult.severity.error)(i18n),
+  ])
+
+const getValidationFieldErrorMessage = (survey, field, i18n) =>
+  R.pipe(
+    getValidationErrorMessages(survey, i18n),
+    R.when(R.isEmpty, () =>
+      getErrorText(
+        survey,
+        i18n,
+      )(
+        ValidationResult.newInstance(
+          Validation.messageKeys.invalidField, // Default error message
+          { field },
+        ),
+      ),
+    ),
+  )
+
+const getValidationFieldMessages = (i18n, survey, showKeys = true) => validation => {
+  const messages = [] // Every message is an array with 2 items (severity and message)
+
+  // Add messages from fields
   R.pipe(
     Validation.getFieldValidations,
     Object.entries,
     // Extract invalid fields error messages
     R.forEach(([field, childValidation]) => {
-      // If it's a childrenCount validation, extract the actual minCount or maxCount validation
-      // and add the nodeDefUuid name as param
-      if (field === RecordValidations.keys.childrenCount) {
-        const childrenCountValidation = getChildrenCountValidation(
-          Validation.getFieldValidations(childValidation),
-          survey,
-          showKeys,
-          i18n,
-        )
-        messages.push(...childrenCountValidation)
-      } else {
-        const [severity, message] = getValidationFieldErrorMessage(i18n, field)(childValidation)
-        messages.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
-      }
+      const [severity, message] = getValidationFieldErrorMessage(survey, field, i18n)(childValidation)
+      messages.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
     }),
   )(validation)
 
-  R.pipe(getValidationErrorMessages(i18n), x => {
-    if (x.length > 0) messages.push(x)
-  })(validation)
+  // Add messages from validation errors and warnings
+  R.pipe(
+    getValidationErrorMessages(survey, i18n),
+    R.unless(R.isEmpty, message => messages.push(message)),
+  )(validation)
 
   return messages
 }
