@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -17,7 +17,6 @@ import { updateCollectImportReportItem } from '../actions'
 
 const TableRow = props => {
   const { i18n, item, idx, nodeDef, nodeDefPath, languages, updateCollectImportReportItem } = props
-  const history = useHistory()
 
   return (
     <div key={idx} className="table__row">
@@ -43,12 +42,12 @@ const TableRow = props => {
         />
       </div>
       <div>
-        <button
+        <Link
           className="btn btn-transparent"
-          onClick={() => history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
+          to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
           <span className="icon icon-12px icon-pencil2" />
-        </button>
+        </Link>
       </div>
     </div>
   )

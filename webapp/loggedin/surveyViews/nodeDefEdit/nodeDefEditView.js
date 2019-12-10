@@ -38,9 +38,6 @@ const NodeDefEditView = props => {
   const { nodeDefUuid } = useParams()
   const history = useHistory()
 
-  const [editingCategory, setEditingCategory] = useState(false)
-  const [editingTaxonomy, setEditingTaxonomy] = useState(false)
-
   useEffect(() => {
     // Editing a nodeDef
     if (nodeDefUuid) {
