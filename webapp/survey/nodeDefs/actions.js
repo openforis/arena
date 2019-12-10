@@ -14,6 +14,7 @@ import * as AppState from '@webapp/app/appState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as SurveyState from '../surveyState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
@@ -71,7 +72,7 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props, history) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
@@ -84,6 +85,8 @@ export const createNodeDef = (parent, type, props) => async (dispatch, getState)
     data: { nodeDefsValidation },
   } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+  history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 
   dispatch(_updateParentLayout(nodeDef))
 }

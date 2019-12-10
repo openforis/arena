@@ -61,6 +61,11 @@ export const designerModules = {
     key: 'formDesigner',
     path: `${appModules.designer.path}/formDesigner`,
   },
+  nodeDef: {
+    key: 'nodeDef',
+    path: `${appModules.designer.path}/nodeDef`,
+  },
+
   surveyHierarchy: {
     key: 'surveyHierarchy',
     path: `${appModules.designer.path}/surveyHierarchy`,

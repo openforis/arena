@@ -1,6 +1,6 @@
-import './nodeDefEdit.scss'
+import './nodeDefEditView.scss'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'
@@ -15,17 +15,18 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
+import { useHistory, useParams } from 'react-router'
 import TaxonomiesView from '../taxonomies/taxonomiesView'
 import CategoriesView from '../categories/categoriesView'
 
-import { putNodeDefProp, putNodeDefLayoutProp } from '../../../survey/nodeDefs/actions'
 import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
-import { closeNodeDefEdit } from './actions'
+import { setNodeDefUuidForEdit } from './actions'
 
-const NodeDefEdit = props => {
+const NodeDefEditView = props => {
   const {
     nodeDef,
     nodeDefParent,
@@ -35,15 +36,22 @@ const NodeDefEdit = props => {
     putNodeDefProp,
     putNodeDefLayoutProp,
     canUpdateCategory,
-    closeNodeDefEdit,
+    setNodeDefUuidForEdit,
   } = props
 
   const i18n = useI18n()
+  const { nodeDefUuid } = useParams()
+  const history = useHistory()
 
   const [editingCategory, setEditingCategory] = useState(false)
   const [editingTaxonomy, setEditingTaxonomy] = useState(false)
 
-  const close = () => closeNodeDefEdit()
+  useEffect(() => {
+    // Editing a nodeDef
+    if (nodeDefUuid) {
+      setNodeDefUuidForEdit(nodeDefUuid)
+    }
+  }, [])
 
   return nodeDef ? (
     <div className="node-def-edit">
@@ -108,7 +116,10 @@ const NodeDefEdit = props => {
 
           <button
             className="btn btn-close"
-            onClick={() => close()}
+            onClick={() => {
+              history.goBack()
+              setNodeDefUuidForEdit(null)
+            }}
             aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
           >
             {i18n.t('common.done')}
@@ -119,7 +130,7 @@ const NodeDefEdit = props => {
   ) : null
 }
 
-NodeDefEdit.defaultProps = {
+NodeDefEditView.defaultProps = {
   nodeDef: null,
   nodeDefParent: null,
 }
@@ -162,5 +173,5 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   putNodeDefProp,
   putNodeDefLayoutProp,
-  closeNodeDefEdit,
-})(NodeDefEdit)
+  setNodeDefUuidForEdit,
+})(NodeDefEditView)

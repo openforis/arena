@@ -2,6 +2,7 @@ import './nodeDefEditButtons.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { elementOffset } from '@webapp/utils/domUtils'
@@ -12,8 +13,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
 import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import { setFormNodeDefAddChildTo } from '../../actions'
-import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditButtons = props => {
   const {
@@ -23,7 +24,6 @@ const NodeDefEditButtons = props => {
     canEditDef,
     hasNodeDefAddChildTo,
     putNodeDefLayoutProp,
-    setNodeDefForEdit,
     setFormNodeDefAddChildTo,
     removeNodeDef,
   } = props
@@ -33,6 +33,7 @@ const NodeDefEditButtons = props => {
   const [style, setStyle] = useState({})
 
   const i18n = useI18n()
+  const history = useHistory()
 
   useEffect(() => {
     if (show) {
@@ -68,10 +69,7 @@ const NodeDefEditButtons = props => {
 
         <button
           className="btn btn-s btn-transparent"
-          onClick={() => setNodeDefForEdit(nodeDef)}
-          onMouseDown={e => {
-            e.stopPropagation()
-          }}
+          onClick={() => history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
         >
           <span className="icon icon-pencil2 icon-12px" />
         </button>
@@ -109,7 +107,6 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  setNodeDefForEdit,
   setFormNodeDefAddChildTo,
   putNodeDefLayoutProp,
   removeNodeDef,

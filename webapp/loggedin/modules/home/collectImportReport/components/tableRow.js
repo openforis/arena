@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,13 +10,14 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import { updateCollectImportReportItem } from '../actions'
-import { setNodeDefForEdit } from '../../../../surveyViews/nodeDefEdit/actions'
 
 const TableRow = props => {
-  const { i18n, item, idx, nodeDef, nodeDefPath, languages, updateCollectImportReportItem, setNodeDefForEdit } = props
+  const { i18n, item, idx, nodeDef, nodeDefPath, languages, updateCollectImportReportItem } = props
+  const history = useHistory()
 
   return (
     <div key={idx} className="table__row">
@@ -41,14 +43,12 @@ const TableRow = props => {
         />
       </div>
       <div>
-        <a
-          className=""
-          onClick={() => {
-            setNodeDefForEdit(nodeDef)
-          }}
+        <button
+          className="btn btn-transparent"
+          onClick={() => history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
         >
           <span className="icon icon-12px icon-pencil2" />
-        </a>
+        </button>
       </div>
     </div>
   )
@@ -80,7 +80,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps, {
-  updateCollectImportReportItem,
-  setNodeDefForEdit,
-})(TableRow)
+export default connect(mapStateToProps, { updateCollectImportReportItem })(TableRow)
