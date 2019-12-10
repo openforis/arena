@@ -15,7 +15,9 @@ const TableRows = props => {
   const rowsScrollTop = useSelector(CollectImportReportState.getRowsScrollTop)
 
   useEffect(() => {
-    if (rowsScrollTop) rowsRef.current.scrollTop = rowsScrollTop
+    if (rowsScrollTop) {
+      rowsRef.current.scrollTop = rowsScrollTop
+    }
   }, [])
 
   return (

@@ -1,6 +1,6 @@
 import './nodeDefEditView.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'

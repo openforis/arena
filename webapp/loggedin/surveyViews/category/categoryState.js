@@ -8,21 +8,21 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyViewsState from '../surveyViewsState'
 
 // DOCS
-const stateDoc = {
-  categoryEdit: {
-    categoryUuid: '',
-    levelItems: {
-      0: { itemUuid: {} },
-      1: { itemUuid: {} },
-      2: { itemUuid: {} },
-    },
-    levelActiveItems: {
-      0: 'itemUuid',
-      1: 'itemUuid',
-      2: 'itemUuid',
-    },
-  },
-}
+// const stateDoc = {
+//   categoryEdit: {
+//     categoryUuid: '',
+//     levelItems: {
+//       0: { itemUuid: {} },
+//       1: { itemUuid: {} },
+//       2: { itemUuid: {} },
+//     },
+//     levelActiveItems: {
+//       0: 'itemUuid',
+//       1: 'itemUuid',
+//       2: 'itemUuid',
+//     },
+//   },
+// }
 
 const keys = {
   categoryUuid: 'categoryUuid', // Current editing category uuid

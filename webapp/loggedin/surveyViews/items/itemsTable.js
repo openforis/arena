@@ -16,7 +16,6 @@ const TableRow = props => {
     itemLabelFunction,
     canSelect,
     onSelect,
-    onEdit,
     canDelete,
     onDelete,
     readOnly,
