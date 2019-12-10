@@ -2,7 +2,6 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-
 import * as Survey from '@core/survey/survey'
 
 import * as SurveyState from '@webapp/survey/surveyState'
