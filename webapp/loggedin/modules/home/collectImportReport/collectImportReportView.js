@@ -13,24 +13,24 @@ import * as CollectImportReportState from './collectImportReportState'
 import { fetchCollectImportReportItems } from './actions'
 
 const CollectImportReportView = props => {
-  const { reportItems, fetchCollectImportReportItems } = props
+  const { items, fetchCollectImportReportItems } = props
+  const itemsEmpty = R.isEmpty(items)
 
   useEffect(() => {
-    fetchCollectImportReportItems()
+    if (itemsEmpty) fetchCollectImportReportItems()
   }, [])
 
-  return R.isEmpty(reportItems) ? null : (
+  return itemsEmpty ? null : (
     <SurveyDefsLoader draft={true} validate={true}>
       <div className="collect-import-report table">
         <TableHeader />
-
-        <TableRows reportItems={reportItems} />
+        <TableRows reportItems={items} />
       </div>
     </SurveyDefsLoader>
   )
 }
 
 const mapStateToProps = state => ({
-  reportItems: CollectImportReportState.getState(state),
+  items: CollectImportReportState.getItems(state),
 })
 export default connect(mapStateToProps, { fetchCollectImportReportItems })(CollectImportReportView)
