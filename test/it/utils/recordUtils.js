@@ -95,15 +95,8 @@ export const traverse = visitorFn => async record => {
   }
 }
 
-const getChildrenCountValidation = key => (parentNode, childDef) =>
+export const getValidationChildrenCount = (parentNode, childDef) =>
   R.pipe(
     Validation.getValidation,
-    Validation.getFieldValidation(NodeDef.getUuid(parentNode)),
-    Validation.getFieldValidation(RecordValidation.keys.childrenCount),
-    Validation.getFieldValidation(NodeDef.getUuid(childDef)),
-    Validation.getFieldValidation(key),
+    RecordValidation.getValidationChildrenCount(Node.getUuid(parentNode), NodeDef.getUuid(childDef)),
   )
-
-export const getValidationMinCount = getChildrenCountValidation(RecordValidation.keys.minCount)
-
-export const getValidationMaxCount = getChildrenCountValidation(RecordValidation.keys.maxCount)

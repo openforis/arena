@@ -50,9 +50,9 @@ const deleteNodeAndExpectMinCountToBe = async (
 
   await _deleteNode(parentNode, childNodeName, childNodePosition)
 
-  const minCountValidation = RecordUtils.getValidationMinCount(parentNode, childDef)(record)
+  const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(record)
 
-  expect(Validation.isValid(minCountValidation)).to.equal(expectedValidation)
+  expect(Validation.isValid(validationCount)).to.equal(expectedValidation)
 }
 
 const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = true, expectedValidation = true) => {
@@ -63,11 +63,9 @@ const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = tr
 
   await _persistNode(node)
 
-  const countValidation = min
-    ? RecordUtils.getValidationMinCount(parentNode, childDef)(record)
-    : RecordUtils.getValidationMaxCount(parentNode, childDef)(record)
+  const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(record)
 
-  expect(Validation.isValid(countValidation)).to.equal(expectedValidation)
+  expect(Validation.isValid(validationCount)).to.equal(expectedValidation)
 }
 
 const addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
