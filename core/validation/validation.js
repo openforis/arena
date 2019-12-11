@@ -112,9 +112,9 @@ export const updateCounts = validation => {
 
 export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
   [keys.valid]: valid,
-  ...(R.isEmpty(fields) ? {} : { [keys.fields]: fields }),
-  ...(R.isEmpty(errors) ? {} : { [keys.errors]: errors }),
-  ...(R.isEmpty(warnings) ? {} : { [keys.warnings]: warnings }),
+  [keys.fields]: fields,
+  [keys.errors]: errors,
+  [keys.warnings]: warnings,
 })
 
 // ====== READ
