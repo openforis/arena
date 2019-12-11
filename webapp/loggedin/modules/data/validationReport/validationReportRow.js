@@ -13,23 +13,8 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 
-const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
-  const i18n = useI18n()
-
-  const path = RecordValidationReportItem.getPath(survey, i18n.lang)(row)
-
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const canEdit =
-    Survey.isPublished(surveyInfo) &&
-    Authorizer.canEditRecord(user, {
-      [Record.keys.surveyUuid]: Survey.getUuid(surveyInfo),
-      [Record.keys.uuid]: RecordValidationReportItem.getRecordUuid(row),
-      [Record.keys.step]: RecordValidationReportItem.getRecordStep(row),
-      [Record.keys.ownerUuid]: RecordValidationReportItem.getRecordOwnerUuid(row),
-    })
-
-  // The validation object can be a childrenCount validation
-  const validation = RecordValidationReportItem.getValidation(row)
+const ValidationReportRow = props => {
+  const { idx, offset, path, validation, canEdit } = props
 
   return (
     <>
@@ -45,9 +30,30 @@ const ValidationReportRow = ({ user, survey, row, idx, offset }) => {
   )
 }
 
-const mapStateToProps = state => ({
-  user: AppState.getUser(state),
-  survey: SurveyState.getSurvey(state),
-})
+const mapStateToProps = (state, props) => {
+  const { row } = props
+
+  const user = AppState.getUser(state)
+  const survey = SurveyState.getSurvey(state)
+  const i18n = AppState.getI18n(state)
+
+  const path = RecordValidationReportItem.getPath(survey, i18n.lang)(row)
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const canEdit =
+    Survey.isPublished(surveyInfo) &&
+    Authorizer.canEditRecord(user, {
+      [Record.keys.surveyUuid]: Survey.getUuid(surveyInfo),
+      [Record.keys.uuid]: RecordValidationReportItem.getRecordUuid(row),
+      [Record.keys.step]: RecordValidationReportItem.getRecordStep(row),
+      [Record.keys.ownerUuid]: RecordValidationReportItem.getRecordOwnerUuid(row),
+    })
+
+  return {
+    path,
+    validation: RecordValidationReportItem.getValidation(row),
+    canEdit,
+  }
+}
 
 export default connect(mapStateToProps)(ValidationReportRow)
