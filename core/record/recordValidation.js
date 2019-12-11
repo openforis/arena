@@ -7,9 +7,6 @@ import * as Node from './node'
 export const keys = {
   recordKeys: 'recordKeys',
   entityKeys: 'entityKeys',
-  childrenCount: 'childrenCount',
-  minCount: 'minCount',
-  maxCount: 'maxCount',
 }
 
 export const prefixValidationFieldChildrenCount = 'childrenCount_'
