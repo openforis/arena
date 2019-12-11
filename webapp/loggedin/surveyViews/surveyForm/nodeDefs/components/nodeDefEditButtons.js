@@ -2,7 +2,7 @@ import './nodeDefEditButtons.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { elementOffset } from '@webapp/utils/domUtils'
@@ -33,7 +33,6 @@ const NodeDefEditButtons = props => {
   const [style, setStyle] = useState({})
 
   const i18n = useI18n()
-  const history = useHistory()
 
   useEffect(() => {
     if (show) {
@@ -67,12 +66,12 @@ const NodeDefEditButtons = props => {
           </div>
         )}
 
-        <button
+        <Link
           className="btn btn-s btn-transparent"
-          onClick={() => history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
+          to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
           <span className="icon icon-pencil2 icon-12px" />
-        </button>
+        </Link>
 
         {NodeDef.isEntity(nodeDef) && (
           <button

@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+import { Link, useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/commonComponents/form/input'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
@@ -15,9 +16,10 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { createCategory, deleteCategory } from '../../categoryEdit/actions'
+import { createCategory, deleteCategory } from '../../category/actions'
 
 const CodeProps = props => {
   const {
@@ -32,10 +34,10 @@ const CodeProps = props => {
     candidateParentCodeNodeDefs,
     parentCodeDef,
     createCategory,
-    toggleCategoryEdit,
   } = props
 
   const i18n = useI18n()
+  const history = useHistory()
 
   const displayAsItems = [
     {
@@ -77,17 +79,16 @@ const CodeProps = props => {
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
             onClick={async () => {
-              putCategoryProp(await createCategory())
-              toggleCategoryEdit(true)
+              putCategoryProp(await createCategory(history))
             }}
           >
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <button className="btn btn-s" style={{ justifySelf: 'center' }} onClick={() => toggleCategoryEdit(true)}>
+          <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.categories)}>
             <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
-          </button>
+          </Link>
         </div>
       </FormItem>
 

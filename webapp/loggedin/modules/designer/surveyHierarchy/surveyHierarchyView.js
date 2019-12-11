@@ -1,4 +1,4 @@
-import './surveyHierarchy.scss'
+import './surveyHierarchyView.scss'
 
 import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
@@ -10,7 +10,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Tree from './surveyHierarchyTree'
 
-const SurveyHierarchy = props => {
+const SurveyHierarchyView = props => {
   const { lang, hierarchy } = props
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
@@ -54,4 +54,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(SurveyHierarchy)
+export default connect(mapStateToProps)(SurveyHierarchyView)

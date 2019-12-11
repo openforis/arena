@@ -1,45 +1,33 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Authorizer from '@core/auth/authorizer'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
-import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
-import TaxonomyEdit from '../taxonomyEdit/taxonomyEditView'
+import * as NodeDefEditState from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditState'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+
+import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { createTaxonomy, deleteTaxonomy } from '../taxonomy/actions'
 import ItemsView from '../items/itemsView'
 
-import { createTaxonomy, setTaxonomyForEdit, deleteTaxonomy } from '../taxonomyEdit/actions'
-
 const TaxonomiesView = props => {
-  const {
-    taxonomy,
-    taxonomies,
-    selectedItemUuid,
-    createTaxonomy,
-    setTaxonomyForEdit,
-    deleteTaxonomy,
-    canSelect,
-    onSelect,
-    onClose,
-    readOnly,
-  } = props
+  const { taxonomies, nodeDef, createTaxonomy, deleteTaxonomy, canSelect, readOnly, putNodeDefProp } = props
 
-  useEffect(
-    () => () => {
-      if (taxonomy) {
-        setTaxonomyForEdit(null)
-      }
-    },
-    [Taxonomy.getUuid(taxonomy)],
-  )
+  const selectedItemUuid = nodeDef && NodeDef.getTaxonomyUuid(nodeDef)
 
   const i18n = useI18n()
+  const history = useHistory()
+
+  const onClose = nodeDef ? history.goBack : null
 
   const canDelete = taxonomy =>
     taxonomy.usedByNodeDefs
@@ -52,19 +40,15 @@ const TaxonomiesView = props => {
 
   return (
     <ItemsView
-      headerText="Taxonomies"
-      itemEditComponent={TaxonomyEdit}
-      itemEditProp="taxonomy"
       itemLabelFunction={taxonomy => Taxonomy.getName(taxonomy)}
-      editedItem={taxonomy}
+      itemLink={appModuleUri(designerModules.taxonomy)}
       items={taxonomies}
       selectedItemUuid={selectedItemUuid}
       onAdd={createTaxonomy}
-      onEdit={setTaxonomyForEdit}
       canDelete={canDelete}
       onDelete={deleteTaxonomy}
       canSelect={canSelect}
-      onSelect={onSelect}
+      onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
       onClose={onClose}
       readOnly={readOnly}
     />
@@ -75,7 +59,7 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
-
+  const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
   const taxonomies = R.pipe(
     Survey.getTaxonomiesArray,
     R.map(t => ({
@@ -83,16 +67,20 @@ const mapStateToProps = state => {
       usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
     })),
   )(survey)
+  // A nodeDef taxon is begin edited.
+  const nodeDef = !readOnly && NodeDefEditState.getNodeDef(state)
+  const canSelect = nodeDef && NodeDef.isTaxon(nodeDef)
 
   return {
     taxonomies,
-    taxonomy: TaxonomyEditState.getTaxonomy(state),
-    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
+    readOnly,
+    nodeDef,
+    canSelect,
   }
 }
 
 export default connect(mapStateToProps, {
   createTaxonomy,
-  setTaxonomyForEdit,
   deleteTaxonomy,
+  putNodeDefProp,
 })(TaxonomiesView)

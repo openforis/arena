@@ -51,6 +51,8 @@ export const enTranslation = {
     reset: 'Reset',
     save: 'Save',
     saved: 'Saved!',
+    select: 'Select',
+    selected: 'Selected',
     srs: 'SRS',
     to: 'To',
     type: 'Type',

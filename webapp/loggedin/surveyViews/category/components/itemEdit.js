@@ -39,7 +39,7 @@ const ItemEdit = props => {
 
   return (
     <div
-      className={`category-edit__item ${active ? 'active' : ''}`}
+      className={`category__item ${active ? 'active' : ''}`}
       onClick={() => (active ? null : setCategoryItemForEdit(category, level, item, true))}
       ref={elemRef}
     >

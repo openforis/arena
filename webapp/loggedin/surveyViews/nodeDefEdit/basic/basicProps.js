@@ -39,8 +39,6 @@ const BasicProps = props => {
 
     putNodeDefProp,
     putNodeDefLayoutProp,
-    toggleTaxonomyEdit,
-    toggleCategoryEdit,
   } = props
 
   const i18n = useI18n()
@@ -79,19 +77,13 @@ const BasicProps = props => {
           surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           validation={validation}
-          toggleCategoryEdit={toggleCategoryEdit}
           putNodeDefProp={putNodeDefProp}
           putNodeDefLayoutProp={putNodeDefLayoutProp}
         />
       )}
 
       {NodeDef.isTaxon(nodeDef) && (
-        <TaxonProps
-          nodeDef={nodeDef}
-          validation={validation}
-          toggleTaxonomyEdit={toggleTaxonomyEdit}
-          putNodeDefProp={putNodeDefProp}
-        />
+        <TaxonProps nodeDef={nodeDef} validation={validation} putNodeDefProp={putNodeDefProp} />
       )}
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (

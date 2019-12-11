@@ -16,7 +16,7 @@ const TaxonomyEditHeader = props => {
   const validation = Validation.getValidation(taxonomy)
 
   return (
-    <div className="taxonomy-edit__header">
+    <div className="taxonomy__header">
       <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
         <div>
           <Input

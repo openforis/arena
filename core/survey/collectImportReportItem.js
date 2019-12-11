@@ -2,7 +2,8 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 
-const keys = {
+export const keys = {
+  id: ObjectUtils.keys.id,
   props: ObjectUtils.keys.props,
   resolved: 'resolved',
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
@@ -29,6 +30,7 @@ export const newReportItem = (expressionType, expression, applyIf, messages) => 
   [propKeys.messages]: messages,
 })
 
+export const getId = ObjectUtils.getId
 export const isResolved = R.propOr(false, keys.resolved)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getProps = R.prop(keys.props)

@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link, useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/commonComponents/form/input'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
@@ -12,9 +13,10 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as NodeDefEditState from '../nodeDefEditState'
 
-import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
+import { createTaxonomy, deleteTaxonomy } from '../../taxonomy/actions'
 
 const { propKeys } = NodeDef
 
@@ -28,12 +30,12 @@ const TaxonProps = props => {
 
     putNodeDefProp,
     createTaxonomy,
-    toggleTaxonomyEdit,
   } = props
 
   const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
 
   const i18n = useI18n()
+  const history = useHistory()
 
   return (
     <React.Fragment>
@@ -57,17 +59,16 @@ const TaxonProps = props => {
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
             onClick={async () => {
-              putTaxonomyProp(await createTaxonomy())
-              toggleTaxonomyEdit(true)
+              putTaxonomyProp(await createTaxonomy(history))
             }}
           >
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <button className="btn btn-s" style={{ justifySelf: 'center' }} onClick={() => toggleTaxonomyEdit(true)}>
+          <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.taxonomies)}>
             <span className="icon icon-list icon-12px icon-left" />
             {i18n.t('common.manage')}
-          </button>
+          </Link>
         </div>
       </FormItem>
     </React.Fragment>
