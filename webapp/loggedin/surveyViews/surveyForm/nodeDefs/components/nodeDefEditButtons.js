@@ -12,8 +12,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
-import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../../actions'
 
 const NodeDefEditButtons = props => {

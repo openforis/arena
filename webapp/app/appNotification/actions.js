@@ -1,5 +1,5 @@
-import { cancelDebouncedAction, debounceAction } from '../../utils/reduxUtils'
 import * as NotificationState from './appNotificationState'
+import { cancelDebouncedAction, debounceAction } from '../../utils/reduxUtils'
 
 export const appNotificationShow = 'app/notification/show'
 export const appNotificationHide = 'app/notification/hide'

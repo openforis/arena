@@ -63,6 +63,7 @@ export const type = {
 }
 
 export const keys = {
+  id: ObjectUtils.keys.id,
   content: 'content',
   dateCreated: ObjectUtils.keys.dateCreated,
   type: 'type',

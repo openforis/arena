@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import { uuidv4 } from '@core/uuid'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,7 +15,6 @@ import * as AppState from '@webapp/app/appState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as SurveyState from '../surveyState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'

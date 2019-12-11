@@ -10,9 +10,10 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
+
 import { updateCollectImportReportItem } from '../actions'
 
 const TableRow = props => {
