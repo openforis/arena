@@ -1,9 +1,10 @@
 import { assocActionProps, exportReducer } from '@webapp/utils/reduxUtils'
 
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import * as AppState from './appState'
 
 import { appPropsChange, appUserLogout, appSavingUpdate, systemErrorThrow } from './actions'
+
+import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 
 const actionHandlers = {
   [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),

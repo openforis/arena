@@ -2,8 +2,9 @@ import './errorBadge.scss'
 
 import React from 'react'
 
-import * as Validation from '@core/validation/validation'
 import { useI18n } from './hooks'
+
+import * as Validation from '@core/validation/validation'
 
 import ValidationTooltip from './validationTooltip'
 

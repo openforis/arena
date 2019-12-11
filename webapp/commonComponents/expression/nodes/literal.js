@@ -3,17 +3,18 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 import axios from 'axios'
 
+import { Input } from '../../form/input'
+import { BinaryOperandType } from './binaryOperand'
+import * as ExpressionParser from '../expressionParser'
+import { useAsyncGetRequest } from '../../hooks'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
-import { useAsyncGetRequest } from '../../hooks'
-import * as ExpressionParser from '../expressionParser'
-import { Input } from '../../form/input'
 import Dropdown from '../../form/dropdown'
-import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>
   nodeDef ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value)) : false
