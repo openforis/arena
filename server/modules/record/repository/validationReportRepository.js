@@ -17,15 +17,7 @@ const query = surveyId =>
     r.step as record_step,
     r.owner_uuid as record_owner_uuid,
 
-    -- node_uuid
-    CASE WHEN LENGTH(node_validation.key) = 36 
-        THEN 
-          node_validation.key
-        ELSE 
-          -- count validation
-          SUBSTRING(node_validation.key, ${RecordValidation.prefixValidationFieldChildrenCount.length + 1}, 36)
-        END 
-        AS node_uuid,
+    h.node_uuid,
     
     -- validation_count_child_def_uuid
     CASE WHEN LENGTH(node_validation.key) > 36 

@@ -49,13 +49,18 @@ const getKeysHierarchy = survey => item =>
     ),
   )(item)
 
-export const getPath = (survey, lang) => item =>
-  R.pipe(getKeysHierarchy(survey), NodeKeys.getKeysHierarchyPath(survey, lang))(item)
+export const getPath = (survey, lang) => R.pipe(getKeysHierarchy(survey), NodeKeys.getKeysHierarchyPath(survey, lang))
 
-export const getNodeContextUuid = item =>
-  isValidationCount(item)
-    ? getNodeUuid(item) // Node is an entity
-    : R.prop(NodeKeys.keys.nodeUuid, R.last(item.keysHierarchy)) // Node is an attribute, its parent is the last item of its hierarchy
+export const getNodeContextUuid = R.ifElse(
+  isValidationCount,
+  getNodeUuid, // Node has a validation count, the context will be the node itself (an entity)
+  R.pipe(
+    // Node is an attribute, the context node will be its parent entity (it's the last item of the hierarchy)
+    R.prop(keys.keysHierarchy),
+    R.last,
+    R.prop(NodeKeys.keys.nodeUuid),
+  ),
+)
 
 export const getNodeDefContextUuid = R.ifElse(isValidationCount, getValidationCountChildDefUuid, getNodeDefUuid)
 export const getValidation = R.prop(keys.validation)

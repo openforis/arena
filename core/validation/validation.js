@@ -146,6 +146,20 @@ export const assocFieldValidation = (field, fieldValidation) =>
   R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
 
 export const dissocFieldValidation = field => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
+/**
+ * Iterates over all the field validations and remove the ones starting with the specified value
+ */
+export const dissocFieldValidationsStartingWith = fieldStartsWith => validation =>
+  R.pipe(
+    R.prop(keys.fields),
+    Object.entries,
+    R.reduce((accFields, [field, fieldValidation]) => {
+      if (!field.startsWith(fieldStartsWith)) accFields[field] = fieldValidation
+      return accFields
+    }, {}),
+    fieldsValidations => R.assoc(keys.fields, fieldsValidations)(validation),
+    cleanup,
+  )(validation)
 
 export const mergeValidation = validationNew => validationOld =>
   R.pipe(
