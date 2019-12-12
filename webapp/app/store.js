@@ -1,21 +1,21 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux'
 
 // == app reducer
-import createDebounce from 'redux-debounced'
-import thunkMiddleware from 'redux-thunk'
-import * as ProcessUtils from '@core/processUtils'
+import appReducer from './reducer'
 import loginReducer from '../login/reducer'
 import surveyReducer from '../survey/reducer'
-import * as LoginState from '../login/loginState'
-import * as SurveyState from '../survey/surveyState'
-import appReducer from './reducer'
 import notificationReducer from './appNotification/reducer'
 import errorsReducer from './appErrors/reducer'
 
+import * as LoginState from '../login/loginState'
+import * as SurveyState from '../survey/surveyState'
 import * as NotificationState from './appNotification/appNotificationState'
 import * as ErrorsState from './appErrors/appErrorsState'
 
+import createDebounce from 'redux-debounced'
+import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from './appErrorsMiddleware'
+import * as ProcessUtils from '@core/processUtils'
 
 const appReducers = {
   app: appReducer,

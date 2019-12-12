@@ -1,8 +1,9 @@
-import './taxonomyEditView.scss'
+import './taxonomyView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
+import { useHistory, useParams } from 'react-router'
 
 import * as Authorizer from '@core/auth/authorizer'
 
@@ -15,16 +16,16 @@ import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
 
-import * as TaxonomyEditState from './taxonomyEditState'
+import * as TaxonomyState from './taxonomyState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
 
-const TaxonomyEditView = props => {
+const TaxonomyView = props => {
   const { surveyId, taxonomy, canEdit, setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile } = props
 
+  const history = useHistory()
+  const { taxonomyUuid } = useParams()
   const i18n = useI18n()
-
-  const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
@@ -32,12 +33,16 @@ const TaxonomyEditView = props => {
     R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 60px)`
   }`
 
-  return (
-    <div className="taxonomy-edit">
+  useEffect(() => {
+    setTaxonomyForEdit(taxonomyUuid)
+  }, [])
+
+  return taxonomy ? (
+    <div className="taxonomy">
       <TaxonomyEditHeader {...props} />
 
       <TableView
-        module={TaxonomyEditState.keys.taxa}
+        module={TaxonomyState.keys.taxa}
         moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
         restParams={{ draft: canEdit }}
         gridTemplateColumns={gridTemplateColumns}
@@ -53,12 +58,18 @@ const TaxonomyEditView = props => {
       />
 
       <div style={{ justifySelf: 'center' }}>
-        <button className="btn" onClick={() => setTaxonomyForEdit(null)}>
+        <button
+          className="btn"
+          onClick={() => {
+            history.goBack()
+            setTaxonomyForEdit(null)
+          }}
+        >
           {i18n.t('common.done')}
         </button>
       </div>
     </div>
-  )
+  ) : null
 }
 
 const mapStateToProps = state => {
@@ -67,7 +78,7 @@ const mapStateToProps = state => {
 
   return {
     surveyId: SurveyState.getSurveyId(state),
-    taxonomy: TaxonomyEditState.getTaxonomy(state),
+    taxonomy: TaxonomyState.getTaxonomy(state),
     canEdit: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
@@ -76,4 +87,4 @@ export default connect(mapStateToProps, {
   setTaxonomyForEdit,
   putTaxonomyProp,
   uploadTaxonomyFile,
-})(TaxonomyEditView)
+})(TaxonomyView)

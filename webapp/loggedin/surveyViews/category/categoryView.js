@@ -1,7 +1,8 @@
-import './components/categoryEditView.scss'
+import './categoryView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { useHistory, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 
@@ -16,13 +17,13 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as CategoryState from './categoryState'
 import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'
-import * as CategoryEditState from './categoryEditState'
 
 import { putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory } from './actions'
 
-const CategoryEditView = props => {
+const CategoryView = props => {
   const {
     category,
     readOnly,
@@ -33,15 +34,21 @@ const CategoryEditView = props => {
     uploadCategory,
   } = props
 
+  const history = useHistory()
+  const { categoryUuid } = useParams()
+  const i18n = useI18n()
+
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
-  const i18n = useI18n()
+  useEffect(() => {
+    setCategoryForEdit(categoryUuid)
+  }, [])
 
-  return (
+  return category ? (
     <>
-      <div className="category-edit">
-        <div className="category-edit__header">
+      <div className="category">
+        <div className="category__header">
           <FormItem label={i18n.t('categoryEdit.categoryName')}>
             <Input
               value={Category.getName(category)}
@@ -61,7 +68,7 @@ const CategoryEditView = props => {
           )}
         </div>
 
-        <div className="category-edit__levels">
+        <div className="category__levels">
           {levels.map(level => (
             <LevelEdit key={CategoryLevel.getUuid(level)} level={level} />
           ))}
@@ -79,7 +86,13 @@ const CategoryEditView = props => {
         </div>
 
         <div style={{ justifySelf: 'center' }}>
-          <button className="btn" onClick={() => setCategoryForEdit(null)}>
+          <button
+            className="btn"
+            onClick={() => {
+              history.goBack()
+              setCategoryForEdit(null)
+            }}
+          >
             {i18n.t('common.done')}
           </button>
         </div>
@@ -87,12 +100,13 @@ const CategoryEditView = props => {
 
       {importSummary && <CategoryImportSummary summary={importSummary} />}
     </>
-  )
+  ) : null
 }
 
 const mapStateToProps = state => ({
+  category: CategoryState.getCategoryForEdit(state),
   readOnly: !Authorizer.canEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
-  importSummary: CategoryEditState.getImportSummary(state),
+  importSummary: CategoryState.getImportSummary(state),
 })
 
 export default connect(mapStateToProps, {
@@ -100,4 +114,4 @@ export default connect(mapStateToProps, {
   createCategoryLevel,
   setCategoryForEdit,
   uploadCategory,
-})(CategoryEditView)
+})(CategoryView)

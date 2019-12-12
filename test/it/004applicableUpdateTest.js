@@ -28,13 +28,23 @@ describe('Applicable Test', () => {
         SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key(),
         SB.attribute('num', NodeDef.nodeDefType.decimal),
         SB.attribute('dependent_node').applyIf('num > 100'),
+        SB.entity(
+          'plot',
+          SB.attribute('plot_no').key(),
+          SB.entity('tree', SB.attribute('tree_no').key(), SB.attribute('tree_dbh').applyIf('plot_no > 10')),
+        ).multiple(),
       ),
     ).buildAndStore()
 
     record = await RB.record(
       user,
       survey,
-      RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
+      RB.entity(
+        'root',
+        RB.attribute('cluster_no', 1),
+        RB.attribute('num', 1),
+        RB.entity('plot', RB.attribute('plot_no', 1), RB.entity('tree', RB.attribute('tree_no', 1))),
+      ),
     ).buildAndStore()
   })
 
@@ -79,5 +89,25 @@ describe('Applicable Test', () => {
 
       expect(applicable).to.equal(expectedValue, sourceValue)
     }
+  })
+
+  it('Applicable evaluated on entity creation', async () => {
+    const nodeTree = RecordUtils.findNodeByPath('root/plot[1]/tree[1]')(survey, record)
+    const nodeTreeDbh = RecordUtils.findNodeByPath('root/plot[1]/tree[1]/tree_dbh')(survey, record)
+
+    // Tree_dbh should be not applicable (plot_no <= 10)
+    expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).to.be.equal(false)
+  })
+
+  it('Applicable in multiple entity update', async () => {
+    const nodePlotNo = RecordUtils.findNodeByPath('root/plot[1]/plot_no')(survey, record)
+    const nodePlotNoUpdated = Node.assocValue(11)(nodePlotNo)
+    const recordUpdated = await RecordManager.persistNode(getContextUser(), survey, record, nodePlotNoUpdated)
+
+    const nodeTree = RecordUtils.findNodeByPath('root/plot[1]/tree[1]')(survey, recordUpdated)
+    const nodeTreeDbh = RecordUtils.findNodeByPath('root/plot[1]/tree[1]/tree_dbh')(survey, recordUpdated)
+
+    // Tree_dbh should be applicable (plot_no > 10)
+    expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).to.be.equal(true)
   })
 })

@@ -51,6 +51,7 @@
       "no-return-await": "off",
       "new-cap": "off",
       "no-alert": "off",
+      "import/order": "off",
       "max-params": [
         "warn",
         {
@@ -292,7 +293,7 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

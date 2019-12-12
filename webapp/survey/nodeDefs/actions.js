@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import { uuidv4 } from '@core/uuid'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -71,7 +72,7 @@ const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getSt
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props, history) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
@@ -84,6 +85,8 @@ export const createNodeDef = (parent, type, props) => async (dispatch, getState)
     data: { nodeDefsValidation },
   } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+  history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 
   dispatch(_updateParentLayout(nodeDef))
 }

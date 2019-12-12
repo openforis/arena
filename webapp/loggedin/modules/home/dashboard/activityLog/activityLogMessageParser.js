@@ -38,7 +38,7 @@ const isItemDeletedFns = {
   ...isItemDeletedFnsAnalysis,
 }
 
-export const toMessage = (i18n, survey) => activityLog => {
+export const toMessage = (i18n, survey, highlighted = true) => activityLog => {
   const type = ActivityLog.getType(activityLog)
 
   const i18nMessageParamsFn = i18nMessageParamsFns[type]
@@ -48,5 +48,5 @@ export const toMessage = (i18n, survey) => activityLog => {
   const isItemDeletedFn = isItemDeletedFns[type]
   const itemDeleted = isItemDeletedFn && isItemDeletedFn(survey)(activityLog)
 
-  return ActivityLogMessage.newMessage(activityLog, message, itemDeleted)
+  return ActivityLogMessage.newMessage(activityLog, message, itemDeleted, highlighted)
 }

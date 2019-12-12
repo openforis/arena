@@ -71,7 +71,7 @@ const CategoryImportSummaryView = props => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   return (
-    <Modal className="category-edit__import-summary" onClose={hideCategoryImportSummary}>
+    <Modal className="category__import-summary" onClose={hideCategoryImportSummary}>
       <ModalBody>
         <div className="table">
           <div className="table__content">

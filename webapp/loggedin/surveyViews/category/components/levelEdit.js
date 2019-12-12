@@ -17,7 +17,7 @@ import * as Validation from '@core/validation/validation'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as Authorizer from '@core/auth/authorizer'
-import * as CategoryEditState from '../categoryEditState'
+import * as CategoryState from '../categoryState'
 
 import {
   createCategoryLevelItem,
@@ -64,8 +64,8 @@ const LevelEdit = props => {
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return (
-    <div className="category-edit__level">
-      <div className="category-edit__level-header">
+    <div className="category__level">
+      <div className="category__level-header">
         <h4 className="label">
           <ErrorBadge validation={validation} />
           {i18n.t('categoryEdit.level')} {level.index + 1}
@@ -86,7 +86,7 @@ const LevelEdit = props => {
         />
       </FormItem>
 
-      <div className="category-edit__level-items-header">
+      <div className="category__level-items-header">
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
         {!readOnly && (
           <button
@@ -100,7 +100,7 @@ const LevelEdit = props => {
         )}
       </div>
 
-      <div className="category-edit__level-items">
+      <div className="category__level-items">
         {items.map(item => (
           <ItemEdit
             key={CategoryItem.getUuid(item)}
@@ -126,12 +126,12 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
-  const category = CategoryEditState.getCategoryForEdit(state)
-  const activeItem = CategoryEditState.getLevelActiveItem(index)(state)
-  const parentItem = CategoryEditState.getLevelActiveItem(index - 1)(state)
+  const category = CategoryState.getCategoryForEdit(state)
+  const activeItem = CategoryState.getLevelActiveItem(index)(state)
+  const parentItem = CategoryState.getLevelActiveItem(index - 1)(state)
 
   const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? CategoryEditState.getLevelItemsArray(index)(state) : []
+  const items = canAddItem ? CategoryState.getLevelItemsArray(index)(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
 
   const user = AppState.getUser(state)

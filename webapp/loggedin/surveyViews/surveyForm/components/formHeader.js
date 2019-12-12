@@ -50,13 +50,18 @@ const FormHeader = props => {
           <button
             className="btn-s btn-transparent btn-add-sub-page"
             onClick={() =>
-              createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, {
-                [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-                  surveyCycleKey,
-                  NodeDefLayout.renderType.form,
-                  uuidv4(),
-                ),
-              })
+              createNodeDef(
+                nodeDefPage,
+                NodeDef.nodeDefType.entity,
+                {
+                  [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+                    surveyCycleKey,
+                    NodeDefLayout.renderType.form,
+                    uuidv4(),
+                  ),
+                },
+                history,
+              )
             }
           >
             <span className="icon icon-plus icon-10px icon-left" />

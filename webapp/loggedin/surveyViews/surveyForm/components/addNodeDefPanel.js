@@ -3,6 +3,7 @@ import './addNodeDefPanel.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
@@ -50,6 +51,7 @@ const AddNodeDefPanel = props => {
   const { surveyCycleKey, nodeDef, nodeDefLabel, createNodeDef, setFormNodeDefAddChildTo } = props
 
   const i18n = useI18n()
+  const history = useHistory()
 
   return (
     nodeDef && (
@@ -67,7 +69,7 @@ const AddNodeDefPanel = props => {
           surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           addNodeDef={(type, props) => {
-            createNodeDef(nodeDef, type, props)
+            createNodeDef(nodeDef, type, props, history)
           }}
           setFormNodeDefAddChildTo={setFormNodeDefAddChildTo}
         />
