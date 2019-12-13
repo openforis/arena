@@ -4,7 +4,7 @@ import { appUserLogout } from '@webapp/app/actions'
 
 import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
 
-import { nodeDefCreate, nodeDefDelete, nodeDefsUpdate, nodeDefPropsUpdate } from './actions'
+import { nodeDefCreate, nodeDefDelete, nodeDefsUpdate, nodeDefPropsUpdate, nodeDefUpdateCancel } from './actions'
 
 import * as NodeDefsState from './nodeDefsState'
 
@@ -28,6 +28,11 @@ const actionHandlers = {
   [nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
   [nodeDefPropsUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+
+  [nodeDefUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+    isNodeDefNew
+      ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
+      : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def
 }
 
 export default exportReducer(actionHandlers)

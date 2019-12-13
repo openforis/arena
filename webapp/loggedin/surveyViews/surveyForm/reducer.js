@@ -7,7 +7,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '@webapp/survey/nodeDefs/actions'
+import { nodeDefCreate, nodeDefDelete } from '@webapp/survey/nodeDefs/actions'
+import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDefEdit/actions'
 import { recordLoad } from '../record/actions'
 import {
   formActivePageNodeDefUpdate,
@@ -45,19 +46,12 @@ const actionHandlers = {
 
   [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
-  // TODO replace it with nodeDefUpdate
-  /*
-  [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props, surveyCycleKey, checkFormPageUuid }) => {
-    if (checkFormPageUuid) {
-      const pageUuid = R.path([NodeDefLayout.keys.layout, surveyCycleKey, NodeDefLayout.keys.pageUuid], props)
-      // When changing displayIn (pageUuid) change form active page
-      const activePageNodeDef = pageUuid ? nodeDef : parentNodeDef
-      return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
-    }
-
-    return state
+  [nodeDefEditUpdate]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
+    const pageUuid = NodeDefLayout.getPageUuid(surveyCycleKey)(nodeDef)
+    // When changing displayIn (pageUuid) change form active page
+    const activePageNodeDef = pageUuid ? nodeDef : nodeDefParent
+    return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
   },
-  */
 
   // Record
   [recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>

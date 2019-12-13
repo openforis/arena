@@ -39,6 +39,7 @@ const BasicProps = props => {
 
     putNodeDefProp,
     putNodeDefLayoutProp,
+    updateNodeDefEditLayoutProp,
   } = props
 
   const i18n = useI18n()
@@ -110,7 +111,7 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={renderType => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, renderType)}
+            onChange={renderType => updateNodeDefEditLayoutProp(NodeDefLayout.keys.renderType, renderType)}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
@@ -132,8 +133,7 @@ const BasicProps = props => {
           <ButtonGroup
             selectedItemKey={displayIn}
             onChange={displayIn =>
-              putNodeDefLayoutProp(
-                nodeDef,
+              updateNodeDefEditLayoutProp(
                 NodeDefLayout.keys.pageUuid,
                 displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4(),
               )

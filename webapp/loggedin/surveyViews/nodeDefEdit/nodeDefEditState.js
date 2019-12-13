@@ -3,11 +3,11 @@ import * as R from 'ramda'
 import * as SurveyViewsState from '../surveyViewsState'
 
 const keys = {
-  nodeDefOriginal: 'nodeDefOriginal',
-  nodeDef: 'nodeDef',
-  nodeDefValidation: 'nodeDefValidation',
-  propsUpdated: 'propsUpdated',
-  propsAdvancedUpdated: 'propsAdvancedUpdated',
+  nodeDefOriginal: 'nodeDefOriginal', // Node def as it is when editing started
+  nodeDef: 'nodeDef', // Node def currently being edited
+  nodeDefValidation: 'nodeDefValidation', // Node def validation
+  propsUpdated: 'propsUpdated', // Updated props
+  propsAdvancedUpdated: 'propsAdvancedUpdated', // Updated props advanced
 }
 
 export const stateKey = 'nodeDefEdit'

@@ -19,7 +19,13 @@ import BasicProps from './basic/basicProps'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
 
-import { putNodeDefProp, putNodeDefLayoutProp, cancelNodeDefEdit, saveNodeDef } from '@webapp/survey/nodeDefs/actions'
+import {
+  putNodeDefProp,
+  putNodeDefLayoutProp,
+  updateNodeDefEditLayoutProp,
+  cancelNodeDefEdit,
+  saveNodeDef,
+} from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 
 const NodeDefEditView = props => {
@@ -32,6 +38,7 @@ const NodeDefEditView = props => {
     nodeDefMultipleEditDisabled,
     putNodeDefProp,
     putNodeDefLayoutProp,
+    updateNodeDefEditLayoutProp,
     setNodeDefUuidForEdit,
     cancelNodeDefEdit,
     saveNodeDef,
@@ -63,6 +70,7 @@ const NodeDefEditView = props => {
                 nodeDefMultipleEditDisabled,
                 putNodeDefProp,
                 putNodeDefLayoutProp,
+                updateNodeDefEditLayoutProp,
               },
             },
             ...(NodeDef.isRoot(nodeDef)
@@ -159,6 +167,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   putNodeDefProp,
   putNodeDefLayoutProp,
+  updateNodeDefEditLayoutProp,
   setNodeDefUuidForEdit,
   cancelNodeDefEdit,
   saveNodeDef,
