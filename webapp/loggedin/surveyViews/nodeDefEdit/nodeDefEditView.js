@@ -19,7 +19,7 @@ import BasicProps from './basic/basicProps'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
 
-import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
+import { putNodeDefProp, putNodeDefLayoutProp, cancelNodeDefEdit, saveNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 
 const NodeDefEditView = props => {
@@ -27,16 +27,19 @@ const NodeDefEditView = props => {
     nodeDef,
     nodeDefParent,
     validation,
+    isDirty,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
     putNodeDefProp,
     putNodeDefLayoutProp,
     setNodeDefUuidForEdit,
+    cancelNodeDefEdit,
+    saveNodeDef,
   } = props
 
   const i18n = useI18n()
-  const { nodeDefUuid } = useParams()
   const history = useHistory()
+  const { nodeDefUuid } = useParams()
 
   useEffect(() => {
     // Editing a nodeDef
@@ -88,17 +91,25 @@ const NodeDefEditView = props => {
                 ]),
           ]}
         />
-
-        <button
-          className="btn btn-close"
-          onClick={() => {
-            history.goBack()
-            setNodeDefUuidForEdit(null)
-          }}
-          aria-disabled={StringUtils.isBlank(NodeDef.getName(nodeDef))}
-        >
-          {i18n.t('common.done')}
-        </button>
+        <div className="button-bar">
+          <button
+            className="btn btn-back"
+            onClick={() => {
+              cancelNodeDefEdit(history)
+            }}
+          >
+            {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
+          </button>
+          <button
+            className="btn btn-save"
+            onClick={() => {
+              saveNodeDef()
+            }}
+            aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
+          >
+            {i18n.t('common.save')}
+          </button>
+        </div>
       </div>
     </div>
   ) : null
@@ -130,6 +141,7 @@ const mapStateToProps = state => {
   const nodeDef = NodeDefEditState.getNodeDef(state)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const validation = NodeDefEditState.getNodeDefValidation(state)
+  const isDirty = NodeDefEditState.isDirty(state)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
@@ -138,6 +150,7 @@ const mapStateToProps = state => {
     nodeDef,
     nodeDefParent,
     validation,
+    isDirty,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
   }
@@ -147,4 +160,6 @@ export default connect(mapStateToProps, {
   putNodeDefProp,
   putNodeDefLayoutProp,
   setNodeDefUuidForEdit,
+  cancelNodeDefEdit,
+  saveNodeDef,
 })(NodeDefEditView)

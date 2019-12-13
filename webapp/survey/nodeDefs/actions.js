@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 
@@ -16,12 +17,12 @@ import * as SurveyState from '../surveyState'
 import * as NodeDefEditState from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
+import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDefEdit/actions'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
-export const nodeDefValidationUpdate = 'survey/nodeDef/validation/update'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
@@ -122,7 +123,7 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false, che
 
   const nodeDefValidation = await SurveyValidator.validateNodeDef(survey, nodeDefUpdated)
 
-  await dispatch({
+  dispatch({
     type: nodeDefPropsUpdate,
     nodeDef: nodeDefUpdated,
     nodeDefValidation,
@@ -168,6 +169,20 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, ge
   dispatch(putNodeDefProp(nodeDef, NodeDefLayout.keys.layout, layoutUpdate, false, checkFormPageUuid))
 }
 
+export const cancelNodeDefEdit = history => async (dispatch, getState) => {
+  const state = getState()
+  const nodeDefOriginal = NodeDefEditState.getNodeDefOriginal(state)
+  const i18n = AppState.getI18n(state)
+
+  if (!NodeDefEditState.isDirty(state) || confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmCancel'))) {
+    dispatch({
+      type: nodeDefPropsUpdate,
+      nodeDef: nodeDefOriginal,
+    })
+    history.goBack()
+  }
+}
+
 export const saveNodeDef = () => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
@@ -190,6 +205,12 @@ export const saveNodeDef = () => async (dispatch, getState) => {
   if (nodeDefsUpdated) {
     dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
   }
+
+  dispatch({
+    type: nodeDefEditUpdate,
+    nodeDef,
+    nodeDefValidation: Validation.getFieldValidation(nodeDefUuid)(nodeDefsValidation),
+  })
 }
 
 // ==== DELETE
