@@ -136,7 +136,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     fetchSurveyById(surveyId, draft, validate, client),
     NodeDefManager.fetchNodeDefsBySurveyId(surveyId, cycle, draft, advanced, includeDeleted, client),
   ])
-  const survey = Survey.assocNodeDefs(nodeDefs)(surveyDb)
+  const survey = R.pipe(Survey.assocNodeDefs(nodeDefs), Survey.buildAndAssocDependencyGraph)(surveyDb)
 
   return validate ? Survey.assocNodeDefsValidation(await SurveyValidator.validateNodeDefs(survey))(survey) : survey
 }

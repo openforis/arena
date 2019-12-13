@@ -2,24 +2,24 @@ import './nodeDefEditView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { useHistory, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
-
-import { useI18n } from '@webapp/commonComponents/hooks'
-import TabBar from '@webapp/commonComponents/tabBar'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
-import { useHistory, useParams } from 'react-router'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import TabBar from '@webapp/commonComponents/tabBar'
 
-import * as NodeDefEditState from './nodeDefEditState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
+
+import * as SurveyState from '@webapp/survey/surveyState'
+import * as NodeDefEditState from './nodeDefEditState'
+
+import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 
 const NodeDefEditView = props => {
@@ -129,7 +129,7 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
-  const validation = Survey.getNodeDefValidation(nodeDef)(survey)
+  const validation = NodeDefEditState.getNodeDefValidation(state)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)

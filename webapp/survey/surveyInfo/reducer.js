@@ -11,7 +11,7 @@ import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
 // SurveyInfo actions
 
 // nodeDefs actions
-import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '../nodeDefs/actions'
+import { nodeDefCreate, nodeDefUpdate, nodeDefDelete } from '../nodeDefs/actions'
 
 // Category actions
 import { categoryCreate, categoryDelete, categoryUpdate } from '../categories/actions'
@@ -38,7 +38,7 @@ const actionHandlers = {
 
   // NodeDef
   [nodeDefCreate]: SurveyInfoState.markDraft,
-  [nodeDefPropsUpdate]: SurveyInfoState.markDraft,
+  [nodeDefUpdate]: SurveyInfoState.markDraft,
   [nodeDefDelete]: SurveyInfoState.markDraft,
 
   // Category

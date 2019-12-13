@@ -1,4 +1,12 @@
-export const nodeDefUuidEditUpdate = 'surveyViews/nodeDefUuidEdit/update'
+import * as Survey from '@core/survey/survey'
+import * as SurveyState from '@webapp/survey/surveyState'
+
+export const nodeDefEditUpdate = 'surveyViews/nodeDefEdit/update'
 
 // Set current nodeDef edit
-export const setNodeDefUuidForEdit = nodeDefUuid => dispatch => dispatch({ type: nodeDefUuidEditUpdate, nodeDefUuid })
+export const setNodeDefUuidForEdit = nodeDefUuid => (dispatch, getState) => {
+  const survey = SurveyState.getSurvey(getState())
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  const nodeDefValidation = Survey.getNodeDefValidation(nodeDef)(survey)
+  dispatch({ type: nodeDefEditUpdate, nodeDef, nodeDefValidation })
+}

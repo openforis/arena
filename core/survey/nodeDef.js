@@ -146,6 +146,7 @@ export const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUu
 // ==== UPDATE
 
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
+export const mergeProps = ObjectUtils.mergeProps
 
 // ==== UTILS
 export const canNodeDefBeMultiple = nodeDef =>

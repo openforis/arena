@@ -109,7 +109,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
   )
 }
 
-const validateNodeDef = async (survey, nodeDef) => {
+export const validateNodeDef = async (survey, nodeDef) => {
   const nodeDefValidation = await Validator.validate(nodeDef, propsValidations(survey))
 
   const advancedPropsValidation = await validateAdvancedProps(survey, nodeDef)
@@ -123,9 +123,6 @@ const validateNodeDef = async (survey, nodeDef) => {
 }
 
 export const validateNodeDefs = async survey => {
-  // Build and assoc dependency graph to survey
-  survey = R.pipe(Survey.buildDependencyGraph, graph => Survey.assocDependencyGraph(graph)(survey))(survey)
-
   const validation = Validation.newInstance()
 
   const nodeDefs = Survey.getNodeDefs(survey)

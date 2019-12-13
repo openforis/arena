@@ -45,6 +45,8 @@ const actionHandlers = {
 
   [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
+  // TODO replace it with nodeDefUpdate
+  /*
   [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props, surveyCycleKey, checkFormPageUuid }) => {
     if (checkFormPageUuid) {
       const pageUuid = R.path([NodeDefLayout.keys.layout, surveyCycleKey, NodeDefLayout.keys.pageUuid], props)
@@ -55,6 +57,7 @@ const actionHandlers = {
 
     return state
   },
+  */
 
   // Record
   [recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
