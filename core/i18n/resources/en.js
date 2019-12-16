@@ -376,8 +376,6 @@ export const enTranslation = {
       applyIf: 'Apply If',
       confirmDelete: 'Delete this expression?',
       severity: 'Severity',
-      advanced: 'Advanced',
-      basicMode: 'Basic mode',
     },
     validationsProps: {
       minCount: 'Min count',

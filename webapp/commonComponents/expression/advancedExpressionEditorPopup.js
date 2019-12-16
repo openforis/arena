@@ -94,7 +94,6 @@ const validateExpression = (nodeDefCurrent, variables, exprString) => {
     const canBeConstant = true // Name the param
     return { ok: Expression.isValid(expr, canBeConstant) }
   } catch (error) {
-    console.error(error)
     return { error: 'syntaxError', message: error.message }
   }
 }
@@ -105,12 +104,7 @@ const autocompleteCurrentWord = (el, completion) => {
 }
 
 const AdvancedExpressionEditorPopup = props => {
-  const { nodeDefCurrent, variables, onChange, onClose, revertToBasicMode } = props
-
-  const { query, queryDraft, exprDraft, updateDraft } = useAdvancedExpressionEditorPopupState({
-    ...props,
-    keepSyntaxFormatting: true,
-  })
+  const { nodeDefCurrent, variables, setExpressionCanBeApplied, query, queryDraft, updateDraft } = props
 
   const [caret, setCaretPos] = useState({ top: 0, left: 0, right: 0 })
   const [prefix, setPrefix] = useState({
@@ -125,99 +119,73 @@ const AdvancedExpressionEditorPopup = props => {
   const i18n = useI18n()
 
   return (
-    <Popup className="expression-editor-popup" onClose={onClose} padding={20}>
-      <button onClick={revertToBasicMode} style={{ position: 'absolute', right: 0 }}>
-        {i18n.t('nodeDefEdit.expressionsProp.basicMode')}
-      </button>
+    <div>
+      <div className="expression-editor-popup__expr-container" style={{ fontSize: '1rem' }}>
+        <textarea
+          defaultValue={query}
+          style={{
+            backgroundColor: 'white',
+            minHeight: `${1 + prefix.value.split(/\n/g).length}em`,
+            width: '100%',
+          }}
+          spellCheck={false}
+          onKeyDown={e => {
+            if (e.key === 'Tab') e.preventDefault() // Always prevent tabbing out
+
+            if (e.key === 'Tab' || e.key === 'Enter') {
+              if (prefix.autocompleteSuggestion) {
+                autocompleteCurrentWord(e.target, prefix.variables[0].value)
+                e.preventDefault() // Allow enter to work in non-completion contexts
+              }
+            }
+          }}
+          onKeyUp={e => {
+            setCaretPos(getCaretCoordinates(e.target, e.target.selectionStart))
+            const newValidation =
+              e.target.value.trim() === '' ? {} : validateExpression(nodeDefCurrent, variables, e.target.value)
+            setValidation(newValidation)
+            setExpressionCanBeApplied(query !== queryDraft && !newValidation.error)
+            setAutocompleteList(i18n, nodeDefCurrent, variables, setPrefix, e.target)
+            updateDraft(e.target.value.trim())
+          }}
+        />
+        <span
+          hidden={!prefix.autocompleteSuggestion}
+          style={{
+            position: 'absolute',
+            color: 'grey',
+            textDecorationStyle: 'dashed',
+            top: top - 2, // A mysterious discrepancy
+            left,
+          }}
+        >
+          {prefix.autocompleteSuggestion}
+          {prefix.variables.length > 0 &&
+            prefix.variables[0].label &&
+            prefix.variables[0].label !== prefix.variables[0].value && (
+              <div style={{ backgroundColor: 'white', borderColor: 'grey' }}>
+                <br />
+                {prefix.variables[0].label}
+              </div>
+            )}
+        </span>
+      </div>
 
       <div>
-        <div className="expression-editor-popup__expr-container" style={{ fontSize: '1rem' }}>
-          <textarea
-            defaultValue={query}
-            style={{
-              backgroundColor: 'white',
-              minHeight: `${1 + prefix.value.split(/\n/g).length}em`,
-              width: '100%',
-            }}
-            pattern={'^[A-Za-z0-9_ |&=!<>+-*/%]+$'}
-            spellCheck={false}
-            onKeyDown={e => {
-              if (e.key === 'Tab') e.preventDefault() // Always prevent tabbing out
-
-              if (e.key === 'Tab' || e.key === 'Enter') {
-                if (prefix.autocompleteSuggestion) {
-                  autocompleteCurrentWord(e.target, prefix.variables[0].value)
-                  e.preventDefault() // Allow enter to work in non-completion contexts
-                }
-              }
-            }}
-            onKeyUp={e => {
-              setCaretPos(getCaretCoordinates(e.target, e.target.selectionStart))
-              setValidation(
-                e.target.value.trim() === '' ? {} : validateExpression(nodeDefCurrent, variables, e.target.value),
-              )
-              setAutocompleteList(i18n, nodeDefCurrent, variables, setPrefix, e.target)
-              updateDraft(e.target.value.trim())
-            }}
-          />
-          <span
-            hidden={!prefix.autocompleteSuggestion}
-            style={{
-              position: 'absolute',
-              top: top - 2, // A mysterious discrepancy
-              left,
-              color: 'grey',
-              textDecorationStyle: 'dashed',
-            }}
-          >
-            {prefix.autocompleteSuggestion}
-            {prefix.variables.length > 0 &&
-              prefix.variables[0].label &&
-              prefix.variables[0].label !== prefix.variables[0].value && (
-                <div style={{ backgroundColor: 'white', borderColor: 'grey' }}>
-                  <br />
-                  {prefix.variables[0].label}
-                </div>
-              )}
-          </span>
-        </div>
-        <div>
-          <ul style={{ listStyle: 'none' }}>
-            {prefix.functions.map((x, i) => (
-              <li key={i} onClick={() => autocompleteCurrentWord(x.value, x)} cursor={'pointer'}>
-                <span>{x.name}</span>
-                <span style={{ float: 'right' }}>{x.description}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="expression-editor__query-container">
-          <div className={`query${!validation.error ? '' : ' invalid'}`}>{validation.message}</div>
-        </div>
+        <ul style={{ listStyle: 'none' }}>
+          {prefix.functions.map((x, i) => (
+            <li key={i} onClick={() => autocompleteCurrentWord(x.value, x)} cursor={'pointer'}>
+              <span>{x.name}</span>
+              <span style={{ float: 'right' }}>{x.description}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <div className="expression-editor-popup__footer">
-        <button className="btn btn-xs" onClick={() => onChange('')} aria-disabled={R.isEmpty(query)}>
-          <span className="icon icon-undo2 icon-12px" />
-          {i18n.t('common.reset')}
-        </button>
-
-        {/*
-        By adding a newline to all onChange() params, we specify that
-        the query was written with this advanced expression editor.
-        With this, we can always open the query (i.e. the expression)
-        in advanced editor directly.
-        */}
-        <button
-          className="btn btn-xs"
-          onClick={() => onChange(queryDraft.trimRight() + '\n', exprDraft)}
-          aria-disabled={query === queryDraft || !validation.ok}
-        >
-          <span className="icon icon-checkmark icon-12px" />
-          {i18n.t('common.apply')}
-        </button>
+      <div className="expression-editor__query-container">
+        <div className={`query${!validation.error ? '' : ' invalid'}`}>{validation.message}</div>
       </div>
-    </Popup>
+    </div>
   )
 }
 

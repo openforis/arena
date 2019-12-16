@@ -17,7 +17,7 @@ const initialState = {
 }
 
 export const useExpressionEditorPopupState = props => {
-  const { query, expr, mode, canBeConstant } = props
+  const { query, expr, mode, canBeConstant, setExpressionCanBeApplied } = props
 
   // An encoding trick. Newlines can only appear in a textarea,
   // so denote advanced mode expressions as anything that contains a newline.
@@ -44,21 +44,27 @@ export const useExpressionEditorPopupState = props => {
   const updateDraft = exprDraft => {
     const queryDraft = Expression.toString(exprDraft, mode)
     const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
-    setState(statePrev => ({
-      ...statePrev,
-      queryDraft,
-      exprDraft,
-      exprDraftValid,
-    }))
+    setState(prevState => {
+      setExpressionCanBeApplied(query !== queryDraft && exprDraftValid)
+      return {
+        ...prevState,
+        queryDraft,
+        exprDraft,
+        exprDraftValid,
+      }
+    })
   }
 
   const resetDraft = () => {
-    setState(statePrev => ({
-      ...statePrev,
-      queryDraft: '',
-      exprDraft: ExpressionParser.parseQuery('', mode, canBeConstant),
-      exprDraftValid: true,
-    }))
+    setState(prevState => {
+      setExpressionCanBeApplied(query !== '')
+      return {
+        ...prevState,
+        queryDraft: '',
+        exprDraft: ExpressionParser.parseQuery('', mode, canBeConstant),
+        exprDraftValid: true,
+      }
+    })
   }
 
   return {
@@ -89,8 +95,8 @@ export const useAdvancedExpressionEditorPopupState = props => {
 
   const updateDraft = queryDraft => {
     if (queryDraft === '') {
-      setState(statePrev => ({
-        ...statePrev,
+      setState(prevState => ({
+        ...prevState,
         queryDraft,
         exprDraft: null,
         exprDraftValid: true,
@@ -98,8 +104,8 @@ export const useAdvancedExpressionEditorPopupState = props => {
     } else {
       const exprDraft = Expression.fromString(queryDraft)
       const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
-      setState(statePrev => ({
-        ...statePrev,
+      setState(prevState => ({
+        ...prevState,
         queryDraft,
         exprDraft,
         exprDraftValid,
