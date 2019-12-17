@@ -5,7 +5,7 @@ import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions
 import { nodeDefPropsUpdateTemp, nodeDefPropsTempCancel } from '@webapp/survey/nodeDefs/actions'
 import { nodeDefEditUpdate } from './actions'
 
-import * as NodeDefEditState from './nodeDefEditState'
+import * as NodeDefState from './nodeDefState'
 
 const actionHandlers = {
   // Reset form
@@ -15,10 +15,10 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   [nodeDefEditUpdate]: (state, { nodeDef, nodeDefValidation }) =>
-    NodeDefEditState.assocNodeDefForEdit(nodeDef, nodeDefValidation)(state),
+    NodeDefState.assocNodeDefForEdit(nodeDef, nodeDefValidation)(state),
 
   [nodeDefPropsUpdateTemp]: (state, { nodeDef, nodeDefValidation, props, propsAdvanced }) =>
-    NodeDefEditState.assocNodeDefProps(nodeDef, nodeDefValidation, props, propsAdvanced)(state),
+    NodeDefState.assocNodeDefProps(nodeDef, nodeDefValidation, props, propsAdvanced)(state),
 
   [nodeDefPropsTempCancel]: () => ({}),
 }

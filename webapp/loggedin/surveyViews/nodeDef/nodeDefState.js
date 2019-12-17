@@ -5,23 +5,23 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyViewsState from '../surveyViewsState'
 
 const keys = {
-  nodeDefOriginal: 'nodeDefOriginal', // Node def as it is when editing started (used when canceling editing)
   nodeDef: 'nodeDef', // Node def currently being edited
-  nodeDefValidation: 'nodeDefValidation', // Node def validation
+  nodeDefOriginal: 'nodeDefOriginal', // Node def as it is when editing started (used when canceling edits)
   propsUpdated: 'propsUpdated', // Updated props
   propsAdvancedUpdated: 'propsAdvancedUpdated', // Updated props advanced
+  validation: 'validation', // Node def validation
 }
 
-export const stateKey = 'nodeDefEdit'
+export const stateKey = 'nodeDef'
 
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultValue) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ===== READ
 
-export const getNodeDefOriginal = getStateProp(keys.nodeDefOriginal)
 export const getNodeDef = getStateProp(keys.nodeDef)
-export const getNodeDefValidation = getStateProp(keys.nodeDefValidation)
+export const getNodeDefOriginal = getStateProp(keys.nodeDefOriginal)
+export const getValidation = getStateProp(keys.validation)
 export const getPropsUpdated = getStateProp(keys.propsUpdated, {})
 export const getPropsAdvancedUpdated = getStateProp(keys.propsAdvancedUpdated, {})
 
@@ -39,7 +39,7 @@ export const isDirty = state => {
 const _assocNodeDef = nodeDef => R.assoc(keys.nodeDef, nodeDef)
 
 const _assocNodeDefAndValidation = (nodeDef, nodeDefValidation) =>
-  R.pipe(_assocNodeDef(nodeDef), R.assoc(keys.nodeDefValidation, nodeDefValidation))
+  R.pipe(_assocNodeDef(nodeDef), R.assoc(keys.validation, nodeDefValidation))
 
 export const assocNodeDefForEdit = (nodeDef, nodeDefValidation) =>
   R.pipe(R.assoc(keys.nodeDefOriginal, nodeDef), _assocNodeDefAndValidation(nodeDef, nodeDefValidation))

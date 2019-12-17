@@ -16,7 +16,7 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import * as SurveyState from '@webapp/survey/surveyState'
 import LabelsEditor from '../../labelsEditor/labelsEditor'
-import * as NodeDefEditState from '../nodeDefEditState'
+import * as NodeDefState from '../nodeDefState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
@@ -183,7 +183,7 @@ const BasicProps = props => {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
   const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
 
   const displayAsFormDisabled = false

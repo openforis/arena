@@ -15,11 +15,11 @@ import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as AppState from '@webapp/app/appState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as SurveyState from '../surveyState'
-import * as NodeDefEditState from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditState'
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDefEdit/actions'
+import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -123,7 +123,7 @@ export const setNodeDefProp = (key, value = null, advanced = false, checkFormPag
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
   const props = advanced ? {} : { [key]: value }
@@ -194,7 +194,7 @@ const _updateLayoutProp = (getState, nodeDef, key, value) => {
  */
 export const setNodeDefLayoutProp = (key, value) => async (dispatch, getState) => {
   const state = getState()
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
   const layoutUpdated = _updateLayoutProp(getState, nodeDef, key, value)
 
   dispatch(setNodeDefProp(NodeDefLayout.keys.layout, layoutUpdated))
@@ -214,11 +214,11 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, ge
 
 export const cancelNodeDefEdits = history => async (dispatch, getState) => {
   const state = getState()
-  const nodeDef = NodeDefEditState.getNodeDef(state)
-  const nodeDefOriginal = NodeDefEditState.getNodeDefOriginal(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
+  const nodeDefOriginal = NodeDefState.getNodeDefOriginal(state)
   const i18n = AppState.getI18n(state)
 
-  if (!NodeDefEditState.isDirty(state) || confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmCancel'))) {
+  if (!NodeDefState.isDirty(state) || confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmCancel'))) {
     dispatch({
       type: nodeDefPropsTempCancel,
       nodeDef,
@@ -237,7 +237,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
   const survey = SurveyState.getSurvey(state)
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
 
   dispatch(showAppLoader())
 
@@ -253,8 +253,8 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 
     dispatch(_updateParentLayout(nodeDefUpdated))
   } else {
-    const props = NodeDefEditState.getPropsUpdated(state)
-    const propsAdvanced = NodeDefEditState.getPropsAdvancedUpdated(state)
+    const props = NodeDefState.getPropsUpdated(state)
+    const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
     dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
   }
 
@@ -264,7 +264,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
     nodeDef: nodeDefUpdated,
     nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
     surveyCycleKey: cycle,
-    nodeDefValidation: NodeDefEditState.getNodeDefValidation(state),
+    nodeDefValidation: NodeDefState.getValidation(state),
   })
 
   dispatch(hideAppLoader())

@@ -14,7 +14,7 @@ import * as Validation from '@core/validation/validation'
 import * as SurveyState from '@webapp/survey/surveyState'
 import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
-import * as NodeDefEditState from '../nodeDefEditState'
+import * as NodeDefState from '../nodeDefState'
 
 import { createTaxonomy, deleteTaxonomy } from '../../taxonomy/actions'
 
@@ -77,7 +77,7 @@ const TaxonProps = props => {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
 
   return {
     taxonomy: Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey),

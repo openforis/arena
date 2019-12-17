@@ -12,7 +12,7 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefEditState from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditState'
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 
 import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
@@ -67,7 +67,7 @@ const mapStateToProps = state => {
     })),
   )(survey)
   // A nodeDef code is begin edited.
-  const nodeDef = !readOnly && NodeDefEditState.getNodeDef(state)
+  const nodeDef = !readOnly && NodeDefState.getNodeDef(state)
   const canSelect = nodeDef && NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
 
   return {

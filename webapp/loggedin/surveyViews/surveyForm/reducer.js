@@ -8,7 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { nodeDefCreate, nodeDefDelete } from '@webapp/survey/nodeDefs/actions'
-import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDefEdit/actions'
+import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 import { recordLoad } from '../record/actions'
 import {
   formActivePageNodeDefUpdate,

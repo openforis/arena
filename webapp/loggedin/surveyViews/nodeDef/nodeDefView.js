@@ -1,4 +1,4 @@
-import './nodeDefEditView.scss'
+import './nodeDefView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
@@ -17,7 +17,7 @@ import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefEditState from './nodeDefEditState'
+import * as NodeDefState from './nodeDefState'
 
 import {
   setNodeDefProp,
@@ -28,7 +28,7 @@ import {
 } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 
-const NodeDefEditView = props => {
+const NodeDefView = props => {
   const {
     nodeDef,
     nodeDefParent,
@@ -124,7 +124,7 @@ const NodeDefEditView = props => {
   ) : null
 }
 
-NodeDefEditView.defaultProps = {
+NodeDefView.defaultProps = {
   nodeDef: null,
   nodeDefParent: null,
 }
@@ -147,10 +147,10 @@ const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
-  const validation = NodeDefEditState.getNodeDefValidation(state)
-  const isDirty = NodeDefEditState.isDirty(state)
+  const validation = NodeDefState.getValidation(state)
+  const isDirty = NodeDefState.isDirty(state)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
@@ -172,4 +172,4 @@ export default connect(mapStateToProps, {
   setNodeDefUuidForEdit,
   cancelNodeDefEdits,
   saveNodeDefEdits,
-})(NodeDefEditView)
+})(NodeDefView)

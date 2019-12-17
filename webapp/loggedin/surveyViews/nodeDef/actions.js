@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-export const nodeDefEditUpdate = 'surveyViews/nodeDefEdit/update'
+export const nodeDefEditUpdate = 'surveyViews/nodeDef/update'
 
 // Set current nodeDef edit
 export const setNodeDefUuidForEdit = nodeDefUuid => (dispatch, getState) => {
