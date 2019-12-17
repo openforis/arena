@@ -41,7 +41,7 @@ export const enTranslation = {
     label_plural: 'Labels',
     language: 'Language',
     manage: 'Manage',
-    messages: 'Messages',
+    message_plural: 'Messages',
     name: 'Name',
     new: 'New',
     no: 'No',

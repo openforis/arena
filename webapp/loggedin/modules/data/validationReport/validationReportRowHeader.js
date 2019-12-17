@@ -9,7 +9,7 @@ const ValidationReportRowHeader = () => {
     <>
       <div>#</div>
       <div>{i18n.t('common.path')}</div>
-      <div>{i18n.t('common.messages')}</div>
+      <div>{i18n.t('common.message_plural')}</div>
       <div />
     </>
   )
