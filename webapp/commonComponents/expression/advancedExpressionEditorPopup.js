@@ -2,12 +2,13 @@ import './expressionEditorPopup.scss'
 
 import React, { useState, useRef } from 'react'
 import { connect } from 'react-redux'
+import getCaretCoordinates from 'textarea-caret'
 
 import * as Expression from '@core/expressionParser/expression'
-import getCaretCoordinates from 'textarea-caret'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
-import { useI18n } from '../hooks'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
 
+import { useI18n } from '../hooks'
 import { mapStateToProps } from './expressionEditorPopupState'
 
 const functionExamples = {
@@ -210,6 +211,18 @@ const AdvancedExpressionEditorPopup = props => {
           </tbody>
         </table>
       </div>
+
+      <Dropdown
+        className="expression-editor__variables-search"
+        items={variables.filter(v => v.value !== nodeDefCurrent.props.name)}
+        itemLabelFunction={x => (x.label ? `${x.label} (${x.value})` : x.value)}
+        itemKeyProp="value"
+        clearOnSelection={true}
+        placeholder={i18n.t('nodeDefEdit.variables')}
+        onChange={x => autocompleteCurrentWord(inputRef.current, x.value)}
+      />
+
+      <br />
 
       <div className="expression-editor__query-container">
         <div className={`query${!validation.error ? '' : ' invalid'}`}>{validation.message}</div>

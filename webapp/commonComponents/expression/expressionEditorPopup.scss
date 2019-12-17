@@ -15,6 +15,10 @@
   right: 0;
 }
 
+.expression-editor__variables-search {
+  max-width: 30ch;
+}
+
 .expression-editor-popup__autocompletions {
   table {
     border-spacing: 20px 0;
@@ -28,6 +32,7 @@
   // These must match, for the autocomplete to work properly.
   textarea {
     border: 1px solid black;
+    margin-bottom: 15px;
   }
   textarea, span {
     font-size: 1rem;
