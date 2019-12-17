@@ -15,6 +15,12 @@
   right: 0;
 }
 
+.expression-editor-popup__autocompletions {
+  table {
+    border-spacing: 20px 0;
+    margin-bottom: 15px;
+  }
+}
 .expression-editor-popup__expr-container {
   margin-top: 1.5rem;
   position: relative;

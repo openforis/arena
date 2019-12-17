@@ -1,16 +1,14 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import getCaretCoordinates from 'textarea-caret'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
-import Popup from '../popup'
 import { useI18n } from '../hooks'
 
-import { useAdvancedExpressionEditorPopupState, mapStateToProps } from './expressionEditorPopupState'
+import { mapStateToProps } from './expressionEditorPopupState'
 
 const functionExamples = {
   min: (
@@ -101,6 +99,8 @@ const validateExpression = (nodeDefCurrent, variables, exprString) => {
 const autocompleteCurrentWord = (el, completion) => {
   const v = el.value
   el.value = v.slice(0, getWordStart(el)) + completion + v.slice(getWordEnd(el))
+  // Ensure we can keep typing without clicking:
+  el.focus()
 }
 
 const AdvancedExpressionEditorPopup = props => {
@@ -118,10 +118,13 @@ const AdvancedExpressionEditorPopup = props => {
 
   const i18n = useI18n()
 
+  const inputRef = useRef()
+
   return (
     <div>
       <div className="expression-editor-popup__expr-container" style={{ fontSize: '1rem' }}>
         <textarea
+          ref={inputRef}
           defaultValue={query}
           style={{
             backgroundColor: 'white',
@@ -171,15 +174,41 @@ const AdvancedExpressionEditorPopup = props => {
         </span>
       </div>
 
-      <div>
-        <ul style={{ listStyle: 'none' }}>
-          {prefix.functions.map((x, i) => (
-            <li key={i} onClick={() => autocompleteCurrentWord(x.value, x)} cursor={'pointer'}>
-              <span>{x.name}</span>
-              <span style={{ float: 'right' }}>{x.description}</span>
-            </li>
-          ))}
-        </ul>
+      <div className="expression-editor-popup__autocompletions">
+        <table hidden={prefix.functions.length === 0}>
+          <thead>
+            <tr>
+              <th>{i18n.t('nodeDefEdit.function')}</th>
+              <th>{i18n.t('common.description')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {prefix.functions.map((x, i) => (
+              <tr key={i} onClick={() => autocompleteCurrentWord(inputRef.current, x.name)} cursor={'pointer'}>
+                <td>{x.name}</td>
+                <td>{x.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <table hidden={prefix.variables.length < 2}>
+          <thead>
+            <tr>
+              <th>{i18n.t('nodeDefEdit.variable')}</th>
+              <th>{i18n.t('common.description')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {prefix.variables.slice(0, 5).map((x, i) => (
+              <tr key={i} onClick={() => autocompleteCurrentWord(inputRef.current, x.value)} cursor={'pointer'}>
+                <td>
+                  <tt>{x.value}</tt>
+                </td>
+                <td>{x.label || ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="expression-editor__query-container">
