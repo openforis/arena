@@ -49,8 +49,8 @@ const RecordView = props => {
   const componentLoad = () => {
     const {
       recordUuidUrlParam,
-      focusNodeUuidUrlParam,
-      focusNodeDefUuidUrlParam,
+      pageNodeUuidUrlParam,
+      pageNodeDefUuidUrlParam,
       checkInRecord,
       recordNodesUpdate,
       nodeValidationsUpdate,
@@ -59,7 +59,7 @@ const RecordView = props => {
     } = props
 
     // Check in record
-    checkInRecord(recordUuidUrlParam, preview, focusNodeUuidUrlParam, focusNodeDefUuidUrlParam)
+    checkInRecord(recordUuidUrlParam, preview, pageNodeUuidUrlParam, pageNodeDefUuidUrlParam)
 
     // Add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
@@ -132,8 +132,8 @@ const mapStateToProps = (state, { match, location }) => {
       Authorizer.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
     recordLoaded: Boolean(record),
     recordUuidUrlParam: getUrlParam('recordUuid')(match) || recordUuidPreview,
-    focusNodeUuidUrlParam: urlSearchParams.get('focusNodeUuid'),
-    focusNodeDefUuidUrlParam: urlSearchParams.get('focusNodeDefUuid'),
+    pageNodeUuidUrlParam: urlSearchParams.get('pageNodeUuid'),
+    pageNodeDefUuidUrlParam: urlSearchParams.get('pageNodeDefUuid'),
     surveyCycleKey,
     preview: Boolean(recordUuidPreview),
   }

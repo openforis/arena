@@ -27,12 +27,12 @@ const ValidationReportView = props => {
   }, [surveyCycleKey])
 
   const onRowClick = row => {
-    const focusNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
-    const focusNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
+    const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
+    const pageNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
     const recordUuid = RecordValidationReportItem.getRecordUuid(row)
     const recordEditUrl = `${appModuleUri(
       dataModules.record,
-    )}${recordUuid}?focusNodeUuid=${focusNodeUuid}&focusNodeDefUuid=${focusNodeDefUuid}`
+    )}${recordUuid}?pageNodeUuid=${pageNodeUuid}&pageNodeDefUuid=${pageNodeDefUuid}`
 
     history.push(recordEditUrl)
   }
