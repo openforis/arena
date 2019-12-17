@@ -146,7 +146,7 @@ const AdvancedExpressionEditorPopup = props => {
             setValidation(newValidation)
             setExpressionCanBeApplied(query !== queryDraft && !newValidation.error)
             setAutocompleteList(i18n, nodeDefCurrent, variables, setPrefix, e.target)
-            updateDraft(e.target.value.trim())
+            if (!newValidation.error) updateDraft(e.target.value.trim())
           }}
         />
         <span
