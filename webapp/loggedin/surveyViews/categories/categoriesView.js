@@ -15,12 +15,12 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditState'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 
-import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
 
 const CategoriesView = props => {
-  const { categories, nodeDef, createCategory, deleteCategory, canSelect, readOnly, putNodeDefProp } = props
+  const { categories, nodeDef, createCategory, deleteCategory, canSelect, readOnly, setNodeDefProp } = props
   const selectedItemUuid = nodeDef && NodeDef.getCategoryUuid(nodeDef)
 
   const i18n = useI18n()
@@ -47,7 +47,7 @@ const CategoriesView = props => {
       canDelete={canDeleteCategory}
       onDelete={deleteCategory}
       canSelect={canSelect}
-      onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
+      onSelect={category => setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
       onClose={onClose}
       readOnly={readOnly}
     />
@@ -81,5 +81,5 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   createCategory,
   deleteCategory,
-  putNodeDefProp,
+  setNodeDefProp,
 })(CategoriesView)

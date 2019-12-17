@@ -18,7 +18,7 @@ const NodeDefExpressionsProp = props => {
     applyIf,
     showLabels,
     readOnly,
-    putNodeDefProp,
+    setNodeDefProp,
     isContextParent,
     canBeConstant,
     isBoolean,
@@ -27,7 +27,7 @@ const NodeDefExpressionsProp = props => {
   const values = NodeDef.getProp(propName, [])(nodeDef)
 
   const onChange = expressions => {
-    putNodeDefProp(nodeDef, propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true)
+    setNodeDefProp(propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true)
   }
 
   return (

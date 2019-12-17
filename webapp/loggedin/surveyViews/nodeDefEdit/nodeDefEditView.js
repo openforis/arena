@@ -20,11 +20,11 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
 
 import {
-  putNodeDefProp,
+  setNodeDefProp,
   putNodeDefLayoutProp,
-  updateNodeDefEditLayoutProp,
-  cancelNodeDefEdit,
-  saveNodeDef,
+  setNodeDefLayoutProp,
+  cancelNodeDefEdits,
+  saveNodeDefEdits,
 } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 
@@ -36,12 +36,12 @@ const NodeDefEditView = props => {
     isDirty,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
-    putNodeDefProp,
+    setNodeDefProp,
     putNodeDefLayoutProp,
-    updateNodeDefEditLayoutProp,
+    setNodeDefLayoutProp,
     setNodeDefUuidForEdit,
-    cancelNodeDefEdit,
-    saveNodeDef,
+    cancelNodeDefEdits,
+    saveNodeDefEdits,
   } = props
 
   const i18n = useI18n()
@@ -68,9 +68,9 @@ const NodeDefEditView = props => {
                 validation,
                 nodeDefKeyEditDisabled,
                 nodeDefMultipleEditDisabled,
-                putNodeDefProp,
+                setNodeDefProp,
                 putNodeDefLayoutProp,
-                updateNodeDefEditLayoutProp,
+                setNodeDefLayoutProp,
               },
             },
             ...(NodeDef.isRoot(nodeDef)
@@ -83,7 +83,7 @@ const NodeDefEditView = props => {
                       nodeDef,
                       validation,
                       nodeDefParent,
-                      putNodeDefProp,
+                      setNodeDefProp,
                     },
                   },
                   {
@@ -93,7 +93,7 @@ const NodeDefEditView = props => {
                       nodeDef,
                       validation,
                       nodeDefParent,
-                      putNodeDefProp,
+                      setNodeDefProp,
                     },
                   },
                 ]),
@@ -103,7 +103,7 @@ const NodeDefEditView = props => {
           <button
             className="btn btn-back"
             onClick={() => {
-              cancelNodeDefEdit(history)
+              cancelNodeDefEdits(history)
             }}
           >
             {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
@@ -111,10 +111,11 @@ const NodeDefEditView = props => {
           <button
             className="btn btn-save"
             onClick={() => {
-              saveNodeDef()
+              saveNodeDefEdits()
             }}
             aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
           >
+            <span className="icon icon-floppy-disk icon-left icon-12px" />
             {i18n.t('common.save')}
           </button>
         </div>
@@ -165,10 +166,10 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  putNodeDefProp,
+  setNodeDefProp,
   putNodeDefLayoutProp,
-  updateNodeDefEditLayoutProp,
+  setNodeDefLayoutProp,
   setNodeDefUuidForEdit,
-  cancelNodeDefEdit,
-  saveNodeDef,
+  cancelNodeDefEdits,
+  saveNodeDefEdits,
 })(NodeDefEditView)

@@ -12,7 +12,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as NodeDefEditState from '../nodeDefEditState'
 
@@ -28,11 +28,11 @@ const TaxonProps = props => {
     taxonomy,
     canUpdateTaxonomy,
 
-    putNodeDefProp,
+    setNodeDefProp,
     createTaxonomy,
   } = props
 
-  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
+  const updateTaxonomyProp = taxonomy => setNodeDefProp(propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
 
   const i18n = useI18n()
   const history = useHistory()
@@ -53,13 +53,13 @@ const TaxonProps = props => {
             validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
-            onChange={putTaxonomyProp}
+            onChange={updateTaxonomyProp}
           />
           <button
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
             onClick={async () => {
-              putTaxonomyProp(await createTaxonomy(history))
+              updateTaxonomyProp(await createTaxonomy(history))
             }}
           >
             <span className="icon icon-plus icon-12px icon-left" />
@@ -87,7 +87,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  putNodeDefProp,
+  setNodeDefProp,
   createTaxonomy,
   deleteTaxonomy,
 })(TaxonProps)

@@ -22,14 +22,13 @@ const integerMask = createNumberMask({
 })
 
 const ValidationsProps = props => {
-  const { nodeDef, validation, nodeDefParent, readOnly, putNodeDefProp } = props
+  const { nodeDef, validation, nodeDefParent, readOnly, setNodeDefProp } = props
 
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
-  const handleValidationsUpdate = validations =>
-    putNodeDefProp(nodeDef, NodeDef.propKeys.validations, validations, true)
+  const handleValidationsUpdate = validations => setNodeDefProp(NodeDef.propKeys.validations, validations, true)
 
   const i18n = useI18n()
 

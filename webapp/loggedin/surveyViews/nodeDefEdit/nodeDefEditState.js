@@ -1,9 +1,11 @@
 import * as R from 'ramda'
 
+import * as NodeDef from '@core/survey/nodeDef'
+
 import * as SurveyViewsState from '../surveyViewsState'
 
 const keys = {
-  nodeDefOriginal: 'nodeDefOriginal', // Node def as it is when editing started
+  nodeDefOriginal: 'nodeDefOriginal', // Node def as it is when editing started (used when canceling editing)
   nodeDef: 'nodeDef', // Node def currently being edited
   nodeDefValidation: 'nodeDefValidation', // Node def validation
   propsUpdated: 'propsUpdated', // Updated props
@@ -27,7 +29,10 @@ export const getPropsAdvancedUpdated = getStateProp(keys.propsAdvancedUpdated, {
 /**
  * Returns true if nodeDef and nodeDefOriginal are not equals
  */
-export const isDirty = R.pipe(R.converge(R.pipe(R.equals, R.not), [getNodeDefOriginal, getNodeDef]))
+export const isDirty = state => {
+  const nodeDef = getNodeDef(state)
+  return nodeDef && (NodeDef.isTemporary(nodeDef) || !R.equals(nodeDef, getNodeDefOriginal(state)))
+}
 
 // ===== UPDATE
 

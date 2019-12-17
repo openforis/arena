@@ -15,7 +15,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { setNodeDefProp, setNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import * as NodeDefEditState from '../nodeDefEditState'
 
@@ -26,8 +26,8 @@ const CodeProps = props => {
     surveyCycleKey,
     nodeDef,
     validation,
-    putNodeDefProp,
-    putNodeDefLayoutProp,
+    setNodeDefProp,
+    setNodeDefLayoutProp,
     categories,
     canUpdateCategory,
     category,
@@ -53,8 +53,8 @@ const CodeProps = props => {
   const disabled = !canUpdateCategory
 
   const putCategoryProp = category => {
-    putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
-    putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))
+    setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
+    setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
 
   return (
@@ -105,7 +105,7 @@ const CodeProps = props => {
             selection={parentCodeDef}
             itemKeyProp={'uuid'}
             itemLabelFunction={NodeDef.getName}
-            onChange={def => putNodeDefProp(nodeDef, NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
+            onChange={def => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
           />
         </div>
       </FormItem>
@@ -113,7 +113,7 @@ const CodeProps = props => {
       <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
         <ButtonGroup
           selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-          onChange={render => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, render)}
+          onChange={render => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render)}
           items={displayAsItems}
         />
       </FormItem>
@@ -135,7 +135,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  putNodeDefProp,
+  setNodeDefProp,
+  setNodeDefLayoutProp,
   createCategory,
   deleteCategory,
 })(CodeProps)

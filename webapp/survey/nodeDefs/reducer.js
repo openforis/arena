@@ -4,7 +4,14 @@ import { appUserLogout } from '@webapp/app/actions'
 
 import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
 
-import { nodeDefCreate, nodeDefDelete, nodeDefsUpdate, nodeDefPropsUpdate, nodeDefUpdateCancel } from './actions'
+import {
+  nodeDefCreate,
+  nodeDefDelete,
+  nodeDefUpdate,
+  nodeDefsUpdate,
+  nodeDefPropsUpdateTemp,
+  nodeDefPropsTempCancel,
+} from './actions'
 
 import * as NodeDefsState from './nodeDefsState'
 
@@ -25,11 +32,13 @@ const actionHandlers = {
 
   [nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
 
+  [nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+
   [nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
-  [nodeDefPropsUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [nodeDefPropsUpdateTemp]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+  [nodeDefPropsTempCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
     isNodeDefNew
       ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
       : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def

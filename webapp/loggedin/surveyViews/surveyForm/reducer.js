@@ -47,10 +47,14 @@ const actionHandlers = {
   [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
   [nodeDefEditUpdate]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
-    const pageUuid = NodeDefLayout.getPageUuid(surveyCycleKey)(nodeDef)
-    // When changing displayIn (pageUuid) change form active page
-    const activePageNodeDef = pageUuid ? nodeDef : nodeDefParent
-    return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
+    if (NodeDef.isEntity(nodeDef)) {
+      const pageUuid = NodeDefLayout.getPageUuid(surveyCycleKey)(nodeDef)
+      // When changing displayIn (pageUuid) change form active page
+      const activePageNodeDef = pageUuid ? nodeDef : nodeDefParent
+      return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
+    }
+
+    return state
   },
 
   // Record

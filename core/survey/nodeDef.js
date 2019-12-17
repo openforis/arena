@@ -31,6 +31,7 @@ export const keys = {
   deleted: 'deleted',
   analysis: 'analysis',
   published: 'published',
+  temporary: 'temporary',
 }
 
 export const propKeys = {
@@ -109,6 +110,7 @@ export const isTaxon = isType(nodeDefType.taxon)
 export const isPublished = R.propEq(keys.published, true)
 export const isDeleted = R.propEq(keys.deleted, true)
 export const isAnalysis = R.propEq(keys.analysis, true)
+export const isTemporary = R.propEq(keys.temporary, true)
 
 export const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
@@ -147,6 +149,7 @@ export const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUu
 
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 export const mergeProps = ObjectUtils.mergeProps
+export const dissocTemporary = R.dissoc(keys.temporary)
 
 // ==== UTILS
 export const canNodeDefBeMultiple = nodeDef =>
