@@ -97,9 +97,11 @@ const validateExpression = (nodeDefCurrent, variables, exprString) => {
   }
 }
 
-const autocompleteCurrentWord = (el, completion) => {
+const autocompleteCurrentWord = (updateInput, el, completion) => {
   const v = el.value
   el.value = v.slice(0, getWordStart(el)) + completion + v.slice(getWordEnd(el))
+  updateInput(el.value)
+
   // Ensure we can keep typing without clicking:
   el.focus()
 }
@@ -121,6 +123,13 @@ const AdvancedExpressionEditorPopup = props => {
 
   const inputRef = useRef()
 
+  const updateInput = value => {
+    const newValidation = value.trim() === '' ? {} : validateExpression(nodeDefCurrent, variables, value)
+    setValidation(newValidation)
+    setExpressionCanBeApplied(query !== value && !newValidation.error)
+    if (!newValidation.error) updateDraft(inputRef.current.value.trim())
+  }
+
   return (
     <div>
       <div className="expression-editor-popup__expr-container" style={{ fontSize: '1rem' }}>
@@ -138,19 +147,15 @@ const AdvancedExpressionEditorPopup = props => {
 
             if (e.key === 'Tab' || e.key === 'Enter') {
               if (prefix.autocompleteSuggestion) {
-                autocompleteCurrentWord(e.target, prefix.variables[0].value)
+                autocompleteCurrentWord(updateInput, e.target, prefix.variables[0].value)
                 e.preventDefault() // Allow enter to work in non-completion contexts
               }
             }
           }}
           onKeyUp={e => {
             setCaretPos(getCaretCoordinates(e.target, e.target.selectionStart))
-            const newValidation =
-              e.target.value.trim() === '' ? {} : validateExpression(nodeDefCurrent, variables, e.target.value)
-            setValidation(newValidation)
-            setExpressionCanBeApplied(query !== queryDraft && !newValidation.error)
+            updateInput(e.target.value)
             setAutocompleteList(i18n, nodeDefCurrent, variables, setPrefix, e.target)
-            if (!newValidation.error) updateDraft(e.target.value.trim())
           }}
         />
         <span
@@ -185,7 +190,11 @@ const AdvancedExpressionEditorPopup = props => {
           </thead>
           <tbody>
             {prefix.functions.map((x, i) => (
-              <tr key={i} onClick={() => autocompleteCurrentWord(inputRef.current, x.name)} cursor={'pointer'}>
+              <tr
+                key={i}
+                onClick={() => autocompleteCurrentWord(updateInput, inputRef.current, x.name)}
+                cursor={'pointer'}
+              >
                 <td>{x.name}</td>
                 <td>{x.description}</td>
               </tr>
@@ -201,7 +210,11 @@ const AdvancedExpressionEditorPopup = props => {
           </thead>
           <tbody>
             {prefix.variables.slice(0, 5).map((x, i) => (
-              <tr key={i} onClick={() => autocompleteCurrentWord(inputRef.current, x.value)} cursor={'pointer'}>
+              <tr
+                key={i}
+                onClick={() => autocompleteCurrentWord(updateInput, inputRef.current, x.value)}
+                cursor={'pointer'}
+              >
                 <td>
                   <tt>{x.value}</tt>
                 </td>
@@ -219,7 +232,7 @@ const AdvancedExpressionEditorPopup = props => {
         itemKeyProp="value"
         clearOnSelection={true}
         placeholder={i18n.t('nodeDefEdit.variables')}
-        onChange={x => autocompleteCurrentWord(inputRef.current, x.value)}
+        onChange={x => autocompleteCurrentWord(updateInput, inputRef.current, x.value)}
       />
 
       <br />
