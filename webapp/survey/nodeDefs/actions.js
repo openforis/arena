@@ -24,8 +24,8 @@ import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
-export const nodeDefPropsUpdateTemp = 'survey/nodeDef/props/update/temp'
-export const nodeDefPropsTempCancel = 'survey/nodeDef/update/cancel'
+export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
+export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
@@ -47,7 +47,7 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 }
 
 // ==== Internal update nodeDefs actions
-const _onNodeDefsUpdate = (dispatch, nodeDefsUpdated, nodeDefsValidation) => {
+const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => dispatch => {
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
   if (nodeDefsUpdated) {
@@ -69,7 +69,7 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
     propsAdvanced,
   })
 
-  _onNodeDefsUpdate(dispatch, nodeDefsUpdated, nodeDefsValidation)
+  dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
@@ -112,10 +112,7 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
 /**
  * Applies changes only to node def in state
  */
-export const setNodeDefProp = (key, value = null, advanced = false, checkFormPageUuid = false) => async (
-  dispatch,
-  getState,
-) => {
+export const setNodeDefProp = (key, value = null, advanced = false) => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
 
@@ -150,14 +147,13 @@ export const setNodeDefProp = (key, value = null, advanced = false, checkFormPag
   const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDefUpdated)
 
   dispatch({
-    type: nodeDefPropsUpdateTemp,
+    type: nodeDefPropsUpdate,
     nodeDef: nodeDefUpdated,
     nodeDefValidation,
     parentNodeDef,
     props,
     propsAdvanced,
     surveyCycleKey,
-    checkFormPageUuid,
   })
 }
 
@@ -218,8 +214,8 @@ export const cancelNodeDefEdits = history => async (dispatch, getState) => {
   const nodeDef = NodeDefState.getNodeDef(state)
   const nodeDefOriginal = NodeDefState.getNodeDefOriginal(state)
 
-  dispatch({
-    type: nodeDefPropsTempCancel,
+  await dispatch({
+    type: nodeDefPropsUpdateCancel,
     nodeDef,
     nodeDefOriginal,
     isNodeDefNew: NodeDef.isTemporary(nodeDef),
@@ -247,7 +243,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
     const {
       data: { nodeDefsValidation, nodeDefsUpdated },
     } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
-    _onNodeDefsUpdate(dispatch, nodeDefsUpdated, nodeDefsValidation)
+    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 
     dispatch(_updateParentLayout(nodeDefUpdated))
   } else {

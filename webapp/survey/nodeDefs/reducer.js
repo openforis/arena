@@ -9,8 +9,8 @@ import {
   nodeDefDelete,
   nodeDefUpdate,
   nodeDefsUpdate,
-  nodeDefPropsUpdateTemp,
-  nodeDefPropsTempCancel,
+  nodeDefPropsUpdate,
+  nodeDefPropsUpdateCancel,
 } from './actions'
 
 import * as NodeDefsState from './nodeDefsState'
@@ -36,9 +36,9 @@ const actionHandlers = {
 
   [nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
-  [nodeDefPropsUpdateTemp]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [nodeDefPropsUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropsTempCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+  [nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
     isNodeDefNew
       ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
       : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def
