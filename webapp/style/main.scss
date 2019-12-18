@@ -96,5 +96,22 @@ body {
   overflow: hidden;
 }
 
+// buttons
+.btn-primary, .btn-cancel {
+  font-weight: 600;
+  min-width: 80px;
+}
 
+.btn-primary {
+  background-color: $blue;
+  color: $white;
+  text-transform: uppercase;
 
+  &:hover {
+    background-color: lighten($blue, 15%);
+  }
+}
+
+.btn-cancel {
+  color: $blue;
+}

@@ -102,7 +102,7 @@ const NodeDefView = props => {
         />
         <ButtonBar>
           <button
-            className="btn btn-back"
+            className="btn btn-cancel"
             onClick={() => {
               cancelNodeDefEdits(history)
             }}
@@ -110,7 +110,7 @@ const NodeDefView = props => {
             {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
           </button>
           <button
-            className="btn btn-save"
+            className="btn btn-primary"
             onClick={() => {
               saveNodeDefEdits()
             }}

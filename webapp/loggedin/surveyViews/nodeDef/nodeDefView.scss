@@ -23,17 +23,7 @@
     grid-template-columns: .2fr .7fr;
   }
 
-  .btn-save {
-    background-color: $blue;
-    color: $white;
-    text-transform: uppercase;
-
-    &:hover {
-      background-color: lighten($blue, 15%);
-    }
-  }
-
-  .btn-back {
+  .btn-cancel {
     margin-right: 3em;
   }
 }
