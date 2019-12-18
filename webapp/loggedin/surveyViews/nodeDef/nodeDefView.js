@@ -10,6 +10,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+import ButtonBar from '@webapp/commonComponents/buttonBar'
 import TabBar from '@webapp/commonComponents/tabBar'
 
 import ValidationsProps from './advanced/validationsProps'
@@ -99,7 +100,7 @@ const NodeDefView = props => {
                 ]),
           ]}
         />
-        <div className="button-bar">
+        <ButtonBar>
           <button
             className="btn btn-back"
             onClick={() => {
@@ -118,7 +119,7 @@ const NodeDefView = props => {
             <span className="icon icon-floppy-disk icon-left icon-12px" />
             {i18n.t('common.save')}
           </button>
-        </div>
+        </ButtonBar>
       </div>
     </div>
   ) : null

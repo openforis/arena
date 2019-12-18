@@ -23,12 +23,6 @@
     grid-template-columns: .2fr .7fr;
   }
 
-  .button-bar {
-    display: flex;
-    align-self: center;
-    justify-content: center;
-  }
-
   .btn-save {
     background-color: $blue;
     color: $white;

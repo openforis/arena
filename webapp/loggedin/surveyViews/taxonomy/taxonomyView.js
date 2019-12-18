@@ -6,16 +6,17 @@ import { connect } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
 
 import * as Authorizer from '@core/auth/authorizer'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import ButtonBar from '@webapp/commonComponents/buttonBar'
 import TableView from '../../tableViews/tableView'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
 
+import * as AppState from '@webapp/app/appState'
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as TaxonomyState from './taxonomyState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
@@ -57,7 +58,7 @@ const TaxonomyView = props => {
         readOnly={!canEdit}
       />
 
-      <div style={{ justifySelf: 'center' }}>
+      <ButtonBar>
         <button
           className="btn"
           onClick={() => {
@@ -67,7 +68,7 @@ const TaxonomyView = props => {
         >
           {i18n.t('common.done')}
         </button>
-      </div>
+      </ButtonBar>
     </div>
   ) : null
 }
