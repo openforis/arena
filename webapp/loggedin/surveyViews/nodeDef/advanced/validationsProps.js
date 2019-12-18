@@ -28,7 +28,8 @@ const ValidationsProps = props => {
 
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
-  const handleValidationsUpdate = validations => setNodeDefProp(NodeDef.propKeys.validations, validations, true)
+  const handleValidationsUpdate = validations =>
+    setNodeDefProp(NodeDef.keysPropsAdvanced.validations, validations, true)
 
   const i18n = useI18n()
 
@@ -41,7 +42,7 @@ const ValidationsProps = props => {
               value={NodeDefValidations.getMinCount(nodeDefValidations)}
               disabled={readOnly}
               validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.propKeys.validations),
+                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.min),
               )(validation)}
               mask={integerMask}
@@ -53,7 +54,7 @@ const ValidationsProps = props => {
               value={NodeDefValidations.getMaxCount(nodeDefValidations)}
               disabled={readOnly}
               validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.propKeys.validations),
+                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.max),
               )(validation)}
               mask={integerMask}
@@ -79,7 +80,7 @@ const ValidationsProps = props => {
           severity={true}
           values={NodeDefValidations.getExpressions(nodeDefValidations)}
           validation={R.pipe(
-            Validation.getFieldValidation(NodeDef.propKeys.validations),
+            Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
             Validation.getFieldValidation(NodeDefValidations.keys.expressions),
           )(validation)}
           onChange={expressions =>

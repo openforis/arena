@@ -19,7 +19,7 @@ import * as RecordUtils from '../utils/recordUtils'
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
-    [NodeDef.propKeys.defaultValues]: defaultValueExpressions,
+    [NodeDef.keysPropsAdvanced.defaultValues]: defaultValueExpressions,
   }
   await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef), {}, propsAdvanced)
 }

@@ -34,7 +34,7 @@ const AdvancedProps = props => {
             setNodeDefProp={setNodeDefProp}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
             readOnly={readOnly}
-            propName={NodeDef.propKeys.defaultValues}
+            propName={NodeDef.keysPropsAdvanced.defaultValues}
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant={true}
             isBoolean={NodeDef.isBoolean(nodeDef)}
@@ -48,7 +48,7 @@ const AdvancedProps = props => {
         setNodeDefProp={setNodeDefProp}
         label={i18n.t('nodeDefEdit.advancedProps.applicableIf')}
         readOnly={readOnly}
-        propName={NodeDef.propKeys.applicable}
+        propName={NodeDef.keysPropsAdvanced.applicable}
         applyIf={false}
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}

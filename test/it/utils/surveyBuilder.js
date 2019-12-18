@@ -21,19 +21,21 @@ class NodeDefBuilder {
     this.props = {
       [NodeDef.propKeys.name]: name,
     }
+    this.propsAdvanced = {}
   }
 
-  _setProp(prop, value) {
-    this.props[prop] = value
+  _setProp(prop, value, advanced = false) {
+    const props = advanced ? this.propsAdvanced : this.props
+    props[prop] = value
     return this
   }
 
-  _createNodeDef(survey, parentDef) {
-    return NodeDef.newNodeDef(parentDef, this.type, Survey.cycleOneKey, this.props)
+  _createNodeDef(parentDef) {
+    return NodeDef.newNodeDef(parentDef, this.type, Survey.cycleOneKey, this.props, this.propsAdvanced)
   }
 
   applyIf(expr) {
-    return this._setProp(NodeDef.propKeys.applicable, [NodeDefExpression.createExpression(expr)])
+    return this._setProp(NodeDef.keysPropsAdvanced.applicable, [NodeDefExpression.createExpression(expr)], true)
   }
 
   multiple() {
@@ -42,22 +44,25 @@ class NodeDefBuilder {
 
   minCount(count) {
     return this._setProp(
-      NodeDef.propKeys.validations,
+      NodeDef.keysPropsAdvanced.validations,
       R.pipe(NodeDef.getValidations, NodeDefValidations.assocMinCount(count))(this),
+      true,
     )
   }
 
   maxCount(count) {
     return this._setProp(
-      NodeDef.propKeys.validations,
+      NodeDef.keysPropsAdvanced.validations,
       R.pipe(NodeDef.getValidations, NodeDefValidations.assocMaxCount(count))(this),
+      true,
     )
   }
 
   expressions(...expressions) {
     return this._setProp(
-      NodeDef.propKeys.validations,
+      NodeDef.keysPropsAdvanced.validations,
       R.pipe(NodeDef.getValidations, NodeDefValidations.assocExpressions(expressions))(this),
+      true,
     )
   }
 }
@@ -69,7 +74,7 @@ class EntityDefBuilder extends NodeDefBuilder {
   }
 
   build(survey, parentDef = null) {
-    const def = this._createNodeDef(survey, parentDef)
+    const def = this._createNodeDef(parentDef)
 
     return R.pipe(
       R.map(childBuilder => childBuilder.build(survey, def)),
@@ -94,13 +99,15 @@ class AttributeDefBuilder extends NodeDefBuilder {
   }
 
   defaultValues(...defaultValues) {
-    return this._setProp(NodeDef.propKeys.defaultValues, defaultValues)
+    return this._setProp(NodeDef.keysPropsAdvanced.defaultValues, defaultValues, true)
   }
 
   required(required = true) {
-    const validations = NodeDef.getValidations(this)
-    const validationsUpdated = NodeDefValidations.assocRequired(required)(validations)
-    return this._setProp(NodeDef.propKeys.validations, validationsUpdated)
+    return this._setProp(
+      NodeDef.keysPropsAdvanced.validations,
+      R.pipe(NodeDef.getValidations, NodeDefValidations.assocRequired(required))(this),
+      true,
+    )
   }
 
   analysis() {
@@ -109,7 +116,7 @@ class AttributeDefBuilder extends NodeDefBuilder {
   }
 
   build(survey, parentDef = null) {
-    const def = this._createNodeDef(survey, parentDef)
+    const def = this._createNodeDef(parentDef)
     def[NodeDef.keys.analysis] = this._analysis
 
     return {

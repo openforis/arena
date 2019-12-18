@@ -102,9 +102,9 @@ const validateAdvancedProps = async (survey, nodeDef) => {
   return Validation.newInstance(
     R.all(Validation.isValid, validations),
     R.reject(Validation.isValid, {
-      [NodeDef.propKeys.defaultValues]: validations[0],
-      [NodeDef.propKeys.applicable]: validations[1],
-      [NodeDef.propKeys.validations]: validations[2],
+      [NodeDef.keysPropsAdvanced.defaultValues]: validations[0],
+      [NodeDef.keysPropsAdvanced.applicable]: validations[1],
+      [NodeDef.keysPropsAdvanced.validations]: validations[2],
     }),
   )
 }
