@@ -5,8 +5,6 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -14,6 +12,7 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
 
+import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
 import Markdown from '@webapp/commonComponents/markdown'
@@ -83,18 +82,14 @@ const getValidationFieldMessages = (i18n, survey, showKeys = true) => validation
 }
 
 const ValidationFieldMessages = props => {
-  const { validation, survey, showKeys, showIcons } = props
-  const i18n = useI18n()
+  const { messages, showIcons } = props
 
-  return R.pipe(
-    getValidationFieldMessages(i18n, survey, showKeys),
-    R.addIndex(R.map)(([type, message], i) => (
-      <div className={`validation-field_message ${type}`} key={i}>
-        {showIcons && <span className="icon icon-warning icon-12px icon-left" />}
-        <Markdown className="validation-field-message__text" source={message} />
-      </div>
-    )),
-  )(validation)
+  return R.addIndex(R.map)(([severity, message], i) => (
+    <div className={`validation-field_message ${severity}`} key={i}>
+      {showIcons && <span className="icon icon-warning icon-12px icon-left" />}
+      <Markdown className="validation-field-message__text" source={message} />
+    </div>
+  ))(messages)
 }
 
 ValidationFieldMessages.defaultProps = {
@@ -104,8 +99,15 @@ ValidationFieldMessages.defaultProps = {
   showIcons: false, // Show error or warning icon
 }
 
-const mapStateToProps = state => ({
-  survey: SurveyState.getSurvey(state),
-})
+const mapStateToProps = (state, props) => {
+  const { validation, showKeys } = props
+
+  const i18n = AppState.getI18n(state)
+  const survey = SurveyState.getSurvey(state)
+
+  return {
+    messages: getValidationFieldMessages(i18n, survey, showKeys)(validation),
+  }
+}
 
 export default connect(mapStateToProps)(ValidationFieldMessages)
