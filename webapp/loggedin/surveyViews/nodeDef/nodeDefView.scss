@@ -29,4 +29,17 @@
     justify-content: center;
   }
 
+  .btn-save {
+    background-color: $blue;
+    color: $white;
+    text-transform: uppercase;
+
+    &:hover {
+      background-color: lighten($blue, 15%);
+    }
+  }
+
+  .btn-back {
+    margin-right: 3em;
+  }
 }
