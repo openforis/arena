@@ -10,20 +10,10 @@
     align-self: start;
     height: 100%;
   }
-
 }
 
 .taxonomy__header {
   display: grid;
   grid-template-columns: .75fr .25fr;
   position: relative;
-
-  .button-bar {
-    display: flex;
-    align-items: center;
-
-    button {
-      margin: 0 .5rem;
-    }
-  }
 }

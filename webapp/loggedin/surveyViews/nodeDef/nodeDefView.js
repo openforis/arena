@@ -111,9 +111,7 @@ const NodeDefView = props => {
           </button>
           <button
             className="btn btn-primary"
-            onClick={() => {
-              saveNodeDefEdits()
-            }}
+            onClick={saveNodeDefEdits}
             aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
           >
             <span className="icon icon-floppy-disk icon-left icon-12px" />
