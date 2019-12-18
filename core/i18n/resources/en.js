@@ -408,7 +408,7 @@ export const enTranslation = {
     nodeDefEditFormActions: {
       columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
-      confirmCancel: 'There are unsaved changes. Do you want to cancel them?',
+      confirmCancel: 'There are unsaved changes. Do you want to leave the page?',
     },
     nodeDefCode: {
       buttonCode: 'Button code',
