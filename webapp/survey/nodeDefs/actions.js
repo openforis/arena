@@ -217,17 +217,15 @@ export const cancelNodeDefEdits = history => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
   const nodeDefOriginal = NodeDefState.getNodeDefOriginal(state)
-  const i18n = AppState.getI18n(state)
 
-  if (!NodeDefState.isDirty(state) || confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmCancel'))) {
-    dispatch({
-      type: nodeDefPropsTempCancel,
-      nodeDef,
-      nodeDefOriginal,
-      isNodeDefNew: NodeDef.isTemporary(nodeDef),
-    })
-    history.goBack()
-  }
+  dispatch({
+    type: nodeDefPropsTempCancel,
+    nodeDef,
+    nodeDefOriginal,
+    isNodeDefNew: NodeDef.isTemporary(nodeDef),
+  })
+
+  history.goBack()
 }
 
 /**
