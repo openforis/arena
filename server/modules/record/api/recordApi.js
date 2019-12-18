@@ -14,6 +14,7 @@ import {
   requireRecordEditPermission,
   requireRecordCreatePermission,
   requireRecordViewPermission,
+  requireRecordCleansePermission,
 } from '../../auth/authApiMiddleware'
 
 export const init = app => {
@@ -105,6 +106,30 @@ export const init = app => {
       }
     },
   )
+
+  app.get('/survey/:surveyId/validationReport', requireRecordCleansePermission, async (req, res, next) => {
+    try {
+      const { surveyId, offset, limit, cycle } = Request.getParams(req)
+
+      const list = await RecordService.fetchValidationReport(surveyId, cycle, offset, limit)
+
+      res.json({ list })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/validationReport/count', requireRecordCleansePermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle } = Request.getParams(req)
+
+      const count = await RecordService.countValidationReports(surveyId, cycle)
+
+      res.json(count)
+    } catch (error) {
+      next(error)
+    }
+  })
 
   // ==== UPDATE
 

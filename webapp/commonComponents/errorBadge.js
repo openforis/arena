@@ -15,7 +15,12 @@ const ErrorBadge = props => {
   const invalid = !Validation.isValid(validation)
 
   // When there are warnings add 'warning' class to className
-  const className = classNameProps + (Validation.isWarning(validation) ? ' warning' : '')
+  let className = classNameProps
+  if (Validation.isError(validation)) {
+    className += ' error'
+  } else if (Validation.isWarning(validation)) {
+    className += ' warning'
+  }
 
   return invalid ? (
     <ValidationTooltip validation={validation} showKeys={showKeys} className={`badge error-badge ${className}`}>

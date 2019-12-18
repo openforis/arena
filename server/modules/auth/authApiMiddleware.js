@@ -57,6 +57,7 @@ const requireUserPermission = permissionFn => async (req, res, next) => {
 // Survey
 export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
 export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
+export const requireRecordCleansePermission = requireSurveyPermission(Authorizer.canCleanseRecords)
 
 // Record
 export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)

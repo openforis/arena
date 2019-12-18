@@ -73,5 +73,9 @@
 
   .app-job-monitor__job-errors {
     padding: 0 1rem 2rem 1rem;
+
+    .validation-field_message {
+      color: inherit;
+    }
   }
 }

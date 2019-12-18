@@ -41,12 +41,14 @@ export const enTranslation = {
     label_plural: 'Labels',
     language: 'Language',
     manage: 'Manage',
+    message_plural: 'Messages',
     name: 'Name',
     new: 'New',
     no: 'No',
     noItems: "$t(common.no) $t(common.item,{'count':2})",
     of: 'of',
     ok: 'Ok',
+    path: 'Path',
     required: 'Required',
     reset: 'Reset',
     save: 'Save',
@@ -118,6 +120,7 @@ export const enTranslation = {
     data: 'Data',
     records: 'Records',
     dataVis: 'Data vis',
+    validationReport: 'Validation report',
 
     users: 'Users',
     userList: 'User list',
@@ -183,9 +186,7 @@ export const enTranslation = {
       importFromCollect: 'Import from Collect',
     },
     collectImportReport: {
-      path: 'Path',
       expression: 'Expression',
-      messages: 'Messages',
       resolved: 'Resolved',
       exprType: {
         applicable: '$t(nodeDefEdit.advancedProps.applicableIf)',
@@ -548,8 +549,8 @@ export const enTranslation = {
       oneOrMoreInvalidValues: 'One or more values are invalid',
 
       entityKeyDuplicate: 'Duplicate entity key',
-      nodesMaxCountExceeded: 'Nodes must be less than or equal to {{maxCount}}',
-      nodesMinCountNotReached: 'Nodes must be more than or equal to {{minCount}}',
+      nodesMaxCountExceeded: '{{nodeDefName}} nodes must be less than or equal to {{maxCount}}',
+      nodesMinCountNotReached: '{{nodeDefName}} nodes must be more than or equal to {{minCount}}',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
     },

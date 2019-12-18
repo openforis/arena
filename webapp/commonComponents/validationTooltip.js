@@ -1,26 +1,32 @@
 import React from 'react'
 
-import * as ValidationUtils from '@webapp/utils/validationUtils'
 import * as Validation from '@core/validation/validation'
 
+import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 import Tooltip from './tooltip'
 
-import { useI18n } from './hooks'
-
-const ValidationTooltip = ({ validation, className, showKeys, children }) => {
-  const i18n = useI18n()
+const ValidationTooltip = props => {
+  const { validation, className, showKeys, children } = props
 
   const isValid = Validation.isValid(validation)
 
-  const type = isValid ? '' : Validation.isWarning(validation) ? 'warning' : 'error'
+  const type = Validation.isError(validation) ? 'error' : Validation.isWarning(validation) ? 'warning' : ''
 
-  const messagesHtml = isValid ? null : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
+  const content = isValid ? null : React.createElement(ValidationFieldMessages, { validation, showKeys })
+
+  const showContent = Validation.isWarning(validation) || Validation.isError(validation)
 
   return (
-    <Tooltip type={type} messages={messagesHtml} className={className}>
+    <Tooltip type={type} messageComponent={content} className={className} showContent={showContent}>
       {children}
     </Tooltip>
   )
+}
+
+ValidationTooltip.defaultProps = {
+  validation: null,
+  className: '',
+  showKeys: false,
 }
 
 export default ValidationTooltip

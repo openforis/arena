@@ -1,7 +1,8 @@
 import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
-import * as Node from '../node'
+import * as Node from '@core/record/node'
+import * as RecordValidation from '@core/record/recordValidation'
 
 import { keys } from './recordKeys'
 import * as NodesIndex from './recordNodesIndex'
@@ -80,8 +81,12 @@ export const deleteNode = node => record => {
   recordUpdated = R.reduce((recordAcc, child) => deleteNode(child)(recordAcc), record, children)
 
   // 4. update validation
-  recordUpdated = R.pipe(Validation.getValidation, Validation.dissocFieldValidation(nodeUuid), newValidation =>
-    Validation.assocValidation(newValidation)(recordUpdated),
+  recordUpdated = R.pipe(
+    Validation.getValidation,
+    Validation.dissocFieldValidation(nodeUuid),
+    // Dissoc childrenCount validation
+    Validation.dissocFieldValidationsStartingWith(`${RecordValidation.prefixValidationFieldChildrenCount}${nodeUuid}`),
+    newValidation => Validation.assocValidation(newValidation)(recordUpdated),
   )(recordUpdated)
 
   // 5. remove node from record
