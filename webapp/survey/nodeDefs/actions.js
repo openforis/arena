@@ -131,12 +131,12 @@ export const setNodeDefProp = (key, value = null, advanced = false, checkFormPag
 
   if (key === NodeDef.propKeys.multiple) {
     // If setting "multiple", reset validations required or count
-    propsAdvanced[NodeDef.propKeys.validations] = value
+    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = value
       ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
       : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
   }
 
-  const nodeDefUpdated = NodeDef.mergeProps(R.mergeLeft(props, propsAdvanced))(nodeDef)
+  const nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
 
   // Validate node def
   const surveyUpdated = R.pipe(
@@ -247,14 +247,14 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
   if (isNodeDefNew) {
     const {
       data: { nodeDefsValidation, nodeDefsUpdated },
-    } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDefUpdated)
-
+    } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
     _onNodeDefsUpdate(dispatch, nodeDefsUpdated, nodeDefsValidation)
 
     dispatch(_updateParentLayout(nodeDefUpdated))
   } else {
     const props = NodeDefState.getPropsUpdated(state)
     const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
+
     dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
   }
 
@@ -274,16 +274,19 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 export const removeNodeDef = nodeDef => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
+  const i18n = AppState.getI18n(state)
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
-  const dependencyGraph = Survey.buildDependencyGraph(survey)
-  const surveyWithDependencies = Survey.assocDependencyGraph(dependencyGraph)(survey)
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefDependentsUuids = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
-  const i18n = AppState.getI18n(state)
+  const nodeDefDependentsUuids = R.pipe(
+    Survey.buildAndAssocDependencyGraph,
+    Survey.getNodeDefDependencies(nodeDefUuid),
+    R.without(nodeDefUuid),
+  )(survey)
 
-  if (!(R.isEmpty(nodeDefDependentsUuids) || R.equals(nodeDefDependentsUuids, [nodeDefUuid]))) {
+  if (!R.isEmpty(nodeDefDependentsUuids)) {
     // Node has not dependencies or it has expressions that depend on itself
     const nodeDefDependents = R.pipe(
       R.map(
