@@ -116,14 +116,15 @@ export const setNodeDefProp = (key, value = null, advanced = false, checkFormPag
   dispatch,
   getState,
 ) => {
+  const state = getState()
+  const nodeDef = NodeDefState.getNodeDef(state)
+
   if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
     return
   }
 
-  const state = getState()
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
   const props = advanced ? {} : { [key]: value }

@@ -22,7 +22,6 @@ const { propKeys } = NodeDef
 
 const TaxonProps = props => {
   const {
-    nodeDef,
     validation,
     taxonomies,
     taxonomy,
