@@ -49,7 +49,7 @@ const goodExpressions = [
     q: "(a == 1 && b != 'b') || c > 1",
     r: {
       clause:
-        'CASE\n  WHEN ($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/) IS NULL AND $/_4:name/ > $/_5/ IS NULL\n  THEN NULL\n  ELSE coalesce({left}, false) OR coalesce({right}, false)\nEND',
+        'CASE\n  WHEN (($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/)) IS NULL AND ($/_4:name/ > $/_5/) IS NULL\n  THEN NULL\n  ELSE coalesce(($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/), false) OR coalesce($/_4:name/ > $/_5/, false)\nEND',
       params: { _0: 'a', _1: '1', _2: 'b', _3: "'b'", _4: 'c', _5: '1' },
     },
   },
