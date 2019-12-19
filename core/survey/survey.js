@@ -132,7 +132,6 @@ export const assocCategories = SurveyCategories.assocCategories
 export const getTaxonomiesArray = SurveyTaxonomies.getTaxonomiesArray
 export const getTaxonomyByUuid = SurveyTaxonomies.getTaxonomyByUuid
 export const assocTaxonomies = SurveyTaxonomies.assocTaxonomies
-export const canUpdateTaxonomy = SurveyNodeDefs.canUpdateTaxonomy
 
 // ====== Survey Reference data index
 // category index

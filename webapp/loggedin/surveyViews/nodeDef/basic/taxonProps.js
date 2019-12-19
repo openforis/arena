@@ -81,7 +81,7 @@ const mapStateToProps = state => {
   return {
     taxonomy: Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey),
     taxonomies: Survey.getTaxonomiesArray(survey),
-    canUpdateTaxonomy: Survey.canUpdateTaxonomy(nodeDef)(survey),
+    canUpdateTaxonomy: !NodeDef.isPublished(nodeDef),
   }
 }
 
