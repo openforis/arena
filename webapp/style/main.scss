@@ -115,3 +115,14 @@ body {
 .btn-cancel {
   color: $blue;
 }
+
+.button-bar {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    margin: 0 .5rem;
+  }
+}

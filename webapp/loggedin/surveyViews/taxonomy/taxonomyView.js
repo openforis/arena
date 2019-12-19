@@ -9,7 +9,6 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import ButtonBar from '@webapp/commonComponents/buttonBar'
 import TableView from '../../tableViews/tableView'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
@@ -58,7 +57,7 @@ const TaxonomyView = props => {
         readOnly={!canEdit}
       />
 
-      <ButtonBar>
+      <div className="button-bar">
         <button
           className="btn"
           onClick={() => {
@@ -68,7 +67,7 @@ const TaxonomyView = props => {
         >
           {i18n.t('common.done')}
         </button>
-      </ButtonBar>
+      </div>
     </div>
   ) : null
 }

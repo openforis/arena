@@ -10,7 +10,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import ButtonBar from '@webapp/commonComponents/buttonBar'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import TabBar from '@webapp/commonComponents/tabBar'
 
@@ -103,7 +102,7 @@ const NodeDefView = props => {
                   ]),
             ]}
           />
-          <ButtonBar>
+          <div className="button-bar">
             <button
               className="btn btn-cancel"
               onClick={() => (isDirty ? setShowCancelConfirm(true) : cancelNodeDefEdits(history))}
@@ -118,7 +117,7 @@ const NodeDefView = props => {
               <span className="icon icon-floppy-disk icon-left icon-12px" />
               {i18n.t('common.save')}
             </button>
-          </ButtonBar>
+          </div>
         </div>
       </div>
 

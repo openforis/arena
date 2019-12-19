@@ -12,7 +12,6 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import ButtonBar from '@webapp/commonComponents/buttonBar'
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
 
 import * as AppState from '@webapp/app/appState'
@@ -85,7 +84,7 @@ const CategoryView = props => {
           )}
         </div>
 
-        <ButtonBar>
+        <div className="button-bar">
           <button
             className="btn"
             onClick={() => {
@@ -95,7 +94,7 @@ const CategoryView = props => {
           >
             {i18n.t('common.done')}
           </button>
-        </ButtonBar>
+        </div>
       </div>
 
       {importSummary && <CategoryImportSummary summary={importSummary} />}
