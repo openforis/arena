@@ -120,3 +120,5 @@ export {
   updateRecordValidationsFromValues,
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
+
+export { fetchValidationReport, countValidationReports } from './_recordManager/validationReportManager'

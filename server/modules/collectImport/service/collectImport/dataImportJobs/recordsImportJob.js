@@ -9,6 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as RecordValidator from '@core/record/recordValidator'
 import * as Validation from '@core/validation/validation'
@@ -206,8 +207,6 @@ export default class RecordsImportJob extends Job {
     const nodesToInsert = []
 
     const nodeUuid = Node.getUuid(node)
-    let nodeValidation = Validation.getFieldValidation(nodeUuid)(recordValidation)
-
     const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
     for (const collectNodeDefChild of collectNodeDefChildren) {
       if (this.isCanceled()) {
@@ -243,12 +242,15 @@ export default class RecordsImportJob extends Job {
 
         // Validate min/max count
         if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
-          const validationCount = RecordValidator.validateChildrenCount(survey, node, nodeDefChild, childrenCount)
+          const validationCount = RecordValidator.validateChildrenCount(nodeDefChild, childrenCount)
 
           if (!Validation.isValid(validationCount)) {
+            RecordValidation.setValidationCount(
+              nodeUuid,
+              NodeDef.getUuid(nodeDefChild),
+              validationCount,
+            )(recordValidation)
             Validation.setValid(false)(recordValidation)
-            nodeValidation = R.mergeDeepRight(nodeValidation, validationCount)
-            Validation.setField(nodeUuid, nodeValidation)(recordValidation)
           }
         }
 

@@ -8,8 +8,10 @@ import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordView from '../../surveyViews/record/recordView'
 import { appModules, appModuleUri, dataModules } from '../../appModules'
-import RecordsView from './records/recordsView'
 import DataVisView from './dataVis/dataVisView'
+import ValidationReportView from './validationReport/validationReportView'
+
+import RecordsView from './records/recordsView'
 
 const DataView = ({ surveyInfo }) => {
   const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
@@ -35,6 +37,11 @@ const DataView = ({ surveyInfo }) => {
           {
             component: DataVisView,
             path: appModuleUri(dataModules.dataVis),
+          },
+          // Validation report
+          {
+            component: ValidationReportView,
+            path: appModuleUri(dataModules.validationReport),
           },
         ]}
       />
