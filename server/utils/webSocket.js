@@ -48,7 +48,7 @@ export const notifyUser = (userUuid, eventType, message) => {
   }
 }
 
-export const init = (server, jwtMiddleware) => {
+export const init = (server, sessionMiddleware) => {
   io.attach(server)
 
   io.use((socket, next) => {
@@ -56,8 +56,8 @@ export const init = (server, jwtMiddleware) => {
     const token = socket.handshake.query.token
     socket.request.headers.authorization = Jwt.bearerPrefix + token
 
-    // Wrap the jwtMiddleware to get the user id
-    jwtMiddleware(socket.request, {}, next)
+    // Wrap the sessionMiddleware to get the user uuid
+    sessionMiddleware(socket.request, {}, next)
   })
 
   io.on(WebSocketEvents.connection, async socket => {

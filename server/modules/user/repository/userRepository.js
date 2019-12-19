@@ -6,20 +6,20 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
-const selectFields = ['uuid', 'name', 'email', 'prefs']
+const selectFields = ['uuid', 'name', 'email', 'password', 'prefs']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // In sql queries, user table must be surrounded by "" e.g. "user"
 
 // CREATE
 
-export const insertUser = async (surveyId, surveyCycleKey, uuid, email, client = db) =>
+export const insertUser = async (surveyId, surveyCycleKey, email, password, status, client = db) =>
   await client.one(
     `
-    INSERT INTO "user" AS u (uuid, email, prefs)
-    VALUES ($1, $2, $3::jsonb)
+    INSERT INTO "user" AS u (email, password, status, prefs)
+    VALUES ($1, $2, $3, $4::jsonb)
     RETURNING ${selectFieldsCommaSep}`,
-    [uuid, email, User.newPrefs(surveyId, surveyCycleKey)],
+    [email, password, status, User.newPrefs(surveyId, surveyCycleKey)],
     camelize,
   )
 
@@ -110,14 +110,14 @@ export const updateUser = async (uuid, name, email, profilePicture, client = db)
     camelize,
   )
 
-export const updateUsername = async (user, name, client = db) =>
+export const updateUsernameAndStatus = async (user, name, status, client = db) =>
   await client.one(
     `
     UPDATE "user"  u
-    SET name = $1
-    WHERE u.uuid = $2
+    SET name = $1, status = $2
+    WHERE u.uuid = $3
     RETURNING ${selectFieldsCommaSep}`,
-    [name, User.getUuid(user)],
+    [name, status, User.getUuid(user)],
     camelize,
   )
 

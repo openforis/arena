@@ -36,7 +36,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
 }
 
 const sendUser = async (res, user) => {
-  const surveyId = User.getUserPrefSurveyId(user)
+  const surveyId = User.getPrefSurveyCurrent(user)
 
   if (surveyId) await sendUserSurvey(res, user, surveyId)
   else sendResponse(res, user)

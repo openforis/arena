@@ -1,4 +1,6 @@
 import * as bcrypt from 'bcrypt'
+import * as passwordGenerator from 'generate-password'
+import * as R from 'ramda'
 
 import { db } from '@server/db/db'
 
@@ -11,11 +13,42 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 
-// ==== CREATE
+// ==== UTILS
+const _encryptPassword = passwordPlain =>
+  new Promise((resolve, reject) =>
+    bcrypt.hash(passwordPlain, 10, (error, hash) => (error ? reject(error) : resolve(hash))),
+  )
 
-export const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid, client = db) =>
+export const generatePassword = () =>
+  passwordGenerator.generate({
+    length: 8,
+    numbers: true,
+    uppercase: true,
+    strict: true,
+  })
+
+const _comparePassword = bcrypt.compare
+
+// ==== CREATE
+export const insertUser = async (
+  user,
+  surveyId,
+  surveyCycleKey,
+  email,
+  passwordPlain,
+  status,
+  groupUuid,
+  client = db,
+) =>
   await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, uuid, email, t)
+    const newUser = await UserRepository.insertUser(
+      surveyId,
+      surveyCycleKey,
+      email,
+      await _encryptPassword(passwordPlain),
+      status,
+      t,
+    )
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
@@ -42,14 +75,11 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
 // ==== READ
 
 const _assocUserAuthGroups = async user =>
-  User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
+  R.pipe(User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user))), User.dissocPassword)(user)
 
 const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
-
-  if (user) return await _assocUserAuthGroups(user)
-
-  return null
+  return user ? await _assocUserAuthGroups(user) : null
 }
 
 export const countUsersBySurveyId = UserRepository.countUsersBySurveyId
@@ -69,7 +99,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemA
 export const findUserByEmailAndPassword = async (email, password) => {
   const user = await UserRepository.fetchUserByEmail(email)
 
-  if (user && (await bcrypt.comparePassword(password, User.getPassword(user)))) {
+  if (user && (await _comparePassword(password, User.getPassword(user)))) {
     return _assocUserAuthGroups(user)
   }
 
@@ -104,7 +134,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUsername = UserRepository.updateUsername
+export const updateUsernameAndStatus = UserRepository.updateUsernameAndStatus
 
 export const updateUserPrefs = async user => ({
   ...(await UserRepository.updateUserPrefs(user)),

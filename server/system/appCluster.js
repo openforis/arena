@@ -6,14 +6,18 @@ import * as fileUpload from 'express-fileupload'
 import { createTerminus } from '@godaddy/terminus'
 
 import * as ProcessUtils from '@core/processUtils'
+
 import * as Log from '@server/log/log'
 import { db } from '@server/db/db'
-
+import * as authConfig from '@server/modules/auth/config/authConfig'
 import * as authApi from '@server/modules/auth/api/authApi'
 import * as WebSocket from '@server/utils/webSocket'
-import * as headerMiddleware from './middleware/headerMiddleware'
-import { jwtMiddleware } from './middleware/jwtMiddleware'
+
+import * as accessControlMiddleware from './middleware/accessControlMiddleware'
 import * as errorMiddleware from './middleware/errorMiddleware'
+import * as headerMiddleware from './middleware/headerMiddleware'
+import sessionMiddleware from './middleware/sessionMiddleware'
+
 import * as apiRouter from './apiRouter'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as ExpiredJwtTokensCleanup from './schedulers/expiredJwtTokensCleanup'
@@ -40,8 +44,10 @@ export const run = async () => {
   )
 
   headerMiddleware.init(app)
-
-  app.use(/^\/api.*|^\/auth.*/, jwtMiddleware)
+  app.use(sessionMiddleware)
+  authConfig.init(app)
+  // AccessControlMiddleware must be initialized after authConfig
+  accessControlMiddleware.init(app)
 
   app.use(compression({ threshold: 512 }))
 
@@ -66,7 +72,7 @@ export const run = async () => {
   })
 
   // ====== socket middleware
-  WebSocket.init(server, jwtMiddleware)
+  WebSocket.init(server, sessionMiddleware)
 
   const onSignal = () => {
     logger.info('server is starting cleanup')

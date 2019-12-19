@@ -2,7 +2,7 @@ import * as passport from 'passport'
 
 import * as User from '@core/user/user'
 
-import * as localStrategy from './authConfigLocalStrategy'
+import localStrategy from './authConfigLocalStrategy'
 
 import * as UserManager from '@server/modules/user/manager/userManager'
 

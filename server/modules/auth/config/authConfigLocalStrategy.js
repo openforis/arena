@@ -9,7 +9,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 const _verifyCallback = async (req, email, password, done) => {
   const sendResp = (user, message) => (user ? done(null, user) : done(null, false, { message }))
 
-  if (Validation.isValid(UserValidator.validateEmail({ [User.keys.email]: email }))) {
+  if (Validation.isValid(UserValidator.validateEmail(User.keys.email, { [User.keys.email]: email }))) {
     const user = await UserManager.findUserByEmailAndPassword(email, password)
     if (user) sendResp(user)
     else sendResp(null, Validation.messageKeys.user.userNotFound)
@@ -18,13 +18,11 @@ const _verifyCallback = async (req, email, password, done) => {
   }
 }
 
-const localStrategy = new LocalStrategy(
+export default new LocalStrategy(
   {
-    usernameField: 'username',
+    usernameField: 'email',
     passwordField: 'password',
     passReqToCallback: true,
   },
   _verifyCallback,
 )
-
-export default localStrategy
