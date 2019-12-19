@@ -109,5 +109,7 @@ export const ValidatorErrorKeys = {
     UserNotFoundException: 'validationErrors.user.userDoesNotExist',
     NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
     CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
+
+    userNotFound: 'valiationErrors.user.userNotFound',
   },
 }

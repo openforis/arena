@@ -18,10 +18,14 @@ export const isEqual = ObjectUtils.isEqual
 export const getUuid = ObjectUtils.getUuid
 export const getName = R.propOr('', keys.name)
 export const getEmail = R.prop(keys.email)
+export const getPassword = R.prop(keys.password)
 export const getLang = R.propOr('en', keys.lang)
 export const getAuthGroups = ObjectUtils.getAuthGroups
 export const getPrefs = R.propOr({}, keys.prefs)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
+
+// ====== UPDATE
+export const dissocPassword = R.dissoc(keys.password)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
@@ -38,15 +42,15 @@ export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) 
     ),
   )(user)
 
-export const assocAuthGroup = authGroup => user => {
-  const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
-  return R.assoc(keys.authGroups, authGroups, user)
-}
+export const assocAuthGroups = R.assoc(keys.authGroups)
 
-export const dissocAuthGroup = authGroup => user => {
-  const authGroups = R.pipe(getAuthGroups, R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))))(user)
-  return R.assoc(keys.authGroups, authGroups, user)
-}
+export const assocAuthGroup = authGroup => user =>
+  R.pipe(getAuthGroups, R.append(authGroup), authGroups => assocAuthGroups(authGroups)(user))(user)
+
+export const dissocAuthGroup = authGroup => user =>
+  R.pipe(getAuthGroups, R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))), authGroups =>
+    assocAuthGroups(authGroups),
+  )(user)
 
 // PREFS
 export const newPrefs = UserPrefs.newPrefs

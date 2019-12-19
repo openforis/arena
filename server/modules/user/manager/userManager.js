@@ -1,3 +1,5 @@
+import * as bcrypt from 'bcrypt'
+
 import { db } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -39,13 +41,13 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
 
 // ==== READ
 
+const _assocUserAuthGroups = async user =>
+  User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
+
 const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
 
-  if (user) {
-    const authGroups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
-    return { ...user, authGroups }
-  }
+  if (user) return await _assocUserAuthGroups(user)
 
   return null
 }
@@ -61,14 +63,18 @@ export const fetchUserProfilePicture = UserRepository.fetchUserProfilePicture
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
-
-    return await Promise.all(
-      users.map(async u => ({
-        ...u,
-        authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(u)),
-      })),
-    )
+    return await Promise.all(users.map(_assocUserAuthGroups))
   })
+
+export const findUserByEmailAndPassword = async (email, password) => {
+  const user = await UserRepository.fetchUserByEmail(email)
+
+  if (user && (await bcrypt.comparePassword(password, User.getPassword(user)))) {
+    return _assocUserAuthGroups(user)
+  }
+
+  return null
+}
 
 // ==== UPDATE
 

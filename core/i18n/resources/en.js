@@ -598,6 +598,8 @@ export const enTranslation = {
       userDoesNotExist: 'User does not exist',
       userNotAuthorized: 'Incorrect username or password',
       verificationCodeMismatch: 'Invalid verification code provided, please try again',
+
+      userNotFound: 'User not found. Make sure email and password are correct',
     },
   },
 

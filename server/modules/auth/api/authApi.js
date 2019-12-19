@@ -1,3 +1,5 @@
+import * as passport from 'passport'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as Jwt from '@server/utils/jwt'
@@ -33,6 +35,21 @@ const sendUserSurvey = async (res, user, surveyId) => {
   }
 }
 
+const sendUser = async (res, user) => {
+  const surveyId = User.getUserPrefSurveyId(user)
+
+  if (surveyId) await sendUserSurvey(res, user, surveyId)
+  else sendResponse(res, user)
+}
+
+const authenticationSuccessful = (req, res, next, user) =>
+  req.logIn(user, err => {
+    if (err) next(err)
+    else {
+      req.session.save(() => sendUser(res, user))
+    }
+  })
+
 export const init = app => {
   app.get('/auth/user', async (req, res, next) => {
     try {
@@ -47,6 +64,14 @@ export const init = app => {
     } catch (error) {
       next(error)
     }
+  })
+
+  app.post('/auth/login', async (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) return next(err)
+      if (!user) res.json(info)
+      else authenticationSuccessful(req, res, next, user)
+    })(req, res, next)
   })
 
   app.post('/auth/logout', async (req, res, next) => {

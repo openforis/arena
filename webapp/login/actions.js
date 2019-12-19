@@ -29,8 +29,28 @@ const _createAction = cognitoResponseHandler => async dispatch => {
   }
 }
 
-export const login = (email, password) =>
-  _createAction(async dispatch => {
+export const login = (email, password) => async dispatch => {
+  try {
+    dispatch(showAppLoader())
+    dispatch(setLoginError(null))
+
+    const {
+      data: { errorMessage, user },
+    } = await axios.post('/auth/login', { email, password })
+
+    if (user) {
+      dispatch(setEmail(''))
+      dispatch(initUser())
+    } else {
+      dispatch(setLoginError(Validation.messageKeys.user[errorMessage]))
+    }
+  } catch (error) {
+    dispatch(setLoginError(Validation.messageKeys.user[error.code]))
+  } finally {
+    dispatch(hideAppLoader())
+  }
+}
+/*  _createAction(async dispatch => {
     const responseType = await CognitoAuth.login(email, password)
 
     if (responseType === CognitoAuth.keysAction.success) {
@@ -43,6 +63,7 @@ export const login = (email, password) =>
       })
     }
   })
+*/
 
 export const acceptInvitation = (name, password) =>
   _createAction(async dispatch => {
