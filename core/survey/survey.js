@@ -106,6 +106,7 @@ export const isNodeDefDependentOn = SurveyDependencies.isNodeDefDependentOn
 export const assocNodeDefs = SurveyNodeDefs.assocNodeDefs
 export const assocDependencyGraph = SurveyDependencies.assocDependencyGraph
 export const buildDependencyGraph = SurveyDependencies.buildGraph
+export const buildAndAssocDependencyGraph = SurveyDependencies.buildAndAssocDependencyGraph
 
 // ====== NodeDefsValidation
 export const getNodeDefsValidation = SurveyNodeDefsValidation.getNodeDefsValidation
@@ -131,7 +132,6 @@ export const assocCategories = SurveyCategories.assocCategories
 export const getTaxonomiesArray = SurveyTaxonomies.getTaxonomiesArray
 export const getTaxonomyByUuid = SurveyTaxonomies.getTaxonomyByUuid
 export const assocTaxonomies = SurveyTaxonomies.assocTaxonomies
-export const canUpdateTaxonomy = SurveyNodeDefs.canUpdateTaxonomy
 
 // ====== Survey Reference data index
 // category index

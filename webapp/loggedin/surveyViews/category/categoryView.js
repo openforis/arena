@@ -5,15 +5,14 @@ import { connect } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
+import * as Authorizer from '@core/auth/authorizer'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import UploadButton from '@webapp/commonComponents/form/uploadButton'
-
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as Validation from '@core/validation/validation'
-import * as Authorizer from '@core/auth/authorizer'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -85,7 +84,7 @@ const CategoryView = props => {
           )}
         </div>
 
-        <div style={{ justifySelf: 'center' }}>
+        <div className="button-bar">
           <button
             className="btn"
             onClick={() => {

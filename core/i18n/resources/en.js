@@ -5,6 +5,7 @@ export const enTranslation = {
   common: {
     add: 'Add',
     apply: 'Apply',
+    back: 'Back',
     cancel: 'Cancel',
     cantUndoWarning: 'This operation cannot be undone',
     close: 'Close',
@@ -408,6 +409,7 @@ export const enTranslation = {
     nodeDefEditFormActions: {
       columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
+      confirmCancel: 'There are unsaved changes. Do you want to leave the page?',
     },
     nodeDefCode: {
       buttonCode: 'Button code',
@@ -536,6 +538,7 @@ export const enTranslation = {
       expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
       expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
+      formContainsErrors: 'The form contains errors. Please, fix them before saving.',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',
       nameInvalid:

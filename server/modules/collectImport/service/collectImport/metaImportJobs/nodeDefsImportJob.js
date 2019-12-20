@@ -254,11 +254,11 @@ export default class NodeDefsImportJob extends Job {
     const defaultValues = await this.parseNodeDefDefaultValues(nodeDefUuid, collectNodeDef)
 
     if (!R.isEmpty(defaultValues)) {
-      propsAdvanced[NodeDef.propKeys.defaultValues] = defaultValues
+      propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = defaultValues
     }
 
     // 2. validations
-    propsAdvanced[NodeDef.propKeys.validations] = {
+    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = {
       ...(multiple
         ? {
             [NodeDefValidations.keys.count]: {
@@ -447,7 +447,7 @@ export default class NodeDefsImportJob extends Job {
         this.tx,
       )
       const propsAdvanced = {
-        [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
+        [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
       }
       await NodeDefManager.updateNodeDefProps(
         this.user,

@@ -28,7 +28,7 @@ const stdlib2sql = {
 
 const logicalOrTemplate = `
 CASE
-  WHEN {left} IS NULL AND {right} IS NULL
+  WHEN ({left}) IS NULL AND ({right}) IS NULL
   THEN NULL
   ELSE coalesce({left}, false) OR coalesce({right}, false)
 END
@@ -47,7 +47,7 @@ const binaryToString = (node, paramsArr) => {
 
   // Logical OR returns a non-null value if either of its parameters is not null.
   if (sqlOperator === 'OR') {
-    return logicalOrTemplate.replace('{left}', clauseLeft).replace('{right}', clauseRight)
+    return logicalOrTemplate.replace(/{left}/g, clauseLeft).replace(/{right}/g, clauseRight)
   }
 
   // Logical OR returns a non-null value if either of its parameters is not null.

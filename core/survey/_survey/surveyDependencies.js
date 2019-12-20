@@ -109,3 +109,6 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => survey =
 
 // UPDATE
 export const assocDependencyGraph = dependencyGraph => R.assoc(keys.dependencyGraph, dependencyGraph)
+
+export const buildAndAssocDependencyGraph = survey =>
+  R.pipe(buildGraph, graph => assocDependencyGraph(graph)(survey))(survey)
