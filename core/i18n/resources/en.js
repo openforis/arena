@@ -594,10 +594,7 @@ export const enTranslation = {
         'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
       passwordsDoNotMatch: "Passwords don't match",
       verificationCodeInvalid: 'Invalid verification code',
-
-      userDoesNotExist: 'User does not exist',
-      userNotAuthorized: 'Incorrect username or password',
-      verificationCodeMismatch: 'Invalid verification code provided, please try again',
+      verificationCodeDoNotMatch: 'Invalid verification code provided, please try again',
 
       userNotFound: 'User not found. Make sure email and password are correct',
     },

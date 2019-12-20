@@ -13,6 +13,7 @@ import * as Mailer from '@server/utils/mailer'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as AuthManager from '../../auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
+import * as UserPasswordUtils from './userPasswordUtils'
 
 // ====== CREATE
 
@@ -60,8 +61,18 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
   } else {
     await db.tx(async t => {
       // Add user to db
-      const password = UserManager.generatePassword()
-      await UserManager.insertUser(user, surveyId, surveyCycleKey, email, User.userStatus.INVITED, groupUuid, t)
+      const password = UserPasswordUtils.generatePassword()
+      const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
+      await UserManager.insertUser(
+        user,
+        surveyId,
+        surveyCycleKey,
+        email,
+        passwordEncrypted,
+        User.userStatus.INVITED,
+        groupUuid,
+        t,
+      )
       // Send email
       const msgParams = {
         serverUrl,

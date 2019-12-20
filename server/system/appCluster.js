@@ -20,7 +20,6 @@ import sessionMiddleware from './middleware/sessionMiddleware'
 
 import * as apiRouter from './apiRouter'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
-import * as ExpiredJwtTokensCleanup from './schedulers/expiredJwtTokensCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 
 export const run = async () => {
@@ -93,6 +92,5 @@ export const run = async () => {
 
   // ====== schedulers
   await RecordPreviewCleanup.init()
-  await ExpiredJwtTokensCleanup.init()
   await TempFilesCleanup.init()
 }

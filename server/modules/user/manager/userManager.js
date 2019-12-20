@@ -1,5 +1,3 @@
-import * as bcrypt from 'bcrypt'
-import * as passwordGenerator from 'generate-password'
 import * as R from 'ramda'
 
 import { db } from '@server/db/db'
@@ -13,42 +11,10 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 
-// ==== UTILS
-const _encryptPassword = passwordPlain =>
-  new Promise((resolve, reject) =>
-    bcrypt.hash(passwordPlain, 10, (error, hash) => (error ? reject(error) : resolve(hash))),
-  )
-
-export const generatePassword = () =>
-  passwordGenerator.generate({
-    length: 8,
-    numbers: true,
-    uppercase: true,
-    strict: true,
-  })
-
-const _comparePassword = bcrypt.compare
-
 // ==== CREATE
-export const insertUser = async (
-  user,
-  surveyId,
-  surveyCycleKey,
-  email,
-  passwordPlain,
-  status,
-  groupUuid,
-  client = db,
-) =>
+export const insertUser = async (user, surveyId, surveyCycleKey, email, password, status, groupUuid, client = db) =>
   await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(
-      surveyId,
-      surveyCycleKey,
-      email,
-      await _encryptPassword(passwordPlain),
-      status,
-      t,
-    )
+    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, email, password, status, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
@@ -96,10 +62,10 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemA
     return await Promise.all(users.map(_assocUserAuthGroups))
   })
 
-export const findUserByEmailAndPassword = async (email, password) => {
+export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
   const user = await UserRepository.fetchUserByEmail(email)
 
-  if (user && (await _comparePassword(password, User.getPassword(user)))) {
+  if (user && (await passwordCompareFn(password, User.getPassword(user)))) {
     return _assocUserAuthGroups(user)
   }
 

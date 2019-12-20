@@ -11,7 +11,6 @@ import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
-import * as AuthService from '../service/authService'
 
 const Logger = Log.getLogger('AuthAPI')
 
