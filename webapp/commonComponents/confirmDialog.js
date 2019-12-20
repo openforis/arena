@@ -7,11 +7,11 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import Markdown from '@webapp/commonComponents/markdown'
 
 const ConfirmDialog = props => {
-  const { message, onOk, onCancel } = props
+  const { className, message, onOk, onCancel } = props
   const i18n = useI18n()
 
   return (
-    <Modal className="confirm-dialog">
+    <Modal className={'confirm-dialog' + (className ? ` ${className}` : '')}>
       <ModalBody>
         <Markdown source={message} />
       </ModalBody>
@@ -30,6 +30,7 @@ const ConfirmDialog = props => {
 }
 
 ConfirmDialog.defaultProps = {
+  className: null,
   message: '',
   onOk: () => {},
   onCancel: () => {},
