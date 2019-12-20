@@ -1,8 +1,8 @@
 import CodeMirror from 'codemirror/lib/codemirror'
 
 const functionExamples = {
-  min: 'max(3,1,2) = 1',
-  max: 'max(3,2,1,2) = 1',
+  min: 'max(3,1) = 1',
+  max: 'max(3,1,2) = 3',
   pow: 'pow(2,3) = 2³ = 8',
 }
 
