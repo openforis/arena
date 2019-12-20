@@ -7,17 +7,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 export const assocNodeDef = nodeDef => R.assoc(NodeDef.getUuid(nodeDef), nodeDef)
 
-const assocNodeDefProp = (nodeDefUuid, key, value) =>
-  R.pipe(
-    R.assocPath(R.concat([nodeDefUuid, 'props'], R.split('.', key)), value),
-    R.dissocPath([nodeDefUuid, 'validation', 'fields', key]),
-  )
-
-export const assocNodeDefProps = (nodeDefUuid, props, propsAdvanced) => state => {
-  const allProps = R.mergeLeft(props, propsAdvanced)
-  return R.reduce((acc, key) => assocNodeDefProp(nodeDefUuid, key, R.prop(key, allProps))(acc), state, R.keys(allProps))
-}
-
 export const mergeNodeDefs = R.mergeLeft
 
 // ====== DELETE

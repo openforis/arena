@@ -40,7 +40,11 @@ export const getModulesHierarchy = (user, surveyInfo) => [
     designerModules.categories,
     designerModules.taxonomies,
   ]),
-  getModule(appModules.data, [dataModules.records, dataModules.dataVis]),
+  getModule(appModules.data, [
+    dataModules.records,
+    dataModules.dataVis,
+    ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
+  ]),
   ...(Authorizer.canAnalyzeRecords(user, surveyInfo)
     ? [getModule(appModules.analysis, [analysisModules.processingChains])]
     : []),

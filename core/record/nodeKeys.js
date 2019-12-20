@@ -9,13 +9,13 @@ export const keys = {
   keys: 'keys',
 }
 
-export const getKeysHierarchyPath = (survey, lang) =>
+export const getKeysHierarchyPath = (survey, lang, includeRootKeys = false) =>
   R.pipe(
     R.map(({ nodeDefUuid, keys }) => {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const label = NodeDef.getLabel(nodeDef, lang)
-      // Do not show keys for root entity
-      return NodeDef.isRoot(nodeDef) ? label : `${label}[${R.values(keys)}]`
+      // Do not show keys for root entity when includeRootKeys is false
+      return R.isEmpty(keys) || (!includeRootKeys && NodeDef.isRoot(nodeDef)) ? label : `${label}[${R.values(keys)}]`
     }),
     R.join(' / '),
   )

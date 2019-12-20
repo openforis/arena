@@ -56,7 +56,7 @@ export const cleanup = validation => {
   )
 
   return newInstance(
-    allFieldsValid && !hasErrors(validation) && !hasWarnings(validation),
+    allFieldsValid && !isError(validation) && !isWarning(validation),
     fieldsCleaned,
     getErrors(validation),
     getWarnings(validation),
@@ -124,11 +124,14 @@ export const getFieldValidations = R.propOr({}, keys.fields)
 export const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
 
 export const getErrors = R.propOr([], keys.errors)
-export const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
+export const isError = validation =>
+  R.pipe(getErrors, R.isEmpty, R.not)(validation) || R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
+
 export const getWarnings = R.propOr([], keys.warnings)
-export const hasWarnings = R.pipe(getWarnings, R.isEmpty, R.not)
-const hasWarningsInFields = R.pipe(getFieldValidations, R.values, R.any(hasWarnings))
-export const isWarning = validation => hasWarnings(validation) || hasWarningsInFields(validation)
+export const isWarning = validation =>
+  R.pipe(getWarnings, R.isEmpty, R.not)(validation) ||
+  R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
+
 export const getCounts = R.propOr({}, keys.counts)
 export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
 export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
@@ -143,6 +146,20 @@ export const assocFieldValidation = (field, fieldValidation) =>
   R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
 
 export const dissocFieldValidation = field => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
+/**
+ * Iterates over all the field validations and remove the ones starting with the specified value
+ */
+export const dissocFieldValidationsStartingWith = fieldStartsWith => validation =>
+  R.pipe(
+    R.prop(keys.fields),
+    Object.entries,
+    R.reduce((accFields, [field, fieldValidation]) => {
+      if (!field.startsWith(fieldStartsWith)) accFields[field] = fieldValidation
+      return accFields
+    }, {}),
+    fieldsValidations => R.assoc(keys.fields, fieldsValidations)(validation),
+    cleanup,
+  )(validation)
 
 export const mergeValidation = validationNew => validationOld =>
   R.pipe(

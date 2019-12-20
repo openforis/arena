@@ -4,9 +4,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
 import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
-import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 import TableHeader from './components/tableHeader'
 import TableRows from './components/tableRows'
 
@@ -15,27 +13,24 @@ import * as CollectImportReportState from './collectImportReportState'
 import { fetchCollectImportReportItems } from './actions'
 
 const CollectImportReportView = props => {
-  const { reportItems, isNodeDefEditOpened, fetchCollectImportReportItems } = props
+  const { items, fetchCollectImportReportItems } = props
+  const itemsEmpty = R.isEmpty(items)
 
   useEffect(() => {
-    fetchCollectImportReportItems()
+    if (itemsEmpty) fetchCollectImportReportItems()
   }, [])
 
-  return R.isEmpty(reportItems) ? null : (
+  return itemsEmpty ? null : (
     <SurveyDefsLoader draft={true} validate={true}>
-      {isNodeDefEditOpened && <NodeDefEdit />}
-
       <div className="collect-import-report table">
         <TableHeader />
-
-        <TableRows reportItems={reportItems} />
+        <TableRows reportItems={items} />
       </div>
     </SurveyDefsLoader>
   )
 }
 
 const mapStateToProps = state => ({
-  reportItems: CollectImportReportState.getState(state),
-  isNodeDefEditOpened: NodeDefEditState.hasNodeDef(state),
+  items: CollectImportReportState.getItems(state),
 })
 export default connect(mapStateToProps, { fetchCollectImportReportItems })(CollectImportReportView)

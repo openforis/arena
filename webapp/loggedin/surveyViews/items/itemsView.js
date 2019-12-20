@@ -1,28 +1,21 @@
-import './items.scss'
+import './itemsView.scss'
 
 import React from 'react'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ItemsTable from './itemsTable'
 
 const ItemsView = props => {
-  const { editedItem, itemEditComponent, itemEditProp, onClose } = props
+  const { onClose } = props
+  const i18n = useI18n()
 
-  const ItemEdit = itemEditComponent
-
-  const itemEditProps = {
-    ...props,
-    [itemEditProp]: editedItem,
-  }
-
-  return editedItem ? (
-    <ItemEdit {...itemEditProps} />
-  ) : (
+  return (
     <div className="items">
       <ItemsTable {...props} />
 
       {onClose && (
         <div className="items__footer">
           <button className="btn" onClick={() => onClose()}>
-            Close
+            {i18n.t('common.close')}
           </button>
         </div>
       )}

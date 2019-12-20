@@ -4,17 +4,20 @@ import { connect } from 'react-redux'
 import * as Authorizer from '@core/auth/authorizer'
 
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
-import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
-import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
+import FormDesignerView from './formDesigner/formDesignerView'
+import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
+import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
+import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
+import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
+import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
+import SurveyHierarchyView from './surveyHierarchy/surveyHierarchyView'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import { appModules, appModuleUri, designerModules } from '../../appModules'
 
 import { resetForm } from '../../surveyViews/surveyForm/actions'
-import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
-import FormDesignerView from './formDesigner/formDesignerView'
 
 const DesignerView = ({ canEditDef, resetForm }) => {
   useEffect(() => {
@@ -33,7 +36,17 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           },
 
           {
-            component: SurveyHierarchy,
+            component: NodeDefView,
+            path: appModuleUri(designerModules.nodeDef),
+          },
+
+          {
+            component: NodeDefView,
+            path: `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid/`,
+          },
+
+          {
+            component: SurveyHierarchyView,
             path: appModuleUri(designerModules.surveyHierarchy),
           },
 
@@ -43,8 +56,18 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           },
 
           {
+            component: CategoryView,
+            path: `${appModuleUri(designerModules.category)}:categoryUuid`,
+          },
+
+          {
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
+          },
+
+          {
+            component: TaxonomyView,
+            path: `${appModuleUri(designerModules.taxonomy)}:taxonomyUuid`,
           },
         ]}
       />

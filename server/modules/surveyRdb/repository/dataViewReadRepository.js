@@ -187,24 +187,3 @@ export const fetchRecordsCountByKeys = async (
     camelize,
   )
 }
-
-export const fetchRecordKeysByRecordUuid = async (survey, recordUuid, client = db) => {
-  const nodeDefRoot = Survey.getNodeDefRoot(survey)
-  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
-  const surveyId = Survey.getId(survey)
-  const schemaRdb = SchemaRdb.getName(surveyId)
-  const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
-  const keyColumns = R.pipe(R.map(NodeDefTable.getColName), R.join(', '))(nodeDefKeys)
-
-  return await client.one(
-    `
-    SELECT
-      ${keyColumns}
-    FROM
-      ${rootTable}
-    WHERE
-      ${DataTable.colNameRecordUuuid} = $1`,
-    [recordUuid],
-    row => Object.values(row),
-  )
-}

@@ -46,7 +46,7 @@ const _navigateToModuleDataHome = history => history.push(appModuleUri(appModule
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
   dispatch(showNotification('recordView.justDeleted'))
-  _navigateToModuleDataHome(history)
+  history.goBack()
 }
 
 export const sessionExpired = history => dispatch => {
@@ -174,7 +174,7 @@ export const deleteRecordUuidPreview = () => dispatch => dispatch({ type: record
  * Check in / check out record
  * ============
  */
-export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch, getState) => {
+export const checkInRecord = (recordUuid, draft, pageNodeUuid, pageNodeDefUuid) => async (dispatch, getState) => {
   dispatch(showAppLoader())
 
   const surveyId = SurveyState.getSurveyId(getState())
@@ -185,18 +185,27 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
   })
 
   // This is used by dataQuery when user is editing a specific entity
-  if (entityUuid) {
+  if (pageNodeUuid) {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
+    const cycle = Record.getCycle(record)
 
     // Ancestors are needed to find the entity with a pageUuid specified
-    const entity = Record.getNodeByUuid(entityUuid)(record)
+    const entity = Record.getNodeByUuid(pageNodeUuid)(record)
     const ancestors = Record.getAncestorsAndSelf(entity)(record)
+    const pageNodeDef = Survey.getNodeDefByUuid(pageNodeDefUuid)(survey)
 
-    const nodeDefActivePage = R.pipe(
-      R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
-      R.find(R.pipe(NodeDefLayout.getPageUuid, R.isNil, R.not)),
-    )(ancestors)
+    /*
+    If a node def to focus is specified and it has its own page, use it as active page,
+    otherwise use the one of the first ancestor where it's defined
+    */
+    const nodeDefActivePage =
+      pageNodeDef && NodeDefLayout.hasPage(cycle)(pageNodeDef)
+        ? pageNodeDef
+        : R.pipe(
+            R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
+            R.find(NodeDefLayout.hasPage(cycle)),
+          )(ancestors)
 
     // Getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(

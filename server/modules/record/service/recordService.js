@@ -101,6 +101,10 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 
 export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
 
+export const fetchValidationReport = RecordManager.fetchValidationReport
+
+export const countValidationReports = RecordManager.countValidationReports
+
 /**
  * ======
  * NODE

@@ -6,6 +6,8 @@ export const validateNewSurvey = SurveyInfoValidator.validateNewSurvey
 
 export const validateSurveyInfo = SurveyInfoValidator.validateSurveyInfo
 
+export const validateNodeDef = NodeDefValidator.validateNodeDef
+
 export const validateNodeDefs = NodeDefValidator.validateNodeDefs
 
 export const validateNodeDefExpressions = NodeDefExpressionsValidator.validate

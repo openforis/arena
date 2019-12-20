@@ -13,7 +13,6 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
 import Markdown from '@webapp/commonComponents/markdown'
-
 import { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs } from './actions'
 import * as ActivityLogMessage from './activityLogMessage'
 

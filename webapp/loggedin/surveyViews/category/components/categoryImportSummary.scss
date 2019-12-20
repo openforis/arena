@@ -1,0 +1,42 @@
+.category__import-summary {
+  display: grid;
+  grid-template-rows: 1fr 50px;
+
+  .modal-content {
+    margin: 5vh 3vw;
+    height: 90vh;
+    padding: 2vh 1vw;
+  }
+
+  .modal-body {
+    padding-top: 0;
+  }
+
+  .modal-footer {
+    padding-top: 1rem;
+    position: relative;
+
+    .btn-close {
+      position: absolute;
+      left: 0;
+    }
+  }
+
+  .table, .table__content {
+    height: 100%;
+  }
+
+  .table {
+
+    .table__row-header,
+    .table__row {
+      grid-template-columns: 30px .4fr .3fr .3fr;
+    }
+
+    .table__row > div:not(:first-child):not(:last-child) {
+      justify-self: left;
+      padding: 0 1rem;
+    }
+  }
+
+}

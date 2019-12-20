@@ -61,6 +61,11 @@ export const designerModules = {
     key: 'formDesigner',
     path: `${appModules.designer.path}/formDesigner`,
   },
+  nodeDef: {
+    key: 'nodeDef',
+    path: `${appModules.designer.path}/nodeDef`,
+  },
+
   surveyHierarchy: {
     key: 'surveyHierarchy',
     path: `${appModules.designer.path}/surveyHierarchy`,
@@ -69,9 +74,17 @@ export const designerModules = {
     key: 'categories',
     path: `${appModules.designer.path}/categories`,
   },
+  category: {
+    key: 'category',
+    path: `${appModules.designer.path}/category`,
+  },
   taxonomies: {
     key: 'taxonomies',
     path: `${appModules.designer.path}/taxonomies`,
+  },
+  taxonomy: {
+    key: 'taxonomy',
+    path: `${appModules.designer.path}/taxonomy`,
   },
 }
 
@@ -87,6 +100,10 @@ export const dataModules = {
   dataVis: {
     key: 'dataVis',
     path: `${appModules.data.path}/dataVis`,
+  },
+  validationReport: {
+    key: 'validationReport',
+    path: `${appModules.data.path}/validationReport`,
   },
 }
 

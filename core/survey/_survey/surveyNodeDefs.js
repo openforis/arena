@@ -180,6 +180,3 @@ export const getNodeDefCategoryLevelIndex = nodeDef => survey => {
 
 export const canUpdateCategory = nodeDef => survey =>
   !(NodeDef.isPublished(nodeDef) || isNodeDefParentCode(nodeDef)(survey))
-
-// ====== NodeDef Taxonomy
-export const canUpdateTaxonomy = nodeDef => () => !NodeDef.isPublished(nodeDef)

@@ -4,9 +4,9 @@ import * as CognitoAuth from '@webapp/app/cognitoAuth'
 
 import * as Validation from '@core/validation/validation'
 
+import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
 import { showNotification } from '../app/appNotification/actions'
-import * as LoginState from './loginState'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'

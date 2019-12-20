@@ -40,7 +40,7 @@ export const getMessages = R.propOr({}, keys.messages)
 
 export const getMessage = (lang, defaultValue = '') => R.pipe(getMessages, R.propOr(defaultValue, lang))
 
-export const getSeverity = R.propOr(ValidationResult.severities.error, keys.severity)
+export const getSeverity = R.propOr(ValidationResult.severity.error, keys.severity)
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)
 

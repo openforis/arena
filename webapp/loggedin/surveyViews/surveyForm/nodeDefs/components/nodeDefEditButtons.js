@@ -2,6 +2,7 @@ import './nodeDefEditButtons.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { elementOffset } from '@webapp/utils/domUtils'
@@ -11,9 +12,9 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
+import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../../actions'
-import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditButtons = props => {
   const {
@@ -23,7 +24,6 @@ const NodeDefEditButtons = props => {
     canEditDef,
     hasNodeDefAddChildTo,
     putNodeDefLayoutProp,
-    setNodeDefForEdit,
     setFormNodeDefAddChildTo,
     removeNodeDef,
   } = props
@@ -66,15 +66,12 @@ const NodeDefEditButtons = props => {
           </div>
         )}
 
-        <button
+        <Link
           className="btn btn-s btn-transparent"
-          onClick={() => setNodeDefForEdit(nodeDef)}
-          onMouseDown={e => {
-            e.stopPropagation()
-          }}
+          to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
           <span className="icon icon-pencil2 icon-12px" />
-        </button>
+        </Link>
 
         {NodeDef.isEntity(nodeDef) && (
           <button
@@ -109,7 +106,6 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  setNodeDefForEdit,
   setFormNodeDefAddChildTo,
   putNodeDefLayoutProp,
   removeNodeDef,
