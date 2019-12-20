@@ -213,8 +213,6 @@
     "@esri/proj-codes": "^2.2.0",
     "@godaddy/terminus": "^4.2.1",
     "@sendgrid/mail": "^6.4.0",
-    "amazon-cognito-identity-js": "^3.2.0",
-    "aws-sdk": "^2.575.0",
     "axios": "^0.19.0",
     "bcrypt": "^3.0.7",
     "bluebird": "^3.7.1",
@@ -274,7 +272,6 @@
   },
   "arenaClientPackages": {
     "META": "This exists to minimize the final Docker server image",
-    "amazon-cognito-identity-js": true,
     "d3-interpolate-path": true,
     "d3-tip": true,
     "d3": true,

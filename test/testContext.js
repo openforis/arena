@@ -13,8 +13,8 @@ import { db } from '@server/db/db'
 const createAdminUser = async () => {
   await db.multi(`
     -- Insert the admin user to be used in the test suite:
-    INSERT INTO "user" (name, email)
-    values ('Admin', 'admin@openforis.org')
+    INSERT INTO "user" (name, email, password, status)
+    values ('Admin', 'admin@openforis.org', 'test_password', 'ACCEPTED')
     ON CONFLICT DO NOTHING;
 
     INSERT INTO auth_group_user (user_uuid, group_uuid)
