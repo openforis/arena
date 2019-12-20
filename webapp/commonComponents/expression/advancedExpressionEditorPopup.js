@@ -74,6 +74,7 @@ const CodeMirrorComponent = props => {
       mode: { name: 'arena-expression' },
       hintOptions: { hint: arenaExpressionHint.bind(this, variables) },
     })
+    editor.setSize('100%', 'auto')
 
     editor.setValue(query)
     const onChange = cm => {
