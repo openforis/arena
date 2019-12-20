@@ -8,6 +8,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
@@ -112,7 +113,9 @@ const NodeDefView = props => {
             <button
               className="btn btn-primary"
               onClick={saveNodeDefEdits}
-              aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
+              aria-disabled={
+                !isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef)) || !Validation.isValid(validation)
+              }
             >
               <span className="icon icon-floppy-disk icon-left icon-12px" />
               {i18n.t('common.save')}
