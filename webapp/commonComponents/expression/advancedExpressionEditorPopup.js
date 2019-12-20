@@ -8,27 +8,10 @@ import 'codemirror/addon/hint/show-hint'
 
 import * as Expression from '@core/expressionParser/expression'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
+import { useI18n } from '@webapp/commonComponents/hooks'
+
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
-
 import { mapStateToProps } from './expressionEditorPopupState'
-
-const functionExamples = {
-  min: (
-    <>
-      <tt>max(3,1,2)</tt> = 1
-    </>
-  ),
-  max: (
-    <>
-      <tt>max(3,2,1,2)</tt> = 1
-    </>
-  ),
-  pow: (
-    <>
-      <tt>pow(2,4)</tt> = 2<sup>4</sup> = 16
-    </>
-  ),
-}
 
 const validateExpression = (nodeDefCurrent, variables, exprString) => {
   try {
@@ -54,6 +37,7 @@ const validateExpression = (nodeDefCurrent, variables, exprString) => {
 
 const CodeMirrorComponent = props => {
   const inputRef = useRef()
+  const i18n = useI18n()
 
   const { nodeDefCurrent, setValidation, setExpressionCanBeApplied, query, updateDraft, variables } = props
 
@@ -72,7 +56,7 @@ const CodeMirrorComponent = props => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(this, variables) },
+      hintOptions: { hint: arenaExpressionHint.bind(this, i18n, variables) },
     })
     editor.setSize('100%', 'auto')
 

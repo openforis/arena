@@ -342,8 +342,6 @@ export const enTranslation = {
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
-    variable: 'Variable',
-    variables: 'Variables',
     function: 'Function',
     functionDescriptions: {
       min: 'Take the minimum of the arguments',
