@@ -73,7 +73,17 @@ const CodeMirrorComponent = props => {
     return () => editor.toTextArea()
   }, effectDependencies)
 
-  return <textarea ref={inputRef} />
+  return (
+    <div>
+      <textarea ref={inputRef} />
+      <div className="expression-editor-popup__editor-help">
+        <p>{i18n.t('nodeDefEdit.editorHelp')}</p>
+        <p>
+          <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
+        </p>
+      </div>
+    </div>
+  )
 }
 
 const AdvancedExpressionEditorPopup = props => {
