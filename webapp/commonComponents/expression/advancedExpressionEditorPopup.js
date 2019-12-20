@@ -56,7 +56,7 @@ const CodeMirrorComponent = props => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(this, i18n, variables) },
+      hintOptions: { hint: arenaExpressionHint.bind(null, i18n, variables) },
     })
     editor.setSize('100%', 'auto')
 

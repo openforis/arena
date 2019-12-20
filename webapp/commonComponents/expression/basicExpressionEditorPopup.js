@@ -8,17 +8,10 @@ import * as Expression from '@core/expressionParser/expression'
 import { useI18n } from '../hooks'
 import ExpressionNode from './nodes/expressionNode'
 
-import { useExpressionEditorPopupState, mapStateToProps } from './expressionEditorPopupState'
+import { mapStateToProps } from './expressionEditorPopupState'
 
 const BasicExpressionEditorPopup = props => {
-  // IsGeneralExpression: this not just a boolean expression, i.e. the advanced mode can be used
   const { nodeDefCurrent, isBoolean, variables, updateDraft, queryDraft, exprDraft, exprDraftValid } = props
-
-  // Const {
-  //   queryDraft,
-  //   exprDraft,
-  //   exprDraftValid,
-  // } = useExpressionEditorPopupState(props)
 
   const i18n = useI18n()
 
