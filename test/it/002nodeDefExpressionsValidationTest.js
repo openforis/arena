@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import * as R from 'ramda'
 
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Survey from '@core/survey/survey'
@@ -10,14 +11,14 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { fetchFullContextSurvey } from '../testContext'
 
 const validateExpression = async (survey, nodeDefName, expression) => {
-  const nodeDef = Survey.getNodeDefByName(nodeDefName)(survey)
-
-  nodeDef[NodeDef.keys.props] = {
-    ...NodeDef.getProps(nodeDef),
-    [NodeDef.propKeys.validations]: {
-      [NodeDefValidations.keys.expressions]: [{ [NodeDefExpression.keys.expression]: expression }],
-    },
-  }
+  const nodeDef = R.pipe(
+    Survey.getNodeDefByName(nodeDefName),
+    NodeDef.mergePropsAdvanced({
+      [NodeDef.keysPropsAdvanced.validations]: {
+        [NodeDefValidations.keys.expressions]: [{ [NodeDefExpression.keys.expression]: expression }],
+      },
+    }),
+  )(survey)
 
   return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, Survey.dependencyTypes.validations)
 }

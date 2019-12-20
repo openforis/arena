@@ -123,3 +123,33 @@ button, .btn {
     background-color: rgba($red, 0.9) !important;
   }
 }
+
+.btn-primary, .btn-cancel {
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.btn-primary {
+  background-color: $blue;
+  color: $white;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: lighten($blue, 15%);
+  }
+}
+
+.btn-cancel {
+  color: $blue;
+}
+
+.button-bar {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    margin: 0 .5rem;
+  }
+}

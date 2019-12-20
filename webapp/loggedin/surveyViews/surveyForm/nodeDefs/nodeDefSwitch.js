@@ -12,7 +12,7 @@ import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import { putNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
+import { setNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 import * as RecordState from '../../record/recordState'
 
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
@@ -134,7 +134,7 @@ const mapStateToProps = (state, props) => {
 }
 
 export default connect(mapStateToProps, {
-  putNodeDefProp,
+  setNodeDefProp,
   putNodeDefLayoutProp,
   updateNode,
   removeNode,

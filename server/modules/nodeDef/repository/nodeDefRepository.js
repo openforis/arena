@@ -12,9 +12,11 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
   const def = advanced
     ? R.pipe(
         def => (R.isEmpty(nodeDef.props_advanced_draft) ? def : R.assoc('draft_advanced', true, def)),
-        R.assoc('props', R.mergeDeepLeft(nodeDef.props, nodeDef.props_advanced)),
-        R.assoc('props_draft', R.mergeDeepLeft(nodeDef.props_draft, nodeDef.props_advanced_draft)),
-        R.omit(['props_advanced', 'props_advanced_draft']),
+        R.when(
+          R.always(draft),
+          R.assoc('props_advanced', R.mergeDeepLeft(nodeDef.props_advanced_draft, nodeDef.props_advanced)),
+        ),
+        R.omit(['props_advanced_draft']),
       )(nodeDef)
     : nodeDef
 
@@ -32,14 +34,15 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
   await client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-      (parent_uuid, uuid, type, props_draft, meta)
-    VALUES ($1, $2, $3, $4, $5::jsonb)
+      (parent_uuid, uuid, type, props_draft, props_advanced_draft, meta)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *`,
     [
       NodeDef.getParentUuid(nodeDef),
       NodeDef.getUuid(nodeDef),
       NodeDef.getType(nodeDef),
       NodeDef.getProps(nodeDef),
+      NodeDef.getPropsAdvanced(nodeDef),
       NodeDef.getMeta(nodeDef),
     ],
     def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef

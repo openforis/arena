@@ -5,25 +5,5 @@
   .modal-content {
     background-color: $white;
   }
-
-  .btn-cancel, .btn-ok {
-    font-weight: 600;
-    min-width: 80px;
-  }
-
-  .btn-cancel {
-    color: $blue;
-  }
-
-  .btn-ok {
-    background-color: $blue;
-    color: $white;
-    text-transform: uppercase;
-
-    &:hover {
-      background-color: lighten($blue, 15%);
-    }
-  }
-
-
+  
 }

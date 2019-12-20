@@ -9,7 +9,7 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 
 const AdvancedProps = props => {
-  const { nodeDef, validation, nodeDefParent, putNodeDefProp, readOnly } = props
+  const { nodeDef, validation, nodeDefParent, setNodeDefProp, readOnly } = props
 
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
@@ -24,17 +24,17 @@ const AdvancedProps = props => {
               checked={NodeDef.isReadOnly(nodeDef)}
               disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-              onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}
+              onChange={checked => setNodeDefProp(NodeDef.propKeys.readOnly, checked)}
             />
           </FormItem>
 
           <NodeDefExpressionsProp
             nodeDef={nodeDef}
             nodeDefValidation={validation}
-            putNodeDefProp={putNodeDefProp}
+            setNodeDefProp={setNodeDefProp}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
             readOnly={readOnly}
-            propName={NodeDef.propKeys.defaultValues}
+            propName={NodeDef.keysPropsAdvanced.defaultValues}
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant={true}
             isBoolean={NodeDef.isBoolean(nodeDef)}
@@ -45,10 +45,10 @@ const AdvancedProps = props => {
       <NodeDefExpressionsProp
         nodeDef={nodeDef}
         nodeDefValidation={validation}
-        putNodeDefProp={putNodeDefProp}
+        setNodeDefProp={setNodeDefProp}
         label={i18n.t('nodeDefEdit.advancedProps.applicableIf')}
         readOnly={readOnly}
-        propName={NodeDef.propKeys.applicable}
+        propName={NodeDef.keysPropsAdvanced.applicable}
         applyIf={false}
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}

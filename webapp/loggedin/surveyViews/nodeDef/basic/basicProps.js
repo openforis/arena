@@ -16,7 +16,7 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import * as SurveyState from '@webapp/survey/surveyState'
 import LabelsEditor from '../../labelsEditor/labelsEditor'
-import * as NodeDefEditState from '../nodeDefEditState'
+import * as NodeDefState from '../nodeDefState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
@@ -37,8 +37,8 @@ const BasicProps = props => {
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
 
-    putNodeDefProp,
-    putNodeDefLayoutProp,
+    setNodeDefProp,
+    setNodeDefLayoutProp,
   } = props
 
   const i18n = useI18n()
@@ -57,19 +57,19 @@ const BasicProps = props => {
         <Input
           value={NodeDef.getName(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-          onChange={value => putNodeDefProp(nodeDef, NodeDef.propKeys.name, normalizeName(value))}
+          onChange={value => setNodeDefProp(NodeDef.propKeys.name, normalizeName(value))}
         />
       </FormItem>
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={labels => putNodeDefProp(nodeDef, NodeDef.propKeys.labels, labels)}
+        onChange={labels => setNodeDefProp(NodeDef.propKeys.labels, labels)}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={descriptions => putNodeDefProp(nodeDef, NodeDef.propKeys.descriptions, descriptions)}
+        onChange={descriptions => setNodeDefProp(NodeDef.propKeys.descriptions, descriptions)}
       />
 
       {NodeDef.isCode(nodeDef) && (
@@ -77,13 +77,13 @@ const BasicProps = props => {
           surveyCycleKey={surveyCycleKey}
           nodeDef={nodeDef}
           validation={validation}
-          putNodeDefProp={putNodeDefProp}
-          putNodeDefLayoutProp={putNodeDefLayoutProp}
+          setNodeDefProp={setNodeDefProp}
+          setNodeDefLayoutProp={setNodeDefLayoutProp}
         />
       )}
 
       {NodeDef.isTaxon(nodeDef) && (
-        <TaxonProps nodeDef={nodeDef} validation={validation} putNodeDefProp={putNodeDefProp} />
+        <TaxonProps nodeDef={nodeDef} validation={validation} setNodeDefProp={setNodeDefProp} />
       )}
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
@@ -91,7 +91,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
-            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.key, checked)}
+            onChange={checked => setNodeDefProp(NodeDef.propKeys.key, checked)}
           />
         </FormItem>
       )}
@@ -101,7 +101,7 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
-            onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.multiple, checked)}
+            onChange={checked => setNodeDefProp(NodeDef.propKeys.multiple, checked)}
           />
         </FormItem>
       )}
@@ -110,7 +110,7 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={renderType => putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.renderType, renderType)}
+            onChange={renderType => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, renderType)}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
@@ -132,8 +132,7 @@ const BasicProps = props => {
           <ButtonGroup
             selectedItemKey={displayIn}
             onChange={displayIn =>
-              putNodeDefLayoutProp(
-                nodeDef,
+              setNodeDefLayoutProp(
                 NodeDefLayout.keys.pageUuid,
                 displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4(),
               )
@@ -161,8 +160,7 @@ const BasicProps = props => {
             deselectable={true}
             selectedItemKey={cyclesNodeDef}
             onChange={cycles =>
-              putNodeDefProp(
-                nodeDef,
+              setNodeDefProp(
                 NodeDef.propKeys.cycles,
                 cycles.sort((a, b) => Number(a) - Number(b)),
               )
@@ -185,7 +183,7 @@ const BasicProps = props => {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const nodeDef = NodeDefState.getNodeDef(state)
   const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
 
   const displayAsFormDisabled = false

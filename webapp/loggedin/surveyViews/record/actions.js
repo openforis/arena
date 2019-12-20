@@ -46,7 +46,7 @@ const _navigateToModuleDataHome = history => history.push(appModuleUri(appModule
 export const recordDeleted = history => dispatch => {
   dispatch({ type: recordDelete })
   dispatch(showNotification('recordView.justDeleted'))
-  _navigateToModuleDataHome(history)
+  history.goBack()
 }
 
 export const sessionExpired = history => dispatch => {

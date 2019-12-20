@@ -6,7 +6,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
 import FormDesignerView from './formDesigner/formDesignerView'
-import NodeDefEditView from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditView'
+import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
@@ -36,12 +36,12 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           },
 
           {
-            component: NodeDefEditView,
+            component: NodeDefView,
             path: appModuleUri(designerModules.nodeDef),
           },
 
           {
-            component: NodeDefEditView,
+            component: NodeDefView,
             path: `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid/`,
           },
 

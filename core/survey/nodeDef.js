@@ -25,31 +25,36 @@ export const keys = {
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
   props: ObjectUtils.keys.props,
+  propsAdvanced: 'propsAdvanced',
   meta: 'meta',
   draftAdvanced: 'draftAdvanced',
   type: 'type',
   deleted: 'deleted',
   analysis: 'analysis',
   published: 'published',
+  temporary: 'temporary',
 }
 
 export const propKeys = {
-  applicable: 'applicable',
   cycles: 'cycles',
-  defaultValues: 'defaultValues',
   descriptions: ObjectUtils.keysProps.descriptions,
   key: 'key',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
-  validations: 'validations',
 
   // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
+}
+
+export const keysPropsAdvanced = {
+  applicable: 'applicable',
+  defaultValues: 'defaultValues',
+  validations: 'validations',
 }
 
 const metaKeys = {
@@ -60,7 +65,7 @@ export const maxKeyAttributes = 3
 
 // ==== CREATE
 
-export const newNodeDef = (nodeDefParent, type, cycle, props, analysis = false) => ({
+export const newNodeDef = (nodeDefParent, type, cycle, props, propsAdvanced = {}, analysis = false) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: getUuid(nodeDefParent),
   [keys.type]: type,
@@ -68,6 +73,9 @@ export const newNodeDef = (nodeDefParent, type, cycle, props, analysis = false) 
   [keys.props]: {
     ...props,
     [propKeys.cycles]: [cycle],
+  },
+  [keys.propsAdvanced]: {
+    ...propsAdvanced,
   },
   [keys.meta]: {
     [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
@@ -109,6 +117,7 @@ export const isTaxon = isType(nodeDefType.taxon)
 export const isPublished = R.propEq(keys.published, true)
 export const isDeleted = R.propEq(keys.deleted, true)
 export const isAnalysis = R.propEq(keys.analysis, true)
+export const isTemporary = R.propEq(keys.temporary, true)
 
 export const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
@@ -127,14 +136,18 @@ export const getTaxonomyUuid = ObjectUtils.getProp(propKeys.taxonomyUuid)
 export const getCycleFirst = R.pipe(getCycles, R.head)
 
 // Advanced props
-export const getDefaultValues = ObjectUtils.getProp(propKeys.defaultValues, [])
+export const getPropsAdvanced = R.propOr({}, keys.propsAdvanced)
+export const getPropAdvanced = (prop, defaultTo = null) =>
+  R.pipe(getPropsAdvanced, R.pathOr(defaultTo, prop.split('.')))
+export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
+
+export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 
-export const getValidations = ObjectUtils.getProp(propKeys.validations, {})
-
-export const getApplicable = ObjectUtils.getProp(propKeys.applicable, [])
+export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
-export const hasAdvancedPropsDraft = R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not)
+
+export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -146,6 +159,14 @@ export const getParentCodeDefUuid = ObjectUtils.getProp(propKeys.parentCodeDefUu
 // ==== UPDATE
 
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
+export const mergeProps = ObjectUtils.mergeProps
+const assocPropsAdvanced = R.assoc(keys.propsAdvanced)
+export const mergePropsAdvanced = propsAdvanced => nodeDef =>
+  R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), propsAdvancedUpdated =>
+    assocPropsAdvanced(propsAdvancedUpdated, nodeDef),
+  )(nodeDef)
+
+export const dissocTemporary = R.dissoc(keys.temporary)
 
 // ==== UTILS
 export const canNodeDefBeMultiple = nodeDef =>

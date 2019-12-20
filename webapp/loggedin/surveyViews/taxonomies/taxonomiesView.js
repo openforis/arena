@@ -12,15 +12,15 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
-import * as NodeDefEditState from '@webapp/loggedin/surveyViews/nodeDefEdit/nodeDefEditState'
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
 
-import { putNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../taxonomy/actions'
 import ItemsView from '../items/itemsView'
 
 const TaxonomiesView = props => {
-  const { taxonomies, nodeDef, createTaxonomy, deleteTaxonomy, canSelect, readOnly, putNodeDefProp } = props
+  const { taxonomies, nodeDef, createTaxonomy, deleteTaxonomy, canSelect, readOnly, setNodeDefProp } = props
 
   const selectedItemUuid = nodeDef && NodeDef.getTaxonomyUuid(nodeDef)
 
@@ -48,7 +48,7 @@ const TaxonomiesView = props => {
       canDelete={canDelete}
       onDelete={deleteTaxonomy}
       canSelect={canSelect}
-      onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
+      onSelect={taxonomy => setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
       onClose={onClose}
       readOnly={readOnly}
     />
@@ -68,7 +68,7 @@ const mapStateToProps = state => {
     })),
   )(survey)
   // A nodeDef taxon is begin edited.
-  const nodeDef = !readOnly && NodeDefEditState.getNodeDef(state)
+  const nodeDef = !readOnly && NodeDefState.getNodeDef(state)
   const canSelect = nodeDef && NodeDef.isTaxon(nodeDef)
 
   return {
@@ -82,5 +82,5 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   createTaxonomy,
   deleteTaxonomy,
-  putNodeDefProp,
+  setNodeDefProp,
 })(TaxonomiesView)
