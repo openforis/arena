@@ -538,6 +538,7 @@ export const enTranslation = {
       expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
       expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
+      formContainsErrors: 'The form contains errors. Please, fix them before saving.',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',
       nameInvalid:

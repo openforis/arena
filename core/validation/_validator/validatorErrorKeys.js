@@ -50,6 +50,7 @@ export const ValidatorErrorKeys = {
     expressionApplyIfOnlyLastOneCanBeEmpty: 'validationErrors.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty',
     expressionDuplicate: 'validationErrors.nodeDefEdit.expressionDuplicate',
     expressionRequired: 'validationErrors.nodeDefEdit.expressionRequired',
+    formContainsErrors: 'validationErrors.nodeDefEdit.formContainsErrors',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',

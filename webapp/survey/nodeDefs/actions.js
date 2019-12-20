@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Validation from '@core/validation/validation'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -229,40 +230,47 @@ export const cancelNodeDefEdits = history => async (dispatch, getState) => {
  */
 export const saveNodeDefEdits = () => async (dispatch, getState) => {
   const state = getState()
-  const survey = SurveyState.getSurvey(state)
-  const surveyId = SurveyState.getSurveyId(state)
-  const cycle = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
+  const validation = NodeDefState.getValidation(state)
 
-  dispatch(showAppLoader())
+  if (Validation.isValid(validation)) {
+    dispatch(showAppLoader())
 
-  const isNodeDefNew = NodeDef.isTemporary(nodeDef)
-  const nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
+    const survey = SurveyState.getSurvey(state)
+    const surveyId = SurveyState.getSurveyId(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
+    const nodeDef = NodeDefState.getNodeDef(state)
 
-  if (isNodeDefNew) {
-    const {
-      data: { nodeDefsValidation, nodeDefsUpdated },
-    } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    const isNodeDefNew = NodeDef.isTemporary(nodeDef)
+    const nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
 
-    dispatch(_updateParentLayout(nodeDefUpdated))
+    if (isNodeDefNew) {
+      const {
+        data: { nodeDefsValidation, nodeDefsUpdated },
+      } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
+      dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+
+      dispatch(_updateParentLayout(nodeDefUpdated))
+    } else {
+      const props = NodeDefState.getPropsUpdated(state)
+      const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
+
+      dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
+    }
+
+    // Update node def edit state
+    dispatch({
+      type: nodeDefEditUpdate,
+      nodeDef: nodeDefUpdated,
+      nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
+      surveyCycleKey: cycle,
+      nodeDefValidation: NodeDefState.getValidation(state),
+    })
+
+    dispatch(hideAppLoader())
   } else {
-    const props = NodeDefState.getPropsUpdated(state)
-    const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
-
-    dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
+    const i18n = AppState.getI18n(state)
+    dispatch(showNotification(i18n.t(Validation.messageKeys.nodeDefEdit.formContainsErrors)))
   }
-
-  // Update node def edit state
-  dispatch({
-    type: nodeDefEditUpdate,
-    nodeDef: nodeDefUpdated,
-    nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
-    surveyCycleKey: cycle,
-    nodeDefValidation: NodeDefState.getValidation(state),
-  })
-
-  dispatch(hideAppLoader())
 }
 
 // ==== DELETE
