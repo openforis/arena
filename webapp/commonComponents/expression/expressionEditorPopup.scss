@@ -1,3 +1,6 @@
+@import '~codemirror/lib/codemirror.css';
+@import '~codemirror/addon/hint/show-hint';
+
 @import "~@webapp/style/vars";
 
 .expression-editor-popup {
