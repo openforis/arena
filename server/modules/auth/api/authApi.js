@@ -2,7 +2,6 @@ import * as passport from 'passport'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as Jwt from '@server/utils/jwt'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -80,9 +79,7 @@ export const init = app => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromRecordThread(socketId)
 
-      const token = req.headers.authorization.slice(Jwt.bearerPrefix.length)
-
-      await AuthService.blacklistToken(token)
+      req.logout()
 
       Response.sendOk(res)
     } catch (error) {

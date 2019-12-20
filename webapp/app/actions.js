@@ -4,8 +4,6 @@ import * as User from '@core/user/user'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import Counter from '@core/counter'
 
-import * as CognitoAuth from './cognitoAuth'
-
 import * as AppState from './appState'
 
 export const appPropsChange = 'app/props/change'
@@ -19,18 +17,8 @@ export const throwSystemError = error => dispatch => dispatch({ type: systemErro
 
 export const initApp = () => async dispatch => {
   const i18n = await i18nFactory.createI18nPromise('en')
-  let user = null
-  let survey = null
-
-  // Get jwt token to check if user is already logged in
   try {
-    const token = await CognitoAuth.getJwtToken()
-    if (token) {
-      const userSurvey = await getUserSurvey()
-      user = userSurvey.user
-      survey = userSurvey.survey
-    }
-
+    const { user, survey } = await getUserSurvey()
     dispatch({
       type: appPropsChange,
       status: AppState.appStatus.ready,
@@ -39,8 +27,11 @@ export const initApp = () => async dispatch => {
       survey,
     })
   } catch (error) {
-    dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n })
-    CognitoAuth.logout()
+    dispatch({
+      type: appPropsChange,
+      status: AppState.appStatus.ready,
+      i18n,
+    })
   }
 }
 
@@ -71,7 +62,6 @@ export const logout = () => async dispatch => {
   dispatch(showAppLoader())
 
   await axios.post('/auth/logout')
-  CognitoAuth.logout()
 
   dispatch({ type: appUserLogout })
   dispatch(hideAppLoader())
