@@ -6,7 +6,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
-import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
 export { userStatus } from './_user/userStatus'
