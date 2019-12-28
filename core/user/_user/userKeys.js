@@ -9,4 +9,5 @@ export const keys = {
   hasProfilePicture: 'hasProfilePicture',
   password: 'password',
   prefs: 'prefs',
+  status: 'status',
 }

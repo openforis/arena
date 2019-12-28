@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as StringUtils from '@core/stringUtils'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
+import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
 export { userStatus } from './_user/userStatus'
@@ -28,7 +28,7 @@ export const dissocPassword = R.dissoc(keys.password)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
-export const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
+export const hasAccepted = R.propEq(keys.status, userStatus.ACCEPTED)
 
 // ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user =>
