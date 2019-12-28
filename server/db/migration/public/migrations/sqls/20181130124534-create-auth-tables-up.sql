@@ -17,12 +17,5 @@ CREATE TABLE
   PRIMARY KEY (user_uuid, group_uuid)
 );
 
-CREATE TABLE jwt_token_blacklist
-(
-  token_jti  VARCHAR NOT NULL,
-  expiration bigint      NULL, -- TODO: can it really be null though?
-  PRIMARY KEY (token_jti)
-);
-
 INSERT INTO auth_group (name)
 VALUES ('systemAdmin');
