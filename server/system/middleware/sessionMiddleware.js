@@ -8,7 +8,7 @@ import { db } from '@server/db/db'
 const pgSession = connectPgSimple(session)
 
 const sessionOptions = {
-  secret: ProcessUtils.ENV.sessionCookieIdSecret,
+  secret: ProcessUtils.ENV.sessionIdCookieSecret,
   resave: false,
   saveUninitialized: true,
   cookie: {

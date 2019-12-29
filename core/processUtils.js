@@ -31,7 +31,7 @@ export const ENV = {
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
   // SESSION
-  sessionCookieIdSecret: process.env.SESSION_COOKIE_ID_SECRET,
+  sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development
