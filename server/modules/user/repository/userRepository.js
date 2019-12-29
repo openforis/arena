@@ -6,7 +6,7 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
-const selectFields = ['uuid', 'name', 'email', 'password', 'prefs']
+const selectFields = ['uuid', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // In sql queries, user table must be surrounded by "" e.g. "user"
@@ -78,6 +78,16 @@ export const fetchUserByEmail = async (email, client = db) =>
   await client.oneOrNone(
     `
     SELECT ${selectFieldsCommaSep}
+    FROM "user" u
+    WHERE u.email = $1`,
+    [email],
+    camelize,
+  )
+
+export const fetchUserAndPasswordByEmail = async (email, client = db) =>
+  await client.oneOrNone(
+    `
+    SELECT ${selectFieldsCommaSep}, password
     FROM "user" u
     WHERE u.email = $1`,
     [email],

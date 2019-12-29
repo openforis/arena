@@ -17,14 +17,10 @@ export const isEqual = ObjectUtils.isEqual
 export const getUuid = ObjectUtils.getUuid
 export const getName = R.propOr('', keys.name)
 export const getEmail = R.prop(keys.email)
-export const getPassword = R.prop(keys.password)
 export const getLang = R.propOr('en', keys.lang)
 export const getAuthGroups = ObjectUtils.getAuthGroups
 export const getPrefs = R.propOr({}, keys.prefs)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
-
-// ====== UPDATE
-export const dissocPassword = R.dissoc(keys.password)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))

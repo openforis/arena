@@ -41,7 +41,7 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
 // ==== READ
 
 const _assocUserAuthGroups = async user =>
-  R.pipe(User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user))), User.dissocPassword)(user)
+  User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
 
 const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
@@ -63,11 +63,10 @@ export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemA
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
-  const user = await UserRepository.fetchUserByEmail(email)
+  const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
-  if (user && (await passwordCompareFn(password, User.getPassword(user)))) {
-    return _assocUserAuthGroups(user)
-  }
+  if (user && (await passwordCompareFn(password, user.password)))
+    return await _assocUserAuthGroups(R.dissoc('password', user))
 
   return null
 }

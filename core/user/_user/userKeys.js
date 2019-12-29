@@ -7,7 +7,6 @@ export const keys = {
   lang: 'lang',
   authGroups: ObjectUtils.keys.authGroups,
   hasProfilePicture: 'hasProfilePicture',
-  password: 'password',
   prefs: 'prefs',
   status: 'status',
 }
