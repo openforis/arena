@@ -1,12 +1,14 @@
 import * as session from 'express-session'
 import connectPgSimple from 'connect-pg-simple'
 
-const db = require('@server/db/db')
+import * as ProcessUtils from '@core/processUtils'
+
+import { db } from '@server/db/db'
 
 const pgSession = connectPgSimple(session)
 
 const sessionOptions = {
-  secret: process.env.FOO_COOKIE_SECRET,
+  secret: ProcessUtils.ENV.sessionCookieIdSecret,
   resave: false,
   saveUninitialized: true,
   cookie: {

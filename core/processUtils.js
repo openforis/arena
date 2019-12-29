@@ -30,6 +30,8 @@ export const ENV = {
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
+  // SESSION
+  sessionCookieIdSecret: process.env.SESSION_COOKIE_ID_SECRET,
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development
