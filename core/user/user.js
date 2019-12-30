@@ -21,6 +21,7 @@ export const getLang = R.propOr('en', keys.lang)
 export const getAuthGroups = ObjectUtils.getAuthGroups
 export const getPrefs = R.propOr({}, keys.prefs)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
+export const getStatus = R.prop(keys.status)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))

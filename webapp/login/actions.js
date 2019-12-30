@@ -36,6 +36,11 @@ export const login = (email, password) =>
     if (user) {
       dispatch(setEmail(''))
       dispatch(initUser())
+    } else if (message === Validation.messageKeys.user.passwordChangeRequired) {
+      dispatch({
+        type: loginUserActionUpdate,
+        action: LoginState.userActions.setNewPassword,
+      })
     } else {
       const i18n = AppState.getI18n(getState())
       dispatch(setLoginError(i18n.t(message)))

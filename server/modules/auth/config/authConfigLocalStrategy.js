@@ -8,14 +8,22 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserPasswordUtils from '@server/modules/user/service/userPasswordUtils'
 
 const _verifyCallback = async (req, email, password, done) => {
-  const sendResp = (user, message) => (user ? done(null, user) : done(null, false, { message }))
+  const sendUser = user => done(null, user)
+  const sendError = message => done(null, false, { message })
 
   if (Validation.isValid(UserValidator.validateEmail(User.keys.email, { [User.keys.email]: email }))) {
     const user = await UserManager.findUserByEmailAndPassword(email, password, UserPasswordUtils.comparePassword)
-    if (user) sendResp(user)
-    else sendResp(null, Validation.messageKeys.user.userNotFound)
+    if (user) {
+      if (User.getStatus(user) === User.userStatus.FORCE_CHANGE_PASSWORD) {
+        sendError(Validation.messageKeys.user.passwordChangeRequired)
+      } else {
+        sendUser(user)
+      }
+    } else {
+      sendError(Validation.messageKeys.user.userNotFound)
+    }
   } else {
-    sendResp(null, Validation.messageKeys.user.emailInvalid)
+    sendError(Validation.messageKeys.user.emailInvalid)
   }
 }
 
