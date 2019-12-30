@@ -6,7 +6,7 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
-const selectFields = ['uuid', 'name', 'email', 'prefs']
+const selectFields = ['uuid', 'name', 'email', 'prefs', 'status']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // In sql queries, user table must be surrounded by "" e.g. "user"
