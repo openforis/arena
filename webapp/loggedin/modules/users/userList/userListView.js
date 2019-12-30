@@ -77,6 +77,7 @@ const UsersListView = ({ canInvite, user, surveyInfo, history }) => {
       module={'users'}
       className="users-list"
       gridTemplateColumns={'35px repeat(3, 1fr) 10rem 50px'}
+      headerLeftComponent={UsersHeaderLeft}
       rowHeaderComponent={UsersRowHeader}
       rowComponent={UsersRow}
       canInvite={canInvite}
