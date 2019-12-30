@@ -12,7 +12,7 @@ const actionHandlers = {
 
   [loginErrorUpdate]: (state, { message }) => LoginState.assocError(message)(state),
 
-  [appUserLogout]: state => LoginState.assocUserAction(LoginState.userActions.login)(state),
+  [appUserLogout]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)
