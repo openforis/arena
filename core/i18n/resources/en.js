@@ -346,6 +346,14 @@ export const enTranslation = {
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
+    function: 'Function',
+    editorHelp: 'Valid expressions are a subset of Javascript.',
+    editorCompletionHelp: '- Show the available variables and functions that can be used',
+    functionDescriptions: {
+      min: 'Take the minimum of the arguments',
+      max: 'Take the maximum of the arguments',
+      pow: 'Raise a number X to the power P',
+    },
     basicProps: {
       key: 'Key',
       multiple: 'Multiple',

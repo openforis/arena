@@ -1,42 +1,88 @@
 import './expressionEditorPopup.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import Popup from '../popup'
 import { useI18n } from '../hooks'
-import ExpressionNode from './nodes/expressionNode'
 
-import { useExpressionEditorPopupState, mapStateToProps } from './expressionEditorPopupState'
+import {
+  useExpressionEditorPopupState,
+  useAdvancedExpressionEditorPopupState,
+  mapStateToProps,
+} from './expressionEditorPopupState'
+
+import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
+import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
 
 const ExpressionEditorPopup = props => {
-  const { nodeDefCurrent, isBoolean, variables, onChange, onClose } = props
+  const { onChange, onClose, hideAdvanced } = props
 
-  const { query, queryDraft, exprDraft, exprDraftValid, updateDraft } = useExpressionEditorPopupState(props)
+  const [expressionCanBeApplied, setExpressionCanBeApplied] = useState(false)
+
+  const {
+    query,
+    queryDraft,
+    exprDraft,
+    exprDraftValid,
+    updateDraft,
+    resetDraft,
+    advanced,
+    setAdvancedEditor,
+  } = useExpressionEditorPopupState({ setExpressionCanBeApplied, ...props })
+
+  const advancedEditorState = useAdvancedExpressionEditorPopupState(props)
 
   const i18n = useI18n()
 
+  let editor
+  if (advanced)
+    editor = (
+      <AdvancedExpressionEditorPopup
+        setExpressionCanBeApplied={setExpressionCanBeApplied}
+        {...props}
+        {...advancedEditorState}
+      />
+    )
+  else
+    editor = (
+      <BasicExpressionEditorPopup
+        query={query}
+        queryDraft={queryDraft}
+        exprDraft={exprDraft}
+        exprDraftValid={exprDraftValid}
+        updateDraft={updateDraft}
+        {...props}
+      />
+    )
+
+  const onToggleAdvancedEditor = () => {
+    if (advanced) resetDraft()
+    setAdvancedEditor(!advanced)
+  }
+
+  const onApply = () => {
+    // By adding a newline to all onChange() params, we specify that
+    // the query was written with this advanced expression editor.
+    // With this, we can always open the query (i.e. the expression)
+    // in advanced editor directly.
+    if (advanced) onChange(advancedEditorState.queryDraft.trimRight() + '\n', advancedEditorState.exprDraft)
+    else onChange(queryDraft, exprDraft)
+  }
+
   return (
     <Popup className="expression-editor-popup" onClose={onClose} padding={20}>
-      <div className="expression-editor__query-container">
-        <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
-          {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
-        </div>
-      </div>
+      <button
+        className="expression-editor-popup__toggle-advanced"
+        hidden={hideAdvanced}
+        onClick={onToggleAdvancedEditor}
+      >
+        {advanced ? i18n.t('nodeDefEdit.basic') : i18n.t('nodeDefEdit.advanced')}
+      </button>
 
-      <div className="expression-editor-popup__expr-container">
-        {exprDraft && (
-          <ExpressionNode
-            variables={variables}
-            node={exprDraft}
-            onChange={updateDraft}
-            isBoolean={isBoolean}
-            nodeDefCurrent={nodeDefCurrent}
-          />
-        )}
-      </div>
+      {editor}
 
       <div className="expression-editor-popup__footer">
         <button className="btn btn-xs" onClick={() => onChange('')} aria-disabled={R.isEmpty(query)}>
@@ -44,11 +90,7 @@ const ExpressionEditorPopup = props => {
           {i18n.t('common.reset')}
         </button>
 
-        <button
-          className="btn btn-xs"
-          onClick={() => onChange(queryDraft, exprDraft)}
-          aria-disabled={query === queryDraft || !exprDraftValid}
-        >
+        <button className="btn btn-xs" onClick={onApply} aria-disabled={!expressionCanBeApplied}>
           <span className="icon icon-checkmark icon-12px" />
           {i18n.t('common.apply')}
         </button>
@@ -67,6 +109,7 @@ ExpressionEditorPopup.defaultProps = {
   isContextParent: false,
   canBeConstant: false, // True if expression can be a constant value like a number or a string
   isBoolean: true, // True if expression returns a boolean condition
+  hideAdvanced: false,
 
   literalSearchParams: null,
   onClose: _ => {},

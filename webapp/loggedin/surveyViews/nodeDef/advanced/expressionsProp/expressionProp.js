@@ -25,6 +25,7 @@ const ExpressionProp = props => {
     isBoolean,
     onUpdate,
     onDelete,
+    hideAdvanced,
   } = props
 
   const i18n = useI18n()
@@ -66,6 +67,7 @@ const ExpressionProp = props => {
             isContextParent={isContextParent}
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
+            hideAdvanced={hideAdvanced}
           />
         </div>
 
@@ -80,6 +82,7 @@ const ExpressionProp = props => {
               onChange={expr => onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))}
               isContextParent={isContextParent}
               canBeConstant={false}
+              hideAdvanced={true}
             />
           </div>
         )}

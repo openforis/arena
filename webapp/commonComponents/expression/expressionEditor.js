@@ -16,6 +16,7 @@ const ExpressionEditor = props => {
     canBeConstant,
     isBoolean,
     onChange,
+    hideAdvanced,
   } = props
 
   const [edit, setEdit] = useState(false)
@@ -38,6 +39,7 @@ const ExpressionEditor = props => {
           isBoolean={isBoolean}
           onClose={() => setEdit(false)}
           onChange={query => applyChange(query)}
+          hideAdvanced={hideAdvanced}
         />
       ) : (
         <div className="expression-editor__query-container">
