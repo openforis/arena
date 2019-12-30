@@ -33,8 +33,12 @@ CREATE TABLE
 (
   uuid          uuid        NOT NULL DEFAULT uuid_generate_v4(),
   user_uuid     uuid        NOT NULL,
-  date_created  TIMESTAMP   NOT NULL,
+  date_created  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
 
   PRIMARY KEY (uuid),
   CONSTRAINT user_reset_password_user_fk FOREIGN KEY (user_uuid) REFERENCES "user" ("uuid")
 );
+
+CREATE UNIQUE INDEX
+user_reset_password_user_idx
+ON user_reset_password (user_uuid);

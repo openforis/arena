@@ -167,7 +167,7 @@ export const useUserViewState = props => {
       }
 
       if (isInvitation) {
-        showNotification('usersView.inviteUserConfirmation', {
+        showNotification('common.emailSentConfirmation', {
           email: formObject.email,
         })
       } else {

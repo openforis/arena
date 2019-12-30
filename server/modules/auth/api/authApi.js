@@ -85,4 +85,15 @@ export const init = app => {
       next(error)
     }
   })
+
+  app.post('/auth/forgot-password', async (req, res, next) => {
+    try {
+      const { email } = Request.getParams(req)
+      const serverUrl = Request.getServerUrl(req)
+      const data = await UserService.generateForgotPasswordUuid(email, serverUrl)
+      res.json(data)
+    } catch (error) {
+      next(error)
+    }
+  })
 }

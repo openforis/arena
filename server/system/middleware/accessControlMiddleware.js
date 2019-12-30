@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as Request from '@server/utils/request'
 
-const privatePaths = [/^\/api\//, /^\/auth\/(?!login|user)/]
+const privatePaths = [/^\/api\//, /^\/auth\/(?!login|user|forgot-password)/]
 
 const checkAuth = (req, res, next) => {
   if (Request.getUser(req)) {

@@ -25,6 +25,7 @@ export const enTranslation = {
     draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
+    emailSentConfirmation: 'An email to {{email}} has been sent',
     empty: 'Empty',
     error: 'Error',
     error_plural: 'Errors',
@@ -304,7 +305,6 @@ export const enTranslation = {
   usersView: {
     inviteUser: 'Invite',
     accepted: 'Accepted',
-    inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
     notAcceptedYet: 'Invitation not accepted yet',
   },
@@ -588,6 +588,7 @@ export const enTranslation = {
     user: {
       emailRequired: 'Email is required',
       emailInvalid: 'Email is invalid',
+      emailNotFound: 'Email not found',
       groupRequired: 'Group is required',
 
       userNameRequired: 'User name is required',
@@ -716,19 +717,25 @@ export const enTranslation = {
   },
 
   emails: {
+    signature: `<p>Thank you,<br>
+      The OpenForis Arena team
+      </p>`,
     userInvite: {
       subject: 'You have been invited to OpenForis Arena!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
              {{temporaryPasswordMsg}}
              <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
-             <p>
-             Thank you,
-             <br>
-             The OpenForis Arena team
-             </p>`,
+             $t(emails.signature)`,
       temporaryPasswordMsg:
         '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
+    },
+    userForgotPassword: {
+      subject: 'OpenForis Arena: password forgot',
+      body: `<p>Hello,</p>
+             <p>You have asked a new password to access the system.</p>
+             <p><a href="{{url}}">Click here to reset your password</a></p>
+             $t(emails.signature)`,
     },
   },
 }

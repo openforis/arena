@@ -4,7 +4,9 @@ import * as Validation from '@core/validation/validation'
 
 import * as LoginState from './loginState'
 import * as AppState from '@webapp/app/appState'
-import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
+import { hideAppLoader, initUser, showAppLoader } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
+import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'
@@ -71,17 +73,13 @@ export const showForgotPasswordForm = () => dispatch => {
 }
 
 export const sendVerificationCode = email =>
-  _createAction(async dispatch => {
-    /* TODO
-    const responseType = await CognitoAuth.forgotPassword(email)
-    if (responseType === CognitoAuth.keysAction.success) {
-      dispatch(showNotification('An email with the verification code has been sent'))
-      dispatch({
-        type: loginUserActionUpdate,
-        action: LoginState.userActions.resetPassword,
-      })
-    }
-    */
+  _createAction(async (dispatch, getState) => {
+    const {
+      data: { errorMessage },
+    } = await axios.post('/auth/forgot-password', { email })
+    const i18n = AppState.getI18n(getState())
+    if (errorMessage) await dispatch(showNotification(i18n.t(errorMessage), null, AppNotificationState.severity.error))
+    else await dispatch(showNotification(i18n.t('common.emailSentConfirmation', { email })))
   })
 
 export const resetPassword = (verificationCode, newPassword) =>

@@ -87,6 +87,20 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
   }
 }
 
+export const generateForgotPasswordUuid = async (email, serverUrl) => {
+  try {
+    await db.tx(async t => {
+      const { uuid, user } = await UserManager.generateForgotPasswordUuid(email, t)
+      const url = `${serverUrl}/resetPassword/?uuid=${uuid}`
+      const lang = User.getLang(user)
+      await Mailer.sendEmail(email, 'emails.userForgotPassword', { url }, lang)
+      return { uuid }
+    })
+  } catch (error) {
+    return { errorMessage: error.message }
+  }
+}
+
 // ====== READ
 
 export const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {

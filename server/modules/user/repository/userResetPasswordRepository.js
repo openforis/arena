@@ -1,12 +1,13 @@
+import * as R from 'ramda'
+
 import { db } from '@server/db/db'
 
-import * as camelize from 'camelize'
-
-export const insertUserResetPassword = async (userUuid, client = db) =>
+export const insertOrUpdateResetPassword = async (userUuid, client = db) =>
   await client.one(
     `INSERT INTO user_reset_password (user_uuid)
     VALUES ($1)
-    RETURNING *`,
+    ON CONFLICT (user_uuid) DO UPDATE SET date_created = NOW() 
+    RETURNING uuid`,
     [userUuid],
-    camelize,
+    R.prop('uuid'),
   )

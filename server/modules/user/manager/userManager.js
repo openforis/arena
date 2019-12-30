@@ -6,10 +6,12 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
+import * as Validation from '@core/validation/validation'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
+import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 
 // ==== CREATE
 export const insertUser = async (user, surveyId, surveyCycleKey, email, password, status, groupUuid, client = db) =>
@@ -38,6 +40,15 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
     }
   })
 
+export const generateForgotPasswordUuid = async email => {
+  const user = await UserRepository.fetchUserByEmail(email)
+  if (user) {
+    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user))
+    return { uuid, user }
+  }
+
+  throw new Error(Validation.messageKeys.user.emailNotFound)
+}
 // ==== READ
 
 const _assocUserAuthGroups = async user =>
