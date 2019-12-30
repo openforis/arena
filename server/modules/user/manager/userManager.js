@@ -99,7 +99,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUsernameAndStatus = UserRepository.updateUsernameAndStatus
+export const updateNamePasswordAndStatus = UserRepository.updateNamePasswordAndStatus
 
 export const updateUserPrefs = async user => ({
   ...(await UserRepository.updateUserPrefs(user)),

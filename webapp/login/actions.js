@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
 import * as LoginState from './loginState'
@@ -33,10 +34,13 @@ export const login = (email, password) =>
       data: { message, user },
     } = await axios.post('/auth/login', { email, password })
 
-    if (user) {
+    if (user && User.hasAccepted(user)) {
       dispatch(setEmail(''))
       dispatch(initUser())
-    } else if (message === Validation.messageKeys.user.passwordChangeRequired) {
+    } else if (
+      User.getStatus(user) === User.userStatus.INVITED ||
+      message === Validation.messageKeys.user.passwordChangeRequired
+    ) {
       dispatch({
         type: loginUserActionUpdate,
         action: LoginState.userActions.setNewPassword,
@@ -49,22 +53,11 @@ export const login = (email, password) =>
 
 export const acceptInvitation = (name, password) =>
   _createAction(async dispatch => {
-    /* TODO
-    const responseType = await CognitoAuth.acceptInvitation(name, password)
-
-    if (responseType === CognitoAuth.keysAction.success) {
-      const cognitoUser = CognitoAuth.getUser()
-      await axios.put(`/api/user/${cognitoUser.username}/accept-invitation`, {
-        name,
-      })
-      dispatch(setEmail(''))
-      dispatch({
-        type: loginUserActionUpdate,
-        action: LoginState.userActions.login,
-      })
-      dispatch(initUser())
-    }
-    */
+    await axios.put(`/api/user/accept-invitation`, {
+      name,
+      password,
+    })
+    dispatch(initUser())
   })
 
 export const showForgotPasswordForm = () => dispatch => {
