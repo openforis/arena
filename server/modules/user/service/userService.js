@@ -91,7 +91,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
     await db.tx(async t => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
-      const url = `${serverUrl}/resetPassword/?uuid=${uuid}`
+      const url = `${serverUrl}/guest/resetForgotPassword/${uuid}`
       const lang = User.getLang(user)
       await Mailer.sendEmail(email, 'emails.userForgotPassword', { url }, lang)
       return { uuid }
@@ -164,6 +164,18 @@ export const acceptInvitation = async (user, userUuid, name, client = db) => {
   }
 
   await UserManager.updateUsernameAndStatus(user, name, User.userStatus.ACCEPTED, client)
+}
+
+export const updateUserPasswordForgot = async (resetPasswordUuid, password) => {
+  const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
+  if (userUuid) {
+    const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
+    // TODO
+    // UserManager.updatePassword(userUuid, passwordEncrypted)
+    await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid)
+  } else {
+    throw new Error(`User password reset not found or expired: ${resetPasswordUuid}`)
+  }
 }
 
 // DELETE

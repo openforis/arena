@@ -146,9 +146,14 @@ export const enTranslation = {
     resetPassword: 'Reset password',
     login: 'Login',
     forgotPassword: 'Forgot password',
-    forgotPasswordLinkInvalid: 'Invalid or expired link',
     sendVerificationCode: 'Send verification code',
+  },
+
+  resetForgotPasswordView: {
     setNewPassword: 'Set new password',
+    forgotPasswordLinkInvalid: 'Invalid or expired link',
+    resetPasswordComplete: 'Your password has been reset successfully',
+    goToLoginPage: 'Go to login page',
   },
 
   homeView: {

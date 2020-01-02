@@ -18,8 +18,8 @@ import * as AppWebSocket from './appWebSocket'
 import * as AppState from './appState'
 
 import { initApp, throwSystemError } from './actions'
-import { isResetForgotPasswordUri } from '@webapp/guest/guestModules'
-import ResetForgotPasswordView from '@webapp/guest/resetForgotPasswordView'
+import { isGuestUri, guestModules } from '@webapp/guest/guestModules'
+import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
 
 const AppRouterSwitch = props => {
   const { isReady, systemError, user, initApp, throwSystemError, activeJobUpdate } = props
@@ -69,8 +69,8 @@ const AppRouterSwitch = props => {
             path="/app"
             render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}
           />
-        ) : isResetForgotPasswordUri(location.pathname) ? (
-          <ResetForgotPasswordView />
+        ) : isGuestUri(location.pathname) ? (
+          <InnerModuleSwitch modules={Object.values(guestModules)} />
         ) : (
           <LoginView />
         )}

@@ -138,3 +138,5 @@ export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) 
         ),
       ]),
   )
+
+export const deleteUserResetPasswordByUuid = UserResetPasswordRepository.deleteUserResetPasswordByUuid

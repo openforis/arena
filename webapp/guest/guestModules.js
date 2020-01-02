@@ -1,11 +1,18 @@
-export const loginModuleUri = module => `/guest/${module.path}/`
+import * as R from 'ramda'
+
+import ResetForgotPasswordView from './resetForgotPassword/resetForgotPasswordView'
+
+const pathPrefix = '/guest/'
+
+const modulePathFull = modulePath => `${pathPrefix}${modulePath}/`
 
 // ==== Guest modules
-export const guestModules = {
-  resetForgotPassword: {
+export const guestModules = [
+  {
     key: 'resetForgotPassword',
-    path: 'resetForgotPassword',
+    path: modulePathFull('resetForgotPassword/:uuid'),
+    component: ResetForgotPasswordView,
   },
-}
+]
 
-export const isResetForgotPasswordUri = uri => uri === loginModuleUri(guestModules.resetForgotPassword)
+export const isGuestUri = R.startsWith(pathPrefix)

@@ -107,4 +107,14 @@ export const init = app => {
       next(error)
     }
   })
+
+  app.post('/auth/reset-password/:uuid', async (req, res, next) => {
+    try {
+      const { uuid, password } = Request.getParams(req)
+      await UserService.updateUserPasswordForgot(uuid, password)
+      res.json({ result: true })
+    } catch (error) {
+      next(error)
+    }
+  })
 }
