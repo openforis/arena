@@ -86,12 +86,23 @@ export const init = app => {
     }
   })
 
-  app.post('/auth/forgot-password', async (req, res, next) => {
+  // ===== RESET PASSWORD
+  app.post('/auth/reset-password', async (req, res, next) => {
     try {
       const { email } = Request.getParams(req)
       const serverUrl = Request.getServerUrl(req)
-      const data = await UserService.generateForgotPasswordUuid(email, serverUrl)
+      const data = await UserService.generateResetPasswordUuid(email, serverUrl)
       res.json(data)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/auth/reset-password/:uuid', async (req, res, next) => {
+    try {
+      const { uuid } = Request.getParams(req)
+      const user = await UserService.findResetPasswordUserByUuid(uuid)
+      res.json({ user })
     } catch (error) {
       next(error)
     }

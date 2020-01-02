@@ -11,3 +11,16 @@ export const insertOrUpdateResetPassword = async (userUuid, client = db) =>
     [userUuid],
     R.prop('uuid'),
   )
+
+/**
+ * Finds a not-expired (date_created < now() - 48 hours) user reset password item by uuid
+ */
+export const findUserUuidByUuid = async (uuid, client = db) =>
+  await client.oneOrNone(
+    `SELECT user_uuid
+     FROM user_reset_password
+     WHERE uuid = $1 AND 
+      date_created > NOW() - INTERVAL '48 HOURS'`,
+    [uuid],
+    R.prop('user_uuid'),
+  )

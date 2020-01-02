@@ -1,12 +1,14 @@
 import React from 'react'
 import { Route, Switch } from 'react-router'
 
+import { guestModules, loginModuleUri } from '@webapp/guest/guestModules'
 import { appModules, appModuleUri } from '../appModules'
 import DesignerView from './designer/designerView'
 import HomeView from './home/homeView'
 import DataViewComponent from './data/dataView'
 import UsersView from './users/usersView'
 import AnalysisView from './analysis/analysisView'
+import ResetForgotPasswordView from '@webapp/guest/resetForgotPasswordView'
 
 const ModuleSwitch = props => (
   <div className="app-module">
@@ -16,6 +18,7 @@ const ModuleSwitch = props => (
       <Route path={appModuleUri(appModules.data)} component={DataViewComponent} />
       <Route path={appModuleUri(appModules.users)} component={UsersView} />
       <Route path={appModuleUri(appModules.analysis)} component={AnalysisView} />
+      <Route path={loginModuleUri(guestModules.resetForgotPassword)} component={ResetForgotPasswordView} />
     </Switch>
   </div>
 )

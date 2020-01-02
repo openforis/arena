@@ -40,7 +40,7 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
     }
   })
 
-export const generateForgotPasswordUuid = async email => {
+export const generateResetPasswordUuid = async email => {
   const user = await UserRepository.fetchUserByEmail(email)
   if (user) {
     const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user))
@@ -81,6 +81,8 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 
   return null
 }
+
+export const findResetPasswordUserUuidByUuid = UserResetPasswordRepository.findUserUuidByUuid
 
 // ==== UPDATE
 

@@ -76,7 +76,7 @@ export const sendVerificationCode = email =>
   _createAction(async (dispatch, getState) => {
     const {
       data: { errorMessage },
-    } = await axios.post('/auth/forgot-password', { email })
+    } = await axios.post('/auth/reset-password', { email })
     const i18n = AppState.getI18n(getState())
     if (errorMessage) await dispatch(showNotification(i18n.t(errorMessage), null, AppNotificationState.severity.error))
     else await dispatch(showNotification(i18n.t('common.emailSentConfirmation', { email })))

@@ -57,6 +57,7 @@ export const run = async () => {
   app.use('/', express.static(dist))
   app.use('/app*', express.static(dist))
   app.use('/img/', express.static(imgDir))
+  app.use('/guest/*', express.static(dist))
 
   // ====== apis
   authApi.init(app)
