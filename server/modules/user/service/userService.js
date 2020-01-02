@@ -181,5 +181,7 @@ export const updateUserPasswordForgot = async (resetPasswordUuid, password) => {
 // DELETE
 export const deleteUser = UserManager.deleteUser
 
+export const deleteUserResetPasswordExpired = UserManager.deleteUserResetPasswordExpired
+
 // ==== User prefs
 export const updateUserPrefs = UserManager.updateUserPrefs

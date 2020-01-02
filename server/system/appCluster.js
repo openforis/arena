@@ -21,6 +21,7 @@ import sessionMiddleware from './middleware/sessionMiddleware'
 import * as apiRouter from './apiRouter'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
+import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -94,4 +95,5 @@ export const run = async () => {
   // ====== schedulers
   await RecordPreviewCleanup.init()
   await TempFilesCleanup.init()
+  await UserResetPasswordCleanup.init()
 }
