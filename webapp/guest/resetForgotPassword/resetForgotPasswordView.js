@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 import { Input } from '@webapp/commonComponents/form/input'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import LoginViewWrapper from '../components/loginViewWrapper'
+import GuestViewWrapper from '../components/guestViewWrapper'
 
 import { useResetForgotPasswordState } from './resetForgotPasswordState'
 import { appModules, appModuleUri } from '@webapp/loggedin/appModules'
@@ -37,7 +37,7 @@ const ResetForgotPasswordView = () => {
   } = useResetForgotPasswordState()
 
   return (
-    <LoginViewWrapper>
+    <GuestViewWrapper>
       {resetComplete ? (
         <ResetCompleteContainer i18n={i18n} />
       ) : user ? (
@@ -76,7 +76,7 @@ const ResetForgotPasswordView = () => {
       ) : (
         <div className="error">{i18n.t('resetForgotPasswordView.forgotPasswordLinkInvalid')}</div>
       )}
-    </LoginViewWrapper>
+    </GuestViewWrapper>
   )
 }
 

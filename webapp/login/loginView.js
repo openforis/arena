@@ -2,7 +2,6 @@ import './loginView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { useParams } from 'react-router'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
@@ -24,7 +23,6 @@ const LoginView = props => {
   const { userAction, error } = props
 
   const i18n = useI18n()
-  const { uuid: forgotPasswordUuid } = useParams()
 
   return (
     <>
