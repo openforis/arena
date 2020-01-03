@@ -12,7 +12,7 @@ import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
 const { keys, propKeys } = NodeDef
 
-export const keysValidationFields = {
+const keysValidationFields = {
   children: 'children',
   keyAttributes: 'keyAttributes',
 }
