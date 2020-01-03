@@ -76,24 +76,6 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
   debounceAction(_putNodeDefProps(nodeDef, props, propsAdvanced), `${nodeDefUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`)
 
-const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
-  const state = getState()
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-
-  if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefParent)) {
-    const nodeDefUuid = NodeDef.getUuid(nodeDef)
-    const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDefParent)
-
-    const layoutChildrenUpdated = deleted
-      ? R.without([nodeDefUuid])(layoutChildren)
-      : R.append(nodeDefUuid)(layoutChildren)
-
-    dispatch(putNodeDefLayoutProp(nodeDefParent, NodeDefLayout.keys.layoutChildren, layoutChildrenUpdated))
-  }
-}
-
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // NodeDef has default values, cannot change into multiple
@@ -171,13 +153,12 @@ const _updateLayoutProp = (getState, nodeDef, key, value) => {
 
       // If setting layout render mode (table | form), set the the proper layout
       const isRenderTable = value === NodeDefLayout.renderType.table
-      const isRenderForm = value === NodeDefLayout.renderType.form
 
       if (isRenderTable) {
         layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n =>
           NodeDef.getUuid(n),
         )
-      } else if (isRenderForm && NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+      } else if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
         // Entity rendered as form can only exists in its own page
         layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
       }
@@ -230,15 +211,29 @@ export const cancelNodeDefEdits = history => async (dispatch, getState) => {
  */
 export const saveNodeDefEdits = () => async (dispatch, getState) => {
   const state = getState()
+  const nodeDef = NodeDefState.getNodeDef(state)
   const validation = NodeDefState.getValidation(state)
 
-  if (Validation.isValid(validation)) {
+  const hasOnlyChildrenOrKeyAttributesErrors = R.pipe(
+    Validation.getFieldValidations,
+    R.keys,
+    R.without([
+      SurveyValidator.nodeDefKeysValidationFields.children,
+      SurveyValidator.nodeDefKeysValidationFields.keyAttributes,
+    ]),
+    R.isEmpty,
+  )(validation)
+
+  if (
+    Validation.isValid(validation) ||
+    // Empty new entity (only missing children or key attributes errors)
+    (NodeDef.isEntity(nodeDef) && hasOnlyChildrenOrKeyAttributesErrors)
+  ) {
     dispatch(showAppLoader())
 
     const survey = SurveyState.getSurvey(state)
     const surveyId = SurveyState.getSurveyId(state)
-    const cycle = SurveyState.getSurveyCycleKey(state)
-    const nodeDef = NodeDefState.getNodeDef(state)
+    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
     const isNodeDefNew = NodeDef.isTemporary(nodeDef)
     const nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
@@ -246,10 +241,8 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
     if (isNodeDefNew) {
       const {
         data: { nodeDefsValidation, nodeDefsUpdated },
-      } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
+      } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef: nodeDefUpdated })
       dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-
-      dispatch(_updateParentLayout(nodeDefUpdated))
     } else {
       const props = NodeDefState.getPropsUpdated(state)
       const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
@@ -262,7 +255,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
       type: nodeDefEditUpdate,
       nodeDef: nodeDefUpdated,
       nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
-      surveyCycleKey: cycle,
+      surveyCycleKey,
       nodeDefValidation: NodeDefState.getValidation(state),
     })
 
@@ -274,7 +267,8 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 }
 
 // ==== DELETE
-export const removeNodeDef = nodeDef => async (dispatch, getState) => {
+
+const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const i18n = AppState.getI18n(state)
@@ -289,42 +283,56 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
     R.without(nodeDefUuid),
   )(survey)
 
-  if (!R.isEmpty(nodeDefDependentsUuids)) {
-    // Node has not dependencies or it has expressions that depend on itself
-    const nodeDefDependents = R.pipe(
-      R.map(
-        R.pipe(
-          nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-          nodeDef => NodeDef.getLabel(nodeDef, i18n.lang),
-        ),
-      ),
-      R.join(', '),
-    )(nodeDefDependentsUuids)
+  if (R.isEmpty(nodeDefDependentsUuids)) {
+    return true
+  }
 
-    dispatch(
-      showNotification(
-        'nodeDefEdit.cannotDeleteNodeDefReferenced',
-        {
-          nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
-          nodeDefDependents,
-        },
-        NotificationState.severity.warning,
+  // Node has not dependencies or it has expressions that depend on itself
+  const nodeDefDependents = R.pipe(
+    R.map(
+      R.pipe(
+        nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+        nodeDef => NodeDef.getLabel(nodeDef, i18n.lang),
       ),
-    )
-  } else if (window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))) {
+    ),
+    R.join(', '),
+  )(nodeDefDependentsUuids)
+
+  dispatch(
+    showNotification(
+      'nodeDefEdit.cannotDeleteNodeDefReferenced',
+      {
+        nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
+        nodeDefDependents,
+      },
+      NotificationState.severity.warning,
+    ),
+  )
+  return false
+}
+
+export const removeNodeDef = nodeDef => async (dispatch, getState) => {
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
+  const i18n = AppState.getI18n(state)
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+  if (
+    dispatch(_checkCanRemoveNodeDef(nodeDef)) &&
+    window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
+  ) {
     // Delete confirmed
     dispatch({ type: nodeDefDelete, nodeDef })
 
     const surveyId = Survey.getId(survey)
-    const cycle = SurveyState.getSurveyCycleKey(state)
+    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
     const {
       data: { nodeDefsValidation },
     } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, {
-      params: cycle,
+      params: { surveyCycleKey },
     })
     dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
-
-    dispatch(_updateParentLayout(nodeDef, true))
   }
 }

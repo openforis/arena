@@ -159,7 +159,14 @@ export default class NodeDefsImportJob extends Job {
 
     // 2. insert node def into db
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
-    let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, true, this.tx)
+    let nodeDef = await NodeDefManager.insertNodeDef(
+      this.user,
+      surveyId,
+      Survey.cycleOneKey,
+      nodeDefParam,
+      true,
+      this.tx,
+    )
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
     // 2a. increment processed items before recursive call to insertNodeDef
@@ -442,6 +449,7 @@ export default class NodeDefsImportJob extends Job {
       const qualifierNodeDef = await NodeDefManager.insertNodeDef(
         this.user,
         this.surveyId,
+        Survey.cycleOneKey,
         qualifierNodeDefParam,
         true,
         this.tx,

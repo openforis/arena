@@ -65,6 +65,13 @@ export const isRenderDropdown = cycle => isRenderType(cycle, renderType.dropdown
 export const isRenderCheckbox = cycle => isRenderType(cycle, renderType.checkbox)
 
 export const isDisplayInParentPage = cycle => R.pipe(getDisplayIn(cycle), R.propEq(displayIn.parentPage))
+
+// ====== UPDATE
+const _assocPropLayout = (cycle, prop, value) => R.assocPath([cycle, prop], value)
+
+export const assocLayoutChildren = (cycle, layoutChildren) =>
+  _assocPropLayout(cycle, keys.layoutChildren, layoutChildren)
+
 // ====== UTILS
 
 export const rejectNodeDefsWithPage = cycle => R.reject(hasPage(cycle))

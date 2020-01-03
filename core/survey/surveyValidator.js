@@ -11,3 +11,5 @@ export const validateNodeDef = NodeDefValidator.validateNodeDef
 export const validateNodeDefs = NodeDefValidator.validateNodeDefs
 
 export const validateNodeDefExpressions = NodeDefExpressionsValidator.validate
+
+export const nodeDefKeysValidationFields = NodeDefValidator.keysValidationFields
