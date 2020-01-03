@@ -51,7 +51,7 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => dispatch => {
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
-  if (nodeDefsUpdated) {
+  if (!R.isEmpty(nodeDefsUpdated)) {
     dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
   }
 }
