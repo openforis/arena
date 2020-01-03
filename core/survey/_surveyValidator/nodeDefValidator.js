@@ -139,3 +139,27 @@ export const validateNodeDefs = async survey => {
 
   return validation
 }
+
+// ===== CHECK
+
+export const isValidationValidOrHasOnlyMissingChildrenErrors = (nodeDef, validation) => {
+  if (Validation.isValid(validation)) {
+    return true
+  }
+
+  if (NodeDef.isEntity(nodeDef)) {
+    // Empty new entity (only missing children or key attributes errors)
+    const hasOnlyChildrenOrKeyAttributesErrors = R.pipe(
+      Validation.getFieldValidations,
+      R.keys,
+      R.without([keysValidationFields.children, keysValidationFields.keyAttributes]),
+      R.isEmpty,
+    )(validation)
+
+    if (hasOnlyChildrenOrKeyAttributesErrors) {
+      return true
+    }
+  }
+
+  return false
+}

@@ -12,4 +12,6 @@ export const validateNodeDefs = NodeDefValidator.validateNodeDefs
 
 export const validateNodeDefExpressions = NodeDefExpressionsValidator.validate
 
-export const nodeDefKeysValidationFields = NodeDefValidator.keysValidationFields
+// ===== CHECK
+export const isNodeDefValidationValidOrHasOnlyMissingChildrenErrors =
+  NodeDefValidator.isValidationValidOrHasOnlyMissingChildrenErrors

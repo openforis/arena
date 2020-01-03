@@ -214,21 +214,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
   const nodeDef = NodeDefState.getNodeDef(state)
   const validation = NodeDefState.getValidation(state)
 
-  const hasOnlyChildrenOrKeyAttributesErrors = R.pipe(
-    Validation.getFieldValidations,
-    R.keys,
-    R.without([
-      SurveyValidator.nodeDefKeysValidationFields.children,
-      SurveyValidator.nodeDefKeysValidationFields.keyAttributes,
-    ]),
-    R.isEmpty,
-  )(validation)
-
-  if (
-    Validation.isValid(validation) ||
-    // Empty new entity (only missing children or key attributes errors)
-    (NodeDef.isEntity(nodeDef) && hasOnlyChildrenOrKeyAttributesErrors)
-  ) {
+  if (SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) {
     dispatch(showAppLoader())
 
     const survey = SurveyState.getSurvey(state)
@@ -261,6 +247,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 
     dispatch(hideAppLoader())
   } else {
+    // Cannot save node def: show notification
     const i18n = AppState.getI18n(state)
     dispatch(showNotification(i18n.t(Validation.messageKeys.nodeDefEdit.formContainsErrors)))
   }
