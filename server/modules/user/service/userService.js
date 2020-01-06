@@ -138,13 +138,9 @@ export const updateUser = async (user, surveyId, userUuid, name, email, groupUui
   return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 
-export const acceptInvitation = async (user, userUuid, name, client = db) => {
-  // For now a user can change only his own name
-  if (User.getUuid(user) !== userUuid) {
-    throw new UnauthorizedError(User.getName(user))
-  }
-
-  await UserManager.updateUsernameAndStatus(user, name, User.userStatus.ACCEPTED, client)
+export const acceptInvitation = async (user, name, password) => {
+  const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
+  await UserManager.updateNamePasswordAndStatus(user, name, passwordEncrypted, User.userStatus.ACCEPTED)
 }
 
 // DELETE

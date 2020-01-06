@@ -610,6 +610,7 @@ Do you want to leave the page?`,
       verificationCodeDoNotMatch: 'Invalid verification code provided, please try again',
 
       userNotFound: 'User not found. Make sure email and password are correct',
+      passwordChangeRequired: 'Password change required',
     },
   },
 
