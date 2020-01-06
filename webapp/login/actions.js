@@ -66,20 +66,22 @@ export const acceptInvitation = (name, password) =>
 
 export const showForgotPasswordForm = () => dispatch => {
   dispatch(setLoginError(null))
-  dispatch({
-    type: loginUserActionUpdate,
-    action: LoginState.userActions.forgotPassword,
-  })
+  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
 }
 
 export const sendVerificationCode = email =>
   _createAction(async (dispatch, getState) => {
+    const i18n = AppState.getI18n(getState())
     const {
       data: { errorMessage },
     } = await axios.post('/auth/reset-password', { email })
-    const i18n = AppState.getI18n(getState())
-    if (errorMessage) await dispatch(showNotification(i18n.t(errorMessage), null, AppNotificationState.severity.error))
-    else await dispatch(showNotification(i18n.t('common.emailSentConfirmation', { email })))
+
+    if (errorMessage) {
+      dispatch(showNotification(i18n.t(errorMessage), null, AppNotificationState.severity.error))
+    } else {
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
+      dispatch(showNotification(i18n.t('common.emailSentConfirmation', { email })))
+    }
   })
 
 export const resetPassword = (verificationCode, newPassword) =>
