@@ -13,6 +13,20 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 
+export const {
+  countUsersBySurveyId,
+  fetchUserProfilePicture,
+  updatePassword,
+  updateNamePasswordAndStatus,
+  resetUsersPrefsSurveyCycle,
+} = UserRepository
+
+export const {
+  findUserUuidByUuid: findResetPasswordUserUuidByUuid,
+  deleteUserResetPasswordByUuid,
+  deleteUserResetPasswordExpired,
+} = UserResetPasswordRepository
+
 // ==== CREATE
 export const insertUser = async (user, surveyId, surveyCycleKey, email, password, status, groupUuid, client = db) =>
   await client.tx(async t => {
@@ -59,13 +73,9 @@ const _userFetcher = fetchFn => async (...args) => {
   return user ? await _assocUserAuthGroups(user) : null
 }
 
-export const countUsersBySurveyId = UserRepository.countUsersBySurveyId
-
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
-
-export const fetchUserProfilePicture = UserRepository.fetchUserProfilePicture
 
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
@@ -81,8 +91,6 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 
   return null
 }
-
-export const findResetPasswordUserUuidByUuid = UserResetPasswordRepository.findUserUuidByUuid
 
 // ==== UPDATE
 
@@ -112,14 +120,10 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateNamePasswordAndStatus = UserRepository.updateNamePasswordAndStatus
-
 export const updateUserPrefs = async user => ({
   ...(await UserRepository.updateUserPrefs(user)),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
-
-export const resetUsersPrefsSurveyCycle = UserRepository.resetUsersPrefsSurveyCycle
 
 // ==== DELETE
 
@@ -138,7 +142,3 @@ export const deleteUser = async (user, surveyId, userUuidToRemove, client = db) 
         ),
       ]),
   )
-
-export const deleteUserResetPasswordByUuid = UserResetPasswordRepository.deleteUserResetPasswordByUuid
-
-export const deleteUserResetPasswordExpired = UserResetPasswordRepository.deleteUserResetPasswordExpired

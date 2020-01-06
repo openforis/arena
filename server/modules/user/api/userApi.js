@@ -121,7 +121,7 @@ export const init = app => {
       const user = Request.getUser(req)
       const { name, password } = Request.getParams(req)
 
-      await UserService.acceptInvitation(user, name, password)
+      await UserService.acceptInvitation(User.getUuid(user), name, password)
 
       Response.sendOk(res)
     } catch (error) {

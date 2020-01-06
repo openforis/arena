@@ -157,18 +157,19 @@ export const updateUser = async (user, surveyId, userUuid, name, email, groupUui
   return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 
-export const acceptInvitation = async (user, name, password) => {
+export const acceptInvitation = async (userUuid, name, password) => {
   const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
-  await UserManager.updateNamePasswordAndStatus(user, name, passwordEncrypted, User.userStatus.ACCEPTED)
+  await UserManager.updateNamePasswordAndStatus(userUuid, name, passwordEncrypted, User.userStatus.ACCEPTED)
 }
 
 export const updateUserPasswordForgot = async (resetPasswordUuid, password) => {
   const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
   if (userUuid) {
     const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
-    // TODO
-    // UserManager.updatePassword(userUuid, passwordEncrypted)
-    await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid)
+    await db.tx(async t => {
+      await UserManager.updatePassword(userUuid, passwordEncrypted, t)
+      await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid, t)
+    })
   } else {
     throw new Error(`User password reset not found or expired: ${resetPasswordUuid}`)
   }
