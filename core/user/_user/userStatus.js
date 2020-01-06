@@ -1,0 +1,5 @@
+export const userStatus = {
+  INVITED: 'INVITED',
+  ACCEPTED: 'ACCEPTED',
+  FORCE_CHANGE_PASSWORD: 'FORCE_CHANGE_PASSWORD',
+}

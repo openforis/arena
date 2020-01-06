@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import { db } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -10,10 +12,9 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 
 // ==== CREATE
-
-export const insertUser = async (user, surveyId, surveyCycleKey, uuid, email, groupUuid, client = db) =>
+export const insertUser = async (user, surveyId, surveyCycleKey, email, password, status, groupUuid, client = db) =>
   await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, uuid, email, t)
+    const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, email, password, status, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
@@ -39,15 +40,12 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
 
 // ==== READ
 
+const _assocUserAuthGroups = async user =>
+  User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
+
 const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
-
-  if (user) {
-    const authGroups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
-    return { ...user, authGroups }
-  }
-
-  return null
+  return user ? await _assocUserAuthGroups(user) : null
 }
 
 export const countUsersBySurveyId = UserRepository.countUsersBySurveyId
@@ -61,14 +59,17 @@ export const fetchUserProfilePicture = UserRepository.fetchUserProfilePicture
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
-
-    return await Promise.all(
-      users.map(async u => ({
-        ...u,
-        authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(u)),
-      })),
-    )
+    return await Promise.all(users.map(_assocUserAuthGroups))
   })
+
+export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
+  const user = await UserRepository.fetchUserAndPasswordByEmail(email)
+
+  if (user && (await passwordCompareFn(password, user.password)))
+    return await _assocUserAuthGroups(R.dissoc('password', user))
+
+  return null
+}
 
 // ==== UPDATE
 
@@ -98,7 +99,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUsername = UserRepository.updateUsername
+export const updateUsernameAndStatus = UserRepository.updateUsernameAndStatus
 
 export const updateUserPrefs = async user => ({
   ...(await UserRepository.updateUserPrefs(user)),

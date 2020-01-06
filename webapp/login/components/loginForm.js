@@ -59,11 +59,12 @@ const LoginForm = props => {
         <button type="button" className="btn btn-login" onClick={onClickLogin}>
           {i18n.t('loginView.login')}
         </button>
-
+        {/*
         <button type="button" className="btn btn-s btn-transparent btn-forgot-pwd" onClick={showForgotPasswordForm}>
           <span className="icon icon-question icon-left icon-12px" />
           {i18n.t('loginView.forgotPassword')}
         </button>
+        */}
       </div>
     </div>
   )

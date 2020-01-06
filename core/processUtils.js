@@ -15,10 +15,6 @@ export const ENV = {
   applicationVersion: process.env.APPLICATION_VERSION,
   gitCommitHash: process.env.GIT_COMMIT_HASH,
   gitBranch: process.env.GIT_BRANCH,
-  // COGNITO
-  cognitoRegion: process.env.COGNITO_REGION,
-  cognitoUserPoolId: process.env.COGNITO_USER_POOL_ID,
-  cognitoClientId: process.env.COGNITO_CLIENT_ID,
   // DB
   dbUrl: process.env.DATABASE_URL,
   pgUser: process.env.PGUSER,
@@ -34,6 +30,8 @@ export const ENV = {
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
+  // SESSION
+  sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development

@@ -1,9 +1,9 @@
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
-
-import * as User from '@core/user/user'
 
 let user = null
 let survey = null
@@ -13,14 +13,14 @@ import { db } from '@server/db/db'
 const createAdminUser = async () => {
   await db.multi(`
     -- Insert the admin user to be used in the test suite:
-    INSERT INTO "user" (name, email)
-    values ('Admin', 'admin@openforis.org')
+    INSERT INTO "user" (name, email, password, status)
+    values ('Admin', 'admin@openforis.org', 'test_password', '${User.userStatus.ACCEPTED}')
     ON CONFLICT DO NOTHING;
 
     INSERT INTO auth_group_user (user_uuid, group_uuid)
     SELECT u.uuid, g.uuid
     FROM "user" u, "auth_group" g
-    WHERE u.email = 'admin@openforis.org' AND g.name = 'systemAdmin'
+    WHERE u.email = 'admin@openforis.org' AND g.name = '${AuthGroup.groupNames.systemAdmin}'
     ON CONFLICT DO NOTHING;
     `)
 }

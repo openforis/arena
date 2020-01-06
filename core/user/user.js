@@ -1,13 +1,14 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as StringUtils from '@core/stringUtils'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
+import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
+export { userStatus } from './_user/userStatus'
 
 export const keysPrefs = UserPrefs.keysPrefs
 
@@ -23,7 +24,7 @@ export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
-export const hasAccepted = R.pipe(getName, StringUtils.isNotBlank)
+export const hasAccepted = R.propEq(keys.status, userStatus.ACCEPTED)
 
 // ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user =>
@@ -36,15 +37,15 @@ export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) 
     ),
   )(user)
 
-export const assocAuthGroup = authGroup => user => {
-  const authGroups = R.pipe(getAuthGroups, R.append(authGroup))(user)
-  return R.assoc(keys.authGroups, authGroups, user)
-}
+export const assocAuthGroups = R.assoc(keys.authGroups)
 
-export const dissocAuthGroup = authGroup => user => {
-  const authGroups = R.pipe(getAuthGroups, R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))))(user)
-  return R.assoc(keys.authGroups, authGroups, user)
-}
+export const assocAuthGroup = authGroup => user =>
+  R.pipe(getAuthGroups, R.append(authGroup), authGroups => assocAuthGroups(authGroups)(user))(user)
+
+export const dissocAuthGroup = authGroup => user =>
+  R.pipe(getAuthGroups, R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))), authGroups =>
+    assocAuthGroups(authGroups),
+  )(user)
 
 // PREFS
 export const newPrefs = UserPrefs.newPrefs

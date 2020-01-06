@@ -105,10 +105,8 @@ export const ValidatorErrorKeys = {
     passwordUnsafe: 'validationErrors.user.passwordUnsafe',
     userNameRequired: 'validationErrors.user.userNameRequired',
     passwordsDoNotMatch: 'validationErrors.user.passwordsDoNotMatch',
+    verificationCodeDoNotMatch: 'validationErrors.user.verificationCodeDoNotMatch',
 
-    // Cognito exceptions
-    UserNotFoundException: 'validationErrors.user.userDoesNotExist',
-    NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
-    CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
+    userNotFound: 'validationErrors.user.userNotFound',
   },
 }

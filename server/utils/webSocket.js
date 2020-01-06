@@ -4,8 +4,6 @@ import * as R from 'ramda'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as Log from '@server/log/log'
-import * as Request from './request'
-import * as Jwt from './jwt'
 
 const Logger = Log.getLogger('WebSocket')
 
@@ -48,20 +46,16 @@ export const notifyUser = (userUuid, eventType, message) => {
   }
 }
 
-export const init = (server, jwtMiddleware) => {
+export const init = (server, sessionMiddleware) => {
   io.attach(server)
 
   io.use((socket, next) => {
-    // Set the request authorization header from socket handshake
-    const token = socket.handshake.query.token
-    socket.request.headers.authorization = Jwt.bearerPrefix + token
-
-    // Wrap the jwtMiddleware to get the user id
-    jwtMiddleware(socket.request, {}, next)
+    // Wrap the sessionMiddleware to get the user uuid
+    sessionMiddleware(socket.request, {}, next)
   })
 
   io.on(WebSocketEvents.connection, async socket => {
-    const userUuid = R.pipe(R.prop('request'), Request.getUserUuid)(socket)
+    const userUuid = R.path(['request', 'session', 'passport', 'user'], socket)
 
     Logger.debug(`socket connection with id: ${socket.id} for userUuid ${userUuid}`)
 

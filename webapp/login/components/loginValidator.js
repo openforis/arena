@@ -28,7 +28,9 @@ const _validatePasswordConfirm = (propName, item) => {
 const _validateVerificationCode = (propName, item) => {
   const verificationCodeRe = new RegExp(/^[\S]+$/)
   const verificationCode = item[propName]
-  return !verificationCodeRe.test(verificationCode) ? { key: Validation.messageKeys.user.CodeMismatchException } : null
+  return !verificationCodeRe.test(verificationCode)
+    ? { key: Validation.messageKeys.user.verificationCodeDoNotMatch }
+    : null
 }
 
 export const validateResetPasswordObj = async obj =>

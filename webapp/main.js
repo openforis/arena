@@ -11,13 +11,9 @@ import { Provider } from 'react-redux'
 
 import AppRouterSwitch from './app/appRouterSwitch'
 
-import * as AxiosJwtMiddleware from './app/axiosJwtMiddleware'
-
 import { store } from './app/store'
 
 function renderApp() {
-  AxiosJwtMiddleware.init()
-
   ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>

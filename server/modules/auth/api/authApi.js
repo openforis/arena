@@ -1,6 +1,7 @@
+import * as passport from 'passport'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as Jwt from '@server/utils/jwt'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -10,7 +11,6 @@ import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
-import * as AuthService from '../service/authService'
 
 const Logger = Log.getLogger('AuthAPI')
 
@@ -33,6 +33,21 @@ const sendUserSurvey = async (res, user, surveyId) => {
   }
 }
 
+const sendUser = async (res, user) => {
+  const surveyId = User.getPrefSurveyCurrent(user)
+
+  if (surveyId) await sendUserSurvey(res, user, surveyId)
+  else sendResponse(res, user)
+}
+
+const authenticationSuccessful = (req, res, next, user) =>
+  req.logIn(user, err => {
+    if (err) next(err)
+    else {
+      req.session.save(() => sendUser(res, user))
+    }
+  })
+
 export const init = app => {
   app.get('/auth/user', async (req, res, next) => {
     try {
@@ -49,15 +64,21 @@ export const init = app => {
     }
   })
 
+  app.post('/auth/login', async (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) return next(err)
+      if (!user) res.json(info)
+      else authenticationSuccessful(req, res, next, user)
+    })(req, res, next)
+  })
+
   app.post('/auth/logout', async (req, res, next) => {
     try {
       // Before logout checkOut record if there's an opened thread
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromRecordThread(socketId)
 
-      const token = req.headers.authorization.slice(Jwt.bearerPrefix.length)
-
-      await AuthService.blacklistToken(token)
+      req.logout()
 
       Response.sendOk(res)
     } catch (error) {

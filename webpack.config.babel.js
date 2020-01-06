@@ -2,7 +2,6 @@ import 'dotenv/config'
 import path from 'path'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
-import HtmlReplaceWebpackPlugin from 'html-replace-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import GoogleFontsPlugin from 'google-fonts-plugin'
@@ -43,22 +42,6 @@ const plugins = [
   new HtmlWebpackPlugin({
     template: './web-resources/index.html',
   }),
-  // Only substitute in variables in development.
-  // In production, this is done upon container startup.
-  new HtmlReplaceWebpackPlugin(
-    ProcessUtils.isEnvProduction
-      ? []
-      : [
-          {
-            pattern: '$COGNITO_USER_POOL_ID',
-            replacement: ProcessUtils.ENV.cognitoUserPoolId || '',
-          },
-          {
-            pattern: '$COGNITO_CLIENT_ID',
-            replacement: ProcessUtils.ENV.cognitoClientId || '',
-          },
-        ],
-  ),
   new webpack.DefinePlugin({
     __BUST__: JSON.stringify(uuidv4()),
     process: {
