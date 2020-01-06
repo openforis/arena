@@ -20,14 +20,61 @@ export {
 
 // ======= CREATE
 
-export const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
+const _updateParentLayout = async (user, surveyId, surveyCycleKey, nodeDef, deleted = false, client = db) => {
+  if (NodeDef.isRoot(nodeDef)) return {}
+
+  const nodeDefParent = await NodeDefRepository.fetchNodeDefByUuid(
+    surveyId,
+    NodeDef.getParentUuid(nodeDef),
+    true,
+    false,
+    client,
+  )
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const layoutChildren = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDefParent)
+
+  let layoutChildrenUpdated
+  if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefParent)) {
+    // Add or remove node def from children (render as table)
+    layoutChildrenUpdated = R.ifElse(R.always(deleted), R.without([nodeDefUuid]), R.append(nodeDefUuid))(layoutChildren)
+  } else if (deleted) {
+    // Remove node def from children (render as form)
+    layoutChildrenUpdated = R.reject(R.propEq('i', nodeDefUuid), layoutChildren)
+  }
+
+  if (!R.equals(layoutChildren, layoutChildrenUpdated)) {
+    // Update parent node def layout
+    const layoutUpdated = R.pipe(
+      NodeDefLayout.getLayout,
+      NodeDefLayout.assocLayoutChildren(surveyCycleKey, layoutChildrenUpdated),
+    )(nodeDefParent)
+
+    return await updateNodeDefProps(
+      user,
+      surveyId,
+      NodeDef.getUuid(nodeDefParent),
+      { [NodeDefLayout.keys.layout]: layoutUpdated },
+      {},
+      true,
+      client,
+    )
+  }
+
+  return {}
+}
+
+export const insertNodeDef = async (user, surveyId, surveyCycleKey, nodeDefParam, system = false, client = db) =>
   await client.tx(async t => {
-    const [nodeDef] = await Promise.all([
+    const [nodeDef, nodeDefsParentUpdated] = await Promise.all([
       NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t),
+      _updateParentLayout(user, surveyId, surveyCycleKey, nodeDefParam, false, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t),
     ])
-    return nodeDef
+    return {
+      ...nodeDefsParentUpdated,
+      [NodeDef.getUuid(nodeDef)]: nodeDef,
+    }
   })
 
 // ======= READ
@@ -148,16 +195,20 @@ export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) 
 
 // ======= DELETE
 
-export const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
+export const markNodeDefDeleted = async (user, surveyId, surveyCycleKey, nodeDefUuid) =>
   await db.tx(async t => {
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)
 
     const logContent = { uuid: nodeDefUuid, name: NodeDef.getName(nodeDef) }
 
-    await Promise.all([
+    const [nodeDefsUpdated] = await Promise.all([
+      _updateParentLayout(user, surveyId, surveyCycleKey, nodeDef, true, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, logContent, false, t),
     ])
 
-    return nodeDef
+    return {
+      ...nodeDefsUpdated,
+      [NodeDef.getUuid(nodeDef)]: nodeDef,
+    }
   })

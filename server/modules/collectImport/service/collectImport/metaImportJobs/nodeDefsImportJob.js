@@ -159,8 +159,10 @@ export default class NodeDefsImportJob extends Job {
 
     // 2. insert node def into db
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
-    let nodeDef = await NodeDefManager.insertNodeDef(this.user, surveyId, nodeDefParam, true, this.tx)
-    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const nodeDefUuid = NodeDef.getUuid(nodeDefParam)
+    let nodeDef = (
+      await NodeDefManager.insertNodeDef(this.user, surveyId, Survey.cycleOneKey, nodeDefParam, true, this.tx)
+    )[nodeDefUuid]
 
     // 2a. increment processed items before recursive call to insertNodeDef
     this.incrementProcessedItems()
@@ -438,28 +440,24 @@ export default class NodeDefsImportJob extends Job {
           R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`),
         )(nodeDef),
       }
-      const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props)
-      const qualifierNodeDef = await NodeDefManager.insertNodeDef(
-        this.user,
-        this.surveyId,
-        qualifierNodeDefParam,
-        true,
-        this.tx,
-      )
+
       const propsAdvanced = {
         [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression(`${nodeDefName} == "${itemCode}"`)],
       }
-      await NodeDefManager.updateNodeDefProps(
-        this.user,
-        this.surveyId,
-        NodeDef.getUuid(qualifierNodeDef),
-        {},
-        propsAdvanced,
-        true,
-        this.tx,
-      )
+      const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
+      const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)
+      const qualifierNodeDef = (
+        await NodeDefManager.insertNodeDef(
+          this.user,
+          this.surveyId,
+          Survey.cycleOneKey,
+          qualifierNodeDefParam,
+          true,
+          this.tx,
+        )
+      )[qualifierNodeDefUuid]
 
-      this.nodeDefs[NodeDef.getUuid(qualifierNodeDef)] = qualifierNodeDef
+      this.nodeDefs[qualifierNodeDefUuid] = qualifierNodeDef
     }
   }
 
@@ -528,8 +526,8 @@ export default class NodeDefsImportJob extends Job {
   }
 }
 
-const _createNodeDef = (parentNodeDef, type, props) =>
-  NodeDef.newNodeDef(parentNodeDef, type, Survey.cycleOneKey, props)
+const _createNodeDef = (parentNodeDef, type, props, propsAdvanced = {}) =>
+  NodeDef.newNodeDef(parentNodeDef, type, Survey.cycleOneKey, props, propsAdvanced)
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {

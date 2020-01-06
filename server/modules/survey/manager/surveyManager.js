@@ -83,7 +83,7 @@ export const insertSurvey = async (user, surveyParam, createRootEntityDef = true
           ),
         },
       )
-      await NodeDefManager.insertNodeDef(user, surveyId, rootEntityDef, true, t)
+      await NodeDefManager.insertNodeDef(user, surveyId, Survey.cycleOneKey, rootEntityDef, true, t)
     }
 
     // Update user prefs
