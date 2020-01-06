@@ -16,7 +16,7 @@ import * as NotificationState from '@webapp/app/appNotification/appNotificationS
 import { showAppLoader, hideAppLoader, showAppSaving, hideAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
-import { appModules, appModuleUri, dataModules } from '../../appModules'
+import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import * as RecordState from './recordState'
 
 export const recordCreate = 'survey/record/create'

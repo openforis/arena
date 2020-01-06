@@ -7,7 +7,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordView from '../../surveyViews/record/recordView'
-import { appModules, appModuleUri, dataModules } from '../../appModules'
+import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import DataVisView from './dataVis/dataVisView'
 import ValidationReportView from './validationReport/validationReportView'
 

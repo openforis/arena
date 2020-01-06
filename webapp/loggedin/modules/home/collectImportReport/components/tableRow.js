@@ -11,7 +11,7 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import LabelsEditor from '../../../../surveyViews/labelsEditor/labelsEditor'
 
 import { updateCollectImportReportItem } from '../actions'

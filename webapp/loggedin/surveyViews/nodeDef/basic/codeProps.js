@@ -16,7 +16,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { setNodeDefProp, setNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as NodeDefState from '../nodeDefState'
 
 import { createCategory, deleteCategory } from '../../category/actions'

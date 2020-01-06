@@ -13,7 +13,7 @@ import {
   taxonomyUpdate,
   taxonomiesUpdate,
 } from '@webapp/survey/taxonomies/actions'
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { reloadListItems } from '../../tableViews/actions'
 import * as TaxonomyState from './taxonomyState'
 

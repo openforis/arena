@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { appModules, appModuleUri, userModules } from '../../appModules'
+import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import UsersListView from './userList/userListView'

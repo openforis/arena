@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
-import { analysisModules, appModuleUri } from '@webapp/loggedin/appModules'
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 

@@ -1,6 +1,12 @@
+import * as R from 'ramda'
+
 const app = 'app'
 
+export const guest = 'guest'
+
 export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
+
+export const isGuestUri = R.startsWith(`/${guest}`)
 
 // ==== App Root modules
 export const appModules = {

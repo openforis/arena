@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 
 import TableView from '@webapp/loggedin/tableViews/tableView'
-import { appModuleUri, dataModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
 

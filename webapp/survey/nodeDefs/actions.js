@@ -11,7 +11,7 @@ import * as Validation from '@core/validation/validation'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'

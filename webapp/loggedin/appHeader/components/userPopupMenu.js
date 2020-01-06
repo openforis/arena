@@ -13,7 +13,7 @@ import * as AppState from '@webapp/app/appState'
 import { logout } from '@webapp/app/actions'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
-import { appModuleUri, homeModules, userModules } from '../../appModules'
+import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 
 const UserPopupMenu = props => {
   const { user, logout, onClose } = props

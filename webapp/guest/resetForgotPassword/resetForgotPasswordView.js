@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import GuestViewWrapper from '../components/guestViewWrapper'
 
 import { useResetForgotPasswordState } from './resetForgotPasswordState'
-import { appModules, appModuleUri } from '@webapp/loggedin/appModules'
+import { appModules, appModuleUri } from '@webapp/app/appModules'
 
 const ResetCompleteContainer = ({ i18n }) => (
   <div className="reset-forgot-password__complete-container">
