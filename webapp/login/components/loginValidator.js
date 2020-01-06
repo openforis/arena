@@ -24,21 +24,6 @@ const _validatePasswordConfirm = (propName, item) => {
   return password !== passwordConfirm ? { key: Validation.messageKeys.user.passwordsDoNotMatch } : null
 }
 
-const _validateVerificationCode = (propName, item) => {
-  const verificationCodeRe = new RegExp(/^[\S]+$/)
-  const verificationCode = item[propName]
-  return !verificationCodeRe.test(verificationCode)
-    ? { key: Validation.messageKeys.user.verificationCodeDoNotMatch }
-    : null
-}
-
-export const validateResetPasswordObj = async obj =>
-  await Validator.validate(obj, {
-    password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
-    passwordConfirm: [_validatePasswordConfirm],
-    verificationCode: [_validateVerificationCode],
-  })
-
 export const validateAcceptInvitationObj = async obj =>
   await Validator.validate(obj, {
     userName: [Validator.validateRequired(Validation.messageKeys.user.userNameRequired)],
@@ -57,7 +42,7 @@ export const validateEmail = async obj =>
     email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
   })
 
-export const validateResetForgotPasswordObj = async obj =>
+export const validateResetPasswordObj = async obj =>
   await Validator.validate(obj, {
     password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
     passwordConfirm: [_validatePasswordConfirm],

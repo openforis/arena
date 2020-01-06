@@ -83,18 +83,3 @@ export const sendVerificationCode = email =>
       dispatch(showNotification(i18n.t('common.emailSentConfirmation', { email })))
     }
   })
-
-export const resetPassword = (verificationCode, newPassword) =>
-  _createAction(async dispatch => {
-    /* TODO
-    const responseType = await CognitoAuth.resetPassword(verificationCode, newPassword)
-    if (responseType === CognitoAuth.keysAction.success) {
-      dispatch(setEmail(''))
-      dispatch(showNotification('Your password has been reset'))
-      dispatch({
-        type: loginUserActionUpdate,
-        action: LoginState.userActions.login,
-      })
-    }
-    */
-  })

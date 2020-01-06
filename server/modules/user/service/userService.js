@@ -91,7 +91,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
     await db.tx(async t => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
-      const url = `${serverUrl}/guest/resetForgotPassword/${uuid}`
+      const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
       await Mailer.sendEmail(email, 'emails.userForgotPassword', { url }, lang)
       return { uuid }

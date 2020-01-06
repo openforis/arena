@@ -142,14 +142,13 @@ export const enTranslation = {
     yourPassword: 'Your password',
     yourNewPassword: 'Your new password',
     repeatYourNewPassword: 'Repeat your new password',
-    verificationCode: 'Verification code',
     resetPassword: 'Reset password',
     login: 'Login',
     forgotPassword: 'Forgot password',
     sendVerificationCode: 'Send verification code',
   },
 
-  resetForgotPasswordView: {
+  resetPasswordView: {
     setNewPassword: 'Set new password',
     forgotPasswordLinkInvalid: 'Invalid or expired link',
     resetPasswordComplete: 'Your password has been reset successfully',
@@ -604,8 +603,6 @@ export const enTranslation = {
       passwordUnsafe:
         'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
       passwordsDoNotMatch: "Passwords don't match",
-      verificationCodeInvalid: 'Invalid verification code',
-      verificationCodeDoNotMatch: 'Invalid verification code provided, please try again',
 
       userNotFound: 'User not found. Make sure email and password are correct',
     },

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
-import ResetForgotPasswordView from '@webapp/guest/resetForgotPassword/resetForgotPasswordView'
+import ResetPasswordView from '@webapp/guest/resetPassword/resetPasswordView'
 
 import { guest } from '@webapp/app/appModules'
 
@@ -11,9 +11,9 @@ const GuestView = () => (
   <InnerModuleSwitch
     modules={[
       {
-        key: 'resetForgotPassword',
-        path: modulePathFull('resetForgotPassword/:uuid'),
-        component: ResetForgotPasswordView,
+        key: 'resetPassword',
+        path: modulePathFull('resetPassword/:uuid'),
+        component: ResetPasswordView,
       },
     ]}
   />

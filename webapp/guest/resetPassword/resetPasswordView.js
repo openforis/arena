@@ -1,4 +1,4 @@
-import './resetForgotPasswordView.scss'
+import './resetPasswordView.scss'
 
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -11,19 +11,19 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import GuestViewWrapper from '../components/guestViewWrapper'
 
-import { useResetForgotPasswordState } from './resetForgotPasswordState'
+import { useResetPasswordState } from './resetPasswordState'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 
 const ResetCompleteContainer = ({ i18n }) => (
-  <div className="reset-forgot-password__complete-container">
-    <div className="info">{i18n.t('resetForgotPasswordView.resetPasswordComplete')}</div>
+  <div className="reset-password__complete-container">
+    <div className="info">{i18n.t('resetPasswordView.resetPasswordComplete')}</div>
     <button className="btn">
-      <Link to={appModuleUri(appModules.home)}>{i18n.t('resetForgotPasswordView.goToLoginPage')}</Link>
+      <Link to={appModuleUri(appModules.home)}>{i18n.t('resetPasswordView.goToLoginPage')}</Link>
     </button>
   </div>
 )
 
-const ResetForgotPasswordView = () => {
+const ResetPasswordView = () => {
   const i18n = useI18n()
   const {
     user,
@@ -34,7 +34,7 @@ const ResetForgotPasswordView = () => {
     validation,
     onClickSetNewPassword,
     resetComplete,
-  } = useResetForgotPasswordState()
+  } = useResetPasswordState()
 
   return (
     <GuestViewWrapper>
@@ -69,15 +69,15 @@ const ResetForgotPasswordView = () => {
               onClick={onClickSetNewPassword}
               aria-disabled={!Validation.isValid(validation)}
             >
-              {i18n.t('resetForgotPasswordView.setNewPassword')}
+              {i18n.t('resetPasswordView.setNewPassword')}
             </button>
           </div>
         </>
       ) : (
-        <div className="error">{i18n.t('resetForgotPasswordView.forgotPasswordLinkInvalid')}</div>
+        <div className="error">{i18n.t('resetPasswordView.forgotPasswordLinkInvalid')}</div>
       )}
     </GuestViewWrapper>
   )
 }
 
-export default ResetForgotPasswordView
+export default ResetPasswordView

@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import { useAsyncGetRequest, useAsyncPostRequest } from '@webapp/commonComponents/hooks'
 import * as LoginValidator from '@webapp/login/components/loginValidator'
 
-export const useResetForgotPasswordState = () => {
+export const useResetPasswordState = () => {
   const { uuid } = useParams()
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -23,7 +23,7 @@ export const useResetForgotPasswordState = () => {
 
   // Validate password and passwordConfirm on change
   const validate = async () => {
-    setValidation(await LoginValidator.validateResetForgotPasswordObj({ password, passwordConfirm }))
+    setValidation(await LoginValidator.validateResetPasswordObj({ password, passwordConfirm }))
   }
 
   useEffect(() => {
