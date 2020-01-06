@@ -233,7 +233,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
       const props = NodeDefState.getPropsUpdated(state)
       const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
 
-      dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
+      await dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
     }
 
     // Update node def edit state
@@ -246,10 +246,13 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
     })
 
     dispatch(hideAppLoader())
+
+    dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
     // Cannot save node def: show notification
-    const i18n = AppState.getI18n(state)
-    dispatch(showNotification(i18n.t(Validation.messageKeys.nodeDefEdit.formContainsErrors)))
+    dispatch(
+      showNotification(Validation.messageKeys.nodeDefEdit.formContainsErrors, {}, NotificationState.severity.error),
+    )
   }
 }
 
