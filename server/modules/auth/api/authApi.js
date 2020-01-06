@@ -108,10 +108,10 @@ export const init = app => {
     }
   })
 
-  app.post('/auth/reset-password/:uuid', async (req, res, next) => {
+  app.put('/auth/reset-password/:uuid', async (req, res, next) => {
     try {
-      const { uuid, password } = Request.getParams(req)
-      await UserService.updateUserPasswordForgot(uuid, password)
+      const { uuid, name, password } = Request.getParams(req)
+      await UserService.resetPassword(uuid, name, password)
       res.json({ result: true })
     } catch (error) {
       next(error)

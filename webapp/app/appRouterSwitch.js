@@ -64,7 +64,7 @@ const AppRouterSwitch = props => {
   ) : (
     isReady && (
       <>
-        {user ? (
+        {user && User.hasAccepted(user) ? (
           <Route
             path="/app"
             render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}

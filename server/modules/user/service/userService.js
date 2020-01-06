@@ -118,8 +118,8 @@ export const countUsersBySurveyId = async (user, surveyId) => {
 export const fetchUserByUuid = UserManager.fetchUserByUuid
 export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
 
-export const findResetPasswordUserByUuid = async uuid => {
-  const userUuid = await UserManager.findResetPasswordUserUuidByUuid(uuid)
+export const findResetPasswordUserByUuid = async resetPasswordUuid => {
+  const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
   return userUuid ? await UserManager.fetchUserByUuid(userUuid) : null
 }
 
@@ -162,12 +162,18 @@ export const acceptInvitation = async (userUuid, name, password) => {
   await UserManager.updateNamePasswordAndStatus(userUuid, name, passwordEncrypted, User.userStatus.ACCEPTED)
 }
 
-export const updateUserPasswordForgot = async (resetPasswordUuid, password) => {
-  const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
-  if (userUuid) {
+export const resetPassword = async (resetPasswordUuid, name, password) => {
+  const user = await findResetPasswordUserByUuid(resetPasswordUuid)
+  if (user) {
     const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
     await db.tx(async t => {
-      await UserManager.updatePassword(userUuid, passwordEncrypted, t)
+      await UserManager.updateNamePasswordAndStatus(
+        User.getUuid(user),
+        name,
+        passwordEncrypted,
+        User.userStatus.ACCEPTED,
+        t,
+      )
       await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid, t)
     })
   } else {

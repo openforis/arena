@@ -151,7 +151,7 @@ export const enTranslation = {
   resetPasswordView: {
     setNewPassword: 'Set new password',
     forgotPasswordLinkInvalid: 'Invalid or expired link',
-    resetPasswordComplete: 'Your password has been reset successfully',
+    passwordSuccessfullyReset: 'Your password has been successfully reset',
     goToLoginPage: 'Go to login page',
   },
 
@@ -606,8 +606,7 @@ Do you want to leave the page?`,
       emailInvalid: 'Email is invalid',
       emailNotFound: 'Email not found',
       groupRequired: 'Group is required',
-
-      userNameRequired: 'User name is required',
+      nameRequired: 'Name is required',
       passwordRequired: 'Password is required',
       passwordInvalid: 'Password should not start nor end with white spaces',
       passwordUnsafe:

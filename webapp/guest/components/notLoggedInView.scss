@@ -1,7 +1,7 @@
 @import "~@webapp/style/vars";
 @import "~@webapp/style/layoutMixins";
 
-@keyframes guest__bg1-animation {
+@keyframes not-logged-in__bg-animation {
   0%, 100% {
     transform: scale(1, 1);
     opacity: .2;
@@ -12,16 +12,16 @@
   }
 }
 
-.guest__bg {
+.not-logged-in__bg {
   @include full-screen-fixed();
   background-size: cover;
   background-position: center;
   background-image: url("/img/login-bg.jpg");
   opacity: .2;
-  animation: guest__bg1-animation 15s infinite;
+  animation: not-logged-in__bg-animation 15s infinite;
 }
 
-.guest__openforis {
+.not-logged-in__openforis {
   position: fixed;
   width: 60px;
   right: 5vw;
@@ -56,7 +56,7 @@
 
 }
 
-.guest-form {
+.not-logged-in__form {
   position: fixed;
   width: 30vw;
   height: 60vh;
@@ -69,7 +69,7 @@
   grid-row-gap: 3rem;
 }
 
-.guest-form input {
+.not-logged-in__form input {
   text-align: center;
   color: $black;
   background-color: white;
@@ -87,7 +87,7 @@
   }
 }
 
-.guest-form__error {
+.not-logged-in__form-error {
   background-color: $red;
   font-size: .9rem;
   font-weight: 600;

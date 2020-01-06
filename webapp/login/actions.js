@@ -68,16 +68,15 @@ export const showForgotPasswordForm = () => dispatch => {
 }
 
 export const sendVerificationCode = email =>
-  _createAction(async (dispatch, getState) => {
-    const i18n = AppState.getI18n(getState())
+  _createAction(async dispatch => {
     const {
       data: { errorMessage },
     } = await axios.post('/auth/reset-password', { email })
 
     if (errorMessage) {
-      dispatch(showNotification(i18n.t(errorMessage), null, AppNotificationState.severity.error))
+      dispatch(setLoginError(errorMessage))
     } else {
       dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
-      dispatch(showNotification(i18n.t('common.emailSentConfirmation', { email })))
+      dispatch(showNotification('common.emailSentConfirmation', { email }))
     }
   })

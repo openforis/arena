@@ -100,11 +100,10 @@ export const ValidatorErrorKeys = {
     emailRequired: 'validationErrors.user.emailRequired',
     emailNotFound: 'validationErrors.user.emailNotFound',
     groupRequired: 'validationErrors.user.groupRequired',
-
+    nameRequired: 'validationErrors.user.nameRequired',
     passwordRequired: 'validationErrors.user.passwordRequired',
     passwordInvalid: 'validationErrors.user.passwordInvalid',
     passwordUnsafe: 'validationErrors.user.passwordUnsafe',
-    userNameRequired: 'validationErrors.user.userNameRequired',
     passwordsDoNotMatch: 'validationErrors.user.passwordsDoNotMatch',
 
     userNotFound: 'validationErrors.user.userNotFound',

@@ -16,7 +16,6 @@ import * as UserResetPasswordRepository from '@server/modules/user/repository/us
 export const {
   countUsersBySurveyId,
   fetchUserProfilePicture,
-  updatePassword,
   updateNamePasswordAndStatus,
   resetUsersPrefsSurveyCycle,
 } = UserRepository

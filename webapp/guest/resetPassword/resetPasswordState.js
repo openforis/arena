@@ -1,47 +1,76 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router'
+import { useDispatch } from 'react-redux'
 
-import { useAsyncGetRequest, useAsyncPostRequest } from '@webapp/commonComponents/hooks'
+import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
+
+import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { showNotification } from '@webapp/app/appNotification/actions'
 import * as LoginValidator from '@webapp/login/components/loginValidator'
+import { appModuleUri, appModules } from '@webapp/app/appModules'
 
 export const useResetPasswordState = () => {
   const { uuid } = useParams()
+  const history = useHistory()
+
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [validation, setValidation] = useState()
+  const [error, setError] = useState()
 
-  const { data: { user } = {}, dispatch: dispatchGetResetPassword } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
+  const dispatch = useDispatch()
+
+  const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 
   const {
     data: { result: resetComplete = false } = {},
     dispatch: dispatchPostResetPassword,
-  } = useAsyncPostRequest(`/auth/reset-password/${uuid}`, { password })
+  } = useAsyncPutRequest(`/auth/reset-password/${uuid}`, { name, password })
 
   useEffect(() => {
-    dispatchGetResetPassword()
+    getResetPasswordUser()
   }, [])
 
-  // Validate password and passwordConfirm on change
-  const validate = async () => {
-    setValidation(await LoginValidator.validateResetPasswordObj({ password, passwordConfirm }))
-  }
-
   useEffect(() => {
-    validate()
+    setError(null)
   }, [password, passwordConfirm])
 
+  useOnUpdate(() => {
+    history.push(appModuleUri(appModules.home))
+    dispatch(showNotification('resetPasswordView.passwordSuccessfullyReset'))
+  }, [resetComplete])
+
+  // Check that reset password uuid is valid (user exists)
+  useOnUpdate(() => {
+    if (user) setName(User.getName(user))
+    else setError('resetPasswordView.forgotPasswordLinkInvalid')
+  }, [user])
+
   const onClickSetNewPassword = () => {
-    dispatchPostResetPassword()
+    ;(async () => {
+      const validation = await LoginValidator.validateResetPasswordObj({ name, password, passwordConfirm })
+      if (Validation.isValid(validation)) {
+        dispatchPostResetPassword()
+      }
+
+      setError(
+        Validation.isValid(validation)
+          ? null
+          : LoginValidator.getFirstError(validation, ['name', 'password', 'passwordConfirm']),
+      )
+    })()
   }
 
   return {
     user,
+    name,
+    setName,
     password,
     setPassword,
     passwordConfirm,
     setPasswordConfirm,
-    validation,
+    error,
     onClickSetNewPassword,
-    resetComplete,
   }
 }

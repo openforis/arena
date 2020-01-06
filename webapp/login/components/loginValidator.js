@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 import * as UserValidator from '@core/user/userValidator'
 
 const validPasswordRe = new RegExp(/^[\S]+.*[\S]+$/)
@@ -26,7 +27,7 @@ const _validatePasswordConfirm = (propName, item) => {
 
 export const validateAcceptInvitationObj = async obj =>
   await Validator.validate(obj, {
-    userName: [Validator.validateRequired(Validation.messageKeys.user.userNameRequired)],
+    userName: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
     password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
     passwordConfirm: [_validatePasswordConfirm],
   })
@@ -44,13 +45,16 @@ export const validateEmail = async obj =>
 
 export const validateResetPasswordObj = async obj =>
   await Validator.validate(obj, {
+    name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
     password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
     passwordConfirm: [_validatePasswordConfirm],
   })
 
-export const getFirstError = (validation, order) => {
-  const firstMatch = order
-    .map(field => Validation.getFieldValidation(field)(validation))
-    .find(v => !Validation.isValid(v))
-  return Validation.getErrors(firstMatch)[0].key
-}
+export const getFirstError = (validation, order) =>
+  R.pipe(
+    R.map(field => Validation.getFieldValidation(field)(validation)),
+    R.find(Validation.isNotValid),
+    Validation.getErrors,
+    R.head,
+    ValidationResult.getKey,
+  )(order)
