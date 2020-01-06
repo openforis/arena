@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import NotLoggedInView from '../components/notLoggedInView'
 
-import { useResetPasswordState } from './resetPasswordState'
+import { useResetPasswordState } from './useResetPasswordState'
 
 const ResetPasswordView = () => {
   const i18n = useI18n()
