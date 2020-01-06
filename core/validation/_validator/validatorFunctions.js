@@ -7,7 +7,7 @@ import * as ValidatorNameKeywords from './validatorNameKeywords'
 /**
  * Internal names must contain only lowercase letters, numbers and underscores starting with a letter
  */
-const validNameRegex = /^[a-z][a-z0-9_]*$/
+const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 
 const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
 

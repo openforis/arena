@@ -11,6 +11,13 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 
+export {
+  addNodeDefsCycles,
+  deleteNodeDefsCycles,
+  permanentlyDeleteNodeDefs,
+  markNodeDefsWithoutCyclesDeleted,
+} from '../repository/nodeDefRepository'
+
 // ======= CREATE
 
 export const insertNodeDef = async (user, surveyId, nodeDefParam, system = false, client = db) =>
@@ -43,8 +50,6 @@ export const fetchNodeDefsBySurveyId = async (
   )
   return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 }
-
-export const fetchNodeDefByUuid = NodeDefRepository.fetchNodeDefByUuid
 
 // ======= UPDATE
 
@@ -130,10 +135,6 @@ export const updateNodeDefProps = async (
     }
   })
 
-export const addNodeDefsCycles = NodeDefRepository.addNodeDefsCycles
-
-export const deleteNodeDefsCycles = NodeDefRepository.deleteNodeDefsCycles
-
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
@@ -160,6 +161,3 @@ export const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     return nodeDef
   })
-
-export const permanentlyDeleteNodeDefs = NodeDefRepository.permanentlyDeleteNodeDefs
-export const markNodeDefsWithoutCyclesDeleted = NodeDefRepository.markNodeDefsWithoutCyclesDeleted

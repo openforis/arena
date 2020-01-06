@@ -94,15 +94,6 @@ export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced 
     res => dbTransformCallback(res, draft, advanced),
   )
 
-export const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, advanced = false, client = db) =>
-  await client.map(
-    `SELECT ${nodeDefSelectFields}
-     FROM ${getSurveyDBSchema(surveyId)}.node_def 
-     WHERE uuid in (${nodeDefUuids.map((uuid, i) => `$${i + 1}`).join(',')})`,
-    [...nodeDefUuids],
-    res => dbTransformCallback(res, draft, advanced),
-  )
-
 const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
   await client.map(
     `
@@ -142,19 +133,6 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdva
   `,
     [props, propsAdvanced, nodeDefUuid],
     def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
-  )
-
-export const updateNodeDefPropsPublished = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
-  await client.one(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
-    SET props = props || $1::jsonb,
-        props_advanced = props_advanced || $2::jsonb
-    WHERE uuid = $3
-    RETURNING ${nodeDefSelectFields}
-  `,
-    [props, propsAdvanced, nodeDefUuid],
-    def => dbTransformCallback(def, false, true),
   )
 
 // CYCLES

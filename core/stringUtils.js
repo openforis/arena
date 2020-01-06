@@ -18,7 +18,12 @@ export const isBlank = R.ifElse(isString, R.pipe(trim, R.isEmpty), R.isNil)
 
 export const isNotBlank = R.pipe(isBlank, R.not)
 
-export const normalizeName = R.pipe(leftTrim, R.toLower, R.replace(/[^a-z0-9]/g, '_'), R.slice(0, 60))
+/**
+ * NormalizeName: Make an identifier suitable for use in various contexts.
+ *
+ * Postgres in particular has a limit of 63 bytes per identifier, so reserve 23 bytes for prefixes and suffixes.
+ */
+export const normalizeName = R.pipe(leftTrim, R.toLower, R.replace(/[^a-z0-9]/g, '_'), R.slice(0, 40))
 
 export const capitalizeFirstLetter = text => text.charAt(0).toUpperCase() + text.slice(1)
 
