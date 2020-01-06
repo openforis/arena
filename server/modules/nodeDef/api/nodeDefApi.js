@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import * as Request from '@server/utils/request'
 
 import * as Survey from '@core/survey/survey'
@@ -7,7 +9,7 @@ import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as NodeDefService from '../service/nodeDefService'
 
-const sendRespNodeDefs = async (
+const sendRespNodeDefsAndValidation = async (
   res,
   surveyId,
   cycle,
@@ -26,19 +28,21 @@ const sendRespNodeDefs = async (
   })
 }
 
+const sendRespNodeDefsUpdated = async (res, surveyId, cycle, nodeDefsUpdated) =>
+  await sendRespNodeDefsAndValidation(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
+
 export const init = app => {
   // ==== CREATE
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const nodeDefRequest = Request.getBody(req)
-      const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
+      const { surveyId } = Request.getParams(req)
+      const { surveyCycleKey, nodeDef } = Request.getBody(req)
 
-      await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
+      const nodeDefsUpdated = await NodeDefService.insertNodeDef(user, surveyId, surveyCycleKey, nodeDef)
 
-      const cycle = NodeDef.getCycleFirst(nodeDefRequest)
-      await sendRespNodeDefs(res, surveyId, cycle)
+      await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated))
     } catch (error) {
       next(error)
     }
@@ -52,7 +56,7 @@ export const init = app => {
       const advanced = true // Always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
       const sendNodeDefs = true
 
-      await sendRespNodeDefs(res, surveyId, cycle, sendNodeDefs, draft, advanced, validate)
+      await sendRespNodeDefsAndValidation(res, surveyId, cycle, sendNodeDefs, draft, advanced, validate)
     } catch (error) {
       next(error)
     }
@@ -78,7 +82,7 @@ export const init = app => {
         )
         delete nodeDefsUpdated[nodeDefUuid]
 
-        await sendRespNodeDefs(res, surveyId, cycle, false, true, true, true, nodeDefsUpdated)
+        await sendRespNodeDefsUpdated(res, surveyId, cycle, nodeDefsUpdated)
       } catch (error) {
         next(error)
       }
@@ -93,11 +97,11 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, cycle, nodeDefUuid } = Request.getParams(req)
+        const { surveyId, surveyCycleKey, nodeDefUuid } = Request.getParams(req)
 
-        await NodeDefService.markNodeDefDeleted(user, surveyId, nodeDefUuid)
+        const nodeDefsUpdated = await NodeDefService.markNodeDefDeleted(user, surveyId, surveyCycleKey, nodeDefUuid)
 
-        await sendRespNodeDefs(res, surveyId, cycle)
+        await sendRespNodeDefsUpdated(res, surveyId, surveyCycleKey, R.dissoc(nodeDefUuid, nodeDefsUpdated))
       } catch (error) {
         next(error)
       }

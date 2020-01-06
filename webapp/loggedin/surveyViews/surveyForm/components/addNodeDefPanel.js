@@ -18,7 +18,7 @@ import * as SurveyFormState from '../surveyFormState'
 import { setFormNodeDefAddChildTo } from '../actions'
 
 const AddNodeDefButtons = props => {
-  const { surveyCycleKey, nodeDef, addNodeDef, setFormNodeDefAddChildTo } = props
+  const { surveyCycleKey, nodeDef, addNodeDef } = props
 
   return (
     <React.Fragment>
@@ -34,7 +34,6 @@ const AddNodeDefButtons = props => {
             className="btn btn-s btn-add-node-def"
             onClick={() => {
               addNodeDef(type, nodeDefProps)
-              setFormNodeDefAddChildTo(null)
             }}
             aria-disabled={disabled}
           >

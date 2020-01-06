@@ -352,6 +352,14 @@ export const enTranslation = {
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
+    function: 'Function',
+    editorHelp: 'Valid expressions are a subset of Javascript.',
+    editorCompletionHelp: '- Show the available variables and functions that can be used',
+    functionDescriptions: {
+      min: 'Take the minimum of the arguments',
+      max: 'Take the maximum of the arguments',
+      pow: 'Raise a number X to the power P',
+    },
     basicProps: {
       key: 'Key',
       multiple: 'Multiple',
@@ -415,7 +423,9 @@ export const enTranslation = {
     nodeDefEditFormActions: {
       columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
-      confirmCancel: 'There are unsaved changes. Do you want to leave the page?',
+      confirmCancel: `**There are unsaved changes**.
+
+Do you want to leave the page?`,
     },
     nodeDefCode: {
       buttonCode: 'Button code',
@@ -605,6 +615,7 @@ export const enTranslation = {
       passwordsDoNotMatch: "Passwords don't match",
 
       userNotFound: 'User not found. Make sure email and password are correct',
+      passwordChangeRequired: 'Password change required',
     },
   },
 

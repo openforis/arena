@@ -53,6 +53,7 @@ const AdvancedProps = props => {
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}
         isContextParent={true}
+        hideAdvanced={true}
       />
     </div>
   )

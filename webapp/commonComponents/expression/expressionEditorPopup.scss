@@ -1,3 +1,6 @@
+@import '~codemirror/lib/codemirror.css';
+@import '~codemirror/addon/hint/show-hint';
+
 @import "~@webapp/style/vars";
 
 .expression-editor-popup {
@@ -10,9 +13,45 @@
   }
 }
 
+.expression-editor-popup__editor-help kbd {
+  border: 1px solid
+  #aaa;
+  border-radius: 0.2em;
+  box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1);
+  background-color: #f9f9f9;
+  background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee);
+  color: #000;
+  padding: 0.1em 0.3em;
+  font-family: inherit;
+}
+
+.expression-editor-popup__toggle-advanced {
+  position: absolute;
+  right: 0;
+}
+
+.expression-editor__variables-search {
+  max-width: 30ch;
+}
+
+.expression-editor-popup__autocompletions {
+  table {
+    border-spacing: 20px 0;
+    margin-bottom: 15px;
+  }
+}
 .expression-editor-popup__expr-container {
-  overflow: auto;
+  margin-top: 1.5rem;
   position: relative;
+
+  // These must match, for the autocomplete to work properly.
+  textarea {
+    border: 1px solid black;
+    margin-bottom: 15px;
+  }
+  textarea, span {
+    font-size: 1rem;
+  }
 
   //common
   .btns {

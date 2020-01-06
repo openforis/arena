@@ -108,5 +108,6 @@ export const ValidatorErrorKeys = {
     passwordsDoNotMatch: 'validationErrors.user.passwordsDoNotMatch',
 
     userNotFound: 'validationErrors.user.userNotFound',
+    passwordChangeRequired: 'validationErrors.user.passwordChangeRequired',
   },
 }
