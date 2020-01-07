@@ -1,31 +1,34 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import { acceptInvitation, setLoginError } from '../actions'
-import { useAcceptInvitationFormState } from './useAcceptInvitationFormState'
+import { acceptInvitation, setLoginError } from '@webapp/guest/login/actions'
+import { useAcceptInvitationState } from './useAcceptInvitationState'
+import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
 
-const AcceptInvitationForm = props => {
+import * as LoginState from '@webapp/guest/login/loginState'
+
+const AcceptInvitationView = props => {
   const i18n = useI18n()
+  const error = useSelector(LoginState.getError)
 
   const {
-    userName,
+    name,
     password,
     passwordConfirm,
-    setUserName,
+    setName,
     setPassword,
     setPasswordConfirm,
-    onClickReset,
-  } = useAcceptInvitationFormState(props)
+    onSubmit,
+  } = useAcceptInvitationState(props)
 
   return (
-    <>
+    <NotLoggedInView error={error}>
       <input
-        value={userName}
-        onChange={e => setUserName(e.target.value)}
+        value={name}
+        onChange={e => setName(e.target.value)}
         type="text"
-        name="name"
         placeholder={i18n.t('loginView.yourName')}
       />
 
@@ -33,7 +36,6 @@ const AcceptInvitationForm = props => {
         value={password}
         onChange={e => setPassword(e.target.value)}
         type="password"
-        name="newPassword"
         placeholder={i18n.t('loginView.yourNewPassword')}
       />
 
@@ -41,20 +43,19 @@ const AcceptInvitationForm = props => {
         value={passwordConfirm}
         onChange={e => setPasswordConfirm(e.target.value)}
         type="password"
-        name="newPasswordRepeat"
         placeholder={i18n.t('loginView.repeatYourNewPassword')}
       />
 
-      <div className="login-form__buttons">
-        <button type="button" className="btn btn-login" onClick={onClickReset}>
+      <div className="not-logged-in__buttons">
+        <button type="submit" className="btn" onClick={onSubmit}>
           {i18n.t('loginView.resetPassword')}
         </button>
       </div>
-    </>
+    </NotLoggedInView>
   )
 }
 
 export default connect(null, {
   acceptInvitation,
   setLoginError,
-})(AcceptInvitationForm)
+})(AcceptInvitationView)

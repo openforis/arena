@@ -53,8 +53,8 @@ const ResetPasswordView = () => {
             placeholder={i18n.t('loginView.repeatYourNewPassword')}
           />
 
-          <div className="login-form__buttons">
-            <button type="button" className="btn btn-login" onClick={onClickSetNewPassword}>
+          <div className="not-logged-in__buttons">
+            <button type="submit" className="btn" onClick={onClickSetNewPassword}>
               {i18n.t('resetPasswordView.setNewPassword')}
             </button>
           </div>

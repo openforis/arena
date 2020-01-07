@@ -9,7 +9,7 @@ import * as LoginState from '@webapp/guest/login/loginState'
 
 import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actions'
 
-import * as LoginValidator from '@webapp/guest/login/components/loginValidator'
+import * as LoginValidator from '@webapp/guest/login/loginValidator'
 
 const ForgotPasswordView = () => {
   const initialEmail = useSelector(LoginState.getEmail)
@@ -51,8 +51,8 @@ const ForgotPasswordView = () => {
         placeholder={i18n.t('loginView.yourEmail')}
       />
 
-      <div className="login-form__buttons">
-        <button type="button" className="btn btn-login" onClick={onSubmit}>
+      <div className="not-logged-in__buttons">
+        <button type="submit" className="btn" onClick={onSubmit}>
           <span className="icon icon-envelop icon-12px icon-left" />
           {i18n.t('loginView.sendPasswordResetEmail')}
         </button>

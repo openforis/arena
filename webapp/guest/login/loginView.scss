@@ -1,24 +1,6 @@
 @import "~@webapp/style/vars";
-@import "~@webapp/style/layoutMixins";
 
-.login-form__buttons {
-  width: 70%;
-  display: grid;
-  justify-self: center;
-  grid-row-gap: .5rem;
-
-  .btn-login {
-    border: none;
-    background-color: rgba($green, .5);
-    padding: 1rem;
-    text-transform: uppercase;
-    font-weight: 600;
-
-    &:hover {
-      background-color: rgba($green, .8);
-    }
-  }
-
+.not-logged-in__buttons {
   .btn-forgot-pwd {
     justify-self: end;
     display: flex;

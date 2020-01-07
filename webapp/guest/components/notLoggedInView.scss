@@ -87,6 +87,25 @@
   }
 }
 
+.not-logged-in__buttons {
+  width: 70%;
+  display: grid;
+  justify-self: center;
+  grid-row-gap: .5rem;
+
+  button[type="submit"] {
+    border: none;
+    background-color: rgba($green, .5);
+    padding: 1rem;
+    text-transform: uppercase;
+    font-weight: 600;
+
+    &:hover {
+      background-color: rgba($green, .8);
+    }
+  }
+}
+
 .not-logged-in__form-error {
   background-color: $red;
   font-size: .9rem;
