@@ -20,13 +20,12 @@ const AcceptInvitationForm = props => {
   } = useAcceptInvitationFormState(props)
 
   return (
-    <div className="login-form">
+    <>
       <input
         value={userName}
         onChange={e => setUserName(e.target.value)}
         type="text"
         name="name"
-        className="login-form__input"
         placeholder={i18n.t('loginView.yourName')}
       />
 
@@ -35,7 +34,6 @@ const AcceptInvitationForm = props => {
         onChange={e => setPassword(e.target.value)}
         type="password"
         name="newPassword"
-        className="login-form__input"
         placeholder={i18n.t('loginView.yourNewPassword')}
       />
 
@@ -44,7 +42,6 @@ const AcceptInvitationForm = props => {
         onChange={e => setPasswordConfirm(e.target.value)}
         type="password"
         name="newPasswordRepeat"
-        className="login-form__input"
         placeholder={i18n.t('loginView.repeatYourNewPassword')}
       />
 
@@ -53,7 +50,7 @@ const AcceptInvitationForm = props => {
           {i18n.t('loginView.resetPassword')}
         </button>
       </div>
-    </div>
+    </>
   )
 }
 

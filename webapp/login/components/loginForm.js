@@ -36,13 +36,12 @@ const LoginForm = props => {
   }
 
   return (
-    <div className="login-form">
+    <>
       <input
         value={formObject.email}
         onChange={e => setEmail(e.target.value)}
         type="text"
         name="email"
-        className="login-form__input"
         placeholder={i18n.t('loginView.yourEmail')}
       />
 
@@ -51,7 +50,6 @@ const LoginForm = props => {
         onChange={e => setObjectField('password', e.target.value)}
         type="password"
         name="password"
-        className="login-form__input"
         placeholder={i18n.t('loginView.yourPassword')}
       />
 
@@ -64,7 +62,7 @@ const LoginForm = props => {
           {i18n.t('loginView.forgotPassword')}
         </button>
       </div>
-    </div>
+    </>
   )
 }
 

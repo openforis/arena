@@ -30,7 +30,7 @@ const ForgotPasswordForm = props => {
   }
 
   return (
-    <div className="login-form">
+    <>
       <input
         value={formObject.email}
         onChange={e => {
@@ -39,7 +39,6 @@ const ForgotPasswordForm = props => {
         }}
         type="text"
         name="username"
-        className="login-form__input"
         placeholder={i18n.t('loginView.yourEmail')}
       />
 
@@ -49,7 +48,7 @@ const ForgotPasswordForm = props => {
           {i18n.t('loginView.sendVerificationCode')}
         </button>
       </div>
-    </div>
+    </>
   )
 }
 
