@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 
 import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/commonComponents/hooks'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import * as LoginValidator from '@webapp/login/components/loginValidator'
+import * as LoginValidator from '@webapp/guest/login/components/loginValidator'
 import { appModuleUri, appModules } from '@webapp/app/appModules'
 
 export const useResetPasswordState = () => {

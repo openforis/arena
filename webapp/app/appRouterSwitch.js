@@ -10,7 +10,7 @@ import * as AppWebSocket from './appWebSocket'
 import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
-import LoginView from '@webapp/login/loginView'
+import LoginView from '@webapp/guest/login/loginView'
 import AppLoaderView from './appLoader/appLoaderView'
 import AppNotificationView from './appNotification/appNotificationView'
 import GuestView from '@webapp/guest/guestView'

@@ -7,7 +7,6 @@ import * as LoginState from './loginState'
 import * as AppState from '@webapp/app/appState'
 import { hideAppLoader, initUser, showAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'
@@ -62,12 +61,7 @@ export const acceptInvitation = (name, password) =>
     dispatch(initUser())
   })
 
-export const showForgotPasswordForm = () => dispatch => {
-  dispatch(setLoginError(null))
-  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
-}
-
-export const sendVerificationCode = email =>
+export const sendPasswordResetEmail = (email, history) =>
   _createAction(async dispatch => {
     const {
       data: { errorMessage },
@@ -76,7 +70,7 @@ export const sendVerificationCode = email =>
     if (errorMessage) {
       dispatch(setLoginError(errorMessage))
     } else {
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
       dispatch(showNotification('common.emailSentConfirmation', { email }))
+      history.goBack()
     }
   })

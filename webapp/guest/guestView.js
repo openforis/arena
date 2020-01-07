@@ -2,18 +2,20 @@ import React from 'react'
 
 import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
 import ResetPasswordView from '@webapp/guest/resetPassword/resetPasswordView'
+import ForgotPasswordView from '@webapp/guest/forgotPassword/forgotPasswordView'
 
-import { guest } from '@webapp/app/appModules'
-
-const modulePathFull = modulePath => `/${guest}/${modulePath}/`
+import { guestModules } from '@webapp/app/appModules'
 
 const GuestView = () => (
   <ModuleSwitch
     modules={[
       {
-        key: 'resetPassword',
-        path: modulePathFull('resetPassword/:uuid'),
+        path: guestModules.resetPassword.path,
         component: ResetPasswordView,
+      },
+      {
+        path: guestModules.forgotPassword.path,
+        component: ForgotPasswordView,
       },
     ]}
   />

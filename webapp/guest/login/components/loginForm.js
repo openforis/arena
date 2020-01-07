@@ -1,15 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
 
 import * as LoginState from '../loginState'
-import { setEmail, login, showForgotPasswordForm, setLoginError } from '../actions'
+import { setEmail, login, setLoginError } from '../actions'
 
 import * as LoginValidator from './loginValidator'
+import { guestModules } from '@webapp/app/appModules'
 
 const LoginForm = props => {
-  const { email: initialEmail, setEmail: setStateEmail, login, showForgotPasswordForm, setLoginError } = props
+  const { email: initialEmail, setEmail: setStateEmail, login, setLoginError } = props
 
   const i18n = useI18n()
 
@@ -57,10 +59,10 @@ const LoginForm = props => {
         <button type="button" className="btn btn-login" onClick={onClickLogin}>
           {i18n.t('loginView.login')}
         </button>
-        <button type="button" className="btn btn-s btn-transparent btn-forgot-pwd" onClick={showForgotPasswordForm}>
+        <Link className="btn btn-s btn-transparent btn-forgot-pwd" to={guestModules.forgotPassword.path}>
           <span className="icon icon-question icon-left icon-12px" />
           {i18n.t('loginView.forgotPassword')}
-        </button>
+        </Link>
       </div>
     </>
   )
@@ -70,9 +72,4 @@ const mapStateToProps = state => ({
   email: LoginState.getEmail(state),
 })
 
-export default connect(mapStateToProps, {
-  setEmail,
-  login,
-  showForgotPasswordForm,
-  setLoginError,
-})(LoginForm)
+export default connect(mapStateToProps, { setEmail, login, setLoginError })(LoginForm)

@@ -1,17 +1,26 @@
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router'
 
+import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
 import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
 
-import * as LoginState from '../../login/loginState'
-import { sendVerificationCode, setLoginError } from '../../login/actions'
+import * as LoginState from '@webapp/guest/login/loginState'
 
-import * as LoginValidator from '../../login/components/loginValidator'
+import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actions'
 
-const ForgotPasswordView = props => {
-  const { email: initialEmail, sendVerificationCode, setLoginError } = props
+import * as LoginValidator from '@webapp/guest/login/components/loginValidator'
 
+const ForgotPasswordView = () => {
+  const initialEmail = useSelector(LoginState.getEmail)
+  const error = useSelector(LoginState.getError)
+  const dispatch = useDispatch()
+  const history = useHistory()
   const i18n = useI18n()
+
+  useEffect(() => {
+    dispatch(setLoginError(null))
+  }, [])
 
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     {
@@ -23,18 +32,18 @@ const ForgotPasswordView = props => {
 
   const onSubmit = () => {
     if (objectValid) {
-      sendVerificationCode(formObject.email)
+      dispatch(sendPasswordResetEmail(formObject.email, history))
     } else {
-      setLoginError(LoginValidator.getFirstError(validation, ['email']))
+      dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email'])))
     }
   }
 
   return (
-    <>
+    <NotLoggedInView error={error}>
       <input
         value={formObject.email}
         onChange={e => {
-          setLoginError(null)
+          dispatch(setLoginError(null))
           setObjectField('email', e.target.value)
         }}
         type="text"
@@ -45,18 +54,11 @@ const ForgotPasswordView = props => {
       <div className="login-form__buttons">
         <button type="button" className="btn btn-login" onClick={onSubmit}>
           <span className="icon icon-envelop icon-12px icon-left" />
-          {i18n.t('loginView.sendVerificationCode')}
+          {i18n.t('loginView.sendPasswordResetEmail')}
         </button>
       </div>
-    </>
+    </NotLoggedInView>
   )
 }
 
-const mapStateToProps = state => ({
-  email: LoginState.getEmail(state),
-})
-
-export default connect(mapStateToProps, {
-  sendVerificationCode,
-  setLoginError,
-})(ForgotPasswordView)
+export default ForgotPasswordView
