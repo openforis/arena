@@ -16,6 +16,7 @@ import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import * as SurveyState from '@webapp/survey/surveyState'
 import LabelsEditor from '../../labelsEditor/labelsEditor'
+import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import * as NodeDefState from '../nodeDefState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
@@ -28,7 +29,6 @@ const BasicProps = props => {
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
 
-    cyclesKeysSurvey,
     cyclesKeysParent,
     displayAsEnabled,
     displayInEnabled,
@@ -153,28 +153,13 @@ const BasicProps = props => {
         </FormItem>
       )}
 
-      {cyclesKeysSurvey.length > 1 && (
-        <FormItem label={i18n.t('common.cycle_plural')}>
-          <ButtonGroup
-            multiple={true}
-            deselectable={true}
-            selectedItemKey={cyclesNodeDef}
-            onChange={cycles =>
-              setNodeDefProp(
-                NodeDef.propKeys.cycles,
-                cycles.sort((a, b) => Number(a) - Number(b)),
-              )
-            }
-            items={cyclesKeysParent.map(cycle => ({
-              key: cycle,
-              label: Number(cycle) + 1,
-              disabled:
-                (cyclesNodeDef.length === 1 && cycle === cyclesNodeDef[0]) || // Disabled if current cycle is the only one selected in nodeDef
-                cycle === surveyCycleKey, // Cannot remove nodeDef from current cycle
-            }))}
-            disabled={NodeDef.isRoot(nodeDef)}
-          />
-        </FormItem>
+      {cyclesKeysParent.length > 1 && (
+        <CyclesSelect
+          cycles={cyclesKeysParent}
+          cyclesSelected={cyclesNodeDef}
+          disabled={NodeDef.isRoot(nodeDef)}
+          onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
+        />
       )}
     </div>
   )
@@ -207,7 +192,6 @@ const mapStateToProps = state => {
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
 
-    cyclesKeysSurvey,
     cyclesKeysParent,
   }
 }
