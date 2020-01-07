@@ -6,7 +6,7 @@ import AppHeader from './appHeader/appHeader'
 import AppSideBar from './appSideBar/appSideBar'
 import AppJobMonitor from './appJob/appJobMonitor'
 import AppErrors from '../app/appErrors/appErrors'
-import ModuleSwitch from './modules/moduleSwitch'
+import LoggedInModuleSwitch from './modules/loggedInModuleSwitch'
 
 const AppView = props => {
   const { location } = props
@@ -18,7 +18,7 @@ const AppView = props => {
 
       <div className="app__container">
         <AppSideBar pathname={pathName} />
-        <ModuleSwitch location={location} />
+        <LoggedInModuleSwitch location={location} />
       </div>
 
       <AppJobMonitor />

@@ -8,7 +8,7 @@ import * as LoginState from './loginState'
 import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
 import LoginForm from './components/loginForm'
 import AcceptInvitationForm from './components/acceptInvitationForm'
-import ForgotPasswordForm from './components/forgotPasswordForm'
+import ForgotPasswordForm from '../guest/forgotPassword/forgotPasswordView'
 
 const forms = {
   [LoginState.userActions.setNewPassword]: AcceptInvitationForm,

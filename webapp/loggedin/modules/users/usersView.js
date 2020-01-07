@@ -2,12 +2,12 @@ import React from 'react'
 
 import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
-import InnerModuleSwitch from '../components/innerModuleSwitch'
+import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
 import UsersListView from './userList/userListView'
 import UserView from './user/userView'
 
 const UsersView = () => (
-  <InnerModuleSwitch
+  <ModuleSwitch
     moduleRoot={appModules.users}
     moduleDefault={userModules.users}
     modules={[

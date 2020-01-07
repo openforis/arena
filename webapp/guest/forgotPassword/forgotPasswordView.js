@@ -3,12 +3,12 @@ import { connect } from 'react-redux'
 
 import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
 
-import * as LoginState from '../loginState'
-import { sendVerificationCode, setLoginError } from '../actions'
+import * as LoginState from '../../login/loginState'
+import { sendVerificationCode, setLoginError } from '../../login/actions'
 
-import * as LoginValidator from './loginValidator'
+import * as LoginValidator from '../../login/components/loginValidator'
 
-const ForgotPasswordForm = props => {
+const ForgotPasswordView = props => {
   const { email: initialEmail, sendVerificationCode, setLoginError } = props
 
   const i18n = useI18n()
@@ -59,4 +59,4 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   sendVerificationCode,
   setLoginError,
-})(ForgotPasswordForm)
+})(ForgotPasswordView)

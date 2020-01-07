@@ -2,7 +2,7 @@ import React from 'react'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
-import InnerModuleSwitch from '../components/innerModuleSwitch'
+import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ProcessingChainsView from './processingChains/processingChainsView'
 import ProcessingChainView from './processingChain/processingChainView'
@@ -10,7 +10,7 @@ import ProcessingStepView from './processingStep/processingStepView'
 
 const AnalysisView = () => (
   <SurveyDefsLoader draft={false} validate={false} requirePublish={true}>
-    <InnerModuleSwitch
+    <ModuleSwitch
       moduleRoot={appModules.analysis}
       moduleDefault={analysisModules.processingChains}
       modules={[

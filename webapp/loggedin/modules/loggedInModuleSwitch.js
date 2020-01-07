@@ -9,7 +9,7 @@ import DataViewComponent from './data/dataView'
 import UsersView from './users/usersView'
 import AnalysisView from './analysis/analysisView'
 
-const ModuleSwitch = props => (
+const LoggedInModuleSwitch = props => (
   <div className="app-module">
     <Switch location={props.location}>
       <Route path={appModuleUri(appModules.home)} component={HomeView} />
@@ -21,4 +21,4 @@ const ModuleSwitch = props => (
   </div>
 )
 
-export default ModuleSwitch
+export default LoggedInModuleSwitch
