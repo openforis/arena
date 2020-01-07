@@ -86,9 +86,14 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
   }
 }
 
+/**
+ * Generates a new reset password uuid.
+ * It returns an object like { uuid } if the reset password uuid has been generated without problems
+ * or an object like { error } if an error occurred
+ */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
-    await db.tx(async t => {
+    return await db.tx(async t => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
@@ -97,7 +102,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
       return { uuid }
     })
   } catch (error) {
-    return { errorMessage: error.message }
+    return { error: error.message }
   }
 }
 

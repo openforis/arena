@@ -59,11 +59,11 @@ export const acceptInvitation = (name, password, history) =>
 export const sendPasswordResetEmail = (email, history) =>
   _createAction(async dispatch => {
     const {
-      data: { errorMessage },
+      data: { error },
     } = await axios.post('/auth/reset-password', { email })
 
-    if (errorMessage) {
-      dispatch(setLoginError(errorMessage))
+    if (error) {
+      dispatch(setLoginError(error))
     } else {
       dispatch(showNotification('common.emailSentConfirmation', { email }))
       history.goBack()
