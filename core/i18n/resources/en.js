@@ -734,18 +734,17 @@ Do you want to leave the page?`,
       subject: 'You have been invited to OpenForis Arena!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
-             {{temporaryPasswordMsg}}
              <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
+             {{temporaryMsg}}
              $t(emails.signature)`,
-      temporaryPasswordMsg:
-        '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
+      temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     },
     userResetPassword: {
       subject: 'OpenForis Arena. Password reset',
       body: `<p>Hello {{name}},</p>
              <p>You recently requested to reset your password for your OpenForis Arena account. Click the link below to reset it.</p>
              <p><a href="{{url}}">Reset your password</a></p>
-             <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 48 hours.</p>
+             <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
              $t(emails.signature)`,
     },
   },
