@@ -93,7 +93,8 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
-      await Mailer.sendEmail(email, 'emails.userForgotPassword', { url }, lang)
+      const name = User.getName(user)
+      await Mailer.sendEmail(email, 'emails.userResetPassword', { url, name }, lang)
       return { uuid }
     })
   } catch (error) {
