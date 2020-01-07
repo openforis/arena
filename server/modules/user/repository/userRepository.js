@@ -120,14 +120,14 @@ export const updateUser = async (uuid, name, email, profilePicture, client = db)
     camelize,
   )
 
-export const updateNamePasswordAndStatus = async (user, name, password, status, client = db) =>
+export const updateNamePasswordAndStatus = async (userUuid, name, password, status, client = db) =>
   await client.one(
     `
     UPDATE "user" u
     SET name = $1, password = $2, status = $3
     WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, password, status, User.getUuid(user)],
+    [name, password, status, userUuid],
     camelize,
   )
 

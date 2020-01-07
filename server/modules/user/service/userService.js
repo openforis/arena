@@ -87,6 +87,21 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
   }
 }
 
+export const generateResetPasswordUuid = async (email, serverUrl) => {
+  try {
+    await db.tx(async t => {
+      const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
+      const url = `${serverUrl}/guest/resetPassword/${uuid}`
+      const lang = User.getLang(user)
+      const name = User.getName(user)
+      await Mailer.sendEmail(email, 'emails.userResetPassword', { url, name }, lang)
+      return { uuid }
+    })
+  } catch (error) {
+    return { errorMessage: error.message }
+  }
+}
+
 // ====== READ
 
 export const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
@@ -103,6 +118,11 @@ export const countUsersBySurveyId = async (user, surveyId) => {
 
 export const fetchUserByUuid = UserManager.fetchUserByUuid
 export const fetchUserProfilePicture = UserManager.fetchUserProfilePicture
+
+export const findResetPasswordUserByUuid = async resetPasswordUuid => {
+  const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
+  return userUuid ? await UserManager.fetchUserByUuid(userUuid) : null
+}
 
 // ====== UPDATE
 
@@ -138,13 +158,34 @@ export const updateUser = async (user, surveyId, userUuid, name, email, groupUui
   return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 
-export const acceptInvitation = async (user, name, password) => {
+export const acceptInvitation = async (userUuid, name, password) => {
   const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
-  await UserManager.updateNamePasswordAndStatus(user, name, passwordEncrypted, User.userStatus.ACCEPTED)
+  await UserManager.updateNamePasswordAndStatus(userUuid, name, passwordEncrypted, User.userStatus.ACCEPTED)
+}
+
+export const resetPassword = async (resetPasswordUuid, name, password) => {
+  const user = await findResetPasswordUserByUuid(resetPasswordUuid)
+  if (user) {
+    const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
+    await db.tx(async t => {
+      await UserManager.updateNamePasswordAndStatus(
+        User.getUuid(user),
+        name,
+        passwordEncrypted,
+        User.userStatus.ACCEPTED,
+        t,
+      )
+      await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid, t)
+    })
+  } else {
+    throw new Error(`User password reset not found or expired: ${resetPasswordUuid}`)
+  }
 }
 
 // DELETE
 export const deleteUser = UserManager.deleteUser
+
+export const deleteUserResetPasswordExpired = UserManager.deleteUserResetPasswordExpired
 
 // ==== User prefs
 export const updateUserPrefs = UserManager.updateUserPrefs

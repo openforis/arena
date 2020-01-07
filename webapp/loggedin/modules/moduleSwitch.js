@@ -1,7 +1,8 @@
 import React from 'react'
 import { Route, Switch } from 'react-router'
 
-import { appModules, appModuleUri } from '../appModules'
+import { appModules, appModuleUri } from '@webapp/app/appModules'
+
 import DesignerView from './designer/designerView'
 import HomeView from './home/homeView'
 import DataViewComponent from './data/dataView'

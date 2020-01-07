@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import { appModuleUri, dataModules } from '../../../../../appModules'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import TableColumn from './tableColumn'
 
 const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>

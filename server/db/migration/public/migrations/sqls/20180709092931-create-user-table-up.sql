@@ -18,12 +18,27 @@ CREATE TABLE
   CONSTRAINT user_email_idx UNIQUE ("email")
 );
 
-CREATE TABLE	
+CREATE TABLE
   user_sessions	
 (	
-  sid    VARCHAR        NOT NULL,	
-  sess   JSON           NOT NULL,	
-  expire TIMESTAMP(6)   NOT NULL,	
+  sid    VARCHAR        NOT NULL,
+  sess   JSON           NOT NULL,
+  expire TIMESTAMP(6)   NOT NULL,
 
-  PRIMARY KEY (sid)	
-); 
+  PRIMARY KEY (sid)
+);
+
+CREATE TABLE
+  user_reset_password	
+(
+  uuid          uuid        NOT NULL DEFAULT uuid_generate_v4(),
+  user_uuid     uuid        NOT NULL,
+  date_created  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+
+  PRIMARY KEY (uuid),
+  CONSTRAINT user_reset_password_user_fk FOREIGN KEY (user_uuid) REFERENCES "user" ("uuid")
+);
+
+CREATE UNIQUE INDEX
+user_reset_password_user_idx
+ON user_reset_password (user_uuid);

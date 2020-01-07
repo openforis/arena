@@ -16,7 +16,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 
 import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
-import { appModuleUri, homeModules } from '../../../../appModules'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = props => {

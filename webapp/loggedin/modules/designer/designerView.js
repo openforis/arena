@@ -15,7 +15,7 @@ import SurveyHierarchyView from './surveyHierarchy/surveyHierarchyView'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import { appModules, appModuleUri, designerModules } from '../../appModules'
+import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { resetForm } from '../../surveyViews/surveyForm/actions'
 

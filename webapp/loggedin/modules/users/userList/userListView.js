@@ -14,7 +14,7 @@ import * as User from '@core/user/user'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import { appModuleUri, userModules } from '../../../appModules'
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 import TableView from '../../../tableViews/tableView'
 
 const UsersHeaderLeft = props => {

@@ -3,21 +3,23 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import { isGuestUri } from '@webapp/app/appModules'
+import * as AppWebSocket from './appWebSocket'
+
 import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
 import LoginView from '@webapp/login/loginView'
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import { activeJobUpdate } from '../loggedin/appJob/actions'
 import AppLoaderView from './appLoader/appLoaderView'
 import AppNotificationView from './appNotification/appNotificationView'
-
-import * as AppWebSocket from './appWebSocket'
+import GuestView from '@webapp/guest/guestView'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 
 import * as AppState from './appState'
 
 import { initApp, throwSystemError } from './actions'
+import { activeJobUpdate } from '@webapp/loggedin/appJob/actions'
 
 const AppRouterSwitch = props => {
   const { isReady, systemError, user, initApp, throwSystemError, activeJobUpdate } = props
@@ -62,11 +64,13 @@ const AppRouterSwitch = props => {
   ) : (
     isReady && (
       <>
-        {user ? (
+        {user && User.hasAccepted(user) ? (
           <Route
             path="/app"
             render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}
           />
+        ) : isGuestUri(location.pathname) ? (
+          <GuestView />
         ) : (
           <LoginView />
         )}

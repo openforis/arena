@@ -12,7 +12,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../../actions'
 

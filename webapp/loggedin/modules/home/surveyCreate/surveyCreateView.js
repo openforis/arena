@@ -14,7 +14,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import { appModuleUri, homeModules } from '../../../appModules'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import * as SurveyCreateState from './surveyCreateState'
 
 import { updateNewSurveyProp, resetNewSurvey, createSurvey, importCollectSurvey } from './actions'

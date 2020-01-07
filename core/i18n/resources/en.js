@@ -25,6 +25,7 @@ export const enTranslation = {
     draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
+    emailSentConfirmation: 'An email to {{email}} has been sent',
     empty: 'Empty',
     error: 'Error',
     error_plural: 'Errors',
@@ -46,7 +47,7 @@ export const enTranslation = {
     name: 'Name',
     new: 'New',
     no: 'No',
-    noItems: "$t(common.no) $t(common.item,{'count':2})",
+    noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
     ok: 'Ok',
     path: 'Path',
@@ -76,7 +77,7 @@ export const enTranslation = {
       minute_plural: 'minutes',
       week: 'week',
       week_plural: 'weeks',
-      timeDiff: "{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago",
+      timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
     },
   },
 
@@ -132,7 +133,7 @@ export const enTranslation = {
   },
 
   surveyDefsLoader: {
-    requireSurveyPublish: 'This section is available when survey is published',
+    requireSurveyPublish: 'This section is available only when survey is published',
   },
 
   loginView: {
@@ -141,11 +142,16 @@ export const enTranslation = {
     yourPassword: 'Your password',
     yourNewPassword: 'Your new password',
     repeatYourNewPassword: 'Repeat your new password',
-    verificationCode: 'Verification code',
     resetPassword: 'Reset password',
     login: 'Login',
     forgotPassword: 'Forgot password',
     sendVerificationCode: 'Send verification code',
+  },
+
+  resetPasswordView: {
+    setNewPassword: 'Set new password',
+    forgotPasswordLinkInvalid: 'Invalid or expired link',
+    passwordSuccessfullyReset: 'Your password has been successfully reset',
   },
 
   homeView: {
@@ -304,7 +310,6 @@ export const enTranslation = {
   usersView: {
     inviteUser: 'Invite',
     accepted: 'Accepted',
-    inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
     notAcceptedYet: 'Invitation not accepted yet',
   },
@@ -391,8 +396,7 @@ export const enTranslation = {
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
-    cannotDeleteNodeDefReferenced:
-      'Cannot delete "{{nodeDef}}": it\'s referenced by these node definitions: {{nodeDefDependents}}',
+    cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
   },
 
   languagesEditor: {
@@ -409,7 +413,7 @@ export const enTranslation = {
     },
     formEntryActions: {
       confirmDemote: 'Are sure you want to demote this record to {{name}}?',
-      confirmPromote: "Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore",
+      confirmPromote: `Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore`,
       confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
       step: 'Step {{id}} ({{name}})',
@@ -500,14 +504,14 @@ Do you want to leave the page?`,
     invalidNumber: 'Invalid number',
     invalidDate: 'Invalid date',
     nameDuplicate: 'Name is duplicate',
-    nameCannotBeKeyword: 'Name "{{value}}" cannot be used: it\'s a reserved word',
+    nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
     nameRequired: 'Name is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
     categoryEdit: {
       childrenEmpty: '$t(common.childrenEmpty)',
       childrenInvalid: 'At least one invalid child',
-      codeCannotBeKeyword: 'Code "{{value}}" cannot be used: it\'s a reserved word',
+      codeCannotBeKeyword: `Code "{{value}}" cannot be used: it's a reserved word`,
       codeDuplicate: 'Code is duplicate',
       codeRequired: 'Code is required',
       itemsInvalid: 'At least one invalid item',
@@ -598,16 +602,14 @@ Do you want to leave the page?`,
     user: {
       emailRequired: 'Email is required',
       emailInvalid: 'Email is invalid',
+      emailNotFound: 'Email not found',
       groupRequired: 'Group is required',
-
-      userNameRequired: 'User name is required',
+      nameRequired: 'Name is required',
       passwordRequired: 'Password is required',
       passwordInvalid: 'Password should not start nor end with white spaces',
       passwordUnsafe:
         'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
-      passwordsDoNotMatch: "Passwords don't match",
-      verificationCodeInvalid: 'Invalid verification code',
-      verificationCodeDoNotMatch: 'Invalid verification code provided, please try again',
+      passwordsDoNotMatch: `Passwords don't match`,
 
       userNotFound: 'User not found. Make sure email and password are correct',
       passwordChangeRequired: 'Password change required',
@@ -644,9 +646,9 @@ Do you want to leave the page?`,
   // ====== App Errors
 
   appErrors: {
-    cannotGetChild: "Cannot get child '{{childName}}' from attribute {{name}}",
+    cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
-    cantUpdateStep: "Can't update step",
+    cantUpdateStep: `Can't update step`,
     entryDataNotFound: 'Entry data not found: {{entryName}}',
     generic: '{{text}}',
     invalidType: 'Invalid type {{type}}',
@@ -657,14 +659,12 @@ Do you want to leave the page?`,
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     unableToFindSibling: 'Unable to find sibling with name {{name}}',
-    undefinedFunction: "Undefined function '{{fnName}}' or wrong parameter types",
+    undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
     invalidSyntax: 'Expression syntax is invalid',
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
-
-    userHasPendingInvitation:
-      "There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted",
+    userHasPendingInvitation: `There's already a pending invitation for user {{email}}; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
@@ -727,19 +727,26 @@ Do you want to leave the page?`,
   },
 
   emails: {
+    signature: `<p>Thank you,<br>
+      The OpenForis Arena team
+      </p>`,
     userInvite: {
       subject: 'You have been invited to OpenForis Arena!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
              {{temporaryPasswordMsg}}
              <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
-             <p>
-             Thank you,
-             <br>
-             The OpenForis Arena team
-             </p>`,
+             $t(emails.signature)`,
       temporaryPasswordMsg:
         '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong></p>',
+    },
+    userResetPassword: {
+      subject: 'OpenForis Arena. Password reset',
+      body: `<p>Hello {{name}},</p>
+             <p>You recently requested to reset your password for your OpenForis Arena account. Click the link below to reset it.</p>
+             <p><a href="{{url}}">Reset your password</a></p>
+             <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 48 hours.</p>
+             $t(emails.signature)`,
     },
   },
 }

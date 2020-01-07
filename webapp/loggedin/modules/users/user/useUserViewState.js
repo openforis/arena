@@ -20,7 +20,7 @@ import {
   usePrevious,
 } from '@webapp/commonComponents/hooks'
 
-import { appModuleUri, userModules } from '../../../appModules'
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 export const useUserViewState = props => {
   const {
@@ -167,7 +167,7 @@ export const useUserViewState = props => {
       }
 
       if (isInvitation) {
-        showNotification('usersView.inviteUserConfirmation', {
+        showNotification('common.emailSentConfirmation', {
           email: formObject.email,
         })
       } else {

@@ -2,7 +2,7 @@ import React from 'react'
 import { Route, Switch, withRouter } from 'react-router'
 import { Redirect } from 'react-router-dom'
 
-import { appModuleUri } from '../../appModules'
+import { appModuleUri } from '@webapp/app/appModules'
 
 const InnerModuleSwitch = props => {
   const { modules, moduleRoot, moduleDefault, location } = props

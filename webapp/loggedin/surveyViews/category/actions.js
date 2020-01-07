@@ -25,7 +25,7 @@ import {
 
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as CategoryState from './categoryState'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'

@@ -13,7 +13,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
-import { appModuleUri, designerModules } from '@webapp/loggedin/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../taxonomy/actions'

@@ -21,7 +21,7 @@ const ForgotPasswordForm = props => {
     true,
   )
 
-  const onClickReset = () => {
+  const onSubmit = () => {
     if (objectValid) {
       sendVerificationCode(formObject.email)
     } else {
@@ -33,7 +33,10 @@ const ForgotPasswordForm = props => {
     <div className="login-form">
       <input
         value={formObject.email}
-        onChange={e => setObjectField('email', e.target.value)}
+        onChange={e => {
+          setLoginError(null)
+          setObjectField('email', e.target.value)
+        }}
         type="text"
         name="username"
         className="login-form__input"
@@ -41,7 +44,7 @@ const ForgotPasswordForm = props => {
       />
 
       <div className="login-form__buttons">
-        <button type="button" className="btn btn-login" onClick={onClickReset}>
+        <button type="button" className="btn btn-login" onClick={onSubmit}>
           <span className="icon icon-envelop icon-12px icon-left" />
           {i18n.t('loginView.sendVerificationCode')}
         </button>

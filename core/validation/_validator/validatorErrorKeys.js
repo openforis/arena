@@ -98,14 +98,13 @@ export const ValidatorErrorKeys = {
   user: {
     emailInvalid: 'validationErrors.user.emailInvalid',
     emailRequired: 'validationErrors.user.emailRequired',
+    emailNotFound: 'validationErrors.user.emailNotFound',
     groupRequired: 'validationErrors.user.groupRequired',
-
+    nameRequired: 'validationErrors.user.nameRequired',
     passwordRequired: 'validationErrors.user.passwordRequired',
     passwordInvalid: 'validationErrors.user.passwordInvalid',
     passwordUnsafe: 'validationErrors.user.passwordUnsafe',
-    userNameRequired: 'validationErrors.user.userNameRequired',
     passwordsDoNotMatch: 'validationErrors.user.passwordsDoNotMatch',
-    verificationCodeDoNotMatch: 'validationErrors.user.verificationCodeDoNotMatch',
 
     userNotFound: 'validationErrors.user.userNotFound',
     passwordChangeRequired: 'validationErrors.user.passwordChangeRequired',

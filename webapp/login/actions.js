@@ -5,7 +5,9 @@ import * as Validation from '@core/validation/validation'
 
 import * as LoginState from './loginState'
 import * as AppState from '@webapp/app/appState'
-import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
+import { hideAppLoader, initUser, showAppLoader } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
+import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'
@@ -62,37 +64,19 @@ export const acceptInvitation = (name, password) =>
 
 export const showForgotPasswordForm = () => dispatch => {
   dispatch(setLoginError(null))
-  dispatch({
-    type: loginUserActionUpdate,
-    action: LoginState.userActions.forgotPassword,
-  })
+  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
 }
 
 export const sendVerificationCode = email =>
   _createAction(async dispatch => {
-    /* TODO
-    const responseType = await CognitoAuth.forgotPassword(email)
-    if (responseType === CognitoAuth.keysAction.success) {
-      dispatch(showNotification('An email with the verification code has been sent'))
-      dispatch({
-        type: loginUserActionUpdate,
-        action: LoginState.userActions.resetPassword,
-      })
-    }
-    */
-  })
+    const {
+      data: { errorMessage },
+    } = await axios.post('/auth/reset-password', { email })
 
-export const resetPassword = (verificationCode, newPassword) =>
-  _createAction(async dispatch => {
-    /* TODO
-    const responseType = await CognitoAuth.resetPassword(verificationCode, newPassword)
-    if (responseType === CognitoAuth.keysAction.success) {
-      dispatch(setEmail(''))
-      dispatch(showNotification('Your password has been reset'))
-      dispatch({
-        type: loginUserActionUpdate,
-        action: LoginState.userActions.login,
-      })
+    if (errorMessage) {
+      dispatch(setLoginError(errorMessage))
+    } else {
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
+      dispatch(showNotification('common.emailSentConfirmation', { email }))
     }
-    */
   })

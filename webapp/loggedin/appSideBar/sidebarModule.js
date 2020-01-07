@@ -11,7 +11,7 @@ import {
   designerModules,
   homeModules,
   userModules,
-} from '../appModules'
+} from '@webapp/app/appModules'
 
 const keys = {
   key: 'key',
