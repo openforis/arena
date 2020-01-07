@@ -54,10 +54,10 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
     }
   })
 
-export const generateResetPasswordUuid = async email => {
-  const user = await UserRepository.fetchUserByEmail(email)
+export const generateResetPasswordUuid = async (email, client = db) => {
+  const user = await UserRepository.fetchUserByEmail(email, client)
   if (user) {
-    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user))
+    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
     return { uuid, user }
   }
 

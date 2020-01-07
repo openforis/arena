@@ -9,7 +9,7 @@ CREATE TABLE
   uuid            uuid            NOT NULL DEFAULT uuid_generate_v4(),
   name            VARCHAR(128)        NULL,
   email           VARCHAR         NOT NULL,
-  password        VARCHAR         NOT NULL,
+  password        VARCHAR             NULL,
   prefs           jsonb           NOT NULL DEFAULT '{}'::jsonb,
   profile_picture bytea               NULL,
   status          user_status     NOT NULL,
