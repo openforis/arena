@@ -36,60 +36,64 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUui
     throw new UnauthorizedError(User.getName(user))
   }
 
-  const dbUser = await UserManager.fetchUserByEmail(email)
+  let userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
   const groupName = AuthGroup.getName(group)
   const groupLabel = `$t(authGroups.${groupName}.label)`
 
-  if (dbUser) {
-    const newUserGroups = User.getAuthGroups(dbUser)
+  if (userToInvite) {
+    const newUserGroups = User.getAuthGroups(userToInvite)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroup.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 
-    if (!User.hasAccepted(dbUser)) {
+    if (!User.hasAccepted(userToInvite)) {
       throw new SystemError('appErrors.userHasPendingInvitation', { email })
     } else if (hasRoleInSurvey) {
       throw new SystemError('appErrors.userHasRole')
-    } else if (User.isSystemAdmin(dbUser)) {
+    } else if (User.isSystemAdmin(userToInvite)) {
       throw new SystemError('appErrors.userIsAdmin')
     }
 
     await db.tx(async t => {
-      await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser, t)
+      await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
       await Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, lang)
     })
   } else {
     await db.tx(async t => {
       // Add user to db
-      const password = UserPasswordUtils.generatePassword()
-      const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
-      await UserManager.insertUser(
+      userToInvite = await UserManager.insertUser(
         user,
         surveyId,
         surveyCycleKey,
         email,
-        passwordEncrypted,
+        null,
         User.userStatus.INVITED,
         groupUuid,
         t,
       )
+      // Add user to reset password table
+      const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
+
       // Send email
       const msgParams = {
-        serverUrl,
-        email,
-        password,
+        serverUrl: `${serverUrl}/guest/resetPassword/${uuid}`,
         surveyLabel,
         groupLabel,
-        temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)',
+        temporaryMsg: '$t(emails.userInvite.temporaryMsg)',
       }
       await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
     })
   }
 }
 
+/**
+ * Generates a new reset password uuid.
+ * It returns an object like { uuid } if the reset password uuid has been generated without problems
+ * or an object like { error } if an error occurred
+ */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
-    await db.tx(async t => {
+    return await db.tx(async t => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
@@ -98,7 +102,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
       return { uuid }
     })
   } catch (error) {
-    return { errorMessage: error.message }
+    return { error: error.message }
   }
 }
 

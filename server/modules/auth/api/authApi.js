@@ -91,8 +91,8 @@ export const init = app => {
     try {
       const { email } = Request.getParams(req)
       const serverUrl = Request.getServerUrl(req)
-      const data = await UserService.generateResetPasswordUuid(email, serverUrl)
-      res.json(data)
+      const { uuid, error } = await UserService.generateResetPasswordUuid(email, serverUrl)
+      res.json({ uuid, error })
     } catch (error) {
       next(error)
     }

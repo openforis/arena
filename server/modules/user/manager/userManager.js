@@ -31,6 +31,7 @@ export const insertUser = async (user, surveyId, surveyCycleKey, email, password
   await client.tx(async t => {
     const newUser = await UserRepository.insertUser(surveyId, surveyCycleKey, email, password, status, t)
     await addUserToGroup(user, surveyId, groupUuid, newUser, t)
+    return newUser
   })
 
 export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
@@ -53,10 +54,10 @@ export const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, clien
     }
   })
 
-export const generateResetPasswordUuid = async email => {
-  const user = await UserRepository.fetchUserByEmail(email)
+export const generateResetPasswordUuid = async (email, client = db) => {
+  const user = await UserRepository.fetchUserByEmail(email, client)
   if (user) {
-    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user))
+    const uuid = await UserResetPasswordRepository.insertOrUpdateResetPassword(User.getUuid(user), client)
     return { uuid, user }
   }
 

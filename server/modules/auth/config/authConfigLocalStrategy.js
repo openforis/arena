@@ -14,10 +14,10 @@ const _verifyCallback = async (req, email, password, done) => {
   if (Validation.isValid(UserValidator.validateEmail(User.keys.email, { [User.keys.email]: email }))) {
     const user = await UserManager.findUserByEmailAndPassword(email, password, UserPasswordUtils.comparePassword)
     if (user) {
-      if (User.getStatus(user) === User.userStatus.FORCE_CHANGE_PASSWORD) {
-        sendError(Validation.messageKeys.user.passwordChangeRequired)
-      } else {
+      if (User.hasAccepted(user)) {
         sendUser(user)
+      } else {
+        sendError(Validation.messageKeys.user.passwordChangeRequired)
       }
     } else {
       sendError(Validation.messageKeys.user.userNotFound)

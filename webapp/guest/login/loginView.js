@@ -2,7 +2,7 @@ import './loginView.scss'
 
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
 import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
@@ -18,7 +18,6 @@ const LoginView = () => {
   const email = useSelector(LoginState.getEmail)
   const i18n = useI18n()
   const dispatch = useDispatch()
-  const history = useHistory()
 
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     { email, password: '' },
@@ -28,7 +27,7 @@ const LoginView = () => {
 
   const onClickLogin = () => {
     if (objectValid) {
-      dispatch(login(formObject.email, formObject.password, history))
+      dispatch(login(formObject.email, formObject.password))
     } else {
       dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email', 'password'])))
     }

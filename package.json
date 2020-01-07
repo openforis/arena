@@ -236,7 +236,6 @@
     "express-fileupload": "^1.1.6",
     "express-session": "^1.17.0",
     "file-saver": "^2.0.2",
-    "generate-password": "^1.4.2",
     "i18next": "^19.0.1",
     "is-valid-coordinates": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
