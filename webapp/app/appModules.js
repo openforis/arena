@@ -12,9 +12,6 @@ export const guestModules = {
   forgotPassword: {
     path: `/${guest}/forgotPassword/`,
   },
-  acceptInvitation: {
-    path: `/${guest}/acceptInvitation/`,
-  },
 }
 
 // ==== Logged in modules

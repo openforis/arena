@@ -18,7 +18,6 @@ const LoginView = () => {
   const email = useSelector(LoginState.getEmail)
   const i18n = useI18n()
   const dispatch = useDispatch()
-  const history = useHistory()
 
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     { email, password: '' },
@@ -28,7 +27,7 @@ const LoginView = () => {
 
   const onClickLogin = () => {
     if (objectValid) {
-      dispatch(login(formObject.email, formObject.password, history))
+      dispatch(login(formObject.email, formObject.password))
     } else {
       dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email', 'password'])))
     }

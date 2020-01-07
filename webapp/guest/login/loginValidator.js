@@ -25,13 +25,6 @@ const _validatePasswordConfirm = (propName, item) => {
   return password !== passwordConfirm ? { key: Validation.messageKeys.user.passwordsDoNotMatch } : null
 }
 
-export const validateAcceptInvitationObj = async obj =>
-  await Validator.validate(obj, {
-    userName: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
-    password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
-    passwordConfirm: [_validatePasswordConfirm],
-  })
-
 export const validateLoginObj = async obj =>
   await Validator.validate(obj, {
     email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
