@@ -1,19 +1,26 @@
 import React from 'react'
 
-import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
+import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
 import ResetPasswordView from '@webapp/guest/resetPassword/resetPasswordView'
+import ForgotPasswordView from '@webapp/guest/forgotPassword/forgotPasswordView'
+import AcceptInvitationView from '@webapp/guest/acceptInvitation/acceptInvitationView'
 
-import { guest } from '@webapp/app/appModules'
-
-const modulePathFull = modulePath => `/${guest}/${modulePath}/`
+import { guestModules } from '@webapp/app/appModules'
 
 const GuestView = () => (
-  <InnerModuleSwitch
+  <ModuleSwitch
     modules={[
       {
-        key: 'resetPassword',
-        path: modulePathFull('resetPassword/:uuid'),
+        path: guestModules.resetPassword.path,
         component: ResetPasswordView,
+      },
+      {
+        path: guestModules.forgotPassword.path,
+        component: ForgotPasswordView,
+      },
+      {
+        path: guestModules.acceptInvitation.path,
+        component: AcceptInvitationView,
       },
     ]}
   />

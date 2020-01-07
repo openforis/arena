@@ -3,14 +3,11 @@ import axios from 'axios'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
-import * as LoginState from './loginState'
-import * as AppState from '@webapp/app/appState'
 import { hideAppLoader, initUser, showAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
+import { appModuleUri, guestModules, homeModules } from '@webapp/app/appModules'
 
 export const loginEmailUpdate = 'login/email/update'
-export const loginUserActionUpdate = 'login/userAction/update'
 export const loginErrorUpdate = 'login/error'
 
 export const setEmail = email => dispatch => dispatch({ type: loginEmailUpdate, email })
@@ -30,7 +27,7 @@ const _createAction = handlerFn => async (dispatch, getState) => {
   }
 }
 
-export const login = (email, password) =>
+export const login = (email, password, history) =>
   _createAction(async (dispatch, getState) => {
     const {
       data: { message, user },
@@ -43,31 +40,23 @@ export const login = (email, password) =>
       User.getStatus(user) === User.userStatus.INVITED ||
       message === Validation.messageKeys.user.passwordChangeRequired
     ) {
-      dispatch({
-        type: loginUserActionUpdate,
-        action: LoginState.userActions.setNewPassword,
-      })
+      history.push(guestModules.acceptInvitation.path)
     } else {
-      const i18n = AppState.getI18n(getState())
-      dispatch(setLoginError(i18n.t(message)))
+      dispatch(setLoginError(message))
     }
   })
 
-export const acceptInvitation = (name, password) =>
+export const acceptInvitation = (name, password, history) =>
   _createAction(async dispatch => {
     await axios.put(`/api/user/accept-invitation`, {
       name,
       password,
     })
-    dispatch(initUser())
+    await dispatch(initUser())
+    history.push(appModuleUri(homeModules.dashboard))
   })
 
-export const showForgotPasswordForm = () => dispatch => {
-  dispatch(setLoginError(null))
-  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
-}
-
-export const sendVerificationCode = email =>
+export const sendPasswordResetEmail = (email, history) =>
   _createAction(async dispatch => {
     const {
       data: { errorMessage },
@@ -76,7 +65,7 @@ export const sendVerificationCode = email =>
     if (errorMessage) {
       dispatch(setLoginError(errorMessage))
     } else {
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
       dispatch(showNotification('common.emailSentConfirmation', { email }))
+      history.goBack()
     }
   })

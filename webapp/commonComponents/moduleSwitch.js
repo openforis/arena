@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 
 import { appModuleUri } from '@webapp/app/appModules'
 
-const InnerModuleSwitch = props => {
+const ModuleSwitch = props => {
   const { modules, moduleRoot, moduleDefault, location } = props
 
   const isRootUri = location.pathname === appModuleUri(moduleRoot)
@@ -25,10 +25,10 @@ const InnerModuleSwitch = props => {
   )
 }
 
-InnerModuleSwitch.defaultProps = {
+ModuleSwitch.defaultProps = {
   modules: [],
   moduleRoot: '',
   moduleDefault: '',
 }
 
-export default withRouter(InnerModuleSwitch)
+export default withRouter(ModuleSwitch)

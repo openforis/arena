@@ -1,0 +1,19 @@
+@import "~@webapp/style/vars";
+
+.not-logged-in__buttons {
+  .btn-forgot-pwd {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: rgba($black, .9);
+    padding: .25rem 0;
+    margin-top: .25rem;
+    border-bottom: 1px solid transparent;
+
+    &:hover {
+      background-color: transparent;
+      border-bottom: 1px solid rgba($black, .8);
+    }
+  }
+}

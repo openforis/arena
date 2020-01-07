@@ -16,7 +16,7 @@
   @include full-screen-fixed();
   background-size: cover;
   background-position: center;
-  background-image: url("/img/login-bg.jpg");
+  background-image: url("/img/not-logged-in-bg.jpg");
   opacity: .2;
   animation: not-logged-in__bg-animation 15s infinite;
 }
@@ -84,6 +84,25 @@
     -webkit-box-shadow: 0 0 0px 1000px lighten($greenLight, 5%) inset;
     font-family: $fontFamily;
     font-size: .9rem;
+  }
+}
+
+.not-logged-in__buttons {
+  width: 70%;
+  display: grid;
+  justify-self: center;
+  grid-row-gap: .5rem;
+
+  button[type="submit"] {
+    border: none;
+    background-color: rgba($green, .5);
+    padding: 1rem;
+    text-transform: uppercase;
+    font-weight: 600;
+
+    &:hover {
+      background-color: rgba($green, .8);
+    }
   }
 }
 

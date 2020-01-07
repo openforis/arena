@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import * as Authorizer from '@core/auth/authorizer'
 
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
-import InnerModuleSwitch from '@webapp/loggedin/modules/components/innerModuleSwitch'
+import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
 import FormDesignerView from './formDesigner/formDesignerView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
@@ -26,7 +26,7 @@ const DesignerView = ({ canEditDef, resetForm }) => {
 
   return (
     <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
-      <InnerModuleSwitch
+      <ModuleSwitch
         moduleRoot={appModules.designer}
         moduleDefault={designerModules.formDesigner}
         modules={[

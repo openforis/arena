@@ -1,12 +1,26 @@
 import * as R from 'ramda'
 
-const app = 'app'
+// ==== Guest modules
 
-export const guest = 'guest'
-
-export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
-
+const guest = 'guest'
 export const isGuestUri = R.startsWith(`/${guest}`)
+
+export const guestModules = {
+  resetPassword: {
+    path: `/${guest}/resetPassword/:uuid/`,
+  },
+  forgotPassword: {
+    path: `/${guest}/forgotPassword/`,
+  },
+  acceptInvitation: {
+    path: `/${guest}/acceptInvitation/`,
+  },
+}
+
+// ==== Logged in modules
+
+const app = 'app'
+export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
 
 // ==== App Root modules
 export const appModules = {

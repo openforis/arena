@@ -145,7 +145,7 @@ export const enTranslation = {
     resetPassword: 'Reset password',
     login: 'Login',
     forgotPassword: 'Forgot password',
-    sendVerificationCode: 'Send verification code',
+    sendPasswordResetEmail: 'Send password reset email',
   },
 
   resetPasswordView: {
