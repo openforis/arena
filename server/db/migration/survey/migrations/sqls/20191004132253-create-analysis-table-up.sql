@@ -28,7 +28,7 @@ CREATE TABLE
   (
     uuid                  uuid    NOT NULL DEFAULT uuid_generate_v4(),
     processing_step_uuid  uuid    NOT NULL,
-    node_def_uuid         uuid    NOT NULL,
+    node_def_uuid         uuid        NULL,
     index                 integer NOT NULL DEFAULT 0,
     props                 jsonb   NOT NULL DEFAULT '{}'::jsonb,
     PRIMARY KEY (uuid),
