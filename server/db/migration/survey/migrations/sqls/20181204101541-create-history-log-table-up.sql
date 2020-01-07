@@ -7,7 +7,7 @@ CREATE TABLE activity_log
   system       boolean      NOT NULL DEFAULT false,
   date_created TIMESTAMP    NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
   PRIMARY KEY (id),
-  CONSTRAINT activity_log_user_fk FOREIGN KEY (user_uuid) REFERENCES "user" ("uuid")
+  CONSTRAINT activity_log_user_fk FOREIGN KEY (user_uuid) REFERENCES "user" ("uuid") ON DELETE CASCADE
 );
 
 CREATE INDEX activity_log_user_aggregated_idx ON activity_log (
@@ -23,7 +23,7 @@ CREATE INDEX activity_log_user_aggregated_idx ON activity_log (
 -- will result in worse performance due to the inability to
 -- use indexes correctly.
 CREATE VIEW activity_log_user_aggregate_keys AS
-SELECT 
+SELECT
   date_created::date as date,
   user_uuid,
   type,
