@@ -34,7 +34,7 @@ export const useResetPasswordState = () => {
 
   useEffect(() => {
     setError(null)
-  }, [password, passwordConfirm])
+  }, [name, password, passwordConfirm])
 
   useOnUpdate(() => {
     history.push(appModuleUri(appModules.home))
