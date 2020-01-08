@@ -9,6 +9,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
@@ -67,6 +68,8 @@ const ProcessingChainView = props => {
           labels={ProcessingChain.getDescriptions(processingChain)}
           onChange={descriptions => putProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
         />
+
+        <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} disabled={true} />
 
         <ProcessingChainSteps history={history} processingChain={processingChain} />
 

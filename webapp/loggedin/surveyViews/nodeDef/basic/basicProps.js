@@ -155,8 +155,8 @@ const BasicProps = props => {
 
       {cyclesKeysParent.length > 1 && (
         <CyclesSelect
-          cycles={cyclesKeysParent}
-          cyclesSelected={cyclesNodeDef}
+          cyclesKeysSelectable={cyclesKeysParent}
+          cyclesKeysSelected={cyclesNodeDef}
           disabled={NodeDef.isRoot(nodeDef)}
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
