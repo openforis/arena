@@ -1,5 +1,7 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import { appUserLogout } from '@webapp/app/actions'
@@ -11,6 +13,8 @@ import {
   processingStepPropsUpdate,
   processingStepUpdate,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+
+import { processingStepCalculationUpdate } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const actionHandlers = {
   // Reset state
@@ -25,10 +29,15 @@ const actionHandlers = {
 
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
-  [processingStepCalculationForEditUpdate]: (state, { uuid }) =>
-    ProcessingStepState.assocCalculationUuidForEdit(uuid)(state),
+
+  [processingStepCalculationForEditUpdate]: (state, { calculation }) =>
+    ProcessingStepState.assocCalculationUuidForEdit(ProcessingStepCalculation.getUuid(calculation))(state),
+
   [processingStepCalculationIndexUpdate]: (state, { indexFrom, indexTo }) =>
     ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
+
+  [processingStepCalculationUpdate]: (state, { calculation }) =>
+    ProcessingStepState.assocCalculation(calculation)(state),
 }
 
 export default exportReducer(actionHandlers)

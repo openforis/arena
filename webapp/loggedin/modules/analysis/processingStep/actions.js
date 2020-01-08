@@ -30,7 +30,7 @@ export const resetProcessingStepState = () => dispatch =>
 export const setProcessingStepCalculationForEdit = calculation => dispatch =>
   dispatch({
     type: processingStepCalculationForEditUpdate,
-    uuid: ProcessingStepCalculation.getUuid(calculation),
+    calculation,
   })
 
 // ====== CREATE
@@ -43,9 +43,15 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
   const processingStep = ProcessingStepState.getProcessingStep(state)
   const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
 
-  const { data: calculation } = await axios.post(
+  /*
+  Const { data: calculation } = await axios.post(
     `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
     { index: calculationSteps.length },
+  )
+  */
+  const calculation = ProcessingStepCalculation.newProcessingStepCalculation(
+    ProcessingStep.getUuid(processingStep),
+    calculationSteps.length,
   )
 
   dispatch({ type: processingStepCalculationCreate, calculation })
