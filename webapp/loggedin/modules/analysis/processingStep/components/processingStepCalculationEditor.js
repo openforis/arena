@@ -37,16 +37,21 @@ const ProcessingStepCalculationEditor = props => {
   } = props
 
   const i18n = useI18n()
-  const types = [
-    {
-      key: ProcessingStepCalculation.types.quantitative,
-      label: i18n.t('processingStepCalculationView.types.quantitative'),
-    },
-    {
-      key: ProcessingStepCalculation.types.categorical,
-      label: i18n.t('processingStepCalculationView.types.categorical'),
-    },
-  ]
+  const types = R.pipe(
+    R.keys,
+    R.map(type => ({
+      key: ProcessingStepCalculation.type[type],
+      label: i18n.t(`processingStepCalculationView.types.${type}`),
+    })),
+  )(ProcessingStepCalculation.type)
+
+  const aggregateFns = R.pipe(
+    R.keys,
+    R.map(fn => ({
+      key: ProcessingStepCalculation.aggregateFn[fn],
+      label: i18n.t(`processingStepCalculationView.aggregateFunctions.${fn}`),
+    })),
+  )(ProcessingStepCalculation.aggregateFn)
 
   return (
     <div className="processing-step__calculation-editor">
@@ -75,6 +80,16 @@ const ProcessingStepCalculationEditor = props => {
           itemKeyProp={ProcessingStepCalculation.keys.uuid}
           itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
           onChange={def => updateProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+        />
+      </FormItem>
+
+      <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
+        <ButtonGroup
+          selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
+          onChange={aggregateFn =>
+            updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
+          }
+          items={aggregateFns}
         />
       </FormItem>
     </div>

@@ -346,6 +346,15 @@ export const enTranslation = {
       quantitative: 'Quantitative',
       categorical: 'Categorical',
     },
+    aggregateFunction: 'Aggregate function',
+    aggregateFunctions: {
+      avg: 'Average',
+      cnt: 'Count',
+      max: 'Maximum',
+      med: 'Median',
+      min: 'Minimum',
+      sum: 'Sum',
+    },
   },
 
   itemsTable: {
