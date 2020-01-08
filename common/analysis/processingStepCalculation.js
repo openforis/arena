@@ -52,6 +52,7 @@ export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 export const getLabels = ObjectUtils.getLabels
 export const getType = ObjectUtils.getProp(keysProps.type)
+export const isQuantitative = R.pipe(getType, R.equals(types.quantitative))
 
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
@@ -60,3 +61,4 @@ export const isEqual = ObjectUtils.isEqual
 // ====== UPDATE
 export const assocIndex = ObjectUtils.assocIndex
 export const assocProp = ObjectUtils.setProp
+export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)

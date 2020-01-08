@@ -11,8 +11,17 @@ export const updateProcessingStepCalculationProp = (prop, value) => async (dispa
 
   dispatch({
     type: processingStepCalculationUpdate,
-    prop,
-    value,
+    calculation: calculationUpdated,
+  })
+}
+
+export const updateProcessingStepCalculationAttribute = attrDefUuid => async (dispatch, getState) => {
+  const calculation = ProcessingStepCalculationState.getCalculation(getState())
+
+  const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(attrDefUuid)(calculation)
+
+  dispatch({
+    type: processingStepCalculationUpdate,
     calculation: calculationUpdated,
   })
 }

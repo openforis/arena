@@ -1,9 +1,12 @@
 import './processingStepCalculationEditor.scss'
 
 import React from 'react'
+import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
@@ -12,13 +15,26 @@ import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { setProcessingStepCalculationForEdit } from '../actions'
-import { updateProcessingStepCalculationProp } from '../../processingStepCalculation/actions'
+import {
+  updateProcessingStepCalculationProp,
+  updateProcessingStepCalculationAttribute,
+} from '../../processingStepCalculation/actions'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
 
 const ProcessingStepCalculationEditor = props => {
-  const { surveyInfo, calculation, setProcessingStepCalculationForEdit, updateProcessingStepCalculationProp } = props
+  const {
+    surveyInfo,
+    calculation,
+    attributes,
+    attribute,
+    setProcessingStepCalculationForEdit,
+    updateProcessingStepCalculationProp,
+    updateProcessingStepCalculationAttribute,
+  } = props
 
   const i18n = useI18n()
   const types = [
@@ -51,6 +67,16 @@ const ProcessingStepCalculationEditor = props => {
           items={types}
         />
       </FormItem>
+
+      <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
+        <Dropdown
+          items={attributes}
+          selection={attribute}
+          itemKeyProp={ProcessingStepCalculation.keys.uuid}
+          itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
+          onChange={def => updateProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+        />
+      </FormItem>
     </div>
   )
 }
@@ -60,12 +86,32 @@ ProcessingStepCalculationEditor.defaultProps = {
   calculation: null,
 }
 
-const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  calculation: ProcessingStepCalculationState.getCalculation(state),
-})
+const mapStateToProps = state => {
+  const survey = SurveyState.getSurvey(state)
+  const calculation = ProcessingStepCalculationState.getCalculation(state)
+  const attributes = R.pipe(
+    ProcessingStepState.getProcessingStep,
+    ProcessingStep.getEntityUuid,
+    entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
+    entityDef => Survey.getNodeDefChildren(entityDef)(survey),
+    R.filter(
+      R.ifElse(R.always(ProcessingStepCalculation.isQuantitative(calculation)), NodeDef.isDecimal, NodeDef.isCode),
+    ),
+  )(state)
+  const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
+    Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+  )(calculation)
+
+  return {
+    surveyInfo: Survey.getSurveyInfo(survey),
+    calculation,
+    attributes,
+    attribute,
+  }
+}
 
 export default connect(mapStateToProps, {
   setProcessingStepCalculationForEdit,
   updateProcessingStepCalculationProp,
+  updateProcessingStepCalculationAttribute,
 })(ProcessingStepCalculationEditor)

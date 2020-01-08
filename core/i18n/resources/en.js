@@ -341,6 +341,7 @@ export const enTranslation = {
   },
 
   processingStepCalculationView: {
+    attribute: 'Attribute',
     types: {
       quantitative: 'Quantitative',
       categorical: 'Categorical',
