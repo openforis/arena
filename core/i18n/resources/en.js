@@ -355,6 +355,9 @@ export const enTranslation = {
       min: 'Minimum',
       sum: 'Sum',
     },
+    confirmCancel: `**There are unsaved changes**.
+
+Do you want to cancel them?`,
   },
 
   itemsTable: {

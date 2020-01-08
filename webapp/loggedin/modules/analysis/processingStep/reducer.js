@@ -1,5 +1,7 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
+import * as R from 'ramda'
+
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
@@ -12,6 +14,7 @@ import {
   processingStepCalculationIndexUpdate,
   processingStepPropsUpdate,
   processingStepUpdate,
+  processingStepCalculationEditCancel,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 import { processingStepCalculationUpdate } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
@@ -38,6 +41,9 @@ const actionHandlers = {
 
   [processingStepCalculationUpdate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
+
+  [processingStepCalculationEditCancel]: state =>
+    R.pipe(ProcessingStepState.dissocLastCalculation, ProcessingStepState.assocCalculationUuidForEdit(null))(state),
 }
 
 export default exportReducer(actionHandlers)

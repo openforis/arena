@@ -42,3 +42,8 @@ export const assocCalculation = calculation => processingStep =>
   )(processingStep)
 
 export const mergeProps = ObjectUtils.mergeProps
+
+export const dissocLastCalculation = processingStep =>
+  R.pipe(getCalculationSteps, R.dropLast(1), calculationSteps => assocCalculations(calculationSteps)(processingStep))(
+    processingStep,
+  )

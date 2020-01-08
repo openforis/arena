@@ -1,6 +1,7 @@
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as ProcessingStepCalculationState from './processingStepCalculationState'
+import { processingStepCalculationEditCancel } from '../processingStep/actions'
 
 export const processingStepCalculationUpdate = 'analysis/processingStep/calculation/update'
 
@@ -23,5 +24,20 @@ export const updateProcessingStepCalculationAttribute = attrDefUuid => async (di
   dispatch({
     type: processingStepCalculationUpdate,
     calculation: calculationUpdated,
+  })
+}
+
+export const saveProcessingStepCalculationEdits = () => async (dispatch, getState) => {}
+
+export const cancelProcessingStepCalculationEdits = () => async (dispatch, getState) => {
+  // Restore original calculation
+  await dispatch({
+    type: processingStepCalculationUpdate,
+    calculation: ProcessingStepCalculationState.getCalculationOriginal(getState()),
+  })
+
+  // Close editor
+  dispatch({
+    type: processingStepCalculationEditCancel,
   })
 }

@@ -1,6 +1,6 @@
 import './processingStepCalculationEditor.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
@@ -12,18 +12,21 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem } from '@webapp/commonComponents/form/input'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import Dropdown from '@webapp/commonComponents/form/dropdown'
+import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
-import { setProcessingStepCalculationForEdit } from '../actions'
+import { setProcessingStepCalculationForEdit } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import {
   updateProcessingStepCalculationProp,
   updateProcessingStepCalculationAttribute,
-} from '../../processingStepCalculation/actions'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
+  saveProcessingStepCalculationEdits,
+  cancelProcessingStepCalculationEdits,
+} from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const ProcessingStepCalculationEditor = props => {
   const {
@@ -31,16 +34,22 @@ const ProcessingStepCalculationEditor = props => {
     calculation,
     attributes,
     attribute,
+    isDirty,
     setProcessingStepCalculationForEdit,
     updateProcessingStepCalculationProp,
     updateProcessingStepCalculationAttribute,
+    saveProcessingStepCalculationEdits,
+    cancelProcessingStepCalculationEdits,
   } = props
 
   const i18n = useI18n()
+
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+
   const types = R.pipe(
     R.keys,
     R.map(type => ({
-      key: ProcessingStepCalculation.type[type],
+      key: type,
       label: i18n.t(`processingStepCalculationView.types.${type}`),
     })),
   )(ProcessingStepCalculation.type)
@@ -48,14 +57,17 @@ const ProcessingStepCalculationEditor = props => {
   const aggregateFns = R.pipe(
     R.keys,
     R.map(fn => ({
-      key: ProcessingStepCalculation.aggregateFn[fn],
+      key: fn,
       label: i18n.t(`processingStepCalculationView.aggregateFunctions.${fn}`),
     })),
   )(ProcessingStepCalculation.aggregateFn)
 
   return (
     <div className="processing-step__calculation-editor">
-      <button className="btn btn-close" onClick={() => setProcessingStepCalculationForEdit(null)}>
+      <button
+        className="btn btn-close"
+        onClick={() => (isDirty ? setShowCancelConfirm(true) : cancelProcessingStepCalculationEdits())}
+      >
         <span className="icon icon-cross icon-10px" />
       </button>
 
@@ -92,6 +104,25 @@ const ProcessingStepCalculationEditor = props => {
           items={aggregateFns}
         />
       </FormItem>
+
+      <div className="button-bar">
+        <button className="btn btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
+          <span className="icon icon-floppy-disk icon-left icon-12px" />
+          {i18n.t('common.save')}
+        </button>
+      </div>
+
+      {showCancelConfirm && (
+        <ConfirmDialog
+          className="processing-step__calculation-editor__cancel-confirm-dialog"
+          message={i18n.t('processingStepCalculationView.confirmCancel')}
+          onOk={() => {
+            setShowCancelConfirm(false)
+            cancelProcessingStepCalculationEdits()
+          }}
+          onCancel={() => setShowCancelConfirm(false)}
+        />
+      )}
     </div>
   )
 }
@@ -122,6 +153,7 @@ const mapStateToProps = state => {
     calculation,
     attributes,
     attribute,
+    isDirty: ProcessingStepCalculationState.isDirty(state),
   }
 }
 
@@ -129,4 +161,6 @@ export default connect(mapStateToProps, {
   setProcessingStepCalculationForEdit,
   updateProcessingStepCalculationProp,
   updateProcessingStepCalculationAttribute,
+  saveProcessingStepCalculationEdits,
+  cancelProcessingStepCalculationEdits,
 })(ProcessingStepCalculationEditor)
