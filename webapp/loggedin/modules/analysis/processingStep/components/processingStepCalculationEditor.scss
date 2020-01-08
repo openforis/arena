@@ -2,9 +2,10 @@
 
 .processing-step__calculation-editor {
   position: absolute;
+  display: grid;
+  grid-row-gap: 1.5rem;
   top: 0;
   width: calc(100% - 200px);
-  height: 100%;
   transform: translate(calc(100% + 230px), 0);
   transition: all 300ms ease;
   border-left: 2px solid $greyBorder;

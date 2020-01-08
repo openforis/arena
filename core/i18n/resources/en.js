@@ -340,6 +340,13 @@ export const enTranslation = {
     calculationSteps: 'Calculation Steps',
   },
 
+  processingStepCalculationView: {
+    types: {
+      quantitative: 'Quantitative',
+      categorical: 'Categorical',
+    },
+  },
+
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',

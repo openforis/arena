@@ -13,9 +13,15 @@ export const keys = {
 }
 
 export const keysProps = {
+  type: 'type',
   aggregateFn: 'aggregateFn',
   formula: 'formula',
   labels: ObjectUtils.keysProps.labels,
+}
+
+export const types = {
+  categorical: 'categorical',
+  quantitative: 'quantitative',
 }
 
 const aggregateFn = {
@@ -33,6 +39,9 @@ export const newProcessingStepCalculation = (processingStepUuid, index) => ({
   [keys.processingStepUuid]: processingStepUuid,
   [keys.index]: index,
   [keys.temporary]: true,
+  [keys.props]: {
+    [keysProps.type]: types.quantitative,
+  },
 })
 
 // ====== READ
@@ -42,6 +51,7 @@ export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, a
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 export const getLabels = ObjectUtils.getLabels
+export const getType = ObjectUtils.getProp(keysProps.type)
 
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
