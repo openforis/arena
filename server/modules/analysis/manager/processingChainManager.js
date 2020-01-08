@@ -131,6 +131,11 @@ export const updateStepCalculationIndex = async (user, surveyId, processingStepU
     )
   })
 
+export const updateStepCalculation = async (user, surveyId, calculation, client = db) =>
+  await client.tx(async t => {
+    // Await ProcessingStepCalculationRepository.updateCalculation(surveyId, calculation)
+  })
+
 // ====== DELETE - Chain
 
 export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>

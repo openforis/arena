@@ -40,16 +40,9 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
   dispatch(showAppLoader())
 
   const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
   const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
 
-  /*
-  Const { data: calculation } = await axios.post(
-    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
-    { index: calculationSteps.length },
-  )
-  */
   const calculation = ProcessingStepCalculation.newProcessingStepCalculation(
     ProcessingStep.getUuid(processingStep),
     calculationSteps.length,

@@ -25,6 +25,7 @@ export {
   // ======  UPDATE - Step
   updateStepProps,
   updateStepCalculationIndex,
+  updateStepCalculation,
   // ======  DELETE - Chain
   deleteChain,
   // ======  DELETE - Step

@@ -220,6 +220,21 @@ export const init = app => {
     },
   )
 
+  app.put(
+    '/survey/:surveyId/processing-step/:processingStepUuid/calculation',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const calculation = Request.getBody(req)
+        const user = Request.getUser(req)
+        await ProcessingChainService.updateStepCalculation(user, surveyId, calculation)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
   // ====== DELETE - Chain
 
   app.delete(
