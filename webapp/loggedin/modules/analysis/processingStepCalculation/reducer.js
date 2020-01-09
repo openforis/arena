@@ -15,8 +15,8 @@ const actionHandlers = {
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
 
-  [processingStepCalculationTempUpdate]: (state, { calculation, validation }) =>
-    ProcessingStepCalculationState.assocCalculationTemp(calculation, validation)(state),
+  [processingStepCalculationTempUpdate]: (state, { calculation }) =>
+    ProcessingStepCalculationState.assocCalculationTemp(calculation)(state),
 
   [processingStepCalculationEditCancel]: () => ({}),
 }
