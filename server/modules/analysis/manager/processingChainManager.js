@@ -135,9 +135,9 @@ export const updateStepCalculationIndex = async (user, surveyId, processingStepU
     )
   })
 
-export const updateStepCalculation = async (user, surveyId, calculation, client = db) =>
+export const updateCalculationStep = async (user, surveyId, calculation, client = db) =>
   await client.tx(async t => {
-    const calculationUpdated = await ProcessingStepCalculationRepository.updateCalculation(surveyId, calculation, t)
+    const calculationUpdated = await ProcessingStepCalculationRepository.updateCalculationStep(surveyId, calculation, t)
     const processingStepUuid = ProcessingStepCalculation.getProcessingStepUuid(calculation)
     const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
     const logContent = {

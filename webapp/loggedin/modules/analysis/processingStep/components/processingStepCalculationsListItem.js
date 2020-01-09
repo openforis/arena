@@ -72,7 +72,7 @@ const ProcessingStepCalculationsListItem = props => {
 
       {showCalculationEditCancelConfirm && (
         <ConfirmDialog
-          message={i18n.t('processingStepCalculationView.confirmCancel')}
+          message={i18n.t('common.cancelConfirm')}
           onOk={() => {
             setCalculationEditShowCancelConfirm(false)
             setProcessingStepCalculationForEdit(calculation)

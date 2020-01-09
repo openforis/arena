@@ -66,7 +66,7 @@ export const updateCalculationIndex = async (surveyId, processingStepUuid, index
   return queriesRes[queriesRes.length - 1]
 }
 
-export const updateCalculation = async (surveyId, calculation, client = db) =>
+export const updateCalculationStep = async (surveyId, calculation, client = db) =>
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
