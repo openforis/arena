@@ -43,7 +43,10 @@ const actionHandlers = {
     ProcessingStepState.assocCalculation(calculation)(state),
 
   [processingStepCalculationEditCancel]: state =>
-    R.pipe(ProcessingStepState.dissocLastCalculation, ProcessingStepState.assocCalculationUuidForEdit(null))(state),
+    R.pipe(
+      ProcessingStepState.dissocTemporaryCalculation,
+      ProcessingStepState.assocCalculationUuidForEdit(null),
+    )(state),
 }
 
 export default exportReducer(actionHandlers)
