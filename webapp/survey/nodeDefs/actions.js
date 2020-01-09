@@ -250,9 +250,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
     dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
     // Cannot save node def: show notification
-    dispatch(
-      showNotification(Validation.messageKeys.nodeDefEdit.formContainsErrors, {}, NotificationState.severity.error),
-    )
+    dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
   }
 }
 

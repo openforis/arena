@@ -32,6 +32,7 @@ export const enTranslation = {
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     formContainsErrors: 'Form contains errors',
+    formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
     group: 'Group',
     id: 'id',
@@ -528,6 +529,14 @@ Do you want to leave the page?`,
     nameRequired: 'Name is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
+    analysis: {
+      processingStepCalculation: {
+        attributeRequired: 'Attribute is required',
+        invalid: 'Processing Step Calculation is invalid',
+        typeRequired: 'Type is required',
+      },
+    },
+
     categoryEdit: {
       childrenEmpty: '$t(common.childrenEmpty)',
       childrenInvalid: 'At least one invalid child',
@@ -572,7 +581,6 @@ Do you want to leave the page?`,
       expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
       expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
-      formContainsErrors: 'The form contains errors. Please, fix them before saving.',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',
       nameInvalid:

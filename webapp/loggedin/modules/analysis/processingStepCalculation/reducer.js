@@ -11,8 +11,8 @@ const actionHandlers = {
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
 
-  [processingStepCalculationUpdate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculation(calculation)(state),
+  [processingStepCalculationUpdate]: (state, { calculation, validation }) =>
+    ProcessingStepCalculationState.assocCalculation(calculation, validation)(state),
 }
 
 export default exportReducer(actionHandlers)

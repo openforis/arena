@@ -1,10 +1,19 @@
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculationValidator from '@common/analysis/processingStepCalculationValidator'
+import * as Validation from '@core/validation/validation'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ProcessingChainService from '../service/processingChainService'
+import SystemError from '@core/systemError'
+
+const _checkIsValidProcessingStepCalculation = async calculation => {
+  const validation = await ProcessingStepCalculationValidator.validate(calculation)
+  if (!Validation.isValid(validation))
+    throw new SystemError(Validation.messageKeys.analysis.processingStepCalculation.invalid)
+}
 
 export const init = app => {
   // ====== CREATE - Chain
@@ -60,6 +69,8 @@ export const init = app => {
         const { surveyId } = Request.getParams(req)
         const calculation = Request.getBody(req)
         const user = Request.getUser(req)
+
+        await _checkIsValidProcessingStepCalculation(calculation)
 
         const calculationInserted = await ProcessingChainService.insertProcessingStepCalculation(
           user,
@@ -230,6 +241,9 @@ export const init = app => {
         const { surveyId } = Request.getParams(req)
         const calculation = Request.getBody(req)
         const user = Request.getUser(req)
+
+        await _checkIsValidProcessingStepCalculation(calculation)
+
         const calculationUpdated = await ProcessingChainService.updateStepCalculation(user, surveyId, calculation)
 
         res.json(calculationUpdated)

@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem } from '@webapp/commonComponents/form/input'
@@ -20,10 +21,9 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
-import { setProcessingStepCalculationForEdit } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import {
-  updateProcessingStepCalculationProp,
-  updateProcessingStepCalculationAttribute,
+  setProcessingStepCalculationProp,
+  setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
   cancelProcessingStepCalculationEdits,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
@@ -32,12 +32,12 @@ const ProcessingStepCalculationEditor = props => {
   const {
     surveyInfo,
     calculation,
+    validation,
     attributes,
     attribute,
     isDirty,
-    setProcessingStepCalculationForEdit,
-    updateProcessingStepCalculationProp,
-    updateProcessingStepCalculationAttribute,
+    setProcessingStepCalculationProp,
+    setProcessingStepCalculationAttribute,
     saveProcessingStepCalculationEdits,
     cancelProcessingStepCalculationEdits,
   } = props
@@ -74,13 +74,13 @@ const ProcessingStepCalculationEditor = props => {
       <LabelsEditor
         languages={Survey.getLanguages(surveyInfo)}
         labels={ProcessingStepCalculation.getLabels(calculation)}
-        onChange={labels => updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels)}
+        onChange={labels => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels)}
       />
 
       <FormItem label={i18n.t('common.type')}>
         <ButtonGroup
           selectedItemKey={ProcessingStepCalculation.getType(calculation)}
-          onChange={type => updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type)}
+          onChange={type => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type)}
           items={types}
         />
       </FormItem>
@@ -91,7 +91,8 @@ const ProcessingStepCalculationEditor = props => {
           selection={attribute}
           itemKeyProp={ProcessingStepCalculation.keys.uuid}
           itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
-          onChange={def => updateProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+          onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+          validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
         />
       </FormItem>
 
@@ -99,7 +100,7 @@ const ProcessingStepCalculationEditor = props => {
         <ButtonGroup
           selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
           onChange={aggregateFn =>
-            updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
+            setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
           }
           items={aggregateFns}
         />
@@ -135,6 +136,7 @@ ProcessingStepCalculationEditor.defaultProps = {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const calculation = ProcessingStepCalculationState.getCalculation(state)
+  const validation = ProcessingStepCalculationState.getValidation(state)
   const attributes = R.pipe(
     ProcessingStepState.getProcessingStep,
     ProcessingStep.getEntityUuid,
@@ -151,6 +153,7 @@ const mapStateToProps = state => {
   return {
     surveyInfo: Survey.getSurveyInfo(survey),
     calculation,
+    validation,
     attributes,
     attribute,
     isDirty: ProcessingStepCalculationState.isDirty(state),
@@ -158,9 +161,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  setProcessingStepCalculationForEdit,
-  updateProcessingStepCalculationProp,
-  updateProcessingStepCalculationAttribute,
+  setProcessingStepCalculationProp,
+  setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
   cancelProcessingStepCalculationEdits,
 })(ProcessingStepCalculationEditor)

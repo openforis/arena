@@ -7,7 +7,7 @@ import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 const keys = {
   calculation: 'calculation', // Calculation currently being edited
   calculationOriginal: 'calculationOriginal', // Calculation as it is when editing started (used when canceling edits)
-  propsUpdated: 'propsUpdated', // Updated props
+  validation: 'validation', // Validation of calculation currently being edited
 }
 
 export const stateKey = 'processingStepCalculation'
@@ -19,6 +19,7 @@ const getStateProp = (prop, defaultValue) => R.pipe(getState, R.propOr(defaultVa
 
 export const getCalculation = getStateProp(keys.calculation)
 export const getCalculationOriginal = getStateProp(keys.calculationOriginal)
+export const getValidation = getStateProp(keys.validation)
 
 // ===== UPDATE
 
@@ -36,7 +37,8 @@ export const isDirty = state => {
 
 // ===== UPDATE
 
-export const assocCalculation = R.assoc(keys.calculation)
+export const assocCalculation = (calculation, validation) =>
+  R.pipe(R.assoc(keys.calculation, calculation), R.assoc(keys.validation, validation))
 
 export const assocCalculationForEdit = calculation =>
   R.pipe(assocCalculation(calculation), R.assoc(keys.calculationOriginal, calculation))
