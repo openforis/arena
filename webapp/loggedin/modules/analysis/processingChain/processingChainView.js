@@ -69,7 +69,7 @@ const ProcessingChainView = props => {
           onChange={descriptions => putProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
         />
 
-        <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} disabled={true} />
+        <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} />
 
         <ProcessingChainSteps history={history} processingChain={processingChain} />
 

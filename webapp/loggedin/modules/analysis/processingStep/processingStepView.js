@@ -8,17 +8,18 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+import EntitySelector from './components/entitySelector'
+import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
+import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
+
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+
 import {
   fetchProcessingStep,
   resetProcessingStepState,
   putProcessingStepProps,
   deleteProcessingStep,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
-import EntitySelector from './components/entitySelector'
-
-import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
-import ProcessingStepCalculationEditor from './components/processingStepCalculationEditor'
 
 const ProcessingStepView = props => {
   const {

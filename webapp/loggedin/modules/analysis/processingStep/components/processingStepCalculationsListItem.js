@@ -2,6 +2,7 @@ import './processingStepCalculationsListItem.scss'
 
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -22,6 +23,7 @@ const ProcessingStepCalculationsListItem = props => {
     calculation,
     calculationForEdit,
     isCalculationEditDirty,
+    isCalculationEditTemporary,
     nodeDef,
     lang,
     dragging,
@@ -45,7 +47,7 @@ const ProcessingStepCalculationsListItem = props => {
   return (
     <div
       className={className}
-      draggable={true}
+      draggable={!isCalculationEditTemporary}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
@@ -90,11 +92,18 @@ const mapStateToProps = (state, { calculation }) => {
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
   const survey = SurveyState.getSurvey(state)
   const isCalculationEditDirty = ProcessingStepCalculationState.isDirty(state)
+  const isCalculationEditTemporary = R.pipe(
+    ProcessingStepCalculationState.getCalculationTemp,
+    R.defaultTo({}),
+    ProcessingStepCalculation.isTemporary,
+  )(state)
+
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     calculationForEdit: ProcessingStepState.getProcessingStepCalculationForEdit(state),
     isCalculationEditDirty,
+    isCalculationEditTemporary,
   }
 }
 

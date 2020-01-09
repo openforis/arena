@@ -14,12 +14,13 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
-import * as SurveyState from '@webapp/survey/surveyState'
-import LabelsEditor from '../../labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
-import * as NodeDefState from '../nodeDefState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
+
+import * as NodeDefState from '../nodeDefState'
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const BasicProps = props => {
   const {
