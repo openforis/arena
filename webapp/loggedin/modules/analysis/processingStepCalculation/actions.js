@@ -19,17 +19,16 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 
 export const processingStepCalculationTempUpdate = 'analysis/processingStep/calculation/temp/update'
 
-const _validate = async calculation => await ProcessingStepCalculationValidator.validate(calculation)
+const _validate = async calculation => {
+  const validation = await ProcessingStepCalculationValidator.validate(calculation)
+  return ProcessingStepCalculation.assocValidation(validation)(calculation)
+}
 
-const _onCalculationUpdated = calculation => async dispatch => {
-  const validation = await _validate(calculation)
-
+const _onCalculationUpdated = calculation => async dispatch =>
   dispatch({
     type: processingStepCalculationTempUpdate,
-    calculation,
-    validation,
+    calculation: await _validate(calculation),
   })
-}
 
 export const setProcessingStepCalculationProp = (prop, value) => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculationTemp(getState())
@@ -52,26 +51,22 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculationParam = ProcessingStepCalculationState.getCalculationTemp(state)
-  const validation = ProcessingStepCalculationState.getValidation(state) || (await _validate(calculationParam))
+  const calculation = await _validate(ProcessingStepCalculationState.getCalculationTemp(state))
 
-  if (Validation.isValid(validation)) {
-    const updateFn = ProcessingStepCalculation.isTemporary(calculationParam) ? axios.post : axios.put
-    const { data: calculation } = await updateFn(
-      `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
-      ProcessingStepCalculation.dissocTemporary(calculationParam),
-    )
-    await dispatch({
+  if (Validation.isObjValid(calculation)) {
+    dispatch({
       type: processingStepCalculationForEditUpdate,
-      calculation,
+      calculation: ProcessingStepCalculation.dissocTemporary(calculation),
     })
+
+    const updateFn = ProcessingStepCalculation.isTemporary(calculation) ? axios.post : axios.put
+    await updateFn(
+      `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
+      calculation,
+    )
     dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
-    await dispatch({
-      type: processingStepCalculationTempUpdate,
-      calculation: calculationParam,
-      validation,
-    })
+    await dispatch({ type: processingStepCalculationTempUpdate, calculation })
     dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
   }
 

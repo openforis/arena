@@ -32,7 +32,6 @@ const ProcessingStepCalculationEditor = props => {
   const {
     surveyInfo,
     calculation,
-    validation,
     attributes,
     attribute,
     isDirty,
@@ -41,9 +40,9 @@ const ProcessingStepCalculationEditor = props => {
     saveProcessingStepCalculationEdits,
     cancelProcessingStepCalculationEdits,
   } = props
+  const validation = ProcessingStepCalculation.getValidation(calculation)
 
   const i18n = useI18n()
-
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   const types = R.pipe(
@@ -137,7 +136,6 @@ ProcessingStepCalculationEditor.defaultProps = {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const calculation = ProcessingStepCalculationState.getCalculationTemp(state)
-  const validation = ProcessingStepCalculationState.getValidation(state)
   const attributes = R.pipe(
     ProcessingStepState.getProcessingStep,
     ProcessingStep.getEntityUuid,
@@ -154,7 +152,6 @@ const mapStateToProps = state => {
   return {
     surveyInfo: Survey.getSurveyInfo(survey),
     calculation,
-    validation,
     attributes,
     attribute,
     isDirty: ProcessingStepCalculationState.isDirty(state),

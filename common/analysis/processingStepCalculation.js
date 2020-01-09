@@ -2,6 +2,7 @@ import { uuidv4 } from '@core/uuid'
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
+import * as Validation from '@core/validation/validation'
 
 export const keys = {
   index: ObjectUtils.keys.index,
@@ -65,3 +66,7 @@ export const assocIndex = ObjectUtils.assocIndex
 export const assocProp = ObjectUtils.setProp
 export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
 export const dissocTemporary = R.dissoc(keys.temporary)
+
+// ====== VALIDATION
+export const getValidation = Validation.getValidation
+export const assocValidation = Validation.assocValidation
