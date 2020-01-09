@@ -51,6 +51,7 @@ export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, a
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 export const getLabels = ObjectUtils.getLabels
+export const getLabel = ObjectUtils.getLabel
 export const getType = ObjectUtils.getProp(keysProps.type, type.quantitative)
 export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
 
