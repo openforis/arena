@@ -135,7 +135,7 @@ ProcessingStepCalculationEditor.defaultProps = {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const calculation = ProcessingStepCalculationState.getCalculation(state)
+  const calculation = ProcessingStepCalculationState.getCalculationTemp(state)
   const validation = ProcessingStepCalculationState.getValidation(state)
   const attributes = R.pipe(
     ProcessingStepState.getProcessingStep,

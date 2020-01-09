@@ -5,8 +5,8 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 
 const keys = {
-  calculation: 'calculation', // Calculation currently being edited
-  calculationOriginal: 'calculationOriginal', // Calculation as it is when editing started (used when canceling edits)
+  calculationTemp: 'calculationTemp', // Calculation currently being edited
+  calculation: 'calculation', // Calculation as it was when editing started (used when canceling edits)
   validation: 'validation', // Validation of calculation currently being edited
 }
 
@@ -18,7 +18,7 @@ const getStateProp = (prop, defaultValue) => R.pipe(getState, R.propOr(defaultVa
 // ===== READ
 
 export const getCalculation = getStateProp(keys.calculation)
-export const getCalculationOriginal = getStateProp(keys.calculationOriginal)
+export const getCalculationTemp = getStateProp(keys.calculationTemp)
 export const getValidation = getStateProp(keys.validation)
 
 // ===== UPDATE
@@ -28,17 +28,17 @@ export const getValidation = getStateProp(keys.validation)
  * Returns true if processingStepCalculation and processingStepCalculation are not equals
  */
 export const isDirty = state => {
-  const calculation = getCalculation(state)
+  const calculationTemp = getCalculationTemp(state)
   return (
-    calculation &&
-    (ProcessingStepCalculation.isTemporary(calculation) || !R.equals(calculation, getCalculationOriginal(state)))
+    calculationTemp &&
+    (ProcessingStepCalculation.isTemporary(calculationTemp) || !R.equals(calculationTemp, getCalculation(state)))
   )
 }
 
 // ===== UPDATE
 
-export const assocCalculation = (calculation, validation) =>
-  R.pipe(R.assoc(keys.calculation, calculation), R.assoc(keys.validation, validation))
+export const assocCalculationTemp = (calculation, validation) =>
+  R.pipe(R.assoc(keys.calculationTemp, calculation), R.assoc(keys.validation, validation))
 
 export const assocCalculationForEdit = calculation =>
-  R.pipe(assocCalculation(calculation), R.assoc(keys.calculationOriginal, calculation))
+  R.pipe(assocCalculationTemp(calculation), R.assoc(keys.calculation, calculation), R.dissoc(keys.validation))

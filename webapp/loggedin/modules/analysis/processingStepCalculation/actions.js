@@ -17,7 +17,7 @@ import {
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
-export const processingStepCalculationUpdate = 'analysis/processingStep/calculation/update'
+export const processingStepCalculationTempUpdate = 'analysis/processingStep/calculation/temp/update'
 
 const _validate = async calculation => await ProcessingStepCalculationValidator.validate(calculation)
 
@@ -25,14 +25,14 @@ const _onCalculationUpdated = calculation => async dispatch => {
   const validation = await _validate(calculation)
 
   dispatch({
-    type: processingStepCalculationUpdate,
+    type: processingStepCalculationTempUpdate,
     calculation,
     validation,
   })
 }
 
 export const setProcessingStepCalculationProp = (prop, value) => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculation(getState())
+  const calculation = ProcessingStepCalculationState.getCalculationTemp(getState())
 
   const calculationUpdated = ProcessingStepCalculation.assocProp(prop, value)(calculation)
 
@@ -40,7 +40,7 @@ export const setProcessingStepCalculationProp = (prop, value) => async (dispatch
 }
 
 export const setProcessingStepCalculationAttribute = attrDefUuid => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculation(getState())
+  const calculation = ProcessingStepCalculationState.getCalculationTemp(getState())
 
   const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(attrDefUuid)(calculation)
 
@@ -52,7 +52,7 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculationParam = ProcessingStepCalculationState.getCalculation(state)
+  const calculationParam = ProcessingStepCalculationState.getCalculationTemp(state)
   const validation = ProcessingStepCalculationState.getValidation(state) || (await _validate(calculationParam))
 
   if (Validation.isValid(validation)) {
@@ -68,7 +68,7 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
     dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
     await dispatch({
-      type: processingStepCalculationUpdate,
+      type: processingStepCalculationTempUpdate,
       calculation: calculationParam,
       validation,
     })
@@ -79,14 +79,9 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
 }
 
 export const cancelProcessingStepCalculationEdits = () => async (dispatch, getState) => {
-  // Restore original calculation
-  await dispatch({
-    type: processingStepCalculationUpdate,
-    calculation: ProcessingStepCalculationState.getCalculationOriginal(getState()),
-  })
-
-  // Close editor
+  // Restore original calculation and close editor
   dispatch({
     type: processingStepCalculationEditCancel,
+    calculation: ProcessingStepCalculationState.getCalculation(getState()),
   })
 }

@@ -1,8 +1,12 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as ProcessingStepCalculationState from './processingStepCalculationState'
-import { processingStepCalculationForEditUpdate, processingStepCalculationCreate } from '../processingStep/actions'
-import { processingStepCalculationUpdate } from './actions'
+import {
+  processingStepCalculationForEditUpdate,
+  processingStepCalculationCreate,
+  processingStepCalculationEditCancel,
+} from '../processingStep/actions'
+import { processingStepCalculationTempUpdate } from './actions'
 
 const actionHandlers = {
   [processingStepCalculationForEditUpdate]: (state, { calculation }) =>
@@ -11,8 +15,10 @@ const actionHandlers = {
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
 
-  [processingStepCalculationUpdate]: (state, { calculation, validation }) =>
-    ProcessingStepCalculationState.assocCalculation(calculation, validation)(state),
+  [processingStepCalculationTempUpdate]: (state, { calculation, validation }) =>
+    ProcessingStepCalculationState.assocCalculationTemp(calculation, validation)(state),
+
+  [processingStepCalculationEditCancel]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)
