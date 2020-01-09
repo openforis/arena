@@ -81,7 +81,7 @@ export default class SurveyHierarchyTree {
     svgEl.setAttribute('width', `${newWidth}`)
     svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
 
-    d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
+    d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${Math.max(-bBox.y, 19)})`)
 
     if (newWidth > oldWidth) {
       treeEl.scrollLeft = newWidth
