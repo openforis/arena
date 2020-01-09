@@ -148,4 +148,8 @@ export const analysisModules = {
     key: 'processingStep',
     path: `${appModules.analysis.path}/processingStep`,
   },
+  nodeDef: {
+    key: 'nodeDef',
+    path: `${appModules.analysis.path}/nodeDef`,
+  },
 }

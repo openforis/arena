@@ -7,6 +7,7 @@ import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoade
 import ProcessingChainsView from './processingChains/processingChainsView'
 import ProcessingChainView from './processingChain/processingChainView'
 import ProcessingStepView from './processingStep/processingStepView'
+import NodeDefAnalysisView from './nodeDefAnalysis/nodeDefAnalysisView'
 
 const AnalysisView = () => (
   <SurveyDefsLoader draft={false} validate={false} requirePublish={true}>
@@ -25,6 +26,10 @@ const AnalysisView = () => (
         {
           component: ProcessingStepView,
           path: `${appModuleUri(analysisModules.processingStep)}:processingStepUuid/`,
+        },
+        {
+          component: NodeDefAnalysisView,
+          path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
         },
       ]}
     />

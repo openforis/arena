@@ -7,7 +7,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Validation from '@core/validation/validation'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -45,6 +44,8 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
   dispatch({ type: nodeDefCreate, nodeDef })
 
   history.push(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+
+  return nodeDef
 }
 
 // ==== Internal update nodeDefs actions

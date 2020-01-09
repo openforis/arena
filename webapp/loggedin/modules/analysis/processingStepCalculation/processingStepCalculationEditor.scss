@@ -28,3 +28,8 @@
     transform: translate(200px, 0);
   }
 }
+
+.processing-step__calculation__attribute-container {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+}

@@ -3,6 +3,7 @@ import './processingStepCalculationEditor.scss'
 import React, { useState } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -26,6 +27,7 @@ import {
   setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
   cancelProcessingStepCalculationEdits,
+  createNodeDefAnalysis,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const ProcessingStepCalculationEditor = props => {
@@ -39,11 +41,14 @@ const ProcessingStepCalculationEditor = props => {
     setProcessingStepCalculationAttribute,
     saveProcessingStepCalculationEdits,
     cancelProcessingStepCalculationEdits,
+    createNodeDefAnalysis,
   } = props
   const validation = ProcessingStepCalculation.getValidation(calculation)
 
   const i18n = useI18n()
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+
+  const history = useHistory()
 
   const types = R.pipe(
     R.keys,
@@ -86,14 +91,26 @@ const ProcessingStepCalculationEditor = props => {
         </FormItem>
 
         <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
-          <Dropdown
-            items={attributes}
-            selection={attribute}
-            itemKeyProp={ProcessingStepCalculation.keys.uuid}
-            itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
-            onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
-            validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
-          />
+          <div className="processing-step__calculation__attribute-container">
+            <Dropdown
+              items={attributes}
+              selection={attribute}
+              itemKeyProp={ProcessingStepCalculation.keys.uuid}
+              itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
+              onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+              validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
+            />
+            <button
+              className="btn btn-s"
+              style={{ justifySelf: 'center' }}
+              onClick={async () => {
+                setProcessingStepCalculationAttribute(await createNodeDefAnalysis(history))
+              }}
+            >
+              <span className="icon icon-plus icon-12px icon-left" />
+              {i18n.t('common.add')}
+            </button>
+          </div>
         </FormItem>
 
         <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
@@ -141,9 +158,7 @@ const mapStateToProps = state => {
     ProcessingStep.getEntityUuid,
     entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
     entityDef => Survey.getNodeDefChildren(entityDef)(survey),
-    R.filter(
-      R.ifElse(R.always(ProcessingStepCalculation.isQuantitative(calculation)), NodeDef.isDecimal, NodeDef.isCode),
-    ),
+    R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
   )(state)
   const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
     Survey.getNodeDefByUuid(nodeDefUuid)(survey),
@@ -163,4 +178,5 @@ export default connect(mapStateToProps, {
   setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
   cancelProcessingStepCalculationEdits,
+  createNodeDefAnalysis,
 })(ProcessingStepCalculationEditor)
