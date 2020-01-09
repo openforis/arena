@@ -44,12 +44,13 @@ export const newProcessingStep = (processingChain, props = {}) => ({
   [ProcessingStep.keys.props]: props,
 })
 
-export const newProcessingStepCalculation = (processingStep, nodeDefUuid, props = {}) => ({
+export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({
   [ProcessingStepCalculation.keys.uuid]: uuidv4(),
   [ProcessingStepCalculation.keys.processingStepUuid]: ProcessingStep.getUuid(processingStep),
   [ProcessingStepCalculation.keys.index]: ProcessingStep.getCalculationSteps(processingStep).length,
   [ProcessingStepCalculation.keys.nodeDefUuid]: nodeDefUuid,
   [ProcessingStepCalculation.keys.props]: props,
+  [ProcessingStepCalculation.keys.temporary]: true,
 })
 
 // ====== READ
