@@ -11,7 +11,7 @@ export {
   // ====== CREATE - Processing Step
   createProcessingStep,
   // ====== CREATE - Processing Step Calculation
-  createProcessingStepCalculation,
+  insertProcessingStepCalculation,
   // ======  READ - Chain
   countChainsBySurveyId,
   fetchChainsBySurveyId,

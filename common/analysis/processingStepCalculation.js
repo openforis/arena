@@ -45,6 +45,8 @@ export const newProcessingStepCalculation = (processingStepUuid, index) => ({
 // ====== READ
 
 export const isTemporary = R.propEq(keys.temporary, true)
+export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
+
 export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, aggregateFn.sum)
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
@@ -54,9 +56,11 @@ export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
 
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
+export const getProps = ObjectUtils.getProps
 export const isEqual = ObjectUtils.isEqual
 
 // ====== UPDATE
 export const assocIndex = ObjectUtils.assocIndex
 export const assocProp = ObjectUtils.setProp
 export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
+export const dissocTemporary = R.dissoc(keys.temporary)

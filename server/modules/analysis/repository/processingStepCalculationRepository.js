@@ -1,21 +1,29 @@
 import camelize from 'camelize'
 
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+
 import { db } from '@server/db/db'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ====== CREATE
 
-export const insertCalculationStep = async (surveyId, processingStepUuid, index, client = db) =>
+export const insertCalculationStep = async (surveyId, calculation, client = db) =>
   await client.one(
     `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-        (processing_step_uuid, index)  
+        (uuid, processing_step_uuid, index, node_def_uuid, props)  
       VALUES 
-        ($1, $2)
+        ($1, $2, $3, $4, $5)
       RETURNING *
     `,
-    [processingStepUuid, index],
+    [
+      ProcessingStepCalculation.getUuid(calculation),
+      ProcessingStepCalculation.getProcessingStepUuid(calculation),
+      ProcessingStepCalculation.getIndex(calculation),
+      ProcessingStepCalculation.getNodeDefUuid(calculation),
+      ProcessingStepCalculation.getProps(calculation),
+    ],
     camelize,
   )
 
@@ -57,5 +65,21 @@ export const updateCalculationIndex = async (surveyId, processingStepUuid, index
 
   return queriesRes[queriesRes.length - 1]
 }
+
+export const updateCalculation = async (surveyId, calculation, client = db) =>
+  await client.one(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
+    SET node_def_uuid = $2, props = $3
+    WHERE uuid = $1
+    RETURNING *
+    `,
+    [
+      ProcessingStepCalculation.getUuid(calculation),
+      ProcessingStepCalculation.getNodeDefUuid(calculation),
+      ProcessingStepCalculation.getProps(calculation),
+    ],
+    camelize,
+  )
 
 // ====== DELETE

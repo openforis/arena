@@ -1,9 +1,18 @@
+import axios from 'axios'
+
+import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepCalculationState from './processingStepCalculationState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
-import { processingStepCalculationEditCancel } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import {
+  processingStepCalculationEditCancel,
+  processingStepCalculationForEditUpdate,
+} from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 
 export const processingStepCalculationUpdate = 'analysis/processingStep/calculation/update'
 
@@ -30,18 +39,23 @@ export const updateProcessingStepCalculationAttribute = attrDefUuid => async (di
 }
 
 export const saveProcessingStepCalculationEdits = () => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculation(getState())
-  const processingStep = ProcessingStepState
+  dispatch(showAppLoader())
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const processingStep = ProcessingStepState.getProcessingStep(state)
+  const calculationParam = ProcessingStepCalculationState.getCalculation(state)
 
-  /*
-  If (ProcessingStepCalculation.isTemporary(calculation)) {
-    Const { data: calculationInserted } = await axios.post(
-      `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
-      calculation,
-    )
-  } else {
-  }
-  */
+  const updateFn = ProcessingStepCalculation.isTemporary(calculationParam) ? axios.post : axios.put
+  const { data: calculation } = await updateFn(
+    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
+    ProcessingStepCalculation.dissocTemporary(calculationParam),
+  )
+  await dispatch({
+    type: processingStepCalculationForEditUpdate,
+    calculation,
+  })
+  dispatch(hideAppLoader())
+  dispatch(showNotification('common.saved', {}, null, 3000))
 }
 
 export const cancelProcessingStepCalculationEdits = () => async (dispatch, getState) => {
