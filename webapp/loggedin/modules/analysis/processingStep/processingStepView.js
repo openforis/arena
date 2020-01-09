@@ -52,7 +52,7 @@ const ProcessingStepView = props => {
         <EntitySelector
           processingStep={processingStep}
           processingStepPrev={processingStepPrev}
-          calculationEditorOpened={calculationEditorOpened}
+          showLabel={!calculationEditorOpened}
           onChange={entityUuid => {
             const props = {
               [ProcessingStep.keysProps.entityUuid]: entityUuid,
@@ -60,6 +60,7 @@ const ProcessingStepView = props => {
             }
             putProcessingStepProps(props)
           }}
+          readOnly={!R.isEmpty(ProcessingStep.getCalculationSteps(processingStep) || calculationEditorOpened)}
         />
 
         <ProcessingStepCalculationsList
