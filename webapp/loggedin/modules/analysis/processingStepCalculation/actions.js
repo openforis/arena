@@ -31,7 +31,7 @@ const _onCalculationUpdated = calculation => async dispatch =>
   })
 
 export const setProcessingStepCalculationProp = (prop, value) => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculationTemp(getState())
+  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
 
   const calculationUpdated = ProcessingStepCalculation.assocProp(prop, value)(calculation)
 
@@ -39,7 +39,7 @@ export const setProcessingStepCalculationProp = (prop, value) => async (dispatch
 }
 
 export const setProcessingStepCalculationAttribute = attrDefUuid => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculationTemp(getState())
+  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
 
   const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(attrDefUuid)(calculation)
 
@@ -51,7 +51,7 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculation = await _validate(ProcessingStepCalculationState.getCalculationTemp(state))
+  const calculation = await _validate(ProcessingStepCalculationState.getCalculationDirty(state))
 
   if (Validation.isObjValid(calculation)) {
     dispatch({
@@ -77,6 +77,6 @@ export const cancelProcessingStepCalculationEdits = () => async (dispatch, getSt
   // Restore original calculation and close editor
   dispatch({
     type: processingStepCalculationEditCancel,
-    calculation: ProcessingStepCalculationState.getCalculation(getState()),
+    calculation: ProcessingStepCalculationState.getCalculationOrig(getState()),
   })
 }

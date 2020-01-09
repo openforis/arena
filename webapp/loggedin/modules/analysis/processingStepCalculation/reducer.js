@@ -16,7 +16,7 @@ const actionHandlers = {
     ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
 
   [processingStepCalculationTempUpdate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculationTemp(calculation)(state),
+    ProcessingStepCalculationState.assocCalculationDirty(calculation)(state),
 
   [processingStepCalculationEditCancel]: () => ({}),
 }

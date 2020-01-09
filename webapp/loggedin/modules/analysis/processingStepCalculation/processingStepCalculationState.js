@@ -4,38 +4,37 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 
 import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 
-const keys = {
-  calculationTemp: 'calculationTemp', // Calculation currently being edited
-  calculation: 'calculation', // Calculation as it was when editing started (used when canceling edits)
-}
-
 export const stateKey = 'processingStepCalculation'
+
+const keys = {
+  calculationDirty: 'calculationDirty', // Calculation currently being edited
+  calculationOrig: 'calculationOrig', // Calculation as it was when editing started (used when canceling edits)
+}
 
 const getState = R.pipe(AnalysisState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultValue) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ===== READ
 
-export const getCalculation = getStateProp(keys.calculation)
-export const getCalculationTemp = getStateProp(keys.calculationTemp)
+export const getCalculationOrig = getStateProp(keys.calculationOrig)
+export const getCalculationDirty = getStateProp(keys.calculationDirty)
 
 // ===== UPDATE
+
+export const assocCalculationDirty = R.assoc(keys.calculationDirty)
+export const assocCalculationOrig = R.assoc(keys.calculationOrig)
+
+export const assocCalculationForEdit = calculation =>
+  R.pipe(assocCalculationDirty(calculation), assocCalculationOrig(calculation))
 
 // ===== UTILS
 /**
  * Returns true if processingStepCalculation and processingStepCalculation are not equals
  */
 export const isDirty = state => {
-  const calculationTemp = getCalculationTemp(state)
+  const calculationDirty = getCalculationDirty(state)
   return (
-    calculationTemp &&
-    (ProcessingStepCalculation.isTemporary(calculationTemp) || !R.equals(calculationTemp, getCalculation(state)))
+    calculationDirty &&
+    (ProcessingStepCalculation.isTemporary(calculationDirty) || !R.equals(calculationDirty, getCalculationOrig(state)))
   )
 }
-
-// ===== UPDATE
-
-export const assocCalculationTemp = R.assoc(keys.calculationTemp)
-
-export const assocCalculationForEdit = calculation =>
-  R.pipe(assocCalculationTemp(calculation), R.assoc(keys.calculation, calculation))

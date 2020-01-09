@@ -93,7 +93,7 @@ const mapStateToProps = (state, { calculation }) => {
   const survey = SurveyState.getSurvey(state)
   const isCalculationEditDirty = ProcessingStepCalculationState.isDirty(state)
   const isCalculationEditTemporary = R.pipe(
-    ProcessingStepCalculationState.getCalculationTemp,
+    ProcessingStepCalculationState.getCalculationDirty,
     R.defaultTo({}),
     ProcessingStepCalculation.isTemporary,
   )(state)
