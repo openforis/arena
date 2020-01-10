@@ -9,16 +9,18 @@ import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processi
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import {
+  processingStepPropsUpdate,
+  processingStepUpdate,
+  processingStepReset,
   processingStepCalculationCreate,
   processingStepCalculationForEditUpdate,
   processingStepCalculationIndexUpdate,
-  processingStepPropsUpdate,
-  processingStepUpdate,
-  processingStepCalculationEditCancel,
-  processingStepReset,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
-import { processingStepCalculationDirtyUpdate } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import {
+  processingStepCalculationSave,
+  processingStepCalculationReset,
+} from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const actionHandlers = {
   // Reset state
@@ -43,16 +45,13 @@ const actionHandlers = {
   [processingStepCalculationIndexUpdate]: (state, { indexFrom, indexTo }) =>
     ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
 
-  [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
-    ProcessingStepState.assocCalculation(calculation)(state),
+  [processingStepCalculationSave]: (state, { calculation }) => ProcessingStepState.assocCalculation(calculation)(state),
 
-  [processingStepCalculationEditCancel]: (state, { calculation }) =>
+  [processingStepCalculationReset]: (state, { temporary }) =>
     R.pipe(
-      R.ifElse(
-        R.always(ProcessingStepCalculation.isTemporary(calculation)),
-        ProcessingStepState.dissocTemporaryCalculation,
-        ProcessingStepState.assocCalculation(calculation),
-      ),
+      // Remove calculation from list if temporary
+      R.when(R.always(temporary), ProcessingStepState.dissocTemporaryCalculation),
+      // Close editor
       ProcessingStepState.assocCalculationUuidForEdit(null),
     )(state),
 }

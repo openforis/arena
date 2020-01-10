@@ -26,7 +26,7 @@ import {
   setProcessingStepCalculationProp,
   setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
-  cancelProcessingStepCalculationEdits,
+  resetProcessingStepCalculationState,
   createNodeDefAnalysis,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
@@ -40,7 +40,7 @@ const ProcessingStepCalculationEditor = props => {
     setProcessingStepCalculationProp,
     setProcessingStepCalculationAttribute,
     saveProcessingStepCalculationEdits,
-    cancelProcessingStepCalculationEdits,
+    resetProcessingStepCalculationState,
     createNodeDefAnalysis,
   } = props
   const validation = ProcessingStepCalculation.getValidation(calculation)
@@ -71,7 +71,7 @@ const ProcessingStepCalculationEditor = props => {
       <div className="processing-step__calculation-editor">
         <button
           className="btn btn-close"
-          onClick={() => (isDirty ? setShowCancelConfirm(true) : cancelProcessingStepCalculationEdits())}
+          onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
         >
           <span className="icon icon-cross icon-10px" />
         </button>
@@ -136,7 +136,7 @@ const ProcessingStepCalculationEditor = props => {
           message={i18n.t('common.cancelConfirm')}
           onOk={() => {
             setShowCancelConfirm(false)
-            cancelProcessingStepCalculationEdits()
+            resetProcessingStepCalculationState()
           }}
           onCancel={() => setShowCancelConfirm(false)}
         />
@@ -177,6 +177,6 @@ export default connect(mapStateToProps, {
   setProcessingStepCalculationProp,
   setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
-  cancelProcessingStepCalculationEdits,
+  resetProcessingStepCalculationState,
   createNodeDefAnalysis,
 })(ProcessingStepCalculationEditor)

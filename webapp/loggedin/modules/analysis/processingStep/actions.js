@@ -21,7 +21,6 @@ export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
 export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
 export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
-export const processingStepCalculationEditCancel = 'analysis/processingStep/calculation/edit/cancel'
 
 export const resetProcessingStepState = () => dispatch => dispatch({ type: processingStepReset })
 

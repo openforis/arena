@@ -9,10 +9,13 @@ import * as ProcessingStepCalculationState from './processingStepCalculationStat
 import {
   processingStepCalculationForEditUpdate,
   processingStepCalculationCreate,
-  processingStepCalculationEditCancel,
   processingStepReset,
 } from '../processingStep/actions'
-import { processingStepCalculationDirtyUpdate } from './actions'
+import {
+  processingStepCalculationDirtyUpdate,
+  processingStepCalculationSave,
+  processingStepCalculationReset,
+} from './actions'
 import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 
 const actionHandlers = {
@@ -25,7 +28,10 @@ const actionHandlers = {
   [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationDirty(calculation)(state),
 
-  [processingStepCalculationEditCancel]: () => ({}),
+  [processingStepCalculationSave]: (state, { calculation }) =>
+    ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
+
+  [processingStepCalculationReset]: () => ({}),
 
   // Update calculation attribute on node def edit cancel / back
   [nodeDefSave]: (state, { nodeDef }) =>

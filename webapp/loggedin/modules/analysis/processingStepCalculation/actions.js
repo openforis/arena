@@ -19,21 +19,19 @@ import * as ProcessingStepCalculationState from './processingStepCalculationStat
 
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import {
-  processingStepCalculationEditCancel,
-  processingStepCalculationForEditUpdate,
-} from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import { setNodeDefUuidForEdit } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
+export const processingStepCalculationSave = 'analysis/processingStep/calculation/save'
+export const processingStepCalculationReset = 'analysis/processingStep/calculation/reset'
 
 const _validate = async calculation => {
   const validation = await ProcessingStepCalculationValidator.validate(calculation)
   return ProcessingStepCalculation.assocValidation(validation)(calculation)
 }
 
-const _onCalculationUpdated = calculation => async dispatch =>
+const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
   dispatch({
     type: processingStepCalculationDirtyUpdate,
     calculation: await _validate(calculation),
@@ -44,7 +42,7 @@ export const setProcessingStepCalculationProp = (prop, value) => async (dispatch
 
   const calculationUpdated = ProcessingStepCalculation.assocProp(prop, value)(calculation)
 
-  dispatch(_onCalculationUpdated(calculationUpdated))
+  dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
 
 export const setProcessingStepCalculationAttribute = attrDefUuid => async (dispatch, getState) => {
@@ -52,7 +50,7 @@ export const setProcessingStepCalculationAttribute = attrDefUuid => async (dispa
 
   const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(attrDefUuid)(calculation)
 
-  dispatch(_onCalculationUpdated(calculationUpdated))
+  dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
 
 export const saveProcessingStepCalculationEdits = () => async (dispatch, getState) => {
@@ -60,33 +58,37 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculation = await _validate(ProcessingStepCalculationState.getCalculationDirty(state))
+  const calculationValidated = await _validate(ProcessingStepCalculationState.getCalculationDirty(state))
 
-  if (Validation.isObjValid(calculation)) {
-    dispatch({
-      type: processingStepCalculationForEditUpdate,
-      calculation: ProcessingStepCalculation.dissocTemporary(calculation),
-    })
+  if (Validation.isObjValid(calculationValidated)) {
+    const calculation = ProcessingStepCalculation.dissocTemporary(calculationValidated)
 
-    const updateFn = ProcessingStepCalculation.isTemporary(calculation) ? axios.post : axios.put
+    const updateFn = ProcessingStepCalculation.isTemporary(calculationValidated) ? axios.post : axios.put
     await updateFn(
       `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
-      calculation,
+      calculationValidated,
     )
+    dispatch({
+      type: processingStepCalculationSave,
+      calculation,
+    })
     dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
-    await dispatch({ type: processingStepCalculationDirtyUpdate, calculation })
+    await dispatch({ type: processingStepCalculationDirtyUpdate, calculation: calculationValidated })
     dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
   }
 
   dispatch(hideAppLoader())
 }
 
-export const cancelProcessingStepCalculationEdits = () => async (dispatch, getState) => {
-  // Restore original calculation and close editor
+export const resetProcessingStepCalculationState = () => async (dispatch, getState) => {
+  // Remove calculation from list (if temporary) and close editor
   dispatch({
-    type: processingStepCalculationEditCancel,
-    calculation: ProcessingStepCalculationState.getCalculationOrig(getState()),
+    type: processingStepCalculationReset,
+    temporary: R.pipe(
+      ProcessingStepCalculationState.getCalculationDirty,
+      ProcessingStepCalculation.isTemporary,
+    )(getState()),
   })
 }
 
@@ -112,10 +114,4 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   await dispatch(setNodeDefUuidForEdit(nodeDefUuid))
 
   history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
-
-  // Update calculation dirty
-  dispatch({
-    type: processingStepCalculationDirtyUpdate,
-    calculation: ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid)(calculation),
-  })
 }
