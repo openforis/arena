@@ -60,6 +60,7 @@ export const type = {
   processingStepDelete: 'processingStepDelete',
   processingStepCalculationCreate: 'processingStepCalculationCreate',
   processingStepCalculationIndexUpdate: 'processingStepCalculationIndexUpdate',
+  processingStepCalculationUpdate: 'processingStepCalculationUpdate',
 }
 
 export const keys = {

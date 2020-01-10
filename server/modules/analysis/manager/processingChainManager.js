@@ -44,14 +44,18 @@ export const createProcessingStep = async (user, surveyId, processingChainUuid, 
 
 // ====== CREATE - Processing Step Calculation
 
-export const createProcessingStepCalculation = async (user, surveyId, processingStepUuid, index, client = db) =>
+export const insertProcessingStepCalculation = async (user, surveyId, calculation, client = db) =>
   await client.tx(async t => {
-    const [calculationStep, processingStep] = await Promise.all([
-      ProcessingStepCalculationRepository.insertCalculationStep(surveyId, processingStepUuid, index, t),
-      ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t),
+    const [calculationStepInserted, processingStep] = await Promise.all([
+      ProcessingStepCalculationRepository.insertCalculationStep(surveyId, calculation, t),
+      ProcessingStepRepository.fetchStepSummaryByUuid(
+        surveyId,
+        ProcessingStepCalculation.getProcessingStepUuid(calculation),
+        t,
+      ),
     ])
     const logContent = {
-      ...calculationStep,
+      ...calculationStepInserted,
       [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
     }
     await ActivityLogRepository.insert(
@@ -62,7 +66,7 @@ export const createProcessingStepCalculation = async (user, surveyId, processing
       false,
       t,
     )
-    return calculationStep
+    return calculationStepInserted
   })
 
 // ====== READ - Chain
@@ -129,6 +133,26 @@ export const updateStepCalculationIndex = async (user, surveyId, processingStepU
       false,
       t,
     )
+  })
+
+export const updateCalculationStep = async (user, surveyId, calculation, client = db) =>
+  await client.tx(async t => {
+    const calculationUpdated = await ProcessingStepCalculationRepository.updateCalculationStep(surveyId, calculation, t)
+    const processingStepUuid = ProcessingStepCalculation.getProcessingStepUuid(calculation)
+    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
+    const logContent = {
+      ...calculationUpdated,
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
+    }
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.processingStepCalculationUpdate,
+      logContent,
+      false,
+      t,
+    )
+    return calculationUpdated
   })
 
 // ====== DELETE - Chain

@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
@@ -30,9 +31,20 @@ export const getUuid = ObjectUtils.getUuid
 
 export const assocCalculations = R.assoc(keys.calculationSteps)
 
-export const assocCalculation = processingStepCalculation => processingStep =>
-  R.pipe(getCalculationSteps, R.append(processingStepCalculation), calculationSteps =>
-    R.assoc(keys.calculationSteps, calculationSteps, processingStep),
+export const assocCalculation = calculation => processingStep =>
+  R.pipe(
+    getCalculationSteps,
+    R.ifElse(
+      R.pipe(R.length, R.gte(ObjectUtils.getIndex(calculation))),
+      R.append(calculation), // Add new calculation
+      R.update(ObjectUtils.getIndex(calculation), calculation), // Replace calculation
+    ),
+    calculationSteps => assocCalculations(calculationSteps)(processingStep),
   )(processingStep)
 
 export const mergeProps = ObjectUtils.mergeProps
+
+export const dissocTemporaryCalculation = processingStep =>
+  R.pipe(getCalculationSteps, R.reject(ProcessingStepCalculation.isTemporary), calculationSteps =>
+    assocCalculations(calculationSteps)(processingStep),
+  )(processingStep)

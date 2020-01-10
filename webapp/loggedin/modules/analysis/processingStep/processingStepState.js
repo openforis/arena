@@ -70,3 +70,8 @@ export const updateCalculationIndex = (indexFrom, indexTo) => processingStepStat
     )
     return _updateProcessingStep(ProcessingStep.assocCalculations(calculationsUpdate))(processingStepState)
   })(processingStepState)
+
+export const dissocTemporaryCalculation = state =>
+  R.pipe(R.prop(keys.step), ProcessingStep.dissocTemporaryCalculation, processingStep =>
+    R.assoc(keys.step, processingStep)(state),
+  )(state)

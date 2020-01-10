@@ -1,8 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
@@ -18,6 +18,7 @@ export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
 export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
 export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
+export const processingStepCalculationEditCancel = 'analysis/processingStep/calculation/edit/cancel'
 
 export const resetProcessingStepState = () => dispatch =>
   dispatch({
@@ -30,7 +31,7 @@ export const resetProcessingStepState = () => dispatch =>
 export const setProcessingStepCalculationForEdit = calculation => dispatch =>
   dispatch({
     type: processingStepCalculationForEditUpdate,
-    uuid: ProcessingStepCalculation.getUuid(calculation),
+    calculation,
   })
 
 // ====== CREATE
@@ -39,14 +40,8 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
   dispatch(showAppLoader())
 
   const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
-
-  const { data: calculation } = await axios.post(
-    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculation`,
-    { index: calculationSteps.length },
-  )
+  const calculation = ProcessingChain.newProcessingStepCalculation(processingStep)
 
   dispatch({ type: processingStepCalculationCreate, calculation })
   dispatch(hideAppLoader())

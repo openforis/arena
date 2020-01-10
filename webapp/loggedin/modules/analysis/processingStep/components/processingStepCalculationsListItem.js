@@ -1,15 +1,20 @@
 import './processingStepCalculationsListItem.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
+import { useI18n } from '@webapp/commonComponents/hooks'
+import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
+
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { setProcessingStepCalculationForEdit } from '../actions'
 
@@ -17,6 +22,8 @@ const ProcessingStepCalculationsListItem = props => {
   const {
     calculation,
     calculationForEdit,
+    isCalculationEditDirty,
+    isCalculationEditTemporary,
     nodeDef,
     lang,
     dragging,
@@ -26,16 +33,21 @@ const ProcessingStepCalculationsListItem = props => {
     setProcessingStepCalculationForEdit,
   } = props
 
+  const i18n = useI18n()
+
+  const editing = ProcessingStepCalculation.isEqual(calculationForEdit)(calculation)
+
   let className = 'processing-step__calculation'
-  className += ProcessingStepCalculation.isEqual(calculationForEdit)(calculation) ? ' editing' : ''
+  className += editing ? ' editing' : ''
   className += dragging ? ' dragging' : ''
 
   const index = ProcessingStepCalculation.getIndex(calculation)
 
+  const [showCalculationEditCancelConfirm, setCalculationEditShowCancelConfirm] = useState()
   return (
     <div
       className={className}
-      draggable={true}
+      draggable={!isCalculationEditTemporary}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
@@ -45,14 +57,29 @@ const ProcessingStepCalculationsListItem = props => {
 
       <div
         className="processing-step__calculation-content"
-        onClick={() => setProcessingStepCalculationForEdit(calculation)}
+        onClick={() =>
+          !editing &&
+          (isCalculationEditDirty
+            ? setCalculationEditShowCancelConfirm(true)
+            : setProcessingStepCalculationForEdit(calculation))
+        }
       >
         <div>
-          {ProcessingStepCalculation.getUuid(calculation)}
-          {nodeDef && NodeDef.getLabel(nodeDef, lang)}
+          {ProcessingStepCalculation.getLabel(i18n.lang)(calculation)} ({nodeDef && NodeDef.getLabel(nodeDef, lang)})
         </div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />
       </div>
+
+      {showCalculationEditCancelConfirm && (
+        <ConfirmDialog
+          message={i18n.t('common.cancelConfirm')}
+          onOk={() => {
+            setCalculationEditShowCancelConfirm(false)
+            setProcessingStepCalculationForEdit(calculation)
+          }}
+          onCancel={() => setCalculationEditShowCancelConfirm(false)}
+        />
+      )}
     </div>
   )
 }
@@ -64,10 +91,19 @@ ProcessingStepCalculationsListItem.defaultProps = {
 const mapStateToProps = (state, { calculation }) => {
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
   const survey = SurveyState.getSurvey(state)
+  const isCalculationEditDirty = ProcessingStepCalculationState.isDirty(state)
+  const isCalculationEditTemporary = R.pipe(
+    ProcessingStepCalculationState.getCalculationDirty,
+    R.defaultTo({}),
+    ProcessingStepCalculation.isTemporary,
+  )(state)
+
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     calculationForEdit: ProcessingStepState.getProcessingStepCalculationForEdit(state),
+    isCalculationEditDirty,
+    isCalculationEditTemporary,
   }
 }
 

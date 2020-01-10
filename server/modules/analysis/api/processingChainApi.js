@@ -1,10 +1,19 @@
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculationValidator from '@common/analysis/processingStepCalculationValidator'
+import * as Validation from '@core/validation/validation'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ProcessingChainService from '../service/processingChainService'
+import SystemError from '@core/systemError'
+
+const _checkIsValidProcessingStepCalculation = async calculation => {
+  const validation = await ProcessingStepCalculationValidator.validate(calculation)
+  if (!Validation.isValid(validation))
+    throw new SystemError(Validation.messageKeys.analysis.processingStepCalculation.invalid)
+}
 
 export const init = app => {
   // ====== CREATE - Chain
@@ -57,17 +66,19 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingStepUuid, index } = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
+        const calculation = Request.getBody(req)
         const user = Request.getUser(req)
 
-        const calculationStep = await ProcessingChainService.createProcessingStepCalculation(
+        await _checkIsValidProcessingStepCalculation(calculation)
+
+        const calculationInserted = await ProcessingChainService.insertProcessingStepCalculation(
           user,
           surveyId,
-          processingStepUuid,
-          index,
+          calculation,
         )
 
-        res.json(calculationStep)
+        res.json(calculationInserted)
       } catch (error) {
         next(error)
       }
@@ -203,6 +214,8 @@ export const init = app => {
     },
   )
 
+  // ====== UPDATE - Processing Step Calculation
+
   app.put(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation-index',
     AuthMiddleware.requireRecordAnalysisPermission,
@@ -214,6 +227,26 @@ export const init = app => {
         await ProcessingChainService.updateStepCalculationIndex(user, surveyId, processingStepUuid, indexFrom, indexTo)
 
         Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
+  app.put(
+    '/survey/:surveyId/processing-step/:processingStepUuid/calculation',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const calculation = Request.getBody(req)
+        const user = Request.getUser(req)
+
+        await _checkIsValidProcessingStepCalculation(calculation)
+
+        const calculationUpdated = await ProcessingChainService.updateCalculationStep(user, surveyId, calculation)
+
+        res.json(calculationUpdated)
       } catch (error) {
         next(error)
       }

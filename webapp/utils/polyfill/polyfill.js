@@ -1,5 +1,5 @@
 import ResizeObserver from './resizeObserver'
 
-if (typeof ResizeObserver === 'undefined') {
+if (typeof window.ResizeObserver === 'undefined') {
   window.ResizeObserver = ResizeObserver
 }

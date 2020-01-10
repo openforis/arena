@@ -124,7 +124,7 @@ const NodeDefView = props => {
       {showCancelConfirm && (
         <ConfirmDialog
           className="node-def-edit__cancel-confirm-dialog"
-          message={i18n.t('surveyForm.nodeDefEditFormActions.confirmCancel')}
+          message={i18n.t('common.cancelConfirm')}
           onOk={() => {
             setShowCancelConfirm(false)
             cancelNodeDefEdits(history)

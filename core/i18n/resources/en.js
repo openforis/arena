@@ -7,6 +7,9 @@ export const enTranslation = {
     apply: 'Apply',
     back: 'Back',
     cancel: 'Cancel',
+    cancelConfirm: `**There are unsaved changes**.
+
+Do you want to cancel them?`,
     cantUndoWarning: 'This operation cannot be undone',
     close: 'Close',
     code: 'Code',
@@ -32,6 +35,7 @@ export const enTranslation = {
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     formContainsErrors: 'Form contains errors',
+    formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
     group: 'Group',
     id: 'id',
@@ -277,6 +281,8 @@ export const enTranslation = {
         'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
       [ActivityLog.type.processingStepCalculationIndexUpdate]:
         'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
+      [ActivityLog.type.processingStepCalculationUpdate]:
+        'updated calculation {{label}} at index {{index}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
     },
   },
 
@@ -338,6 +344,23 @@ export const enTranslation = {
     deleteComplete: 'Processing step deleted',
     category: 'Category',
     calculationSteps: 'Calculation Steps',
+  },
+
+  processingStepCalculationView: {
+    attribute: 'Attribute',
+    types: {
+      quantitative: 'Quantitative',
+      categorical: 'Categorical',
+    },
+    aggregateFunction: 'Aggregate function',
+    aggregateFunctions: {
+      avg: 'Average',
+      cnt: 'Count',
+      max: 'Maximum',
+      med: 'Median',
+      min: 'Minimum',
+      sum: 'Sum',
+    },
   },
 
   itemsTable: {
@@ -421,9 +444,6 @@ export const enTranslation = {
     nodeDefEditFormActions: {
       columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
-      confirmCancel: `**There are unsaved changes**.
-
-Do you want to leave the page?`,
     },
     nodeDefCode: {
       buttonCode: 'Button code',
@@ -508,6 +528,14 @@ Do you want to leave the page?`,
     nameRequired: 'Name is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
+    analysis: {
+      processingStepCalculation: {
+        attributeRequired: 'Attribute is required',
+        invalid: 'Processing Step Calculation is invalid',
+        typeRequired: 'Type is required',
+      },
+    },
+
     categoryEdit: {
       childrenEmpty: '$t(common.childrenEmpty)',
       childrenInvalid: 'At least one invalid child',
@@ -552,7 +580,6 @@ Do you want to leave the page?`,
       expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
       expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
-      formContainsErrors: 'The form contains errors. Please, fix them before saving.',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',
       nameInvalid:

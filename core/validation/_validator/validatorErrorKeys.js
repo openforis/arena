@@ -6,6 +6,14 @@ export const ValidatorErrorKeys = {
   nameCannotBeKeyword: 'validationErrors.nameCannotBeKeyword',
   nameRequired: 'validationErrors.nameRequired',
 
+  analysis: {
+    processingStepCalculation: {
+      attributeRequired: 'validationErrors.analysis.processingStepCalculation.attributeRequired',
+      invalid: 'validationErrors.analysis.processingStepCalculation.invalid',
+      typeRequired: 'validationErrors.analysis.processingStepCalculation.typeRequired',
+    },
+  },
+
   categoryEdit: {
     childrenEmpty: 'validationErrors.categoryEdit.childrenEmpty',
     childrenInvalid: 'validationErrors.categoryEdit.childrenInvalid',
@@ -50,7 +58,6 @@ export const ValidatorErrorKeys = {
     expressionApplyIfOnlyLastOneCanBeEmpty: 'validationErrors.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty',
     expressionDuplicate: 'validationErrors.nodeDefEdit.expressionDuplicate',
     expressionRequired: 'validationErrors.nodeDefEdit.expressionRequired',
-    formContainsErrors: 'validationErrors.nodeDefEdit.formContainsErrors',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',

@@ -34,7 +34,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const { processingStep, entities, calculationEditorOpened, onChange } = props
+  const { processingStep, entities, showLabel, readOnly, onChange } = props
 
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
@@ -42,20 +42,26 @@ const EntitySelector = props => {
 
   return (
     <div className="form-item">
-      {!calculationEditorOpened && (
-        <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>
-      )}
+      {showLabel && <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>}
 
       <Dropdown
         className="processing-step__entity-selector"
         autocompleteDialogClassName="processing-step__entity-selector-dialog"
         items={entities}
         selection={entity}
-        readOnly={calculationEditorOpened}
+        readOnly={readOnly}
         onChange={item => onChange(R.prop('key', item))}
       />
     </div>
   )
+}
+
+EntitySelector.defaultProps = {
+  processingStep: null,
+  processingStepPrev: null,
+  showLabel: true,
+  readOnly: false,
+  onChange: null,
 }
 
 const mapStateToProps = (state, { processingStepPrev }) => {
