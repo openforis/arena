@@ -115,3 +115,5 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
 
   history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
 }
+
+export const deleteProcessingStepCalculation = () => async (dispatch, getState) => {}

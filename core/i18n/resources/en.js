@@ -361,6 +361,7 @@ Do you want to cancel them?`,
       min: 'Minimum',
       sum: 'Sum',
     },
+    deleteConfirm: 'Delete this calculation step?',
   },
 
   itemsTable: {

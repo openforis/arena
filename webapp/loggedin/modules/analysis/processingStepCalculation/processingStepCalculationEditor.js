@@ -28,6 +28,7 @@ import {
   saveProcessingStepCalculationEdits,
   resetProcessingStepCalculationState,
   createNodeDefAnalysis,
+  deleteProcessingStepCalculation,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const ProcessingStepCalculationEditor = props => {
@@ -47,6 +48,7 @@ const ProcessingStepCalculationEditor = props => {
 
   const i18n = useI18n()
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const history = useHistory()
 
@@ -67,83 +69,102 @@ const ProcessingStepCalculationEditor = props => {
   )(ProcessingStepCalculation.aggregateFn)
 
   return (
-    <>
-      <div className="processing-step__calculation-editor">
-        <LabelsEditor
-          languages={Survey.getLanguages(surveyInfo)}
-          labels={ProcessingStepCalculation.getLabels(calculation)}
-          onChange={labels => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels)}
-        />
-
-        <FormItem label={i18n.t('common.type')}>
-          <ButtonGroup
-            selectedItemKey={ProcessingStepCalculation.getType(calculation)}
-            onChange={type => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type)}
-            items={types}
+    calculation && (
+      <>
+        <div className="processing-step__calculation-editor">
+          <LabelsEditor
+            languages={Survey.getLanguages(surveyInfo)}
+            labels={ProcessingStepCalculation.getLabels(calculation)}
+            onChange={labels => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels)}
           />
-        </FormItem>
 
-        <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
-          <div className="processing-step__calculation__attribute-container">
-            <Dropdown
-              items={attributes}
-              selection={attribute}
-              itemKeyProp={ProcessingStepCalculation.keys.uuid}
-              itemLabelFunction={attrDef =>
-                `${NodeDef.getLabel(attrDef, i18n.lang)}${NodeDef.isAnalysis(attrDef) ? ' (c)' : ''}`
-              }
-              onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
-              validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
+          <FormItem label={i18n.t('common.type')}>
+            <ButtonGroup
+              selectedItemKey={ProcessingStepCalculation.getType(calculation)}
+              onChange={type => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type)}
+              items={types}
             />
+          </FormItem>
+
+          <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
+            <div className="processing-step__calculation__attribute-container">
+              <Dropdown
+                items={attributes}
+                selection={attribute}
+                itemKeyProp={ProcessingStepCalculation.keys.uuid}
+                itemLabelFunction={attrDef =>
+                  `${NodeDef.getLabel(attrDef, i18n.lang)}${NodeDef.isAnalysis(attrDef) ? ' (c)' : ''}`
+                }
+                onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+                validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
+              />
+              <button
+                className="btn btn-s"
+                style={{ justifySelf: 'center' }}
+                onClick={() => createNodeDefAnalysis(history)}
+              >
+                <span className="icon icon-plus icon-12px icon-left" />
+                {i18n.t('common.add')}
+              </button>
+            </div>
+          </FormItem>
+
+          <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
+            <ButtonGroup
+              selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
+              onChange={aggregateFn =>
+                setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
+              }
+              items={aggregateFns}
+            />
+          </FormItem>
+
+          <div className="button-bar">
             <button
-              className="btn btn-s"
-              style={{ justifySelf: 'center' }}
-              onClick={async () => {
-                setProcessingStepCalculationAttribute(await createNodeDefAnalysis(history))
-              }}
+              className="btn btn-cancel"
+              onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
             >
-              <span className="icon icon-plus icon-12px icon-left" />
-              {i18n.t('common.add')}
+              <span className="icon icon-cross icon-12px" />
+              {i18n.t(isDirty ? 'common.cancel' : 'common.close')}
+            </button>
+            <button className="btn btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
+              <span className="icon icon-floppy-disk icon-left icon-12px" />
+              {i18n.t('common.save')}
+            </button>
+            <button
+              className="btn btn-danger btn-delete"
+              aria-disabled={ProcessingStepCalculation.isTemporary(calculation)}
+              onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
+            >
+              <span className="icon icon-bin icon-12px" />
+              {i18n.t('common.delete')}
             </button>
           </div>
-        </FormItem>
-
-        <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
-          <ButtonGroup
-            selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
-            onChange={aggregateFn =>
-              setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
-            }
-            items={aggregateFns}
-          />
-        </FormItem>
-
-        <div className="button-bar">
-          <button
-            className="btn btn-cancel"
-            onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
-          >
-            <span className="icon icon-cross icon-10px" />
-            {i18n.t(isDirty ? 'common.cancel' : 'common.close')}
-          </button>
-          <button className="btn btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
-            <span className="icon icon-floppy-disk icon-left icon-12px" />
-            {i18n.t('common.save')}
-          </button>
         </div>
-      </div>
 
-      {showCancelConfirm && (
-        <ConfirmDialog
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setShowCancelConfirm(false)
-            resetProcessingStepCalculationState()
-          }}
-          onCancel={() => setShowCancelConfirm(false)}
-        />
-      )}
-    </>
+        {showCancelConfirm && (
+          <ConfirmDialog
+            message={i18n.t('common.cancelConfirm')}
+            onOk={() => {
+              setShowCancelConfirm(false)
+              resetProcessingStepCalculationState()
+            }}
+            onCancel={() => setShowCancelConfirm(false)}
+          />
+        )}
+
+        {showDeleteConfirm && (
+          <ConfirmDialog
+            message={i18n.t('processingStepCalculationView.deleteConfirm')}
+            onOk={() => {
+              setShowDeleteConfirm(false)
+              deleteProcessingStepCalculation()
+            }}
+            onCancel={() => setShowDeleteConfirm(false)}
+          />
+        )}
+      </>
+    )
   )
 }
 
@@ -181,4 +202,5 @@ export default connect(mapStateToProps, {
   saveProcessingStepCalculationEdits,
   resetProcessingStepCalculationState,
   createNodeDefAnalysis,
+  deleteProcessingStepCalculation,
 })(ProcessingStepCalculationEditor)

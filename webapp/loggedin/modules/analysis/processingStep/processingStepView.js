@@ -7,6 +7,7 @@ import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 
+import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
@@ -36,11 +37,17 @@ const ProcessingStepView = props => {
   } = props
   const { processingStepUuid, nodeDefUuid } = useParams()
 
+  // Reset state on unmount (Only if not navigating to node def edit from calculation editor)
+  const onUnmount = () => {
+    if (R.pipe(R.path(['location', 'pathname']), R.startsWith(appModuleUri(analysisModules.nodeDef)), R.not)(history)) {
+      resetProcessingStepState()
+    }
+  }
+
   useEffect(() => {
     if (processingStepUuid) {
       fetchProcessingStep(processingStepUuid)
-
-      return resetProcessingStepState
+      return onUnmount
     }
   }, [])
 
