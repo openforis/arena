@@ -6,7 +6,7 @@ import {
   processingStepCalculationCreate,
   processingStepCalculationEditCancel,
 } from '../processingStep/actions'
-import { processingStepCalculationTempUpdate } from './actions'
+import { processingStepCalculationDirtyUpdate } from './actions'
 
 const actionHandlers = {
   [processingStepCalculationForEditUpdate]: (state, { calculation }) =>
@@ -15,7 +15,7 @@ const actionHandlers = {
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
 
-  [processingStepCalculationTempUpdate]: (state, { calculation }) =>
+  [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationDirty(calculation)(state),
 
   [processingStepCalculationEditCancel]: () => ({}),

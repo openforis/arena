@@ -17,7 +17,7 @@ import {
   processingStepCalculationEditCancel,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
-import { processingStepCalculationTempUpdate } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import { processingStepCalculationDirtyUpdate } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const actionHandlers = {
   // Reset state
@@ -39,7 +39,7 @@ const actionHandlers = {
   [processingStepCalculationIndexUpdate]: (state, { indexFrom, indexTo }) =>
     ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
 
-  [processingStepCalculationTempUpdate]: (state, { calculation }) =>
+  [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
 
   [processingStepCalculationEditCancel]: (state, { calculation }) =>

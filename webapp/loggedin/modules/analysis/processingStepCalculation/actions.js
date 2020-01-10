@@ -17,7 +17,7 @@ import {
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 
-export const processingStepCalculationTempUpdate = 'analysis/processingStep/calculation/temp/update'
+export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 
 const _validate = async calculation => {
   const validation = await ProcessingStepCalculationValidator.validate(calculation)
@@ -26,7 +26,7 @@ const _validate = async calculation => {
 
 const _onCalculationUpdated = calculation => async dispatch =>
   dispatch({
-    type: processingStepCalculationTempUpdate,
+    type: processingStepCalculationDirtyUpdate,
     calculation: await _validate(calculation),
   })
 
@@ -66,7 +66,7 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
     )
     dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
-    await dispatch({ type: processingStepCalculationTempUpdate, calculation })
+    await dispatch({ type: processingStepCalculationDirtyUpdate, calculation })
     dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
   }
 
