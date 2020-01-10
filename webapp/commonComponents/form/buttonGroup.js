@@ -15,6 +15,8 @@ const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, des
             onChange(
               multiple
                 ? R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
+                : selected
+                ? null
                 : item.key,
             )
           }

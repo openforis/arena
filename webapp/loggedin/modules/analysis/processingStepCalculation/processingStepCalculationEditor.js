@@ -116,6 +116,7 @@ const ProcessingStepCalculationEditor = props => {
                 setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
               }
               items={aggregateFns}
+              deselectable={true}
             />
           </FormItem>
 

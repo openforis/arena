@@ -45,7 +45,7 @@ export const aggregateFn = {
 export const isTemporary = R.propEq(keys.temporary, true)
 export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
 
-export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, aggregateFn.sum)
+export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn)
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 export const getLabels = ObjectUtils.getLabels
