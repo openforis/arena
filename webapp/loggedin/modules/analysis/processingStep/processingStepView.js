@@ -2,15 +2,17 @@ import './processingStepView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { useParams } from 'react-router'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
-import { getUrlParam } from '@webapp/utils/routerUtils'
 
+import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
+import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
@@ -24,7 +26,6 @@ import {
 const ProcessingStepView = props => {
   const {
     history,
-    processingStepUuid,
     processingStep,
     processingStepPrev,
     processingStepNext,
@@ -34,12 +35,19 @@ const ProcessingStepView = props => {
     putProcessingStepProps,
     deleteProcessingStep,
   } = props
+  const { processingStepUuid, nodeDefUuid } = useParams()
+
+  // Reset state on unmount (Only if not navigating to node def edit from calculation editor)
+  const onUnmount = () => {
+    if (R.pipe(R.path(['location', 'pathname']), R.startsWith(appModuleUri(analysisModules.nodeDef)), R.not)(history)) {
+      resetProcessingStepState()
+    }
+  }
 
   useEffect(() => {
-    fetchProcessingStep(processingStepUuid)
-
-    return () => {
-      resetProcessingStepState()
+    if (processingStepUuid) {
+      fetchProcessingStep(processingStepUuid)
+      return onUnmount
     }
   }, [])
 
@@ -47,7 +55,9 @@ const ProcessingStepView = props => {
 
   const i18n = useI18n()
 
-  return R.isEmpty(processingStep) ? null : (
+  return nodeDefUuid ? (
+    <NodeDefView />
+  ) : R.isEmpty(processingStep) ? null : (
     <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
       <div className="form">
         <EntitySelector
@@ -70,13 +80,17 @@ const ProcessingStepView = props => {
         />
 
         {!processingStepNext && !calculationEditorOpened && (
-          <button
-            className="btn-s btn-danger btn-delete"
-            onClick={() => window.confirm(i18n.t('processingStepView.deleteConfirm')) && deleteProcessingStep(history)}
-          >
-            <span className="icon icon-bin icon-12px icon-left" />
-            {i18n.t('common.delete')}
-          </button>
+          <div className="button-bar">
+            <button
+              className="btn-s btn-danger btn-delete"
+              onClick={() =>
+                window.confirm(i18n.t('processingStepView.deleteConfirm')) && deleteProcessingStep(history)
+              }
+            >
+              <span className="icon icon-bin icon-12px icon-left" />
+              {i18n.t('common.delete')}
+            </button>
+          </div>
         )}
       </div>
 
@@ -85,8 +99,7 @@ const ProcessingStepView = props => {
   )
 }
 
-const mapStateToProps = (state, { match }) => ({
-  processingStepUuid: getUrlParam('processingStepUuid')(match),
+const mapStateToProps = state => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),

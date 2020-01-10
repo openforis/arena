@@ -361,6 +361,7 @@ Do you want to cancel them?`,
       min: 'Minimum',
       sum: 'Sum',
     },
+    deleteConfirm: 'Delete this calculation step?',
   },
 
   itemsTable: {
@@ -391,6 +392,7 @@ Do you want to cancel them?`,
       table: 'Table',
       parentPage: 'Parent page',
       ownPage: 'Its own page',
+      analysis: 'Analysis',
     },
     advancedProps: {
       readOnly: 'Read only',

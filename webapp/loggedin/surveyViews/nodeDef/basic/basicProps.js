@@ -54,6 +54,12 @@ const BasicProps = props => {
         <label>{nodeDef.type}</label>
       </FormItem>
 
+      {NodeDef.isAnalysis(nodeDef) && (
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
+          <Checkbox checked={true} disabled={true} />
+        </FormItem>
+      )}
+
       <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
@@ -158,7 +164,7 @@ const BasicProps = props => {
         <CyclesSelect
           cyclesKeysSelectable={cyclesKeysParent}
           cyclesKeysSelected={cyclesNodeDef}
-          disabled={NodeDef.isRoot(nodeDef)}
+          disabled={NodeDef.isRoot(nodeDef) || NodeDef.isAnalysis(nodeDef)}
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}

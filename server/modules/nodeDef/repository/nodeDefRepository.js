@@ -34,16 +34,18 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
   await client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-      (parent_uuid, uuid, type, props_draft, props_advanced_draft, meta)
-    VALUES ($1, $2, $3, $4, $5, $6)
+      (parent_uuid, uuid, type, props, props_draft, props_advanced_draft, meta, analysis)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`,
     [
       NodeDef.getParentUuid(nodeDef),
       NodeDef.getUuid(nodeDef),
       NodeDef.getType(nodeDef),
-      NodeDef.getProps(nodeDef),
+      NodeDef.isAnalysis(nodeDef) ? NodeDef.getProps(nodeDef) : {},
+      NodeDef.isAnalysis(nodeDef) ? {} : NodeDef.getProps(nodeDef),
       NodeDef.getPropsAdvanced(nodeDef),
       NodeDef.getMeta(nodeDef),
+      NodeDef.isAnalysis(nodeDef),
     ],
     def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
   )
@@ -125,14 +127,15 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdva
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
-    SET props_draft = props_draft || $1::jsonb,
-        props_advanced_draft = props_advanced_draft || $2::jsonb,
+    SET props = CASE WHEN analysis THEN props || $1::jsonb ELSE props END,
+        props_draft = CASE WHEN analysis THEN props_draft ELSE props_draft || $1::jsonb END,
+        props_advanced_draft = CASE WHEN analysis THEN props_advanced_draft ELSE props_advanced_draft || $2::jsonb END,
         date_modified = ${DbUtils.now}
     WHERE uuid = $3
     RETURNING ${nodeDefSelectFields}
   `,
     [props, propsAdvanced, nodeDefUuid],
-    def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
+    def => dbTransformCallback(def, true, true), // Always loading draft when updating a nodeDef
   )
 
 // CYCLES

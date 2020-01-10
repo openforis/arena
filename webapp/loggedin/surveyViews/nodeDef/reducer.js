@@ -2,7 +2,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefPropsUpdate, nodeDefPropsUpdateCancel } from '@webapp/survey/nodeDefs/actions'
+import { nodeDefPropsUpdate, nodeDefPropsUpdateCancel, nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 import { nodeDefEditUpdate } from './actions'
 
 import * as NodeDefState from './nodeDefState'
@@ -15,6 +15,9 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   [nodeDefEditUpdate]: (state, { nodeDef, nodeDefValidation }) =>
+    NodeDefState.assocNodeDefForEdit(nodeDef, nodeDefValidation)(state),
+
+  [nodeDefSave]: (state, { nodeDef, nodeDefValidation }) =>
     NodeDefState.assocNodeDefForEdit(nodeDef, nodeDefValidation)(state),
 
   [nodeDefPropsUpdate]: (state, { nodeDef, nodeDefValidation, props, propsAdvanced }) =>

@@ -3,6 +3,7 @@ import './processingStepCalculationEditor.scss'
 import React, { useState } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -25,7 +26,9 @@ import {
   setProcessingStepCalculationProp,
   setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
-  cancelProcessingStepCalculationEdits,
+  resetProcessingStepCalculationState,
+  createNodeDefAnalysis,
+  deleteProcessingStepCalculation,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const ProcessingStepCalculationEditor = props => {
@@ -38,12 +41,16 @@ const ProcessingStepCalculationEditor = props => {
     setProcessingStepCalculationProp,
     setProcessingStepCalculationAttribute,
     saveProcessingStepCalculationEdits,
-    cancelProcessingStepCalculationEdits,
+    resetProcessingStepCalculationState,
+    createNodeDefAnalysis,
   } = props
   const validation = ProcessingStepCalculation.getValidation(calculation)
 
   const i18n = useI18n()
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  const history = useHistory()
 
   const types = R.pipe(
     R.keys,
@@ -62,69 +69,102 @@ const ProcessingStepCalculationEditor = props => {
   )(ProcessingStepCalculation.aggregateFn)
 
   return (
-    <>
-      <div className="processing-step__calculation-editor">
-        <button
-          className="btn btn-close"
-          onClick={() => (isDirty ? setShowCancelConfirm(true) : cancelProcessingStepCalculationEdits())}
-        >
-          <span className="icon icon-cross icon-10px" />
-        </button>
-
-        <LabelsEditor
-          languages={Survey.getLanguages(surveyInfo)}
-          labels={ProcessingStepCalculation.getLabels(calculation)}
-          onChange={labels => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels)}
-        />
-
-        <FormItem label={i18n.t('common.type')}>
-          <ButtonGroup
-            selectedItemKey={ProcessingStepCalculation.getType(calculation)}
-            onChange={type => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type)}
-            items={types}
+    calculation && (
+      <>
+        <div className="processing-step__calculation-editor">
+          <LabelsEditor
+            languages={Survey.getLanguages(surveyInfo)}
+            labels={ProcessingStepCalculation.getLabels(calculation)}
+            onChange={labels => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels)}
           />
-        </FormItem>
 
-        <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
-          <Dropdown
-            items={attributes}
-            selection={attribute}
-            itemKeyProp={ProcessingStepCalculation.keys.uuid}
-            itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
-            onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
-            validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
-          />
-        </FormItem>
+          <FormItem label={i18n.t('common.type')}>
+            <ButtonGroup
+              selectedItemKey={ProcessingStepCalculation.getType(calculation)}
+              onChange={type => setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type)}
+              items={types}
+            />
+          </FormItem>
 
-        <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
-          <ButtonGroup
-            selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
-            onChange={aggregateFn =>
-              setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
-            }
-            items={aggregateFns}
-          />
-        </FormItem>
+          <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
+            <div className="processing-step__calculation__attribute-container">
+              <Dropdown
+                items={attributes}
+                selection={attribute}
+                itemKeyProp={ProcessingStepCalculation.keys.uuid}
+                itemLabelFunction={attrDef =>
+                  `${NodeDef.getLabel(attrDef, i18n.lang)}${NodeDef.isAnalysis(attrDef) ? ' (c)' : ''}`
+                }
+                onChange={def => setProcessingStepCalculationAttribute(NodeDef.getUuid(def))}
+                validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
+              />
+              <button
+                className="btn btn-s"
+                style={{ justifySelf: 'center' }}
+                onClick={() => createNodeDefAnalysis(history)}
+              >
+                <span className="icon icon-plus icon-12px icon-left" />
+                {i18n.t('common.add')}
+              </button>
+            </div>
+          </FormItem>
 
-        <div className="button-bar">
-          <button className="btn btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
-            <span className="icon icon-floppy-disk icon-left icon-12px" />
-            {i18n.t('common.save')}
-          </button>
+          <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
+            <ButtonGroup
+              selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
+              onChange={aggregateFn =>
+                setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
+              }
+              items={aggregateFns}
+            />
+          </FormItem>
+
+          <div className="button-bar">
+            <button
+              className="btn-s btn-cancel"
+              onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
+            >
+              <span className="icon icon-cross icon-left icon-10px" />
+              {i18n.t(isDirty ? 'common.cancel' : 'common.close')}
+            </button>
+            <button className="btn-s btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
+              <span className="icon icon-floppy-disk icon-left icon-12px" />
+              {i18n.t('common.save')}
+            </button>
+            <button
+              className="btn-s btn-danger btn-delete"
+              aria-disabled={ProcessingStepCalculation.isTemporary(calculation)}
+              onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
+            >
+              <span className="icon icon-bin icon-left icon-12px" />
+              {i18n.t('common.delete')}
+            </button>
+          </div>
         </div>
-      </div>
 
-      {showCancelConfirm && (
-        <ConfirmDialog
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setShowCancelConfirm(false)
-            cancelProcessingStepCalculationEdits()
-          }}
-          onCancel={() => setShowCancelConfirm(false)}
-        />
-      )}
-    </>
+        {showCancelConfirm && (
+          <ConfirmDialog
+            message={i18n.t('common.cancelConfirm')}
+            onOk={() => {
+              setShowCancelConfirm(false)
+              resetProcessingStepCalculationState()
+            }}
+            onCancel={() => setShowCancelConfirm(false)}
+          />
+        )}
+
+        {showDeleteConfirm && (
+          <ConfirmDialog
+            message={i18n.t('processingStepCalculationView.deleteConfirm')}
+            onOk={() => {
+              setShowDeleteConfirm(false)
+              deleteProcessingStepCalculation()
+            }}
+            onCancel={() => setShowDeleteConfirm(false)}
+          />
+        )}
+      </>
+    )
   )
 }
 
@@ -140,10 +180,8 @@ const mapStateToProps = state => {
     ProcessingStepState.getProcessingStep,
     ProcessingStep.getEntityUuid,
     entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
-    entityDef => Survey.getNodeDefChildren(entityDef)(survey),
-    R.filter(
-      R.ifElse(R.always(ProcessingStepCalculation.isQuantitative(calculation)), NodeDef.isDecimal, NodeDef.isCode),
-    ),
+    entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
+    R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
   )(state)
   const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
     Survey.getNodeDefByUuid(nodeDefUuid)(survey),
@@ -162,5 +200,7 @@ export default connect(mapStateToProps, {
   setProcessingStepCalculationProp,
   setProcessingStepCalculationAttribute,
   saveProcessingStepCalculationEdits,
-  cancelProcessingStepCalculationEdits,
+  resetProcessingStepCalculationState,
+  createNodeDefAnalysis,
+  deleteProcessingStepCalculation,
 })(ProcessingStepCalculationEditor)
