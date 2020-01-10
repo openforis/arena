@@ -58,7 +58,7 @@ const CodeProps = props => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
         <div
           style={{
@@ -92,32 +92,36 @@ const CodeProps = props => {
         </div>
       </FormItem>
 
-      <FormItem label={i18n.t('nodeDefEdit.codeProps.parentCode')}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 200px',
-          }}
-        >
-          <Dropdown
-            disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
-            items={candidateParentCodeNodeDefs}
-            selection={parentCodeDef}
-            itemKeyProp={'uuid'}
-            itemLabelFunction={NodeDef.getName}
-            onChange={def => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
-          />
-        </div>
-      </FormItem>
+      {!NodeDef.isAnalysis(nodeDef) && (
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.codeProps.parentCode')}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 200px',
+              }}
+            >
+              <Dropdown
+                disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
+                items={candidateParentCodeNodeDefs}
+                selection={parentCodeDef}
+                itemKeyProp={'uuid'}
+                itemLabelFunction={NodeDef.getName}
+                onChange={def => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
+              />
+            </div>
+          </FormItem>
 
-      <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
-        <ButtonGroup
-          selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-          onChange={render => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render)}
-          items={displayAsItems}
-        />
-      </FormItem>
-    </React.Fragment>
+          <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
+            <ButtonGroup
+              selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
+              onChange={render => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render)}
+              items={displayAsItems}
+            />
+          </FormItem>
+        </>
+      )}
+    </>
   )
 }
 
