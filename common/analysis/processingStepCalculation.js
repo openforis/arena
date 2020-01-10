@@ -52,6 +52,8 @@ export const getLabels = ObjectUtils.getLabels
 export const getLabel = ObjectUtils.getLabel
 export const getType = ObjectUtils.getProp(keysProps.type, type.quantitative)
 
+export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
+
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps

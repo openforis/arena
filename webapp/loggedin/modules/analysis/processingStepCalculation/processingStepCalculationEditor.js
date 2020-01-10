@@ -109,16 +109,18 @@ const ProcessingStepCalculationEditor = props => {
             </div>
           </FormItem>
 
-          <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
-            <ButtonGroup
-              selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
-              onChange={aggregateFn =>
-                setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
-              }
-              items={aggregateFns}
-              deselectable={true}
-            />
-          </FormItem>
+          {ProcessingStepCalculation.isQuantitative(calculation) && (
+            <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
+              <ButtonGroup
+                selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
+                onChange={aggregateFn =>
+                  setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn)
+                }
+                items={aggregateFns}
+                deselectable={true}
+              />
+            </FormItem>
+          )}
 
           <div className="button-bar">
             <button

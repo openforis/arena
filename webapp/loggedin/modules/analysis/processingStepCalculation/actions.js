@@ -45,7 +45,14 @@ export const setProcessingStepCalculationProp = (prop, value) => async (dispatch
     // When changing type, reset nodeDef
     R.when(
       R.always(R.equals(prop, ProcessingStepCalculation.keysProps.type)),
-      ProcessingStepCalculation.assocNodeDefUuid(null),
+      R.pipe(
+        ProcessingStepCalculation.assocNodeDefUuid(null),
+        // When type is categorical, reset aggregate function
+        R.when(
+          R.always(R.equals(value, ProcessingStepCalculation.type.categorical)),
+          ProcessingStepCalculation.assocProp(ProcessingStepCalculation.keysProps.aggregateFn, null),
+        ),
+      ),
     ),
   )(calculation)
 
