@@ -389,6 +389,7 @@ Do you want to cancel them?`,
       table: 'Table',
       parentPage: 'Parent page',
       ownPage: 'Its own page',
+      analysis: 'Analysis',
     },
     advancedProps: {
       readOnly: 'Read only',

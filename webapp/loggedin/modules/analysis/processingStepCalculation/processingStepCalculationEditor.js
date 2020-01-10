@@ -157,7 +157,7 @@ const mapStateToProps = state => {
     ProcessingStepState.getProcessingStep,
     ProcessingStep.getEntityUuid,
     entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
-    entityDef => Survey.getNodeDefChildren(entityDef)(survey),
+    entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
     R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
   )(state)
   const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>

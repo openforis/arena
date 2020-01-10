@@ -131,7 +131,14 @@ const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, clien
               ),
             )(nodeDef),
           }
-          await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, {}, client)
+          await NodeDefRepository.updateNodeDefProps(
+            surveyId,
+            nodeDefUuid,
+            props,
+            {},
+            NodeDef.isAnalysis(nodeDef),
+            client,
+          )
         }
       }
     }
@@ -170,14 +177,16 @@ export const updateNodeDefProps = async (
       ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
-    const [nodeDef] = await Promise.all([
-      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
+    const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, true, false, t)
+
+    const [nodeDefUpdated] = await Promise.all([
+      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, NodeDef.isAnalysis(nodeDef), t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
 
     return {
-      [nodeDefUuid]: nodeDef,
+      [nodeDefUuid]: nodeDefUpdated,
       ...ObjectUtils.toUuidIndexedObj(nodeDefsUpdated),
     }
   })

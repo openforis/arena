@@ -9,9 +9,11 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { navigateToProcessingChainView } from '@webapp/loggedin/modules/analysis/processingChains/actions'
+import { fetchProcessingChain } from '../processingChain/actions'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as ProcessingStepState from './processingStepState'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
@@ -56,7 +58,8 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
 export const fetchProcessingStep = processingStepUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
 
-  const surveyId = SurveyState.getSurveyId(getState())
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
   const {
     data: { processingStep, processingStepPrev, processingStepNext },
   } = await axios.get(`/api/survey/${surveyId}/processing-step/${processingStepUuid}`)
@@ -68,6 +71,12 @@ export const fetchProcessingStep = processingStepUuid => async (dispatch, getSta
     processingStepNext,
   })
   dispatch(hideAppSaving())
+
+  // Load processing chain if not in state
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+  if (R.isNil(processingChain) || R.isEmpty(processingChain)) {
+    dispatch(fetchProcessingChain(ProcessingStep.getProcessingChainUuid(processingStep)))
+  }
 }
 
 // ====== UPDATE

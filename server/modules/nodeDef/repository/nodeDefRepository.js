@@ -34,16 +34,18 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
   await client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-      (parent_uuid, uuid, type, props_draft, props_advanced_draft, meta)
-    VALUES ($1, $2, $3, $4, $5, $6)
+      (parent_uuid, uuid, type, props, props_draft, props_advanced_draft, meta, analysis)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`,
     [
       NodeDef.getParentUuid(nodeDef),
       NodeDef.getUuid(nodeDef),
       NodeDef.getType(nodeDef),
-      NodeDef.getProps(nodeDef),
+      NodeDef.isAnalysis(nodeDef) ? NodeDef.getProps(nodeDef) : {},
+      NodeDef.isAnalysis(nodeDef) ? {} : NodeDef.getProps(nodeDef),
       NodeDef.getPropsAdvanced(nodeDef),
       NodeDef.getMeta(nodeDef),
+      NodeDef.isAnalysis(nodeDef),
     ],
     def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
   )
@@ -121,18 +123,33 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
 
 // ============== UPDATE
 
-export const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+export const updateNodeDefProps = async (
+  surveyId,
+  nodeDefUuid,
+  props,
+  propsAdvanced = {},
+  analysis = false,
+  client = db,
+) =>
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
-    SET props_draft = props_draft || $1::jsonb,
-        props_advanced_draft = props_advanced_draft || $2::jsonb,
+    SET props = props || $1::jsonb,
+        props_draft = props_draft || $2::jsonb,
+        props_advanced = props_advanced || $3::jsonb,
+        props_advanced_draft = props_advanced_draft || $4::jsonb,
         date_modified = ${DbUtils.now}
-    WHERE uuid = $3
+    WHERE uuid = $5
     RETURNING ${nodeDefSelectFields}
   `,
-    [props, propsAdvanced, nodeDefUuid],
-    def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
+    [
+      analysis ? props : {}, // If node def is analysis, update props
+      analysis ? propsAdvanced : {},
+      analysis ? {} : props, // If node def is not analysis, update props draft
+      analysis ? {} : propsAdvanced,
+      nodeDefUuid,
+    ],
+    def => dbTransformCallback(def, true, true), // Always loading draft when updating a nodeDef
   )
 
 // CYCLES

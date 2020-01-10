@@ -76,7 +76,7 @@ const NodeDefView = props => {
                   setNodeDefLayoutProp,
                 },
               },
-              ...(NodeDef.isRoot(nodeDef)
+              ...(NodeDef.isRoot(nodeDef) || NodeDef.isAnalysis(nodeDef)
                 ? []
                 : [
                     {

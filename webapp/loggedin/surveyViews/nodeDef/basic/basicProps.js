@@ -54,6 +54,12 @@ const BasicProps = props => {
         <label>{nodeDef.type}</label>
       </FormItem>
 
+      {NodeDef.isAnalysis(nodeDef) && (
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
+          <Checkbox checked={true} disabled={true} />
+        </FormItem>
+      )}
+
       <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
