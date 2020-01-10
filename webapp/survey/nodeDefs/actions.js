@@ -24,6 +24,7 @@ import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
+export const nodeDefSave = 'survey/nodeDef/save'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
 export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
@@ -65,11 +66,7 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
 
   const {
     data: { nodeDefsValidation, nodeDefsUpdated },
-  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
-    cycle,
-    props,
-    propsAdvanced,
-  })
+  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, { cycle, props, propsAdvanced })
 
   dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
@@ -239,7 +236,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 
     // Update node def edit state
     dispatch({
-      type: nodeDefEditUpdate,
+      type: nodeDefSave,
       nodeDef: nodeDefUpdated,
       nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
       surveyCycleKey,

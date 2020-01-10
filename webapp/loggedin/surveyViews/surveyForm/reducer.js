@@ -7,8 +7,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefCreate, nodeDefDelete } from '@webapp/survey/nodeDefs/actions'
-import { nodeDefEditUpdate } from '@webapp/loggedin/surveyViews/nodeDef/actions'
+import { nodeDefCreate, nodeDefDelete, nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 import { recordLoad } from '../record/actions'
 import {
   formActivePageNodeDefUpdate,
@@ -46,7 +45,7 @@ const actionHandlers = {
 
   [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
-  [nodeDefEditUpdate]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
+  [nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
     if (NodeDef.isEntity(nodeDef)) {
       const pageUuid = NodeDefLayout.getPageUuid(surveyCycleKey)(nodeDef)
       // When changing displayIn (pageUuid) change form active page

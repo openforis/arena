@@ -3,11 +3,10 @@ import React from 'react'
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
-import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
+import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ProcessingChainsView from './processingChains/processingChainsView'
 import ProcessingChainView from './processingChain/processingChainView'
 import ProcessingStepView from './processingStep/processingStepView'
-import NodeDefAnalysisView from './nodeDefAnalysis/nodeDefAnalysisView'
 
 const AnalysisView = () => (
   <SurveyDefsLoader draft={false} validate={false} requirePublish={true}>
@@ -28,7 +27,7 @@ const AnalysisView = () => (
           path: `${appModuleUri(analysisModules.processingStep)}:processingStepUuid/`,
         },
         {
-          component: NodeDefAnalysisView,
+          component: ProcessingStepView,
           path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
         },
       ]}

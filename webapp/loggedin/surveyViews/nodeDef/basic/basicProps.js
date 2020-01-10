@@ -164,7 +164,7 @@ const BasicProps = props => {
         <CyclesSelect
           cyclesKeysSelectable={cyclesKeysParent}
           cyclesKeysSelected={cyclesNodeDef}
-          disabled={NodeDef.isRoot(nodeDef)}
+          disabled={NodeDef.isRoot(nodeDef) || NodeDef.isAnalysis(nodeDef)}
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}

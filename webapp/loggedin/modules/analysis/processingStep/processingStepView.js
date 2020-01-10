@@ -2,15 +2,16 @@ import './processingStepView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { useParams } from 'react-router'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
-import { getUrlParam } from '@webapp/utils/routerUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
+import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
@@ -24,7 +25,6 @@ import {
 const ProcessingStepView = props => {
   const {
     history,
-    processingStepUuid,
     processingStep,
     processingStepPrev,
     processingStepNext,
@@ -34,12 +34,13 @@ const ProcessingStepView = props => {
     putProcessingStepProps,
     deleteProcessingStep,
   } = props
+  const { processingStepUuid, nodeDefUuid } = useParams()
 
   useEffect(() => {
-    fetchProcessingStep(processingStepUuid)
+    if (processingStepUuid) {
+      fetchProcessingStep(processingStepUuid)
 
-    return () => {
-      resetProcessingStepState()
+      return resetProcessingStepState
     }
   }, [])
 
@@ -47,7 +48,9 @@ const ProcessingStepView = props => {
 
   const i18n = useI18n()
 
-  return R.isEmpty(processingStep) ? null : (
+  return nodeDefUuid ? (
+    <NodeDefView />
+  ) : R.isEmpty(processingStep) ? null : (
     <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
       <div className="form">
         <EntitySelector
@@ -85,8 +88,7 @@ const ProcessingStepView = props => {
   )
 }
 
-const mapStateToProps = (state, { match }) => ({
-  processingStepUuid: getUrlParam('processingStepUuid')(match),
+const mapStateToProps = state => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),

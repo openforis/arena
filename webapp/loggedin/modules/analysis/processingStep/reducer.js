@@ -15,6 +15,7 @@ import {
   processingStepPropsUpdate,
   processingStepUpdate,
   processingStepCalculationEditCancel,
+  processingStepReset,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 import { processingStepCalculationDirtyUpdate } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
@@ -28,6 +29,9 @@ const actionHandlers = {
 
   [processingStepUpdate]: (state, { processingStep, processingStepPrev, processingStepNext }) =>
     ProcessingStepState.assocProcessingStep(processingStep, processingStepPrev, processingStepNext)(state),
+
+  [processingStepReset]: () => ({}),
+
   [processingStepPropsUpdate]: (state, { props }) => ProcessingStepState.mergeProcessingStepProps(props)(state),
 
   [processingStepCalculationCreate]: (state, { calculation }) =>

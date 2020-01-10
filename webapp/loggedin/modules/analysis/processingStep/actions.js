@@ -16,25 +16,17 @@ import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 
 export const processingStepUpdate = 'analysis/processingStep/update'
+export const processingStepReset = 'analysis/processingStep/reset'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
 export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
 export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
 export const processingStepCalculationEditCancel = 'analysis/processingStep/calculation/edit/cancel'
 
-export const resetProcessingStepState = () => dispatch =>
-  dispatch({
-    type: processingStepUpdate,
-    processingStep: {},
-    processingStepPrev: null,
-    processingStepNext: null,
-  })
+export const resetProcessingStepState = () => dispatch => dispatch({ type: processingStepReset })
 
 export const setProcessingStepCalculationForEdit = calculation => dispatch =>
-  dispatch({
-    type: processingStepCalculationForEditUpdate,
-    calculation,
-  })
+  dispatch({ type: processingStepCalculationForEditUpdate, calculation })
 
 // ====== CREATE
 

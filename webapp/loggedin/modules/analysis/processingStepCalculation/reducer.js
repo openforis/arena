@@ -10,9 +10,10 @@ import {
   processingStepCalculationForEditUpdate,
   processingStepCalculationCreate,
   processingStepCalculationEditCancel,
+  processingStepReset,
 } from '../processingStep/actions'
 import { processingStepCalculationDirtyUpdate } from './actions'
-import { nodeDefPropsUpdateCancel } from '@webapp/survey/nodeDefs/actions'
+import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 
 const actionHandlers = {
   [processingStepCalculationForEditUpdate]: (state, { calculation }) =>
@@ -27,11 +28,14 @@ const actionHandlers = {
   [processingStepCalculationEditCancel]: () => ({}),
 
   // Update calculation attribute on node def edit cancel / back
-  [nodeDefPropsUpdateCancel]: (state, { nodeDef }) =>
+  [nodeDefSave]: (state, { nodeDef }) =>
     R.when(
       R.always(NodeDef.isAnalysis(nodeDef)),
       ProcessingStepCalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef)),
     )(state),
+
+  // Processing step
+  [processingStepReset]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)
