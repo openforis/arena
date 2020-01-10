@@ -244,7 +244,7 @@ export const init = app => {
 
         await _checkIsValidProcessingStepCalculation(calculation)
 
-        const calculationUpdated = await ProcessingChainService.updateStepCalculation(user, surveyId, calculation)
+        const calculationUpdated = await ProcessingChainService.updateCalculationStep(user, surveyId, calculation)
 
         res.json(calculationUpdated)
       } catch (error) {

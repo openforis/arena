@@ -23,7 +23,7 @@ const deleteExpiredItems = async () => {
 export const init = async () => {
   await deleteExpiredItems()
 
-  Logger.debug(`Job scheduled to be executed every 48 hours`)
-  // Executes the job every 2 days (48 hours)
-  schedule.scheduleJob('*/2 * *', deleteExpiredItems)
+  Logger.debug(`Job scheduled to be executed every 7 days at 02:00`)
+
+  schedule.scheduleJob('0 2 */7 * *', deleteExpiredItems)
 }

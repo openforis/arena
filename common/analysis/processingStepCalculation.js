@@ -40,15 +40,6 @@ export const aggregateFn = {
   med: 'med',
 }
 
-// ====== CREATE
-
-export const newProcessingStepCalculation = (processingStepUuid, index) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.processingStepUuid]: processingStepUuid,
-  [keys.index]: index,
-  [keys.temporary]: true,
-})
-
 // ====== READ
 
 export const isTemporary = R.propEq(keys.temporary, true)

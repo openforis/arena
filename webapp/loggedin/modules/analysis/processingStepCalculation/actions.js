@@ -26,7 +26,7 @@ import {
 import { setNodeDefUuidForEdit } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 
-export const processingStepCalculationTempUpdate = 'analysis/processingStep/calculation/temp/update'
+export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 
 const _validate = async calculation => {
   const validation = await ProcessingStepCalculationValidator.validate(calculation)
@@ -35,7 +35,7 @@ const _validate = async calculation => {
 
 const _onCalculationUpdated = calculation => async dispatch =>
   dispatch({
-    type: processingStepCalculationTempUpdate,
+    type: processingStepCalculationDirtyUpdate,
     calculation: await _validate(calculation),
   })
 
@@ -75,7 +75,7 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
     )
     dispatch(showNotification('common.saved', {}, null, 3000))
   } else {
-    await dispatch({ type: processingStepCalculationTempUpdate, calculation })
+    await dispatch({ type: processingStepCalculationDirtyUpdate, calculation })
     dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
   }
 
@@ -115,7 +115,7 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
 
   // Update calculation dirty
   dispatch({
-    type: processingStepCalculationTempUpdate,
+    type: processingStepCalculationDirtyUpdate,
     calculation: ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid)(calculation),
   })
 }

@@ -20,4 +20,6 @@ export default {
   [ActivityLog.type.processingStepCalculationCreate]: _isProcessingStepCalculationDeleted,
 
   [ActivityLog.type.processingStepCalculationIndexUpdate]: _isProcessingStepCalculationDeleted,
+
+  [ActivityLog.type.processingStepCalculationUpdate]: _isProcessingStepCalculationDeleted,
 }

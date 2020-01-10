@@ -1,8 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
@@ -43,12 +43,7 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
 
   const state = getState()
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
-
-  const calculation = ProcessingStepCalculation.newProcessingStepCalculation(
-    ProcessingStep.getUuid(processingStep),
-    calculationSteps.length,
-  )
+  const calculation = ProcessingChain.newProcessingStepCalculation(processingStep)
 
   dispatch({ type: processingStepCalculationCreate, calculation })
   dispatch(hideAppLoader())

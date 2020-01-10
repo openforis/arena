@@ -7,6 +7,9 @@ export const enTranslation = {
     apply: 'Apply',
     back: 'Back',
     cancel: 'Cancel',
+    cancelConfirm: `**There are unsaved changes**.
+
+Do you want to cancel them?`,
     cantUndoWarning: 'This operation cannot be undone',
     close: 'Close',
     code: 'Code',
@@ -278,6 +281,8 @@ export const enTranslation = {
         'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
       [ActivityLog.type.processingStepCalculationIndexUpdate]:
         'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
+      [ActivityLog.type.processingStepCalculationUpdate]:
+        'updated calculation {{label}} at index {{index}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
     },
   },
 
@@ -356,9 +361,6 @@ export const enTranslation = {
       min: 'Minimum',
       sum: 'Sum',
     },
-    confirmCancel: `**There are unsaved changes**.
-
-Do you want to cancel them?`,
   },
 
   itemsTable: {
@@ -443,9 +445,6 @@ Do you want to cancel them?`,
     nodeDefEditFormActions: {
       columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
-      confirmCancel: `**There are unsaved changes**.
-
-Do you want to leave the page?`,
     },
     nodeDefCode: {
       buttonCode: 'Button code',
