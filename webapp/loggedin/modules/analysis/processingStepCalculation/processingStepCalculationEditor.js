@@ -69,13 +69,6 @@ const ProcessingStepCalculationEditor = props => {
   return (
     <>
       <div className="processing-step__calculation-editor">
-        <button
-          className="btn btn-close"
-          onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
-        >
-          <span className="icon icon-cross icon-10px" />
-        </button>
-
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingStepCalculation.getLabels(calculation)}
@@ -126,6 +119,13 @@ const ProcessingStepCalculationEditor = props => {
         </FormItem>
 
         <div className="button-bar">
+          <button
+            className="btn btn-cancel"
+            onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
+          >
+            <span className="icon icon-cross icon-10px" />
+            {i18n.t(isDirty ? 'common.cancel' : 'common.close')}
+          </button>
           <button className="btn btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
             <span className="icon icon-floppy-disk icon-left icon-12px" />
             {i18n.t('common.save')}
