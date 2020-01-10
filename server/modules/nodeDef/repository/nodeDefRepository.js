@@ -123,32 +123,18 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
 
 // ============== UPDATE
 
-export const updateNodeDefProps = async (
-  surveyId,
-  nodeDefUuid,
-  props,
-  propsAdvanced = {},
-  analysis = false,
-  client = db,
-) =>
+export const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
-    SET props = props || $1::jsonb,
-        props_draft = props_draft || $2::jsonb,
-        props_advanced = props_advanced || $3::jsonb,
-        props_advanced_draft = props_advanced_draft || $4::jsonb,
+    SET props = CASE WHEN analysis THEN props || $1::jsonb ELSE props END,
+        props_draft = CASE WHEN analysis THEN props_draft ELSE props_draft || $1::jsonb END,
+        props_advanced_draft = CASE WHEN analysis THEN props_advanced_draft ELSE props_advanced_draft || $2::jsonb END,
         date_modified = ${DbUtils.now}
-    WHERE uuid = $5
+    WHERE uuid = $3
     RETURNING ${nodeDefSelectFields}
   `,
-    [
-      analysis ? props : {}, // If node def is analysis, update props
-      analysis ? propsAdvanced : {},
-      analysis ? {} : props, // If node def is not analysis, update props draft
-      analysis ? {} : propsAdvanced,
-      nodeDefUuid,
-    ],
+    [props, propsAdvanced, nodeDefUuid],
     def => dbTransformCallback(def, true, true), // Always loading draft when updating a nodeDef
   )
 
