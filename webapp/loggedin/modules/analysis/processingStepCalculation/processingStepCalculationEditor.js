@@ -121,22 +121,22 @@ const ProcessingStepCalculationEditor = props => {
 
           <div className="button-bar">
             <button
-              className="btn btn-cancel"
+              className="btn-s btn-cancel"
               onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
             >
-              <span className="icon icon-cross icon-12px" />
+              <span className="icon icon-cross icon-left icon-10px" />
               {i18n.t(isDirty ? 'common.cancel' : 'common.close')}
             </button>
-            <button className="btn btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
+            <button className="btn-s btn-primary" onClick={saveProcessingStepCalculationEdits} aria-disabled={!isDirty}>
               <span className="icon icon-floppy-disk icon-left icon-12px" />
               {i18n.t('common.save')}
             </button>
             <button
-              className="btn btn-danger btn-delete"
+              className="btn-s btn-danger btn-delete"
               aria-disabled={ProcessingStepCalculation.isTemporary(calculation)}
               onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
             >
-              <span className="icon icon-bin icon-12px" />
+              <span className="icon icon-bin icon-left icon-12px" />
               {i18n.t('common.delete')}
             </button>
           </div>

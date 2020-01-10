@@ -80,13 +80,17 @@ const ProcessingStepView = props => {
         />
 
         {!processingStepNext && !calculationEditorOpened && (
-          <button
-            className="btn-s btn-danger btn-delete"
-            onClick={() => window.confirm(i18n.t('processingStepView.deleteConfirm')) && deleteProcessingStep(history)}
-          >
-            <span className="icon icon-bin icon-12px icon-left" />
-            {i18n.t('common.delete')}
-          </button>
+          <div className="button-bar">
+            <button
+              className="btn-s btn-danger btn-delete"
+              onClick={() =>
+                window.confirm(i18n.t('processingStepView.deleteConfirm')) && deleteProcessingStep(history)
+              }
+            >
+              <span className="icon icon-bin icon-12px icon-left" />
+              {i18n.t('common.delete')}
+            </button>
+          </div>
         )}
       </div>
 

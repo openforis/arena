@@ -11,14 +11,6 @@
   border-left: 2px solid $greyBorder;
   height: 100%;
   align-content: start;
-
-  .button-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-  .btn-delete {
-    margin: 0;
-  }
 }
 
 .processing-step.calculation-editor-opened {

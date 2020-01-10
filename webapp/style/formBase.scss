@@ -132,7 +132,6 @@ button, .btn {
 .btn-primary {
   background-color: $blue;
   color: $white;
-  text-transform: uppercase;
 
   &:hover {
     background-color: lighten($blue, 15%);
@@ -148,8 +147,14 @@ button, .btn {
   align-self: center;
   align-items: center;
   justify-content: center;
+  position: relative;
 
   button {
     margin: 0 .5rem;
+  }
+
+  .btn-delete {
+    position: absolute;
+    right: 0;
   }
 }
