@@ -62,6 +62,7 @@ const NodeDefView = props => {
       <div className="node-def-edit">
         <div className="node-def-edit__container">
           <TabBar
+            showTabs={!NodeDef.isAnalysis(nodeDef)}
             tabs={[
               {
                 label: i18n.t('nodeDefEdit.basic'),
@@ -76,7 +77,7 @@ const NodeDefView = props => {
                   setNodeDefLayoutProp,
                 },
               },
-              ...(NodeDef.isRoot(nodeDef) || NodeDef.isAnalysis(nodeDef)
+              ...(NodeDef.isRoot(nodeDef)
                 ? []
                 : [
                     {

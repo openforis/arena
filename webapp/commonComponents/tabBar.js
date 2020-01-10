@@ -1,72 +1,58 @@
 import './tabBar.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 
 const TabBarButtons = ({ tabs, selection, onClick }) => (
   <div className="flex-center tab-bar__header">
-    {tabs.map((tab, i) => {
-      const active = i === selection
-
-      return tab.showTab === false ? null : (
-        <button
-          key={i}
-          className={`btn${active ? ' active' : ''}`}
-          onClick={() => onClick(i)}
-          aria-disabled={Boolean(tab.disabled)}
-        >
-          {tab.icon && <span className={`icon ${tab.icon} icon-12px icon-left`} />}
-          {tab.label}
-        </button>
-      )
-    })}
+    {tabs.map((tab, i) => (
+      <button
+        key={i}
+        className={`btn${i === selection ? ' active' : ''}`}
+        onClick={() => onClick(i)}
+        aria-disabled={Boolean(tab.disabled)}
+      >
+        {tab.icon && <span className={`icon ${tab.icon} icon-12px icon-left`} />}
+        {tab.label}
+      </button>
+    ))}
   </div>
 )
 
-class TabBar extends React.Component {
-  constructor(props) {
-    super(props)
+const TabBar = props => {
+  const { tabs, showTabs, selection, className, renderer, onClick } = props
+  const [selectionState, setSelectionState] = useState(selection)
 
-    this.state = { selection: props.selection || TabBar.defaultProps.selection }
-  }
+  const tab = tabs[selectionState]
 
-  componentDidUpdate(prevProps) {
-    const { selection } = this.props
-    const { selection: selectionPrev } = prevProps
-    if (selection !== selectionPrev) {
-      this.setState({ selection })
-    }
-  }
-
-  render() {
-    const { tabs, className, renderer, onClick } = this.props
-
-    const { selection } = this.state
-
-    const tab = tabs[selection]
-
-    return (
-      <div className={`tab-bar ${className}`}>
+  return (
+    <div className={`tab-bar ${className}`}>
+      {showTabs ? (
         <TabBarButtons
           tabs={tabs}
-          selection={selection}
+          selection={selectionState}
           onClick={tabIndex => {
-            this.setState({ selection: tabIndex })
-            if (onClick) onClick(tabs[tabIndex])
+            setSelectionState(tabIndex)
+            if (onClick) {
+              onClick(tabs[tabIndex])
+            }
           }}
         />
+      ) : (
+        <div />
+      )}
 
-        {renderer
-          ? React.createElement(renderer, { ...this.props })
-          : React.createElement(tab.component, { ...tab.props, ...this.props })}
-      </div>
-    )
-  }
+      {renderer
+        ? React.createElement(renderer, { ...props })
+        : React.createElement(tab.component, { ...tab.props, ...props })}
+    </div>
+  )
 }
 
 TabBar.defaultProps = {
   className: '',
   selection: 0,
   tabs: [],
+  showTabs: true,
   renderer: null,
   onClick: null,
 }
