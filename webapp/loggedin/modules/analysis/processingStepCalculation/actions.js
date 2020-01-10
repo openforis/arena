@@ -40,7 +40,14 @@ const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
 export const setProcessingStepCalculationProp = (prop, value) => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
 
-  const calculationUpdated = ProcessingStepCalculation.assocProp(prop, value)(calculation)
+  const calculationUpdated = R.pipe(
+    ProcessingStepCalculation.assocProp(prop, value),
+    // When changing type, reset nodeDef
+    R.when(
+      R.always(R.equals(prop, ProcessingStepCalculation.keysProps.type)),
+      ProcessingStepCalculation.assocNodeDefUuid(null),
+    ),
+  )(calculation)
 
   dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
