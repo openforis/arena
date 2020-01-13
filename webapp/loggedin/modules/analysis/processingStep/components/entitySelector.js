@@ -34,14 +34,14 @@ const getEntities = (survey, entityStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const { processingStep, entities, showLabel, readOnly, onChange } = props
+  const { processingStep, entities, showLabel, readOnly, onChange, children } = props
 
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
   const i18n = useI18n()
 
   return (
-    <div className="form-item">
+    <div className="form-item processing-step__entity-selector-form-item">
       {showLabel && <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>}
 
       <Dropdown
@@ -52,6 +52,8 @@ const EntitySelector = props => {
         readOnly={readOnly}
         onChange={item => onChange(R.prop('key', item))}
       />
+
+      {children}
     </div>
   )
 }

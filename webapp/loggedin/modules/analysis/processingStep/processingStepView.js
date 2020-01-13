@@ -72,7 +72,12 @@ const ProcessingStepView = props => {
             putProcessingStepProps(props)
           }}
           readOnly={!R.isEmpty(ProcessingStep.getCalculationSteps(processingStep) || calculationEditorOpened)}
-        />
+        >
+          <button className="btn btn-s btn-add">
+            <span className="icon icon-plus icon-12px icon-left" />
+            {i18n.t('common.add')}
+          </button>
+        </EntitySelector>
 
         <ProcessingStepCalculationsList
           processingStep={processingStep}
