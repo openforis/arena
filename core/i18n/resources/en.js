@@ -397,6 +397,7 @@ Do you want to cancel them?`,
       parentPage: 'Parent page',
       ownPage: 'Its own page',
       analysis: 'Analysis',
+      entitySource: 'Entity Source',
     },
     advancedProps: {
       readOnly: 'Read only',

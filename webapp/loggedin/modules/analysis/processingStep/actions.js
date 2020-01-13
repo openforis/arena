@@ -130,7 +130,8 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
   const survey = SurveyState.getSurvey(state)
   const processingChain = ProcessingChainState.getProcessingChain(state)
   const nodeDefParent = Survey.getNodeDefRoot(survey)
-  // Const processingStepPrevEntityDef = R.pipe(ProcessingStepState.getProcessingStepPrev, ProcessingStep.getEntityUuid, entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey))(state)
+  // Entity source = prev processing step entity
+  const entitySourceUuid = R.pipe(ProcessingStepState.getProcessingStepPrev, ProcessingStep.getEntityUuid)(state)
 
   const nodeDef = {
     ...NodeDef.newNodeDef(
@@ -139,6 +140,7 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
       ProcessingChain.getCycle(processingChain),
       {
         [NodeDef.propKeys.multiple]: true,
+        [NodeDef.propKeys.entitySourceUuid]: entitySourceUuid,
       },
       {},
       true,

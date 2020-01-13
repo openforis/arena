@@ -37,6 +37,7 @@ const BasicProps = props => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
+    entitySource,
 
     setNodeDefProp,
     setNodeDefLayoutProp,
@@ -57,6 +58,12 @@ const BasicProps = props => {
       {NodeDef.isAnalysis(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
           <Checkbox checked={true} disabled={true} />
+        </FormItem>
+      )}
+
+      {NodeDef.isAnalysis(nodeDef) && NodeDef.isEntity(nodeDef) && (
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
+          {NodeDef.getLabel(entitySource, i18n.lang)}
         </FormItem>
       )}
 
@@ -184,9 +191,13 @@ const mapStateToProps = state => {
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
   const displayInOwnPageDisabled = false
 
+  // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
   const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
+
+  // Analysis
+  const entitySource = Survey.getNodeDefByUuid(NodeDef.getEntitySourceUuid(nodeDef))(survey)
 
   return {
     surveyCycleKey,
@@ -200,6 +211,8 @@ const mapStateToProps = state => {
     displayInOwnPageDisabled,
 
     cyclesKeysParent,
+
+    entitySource,
   }
 }
 
