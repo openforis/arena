@@ -1,6 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
@@ -14,6 +16,8 @@ import { fetchProcessingChain } from '../processingChain/actions'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
+import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
+import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepReset = 'analysis/processingStep/reset'
@@ -117,4 +121,32 @@ export const deleteProcessingStep = history => async (dispatch, getState) => {
   dispatch(navigateToProcessingChainView(history, ProcessingStep.getProcessingChainUuid(processingStep)))
   dispatch(showNotification('processingStepView.deleteComplete'))
   dispatch(hideAppSaving())
+}
+
+// ====== VIRTUAL ENTITY
+
+export const addEntityVirtual = history => async (dispatch, getState) => {
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+  const nodeDefParent = Survey.getNodeDefRoot(survey)
+  // Const processingStepPrevEntityDef = R.pipe(ProcessingStepState.getProcessingStepPrev, ProcessingStep.getEntityUuid, entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey))(state)
+
+  const nodeDef = {
+    ...NodeDef.newNodeDef(
+      nodeDefParent,
+      NodeDef.nodeDefType.entity,
+      ProcessingChain.getCycle(processingChain),
+      {
+        [NodeDef.propKeys.multiple]: true,
+      },
+      {},
+      true,
+    ),
+    [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
+  }
+
+  await dispatch({ type: nodeDefCreate, nodeDef })
+
+  history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 }

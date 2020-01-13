@@ -347,6 +347,7 @@ Do you want to cancel them?`,
     deleteComplete: 'Processing step deleted',
     category: 'Category',
     calculationSteps: 'Calculation Steps',
+    virtualEntity: 'Virtual Entity',
   },
 
   processingStepCalculationView: {

@@ -191,8 +191,8 @@ const mapStateToProps = state => {
   return {
     surveyCycleKey,
 
-    displayAsEnabled: isEntityAndNotRoot,
-    displayInEnabled: isEntityAndNotRoot,
+    displayAsEnabled: isEntityAndNotRoot && !NodeDef.isAnalysis(nodeDef),
+    displayInEnabled: isEntityAndNotRoot && !NodeDef.isAnalysis(nodeDef),
 
     displayAsFormDisabled,
     displayAsTableDisabled,
