@@ -19,7 +19,6 @@ import * as ProcessingStepCalculationState from './processingStepCalculationStat
 
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { setNodeDefUuidForEdit } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
