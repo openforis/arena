@@ -28,8 +28,11 @@ export const assocCalculationForEdit = calculation =>
   R.pipe(assocCalculationDirty(calculation), assocCalculationOrig(calculation))
 
 export const assocCalculationDirtyNodeDefUuid = nodeDefUuid => state =>
-  R.pipe(R.prop(keys.calculationDirty), ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid), calculation =>
-    R.assoc(keys.calculationDirty, calculation)(state),
+  R.pipe(
+    R.prop(keys.calculationDirty),
+    ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid),
+    ProcessingStepCalculation.dissocValidation,
+    calculation => R.assoc(keys.calculationDirty, calculation)(state),
   )(state)
 
 // ===== UTILS

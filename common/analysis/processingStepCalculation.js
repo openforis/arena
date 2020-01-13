@@ -45,12 +45,14 @@ export const aggregateFn = {
 export const isTemporary = R.propEq(keys.temporary, true)
 export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
 
-export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn, aggregateFn.sum)
+export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn)
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
 export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
 export const getLabels = ObjectUtils.getLabels
 export const getLabel = ObjectUtils.getLabel
 export const getType = ObjectUtils.getProp(keysProps.type, type.quantitative)
+
+export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
 
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
@@ -65,7 +67,9 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 
 // ====== VALIDATION
 export const getValidation = Validation.getValidation
+export const hasValidation = Validation.hasValidation
 export const assocValidation = Validation.assocValidation
+export const dissocValidation = Validation.dissocValidation
 
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, type => R.prop(type, nodeDefTypeByType))

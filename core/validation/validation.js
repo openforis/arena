@@ -173,5 +173,7 @@ export const mergeValidation = validationNew => validationOld =>
 // Object
 
 export const getValidation = R.propOr(newInstance(), keys.validation)
+export const hasValidation = R.has(keys.validation)
 export const isObjValid = R.pipe(getValidation, isValid)
 export const assocValidation = R.assoc(keys.validation)
+export const dissocValidation = R.dissoc(keys.validation)

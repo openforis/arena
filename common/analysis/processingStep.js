@@ -37,14 +37,35 @@ export const assocCalculation = calculation => processingStep =>
     R.ifElse(
       R.pipe(R.length, R.gte(ObjectUtils.getIndex(calculation))),
       R.append(calculation), // Add new calculation
-      R.update(ObjectUtils.getIndex(calculation), calculation), // Replace calculation
+      R.update(ProcessingStepCalculation.getIndex(calculation), calculation), // Replace calculation
     ),
+    // Update calculation steps in processing step
     calculationSteps => assocCalculations(calculationSteps)(processingStep),
   )(processingStep)
 
 export const mergeProps = ObjectUtils.mergeProps
 
 export const dissocTemporaryCalculation = processingStep =>
-  R.pipe(getCalculationSteps, R.reject(ProcessingStepCalculation.isTemporary), calculationSteps =>
-    assocCalculations(calculationSteps)(processingStep),
+  R.pipe(
+    getCalculationSteps,
+    // Remove temporary calculation
+    R.reject(ProcessingStepCalculation.isTemporary),
+    // Update calculation steps in processing step
+    calculationSteps => assocCalculations(calculationSteps)(processingStep),
+  )(processingStep)
+
+export const dissocCalculation = calculation => processingStep =>
+  R.pipe(
+    getCalculationSteps,
+    // Remove calculation
+    R.reject(ProcessingStepCalculation.isEqual(calculation)),
+    // Update indexes of next calculations
+    R.map(
+      R.when(
+        calc => ProcessingStepCalculation.getIndex(calc) > ProcessingStepCalculation.getIndex(calculation),
+        calc => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc),
+      ),
+    ),
+    // Update calculation steps in processing step
+    calculationSteps => assocCalculations(calculationSteps)(processingStep),
   )(processingStep)

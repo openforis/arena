@@ -138,7 +138,7 @@ export const updateStepCalculationIndex = async (user, surveyId, processingStepU
 export const updateCalculationStep = async (user, surveyId, calculation, client = db) =>
   await client.tx(async t => {
     const calculationUpdated = await ProcessingStepCalculationRepository.updateCalculationStep(surveyId, calculation, t)
-    const processingStepUuid = ProcessingStepCalculation.getProcessingStepUuid(calculation)
+    const processingStepUuid = ProcessingStepCalculation.getProcessingStepUuid(calculationUpdated)
     const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
     const logContent = {
       ...calculationUpdated,
@@ -192,4 +192,35 @@ export const deleteStep = async (user, surveyId, processingStepUuid, client = db
         ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
       ]),
   )
+}
+
+// ====== DELETE - Calculation
+
+export const deleteCalculation = async (user, surveyId, processingStepUuid, calculationUuid, client = db) => {
+  const processingStep = await ProcessingStepRepository.fetchStepByUuid(surveyId, processingStepUuid)
+
+  await client.tx(async t => {
+    const calculation = await ProcessingStepCalculationRepository.deleteCalculationStep(
+      surveyId,
+      processingStepUuid,
+      calculationUuid,
+      t,
+    )
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: processingStepUuid,
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
+      [ActivityLog.keysContent.processingStepUuid]: ProcessingStep.getUuid(processingStep),
+      [ActivityLog.keysContent.processingStepIndex]: ProcessingStep.getIndex(processingStep),
+      [ActivityLog.keysContent.index]: ProcessingStepCalculation.getIndex(calculation),
+      [ActivityLog.keysContent.labels]: ProcessingStepCalculation.getLabels(calculation),
+    }
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.processingStepCalculationDelete,
+      logContent,
+      false,
+      t,
+    )
+  })
 }

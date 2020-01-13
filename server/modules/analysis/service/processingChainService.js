@@ -30,6 +30,8 @@ export {
   deleteChain,
   // ======  DELETE - Step
   deleteStep,
+  // ======  DELETE - Calculation
+  deleteCalculation,
 } from '../manager/processingChainManager'
 
 // ====== EXECUTION

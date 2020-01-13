@@ -75,3 +75,8 @@ export const dissocTemporaryCalculation = state =>
   R.pipe(R.prop(keys.step), ProcessingStep.dissocTemporaryCalculation, processingStep =>
     R.assoc(keys.step, processingStep)(state),
   )(state)
+
+export const dissocCalculation = calculation => state =>
+  R.pipe(R.prop(keys.step), ProcessingStep.dissocCalculation(calculation), processingStep =>
+    R.assoc(keys.step, processingStep)(state),
+  )(state)

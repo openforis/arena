@@ -19,6 +19,7 @@ import {
 
 import {
   processingStepCalculationSave,
+  processingStepCalculationDelete,
   processingStepCalculationReset,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
@@ -46,6 +47,9 @@ const actionHandlers = {
     ProcessingStepState.updateCalculationIndex(indexFrom, indexTo)(state),
 
   [processingStepCalculationSave]: (state, { calculation }) => ProcessingStepState.assocCalculation(calculation)(state),
+
+  [processingStepCalculationDelete]: (state, { calculation }) =>
+    ProcessingStepState.dissocCalculation(calculation)(state),
 
   [processingStepCalculationReset]: (state, { temporary }) =>
     R.pipe(

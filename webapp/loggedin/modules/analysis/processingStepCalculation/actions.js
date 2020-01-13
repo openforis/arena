@@ -19,11 +19,11 @@ import * as ProcessingStepCalculationState from './processingStepCalculationStat
 
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { setNodeDefUuidForEdit } from '@webapp/loggedin/surveyViews/nodeDef/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 export const processingStepCalculationSave = 'analysis/processingStep/calculation/save'
+export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'
 export const processingStepCalculationReset = 'analysis/processingStep/calculation/reset'
 
 const _validate = async calculation => {
@@ -40,7 +40,21 @@ const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
 export const setProcessingStepCalculationProp = (prop, value) => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
 
-  const calculationUpdated = ProcessingStepCalculation.assocProp(prop, value)(calculation)
+  const calculationUpdated = R.pipe(
+    ProcessingStepCalculation.assocProp(prop, value),
+    // When changing type, reset nodeDef
+    R.when(
+      R.always(R.equals(prop, ProcessingStepCalculation.keysProps.type)),
+      R.pipe(
+        ProcessingStepCalculation.assocNodeDefUuid(null),
+        // When type is categorical, reset aggregate function
+        R.when(
+          R.always(R.equals(value, ProcessingStepCalculation.type.categorical)),
+          ProcessingStepCalculation.assocProp(ProcessingStepCalculation.keysProps.aggregateFn, null),
+        ),
+      ),
+    ),
+  )(calculation)
 
   dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
@@ -81,6 +95,11 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
   dispatch(hideAppLoader())
 }
 
+export const validateProcessingStepCalculation = () => async (dispatch, getState) => {
+  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
+  dispatch(_updateProcessingStepCalculationDirty(calculation))
+}
+
 export const resetProcessingStepCalculationState = () => async (dispatch, getState) => {
   // Remove calculation from list (if temporary) and close editor
   dispatch({
@@ -108,12 +127,30 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
     [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
   }
 
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-
   await dispatch({ type: nodeDefCreate, nodeDef })
-  await dispatch(setNodeDefUuidForEdit(nodeDefUuid))
 
-  history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
+  history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 }
 
-export const deleteProcessingStepCalculation = () => async (dispatch, getState) => {}
+export const deleteProcessingStepCalculation = () => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const processingStep = ProcessingStepState.getProcessingStep(state)
+  const calculation = ProcessingStepCalculationState.getCalculationDirty(state)
+
+  await axios.delete(
+    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
+      processingStep,
+    )}/calculation/${ProcessingStepCalculation.getUuid(calculation)}`,
+  )
+
+  dispatch({
+    type: processingStepCalculationDelete,
+    calculation,
+  })
+
+  dispatch(showNotification('common.deleted', {}, null, 3000))
+
+  dispatch(hideAppLoader())
+}
