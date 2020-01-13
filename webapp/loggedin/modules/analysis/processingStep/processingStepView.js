@@ -45,7 +45,7 @@ const ProcessingStepView = props => {
   }
 
   useEffect(() => {
-    if (processingStepUuid) {
+    if (processingStepUuid && R.isEmpty(processingStep)) {
       fetchProcessingStep(processingStepUuid)
       return onUnmount
     }

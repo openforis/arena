@@ -96,6 +96,11 @@ export const saveProcessingStepCalculationEdits = () => async (dispatch, getStat
   dispatch(hideAppLoader())
 }
 
+export const validateProcessingStepCalculation = () => async (dispatch, getState) => {
+  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
+  dispatch(_updateProcessingStepCalculationDirty(calculation))
+}
+
 export const resetProcessingStepCalculationState = () => async (dispatch, getState) => {
   // Remove calculation from list (if temporary) and close editor
   dispatch({
