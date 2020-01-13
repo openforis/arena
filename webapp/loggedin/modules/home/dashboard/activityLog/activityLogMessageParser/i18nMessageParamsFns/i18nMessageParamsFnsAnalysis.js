@@ -80,4 +80,11 @@ export default {
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
     stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
   }),
+
+  [ActivityLog.type.processingStepCalculationDelete]: (survey, i18n) => activityLog => ({
+    index: ActivityLog.getContentIndex(activityLog),
+    label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.lang))(activityLog),
+    processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
+    stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
+  }),
 }

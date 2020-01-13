@@ -214,7 +214,7 @@ export const init = app => {
     },
   )
 
-  // ====== UPDATE - Processing Step Calculation
+  // ====== UPDATE - Processing Step Calculation (index)
 
   app.put(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation-index',
@@ -232,6 +232,8 @@ export const init = app => {
       }
     },
   )
+
+  // ====== UPDATE - Processing Step Calculation
 
   app.put(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation',
@@ -272,7 +274,7 @@ export const init = app => {
     },
   )
 
-  // ====== DELETE - Step
+  // ====== DELETE - Processing Step
 
   app.delete(
     '/survey/:surveyId/processing-step/:processingStepUuid',
@@ -283,6 +285,25 @@ export const init = app => {
         const user = Request.getUser(req)
 
         await ProcessingChainService.deleteStep(user, surveyId, processingStepUuid)
+
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
+  // ====== DELETE - Processing Step Calculation
+
+  app.delete(
+    '/survey/:surveyId/processing-step/:processingStepUuid/calculation/:calculationUuid',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, processingStepUuid, calculationUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        await ProcessingChainService.deleteCalculation(user, surveyId, processingStepUuid, calculationUuid)
 
         Response.sendOk(res)
       } catch (error) {

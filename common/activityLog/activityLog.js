@@ -61,6 +61,7 @@ export const type = {
   processingStepCalculationCreate: 'processingStepCalculationCreate',
   processingStepCalculationIndexUpdate: 'processingStepCalculationIndexUpdate',
   processingStepCalculationUpdate: 'processingStepCalculationUpdate',
+  processingStepCalculationDelete: 'processingStepCalculationDelete',
 }
 
 export const keys = {

@@ -15,6 +15,7 @@ import {
   processingStepCalculationDirtyUpdate,
   processingStepCalculationSave,
   processingStepCalculationReset,
+  processingStepCalculationDelete,
 } from './actions'
 import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 
@@ -30,6 +31,8 @@ const actionHandlers = {
 
   [processingStepCalculationSave]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
+
+  [processingStepCalculationDelete]: () => ({}),
 
   [processingStepCalculationReset]: () => ({}),
 

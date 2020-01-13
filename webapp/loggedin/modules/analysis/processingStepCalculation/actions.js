@@ -24,6 +24,7 @@ import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 export const processingStepCalculationSave = 'analysis/processingStep/calculation/save'
+export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'
 export const processingStepCalculationReset = 'analysis/processingStep/calculation/reset'
 
 const _validate = async calculation => {
@@ -122,12 +123,30 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
     [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
   }
 
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-
   await dispatch({ type: nodeDefCreate, nodeDef })
-  await dispatch(setNodeDefUuidForEdit(nodeDefUuid))
 
-  history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
+  history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 }
 
-export const deleteProcessingStepCalculation = () => async (dispatch, getState) => {}
+export const deleteProcessingStepCalculation = () => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const processingStep = ProcessingStepState.getProcessingStep(state)
+  const calculation = ProcessingStepCalculationState.getCalculationDirty(state)
+
+  await axios.delete(
+    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
+      processingStep,
+    )}/calculation/${ProcessingStepCalculation.getUuid(calculation)}`,
+  )
+
+  dispatch({
+    type: processingStepCalculationDelete,
+    calculation,
+  })
+
+  dispatch(showNotification('common.deleted', {}, null, 3000))
+
+  dispatch(hideAppLoader())
+}

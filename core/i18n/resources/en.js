@@ -21,6 +21,7 @@ Do you want to cancel them?`,
     dateCreated: 'Date created',
     dateLastModified: 'Date last modified',
     delete: 'Delete',
+    deleted: 'Deleted!',
     description: 'Description',
     description_plural: 'Descriptions',
     done: 'Done',
@@ -283,6 +284,8 @@ Do you want to cancel them?`,
         'updated calculation index from {{indexFrom}} to {{indexTo}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
       [ActivityLog.type.processingStepCalculationUpdate]:
         'updated calculation {{label}} at index {{index}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
+      [ActivityLog.type.processingStepCalculationDelete]:
+        'deleted calculation {{label}} at index {{index}} of processing chain {{processingChainLabel}} step {{stepIndex}}',
     },
   },
 

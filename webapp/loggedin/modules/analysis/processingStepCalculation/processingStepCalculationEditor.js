@@ -41,8 +41,9 @@ const ProcessingStepCalculationEditor = props => {
     setProcessingStepCalculationProp,
     setProcessingStepCalculationAttribute,
     saveProcessingStepCalculationEdits,
-    resetProcessingStepCalculationState,
+    deleteProcessingStepCalculation,
     createNodeDefAnalysis,
+    resetProcessingStepCalculationState,
   } = props
   const validation = ProcessingStepCalculation.getValidation(calculation)
 
@@ -137,7 +138,7 @@ const ProcessingStepCalculationEditor = props => {
             <button
               className="btn-s btn-danger btn-delete"
               aria-disabled={ProcessingStepCalculation.isTemporary(calculation)}
-              onClick={() => (isDirty ? setShowCancelConfirm(true) : resetProcessingStepCalculationState())}
+              onClick={() => setShowDeleteConfirm(true)}
             >
               <span className="icon icon-bin icon-left icon-12px" />
               {i18n.t('common.delete')}
