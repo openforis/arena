@@ -16,25 +16,6 @@ const _checkIsValidProcessingStepCalculation = async calculation => {
 }
 
 export const init = app => {
-  // ====== CREATE - Chain
-
-  app.post(
-    '/survey/:surveyId/processing-chain',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, surveyCycleKey } = Request.getParams(req)
-        const user = Request.getUser(req)
-
-        const processingChainUuid = await ProcessingChainService.createChain(user, surveyId, surveyCycleKey)
-
-        res.json(processingChainUuid)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
-
   // ====== CREATE - Processing Step
 
   app.post(
@@ -179,14 +160,15 @@ export const init = app => {
   // ====== UPDATE - Chain
 
   app.put(
-    '/survey/:surveyId/processing-chain/:processingChainUuid',
+    '/survey/:surveyId/processing-chain/',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid, key, value } = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
+
         const user = Request.getUser(req)
 
-        await ProcessingChainService.updateChainProp(user, surveyId, processingChainUuid, key, value)
+        await ProcessingChainService.updateChain(user, surveyId, Request.getBody(req))
 
         Response.sendOk(res)
       } catch (error) {

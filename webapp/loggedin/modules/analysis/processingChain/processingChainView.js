@@ -2,23 +2,23 @@ import './processingChainView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { useParams } from 'react-router'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import ProcessingChainButtonBar from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainButtonBar'
-
-import { getUrlParam } from '@webapp/utils/routerUtils'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import ProcessingChainSteps from './components/processingChainSteps'
 import * as ProcessingChainState from './processingChainState'
 
 import { navigateToProcessingChainsView, updateProcessingChainProp, resetProcessingChainState } from './actions'
+import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChains/actions'
 
 const ProcessingChainView = props => {
   const {
@@ -26,14 +26,18 @@ const ProcessingChainView = props => {
     surveyCycleKey,
     processingChain,
     history,
+    fetchProcessingChain,
     navigateToProcessingChainsView,
     updateProcessingChainProp,
     resetProcessingChainState,
   } = props
 
-  const i18n = useI18n()
-
+  const { processingChainUuid } = useParams()
   useEffect(() => {
+    if (R.isEmpty(processingChain)) {
+      fetchProcessingChain(history, processingChainUuid, false)
+    }
+
     return () => {
       resetProcessingChainState()
     }
@@ -76,6 +80,7 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
+  fetchProcessingChain,
   navigateToProcessingChainsView,
   updateProcessingChainProp,
   resetProcessingChainState,

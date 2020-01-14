@@ -14,17 +14,17 @@ import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processi
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import {
+  saveProcessingChain,
   deleteProcessingChain,
   navigateToProcessingChainsView,
 } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import { deleteProcessingStep } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import {
   deleteProcessingStepCalculation,
-  resetProcessingStepCalculationState,
-  saveProcessingStepCalculationEdits,
+  // SaveProcessingStepCalculationEdits,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
-const ProcessingChainButtonBar = props => {
+const ProcessingChainButtonBar = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const history = useHistory()
@@ -61,8 +61,11 @@ const ProcessingChainButtonBar = props => {
 
         <button
           className="btn-s btn-primary"
-          // OnClick={() => dispatch(saveProcessingStepCalculationEdits())}
-          // aria-disabled={!isDirty}
+          onClick={() => {
+            if (editingChain) {
+              dispatch(saveProcessingChain())
+            }
+          }}
           aria-disabled={
             (editingCalculation && !calculationDirty) || (editingStep && !stepDirty) || (editingChain && !chainDirty)
           }

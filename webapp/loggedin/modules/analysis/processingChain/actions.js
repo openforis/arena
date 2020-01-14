@@ -54,7 +54,6 @@ export const createProcessingStep = history => async (dispatch, getState) => {
 
 // ====== READ
 
-// TODO - REMOVE - used in stepView
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
@@ -82,11 +81,12 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
 
   const state = getState()
 
-  const processingChain = ProcessingChainState.getProcessingChain(state)
   const surveyId = SurveyState.getSurveyId(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
 
-  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { processingChain })
+  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain })
 
+  dispatch(showNotification('common.saved'))
   dispatch({ type: processingChainSave })
   dispatch(hideAppSaving())
 }

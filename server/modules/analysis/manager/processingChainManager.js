@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import { db } from '@server/db/db'
 import SystemError from '@core/systemError'
 
@@ -12,21 +14,45 @@ import * as ProcessingChainRepository from '../repository/processingChainReposit
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
-// ====== CREATE - Chain
+// ====== Chain
 
-export const createChain = async (user, surveyId, cycle, client = db) =>
+const _createChain = async (user, surveyId, processingChain, client) =>
   await client.tx(async t => {
-    const processingChain = await ProcessingChainRepository.insertChain(surveyId, cycle, t)
+    const processingChainDb = await ProcessingChainRepository.insertChain(surveyId, processingChain, t)
     await ActivityLogRepository.insert(
       user,
       surveyId,
       ActivityLog.type.processingChainCreate,
-      processingChain,
+      processingChainDb,
       false,
       t,
     )
     return ProcessingChain.getUuid(processingChain)
   })
+
+const _updateChainProps = async (user, surveyId, chain, chainDb, client) => {
+  const propsPost = ProcessingChain.getProps(chain)
+  const propsDb = ProcessingChain.getProps(chainDb)
+  const propsToUpdate = R.fromPairs(R.difference(R.toPairs(propsPost), R.toPairs(propsDb)))
+
+  for (const key in propsToUpdate) {
+    if ({}.hasOwnProperty.call(propsToUpdate, key)) {
+      const processingChainUuid = ProcessingChain.getUuid(chain)
+      const value = propsToUpdate[key]
+      await Promise.all([
+        ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, client),
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.processingChainPropUpdate,
+          { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
+          false,
+          client,
+        ),
+      ])
+    }
+  }
+}
 
 // ====== CREATE - Processing Step
 
@@ -79,21 +105,18 @@ export { fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex } from 
 
 // ====== UPDATE - Chain
 
-export const updateChainProp = async (user, surveyId, processingChainUuid, key, value, client = db) =>
-  await client.tx(
-    async t =>
-      await Promise.all([
-        ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-        ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.processingChainPropUpdate,
-          { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
-          false,
-          t,
-        ),
-      ]),
-  )
+export const updateChain = async (user, surveyId, { chain }, client = db) => {
+  await client.tx(async t => {
+    const chainDb = await ProcessingChainRepository.fetchChainByUuid(surveyId, ProcessingChain.getUuid(chain), t)
+    if (chainDb) {
+      // UPDATE CHAIN
+      await _updateChainProps(user, surveyId, chain, chainDb, t)
+    } else {
+      // CREATE CHAIN
+      await _createChain(user, surveyId, chain, t)
+    }
+  })
+}
 
 // ====== UPDATE - Processing Step
 

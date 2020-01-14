@@ -38,6 +38,11 @@ export const assocProcessingSteps = steps =>
     _assocProcessingChainPropOrig(ProcessingChain.assocProcessingSteps(steps)),
   )
 
+export const mergeDirty = state => {
+  const chainDirty = R.prop(keys.dirty, state)
+  return R.assoc(keys.orig, chainDirty, state)
+}
+
 // ====== UTILS
 
 export const isDirty = state => {

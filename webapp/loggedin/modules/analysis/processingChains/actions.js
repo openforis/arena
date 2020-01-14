@@ -25,7 +25,10 @@ export const createProcessingChain = history => async (dispatch, getState) => {
 
 // ====== READ
 
-export const fetchProcessingChain = (history, processingChainUuid) => async (dispatch, getState) => {
+export const fetchProcessingChain = (history, processingChainUuid, navigateToChainView = true) => async (
+  dispatch,
+  getState,
+) => {
   dispatch(showAppLoader())
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
@@ -33,5 +36,5 @@ export const fetchProcessingChain = (history, processingChainUuid) => async (dis
   await dispatch({ type: processingChainUpdate, processingChain })
   dispatch(hideAppLoader())
 
-  dispatch(navigateToProcessingChainView(history, processingChainUuid))
+  if (navigateToChainView) dispatch(navigateToProcessingChainView(history, processingChainUuid))
 }

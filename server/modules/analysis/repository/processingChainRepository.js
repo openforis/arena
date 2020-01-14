@@ -3,6 +3,8 @@ import camelize from 'camelize'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
+
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
@@ -11,14 +13,14 @@ const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('dat
 
 // ====== CREATE
 
-export const insertChain = async (surveyId, cycle, client = db) =>
+export const insertChain = async (surveyId, processingChain, client = db) =>
   await client.one(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (cycle)
-    VALUES ($1)
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, cycle)
+    VALUES ($1, $2)
     RETURNING ${selectFields}
     `,
-    [cycle],
+    [ProcessingChain.getUuid(processingChain), ProcessingChain.getCycle(processingChain)],
     dbTransformCallback,
   )
 
@@ -49,7 +51,7 @@ export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit =
   )
 
 export const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
-  await client.one(
+  await client.oneOrNone(
     `
     SELECT ${selectFields}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
