@@ -35,22 +35,19 @@ const _updateChainProps = async (user, surveyId, chain, chainDb, client) => {
   const propsDb = ProcessingChain.getProps(chainDb)
   const propsToUpdate = R.fromPairs(R.difference(R.toPairs(propsPost), R.toPairs(propsDb)))
 
-  for (const key in propsToUpdate) {
-    if ({}.hasOwnProperty.call(propsToUpdate, key)) {
-      const processingChainUuid = ProcessingChain.getUuid(chain)
-      const value = propsToUpdate[key]
-      await Promise.all([
-        ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, client),
-        ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.processingChainPropUpdate,
-          { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
-          false,
-          client,
-        ),
-      ])
-    }
+  for (const [key, value] of Object.entries(propsToUpdate)) {
+    const processingChainUuid = ProcessingChain.getUuid(chain)
+    await Promise.all([
+      ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, client),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.processingChainPropUpdate,
+        { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
+        false,
+        client,
+      ),
+    ])
   }
 }
 
