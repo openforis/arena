@@ -13,14 +13,14 @@ const selectFields = `uuid, cycle, props, status_exec, ${DbUtils.selectDate('dat
 
 // ====== CREATE
 
-export const insertChain = async (surveyId, processingChain, client = db) =>
+export const insertChain = async (surveyId, chain, client = db) =>
   await client.one(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, cycle)
-    VALUES ($1, $2)
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, cycle, props)
+    VALUES ($1, $2, $3)
     RETURNING ${selectFields}
     `,
-    [ProcessingChain.getUuid(processingChain), ProcessingChain.getCycle(processingChain)],
+    [ProcessingChain.getUuid(chain), ProcessingChain.getCycle(chain), ProcessingChain.getProps(chain)],
     dbTransformCallback,
   )
 
