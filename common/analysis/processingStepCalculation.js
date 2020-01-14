@@ -1,4 +1,3 @@
-import { uuidv4 } from '@core/uuid'
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -11,7 +10,7 @@ export const keys = {
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
   processingStepUuid: 'processingStepUuid',
   props: ObjectUtils.keys.props,
-  temporary: 'temporary', // True when the calculation has been created but not persisted yet
+  temporary: ObjectUtils.keys.temporary,
 }
 
 export const keysProps = {
@@ -42,7 +41,6 @@ export const aggregateFn = {
 
 // ====== READ
 
-export const isTemporary = R.propEq(keys.temporary, true)
 export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
 
 export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn)
@@ -59,11 +57,13 @@ export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
 export const isEqual = ObjectUtils.isEqual
 
+export const isTemporary = ObjectUtils.isTemporary
+
 // ====== UPDATE
 export const assocIndex = ObjectUtils.assocIndex
 export const assocProp = ObjectUtils.setProp
 export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
-export const dissocTemporary = R.dissoc(keys.temporary)
+export const dissocTemporary = ObjectUtils.dissocTemporary
 
 // ====== VALIDATION
 export const getValidation = Validation.getValidation

@@ -16,6 +16,7 @@ const keys = {
   props: ObjectUtils.keys.props,
   statusExec: 'statusExec',
   uuid: ObjectUtils.keys.uuid,
+  temporary: ObjectUtils.keys.temporary,
 }
 
 export const keysProps = {
@@ -35,6 +36,7 @@ export const newProcessingChain = (cycle, props = {}) => ({
   [keys.uuid]: uuidv4(),
   [keys.cycle]: cycle,
   [keys.props]: props,
+  [ProcessingStepCalculation.keys.temporary]: true,
 })
 
 export const newProcessingStep = (processingChain, props = {}) => ({
@@ -42,6 +44,7 @@ export const newProcessingStep = (processingChain, props = {}) => ({
   [ProcessingStep.keys.processingChainUuid]: getUuid(processingChain),
   [ProcessingStep.keys.index]: getProcessingSteps(processingChain).length,
   [ProcessingStep.keys.props]: props,
+  [ProcessingStepCalculation.keys.temporary]: true,
 })
 
 export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({
@@ -56,6 +59,7 @@ export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null,
 // ====== READ
 
 export const getUuid = ObjectUtils.getUuid
+export const getProps = ObjectUtils.getProps
 export const getCycle = ObjectUtils.getCycle
 export const getDateCreated = ObjectUtils.getDateCreated
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
@@ -67,6 +71,8 @@ export const getDescriptions = ObjectUtils.getDescriptions
 export const getDescription = ObjectUtils.getDescription
 export const getLabels = ObjectUtils.getLabels
 export const getLabel = ObjectUtils.getLabel
+
+export const isTemporary = ObjectUtils.isTemporary
 
 // ====== CHECK
 
@@ -82,3 +88,5 @@ export const assocProcessingStep = step => chain =>
   R.pipe(getProcessingSteps, R.append(step), steps => R.assoc(keys.processingSteps, steps, chain))(chain)
 
 export const assocProp = ObjectUtils.setProp
+
+export const dissocTemporary = ObjectUtils.dissocTemporary

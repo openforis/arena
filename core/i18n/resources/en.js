@@ -337,13 +337,17 @@ Do you want to cancel them?`,
   processingChainView: {
     dateExecuted: 'Date executed',
     status: 'Status',
-    deleteConfirm: 'Delete this processing chain?\n$t(common.cantUndoWarning)',
+    deleteConfirm: `Delete this processing chain?
+    
+$t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
     processingSteps: 'Processing steps',
   },
 
   processingStepView: {
-    deleteConfirm: 'Delete this processing step?\n$t(common.cantUndoWarning)',
+    deleteConfirm: `Delete this processing step?
+    
+$t(common.cantUndoWarning)`,
     deleteComplete: 'Processing step deleted',
     category: 'Category',
     calculationSteps: 'Calculation Steps',
@@ -365,7 +369,9 @@ Do you want to cancel them?`,
       min: 'Minimum',
       sum: 'Sum',
     },
-    deleteConfirm: 'Delete this calculation step?',
+    deleteConfirm: `Delete this calculation step?
+    
+$t(common.cantUndoWarning)`,
   },
 
   itemsTable: {
