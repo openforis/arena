@@ -1,10 +1,7 @@
-import axios from 'axios'
-
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { processingChainUpdate } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
