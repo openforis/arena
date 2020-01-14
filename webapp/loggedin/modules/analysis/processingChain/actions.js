@@ -10,11 +10,12 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 import * as ProcessingChainState from './processingChainState'
 
-export const processingChainUpdate = 'survey/processingChain/update'
-export const processingChainPropUpdate = 'survey/processingChain/prop/update'
-export const processingChainSave = 'survey/processingChain/save'
+export const processingChainUpdate = 'analysis/processingChain/update'
+export const processingChainPropUpdate = 'analysis/processingChain/prop/update'
+export const processingChainSave = 'analysis/processingChain/save'
 
-export const processingChainStepsLoad = 'survey/processingChain/steps/load'
+export const processingChainStepsLoad = 'analysis/processingChain/steps/load'
+export const processingStepForEditUpdate = 'analysis/processingChain/step/forEdit/update'
 
 export const resetProcessingChainState = () => dispatch =>
   dispatch({ type: processingChainUpdate, processingChain: {} })
@@ -28,29 +29,8 @@ export const navigateToProcessingChainsView = history => dispatch => {
 export const navigateToProcessingStepView = (history, processingStepUuid) => _ =>
   history.push(`${appModuleUri(analysisModules.processingStep)}${processingStepUuid}`)
 
-// ====== CREATE
-
-export const createProcessingStep = history => async (dispatch, getState) => {
-  dispatch(showAppLoader())
-
-  const state = getState()
-
-  const surveyId = SurveyState.getSurveyId(state)
-  const processingChain = ProcessingChainState.getProcessingChain(state)
-  const processingChainUuid = ProcessingChain.getUuid(processingChain)
-  const processingSteps = ProcessingChain.getProcessingSteps(processingChain)
-  const processingStepIndex = processingSteps.length
-
-  const { data: processingStepUuid } = await axios.post(
-    `/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-step`,
-    {
-      processingStepIndex,
-    },
-  )
-
-  dispatch(navigateToProcessingStepView(history, processingStepUuid))
-  dispatch(hideAppLoader())
-}
+export const setProcessingStepForEdit = processingStep => dispatch =>
+  dispatch({ type: processingStepForEditUpdate, processingStep })
 
 // ====== READ
 

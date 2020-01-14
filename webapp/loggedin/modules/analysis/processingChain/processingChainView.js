@@ -65,7 +65,7 @@ const ProcessingChainView = props => {
 
         <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} />
 
-        <ProcessingChainSteps history={history} processingChain={processingChain} />
+        <ProcessingChainSteps processingChain={processingChain} />
       </div>
 
       <ProcessingChainButtonBar />

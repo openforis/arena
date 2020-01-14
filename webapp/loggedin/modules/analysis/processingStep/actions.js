@@ -19,6 +19,7 @@ import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/process
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 
+export const processingStepCreate = 'analysis/processingStep/create'
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepReset = 'analysis/processingStep/reset'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
@@ -33,6 +34,18 @@ export const setProcessingStepCalculationForEdit = calculation => dispatch =>
 
 // ====== CREATE
 
+export const createProcessingStep = () => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
+  const state = getState()
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+
+  const processingStep = ProcessingChain.newProcessingStep(processingChain)
+
+  dispatch({ type: processingStepCreate, processingStep })
+  dispatch(hideAppLoader())
+}
+
 export const createProcessingStepCalculation = () => async (dispatch, getState) => {
   dispatch(showAppLoader())
 
@@ -43,6 +56,7 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
   dispatch({ type: processingStepCalculationCreate, calculation })
   dispatch(hideAppLoader())
 }
+
 // ====== READ
 
 export const fetchProcessingStep = processingStepUuid => async (dispatch, getState) => {
