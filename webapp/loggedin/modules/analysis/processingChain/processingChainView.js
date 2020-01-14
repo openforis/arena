@@ -18,7 +18,7 @@ import ProcessingChainSteps from './components/processingChainSteps'
 import * as ProcessingChainState from './processingChainState'
 
 import { navigateToProcessingChainsView, updateProcessingChainProp, resetProcessingChainState } from './actions'
-import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChains/actions'
+import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainView = props => {
   const {
@@ -35,7 +35,7 @@ const ProcessingChainView = props => {
   const { processingChainUuid } = useParams()
   useEffect(() => {
     if (R.isEmpty(processingChain)) {
-      fetchProcessingChain(history, processingChainUuid, false)
+      fetchProcessingChain(processingChainUuid)
     }
 
     return () => {

@@ -15,13 +15,13 @@ import ProcessingChainsHeaderLeft from './components/processingChainsHeaderLeft'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
-import { createProcessingChain, fetchProcessingChain } from './actions'
+import { createProcessingChain, navigateToProcessingChainView } from './actions'
 import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
 
 const processingChainsModule = 'processing-chains'
 
 const ProcessingChainsView = props => {
-  const { surveyCycleKey, reloadListItems, createProcessingChain, fetchProcessingChain } = props
+  const { surveyCycleKey, reloadListItems, createProcessingChain, navigateToProcessingChainView } = props
 
   const restParams = { surveyCycleKey }
 
@@ -40,7 +40,7 @@ const ProcessingChainsView = props => {
       rowHeaderComponent={ProcessingChainsRowHeader}
       headerLeftComponent={ProcessingChainsHeaderLeft}
       rowComponent={ProcessingChainsRow}
-      onRowClick={processingChain => fetchProcessingChain(history, ProcessingChain.getUuid(processingChain))}
+      onRowClick={processingChain => navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain))}
       history={history}
       createProcessingChain={createProcessingChain}
     />
@@ -54,5 +54,5 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   reloadListItems,
   createProcessingChain,
-  fetchProcessingChain,
+  navigateToProcessingChainView,
 })(ProcessingChainsView)
