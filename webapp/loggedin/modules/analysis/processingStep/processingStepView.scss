@@ -28,3 +28,11 @@
     text-align: left;
   }
 }
+
+.processing-step__entity-selector-form-item.form-item {
+  grid-template-columns: .2fr .4fr 140px;
+
+  .btn-add {
+    justify-self: center;
+  }
+}

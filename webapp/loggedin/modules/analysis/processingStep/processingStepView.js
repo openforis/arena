@@ -21,6 +21,7 @@ import {
   resetProcessingStepState,
   putProcessingStepProps,
   deleteProcessingStep,
+  addEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingStepView = props => {
@@ -34,6 +35,7 @@ const ProcessingStepView = props => {
     resetProcessingStepState,
     putProcessingStepProps,
     deleteProcessingStep,
+    addEntityVirtual,
   } = props
   const { processingStepUuid, nodeDefUuid } = useParams()
 
@@ -53,6 +55,8 @@ const ProcessingStepView = props => {
 
   const calculationEditorOpened = Boolean(processingStepCalculation)
 
+  const hasCalculationSteps = !R.isEmpty(ProcessingStep.getCalculationSteps(processingStep))
+
   const i18n = useI18n()
 
   return nodeDefUuid ? (
@@ -71,8 +75,19 @@ const ProcessingStepView = props => {
             }
             putProcessingStepProps(props)
           }}
-          readOnly={!R.isEmpty(ProcessingStep.getCalculationSteps(processingStep) || calculationEditorOpened)}
-        />
+          readOnly={hasCalculationSteps || calculationEditorOpened}
+        >
+          {!calculationEditorOpened && (
+            <button
+              className="btn btn-s btn-add"
+              onClick={() => addEntityVirtual(history)}
+              aria-disabled={hasCalculationSteps}
+            >
+              <span className="icon icon-plus icon-12px icon-left" />
+              {i18n.t('processingStepView.virtualEntity')}
+            </button>
+          )}
+        </EntitySelector>
 
         <ProcessingStepCalculationsList
           processingStep={processingStep}
@@ -111,4 +126,5 @@ export default connect(mapStateToProps, {
   resetProcessingStepState,
   putProcessingStepProps,
   deleteProcessingStep,
+  addEntityVirtual,
 })(ProcessingStepView)

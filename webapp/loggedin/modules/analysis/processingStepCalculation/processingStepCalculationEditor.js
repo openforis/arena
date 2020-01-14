@@ -71,7 +71,7 @@ const ProcessingStepCalculationEditor = () => {
         </FormItem>
 
         <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
-          <div className="processing-step__calculation__attribute-container">
+          <div className="processing-step-calculation__attribute-container">
             <Dropdown
               items={attributes}
               selection={attribute}
@@ -82,11 +82,7 @@ const ProcessingStepCalculationEditor = () => {
               onChange={def => dispatch(setProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
               validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />
-            <button
-              className="btn btn-s"
-              style={{ justifySelf: 'center' }}
-              onClick={() => dispatch(createNodeDefAnalysis(history))}
-            >
+            <button className="btn btn-s btn-add" onClick={() => dispatch(createNodeDefAnalysis(history))}>
               <span className="icon icon-plus icon-12px icon-left" />
               {i18n.t('common.add')}
             </button>
