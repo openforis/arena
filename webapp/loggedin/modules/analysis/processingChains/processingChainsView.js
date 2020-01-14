@@ -2,27 +2,30 @@ import './processingChainsView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-
-import * as ProcessingChain from '@common/analysis/processingChain'
+import { useHistory } from 'react-router'
 
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import * as ProcessingChain from '@common/analysis/processingChain'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import TableView from '../../../tableViews/tableView'
+import TableView from '@webapp/loggedin/tableViews/tableView'
 
-import { reloadListItems } from '../../../tableViews/actions'
 import ProcessingChainsRow from './components/processingChainsRow'
 import ProcessingChainsRowHeader from './components/processingChainsRowHeader'
 import ProcessingChainsHeaderLeft from './components/processingChainsHeaderLeft'
 
-import { createProcessingChain, navigateToProcessingChainView } from './actions'
+import * as SurveyState from '@webapp/survey/surveyState'
+
+import { createProcessingChain, fetchProcessingChain } from './actions'
+import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
 
 const processingChainsModule = 'processing-chains'
 
 const ProcessingChainsView = props => {
-  const { surveyCycleKey, history, reloadListItems, createProcessingChain, navigateToProcessingChainView } = props
+  const { surveyCycleKey, reloadListItems, createProcessingChain, fetchProcessingChain } = props
 
   const restParams = { surveyCycleKey }
+
+  const history = useHistory()
 
   useOnUpdate(() => {
     reloadListItems(processingChainsModule, restParams)
@@ -37,7 +40,7 @@ const ProcessingChainsView = props => {
       rowHeaderComponent={ProcessingChainsRowHeader}
       headerLeftComponent={ProcessingChainsHeaderLeft}
       rowComponent={ProcessingChainsRow}
-      onRowClick={processingChain => navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain))}
+      onRowClick={processingChain => fetchProcessingChain(history, ProcessingChain.getUuid(processingChain))}
       history={history}
       createProcessingChain={createProcessingChain}
     />
@@ -51,5 +54,5 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   reloadListItems,
   createProcessingChain,
-  navigateToProcessingChainView,
+  fetchProcessingChain,
 })(ProcessingChainsView)

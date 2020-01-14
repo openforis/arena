@@ -36,6 +36,7 @@ export const newProcessingChain = (cycle, props = {}) => ({
   [keys.uuid]: uuidv4(),
   [keys.cycle]: cycle,
   [keys.props]: props,
+  [ProcessingStepCalculation.keys.temporary]: true,
 })
 
 export const newProcessingStep = (processingChain, props = {}) => ({
@@ -43,6 +44,7 @@ export const newProcessingStep = (processingChain, props = {}) => ({
   [ProcessingStep.keys.processingChainUuid]: getUuid(processingChain),
   [ProcessingStep.keys.index]: getProcessingSteps(processingChain).length,
   [ProcessingStep.keys.props]: props,
+  [ProcessingStepCalculation.keys.temporary]: true,
 })
 
 export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({

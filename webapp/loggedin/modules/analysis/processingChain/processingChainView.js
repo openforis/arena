@@ -18,33 +18,22 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import ProcessingChainSteps from './components/processingChainSteps'
 import * as ProcessingChainState from './processingChainState'
 
-import {
-  fetchProcessingChain,
-  navigateToProcessingChainsView,
-  updateProcessingChainProp,
-  deleteProcessingChain,
-  resetProcessingChainState,
-} from './actions'
+import { navigateToProcessingChainsView, updateProcessingChainProp, resetProcessingChainState } from './actions'
 
 const ProcessingChainView = props => {
   const {
     surveyInfo,
     surveyCycleKey,
-    processingChainUuid,
     processingChain,
     history,
-    fetchProcessingChain,
     navigateToProcessingChainsView,
     updateProcessingChainProp,
-    deleteProcessingChain,
     resetProcessingChainState,
   } = props
 
   const i18n = useI18n()
 
   useEffect(() => {
-    fetchProcessingChain(processingChainUuid)
-
     return () => {
       resetProcessingChainState()
     }
@@ -73,18 +62,6 @@ const ProcessingChainView = props => {
         <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} />
 
         <ProcessingChainSteps history={history} processingChain={processingChain} />
-
-        {/* <div className="button-bar"> */}
-        {/*  <button */}
-        {/*    className="btn-s btn-danger btn-delete" */}
-        {/*    onClick={() => */}
-        {/*      window.confirm(i18n.t('processingChainView.deleteConfirm')) && deleteProcessingChain(history) */}
-        {/*    } */}
-        {/*  > */}
-        {/*    <span className="icon icon-bin icon-12px icon-left"/> */}
-        {/*    {i18n.t('common.delete')} */}
-        {/*  </button> */}
-        {/* </div> */}
       </div>
 
       <ProcessingChainButtonBar />
@@ -92,17 +69,14 @@ const ProcessingChainView = props => {
   )
 }
 
-const mapStateToProps = (state, { match }) => ({
+const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-  processingChainUuid: getUrlParam('processingChainUuid')(match),
   processingChain: ProcessingChainState.getProcessingChain(state),
 })
 
 export default connect(mapStateToProps, {
-  fetchProcessingChain,
   navigateToProcessingChainsView,
   updateProcessingChainProp,
-  deleteProcessingChain,
   resetProcessingChainState,
 })(ProcessingChainView)

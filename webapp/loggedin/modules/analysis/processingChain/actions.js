@@ -12,6 +12,7 @@ import * as ProcessingChainState from './processingChainState'
 
 export const processingChainUpdate = 'survey/processingChain/update'
 export const processingChainPropUpdate = 'survey/processingChain/prop/update'
+export const processingChainSave = 'survey/processingChain/save'
 
 export const processingChainStepsLoad = 'survey/processingChain/steps/load'
 
@@ -31,6 +32,7 @@ export const navigateToProcessingStepView = (history, processingStepUuid) => _ =
 
 export const createProcessingStep = history => async (dispatch, getState) => {
   dispatch(showAppLoader())
+
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -52,6 +54,7 @@ export const createProcessingStep = history => async (dispatch, getState) => {
 
 // ====== READ
 
+// TODO - REMOVE - used in stepView
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
@@ -71,24 +74,21 @@ export const fetchProcessingSteps = processingChainUuid => async (dispatch, getS
 }
 
 // ====== UPDATE
-export const updateProcessingChainProp = (key, value) => async (dispatch, getState) => {
-  // Const state = getState()
-
-  // const processingChain = ProcessingChainState.getProcessingChain(state)
-
+export const updateProcessingChainProp = (key, value) => dispatch =>
   dispatch({ type: processingChainPropUpdate, key, value })
 
-  // Const action = async () => {
-  //   dispatch(showAppSaving())
-  //   const surveyId = SurveyState.getSurveyId(state)
-  //   await axios.put(`/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`, {
-  //     key,
-  //     value,
-  //   })
-  //   dispatch(hideAppSaving())
-  // }
-  //
-  // dispatch(debounceAction(action, `${processingChainPropUpdate}_${ProcessingChain.getUuid(processingChain)}`))
+export const saveProcessingChain = () => async (dispatch, getState) => {
+  dispatch(showAppSaving())
+
+  const state = getState()
+
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+  const surveyId = SurveyState.getSurveyId(state)
+
+  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { processingChain })
+
+  dispatch({ type: processingChainSave })
+  dispatch(hideAppSaving())
 }
 
 // ====== DELETE
