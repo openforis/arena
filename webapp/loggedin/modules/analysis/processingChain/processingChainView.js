@@ -10,6 +10,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
+import ProcessingChainButtonBar from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainButtonBar'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
@@ -20,7 +21,7 @@ import * as ProcessingChainState from './processingChainState'
 import {
   fetchProcessingChain,
   navigateToProcessingChainsView,
-  putProcessingChainProp,
+  updateProcessingChainProp,
   deleteProcessingChain,
   resetProcessingChainState,
 } from './actions'
@@ -34,7 +35,7 @@ const ProcessingChainView = props => {
     history,
     fetchProcessingChain,
     navigateToProcessingChainsView,
-    putProcessingChainProp,
+    updateProcessingChainProp,
     deleteProcessingChain,
     resetProcessingChainState,
   } = props
@@ -59,32 +60,34 @@ const ProcessingChainView = props => {
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingChain.getLabels(processingChain)}
-          onChange={labels => putProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
+          onChange={labels => updateProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
         />
 
         <LabelsEditor
           formLabelKey="common.description"
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingChain.getDescriptions(processingChain)}
-          onChange={descriptions => putProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
+          onChange={descriptions => updateProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
         />
 
         <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} />
 
         <ProcessingChainSteps history={history} processingChain={processingChain} />
 
-        <div className="button-bar">
-          <button
-            className="btn-s btn-danger btn-delete"
-            onClick={() =>
-              window.confirm(i18n.t('processingChainView.deleteConfirm')) && deleteProcessingChain(history)
-            }
-          >
-            <span className="icon icon-bin icon-12px icon-left" />
-            {i18n.t('common.delete')}
-          </button>
-        </div>
+        {/* <div className="button-bar"> */}
+        {/*  <button */}
+        {/*    className="btn-s btn-danger btn-delete" */}
+        {/*    onClick={() => */}
+        {/*      window.confirm(i18n.t('processingChainView.deleteConfirm')) && deleteProcessingChain(history) */}
+        {/*    } */}
+        {/*  > */}
+        {/*    <span className="icon icon-bin icon-12px icon-left"/> */}
+        {/*    {i18n.t('common.delete')} */}
+        {/*  </button> */}
+        {/* </div> */}
       </div>
+
+      <ProcessingChainButtonBar />
     </div>
   )
 }
@@ -99,7 +102,7 @@ const mapStateToProps = (state, { match }) => ({
 export default connect(mapStateToProps, {
   fetchProcessingChain,
   navigateToProcessingChainsView,
-  putProcessingChainProp,
+  updateProcessingChainProp,
   deleteProcessingChain,
   resetProcessingChainState,
 })(ProcessingChainView)

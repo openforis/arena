@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 
 import { appUserLogout } from '@webapp/app/actions'
 
@@ -15,12 +15,14 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // Chain
-  [processingChainUpdate]: (state, { processingChain }) => processingChain,
-  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChain.assocProp(key, value)(state),
+  [processingChainUpdate]: (state, { processingChain }) =>
+    ProcessingChainState.assocProcessingChain(processingChain)(state),
+
+  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainState.assocPropDirty(key, value)(state),
 
   // Steps
   [processingChainStepsLoad]: (state, { processingSteps }) =>
-    ProcessingChain.assocProcessingSteps(processingSteps)(state),
+    ProcessingChainState.assocProcessingSteps(processingSteps)(state),
 }
 
 export default exportReducer(actionHandlers)

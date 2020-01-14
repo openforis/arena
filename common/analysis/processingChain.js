@@ -16,6 +16,7 @@ const keys = {
   props: ObjectUtils.keys.props,
   statusExec: 'statusExec',
   uuid: ObjectUtils.keys.uuid,
+  temporary: ObjectUtils.keys.temporary,
 }
 
 export const keysProps = {
@@ -68,6 +69,8 @@ export const getDescription = ObjectUtils.getDescription
 export const getLabels = ObjectUtils.getLabels
 export const getLabel = ObjectUtils.getLabel
 
+export const isTemporary = ObjectUtils.isTemporary
+
 // ====== CHECK
 
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), chain =>
@@ -82,3 +85,5 @@ export const assocProcessingStep = step => chain =>
   R.pipe(getProcessingSteps, R.append(step), steps => R.assoc(keys.processingSteps, steps, chain))(chain)
 
 export const assocProp = ObjectUtils.setProp
+
+export const dissocTemporary = ObjectUtils.dissocTemporary

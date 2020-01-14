@@ -1,3 +1,12 @@
+.processing-chain {
+  display: grid;
+  grid-template-rows: 1fr 60px;
+
+  .button-bar {
+    align-self: center;
+  }
+}
+
 .processing-chain,
 .processing-step,
 .processing-step__calculation-editor {
@@ -7,10 +16,6 @@
 
   .form-item {
     grid-template-columns: .2fr .8fr;
-  }
-
-  .button-bar {
-    margin-top: 30px;
   }
 
 }

@@ -46,3 +46,5 @@ export const isDirty = state => {
     (ProcessingStepCalculation.isTemporary(calculationDirty) || !R.equals(calculationDirty, getCalculationOrig(state)))
   )
 }
+
+export const isEditingCalculation = R.pipe(getCalculationDirty, R.isNil, R.not)

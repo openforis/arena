@@ -102,31 +102,31 @@ const ProcessingStepCalculationEditor = () => {
           </FormItem>
         )}
 
-        <div className="button-bar">
-          <button
-            className="btn-s btn-cancel"
-            onClick={() => (isDirty ? setShowCancelConfirm(true) : dispatch(resetProcessingStepCalculationState()))}
-          >
-            <span className="icon icon-cross icon-left icon-10px" />
-            {i18n.t(isDirty ? 'common.cancel' : 'common.close')}
-          </button>
-          <button
-            className="btn-s btn-primary"
-            onClick={() => dispatch(saveProcessingStepCalculationEdits())}
-            aria-disabled={!isDirty}
-          >
-            <span className="icon icon-floppy-disk icon-left icon-12px" />
-            {i18n.t('common.save')}
-          </button>
-          <button
-            className="btn-s btn-danger btn-delete"
-            aria-disabled={ProcessingStepCalculation.isTemporary(calculation)}
-            onClick={() => setShowDeleteConfirm(true)}
-          >
-            <span className="icon icon-bin icon-left icon-12px" />
-            {i18n.t('common.delete')}
-          </button>
-        </div>
+        {/* <div className="button-bar"> */}
+        {/*  <button */}
+        {/*    className="btn-s btn-cancel" */}
+        {/*    onClick={() => (isDirty ? setShowCancelConfirm(true) : dispatch(resetProcessingStepCalculationState()))} */}
+        {/*  > */}
+        {/*    <span className="icon icon-cross icon-left icon-10px" /> */}
+        {/*    {i18n.t(isDirty ? 'common.cancel' : 'common.close')} */}
+        {/*  </button> */}
+        {/*  <button */}
+        {/*    className="btn-s btn-primary" */}
+        {/*    onClick={() => dispatch(saveProcessingStepCalculationEdits())} */}
+        {/*    aria-disabled={!isDirty} */}
+        {/*  > */}
+        {/*    <span className="icon icon-floppy-disk icon-left icon-12px" /> */}
+        {/*    {i18n.t('common.save')} */}
+        {/*  </button> */}
+        {/*  <button */}
+        {/*    className="btn-s btn-danger btn-delete" */}
+        {/*    aria-disabled={ProcessingStepCalculation.isTemporary(calculation)} */}
+        {/*    onClick={() => setShowDeleteConfirm(true)} */}
+        {/*  > */}
+        {/*    <span className="icon icon-bin icon-left icon-12px" /> */}
+        {/*    {i18n.t('common.delete')} */}
+        {/*  </button> */}
+        {/* </div> */}
       </div>
 
       {showCancelConfirm && (

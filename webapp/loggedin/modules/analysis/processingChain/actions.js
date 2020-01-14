@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -72,27 +71,28 @@ export const fetchProcessingSteps = processingChainUuid => async (dispatch, getS
 }
 
 // ====== UPDATE
-export const putProcessingChainProp = (key, value) => async (dispatch, getState) => {
-  const state = getState()
+export const updateProcessingChainProp = (key, value) => async (dispatch, getState) => {
+  // Const state = getState()
 
-  const processingChain = ProcessingChainState.getProcessingChain(state)
+  // const processingChain = ProcessingChainState.getProcessingChain(state)
 
   dispatch({ type: processingChainPropUpdate, key, value })
 
-  const action = async () => {
-    dispatch(showAppSaving())
-    const surveyId = SurveyState.getSurveyId(state)
-    await axios.put(`/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`, {
-      key,
-      value,
-    })
-    dispatch(hideAppSaving())
-  }
-
-  dispatch(debounceAction(action, `${processingChainPropUpdate}_${ProcessingChain.getUuid(processingChain)}`))
+  // Const action = async () => {
+  //   dispatch(showAppSaving())
+  //   const surveyId = SurveyState.getSurveyId(state)
+  //   await axios.put(`/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}`, {
+  //     key,
+  //     value,
+  //   })
+  //   dispatch(hideAppSaving())
+  // }
+  //
+  // dispatch(debounceAction(action, `${processingChainPropUpdate}_${ProcessingChain.getUuid(processingChain)}`))
 }
 
 // ====== DELETE
+
 export const deleteProcessingChain = history => async (dispatch, getState) => {
   dispatch(showAppSaving())
 

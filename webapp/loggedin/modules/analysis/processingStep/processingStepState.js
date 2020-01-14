@@ -80,3 +80,7 @@ export const dissocCalculation = calculation => state =>
   R.pipe(R.prop(keys.step), ProcessingStep.dissocCalculation(calculation), processingStep =>
     R.assoc(keys.step, processingStep)(state),
   )(state)
+
+// ====== UTILS
+
+export const isEditingStep = R.pipe(getProcessingStep, R.isEmpty, R.not)

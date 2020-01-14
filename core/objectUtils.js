@@ -15,6 +15,7 @@ export const keys = {
   parentUuid: 'parentUuid',
   props: 'props',
   uuid: 'uuid',
+  temporary: 'temporary', // True when the object has been created but not persisted yet
 }
 
 export const keysProps = {
@@ -50,6 +51,8 @@ export const getIndex = R.propOr(null, keys.index)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.prop(keys.authGroups)
 
+export const isTemporary = R.propEq(keys.temporary, true)
+
 // ===== UPDATE
 export const assocIndex = R.assoc(keys.index)
 
@@ -77,6 +80,8 @@ export const setInPath = (pathArray, value, includeEmpty = true) => obj => {
   })
   return obj
 }
+
+export const dissocTemporary = R.dissoc(keys.temporary)
 
 // ====== UTILS / uuid
 export const toIndexedObj = (array, propName) =>

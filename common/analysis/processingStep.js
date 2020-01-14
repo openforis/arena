@@ -9,6 +9,7 @@ export const keys = {
   processingChainUuid: 'processingChainUuid',
   props: ObjectUtils.keys.props,
   uuid: ObjectUtils.keys.uuid,
+  temporary: ObjectUtils.keys.temporary,
 }
 
 export const keysProps = {
@@ -26,6 +27,8 @@ export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
+
+export const isTemporary = ObjectUtils.isTemporary
 
 // ====== UPDATE
 
@@ -69,3 +72,5 @@ export const dissocCalculation = calculation => processingStep =>
     // Update calculation steps in processing step
     calculationSteps => assocCalculations(calculationSteps)(processingStep),
   )(processingStep)
+
+export const dissocTemporary = ObjectUtils.dissocTemporary
