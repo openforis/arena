@@ -28,7 +28,7 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepPropsUpdate]: (survey, i18n) => activityLog => {
+  [ActivityLog.type.processingStepPropUpdate]: (survey, i18n) => activityLog => {
     const content = ActivityLog.getContent(activityLog)
 
     // Only one of entityUuid or categoryUuid can have a value associated

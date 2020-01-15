@@ -41,7 +41,7 @@ export const assocProcessingSteps = steps =>
     _updateChainOrig(ProcessingChain.assocProcessingSteps(steps)),
   )
 
-export const appendProcessingStep = step => _updateChainDirty(ProcessingChain.appendProcessingStep(step))
+export const appendProcessingStep = step => _updateChainDirty(ProcessingChain.assocProcessingStep(step))
 
 export const dissocStepTemporary = state => {
   const steps = R.pipe(R.prop(keys.dirty), ProcessingChain.getProcessingSteps)(state)
@@ -52,9 +52,10 @@ export const dissocStepTemporary = state => {
     : state
 }
 
-export const saveDirty = R.pipe(_updateChainDirty(ProcessingChain.dissocTemporary), state =>
-  R.pipe(R.prop(keys.dirty), chainDirty => _updateChainOrig(R.always(chainDirty))(state))(state),
-)
+export const saveDirty = (chain, step) => state =>
+  R.pipe(R.when(R.always(Boolean(step)), ProcessingChain.assocProcessingStep(step)), chainUpdate =>
+    assocProcessingChain(chainUpdate)(state),
+  )(chain)
 
 // ====== UTILS
 

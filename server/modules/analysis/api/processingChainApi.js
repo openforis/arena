@@ -169,7 +169,8 @@ export const init = app => {
 
         const user = Request.getUser(req)
 
-        await ProcessingChainService.updateChain(user, surveyId, Request.getBody(req))
+        const { chain, step } = Request.getBody(req)
+        await ProcessingChainService.updateChain(user, surveyId, chain, step)
 
         Response.sendOk(res)
       } catch (error) {

@@ -64,7 +64,7 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
 
 // ====== UPDATE
 
-export const putProcessingStepProps = props => dispatch => dispatch({ type: processingStepPropsUpdate, props })
+export const updateProcessingStepProps = props => dispatch => dispatch({ type: processingStepPropsUpdate, props })
 
 export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async (dispatch, getState) => {
   dispatch(showAppSaving())

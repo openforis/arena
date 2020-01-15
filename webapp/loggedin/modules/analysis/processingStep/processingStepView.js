@@ -19,7 +19,7 @@ import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analys
 
 import {
   resetProcessingStepState,
-  putProcessingStepProps,
+  updateProcessingStepProps,
   addEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
@@ -32,7 +32,7 @@ const ProcessingStepView = props => {
     dirty,
     editingCalculation,
     resetProcessingStepState,
-    putProcessingStepProps,
+    updateProcessingStepProps,
     addEntityVirtual,
   } = props
 
@@ -75,7 +75,7 @@ const ProcessingStepView = props => {
               [ProcessingStep.keysProps.entityUuid]: entityUuid,
               [ProcessingStep.keysProps.categoryUuid]: null,
             }
-            putProcessingStepProps(props)
+            updateProcessingStepProps(props)
           }}
           readOnly={hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)}
         >
@@ -124,6 +124,6 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   resetProcessingStepState,
-  putProcessingStepProps,
+  updateProcessingStepProps,
   addEntityVirtual,
 })(ProcessingStepView)

@@ -89,8 +89,7 @@ export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true)
 
 export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
-export const appendProcessingStep = step => chain =>
-  R.pipe(getProcessingSteps, R.append(step), steps => R.assoc(keys.processingSteps, steps, chain))(chain)
+export const assocProcessingStep = step => R.assocPath([keys.processingSteps, ProcessingStep.getIndex(step)], step)
 
 export const assocProp = ObjectUtils.setProp
 

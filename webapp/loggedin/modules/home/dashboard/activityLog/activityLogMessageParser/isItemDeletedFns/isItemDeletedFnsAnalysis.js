@@ -13,7 +13,7 @@ export default {
 
   [ActivityLog.type.processingStepCreate]: _isProcessingStepDeleted,
 
-  [ActivityLog.type.processingStepPropsUpdate]: _isProcessingStepDeleted,
+  [ActivityLog.type.processingStepPropUpdate]: _isProcessingStepDeleted,
 
   [ActivityLog.type.processingStepDelete]: _isProcessingChainDeleted,
 

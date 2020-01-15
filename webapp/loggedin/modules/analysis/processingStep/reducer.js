@@ -9,7 +9,7 @@ import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processi
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 
-import { processingChainReset } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { processingChainReset, processingChainSave } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import {
   processingStepReset,
   processingStepCreate,
@@ -33,8 +33,12 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
+  // Chain
   [processingChainReset]: () => ({}),
 
+  [processingChainSave]: (state, { step }) => ProcessingStepState.saveDirty(step)(state),
+
+  // Step
   [processingStepReset]: () => ({}),
 
   [processingStepCreate]: (state, { processingStep }) => ProcessingStepState.assocProcessingStep(processingStep)(state),
@@ -43,6 +47,7 @@ const actionHandlers = {
 
   [processingStepPropsUpdate]: (state, { props }) => ProcessingStepState.mergeProcessingStepProps(props)(state),
 
+  // Calculations
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
 

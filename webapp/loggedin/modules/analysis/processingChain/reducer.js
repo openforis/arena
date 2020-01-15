@@ -28,7 +28,7 @@ const actionHandlers = {
 
   [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainState.assocPropDirty(key, value)(state),
 
-  [processingChainSave]: state => ProcessingChainState.saveDirty(state),
+  [processingChainSave]: (state, { chain, step }) => ProcessingChainState.saveDirty(chain, step)(state),
 
   // Steps
   [processingChainStepsLoad]: (state, { processingSteps }) =>

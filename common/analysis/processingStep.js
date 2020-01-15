@@ -27,6 +27,7 @@ export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
+export const getProps = ObjectUtils.getProps
 
 export const isEqual = ObjectUtils.isEqual
 export const isTemporary = ObjectUtils.isTemporary

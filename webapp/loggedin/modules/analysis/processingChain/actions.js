@@ -1,6 +1,8 @@
+import * as R from 'ramda'
 import axios from 'axios'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingStep from '@common/analysis/processingStep'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
@@ -57,13 +59,17 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
-  const chain = ProcessingChainState.getProcessingChain(state)
-  const step = ProcessingStepState.getProcessingStep(state)
+  const chain = R.pipe(ProcessingChainState.getProcessingChain, ProcessingChain.dissocTemporary)(state)
+  const step = R.pipe(
+    ProcessingStepState.getProcessingStep,
+    ProcessingStep.dissocTemporary,
+    R.when(R.isEmpty, R.always(null)),
+  )(state)
 
   await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain, step })
 
   dispatch(showNotification('common.saved'))
-  dispatch({ type: processingChainSave })
+  dispatch({ type: processingChainSave, chain, step })
   dispatch(hideAppSaving())
 }
 
