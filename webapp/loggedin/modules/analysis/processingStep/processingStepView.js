@@ -19,7 +19,6 @@ import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processi
 import {
   resetProcessingStepState,
   putProcessingStepProps,
-  deleteProcessingStep,
   addEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
@@ -28,24 +27,22 @@ const ProcessingStepView = props => {
     history,
     processingStep,
     processingStepPrev,
-    processingStepNext,
     processingStepCalculation,
     resetProcessingStepState,
     putProcessingStepProps,
-    deleteProcessingStep,
     addEntityVirtual,
   } = props
   const { nodeDefUuid } = useParams()
 
-  // Reset state on unmount (Only if not navigating to node def edit from calculation editor)
-  const onUnmount = () => {
-    if (R.pipe(R.path(['location', 'pathname']), R.startsWith(appModuleUri(analysisModules.nodeDef)), R.not)(history)) {
-      resetProcessingStepState()
-    }
-  }
-
   useEffect(() => {
-    return onUnmount
+    // Reset state on unmount (Only if not navigating to node def edit from calculation editor)
+    return () => {
+      if (
+        R.pipe(R.path(['location', 'pathname']), R.startsWith(appModuleUri(analysisModules.nodeDef)), R.not)(history)
+      ) {
+        resetProcessingStepState()
+      }
+    }
   }, [])
 
   const calculationEditorOpened = Boolean(processingStepCalculation)
@@ -88,20 +85,6 @@ const ProcessingStepView = props => {
           processingStep={processingStep}
           calculationEditorOpened={calculationEditorOpened}
         />
-
-        {!processingStepNext && !calculationEditorOpened && (
-          <div className="button-bar">
-            <button
-              className="btn-s btn-danger btn-delete"
-              onClick={() =>
-                window.confirm(i18n.t('processingStepView.deleteConfirm')) && deleteProcessingStep(history)
-              }
-            >
-              <span className="icon icon-bin icon-12px icon-left" />
-              {i18n.t('common.delete')}
-            </button>
-          </div>
-        )}
       </div>
 
       <ProcessingStepCalculationEditor />
@@ -111,7 +94,6 @@ const ProcessingStepView = props => {
 
 const mapStateToProps = state => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
-  processingStepNext: ProcessingStepState.getProcessingStepNext(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
   processingStepCalculation: ProcessingStepState.getProcessingStepCalculationForEdit(state),
 })
@@ -119,6 +101,5 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   resetProcessingStepState,
   putProcessingStepProps,
-  deleteProcessingStep,
   addEntityVirtual,
 })(ProcessingStepView)

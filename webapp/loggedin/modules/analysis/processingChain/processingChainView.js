@@ -27,7 +27,7 @@ const ProcessingChainView = props => {
     surveyInfo,
     surveyCycleKey,
     processingChain,
-    isEditingStep,
+    editingStep,
     history,
     fetchProcessingChain,
     navigateToProcessingChainsView,
@@ -36,6 +36,7 @@ const ProcessingChainView = props => {
   } = props
 
   const { processingChainUuid } = useParams()
+
   useEffect(() => {
     if (R.isEmpty(processingChain)) {
       fetchProcessingChain(processingChainUuid)
@@ -51,16 +52,17 @@ const ProcessingChainView = props => {
   }, [surveyCycleKey])
 
   return R.isEmpty(processingChain) ? null : (
-    <div className={`processing-chain${isEditingStep ? ' step-editor-open' : ''}`}>
+    <div className={`processing-chain${editingStep ? ' step-editor-open' : ''}`}>
       <div className="form">
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingChain.getLabels(processingChain)}
-          showFormLabel={!isEditingStep}
           onChange={labels => updateProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
+          formLabelKey="processingChainView.formLabel"
+          readOnly={editingStep}
         />
 
-        {!isEditingStep && (
+        {!editingStep && (
           <>
             <LabelsEditor
               formLabelKey="common.description"
@@ -73,8 +75,6 @@ const ProcessingChainView = props => {
         )}
 
         <ProcessingChainSteps processingChain={processingChain} />
-
-        {isEditingStep && <ProcessingStepView />}
       </div>
 
       <ProcessingChainButtonBar />
@@ -86,7 +86,7 @@ const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   processingChain: ProcessingChainState.getProcessingChain(state),
-  isEditingStep: ProcessingStepState.isEditingStep(state),
+  editingStep: ProcessingStepState.isEditingStep(state),
 })
 
 export default connect(mapStateToProps, {

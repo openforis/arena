@@ -335,6 +335,7 @@ Do you want to cancel them?`,
   },
 
   processingChainView: {
+    formLabel: 'Processing chain label',
     dateExecuted: 'Date executed',
     status: 'Status',
     deleteConfirm: `Delete this processing chain?

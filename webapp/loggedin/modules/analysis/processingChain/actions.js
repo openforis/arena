@@ -5,10 +5,10 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as ProcessingChainState from './processingChainState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
-import * as ProcessingChainState from './processingChainState'
+import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 
 export const processingChainUpdate = 'analysis/processingChain/update'
 export const processingChainPropUpdate = 'analysis/processingChain/prop/update'
@@ -25,9 +25,6 @@ export const navigateToProcessingChainsView = history => dispatch => {
   // Navigate to processing chains view
   history.push(appModuleUri(analysisModules.processingChains))
 }
-
-export const navigateToProcessingStepView = (history, processingStepUuid) => _ =>
-  history.push(`${appModuleUri(analysisModules.processingStep)}${processingStepUuid}`)
 
 export const setProcessingStepForEdit = processingStep => dispatch =>
   dispatch({ type: processingStepForEditUpdate, processingStep })
@@ -53,6 +50,7 @@ export const fetchProcessingSteps = processingChainUuid => async (dispatch, getS
 }
 
 // ====== UPDATE
+
 export const updateProcessingChainProp = (key, value) => dispatch =>
   dispatch({ type: processingChainPropUpdate, key, value })
 

@@ -28,6 +28,7 @@ export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
 
+export const isEqual = ObjectUtils.isEqual
 export const isTemporary = ObjectUtils.isTemporary
 
 // ====== UPDATE

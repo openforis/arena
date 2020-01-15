@@ -2,6 +2,10 @@
   display: grid;
   grid-template-rows: 1fr 60px;
 
+  .form {
+    grid-row-gap: 2rem;
+  }
+
   .button-bar {
     align-self: center;
   }
@@ -10,8 +14,6 @@
 .processing-chain,
 .processing-step,
 .processing-step__calculation-editor {
-
-  padding-top: 2rem;
   position: relative;
 
   .form-item {
