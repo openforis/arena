@@ -6,9 +6,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import ProcessingChainStep from './processingChainStep'
-
 import { useI18n } from '@webapp/commonComponents/hooks'
+import ProcessingChainStep from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainStep'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 

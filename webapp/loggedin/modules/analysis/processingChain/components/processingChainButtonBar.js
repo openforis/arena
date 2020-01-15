@@ -34,6 +34,7 @@ const ProcessingChainButtonBar = () => {
   const editingChain = useSelector(ProcessingChainState.isEditingChain)
 
   const step = useSelector(ProcessingStepState.getProcessingStep)
+  const stepNext = useSelector(ProcessingStepState.getProcessingStepNext)
   const stepDirty = false // UseSelector(ProcessingStepState.getProcessingStep) TODO
   const editingStep = useSelector(ProcessingStepState.isEditingStep)
 
@@ -77,7 +78,7 @@ const ProcessingChainButtonBar = () => {
           className="btn-s btn-danger btn-delete"
           aria-disabled={
             (editingCalculation && ProcessingStepCalculation.isTemporary(calculation)) ||
-            (editingStep && ProcessingStep.isTemporary(step)) ||
+            (editingStep && ProcessingStep.isTemporary(step) && !stepNext) ||
             (editingChain && ProcessingChain.isTemporary(chain))
           }
           onClick={() => setShowDeleteConfirm(true)}

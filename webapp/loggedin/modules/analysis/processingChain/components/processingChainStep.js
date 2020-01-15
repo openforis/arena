@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
-import { setProcessingStepForEdit } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { setProcessingStepForEdit } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingChainStep = props => {
   const { processingStep } = props

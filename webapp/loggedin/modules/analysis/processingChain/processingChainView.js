@@ -8,15 +8,16 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+
 import { useOnUpdate } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
+import ProcessingChainSteps from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainSteps'
 import ProcessingChainButtonBar from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainButtonBar'
-import ProcessingStepView from '@webapp/loggedin/modules/analysis/processingStep/processingStepView'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import ProcessingChainSteps from './components/processingChainSteps'
-import * as ProcessingChainState from './processingChainState'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import { navigateToProcessingChainsView, updateProcessingChainProp, resetProcessingChainState } from './actions'
@@ -43,7 +44,12 @@ const ProcessingChainView = props => {
     }
 
     return () => {
-      resetProcessingChainState()
+      // Reset state on unmount (Only if not navigating to node def edit from calculation editor)
+      if (
+        R.pipe(R.path(['location', 'pathname']), R.startsWith(appModuleUri(analysisModules.nodeDef)), R.not)(history)
+      ) {
+        resetProcessingChainState()
+      }
     }
   }, [])
 

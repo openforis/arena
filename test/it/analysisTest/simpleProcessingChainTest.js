@@ -86,7 +86,7 @@ before(async () => {
   )
 
   step1 = ProcessingStep.assocCalculation(calc1)(step1)
-  processingChain = ProcessingChain.assocProcessingStep(step1)(processingChain)
+  processingChain = ProcessingChain.appendProcessingStep(step1)(processingChain)
 })
 
 after(async () => {

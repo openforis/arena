@@ -10,24 +10,20 @@ import * as ProcessingChainState from './processingChainState'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 
+export const processingChainReset = 'analysis/processingChain/reset'
 export const processingChainUpdate = 'analysis/processingChain/update'
 export const processingChainPropUpdate = 'analysis/processingChain/prop/update'
 export const processingChainSave = 'analysis/processingChain/save'
 
 export const processingChainStepsLoad = 'analysis/processingChain/steps/load'
-export const processingStepForEditUpdate = 'analysis/processingChain/step/forEdit/update'
 
-export const resetProcessingChainState = () => dispatch =>
-  dispatch({ type: processingChainUpdate, processingChain: {} })
+export const resetProcessingChainState = () => dispatch => dispatch({ type: processingChainReset })
 
 export const navigateToProcessingChainsView = history => dispatch => {
   dispatch(resetProcessingChainState())
   // Navigate to processing chains view
   history.push(appModuleUri(analysisModules.processingChains))
 }
-
-export const setProcessingStepForEdit = processingStep => dispatch =>
-  dispatch({ type: processingStepForEditUpdate, processingStep })
 
 // ====== READ
 

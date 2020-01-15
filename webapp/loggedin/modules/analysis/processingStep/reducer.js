@@ -8,10 +8,13 @@ import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processi
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+
+import { processingChainReset } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import {
-  processingStepPropsUpdate,
-  processingStepUpdate,
   processingStepReset,
+  processingStepCreate,
+  processingStepUpdate,
+  processingStepPropsUpdate,
   processingStepCalculationCreate,
   processingStepCalculationForEditUpdate,
   processingStepCalculationIndexUpdate,
@@ -22,7 +25,6 @@ import {
   processingStepCalculationDelete,
   processingStepCalculationReset,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
-import { processingStepForEditUpdate } from '../processingChain/actions'
 
 const actionHandlers = {
   // Reset state
@@ -31,13 +33,13 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [processingStepForEditUpdate]: (state, { processingStep }) =>
-    ProcessingStepState.assocProcessingStep(processingStep)(state),
-
-  [processingStepUpdate]: (state, { processingStep, processingStepPrev, processingStepNext }) =>
-    ProcessingStepState.assocProcessingStep(processingStep, processingStepPrev, processingStepNext)(state),
+  [processingChainReset]: () => ({}),
 
   [processingStepReset]: () => ({}),
+
+  [processingStepCreate]: (state, { processingStep }) => ProcessingStepState.assocProcessingStep(processingStep)(state),
+
+  [processingStepUpdate]: (state, { processingStep }) => ProcessingStepState.assocProcessingStep(processingStep)(state),
 
   [processingStepPropsUpdate]: (state, { props }) => ProcessingStepState.mergeProcessingStepProps(props)(state),
 

@@ -7,7 +7,7 @@ import { uuidv4 } from '@core/uuid'
 import * as ProcessingStep from './processingStep'
 import * as ProcessingStepCalculation from './processingStepCalculation'
 
-const keys = {
+export const keys = {
   cycle: ObjectUtils.keys.cycle,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
@@ -74,6 +74,11 @@ export const getLabel = ObjectUtils.getLabel
 
 export const isTemporary = ObjectUtils.isTemporary
 
+const _getStepByIdx = stepIdx => R.pipe(getProcessingSteps, R.propOr(null, stepIdx))
+
+export const getStepPrev = step => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
+export const getStepNext = step => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
+
 // ====== CHECK
 
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), chain =>
@@ -84,7 +89,7 @@ export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true)
 
 export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
-export const assocProcessingStep = step => chain =>
+export const appendProcessingStep = step => chain =>
   R.pipe(getProcessingSteps, R.append(step), steps => R.assoc(keys.processingSteps, steps, chain))(chain)
 
 export const assocProp = ObjectUtils.setProp
