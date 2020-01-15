@@ -2,7 +2,7 @@ import './processingStepView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -24,7 +24,6 @@ import {
 
 const ProcessingStepView = props => {
   const {
-    history,
     processingStep,
     processingStepPrev,
     processingStepCalculation,
@@ -32,6 +31,8 @@ const ProcessingStepView = props => {
     putProcessingStepProps,
     addEntityVirtual,
   } = props
+
+  const history = useHistory()
   const { nodeDefUuid } = useParams()
 
   useEffect(() => {
