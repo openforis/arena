@@ -22,6 +22,7 @@ import {
   processingStepCalculationDelete,
   processingStepCalculationReset,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import { processingStepForEditUpdate } from '../processingChain/actions'
 
 const actionHandlers = {
   // Reset state
@@ -29,6 +30,9 @@ const actionHandlers = {
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
+
+  [processingStepForEditUpdate]: (state, { processingStep }) =>
+    ProcessingStepState.assocProcessingStep(processingStep)(state),
 
   [processingStepUpdate]: (state, { processingStep, processingStepPrev, processingStepNext }) =>
     ProcessingStepState.assocProcessingStep(processingStep, processingStepPrev, processingStepNext)(state),

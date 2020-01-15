@@ -17,7 +17,6 @@ import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import {
-  fetchProcessingStep,
   resetProcessingStepState,
   putProcessingStepProps,
   deleteProcessingStep,
@@ -31,13 +30,12 @@ const ProcessingStepView = props => {
     processingStepPrev,
     processingStepNext,
     processingStepCalculation,
-    fetchProcessingStep,
     resetProcessingStepState,
     putProcessingStepProps,
     deleteProcessingStep,
     addEntityVirtual,
   } = props
-  const { processingStepUuid, nodeDefUuid } = useParams()
+  const { nodeDefUuid } = useParams()
 
   // Reset state on unmount (Only if not navigating to node def edit from calculation editor)
   const onUnmount = () => {
@@ -47,10 +45,7 @@ const ProcessingStepView = props => {
   }
 
   useEffect(() => {
-    if (processingStepUuid && R.isEmpty(processingStep)) {
-      fetchProcessingStep(processingStepUuid)
-      return onUnmount
-    }
+    return onUnmount
   }, [])
 
   const calculationEditorOpened = Boolean(processingStepCalculation)
@@ -122,7 +117,6 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  fetchProcessingStep,
   resetProcessingStepState,
   putProcessingStepProps,
   deleteProcessingStep,
