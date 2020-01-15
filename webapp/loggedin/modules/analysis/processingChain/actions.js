@@ -6,6 +6,7 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
+import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
@@ -57,8 +58,9 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
 
   const surveyId = SurveyState.getSurveyId(state)
   const chain = ProcessingChainState.getProcessingChain(state)
+  const step = ProcessingStepState.getProcessingStep(state)
 
-  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain })
+  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain, step })
 
   dispatch(showNotification('common.saved'))
   dispatch({ type: processingChainSave })
