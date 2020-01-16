@@ -27,6 +27,16 @@ export const insertCalculationStep = async (surveyId, calculation, client = db) 
     camelize,
   )
 
+// ====== READ
+
+export const fetchCalculationsByStepUuid = async (surveyId, processingStepUuid, client = db) =>
+  await client.map(
+    `SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation 
+    WHERE processing_step_uuid = $1`,
+    [processingStepUuid],
+    camelize,
+  )
 // ====== UPDATE
 
 export const updateCalculationIndex = async (surveyId, processingStepUuid, indexFrom, indexTo, client = db) => {

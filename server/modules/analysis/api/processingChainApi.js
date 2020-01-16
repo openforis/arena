@@ -135,28 +135,23 @@ export const init = app => {
     },
   )
 
-  // App.get(
-  //   '/survey/:surveyId/processing-step/:processingStepUuid',
-  //   AuthMiddleware.requireRecordAnalysisPermission,
-  //   async (req, res, next) => {
-  //     try {
-  //       const { surveyId, processingStepUuid } = Request.getParams(req)
-  //
-  //       const processingStep = await ProcessingChainService.fetchStepByUuid(surveyId, processingStepUuid)
-  //       const processingChainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
-  //       const index = ProcessingStep.getIndex(processingStep)
-  //
-  //       const [processingStepPrev, processingStepNext] = await Promise.all([
-  //         ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index - 1),
-  //         ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index + 1),
-  //       ])
-  //
-  //       res.json({ processingStep, processingStepPrev, processingStepNext })
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   },
-  // )
+  // ====== READ - Calculations
+
+  app.get(
+    '/survey/:surveyId/processing-step/:processingStepUuid/calculations',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, processingStepUuid } = Request.getParams(req)
+
+        const calculations = await ProcessingChainService.fetchCalculationsByStepUuid(surveyId, processingStepUuid)
+
+        res.json(calculations)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ====== UPDATE - Chain
 

@@ -5,6 +5,7 @@ import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
   calculationSteps: 'calculationSteps',
+  calculationsCount: 'calculationsCount',
   index: ObjectUtils.keys.index,
   processingChainUuid: 'processingChainUuid',
   props: ObjectUtils.keys.props,
@@ -22,6 +23,7 @@ export const keysProps = {
 
 export const getProcessingChainUuid = R.prop(keys.processingChainUuid)
 export const getCalculationSteps = R.propOr([], keys.calculationSteps)
+export const getCalculationsCount = R.pipe(R.propOr(0, keys.calculationsCount), Number)
 export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)

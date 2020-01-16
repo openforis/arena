@@ -16,9 +16,8 @@ import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import {
-  setProcessingStepCalculationProp,
-  setProcessingStepCalculationAttribute,
-  saveProcessingStepCalculationEdits,
+  updateProcessingStepCalculationProp,
+  updateProcessingStepCalculationAttribute,
   resetProcessingStepCalculationState,
   createNodeDefAnalysis,
   deleteProcessingStepCalculation,
@@ -55,7 +54,7 @@ const ProcessingStepCalculationEditor = () => {
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingStepCalculation.getLabels(calculation)}
           onChange={labels =>
-            dispatch(setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels))
+            dispatch(updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels))
           }
         />
 
@@ -63,7 +62,7 @@ const ProcessingStepCalculationEditor = () => {
           <ButtonGroup
             selectedItemKey={ProcessingStepCalculation.getType(calculation)}
             onChange={type =>
-              dispatch(setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type))
+              dispatch(updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type))
             }
             items={types}
           />
@@ -78,7 +77,7 @@ const ProcessingStepCalculationEditor = () => {
               itemLabelFunction={attrDef =>
                 `${NodeDef.getLabel(attrDef, i18n.lang)}${NodeDef.isAnalysis(attrDef) ? ' (c)' : ''}`
               }
-              onChange={def => dispatch(setProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
+              onChange={def => dispatch(updateProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
               validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />
             <button className="btn btn-s btn-add" onClick={() => dispatch(createNodeDefAnalysis(history))}>
@@ -93,7 +92,9 @@ const ProcessingStepCalculationEditor = () => {
             <ButtonGroup
               selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
               onChange={aggregateFn =>
-                dispatch(setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn))
+                dispatch(
+                  updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn),
+                )
               }
               items={aggregateFns}
               deselectable={true}

@@ -54,7 +54,9 @@ export const getProcessingStepCalculationForEdit = state =>
 export const assocProcessingStep = processingStep =>
   R.pipe(R.assoc(keys.dirty, processingStep), R.assoc(keys.orig, processingStep))
 
-const _updateStepDirty = fn => state => R.pipe(R.prop(keys.dirty), fn, step => R.assoc(keys.dirty, step, state))(state)
+const _updateStep = (key, fn) => state => R.pipe(R.prop(key), fn, step => R.assoc(key, step, state))(state)
+const _updateStepDirty = fn => _updateStep(keys.dirty, fn)
+const _updateStepOrig = fn => _updateStep(keys.orig, fn)
 
 export const mergeProcessingStepProps = props => _updateStepDirty(ProcessingStep.mergeProps(props))
 
@@ -62,6 +64,12 @@ export const saveDirty = step => assocProcessingStep(step)
 
 // Calculations
 export const assocCalculationUuidForEdit = R.assoc(keys.calculationUuidForEdit)
+
+export const assocCalculations = calculations =>
+  R.pipe(
+    _updateStepDirty(ProcessingStep.assocCalculations(calculations)),
+    _updateStepOrig(ProcessingStep.assocCalculations(calculations)),
+  )
 
 export const assocCalculation = calculation =>
   R.pipe(

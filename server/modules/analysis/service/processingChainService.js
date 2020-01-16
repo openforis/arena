@@ -14,8 +14,9 @@ export {
   fetchChainByUuid,
   // ======  READ - Steps
   fetchStepsByChainUuid,
-  fetchStepByUuid,
   fetchStepSummaryByIndex,
+  // ======  READ - Calculations
+  fetchCalculationsByStepUuid,
   // ======  UPDATE - Chain
   updateChain,
   // ======  UPDATE - Step

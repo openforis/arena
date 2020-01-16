@@ -121,7 +121,11 @@ export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '
 
 // ====== READ - Steps
 
-export { fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex } from '../repository/processingStepRepository'
+export { fetchStepsByChainUuid, fetchStepSummaryByIndex } from '../repository/processingStepRepository'
+
+// ====== READ - Calculations
+
+export { fetchCalculationsByStepUuid } from '../repository/processingStepCalculationRepository'
 
 // ====== UPDATE - Chain
 
@@ -196,37 +200,35 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 
 // ====== DELETE - Step
 
-export const deleteStep = async (user, surveyId, processingStepUuid, client = db) => {
-  const processingStep = await ProcessingStepRepository.fetchStepByUuid(surveyId, processingStepUuid)
-  const processingStepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
-    surveyId,
-    ProcessingStep.getProcessingChainUuid(processingStep),
-    ProcessingStep.getIndex(processingStep) + 1,
-  )
-  if (processingStepNext) {
-    throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
-  }
+export const deleteStep = async (user, surveyId, processingStepUuid, client = db) =>
+  await client.tx(async t => {
+    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
+    const processingStepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
+      surveyId,
+      ProcessingStep.getProcessingChainUuid(processingStep),
+      ProcessingStep.getIndex(processingStep) + 1,
+      t,
+    )
+    if (processingStepNext) {
+      throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
+    }
 
-  const logContent = {
-    [ActivityLog.keysContent.uuid]: processingStepUuid,
-    [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-    [ActivityLog.keysContent.index]: ProcessingStep.getIndex(processingStep),
-  }
-  await client.tx(
-    async t =>
-      await Promise.all([
-        ProcessingStepRepository.deleteStep(surveyId, processingStepUuid, t),
-        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
-      ]),
-  )
-}
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: processingStepUuid,
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
+      [ActivityLog.keysContent.index]: ProcessingStep.getIndex(processingStep),
+    }
+    await Promise.all([
+      ProcessingStepRepository.deleteStep(surveyId, processingStepUuid, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
+    ])
+  })
 
 // ====== DELETE - Calculation
 
-export const deleteCalculation = async (user, surveyId, processingStepUuid, calculationUuid, client = db) => {
-  const processingStep = await ProcessingStepRepository.fetchStepByUuid(surveyId, processingStepUuid)
-
+export const deleteCalculation = async (user, surveyId, processingStepUuid, calculationUuid, client = db) =>
   await client.tx(async t => {
+    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
     const calculation = await ProcessingStepCalculationRepository.deleteCalculationStep(
       surveyId,
       processingStepUuid,
@@ -250,4 +252,3 @@ export const deleteCalculation = async (user, surveyId, processingStepUuid, calc
       t,
     )
   })
-}

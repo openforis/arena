@@ -15,6 +15,7 @@ import {
   processingStepCreate,
   processingStepUpdate,
   processingStepPropsUpdate,
+  processingStepCalculationsLoad,
   processingStepCalculationCreate,
   processingStepCalculationForEditUpdate,
   processingStepCalculationIndexUpdate,
@@ -48,6 +49,9 @@ const actionHandlers = {
   [processingStepPropsUpdate]: (state, { props }) => ProcessingStepState.mergeProcessingStepProps(props)(state),
 
   // Calculations
+  [processingStepCalculationsLoad]: (state, { calculations }) =>
+    ProcessingStepState.assocCalculations(calculations)(state),
+
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
 
