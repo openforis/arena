@@ -41,7 +41,7 @@ const ProcessingStepView = props => {
 
   const calculationEditorOpened = !R.isEmpty(processingStepCalculation)
   const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, cnt => cnt > 0)(processingStep)
-  const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
+  const calculationSteps = ProcessingStep.getCalculations(processingStep)
   const canUpdateEntity = hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)
 
   const i18n = useI18n()
@@ -57,45 +57,46 @@ const ProcessingStepView = props => {
     <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
       <div className="form">
         {!editingCalculation && (
-          <button
-            className="btn-s btn-close"
-            onClick={() => {
-              if (dirty) {
-                setShowCancelConfirm(true)
-              } else {
-                resetProcessingStepState()
-              }
-            }}
-          >
-            <span className="icon icon-10px icon-cross" />
-          </button>
-        )}
-
-        <EntitySelector
-          processingStep={processingStep}
-          processingStepPrev={processingStepPrev}
-          showLabel={!calculationEditorOpened}
-          onChange={entityUuid => {
-            const props = {
-              [ProcessingStep.keysProps.entityUuid]: entityUuid,
-              [ProcessingStep.keysProps.categoryUuid]: null,
-            }
-            updateProcessingStepProps(props)
-          }}
-          readOnly={canUpdateEntity}
-        >
-          {!calculationEditorOpened && (
+          <>
             <button
-              className="btn btn-s btn-add"
-              onClick={() => addEntityVirtual(history)}
-              aria-disabled={hasCalculationSteps}
+              className="btn-s btn-close"
+              onClick={() => {
+                if (dirty) {
+                  setShowCancelConfirm(true)
+                } else {
+                  resetProcessingStepState()
+                }
+              }}
             >
-              <span className="icon icon-plus icon-12px icon-left" />
-              {i18n.t('processingStepView.virtualEntity')}
+              <span className="icon icon-10px icon-cross" />
             </button>
-          )}
-        </EntitySelector>
 
+            <EntitySelector
+              processingStep={processingStep}
+              processingStepPrev={processingStepPrev}
+              showLabel={!calculationEditorOpened}
+              onChange={entityUuid => {
+                const props = {
+                  [ProcessingStep.keysProps.entityUuid]: entityUuid,
+                  [ProcessingStep.keysProps.categoryUuid]: null,
+                }
+                updateProcessingStepProps(props)
+              }}
+              readOnly={canUpdateEntity}
+            >
+              {!calculationEditorOpened && (
+                <button
+                  className="btn btn-s btn-add"
+                  onClick={() => addEntityVirtual(history)}
+                  aria-disabled={hasCalculationSteps}
+                >
+                  <span className="icon icon-plus icon-12px icon-left" />
+                  {i18n.t('processingStepView.virtualEntity')}
+                </button>
+              )}
+            </EntitySelector>
+          </>
+        )}
         <ProcessingStepCalculationsList
           processingStep={processingStep}
           calculationEditorOpened={calculationEditorOpened}

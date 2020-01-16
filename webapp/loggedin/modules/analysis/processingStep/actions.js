@@ -78,22 +78,8 @@ export const fetchProcessingStepCalculations = () => async (dispatch, getState) 
 
 export const updateProcessingStepProps = props => dispatch => dispatch({ type: processingStepPropsUpdate, props })
 
-export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async (dispatch, getState) => {
-  dispatch(showAppSaving())
-
+export const updateProcessingStepCalculationIndex = (indexFrom, indexTo) => dispatch =>
   dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
-
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
-
-  await axios.put(`/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculation-index`, {
-    indexFrom,
-    indexTo,
-  })
-
-  dispatch(hideAppSaving())
-}
 
 // ====== DELETE
 

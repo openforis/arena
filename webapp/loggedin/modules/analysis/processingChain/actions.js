@@ -73,7 +73,28 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     R.when(R.isEmpty, R.always(null)),
   )(state)
 
-  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain, step, calculation })
+  // POST Params
+  const chainParam = R.pipe(ProcessingChain.dissocProcessingSteps, ProcessingChain.dissocValidation)(chain)
+
+  // Step, get only calculation uuid for order
+  const stepParam = R.unless(
+    R.isNil,
+    R.pipe(
+      ProcessingStep.getCalculations,
+      R.pluck(ProcessingStep.keys.uuid),
+      stepUuids => ProcessingStep.assocCalculationUuids(stepUuids)(step),
+      ProcessingStep.dissocCalculations,
+      ProcessingStep.dissocValidation,
+    ),
+  )(step)
+
+  const calculationParam = R.unless(R.isNil, ProcessingStepCalculation.dissocValidation)(calculation)
+
+  await axios.put(`/api/survey/${surveyId}/processing-chain/`, {
+    chain: chainParam,
+    step: stepParam,
+    calculation: calculationParam,
+  })
 
   dispatch(showNotification('common.saved'))
   dispatch({ type: processingChainSave, chain, step, calculation })

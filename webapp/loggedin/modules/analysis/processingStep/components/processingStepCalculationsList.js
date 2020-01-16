@@ -1,30 +1,24 @@
 import React, { useRef } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import useI18n from '@webapp/commonComponents/hooks/useI18n'
-import { createProcessingStepCalculation, putProcessingStepCalculationIndex } from '../actions'
+import { createProcessingStepCalculation } from '../actions'
 import ProcessingStepCalculationsListItem from './processingStepCalculationsListItem'
 
 import useProcessingStepCalculationsListState from './useProcessingStepCalculationsListState'
 
 const ProcessingStepCalculationsList = props => {
-  const {
-    processingStep,
-    calculationEditorOpened,
-    createProcessingStepCalculation,
-    putProcessingStepCalculationIndex,
-  } = props
+  const { processingStep, calculationEditorOpened } = props
+
+  const dispatch = useDispatch()
 
   const placeholderRef = useRef(null)
-  const { dragging, onDragStart, onDragEnd, onDragOver } = useProcessingStepCalculationsListState(
-    placeholderRef,
-    putProcessingStepCalculationIndex,
-  )
+  const { dragging, onDragStart, onDragEnd, onDragOver } = useProcessingStepCalculationsListState(placeholderRef)
 
-  const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
+  const calculationSteps = ProcessingStep.getCalculations(processingStep)
   const i18n = useI18n()
 
   return (
@@ -32,7 +26,7 @@ const ProcessingStepCalculationsList = props => {
       {!calculationEditorOpened && (
         <div className="form-label processing-step__calculations-label">
           {i18n.t('processingStepView.calculationSteps')}
-          <button className="btn-s btn-transparent" onClick={() => createProcessingStepCalculation()}>
+          <button className="btn-s btn-transparent" onClick={() => dispatch(createProcessingStepCalculation())}>
             <span className="icon icon-plus icon-14px" />
           </button>
         </div>
@@ -61,9 +55,7 @@ const ProcessingStepCalculationsList = props => {
 
 ProcessingStepCalculationsList.defaultProps = {
   processingStep: null,
+  calculationEditorOpened: false,
 }
 
-export default connect(null, {
-  createProcessingStepCalculation,
-  putProcessingStepCalculationIndex,
-})(ProcessingStepCalculationsList)
+export default ProcessingStepCalculationsList

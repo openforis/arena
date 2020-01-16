@@ -1,7 +1,12 @@
 import { useState, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+
 import { elementOffset } from '@webapp/utils/domUtils'
 
-export default (placeholderRef, putProcessingStepCalculationIndex) => {
+import { updateProcessingStepCalculationIndex } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+
+export default placeholderRef => {
+  const dispatch = useDispatch()
   const [dragging, setDragging] = useState(false)
 
   // Current element being dragged
@@ -54,7 +59,7 @@ export default (placeholderRef, putProcessingStepCalculationIndex) => {
     const indexTo = elements.indexOf(elementDrag)
     const indexFrom = Number(elementDrag.dataset.index)
     if (indexFrom !== indexTo) {
-      putProcessingStepCalculationIndex(indexFrom, indexTo)
+      dispatch(updateProcessingStepCalculationIndex(indexFrom, indexTo))
     }
 
     elementDragRef.current = null

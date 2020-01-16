@@ -41,8 +41,9 @@ export const fetchCalculationByUuid = async (surveyId, uuid, client = db) =>
 export const fetchCalculationsByStepUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.map(
     `SELECT * 
-    FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation 
-    WHERE processing_step_uuid = $1`,
+    FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation
+    WHERE processing_step_uuid = $1
+    ORDER BY index`,
     [processingStepUuid],
     camelize,
   )

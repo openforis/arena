@@ -19,9 +19,9 @@ const keys = {
 
 const getState = R.pipe(AnalysisState.getState, R.prop(stateKey))
 
-const _getStep = (stepKey, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, stepKey))
+const _getStep = stepKey => R.pipe(getState, R.propOr({}, stepKey))
 
-export const getProcessingStep = _getStep(keys.dirty, {})
+export const getProcessingStep = _getStep(keys.dirty)
 
 export const getProcessingStepPrev = state => {
   const chain = ProcessingChainState.getProcessingChain(state)
@@ -63,7 +63,7 @@ export const assocCalculations = calculations =>
 export const assocCalculation = calculation => _updateStepDirty(ProcessingStep.assocCalculation(calculation))
 
 export const updateCalculationIndex = (indexFrom, indexTo) => processingStepState =>
-  R.pipe(R.prop(keys.dirty), ProcessingStep.getCalculationSteps, R.move(indexFrom, indexTo), calculations => {
+  R.pipe(R.prop(keys.dirty), ProcessingStep.getCalculations, R.move(indexFrom, indexTo), calculations => {
     const calculationsUpdate = calculations.map((calculation, idx) =>
       ProcessingStepCalculation.assocIndex(idx)(calculation),
     )
