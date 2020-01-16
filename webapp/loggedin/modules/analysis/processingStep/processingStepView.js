@@ -41,7 +41,6 @@ const ProcessingStepView = props => {
 
   const calculationEditorOpened = !R.isEmpty(processingStepCalculation)
   const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, cnt => cnt > 0)(processingStep)
-  const calculationSteps = ProcessingStep.getCalculations(processingStep)
   const canUpdateEntity = hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)
 
   const i18n = useI18n()

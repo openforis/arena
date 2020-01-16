@@ -21,6 +21,7 @@ const ProcessingStepCalculationsListItem = props => {
     calculation,
     calculationForEdit,
     calculationEditDirty,
+    editingCalculation,
     nodeDef,
     lang,
     dragging,
@@ -44,7 +45,7 @@ const ProcessingStepCalculationsListItem = props => {
   return (
     <div
       className={className}
-      draggable={true}
+      draggable={!editingCalculation}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
@@ -89,12 +90,14 @@ const mapStateToProps = (state, { calculation }) => {
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
   const survey = SurveyState.getSurvey(state)
   const calculationEditDirty = ProcessingStepCalculationState.isDirty(state)
+  const editingCalculation = ProcessingStepCalculationState.isEditingCalculation(state)
 
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     calculationForEdit: ProcessingStepCalculationState.getCalculation(state),
     calculationEditDirty,
+    editingCalculation,
   }
 }
 

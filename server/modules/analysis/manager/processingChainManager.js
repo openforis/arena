@@ -137,34 +137,42 @@ const _insertOrUpdateCalculation = async (user, surveyId, chain, calculation, t)
 }
 
 const _updateCalculationIndexes = async (user, surveyId, step, t) => {
+  const stepUuid = ProcessingStep.getUuid(step)
   const calculationUuids = ProcessingStep.getCalculationUuids(step)
-  const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(
-    surveyId,
-    ProcessingStep.getUuid(step),
-    t,
-  )
-  // Await ProcessingStepCalculationRepository.incrementCalculationIndexesByStepUuid(surveyId,ProcessingStep.getUuid(step), calculations.length, t)
-  // await ProcessingStepCalculationRepository.updateCalculationIndexesByUuids(surveyId, calculationUuids, t)
-  for (const calculation of calculations) {
-    const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
-    const indexFrom = ProcessingStepCalculation.getIndex(calculation)
-    const indexTo = R.indexOf(calculationUuid, calculationUuids)
-    if (indexFrom !== indexTo) {
-      const logContent = {
-        [ActivityLog.keysContent.uuid]: ProcessingStepCalculation.getUuid(calculation),
-        [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(step),
-        [ActivityLog.keysContent.processingStepUuid]: ProcessingStep.getUuid(step),
-        [ActivityLog.keysContent.indexFrom]: indexFrom,
-        [ActivityLog.keysContent.indexTo]: indexTo,
+  const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
+  if (R.pipe(R.pluck(ProcessingStepCalculation.keys.uuid), R.equals(calculationUuids), R.not)(calculations)) {
+    // Calculation indexes changed
+    // Update indexes in db
+    await ProcessingStepCalculationRepository.incrementCalculationIndexesByStepUuid(
+      surveyId,
+      stepUuid,
+      calculations.length,
+      t,
+    )
+    await ProcessingStepCalculationRepository.updateCalculationIndexesByUuids(surveyId, calculationUuids, t)
+
+    // Insert activity logs
+    for (const calculation of calculations) {
+      const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
+      const indexFrom = ProcessingStepCalculation.getIndex(calculation)
+      const indexTo = R.indexOf(calculationUuid, calculationUuids)
+      if (indexFrom !== indexTo) {
+        const logContent = {
+          [ActivityLog.keysContent.uuid]: calculationUuid,
+          [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(step),
+          [ActivityLog.keysContent.processingStepUuid]: stepUuid,
+          [ActivityLog.keysContent.indexFrom]: indexFrom,
+          [ActivityLog.keysContent.indexTo]: indexTo,
+        }
+        await ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.processingStepCalculationIndexUpdate,
+          logContent,
+          false,
+          t,
+        )
       }
-      await ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.processingStepCalculationIndexUpdate,
-        logContent,
-        false,
-        t,
-      )
     }
   }
 }
