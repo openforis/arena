@@ -1,6 +1,6 @@
 import './processingStepView.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
 import * as R from 'ramda'

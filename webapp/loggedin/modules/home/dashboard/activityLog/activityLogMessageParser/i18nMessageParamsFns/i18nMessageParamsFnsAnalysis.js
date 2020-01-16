@@ -29,25 +29,17 @@ export default {
   },
 
   [ActivityLog.type.processingStepPropUpdate]: (survey, i18n) => activityLog => {
-    const content = ActivityLog.getContent(activityLog)
+    const contentKey = ActivityLog.getContentKey(activityLog)
 
-    // Only one of entityUuid or categoryUuid can have a value associated
-    const entityUuid = content[ProcessingStep.keysProps.entityUuid]
-    const categoryUuid = content[ProcessingStep.keysProps.categoryUuid]
-
-    let key
-    let value
-    if (entityUuid) {
-      key = i18n.t('nodeDefsTypes.entity')
-      value = R.pipe(Survey.getNodeDefByUuid(entityUuid), entityDef => NodeDef.getLabel(entityDef, i18n.lang))(survey)
-    } else {
-      key = i18n.t('processingStepView.category')
-      value = R.pipe(Survey.getCategoryByUuid(categoryUuid), Category.getName)(survey)
-    }
+    const key =
+      contentKey === ProcessingStep.keysProps.entityUuid
+        ? i18n.t('nodeDefsTypes.entity')
+        : contentKey === ProcessingStep.keysProps.categoryUuid
+        ? i18n.t('processingStepView.category')
+        : null
 
     return {
       key,
-      value,
       processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
       index: ActivityLog.getProcessingStepIndex(activityLog),
     }

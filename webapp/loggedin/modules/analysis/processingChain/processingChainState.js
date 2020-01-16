@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
 
 import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 
@@ -43,14 +42,7 @@ export const assocProcessingSteps = steps =>
 
 export const appendProcessingStep = step => _updateChainDirty(ProcessingChain.assocProcessingStep(step))
 
-export const dissocStepTemporary = state => {
-  const steps = R.pipe(R.prop(keys.dirty), ProcessingChain.getProcessingSteps)(state)
-  const stepLast = R.last(steps)
-
-  return ProcessingStep.isTemporary(stepLast)
-    ? R.assocPath([keys.dirty, ProcessingChain.keys.processingSteps], R.dropLast(1, steps))(state)
-    : state
-}
+export const dissocStepTemporary = _updateChainDirty(ProcessingChain.dissocProcessingStepTemporary)
 
 export const saveDirty = (chain, step) => state =>
   R.pipe(R.when(R.always(Boolean(step)), ProcessingChain.assocProcessingStep(step)), chainUpdate =>
