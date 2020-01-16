@@ -11,17 +11,17 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { navigateToProcessingChainView } from '@webapp/loggedin/modules/analysis/processingChains/actions'
-import { fetchProcessingChain } from '../processingChain/actions'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
-import { appModuleUri, analysisModules } from '@webapp/app/appModules'
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
+export const processingStepCreate = 'analysis/processingStep/create'
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepReset = 'analysis/processingStep/reset'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
+
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
 export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
 export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
@@ -31,7 +31,24 @@ export const resetProcessingStepState = () => dispatch => dispatch({ type: proce
 export const setProcessingStepCalculationForEdit = calculation => dispatch =>
   dispatch({ type: processingStepCalculationForEditUpdate, calculation })
 
+// ====== SET FOR EDIT
+
+export const setProcessingStepForEdit = processingStep => dispatch =>
+  dispatch({ type: processingStepUpdate, processingStep })
+
 // ====== CREATE
+
+export const createProcessingStep = () => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
+  const state = getState()
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+
+  const processingStep = ProcessingChain.newProcessingStep(processingChain)
+
+  dispatch({ type: processingStepCreate, processingStep })
+  dispatch(hideAppLoader())
+}
 
 export const createProcessingStepCalculation = () => async (dispatch, getState) => {
   dispatch(showAppLoader())
@@ -43,52 +60,10 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
   dispatch({ type: processingStepCalculationCreate, calculation })
   dispatch(hideAppLoader())
 }
-// ====== READ
-
-export const fetchProcessingStep = processingStepUuid => async (dispatch, getState) => {
-  dispatch(showAppSaving())
-
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const {
-    data: { processingStep, processingStepPrev, processingStepNext },
-  } = await axios.get(`/api/survey/${surveyId}/processing-step/${processingStepUuid}`)
-
-  dispatch({
-    type: processingStepUpdate,
-    processingStep,
-    processingStepPrev,
-    processingStepNext,
-  })
-  dispatch(hideAppSaving())
-
-  // Load processing chain if not in state
-  const processingChain = ProcessingChainState.getProcessingChain(state)
-  if (R.isNil(processingChain) || R.isEmpty(processingChain)) {
-    dispatch(fetchProcessingChain(ProcessingStep.getProcessingChainUuid(processingStep)))
-  }
-}
 
 // ====== UPDATE
 
-export const putProcessingStepProps = props => async (dispatch, getState) => {
-  const state = getState()
-
-  const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
-
-  dispatch({ type: processingStepPropsUpdate, props })
-
-  const action = async () => {
-    dispatch(showAppSaving())
-
-    const surveyId = SurveyState.getSurveyId(state)
-    await axios.put(`/api/survey/${surveyId}/processing-step/${processingStepUuid}`, { props })
-
-    dispatch(hideAppSaving())
-  }
-
-  dispatch(debounceAction(action, `${processingStepPropsUpdate}_${processingStepUuid}`))
-}
+export const updateProcessingStepProps = props => dispatch => dispatch({ type: processingStepPropsUpdate, props })
 
 export const putProcessingStepCalculationIndex = (indexFrom, indexTo) => async (dispatch, getState) => {
   dispatch(showAppSaving())

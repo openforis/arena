@@ -275,8 +275,8 @@ Do you want to cancel them?`,
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]:
         'added processing step {{index}} to processing chain {{processingChainLabel}}',
-      [ActivityLog.type.processingStepPropsUpdate]:
-        'updated {{key}} {{value}} of processing chain {{processingChainLabel}} step {{index}}',
+      [ActivityLog.type.processingStepPropUpdate]:
+        'updated {{key}} of processing chain {{processingChainLabel}} step {{index}}',
       [ActivityLog.type.processingStepDelete]: 'deleted processing chain {{processingChainLabel}} step {{index}}',
       [ActivityLog.type.processingStepCalculationCreate]:
         'added calculation {{index}} to processing chain {{processingChainLabel}} step {{stepIndex}}',
@@ -335,6 +335,7 @@ Do you want to cancel them?`,
   },
 
   processingChainView: {
+    formLabel: 'Processing chain label',
     dateExecuted: 'Date executed',
     status: 'Status',
     deleteConfirm: `Delete this processing chain?

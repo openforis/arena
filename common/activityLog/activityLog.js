@@ -56,7 +56,7 @@ export const type = {
   processingChainPropUpdate: 'processingChainPropUpdate',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',
-  processingStepPropsUpdate: 'processingStepPropsUpdate',
+  processingStepPropUpdate: 'processingStepPropUpdate',
   processingStepDelete: 'processingStepDelete',
   processingStepCalculationCreate: 'processingStepCalculationCreate',
   processingStepCalculationIndexUpdate: 'processingStepCalculationIndexUpdate',

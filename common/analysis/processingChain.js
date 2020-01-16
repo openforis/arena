@@ -74,6 +74,10 @@ export const getLabel = ObjectUtils.getLabel
 
 export const isTemporary = ObjectUtils.isTemporary
 
+const _getStepByIdx = stepIdx => R.pipe(getProcessingSteps, R.propOr(null, stepIdx))
+export const getStepPrev = step => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
+export const getStepNext = step => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
+
 // ====== CHECK
 
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), chain =>
@@ -81,12 +85,16 @@ export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true)
 )
 
 // ====== UPDATE
-
-export const assocProcessingSteps = R.assoc(keys.processingSteps)
-
-export const assocProcessingStep = step => chain =>
-  R.pipe(getProcessingSteps, R.append(step), steps => R.assoc(keys.processingSteps, steps, chain))(chain)
-
 export const assocProp = ObjectUtils.setProp
 
 export const dissocTemporary = ObjectUtils.dissocTemporary
+
+export const assocProcessingSteps = R.assoc(keys.processingSteps)
+
+export const assocProcessingStep = step => R.assocPath([keys.processingSteps, ProcessingStep.getIndex(step)], step)
+
+export const dissocProcessingStepTemporary = chain => {
+  const steps = getProcessingSteps(chain)
+  const stepLast = R.last(steps)
+  return ProcessingStep.isTemporary(stepLast) ? assocProcessingSteps(R.dropLast(1, steps))(chain) : chain
+}

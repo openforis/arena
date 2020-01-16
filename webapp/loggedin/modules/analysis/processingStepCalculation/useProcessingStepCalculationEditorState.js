@@ -50,7 +50,6 @@ export default () => {
   const survey = useSelector(SurveyState.getSurvey)
   const processingStep = useSelector(ProcessingStepState.getProcessingStep)
   const calculation = useSelector(ProcessingStepCalculationState.getCalculationDirty)
-  const isDirty = useSelector(ProcessingStepCalculationState.isDirty)
 
   const attributes = R.pipe(
     ProcessingStep.getEntityUuid,
@@ -70,7 +69,6 @@ export default () => {
     calculation,
     attributes,
     attribute,
-    isDirty,
 
     types: getTypes(i18n),
     aggregateFns: getAggregateFns(i18n),

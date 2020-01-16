@@ -34,7 +34,8 @@ const ProcessingChainButtonBar = () => {
   const editingChain = useSelector(ProcessingChainState.isEditingChain)
 
   const step = useSelector(ProcessingStepState.getProcessingStep)
-  const stepDirty = false // UseSelector(ProcessingStepState.getProcessingStep) TODO
+  const stepNext = useSelector(ProcessingStepState.getProcessingStepNext)
+  const stepDirty = useSelector(ProcessingStepState.isDirty)
   const editingStep = useSelector(ProcessingStepState.isEditingStep)
 
   const calculation = useSelector(ProcessingStepCalculationState.getCalculationDirty)
@@ -61,14 +62,8 @@ const ProcessingChainButtonBar = () => {
 
         <button
           className="btn-s btn-primary"
-          onClick={() => {
-            if (editingChain) {
-              dispatch(saveProcessingChain())
-            }
-          }}
-          aria-disabled={
-            (editingCalculation && !calculationDirty) || (editingStep && !stepDirty) || (editingChain && !chainDirty)
-          }
+          onClick={() => dispatch(saveProcessingChain())}
+          aria-disabled={!calculationDirty && !stepDirty && !chainDirty}
         >
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
@@ -77,7 +72,7 @@ const ProcessingChainButtonBar = () => {
           className="btn-s btn-danger btn-delete"
           aria-disabled={
             (editingCalculation && ProcessingStepCalculation.isTemporary(calculation)) ||
-            (editingStep && ProcessingStep.isTemporary(step)) ||
+            (editingStep && ProcessingStep.isTemporary(step) && !stepNext) ||
             (editingChain && ProcessingChain.isTemporary(chain))
           }
           onClick={() => setShowDeleteConfirm(true)}

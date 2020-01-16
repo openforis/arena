@@ -42,6 +42,15 @@
   color: lighten($black, 20%);
   font-weight: 600;
   font-size: .75rem;
+  transition: all 300ms ease;
+}
+
+.processing-chain__step.editing,
+.processing-step__calculation.editing {
+  .processing-chain__step-index,
+  .processing-step__calculation-index {
+    background-color: $yellow;
+  }
 }
 
 .processing-chain__step-content,

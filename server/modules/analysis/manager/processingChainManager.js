@@ -16,21 +16,12 @@ import * as ProcessingStepCalculationRepository from '../repository/processingSt
 
 // ====== Chain
 
-const _insertChain = async (user, surveyId, processingChain, client) =>
-  await client.tx(async t => {
-    const processingChainDb = await ProcessingChainRepository.insertChain(surveyId, processingChain, t)
-    await ActivityLogRepository.insert(
-      user,
-      surveyId,
-      ActivityLog.type.processingChainCreate,
-      processingChainDb,
-      false,
-      t,
-    )
-    return ProcessingChain.getUuid(processingChain)
-  })
+const _insertChain = async (user, surveyId, chain, t) => {
+  const chainDb = await ProcessingChainRepository.insertChain(surveyId, chain, t)
+  await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate, chainDb, false, t)
+}
 
-const _updateChainProps = async (user, surveyId, chain, chainDb, client) => {
+const _updateChainProps = async (user, surveyId, chain, chainDb, t) => {
   const propsNew = ProcessingChain.getProps(chain)
   const propsExisting = ProcessingChain.getProps(chainDb)
   const propsToUpdate = R.fromPairs(R.difference(R.toPairs(propsNew), R.toPairs(propsExisting)))
@@ -38,32 +29,64 @@ const _updateChainProps = async (user, surveyId, chain, chainDb, client) => {
   for (const [key, value] of Object.entries(propsToUpdate)) {
     const processingChainUuid = ProcessingChain.getUuid(chain)
     await Promise.all([
-      ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, client),
+      ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
       ActivityLogRepository.insert(
         user,
         surveyId,
         ActivityLog.type.processingChainPropUpdate,
         { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
         false,
-        client,
+        t,
       ),
     ])
   }
 }
 
+const _insertOrUpdateChain = async (user, surveyId, chain, client) => {
+  const chainDb = await ProcessingChainRepository.fetchChainByUuid(surveyId, ProcessingChain.getUuid(chain), client)
+  if (chainDb) {
+    // UPDATE CHAIN
+    await _updateChainProps(user, surveyId, chain, chainDb, client)
+  } else {
+    // CREATE CHAIN
+    await _insertChain(user, surveyId, chain, client)
+  }
+}
+
 // ====== CREATE - Processing Step
 
-export const createProcessingStep = async (user, surveyId, processingChainUuid, processingStepIndex, client = db) =>
-  await client.tx(async t => {
-    const processingStep = await ProcessingStepRepository.insertStep(
-      surveyId,
-      processingChainUuid,
-      processingStepIndex,
-      t,
-    )
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCreate, processingStep, false, t)
-    return ProcessingStep.getUuid(processingStep)
-  })
+const _insertStep = async (user, surveyId, step, t) => {
+  const stepDb = await ProcessingStepRepository.insertStep(surveyId, step, t)
+  await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCreate, stepDb, false, t)
+}
+
+const _updateStepProps = async (user, surveyId, step, stepDb, t) => {
+  const propsNew = ProcessingStep.getProps(step)
+  const propsExisting = ProcessingStep.getProps(stepDb)
+  const propsToUpdate = R.fromPairs(R.difference(R.toPairs(propsNew), R.toPairs(propsExisting)))
+
+  for (const [key, value] of Object.entries(propsToUpdate)) {
+    const processingStepUuid = ProcessingStep.getUuid(step)
+
+    const processingStepDb = await ProcessingStepRepository.updateStepProp(surveyId, processingStepUuid, key, value, t)
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: processingStepUuid,
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStepDb),
+      key,
+      value,
+    }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepPropUpdate, logContent, false, t)
+  }
+}
+
+const _insertOrUpdateStep = async (user, surveyId, step, t) => {
+  const stepDb = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, ProcessingStep.getUuid(step), t)
+  if (stepDb) {
+    await _updateStepProps(user, surveyId, step, stepDb, t)
+  } else {
+    await _insertStep(user, surveyId, step, t)
+  }
+}
 
 // ====== CREATE - Processing Step Calculation
 
@@ -102,31 +125,15 @@ export { fetchStepsByChainUuid, fetchStepByUuid, fetchStepSummaryByIndex } from 
 
 // ====== UPDATE - Chain
 
-export const updateChain = async (user, surveyId, { chain }, client = db) => {
+export const updateChain = async (user, surveyId, chain, step = null, client = db) => {
   await client.tx(async t => {
-    const chainDb = await ProcessingChainRepository.fetchChainByUuid(surveyId, ProcessingChain.getUuid(chain), t)
-    if (chainDb) {
-      // UPDATE CHAIN
-      await _updateChainProps(user, surveyId, chain, chainDb, t)
-    } else {
-      // CREATE CHAIN
-      await _insertChain(user, surveyId, chain, t)
+    await _insertOrUpdateChain(user, surveyId, chain, t)
+
+    if (step) {
+      await _insertOrUpdateStep(user, surveyId, step, t)
     }
   })
 }
-
-// ====== UPDATE - Processing Step
-
-export const updateStepProps = async (user, surveyId, processingStepUuid, props, client = db) =>
-  await client.tx(async t => {
-    const processingStep = await ProcessingStepRepository.updateStepProps(surveyId, processingStepUuid, props, t)
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: processingStepUuid,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-      ...props,
-    }
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepPropsUpdate, logContent, false, t)
-  })
 
 export const updateStepCalculationIndex = async (user, surveyId, processingStepUuid, indexFrom, indexTo, client = db) =>
   await client.tx(async t => {

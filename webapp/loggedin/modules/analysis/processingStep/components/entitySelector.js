@@ -41,7 +41,7 @@ const EntitySelector = props => {
   const i18n = useI18n()
 
   return (
-    <div className="form-item processing-step__entity-selector-form-item">
+    <div className={`form-item${showLabel ? ' processing-step__entity-selector-form-item' : ''}`}>
       {showLabel && <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>}
 
       <Dropdown
