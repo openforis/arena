@@ -48,7 +48,7 @@ const ProcessingStepView = props => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   useEffect(() => {
-    if (hasCalculationSteps && R.isEmpty(calculationSteps)) {
+    if (!editingCalculation) {
       fetchProcessingStepCalculations()
     }
   }, [ProcessingStep.getUuid(processingStep)])
@@ -122,8 +122,8 @@ const mapStateToProps = state => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
-  processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
   dirty: ProcessingStepState.isDirty(state),
+  processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
   editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
 })
 
