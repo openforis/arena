@@ -19,17 +19,18 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 export const processingStepCreate = 'analysis/processingStep/create'
 export const processingStepUpdate = 'analysis/processingStep/update'
+export const processingStepCalculationsLoad = 'analysis/processingStep/calculations/load'
 export const processingStepReset = 'analysis/processingStep/reset'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
-export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
+export const processingStepCalculationUpdate = 'analysis/processingStep/calculation/update'
 export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
 
 export const resetProcessingStepState = () => dispatch => dispatch({ type: processingStepReset })
 
 export const setProcessingStepCalculationForEdit = calculation => dispatch =>
-  dispatch({ type: processingStepCalculationForEditUpdate, calculation })
+  dispatch({ type: processingStepCalculationUpdate, calculation })
 
 // ====== SET FOR EDIT
 
@@ -61,6 +62,18 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
   dispatch(hideAppLoader())
 }
 
+// ====== READ
+export const fetchProcessingStepCalculations = () => async (dispatch, getState) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
+
+  const { data: calculations = [] } = await axios.get(
+    `/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculations`,
+  )
+
+  dispatch({ type: processingStepCalculationsLoad, calculations })
+}
 // ====== UPDATE
 
 export const updateProcessingStepProps = props => dispatch => dispatch({ type: processingStepPropsUpdate, props })

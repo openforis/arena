@@ -16,56 +16,6 @@ import * as ProcessingChainService from '../service/processingChainService'
 // }
 
 export const init = app => {
-  // ====== CREATE - Processing Step
-
-  // app.post(
-  //   '/survey/:surveyId/processing-chain/:processingChainUuid/processing-step',
-  //   AuthMiddleware.requireRecordAnalysisPermission,
-  //   async (req, res, next) => {
-  //     try {
-  //       const { surveyId, processingChainUuid, processingStepIndex } = Request.getParams(req)
-  //       const user = Request.getUser(req)
-  //
-  //       const processingStepUuid = await ProcessingChainService.createProcessingStep(
-  //         user,
-  //         surveyId,
-  //         processingChainUuid,
-  //         processingStepIndex,
-  //       )
-  //
-  //       res.json(processingStepUuid)
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   },
-  // )
-
-  // ====== CREATE - Processing Step Calculation
-
-  // app.post(
-  //   '/survey/:surveyId/processing-step/:processingStepUuid/calculation',
-  //   AuthMiddleware.requireRecordAnalysisPermission,
-  //   async (req, res, next) => {
-  //     try {
-  //       const { surveyId } = Request.getParams(req)
-  //       const calculation = Request.getBody(req)
-  //       const user = Request.getUser(req)
-  //
-  //       await _checkIsValidProcessingStepCalculation(calculation)
-  //
-  //       const calculationInserted = await ProcessingChainService.insertProcessingStepCalculation(
-  //         user,
-  //         surveyId,
-  //         calculation,
-  //       )
-  //
-  //       res.json(calculationInserted)
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   },
-  // )
-
   // ====== READ - Chains
 
   app.get(
@@ -135,28 +85,23 @@ export const init = app => {
     },
   )
 
-  // App.get(
-  //   '/survey/:surveyId/processing-step/:processingStepUuid',
-  //   AuthMiddleware.requireRecordAnalysisPermission,
-  //   async (req, res, next) => {
-  //     try {
-  //       const { surveyId, processingStepUuid } = Request.getParams(req)
-  //
-  //       const processingStep = await ProcessingChainService.fetchStepByUuid(surveyId, processingStepUuid)
-  //       const processingChainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
-  //       const index = ProcessingStep.getIndex(processingStep)
-  //
-  //       const [processingStepPrev, processingStepNext] = await Promise.all([
-  //         ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index - 1),
-  //         ProcessingChainService.fetchStepSummaryByIndex(surveyId, processingChainUuid, index + 1),
-  //       ])
-  //
-  //       res.json({ processingStep, processingStepPrev, processingStepNext })
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   },
-  // )
+  // ====== READ - Calculations
+
+  app.get(
+    '/survey/:surveyId/processing-step/:processingStepUuid/calculations',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, processingStepUuid } = Request.getParams(req)
+
+        const calculations = await ProcessingChainService.fetchCalculationsByStepUuid(surveyId, processingStepUuid)
+
+        res.json(calculations)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ====== UPDATE - Chain
 
@@ -169,8 +114,8 @@ export const init = app => {
 
         const user = Request.getUser(req)
 
-        const { chain, step } = Request.getBody(req)
-        await ProcessingChainService.updateChain(user, surveyId, chain, step)
+        const { chain, step, calculation } = Request.getBody(req)
+        await ProcessingChainService.updateChain(user, surveyId, chain, step, calculation)
 
         Response.sendOk(res)
       } catch (error) {
@@ -178,25 +123,6 @@ export const init = app => {
       }
     },
   )
-
-  // ====== UPDATE - Processing Step
-
-  // app.put(
-  //   '/survey/:surveyId/processing-step/:processingStepUuid',
-  //   AuthMiddleware.requireRecordAnalysisPermission,
-  //   async (req, res, next) => {
-  //     try {
-  //       const { surveyId, processingStepUuid, props } = Request.getParams(req)
-  //       const user = Request.getUser(req)
-  //
-  //       await ProcessingChainService.updateStepProps(user, surveyId, processingStepUuid, props)
-  //
-  //       Response.sendOk(res)
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   },
-  // )
 
   // ====== UPDATE - Processing Step Calculation (index)
 
@@ -216,28 +142,6 @@ export const init = app => {
       }
     },
   )
-
-  // ====== UPDATE - Processing Step Calculation
-
-  // app.put(
-  //   '/survey/:surveyId/processing-step/:processingStepUuid/calculation',
-  //   AuthMiddleware.requireRecordAnalysisPermission,
-  //   async (req, res, next) => {
-  //     try {
-  //       const { surveyId } = Request.getParams(req)
-  //       const calculation = Request.getBody(req)
-  //       const user = Request.getUser(req)
-  //
-  //       await _checkIsValidProcessingStepCalculation(calculation)
-  //
-  //       const calculationUpdated = await ProcessingChainService.updateCalculationStep(user, surveyId, calculation)
-  //
-  //       res.json(calculationUpdated)
-  //     } catch (error) {
-  //       next(error)
-  //     }
-  //   },
-  // )
 
   // ====== DELETE - Chain
 

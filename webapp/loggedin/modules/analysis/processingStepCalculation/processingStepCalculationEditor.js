@@ -3,6 +3,7 @@ import './processingStepCalculationEditor.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -16,12 +17,10 @@ import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import {
-  setProcessingStepCalculationProp,
-  setProcessingStepCalculationAttribute,
-  saveProcessingStepCalculationEdits,
+  updateProcessingStepCalculationProp,
+  updateProcessingStepCalculationAttribute,
   resetProcessingStepCalculationState,
   createNodeDefAnalysis,
-  deleteProcessingStepCalculation,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 import useProcessingStepCalculationEditorState from './useProcessingStepCalculationEditorState'
 
@@ -31,6 +30,7 @@ const ProcessingStepCalculationEditor = () => {
 
     surveyInfo,
     calculation,
+    dirty,
     attributes,
     attribute,
 
@@ -39,8 +39,6 @@ const ProcessingStepCalculationEditor = () => {
 
     showCancelConfirm,
     setShowCancelConfirm,
-    showDeleteConfirm,
-    setShowDeleteConfirm,
   } = useProcessingStepCalculationEditorState()
 
   const dispatch = useDispatch()
@@ -48,14 +46,27 @@ const ProcessingStepCalculationEditor = () => {
 
   const validation = ProcessingStepCalculation.getValidation(calculation)
 
-  return calculation ? (
+  return R.isEmpty(calculation) ? null : (
     <>
       <div className="processing-step__calculation-editor">
+        <button
+          className="btn-s btn-close"
+          onClick={() => {
+            if (dirty) {
+              setShowCancelConfirm(true)
+            } else {
+              dispatch(resetProcessingStepCalculationState())
+            }
+          }}
+        >
+          <span className="icon icon-10px icon-cross" />
+        </button>
+
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingStepCalculation.getLabels(calculation)}
           onChange={labels =>
-            dispatch(setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels))
+            dispatch(updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels))
           }
         />
 
@@ -63,7 +74,7 @@ const ProcessingStepCalculationEditor = () => {
           <ButtonGroup
             selectedItemKey={ProcessingStepCalculation.getType(calculation)}
             onChange={type =>
-              dispatch(setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type))
+              dispatch(updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.type, type))
             }
             items={types}
           />
@@ -78,7 +89,7 @@ const ProcessingStepCalculationEditor = () => {
               itemLabelFunction={attrDef =>
                 `${NodeDef.getLabel(attrDef, i18n.lang)}${NodeDef.isAnalysis(attrDef) ? ' (c)' : ''}`
               }
-              onChange={def => dispatch(setProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
+              onChange={def => dispatch(updateProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
               validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />
             <button className="btn btn-s btn-add" onClick={() => dispatch(createNodeDefAnalysis(history))}>
@@ -93,7 +104,9 @@ const ProcessingStepCalculationEditor = () => {
             <ButtonGroup
               selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
               onChange={aggregateFn =>
-                dispatch(setProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn))
+                dispatch(
+                  updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.aggregateFn, aggregateFn),
+                )
               }
               items={aggregateFns}
               deselectable={true}
@@ -112,19 +125,8 @@ const ProcessingStepCalculationEditor = () => {
           onCancel={() => setShowCancelConfirm(false)}
         />
       )}
-
-      {showDeleteConfirm && (
-        <ConfirmDialog
-          message={i18n.t('processingStepCalculationView.deleteConfirm')}
-          onOk={() => {
-            setShowDeleteConfirm(false)
-            dispatch(deleteProcessingStepCalculation())
-          }}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
     </>
-  ) : null
+  )
 }
 
 export default ProcessingStepCalculationEditor

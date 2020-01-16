@@ -1,8 +1,8 @@
 import './processingStepView.scss'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { useHistory, useParams } from 'react-router'
+import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -11,13 +11,13 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
-import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import {
+  fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,
@@ -31,24 +31,29 @@ const ProcessingStepView = props => {
     processingStepCalculation,
     dirty,
     editingCalculation,
+    fetchProcessingStepCalculations,
     resetProcessingStepState,
     updateProcessingStepProps,
     addEntityVirtual,
   } = props
 
   const history = useHistory()
-  const { nodeDefUuid } = useParams()
 
-  const calculationEditorOpened = Boolean(processingStepCalculation)
-
-  const hasCalculationSteps = !R.isEmpty(ProcessingStep.getCalculationSteps(processingStep))
+  const calculationEditorOpened = !R.isEmpty(processingStepCalculation)
+  const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, cnt => cnt > 0)(processingStep)
+  const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
+  const canUpdateEntity = hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)
 
   const i18n = useI18n()
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
-  return nodeDefUuid ? (
-    <NodeDefView />
-  ) : R.isEmpty(processingStep) ? null : (
+  useEffect(() => {
+    if (!editingCalculation) {
+      fetchProcessingStepCalculations()
+    }
+  }, [ProcessingStep.getUuid(processingStep)])
+
+  return (
     <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
       <div className="form">
         {!editingCalculation && (
@@ -77,7 +82,7 @@ const ProcessingStepView = props => {
             }
             updateProcessingStepProps(props)
           }}
-          readOnly={hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)}
+          readOnly={canUpdateEntity}
         >
           {!calculationEditorOpened && (
             <button
@@ -117,12 +122,13 @@ const mapStateToProps = state => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
-  processingStepCalculation: ProcessingStepState.getProcessingStepCalculationForEdit(state),
   dirty: ProcessingStepState.isDirty(state),
+  processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
   editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
 })
 
 export default connect(mapStateToProps, {
+  fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,

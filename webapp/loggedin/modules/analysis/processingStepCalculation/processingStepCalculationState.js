@@ -7,8 +7,8 @@ import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
 export const stateKey = 'processingStepCalculation'
 
 const keys = {
-  calculationDirty: 'calculationDirty', // Calculation currently being edited
-  calculationOrig: 'calculationOrig', // Calculation as it was when editing started (used when canceling edits)
+  dirty: 'dirty', // Calculation currently being edited
+  orig: 'orig', // Calculation as it was when editing started (used when canceling edits)
 }
 
 const getState = R.pipe(AnalysisState.getState, R.prop(stateKey))
@@ -16,35 +16,36 @@ const getStateProp = (prop, defaultValue) => R.pipe(getState, R.propOr(defaultVa
 
 // ===== READ
 
-export const getCalculationOrig = getStateProp(keys.calculationOrig)
-export const getCalculationDirty = getStateProp(keys.calculationDirty)
+const getCalculationOrig = getStateProp(keys.orig, {})
+export const getCalculation = getStateProp(keys.dirty, {})
 
 // ===== UPDATE
 
-export const assocCalculationDirty = R.assoc(keys.calculationDirty)
-export const assocCalculationOrig = R.assoc(keys.calculationOrig)
+export const assocCalculationDirty = R.assoc(keys.dirty)
+export const assocCalculationOrig = R.assoc(keys.orig)
 
-export const assocCalculationForEdit = calculation =>
+export const assocCalculation = calculation =>
   R.pipe(assocCalculationDirty(calculation), assocCalculationOrig(calculation))
 
 export const assocCalculationDirtyNodeDefUuid = nodeDefUuid => state =>
   R.pipe(
-    R.prop(keys.calculationDirty),
+    R.prop(keys.dirty),
     ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid),
     ProcessingStepCalculation.dissocValidation,
-    calculation => R.assoc(keys.calculationDirty, calculation)(state),
+    calculation => R.assoc(keys.dirty, calculation)(state),
   )(state)
+
+export const saveDirty = assocCalculation
 
 // ===== UTILS
 /**
  * Returns true if processingStepCalculation and processingStepCalculation are not equals
  */
 export const isDirty = state => {
-  const calculationDirty = getCalculationDirty(state)
+  const calculationDirty = getCalculation(state)
   return (
-    calculationDirty &&
-    (ProcessingStepCalculation.isTemporary(calculationDirty) || !R.equals(calculationDirty, getCalculationOrig(state)))
+    ProcessingStepCalculation.isTemporary(calculationDirty) || !R.equals(calculationDirty, getCalculationOrig(state))
   )
 }
 
-export const isEditingCalculation = R.pipe(getCalculationDirty, R.isNil, R.not)
+export const isEditingCalculation = R.pipe(getCalculation, R.isEmpty, R.not)

@@ -3,12 +3,14 @@ import axios from 'axios'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from './processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
@@ -65,11 +67,16 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     ProcessingStep.dissocTemporary,
     R.when(R.isEmpty, R.always(null)),
   )(state)
+  const calculation = R.pipe(
+    ProcessingStepCalculationState.getCalculation,
+    ProcessingStepCalculation.dissocTemporary,
+    R.when(R.isEmpty, R.always(null)),
+  )(state)
 
-  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain, step })
+  await axios.put(`/api/survey/${surveyId}/processing-chain/`, { chain, step, calculation })
 
   dispatch(showNotification('common.saved'))
-  dispatch({ type: processingChainSave, chain, step })
+  dispatch({ type: processingChainSave, chain, step, calculation })
   dispatch(hideAppSaving())
 }
 

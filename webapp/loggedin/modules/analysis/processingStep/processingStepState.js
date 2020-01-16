@@ -35,39 +35,32 @@ export const getProcessingStepNext = state => {
   return ProcessingChain.getStepNext(step)(chain)
 }
 
-export const getProcessingStepCalculationForEdit = state =>
-  R.pipe(
-    getState,
-    R.propOr(null, keys.calculationUuidForEdit),
-    R.unless(R.isNil, uuid =>
-      R.pipe(
-        getProcessingStep,
-        ProcessingStep.getCalculationSteps,
-        R.find(R.propEq(ProcessingStepCalculation.keys.uuid, uuid)),
-      )(state),
-    ),
-  )(state)
-
 // ====== UPDATE
 
 // Step
 export const assocProcessingStep = processingStep =>
   R.pipe(R.assoc(keys.dirty, processingStep), R.assoc(keys.orig, processingStep))
 
-const _updateStepDirty = fn => state => R.pipe(R.prop(keys.dirty), fn, step => R.assoc(keys.dirty, step, state))(state)
+const _updateStep = (key, fn) => state => R.pipe(R.prop(key), fn, step => R.assoc(key, step, state))(state)
+const _updateStepDirty = fn => _updateStep(keys.dirty, fn)
+const _updateStepOrig = fn => _updateStep(keys.orig, fn)
 
 export const mergeProcessingStepProps = props => _updateStepDirty(ProcessingStep.mergeProps(props))
 
-export const saveDirty = step => assocProcessingStep(step)
+export const saveDirty = (step, calculation) => state =>
+  R.pipe(R.when(R.always(Boolean(calculation)), ProcessingStep.assocCalculation(calculation)), stepUpdate =>
+    assocProcessingStep(stepUpdate)(state),
+  )(step)
 
 // Calculations
-export const assocCalculationUuidForEdit = R.assoc(keys.calculationUuidForEdit)
 
-export const assocCalculation = calculation =>
+export const assocCalculations = calculations =>
   R.pipe(
-    _updateStepDirty(ProcessingStep.assocCalculation(calculation)),
-    assocCalculationUuidForEdit(ProcessingStepCalculation.getUuid(calculation)),
+    _updateStepDirty(ProcessingStep.assocCalculations(calculations)),
+    _updateStepOrig(ProcessingStep.assocCalculations(calculations)),
   )
+
+export const assocCalculation = calculation => _updateStepDirty(ProcessingStep.assocCalculation(calculation))
 
 export const updateCalculationIndex = (indexFrom, indexTo) => processingStepState =>
   R.pipe(R.prop(keys.dirty), ProcessingStep.getCalculationSteps, R.move(indexFrom, indexTo), calculations => {
@@ -77,10 +70,7 @@ export const updateCalculationIndex = (indexFrom, indexTo) => processingStepStat
     return _updateStepDirty(ProcessingStep.assocCalculations(calculationsUpdate))(processingStepState)
   })(processingStepState)
 
-export const dissocTemporaryCalculation = state =>
-  R.pipe(R.prop(keys.dirty), ProcessingStep.dissocTemporaryCalculation, processingStep =>
-    R.assoc(keys.dirty, processingStep)(state),
-  )(state)
+export const dissocTemporaryCalculation = _updateStepDirty(ProcessingStep.dissocTemporaryCalculation)
 
 export const dissocCalculation = calculation => state =>
   R.pipe(R.prop(keys.dirty), ProcessingStep.dissocCalculation(calculation), processingStep =>

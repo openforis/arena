@@ -47,11 +47,19 @@ export const getDateCreated = getDate(keys.dateCreated)
 export const getDateModified = getDate(keys.dateModified)
 
 export const getCycle = R.prop(keys.cycle)
-export const getIndex = R.propOr(null, keys.index)
+export const getIndex = R.pipe(R.propOr(0, keys.index), Number)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.prop(keys.authGroups)
 
 export const isTemporary = R.propEq(keys.temporary, true)
+
+// ===== Props
+
+export const getPropsDiff = other => obj => {
+  const propsSelf = getProps(obj)
+  const propsOther = getProps(other)
+  return R.fromPairs(R.difference(R.toPairs(propsOther), R.toPairs(propsSelf)))
+}
 
 // ===== UPDATE
 export const assocIndex = R.assoc(keys.index)

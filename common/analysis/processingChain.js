@@ -60,6 +60,7 @@ export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null,
 
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
+export const getPropsDiff = ObjectUtils.getPropsDiff
 export const getCycle = ObjectUtils.getCycle
 export const getDateCreated = ObjectUtils.getDateCreated
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
