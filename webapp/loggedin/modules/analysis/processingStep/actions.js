@@ -10,7 +10,6 @@ import * as SurveyState from '@webapp/survey/surveyState'
 
 import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { navigateToProcessingChainView } from '@webapp/loggedin/modules/analysis/processingChains/actions'
 
 import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
@@ -18,10 +17,11 @@ import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 export const processingStepCreate = 'analysis/processingStep/create'
-export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepCalculationsLoad = 'analysis/processingStep/calculations/load'
-export const processingStepReset = 'analysis/processingStep/reset'
+export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
+export const processingStepDelete = 'analysis/processingStep/delete'
+export const processingStepReset = 'analysis/processingStep/reset'
 
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
 export const processingStepCalculationUpdate = 'analysis/processingStep/calculation/update'
@@ -83,7 +83,7 @@ export const updateProcessingStepCalculationIndex = (indexFrom, indexTo) => disp
 
 // ====== DELETE
 
-export const deleteProcessingStep = history => async (dispatch, getState) => {
+export const deleteProcessingStep = () => async (dispatch, getState) => {
   dispatch(showAppSaving())
 
   const state = getState()
@@ -92,7 +92,7 @@ export const deleteProcessingStep = history => async (dispatch, getState) => {
 
   await axios.delete(`/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}`)
 
-  dispatch(navigateToProcessingChainView(history, ProcessingStep.getProcessingChainUuid(processingStep)))
+  dispatch({ type: processingStepDelete })
   dispatch(showNotification('processingStepView.deleteComplete'))
   dispatch(hideAppSaving())
 }

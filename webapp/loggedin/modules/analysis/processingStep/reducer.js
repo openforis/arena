@@ -13,6 +13,7 @@ import {
   processingStepCreate,
   processingStepUpdate,
   processingStepPropsUpdate,
+  processingStepDelete,
   processingStepCalculationsLoad,
   processingStepCalculationCreate,
   processingStepCalculationIndexUpdate,
@@ -33,7 +34,8 @@ const actionHandlers = {
   // Chain
   [processingChainReset]: () => ({}),
 
-  [processingChainSave]: (state, { step, calculation }) => ProcessingStepState.saveDirty(step, calculation)(state),
+  [processingChainSave]: (state, { step, calculation }) =>
+    R.when(R.always(Boolean(step)), ProcessingStepState.saveDirty(step, calculation))(state),
 
   // Step
   [processingStepReset]: () => ({}),
@@ -43,6 +45,8 @@ const actionHandlers = {
   [processingStepUpdate]: (state, { processingStep }) => ProcessingStepState.assocProcessingStep(processingStep)(state),
 
   [processingStepPropsUpdate]: (state, { props }) => ProcessingStepState.mergeProcessingStepProps(props)(state),
+
+  [processingStepDelete]: () => ({}),
 
   // Calculations
   [processingStepCalculationsLoad]: (state, { calculations }) =>

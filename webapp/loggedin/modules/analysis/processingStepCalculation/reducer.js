@@ -23,7 +23,8 @@ const actionHandlers = {
   // Chain
   [processingChainReset]: () => ({}),
 
-  [processingChainSave]: (state, { calculation }) => ProcessingStepCalculationState.saveDirty(calculation)(state),
+  [processingChainSave]: (state, { calculation }) =>
+    R.when(R.always(Boolean(calculation)), ProcessingStepCalculationState.saveDirty(calculation))(state),
 
   // Step
   [processingStepUpdate]: () => ({}),

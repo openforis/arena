@@ -40,14 +40,16 @@ export const isTemporary = ObjectUtils.isTemporary
 
 // ====== UPDATE
 
+export const assocIndex = ObjectUtils.assocIndex
+export const mergeProps = ObjectUtils.mergeProps
+export const dissocTemporary = ObjectUtils.dissocTemporary
+
 export const assocCalculations = R.assoc(keys.calculations)
 export const dissocCalculations = R.dissoc(keys.calculations)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
 
 export const assocCalculation = calculation =>
   R.assocPath([keys.calculations, ProcessingStepCalculation.getIndex(calculation)], calculation)
-
-export const mergeProps = ObjectUtils.mergeProps
 
 export const dissocTemporaryCalculation = processingStep =>
   R.pipe(
@@ -73,8 +75,6 @@ export const dissocCalculation = calculation => processingStep =>
     // Update calculation steps in processing step
     calculationSteps => assocCalculations(calculationSteps)(processingStep),
   )(processingStep)
-
-export const dissocTemporary = ObjectUtils.dissocTemporary
 
 // ====== VALIDATION
 export const getValidation = Validation.getValidation
