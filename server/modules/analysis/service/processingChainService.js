@@ -17,8 +17,6 @@ export {
   fetchCalculationsByStepUuid,
   // ======  UPDATE - Chain
   updateChain,
-  // ======  UPDATE - Step
-  updateStepCalculationIndex,
   // ======  DELETE - Chain
   deleteChain,
   // ======  DELETE - Step

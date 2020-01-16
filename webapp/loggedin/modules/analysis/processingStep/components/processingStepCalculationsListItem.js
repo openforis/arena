@@ -2,7 +2,6 @@ import './processingStepCalculationsListItem.scss'
 
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -21,8 +20,8 @@ const ProcessingStepCalculationsListItem = props => {
   const {
     calculation,
     calculationForEdit,
-    isCalculationEditDirty,
-    isCalculationEditTemporary,
+    calculationEditDirty,
+    editingCalculation,
     nodeDef,
     lang,
     dragging,
@@ -42,11 +41,11 @@ const ProcessingStepCalculationsListItem = props => {
 
   const index = ProcessingStepCalculation.getIndex(calculation)
 
-  const [showCalculationEditCancelConfirm, setCalculationEditShowCancelConfirm] = useState()
+  const [showCalculationEditCancelConfirm, setCalculationEditShowCancelConfirm] = useState(false)
   return (
     <div
       className={className}
-      draggable={!isCalculationEditTemporary}
+      draggable={!editingCalculation}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
@@ -58,7 +57,7 @@ const ProcessingStepCalculationsListItem = props => {
         className="processing-step__calculation-content"
         onClick={() =>
           !editing &&
-          (isCalculationEditDirty
+          (calculationEditDirty
             ? setCalculationEditShowCancelConfirm(true)
             : setProcessingStepCalculationForEdit(calculation))
         }
@@ -90,18 +89,15 @@ ProcessingStepCalculationsListItem.defaultProps = {
 const mapStateToProps = (state, { calculation }) => {
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
   const survey = SurveyState.getSurvey(state)
-  const isCalculationEditDirty = ProcessingStepCalculationState.isDirty(state)
-  const isCalculationEditTemporary = R.pipe(
-    ProcessingStepCalculationState.getCalculation,
-    ProcessingStepCalculation.isTemporary,
-  )(state)
+  const calculationEditDirty = ProcessingStepCalculationState.isDirty(state)
+  const editingCalculation = ProcessingStepCalculationState.isEditingCalculation(state)
 
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     calculationForEdit: ProcessingStepCalculationState.getCalculation(state),
-    isCalculationEditDirty,
-    isCalculationEditTemporary,
+    calculationEditDirty,
+    editingCalculation,
   }
 }
 

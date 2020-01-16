@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
 import { uuidv4 } from '@core/uuid'
+import * as Validation from '@core/validation/validation'
 
 import * as ProcessingStep from './processingStep'
 import * as ProcessingStepCalculation from './processingStepCalculation'
@@ -50,7 +51,7 @@ export const newProcessingStep = (processingChain, props = {}) => ({
 export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null, props = {}) => ({
   [ProcessingStepCalculation.keys.uuid]: uuidv4(),
   [ProcessingStepCalculation.keys.processingStepUuid]: ProcessingStep.getUuid(processingStep),
-  [ProcessingStepCalculation.keys.index]: ProcessingStep.getCalculationSteps(processingStep).length,
+  [ProcessingStepCalculation.keys.index]: ProcessingStep.getCalculations(processingStep).length,
   [ProcessingStepCalculation.keys.nodeDefUuid]: nodeDefUuid,
   [ProcessingStepCalculation.keys.props]: props,
   [ProcessingStepCalculation.keys.temporary]: true,
@@ -90,6 +91,8 @@ export const assocProp = ObjectUtils.setProp
 
 export const dissocTemporary = ObjectUtils.dissocTemporary
 
+export const dissocProcessingSteps = R.dissoc(keys.processingSteps)
+
 export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
 export const assocProcessingStep = step => R.assocPath([keys.processingSteps, ProcessingStep.getIndex(step)], step)
@@ -99,3 +102,9 @@ export const dissocProcessingStepTemporary = chain => {
   const stepLast = R.last(steps)
   return ProcessingStep.isTemporary(stepLast) ? assocProcessingSteps(R.dropLast(1, steps))(chain) : chain
 }
+
+// ====== VALIDATION
+export const getValidation = Validation.getValidation
+export const hasValidation = Validation.hasValidation
+export const assocValidation = Validation.assocValidation
+export const dissocValidation = Validation.dissocValidation

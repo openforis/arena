@@ -3,7 +3,6 @@ import './processingStepCalculationEditor.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
-import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -46,7 +45,7 @@ const ProcessingStepCalculationEditor = () => {
 
   const validation = ProcessingStepCalculation.getValidation(calculation)
 
-  return R.isEmpty(calculation) ? null : (
+  return (
     <>
       <div className="processing-step__calculation-editor">
         <button

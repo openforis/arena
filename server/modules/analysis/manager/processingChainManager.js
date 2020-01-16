@@ -136,6 +136,47 @@ const _insertOrUpdateCalculation = async (user, surveyId, chain, calculation, t)
   }
 }
 
+const _updateCalculationIndexes = async (user, surveyId, step, t) => {
+  const stepUuid = ProcessingStep.getUuid(step)
+  const calculationUuids = ProcessingStep.getCalculationUuids(step)
+  const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
+  if (R.pipe(R.pluck(ProcessingStepCalculation.keys.uuid), R.equals(calculationUuids), R.not)(calculations)) {
+    // Calculation indexes changed
+    // Update indexes in db
+    await ProcessingStepCalculationRepository.incrementCalculationIndexesByStepUuid(
+      surveyId,
+      stepUuid,
+      calculations.length,
+      t,
+    )
+    await ProcessingStepCalculationRepository.updateCalculationIndexesByUuids(surveyId, calculationUuids, t)
+
+    // Insert activity logs
+    for (const calculation of calculations) {
+      const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
+      const indexFrom = ProcessingStepCalculation.getIndex(calculation)
+      const indexTo = R.indexOf(calculationUuid, calculationUuids)
+      if (indexFrom !== indexTo) {
+        const logContent = {
+          [ActivityLog.keysContent.uuid]: calculationUuid,
+          [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(step),
+          [ActivityLog.keysContent.processingStepUuid]: stepUuid,
+          [ActivityLog.keysContent.indexFrom]: indexFrom,
+          [ActivityLog.keysContent.indexTo]: indexTo,
+        }
+        await ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.processingStepCalculationIndexUpdate,
+          logContent,
+          false,
+          t,
+        )
+      }
+    }
+  }
+}
+
 // ====== READ - Chain
 
 export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '../repository/processingChainRepository'
@@ -159,36 +200,11 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
       if (calculation) {
         await _insertOrUpdateCalculation(user, surveyId, chain, calculation, t)
       }
+
+      await _updateCalculationIndexes(user, surveyId, step, t)
     }
   })
 }
-
-export const updateStepCalculationIndex = async (user, surveyId, processingStepUuid, indexFrom, indexTo, client = db) =>
-  await client.tx(async t => {
-    const calculation = await ProcessingStepCalculationRepository.updateCalculationIndex(
-      surveyId,
-      processingStepUuid,
-      indexFrom,
-      indexTo,
-      t,
-    )
-    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: ProcessingStepCalculation.getUuid(calculation),
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-      [ActivityLog.keysContent.processingStepUuid]: ProcessingStep.getUuid(processingStep),
-      [ActivityLog.keysContent.indexFrom]: indexFrom,
-      [ActivityLog.keysContent.indexTo]: indexTo,
-    }
-    await ActivityLogRepository.insert(
-      user,
-      surveyId,
-      ActivityLog.type.processingStepCalculationIndexUpdate,
-      logContent,
-      false,
-      t,
-    )
-  })
 
 // ====== DELETE - Chain
 

@@ -124,25 +124,6 @@ export const init = app => {
     },
   )
 
-  // ====== UPDATE - Processing Step Calculation (index)
-
-  app.put(
-    '/survey/:surveyId/processing-step/:processingStepUuid/calculation-index',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, processingStepUuid, indexFrom, indexTo } = Request.getParams(req)
-        const user = Request.getUser(req)
-
-        await ProcessingChainService.updateStepCalculationIndex(user, surveyId, processingStepUuid, indexFrom, indexTo)
-
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
-
   // ====== DELETE - Chain
 
   app.delete(
