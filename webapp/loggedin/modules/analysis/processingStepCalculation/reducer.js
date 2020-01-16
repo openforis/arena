@@ -10,6 +10,7 @@ import { processingChainReset, processingChainSave } from '@webapp/loggedin/modu
 import {
   processingStepCalculationUpdate,
   processingStepCalculationCreate,
+  processingStepUpdate,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import {
   processingStepCalculationDirtyUpdate,
@@ -23,6 +24,9 @@ const actionHandlers = {
   [processingChainReset]: () => ({}),
 
   [processingChainSave]: (state, { calculation }) => ProcessingStepCalculationState.saveDirty(calculation)(state),
+
+  // Step
+  [processingStepUpdate]: () => ({}),
 
   [processingStepCalculationUpdate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculation(calculation)(state),
