@@ -38,18 +38,18 @@ export default () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (calculation && !ProcessingStepCalculation.hasValidation(calculation)) {
+    if (!R.isEmpty(calculation) && !ProcessingStepCalculation.hasValidation(calculation)) {
       dispatch(validateProcessingStepCalculation())
     }
   }, [])
 
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   // Get survey info, calculation and attributes from store
   const survey = useSelector(SurveyState.getSurvey)
   const processingStep = useSelector(ProcessingStepState.getProcessingStep)
-  const calculation = useSelector(ProcessingStepCalculationState.getCalculationDirty)
+  const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
+  const dirty = useSelector(ProcessingStepCalculationState.isDirty)
 
   const attributes = R.pipe(
     ProcessingStep.getEntityUuid,
@@ -67,6 +67,7 @@ export default () => {
 
     surveyInfo: Survey.getSurveyInfo(survey),
     calculation,
+    dirty,
     attributes,
     attribute,
 
@@ -75,7 +76,5 @@ export default () => {
 
     showCancelConfirm,
     setShowCancelConfirm,
-    showDeleteConfirm,
-    setShowDeleteConfirm,
   }
 }

@@ -38,7 +38,7 @@ const ProcessingChainButtonBar = () => {
   const stepDirty = useSelector(ProcessingStepState.isDirty)
   const editingStep = useSelector(ProcessingStepState.isEditingStep)
 
-  const calculation = useSelector(ProcessingStepCalculationState.getCalculationDirty)
+  const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
   const calculationDirty = useSelector(ProcessingStepCalculationState.isDirty)
   const editingCalculation = useSelector(ProcessingStepCalculationState.isEditingCalculation)
 

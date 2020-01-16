@@ -3,6 +3,7 @@ import './processingStepCalculationEditor.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -20,7 +21,6 @@ import {
   updateProcessingStepCalculationAttribute,
   resetProcessingStepCalculationState,
   createNodeDefAnalysis,
-  deleteProcessingStepCalculation,
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 import useProcessingStepCalculationEditorState from './useProcessingStepCalculationEditorState'
 
@@ -30,6 +30,7 @@ const ProcessingStepCalculationEditor = () => {
 
     surveyInfo,
     calculation,
+    dirty,
     attributes,
     attribute,
 
@@ -38,8 +39,6 @@ const ProcessingStepCalculationEditor = () => {
 
     showCancelConfirm,
     setShowCancelConfirm,
-    showDeleteConfirm,
-    setShowDeleteConfirm,
   } = useProcessingStepCalculationEditorState()
 
   const dispatch = useDispatch()
@@ -47,9 +46,22 @@ const ProcessingStepCalculationEditor = () => {
 
   const validation = ProcessingStepCalculation.getValidation(calculation)
 
-  return calculation ? (
+  return R.isEmpty(calculation) ? null : (
     <>
       <div className="processing-step__calculation-editor">
+        <button
+          className="btn-s btn-close"
+          onClick={() => {
+            if (dirty) {
+              setShowCancelConfirm(true)
+            } else {
+              dispatch(resetProcessingStepCalculationState())
+            }
+          }}
+        >
+          <span className="icon icon-10px icon-cross" />
+        </button>
+
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingStepCalculation.getLabels(calculation)}
@@ -113,19 +125,8 @@ const ProcessingStepCalculationEditor = () => {
           onCancel={() => setShowCancelConfirm(false)}
         />
       )}
-
-      {showDeleteConfirm && (
-        <ConfirmDialog
-          message={i18n.t('processingStepCalculationView.deleteConfirm')}
-          onOk={() => {
-            setShowDeleteConfirm(false)
-            dispatch(deleteProcessingStepCalculation())
-          }}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
     </>
-  ) : null
+  )
 }
 
 export default ProcessingStepCalculationEditor

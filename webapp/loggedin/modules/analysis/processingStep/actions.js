@@ -24,13 +24,13 @@ export const processingStepReset = 'analysis/processingStep/reset'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 
 export const processingStepCalculationCreate = 'analysis/processingStep/calculation/create'
-export const processingStepCalculationForEditUpdate = 'analysis/processingStep/calculation/forEdit/update'
+export const processingStepCalculationUpdate = 'analysis/processingStep/calculation/update'
 export const processingStepCalculationIndexUpdate = 'analysis/processingStep/calculation/index/update'
 
 export const resetProcessingStepState = () => dispatch => dispatch({ type: processingStepReset })
 
 export const setProcessingStepCalculationForEdit = calculation => dispatch =>
-  dispatch({ type: processingStepCalculationForEditUpdate, calculation })
+  dispatch({ type: processingStepCalculationUpdate, calculation })
 
 // ====== SET FOR EDIT
 

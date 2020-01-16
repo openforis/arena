@@ -20,7 +20,6 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
-export const processingStepCalculationSave = 'analysis/processingStep/calculation/save'
 export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'
 export const processingStepCalculationReset = 'analysis/processingStep/calculation/reset'
 
@@ -35,26 +34,17 @@ const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
     calculation: await _validate(calculation),
   })
 
-export const resetProcessingStepCalculationState = () => async (dispatch, getState) => {
-  // Remove calculation from list (if temporary) and close editor
-  dispatch({
-    type: processingStepCalculationReset,
-    temporary: R.pipe(
-      ProcessingStepCalculationState.getCalculationDirty,
-      ProcessingStepCalculation.isTemporary,
-    )(getState()),
-  })
-}
+export const resetProcessingStepCalculationState = () => dispatch => dispatch({ type: processingStepCalculationReset })
 
 // ====== UPDATE
 
 export const validateProcessingStepCalculation = () => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
+  const calculation = ProcessingStepCalculationState.getCalculation(getState())
   dispatch(_updateProcessingStepCalculationDirty(calculation))
 }
 
 export const updateProcessingStepCalculationProp = (prop, value) => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
+  const calculation = ProcessingStepCalculationState.getCalculation(getState())
 
   const calculationUpdated = R.pipe(
     ProcessingStepCalculation.assocProp(prop, value),
@@ -76,7 +66,7 @@ export const updateProcessingStepCalculationProp = (prop, value) => async (dispa
 }
 
 export const updateProcessingStepCalculationAttribute = attrDefUuid => async (dispatch, getState) => {
-  const calculation = ProcessingStepCalculationState.getCalculationDirty(getState())
+  const calculation = ProcessingStepCalculationState.getCalculation(getState())
 
   const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(attrDefUuid)(calculation)
 
@@ -90,7 +80,7 @@ export const deleteProcessingStepCalculation = () => async (dispatch, getState) 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const calculation = ProcessingStepCalculationState.getCalculationDirty(state)
+  const calculation = ProcessingStepCalculationState.getCalculation(state)
 
   await axios.delete(
     `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
@@ -118,7 +108,7 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const nodeDefParent = R.pipe(ProcessingStep.getEntityUuid, entityDefUuid =>
     Survey.getNodeDefByUuid(entityDefUuid)(survey),
   )(processingStep)
-  const calculation = ProcessingStepCalculationState.getCalculationDirty(state)
+  const calculation = ProcessingStepCalculationState.getCalculation(state)
   const nodeDefType = ProcessingStepCalculation.getNodeDefType(calculation)
 
   const nodeDef = {

@@ -14,7 +14,7 @@ import * as ProcessingChainRepository from '../repository/processingChainReposit
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
-// ====== Chain
+// ====== CREATE OR UPDATE Chain
 
 const _insertChain = async (user, surveyId, chain, t) => {
   const chainDb = await ProcessingChainRepository.insertChain(surveyId, chain, t)
@@ -22,10 +22,7 @@ const _insertChain = async (user, surveyId, chain, t) => {
 }
 
 const _updateChainProps = async (user, surveyId, chain, chainDb, t) => {
-  const propsNew = ProcessingChain.getProps(chain)
-  const propsExisting = ProcessingChain.getProps(chainDb)
-  const propsToUpdate = R.fromPairs(R.difference(R.toPairs(propsNew), R.toPairs(propsExisting)))
-
+  const propsToUpdate = ProcessingChain.getPropsDiff(chain)(chainDb)
   for (const [key, value] of Object.entries(propsToUpdate)) {
     const processingChainUuid = ProcessingChain.getUuid(chain)
     await Promise.all([
@@ -53,7 +50,7 @@ const _insertOrUpdateChain = async (user, surveyId, chain, client) => {
   }
 }
 
-// ====== CREATE - Processing Step
+// ====== CREATE OR UPDATE - Step
 
 const _insertStep = async (user, surveyId, step, t) => {
   const stepDb = await ProcessingStepRepository.insertStep(surveyId, step, t)
@@ -61,21 +58,19 @@ const _insertStep = async (user, surveyId, step, t) => {
 }
 
 const _updateStepProps = async (user, surveyId, step, stepDb, t) => {
-  const propsNew = ProcessingStep.getProps(step)
-  const propsExisting = ProcessingStep.getProps(stepDb)
-  const propsToUpdate = R.fromPairs(R.difference(R.toPairs(propsNew), R.toPairs(propsExisting)))
-
+  const propsToUpdate = ProcessingStep.getPropsDiff(step)(stepDb)
   for (const [key, value] of Object.entries(propsToUpdate)) {
     const processingStepUuid = ProcessingStep.getUuid(step)
-
-    const processingStepDb = await ProcessingStepRepository.updateStepProp(surveyId, processingStepUuid, key, value, t)
     const logContent = {
       [ActivityLog.keysContent.uuid]: processingStepUuid,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStepDb),
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(step),
       key,
       value,
     }
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepPropUpdate, logContent, false, t)
+    await Promise.all([
+      ProcessingStepRepository.updateStepProp(surveyId, processingStepUuid, key, value, t),
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepPropUpdate, logContent, false, t),
+    ])
   }
 }
 
@@ -88,32 +83,58 @@ const _insertOrUpdateStep = async (user, surveyId, step, t) => {
   }
 }
 
-// ====== CREATE - Processing Step Calculation
+// ====== CREATE OR UPDATE - Calculation
 
-export const insertProcessingStepCalculation = async (user, surveyId, calculation, client = db) =>
-  await client.tx(async t => {
-    const [calculationStepInserted, processingStep] = await Promise.all([
-      ProcessingStepCalculationRepository.insertCalculationStep(surveyId, calculation, t),
-      ProcessingStepRepository.fetchStepSummaryByUuid(
-        surveyId,
-        ProcessingStepCalculation.getProcessingStepUuid(calculation),
-        t,
-      ),
-    ])
+const _insertCalculation = async (user, surveyId, chain, calculation, t) => {
+  const calculationDb = await ProcessingStepCalculationRepository.insertCalculationStep(surveyId, calculation, t)
+  const logContent = {
+    ...calculationDb,
+    [ActivityLog.keysContent.processingChainUuid]: ProcessingChain.getUuid(chain),
+  }
+  await ActivityLogRepository.insert(
+    user,
+    surveyId,
+    ActivityLog.type.processingStepCalculationCreate,
+    logContent,
+    false,
+    t,
+  )
+}
+
+export const _updateCalculation = async (user, surveyId, chain, calculation, calculationDb, t) => {
+  const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+  const nodeDefUuidDb = ProcessingStepCalculation.getNodeDefUuid(calculationDb)
+  const propsDiff = ProcessingStepCalculation.getPropsDiff(calculation)(calculationDb)
+
+  if (nodeDefUuid !== nodeDefUuidDb || !R.isEmpty(propsDiff)) {
+    const calculationUpdated = await ProcessingStepCalculationRepository.updateCalculationStep(surveyId, calculation, t)
     const logContent = {
-      ...calculationStepInserted,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
+      ...calculationUpdated,
+      [ActivityLog.keysContent.processingChainUuid]: ProcessingChain.getUuid(chain),
     }
     await ActivityLogRepository.insert(
       user,
       surveyId,
-      ActivityLog.type.processingStepCalculationCreate,
+      ActivityLog.type.processingStepCalculationUpdate,
       logContent,
       false,
       t,
     )
-    return calculationStepInserted
-  })
+  }
+}
+
+const _insertOrUpdateCalculation = async (user, surveyId, chain, calculation, t) => {
+  const calculationDb = await ProcessingStepCalculationRepository.fetchCalculationByUuid(
+    surveyId,
+    ProcessingStepCalculation.getUuid(calculation),
+    t,
+  )
+  if (calculationDb) {
+    await _updateCalculation(user, surveyId, chain, calculation, calculationDb, t)
+  } else {
+    await _insertCalculation(user, surveyId, chain, calculation, t)
+  }
+}
 
 // ====== READ - Chain
 
@@ -129,12 +150,15 @@ export { fetchCalculationsByStepUuid } from '../repository/processingStepCalcula
 
 // ====== UPDATE - Chain
 
-export const updateChain = async (user, surveyId, chain, step = null, client = db) => {
+export const updateChain = async (user, surveyId, chain, step = null, calculation = null, client = db) => {
   await client.tx(async t => {
     await _insertOrUpdateChain(user, surveyId, chain, t)
 
     if (step) {
       await _insertOrUpdateStep(user, surveyId, step, t)
+      if (calculation) {
+        await _insertOrUpdateCalculation(user, surveyId, chain, calculation, t)
+      }
     }
   })
 }
@@ -164,26 +188,6 @@ export const updateStepCalculationIndex = async (user, surveyId, processingStepU
       false,
       t,
     )
-  })
-
-export const updateCalculationStep = async (user, surveyId, calculation, client = db) =>
-  await client.tx(async t => {
-    const calculationUpdated = await ProcessingStepCalculationRepository.updateCalculationStep(surveyId, calculation, t)
-    const processingStepUuid = ProcessingStepCalculation.getProcessingStepUuid(calculationUpdated)
-    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
-    const logContent = {
-      ...calculationUpdated,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-    }
-    await ActivityLogRepository.insert(
-      user,
-      surveyId,
-      ActivityLog.type.processingStepCalculationUpdate,
-      logContent,
-      false,
-      t,
-    )
-    return calculationUpdated
   })
 
 // ====== DELETE - Chain

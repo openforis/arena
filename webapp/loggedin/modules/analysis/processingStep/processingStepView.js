@@ -31,6 +31,7 @@ const ProcessingStepView = props => {
     processingStepCalculation,
     dirty,
     editingCalculation,
+    fetchProcessingStepCalculations,
     resetProcessingStepState,
     updateProcessingStepProps,
     addEntityVirtual,
@@ -38,8 +39,8 @@ const ProcessingStepView = props => {
 
   const history = useHistory()
 
-  const calculationEditorOpened = Boolean(processingStepCalculation)
-  const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, R.gt(0))(processingStep)
+  const calculationEditorOpened = !R.isEmpty(processingStepCalculation)
+  const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, cnt => cnt > 0)(processingStep)
   const calculationSteps = ProcessingStep.getCalculationSteps(processingStep)
   const canUpdateEntity = hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)
 
@@ -50,7 +51,7 @@ const ProcessingStepView = props => {
     if (hasCalculationSteps && R.isEmpty(calculationSteps)) {
       fetchProcessingStepCalculations()
     }
-  }, [])
+  }, [ProcessingStep.getUuid(processingStep)])
 
   return (
     <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
@@ -121,7 +122,7 @@ const mapStateToProps = state => ({
   processingStep: ProcessingStepState.getProcessingStep(state),
   processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
   processingStepNext: ProcessingStepState.getProcessingStepNext(state),
-  processingStepCalculation: ProcessingStepState.getProcessingStepCalculationForEdit(state),
+  processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
   dirty: ProcessingStepState.isDirty(state),
   editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
 })

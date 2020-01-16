@@ -13,7 +13,6 @@ import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
-import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { setProcessingStepCalculationForEdit } from '../actions'
@@ -93,15 +92,14 @@ const mapStateToProps = (state, { calculation }) => {
   const survey = SurveyState.getSurvey(state)
   const isCalculationEditDirty = ProcessingStepCalculationState.isDirty(state)
   const isCalculationEditTemporary = R.pipe(
-    ProcessingStepCalculationState.getCalculationDirty,
-    R.defaultTo({}),
+    ProcessingStepCalculationState.getCalculation,
     ProcessingStepCalculation.isTemporary,
   )(state)
 
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-    calculationForEdit: ProcessingStepState.getProcessingStepCalculationForEdit(state),
+    calculationForEdit: ProcessingStepCalculationState.getCalculation(state),
     isCalculationEditDirty,
     isCalculationEditTemporary,
   }

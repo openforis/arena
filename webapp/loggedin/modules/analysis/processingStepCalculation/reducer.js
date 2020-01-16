@@ -6,31 +6,32 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ProcessingStepCalculationState from './processingStepCalculationState'
 
+import { processingChainReset, processingChainSave } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import {
-  processingStepCalculationForEditUpdate,
+  processingStepCalculationUpdate,
   processingStepCalculationCreate,
-  processingStepReset,
-} from '../processingStep/actions'
+} from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import {
   processingStepCalculationDirtyUpdate,
-  processingStepCalculationSave,
   processingStepCalculationReset,
   processingStepCalculationDelete,
 } from './actions'
 import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 
 const actionHandlers = {
-  [processingStepCalculationForEditUpdate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
+  // Chain
+  [processingChainReset]: () => ({}),
+
+  [processingChainSave]: (state, { calculation }) => ProcessingStepCalculationState.saveDirty(calculation)(state),
+
+  [processingStepCalculationUpdate]: (state, { calculation }) =>
+    ProcessingStepCalculationState.assocCalculation(calculation)(state),
 
   [processingStepCalculationCreate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
+    ProcessingStepCalculationState.assocCalculation(calculation)(state),
 
   [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationDirty(calculation)(state),
-
-  [processingStepCalculationSave]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculationForEdit(calculation)(state),
 
   [processingStepCalculationDelete]: () => ({}),
 
@@ -42,9 +43,6 @@ const actionHandlers = {
       R.always(NodeDef.isAnalysis(nodeDef)),
       ProcessingStepCalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef)),
     )(state),
-
-  // Processing step
-  [processingStepReset]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)

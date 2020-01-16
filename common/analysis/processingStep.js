@@ -30,6 +30,7 @@ export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
+export const getPropsDiff = ObjectUtils.getPropsDiff
 
 export const isEqual = ObjectUtils.isEqual
 export const isTemporary = ObjectUtils.isTemporary
@@ -38,17 +39,8 @@ export const isTemporary = ObjectUtils.isTemporary
 
 export const assocCalculations = R.assoc(keys.calculationSteps)
 
-export const assocCalculation = calculation => processingStep =>
-  R.pipe(
-    getCalculationSteps,
-    R.ifElse(
-      R.pipe(R.length, R.gte(ObjectUtils.getIndex(calculation))),
-      R.append(calculation), // Add new calculation
-      R.update(ProcessingStepCalculation.getIndex(calculation), calculation), // Replace calculation
-    ),
-    // Update calculation steps in processing step
-    calculationSteps => assocCalculations(calculationSteps)(processingStep),
-  )(processingStep)
+export const assocCalculation = calculation =>
+  R.assocPath([keys.calculationSteps, ProcessingStepCalculation.getIndex(calculation)], calculation)
 
 export const mergeProps = ObjectUtils.mergeProps
 

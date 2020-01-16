@@ -6,8 +6,6 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ProcessingStepScriptGenerator from './_processingChainScriptGenerator/processingStepScriptGenerator'
 
 export {
-  // ====== CREATE - Processing Step Calculation
-  insertProcessingStepCalculation,
   // ======  READ - Chain
   countChainsBySurveyId,
   fetchChainsBySurveyId,
@@ -21,7 +19,6 @@ export {
   updateChain,
   // ======  UPDATE - Step
   updateStepCalculationIndex,
-  updateCalculationStep,
   // ======  DELETE - Chain
   deleteChain,
   // ======  DELETE - Step

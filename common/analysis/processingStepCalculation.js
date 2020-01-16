@@ -55,6 +55,7 @@ export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
 export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
+export const getPropsDiff = ObjectUtils.getPropsDiff
 export const isEqual = ObjectUtils.isEqual
 
 export const isTemporary = ObjectUtils.isTemporary
