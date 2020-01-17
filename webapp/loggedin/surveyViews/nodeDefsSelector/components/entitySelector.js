@@ -8,14 +8,14 @@ import { nbsp } from '@core/stringUtils'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-const getEntities = (hierarchy, lang) => {
+const _generateDropdownItems = (hierarchy, lang) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
     const label = NodeDef.getLabel(nodeDef, lang)
     entities.push({
       key: NodeDef.getUuid(nodeDef),
-      value: nbsp + R.repeat(nbsp + nbsp, depth).join('') + label,
+      value: `${nbsp}${R.repeat(nbsp + nbsp, depth).join('')}${label}${NodeDef.isAnalysis(nodeDef) ? ' (V)' : ''}`,
     })
   }
 
@@ -27,18 +27,25 @@ const getEntities = (hierarchy, lang) => {
 const EntitySelector = props => {
   const { hierarchy, nodeDefUuidEntity, lang, onChange } = props
 
-  const entities = getEntities(hierarchy, lang)
-  const selection = entities.find(R.propEq('key', nodeDefUuidEntity))
+  const dropdownItems = _generateDropdownItems(hierarchy, lang)
+  const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
     <Dropdown
       className="node-defs-selector__entity-selector"
       autocompleteDialogClassName="node-defs-selector__entity-selector-dialog"
-      items={entities}
+      items={dropdownItems}
       selection={selection}
       onChange={item => onChange(R.prop('key', item))}
     />
   )
+}
+
+EntitySelector.defaultProps = {
+  hierarchy: null, // Survey hierarchy
+  nodeDefUuidEntity: null, // Selected entity def uuid
+  lang: null,
+  onChange: null,
 }
 
 export default EntitySelector

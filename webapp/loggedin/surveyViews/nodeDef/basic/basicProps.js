@@ -14,6 +14,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import CodeProps from './codeProps'
@@ -38,6 +39,7 @@ const BasicProps = props => {
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
     entitySource,
+    entitySourceHierarchy,
 
     setNodeDefProp,
     setNodeDefLayoutProp,
@@ -58,12 +60,6 @@ const BasicProps = props => {
       {NodeDef.isAnalysis(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
           <Checkbox checked={true} disabled={true} />
-        </FormItem>
-      )}
-
-      {NodeDef.isAnalysis(nodeDef) && NodeDef.isEntity(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
-          {NodeDef.getLabel(entitySource, i18n.lang)}
         </FormItem>
       )}
 
@@ -175,6 +171,16 @@ const BasicProps = props => {
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}
+      {NodeDef.isAnalysis(nodeDef) && NodeDef.isEntity(nodeDef) && (
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
+          <EntitySelector
+            hierarchy={entitySourceHierarchy}
+            nodeDefUuidEntity={NodeDef.getUuid(entitySource)}
+            lang={i18n.lang}
+            onChange={uuid => setNodeDefProp(NodeDef.propKeys.entitySourceUuid, uuid)}
+          />
+        </FormItem>
+      )}
     </div>
   )
 }
@@ -198,6 +204,10 @@ const mapStateToProps = state => {
 
   // Analysis
   const entitySource = Survey.getNodeDefByUuid(NodeDef.getEntitySourceUuid(nodeDef))(survey)
+  const entitySourceHierarchy = Survey.getHierarchy(
+    nodeDef => NodeDef.isEntity(nodeDef) && !NodeDef.isAnalysis(nodeDef),
+    true,
+  )(survey)
 
   return {
     surveyCycleKey,
@@ -213,6 +223,7 @@ const mapStateToProps = state => {
     cyclesKeysParent,
 
     entitySource,
+    entitySourceHierarchy,
   }
 }
 
