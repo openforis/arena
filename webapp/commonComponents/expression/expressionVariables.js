@@ -37,14 +37,14 @@ const getSqlVariables = (nodeDef, lang) => {
 
 const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, lang) =>
   R.pipe(
-    Survey.getNodeDefChildren(nodeDefContext),
+    Survey.getNodeDefChildren(nodeDefContext, Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)),
     R.map(childDef => {
       if (!Expression.isValidExpressionType(childDef)) {
         return null
       }
 
       if (
-        nodeDefCurrent !== null &&
+        Boolean(nodeDefCurrent) &&
         Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
       ) {
         // Exclude nodes that reference the current one
