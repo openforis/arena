@@ -110,7 +110,7 @@ export const getParentUuid = ObjectUtils.getParentUuid
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = R.pipe(getProp(propKeys.key), R.equals(true))
-export const isRoot = nodeDef => getParentUuid(nodeDef)(nodeDef) === null && !isVirtual(nodeDef)
+export const isRoot = nodeDef => getParentUuid(nodeDef) === null && !isVirtual(nodeDef)
 export const isMultiple = R.pipe(getProp(propKeys.multiple), R.equals(true))
 export const isSingle = R.pipe(isMultiple, R.not)
 
