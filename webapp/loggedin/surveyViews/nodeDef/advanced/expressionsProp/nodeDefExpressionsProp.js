@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
+import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './expressionsProp'
 
@@ -18,11 +19,12 @@ const NodeDefExpressionsProp = props => {
     applyIf,
     showLabels,
     readOnly,
-    setNodeDefProp,
     isContextParent,
     canBeConstant,
     isBoolean,
     hideAdvanced,
+    mode,
+    setNodeDefProp,
   } = props
 
   const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
@@ -40,6 +42,7 @@ const NodeDefExpressionsProp = props => {
       values={values}
       showLabels={showLabels}
       validation={Validation.getFieldValidation(propName)(nodeDefValidation)}
+      mode={mode}
       onChange={onChange}
       nodeDefUuidContext={nodeDefUuidContext}
       nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
@@ -57,6 +60,7 @@ NodeDefExpressionsProp.defaultProps = {
   nodeDefUuidContext: null,
   propName: null,
   label: '',
+  mode: Expression.modes.json,
 
   applyIf: true,
   showLabels: false,
@@ -67,6 +71,8 @@ NodeDefExpressionsProp.defaultProps = {
   isContextParent: false,
   canBeConstant: false,
   isBoolean: true,
+
+  setNodeDefProp: null,
 }
 
 export default NodeDefExpressionsProp

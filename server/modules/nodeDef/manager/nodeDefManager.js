@@ -21,7 +21,7 @@ export {
 // ======= CREATE
 
 const _updateParentLayout = async (user, surveyId, surveyCycleKey, nodeDef, deleted = false, client = db) => {
-  if (NodeDef.isRoot(nodeDef)) return {}
+  if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
 
   const nodeDefParent = await NodeDefRepository.fetchNodeDefByUuid(
     surveyId,

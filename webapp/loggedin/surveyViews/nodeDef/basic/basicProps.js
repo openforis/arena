@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
+import * as Expression from '@core/expressionParser/expression'
 
 import { uuidv4 } from '@core/uuid'
 import { normalizeName } from '@core/stringUtils'
@@ -17,6 +18,7 @@ import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
+import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
@@ -182,12 +184,19 @@ const BasicProps = props => {
               onChange={uuid => setNodeDefProp(NodeDef.propKeys.entitySourceUuid, uuid)}
             />
           </FormItem>
-          <FormItem label={i18n.t('nodeDefEdit.basicProps.formula')}>
-            <Input
-              onChange={e => setNodeDefProp(NodeDef.propKeys.formula, e.target.value)}
-              value={NodeDef.getFormula(nodeDef)}
-            />
-          </FormItem>
+          <NodeDefExpressionsProp
+            nodeDef={nodeDef}
+            nodeDefValidation={validation}
+            setNodeDefProp={setNodeDefProp}
+            label={i18n.t('nodeDefEdit.basicProps.formula')}
+            propName={NodeDef.propKeys.formula}
+            applyIf={false}
+            multiple={false}
+            nodeDefUuidContext={NodeDef.getUuid(nodeDef)}
+            isContextParent={false}
+            hideAdvanced={true}
+            mode={Expression.modes.sql}
+          />
         </>
       )}
     </div>

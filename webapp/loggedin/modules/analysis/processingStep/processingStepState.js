@@ -70,6 +70,8 @@ export const updateCalculationIndex = (indexFrom, indexTo) => processingStepStat
     return _updateStepDirty(ProcessingStep.assocCalculations(calculationsUpdate))(processingStepState)
   })(processingStepState)
 
+export const updateEntityUuid = entityDefUuid => _updateStepDirty(ProcessingStep.assocEntityUuid(entityDefUuid))
+
 export const dissocTemporaryCalculation = _updateStepDirty(ProcessingStep.dissocTemporaryCalculation)
 
 export const dissocCalculation = calculation => state =>

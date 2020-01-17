@@ -18,7 +18,12 @@ const getEntities = (survey, entityStepPrev, lang) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    if (!entityStepPrev || NodeDef.isRoot(nodeDef) || Survey.isNodeDefAncestor(nodeDef, entityStepPrev)(survey)) {
+    if (
+      !entityStepPrev ||
+      NodeDef.isRoot(nodeDef) ||
+      NodeDef.isVirtual(nodeDef) ||
+      Survey.isNodeDefAncestor(nodeDef, entityStepPrev)(survey)
+    ) {
       const label = NodeDef.getLabel(nodeDef, lang)
       entities.push({
         key: NodeDef.getUuid(nodeDef),
@@ -27,7 +32,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
     }
   }
 
-  const hierarchy = Survey.getHierarchy()(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
 
   return entities

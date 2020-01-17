@@ -88,7 +88,10 @@ export const getNodeDefParent = nodeDef => survey =>
   R.ifElse(
     // If nodeDef is virtual, get parent from its source
     R.always(NodeDef.isVirtual(nodeDef)),
-    R.pipe(_getEntitySource(nodeDef), entitySource => getNodeDefParent(entitySource)(survey)),
+    R.pipe(
+      _getEntitySource(nodeDef),
+      R.ifElse(R.isNil, R.always(null), entitySource => getNodeDefParent(entitySource)(survey)),
+    ),
     getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)),
   )(survey)
 
@@ -114,9 +117,18 @@ export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => survey 
 export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = false) => survey => {
   let length = 1
   const h = (array, nodeDef) => {
-    const childDefs = NodeDef.isEntity(nodeDef)
-      ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
-      : []
+    const childDefs = [
+      ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
+        ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
+        : []),
+      // Add virtual entities as children of root entity
+      ...(includeAnalysis && NodeDef.isRoot(nodeDef)
+        ? R.pipe(
+            getNodeDefsArray,
+            R.filter(nodeDef => NodeDef.isVirtual(nodeDef) && filterFn(nodeDef)),
+          )(survey)
+        : []),
+    ]
 
     length += childDefs.length
     const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }

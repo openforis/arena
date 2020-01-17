@@ -102,19 +102,17 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
   const state = getState()
   const processingChain = ProcessingChainState.getProcessingChain(state)
 
-  const nodeDef = {
-    ...NodeDef.newNodeDef(
-      null,
-      NodeDef.nodeDefType.entity,
-      ProcessingChain.getCycle(processingChain),
-      {
-        [NodeDef.propKeys.multiple]: true,
-      },
-      {},
-      true,
-    ),
-    [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
-  }
+  const nodeDef = NodeDef.newNodeDef(
+    null,
+    NodeDef.nodeDefType.entity,
+    ProcessingChain.getCycle(processingChain),
+    {
+      [NodeDef.propKeys.multiple]: true,
+    },
+    {},
+    true,
+    true,
+  )
 
   await dispatch({ type: nodeDefCreate, nodeDef })
 

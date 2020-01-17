@@ -111,10 +111,14 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(state)
   const nodeDefType = ProcessingStepCalculation.getNodeDefType(calculation)
 
-  const nodeDef = {
-    ...NodeDef.newNodeDef(nodeDefParent, nodeDefType, ProcessingChain.getCycle(processingChain), {}, {}, true),
-    [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
-  }
+  const nodeDef = NodeDef.newNodeDef(
+    nodeDefParent,
+    nodeDefType,
+    ProcessingChain.getCycle(processingChain),
+    {},
+    {},
+    true,
+  )
 
   await dispatch({ type: nodeDefCreate, nodeDef })
 

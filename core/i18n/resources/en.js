@@ -405,6 +405,7 @@ $t(common.cantUndoWarning)`,
       ownPage: 'Its own page',
       analysis: 'Analysis',
       entitySource: 'Entity Source',
+      formula: 'Formula',
     },
     advancedProps: {
       readOnly: 'Read only',
