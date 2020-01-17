@@ -40,7 +40,7 @@ describe('Applicable Test', () => {
       user,
       survey,
       RB.entity(
-        'root',
+        'cluster',
         RB.attribute('cluster_no', 1),
         RB.attribute('num', 1),
         RB.entity('plot', RB.attribute('plot_no', 1), RB.entity('tree', RB.attribute('tree_no', 1))),
@@ -55,8 +55,8 @@ describe('Applicable Test', () => {
   })
 
   it('Applicable update', async () => {
-    const nodeSource = RecordUtils.findNodeByPath('root/num')(survey, record)
-    const nodeDependent = RecordUtils.findNodeByPath('root/dependent_node')(survey, record)
+    const nodeSource = RecordUtils.findNodeByPath('cluster/num')(survey, record)
+    const nodeDependent = RecordUtils.findNodeByPath('cluster/dependent_node')(survey, record)
     const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
     const nodeDependentParentUuid = Node.getUuid(nodeDependentParent)
     const nodeDependentDefUuid = Node.getNodeDefUuid(nodeDependent)
@@ -92,20 +92,20 @@ describe('Applicable Test', () => {
   })
 
   it('Applicable evaluated on entity creation', async () => {
-    const nodeTree = RecordUtils.findNodeByPath('root/plot[1]/tree[1]')(survey, record)
-    const nodeTreeDbh = RecordUtils.findNodeByPath('root/plot[1]/tree[1]/tree_dbh')(survey, record)
+    const nodeTree = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]')(survey, record)
+    const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, record)
 
     // Tree_dbh should be not applicable (plot_no <= 10)
     expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).to.be.equal(false)
   })
 
   it('Applicable in multiple entity update', async () => {
-    const nodePlotNo = RecordUtils.findNodeByPath('root/plot[1]/plot_no')(survey, record)
+    const nodePlotNo = RecordUtils.findNodeByPath('cluster/plot[1]/plot_no')(survey, record)
     const nodePlotNoUpdated = Node.assocValue(11)(nodePlotNo)
     const recordUpdated = await RecordManager.persistNode(getContextUser(), survey, record, nodePlotNoUpdated)
 
-    const nodeTree = RecordUtils.findNodeByPath('root/plot[1]/tree[1]')(survey, recordUpdated)
-    const nodeTreeDbh = RecordUtils.findNodeByPath('root/plot[1]/tree[1]/tree_dbh')(survey, recordUpdated)
+    const nodeTree = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]')(survey, recordUpdated)
+    const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, recordUpdated)
 
     // Tree_dbh should be applicable (plot_no > 10)
     expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).to.be.equal(true)
