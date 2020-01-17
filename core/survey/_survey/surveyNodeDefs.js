@@ -11,7 +11,7 @@ export const getNodeDefs = R.propOr({}, nodeDefsKey)
 
 export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(R.propEq(NodeDef.keys.parentUuid, null)))
+export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(NodeDef.isRoot))
 
 export const getNodeDefByUuid = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 

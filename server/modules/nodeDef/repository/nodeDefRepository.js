@@ -23,7 +23,7 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
   return dbTransformCallbackCommon(def, draft, true)
 }
 
-const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, ${DbUtils.selectDate(
+const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, virtual, ${DbUtils.selectDate(
   'date_created',
 )}, ${DbUtils.selectDate('date_modified')}, 
   props, props_advanced, props_draft, props_advanced_draft, meta`
@@ -34,8 +34,8 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
   await client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-      (parent_uuid, uuid, type, props, props_draft, props_advanced_draft, meta, analysis)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (parent_uuid, uuid, type, props, props_draft, props_advanced_draft, meta, analysis, virtual)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *`,
     [
       NodeDef.getParentUuid(nodeDef),
@@ -46,6 +46,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
       NodeDef.getPropsAdvanced(nodeDef),
       NodeDef.getMeta(nodeDef),
       NodeDef.isAnalysis(nodeDef),
+      NodeDef.isVirtual(nodeDef),
     ],
     def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
   )

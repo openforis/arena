@@ -171,15 +171,24 @@ const BasicProps = props => {
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}
-      {NodeDef.isAnalysis(nodeDef) && NodeDef.isEntity(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
-          <EntitySelector
-            hierarchy={entitySourceHierarchy}
-            nodeDefUuidEntity={NodeDef.getUuid(entitySource)}
-            lang={i18n.lang}
-            onChange={uuid => setNodeDefProp(NodeDef.propKeys.entitySourceUuid, uuid)}
-          />
-        </FormItem>
+
+      {NodeDef.isVirtual(nodeDef) && (
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
+            <EntitySelector
+              hierarchy={entitySourceHierarchy}
+              nodeDefUuidEntity={NodeDef.getUuid(entitySource)}
+              lang={i18n.lang}
+              onChange={uuid => setNodeDefProp(NodeDef.propKeys.entitySourceUuid, uuid)}
+            />
+          </FormItem>
+          <FormItem label={i18n.t('nodeDefEdit.basicProps.formula')}>
+            <Input
+              onChange={e => setNodeDefProp(NodeDef.propKeys.formula, e.target.value)}
+              value={NodeDef.getFormula(nodeDef)}
+            />
+          </FormItem>
+        </>
       )}
     </div>
   )

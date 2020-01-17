@@ -33,6 +33,8 @@ export const keys = {
   analysis: 'analysis',
   published: 'published',
   temporary: 'temporary', // Not persisted yet
+  // Analysis
+  virtual: 'virtual', // Virtual Entity
 }
 
 export const propKeys = {
@@ -51,6 +53,7 @@ export const propKeys = {
   taxonomyUuid: 'taxonomyUuid',
   // Analysis
   entitySourceUuid: 'entitySourceUuid',
+  formula: 'formula',
 }
 
 export const keysPropsAdvanced = {
@@ -67,11 +70,18 @@ export const maxKeyAttributes = 3
 
 // ==== CREATE
 
-export const newNodeDef = (nodeDefParent, type, cycle, props, propsAdvanced = {}, analysis = false) => ({
+export const newNodeDef = (
+  nodeDefParent,
+  type,
+  cycle,
+  props,
+  propsAdvanced = {},
+  analysis = false,
+  virtual = false,
+) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: getUuid(nodeDefParent),
   [keys.type]: type,
-  [keys.analysis]: analysis,
   [keys.props]: {
     ...props,
     [propKeys.cycles]: [cycle],
@@ -82,6 +92,9 @@ export const newNodeDef = (nodeDefParent, type, cycle, props, propsAdvanced = {}
   [keys.meta]: {
     [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
   },
+  [keys.analysis]: analysis,
+  [keys.virtual]: virtual,
+  [keys.temporary]: true,
 })
 
 // ==== READ
@@ -97,7 +110,7 @@ export const getParentUuid = ObjectUtils.getParentUuid
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = R.pipe(getProp(propKeys.key), R.equals(true))
-export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isRoot = nodeDef => getParentUuid(nodeDef)(nodeDef) === null && !isVirtual(nodeDef)
 export const isMultiple = R.pipe(getProp(propKeys.multiple), R.equals(true))
 export const isSingle = R.pipe(isMultiple, R.not)
 
@@ -124,14 +137,17 @@ export const isReadOnly = getProp(propKeys.readOnly, false)
 
 export const isPublished = R.propEq(keys.published, true)
 export const isDeleted = R.propEq(keys.deleted, true)
-export const isAnalysis = R.propEq(keys.analysis, true)
 export const isTemporary = R.propEq(keys.temporary, true)
 
 export const getLabels = ObjectUtils.getLabels
 export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
+// READ Analysis
+export const isAnalysis = R.propEq(keys.analysis, true)
+export const isVirtual = R.propEq(keys.virtual, true)
 export const getEntitySourceUuid = getProp(propKeys.entitySourceUuid)
+export const getFormula = getProp(propKeys.formula)
 
 // Utils
 export const getLabel = (nodeDef, lang) => {

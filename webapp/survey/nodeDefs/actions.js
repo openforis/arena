@@ -36,10 +36,7 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const nodeDef = {
-    ...NodeDef.newNodeDef(parent, type, cycle, props),
-    [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
-  }
+  const nodeDef = NodeDef.newNodeDef(parent, type, cycle, props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
