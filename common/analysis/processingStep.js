@@ -47,22 +47,34 @@ export const dissocTemporary = ObjectUtils.dissocTemporary
 export const assocCalculations = R.assoc(keys.calculations)
 export const dissocCalculations = R.dissoc(keys.calculations)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
+const assocCalculationsCount = R.assoc(keys.calculationsCount)
+
+const _updateCalculationsCount = calculationStep =>
+  R.pipe(getCalculations, R.length, calculationsCount => assocCalculationsCount(calculationsCount)(calculationStep))(
+    calculationStep,
+  )
 
 export const assocCalculation = calculation =>
-  R.assocPath([keys.calculations, ProcessingStepCalculation.getIndex(calculation)], calculation)
+  R.pipe(
+    R.assocPath([keys.calculations, ProcessingStepCalculation.getIndex(calculation)], calculation),
+    _updateCalculationsCount,
+  )
 
-export const dissocTemporaryCalculation = processingStep =>
+const _updateCalculations = fn => processingStep =>
   R.pipe(
     getCalculations,
-    // Remove temporary calculation
-    R.reject(ProcessingStepCalculation.isTemporary),
-    // Update calculation steps in processing step
-    calculationSteps => assocCalculations(calculationSteps)(processingStep),
+    fn,
+    calculations => assocCalculations(calculations)(processingStep),
+    _updateCalculationsCount,
   )(processingStep)
 
-export const dissocCalculation = calculation => processingStep =>
-  R.pipe(
-    getCalculations,
+export const dissocTemporaryCalculation = _updateCalculations(
+  // Remove temporary calculation
+  R.reject(ProcessingStepCalculation.isTemporary),
+)
+
+export const dissocCalculation = calculation =>
+  _updateCalculations(
     // Remove calculation
     R.reject(ProcessingStepCalculation.isEqual(calculation)),
     // Update indexes of next calculations
@@ -72,9 +84,7 @@ export const dissocCalculation = calculation => processingStep =>
         calc => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc),
       ),
     ),
-    // Update calculation steps in processing step
-    calculationSteps => assocCalculations(calculationSteps)(processingStep),
-  )(processingStep)
+  )
 
 // ====== VALIDATION
 export const getValidation = Validation.getValidation
