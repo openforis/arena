@@ -173,7 +173,9 @@ export default class SurveyHierarchyTree {
       .attr('width', nodeWidth)
       .attr('height', nodeHeight)
 
-    const grid = fo.append('xhtml:div').attr('class', 'node-grid')
+    const grid = fo
+      .append('xhtml:div')
+      .attr('class', d => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`)
 
     grid
       .append('xhtml:a')

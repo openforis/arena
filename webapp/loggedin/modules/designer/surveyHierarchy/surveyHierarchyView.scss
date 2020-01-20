@@ -54,6 +54,10 @@
     &.highlight {
       background-color: $blueLightActive;
     }
+
+    &.node-virtual {
+      background-color: $grey;
+    }
   }
 
   .link {
