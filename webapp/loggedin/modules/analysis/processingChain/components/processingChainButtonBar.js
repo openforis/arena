@@ -72,7 +72,7 @@ const ProcessingChainButtonBar = () => {
           className="btn-s btn-danger btn-delete"
           aria-disabled={
             (editingCalculation && ProcessingStepCalculation.isTemporary(calculation)) ||
-            (editingStep && ProcessingStep.isTemporary(step) && !stepNext) ||
+            (editingStep && (ProcessingStep.isTemporary(step) || Boolean(stepNext))) ||
             (editingChain && ProcessingChain.isTemporary(chain))
           }
           onClick={() => setShowDeleteConfirm(true)}

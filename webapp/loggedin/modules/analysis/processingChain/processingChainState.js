@@ -44,6 +44,8 @@ export const appendProcessingStep = step => _updateChainDirty(ProcessingChain.as
 
 export const dissocStepTemporary = _updateChainDirty(ProcessingChain.dissocProcessingStepTemporary)
 
+export const dissocStepLast = _updateChainDirty(ProcessingChain.dissocProcessingStepLast)
+
 export const saveDirty = (chain, step) => state =>
   R.pipe(R.when(R.always(Boolean(step)), ProcessingChain.assocProcessingStep(step)), chainUpdate =>
     assocProcessingChain(chainUpdate)(state),

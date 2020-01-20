@@ -97,11 +97,14 @@ export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
 export const assocProcessingStep = step => R.assocPath([keys.processingSteps, ProcessingStep.getIndex(step)], step)
 
-export const dissocProcessingStepTemporary = chain => {
-  const steps = getProcessingSteps(chain)
-  const stepLast = R.last(steps)
-  return ProcessingStep.isTemporary(stepLast) ? assocProcessingSteps(R.dropLast(1, steps))(chain) : chain
-}
+const _updateSteps = fn => chain => R.pipe(getProcessingSteps, fn, steps => assocProcessingSteps(steps)(chain))(chain)
+
+export const dissocProcessingStepLast = _updateSteps(R.dropLast(1))
+
+export const dissocProcessingStepTemporary = R.when(
+  R.pipe(getProcessingSteps, R.last, ProcessingStep.isTemporary),
+  dissocProcessingStepLast,
+)
 
 // ====== VALIDATION
 export const getValidation = Validation.getValidation

@@ -11,7 +11,11 @@ import {
   processingChainStepsLoad,
   processingChainSave,
 } from '@webapp/loggedin/modules/analysis/processingChain/actions'
-import { processingStepCreate, processingStepReset } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import {
+  processingStepCreate,
+  processingStepReset,
+  processingStepDelete,
+} from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const actionHandlers = {
   // Reset state
@@ -38,6 +42,8 @@ const actionHandlers = {
     ProcessingChainState.appendProcessingStep(processingStep)(state),
 
   [processingStepReset]: state => ProcessingChainState.dissocStepTemporary(state),
+
+  [processingStepDelete]: state => ProcessingChainState.dissocStepLast(state),
 }
 
 export default exportReducer(actionHandlers)
