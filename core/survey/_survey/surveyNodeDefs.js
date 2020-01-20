@@ -121,7 +121,7 @@ export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = fals
   let length = 1
   const h = (array, nodeDef) => {
     const childDefs = [
-      ...(NodeDef.isEntity(nodeDef)
+      ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
         ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
         : []),
       // Add virtual entities as children of root entity
