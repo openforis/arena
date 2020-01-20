@@ -27,7 +27,9 @@ const getEntities = (survey, entityStepPrev, lang) => {
       const label = NodeDef.getLabel(nodeDef, lang)
       entities.push({
         key: NodeDef.getUuid(nodeDef),
-        value: StringUtils.nbsp + R.repeat(StringUtils.nbsp + StringUtils.nbsp, depth).join('') + label,
+        value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}${
+          NodeDef.isVirtual(nodeDef) ? ' (V)' : ''
+        }`,
       })
     }
   }

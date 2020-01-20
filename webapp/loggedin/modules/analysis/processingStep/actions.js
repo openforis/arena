@@ -118,3 +118,9 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
 
   history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
 }
+
+export const editEntityVirtual = history => async (_, getState) => {
+  const processingStep = ProcessingStepState.getProcessingStep(getState())
+
+  history.push(`${appModuleUri(analysisModules.nodeDef)}${ProcessingStep.getEntityUuid(processingStep)}/`)
+}

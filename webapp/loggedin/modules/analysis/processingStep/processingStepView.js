@@ -6,13 +6,16 @@ import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
+import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
@@ -21,6 +24,7 @@ import {
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,
+  editEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingStepView = props => {
@@ -28,6 +32,7 @@ const ProcessingStepView = props => {
     processingStep,
     processingStepPrev,
     processingStepNext,
+    processingStepEntity,
     processingStepCalculation,
     dirty,
     editingCalculation,
@@ -35,6 +40,7 @@ const ProcessingStepView = props => {
     resetProcessingStepState,
     updateProcessingStepProps,
     addEntityVirtual,
+    editEntityVirtual,
   } = props
 
   const history = useHistory()
@@ -84,14 +90,26 @@ const ProcessingStepView = props => {
               readOnly={canUpdateEntity}
             >
               {!calculationEditorOpened && (
-                <button
-                  className="btn btn-s btn-add"
-                  onClick={() => addEntityVirtual(history)}
-                  aria-disabled={hasCalculationSteps}
-                >
-                  <span className="icon icon-plus icon-12px icon-left" />
-                  {i18n.t('processingStepView.virtualEntity')}
-                </button>
+                <>
+                  <button
+                    className="btn btn-s btn-add"
+                    onClick={() => addEntityVirtual(history)}
+                    aria-disabled={hasCalculationSteps}
+                  >
+                    <span className="icon icon-plus icon-12px icon-left" />
+                    {i18n.t('processingStepView.virtualEntity')}
+                  </button>
+                  <button
+                    className="btn btn-s btn-edit"
+                    onClick={() => editEntityVirtual(history)}
+                    aria-disabled={
+                      hasCalculationSteps || (Boolean(processingStepEntity) && !NodeDef.isVirtual(processingStepEntity))
+                    }
+                  >
+                    <span className="icon icon-pencil2 icon-12px icon-left" />
+                    {i18n.t('processingStepView.virtualEntity')}
+                  </button>
+                </>
               )}
             </EntitySelector>
           </>
@@ -118,18 +136,28 @@ const ProcessingStepView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  processingStep: ProcessingStepState.getProcessingStep(state),
-  processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
-  processingStepNext: ProcessingStepState.getProcessingStepNext(state),
-  dirty: ProcessingStepState.isDirty(state),
-  processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
-  editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
-})
+const mapStateToProps = state => {
+  const survey = SurveyState.getSurvey(state)
+  const processingStep = ProcessingStepState.getProcessingStep(state)
+  const processingStepEntity = R.pipe(ProcessingStep.getEntityUuid, entityDefUuid =>
+    Survey.getNodeDefByUuid(entityDefUuid)(survey),
+  )(processingStep)
+
+  return {
+    processingStep,
+    processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
+    processingStepNext: ProcessingStepState.getProcessingStepNext(state),
+    processingStepEntity,
+    dirty: ProcessingStepState.isDirty(state),
+    processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
+    editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
+  }
+}
 
 export default connect(mapStateToProps, {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,
+  editEntityVirtual,
 })(ProcessingStepView)
