@@ -75,13 +75,15 @@ export const dissocTemporaryCalculation = _updateCalculations(
 
 export const dissocCalculation = calculation =>
   _updateCalculations(
-    // Remove calculation
-    R.reject(ProcessingStepCalculation.isEqual(calculation)),
-    // Update indexes of next calculations
-    R.map(
-      R.when(
-        calc => ProcessingStepCalculation.getIndex(calc) > ProcessingStepCalculation.getIndex(calculation),
-        calc => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc),
+    R.pipe(
+      // Remove calculation
+      R.reject(ProcessingStepCalculation.isEqual(calculation)),
+      // Update indexes of next calculations
+      R.map(
+        R.when(
+          calc => ProcessingStepCalculation.getIndex(calc) > ProcessingStepCalculation.getIndex(calculation),
+          calc => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc),
+        ),
       ),
     ),
   )
