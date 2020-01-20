@@ -27,8 +27,11 @@ const _getEntitySource = nodeDef => survey =>
 export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => survey =>
   R.ifElse(
     // If nodeDef is virtual, get children from its source
-    R.always(includeAnalysis && NodeDef.isVirtual(nodeDef)),
-    R.pipe(_getEntitySource(nodeDef), entitySource => getNodeDefChildren(entitySource, includeAnalysis)(survey)),
+    R.always(NodeDef.isVirtual(nodeDef)),
+    R.pipe(
+      _getEntitySource(nodeDef),
+      R.ifElse(R.isNil, R.always([]), entitySource => getNodeDefChildren(entitySource, includeAnalysis)(survey)),
+    ),
     R.pipe(
       getNodeDefsArray,
       R.filter(
@@ -118,7 +121,7 @@ export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = fals
   let length = 1
   const h = (array, nodeDef) => {
     const childDefs = [
-      ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
+      ...(NodeDef.isEntity(nodeDef)
         ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
         : []),
       // Add virtual entities as children of root entity

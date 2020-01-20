@@ -54,7 +54,7 @@ DataQueryView.defaultProps = {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
 
   return {
     hierarchy,
