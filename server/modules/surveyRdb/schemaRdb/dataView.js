@@ -75,3 +75,20 @@ export const getJoin = (schemaName, nodeDefParent) =>
        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
       `
     : ''
+
+export const getFromTable = (survey, nodeDef) => {
+  if (NodeDef.isVirtual(nodeDef)) {
+    const entityDefSource = R.pipe(NodeDef.getEntitySourceUuid, entitySourceUuid =>
+      Survey.getNodeDefByUuid(entitySourceUuid)(survey),
+    )(nodeDef)
+    return getFromTable(survey, entityDefSource)
+  }
+
+  const schemaName = SchemaRdb.getName(Survey.getId(survey))
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const tableName = DataTable.getName(nodeDef, nodeDefParent)
+  return `${schemaName}.${tableName}`
+}
+
+export const getWhereCondition = nodeDef =>
+  NodeDef.isVirtual(nodeDef) ? ` WHERE ${NodeDef.getFormulaExpression(nodeDef)}` : ''

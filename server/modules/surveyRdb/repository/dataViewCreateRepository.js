@@ -21,28 +21,31 @@ const toTableViewCreate = (survey, nodeDef) => {
 
     viewName: RDBDataView.getName(nodeDef, nodeDefParent),
     viewFields: RDBDataView.getSelectFields(survey, nodeDef),
-    viewFrom: `${schemaName}.${tableName} as ${RDBDataView.alias}`,
+    viewFrom: `${RDBDataView.getFromTable(survey, nodeDef)} as ${RDBDataView.alias}`,
     viewJoin: RDBDataView.getJoin(schemaName, nodeDefParent),
+    viewWhereCondition: RDBDataView.getWhereCondition(nodeDef),
   }
 }
 
 export const createTableAndView = async (survey, nodeDef, client) => {
   const tableViewCreate = toTableViewCreate(survey, nodeDef)
 
-  await client.query(`
-    CREATE TABLE
-      ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
-    (
-      id            bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
-      date_created  TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-      date_modified TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-      ${tableViewCreate.colsAndType.join(', ')},
-      ${tableViewCreate.uuidUniqueIdx},
-      ${tableViewCreate.recordForeignKey}
-      ${NodeDef.isRoot(nodeDef) ? '' : ', ' + tableViewCreate.parentForeignKey},
-      PRIMARY KEY (id)
-    )
-  `)
+  if (!NodeDef.isVirtual(nodeDef)) {
+    await client.query(`
+      CREATE TABLE
+        ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
+      (
+        id            bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
+        date_created  TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+        date_modified TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
+        ${tableViewCreate.colsAndType.join(', ')},
+        ${tableViewCreate.uuidUniqueIdx},
+        ${tableViewCreate.recordForeignKey}
+        ${NodeDef.isRoot(nodeDef) ? '' : ', ' + tableViewCreate.parentForeignKey},
+        PRIMARY KEY (id)
+      )
+    `)
+  }
 
   await client.query(`
     CREATE VIEW
@@ -50,5 +53,6 @@ export const createTableAndView = async (survey, nodeDef, client) => {
       SELECT ${tableViewCreate.viewFields.join(', ')}
       FROM ${tableViewCreate.viewFrom}
       ${tableViewCreate.viewJoin}
+      ${tableViewCreate.viewWhereCondition}
   `)
 }

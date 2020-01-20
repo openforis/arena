@@ -83,7 +83,7 @@ export const fetchRootNodeDef = async (surveyId, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
-     WHERE parent_uuid IS NULL`,
+     WHERE parent_uuid IS NULL AND NOT virtual`,
     [],
     res => dbTransformCallback(res, draft, false),
   )
@@ -130,6 +130,7 @@ export const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdva
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props = CASE WHEN analysis THEN props || $1::jsonb ELSE props END,
         props_draft = CASE WHEN analysis THEN props_draft ELSE props_draft || $1::jsonb END,
+        props_advanced = CASE WHEN analysis THEN props_advanced || $2::jsonb ELSE props_advanced END,
         props_advanced_draft = CASE WHEN analysis THEN props_advanced_draft ELSE props_advanced_draft || $2::jsonb END,
         date_modified = ${DbUtils.now}
     WHERE uuid = $3

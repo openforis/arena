@@ -4,6 +4,7 @@ import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDefValidations from './nodeDefValidations'
+import * as NodeDefExpression from './nodeDefExpression'
 
 // ======== NODE DEF PROPERTIES
 
@@ -53,13 +54,13 @@ export const propKeys = {
   taxonomyUuid: 'taxonomyUuid',
   // Analysis
   entitySourceUuid: 'entitySourceUuid',
-  formula: 'formula',
 }
 
 export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
   validations: 'validations',
+  formula: 'formula',
 }
 
 const metaKeys = {
@@ -145,9 +146,8 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 // READ Analysis
 export const isAnalysis = R.propEq(keys.analysis, true)
-export const isVirtual = R.propEq(keys.virtual, true)
+export const isVirtual = R.pipe(R.propOr(false, keys.virtual), R.equals(true))
 export const getEntitySourceUuid = getProp(propKeys.entitySourceUuid)
-export const getFormula = getProp(propKeys.formula)
 
 // Utils
 export const getLabel = (nodeDef, lang) => {
@@ -170,6 +170,10 @@ export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
+
+// Advanced props - Analysis
+export const getFormula = getPropAdvanced(keysPropsAdvanced.formula)
+export const getFormulaExpression = R.pipe(getFormula, R.head, NodeDefExpression.getExpression)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)

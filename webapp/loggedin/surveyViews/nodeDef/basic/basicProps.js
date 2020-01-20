@@ -189,7 +189,7 @@ const BasicProps = props => {
             nodeDefValidation={validation}
             setNodeDefProp={setNodeDefProp}
             label={i18n.t('nodeDefEdit.basicProps.formula')}
-            propName={NodeDef.propKeys.formula}
+            propName={NodeDef.keysPropsAdvanced.formula}
             applyIf={false}
             multiple={false}
             nodeDefUuidContext={NodeDef.getUuid(nodeDef)}
