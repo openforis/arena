@@ -67,14 +67,14 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, lang
 
 export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, preferredLang) => {
   const lang = Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey))
-  const surveyWithDependencies = R.pipe(Survey.buildDependencyGraph, graph =>
-    Survey.assocDependencyGraph(graph)(survey),
-  )(survey)
+  const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
 
   const variables = []
   Survey.visitAncestorsAndSelf(nodeDefContext, nodeDef => {
-    const childVariables = getChildDefVariables(surveyWithDependencies, nodeDef, nodeDefCurrent, mode, lang)
-    variables.push(...childVariables)
+    if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
+      const childVariables = getChildDefVariables(surveyWithDependencies, nodeDef, nodeDefCurrent, mode, lang)
+      variables.push(...childVariables)
+    }
   })(surveyWithDependencies)
 
   return variables

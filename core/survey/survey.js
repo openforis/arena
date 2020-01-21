@@ -104,6 +104,7 @@ export const isNodeDefDependentOn = SurveyDependencies.isNodeDefDependentOn
 
 // ====== UPDATE
 export const assocNodeDefs = SurveyNodeDefs.assocNodeDefs
+export const assocNodeDef = SurveyNodeDefs.assocNodeDef
 export const assocDependencyGraph = SurveyDependencies.assocDependencyGraph
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const buildAndAssocDependencyGraph = SurveyDependencies.buildAndAssocDependencyGraph

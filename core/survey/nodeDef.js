@@ -52,8 +52,6 @@ export const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
-  // Analysis
-  entitySourceUuid: 'entitySourceUuid',
 }
 
 export const keysPropsAdvanced = {
@@ -147,7 +145,6 @@ export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 // READ Analysis
 export const isAnalysis = R.propEq(keys.analysis, true)
 export const isVirtual = R.pipe(R.propOr(false, keys.virtual), R.equals(true))
-export const getEntitySourceUuid = getProp(propKeys.entitySourceUuid)
 
 // Utils
 export const getLabel = (nodeDef, lang) => {
@@ -172,7 +169,7 @@ export const getValidationExpressions = R.pipe(getValidations, NodeDefValidation
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
 // Advanced props - Analysis
-export const getFormula = getPropAdvanced(keysPropsAdvanced.formula)
+export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
 export const getFormulaExpression = R.pipe(getFormula, R.head, NodeDefExpression.getExpression)
 
 // ==== READ meta
@@ -184,6 +181,7 @@ export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
+export const assocParentUuid = R.assoc(keys.parentUuid)
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 export const mergeProps = ObjectUtils.mergeProps
 const assocPropsAdvanced = R.assoc(keys.propsAdvanced)

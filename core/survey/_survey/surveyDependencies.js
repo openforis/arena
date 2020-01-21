@@ -14,6 +14,7 @@ export const dependencyTypes = {
   defaultValues: 'defaultValues',
   applicable: 'applicable',
   validations: 'validations',
+  formula: 'formula',
 }
 
 const _getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])

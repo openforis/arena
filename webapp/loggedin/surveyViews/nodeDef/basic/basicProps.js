@@ -6,7 +6,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
-import * as Expression from '@core/expressionParser/expression'
 
 import { uuidv4 } from '@core/uuid'
 import { normalizeName } from '@core/stringUtils'
@@ -40,9 +39,9 @@ const BasicProps = props => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
-    entitySource,
     entitySourceHierarchy,
 
+    setNodeDefParentUuid,
     setNodeDefProp,
     setNodeDefLayoutProp,
   } = props
@@ -182,7 +181,7 @@ const BasicProps = props => {
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
               lang={i18n.lang}
               validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
-              onChange={uuid => setNodeDefProp(NodeDef.propKeys.entitySourceUuid, uuid)}
+              onChange={uuid => setNodeDefParentUuid(uuid)}
             />
           </FormItem>
           <NodeDefExpressionsProp
@@ -221,7 +220,6 @@ const mapStateToProps = state => {
   const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
 
   // Analysis
-  const entitySource = Survey.getNodeDefByUuid(NodeDef.getEntitySourceUuid(nodeDef))(survey)
   const entitySourceHierarchy = Survey.getHierarchy(
     nodeDef => NodeDef.isEntity(nodeDef) && !NodeDef.isAnalysis(nodeDef),
     true,
@@ -240,7 +238,6 @@ const mapStateToProps = state => {
 
     cyclesKeysParent,
 
-    entitySource,
     entitySourceHierarchy,
   }
 }

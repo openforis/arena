@@ -188,7 +188,7 @@ class SurveyBuilder {
         false,
         t,
       )
-      return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)
+      return Survey.buildAndAssocDependencyGraph(surveyDb)
     })
   }
 }

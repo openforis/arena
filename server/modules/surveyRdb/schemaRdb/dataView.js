@@ -78,9 +78,7 @@ export const getJoin = (schemaName, nodeDefParent) =>
 
 export const getFromTable = (survey, nodeDef) => {
   if (NodeDef.isVirtual(nodeDef)) {
-    const entityDefSource = R.pipe(NodeDef.getEntitySourceUuid, entitySourceUuid =>
-      Survey.getNodeDefByUuid(entitySourceUuid)(survey),
-    )(nodeDef)
+    const entityDefSource = Survey.getNodeDefParent(NodeDef.getParentUuid(nodeDef))(survey)
     return getFromTable(survey, entityDefSource)
   }
 

@@ -53,6 +53,7 @@ const _updateParentLayout = async (user, surveyId, surveyCycleKey, nodeDef, dele
       user,
       surveyId,
       NodeDef.getUuid(nodeDefParent),
+      NodeDef.getParentUuid(nodeDefParent),
       { [NodeDefLayout.keys.layout]: layoutUpdated },
       {},
       true,
@@ -131,7 +132,14 @@ const _updateNodeDefOnCyclesUpdate = async (surveyId, nodeDefUuid, cycles, clien
               ),
             )(nodeDef),
           }
-          await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, {}, client)
+          await NodeDefRepository.updateNodeDefProps(
+            surveyId,
+            nodeDefUuid,
+            NodeDef.getParentUuid(nodeDef),
+            props,
+            {},
+            client,
+          )
         }
       }
     }
@@ -152,6 +160,7 @@ export const updateNodeDefProps = async (
   user,
   surveyId,
   nodeDefUuid,
+  parentUuid,
   props,
   propsAdvanced = {},
   system = false,
@@ -171,7 +180,7 @@ export const updateNodeDefProps = async (
     }
 
     const [nodeDef] = await Promise.all([
-      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t),
+      NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, parentUuid, props, propsAdvanced, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])

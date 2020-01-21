@@ -59,10 +59,16 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const parentUuid = NodeDef.getParentUuid(nodeDef)
 
   const {
     data: { nodeDefsValidation, nodeDefsUpdated },
-  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, { cycle, props, propsAdvanced })
+  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
+    parentUuid,
+    cycle,
+    props,
+    propsAdvanced,
+  })
 
   dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
@@ -89,6 +95,44 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
 /**
  * Applies changes only to node def in state
  */
+
+const _validateAndNotifyNodeDefUpdate = (nodeDef, props = {}, propsAdvanced = {}) => async (dispatch, getState) => {
+  const state = getState()
+
+  const survey = SurveyState.getSurvey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+  const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
+
+  // Validate node def
+  const surveyUpdated = R.pipe(
+    // Associate updated node def
+    Survey.assocNodeDef(nodeDef),
+    // Build and associate dependency graph
+    Survey.buildAndAssocDependencyGraph,
+  )(survey)
+
+  const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDef)
+
+  dispatch({
+    type: nodeDefPropsUpdate,
+    nodeDef,
+    nodeDefValidation,
+    parentNodeDef,
+    props,
+    propsAdvanced,
+    surveyCycleKey,
+  })
+}
+
+export const setNodeDefParentUuid = parentUuid => (dispatch, getState) => {
+  const state = getState()
+  const nodeDef = NodeDefState.getNodeDef(state)
+
+  const nodeDefUpdated = NodeDef.assocParentUuid(parentUuid)(nodeDef)
+
+  dispatch(_validateAndNotifyNodeDefUpdate(nodeDefUpdated))
+}
+
 export const setNodeDefProp = (key, value = null, advanced = false) => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
@@ -96,10 +140,6 @@ export const setNodeDefProp = (key, value = null, advanced = false) => async (di
   if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
     return
   }
-
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
   const props = advanced ? {} : { [key]: value }
   const propsAdvanced = advanced ? { [key]: value } : {}
@@ -113,25 +153,7 @@ export const setNodeDefProp = (key, value = null, advanced = false) => async (di
 
   const nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
 
-  // Validate node def
-  const surveyUpdated = R.pipe(
-    // Associate updated node def
-    Survey.assocNodeDefs({ ...Survey.getNodeDefs(survey), [NodeDef.getUuid(nodeDefUpdated)]: nodeDefUpdated }),
-    // Build and associate dependency graph
-    Survey.buildAndAssocDependencyGraph,
-  )(survey)
-
-  const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDefUpdated)
-
-  dispatch({
-    type: nodeDefPropsUpdate,
-    nodeDef: nodeDefUpdated,
-    nodeDefValidation,
-    parentNodeDef,
-    props,
-    propsAdvanced,
-    surveyCycleKey,
-  })
+  dispatch(_validateAndNotifyNodeDefUpdate(nodeDefUpdated, props, propsAdvanced))
 }
 
 const _updateLayoutProp = (getState, nodeDef, key, value) => {

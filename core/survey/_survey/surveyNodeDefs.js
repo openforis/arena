@@ -21,26 +21,22 @@ export const getNodeDefsByUuids = (uuids = []) =>
     R.filter(nodeDef => R.includes(NodeDef.getUuid(nodeDef), uuids)),
   )
 
-const _getEntitySource = nodeDef => survey =>
-  R.pipe(NodeDef.getEntitySourceUuid, sourceUuid => getNodeDefByUuid(sourceUuid)(survey))(nodeDef)
-
-export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => survey =>
-  R.ifElse(
+export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => survey => {
+  if (NodeDef.isVirtual(nodeDef)) {
     // If nodeDef is virtual, get children from its source
-    R.always(NodeDef.isVirtual(nodeDef)),
-    R.pipe(
-      _getEntitySource(nodeDef),
-      R.ifElse(R.isNil, R.always([]), entitySource => getNodeDefChildren(entitySource, includeAnalysis)(survey)),
-    ),
-    R.pipe(
-      getNodeDefsArray,
-      R.filter(
-        nodeDefCurrent =>
-          R.propEq(NodeDef.keys.parentUuid, NodeDef.getUuid(nodeDef), nodeDefCurrent) &&
-          (includeAnalysis || !NodeDef.isAnalysis(nodeDefCurrent)),
-      ),
+    const entitySource = getNodeDefParent(nodeDef)(survey)
+    return getNodeDefChildren(entitySource, includeAnalysis)(survey)
+  }
+
+  return R.pipe(
+    getNodeDefsArray,
+    R.filter(
+      nodeDefCurrent =>
+        R.propEq(NodeDef.keys.parentUuid, NodeDef.getUuid(nodeDef), nodeDefCurrent) &&
+        (includeAnalysis || !NodeDef.isAnalysis(nodeDefCurrent)),
     ),
   )(survey)
+}
 
 export const hasNodeDefChildrenEntities = nodeDef => survey => {
   if (NodeDef.isAttribute(nodeDef)) {
@@ -84,19 +80,11 @@ export const findNodeDef = predicate => R.pipe(getNodeDefsArray, R.find(predicat
 // ====== UPDATE
 
 export const assocNodeDefs = nodeDefs => R.assoc(nodeDefsKey, nodeDefs)
+export const assocNodeDef = nodeDef => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
 
 // ====== HIERARCHY
 
-export const getNodeDefParent = nodeDef => survey =>
-  R.ifElse(
-    // If nodeDef is virtual, get parent from its source
-    R.always(NodeDef.isVirtual(nodeDef)),
-    R.pipe(
-      _getEntitySource(nodeDef),
-      R.ifElse(R.isNil, R.always(null), entitySource => getNodeDefParent(entitySource)(survey)),
-    ),
-    getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)),
-  )(survey)
+export const getNodeDefParent = nodeDef => getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => survey => {
   let nodeDefCurrent = nodeDef
@@ -123,13 +111,6 @@ export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = fals
     const childDefs = [
       ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
         ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
-        : []),
-      // Add virtual entities as children of root entity
-      ...(includeAnalysis && NodeDef.isRoot(nodeDef)
-        ? R.pipe(
-            getNodeDefsArray,
-            R.filter(nodeDef => NodeDef.isVirtual(nodeDef) && filterFn(nodeDef)),
-          )(survey)
         : []),
     ]
 
