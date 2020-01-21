@@ -7,8 +7,8 @@ import * as StringUtils from '@core/stringUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ProgressBar from '@webapp/commonComponents/progressBar'
-import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
-import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
+import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import NodeDefTableCellHeader from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
 import TableColumnEdit from './tableColumnEdit'
 

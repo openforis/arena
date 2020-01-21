@@ -58,20 +58,21 @@ const AttributesSelector = props => {
 
   return (
     childDefs && (
-      <React.Fragment>
-        {childDefs.map((childDef, i) => (
-          <AttributeSelector
-            key={i}
-            nodeDefContext={nodeDefContext}
-            nodeDef={childDef}
-            lang={lang}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            onToggleAttribute={onToggleAttribute}
-            filterTypes={filterTypes}
-            canSelectAttributes={canSelectAttributes}
-            showMultipleAttributes={showMultipleAttributes}
-          />
-        ))}
+      <>
+        {!NodeDef.isVirtual(nodeDefContext) &&
+          childDefs.map((childDef, i) => (
+            <AttributeSelector
+              key={i}
+              nodeDefContext={nodeDefContext}
+              nodeDef={childDef}
+              lang={lang}
+              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+              onToggleAttribute={onToggleAttribute}
+              filterTypes={filterTypes}
+              canSelectAttributes={canSelectAttributes}
+              showMultipleAttributes={showMultipleAttributes}
+            />
+          ))}
 
         {showAncestors && nodeDefParent && (
           <React.Fragment>
@@ -87,7 +88,7 @@ const AttributesSelector = props => {
             />
           </React.Fragment>
         )}
-      </React.Fragment>
+      </>
     )
   )
 }
