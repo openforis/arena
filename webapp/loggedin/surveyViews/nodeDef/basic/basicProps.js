@@ -179,8 +179,9 @@ const BasicProps = props => {
           <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
             <EntitySelector
               hierarchy={entitySourceHierarchy}
-              nodeDefUuidEntity={NodeDef.getUuid(entitySource)}
+              nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
               lang={i18n.lang}
+              validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
               onChange={uuid => setNodeDefProp(NodeDef.propKeys.entitySourceUuid, uuid)}
             />
           </FormItem>
@@ -195,7 +196,6 @@ const BasicProps = props => {
             nodeDefUuidContext={NodeDef.getUuid(nodeDef)}
             isContextParent={false}
             hideAdvanced={true}
-            mode={Expression.modes.sql}
           />
         </>
       )}

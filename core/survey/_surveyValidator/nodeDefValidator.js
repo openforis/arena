@@ -81,6 +81,16 @@ const validateReadOnly = (propName, nodeDef) =>
     ? { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
     : null
 
+const validateVirtualEntitySoruceUuid = (propName, nodeDef) =>
+  NodeDef.isVirtual(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))
+    ? { key: Validation.messageKeys.nodeDefEdit.entitySourceRequired }
+    : null
+
+const validateVirtualEntityFormula = nodeDef =>
+  NodeDef.isVirtual(nodeDef) && R.isEmpty(NodeDef.getFormula(nodeDef))
+    ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.formulaRequired }])
+    : null
+
 const propsValidations = survey => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
@@ -94,21 +104,35 @@ const propsValidations = survey => ({
   [`${keys.props}.${propKeys.readOnly}`]: [validateReadOnly],
   [keysValidationFields.keyAttributes]: [validateKeyAttributes(survey)],
   [keysValidationFields.children]: [validateChildren(survey)],
+  // Virtual Entity
+  [`${keys.parentUuid}`]: [validateVirtualEntitySoruceUuid],
 })
 
 const validateAdvancedProps = async (survey, nodeDef) => {
-  const [validationDefaultValues, validationApplicable, validationValidations] = await Promise.all([
+  const [
+    validationDefaultValues,
+    validationApplicable,
+    validationValidations,
+    validationVirtualEntityFormula,
+  ] = await Promise.all([
     NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
     NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
     NodeDefValidationsValidator.validate(survey, nodeDef),
+    validateVirtualEntityFormula(nodeDef),
   ])
 
   return Validation.newInstance(
-    R.all(Validation.isValid, [validationDefaultValues, validationApplicable, validationValidations]),
+    R.all(Validation.isValid, [
+      validationDefaultValues,
+      validationApplicable,
+      validationValidations,
+      validationVirtualEntityFormula,
+    ]),
     R.reject(Validation.isValid, {
       [NodeDef.keysPropsAdvanced.defaultValues]: validationDefaultValues,
       [NodeDef.keysPropsAdvanced.applicable]: validationApplicable,
       [NodeDef.keysPropsAdvanced.validations]: validationValidations,
+      [NodeDef.keysPropsAdvanced.formula]: validationVirtualEntityFormula,
     }),
   )
 }
