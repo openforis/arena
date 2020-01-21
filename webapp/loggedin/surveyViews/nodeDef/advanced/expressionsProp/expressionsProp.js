@@ -12,7 +12,7 @@ import { FormItem } from '@webapp/commonComponents/form/input'
 import ExpressionProp from './expressionProp'
 
 const ExpressionsProp = props => {
-  const { values, label, validation, multiple, mode, onChange } = props
+  const { values, label, validation, multiple, onChange } = props
 
   const i18n = useI18n()
 

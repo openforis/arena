@@ -20,13 +20,7 @@ export const toString = (expr, exprMode = modes.json) => {
   const string = ExpressionUtils.toString(expr)
 
   return exprMode === modes.sql
-    ? R.pipe(
-        R.replace(/&&/g, 'AND'),
-        R.replace(/\|\|/g, 'OR'),
-        R.replace(/==/g, '='),
-        R.replace(/!=/g, '!='),
-        R.replace(/"/g, `'`),
-      )(string)
+    ? R.pipe(R.replace(/&&/g, 'AND'), R.replace(/\|\|/g, 'OR'), R.replace(/==/g, '='), R.replace(/"/g, `'`))(string)
     : string
 }
 
