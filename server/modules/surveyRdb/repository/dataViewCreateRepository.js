@@ -22,7 +22,7 @@ const toTableViewCreate = (survey, nodeDef) => {
     viewName: RDBDataView.getName(nodeDef, nodeDefParent),
     viewFields: RDBDataView.getSelectFields(survey, nodeDef),
     viewFrom: `${RDBDataView.getFromTable(survey, nodeDef)} as ${RDBDataView.alias}`,
-    viewJoin: RDBDataView.getJoin(schemaName, nodeDefParent),
+    viewJoin: RDBDataView.getJoin(schemaName, nodeDef, nodeDefParent),
     viewWhereCondition: RDBDataView.getWhereCondition(nodeDef),
   }
 }

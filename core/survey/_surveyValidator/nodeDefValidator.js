@@ -86,9 +86,11 @@ const validateVirtualEntitySoruceUuid = (propName, nodeDef) =>
     ? { key: Validation.messageKeys.nodeDefEdit.entitySourceRequired }
     : null
 
-const validateVirtualEntityFormula = nodeDef =>
-  NodeDef.isVirtual(nodeDef) && R.isEmpty(NodeDef.getFormula(nodeDef))
-    ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.formulaRequired }])
+const validateVirtualEntityFormula = (survey, nodeDef) =>
+  NodeDef.isVirtual(nodeDef)
+    ? R.isEmpty(NodeDef.getFormula(nodeDef))
+      ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.formulaRequired }])
+      : NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
 const propsValidations = survey => ({
@@ -118,7 +120,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
     NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
     NodeDefValidationsValidator.validate(survey, nodeDef),
-    validateVirtualEntityFormula(nodeDef),
+    validateVirtualEntityFormula(survey, nodeDef),
   ])
 
   return Validation.newInstance(

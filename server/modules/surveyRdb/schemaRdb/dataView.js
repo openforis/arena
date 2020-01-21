@@ -2,6 +2,8 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Expression from '@core/expressionParser/expression'
 
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
@@ -23,6 +25,10 @@ export const columns = {
 export const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
 export const getSelectFields = (survey, nodeDef) => {
+  if (NodeDef.isVirtual(nodeDef)) {
+    return ['*']
+  }
+
   const fields = []
   Survey.visitAncestorsAndSelf(nodeDef, nodeDefCurrent => {
     const cols = getCols(survey, nodeDefCurrent, NodeDef.isEqual(nodeDefCurrent)(nodeDef))
@@ -68,25 +74,38 @@ const getCols = (survey, nodeDef, isSelf) => {
   return fields
 }
 
-export const getJoin = (schemaName, nodeDefParent) =>
-  nodeDefParent
+export const getJoin = (schemaName, nodeDef, nodeDefParent) =>
+  NodeDef.isVirtual(nodeDef)
+    ? ''
+    : nodeDefParent
     ? `JOIN 
-       ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
-       ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
-      `
+        ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
+        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
+        `
     : ''
 
 export const getFromTable = (survey, nodeDef) => {
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   if (NodeDef.isVirtual(nodeDef)) {
-    const entityDefSource = Survey.getNodeDefParent(NodeDef.getParentUuid(nodeDef))(survey)
-    return getFromTable(survey, entityDefSource)
+    return getNameWithSchema(Survey.getId(survey))(nodeDefParent)
   }
 
   const schemaName = SchemaRdb.getName(Survey.getId(survey))
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   const tableName = DataTable.getName(nodeDef, nodeDefParent)
   return `${schemaName}.${tableName}`
 }
 
-export const getWhereCondition = nodeDef =>
-  NodeDef.isVirtual(nodeDef) ? ` WHERE ${NodeDef.getFormulaExpression(nodeDef)}` : ''
+export const getWhereCondition = nodeDef => {
+  if (NodeDef.isVirtual(nodeDef)) {
+    const expressionSql = R.pipe(
+      NodeDef.getFormula,
+      R.head,
+      NodeDefExpression.getExpression,
+      Expression.fromString,
+      expr => Expression.toString(expr, Expression.modes.sql),
+    )(nodeDef)
+    return ` WHERE ${expressionSql}`
+  }
+
+  return ''
+}

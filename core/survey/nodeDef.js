@@ -4,7 +4,6 @@ import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDefValidations from './nodeDefValidations'
-import * as NodeDefExpression from './nodeDefExpression'
 
 // ======== NODE DEF PROPERTIES
 
@@ -170,7 +169,6 @@ export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
-export const getFormulaExpression = R.pipe(getFormula, R.head, NodeDefExpression.getExpression)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
