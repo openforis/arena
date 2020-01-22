@@ -190,7 +190,10 @@ export { fetchStepsByChainUuid, fetchStepSummaryByIndex } from '../repository/pr
 
 // ====== READ - Calculations
 
-export { fetchCalculationsByStepUuid } from '../repository/processingStepCalculationRepository'
+export {
+  fetchCalculationsByStepUuid,
+  fetchCalculationAttributeUuidsByChainUuid,
+} from '../repository/processingStepCalculationRepository'
 
 // ====== UPDATE - Chain
 

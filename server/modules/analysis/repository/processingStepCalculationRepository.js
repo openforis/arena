@@ -1,5 +1,8 @@
+import * as R from 'ramda'
+
 import camelize from 'camelize'
 
+import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { db } from '@server/db/db'
@@ -47,6 +50,28 @@ export const fetchCalculationsByStepUuid = async (surveyId, processingStepUuid, 
     ORDER BY index`,
     [processingStepUuid],
     camelize,
+  )
+
+export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainUuid, client = db) =>
+  await client.oneOrNone(
+    `
+    SELECT
+      jsonb_object_agg(c.uuid, c.node_def_uuid::text) as result
+    FROM
+      ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+    JOIN
+      ${getSurveyDBSchema(surveyId)}.processing_step s
+    ON
+      s.uuid = c.processing_step_uuid
+    JOIN
+      ${getSurveyDBSchema(surveyId)}.node_def n
+    ON
+      n.uuid = (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid
+    WHERE
+      s.processing_chain_uuid = $1
+    `,
+    [chainUuid],
+    R.prop('result'),
   )
 
 // ====== UPDATE
