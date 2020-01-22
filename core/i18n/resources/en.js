@@ -343,6 +343,7 @@ Do you want to cancel them?`,
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
     processingSteps: 'Processing steps',
+    cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
   },
 
   processingStepView: {
