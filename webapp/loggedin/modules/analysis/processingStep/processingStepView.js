@@ -7,7 +7,6 @@ import * as R from 'ramda'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
@@ -19,12 +18,12 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
+import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,
-  editEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingStepView = props => {
@@ -40,7 +39,7 @@ const ProcessingStepView = props => {
     resetProcessingStepState,
     updateProcessingStepProps,
     addEntityVirtual,
-    editEntityVirtual,
+    navigateToNodeDefEdit,
   } = props
 
   const history = useHistory()
@@ -48,6 +47,7 @@ const ProcessingStepView = props => {
   const calculationEditorOpened = !R.isEmpty(processingStepCalculation)
   const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, cnt => cnt > 0)(processingStep)
   const canUpdateEntity = hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)
+  const entityUuid = ProcessingStep.getEntityUuid(processingStep)
 
   const i18n = useI18n()
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
@@ -92,21 +92,19 @@ const ProcessingStepView = props => {
               {!calculationEditorOpened && (
                 <>
                   <button
+                    className="btn btn-s btn-edit"
+                    onClick={() => navigateToNodeDefEdit(history, entityUuid)}
+                    aria-disabled={!entityUuid}
+                  >
+                    <span className="icon icon-pencil2 icon-12px icon-left" />
+                    {i18n.t('common.edit')}
+                  </button>
+                  <button
                     className="btn btn-s btn-add"
                     onClick={() => addEntityVirtual(history)}
                     aria-disabled={hasCalculationSteps}
                   >
                     <span className="icon icon-plus icon-12px icon-left" />
-                    {i18n.t('processingStepView.virtualEntity')}
-                  </button>
-                  <button
-                    className="btn btn-s btn-edit"
-                    onClick={() => editEntityVirtual(history)}
-                    aria-disabled={
-                      hasCalculationSteps || !processingStepEntity || !NodeDef.isVirtual(processingStepEntity)
-                    }
-                  >
-                    <span className="icon icon-pencil2 icon-12px icon-left" />
                     {i18n.t('processingStepView.virtualEntity')}
                   </button>
                 </>
@@ -159,5 +157,5 @@ export default connect(mapStateToProps, {
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,
-  editEntityVirtual,
+  navigateToNodeDefEdit,
 })(ProcessingStepView)

@@ -27,6 +27,7 @@ import {
   setNodeDefLayoutProp,
   cancelNodeDefEdits,
   saveNodeDefEdits,
+  removeNodeDef,
 } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 
@@ -45,6 +46,7 @@ const NodeDefView = props => {
     setNodeDefUuidForEdit,
     cancelNodeDefEdits,
     saveNodeDefEdits,
+    removeNodeDef,
   } = props
 
   const i18n = useI18n()
@@ -106,6 +108,7 @@ const NodeDefView = props => {
                   ]),
             ]}
           />
+
           <div className="button-bar">
             <button
               className="btn btn-cancel"
@@ -121,6 +124,12 @@ const NodeDefView = props => {
               <span className="icon icon-floppy-disk icon-left icon-12px" />
               {i18n.t('common.save')}
             </button>
+            {!NodeDef.isRoot(nodeDef) && (
+              <button className="btn btn-danger btn-delete" onClick={() => removeNodeDef(nodeDef, history)}>
+                <span className="icon icon-bin2 icon-left icon-12px" />
+                {i18n.t('common.delete')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -189,4 +198,5 @@ export default connect(mapStateToProps, {
   setNodeDefUuidForEdit,
   cancelNodeDefEdits,
   saveNodeDefEdits,
+  removeNodeDef,
 })(NodeDefView)
