@@ -82,7 +82,7 @@ export const fetchRootNodeDef = async (surveyId, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
-     WHERE parent_uuid IS NULL AND NOT virtual`,
+     WHERE parent_uuid IS NULL`,
     [],
     res => dbTransformCallback(res, draft, false),
   )
