@@ -528,7 +528,7 @@ export default class NodeDefsImportJob extends Job {
 }
 
 const _createNodeDef = (parentNodeDef, type, props, propsAdvanced = {}) =>
-  NodeDef.newNodeDef(parentNodeDef, type, Survey.cycleOneKey, props, propsAdvanced)
+  NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {

@@ -9,7 +9,6 @@ import * as ProcessingStep from './processingStep'
 import * as ProcessingStepCalculation from './processingStepCalculation'
 
 const keys = {
-  cycle: ObjectUtils.keys.cycle,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
   dateModified: ObjectUtils.keys.dateModified,
@@ -23,6 +22,7 @@ const keys = {
 export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
+  cycles: ObjectUtils.keysProps.cycles,
 }
 
 export const statusExec = {
@@ -33,9 +33,8 @@ export const statusExec = {
 
 // ====== CREATE
 
-export const newProcessingChain = (cycle, props = {}) => ({
+export const newProcessingChain = (props = {}) => ({
   [keys.uuid]: uuidv4(),
-  [keys.cycle]: cycle,
   [keys.props]: props,
   [ProcessingStepCalculation.keys.temporary]: true,
 })
@@ -62,7 +61,7 @@ export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null,
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
 export const getPropsDiff = ObjectUtils.getPropsDiff
-export const getCycle = ObjectUtils.getCycle
+export const getCycles = ObjectUtils.getCycles
 export const getDateCreated = ObjectUtils.getDateCreated
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getDateModified = ObjectUtils.getDateModified

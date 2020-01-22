@@ -72,7 +72,7 @@ export const insertSurvey = async (user, surveyParam, createRootEntityDef = true
       const rootEntityDef = NodeDef.newNodeDef(
         null,
         NodeDef.nodeDefType.entity,
-        Survey.cycleOneKey, // Use first (and only) cycle
+        [Survey.cycleOneKey], // Use first (and only) cycle
         {
           [NodeDef.propKeys.name]: 'root_entity',
           [NodeDef.propKeys.multiple]: false,

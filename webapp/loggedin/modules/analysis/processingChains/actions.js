@@ -11,7 +11,9 @@ export const createProcessingChain = history => async (dispatch, getState) => {
   const state = getState()
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-  const processingChain = ProcessingChain.newProcessingChain(surveyCycleKey)
+  const processingChain = ProcessingChain.newProcessingChain({
+    [ProcessingChain.keysProps.cycles]: [surveyCycleKey],
+  })
   dispatch({ type: processingChainUpdate, processingChain })
 
   dispatch(navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain)))

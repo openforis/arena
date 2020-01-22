@@ -31,7 +31,7 @@ class NodeDefBuilder {
   }
 
   _createNodeDef(parentDef) {
-    return NodeDef.newNodeDef(parentDef, this.type, Survey.cycleOneKey, this.props, this.propsAdvanced)
+    return NodeDef.newNodeDef(parentDef, this.type, [Survey.cycleOneKey], this.props, this.propsAdvanced)
   }
 
   applyIf(expr) {

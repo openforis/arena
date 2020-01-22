@@ -27,19 +27,11 @@ export {
 
 // ====== EXECUTION
 
-export const generateScript = async (surveyId, processingChain) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    surveyId,
-    ProcessingChain.getCycle(processingChain),
-  )
+export const generateScript = async (surveyId, cycle, processingChain) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
 
   const outputDir = ProcessUtils.ENV.analysisOutputDir
   for (const processingStep of ProcessingChain.getProcessingSteps(processingChain)) {
-    await ProcessingStepScriptGenerator.generateScript(
-      survey,
-      ProcessingChain.getCycle(processingChain),
-      processingStep,
-      outputDir,
-    )
+    await ProcessingStepScriptGenerator.generateScript(survey, cycle, processingStep, outputDir)
   }
 }

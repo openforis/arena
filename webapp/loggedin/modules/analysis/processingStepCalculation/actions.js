@@ -113,7 +113,7 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const nodeDef = NodeDef.newNodeDef(
     nodeDefParent,
     nodeDefType,
-    ProcessingChain.getCycle(processingChain),
+    ProcessingChain.getCycles(processingChain),
     {},
     {},
     true,

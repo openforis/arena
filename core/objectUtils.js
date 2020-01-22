@@ -21,6 +21,7 @@ export const keys = {
 export const keysProps = {
   descriptions: 'descriptions',
   labels: 'labels',
+  cycles: 'cycles',
 }
 
 // ====== CHECK
@@ -47,6 +48,7 @@ export const getDateCreated = getDate(keys.dateCreated)
 export const getDateModified = getDate(keys.dateModified)
 
 export const getCycle = R.prop(keys.cycle)
+export const getCycles = getProp(keysProps.cycles, [])
 export const getIndex = R.pipe(R.propOr(0, keys.index), Number)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.prop(keys.authGroups)

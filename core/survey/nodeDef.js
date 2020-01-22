@@ -71,7 +71,7 @@ export const maxKeyAttributes = 3
 export const newNodeDef = (
   nodeDefParent,
   type,
-  cycle,
+  cycles,
   props,
   propsAdvanced = {},
   analysis = false,
@@ -82,7 +82,7 @@ export const newNodeDef = (
   [keys.type]: type,
   [keys.props]: {
     ...props,
-    [propKeys.cycles]: [cycle],
+    [propKeys.cycles]: cycles,
   },
   [keys.propsAdvanced]: {
     ...propsAdvanced,

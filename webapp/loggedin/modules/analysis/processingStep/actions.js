@@ -105,7 +105,7 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
   const nodeDef = NodeDef.newNodeDef(
     null,
     NodeDef.nodeDefType.entity,
-    ProcessingChain.getCycle(processingChain),
+    ProcessingChain.getCycles(processingChain),
     {
       [NodeDef.propKeys.multiple]: true,
     },
