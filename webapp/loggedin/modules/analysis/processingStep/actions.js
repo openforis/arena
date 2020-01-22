@@ -13,7 +13,7 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 
 export const processingStepCreate = 'analysis/processingStep/create'
 export const processingStepCalculationsLoad = 'analysis/processingStep/calculations/load'
@@ -116,11 +116,11 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
 
   await dispatch({ type: nodeDefCreate, nodeDef })
 
-  history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  dispatch(navigateToNodeDefEdit(history, NodeDef.getUuid(nodeDef)))
 }
 
-export const editEntityVirtual = history => async (_, getState) => {
+export const editEntityVirtual = history => async (dispatch, getState) => {
   const processingStep = ProcessingStepState.getProcessingStep(getState())
 
-  history.push(`${appModuleUri(analysisModules.nodeDef)}${ProcessingStep.getEntityUuid(processingStep)}/`)
+  dispatch(navigateToNodeDefEdit(history, ProcessingStep.getEntityUuid(processingStep)))
 }
