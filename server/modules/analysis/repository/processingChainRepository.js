@@ -67,12 +67,12 @@ export const updateChainProp = async (surveyId, processingChainUuid, key, value,
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET props = jsonb_set("props", '{${key}}', $2::jsonb),
+    SET props = props || $2::jsonb,
         date_modified = ${DbUtils.now}
     WHERE uuid = $1
     RETURNING ${selectFields}
     `,
-    [processingChainUuid, value],
+    [processingChainUuid, { [key]: value }],
   )
 
 // ====== DELETE
