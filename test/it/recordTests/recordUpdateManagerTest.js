@@ -21,7 +21,13 @@ const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => 
   const propsAdvanced = {
     [NodeDef.keysPropsAdvanced.defaultValues]: defaultValueExpressions,
   }
-  await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef), {}, propsAdvanced)
+  await NodeDefRepository.updateNodeDefProps(
+    Survey.getId(survey),
+    NodeDef.getUuid(nodeDef),
+    NodeDef.getParentUuid(nodeDef),
+    {},
+    propsAdvanced,
+  )
 }
 
 export const recordCreationTest = async () => {

@@ -44,6 +44,7 @@ export const assocIndex = ObjectUtils.assocIndex
 export const mergeProps = ObjectUtils.mergeProps
 export const dissocTemporary = ObjectUtils.dissocTemporary
 
+export const assocEntityUuid = entityUuid => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
 export const assocCalculations = R.assoc(keys.calculations)
 export const dissocCalculations = R.dissoc(keys.calculations)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)

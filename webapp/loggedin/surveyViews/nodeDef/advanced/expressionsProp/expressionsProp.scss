@@ -24,6 +24,13 @@
 
 }
 
+.tooltip-error {
+  .node-def-edit__expressions {
+    border: 1px solid rgba($red, .6);
+    background-color: rgba($red, .1);
+  }
+}
+
 .node-def-edit__expression-grid-item {
   display: grid;
   grid-template-columns: 120px 1fr;

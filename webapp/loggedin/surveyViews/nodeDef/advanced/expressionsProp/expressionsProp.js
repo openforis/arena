@@ -5,9 +5,11 @@ import * as R from 'ramda'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
+import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem } from '@webapp/commonComponents/form/input'
+import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import ExpressionProp from './expressionProp'
 
 const ExpressionsProp = props => {
@@ -37,28 +39,30 @@ const ExpressionsProp = props => {
 
   return (
     <FormItem label={label}>
-      <div className="node-def-edit__expressions">
-        {values.map((value, i) => (
-          <ExpressionProp
-            key={i}
-            {...props}
-            expression={value}
-            validation={Validation.getFieldValidation(i)(validation)}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-          />
-        ))}
+      <ValidationTooltip validation={validation} showKeys={false} type={Validation.isValid(validation) ? '' : 'error'}>
+        <div className="node-def-edit__expressions">
+          {values.map((value, i) => (
+            <ExpressionProp
+              key={i}
+              {...props}
+              expression={value}
+              validation={Validation.getFieldValidation(i)(validation)}
+              onDelete={onDelete}
+              onUpdate={onUpdate}
+            />
+          ))}
 
-        {(multiple || R.isEmpty(values)) && (
-          <ExpressionProp
-            {...props}
-            expression={NodeDefExpression.createExpressionPlaceholder()}
-            validation={{}}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-          />
-        )}
-      </div>
+          {(multiple || R.isEmpty(values)) && (
+            <ExpressionProp
+              {...props}
+              expression={NodeDefExpression.createExpressionPlaceholder()}
+              validation={{}}
+              onDelete={onDelete}
+              onUpdate={onUpdate}
+            />
+          )}
+        </div>
+      </ValidationTooltip>
     </FormItem>
   )
 }
@@ -70,6 +74,7 @@ ExpressionsProp.defaultProps = {
   severity: false,
   multiple: true,
   readOnly: false,
+  mode: Expression.modes.json,
   nodeDefUuidContext: null,
   nodeDefUuidCurrent: null,
   // Array of expressions

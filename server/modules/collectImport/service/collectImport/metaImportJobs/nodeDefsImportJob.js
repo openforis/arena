@@ -200,6 +200,7 @@ export default class NodeDefsImportJob extends Job {
         this.user,
         surveyId,
         nodeDefUuid,
+        NodeDef.getParentUuid(nodeDef),
         propsUpdated,
         propsAdvanced,
         true,

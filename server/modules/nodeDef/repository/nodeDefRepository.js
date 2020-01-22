@@ -23,9 +23,8 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
   return dbTransformCallbackCommon(def, draft, true)
 }
 
-const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, ${DbUtils.selectDate(
-  'date_created',
-)}, ${DbUtils.selectDate('date_modified')}, 
+const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, virtual, 
+  ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
   props, props_advanced, props_draft, props_advanced_draft, meta`
 
 // ============== CREATE
@@ -34,8 +33,8 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
   await client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-      (parent_uuid, uuid, type, props, props_draft, props_advanced_draft, meta, analysis)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (parent_uuid, uuid, type, props, props_draft, props_advanced_draft, meta, analysis, virtual)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *`,
     [
       NodeDef.getParentUuid(nodeDef),
@@ -46,6 +45,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = db) =>
       NodeDef.getPropsAdvanced(nodeDef),
       NodeDef.getMeta(nodeDef),
       NodeDef.isAnalysis(nodeDef),
+      NodeDef.isVirtual(nodeDef),
     ],
     def => dbTransformCallback(def, true, true), // Always loading draft when creating or updating a nodeDef
   )
@@ -123,18 +123,20 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
 
 // ============== UPDATE
 
-export const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, props, propsAdvanced = {}, client = db) =>
   await client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props = CASE WHEN analysis THEN props || $1::jsonb ELSE props END,
         props_draft = CASE WHEN analysis THEN props_draft ELSE props_draft || $1::jsonb END,
+        props_advanced = CASE WHEN analysis THEN props_advanced || $2::jsonb ELSE props_advanced END,
         props_advanced_draft = CASE WHEN analysis THEN props_advanced_draft ELSE props_advanced_draft || $2::jsonb END,
+        parent_uuid = $3,
         date_modified = ${DbUtils.now}
-    WHERE uuid = $3
+    WHERE uuid = $4
     RETURNING ${nodeDefSelectFields}
   `,
-    [props, propsAdvanced, nodeDefUuid],
+    [props, propsAdvanced, parentUuid, nodeDefUuid],
     def => dbTransformCallback(def, true, true), // Always loading draft when updating a nodeDef
   )
 

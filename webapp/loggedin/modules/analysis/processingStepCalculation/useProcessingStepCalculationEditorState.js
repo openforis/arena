@@ -51,12 +51,14 @@ export default () => {
   const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
   const dirty = useSelector(ProcessingStepCalculationState.isDirty)
 
-  const attributes = R.pipe(
-    ProcessingStep.getEntityUuid,
-    entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
-    entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
-    R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
-  )(processingStep)
+  const entityDefUuid = ProcessingStep.getEntityUuid(processingStep)
+  const attributes = entityDefUuid
+    ? R.pipe(
+        Survey.getNodeDefByUuid(entityDefUuid),
+        entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
+        R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
+      )(survey)
+    : []
 
   const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
     Survey.getNodeDefByUuid(nodeDefUuid)(survey),

@@ -21,6 +21,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefState from './nodeDefState'
 
 import {
+  setNodeDefParentUuid,
   setNodeDefProp,
   putNodeDefLayoutProp,
   setNodeDefLayoutProp,
@@ -37,6 +38,7 @@ const NodeDefView = props => {
     isDirty,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
+    setNodeDefParentUuid,
     setNodeDefProp,
     putNodeDefLayoutProp,
     setNodeDefLayoutProp,
@@ -72,6 +74,7 @@ const NodeDefView = props => {
                   validation,
                   nodeDefKeyEditDisabled,
                   nodeDefMultipleEditDisabled,
+                  setNodeDefParentUuid,
                   setNodeDefProp,
                   putNodeDefLayoutProp,
                   setNodeDefLayoutProp,
@@ -179,6 +182,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
+  setNodeDefParentUuid,
   setNodeDefProp,
   putNodeDefLayoutProp,
   setNodeDefLayoutProp,

@@ -11,7 +11,7 @@ export const getNodeDefs = R.propOr({}, nodeDefsKey)
 
 export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(R.propEq(NodeDef.keys.parentUuid, null)))
+export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(NodeDef.isRoot))
 
 export const getNodeDefByUuid = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
@@ -21,15 +21,22 @@ export const getNodeDefsByUuids = (uuids = []) =>
     R.filter(nodeDef => R.includes(NodeDef.getUuid(nodeDef), uuids)),
   )
 
-export const getNodeDefChildren = (nodeDef, includeAnalysis = false) =>
-  R.pipe(
+export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => survey => {
+  if (NodeDef.isVirtual(nodeDef)) {
+    // If nodeDef is virtual, get children from its source
+    const entitySource = getNodeDefParent(nodeDef)(survey)
+    return getNodeDefChildren(entitySource, includeAnalysis)(survey)
+  }
+
+  return R.pipe(
     getNodeDefsArray,
     R.filter(
       nodeDefCurrent =>
         R.propEq(NodeDef.keys.parentUuid, NodeDef.getUuid(nodeDef), nodeDefCurrent) &&
         (includeAnalysis || !NodeDef.isAnalysis(nodeDefCurrent)),
     ),
-  )
+  )(survey)
+}
 
 export const hasNodeDefChildrenEntities = nodeDef => survey => {
   if (NodeDef.isAttribute(nodeDef)) {
@@ -73,6 +80,7 @@ export const findNodeDef = predicate => R.pipe(getNodeDefsArray, R.find(predicat
 // ====== UPDATE
 
 export const assocNodeDefs = nodeDefs => R.assoc(nodeDefsKey, nodeDefs)
+export const assocNodeDef = nodeDef => R.assocPath([nodeDefsKey, NodeDef.getUuid(nodeDef)], nodeDef)
 
 // ====== HIERARCHY
 
@@ -100,9 +108,11 @@ export const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) => survey 
 export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = false) => survey => {
   let length = 1
   const h = (array, nodeDef) => {
-    const childDefs = NodeDef.isEntity(nodeDef)
-      ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
-      : []
+    const childDefs = [
+      ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
+        ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
+        : []),
+    ]
 
     length += childDefs.length
     const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }

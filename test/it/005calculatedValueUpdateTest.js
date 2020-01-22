@@ -74,7 +74,7 @@ describe('Calculated value test', () => {
     record = await RB.record(
       user,
       survey,
-      RB.entity('root', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
+      RB.entity('cluster', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
     ).buildAndStore()
   })
 
@@ -85,7 +85,7 @@ describe('Calculated value test', () => {
   })
 
   it('Calculated value updated', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double', 4)
+    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'cluster/num', 2, 'cluster/num_double', 4)
   })
 
   it('Calculated value with apply if updated', async () => {
@@ -105,15 +105,15 @@ describe('Calculated value test', () => {
       record = await updateNodeAndExpectDependentNodeValueToBe(
         survey,
         record,
-        'root/num',
+        'cluster/num',
         sourceValue,
-        'root/num_range',
+        'cluster/num_range',
         expectedValue,
       )
     }
   })
 
   it('Calculated value cascade update', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'root/num', 2, 'root/num_double_square', 16)
+    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'cluster/num', 2, 'cluster/num_double_square', 16)
   })
 })

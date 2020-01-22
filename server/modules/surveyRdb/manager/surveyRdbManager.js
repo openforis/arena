@@ -59,9 +59,12 @@ export const queryTable = async (
 
   // Get hierarchy entities uuid col names
   const ancestorUuidColNames = []
-  Survey.visitAncestorsAndSelf(nodeDefTable, nodeDefCurrent =>
-    ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`),
-  )(survey)
+  Survey.visitAncestorsAndSelf(nodeDefTable, nodeDefCurrent => {
+    // Skip virtual entity: ancestor uuid column taken from its parent entity def
+    if (!NodeDef.isVirtual(nodeDefCurrent)) {
+      ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
+    }
+  })(survey)
 
   // Fetch data
   const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]

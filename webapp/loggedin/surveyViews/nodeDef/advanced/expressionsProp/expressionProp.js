@@ -7,8 +7,10 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
+import * as Expression from '@core/expressionParser/expression'
+
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
-import LabelsEditor from '../../../labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 const ExpressionProp = props => {
   const {
@@ -23,9 +25,10 @@ const ExpressionProp = props => {
     isContextParent,
     canBeConstant,
     isBoolean,
+    hideAdvanced,
+    mode,
     onUpdate,
     onDelete,
-    hideAdvanced,
   } = props
 
   const i18n = useI18n()
@@ -68,6 +71,7 @@ const ExpressionProp = props => {
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
             hideAdvanced={hideAdvanced}
+            mode={mode}
           />
         </div>
 
@@ -125,6 +129,7 @@ ExpressionProp.defaultProps = {
   isContextParent: false,
   canBeConstant: false,
   isBoolean: true,
+  mode: Expression.modes.json,
 
   onUpdate: () => {},
   onDelete: () => {},

@@ -1,7 +1,6 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -14,7 +13,7 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 
 export const processingStepCreate = 'analysis/processingStep/create'
 export const processingStepCalculationsLoad = 'analysis/processingStep/calculations/load'
@@ -101,28 +100,27 @@ export const deleteProcessingStep = () => async (dispatch, getState) => {
 
 export const addEntityVirtual = history => async (dispatch, getState) => {
   const state = getState()
-  const survey = SurveyState.getSurvey(state)
   const processingChain = ProcessingChainState.getProcessingChain(state)
-  const nodeDefParent = Survey.getNodeDefRoot(survey)
-  // Entity source = prev processing step entity
-  const entitySourceUuid = R.pipe(ProcessingStepState.getProcessingStepPrev, ProcessingStep.getEntityUuid)(state)
 
-  const nodeDef = {
-    ...NodeDef.newNodeDef(
-      nodeDefParent,
-      NodeDef.nodeDefType.entity,
-      ProcessingChain.getCycle(processingChain),
-      {
-        [NodeDef.propKeys.multiple]: true,
-        [NodeDef.propKeys.entitySourceUuid]: entitySourceUuid,
-      },
-      {},
-      true,
-    ),
-    [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
-  }
+  const nodeDef = NodeDef.newNodeDef(
+    null,
+    NodeDef.nodeDefType.entity,
+    ProcessingChain.getCycle(processingChain),
+    {
+      [NodeDef.propKeys.multiple]: true,
+    },
+    {},
+    true,
+    true,
+  )
 
   await dispatch({ type: nodeDefCreate, nodeDef })
 
-  history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  dispatch(navigateToNodeDefEdit(history, NodeDef.getUuid(nodeDef)))
+}
+
+export const editEntityVirtual = history => async (dispatch, getState) => {
+  const processingStep = ProcessingStepState.getProcessingStep(getState())
+
+  dispatch(navigateToNodeDefEdit(history, ProcessingStep.getEntityUuid(processingStep)))
 }

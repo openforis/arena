@@ -16,7 +16,7 @@ export const colNameRecordCycle = 'record_cycle'
 export const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
     ? R.pipe(
-        Survey.getNodeDefChildren(nodeDef),
+        Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef)),
         R.filter(NodeDef.isSingleAttribute),
         R.sortBy(R.ascend(R.prop('id'))),
       )(survey)

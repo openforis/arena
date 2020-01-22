@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -46,7 +47,7 @@ const SurveyHierarchyView = props => {
 const mapStateToProps = state => {
   const lang = AppState.getLang(state)
   const survey = SurveyState.getSurvey(state)
-  const hierarchy = Survey.getHierarchy()(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
 
   return {
     lang,

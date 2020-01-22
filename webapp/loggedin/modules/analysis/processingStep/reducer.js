@@ -2,10 +2,12 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as R from 'ramda'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 
 import { processingChainReset, processingChainSave } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import {
@@ -18,7 +20,6 @@ import {
   processingStepCalculationCreate,
   processingStepCalculationIndexUpdate,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
-
 import {
   processingStepCalculationDelete,
   processingStepCalculationReset,
@@ -62,6 +63,10 @@ const actionHandlers = {
     ProcessingStepState.dissocCalculation(calculation)(state),
 
   [processingStepCalculationReset]: state => ProcessingStepState.dissocTemporaryCalculation(state),
+
+  // NodeDef (Virtual Entity)
+  [nodeDefSave]: (state, { nodeDef }) =>
+    R.when(R.always(NodeDef.isVirtual(nodeDef)), ProcessingStepState.updateEntityUuid(NodeDef.getUuid(nodeDef)))(state),
 }
 
 export default exportReducer(actionHandlers)

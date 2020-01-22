@@ -71,12 +71,13 @@ export const init = app => {
       try {
         const user = Request.getUser(req)
         const { props, propsAdvanced } = Request.getBody(req)
-        const { surveyId, cycle, nodeDefUuid } = Request.getParams(req)
+        const { surveyId, cycle, nodeDefUuid, parentUuid } = Request.getParams(req)
 
         const nodeDefsUpdated = await NodeDefService.updateNodeDefProps(
           user,
           surveyId,
           nodeDefUuid,
+          parentUuid,
           props,
           propsAdvanced,
         )

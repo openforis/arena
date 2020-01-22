@@ -33,6 +33,8 @@ export const keys = {
   analysis: 'analysis',
   published: 'published',
   temporary: 'temporary', // Not persisted yet
+  // Analysis
+  virtual: 'virtual', // Virtual Entity
 }
 
 export const propKeys = {
@@ -49,14 +51,13 @@ export const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
-  // Analysis
-  entitySourceUuid: 'entitySourceUuid',
 }
 
 export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
   validations: 'validations',
+  formula: 'formula',
 }
 
 const metaKeys = {
@@ -67,11 +68,18 @@ export const maxKeyAttributes = 3
 
 // ==== CREATE
 
-export const newNodeDef = (nodeDefParent, type, cycle, props, propsAdvanced = {}, analysis = false) => ({
+export const newNodeDef = (
+  nodeDefParent,
+  type,
+  cycle,
+  props,
+  propsAdvanced = {},
+  analysis = false,
+  virtual = false,
+) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: getUuid(nodeDefParent),
   [keys.type]: type,
-  [keys.analysis]: analysis,
   [keys.props]: {
     ...props,
     [propKeys.cycles]: [cycle],
@@ -82,6 +90,9 @@ export const newNodeDef = (nodeDefParent, type, cycle, props, propsAdvanced = {}
   [keys.meta]: {
     [metaKeys.h]: nodeDefParent ? [...getMetaHierarchy(nodeDefParent), getUuid(nodeDefParent)] : [],
   },
+  [keys.analysis]: analysis,
+  [keys.virtual]: virtual,
+  [keys.temporary]: true,
 })
 
 // ==== READ
@@ -124,19 +135,32 @@ export const isReadOnly = getProp(propKeys.readOnly, false)
 
 export const isPublished = R.propEq(keys.published, true)
 export const isDeleted = R.propEq(keys.deleted, true)
-export const isAnalysis = R.propEq(keys.analysis, true)
 export const isTemporary = R.propEq(keys.temporary, true)
 
 export const getLabels = ObjectUtils.getLabels
 export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
-export const getEntitySourceUuid = getProp(propKeys.entitySourceUuid)
+// READ Analysis
+export const isAnalysis = R.propEq(keys.analysis, true)
+export const isVirtual = R.pipe(R.propOr(false, keys.virtual), R.equals(true))
 
 // Utils
 export const getLabel = (nodeDef, lang) => {
-  const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-  return StringUtils.isBlank(label) ? getName(nodeDef) : label
+  let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+  if (StringUtils.isBlank(label)) {
+    label = getName(nodeDef)
+  }
+
+  if (isVirtual(nodeDef)) {
+    return `${label}${' (V)'}`
+  }
+
+  if (isAnalysis(nodeDef) && isAttribute(nodeDef)) {
+    return `${label}${' (C)'}`
+  }
+
+  return label
 }
 
 export const getCycleFirst = R.pipe(getCycles, R.head)
@@ -155,6 +179,9 @@ export const getValidationExpressions = R.pipe(getValidations, NodeDefValidation
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
+// Advanced props - Analysis
+export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
+
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
 
@@ -164,6 +191,7 @@ export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
+export const assocParentUuid = R.assoc(keys.parentUuid)
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 export const mergeProps = ObjectUtils.mergeProps
 const assocPropsAdvanced = R.assoc(keys.propsAdvanced)

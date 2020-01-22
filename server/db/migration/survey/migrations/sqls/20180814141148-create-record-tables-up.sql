@@ -7,6 +7,7 @@ CREATE TABLE
     type                 varchar   NOT NULL,
     deleted              boolean   NOT NULL DEFAULT false,
     analysis             boolean   NOT NULL DEFAULT false,
+    virtual              boolean   NOT NULL DEFAULT false,
     props                jsonb     NOT NULL DEFAULT '{}'::jsonb,
     props_draft          jsonb     NOT NULL DEFAULT '{}'::jsonb,
     props_advanced       jsonb     NOT NULL DEFAULT '{}'::jsonb,

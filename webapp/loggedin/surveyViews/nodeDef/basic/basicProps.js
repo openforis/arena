@@ -14,8 +14,10 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
+import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
@@ -37,8 +39,9 @@ const BasicProps = props => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     displayInOwnPageDisabled,
-    entitySource,
+    entitySourceHierarchy,
 
+    setNodeDefParentUuid,
     setNodeDefProp,
     setNodeDefLayoutProp,
   } = props
@@ -58,12 +61,6 @@ const BasicProps = props => {
       {NodeDef.isAnalysis(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
           <Checkbox checked={true} disabled={true} />
-        </FormItem>
-      )}
-
-      {NodeDef.isAnalysis(nodeDef) && NodeDef.isEntity(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
-          {NodeDef.getLabel(entitySource, i18n.lang)}
         </FormItem>
       )}
 
@@ -175,6 +172,32 @@ const BasicProps = props => {
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}
+
+      {NodeDef.isVirtual(nodeDef) && (
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
+            <EntitySelector
+              hierarchy={entitySourceHierarchy}
+              nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
+              lang={i18n.lang}
+              validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
+              onChange={uuid => setNodeDefParentUuid(uuid)}
+            />
+          </FormItem>
+          <NodeDefExpressionsProp
+            nodeDef={nodeDef}
+            nodeDefValidation={validation}
+            setNodeDefProp={setNodeDefProp}
+            label={i18n.t('nodeDefEdit.basicProps.formula')}
+            propName={NodeDef.keysPropsAdvanced.formula}
+            applyIf={false}
+            multiple={false}
+            nodeDefUuidContext={NodeDef.getUuid(nodeDef)}
+            isContextParent={false}
+            hideAdvanced={true}
+          />
+        </>
+      )}
     </div>
   )
 }
@@ -197,7 +220,10 @@ const mapStateToProps = state => {
   const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
 
   // Analysis
-  const entitySource = Survey.getNodeDefByUuid(NodeDef.getEntitySourceUuid(nodeDef))(survey)
+  const entitySourceHierarchy = Survey.getHierarchy(
+    nodeDef => NodeDef.isEntity(nodeDef) && !NodeDef.isAnalysis(nodeDef),
+    true,
+  )(survey)
 
   return {
     surveyCycleKey,
@@ -212,7 +238,7 @@ const mapStateToProps = state => {
 
     cyclesKeysParent,
 
-    entitySource,
+    entitySourceHierarchy,
   }
 }
 

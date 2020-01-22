@@ -58,20 +58,21 @@ const AttributesSelector = props => {
 
   return (
     childDefs && (
-      <React.Fragment>
-        {childDefs.map((childDef, i) => (
-          <AttributeSelector
-            key={i}
-            nodeDefContext={nodeDefContext}
-            nodeDef={childDef}
-            lang={lang}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            onToggleAttribute={onToggleAttribute}
-            filterTypes={filterTypes}
-            canSelectAttributes={canSelectAttributes}
-            showMultipleAttributes={showMultipleAttributes}
-          />
-        ))}
+      <>
+        {!NodeDef.isVirtual(nodeDefContext) &&
+          childDefs.map((childDef, i) => (
+            <AttributeSelector
+              key={i}
+              nodeDefContext={nodeDefContext}
+              nodeDef={childDef}
+              lang={lang}
+              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+              onToggleAttribute={onToggleAttribute}
+              filterTypes={filterTypes}
+              canSelectAttributes={canSelectAttributes}
+              showMultipleAttributes={showMultipleAttributes}
+            />
+          ))}
 
         {showAncestors && nodeDefParent && (
           <React.Fragment>
@@ -87,7 +88,7 @@ const AttributesSelector = props => {
             />
           </React.Fragment>
         )}
-      </React.Fragment>
+      </>
     )
   )
 }
@@ -111,7 +112,7 @@ const mapStateToProps = (state, props) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
   const childDefs = nodeDefContext
     ? NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext)(survey)
+      ? Survey.getNodeDefChildren(nodeDefContext, NodeDef.isVirtual(nodeDefContext))(survey)
       : [nodeDefContext] // Multiple attribute
     : []
 

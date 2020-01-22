@@ -16,30 +16,35 @@ const contextByDependencyTypeFns = {
   [Survey.dependencyTypes.defaultValues]: (survey, nodeDef) => nodeDef,
   [Survey.dependencyTypes.applicable]: (survey, nodeDef) => Survey.getNodeDefParent(nodeDef)(survey),
   [Survey.dependencyTypes.validations]: (survey, nodeDef) => nodeDef,
+  [Survey.dependencyTypes.formula]: (survey, nodeDef) => nodeDef,
 }
 
 const expressionsByDependencyTypeFns = {
   [Survey.dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
   [Survey.dependencyTypes.applicable]: NodeDef.getApplicable,
   [Survey.dependencyTypes.validations]: R.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
+  [Survey.dependencyTypes.formula]: NodeDef.getFormula,
 }
 
 const selfReferenceAllowedByDependencyType = {
   [Survey.dependencyTypes.defaultValues]: false,
   [Survey.dependencyTypes.applicable]: false,
   [Survey.dependencyTypes.validations]: true,
+  [Survey.dependencyTypes.formula]: false,
 }
 
 const applyIfUniquenessByDependencyType = {
   [Survey.dependencyTypes.defaultValues]: true,
   [Survey.dependencyTypes.applicable]: false,
   [Survey.dependencyTypes.validations]: false,
+  [Survey.dependencyTypes.formula]: false,
 }
 
 const errorKeyByDependencyType = {
   [Survey.dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
   [Survey.dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
   [Survey.dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
+  [Survey.dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
 }
 
 const _getNodeValue = nodeDef => (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1) // Simulates node value

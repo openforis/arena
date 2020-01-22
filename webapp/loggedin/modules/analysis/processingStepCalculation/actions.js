@@ -8,8 +8,6 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ProcessingStepCalculationValidator from '@common/analysis/processingStepCalculationValidator'
 
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
@@ -18,6 +16,7 @@ import * as ProcessingStepCalculationState from './processingStepCalculationStat
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
+import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'
@@ -111,12 +110,16 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(state)
   const nodeDefType = ProcessingStepCalculation.getNodeDefType(calculation)
 
-  const nodeDef = {
-    ...NodeDef.newNodeDef(nodeDefParent, nodeDefType, ProcessingChain.getCycle(processingChain), {}, {}, true),
-    [NodeDef.keys.temporary]: true, // Used to dissoc node def on cancel if changes are not persisted
-  }
+  const nodeDef = NodeDef.newNodeDef(
+    nodeDefParent,
+    nodeDefType,
+    ProcessingChain.getCycle(processingChain),
+    {},
+    {},
+    true,
+  )
 
   await dispatch({ type: nodeDefCreate, nodeDef })
 
-  history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  dispatch(navigateToNodeDefEdit(history, NodeDef.getUuid(nodeDef)))
 }

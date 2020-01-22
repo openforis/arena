@@ -45,7 +45,7 @@ const actionHandlers = {
   // Update calculation attribute on node def edit cancel / back
   [nodeDefSave]: (state, { nodeDef }) =>
     R.when(
-      R.always(NodeDef.isAnalysis(nodeDef)),
+      R.always(NodeDef.isAnalysis(nodeDef) && NodeDef.isAttribute(nodeDef)),
       ProcessingStepCalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef)),
     )(state),
 }
