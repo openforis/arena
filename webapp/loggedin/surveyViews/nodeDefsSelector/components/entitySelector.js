@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { nbsp } from '@core/stringUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
@@ -15,7 +15,7 @@ const _generateDropdownItems = (hierarchy, lang) => {
     const label = NodeDef.getLabel(nodeDef, lang)
     entities.push({
       key: NodeDef.getUuid(nodeDef),
-      value: `${nbsp}${R.repeat(nbsp + nbsp, depth).join('')}${label}${NodeDef.isAnalysis(nodeDef) ? ' (V)' : ''}`,
+      value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
     })
   }
 

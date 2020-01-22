@@ -85,9 +85,7 @@ const ProcessingStepCalculationEditor = () => {
               items={attributes}
               selection={attribute}
               itemKeyProp={ProcessingStepCalculation.keys.uuid}
-              itemLabelFunction={attrDef =>
-                `${NodeDef.getLabel(attrDef, i18n.lang)}${NodeDef.isAnalysis(attrDef) ? ' (c)' : ''}`
-              }
+              itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
               onChange={def => dispatch(updateProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
               validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />

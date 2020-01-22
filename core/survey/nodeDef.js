@@ -147,8 +147,20 @@ export const isVirtual = R.pipe(R.propOr(false, keys.virtual), R.equals(true))
 
 // Utils
 export const getLabel = (nodeDef, lang) => {
-  const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-  return StringUtils.isBlank(label) ? getName(nodeDef) : label
+  let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+  if (StringUtils.isBlank(label)) {
+    label = getName(nodeDef)
+  }
+
+  if (isVirtual(nodeDef)) {
+    return `${label}${' (V)'}`
+  }
+
+  if (isAnalysis(nodeDef) && isAttribute(nodeDef)) {
+    return `${label}${' (C)'}`
+  }
+
+  return label
 }
 
 export const getCycleFirst = R.pipe(getCycles, R.head)
