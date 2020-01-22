@@ -103,7 +103,7 @@ const ProcessingStepView = props => {
                     className="btn btn-s btn-edit"
                     onClick={() => editEntityVirtual(history)}
                     aria-disabled={
-                      hasCalculationSteps || (Boolean(processingStepEntity) && !NodeDef.isVirtual(processingStepEntity))
+                      hasCalculationSteps || !processingStepEntity || !NodeDef.isVirtual(processingStepEntity)
                     }
                   >
                     <span className="icon icon-pencil2 icon-12px icon-left" />
