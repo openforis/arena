@@ -21,9 +21,9 @@
 
 .processing-step-calculation__attribute-container {
   display: grid;
-  grid-template-columns: 1fr 100px;
+  grid-template-columns: .8fr 100px 100px;
 
-  .btn-add {
+  button {
     justify-self: center;
   }
 }
