@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as ObjectUtils from '@core/objectUtils'
 
 import Job from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
