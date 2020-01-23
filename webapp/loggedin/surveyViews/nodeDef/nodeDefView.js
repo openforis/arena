@@ -2,14 +2,16 @@ import './nodeDefView.scss'
 
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { useHistory, useParams } from 'react-router'
+import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { analysisModules, appModuleUri, designerModules } from '@webapp/app/appModules'
+
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import TabBar from '@webapp/commonComponents/tabBar'
 
@@ -33,6 +35,7 @@ import { setNodeDefUuidForEdit } from './actions'
 
 const NodeDefView = props => {
   const {
+    surveyCycleKey,
     nodeDef,
     nodeDefParent,
     validation,
@@ -51,8 +54,13 @@ const NodeDefView = props => {
 
   const i18n = useI18n()
   const history = useHistory()
+  const { pathname } = useLocation()
   const { nodeDefUuid } = useParams()
+
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const editingNodeDefFromDesigner = Boolean(
+    matchPath(pathname, appModuleUri(designerModules.nodeDef) + ':nodeDefUuid'),
+  )
 
   useEffect(() => {
     // Editing a nodeDef
@@ -60,6 +68,14 @@ const NodeDefView = props => {
       setNodeDefUuidForEdit(nodeDefUuid)
     }
   }, [])
+
+  useOnUpdate(() => {
+    if (editingNodeDefFromDesigner) {
+      history.goBack()
+    } else {
+      history.push(appModuleUri(analysisModules.processingChains))
+    }
+  }, [surveyCycleKey])
 
   return nodeDef ? (
     <>
@@ -76,6 +92,7 @@ const NodeDefView = props => {
                   validation,
                   nodeDefKeyEditDisabled,
                   nodeDefMultipleEditDisabled,
+                  editingNodeDefFromDesigner,
                   setNodeDefParentUuid,
                   setNodeDefProp,
                   putNodeDefLayoutProp,
@@ -173,6 +190,7 @@ const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const nodeDef = NodeDefState.getNodeDef(state)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const validation = NodeDefState.getValidation(state)
@@ -182,6 +200,7 @@ const mapStateToProps = state => {
   const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
 
   return {
+    surveyCycleKey,
     nodeDef,
     nodeDefParent,
     validation,

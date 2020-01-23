@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { matchPath, useLocation } from 'react-router'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -10,7 +9,6 @@ import * as Validation from '@core/validation/validation'
 
 import { uuidv4 } from '@core/uuid'
 import { normalizeName } from '@core/stringUtils'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
@@ -33,6 +31,7 @@ const BasicProps = props => {
     validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
+    editingNodeDefFromDesigner,
 
     cyclesKeysParent,
     displayAsEnabled,
@@ -49,10 +48,6 @@ const BasicProps = props => {
   } = props
 
   const i18n = useI18n()
-  const { pathname } = useLocation()
-  const editingNodeDefFromDesigner = Boolean(
-    matchPath(pathname, appModuleUri(designerModules.nodeDef) + ':nodeDefUuid'),
-  )
 
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
   const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
