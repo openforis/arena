@@ -47,7 +47,7 @@ const validateItemCodeUniqueness = siblingsAndSelfByCode => (_propName, item) =>
 }
 
 const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
-  [`${CategoryItem.keys.props}.${CategoryItem.props.code}`]: [
+  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsAndSelfByCode),

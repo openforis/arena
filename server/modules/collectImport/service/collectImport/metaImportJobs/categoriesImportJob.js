@@ -105,8 +105,8 @@ export default class CategoriesImportJob extends Job {
       const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
       const item = {
         ...CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
-          [CategoryItem.props.code]: itemCode,
-          [ObjectUtils.keysProps.labels]: labels,
+          [CategoryItem.keysProps.code]: itemCode,
+          [CategoryItem.keysProps.labels]: labels,
         }),
         categoryUuid: Category.getUuid(category), // Used to revalidate categories after items import
       }
