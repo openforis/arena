@@ -315,7 +315,7 @@ const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
   return false
 }
 
-export const removeNodeDef = nodeDef => async (dispatch, getState) => {
+export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const i18n = AppState.getI18n(state)
@@ -326,17 +326,21 @@ export const removeNodeDef = nodeDef => async (dispatch, getState) => {
     dispatch(_checkCanRemoveNodeDef(nodeDef)) &&
     window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
   ) {
-    // Delete confirmed
-    dispatch({ type: nodeDefDelete, nodeDef })
-
     const surveyId = Survey.getId(survey)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-    const {
-      data: { nodeDefsValidation },
-    } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, {
-      params: { surveyCycleKey },
-    })
+    const [
+      {
+        data: { nodeDefsValidation },
+      },
+    ] = await Promise.all([
+      axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
+      dispatch({ type: nodeDefDelete, nodeDef }),
+    ])
+
     dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+    if (history) {
+      history.goBack()
+    }
   }
 }

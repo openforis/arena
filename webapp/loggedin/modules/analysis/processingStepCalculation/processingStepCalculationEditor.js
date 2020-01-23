@@ -15,6 +15,7 @@ import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
+import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import {
   updateProcessingStepCalculationProp,
   updateProcessingStepCalculationAttribute,
@@ -46,6 +47,7 @@ const ProcessingStepCalculationEditor = () => {
   const history = useHistory()
 
   const validation = ProcessingStepCalculation.getValidation(calculation)
+  const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
 
   return (
     <>
@@ -92,6 +94,14 @@ const ProcessingStepCalculationEditor = () => {
               onChange={def => dispatch(updateProcessingStepCalculationAttribute(def))}
               validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />
+            <button
+              className="btn btn-s btn-edit"
+              onClick={() => dispatch(navigateToNodeDefEdit(history, nodeDefUuid))}
+              aria-disabled={!nodeDefUuid}
+            >
+              <span className="icon icon-pencil2 icon-12px icon-left" />
+              {i18n.t('common.edit')}
+            </button>
             <button className="btn btn-s btn-add" onClick={() => dispatch(createNodeDefAnalysis(history))}>
               <span className="icon icon-plus icon-12px icon-left" />
               {i18n.t('common.add')}

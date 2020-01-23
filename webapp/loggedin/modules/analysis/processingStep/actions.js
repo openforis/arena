@@ -118,9 +118,3 @@ export const addEntityVirtual = history => async (dispatch, getState) => {
 
   dispatch(navigateToNodeDefEdit(history, NodeDef.getUuid(nodeDef)))
 }
-
-export const editEntityVirtual = history => async (dispatch, getState) => {
-  const processingStep = ProcessingStepState.getProcessingStep(getState())
-
-  dispatch(navigateToNodeDefEdit(history, ProcessingStep.getEntityUuid(processingStep)))
-}
