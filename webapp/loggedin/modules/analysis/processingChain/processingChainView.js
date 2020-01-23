@@ -20,7 +20,12 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
-import { navigateToProcessingChainsView, updateProcessingChainProp, resetProcessingChainState } from './actions'
+import {
+  navigateToProcessingChainsView,
+  updateProcessingChainProp,
+  updateProcessingChainCycles,
+  resetProcessingChainState,
+} from './actions'
 import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainView = props => {
@@ -33,6 +38,7 @@ const ProcessingChainView = props => {
     fetchProcessingChain,
     navigateToProcessingChainsView,
     updateProcessingChainProp,
+    updateProcessingChainCycles,
     resetProcessingChainState,
   } = props
 
@@ -78,7 +84,7 @@ const ProcessingChainView = props => {
             />
             <CyclesSelect
               cyclesKeysSelected={ProcessingChain.getCycles(processingChain)}
-              onChange={cycles => updateProcessingChainProp(ProcessingChain.keysProps.cycles, cycles)}
+              onChange={cycles => updateProcessingChainCycles(cycles)}
             />
           </>
         )}
@@ -102,5 +108,6 @@ export default connect(mapStateToProps, {
   fetchProcessingChain,
   navigateToProcessingChainsView,
   updateProcessingChainProp,
+  updateProcessingChainCycles,
   resetProcessingChainState,
 })(ProcessingChainView)
