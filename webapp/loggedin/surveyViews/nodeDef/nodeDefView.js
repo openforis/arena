@@ -168,7 +168,8 @@ const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
   NodeDef.isKey(nodeDef) ||
   NodeDefLayout.isRenderTable(nodeDef) ||
   Survey.isNodeDefParentCode(nodeDef)(survey) ||
-  NodeDef.isReadOnly(nodeDef)
+  NodeDef.isReadOnly(nodeDef) ||
+  NodeDef.isAnalysis(nodeDef)
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
