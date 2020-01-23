@@ -45,7 +45,7 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 
   dispatch({
     type: processingChainUpdate,
-    processingChain: ProcessingChain.assocCalculationAttributeUuids(calculationAttributeUuids)(processingChain),
+    processingChain: ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain),
   })
   dispatch(hideAppSaving())
 }
@@ -83,12 +83,9 @@ export const updateProcessingChainCycles = cycles => (dispatch, getState) => {
   let allStepCalculationAttriutesBelongToCycles = false
   if (allStepEntitiesBelongToCycles) {
     // Check that all step calculation attribute defs belong to the specified cycles
-    allStepCalculationAttriutesBelongToCycles = R.all(
-      R.pipe(
-        ProcessingChain.getCalculationAttributeUuids,
-        nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-        NodeDef.belongsToAllCycles(cycles),
-      ),
+    allStepCalculationAttriutesBelongToCycles = R.pipe(
+      ProcessingChain.getCalculationAttributeUuids,
+      R.all(R.pipe(nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey), NodeDef.belongsToAllCycles(cycles))),
     )(processingChain)
   }
 
@@ -125,8 +122,8 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     R.isNil,
     R.pipe(
       ProcessingStep.getCalculations,
-      R.pluck(ProcessingStep.keys.uuid),
-      stepUuids => ProcessingStep.assocCalculationUuids(stepUuids)(step),
+      R.pluck(ProcessingStepCalculation.keys.uuid),
+      calculationUuids => ProcessingStep.assocCalculationUuids(calculationUuids)(step),
       ProcessingStep.dissocCalculations,
       ProcessingStep.dissocValidation,
     ),

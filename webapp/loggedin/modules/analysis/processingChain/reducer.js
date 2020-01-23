@@ -1,4 +1,8 @@
+import * as R from 'ramda'
+
 import { exportReducer } from '@webapp/utils/reduxUtils'
+
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 
@@ -16,6 +20,11 @@ import {
   processingStepReset,
   processingStepDelete,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import {
+  processingStepCalculationDirtyUpdate,
+  processingStepCalculationDelete,
+  processingStepCalculationReset,
+} from '../processingStepCalculation/actions'
 
 const actionHandlers = {
   // Reset state
@@ -44,6 +53,25 @@ const actionHandlers = {
   [processingStepReset]: state => ProcessingChainState.dissocStepTemporary(state),
 
   [processingStepDelete]: state => ProcessingChainState.dissocStepLast(state),
+
+  // Calculations
+  [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
+    ProcessingChainState.assocProcessingStepCalculationAttributeUuid(
+      ProcessingStepCalculation.getUuid(calculation),
+      ProcessingStepCalculation.getNodeDefUuid(calculation),
+    )(state),
+
+  [processingStepCalculationDelete]: (state, { calculation }) =>
+    ProcessingChainState.dissocProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation))(
+      state,
+    ),
+
+  [processingStepCalculationReset]: (state, { calculation }) =>
+    R.ifElse(
+      R.always(ProcessingStepCalculation.isTemporary(calculation)),
+      ProcessingChainState.dissocProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation)),
+      ProcessingChainState.resetProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation)),
+    )(state),
 }
 
 export default exportReducer(actionHandlers)

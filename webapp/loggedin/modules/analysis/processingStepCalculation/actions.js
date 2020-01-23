@@ -33,11 +33,14 @@ const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
     calculation: await _validate(calculation),
   })
 
-export const resetProcessingStepCalculationState = () => dispatch => dispatch({ type: processingStepCalculationReset })
+export const resetProcessingStepCalculationState = () => (dispatch, getState) => {
+  const calculation = ProcessingStepCalculationState.getCalculation(getState())
+  dispatch({ type: processingStepCalculationReset, calculation })
+}
 
 // ====== UPDATE
 
-export const validateProcessingStepCalculation = () => async (dispatch, getState) => {
+export const validateProcessingStepCalculation = () => (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(getState())
   dispatch(_updateProcessingStepCalculationDirty(calculation))
 }
