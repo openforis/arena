@@ -60,7 +60,6 @@ export const ValidatorErrorKeys = {
     expressionDuplicate: 'validationErrors.nodeDefEdit.expressionDuplicate',
     expressionRequired: 'validationErrors.nodeDefEdit.expressionRequired',
     formulaInvalid: 'validationErrors.nodeDefEdit.formulaInvalid',
-    formulaRequired: 'validationErrors.nodeDefEdit.formulaRequired',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',

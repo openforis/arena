@@ -28,7 +28,7 @@ const validateTaxonomy = async (propName, nodeDef) =>
     : null
 
 const validateChildren = survey => (propName, nodeDef) => {
-  if (NodeDef.isEntity(nodeDef)) {
+  if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const children = Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef))(survey)
     if (R.isEmpty(children)) {
       return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
@@ -46,7 +46,7 @@ const countKeyAttributes = (survey, nodeDefEntity) =>
   )(survey)
 
 const validateKeyAttributes = survey => (propName, nodeDef) => {
-  if (NodeDef.isEntity(nodeDef)) {
+  if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
     if (
@@ -87,10 +87,8 @@ const validateVirtualEntitySoruceUuid = (propName, nodeDef) =>
     : null
 
 const validateVirtualEntityFormula = (survey, nodeDef) =>
-  NodeDef.isVirtual(nodeDef)
-    ? R.isEmpty(NodeDef.getFormula(nodeDef))
-      ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.formulaRequired }])
-      : NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
+  NodeDef.isVirtual(nodeDef) && !R.isEmpty(NodeDef.getFormula(nodeDef))
+    ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
 const propsValidations = survey => ({
