@@ -73,7 +73,9 @@ before(async () => {
     records.push(record)
   }
 
-  processingChain = ProcessingChain.newProcessingChain('0', {})
+  processingChain = ProcessingChain.newProcessingChain({
+    [ProcessingChain.keysProps.cycles]: [Survey.cycleOneKey],
+  })
   let step1 = ProcessingChain.newProcessingStep(processingChain, {
     [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName('tree')(survey)),
   })
@@ -99,5 +101,5 @@ export const simpleTest = async () => {
   // Console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))
 
-  await ProcessingChainService.generateScript(Survey.getId(survey), processingChain)
+  await ProcessingChainService.generateScript(Survey.getId(survey), Survey.cycleOneKey, processingChain)
 }

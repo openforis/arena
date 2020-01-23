@@ -56,7 +56,10 @@ export default () => {
     ? R.pipe(
         Survey.getNodeDefByUuid(entityDefUuid),
         entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
-        R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
+        R.filter(nodeDef =>
+          // Node def type is compatible with processing step type (quantitative/categorical)
+          R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))(nodeDef),
+        ),
       )(survey)
     : []
 

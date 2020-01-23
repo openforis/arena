@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
@@ -11,10 +11,15 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-const getEntities = (survey, entityStepPrev, lang) => {
+import { checkCanSelectNodeDef } from '../../actions'
+
+const getEntities = (survey, processingStepPrev, lang) => {
+  const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
+    Survey.getNodeDefByUuid(entityUuid)(survey),
+  )(processingStepPrev)
+
   const entities = []
 
   const traverse = (nodeDef, depth) => {
@@ -28,6 +33,7 @@ const getEntities = (survey, entityStepPrev, lang) => {
       entities.push({
         key: NodeDef.getUuid(nodeDef),
         value: `${StringUtils.nbsp}${R.repeat(StringUtils.nbsp, depth * 2).join('')}${label}`,
+        label,
       })
     }
   }
@@ -39,11 +45,16 @@ const getEntities = (survey, entityStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const { processingStep, entities, showLabel, readOnly, onChange, children } = props
+  const { processingStep, processingStepPrev, showLabel, readOnly, children, onChange } = props
 
-  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
+  const survey = useSelector(SurveyState.getSurvey)
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
+
+  const entities = getEntities(survey, processingStepPrev, i18n.lang)
+
+  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
   return (
     <div className={`form-item${showLabel ? ' processing-step__entity-selector-form-item' : ''}`}>
@@ -55,6 +66,7 @@ const EntitySelector = props => {
         items={entities}
         selection={entity}
         readOnly={readOnly}
+        onBeforeChange={item => dispatch(checkCanSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey)))}
         onChange={item => onChange(R.prop('key', item))}
       />
 
@@ -71,15 +83,4 @@ EntitySelector.defaultProps = {
   onChange: null,
 }
 
-const mapStateToProps = (state, { processingStepPrev }) => {
-  const survey = SurveyState.getSurvey(state)
-  const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
-    Survey.getNodeDefByUuid(entityUuid)(survey),
-  )(processingStepPrev)
-
-  return {
-    entities: getEntities(survey, entityStepPrev, AppState.getLang(state)),
-  }
-}
-
-export default connect(mapStateToProps)(EntitySelector)
+export default EntitySelector

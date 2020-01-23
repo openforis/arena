@@ -76,7 +76,10 @@ const ProcessingChainView = props => {
               labels={ProcessingChain.getDescriptions(processingChain)}
               onChange={descriptions => updateProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
             />
-            <CyclesSelect cyclesKeysSelected={[ProcessingChain.getCycle(processingChain)]} />
+            <CyclesSelect
+              cyclesKeysSelected={ProcessingChain.getCycles(processingChain)}
+              onChange={cycles => updateProcessingChainProp(ProcessingChain.keysProps.cycles, cycles)}
+            />
           </>
         )}
 

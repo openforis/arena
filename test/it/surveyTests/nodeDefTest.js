@@ -13,7 +13,7 @@ const fetchRootNodeDef = async () => {
 }
 
 const createNodeDef = (nodeDefParent, type, name) =>
-  NodeDef.newNodeDef(nodeDefParent, type, Survey.cycleOneKey, {
+  NodeDef.newNodeDef(nodeDefParent, type, [Survey.cycleOneKey], {
     [NodeDef.propKeys.name]: name,
   })
 

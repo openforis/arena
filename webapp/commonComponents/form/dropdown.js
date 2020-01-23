@@ -62,14 +62,23 @@ class Dropdown extends React.Component {
     return this.state.opened
   }
 
-  onSelectionChange(item) {
-    const { onChange, clearOnSelection, itemsLookupFunction } = this.props
+  async onSelectionChange(item) {
+    const { onBeforeChange, onChange, clearOnSelection, itemsLookupFunction } = this.props
     const { items } = this.state
 
-    onChange(item)
+    let changed = false
+    if (!onBeforeChange || (await onBeforeChange(item))) {
+      await onChange(item)
+      changed = true
+    }
 
+    // If not changed (cannot select item) do not update displayValue in state
     this.setState({
-      displayValue: clearOnSelection ? '' : this.getItemLabel(item),
+      ...(changed
+        ? {
+            displayValue: clearOnSelection ? '' : this.getItemLabel(item),
+          }
+        : {}),
       items: itemsLookupFunction ? [] : items,
       opened: false,
     })
@@ -223,6 +232,7 @@ Dropdown.defaultProps = {
   items: [],
   itemsLookupFunction: null,
   selection: null,
+  onBeforeChange: null, // Exceuted before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: null,
   itemKeyProp: null,
   itemKeyFunction: null,

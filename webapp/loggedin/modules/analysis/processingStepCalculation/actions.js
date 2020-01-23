@@ -64,11 +64,9 @@ export const updateProcessingStepCalculationProp = (prop, value) => async (dispa
   dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
 
-export const updateProcessingStepCalculationAttribute = attrDefUuid => async (dispatch, getState) => {
+export const updateProcessingStepCalculationAttribute = attrDef => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(getState())
-
-  const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(attrDefUuid)(calculation)
-
+  const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(NodeDef.getUuid(attrDef))(calculation)
   dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
 
@@ -113,7 +111,7 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const nodeDef = NodeDef.newNodeDef(
     nodeDefParent,
     nodeDefType,
-    ProcessingChain.getCycle(processingChain),
+    ProcessingChain.getCycles(processingChain),
     {},
     {},
     true,

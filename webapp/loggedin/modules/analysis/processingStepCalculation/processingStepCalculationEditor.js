@@ -24,6 +24,7 @@ import {
 } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 import useProcessingStepCalculationEditorState from './useProcessingStepCalculationEditorState'
+import { checkCanSelectNodeDef } from '../actions'
 
 const ProcessingStepCalculationEditor = () => {
   const {
@@ -89,7 +90,8 @@ const ProcessingStepCalculationEditor = () => {
               selection={attribute}
               itemKeyProp={ProcessingStepCalculation.keys.uuid}
               itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
-              onChange={def => dispatch(updateProcessingStepCalculationAttribute(NodeDef.getUuid(def)))}
+              onBeforeChange={attrDef => dispatch(checkCanSelectNodeDef(attrDef))}
+              onChange={def => dispatch(updateProcessingStepCalculationAttribute(def))}
               validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />
             <button
