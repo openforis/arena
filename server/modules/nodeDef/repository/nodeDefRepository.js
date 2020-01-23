@@ -209,6 +209,16 @@ export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, 
     [nodeDefUuid],
   )
 
+export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = db) =>
+  await client.query(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{cycles}', $1)
+    WHERE analysis
+  `,
+    [cycleKeys],
+  )
+
 // PUBLISH
 export const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
