@@ -12,11 +12,13 @@ const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
   dateModified: ObjectUtils.keys.dateModified,
-  processingSteps: 'processingSteps',
   props: ObjectUtils.keys.props,
   statusExec: 'statusExec',
   uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
+
+  processingSteps: 'processingSteps',
+  calculationAttributeUuids: 'calculationAttributeUuids',
 }
 
 export const keysProps = {
@@ -65,7 +67,6 @@ export const getCycles = ObjectUtils.getCycles
 export const getDateCreated = ObjectUtils.getDateCreated
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getDateModified = ObjectUtils.getDateModified
-export const getProcessingSteps = R.propOr([], keys.processingSteps)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 
 export const getDescriptions = ObjectUtils.getDescriptions
@@ -75,9 +76,16 @@ export const getLabel = ObjectUtils.getLabel
 
 export const isTemporary = ObjectUtils.isTemporary
 
+// ===== READ - Steps
+export const getProcessingSteps = R.propOr([], keys.processingSteps)
 const _getStepByIdx = stepIdx => R.pipe(getProcessingSteps, R.propOr(null, stepIdx))
 export const getStepPrev = step => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
 export const getStepNext = step => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
+
+// ===== READ - Calculation attribute uudis
+export const getCalculationAttributeUuids = R.propOr({}, keys.calculationAttributeUuids)
+export const getCalculationAttributeUuidByCalculationUuid = calculationUuid =>
+  R.path([keys.calculationAttributeUuids, calculationUuid])
 
 // ====== CHECK
 
@@ -98,12 +106,34 @@ export const assocProcessingStep = step => R.assocPath([keys.processingSteps, Pr
 
 const _updateSteps = fn => chain => R.pipe(getProcessingSteps, fn, steps => assocProcessingSteps(steps)(chain))(chain)
 
-export const dissocProcessingStepLast = _updateSteps(R.dropLast(1))
+export const dissocProcessingStepLast = processingChain =>
+  R.pipe(
+    // Get last processing step calculation uuids
+    getProcessingSteps,
+    R.last,
+    ProcessingStep.getCalculations,
+    R.pluck(ProcessingStepCalculation.keys.uuid),
+    // Dissoc each calculation uuid from calculationAttributeUuids
+    R.reduce(
+      (accChain, calculationUuid) => dissocCalculationAttributeDefUuid(calculationUuid)(accChain),
+      processingChain,
+    ),
+    // Remove last step from chain
+    _updateSteps(R.dropLast(1)),
+  )(processingChain)
 
 export const dissocProcessingStepTemporary = R.when(
   R.pipe(getProcessingSteps, R.last, ProcessingStep.isTemporary),
   dissocProcessingStepLast,
 )
+
+export const assocCalculationAttributeDefUuids = R.assoc(keys.calculationAttributeUuids)
+
+export const assocCalculationAttributeDefUuid = (calculationUuid, attributeDefUuid) =>
+  R.assocPath([keys.calculationAttributeUuids, calculationUuid], attributeDefUuid)
+
+export const dissocCalculationAttributeDefUuid = calculationUuid =>
+  R.dissocPath([keys.calculationAttributeUuids, calculationUuid])
 
 // ====== VALIDATION
 export const getValidation = Validation.getValidation

@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import axios from 'axios'
 
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
@@ -12,6 +14,7 @@ import * as ProcessingChainState from './processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
+import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 
@@ -35,9 +38,15 @@ export const navigateToProcessingChainsView = history => dispatch => {
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
+  const [{ data: processingChain }, { data: calculationAttributeUuids }] = await Promise.all([
+    axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`),
+    axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/calculation-attribute-uuids`),
+  ])
 
-  dispatch({ type: processingChainUpdate, processingChain })
+  dispatch({
+    type: processingChainUpdate,
+    processingChain: ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain),
+  })
   dispatch(hideAppSaving())
 }
 
@@ -54,6 +63,38 @@ export const fetchProcessingSteps = processingChainUuid => async (dispatch, getS
 
 export const updateProcessingChainProp = (key, value) => dispatch =>
   dispatch({ type: processingChainPropUpdate, key, value })
+
+export const updateProcessingChainCycles = cycles => (dispatch, getState) => {
+  const state = getState()
+
+  const survey = SurveyState.getSurvey(state)
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+
+  // Check that all step entity defs belong to the specified cycles
+  const steps = ProcessingChain.getProcessingSteps(processingChain)
+  const allStepEntitiesBelongToCycles = R.all(
+    R.pipe(
+      ProcessingStep.getEntityUuid,
+      nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+      NodeDef.belongsToAllCycles(cycles),
+    ),
+  )(steps)
+
+  let allStepCalculationAttriutesBelongToCycles = false
+  if (allStepEntitiesBelongToCycles) {
+    // Check that all step calculation attribute defs belong to the specified cycles
+    allStepCalculationAttriutesBelongToCycles = R.pipe(
+      ProcessingChain.getCalculationAttributeUuids,
+      R.all(R.pipe(nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey), NodeDef.belongsToAllCycles(cycles))),
+    )(processingChain)
+  }
+
+  if (allStepEntitiesBelongToCycles && allStepCalculationAttriutesBelongToCycles) {
+    dispatch({ type: processingChainPropUpdate, key: ProcessingChain.keysProps.cycles, value: cycles })
+  } else {
+    dispatch(showNotification('processingChainView.cannotSelectCycle', {}, NotificationState.severity.error))
+  }
+}
 
 export const saveProcessingChain = () => async (dispatch, getState) => {
   dispatch(showAppSaving())
@@ -81,8 +122,8 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     R.isNil,
     R.pipe(
       ProcessingStep.getCalculations,
-      R.pluck(ProcessingStep.keys.uuid),
-      stepUuids => ProcessingStep.assocCalculationUuids(stepUuids)(step),
+      R.pluck(ProcessingStepCalculation.keys.uuid),
+      calculationUuids => ProcessingStep.assocCalculationUuids(calculationUuids)(step),
       ProcessingStep.dissocCalculations,
       ProcessingStep.dissocValidation,
     ),

@@ -3,13 +3,11 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ProcessingStepCalculationValidator from '@common/analysis/processingStepCalculationValidator'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from './processingStepCalculationState'
 
@@ -33,11 +31,14 @@ const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
     calculation: await _validate(calculation),
   })
 
-export const resetProcessingStepCalculationState = () => dispatch => dispatch({ type: processingStepCalculationReset })
+export const resetProcessingStepCalculationState = () => (dispatch, getState) => {
+  const calculation = ProcessingStepCalculationState.getCalculation(getState())
+  dispatch({ type: processingStepCalculationReset, calculation })
+}
 
 // ====== UPDATE
 
-export const validateProcessingStepCalculation = () => async (dispatch, getState) => {
+export const validateProcessingStepCalculation = () => (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(getState())
   dispatch(_updateProcessingStepCalculationDirty(calculation))
 }
@@ -100,7 +101,6 @@ export const deleteProcessingStepCalculation = () => async (dispatch, getState) 
 export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
-  const processingChain = ProcessingChainState.getProcessingChain(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
   const nodeDefParent = R.pipe(ProcessingStep.getEntityUuid, entityDefUuid =>
     Survey.getNodeDefByUuid(entityDefUuid)(survey),
@@ -111,7 +111,7 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
   const nodeDef = NodeDef.newNodeDef(
     nodeDefParent,
     nodeDefType,
-    ProcessingChain.getCycles(processingChain),
+    R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey),
     {},
     {},
     true,

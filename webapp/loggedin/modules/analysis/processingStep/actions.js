@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -100,12 +101,12 @@ export const deleteProcessingStep = () => async (dispatch, getState) => {
 
 export const addEntityVirtual = history => async (dispatch, getState) => {
   const state = getState()
-  const processingChain = ProcessingChainState.getProcessingChain(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
 
   const nodeDef = NodeDef.newNodeDef(
     null,
     NodeDef.nodeDefType.entity,
-    ProcessingChain.getCycles(processingChain),
+    Survey.getCycleKeys(surveyInfo),
     {
       [NodeDef.propKeys.multiple]: true,
     },

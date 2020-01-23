@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 
 export const keys = {
   calculations: 'calculations',
-  calculationUuids: 'calculationUuids',
+  calculationUuids: 'calculationUuids', // Associated only when processing step is saved
   calculationsCount: 'calculationsCount',
   index: ObjectUtils.keys.index,
   processingChainUuid: 'processingChainUuid',
@@ -33,6 +33,10 @@ export const getIndex = ObjectUtils.getIndex
 export const getUuid = ObjectUtils.getUuid
 export const getProps = ObjectUtils.getProps
 export const getPropsDiff = ObjectUtils.getPropsDiff
+/**
+ * Returns the uuids of all associated calculations.
+ * Note: calculationUuids has a value only when calculation step is passed as parameter to the API
+ */
 export const getCalculationUuids = R.propOr([], keys.calculationUuids)
 
 export const isEqual = ObjectUtils.isEqual
