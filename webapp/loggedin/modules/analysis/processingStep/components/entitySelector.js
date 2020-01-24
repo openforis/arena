@@ -45,7 +45,7 @@ const getEntities = (survey, processingStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const { processingStep, processingStepPrev, showLabel, readOnly, children, onChange } = props
+  const { processingStep, processingStepPrev, showLabel, readOnly, validation, children, onChange } = props
 
   const survey = useSelector(SurveyState.getSurvey)
 
@@ -66,6 +66,7 @@ const EntitySelector = props => {
         items={entities}
         selection={entity}
         readOnly={readOnly}
+        validation={validation}
         onBeforeChange={item => dispatch(checkCanSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey)))}
         onChange={item => onChange(R.prop('key', item))}
       />
@@ -80,6 +81,7 @@ EntitySelector.defaultProps = {
   processingStepPrev: null,
   showLabel: true,
   readOnly: false,
+  validation: null,
   onChange: null,
 }
 

@@ -7,6 +7,10 @@ export const ValidatorErrorKeys = {
   nameRequired: 'validationErrors.nameRequired',
 
   analysis: {
+    labelDefaultLangRequired: 'validationErrors.analysis.labelDefaultLangRequired',
+    processingStep: {
+      entityRequired: 'validationErrors.analysis.processingStep.entityRequired',
+    },
     processingStepCalculation: {
       attributeRequired: 'validationErrors.analysis.processingStepCalculation.attributeRequired',
       invalid: 'validationErrors.analysis.processingStepCalculation.invalid',

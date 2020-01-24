@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 import * as ProcessingStep from './processingStep'
 import * as ProcessingStepCalculation from './processingStepCalculation'
 
-const keys = {
+export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
   dateModified: ObjectUtils.keys.dateModified,

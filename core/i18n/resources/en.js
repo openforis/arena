@@ -546,6 +546,10 @@ $t(common.cantUndoWarning)`,
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
     analysis: {
+      labelDefaultLangRequired: 'Label in survey default language is required',
+      processingStep: {
+        entityRequired: 'Entity is required',
+      },
       processingStepCalculation: {
         attributeRequired: 'Attribute is required',
         invalid: 'Processing Step Calculation is invalid',

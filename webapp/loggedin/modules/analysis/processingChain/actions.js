@@ -6,6 +6,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
+import * as Validation from '@core/validation/validation'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
@@ -22,8 +24,8 @@ export const processingChainReset = 'analysis/processingChain/reset'
 export const processingChainUpdate = 'analysis/processingChain/update'
 export const processingChainPropUpdate = 'analysis/processingChain/prop/update'
 export const processingChainSave = 'analysis/processingChain/save'
-
 export const processingChainStepsLoad = 'analysis/processingChain/steps/load'
+export const processingChainValidationUpdate = 'analysis/processingChain/validation/update'
 
 export const resetProcessingChainState = () => dispatch => dispatch({ type: processingChainReset })
 
@@ -51,26 +53,29 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 }
 
 export const fetchProcessingSteps = processingChainUuid => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const chain = ProcessingChainState.getProcessingChain(state)
+  const surveyId = SurveyState.getSurveyId(getState())
 
-  const { data: stepsDb } = await axios.get(
+  const { data: processingSteps } = await axios.get(
     `/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-steps`,
   )
-  // Get validation from chain and associate it to each processing step
-  const processingSteps = R.map(stepDb => {
-    const validation = ProcessingChain.getItemValidationByUuid(ProcessingStep.getUuid(stepDb))(chain)
-    return ProcessingStep.assocValidation(validation)(stepDb)
-  }, stepsDb)
 
   dispatch({ type: processingChainStepsLoad, processingSteps })
 }
 
 // ====== UPDATE
 
-export const updateProcessingChainProp = (key, value) => dispatch =>
-  dispatch({ type: processingChainPropUpdate, key, value })
+const _onProcessingChainPropUpdate = (key, value) => async (dispatch, getState) => {
+  const state = getState()
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
+
+  const chainUpdated = ProcessingChain.assocProp(key, value)(chain)
+  const validation = await ProcessingChainValidator.validateChain(chainUpdated, Survey.getDefaultLanguage(surveyInfo))
+
+  dispatch({ type: processingChainPropUpdate, key, value, validation })
+}
+
+export const updateProcessingChainProp = (key, value) => dispatch => dispatch(_onProcessingChainPropUpdate(key, value))
 
 export const updateProcessingChainCycles = cycles => (dispatch, getState) => {
   const state = getState()
@@ -98,7 +103,7 @@ export const updateProcessingChainCycles = cycles => (dispatch, getState) => {
   }
 
   if (allStepEntitiesBelongToCycles && allStepCalculationAttriutesBelongToCycles) {
-    dispatch({ type: processingChainPropUpdate, key: ProcessingChain.keysProps.cycles, value: cycles })
+    dispatch(_onProcessingChainPropUpdate(ProcessingChain.keysProps.cycles, cycles))
   } else {
     dispatch(showNotification('processingChainView.cannotSelectCycle', {}, NotificationState.severity.error))
   }
@@ -110,6 +115,8 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
   const step = R.pipe(
     ProcessingStepState.getProcessingStep,
@@ -117,54 +124,63 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     R.when(R.isEmpty, R.always(null)),
   )(state)
 
+  const stepValidation = step ? await ProcessingChainValidator.validateStep(step) : null
+
   const calculation = R.pipe(
     ProcessingStepCalculationState.getCalculation,
     ProcessingStepCalculation.dissocTemporary,
     R.when(R.isEmpty, R.always(null)),
   )(state)
+  const calculationValidation = await ProcessingChainValidator.validateCalculation(calculation, surveyDefaultLang)
 
-  const chain = R.pipe(
-    ProcessingChainState.getProcessingChain,
-    ProcessingChain.dissocTemporary,
-    // Update validation
+  let chain = R.pipe(ProcessingChainState.getProcessingChain, ProcessingChain.dissocTemporary)(state)
+
+  const chainValidation = await ProcessingChainValidator.validateChain(chain, surveyDefaultLang)
+
+  // Update chain, step and calculation validation in chain validation
+  chain = R.pipe(
+    ProcessingChain.assocItemValidation(ProcessingChain.getUuid(chain), chainValidation),
     R.unless(
       R.always(R.isNil(step)),
-      ProcessingChain.assocItemValidation(ProcessingStep.getUuid(step), ProcessingStep.getValidation(step)),
+      ProcessingChain.assocItemValidation(ProcessingStep.getUuid(step), stepValidation),
     ),
     R.unless(
       R.always(R.isNil(calculation)),
-      ProcessingChain.assocItemValidation(
-        ProcessingStepCalculation.getUuid(calculation),
-        ProcessingStepCalculation.getValidation(calculation),
+      ProcessingChain.assocItemValidation(ProcessingStepCalculation.getUuid(calculation), calculationValidation),
+    ),
+  )(chain)
+
+  if (Validation.isObjValid(chain)) {
+    // POST Params
+    const chainParam = ProcessingChain.dissocProcessingSteps(chain)
+
+    // Step, get only calculation uuid for order
+    const stepParam = R.unless(
+      R.isNil,
+      R.pipe(
+        ProcessingStep.getCalculations,
+        R.pluck(ProcessingStepCalculation.keys.uuid),
+        calculationUuids => ProcessingStep.assocCalculationUuids(calculationUuids)(step),
+        ProcessingStep.dissocCalculations,
+        ProcessingStep.dissocValidation,
       ),
-    ),
-  )(state)
+    )(step)
 
-  // POST Params
-  const chainParam = ProcessingChain.dissocProcessingSteps(chain)
+    const calculationParam = R.unless(R.isNil, ProcessingStepCalculation.dissocValidation)(calculation)
 
-  // Step, get only calculation uuid for order
-  const stepParam = R.unless(
-    R.isNil,
-    R.pipe(
-      ProcessingStep.getCalculations,
-      R.pluck(ProcessingStepCalculation.keys.uuid),
-      calculationUuids => ProcessingStep.assocCalculationUuids(calculationUuids)(step),
-      ProcessingStep.dissocCalculations,
-      ProcessingStep.dissocValidation,
-    ),
-  )(step)
+    await axios.put(`/api/survey/${surveyId}/processing-chain/`, {
+      chain: chainParam,
+      step: stepParam,
+      calculation: calculationParam,
+    })
 
-  const calculationParam = R.unless(R.isNil, ProcessingStepCalculation.dissocValidation)(calculation)
+    dispatch(showNotification('common.saved'))
+    dispatch({ type: processingChainSave, chain, step, calculation })
+  } else {
+    dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chain) })
+    dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
+  }
 
-  await axios.put(`/api/survey/${surveyId}/processing-chain/`, {
-    chain: chainParam,
-    step: stepParam,
-    calculation: calculationParam,
-  })
-
-  dispatch(showNotification('common.saved'))
-  dispatch({ type: processingChainSave, chain, step, calculation })
   dispatch(hideAppSaving())
 }
 

@@ -3,11 +3,13 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as ProcessingStepCalculationValidator from '@common/analysis/processingStepCalculationValidator'
+import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from './processingStepCalculationState'
 
@@ -15,21 +17,30 @@ import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
+import { processingChainValidationUpdate } from '../processingChain/actions'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'
 export const processingStepCalculationReset = 'analysis/processingStep/calculation/reset'
 
-const _validate = async calculation => {
-  const validation = await ProcessingStepCalculationValidator.validate(calculation)
-  return ProcessingStepCalculation.assocValidation(validation)(calculation)
-}
+const _updateProcessingStepCalculationDirty = calculation => async (dispatch, getState) => {
+  dispatch({ type: processingStepCalculationDirtyUpdate, calculation })
 
-const _updateProcessingStepCalculationDirty = calculation => async dispatch =>
-  dispatch({
-    type: processingStepCalculationDirtyUpdate,
-    calculation: await _validate(calculation),
-  })
+  // Validate calculation and update validation in chain
+  const state = getState()
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
+  const calculationValidation = await ProcessingChainValidator.validateCalculation(
+    calculation,
+    Survey.getDefaultLanguage(surveyInfo),
+  )
+  const chainUpdated = ProcessingChain.assocItemValidation(
+    ProcessingStepCalculation.getUuid(calculation),
+    calculationValidation,
+  )(chain)
+
+  dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })
+}
 
 export const resetProcessingStepCalculationState = () => (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(getState())

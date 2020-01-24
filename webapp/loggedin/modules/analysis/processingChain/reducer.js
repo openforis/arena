@@ -14,6 +14,7 @@ import {
   processingChainPropUpdate,
   processingChainStepsLoad,
   processingChainSave,
+  processingChainValidationUpdate,
 } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import {
   processingStepCreate,
@@ -39,9 +40,13 @@ const actionHandlers = {
   [processingChainUpdate]: (state, { processingChain }) =>
     ProcessingChainState.assocProcessingChain(processingChain)(state),
 
-  [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainState.assocPropDirty(key, value)(state),
+  [processingChainPropUpdate]: (state, { key, value, validation }) =>
+    ProcessingChainState.assocPropDirty(key, value, validation)(state),
 
   [processingChainSave]: (state, { chain, step }) => ProcessingChainState.saveDirty(chain, step)(state),
+
+  [processingChainValidationUpdate]: (state, { validation }) =>
+    ProcessingChainState.assocProcessingChainValidation(validation)(state),
 
   // Steps
   [processingChainStepsLoad]: (state, { processingSteps }) =>
