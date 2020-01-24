@@ -22,6 +22,18 @@
   .form-item {
     grid-template-columns: .2fr .7fr;
   }
+
+}
+
+.node-def-edit__container .node-defs-selector__entity-selector {
+  background-color: inherit;
+
+  .form-input {
+    text-align: left;
+    font-size: .9rem;
+    font-weight: inherit;
+    padding: .5rem 1rem;
+  }
 }
 
 .node-def-edit__cancel-confirm-dialog .modal-content {

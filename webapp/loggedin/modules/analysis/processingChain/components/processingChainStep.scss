@@ -80,3 +80,8 @@
     }
   }
 }
+
+.processing-chain.step-editor-open .processing-chain__step-content,
+.processing-step.calculation-editor-opened .processing-step__calculation-content {
+  grid-template-columns: 65px auto;
+}

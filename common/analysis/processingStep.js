@@ -92,9 +92,3 @@ export const dissocCalculation = calculation =>
       ),
     ),
   )
-
-// ====== VALIDATION
-export const getValidation = Validation.getValidation
-export const hasValidation = Validation.hasValidation
-export const assocValidation = Validation.assocValidation
-export const dissocValidation = Validation.dissocValidation

@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as Validation from '@core/validation/validation'
@@ -16,7 +15,6 @@ import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
 
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
@@ -26,6 +24,7 @@ import {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
+  validateProcessingStep,
   addEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
@@ -41,6 +40,7 @@ const ProcessingStepView = props => {
     fetchProcessingStepCalculations,
     resetProcessingStepState,
     updateProcessingStepProps,
+    validateProcessingStep,
     addEntityVirtual,
     navigateToNodeDefEdit,
   } = props
@@ -58,6 +58,7 @@ const ProcessingStepView = props => {
   useEffect(() => {
     if (!editingCalculation) {
       fetchProcessingStepCalculations()
+      validateProcessingStep()
     }
   }, [ProcessingStep.getUuid(processingStep)])
 
@@ -158,6 +159,7 @@ export default connect(mapStateToProps, {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
+  validateProcessingStep,
   addEntityVirtual,
   navigateToNodeDefEdit,
 })(ProcessingStepView)

@@ -66,11 +66,5 @@ export const assocProp = ObjectUtils.setProp
 export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
 export const dissocTemporary = ObjectUtils.dissocTemporary
 
-// ====== VALIDATION
-export const getValidation = Validation.getValidation
-export const hasValidation = Validation.hasValidation
-export const assocValidation = Validation.assocValidation
-export const dissocValidation = Validation.dissocValidation
-
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, type => R.prop(type, nodeDefTypeByType))

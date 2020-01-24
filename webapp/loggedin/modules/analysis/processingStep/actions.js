@@ -78,22 +78,26 @@ export const fetchProcessingStepCalculations = () => async (dispatch, getState) 
 }
 // ====== UPDATE
 
-export const updateProcessingStepProps = props => async (dispatch, getState) => {
-  dispatch({ type: processingStepPropsUpdate, props })
+export const updateProcessingStepProps = props => async dispatch => {
+  await dispatch({ type: processingStepPropsUpdate, props })
 
+  dispatch(validateProcessingStep())
+}
+
+export const updateProcessingStepCalculationIndex = (indexFrom, indexTo) => dispatch =>
+  dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
+
+export const validateProcessingStep = () => async (dispatch, getState) => {
   // Validate step and update validation in chain
   const state = getState()
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const chain = ProcessingChainState.getProcessingChain(state)
-  const step = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.mergeProps(props))(state)
+  const step = ProcessingStepState.getProcessingStep(state)
   const stepValidation = await ProcessingChainValidator.validateStep(step, Survey.getDefaultLanguage(surveyInfo))
   const chainUpdated = ProcessingChain.assocItemValidation(ProcessingStep.getUuid(step), stepValidation)(chain)
 
   dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })
 }
-
-export const updateProcessingStepCalculationIndex = (indexFrom, indexTo) => dispatch =>
-  dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
 
 // ====== DELETE
 

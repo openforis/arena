@@ -40,7 +40,7 @@ export default () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!R.isEmpty(calculation) && !ProcessingStepCalculation.hasValidation(calculation)) {
+    if (!R.isEmpty(calculation)) {
       dispatch(validateProcessingStepCalculation())
     }
   }, [])

@@ -131,7 +131,10 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     ProcessingStepCalculation.dissocTemporary,
     R.when(R.isEmpty, R.always(null)),
   )(state)
-  const calculationValidation = await ProcessingChainValidator.validateCalculation(calculation, surveyDefaultLang)
+
+  const calculationValidation = calculation
+    ? await ProcessingChainValidator.validateCalculation(calculation, surveyDefaultLang)
+    : null
 
   let chain = R.pipe(ProcessingChainState.getProcessingChain, ProcessingChain.dissocTemporary)(state)
 
@@ -162,16 +165,13 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
         R.pluck(ProcessingStepCalculation.keys.uuid),
         calculationUuids => ProcessingStep.assocCalculationUuids(calculationUuids)(step),
         ProcessingStep.dissocCalculations,
-        ProcessingStep.dissocValidation,
       ),
     )(step)
-
-    const calculationParam = R.unless(R.isNil, ProcessingStepCalculation.dissocValidation)(calculation)
 
     await axios.put(`/api/survey/${surveyId}/processing-chain/`, {
       chain: chainParam,
       step: stepParam,
-      calculation: calculationParam,
+      calculation,
     })
 
     dispatch(showNotification('common.saved'))
