@@ -75,6 +75,14 @@ export const updateChainProp = async (surveyId, processingChainUuid, key, value,
     [processingChainUuid, { [key]: value }],
   )
 
+export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
+  await client.query(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+    SET props = jsonb_set(props, '{${ProcessingChain.keysProps.cycles}}',
+      (props->'${ProcessingChain.keysProps.cycles}') ${cycles.map(cycle => `- '${cycle}'`).join(' ')}
+    )
+  `)
+
 // ====== DELETE
 
 export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
@@ -87,3 +95,9 @@ export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
     [processingChainUuid],
     camelize,
   )
+
+export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
+  await client.query(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+    WHERE jsonb_array_length(props->'${ProcessingChain.keysProps.cycles}') = 0
+  `)

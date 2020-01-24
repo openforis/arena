@@ -21,15 +21,20 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
     await NodeDefManager.updateNodeDefAnalysisCycles(this.surveyId, cycleKeys, this.tx)
     this.incrementProcessedItems()
 
-    // If(!R.isEmpty(cycleKeysDeleted)){
-    //   await ProcessingChainManager.
-    // }
-
     // 2. dissoc deleted survey cycles from processing chains
+    if (!R.isEmpty(cycleKeysDeleted)) {
+      await ProcessingChainManager.removeCyclesFromChains(this.surveyId, cycleKeysDeleted, this.tx)
+    }
+
+    this.incrementProcessedItems()
 
     // 3. delete processing chains with no cycles
+    await ProcessingChainManager.deleteChainsWithoutCycles(this.surveyId, this.tx)
+    this.incrementProcessedItems()
 
     // 4. delete analysis nodeDef if they are not used
+    await NodeDefManager.deleteNodeDefAnalysisUnused(this.surveyId, this.tx)
+    this.incrementProcessedItems()
   }
 
   async _getCycleKeys() {
