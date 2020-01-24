@@ -24,7 +24,7 @@ const ProcessingChainSteps = props => {
 
   const processingSteps = ProcessingChain.getProcessingSteps(processingChain)
   useEffect(() => {
-    if (!ProcessingChain.isTemporary(processingChain)) {
+    if (!ProcessingChain.isTemporary(processingChain) && !editingStep) {
       dispatch(fetchProcessingSteps(ProcessingChain.getUuid(processingChain)))
     }
   }, [])

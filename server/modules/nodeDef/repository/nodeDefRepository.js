@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingStep from '@common/analysis/processingStep'
 import {
   getSurveyDBSchema,
   dbTransformCallback as dbTransformCallbackCommon,
@@ -209,6 +210,16 @@ export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, 
     [nodeDefUuid],
   )
 
+export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = db) =>
+  await client.query(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def
+    SET props_draft = jsonb_set(props_draft, '{cycles}', jsonb_build_array($1:csv))
+    WHERE analysis
+  `,
+    [cycleKeys],
+  )
+
 // PUBLISH
 export const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
@@ -311,3 +322,20 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
       e.uuid = n.uuid
   `)
 }
+
+export const deleteNodeDefAnalysisUnused = async (surveyId, client = db) =>
+  await client.query(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.node_def n
+    WHERE 
+      n.analysis 
+      -- not used by any processing steps
+      AND NOT EXISTS (
+        SELECT s.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step s
+        WHERE (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid = n.uuid
+      )
+      -- not used by any processing step calculations
+      AND NOT EXISTS (
+        SELECT c.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+        WHERE c.node_def_uuid = n.uuid
+      )
+  `)

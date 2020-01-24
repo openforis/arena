@@ -96,7 +96,7 @@ export const getFromTable = (survey, nodeDef) => {
 }
 
 export const getWhereCondition = nodeDef => {
-  if (NodeDef.isVirtual(nodeDef)) {
+  if (NodeDef.isVirtual(nodeDef) && !R.isEmpty(NodeDef.getFormula(nodeDef))) {
     const expressionSql = R.pipe(
       NodeDef.getFormula,
       R.head,

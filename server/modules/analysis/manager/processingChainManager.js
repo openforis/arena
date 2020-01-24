@@ -212,6 +212,8 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
   })
 }
 
+export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository/processingChainRepository'
+
 // ====== DELETE - Chain
 
 export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
