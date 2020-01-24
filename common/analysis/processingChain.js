@@ -144,7 +144,6 @@ export const assocValidation = Validation.assocValidation
 export const dissocValidation = Validation.dissocValidation
 
 export const getItemValidationByUuid = uuid => R.pipe(getValidation, Validation.getFieldValidation(uuid))
-export const hasItemValidation = uuid => R.pipe(getValidation, Validation.hasFieldValidation(uuid))
 export const assocItemValidation = (uuid, validation) => chain =>
   R.pipe(getValidation, Validation.assocFieldValidation(uuid, validation), validationUpdated =>
     Validation.assocValidation(validationUpdated)(chain),
