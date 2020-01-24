@@ -31,6 +31,7 @@ const BasicProps = props => {
     validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
+    editingNodeDefFromDesigner,
 
     cyclesKeysParent,
     displayAsEnabled,
@@ -117,7 +118,7 @@ const BasicProps = props => {
         </FormItem>
       )}
 
-      {displayAsEnabled && (
+      {displayAsEnabled && editingNodeDefFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
@@ -138,7 +139,7 @@ const BasicProps = props => {
         </FormItem>
       )}
 
-      {displayInEnabled && (
+      {displayInEnabled && editingNodeDefFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={displayIn}
@@ -168,7 +169,7 @@ const BasicProps = props => {
         <CyclesSelect
           cyclesKeysSelectable={cyclesKeysParent}
           cyclesKeysSelected={cyclesNodeDef}
-          disabled={NodeDef.isRoot(nodeDef) || NodeDef.isAnalysis(nodeDef)}
+          disabled={NodeDef.isRoot(nodeDef) || !editingNodeDefFromDesigner}
           onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}
@@ -228,8 +229,8 @@ const mapStateToProps = state => {
   return {
     surveyCycleKey,
 
-    displayAsEnabled: isEntityAndNotRoot && !NodeDef.isAnalysis(nodeDef),
-    displayInEnabled: isEntityAndNotRoot && !NodeDef.isAnalysis(nodeDef),
+    displayAsEnabled: isEntityAndNotRoot,
+    displayInEnabled: isEntityAndNotRoot,
 
     displayAsFormDisabled,
     displayAsTableDisabled,

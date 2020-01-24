@@ -236,12 +236,12 @@ export default class CategoryImportJob extends Job {
     let item = null
 
     const itemProps = {
-      [CategoryItem.props.code]: itemCodes[itemCodes.length - 1],
+      [CategoryItem.keysProps.code]: itemCodes[itemCodes.length - 1],
     }
     const levelName = CategoryLevel.getName(level)
     ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
     ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
-    ObjectUtils.setInPath([CategoryItem.props.extra], this.extractItemExtraProps(extra), false)(itemProps)
+    ObjectUtils.setInPath([CategoryItem.keysProps.extra], this.extractItemExtraProps(extra), false)(itemProps)
 
     if (itemCached) {
       // Update existing item if extra props are changed

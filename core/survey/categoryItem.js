@@ -10,9 +10,10 @@ export const keys = {
   levelUuid: 'levelUuid',
 }
 
-export const props = {
+export const keysProps = {
   code: 'code',
   extra: 'extra',
+  labels: ObjectUtils.keysProps.labels,
 }
 
 export const keysExtraDef = {
@@ -31,14 +32,14 @@ export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 export const getUuid = ObjectUtils.getUuid
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
-export const getCode = ObjectUtils.getProp(props.code, '')
+export const getCode = ObjectUtils.getProp(keysProps.code, '')
 export const getLabels = ObjectUtils.getLabels
 export const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item))(item)
 export const getDescriptions = ObjectUtils.getDescriptions
 export const getDescription = ObjectUtils.getDescription
-export const getExtra = ObjectUtils.getProp(props.extra)
 export const getProps = ObjectUtils.getProps
 export const isEqual = ObjectUtils.isEqual
 
-// NOT USED YET
-export const getExtraProp = prop => R.pipe(ObjectUtils.getProp(keys.extra), R.propOr('', prop))
+// ====== READ - Extra Props
+export const getExtra = ObjectUtils.getProp(keysProps.extra)
+export const getExtraProp = prop => R.pipe(getExtra, R.propOr('', prop))

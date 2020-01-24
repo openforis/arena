@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import * as R from 'ramda'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
@@ -32,6 +33,7 @@ const ItemEdit = props => {
     readOnly,
   } = props
 
+  const itemExtraDefs = Category.getItemExtraDef(category)
   const validation = Category.getItemValidation(item)(category)
   const disabled = item.published
 
@@ -54,9 +56,9 @@ const ItemEdit = props => {
             <Input
               value={CategoryItem.getCode(item)}
               disabled={disabled}
-              validation={Validation.getFieldValidation(CategoryItem.props.code)(validation)}
+              validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
               onChange={value =>
-                putCategoryItemProp(category, level, item, CategoryItem.props.code, normalizeName(value))
+                putCategoryItemProp(category, level, item, CategoryItem.keysProps.code, normalizeName(value))
               }
               readOnly={readOnly}
             />
@@ -64,9 +66,23 @@ const ItemEdit = props => {
 
           <LabelsEditor
             labels={CategoryItem.getLabels(item)}
-            onChange={labels => putCategoryItemProp(category, level, item, 'labels', labels)}
+            onChange={labels => putCategoryItemProp(category, level, item, CategoryItem.keysProps.labels, labels)}
             readOnly={readOnly}
           />
+
+          {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
+            <FormItem label={key} key={key}>
+              <Input
+                value={CategoryItem.getExtraProp(key)(item)}
+                disabled={disabled}
+                onChange={value => {
+                  const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
+                  putCategoryItemProp(category, level, item, CategoryItem.keysProps.extra, extra)
+                }}
+                readOnly={readOnly}
+              />
+            </FormItem>
+          ))}
 
           {!readOnly && (
             <button

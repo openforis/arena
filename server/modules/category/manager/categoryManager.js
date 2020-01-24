@@ -215,7 +215,7 @@ export const updateItemsExtra = async (user, surveyId, categoryUuid, items, clie
       _newCategoryItemUpdateLogActivity(
         categoryUuid,
         item,
-        CategoryItem.props.extra,
+        CategoryItem.keysProps.extra,
         CategoryItem.getExtra(item),
         true,
       ),
