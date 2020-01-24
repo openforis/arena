@@ -5,6 +5,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
@@ -66,11 +67,18 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
 export const fetchProcessingStepCalculations = () => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
   const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
 
-  const { data: calculations = [] } = await axios.get(
+  const { data: calculationsDb = [] } = await axios.get(
     `/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculations`,
   )
+
+  // Get validation from chain and associate it to each processing step
+  const calculations = R.map(calculationDb => {
+    const validation = ProcessingChain.getItemValidationByUuid(ProcessingStepCalculation.getUuid(calculationDb))(chain)
+    return ProcessingStepCalculation.assocValidation(validation)(calculationDb)
+  }, calculationsDb)
 
   dispatch({ type: processingStepCalculationsLoad, calculations })
 }

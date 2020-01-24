@@ -6,6 +6,7 @@ CREATE TABLE
     date_modified  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
     date_executed  TIMESTAMP       NULL,
     props          jsonb       NOT NULL DEFAULT '{}'::jsonb,
+    validation     jsonb       NOT NULL DEFAULT '{}'::jsonb,
     status_exec    VARCHAR(32)     NULL,
     PRIMARY KEY (uuid)
   );

@@ -51,10 +51,18 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 }
 
 export const fetchProcessingSteps = processingChainUuid => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
-  const { data: processingSteps } = await axios.get(
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
+
+  const { data: stepsDb } = await axios.get(
     `/api/survey/${surveyId}/processing-chain/${processingChainUuid}/processing-steps`,
   )
+  // Get validation from chain and associate it to each processing step
+  const processingSteps = R.map(stepDb => {
+    const validation = ProcessingChain.getItemValidationByUuid(ProcessingStep.getUuid(stepDb))(chain)
+    return ProcessingStep.assocValidation(validation)(stepDb)
+  }, stepsDb)
 
   dispatch({ type: processingChainStepsLoad, processingSteps })
 }
@@ -102,20 +110,38 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
-  const chain = R.pipe(ProcessingChainState.getProcessingChain, ProcessingChain.dissocTemporary)(state)
+
   const step = R.pipe(
     ProcessingStepState.getProcessingStep,
     ProcessingStep.dissocTemporary,
     R.when(R.isEmpty, R.always(null)),
   )(state)
+
   const calculation = R.pipe(
     ProcessingStepCalculationState.getCalculation,
     ProcessingStepCalculation.dissocTemporary,
     R.when(R.isEmpty, R.always(null)),
   )(state)
 
+  const chain = R.pipe(
+    ProcessingChainState.getProcessingChain,
+    ProcessingChain.dissocTemporary,
+    // Update validation
+    R.unless(
+      R.always(R.isNil(step)),
+      ProcessingChain.assocItemValidation(ProcessingStep.getUuid(step), ProcessingStep.getValidation(step)),
+    ),
+    R.unless(
+      R.always(R.isNil(calculation)),
+      ProcessingChain.assocItemValidation(
+        ProcessingStepCalculation.getUuid(calculation),
+        ProcessingStepCalculation.getValidation(calculation),
+      ),
+    ),
+  )(state)
+
   // POST Params
-  const chainParam = R.pipe(ProcessingChain.dissocProcessingSteps, ProcessingChain.dissocValidation)(chain)
+  const chainParam = ProcessingChain.dissocProcessingSteps(chain)
 
   // Step, get only calculation uuid for order
   const stepParam = R.unless(

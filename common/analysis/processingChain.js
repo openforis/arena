@@ -16,6 +16,7 @@ const keys = {
   statusExec: 'statusExec',
   uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
+  validation: ObjectUtils.keys.validation,
 
   processingSteps: 'processingSteps',
   calculationAttributeUuids: 'calculationAttributeUuids',
@@ -136,7 +137,14 @@ export const dissocCalculationAttributeDefUuid = calculationUuid =>
   R.dissocPath([keys.calculationAttributeUuids, calculationUuid])
 
 // ====== VALIDATION
+// The validation object contains the validation of chain, steps, calculations, index by uuids
 export const getValidation = Validation.getValidation
 export const hasValidation = Validation.hasValidation
 export const assocValidation = Validation.assocValidation
 export const dissocValidation = Validation.dissocValidation
+
+export const getItemValidationByUuid = uuid => R.pipe(getValidation, Validation.getFieldValidation(uuid))
+export const assocItemValidation = (uuid, validation) => chain =>
+  R.pipe(getValidation, Validation.assocFieldValidation(uuid, validation), validationUpdated =>
+    Validation.assocValidation(validationUpdated)(chain),
+  )(chain)

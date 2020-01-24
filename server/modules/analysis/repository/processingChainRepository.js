@@ -7,7 +7,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-const selectFields = `uuid, props, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
+const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
   'date_modified',
 )}, ${DbUtils.selectDate('date_executed')}`
 
@@ -16,11 +16,11 @@ const selectFields = `uuid, props, status_exec, ${DbUtils.selectDate('date_creat
 export const insertChain = async (surveyId, chain, client = db) =>
   await client.one(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, props)
-    VALUES ($1, $2)
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, props, validation)
+    VALUES ($1, $2, $3)
     RETURNING ${selectFields}
     `,
-    [ProcessingChain.getUuid(chain), ProcessingChain.getProps(chain)],
+    [ProcessingChain.getUuid(chain), ProcessingChain.getProps(chain), ProcessingChain.getValidation(chain)],
     dbTransformCallback,
   )
 
@@ -70,9 +70,18 @@ export const updateChainProp = async (surveyId, processingChainUuid, key, value,
     SET props = props || $2::jsonb,
         date_modified = ${DbUtils.now}
     WHERE uuid = $1
-    RETURNING ${selectFields}
     `,
     [processingChainUuid, { [key]: value }],
+  )
+
+export const updateChainValidation = async (surveyId, processingChainUuid, validation, client = db) =>
+  await client.query(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+    SET validation = $2
+    WHERE uuid = $1
+    `,
+    [processingChainUuid, validation],
   )
 
 export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
