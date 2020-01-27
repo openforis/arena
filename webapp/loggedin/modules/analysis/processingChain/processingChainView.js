@@ -93,7 +93,10 @@ const ProcessingChainView = props => {
           </>
         )}
 
-        <ProcessingChainSteps processingChain={processingChain} />
+        <ProcessingChainSteps
+          processingChain={processingChain}
+          validation={Validation.getFieldValidation(ProcessingChain.keys.processingSteps)(validation)}
+        />
       </div>
 
       <ProcessingChainButtonBar />

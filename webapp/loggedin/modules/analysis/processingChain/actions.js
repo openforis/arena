@@ -47,7 +47,9 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 
   dispatch({
     type: processingChainUpdate,
-    processingChain: ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain),
+    processingChain: processingChain
+      ? ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain)
+      : null,
   })
   dispatch(hideAppSaving())
 }
@@ -67,12 +69,12 @@ export const fetchProcessingSteps = processingChainUuid => async (dispatch, getS
 const _onProcessingChainPropUpdate = (key, value) => async (dispatch, getState) => {
   const state = getState()
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const chain = ProcessingChainState.getProcessingChain(state)
+  const chain = R.pipe(ProcessingChainState.getProcessingChain, ProcessingChain.assocProp(key, value))(state)
 
-  const chainUpdated = ProcessingChain.assocProp(key, value)(chain)
-  const validation = await ProcessingChainValidator.validateChain(chainUpdated, Survey.getDefaultLanguage(surveyInfo))
+  const validation = await ProcessingChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
+  const chainUpdated = ProcessingChain.assocItemValidation(ProcessingChain.getUuid(chain), validation)(chain)
 
-  dispatch({ type: processingChainPropUpdate, key, value, validation })
+  dispatch({ type: processingChainPropUpdate, key, value, validation: ProcessingChain.getValidation(chainUpdated) })
 }
 
 export const updateProcessingChainProp = (key, value) => dispatch => dispatch(_onProcessingChainPropUpdate(key, value))

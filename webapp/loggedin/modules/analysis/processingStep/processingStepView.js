@@ -120,6 +120,7 @@ const ProcessingStepView = props => {
         <ProcessingStepCalculationsList
           processingStep={processingStep}
           calculationEditorOpened={calculationEditorOpened}
+          validation={Validation.getFieldValidation(ProcessingStep.keys.calculations)(validation)}
         />
       </div>
 
