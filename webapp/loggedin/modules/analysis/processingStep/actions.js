@@ -74,7 +74,9 @@ export const fetchProcessingStepCalculations = () => async (dispatch, getState) 
     `/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculations`,
   )
 
-  dispatch({ type: processingStepCalculationsLoad, calculations })
+  await dispatch({ type: processingStepCalculationsLoad, calculations })
+
+  dispatch(validateProcessingStep())
 }
 // ====== UPDATE
 

@@ -9,7 +9,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
@@ -24,8 +24,8 @@ import {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
-  validateProcessingStep,
   addEntityVirtual,
+  validateProcessingStep,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingStepView = props => {
@@ -38,9 +38,9 @@ const ProcessingStepView = props => {
     dirty,
     editingCalculation,
     fetchProcessingStepCalculations,
+    validateProcessingStep,
     resetProcessingStepState,
     updateProcessingStepProps,
-    validateProcessingStep,
     addEntityVirtual,
     navigateToNodeDefEdit,
   } = props
@@ -58,9 +58,15 @@ const ProcessingStepView = props => {
   useEffect(() => {
     if (!editingCalculation) {
       fetchProcessingStepCalculations()
-      validateProcessingStep()
     }
   }, [ProcessingStep.getUuid(processingStep)])
+
+  useOnUpdate(() => {
+    // Validate step on calculation editor close (calculations may have been added / deleted)
+    if (!calculationEditorOpened) {
+      validateProcessingStep()
+    }
+  }, [calculationEditorOpened])
 
   return (
     <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
@@ -158,9 +164,9 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   fetchProcessingStepCalculations,
+  validateProcessingStep,
   resetProcessingStepState,
   updateProcessingStepProps,
-  validateProcessingStep,
   addEntityVirtual,
   navigateToNodeDefEdit,
 })(ProcessingStepView)

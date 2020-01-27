@@ -18,7 +18,6 @@ export const ValidatorErrorKeys = {
     processingStepCalculation: {
       attributeRequired: 'validationErrors.analysis.processingStepCalculation.attributeRequired',
       invalid: 'validationErrors.analysis.processingStepCalculation.invalid',
-      typeRequired: 'validationErrors.analysis.processingStepCalculation.typeRequired',
     },
   },
 

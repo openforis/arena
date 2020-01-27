@@ -1,7 +1,10 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
+
 import { db } from '@server/db/db'
 import { now } from '@server/db/dbUtils'
+
+import * as Validation from '@core/validation/validation'
 
 const mergeProps = (def, draft) => {
   const { props, propsDraft } = def
@@ -11,17 +14,24 @@ const mergeProps = (def, draft) => {
   return R.pipe(R.assoc('props', propsMerged), R.dissoc('propsDraft'))(def)
 }
 
-export const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) =>
-  R.pipe(
+export const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) => {
+  const validation = R.ifElse(Validation.hasValidation, Validation.getValidation, R.always(null))(def)
+
+  return R.pipe(
     // Assoc published and draft properties based on props
     def =>
       assocPublishedDraft
         ? R.pipe(R.assoc('published', !R.isEmpty(def.props)), R.assoc('draft', !R.isEmpty(def.props_draft)))(def)
         : def,
+    // Dissoc validation before camelize (if any)
+    R.unless(R.always(R.isNil(validation)), Validation.dissocValidation),
     camelize,
     // Apply db conversion
     def => mergeProps(def, draft),
+    // Assoc validation (if any)
+    R.unless(R.always(R.isNil(validation)), Validation.assocValidation(validation)),
   )(def)
+}
 
 export const getSurveyDBSchema = surveyId => `survey_${surveyId}`
 

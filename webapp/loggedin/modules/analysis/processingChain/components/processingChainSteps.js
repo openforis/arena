@@ -45,7 +45,13 @@ const ProcessingChainSteps = props => {
 
       <div className="processing-chain__steps">
         {processingSteps.map(processingStep => (
-          <ProcessingChainStep key={ProcessingStep.getIndex(processingStep)} processingStep={processingStep} />
+          <ProcessingChainStep
+            key={ProcessingStep.getIndex(processingStep)}
+            processingStep={processingStep}
+            validation={ProcessingChain.getItemValidationByUuid(ProcessingStep.getUuid(processingStep))(
+              processingChain,
+            )}
+          />
         ))}
       </div>
 

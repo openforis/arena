@@ -557,7 +557,6 @@ $t(common.cantUndoWarning)`,
       processingStepCalculation: {
         attributeRequired: 'Attribute is required',
         invalid: 'Processing Step Calculation is invalid',
-        typeRequired: 'Type is required',
       },
     },
 

@@ -62,7 +62,7 @@
   grid-column-gap: 20px;
   align-items: center;
   height: 32px;
-  padding: 0 20px;
+  padding: 0 10px;
   font-size: .9rem;
 
   .icon-edit {
@@ -83,5 +83,15 @@
 
 .processing-chain.step-editor-open .processing-chain__step-content,
 .processing-step.calculation-editor-opened .processing-step__calculation-content {
-  grid-template-columns: 65px auto;
+  grid-template-columns: 80px auto;
+}
+
+.processing-chain__step-label,
+.processing-step__calculation-label {
+  display: grid;
+  grid-template-columns: 1fr 24px;
+
+  .error-badge  {
+    position: relative;
+  }
 }

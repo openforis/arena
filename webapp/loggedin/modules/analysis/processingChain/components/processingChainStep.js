@@ -13,9 +13,10 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import { setProcessingStepForEdit } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 const ProcessingChainStep = props => {
-  const { processingStep } = props
+  const { processingStep, validation } = props
 
   const entityUuid = ProcessingStep.getEntityUuid(processingStep)
   const survey = useSelector(SurveyState.getSurvey)
@@ -34,11 +35,19 @@ const ProcessingChainStep = props => {
     >
       <div className="processing-chain__step-index">{ProcessingStep.getIndex(processingStep) + 1}</div>
       <div className="processing-chain__step-content">
-        <div>{entity && NodeDef.getLabel(entity, i18n.lang)}</div>
+        <div className="processing-chain__step-label">
+          {entity && NodeDef.getLabel(entity, i18n.lang)}
+          <ErrorBadge validation={validation} className="error-badge-inverse" showLabel={false} />
+        </div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />
       </div>
     </div>
   )
+}
+
+ProcessingChainStep.defaultProps = {
+  processingStep: null,
+  validation: null,
 }
 
 export default ProcessingChainStep

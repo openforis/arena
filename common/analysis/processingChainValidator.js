@@ -45,7 +45,4 @@ export const validateCalculation = async (calculation, defaultLang) =>
     [ProcessingStepCalculation.keys.nodeDefUuid]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStepCalculation.attributeRequired),
     ],
-    [`${ProcessingStepCalculation.keys.props}.${ProcessingStepCalculation.keysProps.type}`]: [
-      Validator.validateRequired(Validation.messageKeys.analysis.processingStepCalculation.typeRequired),
-    ],
   })

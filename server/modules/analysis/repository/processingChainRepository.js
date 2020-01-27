@@ -1,5 +1,3 @@
-import camelize from 'camelize'
-
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -58,7 +56,7 @@ export const fetchChainByUuid = async (surveyId, processingChainUuid, client = d
     WHERE uuid = $1
     `,
     [processingChainUuid],
-    camelize,
+    dbTransformCallback,
   )
 
 // ====== UPDATE
@@ -102,7 +100,7 @@ export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
     RETURNING ${selectFields}
     `,
     [processingChainUuid],
-    camelize,
+    dbTransformCallback,
   )
 
 export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
