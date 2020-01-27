@@ -4,12 +4,14 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as SurveyState from '@webapp/survey/surveyState'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
@@ -38,7 +40,7 @@ export default () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!R.isEmpty(calculation) && !ProcessingStepCalculation.hasValidation(calculation)) {
+    if (!R.isEmpty(calculation)) {
       dispatch(validateProcessingStepCalculation())
     }
   }, [])
@@ -47,6 +49,7 @@ export default () => {
 
   // Get survey info, calculation and attributes from store
   const survey = useSelector(SurveyState.getSurvey)
+  const processingChain = useSelector(ProcessingChainState.getProcessingChain)
   const processingStep = useSelector(ProcessingStepState.getProcessingStep)
   const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
   const dirty = useSelector(ProcessingStepCalculationState.isDirty)
@@ -72,6 +75,9 @@ export default () => {
 
     surveyInfo: Survey.getSurveyInfo(survey),
     calculation,
+    validation: ProcessingChain.getItemValidationByUuid(ProcessingStepCalculation.getUuid(calculation))(
+      processingChain,
+    ),
     dirty,
     attributes,
     attribute,

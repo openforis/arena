@@ -32,6 +32,7 @@ const ProcessingStepCalculationEditor = () => {
 
     surveyInfo,
     calculation,
+    validation,
     dirty,
     attributes,
     attribute,
@@ -46,7 +47,6 @@ const ProcessingStepCalculationEditor = () => {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const validation = ProcessingStepCalculation.getValidation(calculation)
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
 
   return (

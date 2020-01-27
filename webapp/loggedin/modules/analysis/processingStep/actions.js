@@ -5,6 +5,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 
@@ -15,6 +16,7 @@ import * as ProcessingStepState from './processingStepState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
+import { processingChainValidationUpdate } from '../processingChain/actions'
 
 export const processingStepCreate = 'analysis/processingStep/create'
 export const processingStepCalculationsLoad = 'analysis/processingStep/calculations/load'
@@ -76,10 +78,26 @@ export const fetchProcessingStepCalculations = () => async (dispatch, getState) 
 }
 // ====== UPDATE
 
-export const updateProcessingStepProps = props => dispatch => dispatch({ type: processingStepPropsUpdate, props })
+export const updateProcessingStepProps = props => async dispatch => {
+  await dispatch({ type: processingStepPropsUpdate, props })
+
+  dispatch(validateProcessingStep())
+}
 
 export const updateProcessingStepCalculationIndex = (indexFrom, indexTo) => dispatch =>
   dispatch({ type: processingStepCalculationIndexUpdate, indexFrom, indexTo })
+
+export const validateProcessingStep = () => async (dispatch, getState) => {
+  // Validate step and update validation in chain
+  const state = getState()
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
+  const step = ProcessingStepState.getProcessingStep(state)
+  const stepValidation = await ProcessingChainValidator.validateStep(step, Survey.getDefaultLanguage(surveyInfo))
+  const chainUpdated = ProcessingChain.assocItemValidation(ProcessingStep.getUuid(step), stepValidation)(chain)
+
+  dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })
+}
 
 // ====== DELETE
 

@@ -6,6 +6,7 @@ import { useParams } from 'react-router'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
@@ -63,15 +64,18 @@ const ProcessingChainView = props => {
     navigateToProcessingChainsView(history)
   }, [surveyCycleKey])
 
+  const validation = ProcessingChain.getItemValidationByUuid(ProcessingChain.getUuid(processingChain))(processingChain)
+
   return R.isEmpty(processingChain) ? null : (
     <div className={`processing-chain${editingStep ? ' step-editor-open' : ''}`}>
       <div className="form">
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingChain.getLabels(processingChain)}
-          onChange={labels => updateProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
           formLabelKey="processingChainView.formLabel"
           readOnly={editingStep}
+          validation={Validation.getFieldValidation(ProcessingChain.keysProps.labels)(validation)}
+          onChange={labels => updateProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
         />
 
         {!editingStep && (

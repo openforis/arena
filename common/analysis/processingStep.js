@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ObjectUtils from '@core/objectUtils'
-import * as Validation from '@core/validation/validation'
 
 export const keys = {
   calculations: 'calculations',
@@ -92,9 +91,3 @@ export const dissocCalculation = calculation =>
       ),
     ),
   )
-
-// ====== VALIDATION
-export const getValidation = Validation.getValidation
-export const hasValidation = Validation.hasValidation
-export const assocValidation = Validation.assocValidation
-export const dissocValidation = Validation.dissocValidation

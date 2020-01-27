@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 
 export const keys = {
@@ -65,12 +64,6 @@ export const assocIndex = ObjectUtils.assocIndex
 export const assocProp = ObjectUtils.setProp
 export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
 export const dissocTemporary = ObjectUtils.dissocTemporary
-
-// ====== VALIDATION
-export const getValidation = Validation.getValidation
-export const hasValidation = Validation.hasValidation
-export const assocValidation = Validation.assocValidation
-export const dissocValidation = Validation.dissocValidation
 
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, type => R.prop(type, nodeDefTypeByType))

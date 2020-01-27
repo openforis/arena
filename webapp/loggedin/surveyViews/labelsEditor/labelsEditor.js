@@ -4,14 +4,15 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-
-import { Input } from '@webapp/commonComponents/form/input'
-
 import * as Survey from '@core/survey/survey'
-import * as SurveyState from '@webapp/survey/surveyState'
+
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { Input } from '@webapp/commonComponents/form/input'
+import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 
 import { getLanguageLabel } from '@core/app/languages'
+
+import * as SurveyState from '@webapp/survey/surveyState'
 
 const LanguageBadge = ({ lang, compact }) => (
   <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>
@@ -46,6 +47,7 @@ const LabelsEditor = props => {
     canTogglePreview,
     readOnly,
     compactLanguage,
+    validation,
   } = props
 
   const displayLangs = preview ? R.slice(0, maxPreview, languages) : languages
@@ -72,17 +74,19 @@ const LabelsEditor = props => {
         )}
       </div>
       <div className="labels-editor__labels">
-        {displayLangs.map(lang => (
-          <LabelRow
-            key={lang}
-            lang={lang}
-            labels={labels}
-            onChange={onChange}
-            readOnly={readOnly}
-            showLanguageBadge={languages.length > 1}
-            compactLanguage={compactLanguage}
-          />
-        ))}
+        <ValidationTooltip validation={validation}>
+          {displayLangs.map(lang => (
+            <LabelRow
+              key={lang}
+              lang={lang}
+              labels={labels}
+              onChange={onChange}
+              readOnly={readOnly}
+              showLanguageBadge={languages.length > 1}
+              compactLanguage={compactLanguage}
+            />
+          ))}
+        </ValidationTooltip>
       </div>
     </div>
   )
@@ -97,6 +101,7 @@ LabelsEditor.defaultProps = {
   canTogglePreview: true,
   readOnly: false,
   compactLanguage: false,
+  validation: null,
   onChange: null,
 }
 

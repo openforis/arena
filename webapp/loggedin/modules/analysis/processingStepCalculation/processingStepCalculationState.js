@@ -28,11 +28,8 @@ export const assocCalculation = calculation =>
   R.pipe(assocCalculationDirty(calculation), assocCalculationOrig(calculation))
 
 export const assocCalculationDirtyNodeDefUuid = nodeDefUuid => state =>
-  R.pipe(
-    R.prop(keys.dirty),
-    ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid),
-    ProcessingStepCalculation.dissocValidation,
-    calculation => R.assoc(keys.dirty, calculation)(state),
+  R.pipe(R.prop(keys.dirty), ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid), calculation =>
+    R.assoc(keys.dirty, calculation)(state),
   )(state)
 
 export const saveDirty = assocCalculation

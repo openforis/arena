@@ -5,8 +5,9 @@ import { connect } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
-import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
@@ -14,7 +15,7 @@ import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
@@ -23,21 +24,23 @@ import {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
+  validateProcessingStep,
   addEntityVirtual,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 
 const ProcessingStepView = props => {
   const {
     processingStep,
+    validation,
     processingStepPrev,
     processingStepNext,
-    processingStepEntity,
     processingStepCalculation,
     dirty,
     editingCalculation,
     fetchProcessingStepCalculations,
     resetProcessingStepState,
     updateProcessingStepProps,
+    validateProcessingStep,
     addEntityVirtual,
     navigateToNodeDefEdit,
   } = props
@@ -55,6 +58,7 @@ const ProcessingStepView = props => {
   useEffect(() => {
     if (!editingCalculation) {
       fetchProcessingStepCalculations()
+      validateProcessingStep()
     }
   }, [ProcessingStep.getUuid(processingStep)])
 
@@ -80,6 +84,7 @@ const ProcessingStepView = props => {
               processingStep={processingStep}
               processingStepPrev={processingStepPrev}
               showLabel={!calculationEditorOpened}
+              validation={Validation.getFieldValidation(ProcessingStep.keysProps.entityUuid)(validation)}
               onChange={entityUuid => {
                 const props = {
                   [ProcessingStep.keysProps.entityUuid]: entityUuid,
@@ -135,17 +140,15 @@ const ProcessingStepView = props => {
 }
 
 const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
+  const processingChain = ProcessingChainState.getProcessingChain(state)
   const processingStep = ProcessingStepState.getProcessingStep(state)
-  const processingStepEntity = R.pipe(ProcessingStep.getEntityUuid, entityDefUuid =>
-    Survey.getNodeDefByUuid(entityDefUuid)(survey),
-  )(processingStep)
+  const validation = ProcessingChain.getItemValidationByUuid(ProcessingStep.getUuid(processingStep))(processingChain)
 
   return {
     processingStep,
+    validation,
     processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
     processingStepNext: ProcessingStepState.getProcessingStepNext(state),
-    processingStepEntity,
     dirty: ProcessingStepState.isDirty(state),
     processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
     editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
@@ -156,6 +159,7 @@ export default connect(mapStateToProps, {
   fetchProcessingStepCalculations,
   resetProcessingStepState,
   updateProcessingStepProps,
+  validateProcessingStep,
   addEntityVirtual,
   navigateToNodeDefEdit,
 })(ProcessingStepView)
