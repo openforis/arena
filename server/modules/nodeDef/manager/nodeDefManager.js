@@ -17,7 +17,7 @@ export {
   permanentlyDeleteNodeDefs,
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
-  deleteNodeDefAnalysisUnused,
+  deleteNodeDefsAnalysisUnused,
 } from '../repository/nodeDefRepository'
 
 // ======= CREATE

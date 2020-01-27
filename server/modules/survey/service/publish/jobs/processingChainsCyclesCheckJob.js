@@ -33,7 +33,7 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
     this.incrementProcessedItems()
 
     // 4. delete analysis nodeDef if they are not used
-    await NodeDefManager.deleteNodeDefAnalysisUnused(this.surveyId, this.tx)
+    await NodeDefManager.deleteNodeDefsAnalysisUnused(this.surveyId, this.tx)
     this.incrementProcessedItems()
   }
 

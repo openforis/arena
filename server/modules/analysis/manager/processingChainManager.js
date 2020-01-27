@@ -15,6 +15,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
@@ -269,39 +270,34 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 
 // ====== DELETE - Step
 
-export const deleteStep = async (user, surveyId, processingStepUuid, client = db) =>
+export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
   await client.tx(async t => {
-    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
-    const processingStepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
+    const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
+    const chainUuid = ProcessingStep.getProcessingChainUuid(step)
+    const stepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
       surveyId,
-      ProcessingStep.getProcessingChainUuid(processingStep),
-      ProcessingStep.getIndex(processingStep) + 1,
+      chainUuid,
+      ProcessingStep.getIndex(step) + 1,
       t,
     )
-    if (processingStepNext) {
+    if (stepNext) {
       throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
     }
 
     const logContent = {
-      [ActivityLog.keysContent.uuid]: processingStepUuid,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-      [ActivityLog.keysContent.index]: ProcessingStep.getIndex(processingStep),
+      [ActivityLog.keysContent.uuid]: stepUuid,
+      [ActivityLog.keysContent.processingChainUuid]: chainUuid,
+      [ActivityLog.keysContent.index]: ProcessingStep.getIndex(step),
     }
     await Promise.all([
-      ProcessingStepRepository.deleteStep(surveyId, processingStepUuid, t),
+      ProcessingStepRepository.deleteStep(surveyId, stepUuid, t),
+      // Delete calculation node def, if unused
+      NodeDefRepository.deleteNodeDefAnalysisIfUnused(surveyId, ProcessingStep.getEntityUuid(step), t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
     ])
 
-    const processingStepPrev = await ProcessingStepRepository.fetchStepSummaryByIndex(
-      surveyId,
-      ProcessingStep.getProcessingChainUuid(processingStep),
-      ProcessingStep.getIndex(processingStep) - 1,
-      t,
-    )
-
-    if (!processingStepPrev) {
+    if (ProcessingStep.getIndex(step) === 0) {
       // Deleted processing step was the only one, chain validation must be updated (steps are required)
-      const chainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
       const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
       const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
       const chainValidation = await ProcessingChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
@@ -342,6 +338,13 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       ActivityLog.type.processingStepCalculationDelete,
       logContent,
       false,
+      t,
+    )
+
+    // Delete calculation node def, if unused
+    await NodeDefRepository.deleteNodeDefAnalysisIfUnused(
+      surveyId,
+      ProcessingStepCalculation.getNodeDefUuid(calculation),
       t,
     )
 
