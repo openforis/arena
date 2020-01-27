@@ -5,6 +5,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import ProgressBar from '@webapp/commonComponents/progressBar'
 import { useI18n } from '@webapp/commonComponents/hooks'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 const statusComponent = {
   [ProcessingChain.statusExec.success]: <span className="icon icon-checkmark icon-14px" />,
@@ -22,7 +23,13 @@ const ProcessingChainsRow = props => {
 
   return (
     <>
-      <div>{ProcessingChain.getLabel(i18n.lang)(processingChainsListItem)}</div>
+      <div className="chain-label">
+        <div>{ProcessingChain.getLabel(i18n.lang)(processingChainsListItem)}</div>
+        <ErrorBadge
+          validation={ProcessingChain.getValidation(processingChainsListItem)}
+          className="error-badge-inverse"
+        />
+      </div>
       <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateModified(processingChainsListItem))}</div>
       <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateExecuted(processingChainsListItem))}</div>
       <div className="column-draft">
