@@ -6,9 +6,15 @@ import SystemError from '@core/systemError'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
+
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
@@ -215,6 +221,34 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
       }
 
       await _updateCalculationIndexes(user, surveyId, step, t)
+    }
+
+    // Validate chain / step / calculation after insert/update
+    const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
+    const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
+    const calculationValidation = calculation
+      ? await ProcessingChainValidator.validateCalculation(calculation, surveyDefaultLang)
+      : Validation.newInstance()
+
+    let stepValidation = null
+    if (step) {
+      const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(
+        surveyId,
+        ProcessingStep.getUuid(step),
+        t,
+      )
+      stepValidation = await ProcessingChainValidator.validateStep(ProcessingStep.assocCalculations(calculations)(step))
+    }
+
+    const steps = await ProcessingStepRepository.fetchStepsByChainUuid(surveyId, ProcessingChain.getUuid(chain), t)
+    const chainValidation = await ProcessingChainValidator.validateChain(
+      ProcessingChain.assocProcessingSteps(steps)(chain),
+      surveyDefaultLang,
+    )
+
+    if (!R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
+      // Throw error to rollabck transaction
+      throw new SystemError('appErrors.processingChainCannotBeSaved')
     }
   })
 }

@@ -92,10 +92,9 @@ export const updateProcessingStepCalculationIndex = (indexFrom, indexTo) => disp
 export const validateProcessingStep = () => async (dispatch, getState) => {
   // Validate step and update validation in chain
   const state = getState()
-  const surveyInfo = SurveyState.getSurveyInfo(state)
   const chain = ProcessingChainState.getProcessingChain(state)
   const step = ProcessingStepState.getProcessingStep(state)
-  const stepValidation = await ProcessingChainValidator.validateStep(step, Survey.getDefaultLanguage(surveyInfo))
+  const stepValidation = await ProcessingChainValidator.validateStep(step)
   const chainUpdated = ProcessingChain.assocItemValidation(ProcessingStep.getUuid(step), stepValidation)(chain)
 
   dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })

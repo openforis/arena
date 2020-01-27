@@ -15,6 +15,10 @@ const mergeProps = (def, draft) => {
 }
 
 export const dbTransformCallback = (def, draft = false, assocPublishedDraft = false) => {
+  if (R.isNil(def)) {
+    return null
+  }
+
   const validation = R.ifElse(Validation.hasValidation, Validation.getValidation, R.always(null))(def)
 
   return R.pipe(

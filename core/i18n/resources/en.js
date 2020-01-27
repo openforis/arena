@@ -709,6 +709,7 @@ $t(common.cantUndoWarning)`,
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
+    processingChainCannotBeSaved: 'Processing chain or step or calculation is invalid and cannot be saved',
     processingStepOnlyLastCanBeDeleted:
       'Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted',
     unableToFindParent: 'Unable to find parent of {{name}}',

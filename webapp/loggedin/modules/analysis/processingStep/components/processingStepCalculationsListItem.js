@@ -22,6 +22,7 @@ import { setProcessingStepCalculationForEdit } from '../actions'
 const ProcessingStepCalculationsListItem = props => {
   const {
     calculation,
+    calculationForEdit,
     nodeDef,
     validation,
     editingCalculation,
@@ -36,8 +37,11 @@ const ProcessingStepCalculationsListItem = props => {
 
   const i18n = useI18n()
 
-  const className =
-    'processing-step__calculation' + (editingCalculation ? ' editing' : '') + (dragging ? ' dragging' : '')
+  const editing = ProcessingStepCalculation.isEqual(calculationForEdit)(calculation)
+
+  let className = 'processing-step__calculation'
+  className += editing ? ' editing' : ''
+  className += dragging ? ' dragging' : ''
 
   const index = ProcessingStepCalculation.getIndex(calculation)
 
@@ -56,7 +60,7 @@ const ProcessingStepCalculationsListItem = props => {
       <div
         className="processing-step__calculation-content"
         onClick={() =>
-          !editingCalculation &&
+          !editing &&
           (calculationEditDirty
             ? setCalculationEditShowCancelConfirm(true)
             : setProcessingStepCalculationForEdit(calculation))
@@ -99,6 +103,7 @@ const mapStateToProps = (state, { calculation }) => {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
     validation,
+    calculationForEdit: ProcessingStepCalculationState.getCalculation(state),
     calculationEditDirty,
     editingCalculation,
   }

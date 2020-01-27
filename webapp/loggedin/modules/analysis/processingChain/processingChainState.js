@@ -32,8 +32,7 @@ const _updateChainOrig = fn => _updateChain(keys.orig, fn)
 
 const _updateChainDirty = fn => _updateChain(keys.dirty, fn)
 
-export const assocPropDirty = (key, value, validation) =>
-  R.pipe(_updateChainDirty(ProcessingChain.assocProp(key, value)), assocProcessingChainValidation(validation))
+export const assocPropDirty = (key, value) => _updateChainDirty(ProcessingChain.assocProp(key, value))
 
 export const assocProcessingChainValidation = validation =>
   _updateChainDirty(ProcessingChain.assocValidation(validation))
