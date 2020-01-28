@@ -30,12 +30,16 @@ const ProcessingChainsRow = props => {
           className="error-badge-inverse"
         />
       </div>
+      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateCreated(processingChainsListItem))}</div>
       <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateModified(processingChainsListItem))}</div>
       <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateExecuted(processingChainsListItem))}</div>
       <div className="column-draft">
         {ProcessingChain.isDraft(processingChainsListItem) && <span className="icon icon-wrench icon-14px" />}
       </div>
       <div className={`column-status ${statusExec}`}>{statusComponent[statusExec]}</div>
+      <div>
+        <span className="icon icon-12px icon-action icon-pencil2" />
+      </div>
     </>
   )
 }
