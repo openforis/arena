@@ -13,6 +13,7 @@ const ProcessingChainsRowHeader = () => {
       <div>{i18n.t('processingChainView.dateExecuted')}</div>
       <div>{i18n.t('common.draft')}</div>
       <div>{i18n.t('processingChainView.status')}</div>
+      <div />
     </>
   )
 }

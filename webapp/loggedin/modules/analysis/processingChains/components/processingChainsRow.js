@@ -38,7 +38,7 @@ const ProcessingChainsRow = props => {
       </div>
       <div className={`column-status ${statusExec}`}>{statusComponent[statusExec]}</div>
       <div>
-        <span className="icon icon-12px icon-action icon-pencil2"></span>
+        <span className="icon icon-12px icon-action icon-pencil2" />
       </div>
     </>
   )
