@@ -323,31 +323,24 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
   `)
 }
 
-const getNodeDefAnalysisUnusedCondition = surveyId => `
-  n.analysis 
-    -- not used by any processing steps
-    AND NOT EXISTS (
-      SELECT s.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step s
-      WHERE (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid = n.uuid
-    )
-    -- not used by any processing step calculations
-    AND NOT EXISTS (
-      SELECT c.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
-      WHERE c.node_def_uuid = n.uuid
-    )
-`
-
 export const deleteNodeDefsAnalysisUnused = async (surveyId, client = db) =>
-  await client.query(`
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node_def n
-    WHERE ${getNodeDefAnalysisUnusedCondition(surveyId)}
-  `)
-
-export const deleteNodeDefAnalysisIfUnused = async (surveyId, nodeDefUuid, client = db) =>
-  await client.query(
+  await client.map(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node_def n
-    WHERE n.uuid = $1 AND ${getNodeDefAnalysisUnusedCondition(surveyId)}
+    WHERE
+      n.analysis 
+      -- not used by any processing steps
+      AND NOT EXISTS (
+        SELECT s.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step s
+        WHERE (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid = n.uuid
+      )
+      -- not used by any processing step calculations
+      AND NOT EXISTS (
+        SELECT c.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+        WHERE c.node_def_uuid = n.uuid
+      )
+    RETURNING n.uuid
     `,
-    [nodeDefUuid],
+    [],
+    R.prop('uuid'),
   )

@@ -11,6 +11,7 @@ import {
   nodeDefsUpdate,
   nodeDefPropsUpdate,
   nodeDefPropsUpdateCancel,
+  nodeDefsDelete,
 } from './actions'
 
 import * as NodeDefsState from './nodeDefsState'
@@ -42,6 +43,8 @@ const actionHandlers = {
     isNodeDefNew
       ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
       : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def
+
+  [nodeDefsDelete]: (state, { nodeDefUuids }) => NodeDefsState.dissocNodeDefs(nodeDefUuids)(state),
 }
 
 export default exportReducer(actionHandlers)

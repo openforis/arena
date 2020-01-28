@@ -29,6 +29,7 @@ export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
+export const nodeDefsDelete = 'survey/nodeDefs/delete'
 
 // ==== CREATE
 

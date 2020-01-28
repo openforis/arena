@@ -270,6 +270,9 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 
 // ====== DELETE - Step
 
+/**
+ * It returns a list of deleted unused node def analysis uuids (if any)
+ */
 export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
   await client.tx(async t => {
     const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
@@ -291,10 +294,11 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
     }
     await Promise.all([
       ProcessingStepRepository.deleteStep(surveyId, stepUuid, t),
-      // Delete calculation node def, if unused
-      NodeDefRepository.deleteNodeDefAnalysisIfUnused(surveyId, ProcessingStep.getEntityUuid(step), t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
     ])
+
+    // Delete unused node defs analysis
+    const nodeDefUnusedDeletedUuids = await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
 
     if (ProcessingStep.getIndex(step) === 0) {
       // Deleted processing step was the only one, chain validation must be updated (steps are required)
@@ -309,10 +313,15 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
         t,
       )
     }
+
+    return nodeDefUnusedDeletedUuids
   })
 
 // ====== DELETE - Calculation
 
+/**
+ * It returns a list of deleted unused node def analysis uuids (if any)
+ */
 export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = db) =>
   await client.tx(async t => {
     const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
@@ -341,12 +350,8 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       t,
     )
 
-    // Delete calculation node def, if unused
-    await NodeDefRepository.deleteNodeDefAnalysisIfUnused(
-      surveyId,
-      ProcessingStepCalculation.getNodeDefUuid(calculation),
-      t,
-    )
+    // Delete unused node defs analysis
+    const nodeDefUnusedDeletedUuids = await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
 
     // Update step validation
     const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
@@ -360,4 +365,6 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       ProcessingChain.getValidation(chainUpdated),
       t,
     )
+
+    return nodeDefUnusedDeletedUuids
   })
