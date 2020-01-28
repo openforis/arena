@@ -8,6 +8,7 @@ const ProcessingChainsRowHeader = () => {
   return (
     <>
       <div>{i18n.t('common.label')}</div>
+      <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>
       <div>{i18n.t('processingChainView.dateExecuted')}</div>
       <div>{i18n.t('common.draft')}</div>

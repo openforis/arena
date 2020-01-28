@@ -30,6 +30,7 @@ const ProcessingChainsRow = props => {
           className="error-badge-inverse"
         />
       </div>
+      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateCreated(processingChainsListItem))}</div>
       <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateModified(processingChainsListItem))}</div>
       <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateExecuted(processingChainsListItem))}</div>
       <div className="column-draft">
