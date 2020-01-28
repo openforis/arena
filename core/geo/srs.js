@@ -28,7 +28,8 @@ export const latLonSrs = newSrs(
       AUTHORITY["EPSG","4326"]]`,
 )
 
-export const isLatLon = code => getCode(latLonSrs) === code
+export const latLonSrsCode = getCode(latLonSrs)
+export const isLatLon = code => latLonSrsCode === code
 export const getCode = R.prop(keys.code)
 export const getName = R.prop(keys.name)
 export const getWkt = R.prop(keys.wkt)

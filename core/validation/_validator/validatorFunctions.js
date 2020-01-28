@@ -36,18 +36,21 @@ export const validateName = errorKey => (propName, item) => {
   return prop && !validNameRegex.test(prop) ? { key: errorKey } : null
 }
 
-export const validatePositiveNumber = errorKey => (propName, item) => {
+export const validateNumber = (errorKey = ValidatorErrorKeys.invalidNumber, params = {}) => (propName, item) => {
   const value = getProp(propName)(item)
 
-  if (value && isNaN(value)) {
-    return { key: ValidatorErrorKeys.invalidNumber }
+  return value && isNaN(value) ? { key: errorKey, params } : null
+}
+
+export const validatePositiveNumber = (errorKey, params = {}) => (propName, item) => {
+  const validateNumberResult = validateNumber(errorKey, params)(propName, item)
+  if (validateNumberResult) {
+    return validateNumberResult
   }
 
-  if (value && value <= 0) {
-    return { key: errorKey }
-  }
+  const value = getProp(propName)(item)
 
-  return null
+  return value && value <= 0 ? { key: errorKey, params } : null
 }
 
 export const isKeyword = ValidatorNameKeywords.isKeyword
