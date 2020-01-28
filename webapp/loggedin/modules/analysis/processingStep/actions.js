@@ -71,18 +71,12 @@ export const fetchProcessingStepData = () => async (dispatch, getState) => {
   const processingStep = ProcessingStepState.getProcessingStep(state)
   const processingStepPrevUuid = R.pipe(ProcessingStepState.getProcessingStepPrev, ProcessingStep.getUuid)(state)
 
-  const { data: calculations = [] } = await axios.get(
-    `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculations`,
-  )
-
-  // Load prev step attribute uuids
-  let stepPrevAttributeUuids = null
-  if (processingStepPrevUuid) {
-    const { data: attributeUuids = [] } = await axios.get(
-      `/api/survey/${surveyId}/processing-step/${processingStepPrevUuid}/calculation-attribute-uuids`,
-    )
-    stepPrevAttributeUuids = attributeUuids
-  }
+  const [{ data: calculations = [] }, { data: stepPrevAttributeUuids = [] }] = await Promise.all([
+    axios.get(`/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculations`),
+    processingStepPrevUuid
+      ? axios.get(`/api/survey/${surveyId}/processing-step/${processingStepPrevUuid}/calculation-attribute-uuids`)
+      : {},
+  ])
 
   await dispatch({ type: processingStepDataLoad, calculations, stepPrevAttributeUuids })
 
