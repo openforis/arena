@@ -51,13 +51,12 @@ export default () => {
   const survey = useSelector(SurveyState.getSurvey)
   const processingChain = useSelector(ProcessingChainState.getProcessingChain)
   const processingStep = useSelector(ProcessingStepState.getProcessingStep)
+  const stepPrevCalculationAttributeUuids = useSelector(ProcessingStepState.getStepPrevCalculationAttributeUuids)
   const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
   const dirty = useSelector(ProcessingStepCalculationState.isDirty)
-
-  const attrDefsPrevStep = R.pipe(
-    ProcessingStep.getStepPrevCalculationAttributeUuids,
-    R.map(nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)),
-  )(processingStep)
+  const attrDefsPrevStep = stepPrevCalculationAttributeUuids.map(nodeDefUuid =>
+    Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+  )
 
   const attrDefsEntityChildren = R.pipe(
     ProcessingStep.getEntityUuid,
