@@ -8,10 +8,11 @@ export const keys = {
   calculationUuids: 'calculationUuids', // Associated only when processing step is saved
   calculationsCount: 'calculationsCount',
   index: ObjectUtils.keys.index,
+  stepPrevAttributeUuids: 'stepPrevAttributeUuids',
   processingChainUuid: 'processingChainUuid',
   props: ObjectUtils.keys.props,
-  uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
+  uuid: ObjectUtils.keys.uuid,
 }
 
 export const keysProps = {
@@ -38,6 +39,8 @@ export const getPropsDiff = ObjectUtils.getPropsDiff
  */
 export const getCalculationUuids = R.propOr([], keys.calculationUuids)
 
+export const getStepPrevAttributeUuids = R.propOr([], keys.stepPrevAttributeUuids)
+
 export const isEqual = ObjectUtils.isEqual
 export const isTemporary = ObjectUtils.isTemporary
 
@@ -51,6 +54,8 @@ export const assocEntityUuid = entityUuid => ObjectUtils.setProp(keysProps.entit
 export const assocCalculations = R.assoc(keys.calculations)
 export const dissocCalculations = R.dissoc(keys.calculations)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
+export const assocStepPrevAttributeUuids = R.assoc(keys.stepPrevAttributeUuids)
+
 const assocCalculationsCount = R.assoc(keys.calculationsCount)
 
 const _updateCalculationsCount = calculationStep =>

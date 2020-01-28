@@ -60,6 +60,12 @@ export const assocCalculations = calculations =>
     _updateStepOrig(ProcessingStep.assocCalculations(calculations)),
   )
 
+export const assocStepPrevAttributeUuids = stepPrevAttributeUuids =>
+  R.pipe(
+    _updateStepDirty(ProcessingStep.assocStepPrevAttributeUuids(stepPrevAttributeUuids)),
+    _updateStepOrig(ProcessingStep.assocStepPrevAttributeUuids(stepPrevAttributeUuids)),
+  )
+
 export const assocCalculation = calculation => _updateStepDirty(ProcessingStep.assocCalculation(calculation))
 
 export const updateCalculationIndex = (indexFrom, indexTo) => processingStepState =>

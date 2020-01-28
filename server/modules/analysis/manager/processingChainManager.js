@@ -207,6 +207,7 @@ export { fetchStepsByChainUuid, fetchStepSummaryByIndex } from '../repository/pr
 
 export {
   fetchCalculationsByStepUuid,
+  fetchCalculationAttributeUuidsByStepUuid,
   fetchCalculationAttributeUuidsByChainUuid,
 } from '../repository/processingStepCalculationRepository'
 
