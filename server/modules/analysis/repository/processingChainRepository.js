@@ -76,10 +76,21 @@ export const updateChainValidation = async (surveyId, processingChainUuid, valid
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET validation = $2
+    SET validation = $2,
+        date_modified = ${DbUtils.now}
     WHERE uuid = $1
     `,
     [processingChainUuid, validation],
+  )
+
+export const updateChainDateModified = async (surveyId, processingChainUuid, client = db) =>
+  await client.query(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+    SET date_modified = ${DbUtils.now}
+    WHERE uuid = $1
+    `,
+    [processingChainUuid],
   )
 
 export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
