@@ -8,13 +8,16 @@ export const ValidatorErrorKeys = {
 
   analysis: {
     labelDefaultLangRequired: 'validationErrors.analysis.labelDefaultLangRequired',
+    processingChain: {
+      stepsRequired: 'validationErrors.analysis.processingChain.stepsRequired',
+    },
     processingStep: {
       entityRequired: 'validationErrors.analysis.processingStep.entityRequired',
+      calculationsRequired: 'validationErrors.analysis.processingStep.calculationsRequired',
     },
     processingStepCalculation: {
       attributeRequired: 'validationErrors.analysis.processingStepCalculation.attributeRequired',
       invalid: 'validationErrors.analysis.processingStepCalculation.invalid',
-      typeRequired: 'validationErrors.analysis.processingStepCalculation.typeRequired',
     },
   },
 

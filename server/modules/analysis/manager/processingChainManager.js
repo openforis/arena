@@ -6,9 +6,15 @@ import SystemError from '@core/systemError'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
+
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
@@ -216,6 +222,34 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
 
       await _updateCalculationIndexes(user, surveyId, step, t)
     }
+
+    // Validate chain / step / calculation after insert/update
+    const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
+    const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
+    const calculationValidation = calculation
+      ? await ProcessingChainValidator.validateCalculation(calculation, surveyDefaultLang)
+      : Validation.newInstance()
+
+    let stepValidation = null
+    if (step) {
+      const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(
+        surveyId,
+        ProcessingStep.getUuid(step),
+        t,
+      )
+      stepValidation = await ProcessingChainValidator.validateStep(ProcessingStep.assocCalculations(calculations)(step))
+    }
+
+    const steps = await ProcessingStepRepository.fetchStepsByChainUuid(surveyId, ProcessingChain.getUuid(chain), t)
+    const chainValidation = await ProcessingChainValidator.validateChain(
+      ProcessingChain.assocProcessingSteps(steps)(chain),
+      surveyDefaultLang,
+    )
+
+    if (!R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
+      // Throw error to rollabck transaction
+      throw new SystemError('appErrors.processingChainCannotBeSaved')
+    }
   })
 }
 
@@ -257,24 +291,48 @@ export const deleteStep = async (user, surveyId, processingStepUuid, client = db
       ProcessingStepRepository.deleteStep(surveyId, processingStepUuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
     ])
+
+    const processingStepPrev = await ProcessingStepRepository.fetchStepSummaryByIndex(
+      surveyId,
+      ProcessingStep.getProcessingChainUuid(processingStep),
+      ProcessingStep.getIndex(processingStep) - 1,
+      t,
+    )
+
+    if (!processingStepPrev) {
+      // Deleted processing step was the only one, chain validation must be updated (steps are required)
+      const chainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
+      const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
+      const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
+      const chainValidation = await ProcessingChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
+      const chainUpdated = ProcessingChain.assocItemValidation(chainUuid, chainValidation)(chain)
+      await ProcessingChainRepository.updateChainValidation(
+        surveyId,
+        chainUuid,
+        ProcessingChain.getValidation(chainUpdated),
+        t,
+      )
+    }
   })
 
 // ====== DELETE - Calculation
 
-export const deleteCalculation = async (user, surveyId, processingStepUuid, calculationUuid, client = db) =>
+export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = db) =>
   await client.tx(async t => {
-    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
+    const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
+    const chainUuid = ProcessingStep.getProcessingChainUuid(step)
     const calculation = await ProcessingStepCalculationRepository.deleteCalculationStep(
       surveyId,
-      processingStepUuid,
+      stepUuid,
       calculationUuid,
       t,
     )
+
     const logContent = {
-      [ActivityLog.keysContent.uuid]: processingStepUuid,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-      [ActivityLog.keysContent.processingStepUuid]: ProcessingStep.getUuid(processingStep),
-      [ActivityLog.keysContent.processingStepIndex]: ProcessingStep.getIndex(processingStep),
+      [ActivityLog.keysContent.uuid]: stepUuid,
+      [ActivityLog.keysContent.processingChainUuid]: chainUuid,
+      [ActivityLog.keysContent.processingStepUuid]: stepUuid,
+      [ActivityLog.keysContent.processingStepIndex]: ProcessingStep.getIndex(step),
       [ActivityLog.keysContent.index]: ProcessingStepCalculation.getIndex(calculation),
       [ActivityLog.keysContent.labels]: ProcessingStepCalculation.getLabels(calculation),
     }
@@ -284,6 +342,19 @@ export const deleteCalculation = async (user, surveyId, processingStepUuid, calc
       ActivityLog.type.processingStepCalculationDelete,
       logContent,
       false,
+      t,
+    )
+
+    // Update step validation
+    const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
+    const stepUpdated = ProcessingStep.assocCalculations(calculations)(step)
+    const stepValidation = await ProcessingChainValidator.validateStep(stepUpdated)
+    const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
+    const chainUpdated = ProcessingChain.assocItemValidation(stepUuid, stepValidation)(chain)
+    await ProcessingChainRepository.updateChainValidation(
+      surveyId,
+      chainUuid,
+      ProcessingChain.getValidation(chainUpdated),
       t,
     )
   })

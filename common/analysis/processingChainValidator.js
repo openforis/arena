@@ -4,6 +4,7 @@ import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
@@ -16,9 +17,16 @@ const _validationsCommonProps = defaultLang => ({
   ],
 })
 
+/**
+ * Validates a processing chain.
+ * The processing chain must have processing steps pre-loaded.
+ */
 export const validateChain = async (chain, defaultLang) =>
   await Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
+    [ProcessingChain.keys.processingSteps]: [
+      Validator.validateRequired(Validation.messageKeys.analysis.processingChain.stepsRequired),
+    ],
   })
 
 export const validateStep = async step =>
@@ -26,12 +34,15 @@ export const validateStep = async step =>
     [`${ProcessingStep.keys.props}.${ProcessingStep.keysProps.entityUuid}`]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStep.entityRequired),
     ],
+    [ProcessingStep.keys.calculations]: [
+      Validator.validateRequired(Validation.messageKeys.analysis.processingStep.calculationsRequired),
+    ],
   })
 
 export const validateCalculation = async (calculation, defaultLang) =>
   await Validator.validate(calculation, {
     ..._validationsCommonProps(defaultLang),
-    [`${ProcessingStepCalculation.keys.nodeDefUuid}`]: [
+    [ProcessingStepCalculation.keys.nodeDefUuid]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStepCalculation.attributeRequired),
     ],
   })

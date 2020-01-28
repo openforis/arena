@@ -15,6 +15,13 @@
   }
 }
 
+.tooltip-error {
+  .processing-chain__steps-label,
+  .processing-step__calculations-label {
+    color: $red;
+  }
+}
+
 .form-item.processing-chain__steps-editing-step {
   grid-template-columns: 200px 1fr;
 }

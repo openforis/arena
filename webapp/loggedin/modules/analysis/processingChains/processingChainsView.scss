@@ -22,4 +22,14 @@
     }
   }
 
+  .table__row {
+    .chain-label {
+      display: flex;
+      align-items: center;
+    }
+    .error-badge {
+      left: 26rem;
+    }
+  }
+
 }

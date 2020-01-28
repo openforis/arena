@@ -25,6 +25,7 @@ import {
   navigateToProcessingChainsView,
   updateProcessingChainProp,
   updateProcessingChainCycles,
+  validateProcessingChain,
   resetProcessingChainState,
 } from './actions'
 import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChain/actions'
@@ -40,6 +41,7 @@ const ProcessingChainView = props => {
     navigateToProcessingChainsView,
     updateProcessingChainProp,
     updateProcessingChainCycles,
+    validateProcessingChain,
     resetProcessingChainState,
   } = props
 
@@ -63,6 +65,13 @@ const ProcessingChainView = props => {
   useOnUpdate(() => {
     navigateToProcessingChainsView(history)
   }, [surveyCycleKey])
+
+  useOnUpdate(() => {
+    if (!editingStep) {
+      // Validate chain on step editor close
+      validateProcessingChain()
+    }
+  }, [editingStep])
 
   const validation = ProcessingChain.getItemValidationByUuid(ProcessingChain.getUuid(processingChain))(processingChain)
 
@@ -93,7 +102,10 @@ const ProcessingChainView = props => {
           </>
         )}
 
-        <ProcessingChainSteps processingChain={processingChain} />
+        <ProcessingChainSteps
+          processingChain={processingChain}
+          validation={Validation.getFieldValidation(ProcessingChain.keys.processingSteps)(validation)}
+        />
       </div>
 
       <ProcessingChainButtonBar />
@@ -113,5 +125,6 @@ export default connect(mapStateToProps, {
   navigateToProcessingChainsView,
   updateProcessingChainProp,
   updateProcessingChainCycles,
+  validateProcessingChain,
   resetProcessingChainState,
 })(ProcessingChainView)

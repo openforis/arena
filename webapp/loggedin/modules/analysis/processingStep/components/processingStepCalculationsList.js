@@ -4,14 +4,15 @@ import { useDispatch } from 'react-redux'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-import useI18n from '@webapp/commonComponents/hooks/useI18n'
+import { useI18n } from '@webapp/commonComponents/hooks'
+import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import { createProcessingStepCalculation } from '../actions'
 import ProcessingStepCalculationsListItem from './processingStepCalculationsListItem'
 
 import useProcessingStepCalculationsListState from './useProcessingStepCalculationsListState'
 
 const ProcessingStepCalculationsList = props => {
-  const { processingStep, calculationEditorOpened } = props
+  const { processingStep, calculationEditorOpened, validation } = props
 
   const dispatch = useDispatch()
 
@@ -24,12 +25,14 @@ const ProcessingStepCalculationsList = props => {
   return (
     <div className="form-item">
       {!calculationEditorOpened && (
-        <div className="form-label processing-step__calculations-label">
-          {i18n.t('processingStepView.calculationSteps')}
-          <button className="btn-s btn-transparent" onClick={() => dispatch(createProcessingStepCalculation())}>
-            <span className="icon icon-plus icon-14px" />
-          </button>
-        </div>
+        <ValidationTooltip validation={validation}>
+          <div className="form-label processing-step__calculations-label">
+            {i18n.t('processingStepView.calculationSteps')}
+            <button className="btn-s btn-transparent" onClick={() => dispatch(createProcessingStepCalculation())}>
+              <span className="icon icon-plus icon-14px" />
+            </button>
+          </div>
+        </ValidationTooltip>
       )}
 
       <div className="processing-step__calculations">
@@ -56,6 +59,7 @@ const ProcessingStepCalculationsList = props => {
 ProcessingStepCalculationsList.defaultProps = {
   processingStep: null,
   calculationEditorOpened: false,
+  validation: null,
 }
 
 export default ProcessingStepCalculationsList

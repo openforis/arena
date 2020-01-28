@@ -5,13 +5,16 @@ import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as AppState from '@webapp/app/appState'
+import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { setProcessingStepCalculationForEdit } from '../actions'
@@ -20,9 +23,10 @@ const ProcessingStepCalculationsListItem = props => {
   const {
     calculation,
     calculationForEdit,
-    calculationEditDirty,
-    editingCalculation,
     nodeDef,
+    validation,
+    editingCalculation,
+    calculationEditDirty,
     lang,
     dragging,
     onDragStart,
@@ -62,8 +66,9 @@ const ProcessingStepCalculationsListItem = props => {
             : setProcessingStepCalculationForEdit(calculation))
         }
       >
-        <div>
+        <div className="processing-step__calculation-label">
           {ProcessingStepCalculation.getLabel(i18n.lang)(calculation)} ({nodeDef && NodeDef.getLabel(nodeDef, lang)})
+          <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
         </div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />
       </div>
@@ -89,12 +94,15 @@ ProcessingStepCalculationsListItem.defaultProps = {
 const mapStateToProps = (state, { calculation }) => {
   const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
   const survey = SurveyState.getSurvey(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
+  const validation = ProcessingChain.getItemValidationByUuid(ProcessingStepCalculation.getUuid(calculation))(chain)
   const calculationEditDirty = ProcessingStepCalculationState.isDirty(state)
   const editingCalculation = ProcessingStepCalculationState.isEditingCalculation(state)
 
   return {
     lang: AppState.getLang(state),
     nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+    validation,
     calculationForEdit: ProcessingStepCalculationState.getCalculation(state),
     calculationEditDirty,
     editingCalculation,

@@ -547,13 +547,16 @@ $t(common.cantUndoWarning)`,
 
     analysis: {
       labelDefaultLangRequired: 'Label in survey default language is required',
+      processingChain: {
+        stepsRequired: 'At least one step is required',
+      },
       processingStep: {
         entityRequired: 'Entity is required',
+        calculationsRequired: 'At least one calculation is required',
       },
       processingStepCalculation: {
         attributeRequired: 'Attribute is required',
         invalid: 'Processing Step Calculation is invalid',
-        typeRequired: 'Type is required',
       },
     },
 
@@ -706,6 +709,7 @@ $t(common.cantUndoWarning)`,
     invalidType: 'Invalid type {{type}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     paramIsRequired: 'Param {{param}} is required',
+    processingChainCannotBeSaved: 'Processing chain or step or calculation is invalid and cannot be saved',
     processingStepOnlyLastCanBeDeleted:
       'Processing step cannot be deleted.\n\nOnly last step in processing chain can be deleted',
     unableToFindParent: 'Unable to find parent of {{name}}',

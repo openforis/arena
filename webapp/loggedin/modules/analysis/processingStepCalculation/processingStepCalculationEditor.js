@@ -68,6 +68,7 @@ const ProcessingStepCalculationEditor = () => {
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}
           labels={ProcessingStepCalculation.getLabels(calculation)}
+          validation={Validation.getFieldValidation(ProcessingStepCalculation.keysProps.labels)(validation)}
           onChange={labels =>
             dispatch(updateProcessingStepCalculationProp(ProcessingStepCalculation.keysProps.labels, labels))
           }
@@ -90,9 +91,9 @@ const ProcessingStepCalculationEditor = () => {
               selection={attribute}
               itemKeyProp={ProcessingStepCalculation.keys.uuid}
               itemLabelFunction={attrDef => NodeDef.getLabel(attrDef, i18n.lang)}
+              validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
               onBeforeChange={attrDef => dispatch(checkCanSelectNodeDef(attrDef))}
               onChange={def => dispatch(updateProcessingStepCalculationAttribute(def))}
-              validation={Validation.getFieldValidation(ProcessingStepCalculation.keys.nodeDefUuid)(validation)}
             />
             <button
               className="btn btn-s btn-edit"

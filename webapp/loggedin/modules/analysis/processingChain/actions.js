@@ -47,7 +47,9 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
 
   dispatch({
     type: processingChainUpdate,
-    processingChain: ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain),
+    processingChain: processingChain
+      ? ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain)
+      : null,
   })
   dispatch(hideAppSaving())
 }
@@ -64,15 +66,10 @@ export const fetchProcessingSteps = processingChainUuid => async (dispatch, getS
 
 // ====== UPDATE
 
-const _onProcessingChainPropUpdate = (key, value) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const chain = ProcessingChainState.getProcessingChain(state)
+const _onProcessingChainPropUpdate = (key, value) => async dispatch => {
+  await dispatch({ type: processingChainPropUpdate, key, value })
 
-  const chainUpdated = ProcessingChain.assocProp(key, value)(chain)
-  const validation = await ProcessingChainValidator.validateChain(chainUpdated, Survey.getDefaultLanguage(surveyInfo))
-
-  dispatch({ type: processingChainPropUpdate, key, value, validation })
+  dispatch(validateProcessingChain())
 }
 
 export const updateProcessingChainProp = (key, value) => dispatch => dispatch(_onProcessingChainPropUpdate(key, value))
@@ -107,6 +104,16 @@ export const updateProcessingChainCycles = cycles => (dispatch, getState) => {
   } else {
     dispatch(showNotification('processingChainView.cannotSelectCycle', {}, NotificationState.severity.error))
   }
+}
+
+export const validateProcessingChain = () => async (dispatch, getState) => {
+  const state = getState()
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const chain = ProcessingChainState.getProcessingChain(state)
+  const validation = await ProcessingChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
+  const chainUpdated = ProcessingChain.assocItemValidation(ProcessingChain.getUuid(chain), validation)(chain)
+
+  dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })
 }
 
 export const saveProcessingChain = () => async (dispatch, getState) => {
@@ -153,7 +160,8 @@ export const saveProcessingChain = () => async (dispatch, getState) => {
     ),
   )(chain)
 
-  if (Validation.isObjValid(chain)) {
+  // Do not save if one of chain, step or calculation is invalid
+  if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
     // POST Params
     const chainParam = ProcessingChain.dissocProcessingSteps(chain)
 
