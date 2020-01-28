@@ -54,17 +54,23 @@ export default () => {
   const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
   const dirty = useSelector(ProcessingStepCalculationState.isDirty)
 
-  const entityDefUuid = ProcessingStep.getEntityUuid(processingStep)
-  const attributes = entityDefUuid
-    ? R.pipe(
-        Survey.getNodeDefByUuid(entityDefUuid),
-        entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
-        R.filter(nodeDef =>
-          // Node def type is compatible with processing step type (quantitative/categorical)
-          R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))(nodeDef),
-        ),
-      )(survey)
-    : []
+  const attrDefsPrevStep = R.pipe(
+    ProcessingStep.getStepPrevCalculationAttributeUuids,
+    R.map(nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)),
+  )(processingStep)
+
+  const attrDefsEntityChildren = R.pipe(
+    ProcessingStep.getEntityUuid,
+    entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
+    entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
+  )(processingStep)
+
+  const attributes = R.pipe(
+    R.concat(attrDefsPrevStep),
+    R.uniq,
+    // Node def type is compatible with processing step type (quantitative/categorical)
+    R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
+  )(attrDefsEntityChildren)
 
   const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
     Survey.getNodeDefByUuid(nodeDefUuid)(survey),

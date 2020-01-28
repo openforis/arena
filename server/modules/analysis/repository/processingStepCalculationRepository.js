@@ -80,10 +80,6 @@ export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainU
       ${getSurveyDBSchema(surveyId)}.processing_step s
     ON
       s.uuid = c.processing_step_uuid
-    JOIN
-      ${getSurveyDBSchema(surveyId)}.node_def n
-    ON
-      n.uuid = (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid
     WHERE
       s.processing_chain_uuid = $1
     `,

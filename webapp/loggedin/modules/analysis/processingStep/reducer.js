@@ -52,7 +52,7 @@ const actionHandlers = {
   [processingStepDataLoad]: (state, { calculations, stepPrevAttributeUuids }) =>
     R.pipe(
       ProcessingStepState.assocCalculations(calculations),
-      ProcessingStepState.assocStepPrevAttributeUuids(stepPrevAttributeUuids),
+      ProcessingStepState.assocStepPrevCalculationAttributeUuids(stepPrevAttributeUuids),
     )(state),
 
   // Calculations

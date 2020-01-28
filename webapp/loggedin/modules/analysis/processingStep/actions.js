@@ -19,7 +19,7 @@ import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions
 import { processingChainValidationUpdate } from '../processingChain/actions'
 
 export const processingStepCreate = 'analysis/processingStep/create'
-export const processingStepDataLoad = 'analysis/processingStep/calculations/load'
+export const processingStepDataLoad = 'analysis/processingStep/data/load'
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepDelete = 'analysis/processingStep/delete'
@@ -78,7 +78,7 @@ export const fetchProcessingStepData = () => async (dispatch, getState) => {
   // Load prev step attribute uuids
   let stepPrevAttributeUuids = null
   if (processingStepPrevUuid) {
-    const { data: attributeUuids = [] } = axios.get(
+    const { data: attributeUuids = [] } = await axios.get(
       `/api/survey/${surveyId}/processing-step/${processingStepPrevUuid}/calculation-attribute-uuids`,
     )
     stepPrevAttributeUuids = attributeUuids
