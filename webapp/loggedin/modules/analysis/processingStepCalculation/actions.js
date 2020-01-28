@@ -15,7 +15,7 @@ import * as ProcessingStepCalculationState from './processingStepCalculationStat
 
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
-import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
+import { nodeDefCreate, onNodeDefsDelete } from '@webapp/survey/nodeDefs/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import { processingChainValidationUpdate } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
@@ -91,16 +91,16 @@ export const deleteProcessingStepCalculation = () => async (dispatch, getState) 
   const processingStep = ProcessingStepState.getProcessingStep(state)
   const calculation = ProcessingStepCalculationState.getCalculation(state)
 
-  await axios.delete(
+  const { data: nodeDefUnusedDeletedUuids = [] } = await axios.delete(
     `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
       processingStep,
     )}/calculation/${ProcessingStepCalculation.getUuid(calculation)}`,
   )
 
-  dispatch({
-    type: processingStepCalculationDelete,
-    calculation,
-  })
+  dispatch({ type: processingStepCalculationDelete, calculation })
+
+  // Dissoc deleted node def analysis
+  dispatch(onNodeDefsDelete(nodeDefUnusedDeletedUuids))
 
   dispatch(showNotification('common.deleted', {}, null, 3000))
 

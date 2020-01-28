@@ -323,10 +323,11 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
   `)
 }
 
-export const deleteNodeDefAnalysisUnused = async (surveyId, client = db) =>
-  await client.query(`
+export const deleteNodeDefsAnalysisUnused = async (surveyId, client = db) =>
+  await client.map(
+    `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node_def n
-    WHERE 
+    WHERE
       n.analysis 
       -- not used by any processing steps
       AND NOT EXISTS (
@@ -338,4 +339,8 @@ export const deleteNodeDefAnalysisUnused = async (surveyId, client = db) =>
         SELECT c.uuid FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
         WHERE c.node_def_uuid = n.uuid
       )
-  `)
+    RETURNING n.uuid
+    `,
+    [],
+    R.prop('uuid'),
+  )

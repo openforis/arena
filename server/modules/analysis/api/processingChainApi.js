@@ -153,9 +153,9 @@ export const init = app => {
         const { surveyId, processingChainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.deleteChain(user, surveyId, processingChainUuid)
+        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteChain(user, surveyId, processingChainUuid)
 
-        Response.sendOk(res)
+        res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
         next(error)
       }
@@ -172,9 +172,9 @@ export const init = app => {
         const { surveyId, processingStepUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.deleteStep(user, surveyId, processingStepUuid)
+        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteStep(user, surveyId, processingStepUuid)
 
-        Response.sendOk(res)
+        res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
         next(error)
       }
@@ -191,9 +191,14 @@ export const init = app => {
         const { surveyId, processingStepUuid, calculationUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.deleteCalculation(user, surveyId, processingStepUuid, calculationUuid)
+        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteCalculation(
+          user,
+          surveyId,
+          processingStepUuid,
+          calculationUuid,
+        )
 
-        Response.sendOk(res)
+        res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
         next(error)
       }

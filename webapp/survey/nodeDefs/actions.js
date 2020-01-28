@@ -29,6 +29,7 @@ export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
+export const nodeDefsDelete = 'survey/nodeDefs/delete'
 
 // ==== CREATE
 
@@ -342,5 +343,11 @@ export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getSt
     if (history) {
       history.goBack()
     }
+  }
+}
+
+export const onNodeDefsDelete = nodeDefUuids => dispatch => {
+  if (!R.isEmpty(nodeDefUuids)) {
+    dispatch({ type: nodeDefsDelete, nodeDefUuids })
   }
 }

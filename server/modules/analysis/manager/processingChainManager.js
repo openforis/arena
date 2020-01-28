@@ -15,6 +15,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
@@ -44,6 +45,7 @@ const _updateChainProps = async (user, surveyId, chain, chainDb, t) => {
     ])
   }
 
+  // Update processing_chain validation and date_modified
   await ProcessingChainRepository.updateChainValidation(
     surveyId,
     processingChainUuid,
@@ -257,6 +259,10 @@ export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository
 
 // ====== DELETE - Chain
 
+/**
+ * Deletes a processing chain.
+ * It returns a list of deleted unused node def analysis uuids (if any)
+ */
 export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
   await client.tx(async t => {
     const processingChain = await ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t)
@@ -265,43 +271,44 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
       [ActivityLog.keysContent.labels]: ProcessingChain.getLabels(processingChain),
     }
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, logContent, false, t)
+
+    // Delete unused node defs analysis
+    return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
   })
 
 // ====== DELETE - Step
 
-export const deleteStep = async (user, surveyId, processingStepUuid, client = db) =>
+/**
+ * Deletes a processing step.
+ * It returns a list of deleted unused node def analysis uuids (if any)
+ */
+export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
   await client.tx(async t => {
-    const processingStep = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, processingStepUuid, t)
-    const processingStepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
+    const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
+    const chainUuid = ProcessingStep.getProcessingChainUuid(step)
+    const stepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
       surveyId,
-      ProcessingStep.getProcessingChainUuid(processingStep),
-      ProcessingStep.getIndex(processingStep) + 1,
+      chainUuid,
+      ProcessingStep.getIndex(step) + 1,
       t,
     )
-    if (processingStepNext) {
+    if (stepNext) {
       throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
     }
 
     const logContent = {
-      [ActivityLog.keysContent.uuid]: processingStepUuid,
-      [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(processingStep),
-      [ActivityLog.keysContent.index]: ProcessingStep.getIndex(processingStep),
+      [ActivityLog.keysContent.uuid]: stepUuid,
+      [ActivityLog.keysContent.processingChainUuid]: chainUuid,
+      [ActivityLog.keysContent.index]: ProcessingStep.getIndex(step),
     }
     await Promise.all([
-      ProcessingStepRepository.deleteStep(surveyId, processingStepUuid, t),
+      ProcessingStepRepository.deleteStep(surveyId, stepUuid, t),
+      ProcessingChainRepository.updateChainDateModified(surveyId, chainUuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
     ])
 
-    const processingStepPrev = await ProcessingStepRepository.fetchStepSummaryByIndex(
-      surveyId,
-      ProcessingStep.getProcessingChainUuid(processingStep),
-      ProcessingStep.getIndex(processingStep) - 1,
-      t,
-    )
-
-    if (!processingStepPrev) {
+    if (ProcessingStep.getIndex(step) === 0) {
       // Deleted processing step was the only one, chain validation must be updated (steps are required)
-      const chainUuid = ProcessingStep.getProcessingChainUuid(processingStep)
       const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
       const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
       const chainValidation = await ProcessingChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
@@ -313,14 +320,22 @@ export const deleteStep = async (user, surveyId, processingStepUuid, client = db
         t,
       )
     }
+
+    // Delete unused node defs analysis
+    return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
   })
 
 // ====== DELETE - Calculation
 
+/**
+ * Deletes a processing step calculation.
+ * It returns a list of deleted unused node def analysis uuids (if any)
+ */
 export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = db) =>
   await client.tx(async t => {
     const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
     const chainUuid = ProcessingStep.getProcessingChainUuid(step)
+
     const calculation = await ProcessingStepCalculationRepository.deleteCalculationStep(
       surveyId,
       stepUuid,
@@ -336,6 +351,7 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       [ActivityLog.keysContent.index]: ProcessingStepCalculation.getIndex(calculation),
       [ActivityLog.keysContent.labels]: ProcessingStepCalculation.getLabels(calculation),
     }
+
     await ActivityLogRepository.insert(
       user,
       surveyId,
@@ -351,10 +367,14 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
     const stepValidation = await ProcessingChainValidator.validateStep(stepUpdated)
     const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
     const chainUpdated = ProcessingChain.assocItemValidation(stepUuid, stepValidation)(chain)
+    // Update processing_chain validation and date_modified
     await ProcessingChainRepository.updateChainValidation(
       surveyId,
       chainUuid,
       ProcessingChain.getValidation(chainUpdated),
       t,
     )
+
+    // Delete unused node defs analysis
+    return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
   })

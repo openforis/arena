@@ -40,7 +40,7 @@ export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit =
     SELECT ${selectFields}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> $1
-    ORDER BY date_modified DESC
+    ORDER BY date_created DESC
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}
     `,
@@ -76,10 +76,21 @@ export const updateChainValidation = async (surveyId, processingChainUuid, valid
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET validation = $2
+    SET validation = $2,
+        date_modified = ${DbUtils.now}
     WHERE uuid = $1
     `,
     [processingChainUuid, validation],
+  )
+
+export const updateChainDateModified = async (surveyId, processingChainUuid, client = db) =>
+  await client.query(
+    `
+    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+    SET date_modified = ${DbUtils.now}
+    WHERE uuid = $1
+    `,
+    [processingChainUuid],
   )
 
 export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>

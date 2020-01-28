@@ -22,3 +22,6 @@ export const dissocNodeDef = nodeDef => nodeDefsState => {
 
   return R.dissoc(NodeDef.getUuid(nodeDef), state)
 }
+
+export const dissocNodeDefs = nodeDefUuids => state =>
+  R.reduce((accState, nodeDefUuid) => R.dissoc(nodeDefUuid, accState), state, nodeDefUuids)
