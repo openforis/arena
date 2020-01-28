@@ -36,7 +36,7 @@ const ProcessingChainsView = props => {
       module={processingChainsModule}
       restParams={restParams}
       className="processing-chains"
-      gridTemplateColumns={'repeat(4, 1fr) repeat(2, 80px)'}
+      gridTemplateColumns={'repeat(4, 1fr) repeat(2, 80px) 50px'}
       rowHeaderComponent={ProcessingChainsRowHeader}
       headerLeftComponent={ProcessingChainsHeaderLeft}
       rowComponent={ProcessingChainsRow}

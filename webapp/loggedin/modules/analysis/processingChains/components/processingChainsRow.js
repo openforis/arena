@@ -37,6 +37,9 @@ const ProcessingChainsRow = props => {
         {ProcessingChain.isDraft(processingChainsListItem) && <span className="icon icon-wrench icon-14px" />}
       </div>
       <div className={`column-status ${statusExec}`}>{statusComponent[statusExec]}</div>
+      <div>
+        <span className="icon icon-12px icon-action icon-pencil2"></span>
+      </div>
     </>
   )
 }
