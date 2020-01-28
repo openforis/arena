@@ -345,3 +345,9 @@ export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getSt
     }
   }
 }
+
+export const onNodeDefsDelete = nodeDefUuids => dispatch => {
+  if (!R.isEmpty(nodeDefUuids)) {
+    dispatch({ type: nodeDefsDelete, nodeDefUuids })
+  }
+}

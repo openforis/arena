@@ -191,9 +191,14 @@ export const init = app => {
         const { surveyId, processingStepUuid, calculationUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        await ProcessingChainService.deleteCalculation(user, surveyId, processingStepUuid, calculationUuid)
+        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteCalculation(
+          user,
+          surveyId,
+          processingStepUuid,
+          calculationUuid,
+        )
 
-        Response.sendOk(res)
+        res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
         next(error)
       }
