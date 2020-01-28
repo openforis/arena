@@ -19,7 +19,7 @@ import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions
 import { processingChainValidationUpdate } from '../processingChain/actions'
 
 export const processingStepCreate = 'analysis/processingStep/create'
-export const processingStepCalculationsLoad = 'analysis/processingStep/calculations/load'
+export const processingStepDataLoad = 'analysis/processingStep/data/load'
 export const processingStepUpdate = 'analysis/processingStep/update'
 export const processingStepPropsUpdate = 'analysis/processingStep/props/update'
 export const processingStepDelete = 'analysis/processingStep/delete'
@@ -65,16 +65,20 @@ export const createProcessingStepCalculation = () => async (dispatch, getState) 
 }
 
 // ====== READ
-export const fetchProcessingStepCalculations = () => async (dispatch, getState) => {
+export const fetchProcessingStepData = () => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
-  const processingStepUuid = R.pipe(ProcessingStepState.getProcessingStep, ProcessingStep.getUuid)(state)
+  const processingStep = ProcessingStepState.getProcessingStep(state)
+  const processingStepPrevUuid = R.pipe(ProcessingStepState.getProcessingStepPrev, ProcessingStep.getUuid)(state)
 
-  const { data: calculations = [] } = await axios.get(
-    `/api/survey/${surveyId}/processing-step/${processingStepUuid}/calculations`,
-  )
+  const [{ data: calculations = [] }, { data: stepPrevAttributeUuids = [] }] = await Promise.all([
+    axios.get(`/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(processingStep)}/calculations`),
+    processingStepPrevUuid
+      ? axios.get(`/api/survey/${surveyId}/processing-step/${processingStepPrevUuid}/calculation-attribute-uuids`)
+      : {},
+  ])
 
-  await dispatch({ type: processingStepCalculationsLoad, calculations })
+  await dispatch({ type: processingStepDataLoad, calculations, stepPrevAttributeUuids })
 
   dispatch(validateProcessingStep())
 }

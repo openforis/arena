@@ -16,7 +16,7 @@ import {
   processingStepUpdate,
   processingStepPropsUpdate,
   processingStepDelete,
-  processingStepCalculationsLoad,
+  processingStepDataLoad,
   processingStepCalculationCreate,
   processingStepCalculationIndexUpdate,
 } from '@webapp/loggedin/modules/analysis/processingStep/actions'
@@ -49,10 +49,10 @@ const actionHandlers = {
 
   [processingStepDelete]: () => ({}),
 
-  // Calculations
-  [processingStepCalculationsLoad]: (state, { calculations }) =>
-    ProcessingStepState.assocCalculations(calculations)(state),
+  [processingStepDataLoad]: (state, { calculations, stepPrevAttributeUuids }) =>
+    ProcessingStepState.assocStepData(calculations, stepPrevAttributeUuids)(state),
 
+  // Calculations
   [processingStepCalculationCreate]: (state, { calculation }) =>
     ProcessingStepState.assocCalculation(calculation)(state),
 

@@ -10,8 +10,8 @@ export const keys = {
   index: ObjectUtils.keys.index,
   processingChainUuid: 'processingChainUuid',
   props: ObjectUtils.keys.props,
-  uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
+  uuid: ObjectUtils.keys.uuid,
 }
 
 export const keysProps = {
@@ -51,6 +51,7 @@ export const assocEntityUuid = entityUuid => ObjectUtils.setProp(keysProps.entit
 export const assocCalculations = R.assoc(keys.calculations)
 export const dissocCalculations = R.dissoc(keys.calculations)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
+
 const assocCalculationsCount = R.assoc(keys.calculationsCount)
 
 const _updateCalculationsCount = calculationStep =>

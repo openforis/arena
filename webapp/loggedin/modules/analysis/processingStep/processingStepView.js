@@ -21,7 +21,7 @@ import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analys
 
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import {
-  fetchProcessingStepCalculations,
+  fetchProcessingStepData,
   resetProcessingStepState,
   updateProcessingStepProps,
   addEntityVirtual,
@@ -37,7 +37,7 @@ const ProcessingStepView = props => {
     processingStepCalculation,
     dirty,
     editingCalculation,
-    fetchProcessingStepCalculations,
+    fetchProcessingStepData,
     validateProcessingStep,
     resetProcessingStepState,
     updateProcessingStepProps,
@@ -57,7 +57,7 @@ const ProcessingStepView = props => {
 
   useEffect(() => {
     if (!editingCalculation) {
-      fetchProcessingStepCalculations()
+      fetchProcessingStepData()
     }
   }, [ProcessingStep.getUuid(processingStep)])
 
@@ -163,7 +163,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  fetchProcessingStepCalculations,
+  fetchProcessingStepData,
   validateProcessingStep,
   resetProcessingStepState,
   updateProcessingStepProps,

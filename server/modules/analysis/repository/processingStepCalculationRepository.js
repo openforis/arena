@@ -52,6 +52,23 @@ export const fetchCalculationsByStepUuid = async (surveyId, processingStepUuid, 
     camelize,
   )
 
+export const fetchCalculationAttributeUuidsByStepUuid = async (surveyId, stepUuid, client = db) =>
+  await client.map(
+    `
+    SELECT
+      c.node_def_uuid
+    FROM
+      ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+    JOIN
+      ${getSurveyDBSchema(surveyId)}.processing_step s
+    ON
+      s.uuid = c.processing_step_uuid
+    WHERE s.uuid = $1
+    `,
+    [stepUuid],
+    R.prop('node_def_uuid'),
+  )
+
 export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainUuid, client = db) =>
   await client.oneOrNone(
     `
@@ -63,10 +80,6 @@ export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainU
       ${getSurveyDBSchema(surveyId)}.processing_step s
     ON
       s.uuid = c.processing_step_uuid
-    JOIN
-      ${getSurveyDBSchema(surveyId)}.node_def n
-    ON
-      n.uuid = (s.props->>'${ProcessingStep.keysProps.entityUuid}')::uuid
     WHERE
       s.processing_chain_uuid = $1
     `,

@@ -7,13 +7,6 @@ import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ProcessingChainService from '../service/processingChainService'
-// Import SystemError from '@core/systemError'
-
-// const _checkIsValidProcessingStepCalculation = async calculation => {
-//   const validation = await ProcessingStepCalculationValidator.validate(calculation)
-//   if (!Validation.isValid(validation))
-//     throw new SystemError(Validation.messageKeys.analysis.processingStepCalculation.invalid)
-// }
 
 export const init = app => {
   // ====== READ - Chains
@@ -116,6 +109,25 @@ export const init = app => {
         const calculations = await ProcessingChainService.fetchCalculationsByStepUuid(surveyId, processingStepUuid)
 
         res.json(calculations)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
+  app.get(
+    '/survey/:surveyId/processing-step/:processingStepUuid/calculation-attribute-uuids',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, processingStepUuid } = Request.getParams(req)
+
+        const attributeUuids = await ProcessingChainService.fetchCalculationAttributeUuidsByStepUuid(
+          surveyId,
+          processingStepUuid,
+        )
+
+        res.json(attributeUuids)
       } catch (error) {
         next(error)
       }
