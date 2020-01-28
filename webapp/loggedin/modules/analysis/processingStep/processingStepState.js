@@ -12,7 +12,6 @@ export const stateKey = 'processingStep'
 const keys = {
   dirty: 'dirty',
   orig: 'orig',
-  calculationUuidForEdit: 'calculationIndexForEdit',
   stepPrevAttributeUuids: 'stepPrevAttributeUuids',
 }
 
