@@ -27,10 +27,11 @@ SELECT
   date_created::date as date,
   user_uuid,
   type,
-  (content->>'uuid')::uuid
+  (content->>'uuid')::uuid,
+  content->>'key'
 FROM activity_log
 WHERE not system
-group by 1,2,3,4
+group by 1,2,3,4,5
 ORDER BY date_created::date DESC;
 
 -- This view aggregates each user's activity log entries by the day
@@ -45,13 +46,15 @@ SELECT
         date_created::date,
         user_uuid,
         type,
-        content_uuid
+        content_uuid,
+        content_key
     )
     id,
     date_created,
     user_uuid,
     type,
     (content->>'uuid')::uuid as content_uuid,
+    content->>'key' as content_key,
     content
 FROM
     activity_log
@@ -62,4 +65,5 @@ ORDER BY
     user_uuid,
     type,
     content_uuid,
+    content_key,
     date_created DESC;
