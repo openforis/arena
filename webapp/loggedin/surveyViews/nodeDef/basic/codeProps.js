@@ -1,12 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
-import { Link, useHistory } from 'react-router-dom'
 
+import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem } from '@webapp/commonComponents/form/input'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,11 +15,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import { setNodeDefProp, setNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as NodeDefState from '../nodeDefState'
-
-import { createCategory, deleteCategory } from '../../category/actions'
+import { setNodeDefProp, setNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 
 const CodeProps = props => {
   const {
@@ -28,16 +25,12 @@ const CodeProps = props => {
     validation,
     setNodeDefProp,
     setNodeDefLayoutProp,
-    categories,
     canUpdateCategory,
-    category,
     candidateParentCodeNodeDefs,
     parentCodeDef,
-    createCategory,
   } = props
 
   const i18n = useI18n()
-  const history = useHistory()
 
   const displayAsItems = [
     {
@@ -60,36 +53,12 @@ const CodeProps = props => {
   return (
     <>
       <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr repeat(2, 100px)',
-          }}
-        >
-          <Dropdown
-            disabled={disabled}
-            items={categories}
-            itemKeyProp={'uuid'}
-            itemLabelFunction={Category.getName}
-            validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
-            selection={category}
-            onChange={putCategoryProp}
-          />
-          <button
-            className="btn btn-s"
-            style={{ justifySelf: 'center' }}
-            onClick={async () => {
-              putCategoryProp(await createCategory(history))
-            }}
-          >
-            <span className="icon icon-plus icon-12px icon-left" />
-            {i18n.t('common.add')}
-          </button>
-          <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.categories)}>
-            <span className="icon icon-list icon-12px icon-left" />
-            {i18n.t('common.manage')}
-          </Link>
-        </div>
+        <CategorySelector
+          disabled={disabled}
+          categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
+          validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
+          onChange={putCategoryProp}
+        />
       </FormItem>
 
       {!NodeDef.isAnalysis(nodeDef) && (
@@ -130,17 +99,10 @@ const mapStateToProps = state => {
   const nodeDef = NodeDefState.getNodeDef(state)
 
   return {
-    categories: Survey.getCategoriesArray(survey),
     canUpdateCategory: Survey.canUpdateCategory(nodeDef)(survey),
-    category: Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey),
     candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(survey),
     parentCodeDef: Survey.getNodeDefParentCode(nodeDef)(survey),
   }
 }
 
-export default connect(mapStateToProps, {
-  setNodeDefProp,
-  setNodeDefLayoutProp,
-  createCategory,
-  deleteCategory,
-})(CodeProps)
+export default connect(mapStateToProps, { setNodeDefProp, setNodeDefLayoutProp })(CodeProps)
