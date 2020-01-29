@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import createNumberMask from 'text-mask-addons/dist/createNumberMask'
+import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
@@ -19,13 +19,7 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 const NodeDefCoordinate = props => {
   const i18n = useI18n()
 
-  const numberMask = createNumberMask({
-    prefix: '',
-    includeThousandsSeparator: false,
-    allowDecimal: true,
-    decimalLimit: 12,
-    allowNegative: true,
-  })
+  const numberMask = InputMasks.decimalLimited(16, 12)
 
   const handleInputChange = (node, field, value) => {
     const { nodeDef, updateNode } = props

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
@@ -74,12 +75,13 @@ const ItemEdit = props => {
             <FormItem label={key} key={key}>
               <Input
                 value={CategoryItem.getExtraProp(key)(item)}
-                disabled={disabled}
+                mask={dataType === Category.itemExtraDefDataTypes.number ? InputMasks.decimal : null}
+                readOnly={readOnly}
+                validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
                 onChange={value => {
                   const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
                   putCategoryItemProp(category, level, item, CategoryItem.keysProps.extra, extra)
                 }}
-                readOnly={readOnly}
               />
             </FormItem>
           ))}

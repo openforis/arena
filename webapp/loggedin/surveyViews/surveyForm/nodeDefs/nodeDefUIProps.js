@@ -1,9 +1,10 @@
 import React from 'react'
 import * as R from 'ramda'
-import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
+import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
 
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
@@ -19,19 +20,7 @@ const propsUI = {
   [integer]: {
     icon: <span className="icon-left node_def__icon">923</span>,
     inputText: {
-      mask: createNumberMask({
-        prefix: '',
-        suffix: '',
-        includeThousandsSeparator: false,
-        thousandsSeparatorSymbol: ',',
-        allowDecimal: false,
-        decimalSymbol: '.',
-        decimalLimit: 0,
-        integerLimit: 16,
-        requireDecimal: false,
-        allowNegative: true,
-        allowLeadingZeroes: true,
-      }),
+      mask: InputMasks.integerLimited(16),
     },
     defaultValue: '',
   },
@@ -39,19 +28,7 @@ const propsUI = {
   [decimal]: {
     icon: <span className="icon-left node_def__icon">923,4</span>,
     inputText: {
-      mask: createNumberMask({
-        prefix: '',
-        suffix: '',
-        includeThousandsSeparator: false,
-        thousandsSeparatorSymbol: ',',
-        allowDecimal: true,
-        decimalSymbol: '.',
-        decimalLimit: 6,
-        integerLimit: 16,
-        requireDecimal: false,
-        allowNegative: true,
-        allowLeadingZeroes: true,
-      }),
+      mask: InputMasks.decimalLimited(16, 6),
     },
     defaultValue: '',
   },

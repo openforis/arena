@@ -45,5 +45,6 @@ export const validateRequired = ValidatorFunctions.validateRequired
 export const validateItemPropUniqueness = ValidatorFunctions.validateItemPropUniqueness
 export const validateNotKeyword = ValidatorFunctions.validateNotKeyword
 export const validateName = ValidatorFunctions.validateName
+export const validateNumber = ValidatorFunctions.validateNumber
 export const validatePositiveNumber = ValidatorFunctions.validatePositiveNumber
 export const isKeyword = ValidatorFunctions.isKeyword

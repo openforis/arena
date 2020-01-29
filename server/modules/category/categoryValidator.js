@@ -5,6 +5,10 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as StringUtils from '@core/stringUtils'
+import * as GeoUtils from '@core/geo/geoUtils'
+import * as Point from '@core/geo/point'
 
 const keys = {
   children: 'children',
@@ -65,6 +69,46 @@ const validateNotEmptyFirstLevelItems = itemsByParentUuid => (_propName, level) 
     ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
     : null
 
+const _extraPropValidators = {
+  [Category.itemExtraDefDataTypes.number]: (key, extra) =>
+    Validator.validateNumber(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, { key })(key, extra),
+  [Category.itemExtraDefDataTypes.geometryPoint]: (key, extra) => {
+    const point = Point.parsePoint(extra[key])
+    return GeoUtils.isCoordinateValid(Point.getSrsId(point), Point.getX(point), Point.getY(point))
+      ? null
+      : ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
+  },
+  [Category.itemExtraDefDataTypes.text]: () => null,
+}
+
+const _validateItemExtraProps = (extraDefs, validation) => item => {
+  const _validateItemExtraProp = (key, extra) => {
+    if (StringUtils.isBlank(extra[key])) {
+      return null
+    }
+
+    const extraDefType = R.path([key, CategoryItem.keysExtraDef.dataType], extraDefs)
+    return _extraPropValidators[extraDefType](key, extra)
+  }
+
+  const extra = CategoryItem.getExtra(item)
+  return extra
+    ? R.pipe(
+        R.keys,
+        R.reduce((accValidation, key) => {
+          const validationResult = _validateItemExtraProp(key, extra)
+          return R.unless(
+            R.always(R.isNil(validationResult)),
+            Validation.assocFieldValidation(
+              `${CategoryItem.keysProps.extra}_${key}`,
+              Validation.newInstance(false, {}, [validationResult]),
+            ),
+          )(accValidation)
+        }, validation),
+      )(extra)
+    : null
+}
+
 const validateItems = async (category, itemsByParentUuid) => {
   const itemsValidationsByUuid = {}
 
@@ -107,6 +151,8 @@ const validateItems = async (category, itemsByParentUuid) => {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
+
+    validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
 
     if (isLeaf || R.isEmpty(itemChildren)) {
       stack.pop() // It won't be visited again, remove it from stack
