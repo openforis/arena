@@ -551,7 +551,7 @@ $t(common.cantUndoWarning)`,
         stepsRequired: 'At least one step is required',
       },
       processingStep: {
-        entityRequired: 'Entity is required',
+        entityOrCategoryRequired: 'One of Entity or Category is required',
         calculationsRequired: 'At least one calculation is required',
       },
       processingStepCalculation: {

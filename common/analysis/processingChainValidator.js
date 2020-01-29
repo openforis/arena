@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validator from '@core/validation/validator'
@@ -7,6 +9,10 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+
+export const keys = {
+  entityOrCategory: 'entityOrCategory',
+}
 
 const _validateLabelDefaultLanguageRequire = (defaultLang, errorMessageKey) => async (_, item) =>
   StringUtils.isBlank(ObjectUtils.getLabel(defaultLang)(item)) ? ValidationResult.newInstance(errorMessageKey) : null
@@ -29,15 +35,25 @@ export const validateChain = async (chain, defaultLang) =>
     ],
   })
 
-export const validateStep = async step =>
-  await Validator.validate(step, {
-    [`${ProcessingStep.keys.props}.${ProcessingStep.keysProps.entityUuid}`]: [
-      Validator.validateRequired(Validation.messageKeys.analysis.processingStep.entityRequired),
-    ],
+export const validateStep = async step => {
+  const validation = await Validator.validate(step, {
     [ProcessingStep.keys.calculations]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStep.calculationsRequired),
     ],
   })
+
+  return R.when(
+    R.always(!ProcessingStep.getEntityUuid(step) && !ProcessingStep.getCategoryUuid(step)),
+    R.pipe(
+      Validation.assocFieldValidation(
+        keys.entityOrCategory,
+        Validation.newInstance(false, {}, [
+          ValidationResult.newInstance(Validation.messageKeys.analysis.processingStep.entityOrCategoryRequired),
+        ]),
+      ),
+    ),
+  )(validation)
+}
 
 export const validateCalculation = async (calculation, defaultLang) =>
   await Validator.validate(calculation, {

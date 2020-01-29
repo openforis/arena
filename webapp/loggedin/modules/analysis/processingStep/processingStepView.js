@@ -6,9 +6,10 @@ import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
+import * as Validation from '@core/validation/validation'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
-import * as Validation from '@core/validation/validation'
+import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
@@ -89,7 +90,7 @@ const ProcessingStepView = props => {
             <EntitySelector
               processingStep={processingStep}
               processingStepPrev={processingStepPrev}
-              validation={Validation.getFieldValidation(ProcessingStep.keysProps.entityUuid)(validation)}
+              validation={Validation.getFieldValidation(ProcessingChainValidator.keys.entityOrCategory)(validation)}
               onChange={entityUuid => {
                 const props = {
                   [ProcessingStep.keysProps.entityUuid]: entityUuid,
@@ -122,7 +123,7 @@ const ProcessingStepView = props => {
               <CategorySelector
                 disabled={disabledEntityOrCategory}
                 categoryUuid={ProcessingStep.getCategoryUuid(processingStep)}
-                validation={null}
+                validation={Validation.getFieldValidation(ProcessingChainValidator.keys.entityOrCategory)(validation)}
                 showManage={false}
                 onChange={category => {
                   const props = {

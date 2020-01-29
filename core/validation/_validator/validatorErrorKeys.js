@@ -12,7 +12,7 @@ export const ValidatorErrorKeys = {
       stepsRequired: 'validationErrors.analysis.processingChain.stepsRequired',
     },
     processingStep: {
-      entityRequired: 'validationErrors.analysis.processingStep.entityRequired',
+      entityOrCategoryRequired: 'validationErrors.analysis.processingStep.entityOrCategoryRequired',
       calculationsRequired: 'validationErrors.analysis.processingStep.calculationsRequired',
     },
     processingStepCalculation: {
