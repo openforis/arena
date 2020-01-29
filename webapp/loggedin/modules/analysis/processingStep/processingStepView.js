@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
+import * as Category from '@core/survey/category'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as Validation from '@core/validation/validation'
@@ -14,6 +15,7 @@ import EntitySelector from './components/entitySelector'
 import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
+import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
 
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
@@ -34,7 +36,6 @@ const ProcessingStepView = props => {
     validation,
     processingStepPrev,
     processingStepNext,
-    processingStepCalculation,
     dirty,
     editingCalculation,
     fetchProcessingStepData,
@@ -47,9 +48,8 @@ const ProcessingStepView = props => {
 
   const history = useHistory()
 
-  const calculationEditorOpened = !R.isEmpty(processingStepCalculation)
   const hasCalculationSteps = R.pipe(ProcessingStep.getCalculationsCount, cnt => cnt > 0)(processingStep)
-  const canUpdateEntity = hasCalculationSteps || calculationEditorOpened || Boolean(processingStepNext)
+  const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(processingStepNext)
   const entityUuid = ProcessingStep.getEntityUuid(processingStep)
 
   const i18n = useI18n()
@@ -63,13 +63,13 @@ const ProcessingStepView = props => {
 
   useOnUpdate(() => {
     // Validate step on calculation editor close (calculations may have been added / deleted)
-    if (!calculationEditorOpened) {
+    if (!editingCalculation) {
       validateProcessingStep()
     }
-  }, [calculationEditorOpened])
+  }, [editingCalculation])
 
   return (
-    <div className={`processing-step${calculationEditorOpened ? ' calculation-editor-opened' : ''}`}>
+    <div className={`processing-step${editingCalculation ? ' calculation-editor-opened' : ''}`}>
       <div className="form">
         {!editingCalculation && (
           <>
@@ -89,7 +89,6 @@ const ProcessingStepView = props => {
             <EntitySelector
               processingStep={processingStep}
               processingStepPrev={processingStepPrev}
-              showLabel={!calculationEditorOpened}
               validation={Validation.getFieldValidation(ProcessingStep.keysProps.entityUuid)(validation)}
               onChange={entityUuid => {
                 const props = {
@@ -98,34 +97,47 @@ const ProcessingStepView = props => {
                 }
                 updateProcessingStepProps(props)
               }}
-              readOnly={canUpdateEntity}
+              readOnly={disabledEntityOrCategory}
             >
-              {!calculationEditorOpened && (
-                <>
-                  <button
-                    className="btn btn-s btn-edit"
-                    onClick={() => navigateToNodeDefEdit(history, entityUuid)}
-                    aria-disabled={!entityUuid}
-                  >
-                    <span className="icon icon-pencil2 icon-12px icon-left" />
-                    {i18n.t('common.edit')}
-                  </button>
-                  <button
-                    className="btn btn-s btn-add"
-                    onClick={() => addEntityVirtual(history)}
-                    aria-disabled={hasCalculationSteps}
-                  >
-                    <span className="icon icon-plus icon-12px icon-left" />
-                    {i18n.t('processingStepView.virtualEntity')}
-                  </button>
-                </>
-              )}
+              <button
+                className="btn btn-s btn-edit"
+                onClick={() => navigateToNodeDefEdit(history, entityUuid)}
+                aria-disabled={!entityUuid}
+              >
+                <span className="icon icon-pencil2 icon-12px icon-left" />
+                {i18n.t('common.edit')}
+              </button>
+              <button
+                className="btn btn-s btn-add"
+                onClick={() => addEntityVirtual(history)}
+                aria-disabled={hasCalculationSteps}
+              >
+                <span className="icon icon-plus icon-12px icon-left" />
+                {i18n.t('processingStepView.virtualEntity')}
+              </button>
             </EntitySelector>
+
+            <div className="form-item processing-step__category-selector-form-item">
+              <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefEdit.codeProps.category')}</div>
+              <CategorySelector
+                disabled={disabledEntityOrCategory}
+                categoryUuid={ProcessingStep.getCategoryUuid(processingStep)}
+                validation={null}
+                showManage={false}
+                onChange={category => {
+                  const props = {
+                    [ProcessingStep.keysProps.entityUuid]: null,
+                    [ProcessingStep.keysProps.categoryUuid]: Category.getUuid(category),
+                  }
+                  updateProcessingStepProps(props)
+                }}
+              />
+            </div>
           </>
         )}
         <ProcessingStepCalculationsList
           processingStep={processingStep}
-          calculationEditorOpened={calculationEditorOpened}
+          calculationEditorOpened={editingCalculation}
           validation={Validation.getFieldValidation(ProcessingStep.keys.calculations)(validation)}
         />
       </div>
@@ -157,7 +169,6 @@ const mapStateToProps = state => {
     processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
     processingStepNext: ProcessingStepState.getProcessingStepNext(state),
     dirty: ProcessingStepState.isDirty(state),
-    processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
     editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
   }
 }

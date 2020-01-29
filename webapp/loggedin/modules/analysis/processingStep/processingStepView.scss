@@ -46,9 +46,13 @@
 }
 
 .processing-step__entity-selector-form-item.form-item {
-  grid-template-columns: .2fr .5fr 80px 140px;
+  grid-template-columns: 150px .5fr .1fr .15fr;
 
   .btn-add {
     justify-self: center;
   }
+}
+
+.processing-step__category-selector-form-item.form-item {
+  grid-template-columns: 150px .7fr;
 }
