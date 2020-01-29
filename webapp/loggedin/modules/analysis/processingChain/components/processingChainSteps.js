@@ -2,6 +2,7 @@ import './processingChainSteps.scss'
 
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import * as R from 'ramda'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -30,13 +31,19 @@ const ProcessingChainSteps = props => {
     }
   }, [])
 
+  const lastStepHasCategory = Boolean(ProcessingStep.getCategoryUuid(R.last(processingSteps)))
+
   return (
     <div className={`form-item${editingStep ? ' processing-chain__steps-editing-step' : ''}`}>
       {!editingStep && (
         <ValidationTooltip validation={validation}>
           <div className="form-label processing-chain__steps-label">
             {i18n.t('processingChainView.processingSteps')}
-            <button className="btn-s btn-transparent" onClick={() => dispatch(createProcessingStep())}>
+            <button
+              className="btn-s btn-transparent"
+              onClick={() => dispatch(createProcessingStep())}
+              aria-disabled={lastStepHasCategory}
+            >
               <span className="icon icon-plus icon-14px" />
             </button>
           </div>
