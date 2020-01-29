@@ -79,7 +79,6 @@ const EntitySelector = props => {
 EntitySelector.defaultProps = {
   processingStep: null,
   processingStepPrev: null,
-  showLabel: true,
   readOnly: false,
   validation: null,
   onChange: null,
