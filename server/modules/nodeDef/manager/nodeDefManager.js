@@ -22,6 +22,11 @@ export {
 
 // ======= CREATE
 
+const nodeDefLayoutHeights = {
+  [NodeDef.nodeDefType.coordinate]: 2,
+  [NodeDef.nodeDefType.taxon]: 2,
+}
+
 const _updateParentLayout = async (user, surveyId, surveyCycleKey, nodeDef, deleted = false, client = db) => {
   if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) return {}
 
@@ -42,6 +47,12 @@ const _updateParentLayout = async (user, surveyId, surveyCycleKey, nodeDef, dele
   } else if (deleted) {
     // Remove node def from children (render as form)
     layoutChildrenUpdated = R.reject(R.propEq('i', nodeDefUuid), layoutChildren)
+  } else {
+    // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
+    const y = R.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0, layoutChildren)
+    // New node def height depends on its type
+    const h = R.propOr(1, NodeDef.getType(nodeDef), nodeDefLayoutHeights)
+    layoutChildrenUpdated = R.append({ i: nodeDefUuid, x: 0, y, w: 1, h })(layoutChildren)
   }
 
   if (!R.equals(layoutChildren, layoutChildrenUpdated)) {
