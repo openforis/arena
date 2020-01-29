@@ -125,6 +125,7 @@ const ProcessingStepView = props => {
                 categoryUuid={ProcessingStep.getCategoryUuid(processingStep)}
                 validation={Validation.getFieldValidation(ProcessingChainValidator.keys.entityOrCategory)(validation)}
                 showManage={false}
+                showAdd={false}
                 onChange={category => {
                   const props = {
                     [ProcessingStep.keysProps.entityUuid]: null,
