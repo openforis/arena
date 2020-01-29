@@ -32,7 +32,7 @@ const ProcessingChainSteps = props => {
   }, [])
 
   const processingSteps = ProcessingChain.getProcessingSteps(processingChain)
-  const lastStepHasCategory = Boolean(ProcessingStep.getCategoryUuid(R.last(processingSteps)))
+  const lastStepHasCategory = R.pipe(R.last, ProcessingStep.hasCategory)(processingSteps)
 
   return (
     <div className={`form-item${editingStep ? ' processing-chain__steps-editing-step' : ''}`}>
