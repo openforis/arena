@@ -17,7 +17,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import { createCategory } from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = props => {
-  const { disabled, categoryUuid, validation, onChange } = props
+  const { disabled, categoryUuid, validation, showManage, onChange } = props
 
   const i18n = useI18n()
 
@@ -45,22 +45,26 @@ const CategorySelector = props => {
           const category = await dispatch(createCategory(history))
           onChange(category)
         }}
+        aria-disabled={disabled}
       >
         <span className="icon icon-plus icon-12px icon-left" />
         {i18n.t('common.add')}
       </button>
-      <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.categories)}>
-        <span className="icon icon-list icon-12px icon-left" />
-        {i18n.t('common.manage')}
-      </Link>
+      {showManage && (
+        <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.categories)}>
+          <span className="icon icon-list icon-12px icon-left" />
+          {i18n.t('common.manage')}
+        </Link>
+      )}
     </div>
   )
 }
 
 CategorySelector.defaultProps = {
-  disabled: false,
   categoryUuid: null, // Selected categoryUuid
   validation: null,
+  disabled: false,
+  showManage: true,
   onChange: () => ({}),
 }
 
