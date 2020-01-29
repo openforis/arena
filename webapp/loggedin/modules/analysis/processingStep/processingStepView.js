@@ -89,7 +89,6 @@ const ProcessingStepView = props => {
             <EntitySelector
               processingStep={processingStep}
               processingStepPrev={processingStepPrev}
-              showLabel={!editingCalculation}
               validation={Validation.getFieldValidation(ProcessingStep.keysProps.entityUuid)(validation)}
               onChange={entityUuid => {
                 const props = {
@@ -118,7 +117,7 @@ const ProcessingStepView = props => {
               </button>
             </EntitySelector>
 
-            <div className={`form-item${editingCalculation ? '' : ' processing-step__category-selector-form-item'}`}>
+            <div className="form-item processing-step__category-selector-form-item">
               <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefEdit.codeProps.category')}</div>
               <CategorySelector
                 disabled={disabledEntityOrCategory}

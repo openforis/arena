@@ -45,7 +45,7 @@ const getEntities = (survey, processingStepPrev, lang) => {
 }
 
 const EntitySelector = props => {
-  const { processingStep, processingStepPrev, showLabel, readOnly, validation, children, onChange } = props
+  const { processingStep, processingStepPrev, readOnly, validation, children, onChange } = props
 
   const survey = useSelector(SurveyState.getSurvey)
 
@@ -57,8 +57,8 @@ const EntitySelector = props => {
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
 
   return (
-    <div className={`form-item${showLabel ? ' processing-step__entity-selector-form-item' : ''}`}>
-      {showLabel && <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>}
+    <div className="form-item processing-step__entity-selector-form-item">
+      <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>
 
       <Dropdown
         className="processing-step__entity-selector"
