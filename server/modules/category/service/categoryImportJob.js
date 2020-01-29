@@ -209,17 +209,17 @@ export default class CategoryImportJob extends Job {
       // For each level insert an item or replace its props if already parsed
       for (let levelIndex = 0; levelIndex <= levelIndexItem; levelIndex++) {
         const level = levels[levelIndex]
-        const lastLevel = levelIndex === levelIndexItem
+        const placeholder = levelIndex !== levelIndexItem
         const itemCodes = codes.slice(0, levelIndex + 1)
         const itemCodeKey = String(itemCodes)
         const itemCached = this._getItemCachedByCodes(itemCodes)
 
-        if (itemCached && lastLevel && !itemCached.placeholder) {
+        if (itemCached && !placeholder && !itemCached.placeholder) {
           this._addErrorCodeDuplicate(levelIndex, itemCodeKey)
-        } else if (!itemCached || lastLevel) {
+        } else if (!itemCached || !placeholder) {
           // Insert new items if not inserted already
           // update existing items (only when last level is reached)
-          await this._insertOrUpdateItem(itemCodes, level, lastLevel, labelsByLevel, descriptionsByLevel, extra)
+          await this._insertOrUpdateItem(itemCodes, level, placeholder, labelsByLevel, descriptionsByLevel, extra)
         }
       }
     }
@@ -230,7 +230,7 @@ export default class CategoryImportJob extends Job {
   /**
    * Insert new item if not already created or update already inserted item if in last level
    */
-  async _insertOrUpdateItem(itemCodes, level, lastLevel, labelsByLevel, descriptionsByLevel, extra) {
+  async _insertOrUpdateItem(itemCodes, level, placeholder, labelsByLevel, descriptionsByLevel, extra) {
     const itemCached = this._getItemCachedByCodes(itemCodes)
 
     let item = null
@@ -241,7 +241,7 @@ export default class CategoryImportJob extends Job {
     const levelName = CategoryLevel.getName(level)
     ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
     ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
-    if (lastLevel) {
+    if (!placeholder) {
       ObjectUtils.setInPath([CategoryItem.keysProps.extra], this.extractItemExtraProps(extra), false)(itemProps)
     }
 
@@ -263,7 +263,7 @@ export default class CategoryImportJob extends Job {
       this.totalItemsInserted++
     }
 
-    item.placeholder = !lastLevel
+    item.placeholder = placeholder
     this._putItemToCache(itemCodes, item)
   }
 
