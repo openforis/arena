@@ -36,7 +36,6 @@ const ProcessingStepView = props => {
     validation,
     processingStepPrev,
     processingStepNext,
-    processingStepCalculation,
     dirty,
     editingCalculation,
     fetchProcessingStepData,
@@ -101,34 +100,26 @@ const ProcessingStepView = props => {
               }}
               readOnly={disabledEntityOrCategory}
             >
-              {!editingCalculation && (
-                <>
-                  <button
-                    className="btn btn-s btn-edit"
-                    onClick={() => navigateToNodeDefEdit(history, entityUuid)}
-                    aria-disabled={!entityUuid}
-                  >
-                    <span className="icon icon-pencil2 icon-12px icon-left" />
-                    {i18n.t('common.edit')}
-                  </button>
-                  <button
-                    className="btn btn-s btn-add"
-                    onClick={() => addEntityVirtual(history)}
-                    aria-disabled={hasCalculationSteps}
-                  >
-                    <span className="icon icon-plus icon-12px icon-left" />
-                    {i18n.t('processingStepView.virtualEntity')}
-                  </button>
-                </>
-              )}
+              <button
+                className="btn btn-s btn-edit"
+                onClick={() => navigateToNodeDefEdit(history, entityUuid)}
+                aria-disabled={!entityUuid}
+              >
+                <span className="icon icon-pencil2 icon-12px icon-left" />
+                {i18n.t('common.edit')}
+              </button>
+              <button
+                className="btn btn-s btn-add"
+                onClick={() => addEntityVirtual(history)}
+                aria-disabled={hasCalculationSteps}
+              >
+                <span className="icon icon-plus icon-12px icon-left" />
+                {i18n.t('processingStepView.virtualEntity')}
+              </button>
             </EntitySelector>
 
             <div className={`form-item${editingCalculation ? '' : ' processing-step__category-selector-form-item'}`}>
-              {!editingCalculation && (
-                <div className="form-label processing-chain__steps-label">
-                  {i18n.t('nodeDefEdit.codeProps.category')}
-                </div>
-              )}
+              <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefEdit.codeProps.category')}</div>
               <CategorySelector
                 disabled={disabledEntityOrCategory}
                 categoryUuid={ProcessingStep.getCategoryUuid(processingStep)}
@@ -179,7 +170,6 @@ const mapStateToProps = state => {
     processingStepPrev: ProcessingStepState.getProcessingStepPrev(state),
     processingStepNext: ProcessingStepState.getProcessingStepNext(state),
     dirty: ProcessingStepState.isDirty(state),
-    processingStepCalculation: ProcessingStepCalculationState.getCalculation(state),
     editingCalculation: ProcessingStepCalculationState.isEditingCalculation(state),
   }
 }
