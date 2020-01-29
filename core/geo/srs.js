@@ -6,11 +6,19 @@ export const keys = {
   wkt: 'wkt',
 }
 
+// ===== CREATE
 export const newSrs = (code, name, wkt) => ({
   [keys.code]: code,
   [keys.name]: name,
   [keys.wkt]: wkt,
 })
+
+// ===== READ
+export const getCode = R.prop(keys.code)
+export const getName = R.prop(keys.name)
+export const getWkt = R.prop(keys.wkt)
+
+// ===== UTILS
 
 // EPSG:4326 WGS84 Lat Lon Spatial Reference System
 export const latLonSrs = newSrs(
@@ -30,6 +38,3 @@ export const latLonSrs = newSrs(
 
 export const latLonSrsCode = getCode(latLonSrs)
 export const isLatLon = code => latLonSrsCode === code
-export const getCode = R.prop(keys.code)
-export const getName = R.prop(keys.name)
-export const getWkt = R.prop(keys.wkt)

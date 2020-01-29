@@ -28,6 +28,7 @@ export const ValidatorErrorKeys = {
     codeDuplicate: 'validationErrors.categoryEdit.codeDuplicate',
     codeRequired: 'validationErrors.categoryEdit.codeRequired',
     itemExtraPropInvalidNumber: 'validationErrors.categoryEdit.itemExtraPropInvalidNumber',
+    itemExtraPropInvalidGeometryPoint: 'validationErrors.categoryEdit.itemExtraPropInvalidGeometryPoint',
     itemsInvalid: 'validationErrors.categoryEdit.itemsInvalid',
     itemsEmpty: 'validationErrors.categoryEdit.itemsEmpty',
     levelDuplicate: 'validationErrors.categoryEdit.levelDuplicate',
