@@ -138,8 +138,6 @@ const validateItems = async (category, itemsByParentUuid) => {
   const itemsFirstLevel = getItemChildren(null)(itemsByParentUuid)
   addItemsToStack(itemsFirstLevel)
 
-  const extraDefs = Category.getItemExtraDef(category)
-
   while (!R.isEmpty(stack)) {
     const { item, siblingsAndSelfByCode } = stack[stack.length - 1] // Do not pop item: it can be visited again
     const itemUuid = CategoryItem.getUuid(item)
@@ -154,7 +152,7 @@ const validateItems = async (category, itemsByParentUuid) => {
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
 
-    validation = _validateItemExtraProps(extraDefs, validation)(item)
+    validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
 
     if (isLeaf || R.isEmpty(itemChildren)) {
       stack.pop() // It won't be visited again, remove it from stack
