@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import ProcessingChainStep from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainStep'
 
