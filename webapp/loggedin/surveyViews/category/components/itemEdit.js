@@ -75,7 +75,6 @@ const ItemEdit = props => {
             <FormItem label={key} key={key}>
               <Input
                 value={CategoryItem.getExtraProp(key)(item)}
-                disabled={disabled}
                 mask={dataType === Category.itemExtraDefDataTypes.number ? InputMasks.decimal : null}
                 readOnly={readOnly}
                 validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
