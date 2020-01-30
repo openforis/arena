@@ -16,7 +16,9 @@ export const keys = {
   lang: 'lang',
 }
 
-export const getState = R.prop('app')
+export const stateKey = 'app'
+
+export const getState = R.prop(stateKey)
 
 export const appStatus = {
   ready: 'ready',

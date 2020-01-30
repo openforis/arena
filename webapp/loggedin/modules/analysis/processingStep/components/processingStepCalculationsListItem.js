@@ -1,7 +1,7 @@
 import './processingStepCalculationsListItem.scss'
 
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
+import { connect, useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,7 +9,6 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -17,6 +16,7 @@ import * as AppState from '@webapp/app/appState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setProcessingStepCalculationForEdit } from '../actions'
 
 const ProcessingStepCalculationsListItem = props => {
@@ -32,10 +32,10 @@ const ProcessingStepCalculationsListItem = props => {
     onDragStart,
     onDragEnd,
     onDragOver,
-    setProcessingStepCalculationForEdit,
   } = props
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
 
   const editing = ProcessingStepCalculation.isEqual(calculationForEdit)(calculation)
 
@@ -45,7 +45,6 @@ const ProcessingStepCalculationsListItem = props => {
 
   const index = ProcessingStepCalculation.getIndex(calculation)
 
-  const [showCalculationEditCancelConfirm, setCalculationEditShowCancelConfirm] = useState(false)
   return (
     <div
       className={className}
@@ -62,8 +61,8 @@ const ProcessingStepCalculationsListItem = props => {
         onClick={() =>
           !editing &&
           (calculationEditDirty
-            ? setCalculationEditShowCancelConfirm(true)
-            : setProcessingStepCalculationForEdit(calculation))
+            ? dispatch(showDialogConfirm('common.cancelConfirm', {}, setProcessingStepCalculationForEdit(calculation)))
+            : dispatch(setProcessingStepCalculationForEdit(calculation)))
         }
       >
         <div className="processing-step__calculation-label">
@@ -72,17 +71,6 @@ const ProcessingStepCalculationsListItem = props => {
         </div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />
       </div>
-
-      {showCalculationEditCancelConfirm && (
-        <ConfirmDialog
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setCalculationEditShowCancelConfirm(false)
-            setProcessingStepCalculationForEdit(calculation)
-          }}
-          onCancel={() => setCalculationEditShowCancelConfirm(false)}
-        />
-      )}
     </div>
   )
 }
@@ -109,6 +97,4 @@ const mapStateToProps = (state, { calculation }) => {
   }
 }
 
-export default connect(mapStateToProps, {
-  setProcessingStepCalculationForEdit,
-})(ProcessingStepCalculationsListItem)
+export default connect(mapStateToProps)(ProcessingStepCalculationsListItem)

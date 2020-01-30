@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
@@ -7,22 +7,19 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   saveProcessingChain,
   deleteProcessingChain,
   navigateToProcessingChainsView,
 } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import { deleteProcessingStep } from '@webapp/loggedin/modules/analysis/processingStep/actions'
-import {
-  deleteProcessingStepCalculation,
-  // SaveProcessingStepCalculationEdits,
-} from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import { deleteProcessingStepCalculation } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const ProcessingChainButtonBar = () => {
   const i18n = useI18n()
@@ -42,9 +39,6 @@ const ProcessingChainButtonBar = () => {
   const calculationDirty = useSelector(ProcessingStepCalculationState.isDirty)
   const editingCalculation = useSelector(ProcessingStepCalculationState.isEditingCalculation)
 
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-
   return (
     <>
       <div className="button-bar">
@@ -52,7 +46,9 @@ const ProcessingChainButtonBar = () => {
           <button
             className="btn-s btn-cancel"
             onClick={() =>
-              chainDirty ? setShowCancelConfirm(true) : dispatch(navigateToProcessingChainsView(history))
+              chainDirty
+                ? dispatch(showDialogConfirm('common.cancelConfirm', {}, navigateToProcessingChainsView(history)))
+                : dispatch(navigateToProcessingChainsView(history))
             }
           >
             <span className="icon icon-cross icon-left icon-10px" />
@@ -75,48 +71,28 @@ const ProcessingChainButtonBar = () => {
             (editingStep && (ProcessingStep.isTemporary(step) || Boolean(stepNext))) ||
             (editingChain && ProcessingChain.isTemporary(chain))
           }
-          onClick={() => setShowDeleteConfirm(true)}
-        >
-          <span className="icon icon-bin icon-left icon-12px" />
-          {i18n.t('common.delete')}
-        </button>
-      </div>
-
-      {showCancelConfirm && (
-        <ConfirmDialog
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setShowCancelConfirm(false)
-            dispatch(navigateToProcessingChainsView(history))
-          }}
-          onCancel={() => setShowCancelConfirm(false)}
-        />
-      )}
-
-      {showDeleteConfirm && (
-        <ConfirmDialog
-          message={i18n.t(
-            `${
+          onClick={() => {
+            const messageKeyConfirm = `${
               editingCalculation
                 ? 'processingStepCalculationView'
                 : editingStep
                 ? 'processingStepView'
                 : 'processingChainView'
-            }.deleteConfirm`,
-          )}
-          onOk={() => {
-            setShowDeleteConfirm(false)
-            if (editingCalculation) {
-              dispatch(deleteProcessingStepCalculation())
-            } else if (editingStep) {
-              dispatch(deleteProcessingStep())
-            } else {
-              dispatch(deleteProcessingChain(history))
-            }
+            }.deleteConfirm`
+
+            const onDeleteConfirm = editingCalculation
+              ? deleteProcessingStepCalculation()
+              : editingStep
+              ? deleteProcessingStep()
+              : deleteProcessingChain(history)
+
+            dispatch(showDialogConfirm(messageKeyConfirm, {}, onDeleteConfirm))
           }}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
+        >
+          <span className="icon icon-bin icon-left icon-12px" />
+          {i18n.t('common.delete')}
+        </button>
+      </div>
     </>
   )
 }

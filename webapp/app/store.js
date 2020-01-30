@@ -6,23 +6,27 @@ import * as ProcessUtils from '@core/processUtils'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
-import appReducer from '@webapp/app/reducer'
-import loginReducer from '@webapp/guest/login/reducer'
-import surveyReducer from '@webapp/survey/reducer'
-import notificationReducer from '@webapp/app/appNotification/reducer'
-import errorsReducer from '@webapp/app/appErrors/reducer'
+import AppReducer from '@webapp/app/reducer'
+import AppErrorsReducer from '@webapp/app/appErrors/reducer'
+import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
+import AppNotificationReducer from '@webapp/app/appNotification/reducer'
+import LoginReducer from '@webapp/guest/login/reducer'
+import SurveyReducer from '@webapp/survey/reducer'
 
+import * as AppState from '@webapp/app/appState'
+import * as AppDialogConfirmState from '@webapp/app/appDialogConfirm/appDialogConfirmState'
+import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
+import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
 import * as LoginState from '@webapp/guest/login/loginState'
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
-import * as ErrorsState from '@webapp/app/appErrors/appErrorsState'
 
 const appReducers = {
-  app: appReducer,
-  [LoginState.stateKey]: loginReducer,
-  [SurveyState.stateKey]: surveyReducer,
-  [NotificationState.stateKey]: notificationReducer,
-  [ErrorsState.stateKey]: errorsReducer,
+  [AppState.stateKey]: AppReducer,
+  [LoginState.stateKey]: LoginReducer,
+  [SurveyState.stateKey]: SurveyReducer,
+  [AppDialogConfirmState.stateKey]: AppDialogConfirmReducer,
+  [AppNotificationState.stateKey]: AppNotificationReducer,
+  [AppErrorsState.stateKey]: AppErrorsReducer,
 }
 
 const createReducer = asyncReducers =>
