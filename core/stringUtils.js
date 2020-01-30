@@ -8,6 +8,8 @@ export const trim = R.pipe(R.defaultTo(''), R.trim)
 
 export const leftTrim = R.replace(/^\s+/, '')
 
+export const padStart = (length, padString) => R.pipe(String, s => s.padStart(length, padString))
+
 const toLower = R.pipe(trim, R.toLower)
 
 export const truncate = maxLength => text => (text.length > maxLength ? text.slice(0, maxLength) + '...' : text)
