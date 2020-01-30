@@ -1,4 +1,4 @@
-import { exportReducer } from '@webapp/app/utils/reduxUtils'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appDialogConfirmShow, appDialogConfirmHide } from './actions'
 

@@ -23,4 +23,4 @@ export const show = (messageKey, messageParams, onOk, onCancel) => ({
   [keys.onCancel]: onCancel,
 })
 
-export const hide = {}
+export const hide = () => ({})

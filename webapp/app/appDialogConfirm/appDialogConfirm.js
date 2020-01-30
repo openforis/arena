@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import Markdown from '@webapp/commonComponents/markdown'
 
 import * as AppDialogConfirmState from './appDialogConfirmState'
-import { onDialogConfirmOk, hideDialogConfirm } from './actions'
+import { onDialogConfirmOk, onDialogConfirmCancel } from './actions'
 
 const AppDialogConfirm = () => {
   const messageKey = useSelector(AppDialogConfirmState.getMessageKey)
@@ -17,23 +17,23 @@ const AppDialogConfirm = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  return (
+  return messageKey ? (
     <Modal className="app-dialog-confirm">
       <ModalBody>
         <Markdown source={i18n.t(messageKey, messageParams)} />
       </ModalBody>
 
       <ModalFooter>
-        <button className="btn btn-cancel modal-footer__item" onClick={dispatch(hideDialogConfirm)}>
+        <button className="btn btn-cancel modal-footer__item" onClick={() => dispatch(onDialogConfirmCancel())}>
           {i18n.t('common.cancel')}
         </button>
 
-        <button className="btn btn-primary modal-footer__item" onClick={dispatch(onDialogConfirmOk)}>
+        <button className="btn btn-primary modal-footer__item" onClick={() => dispatch(onDialogConfirmOk())}>
           {i18n.t('common.ok')}
         </button>
       </ModalFooter>
     </Modal>
-  )
+  ) : null
 }
 
 AppDialogConfirm.defaultProps = {

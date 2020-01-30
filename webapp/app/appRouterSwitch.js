@@ -12,6 +12,7 @@ import * as User from '@core/user/user'
 import DynamicImport from '@webapp/commonComponents/dynamicImport'
 import LoginView from '@webapp/guest/login/loginView'
 import AppLoaderView from './appLoader/appLoaderView'
+import AppDialogConfirm from './appDialogConfirm/appDialogConfirm'
 import AppNotificationView from './appNotification/appNotificationView'
 import GuestView from '@webapp/guest/guestView'
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
@@ -76,6 +77,7 @@ const AppRouterSwitch = props => {
         )}
 
         <AppLoaderView />
+        <AppDialogConfirm />
         <AppNotificationView />
       </>
     )

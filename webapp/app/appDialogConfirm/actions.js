@@ -8,15 +8,17 @@ export const showDialogConfirm = (messageKey, messageParams, onOk, onCancel = nu
 
 export const onDialogConfirmOk = () => (dispatch, getState) => {
   const onOk = AppDialogConfirmState.getOnOk(getState())
-  dispatch(onOk())
-  dispatch({ type: appDialogConfirmHide })
+  dispatch(onOk)
+  dispatch(hideDialogConfirm())
 }
 
-export const hideDialogConfirm = () => (dispatch, getState) => {
+export const onDialogConfirmCancel = () => (dispatch, getState) => {
   const onCancel = AppDialogConfirmState.getOnCancel(getState())
   if (onCancel) {
-    dispatch(onCancel())
+    dispatch(onCancel)
   }
 
-  dispatch({ type: appDialogConfirmHide })
+  dispatch(hideDialogConfirm())
 }
+
+export const hideDialogConfirm = () => dispatch => dispatch({ type: appDialogConfirmHide })
