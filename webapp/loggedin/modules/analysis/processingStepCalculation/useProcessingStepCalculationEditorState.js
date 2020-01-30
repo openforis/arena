@@ -45,8 +45,6 @@ export default () => {
     }
   }, [])
 
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-
   // Get survey info, calculation and attributes from store
   const survey = useSelector(SurveyState.getSurvey)
   const processingChain = useSelector(ProcessingChainState.getProcessingChain)
@@ -89,8 +87,5 @@ export default () => {
 
     types: getTypes(i18n),
     aggregateFns: getAggregateFns(i18n),
-
-    showCancelConfirm,
-    setShowCancelConfirm,
   }
 }

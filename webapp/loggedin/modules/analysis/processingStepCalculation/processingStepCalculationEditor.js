@@ -12,9 +12,9 @@ import * as Validation from '@core/validation/validation'
 import { FormItem } from '@webapp/commonComponents/form/input'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import {
   updateProcessingStepCalculationProp,
@@ -39,9 +39,6 @@ const ProcessingStepCalculationEditor = () => {
 
     types,
     aggregateFns,
-
-    showCancelConfirm,
-    setShowCancelConfirm,
   } = useProcessingStepCalculationEditorState()
 
   const dispatch = useDispatch()
@@ -54,13 +51,11 @@ const ProcessingStepCalculationEditor = () => {
       <div className="processing-step__calculation-editor">
         <button
           className="btn-s btn-close"
-          onClick={() => {
-            if (dirty) {
-              setShowCancelConfirm(true)
-            } else {
-              dispatch(resetProcessingStepCalculationState())
-            }
-          }}
+          onClick={() =>
+            dirty
+              ? dispatch(showDialogConfirm('common.cancelConfirm', {}, resetProcessingStepCalculationState()))
+              : dispatch(resetProcessingStepCalculationState())
+          }
         >
           <span className="icon icon-10px icon-cross" />
         </button>
@@ -125,17 +120,6 @@ const ProcessingStepCalculationEditor = () => {
           </FormItem>
         )}
       </div>
-
-      {showCancelConfirm && (
-        <ConfirmDialog
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setShowCancelConfirm(false)
-            dispatch(resetProcessingStepCalculationState())
-          }}
-          onCancel={() => setShowCancelConfirm(false)}
-        />
-      )}
     </>
   )
 }
