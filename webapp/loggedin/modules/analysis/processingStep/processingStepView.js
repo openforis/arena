@@ -1,6 +1,6 @@
 import './processingStepView.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
@@ -13,7 +13,6 @@ import * as ProcessingChainValidator from '@common/analysis/processingChainValid
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
 import EntitySelector from './components/entitySelector'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import ProcessingStepCalculationsList from './components/processingStepCalculationsList'
 import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
 import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
@@ -22,6 +21,7 @@ import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/process
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import {
   fetchProcessingStepData,
@@ -39,6 +39,7 @@ const ProcessingStepView = props => {
     processingStepNext,
     dirty,
     editingCalculation,
+    showDialogConfirm,
     fetchProcessingStepData,
     validateProcessingStep,
     resetProcessingStepState,
@@ -54,7 +55,6 @@ const ProcessingStepView = props => {
   const entityUuid = ProcessingStep.getEntityUuid(processingStep)
 
   const i18n = useI18n()
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   useEffect(() => {
     if (!editingCalculation) {
@@ -76,13 +76,11 @@ const ProcessingStepView = props => {
           <>
             <button
               className="btn-s btn-close"
-              onClick={() => {
-                if (dirty) {
-                  setShowCancelConfirm(true)
-                } else {
-                  resetProcessingStepState()
-                }
-              }}
+              onClick={() =>
+                dirty
+                  ? showDialogConfirm('common.cancelConfirm', {}, resetProcessingStepState)
+                  : resetProcessingStepState()
+              }
             >
               <span className="icon icon-10px icon-cross" />
             </button>
@@ -145,17 +143,6 @@ const ProcessingStepView = props => {
       </div>
 
       <ProcessingStepCalculationEditor />
-
-      {showCancelConfirm && (
-        <ConfirmDialog
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setShowCancelConfirm(false)
-            resetProcessingStepState()
-          }}
-          onCancel={() => setShowCancelConfirm(false)}
-        />
-      )}
     </div>
   )
 }
@@ -176,6 +163,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
+  showDialogConfirm,
   fetchProcessingStepData,
   validateProcessingStep,
   resetProcessingStepState,
