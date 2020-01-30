@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
@@ -82,9 +83,23 @@ export const generateScript = async (surveyId, chainUuid) => {
   const fileCommon = FileUtils.join(dirUser, 'common.R')
   await FileUtils.appendFile(fileCommon)
 
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Survey.cycleOneKey)
   const chain = await ProcessingChainManager.fetchChainByUuid(surveyId, chainUuid)
   const steps = await ProcessingChainManager.fetchStepsByChainUuid(surveyId, chainUuid)
   for (const step of steps) {
+    const stepLabel = R.ifElse(
+      ProcessingStep.hasCategory,
+      R.pipe(
+        ProcessingStep.getCategoryUuid,
+        categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey),
+        Category.getName,
+      ),
+      R.pipe(ProcessingStep.getEntityUuid, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey), NodeDef.getName),
+    )(step)
+
+    const dirStep = FileUtils.join(dirChain, `step-${ProcessingStep.getIndex(step) + 1}-${stepLabel}`)
+    await FileUtils.mkdir(dirStep)
+
     const calculations = await ProcessingChainManager.fetchCalculationsByStepUuid(
       surveyId,
       ProcessingStep.getUuid(step),
