@@ -8,10 +8,10 @@ export default class Counter {
   }
 
   increment() {
-    this._count++
+    return ++this._count
   }
 
   decrement() {
-    this._count--
+    return --this._count
   }
 }

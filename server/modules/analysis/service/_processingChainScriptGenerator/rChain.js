@@ -1,8 +1,11 @@
+import Counter from '@core/counter'
 import * as ProcessUtils from '@core/processUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
+import RFile from './rFile'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'chain', 'r_studio_project.Rproj')
 
@@ -18,6 +21,14 @@ class RChain {
 
     this._fileArena = null
     this._fileRStudioProject = null
+
+    this._fileSystemInit = null
+
+    this._counter = new Counter()
+  }
+
+  _newFileName(name) {
+    return `${StringUtils.padStart(3, '0')(this._counter.increment())}-${name}`
   }
 
   async _initDirs() {
@@ -28,6 +39,13 @@ class RChain {
     this._dirSystem = FileUtils.join(this._dir, 'system')
     this._dirUser = FileUtils.join(this._dir, 'user')
     await Promise.all([FileUtils.mkdir(this._dirSystem), FileUtils.mkdir(this._dirUser)])
+
+    await this._initDirSystem()
+  }
+
+  async _initDirSystem() {
+    this._fileSystemInit = new RFile(this, FileUtils.join(this._dirSystem, this._newFileName('init.R')))
+    await this._fileSystemInit.init()
   }
 
   async _initFiles() {
