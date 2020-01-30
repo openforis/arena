@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import * as R from 'ramda'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
