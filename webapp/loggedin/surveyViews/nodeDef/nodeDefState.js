@@ -42,7 +42,12 @@ const _assocNodeDefAndValidation = (nodeDef, nodeDefValidation) =>
   R.pipe(_assocNodeDef(nodeDef), R.assoc(keys.validation, nodeDefValidation))
 
 export const assocNodeDefForEdit = (nodeDef, nodeDefValidation) =>
-  R.pipe(R.assoc(keys.nodeDefOriginal, nodeDef), _assocNodeDefAndValidation(nodeDef, nodeDefValidation))
+  R.pipe(
+    R.assoc(keys.nodeDefOriginal, nodeDef),
+    _assocNodeDefAndValidation(nodeDef, nodeDefValidation),
+    R.dissoc(keys.propsUpdated),
+    R.dissoc(keys.propsAdvancedUpdated),
+  )
 
 const _mergeProps = (props, propsAdvanced) => state => {
   const propsOld = R.prop(keys.propsUpdated, state)
