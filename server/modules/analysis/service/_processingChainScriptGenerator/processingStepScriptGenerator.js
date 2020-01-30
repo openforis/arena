@@ -14,6 +14,8 @@ import * as ProcessingChainManager from '@server/modules/analysis/manager/proces
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
+import RChain from '@server/modules/analysis/service/_processingChainScriptGenerator/rChain'
+
 const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
   const nodeDefUuidCols = []
 
@@ -69,41 +71,43 @@ const _generateChainDirs = async path => {
 }
 
 export const generateScript = async (surveyId, chainUuid) => {
-  const dirChain = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, chainUuid)
-  await FileUtils.rmdir(dirChain)
-  await FileUtils.mkdir(dirChain)
-  const { dirSystem, dirUser } = await _generateChainDirs(dirChain)
-
-  const fileArena = FileUtils.join(dirChain, 'arena.R')
-  await FileUtils.appendFile(fileArena)
-
-  const fileRStudioProj = FileUtils.join(dirChain, 'r_studio_project.Rproj')
-  await FileUtils.copyFile(FileUtils.join(__dirname, 'chain', 'r_studio_project.Rproj'), fileRStudioProj)
-
-  const fileCommon = FileUtils.join(dirUser, 'common.R')
-  await FileUtils.appendFile(fileCommon)
-
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Survey.cycleOneKey)
-  const chain = await ProcessingChainManager.fetchChainByUuid(surveyId, chainUuid)
-  const steps = await ProcessingChainManager.fetchStepsByChainUuid(surveyId, chainUuid)
-  for (const step of steps) {
-    const stepLabel = R.ifElse(
-      ProcessingStep.hasCategory,
-      R.pipe(
-        ProcessingStep.getCategoryUuid,
-        categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey),
-        Category.getName,
-      ),
-      R.pipe(ProcessingStep.getEntityUuid, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey), NodeDef.getName),
-    )(step)
-
-    const dirStep = FileUtils.join(dirChain, `step-${ProcessingStep.getIndex(step) + 1}-${stepLabel}`)
-    await FileUtils.mkdir(dirStep)
-
-    const calculations = await ProcessingChainManager.fetchCalculationsByStepUuid(
-      surveyId,
-      ProcessingStep.getUuid(step),
-    )
-    console.log(JSON.stringify(calculations))
-  }
+  const rChain = new RChain(surveyId, chainUuid)
+  await rChain.init()
+  // Const dirChain = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, chainUuid)
+  // await FileUtils.rmdir(dirChain)
+  // await FileUtils.mkdir(dirChain)
+  // const { dirSystem, dirUser } = await _generateChainDirs(dirChain)
+  //
+  // const fileArena = FileUtils.join(dirChain, 'arena.R')
+  // await FileUtils.appendFile(fileArena)
+  //
+  // const fileRStudioProj = FileUtils.join(dirChain, 'r_studio_project.Rproj')
+  // await FileUtils.copyFile(FileUtils.join(__dirname, 'chain', 'r_studio_project.Rproj'), fileRStudioProj)
+  //
+  // const fileCommon = FileUtils.join(dirUser, 'common.R')
+  // await FileUtils.appendFile(fileCommon)
+  //
+  // const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, Survey.cycleOneKey)
+  // const chain = await ProcessingChainManager.fetchChainByUuid(surveyId, chainUuid)
+  // const steps = await ProcessingChainManager.fetchStepsByChainUuid(surveyId, chainUuid)
+  // for (const step of steps) {
+  //   const calculations = await ProcessingChainManager.fetchCalculationsByStepUuid(
+  //     surveyId,
+  //     ProcessingStep.getUuid(step),
+  //   )
+  //   const stepName = R.ifElse(
+  //     ProcessingStep.hasCategory,
+  //     R.pipe(
+  //       ProcessingStep.getCategoryUuid,
+  //       categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey),
+  //       Category.getName,
+  //     ),
+  //     R.pipe(ProcessingStep.getEntityUuid, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey), NodeDef.getName),
+  //   )(step)
+  //
+  //   const dirStep = FileUtils.join(dirChain, `step-${ProcessingStep.getIndex(step) + 1}-${stepName}`)
+  //   await FileUtils.mkdir(dirStep)
+  //
+  //   console.log(JSON.stringify(calculations))
+  // }
 }
