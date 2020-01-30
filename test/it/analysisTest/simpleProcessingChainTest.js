@@ -101,5 +101,5 @@ export const simpleTest = async () => {
   // Console.log(JSON.stringify(survey))
   // console.log(JSON.stringify(records))
 
-  await ProcessingChainService.generateScript(Survey.getId(survey), Survey.cycleOneKey, processingChain)
+  await ProcessingChainService.generateScriptDeprecated(Survey.getId(survey), Survey.cycleOneKey, processingChain)
 }
