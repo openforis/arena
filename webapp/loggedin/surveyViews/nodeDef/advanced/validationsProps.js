@@ -4,22 +4,14 @@ import * as R from 'ramda'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
-import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 import ExpressionsProp from './expressionsProp/expressionsProp'
-
-const integerMask = createNumberMask({
-  prefix: '',
-  suffix: '',
-  includeThousandsSeparator: false,
-  allowNegative: false,
-  allowLeadingZeroes: false,
-})
 
 const ValidationsProps = props => {
   const { nodeDef, validation, nodeDefParent, readOnly, setNodeDefProp } = props
@@ -45,7 +37,7 @@ const ValidationsProps = props => {
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.min),
               )(validation)}
-              mask={integerMask}
+              mask={InputMasks.integer}
               onChange={value => handleValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
             />
           </FormItem>
@@ -57,7 +49,7 @@ const ValidationsProps = props => {
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
                 Validation.getFieldValidation(NodeDefValidations.keys.max),
               )(validation)}
-              mask={integerMask}
+              mask={InputMasks.integer}
               onChange={value => handleValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
             />
           </FormItem>

@@ -21,13 +21,11 @@ const ProcessingChainStep = props => {
   const { processingStep, validation } = props
 
   const survey = useSelector(SurveyState.getSurvey)
-  const entity = R.pipe(
-    ProcessingStep.getEntityUuid,
-    R.unless(R.isNil, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey)),
-  )(processingStep)
-  const category = R.pipe(
-    ProcessingStep.getCategoryUuid,
-    R.unless(R.isNil, categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey)),
+  const entity = R.pipe(ProcessingStep.getEntityUuid, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey))(
+    processingStep,
+  )
+  const category = R.pipe(ProcessingStep.getCategoryUuid, categoryUuid =>
+    Survey.getCategoryByUuid(categoryUuid)(survey),
   )(processingStep)
   const processingStepEditing = useSelector(ProcessingStepState.getProcessingStep)
 

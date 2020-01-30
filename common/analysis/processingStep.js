@@ -92,3 +92,7 @@ export const dissocCalculation = calculation =>
       ),
     ),
   )
+
+// ===== UTILS
+
+export const hasCategory = R.pipe(getCategoryUuid, R.isNil, R.not)

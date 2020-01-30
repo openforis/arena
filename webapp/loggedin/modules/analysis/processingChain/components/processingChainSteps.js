@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import ProcessingChainStep from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainStep'
 
@@ -32,7 +32,7 @@ const ProcessingChainSteps = props => {
   }, [])
 
   const processingSteps = ProcessingChain.getProcessingSteps(processingChain)
-  const lastStepHasCategory = Boolean(ProcessingStep.getCategoryUuid(R.last(processingSteps)))
+  const lastStepHasCategory = R.pipe(R.last, ProcessingStep.hasCategory)(processingSteps)
 
   return (
     <div className={`form-item${editingStep ? ' processing-chain__steps-editing-step' : ''}`}>
