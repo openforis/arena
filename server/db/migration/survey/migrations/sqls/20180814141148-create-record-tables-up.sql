@@ -46,7 +46,7 @@ CREATE TABLE
     record_uuid   uuid      NOT NULL,
     parent_uuid   uuid          NULL,
     node_def_uuid uuid      NOT NULL,
-    value         jsonb     NOT NULL,
+    value         jsonb         NULL DEFAULT '{}'::jsonb,
     meta          jsonb     NOT NULL DEFAULT '{}'::jsonb,
     date_created  TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
     date_modified TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
