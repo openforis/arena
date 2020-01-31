@@ -20,9 +20,8 @@ export default class RFileInit extends RFileSystem {
     const connection = `connection <- dbConnect(driver, host="${ProcessUtils.ENV.pgHost}", dbname="${ProcessUtils.ENV.pgDatabase}", user="${ProcessUtils.ENV.pgUser}", password="${ProcessUtils.ENV.pgPassword}", port=${ProcessUtils.ENV.pgPort});`
     await this.appendContent(connection)
 
-    const setSearchPath = `dbSendQuery(conn=connection, statement='set search_path to "${SchemaRdb.getName(
-      this.rChain.surveyId,
-    )}", "public"');`
+    const schema = SchemaRdb.getName(this.rChain.surveyId)
+    const setSearchPath = `dbSendQuery(conn=connection, statement='set search_path to "${schema}", "public"');`
     await this.appendContent(setSearchPath)
 
     return this
