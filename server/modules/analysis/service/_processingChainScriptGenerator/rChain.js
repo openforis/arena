@@ -119,6 +119,8 @@ class RChain {
     await this._initFiles()
     await this._initSteps()
     await this._initFilesClosing()
+
+    return this
   }
 }
 

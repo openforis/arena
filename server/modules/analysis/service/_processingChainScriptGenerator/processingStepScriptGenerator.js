@@ -61,6 +61,5 @@ export const generateScriptDeprecated = async (surveyId, cycle, processingChain)
 }
 
 export const generateScript = async (surveyId, cycle, chainUuid) => {
-  const rChain = new RChain(surveyId, cycle, chainUuid)
-  await rChain.init()
+  await new RChain(surveyId, cycle, chainUuid).init()
 }
