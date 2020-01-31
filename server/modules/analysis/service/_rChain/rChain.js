@@ -10,6 +10,7 @@ import * as ProcessingChainManager from '@server/modules/analysis/manager/proces
 import RStep from './rStep'
 import { RFileSystem } from './rFile'
 import RFileInit from './_files/system/rFileInit'
+import RFileResetResults from './_files/system/rFileResetResults'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
 
@@ -49,6 +50,10 @@ class RChain {
     return this._survey
   }
 
+  get chainUuid() {
+    return this._chainUuid
+  }
+
   get chain() {
     return this._chain
   }
@@ -70,15 +75,15 @@ class RChain {
   }
 
   async _initSurveyAndChain() {
-    this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this._surveyId, this._cycle)
-    this._chain = await ProcessingChainManager.fetchChainByUuid(this._surveyId, this._chainUuid)
-    const steps = await ProcessingChainManager.fetchStepsByChainUuid(this._surveyId, this._chainUuid)
+    this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this._cycle)
+    this._chain = await ProcessingChainManager.fetchChainByUuid(this.surveyId, this.chainUuid)
+    const steps = await ProcessingChainManager.fetchStepsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
   }
 
   async _initDirs() {
     // Init dirs
-    this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, this._chainUuid)
+    this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, this.chainUuid)
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 
@@ -99,7 +104,7 @@ class RChain {
 
     // Init system files
     this._fileInit = await new RFileInit(this).init()
-    this._fileResetResults = await new RFileSystem(this, 'reset-results').init()
+    this._fileResetResults = await new RFileResetResults(this).init()
     this._fileReadData = await new RFileSystem(this, 'read-data').init()
 
     // Init user files

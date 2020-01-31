@@ -22,8 +22,6 @@ export default class RFileInit extends RFileSystem {
 
     const schema = SchemaRdb.getName(this.rChain.surveyId)
     const setSearchPath = `dbSendQuery(conn=connection, statement='set search_path to "${schema}", "public"');`
-    await this.appendContent(setSearchPath)
-
-    return this
+    return await this.appendContent(setSearchPath)
   }
 }

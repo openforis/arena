@@ -34,6 +34,7 @@ class RFile {
   async appendContent(content) {
     await FileUtils.appendFile(this.path, content)
     await FileUtils.appendFile(this.path, StringUtils.NEW_LINE + StringUtils.NEW_LINE)
+    return this
   }
 
   async init() {
