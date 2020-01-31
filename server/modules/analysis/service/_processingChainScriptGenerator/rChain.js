@@ -29,9 +29,13 @@ class RChain {
     this._fileRStudioProject = null
     // System files
     this._fileInit = null
+    this._fileResetResults = null
+    this._fileReadData = null
     this._filePersistResults = null
     this._filePersistScripts = null
     this._fileClose = null
+    // User files
+    this._fileCommon = null
 
     this._counter = new Counter()
   }
@@ -94,6 +98,13 @@ class RChain {
 
     this._fileResetResults = new RFileSystem(this, 'reset-results')
     await this._fileResetResults.init()
+
+    this._fileReadData = new RFileSystem(this, 'read-data')
+    await this._fileReadData.init()
+
+    // Init user files
+    this._fileCommon = new RFileSystem(this, 'common')
+    await this._fileCommon.init()
   }
 
   async _initSteps() {
