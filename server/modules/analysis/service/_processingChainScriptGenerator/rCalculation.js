@@ -17,5 +17,7 @@ export default class RCalculation {
 
   async init() {
     await this._rFile.init()
+
+    return this
   }
 }

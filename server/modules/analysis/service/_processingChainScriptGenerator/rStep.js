@@ -35,13 +35,14 @@ export default class RStep {
       ProcessingStep.getUuid(this._step),
     )
     for (const calculation of calculations) {
-      const rCalculation = new RCalculation(this, calculation)
-      await rCalculation.init()
+      await new RCalculation(this, calculation).init()
     }
   }
 
   async init() {
     await this._initDir()
     await this._initCalculations()
+
+    return this
   }
 }

@@ -33,6 +33,7 @@ class RFile {
       this._rChain.fileArena,
       `source("${this._pathRelative}")${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`,
     )
+    return this
   }
 }
 

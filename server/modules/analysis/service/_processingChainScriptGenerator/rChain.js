@@ -93,36 +93,24 @@ class RChain {
     ])
 
     // Init system files
-    this._fileInit = new RFileSystem(this, 'init')
-    await this._fileInit.init()
-
-    this._fileResetResults = new RFileSystem(this, 'reset-results')
-    await this._fileResetResults.init()
-
-    this._fileReadData = new RFileSystem(this, 'read-data')
-    await this._fileReadData.init()
+    this._fileInit = await new RFileSystem(this, 'init').init()
+    this._fileResetResults = await new RFileSystem(this, 'reset-results').init()
+    this._fileReadData = await new RFileSystem(this, 'read-data').init()
 
     // Init user files
-    this._fileCommon = new RFileSystem(this, 'common')
-    await this._fileCommon.init()
+    this._fileCommon = await new RFileSystem(this, 'common').init()
   }
 
   async _initSteps() {
     for (const step of ProcessingChain.getProcessingSteps(this._chain)) {
-      const rStep = new RStep(this._surveyId, this, step)
-      await rStep.init()
+      await new RStep(this._surveyId, this, step).init()
     }
   }
 
   async _initFilesClosing() {
-    this._filePersistResults = new RFileSystem(this, 'persist-results')
-    await this._filePersistResults.init()
-
-    this._filePersistScripts = new RFileSystem(this, 'persist-scripts')
-    await this._filePersistScripts.init()
-
-    this._fileClose = new RFileSystem(this, 'close')
-    await this._fileClose.init()
+    this._filePersistResults = await new RFileSystem(this, 'persist-results').init()
+    this._filePersistScripts = await new RFileSystem(this, 'persist-scripts').init()
+    this._fileClose = await new RFileSystem(this, 'close').init()
   }
 
   async init() {
