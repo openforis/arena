@@ -2,11 +2,16 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as R from 'ramda'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+
+import RChain from '@server/modules/analysis/service/_processingChainScriptGenerator/rChain'
 
 const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
   const nodeDefUuidCols = []
@@ -40,12 +45,21 @@ const _generateDataFile = async (survey, cycle, nodeDef, outputDir) => {
   )
 }
 
-export const generateScript = async (survey, cycle, processingStep, outputDir) => {
-  const nodeDefTable = R.pipe(ProcessingStep.getEntityUuid, entityUuid => Survey.getNodeDefByUuid(entityUuid)(survey))(
-    processingStep,
-  )
+export const generateScriptDeprecated = async (surveyId, cycle, processingChain) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
 
-  if (nodeDefTable) {
-    await _generateDataFile(survey, cycle, nodeDefTable, outputDir)
+  const outputDir = ProcessUtils.ENV.analysisOutputDir
+  for (const processingStep of ProcessingChain.getProcessingSteps(processingChain)) {
+    const nodeDefTable = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
+      Survey.getNodeDefByUuid(entityUuid)(survey),
+    )(processingStep)
+
+    if (nodeDefTable) {
+      await _generateDataFile(survey, cycle, nodeDefTable, outputDir)
+    }
   }
+}
+
+export const generateScript = async (surveyId, cycle, chainUuid) => {
+  await new RChain(surveyId, cycle, chainUuid).init()
 }

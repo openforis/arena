@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+export const NEW_LINE = '\r\n'
+
 export const nbsp = '\u00A0'
 
 export const isString = R.is(String)
@@ -7,6 +9,8 @@ export const isString = R.is(String)
 export const trim = R.pipe(R.defaultTo(''), R.trim)
 
 export const leftTrim = R.replace(/^\s+/, '')
+
+export const padStart = (length, padString) => R.pipe(String, s => s.padStart(length, padString))
 
 const toLower = R.pipe(trim, R.toLower)
 

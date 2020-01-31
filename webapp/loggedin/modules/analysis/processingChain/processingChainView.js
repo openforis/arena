@@ -11,7 +11,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useAsyncGetRequest } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import ProcessingChainSteps from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainSteps'
@@ -47,6 +47,11 @@ const ProcessingChainView = props => {
 
   const { processingChainUuid } = useParams()
 
+  const { dispatch: generateScript } = useAsyncGetRequest(
+    `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/processing-chain/${processingChainUuid}/script`,
+    { params: { surveyCycleKey } },
+  )
+
   useEffect(() => {
     if (R.isEmpty(processingChain)) {
       fetchProcessingChain(processingChainUuid)
@@ -77,6 +82,17 @@ const ProcessingChainView = props => {
 
   return R.isEmpty(processingChain) ? null : (
     <div className={`processing-chain${editingStep ? ' step-editor-open' : ''}`}>
+      <button
+        className="btn btn-s"
+        style={{ position: 'absolute', right: '0' }}
+        onClick={() => {
+          ;(async () => {
+            await generateScript()
+          })()
+        }}
+      >
+        generate script
+      </button>
       <div className="form">
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}

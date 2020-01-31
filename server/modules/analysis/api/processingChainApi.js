@@ -60,6 +60,23 @@ export const init = app => {
     },
   )
 
+  // === test
+  app.get(
+    '/survey/:surveyId/processing-chain/:processingChainUuid/script',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
+
+        await ProcessingChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid)
+
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
   app.get(
     '/survey/:surveyId/processing-chain/:processingChainUuid/calculation-attribute-uuids',
     AuthMiddleware.requireRecordAnalysisPermission,
