@@ -6,7 +6,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-import * as ProcessingChainService from '@server/modules/analysis/service/processingChainService'
+// Import * as ProcessingChainService from '@server/modules/analysis/service/processingChainService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { getContextUser } from '../../testContext'
