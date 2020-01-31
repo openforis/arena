@@ -1,6 +1,7 @@
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 
 import * as NodeAnalysisTable from '@common/surveyRdb/nodeAnalysisTable'
+import { dbSendQuery } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 export default class RFileResetResults extends RFileSystem {
   constructor(rChain) {
@@ -10,7 +11,9 @@ export default class RFileResetResults extends RFileSystem {
   async init() {
     await super.init()
 
-    const query = `dbSendQuery(conn=connection, statement="delete from ${NodeAnalysisTable.tableName} where ${NodeAnalysisTable.colNames.processingChainUuid} = '${this.rChain.chainUuid}'");`
+    const query = dbSendQuery(
+      `delete from ${NodeAnalysisTable.tableName} where ${NodeAnalysisTable.colNames.processingChainUuid} = '${this.rChain.chainUuid}'`,
+    )
     return await this.appendContent(query)
   }
 }

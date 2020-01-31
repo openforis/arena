@@ -8,6 +8,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { arenaInfo } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 export const padStart = StringUtils.padStart(3, '0')
 
@@ -16,7 +17,8 @@ class RFile {
     this._rChain = rChain
     this._dir = dir
     const fileIndex = padStart(this._rChain.scriptIndexNext)
-    this._path = FileUtils.join(this._dir, `${fileIndex}-${fileName}.R`)
+    this._fileName = `${fileIndex}-${fileName}.R`
+    this._path = FileUtils.join(this._dir, this._fileName)
     this._pathRelative = R.pipe(
       R.split(ProcessingChain.getUuid(this._rChain.chain) + FileUtils.sep),
       R.last,
@@ -35,6 +37,10 @@ class RFile {
     await FileUtils.appendFile(this.path, content)
     await FileUtils.appendFile(this.path, StringUtils.NEW_LINE + StringUtils.NEW_LINE)
     return this
+  }
+
+  async logInfo(content) {
+    return await this.appendContent(arenaInfo(this._fileName, content))
   }
 
   async init() {
