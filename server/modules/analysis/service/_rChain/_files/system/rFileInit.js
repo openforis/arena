@@ -5,6 +5,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { dbConnect, dbSendQuery } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 const FILE_INIT = FileUtils.join(__dirname, 'init.R')
 
@@ -17,11 +18,17 @@ export default class RFileInit extends RFileSystem {
     await super.init()
     await FileUtils.copyFile(FILE_INIT, this.path)
 
-    const connection = `connection <- dbConnect(driver, host="${ProcessUtils.ENV.pgHost}", dbname="${ProcessUtils.ENV.pgDatabase}", user="${ProcessUtils.ENV.pgUser}", password="${ProcessUtils.ENV.pgPassword}", port=${ProcessUtils.ENV.pgPort});`
+    const connection = dbConnect(
+      ProcessUtils.ENV.pgHost,
+      ProcessUtils.ENV.pgDatabase,
+      ProcessUtils.ENV.pgUser,
+      ProcessUtils.ENV.pgPassword,
+      ProcessUtils.ENV.pgPort,
+    )
     await this.appendContent(connection)
 
     const schema = SchemaRdb.getName(this.rChain.surveyId)
-    const setSearchPath = `dbSendQuery(conn=connection, statement='set search_path to "${schema}", "public"');`
+    const setSearchPath = dbSendQuery(`set search_path to '${schema}', 'public'`)
     return await this.appendContent(setSearchPath)
   }
 }

@@ -11,6 +11,7 @@ import RStep from './rStep'
 import { RFileSystem } from './rFile'
 import RFileInit from './_files/system/rFileInit'
 import RFileResetResults from './_files/system/rFileResetResults'
+import RFileClose from './_files/system/rFileClose'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
 
@@ -120,7 +121,7 @@ class RChain {
   async _initFilesClosing() {
     this._filePersistResults = await new RFileSystem(this, 'persist-results').init()
     this._filePersistScripts = await new RFileSystem(this, 'persist-scripts').init()
-    this._fileClose = await new RFileSystem(this, 'close').init()
+    this._fileClose = await new RFileClose(this).init()
   }
 
   async init() {
