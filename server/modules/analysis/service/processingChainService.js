@@ -1,3 +1,5 @@
+import RChain from '@server/modules/analysis/service/_rChain/rChain'
+
 export {
   // ======  READ - Chain
   countChainsBySurveyId,
@@ -20,7 +22,6 @@ export {
   deleteCalculation,
 } from '../manager/processingChainManager'
 
-export {
-  generateScript,
-  generateScriptDeprecated,
-} from './_processingChainScriptGenerator/processingStepScriptGenerator'
+export const generateScript = async (surveyId, cycle, chainUuid) => {
+  await new RChain(surveyId, cycle, chainUuid).init()
+}

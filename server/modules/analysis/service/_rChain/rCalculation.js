@@ -1,4 +1,4 @@
-import { RFileCalculation } from '@server/modules/analysis/service/_processingChainScriptGenerator/rFile'
+import { RFileCalculation } from '@server/modules/analysis/service/_rChain/rFile'
 
 export default class RCalculation {
   constructor(rStep, calculation) {
