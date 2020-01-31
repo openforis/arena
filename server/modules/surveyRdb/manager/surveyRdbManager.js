@@ -26,6 +26,7 @@ export const createTableAndView = DataViewCreateRepository.createTableAndView
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
+export { createNodeAnalysisTable } from '../repository/nodeAnalysisTableRepository'
 
 // ==== DML
 

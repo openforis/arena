@@ -7,6 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as NodeAnalysisTable from '@common/surveyRdb/nodeAnalysisTable'
 
 import * as DataTable from './dataTable'
 import * as DataCol from './dataCol'
@@ -83,6 +84,10 @@ export const getJoin = (schemaName, nodeDef, nodeDefParent) =>
         ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
         `
     : ''
+
+export const getJoinNodeAnalysis = schemaName =>
+  `LEFT OUTER JOIN ${schemaName}.${NodeAnalysisTable.tableName}
+    ON ${alias}.${DataTable.colNameUuuid} = ${schemaName}.${NodeAnalysisTable.tableName}.${NodeAnalysisTable.colNames.parentUuid}`
 
 export const getFromTable = (survey, nodeDef) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

@@ -23,6 +23,7 @@ const toTableViewCreate = (survey, nodeDef) => {
     viewFields: RDBDataView.getSelectFields(survey, nodeDef),
     viewFrom: `${RDBDataView.getFromTable(survey, nodeDef)} as ${RDBDataView.alias}`,
     viewJoin: RDBDataView.getJoin(schemaName, nodeDef, nodeDefParent),
+    viewJoinNodeAnalysis: RDBDataView.getJoinNodeAnalysis(schemaName),
     viewWhereCondition: RDBDataView.getWhereCondition(nodeDef),
   }
 }
@@ -53,6 +54,7 @@ export const createTableAndView = async (survey, nodeDef, client) => {
       SELECT ${tableViewCreate.viewFields.join(', ')}
       FROM ${tableViewCreate.viewFrom}
       ${tableViewCreate.viewJoin}
+      ${tableViewCreate.viewJoinNodeAnalysis}
       ${tableViewCreate.viewWhereCondition}
   `)
 }
