@@ -7,10 +7,11 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 
-import { RFileSystem } from './rFile'
 import RStep from './rStep'
+import { RFileSystem } from './rFile'
+import RFileInit from './_files/system/rFileInit'
 
-const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'chain', 'r_studio_project.Rproj')
+const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
 
 class RChain {
   constructor(surveyId, cycle, chainUuid) {
@@ -38,6 +39,10 @@ class RChain {
     this._fileCommon = null
 
     this._counter = new Counter()
+  }
+
+  get surveyId() {
+    return this._surveyId
   }
 
   get survey() {
@@ -93,7 +98,7 @@ class RChain {
     ])
 
     // Init system files
-    this._fileInit = await new RFileSystem(this, 'init').init()
+    this._fileInit = await new RFileInit(this).init()
     this._fileResetResults = await new RFileSystem(this, 'reset-results').init()
     this._fileReadData = await new RFileSystem(this, 'read-data').init()
 

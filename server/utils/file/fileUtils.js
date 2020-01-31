@@ -10,7 +10,7 @@ export { join, sep } from 'path'
 
 // ====== FILE
 
-export const readFile = async filePath => await promises.readFile(filePath, { encoding: 'utf-8' })
+export const readFile = async filePath => await promises.readFile(filePath, { encoding: 'utf8' })
 
 export const appendFile = async (path, data = '') => await promises.appendFile(path, data)
 
