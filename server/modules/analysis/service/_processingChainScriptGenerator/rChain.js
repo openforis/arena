@@ -46,6 +46,12 @@ class RChain {
   async _initDirSystem() {
     this._fileSystemInit = new RFile(this, FileUtils.join(this._dirSystem, this._newFileName('init.R')))
     await this._fileSystemInit.init()
+
+    this._fileSystemResetResults = new RFile(
+      this,
+      FileUtils.join(this._dirSystem, this._newFileName('reset-results.R')),
+    )
+    await this._fileSystemResetResults.init()
   }
 
   async _initFiles() {
