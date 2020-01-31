@@ -63,15 +63,8 @@ export const generateScriptDeprecated = async (surveyId, cycle, processingChain)
   }
 }
 
-const _generateChainDirs = async path => {
-  const dirSystem = FileUtils.join(path, 'system')
-  const dirUser = FileUtils.join(path, 'user')
-  await Promise.all([FileUtils.mkdir(dirSystem), FileUtils.mkdir(dirUser)])
-  return { dirSystem, dirUser }
-}
-
-export const generateScript = async (surveyId, chainUuid) => {
-  const rChain = new RChain(surveyId, chainUuid)
+export const generateScript = async (surveyId, chainUuid, cycle) => {
+  const rChain = new RChain(surveyId, cycle, chainUuid)
   await rChain.init()
   // Const dirChain = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, chainUuid)
   // await FileUtils.rmdir(dirChain)

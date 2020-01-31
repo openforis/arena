@@ -49,6 +49,7 @@ const ProcessingChainView = props => {
 
   const { dispatch: generateScript } = useAsyncGetRequest(
     `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/processing-chain/${processingChainUuid}/script`,
+    { params: { surveyCycleKey } },
   )
 
   useEffect(() => {

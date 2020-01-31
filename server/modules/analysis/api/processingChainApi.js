@@ -66,9 +66,9 @@ export const init = app => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
+        const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
 
-        await ProcessingChainService.generateScript(surveyId, processingChainUuid)
+        await ProcessingChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid)
 
         Response.sendOk(res)
       } catch (error) {
