@@ -23,8 +23,17 @@ class RFile {
     )(this._path)
   }
 
+  get rChain() {
+    return this._rChain
+  }
+
   get path() {
     return this._path
+  }
+
+  async appendContent(content) {
+    await FileUtils.appendFile(this.path, content)
+    await FileUtils.appendFile(this.path, StringUtils.NEW_LINE + StringUtils.NEW_LINE)
   }
 
   async init() {

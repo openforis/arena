@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 
-import * as SurveyManager from '../../survey/manager/surveyManager'
-import * as SurveyRdbManager from '../manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 const _fetchSurvey = async (surveyId, cycle) => {
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId, true))

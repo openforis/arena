@@ -4,8 +4,8 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 
-import RCalculation from '@server/modules/analysis/service/_processingChainScriptGenerator/rCalculation'
-import { padStart } from '@server/modules/analysis/service/_processingChainScriptGenerator/rFile'
+import RCalculation from '@server/modules/analysis/service/_rChain/rCalculation'
+import { padStart } from '@server/modules/analysis/service/_rChain/rFile'
 
 export default class RStep {
   constructor(surveyId, rChain, step) {
