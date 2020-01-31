@@ -6,7 +6,7 @@ export const mkdir = async path => await promises.mkdir(path, { recursive: true 
 
 export const rmdir = async path => await promises.rmdir(path, { recursive: true })
 
-export { join } from 'path'
+export { join, sep } from 'path'
 
 // ====== FILE
 

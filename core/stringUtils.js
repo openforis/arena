@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+export const NEW_LINE = '\r\n'
+
 export const nbsp = '\u00A0'
 
 export const isString = R.is(String)
