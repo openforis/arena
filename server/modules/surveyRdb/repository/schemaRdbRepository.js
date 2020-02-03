@@ -8,10 +8,11 @@ export const createSchema = async (surveyId, client = db) =>
   await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
 export const grantSchemaSelectToUser = async (surveyId, userName, client = db) => {
+  const schema = SchemaRdb.getName(surveyId)
   await client.query(`
-    GRANT USAGE ON SCHEMA ${SchemaRdb.getName(surveyId)} TO "${userName}"
+    GRANT USAGE ON SCHEMA ${schema} TO "${userName}"
   `)
   await client.query(`
-    GRANT SELECT ON ALL TABLES IN SCHEMA ${SchemaRdb.getName(surveyId)} TO "${userName}"
+    GRANT SELECT ON ALL TABLES IN SCHEMA ${schema} TO "${userName}"
   `)
 }
