@@ -15,6 +15,7 @@ import ProcessingChainsCyclesCheckJob from './jobs/processingChainsCyclesCheckJo
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
 import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
+import UserAnalysisCreationJob from './jobs/userAnalysisCreationJob'
 
 export default class SurveyPublishJob extends Job {
   constructor(params) {
@@ -31,6 +32,7 @@ export default class SurveyPublishJob extends Job {
       new SurveyDependencyGraphsGenerationJob(),
       new SurveyRdbGeneratorJob(),
       new RecordsUniquenessValidationJob(),
+      new UserAnalysisCreationJob(),
     ])
   }
 
