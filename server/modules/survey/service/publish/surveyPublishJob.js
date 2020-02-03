@@ -30,9 +30,9 @@ export default class SurveyPublishJob extends Job {
       new RecordCheckJob(),
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
-      new UserAnalysisCreationJob(),
       new SurveyRdbGeneratorJob(),
       new RecordsUniquenessValidationJob(),
+      new UserAnalysisCreationJob(),
     ])
   }
 

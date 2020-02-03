@@ -119,3 +119,12 @@ export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
     DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE jsonb_array_length(props->'${ProcessingChain.keysProps.cycles}') = 0
   `)
+
+// ===== GRANT PRIVILEGES
+export const grantUpdateOnProcessingChainStatusToUser = async (surveyId, userName, client = db) =>
+  await client.query(`
+    GRANT 
+      UPDATE (status_exec) 
+      ON ${getSurveyDBSchema(surveyId)}.processing_chain
+      TO "${userName}"
+  `)

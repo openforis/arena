@@ -4,41 +4,26 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as UserAnalysis from '@core/user/userAnalysis'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as DataTable from '../schemaRdb/dataTable'
 
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
-import * as UserAnalysisRepository from '@server/modules/user/repository/userAnalysisRepository'
 
-import * as SchemaRdbRepository from '../repository/schemaRdbRepository'
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
-import * as DataViewCreateRepository from '../repository/dataViewCreateRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
-import * as NodeAnalysisTableRepository from '../repository/nodeAnalysisTableRepository'
 
 // ==== DDL
 
-export const dropSchema = SchemaRdbRepository.dropSchema
-export const createSchema = SchemaRdbRepository.createSchema
-export const createTableAndView = DataViewCreateRepository.createTableAndView
+export { createSchema, dropSchema, grantSchemaSelectToUser } from '../repository/schemaRdbRepository'
+export { createTableAndView } from '../repository/dataViewCreateRepository'
 
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
-export { createNodeAnalysisTable } from '../repository/nodeAnalysisTableRepository'
-
-export const grantPrivilegesToUserAnalysis = async (surveyId, client = db) => {
-  const userAnalysis = await UserAnalysisRepository.fetchUserAnalysisBySurveyId(surveyId, client)
-  const userAnalysisName = UserAnalysis.getName(userAnalysis)
-  // Grant SELECT from RDB schema tables and views
-  await SchemaRdbRepository.grantSchemaSelectToUser(surveyId, userAnalysisName, client)
-  // Grant INSERT into node_analysis table
-  await NodeAnalysisTableRepository.grantNodeAnalysisTableWritePermissions(surveyId, userAnalysisName, client)
-}
+export { createNodeAnalysisTable, grantWriteOnNodeAnalysisToUser } from '../repository/nodeAnalysisTableRepository'
 
 // ==== DML
 

@@ -22,8 +22,8 @@ export const createNodeAnalysisTable = async (surveyId, client) => {
   `)
 }
 
-// ===== GRANT PERMISSIONS
-export const grantNodeAnalysisTableWritePermissions = async (surveyId, userName, client) =>
+// ===== GRANT PRIVILEGES
+export const grantWriteOnNodeAnalysisToUser = async (surveyId, userName, client) =>
   await client.query(`
     GRANT SELECT, INSERT, UPDATE, DELETE 
     ON ${SchemaRdb.getName(surveyId)}.${NodeAnalysisTable.tableName}
