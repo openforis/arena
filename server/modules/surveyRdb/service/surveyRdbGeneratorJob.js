@@ -73,10 +73,10 @@ export default class SurveyRdbGeneratorJob extends Job {
     this.logDebug('create node keys hierarchy view - end')
 
     // 5 ===== Create grant read privileges to views to analysis db user
-    this.logDebug('grant read privileges to analysis user - start')
-    await SurveyRdbManager.grantReadPrivilegesToUserAnalysis(surveyId, tx)
+    this.logDebug('grant privileges to analysis user - start')
+    await SurveyRdbManager.grantPrivilegesToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
-    this.logDebug('grant read privileges to analysis user - end')
+    this.logDebug('grant privileges to analysis user - end')
   }
 
   async fetchSurvey(tx) {

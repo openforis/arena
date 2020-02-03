@@ -18,6 +18,7 @@ import * as DataTableUpdateRepository from '../repository/dataTableUpdateReposit
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewCreateRepository from '../repository/dataViewCreateRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
+import * as NodeAnalysisTableRepository from '../repository/nodeAnalysisTableRepository'
 
 // ==== DDL
 
@@ -30,9 +31,13 @@ export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarch
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
 export { createNodeAnalysisTable } from '../repository/nodeAnalysisTableRepository'
 
-export const grantReadPrivilegesToUserAnalysis = async (surveyId, client = db) => {
+export const grantPrivilegesToUserAnalysis = async (surveyId, client = db) => {
   const userAnalysis = await UserAnalysisRepository.fetchUserAnalysisBySurveyId(surveyId, client)
-  await SchemaRdbRepository.grantSchemaSelectToUser(surveyId, UserAnalysis.getName(userAnalysis), client)
+  const userAnalysisName = UserAnalysis.getName(userAnalysis)
+  // Grant SELECT from RDB schema tables and views
+  await SchemaRdbRepository.grantSchemaSelectToUser(surveyId, userAnalysisName, client)
+  // Grant INSERT into node_analysis table
+  await NodeAnalysisTableRepository.grantNodeAnalysisTableWritePermissions(surveyId, userAnalysisName, client)
 }
 
 // ==== DML
