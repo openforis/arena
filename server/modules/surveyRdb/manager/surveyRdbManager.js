@@ -4,11 +4,13 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as UserAnalysis from '@core/user/userAnalysis'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as DataTable from '../schemaRdb/dataTable'
 
-import * as RecordRepository from '../../record/repository/recordRepository'
-import * as NodeRepository from '../../record/repository/nodeRepository'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import * as UserAnalysisRepository from '@server/modules/user/repository/userAnalysisRepository'
 
 import * as SchemaRdbRepository from '../repository/schemaRdbRepository'
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
@@ -27,6 +29,11 @@ export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
 export { createNodeAnalysisTable } from '../repository/nodeAnalysisTableRepository'
+
+export const grantReadPrivilegesToUserAnalysis = async (surveyId, client = db) => {
+  const userAnalysis = await UserAnalysisRepository.fetchUserAnalysisBySurveyId(surveyId, client)
+  await SchemaRdbRepository.grantSchemaSelectToUser(surveyId, UserAnalysis.getName(userAnalysis), client)
+}
 
 // ==== DML
 

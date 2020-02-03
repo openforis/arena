@@ -17,15 +17,16 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import { migrateSurveySchema } from '@server/db/migration/dbMigrator'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as UserManager from '../../user/manager/userManager'
-import * as NodeDefManager from '../../nodeDef/manager/nodeDefManager'
+import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as CategoryRepository from '@server/modules//category/repository/categoryRepository'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
+import * as TaxonomyRepository from '@server/modules//taxonomy/repository/taxonomyRepository'
+import * as UserManager from '@server/modules/user/manager/userManager'
+import * as UserAnalysisRepository from '@server/modules/user/repository/userAnalysisRepository'
+import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
-import * as CategoryRepository from '../../category/repository/categoryRepository'
-import * as TaxonomyRepository from '../../taxonomy/repository/taxonomyRepository'
-import * as UserRepository from '../../user/repository/userRepository'
-import * as AuthGroupRepository from '../../auth/repository/authGroupRepository'
-import * as SchemaRdbRepository from '../../surveyRdb/repository/schemaRdbRepository'
 
 const assocSurveyInfo = info => ({ info })
 
@@ -240,6 +241,7 @@ export const deleteSurvey = async surveyId =>
         UserRepository.deleteUsersPrefsSurvey(surveyId, t),
         SurveyRepository.dropSurveySchema(surveyId, t),
         SchemaRdbRepository.dropSchema(surveyId, t),
+        UserAnalysisRepository.deleteUserAnalysisBySurveyId(surveyId, t),
         SurveyRepository.deleteSurvey(surveyId, t),
       ]),
   )

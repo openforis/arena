@@ -8,7 +8,7 @@ export default class UserAnalysisCreationJob extends Job {
   }
 
   async execute() {
-    await UserAnalysisManager.insertOrUpdateUserAnalysis(this.surveyId, this.tx)
+    await UserAnalysisManager.insertUserAnalysis(this.surveyId, this.tx)
   }
 }
 
