@@ -239,9 +239,6 @@ export const updateSurveyDependencyGraphs = SurveyRepository.updateSurveyDepende
 // ====== DELETE
 export const deleteSurvey = async surveyId =>
   await db.tx(async t => {
-    // Fetch user analysis before survey is deleted
-    const userAnalysis = await UserAnalysisManager.fetchUserAnalysisBySurveyId(surveyId, t)
-
     await Promise.all([
       UserRepository.deleteUsersPrefsSurvey(surveyId, t),
       SurveyRepository.dropSurveySchema(surveyId, t),
@@ -250,7 +247,7 @@ export const deleteSurvey = async surveyId =>
     ])
 
     // Delete user analysis after rdb and survey schemas have been deleted
-    await DbUtils.dropUser(UserAnalysis.getName(userAnalysis), t)
+    await DbUtils.dropUser(UserAnalysis.getName(surveyId), t)
   })
 
 export const dropSurveySchema = SurveyRepository.dropSurveySchema

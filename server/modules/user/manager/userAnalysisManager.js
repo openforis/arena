@@ -15,7 +15,7 @@ export const insertUserAnalysis = async (surveyId, client = db) =>
     }
 
     const userAnalysis = await UserAnalysisRepository.insertUserAnalysis(surveyId, t)
-    await DbUtils.createUser(UserAnalysis.getName(userAnalysis), UserAnalysis.getPassword(userAnalysis), t)
+    await DbUtils.createUser(UserAnalysis.getName(surveyId), UserAnalysis.getPassword(userAnalysis), t)
     return userAnalysis
   })
 

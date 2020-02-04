@@ -16,21 +16,21 @@ export default class UserAnalysisCreationJob extends Job {
     this.total = 4
 
     // Create user (if not existing)
-    const userAnalysis = await UserAnalysisManager.insertUserAnalysis(this.surveyId, this.tx)
+    await UserAnalysisManager.insertUserAnalysis(surveyId, this.tx)
     this.incrementProcessedItems()
 
-    const userAnalysisName = UserAnalysis.getName(userAnalysis)
+    const userAnalysisName = UserAnalysis.getName(surveyId)
 
     // Grant SELECT on RDB schema tables and views
     await SchemaRdbManager.grantSchemaSelectToUser(surveyId, userAnalysisName, tx)
     this.incrementProcessedItems()
 
     // Grant INSERT/UPDATE/DELETE on node_analysis table
-    await SchemaRdbManager.grantWriteOnNodeAnalysisToUser(surveyId, userAnalysisName, tx)
+    await SchemaRdbManager.grantWriteOnNodeAnalysisToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant UPDATE on processing_chain.status_exec
-    await ProcessingChainManager.grantUpdateOnProcessingChainStatusToUser(surveyId, userAnalysisName, tx)
+    await ProcessingChainManager.grantUpdateOnProcessingChainStatusToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
   }
 }

@@ -23,7 +23,10 @@ export { createTableAndView } from '../repository/dataViewCreateRepository'
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
-export { createNodeAnalysisTable, grantWriteOnNodeAnalysisToUser } from '../repository/nodeAnalysisTableRepository'
+export {
+  createNodeAnalysisTable,
+  grantWriteOnNodeAnalysisToUserAnalysis,
+} from '../repository/nodeAnalysisTableRepository'
 
 // ==== DML
 

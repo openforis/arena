@@ -21,14 +21,3 @@ export const fetchUserAnalysisBySurveyId = async (surveyId, client = db) =>
     `,
     [surveyId],
   )
-
-// ===== DELETE
-export const deleteUserAnalysis = async (surveyId, client = db) =>
-  await client.oneOrNone(
-    `
-    DELETE FROM user_analysis
-    WHERE survey_id = $1
-    RETURNING *
-    `,
-    [surveyId],
-  )

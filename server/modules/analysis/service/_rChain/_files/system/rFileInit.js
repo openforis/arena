@@ -26,7 +26,7 @@ export default class RFileInit extends RFileSystem {
     const connection = dbConnect(
       ProcessUtils.ENV.pgHost,
       ProcessUtils.ENV.pgDatabase,
-      UserAnalysis.getName(userAnalysis),
+      UserAnalysis.getName(surveyId),
       UserAnalysis.getPassword(userAnalysis),
       ProcessUtils.ENV.pgPort,
     )

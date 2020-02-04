@@ -1,3 +1,4 @@
+import * as UserAnalysis from '@core/user/userAnalysis'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeAnalysisTable from '@common/surveyRdb/nodeAnalysisTable'
 import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
@@ -23,9 +24,9 @@ export const createNodeAnalysisTable = async (surveyId, client) => {
 }
 
 // ===== GRANT PRIVILEGES
-export const grantWriteOnNodeAnalysisToUser = async (surveyId, userName, client) =>
+export const grantWriteOnNodeAnalysisToUserAnalysis = async (surveyId, client) =>
   await client.query(`
     GRANT SELECT, INSERT, UPDATE, DELETE 
     ON ${SchemaRdb.getName(surveyId)}.${NodeAnalysisTable.tableName}
-    TO "${userName}"
+    TO "${UserAnalysis.getName(surveyId)}"
   `)

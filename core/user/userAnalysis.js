@@ -1,9 +1,8 @@
 import * as R from 'ramda'
 
 const keys = {
-  name: 'name',
   password: 'password',
 }
 
-export const getName = R.prop(keys.name)
+export const getName = surveyId => `arena_analysis_${surveyId}`
 export const getPassword = R.prop(keys.password)

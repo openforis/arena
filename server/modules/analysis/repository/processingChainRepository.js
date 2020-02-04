@@ -1,6 +1,7 @@
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
+import * as UserAnalysis from '@core/user/userAnalysis'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
@@ -121,10 +122,10 @@ export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
   `)
 
 // ===== GRANT PRIVILEGES
-export const grantUpdateOnProcessingChainStatusToUser = async (surveyId, userName, client = db) =>
+export const grantUpdateOnProcessingChainStatusToUserAnalysis = async (surveyId, client = db) =>
   await client.query(`
     GRANT 
       UPDATE (status_exec) 
       ON ${getSurveyDBSchema(surveyId)}.processing_chain
-      TO "${userName}"
+      TO "${UserAnalysis.getName(surveyId)}"
   `)
