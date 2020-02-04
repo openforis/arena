@@ -8,7 +8,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
-import { dbGetQuery } from '@server/modules/analysis/service/_rChain/rFunctions'
+import { dbGetQuery, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 export default class RFileReadData extends RFileSystem {
   constructor(rChain) {
@@ -28,7 +28,7 @@ export default class RFileReadData extends RFileSystem {
         const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
         const entityDefParent = Survey.getNodeDefParent(entityDef)(survey)
         const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
-        const query = `${NodeDef.getName(entityDef)} <- ${dbGetQuery(`select * from ${schema}.${viewName}`)}`
+        const query = setVar(NodeDef.getName(entityDef), dbGetQuery(schema, viewName))
         await this.appendContent(query)
       }
     }
