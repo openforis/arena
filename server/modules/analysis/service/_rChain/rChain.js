@@ -60,6 +60,10 @@ class RChain {
     return this._chain
   }
 
+  get cycle() {
+    return this._cycle
+  }
+
   get dirSystem() {
     return this._dirSystem
   }
@@ -77,7 +81,7 @@ class RChain {
   }
 
   async _initSurveyAndChain() {
-    this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this._cycle)
+    this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     this._chain = await ProcessingChainManager.fetchChainByUuid(this.surveyId, this.chainUuid)
     const steps = await ProcessingChainManager.fetchStepsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
