@@ -11,6 +11,7 @@ import RStep from './rStep'
 import { RFileSystem } from './rFile'
 import RFileInit from './_files/system/rFileInit'
 import RFileResetResults from './_files/system/rFileResetResults'
+import RFileReadData from './_files/system/rFileReadData'
 import RFileClose from './_files/system/rFileClose'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
@@ -106,7 +107,7 @@ class RChain {
     // Init system files
     this._fileInit = await new RFileInit(this).init()
     this._fileResetResults = await new RFileResetResults(this).init()
-    this._fileReadData = await new RFileSystem(this, 'read-data').init()
+    this._fileReadData = await new RFileReadData(this).init()
 
     // Init user files
     this._fileCommon = await new RFileSystem(this, 'common').init()

@@ -8,6 +8,7 @@ import {
   arenaStartTime,
   dbDisconnect,
   dbSendQuery,
+  setVar,
   sysTime,
 } from '@server/modules/analysis/service/_rChain/rFunctions'
 
@@ -27,7 +28,7 @@ export default class RFileClose extends RFileSystem {
 
     await this.appendContent(dbDisconnect())
 
-    await this.appendContent(`${arenaEndTime} <- ${sysTime()}`)
+    await this.appendContent(setVar(arenaEndTime, sysTime()))
 
     const logEnd = `paste(paste('Processing chain successfully executed in' , as.numeric((${arenaEndTime} - ${arenaStartTime}) , units='secs') , sep = ' ') , 'seconds' , sep = ' ')`
     return this.logInfo(logEnd)
