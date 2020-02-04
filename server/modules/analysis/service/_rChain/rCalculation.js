@@ -1,4 +1,13 @@
+import * as R from 'ramda'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+
 import { RFileCalculation } from '@server/modules/analysis/service/_rChain/rFile'
+import { dfVar, NA, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 export default class RCalculation {
   constructor(rStep, calculation) {
@@ -17,6 +26,25 @@ export default class RCalculation {
 
   async init() {
     await this._rFile.init()
+
+    const survey = this.rStep.rChain.survey
+    const step = this.rStep.step
+
+    if (ProcessingStep.hasEntity(step)) {
+      const entityName = R.pipe(
+        ProcessingStep.getEntityUuid,
+        uuid => Survey.getNodeDefByUuid(uuid)(survey),
+        NodeDef.getName,
+      )(step)
+
+      const attributeName = R.pipe(
+        ProcessingStepCalculation.getNodeDefUuid,
+        uuid => Survey.getNodeDefByUuid(uuid)(survey),
+        NodeDef.getName,
+      )(this.calculation)
+
+      await this._rFile.appendContent(setVar(dfVar(entityName, attributeName), NA))
+    }
 
     return this
   }
