@@ -4,10 +4,11 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 
 // ===== CREATE
 export const insertUserAnalysis = async (surveyId, client = db) =>
-  await client.query(
+  await client.one(
     `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.user_analysis
       DEFAULT VALUES
+      RETURNING *
     `,
   )
 
