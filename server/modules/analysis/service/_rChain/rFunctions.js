@@ -16,6 +16,8 @@ export const dbConnect = (host, database, user, password, port) =>
 
 export const dbDisconnect = () => `dbDisconnect(${connection});`
 
+export const dbGetQuery = statement => `dbGetQuery(conn=${connection}, statement="${statement}");`
+
 export const dbSendQuery = statement => `dbSendQuery(conn=${connection}, statement="${statement}");`
 
 export const sysTime = () => `Sys.time()`

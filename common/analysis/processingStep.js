@@ -95,4 +95,5 @@ export const dissocCalculation = calculation =>
 
 // ===== UTILS
 
+export const hasEntity = R.pipe(getEntityUuid, R.isNil, R.not)
 export const hasCategory = R.pipe(getCategoryUuid, R.isNil, R.not)
