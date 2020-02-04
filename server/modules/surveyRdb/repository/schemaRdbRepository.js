@@ -1,7 +1,7 @@
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as UserAnalysis from '@common/analysis/userAnalysis'
 
-import { db } from '@server/db/sb'
+import { db } from '@server/db/db'
 
 export const dropSchema = async (surveyId, client = db) =>
   await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)

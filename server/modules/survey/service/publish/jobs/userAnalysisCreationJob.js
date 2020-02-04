@@ -1,7 +1,7 @@
 import Job from '@server/job/job'
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 import * as SchemaRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import * as UserAnalysisManager from '@server/modules/user/manager/userAnalysisManager'
+import * as UserAnalysisManager from '@server/modules/analysis/manager/userAnalysisManager'
 
 export default class UserAnalysisCreationJob extends Job {
   constructor() {

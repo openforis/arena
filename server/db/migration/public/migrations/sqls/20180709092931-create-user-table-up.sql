@@ -42,13 +42,3 @@ CREATE TABLE
 CREATE UNIQUE INDEX
 user_reset_password_user_idx
 ON user_reset_password (user_uuid);
-
-CREATE TABLE
-  user_analysis
-(
-  survey_id     BIGINT      NOT NULL REFERENCES survey("id") ON DELETE CASCADE,
-  name          VARCHAR(47) NOT NULL DEFAULT 'arena_data_' || uuid_generate_v4(),
-  password      VARCHAR(36) NOT NULL DEFAULT uuid_generate_v4(),
-
-  PRIMARY KEY (survey_id)
-);

@@ -36,3 +36,9 @@ CREATE TABLE
     CONSTRAINT processingstepcalculation_nodedef_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
     CONSTRAINT processingstepcalculation_index_idx UNIQUE (processing_step_uuid, index)
   );
+
+CREATE TABLE
+  user_analysis
+(
+  password VARCHAR(36) NOT NULL DEFAULT uuid_generate_v4()
+);

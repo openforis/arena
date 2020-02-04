@@ -4,7 +4,7 @@ import * as UserAnalysis from '@common/analysis/userAnalysis'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as UserAnalysisManager from '@server/modules/user/manager/userAnalysisManager'
+import * as UserAnalysisManager from '@server/modules/analysis/manager/userAnalysisManager'
 import { dbConnect, dbSendQuery } from '@server/modules/analysis/service/_rChain/rFunctions'
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 

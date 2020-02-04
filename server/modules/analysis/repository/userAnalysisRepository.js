@@ -1,23 +1,20 @@
 import { db } from '@server/db/db'
 
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+
 // ===== CREATE
 export const insertUserAnalysis = async (surveyId, client = db) =>
-  await client.one(
+  await client.query(
     `
-      INSERT INTO 
-        user_analysis(survey_id) 
-      VALUES ($1)
-      RETURNING *
+      INSERT INTO ${getSurveyDBSchema(surveyId)}.user_analysis
+      DEFAULT VALUES
     `,
-    [surveyId],
   )
 
 // ===== READ
 export const fetchUserAnalysisBySurveyId = async (surveyId, client = db) =>
   await client.oneOrNone(
     `
-    SELECT * FROM user_analysis
-    WHERE survey_id = $1
+    SELECT * FROM ${getSurveyDBSchema(surveyId)}.user_analysis
     `,
-    [surveyId],
   )
