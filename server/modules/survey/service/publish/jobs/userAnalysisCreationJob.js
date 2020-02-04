@@ -1,5 +1,3 @@
-import * as UserAnalysis from '@common/analysis/userAnalysis'
-
 import Job from '@server/job/job'
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 import * as SchemaRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -19,18 +17,16 @@ export default class UserAnalysisCreationJob extends Job {
     await UserAnalysisManager.insertUserAnalysis(surveyId, this.tx)
     this.incrementProcessedItems()
 
-    const userAnalysisName = UserAnalysis.getName(surveyId)
-
     // Grant SELECT on RDB schema tables and views
-    await SchemaRdbManager.grantSchemaSelectToUser(surveyId, userAnalysisName, tx)
+    await SchemaRdbManager.grantSelectToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant INSERT/UPDATE/DELETE on node_analysis table
-    await SchemaRdbManager.grantWriteOnNodeAnalysisToUserAnalysis(surveyId, tx)
+    await SchemaRdbManager.grantWriteToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant UPDATE on processing_chain.status_exec
-    await ProcessingChainManager.grantUpdateOnProcessingChainStatusToUserAnalysis(surveyId, tx)
+    await ProcessingChainManager.grantUpdateToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
   }
 }

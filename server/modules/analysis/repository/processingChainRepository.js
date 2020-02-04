@@ -122,7 +122,7 @@ export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
   `)
 
 // ===== GRANT PRIVILEGES
-export const grantUpdateOnProcessingChainStatusToUserAnalysis = async (surveyId, client = db) =>
+export const grantUpdateToUserAnalysis = async (surveyId, client = db) =>
   await client.query(`
     GRANT 
       UPDATE (status_exec) 

@@ -382,4 +382,4 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
 
 // ===== GRANT PRIVILEGES
 
-export { grantUpdateOnProcessingChainStatusToUserAnalysis } from '../repository/processingChainRepository'
+export { grantUpdateToUserAnalysis } from '../repository/processingChainRepository'

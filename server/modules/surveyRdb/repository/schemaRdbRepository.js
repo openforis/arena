@@ -1,5 +1,7 @@
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import { db } from '../../../db/db'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
+
+import { db } from '@server/db/sb'
 
 export const dropSchema = async (surveyId, client = db) =>
   await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)
@@ -7,8 +9,9 @@ export const dropSchema = async (surveyId, client = db) =>
 export const createSchema = async (surveyId, client = db) =>
   await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
-export const grantSchemaSelectToUser = async (surveyId, userName, client = db) => {
+export const grantSelectToUserAnalysis = async (surveyId, client = db) => {
   const schema = SchemaRdb.getName(surveyId)
+  const userName = UserAnalysis.getName(surveyId)
   await client.query(`
     GRANT USAGE ON SCHEMA ${schema} TO "${userName}"
   `)
