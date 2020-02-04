@@ -2,6 +2,8 @@ import * as R from 'ramda'
 import * as pgPromise from 'pg-promise'
 import * as _QueryStream from 'pg-query-stream'
 
+import { db } from '@server/db/db'
+
 const pgp = pgPromise()
 
 export const QueryStream = _QueryStream
@@ -89,3 +91,9 @@ export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
   `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`
 
 export const formatQuery = pgp.as.format
+
+// USERS (ROLES)
+export const createUser = async (name, password, client = db) =>
+  await client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
+
+export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)

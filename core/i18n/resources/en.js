@@ -698,6 +698,7 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
+    UserAnalysisCreationJob: 'Creating Analysis User',
   },
 
   // ====== App Errors

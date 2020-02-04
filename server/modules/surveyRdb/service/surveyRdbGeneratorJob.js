@@ -19,7 +19,7 @@ export default class SurveyRdbGeneratorJob extends Job {
     // Get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
 
-    this.total = 1 + length + 4 // Create schema + create node analysis table + create and populate tables + create views
+    this.total = 2 + length + 3 // Create schema + create node_analysis table + create and populate tables + create views
 
     this.logDebug('drop and create schema - start')
 

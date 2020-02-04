@@ -379,3 +379,7 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
     // Delete unused node defs analysis
     return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
   })
+
+// ===== GRANT PRIVILEGES
+
+export { grantUpdateToUserAnalysis } from '../repository/processingChainRepository'

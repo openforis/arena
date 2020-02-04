@@ -7,26 +7,23 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as DataTable from '../schemaRdb/dataTable'
 
-import * as RecordRepository from '../../record/repository/recordRepository'
-import * as NodeRepository from '../../record/repository/nodeRepository'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
-import * as SchemaRdbRepository from '../repository/schemaRdbRepository'
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
-import * as DataViewCreateRepository from '../repository/dataViewCreateRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
 
 // ==== DDL
 
-export const dropSchema = SchemaRdbRepository.dropSchema
-export const createSchema = SchemaRdbRepository.createSchema
-export const createTableAndView = DataViewCreateRepository.createTableAndView
+export { createSchema, dropSchema, grantSelectToUserAnalysis } from '../repository/schemaRdbRepository'
+export { createTableAndView } from '../repository/dataViewCreateRepository'
 
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
-export { createNodeAnalysisTable } from '../repository/nodeAnalysisTableRepository'
+export { createNodeAnalysisTable, grantWriteToUserAnalysis } from '../repository/nodeAnalysisTableRepository'
 
 // ==== DML
 
