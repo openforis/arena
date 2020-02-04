@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { db } from '@server/db/db'
 import { uuidv4 } from '@core/uuid'
 
 import * as Survey from '@core/survey/survey'
@@ -10,20 +9,24 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
+import * as UserAnalysis from '@core/user/userAnalysis'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
 import * as AuthGroup from '@core/auth/authGroup'
 
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import { migrateSurveySchema } from '@server/db/migration/dbMigrator'
+
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
-import * as CategoryRepository from '@server/modules//category/repository/categoryRepository'
+import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
-import * as TaxonomyRepository from '@server/modules//taxonomy/repository/taxonomyRepository'
+import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
-import * as UserAnalysisRepository from '@server/modules/user/repository/userAnalysisRepository'
+import * as UserAnalysisManager from '@server/modules/user/manager/userAnalysisManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
@@ -235,15 +238,19 @@ export const updateSurveyDependencyGraphs = SurveyRepository.updateSurveyDepende
 
 // ====== DELETE
 export const deleteSurvey = async surveyId =>
-  await db.tx(
-    async t =>
-      await Promise.all([
-        UserRepository.deleteUsersPrefsSurvey(surveyId, t),
-        SurveyRepository.dropSurveySchema(surveyId, t),
-        SchemaRdbRepository.dropSchema(surveyId, t),
-        UserAnalysisRepository.deleteUserAnalysisBySurveyId(surveyId, t),
-        SurveyRepository.deleteSurvey(surveyId, t),
-      ]),
-  )
+  await db.tx(async t => {
+    // Fetch user analysis before survey is deleted
+    const userAnalysis = await UserAnalysisManager.fetchUserAnalysisBySurveyId(surveyId, t)
+
+    await Promise.all([
+      UserRepository.deleteUsersPrefsSurvey(surveyId, t),
+      SurveyRepository.dropSurveySchema(surveyId, t),
+      SchemaRdbRepository.dropSchema(surveyId, t),
+      SurveyRepository.deleteSurvey(surveyId, t),
+    ])
+
+    // Delete user analysis after rdb and survey schemas have been deleted
+    await DbUtils.dropUser(UserAnalysis.getName(userAnalysis), t)
+  })
 
 export const dropSurveySchema = SurveyRepository.dropSurveySchema
