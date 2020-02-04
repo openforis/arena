@@ -1,4 +1,4 @@
-import * as UserAnalysis from '@core/user/userAnalysis'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeAnalysisTable from '@common/surveyRdb/nodeAnalysisTable'
 import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'

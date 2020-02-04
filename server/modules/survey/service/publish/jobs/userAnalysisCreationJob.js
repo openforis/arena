@@ -1,4 +1,4 @@
-import * as UserAnalysis from '@core/user/userAnalysis'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 import Job from '@server/job/job'
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'

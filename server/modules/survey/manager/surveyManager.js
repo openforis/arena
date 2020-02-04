@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 import { uuidv4 } from '@core/uuid'
 
@@ -9,7 +10,6 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
-import * as UserAnalysis from '@core/user/userAnalysis'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 

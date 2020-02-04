@@ -1,8 +1,8 @@
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import * as UserAnalysis from '@core/user/userAnalysis'
 import * as ProcessingChain from '@common/analysis/processingChain'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 

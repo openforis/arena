@@ -1,7 +1,7 @@
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 import * as ProcessUtils from '@core/processUtils'
-import * as UserAnalysis from '@core/user/userAnalysis'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as UserAnalysisManager from '@server/modules/user/manager/userAnalysisManager'
