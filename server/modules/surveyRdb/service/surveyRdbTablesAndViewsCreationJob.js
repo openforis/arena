@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as SurveyRdbManager from 'server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 export default class SurveyRdbTablesAndViewsCreationJob extends Job {
   constructor(params) {
