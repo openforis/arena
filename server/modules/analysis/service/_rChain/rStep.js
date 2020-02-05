@@ -2,8 +2,6 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
-
 import RCalculation from '@server/modules/analysis/service/_rChain/rCalculation'
 import { padStart } from '@server/modules/analysis/service/_rChain/rFile'
 
@@ -34,10 +32,8 @@ export default class RStep {
   }
 
   async _initCalculations() {
-    const calculations = await ProcessingChainManager.fetchCalculationsByStepUuid(
-      this._surveyId,
-      ProcessingStep.getUuid(this.step),
-    )
+    const calculations = ProcessingStep.getCalculations(this.step)
+
     for (const calculation of calculations) {
       await new RCalculation(this, calculation).init()
     }

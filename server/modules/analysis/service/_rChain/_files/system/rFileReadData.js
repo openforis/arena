@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
@@ -31,7 +32,13 @@ export default class RFileReadData extends RFileSystem {
         const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
         const entityDefParent = Survey.getNodeDefParent(entityDef)(survey)
         const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
-        const selectData = dbGetQuery(schema, viewName, '*', [`${DataTable.colNameRecordCycle} = '${cycle}'`])
+        const fields = ProcessingStep.getCalculations(step).reduce((fieldsAcc, calculation) => {
+          const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+          const nodeDefName = NodeDef.getName(nodeDef)
+          return `${fieldsAcc}, uuid_generate_v4() as ${nodeDefName}_uuid`
+        }, '*')
+        const selectData = dbGetQuery(schema, viewName, fields, [`${DataTable.colNameRecordCycle} = '${cycle}'`])
         const setEntityData = setVar(NodeDef.getName(entityDef), selectData)
         await this.appendContent(setEntityData)
       }

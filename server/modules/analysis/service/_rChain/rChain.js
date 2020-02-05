@@ -83,7 +83,7 @@ class RChain {
   async _initSurveyAndChain() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     this._chain = await ProcessingChainManager.fetchChainByUuid(this.surveyId, this.chainUuid)
-    const steps = await ProcessingChainManager.fetchStepsByChainUuid(this.surveyId, this.chainUuid)
+    const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
   }
 

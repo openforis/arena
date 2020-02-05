@@ -26,8 +26,7 @@ export const insertStep = async (surveyId, step, client = db) =>
   )
 
 // ====== READ
-
-export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, client = db) => {
+const _fetchStepsByChainUuid = async (surveyId, processingChainUuid, includeCalculations, client) => {
   const schema = getSurveyDBSchema(surveyId)
 
   return await client.map(
@@ -35,6 +34,7 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
     SELECT
       s.*,
       COUNT(c.uuid) AS calculations_count
+      ${includeCalculations ? ', json_agg(c.* order by c.index) as calculations' : ''}
     FROM
       ${schema}.processing_step s
     LEFT OUTER JOIN
@@ -51,6 +51,12 @@ export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, clien
     camelize,
   )
 }
+
+export const fetchStepsByChainUuid = async (surveyId, processingChainUuid, client = db) =>
+  await _fetchStepsByChainUuid(surveyId, processingChainUuid, false, client)
+
+export const fetchStepsAndCalculationsByChainUuid = async (surveyId, processingChainUuid, client = db) =>
+  await _fetchStepsByChainUuid(surveyId, processingChainUuid, true, client)
 
 export const fetchStepSummaryByUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.oneOrNone(
