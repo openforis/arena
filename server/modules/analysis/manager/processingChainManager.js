@@ -201,7 +201,11 @@ export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '
 
 // ====== READ - Steps
 
-export { fetchStepsByChainUuid, fetchStepSummaryByIndex } from '../repository/processingStepRepository'
+export {
+  fetchStepsByChainUuid,
+  fetchStepsAndCalculationsByChainUuid,
+  fetchStepSummaryByIndex,
+} from '../repository/processingStepRepository'
 
 // ====== READ - Calculations
 

@@ -12,9 +12,14 @@ export const arenaInfo = (fileName, content) => `arena.info('${fileName}', ${con
 
 // ==== R utility functions
 
+export const NA = 'NA'
+
 export const setVar = (name, value) => `${name} <- ${value}`
 
+export const dfVar = (dataFrame, varName) => `${dataFrame}$${varName}`
+
 // ==== db functions
+
 const connection = 'connection'
 
 const dbConnect = (host, database, user, password, port) =>
