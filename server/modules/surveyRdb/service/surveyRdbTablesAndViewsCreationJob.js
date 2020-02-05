@@ -2,38 +2,26 @@ import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SurveyManager from '../../survey/manager/surveyManager'
 
-import * as SurveyRdbManager from '../manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from 'server/modules/surveyRdb/manager/surveyRdbManager'
 
-export default class SurveyRdbGeneratorJob extends Job {
+export default class SurveyRdbTablesAndViewsCreationJob extends Job {
   constructor(params) {
-    super(SurveyRdbGeneratorJob.type, params)
+    super(SurveyRdbTablesAndViewsCreationJob.type, params)
   }
 
   async execute() {
     const { tx } = this
-    const survey = await this.fetchSurvey(tx)
-    const surveyId = Survey.getId(survey)
+
+    const survey = await this.fetchSurvey()
 
     // Get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
 
-    this.total = 2 + length + 3 // Create schema + create node_analysis table + create and populate tables + create views
+    this.total = length + 3
 
-    this.logDebug('drop and create schema - start')
-
-    // 1 ==== drop and create schema
-    await SurveyRdbManager.dropSchema(surveyId, tx)
-    await SurveyRdbManager.createSchema(surveyId, tx)
-    this.incrementProcessedItems()
-    this.logDebug('drop and create schema - end')
-
-    // 2 ==== Create node analysis table
-    await SurveyRdbManager.createNodeAnalysisTable(surveyId, tx)
-    this.incrementProcessedItems()
-
-    // 3 ==== traverse entities to create and populate tables
+    // Traverse entities to create and populate tables
     const traverseNodeDef = async nodeDef => {
       if (this.isCanceled()) {
         return
@@ -56,7 +44,6 @@ export default class SurveyRdbGeneratorJob extends Job {
 
     await Survey.traverseHierarchyItem(root, traverseNodeDef)
 
-    // 4 ==== Create views
     this.logDebug('create node keys view - start')
     await SurveyRdbManager.createNodeKeysView(survey, tx)
     this.incrementProcessedItems()
@@ -73,13 +60,14 @@ export default class SurveyRdbGeneratorJob extends Job {
     this.logDebug('create node keys hierarchy view - end')
   }
 
-  async fetchSurvey(tx) {
-    const surveySummary = await SurveyManager.fetchSurveyById(this.surveyId, true, false, tx)
+  async fetchSurvey() {
+    const { surveyId, tx } = this
+    const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
     return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      this.surveyId,
+      surveyId,
       null,
       fetchDraft,
       false,
@@ -90,4 +78,4 @@ export default class SurveyRdbGeneratorJob extends Job {
   }
 }
 
-SurveyRdbGeneratorJob.type = 'SurveyRdbGeneratorJob'
+SurveyRdbTablesAndViewsCreationJob.type = 'SurveyRdbTablesAndViewsCreationJob'

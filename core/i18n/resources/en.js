@@ -674,6 +674,7 @@ $t(common.cantUndoWarning)`,
 
   // ====== Jobs
   jobs: {
+    AnalysisUserCreationJob: 'Analysis User Creation',
     CategoriesImportJob: 'Categories Import',
     CategoryImportJob: 'Category Import',
     CategoriesValidationJob: 'Categories Validation',
@@ -694,7 +695,9 @@ $t(common.cantUndoWarning)`,
     SurveyPropsPublishJob: 'Survey Props Publish',
     SurveyPublishJob: 'Survey Publish',
     SurveyPublishPerformJob: 'Survey Publish Perform',
-    SurveyRdbGeneratorJob: 'Survey RDB Generator',
+    SurveyRdbAnalysisTablesCreationJob: 'Survey RDB Analysis Tables Creation',
+    SurveyRdbSchemaCreationJob: 'Survey RDB Schema Creation',
+    SurveyRdbTablesAndViewsCreationJob: 'Survey RDB Tables And Views Creation',
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',

@@ -4,7 +4,7 @@ import * as SurveyManager from '../../../survey/manager/surveyManager'
 
 import SurveyDependencyGraphsGenerationJob from '../../../survey/service/surveyDependencyGraphsGenerationJob'
 import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
-import SurveyRdbGeneratorJob from '../../../surveyRdb/service/surveyRdbGeneratorJob'
+import SurveyRdbTablesAndViewsCreationJob from '../../../surveyRdb/service/surveyRdbTablesAndViewsCreationJob'
 import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
 import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
@@ -25,7 +25,7 @@ export default class CollectImportJob extends Job {
       new NodeDefsImportJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
-      new SurveyRdbGeneratorJob(),
+      new SurveyRdbTablesAndViewsCreationJob(),
       new RecordsUniquenessValidationJob(),
     ])
   }
