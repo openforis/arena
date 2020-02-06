@@ -14,6 +14,8 @@ import * as DataTableInsertRepository from '../repository/dataTableInsertReposit
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
+import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
+import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 
 // ==== DDL
 
@@ -135,3 +137,10 @@ export const updateTable = DataTableUpdateRepository.updateTable
 export const countDuplicateRecords = DataViewReadRepository.countDuplicateRecords
 export const fetchRecordsCountByKeys = DataViewReadRepository.fetchRecordsCountByKeys
 export const fetchRecordsWithDuplicateEntities = DataTableReadRepository.fetchRecordsWithDuplicateEntities
+
+// Result views
+export const generateResultViews = async (surveyId, client = db) => {
+  const resultViews = {}
+
+  const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
+}

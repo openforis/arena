@@ -5,3 +5,10 @@ export const getViewName = stepUuid => `${SchemaRdb.resultTablePrefix}_${stepUui
 export const colNames = {
   parentUuid: 'parent_uuid',
 }
+
+//
+const keys = {
+  step: 'step',
+  nodeDefColumns: 'nodeDefColumns',
+  viewName: 'viewName',
+}
