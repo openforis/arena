@@ -2,17 +2,11 @@ import * as R from 'ramda'
 
 import Job from '@server/job/job'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as ResultStepView from '@common/surveyRdb/resultStepView'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 
 export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   constructor(params) {
@@ -20,11 +14,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   }
 
   async execute() {
-    const { tx } = this
+    const { surveyId, tx } = this
 
     const survey = await this.fetchSurvey()
 
-    const resultViewsInfoByEntityUuid = await this._getResultViewsInfoByEntityUuid(survey)
+    const resultStepViewsByEntityUuid = await SurveyRdbManager.generateResultViews(surveyId, tx)
 
     // Get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
@@ -38,11 +32,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       }
 
       const nodeDefName = NodeDef.getName(nodeDef)
-      const resultViewInfo = resultViewsInfoByEntityUuid[NodeDef.getUuid(nodeDef)]
+      const resultStepViews = R.propOr([], NodeDef.getUuid(nodeDef), resultStepViewsByEntityUuid)
 
       // ===== create table
       this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createTableAndView(survey, nodeDef, resultViewInfo, tx)
+      await SurveyRdbManager.createTableAndView(survey, nodeDef, resultStepViews, tx)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table
@@ -86,40 +80,6 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       false,
       tx,
     )
-  }
-
-  async _getResultViewsInfoByEntityUuid(survey) {
-    const { surveyId, tx } = this
-
-    const resultViewsInfoByEntityUuid = {}
-    const chains = await ProcessingChainManager.fetchChainsBySurveyId(surveyId, null, 0, null, tx)
-    for (const chain of chains) {
-      const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(
-        surveyId,
-        ProcessingChain.getUuid(chain),
-        tx,
-      )
-      for (const step of steps) {
-        if (ProcessingStep.hasEntity(step)) {
-          const viewName = ResultStepView.getViewName(ProcessingStep.getUuid(step))
-          const nodeDefsCalculation = R.pipe(
-            ProcessingStep.getCalculations,
-            R.map(
-              R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
-                Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-              ),
-            ),
-          )(step)
-
-          resultViewsInfoByEntityUuid[ProcessingStep.getEntityUuid(step)] = {
-            viewName,
-            nodeDefsCalculation,
-          }
-        }
-      }
-    }
-
-    return resultViewsInfoByEntityUuid
   }
 }
 

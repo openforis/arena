@@ -25,7 +25,7 @@ export const columns = {
 
 export const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
-export const getSelectFields = (survey, nodeDef, nodeDefsCalculation = []) => {
+export const getSelectFields = (survey, nodeDef, resultStepViews) => {
   if (NodeDef.isVirtual(nodeDef)) {
     return ['*']
   }
@@ -38,9 +38,13 @@ export const getSelectFields = (survey, nodeDef, nodeDefsCalculation = []) => {
     fields.unshift(...cols)
   })(survey)
 
-  if (!R.isEmpty(nodeDefsCalculation)) {
-    fields.push(...R.map(NodeDef.getName, nodeDefsCalculation))
-  }
+  const nodeDefsCalculationNames = R.pipe(
+    R.map(ResultStepView.getNodeDefColumns),
+    R.flatten,
+    R.map(NodeDef.getName),
+  )(resultStepViews)
+
+  fields.push(...nodeDefsCalculationNames)
 
   const fieldKey = R.pipe(
     Survey.getNodeDefKeys(nodeDef),
@@ -91,15 +95,19 @@ export const getJoin = (schemaName, nodeDef, nodeDefParent) =>
         `
     : ''
 
-export const getJoinResultStepView = (schemaName, viewInfo) => {
-  if (viewInfo) {
-    const schemaAndViewName = `${schemaName}."${viewInfo.viewName}"`
-    return `LEFT OUTER JOIN ${schemaAndViewName}
-      ON ${alias}.${DataTable.colNameUuuid} = ${schemaAndViewName}.${ResultStepView.colNames.parentUuid}`
-  }
-
-  return ''
-}
+export const getJoinResultStepView = (schemaName, resultStepViews) =>
+  R.ifElse(
+    R.isEmpty,
+    R.always(''),
+    R.pipe(
+      R.map(resultStepView => {
+        const schemaAndViewName = `${schemaName}."${ResultStepView.getViewName(resultStepView)}"`
+        return `LEFT OUTER JOIN ${schemaAndViewName}
+          ON ${alias}.${DataTable.colNameUuuid} = ${schemaAndViewName}.${ResultStepView.colNames.parentUuid}`
+      }),
+      R.join(' '),
+    ),
+  )(resultStepViews)
 
 export const getFromTable = (survey, nodeDef) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

@@ -5,7 +5,7 @@ import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 // ===== CREATE
-export const createResultStepView = async (surveyId, stepUuid, nodeDefs, client) => {
+export const createResultStepView = async (surveyId, resultStepView, client) => {
   const schemaRdb = SchemaRdb.getName(surveyId)
   const resultNodeTable = `${schemaRdb}.${ResultNodeTable.tableName}`
 
@@ -13,7 +13,8 @@ export const createResultStepView = async (surveyId, stepUuid, nodeDefs, client)
   const joins = []
   let from = ''
   let where = ''
-  nodeDefs.forEach((nodeDef, i) => {
+
+  ResultStepView.getNodeDefColumns(resultStepView).forEach((nodeDef, i) => {
     const alias = `n${i}`
     const tableWithAlias = `${resultNodeTable} AS ${alias}`
     const conditionNodeDefUuid = `${alias}.${ResultNodeTable.colNames.nodeDefUuid} = '${NodeDef.getUuid(nodeDef)}'`
@@ -27,14 +28,14 @@ export const createResultStepView = async (surveyId, stepUuid, nodeDefs, client)
     } else {
       joins.push(`
         FULL OUTER JOIN ${tableWithAlias}
-        ON ${alias}.${ResultNodeTable.colNames.processingStepUuid} = '${stepUuid}'
+        ON ${alias}.${ResultNodeTable.colNames.processingStepUuid} = '${ResultStepView.getStepUuid(resultStepView)}'
         AND ${conditionNodeDefUuid}
       `)
     }
   })
 
   await client.query(`
-    CREATE MATERIALIZED VIEW ${schemaRdb}."${ResultStepView.getViewName(stepUuid)}" AS 
+    CREATE MATERIALIZED VIEW ${schemaRdb}."${ResultStepView.getViewName(resultStepView)}" AS 
     SELECT ${fields.join(', ')}
     ${from}
     ${joins.join(' ')}

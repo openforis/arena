@@ -5,7 +5,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as DataTable from '../schemaRdb/dataTable'
 import * as RDBDataView from '../schemaRdb/dataView'
 
-const toTableViewCreate = (survey, nodeDef, resultViewInfo) => {
+const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
   const surveyId = Survey.getSurveyInfo(survey).id
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
@@ -20,16 +20,16 @@ const toTableViewCreate = (survey, nodeDef, resultViewInfo) => {
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
     viewName: RDBDataView.getName(nodeDef, nodeDefParent),
-    viewFields: RDBDataView.getSelectFields(survey, nodeDef, resultViewInfo ? resultViewInfo.nodeDefsCalculation : []),
+    viewFields: RDBDataView.getSelectFields(survey, nodeDef, resultStepViews),
     viewFrom: `${RDBDataView.getFromTable(survey, nodeDef)} as ${RDBDataView.alias}`,
     viewJoin: RDBDataView.getJoin(schemaName, nodeDef, nodeDefParent),
-    viewJoinResultViews: RDBDataView.getJoinResultStepView(schemaName, resultViewInfo),
+    viewJoinResultViews: RDBDataView.getJoinResultStepView(schemaName, resultStepViews),
     viewWhereCondition: RDBDataView.getWhereCondition(nodeDef),
   }
 }
 
-export const createTableAndView = async (survey, nodeDef, resultViewInfo, client) => {
-  const tableViewCreate = toTableViewCreate(survey, nodeDef, resultViewInfo)
+export const createTableAndView = async (survey, nodeDef, resultStepViews, client) => {
+  const tableViewCreate = toTableViewCreate(survey, nodeDef, resultStepViews)
 
   if (!NodeDef.isVirtual(nodeDef)) {
     await client.query(`
