@@ -15,7 +15,7 @@ export const createResultNodeTable = async (surveyId, client) => {
       uuid                                                uuid      NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
       ${ResultNodeTable.colNames.processingChainUuid}     uuid      NOT NULL REFERENCES ${schemaSurvey}.processing_chain ("uuid") ON DELETE CASCADE,
       ${ResultNodeTable.colNames.processingStepUuid}      uuid      NOT NULL REFERENCES ${schemaSurvey}.processing_step ("uuid") ON DELETE CASCADE,
-      record_uuid                                         uuid      NOT NULL REFERENCES ${schemaSurvey}.record ("uuid") ON DELETE CASCADE,
+      ${ResultNodeTable.colNames.recordUuid}              uuid      NOT NULL REFERENCES ${schemaSurvey}.record ("uuid") ON DELETE CASCADE,
       ${ResultNodeTable.colNames.parentUuid}              uuid          NULL REFERENCES ${schemaSurvey}.node ("uuid") ON DELETE CASCADE,
       ${ResultNodeTable.colNames.nodeDefUuid}             uuid      NOT NULL REFERENCES ${schemaSurvey}.node_def ("uuid") ON DELETE CASCADE,
       ${ResultNodeTable.colNames.value}                   jsonb         NULL
