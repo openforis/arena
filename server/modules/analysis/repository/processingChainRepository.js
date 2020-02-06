@@ -122,10 +122,22 @@ export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
   `)
 
 // ===== GRANT PRIVILEGES
-export const grantUpdateToUserAnalysis = async (surveyId, client = db) =>
+export const grantUpdateToUserAnalysis = async (surveyId, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  const userName = UserAnalysis.getName(surveyId)
+
+  // Grant usage on survey RDB schema
+  await client.query(`
+    GRANT
+      USAGE
+      ON SCHEMA ${schema}
+      TO "${userName}"
+    `)
+  // Grant select on processing_chain table and update only on status_exec column
   await client.query(`
     GRANT 
-      UPDATE (status_exec) 
-      ON ${getSurveyDBSchema(surveyId)}.processing_chain
-      TO "${UserAnalysis.getName(surveyId)}"
+      SELECT, UPDATE (status_exec) 
+      ON ${schema}.processing_chain
+      TO "${userName}"
   `)
+}

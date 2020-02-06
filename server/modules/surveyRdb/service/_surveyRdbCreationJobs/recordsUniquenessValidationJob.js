@@ -8,9 +8,9 @@ import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
 import Job from '@server/job/job'
-import * as SurveyManager from '../../survey/manager/surveyManager'
-import * as RecordManager from '../manager/recordManager'
-import * as SurveyRdbManager from '../../surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 const recordValidationUpdateBatchSize = 1000
 

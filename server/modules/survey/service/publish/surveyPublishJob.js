@@ -5,8 +5,7 @@ import * as ActivityLogManager from '@server/modules/activityLog/manager/activit
 
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
-import SurveyRdbGeneratorJob from '@server/modules/surveyRdb/service/surveyRdbGeneratorJob'
-import RecordsUniquenessValidationJob from '@server/modules/record/service/recordsUniquenessValidationJob'
+import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 
 import CategoriesValidationJob from './jobs/categoriesValidationJob'
 import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
@@ -15,7 +14,6 @@ import ProcessingChainsCyclesCheckJob from './jobs/processingChainsCyclesCheckJo
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
 import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
-import UserAnalysisCreationJob from './jobs/userAnalysisCreationJob'
 
 export default class SurveyPublishJob extends Job {
   constructor(params) {
@@ -30,9 +28,7 @@ export default class SurveyPublishJob extends Job {
       new RecordCheckJob(),
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
-      new SurveyRdbGeneratorJob(),
-      new RecordsUniquenessValidationJob(),
-      new UserAnalysisCreationJob(),
+      new SurveyRdbCreationJob(),
     ])
   }
 

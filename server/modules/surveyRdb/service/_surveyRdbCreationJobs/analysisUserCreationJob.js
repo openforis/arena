@@ -1,11 +1,12 @@
 import Job from '@server/job/job'
+
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
-import * as SchemaRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as UserAnalysisManager from '@server/modules/analysis/manager/userAnalysisManager'
 
-export default class UserAnalysisCreationJob extends Job {
+export default class AnalysisUserCreationJob extends Job {
   constructor() {
-    super(UserAnalysisCreationJob.type)
+    super(AnalysisUserCreationJob.type)
   }
 
   async execute() {
@@ -14,15 +15,15 @@ export default class UserAnalysisCreationJob extends Job {
     this.total = 4
 
     // Create user (if not existing)
-    await UserAnalysisManager.insertUserAnalysis(surveyId, this.tx)
+    await UserAnalysisManager.insertUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant SELECT on RDB schema tables and views
-    await SchemaRdbManager.grantSelectToUserAnalysis(surveyId, tx)
+    await SurveyRdbManager.grantSelectToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant INSERT/UPDATE/DELETE on node_analysis table
-    await SchemaRdbManager.grantWriteToUserAnalysis(surveyId, tx)
+    await SurveyRdbManager.grantWriteToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant UPDATE on processing_chain.status_exec
@@ -30,4 +31,4 @@ export default class UserAnalysisCreationJob extends Job {
     this.incrementProcessedItems()
   }
 }
-UserAnalysisCreationJob.type = 'UserAnalysisCreationJob'
+AnalysisUserCreationJob.type = 'AnalysisUserCreationJob'

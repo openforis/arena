@@ -5,6 +5,10 @@
   .modal-content {
     background-color: $white;
     text-align: center;
+
+    ul {
+      text-align: left;
+    }
   }
 
 }
