@@ -7,7 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
+import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as DataTable from './dataTable'
 import * as DataCol from './dataCol'
@@ -25,16 +25,22 @@ export const columns = {
 
 export const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
-export const getSelectFields = (survey, nodeDef) => {
+export const getSelectFields = (survey, nodeDef, nodeDefsCalculation = []) => {
   if (NodeDef.isVirtual(nodeDef)) {
     return ['*']
   }
 
   const fields = []
+
   Survey.visitAncestorsAndSelf(nodeDef, nodeDefCurrent => {
+    // Do not include node defs of calculation steps
     const cols = getCols(survey, nodeDefCurrent, NodeDef.isEqual(nodeDefCurrent)(nodeDef))
     fields.unshift(...cols)
   })(survey)
+
+  if (!R.isEmpty(nodeDefsCalculation)) {
+    fields.push(...R.map(NodeDef.getName, nodeDefsCalculation))
+  }
 
   const fieldKey = R.pipe(
     Survey.getNodeDefKeys(nodeDef),
@@ -85,9 +91,15 @@ export const getJoin = (schemaName, nodeDef, nodeDefParent) =>
         `
     : ''
 
-export const getJoinNodeAnalysis = schemaName =>
-  `LEFT OUTER JOIN ${schemaName}.${ResultNodeTable.tableName}
-    ON ${alias}.${DataTable.colNameUuuid} = ${schemaName}.${ResultNodeTable.tableName}.${ResultNodeTable.colNames.parentUuid}`
+export const getJoinResultStepView = (schemaName, viewInfo) => {
+  if (viewInfo) {
+    const schemaAndViewName = `${schemaName}."${viewInfo.viewName}"`
+    return `LEFT OUTER JOIN ${schemaAndViewName}
+      ON ${alias}.${DataTable.colNameUuuid} = ${schemaAndViewName}.${ResultStepView.colNames.parentUuid}`
+  }
+
+  return ''
+}
 
 export const getFromTable = (survey, nodeDef) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

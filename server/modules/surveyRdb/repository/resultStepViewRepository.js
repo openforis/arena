@@ -5,7 +5,7 @@ import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 // ===== CREATE
-export const createResultStepView = async (surveyId, chainUuid, stepUuid, nodeDefs, client) => {
+export const createResultStepView = async (surveyId, stepUuid, nodeDefs, client) => {
   const schemaRdb = SchemaRdb.getName(surveyId)
   const resultNodeTable = `${schemaRdb}.${ResultNodeTable.tableName}`
 
@@ -34,7 +34,7 @@ export const createResultStepView = async (surveyId, chainUuid, stepUuid, nodeDe
   })
 
   await client.query(`
-    CREATE MATERIALIZED VIEW ${schemaRdb}."${ResultStepView.getViewName(chainUuid, stepUuid)}" AS 
+    CREATE MATERIALIZED VIEW ${schemaRdb}."${ResultStepView.getViewName(stepUuid)}" AS 
     SELECT ${fields.join(', ')}
     ${from}
     ${joins.join(' ')}

@@ -21,8 +21,11 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
 
     const chains = await ProcessingChainManager.fetchChainsBySurveyId(surveyId, null, 0, null, tx)
     for (const chain of chains) {
-      const chainUuid = ProcessingChain.getUuid(chain)
-      const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(surveyId, chainUuid, tx)
+      const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(
+        surveyId,
+        ProcessingChain.getUuid(chain),
+        tx,
+      )
       for (const step of steps) {
         // Generate materialized view for step that are linked to an entity
         if (ProcessingStep.hasEntity(step)) {
@@ -35,7 +38,7 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
           )
           const stepUuid = ProcessingStep.getUuid(step)
 
-          await SurveyRdbManager.createResultStepView(surveyId, chainUuid, stepUuid, nodeDefs, tx)
+          await SurveyRdbManager.createResultStepView(surveyId, stepUuid, nodeDefs, tx)
         }
       }
     }
