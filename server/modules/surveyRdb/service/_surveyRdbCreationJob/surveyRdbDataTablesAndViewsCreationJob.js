@@ -6,9 +6,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
-export default class SurveyRdbTablesAndViewsCreationJob extends Job {
+export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   constructor(params) {
-    super(SurveyRdbTablesAndViewsCreationJob.type, params)
+    super(SurveyRdbDataTablesAndViewsCreationJob.type, params)
   }
 
   async execute() {
@@ -78,4 +78,4 @@ export default class SurveyRdbTablesAndViewsCreationJob extends Job {
   }
 }
 
-SurveyRdbTablesAndViewsCreationJob.type = 'SurveyRdbTablesAndViewsCreationJob'
+SurveyRdbDataTablesAndViewsCreationJob.type = 'SurveyRdbDataTablesAndViewsCreationJob'

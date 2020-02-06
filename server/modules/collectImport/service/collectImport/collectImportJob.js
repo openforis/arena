@@ -2,16 +2,17 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 
-import SurveyDependencyGraphsGenerationJob from '../../../survey/service/surveyDependencyGraphsGenerationJob'
-import RecordsUniquenessValidationJob from '../../../record/service/recordsUniquenessValidationJob'
-import SurveyRdbTablesAndViewsCreationJob from '../../../surveyRdb/service/surveyRdbTablesAndViewsCreationJob'
+import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
+import AnalysisUserCreationJob from '@server/modules/analysis/service/analysisUserCreationJob'
+import RecordsUniquenessValidationJob from '@server/modules/record/service/recordsUniquenessValidationJob'
+import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
+
 import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import SurveyCreatorJob from './metaImportJobs/surveyCreatorJob'
 import CategoriesImportJob from './metaImportJobs/categoriesImportJob'
 import TaxonomiesImportJob from './metaImportJobs/taxonomiesImportJob'
 import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImportJob'
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob'
-
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
 export default class CollectImportJob extends Job {
@@ -25,7 +26,8 @@ export default class CollectImportJob extends Job {
       new NodeDefsImportJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
-      new SurveyRdbTablesAndViewsCreationJob(),
+      new SurveyRdbCreationJob(),
+      new AnalysisUserCreationJob(),
       new RecordsUniquenessValidationJob(),
     ])
   }

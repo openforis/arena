@@ -3,11 +3,10 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
+import AnalysisUserCreationJob from '@server/modules/analysis/service/analysisUserCreationJob'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
-import SurveyRdbSchemaCreationJob from '@server/modules/surveyRdb/service/surveyRdbSchemaCreationJob'
-import SurveyRdbTablesAndViewsCreationJob from '@server/modules/surveyRdb/service/surveyRdbTablesAndViewsCreationJob'
-import SurveyRdbAnalysisTablesCreationJob from '@server/modules/surveyRdb/service/surveyRdbAnalysisTablesCreationJob'
+import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 import RecordsUniquenessValidationJob from '@server/modules/record/service/recordsUniquenessValidationJob'
 
 import CategoriesValidationJob from './jobs/categoriesValidationJob'
@@ -17,7 +16,6 @@ import ProcessingChainsCyclesCheckJob from './jobs/processingChainsCyclesCheckJo
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
 import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
-import AnalysisUserCreationJob from './jobs/analysisUserCreationJob'
 
 export default class SurveyPublishJob extends Job {
   constructor(params) {
@@ -32,9 +30,7 @@ export default class SurveyPublishJob extends Job {
       new RecordCheckJob(),
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
-      new SurveyRdbSchemaCreationJob(),
-      new SurveyRdbAnalysisTablesCreationJob(),
-      new SurveyRdbTablesAndViewsCreationJob(),
+      new SurveyRdbCreationJob(),
       new AnalysisUserCreationJob(),
       new RecordsUniquenessValidationJob(),
     ])
