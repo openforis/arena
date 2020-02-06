@@ -7,4 +7,5 @@ export const colNames = {
   processingStepUuid: 'processing_step_uuid',
   parentUuid: 'parent_uuid',
   nodeDefUuid: 'node_def_uuid',
+  value: 'value',
 }
