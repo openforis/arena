@@ -3,8 +3,6 @@ import Job from '@server/job/job'
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
-import AnalysisUserCreationJob from '@server/modules/analysis/service/analysisUserCreationJob'
-import RecordsUniquenessValidationJob from '@server/modules/record/service/recordsUniquenessValidationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 
 import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
@@ -27,8 +25,6 @@ export default class CollectImportJob extends Job {
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
       new SurveyRdbCreationJob(),
-      new AnalysisUserCreationJob(),
-      new RecordsUniquenessValidationJob(),
     ])
   }
 

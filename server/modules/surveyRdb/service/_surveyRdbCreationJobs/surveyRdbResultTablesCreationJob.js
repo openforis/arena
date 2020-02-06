@@ -1,6 +1,6 @@
 import Job from '@server/job/job'
 
-import * as SurveyRdbManager from '../../manager/surveyRdbManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 export default class SurveyRdbResultTablesCreationJob extends Job {
   constructor(params) {

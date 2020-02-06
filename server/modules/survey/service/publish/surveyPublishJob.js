@@ -3,11 +3,9 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
-import AnalysisUserCreationJob from '@server/modules/analysis/service/analysisUserCreationJob'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
-import RecordsUniquenessValidationJob from '@server/modules/record/service/recordsUniquenessValidationJob'
 
 import CategoriesValidationJob from './jobs/categoriesValidationJob'
 import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
@@ -31,8 +29,6 @@ export default class SurveyPublishJob extends Job {
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new SurveyRdbCreationJob(),
-      new AnalysisUserCreationJob(),
-      new RecordsUniquenessValidationJob(),
     ])
   }
 
