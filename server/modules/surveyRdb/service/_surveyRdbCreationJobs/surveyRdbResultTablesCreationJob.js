@@ -33,7 +33,6 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
           const nodeDefs = await Promise.all(
             nodeDefUuids.map(nodeDefUuid => NodeDefManager.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, tx)),
           )
-          console.log(nodeDefs)
           const stepUuid = ProcessingStep.getUuid(step)
 
           await SurveyRdbManager.createResultStepView(surveyId, chainUuid, stepUuid, nodeDefs, tx)

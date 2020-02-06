@@ -4,12 +4,9 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
-import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-
 // ===== CREATE
 export const createResultStepView = async (surveyId, chainUuid, stepUuid, nodeDefs, client) => {
   const schemaRdb = SchemaRdb.getName(surveyId)
-  const schemaSurvey = SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)
   const resultNodeTable = `${schemaRdb}.${ResultNodeTable.tableName}`
 
   const fields = []
