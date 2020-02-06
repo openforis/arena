@@ -17,13 +17,20 @@ import * as DataViewReadRepository from '../repository/dataViewReadRepository'
 
 // ==== DDL
 
+// schema
 export { createSchema, dropSchema, grantSelectToUserAnalysis } from '../repository/schemaRdbRepository'
+
+// Data tables and views
 export { createTableAndView } from '../repository/dataViewCreateRepository'
 
+// Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
-export { createNodeAnalysisTable, grantWriteToUserAnalysis } from '../repository/nodeAnalysisTableRepository'
+
+// Result tables and views
+export { createResultNodeTable, grantWriteToUserAnalysis } from '../repository/resultNodeTableRepository'
+export { createResultStepView } from '../repository/resultStepViewRepository'
 
 // ==== DML
 
