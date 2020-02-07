@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import camelize from 'camelize'
 
-import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { db } from '@server/db/db'
@@ -10,16 +9,18 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
+const _selectFields = `uuid, processing_step_uuid, index, node_def_uuid, props`
+
 // ====== CREATE
 
 export const insertCalculationStep = async (surveyId, calculation, client = db) =>
   await client.one(
     `
       INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-        (uuid, processing_step_uuid, index, node_def_uuid, props)  
+        (${_selectFields})  
       VALUES 
         ($1, $2, $3, $4, $5)
-      RETURNING *
+      RETURNING ${_selectFields}
     `,
     [
       ProcessingStepCalculation.getUuid(calculation),
@@ -35,7 +36,7 @@ export const insertCalculationStep = async (surveyId, calculation, client = db) 
 
 export const fetchCalculationByUuid = async (surveyId, uuid, client = db) =>
   await client.oneOrNone(
-    `SELECT * 
+    `SELECT ${_selectFields} 
     FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation 
     WHERE uuid = $1`,
     [uuid],
@@ -44,7 +45,7 @@ export const fetchCalculationByUuid = async (surveyId, uuid, client = db) =>
 
 export const fetchCalculationsByStepUuid = async (surveyId, processingStepUuid, client = db) =>
   await client.map(
-    `SELECT * 
+    `SELECT ${_selectFields} 
     FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation
     WHERE processing_step_uuid = $1
     ORDER BY index`,
@@ -120,7 +121,7 @@ export const updateCalculationIndex = async (surveyId, processingStepUuid, index
     SET index = ${indexUpdate}
     WHERE processing_step_uuid = $1
     AND index = $2
-    RETURNING *
+    RETURNING ${_selectFields}
     `,
       [processingStepUuid, indexCurrent],
     )
@@ -152,7 +153,7 @@ export const updateCalculationStep = async (surveyId, calculation, client = db) 
     UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
     SET node_def_uuid = $2, props = $3
     WHERE uuid = $1
-    RETURNING *
+    RETURNING ${_selectFields}
     `,
     [
       ProcessingStepCalculation.getUuid(calculation),
@@ -171,7 +172,7 @@ export const deleteCalculationStep = async (surveyId, processingStepUuid, proces
       `
       DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation
       WHERE uuid = $1
-      RETURNING *
+      RETURNING ${_selectFields}
       `,
       [processingStepCalculationUuid],
       camelize,
