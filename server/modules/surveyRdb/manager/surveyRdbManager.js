@@ -45,9 +45,11 @@ export { createResultStepView } from '../repository/resultStepViewRepository'
 export const grantPermissionsToUserAnalysis = async (surveyId, client) => {
   // Grant SELECT on RDB schema tables and views
   await SchemaRdbRepository.grantSelectToUserAnalysis(surveyId, client)
+
   // Grant INSERT/UPDATE/DELETE on _res_node table
   await ResultNodeTableRepository.grantWriteToUserAnalysis(surveyId, client)
-  // Change result step view owner to user analysis
+
+  // Change result step view owner to user analysis (to allow view refresh by user analysis)
   const resultViewsByEntityUuid = await generateResultViews(surveyId, client)
   const resultViewNames = R.pipe(R.values, R.flatten, R.map(ResultStepView.getViewName))(resultViewsByEntityUuid)
   for (const resultViewName of resultViewNames) {

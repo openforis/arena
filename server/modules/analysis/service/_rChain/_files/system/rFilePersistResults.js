@@ -44,8 +44,8 @@ export default class RFilePersistResults extends RFileSystem {
 
         // Build result dataframe
         // Add common part
+        await this.logInfo(`'Persist results for step ${stepIndex} (start)'`)
         await this.appendContent(
-          `# Persist results for step ${stepIndex} - start`,
           setVar(dfRes, dfSource),
           setVar(dfVar(dfRes, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
           setVar(dfVar(dfRes, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
@@ -60,8 +60,9 @@ export default class RFilePersistResults extends RFileSystem {
             NodeDef.getName,
           )(calculationNodeDefUuid)
 
+          await this.logInfo(`'Persist results for calculation ${ProcessingStepCalculation.getIndex(calculation) + 1}'`)
+
           await this.appendContent(
-            `# Calculation ${ProcessingStepCalculation.getIndex(calculation) + 1}`,
             setVar(dfVar(dfRes, ResultNodeTable.colNames.uuid), dfVar(dfSource, `${nodeDefCalculationName}_uuid`)),
             setVar(dfVar(dfRes, ResultNodeTable.colNames.nodeDefUuid), `'${calculationNodeDefUuid}'`),
             setVar(dfVar(dfRes, ResultNodeTable.colNames.value), dfVar(dfSource, nodeDefCalculationName)),
@@ -71,7 +72,7 @@ export default class RFilePersistResults extends RFileSystem {
           )
         }
 
-        await this.appendContent(`# Persist results for step ${stepIndex} - end`)
+        await this.logInfo(`'Persist results for step ${stepIndex} (end)'`)
       }
     }
 
@@ -83,7 +84,8 @@ export default class RFilePersistResults extends RFileSystem {
       R.map(view => dbSendQuery(`REFRESH MATERIALIZED VIEW \\"${ResultStepView.getViewName(view)}\\"`)),
     )(resultStepViewsByEntityUuid)
 
-    await this.appendContent('# Refresh result step materialized views', ...refreshMaterializedViewQueries)
+    await this.logInfo(`'Refresh result step materialized views'`)
+    await this.appendContent(refreshMaterializedViewQueries)
 
     return this
   }
