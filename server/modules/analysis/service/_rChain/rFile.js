@@ -12,6 +12,8 @@ import { arenaInfo } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 export const padStart = StringUtils.padStart(3, '0')
 
+const _lineSeparator = StringUtils.NEW_LINE + StringUtils.NEW_LINE
+
 class RFile {
   constructor(rChain, dir, fileName) {
     this._rChain = rChain
@@ -33,9 +35,8 @@ class RFile {
     return this._path
   }
 
-  async appendContent(content) {
-    await FileUtils.appendFile(this.path, content)
-    await FileUtils.appendFile(this.path, StringUtils.NEW_LINE + StringUtils.NEW_LINE)
+  async appendContent(...contentLines) {
+    await FileUtils.appendFile(this.path, contentLines.join(_lineSeparator) + _lineSeparator)
     return this
   }
 
