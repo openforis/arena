@@ -31,6 +31,7 @@ CREATE TABLE
     node_def_uuid         uuid        NULL,
     index                 integer NOT NULL DEFAULT 0,
     props                 jsonb   NOT NULL DEFAULT '{}'::jsonb,
+    script                text        NULL,
     PRIMARY KEY (uuid),
     CONSTRAINT processingstepcalculation_processingstep_fk FOREIGN KEY (processing_step_uuid) REFERENCES "processing_step" ("uuid") ON DELETE CASCADE,
     CONSTRAINT processingstepcalculation_nodedef_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
