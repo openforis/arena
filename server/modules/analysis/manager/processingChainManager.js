@@ -16,10 +16,25 @@ import * as ProcessingChainValidator from '@common/analysis/processingChainValid
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
+
+/**
+ * - mark survey as draft
+ * - deletes unused node def analysis
+ *
+ * @returns uuids of deleted unused node defs analysis
+ */
+const _afterChainUpdate = async (surveyId, t, deleteNodeDefAnalysisUnused = true) => {
+  const [nodeDefAnalysisDeletedUudis] = await Promise.all([
+    ...(deleteNodeDefAnalysisUnused ? [NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)] : []),
+    markSurveyDraft(surveyId, t),
+  ])
+  return nodeDefAnalysisDeletedUudis
+}
 
 // ====== CREATE OR UPDATE Chain
 
@@ -257,6 +272,8 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
       // Throw error to rollabck transaction
       throw new SystemError('appErrors.processingChainCannotBeSaved')
     }
+
+    return await _afterChainUpdate(surveyId, t, false)
   })
 }
 
@@ -277,8 +294,7 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
     }
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, logContent, false, t)
 
-    // Delete unused node defs analysis
-    return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
+    return await _afterChainUpdate(surveyId, t)
   })
 
 // ====== DELETE - Step
@@ -326,8 +342,7 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
       )
     }
 
-    // Delete unused node defs analysis
-    return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
+    return await _afterChainUpdate(surveyId, t)
   })
 
 // ====== DELETE - Calculation
@@ -372,6 +387,7 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
     const stepValidation = await ProcessingChainValidator.validateStep(stepUpdated)
     const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
     const chainUpdated = ProcessingChain.assocItemValidation(stepUuid, stepValidation)(chain)
+
     // Update processing_chain validation and date_modified
     await ProcessingChainRepository.updateChainValidation(
       surveyId,
@@ -380,8 +396,7 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       t,
     )
 
-    // Delete unused node defs analysis
-    return await NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)
+    return await _afterChainUpdate(surveyId, t)
   })
 
 // ===== GRANT PRIVILEGES
