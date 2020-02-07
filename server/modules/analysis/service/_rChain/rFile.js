@@ -35,6 +35,10 @@ class RFile {
     return this._path
   }
 
+  get pathRelative() {
+    return this._pathRelative
+  }
+
   async appendContent(...contentLines) {
     await FileUtils.appendFile(this.path, contentLines.join(_lineSeparator) + _lineSeparator)
     return this
@@ -48,7 +52,7 @@ class RFile {
     await FileUtils.appendFile(this.path)
     await FileUtils.appendFile(
       this._rChain.fileArena,
-      `source("${this._pathRelative}")${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`,
+      `source("${this.pathRelative}")${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`,
     )
     return this
   }

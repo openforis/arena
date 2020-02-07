@@ -27,9 +27,12 @@ export const createResultStepView = async (surveyId, resultStepView, client) => 
       from = `FROM ${tableWithAlias}`
       where = `WHERE ${conditionNodeDefUuid}`
     } else {
+      const aliasPrev = `n${i - 1}`
       joins.push(`
         FULL OUTER JOIN ${tableWithAlias}
-        ON ${alias}.${ResultNodeTable.colNames.processingStepUuid} = '${ResultStepView.getStepUuid(resultStepView)}'
+        ON 
+          ${alias}.${ResultNodeTable.colNames.processingStepUuid} = '${ResultStepView.getStepUuid(resultStepView)}'
+          AND ${alias}.${ResultNodeTable.colNames.parentUuid} = ${aliasPrev}.${ResultNodeTable.colNames.parentUuid}
         AND ${conditionNodeDefUuid}
       `)
     }

@@ -24,8 +24,12 @@ export default class RCalculation {
     return this._calculation
   }
 
+  get rFile() {
+    return this._rFile
+  }
+
   async init() {
-    await this._rFile.init()
+    await this.rFile.init()
 
     const survey = this.rStep.rChain.survey
     const step = this.rStep.step
@@ -43,7 +47,7 @@ export default class RCalculation {
         NodeDef.getName,
       )(this.calculation)
 
-      await this._rFile.appendContent(setVar(dfVar(entityName, attributeName), NA))
+      await this.rFile.appendContent(setVar(dfVar(entityName, attributeName), NA))
     }
 
     return this

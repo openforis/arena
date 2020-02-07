@@ -9,6 +9,8 @@ export const arenaEndTime = 'arena.endTime'
 // ==== arena functions
 
 export const arenaInfo = (fileName, content) => `arena.info('${fileName}', ${content})`
+export const arenaPersistCalculationScript = (fileName, schema, calculationUuid) =>
+  `arena.persistCalculationScript('${fileName}', '${schema}', '${calculationUuid}')`
 
 // ==== R utility functions
 

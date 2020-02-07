@@ -13,6 +13,7 @@ import RFileInit from './_files/system/rFileInit'
 import RFileResetResults from './_files/system/rFileResetResults'
 import RFileReadData from './_files/system/rFileReadData'
 import RFilePersistResults from './_files/system/rFilePersistResults'
+import RFilePersistScripts from './_files/system/rFilePersistScripts'
 import RFileClose from './_files/system/rFileClose'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
@@ -43,6 +44,7 @@ class RChain {
     this._fileCommon = null
 
     this._counter = new Counter()
+    this._rSteps = []
   }
 
   get surveyId() {
@@ -59,6 +61,10 @@ class RChain {
 
   get chain() {
     return this._chain
+  }
+
+  get rSteps() {
+    return this._rSteps
   }
 
   get cycle() {
@@ -120,13 +126,14 @@ class RChain {
 
   async _initSteps() {
     for (const step of ProcessingChain.getProcessingSteps(this._chain)) {
-      await new RStep(this._surveyId, this, step).init()
+      const rStep = await new RStep(this._surveyId, this, step).init()
+      this._rSteps.push(rStep)
     }
   }
 
   async _initFilesClosing() {
     this._filePersistResults = await new RFilePersistResults(this).init()
-    this._filePersistScripts = await new RFileSystem(this, 'persist-scripts').init()
+    this._filePersistScripts = await new RFilePersistScripts(this).init()
     this._fileClose = await new RFileClose(this).init()
   }
 

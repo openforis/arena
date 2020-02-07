@@ -133,11 +133,18 @@ export const grantUpdateToUserAnalysis = async (surveyId, client = db) => {
       ON SCHEMA ${schema}
       TO "${userName}"
     `)
-  // Grant select on processing_chain table and update only on status_exec column
+  // Grant select uuid on 'processing_chain' table and update only on 'status_exec' column
   await client.query(`
     GRANT 
-      SELECT, UPDATE (status_exec) 
+      SELECT (uuid), UPDATE (status_exec) 
       ON ${schema}.processing_chain
+      TO "${userName}"
+  `)
+  // Grant select uuid on 'processing_step_calculation' and update only on 'script' column
+  await client.query(`
+    GRANT 
+      SELECT (uuid), UPDATE (script) 
+      ON ${schema}.processing_step_calculation
       TO "${userName}"
   `)
 }

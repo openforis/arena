@@ -13,6 +13,7 @@ export default class RStep {
 
     const stepIndex = padStart(ProcessingStep.getIndex(this.step) + 1)
     this._path = FileUtils.join(this._rChain.dirUser, `step-${stepIndex}`)
+    this._rCalculations = []
   }
 
   get path() {
@@ -27,6 +28,10 @@ export default class RStep {
     return this._step
   }
 
+  get rCalculations() {
+    return this._rCalculations
+  }
+
   async _initDir() {
     await FileUtils.mkdir(this._path)
   }
@@ -35,7 +40,8 @@ export default class RStep {
     const calculations = ProcessingStep.getCalculations(this.step)
 
     for (const calculation of calculations) {
-      await new RCalculation(this, calculation).init()
+      const rCalculation = await new RCalculation(this, calculation).init()
+      this._rCalculations.push(rCalculation)
     }
   }
 
