@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import Job from '@server/job/job'
 
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -8,7 +10,15 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
   }
 
   async execute() {
-    await SurveyRdbManager.createNodeAnalysisTable(this.surveyId, this.tx)
+    const { surveyId, tx } = this
+
+    await SurveyRdbManager.createResultNodeTable(surveyId, tx)
+
+    const resultStepViewsByEntityUuid = await SurveyRdbManager.generateResultViews(surveyId, tx)
+    const resultStepViews = R.pipe(R.values, R.flatten)(resultStepViewsByEntityUuid)
+    await Promise.all(
+      resultStepViews.map(resultStepView => SurveyRdbManager.createResultStepView(surveyId, resultStepView, tx)),
+    )
   }
 }
 

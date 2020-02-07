@@ -2,11 +2,18 @@ import * as R from 'ramda'
 import { db } from '@server/db/db'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
+import * as ProcessingStep from '@common/analysis/processingStep'
+import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as ResultStepView from '@common/surveyRdb/resultStepView'
 import * as DataTable from '../schemaRdb/dataTable'
 
+import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
+import * as ProcessingStepRepository from '@server/modules/analysis/repository/processingStepRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
@@ -17,13 +24,20 @@ import * as DataViewReadRepository from '../repository/dataViewReadRepository'
 
 // ==== DDL
 
+// schema
 export { createSchema, dropSchema, grantSelectToUserAnalysis } from '../repository/schemaRdbRepository'
+
+// Data tables and views
 export { createTableAndView } from '../repository/dataViewCreateRepository'
 
+// Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
-export { createNodeAnalysisTable, grantWriteToUserAnalysis } from '../repository/nodeAnalysisTableRepository'
+
+// Result tables and views
+export { createResultNodeTable, grantWriteToUserAnalysis } from '../repository/resultNodeTableRepository'
+export { createResultStepView } from '../repository/resultStepViewRepository'
 
 // ==== DML
 
@@ -128,3 +142,39 @@ export const updateTable = DataTableUpdateRepository.updateTable
 export const countDuplicateRecords = DataViewReadRepository.countDuplicateRecords
 export const fetchRecordsCountByKeys = DataViewReadRepository.fetchRecordsCountByKeys
 export const fetchRecordsWithDuplicateEntities = DataTableReadRepository.fetchRecordsWithDuplicateEntities
+
+// Result views
+export const generateResultViews = async (surveyId, client = db) => {
+  const resultStepViewsByEntityUuid = {}
+
+  const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
+
+  for (const chain of chains) {
+    const steps = await ProcessingStepRepository.fetchStepsAndCalculationsByChainUuid(
+      surveyId,
+      ProcessingChain.getUuid(chain),
+      client,
+    )
+    for (const step of steps) {
+      if (ProcessingStep.hasEntity(step)) {
+        const calculationNodeDefUuids = R.pipe(
+          ProcessingStep.getCalculations,
+          R.map(ProcessingStepCalculation.getNodeDefUuid),
+        )(step)
+
+        const nodeDefColumns = await Promise.all(
+          calculationNodeDefUuids.map(nodeDefUuid =>
+            NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client),
+          ),
+        )
+
+        const entityDefUuid = ProcessingStep.getEntityUuid(step)
+        const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
+        resultStepViews.push(ResultStepView.newResultStepView(step, nodeDefColumns))
+        resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
+      }
+    }
+  }
+
+  return resultStepViewsByEntityUuid
+}

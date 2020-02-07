@@ -93,6 +93,8 @@ export const insertNodeDef = async (user, surveyId, surveyCycleKey, nodeDefParam
 
 // ======= READ
 
+export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
+
 export const fetchNodeDefsBySurveyId = async (
   surveyId,
   cycle = null,

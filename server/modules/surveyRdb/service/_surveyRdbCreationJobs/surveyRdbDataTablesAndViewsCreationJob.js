@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
@@ -12,9 +14,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   }
 
   async execute() {
-    const { tx } = this
+    const { surveyId, tx } = this
 
     const survey = await this.fetchSurvey()
+
+    const resultStepViewsByEntityUuid = await SurveyRdbManager.generateResultViews(surveyId, tx)
 
     // Get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
@@ -28,10 +32,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       }
 
       const nodeDefName = NodeDef.getName(nodeDef)
+      const resultStepViews = R.propOr([], NodeDef.getUuid(nodeDef), resultStepViewsByEntityUuid)
 
       // ===== create table
       this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createTableAndView(survey, nodeDef, tx)
+      await SurveyRdbManager.createTableAndView(survey, nodeDef, resultStepViews, tx)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table

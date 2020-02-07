@@ -35,17 +35,17 @@ export const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
     [JSON.stringify(cycle)],
   )
 
-export const fetchChainsBySurveyId = async (surveyId, cycle, offset = 0, limit = null, client = db) =>
+export const fetchChainsBySurveyId = async (surveyId, cycle = null, offset = 0, limit = null, client = db) =>
   await client.map(
     `
     SELECT ${selectFields}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> $1
+    ${cycle ? `WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
     ORDER BY date_created DESC
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}
     `,
-    [JSON.stringify(cycle)],
+    [],
     dbTransformCallback,
   )
 
