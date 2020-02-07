@@ -8,8 +8,8 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import * as DataView from '@server/modules/surveyRdb/schemaRdb/dataView'
+import * as RDBDataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 import { dbWriteTable, dfVar, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
 
@@ -39,14 +39,14 @@ export default class RFilePersistResults extends RFileSystem {
             nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
             NodeDef.getName,
           )(calculation)
-          /*
-          Await this.appendContent(
+
+          await this.appendContent(
             setVar(res, NodeDef.getName(entityDef)),
             setVar(dfVar(res, ResultNodeTable.colNames.uuid), dfVar(res, `${nodeDefCalculationName}_uuid`)),
             setVar(dfVar(res, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
             setVar(dfVar(res, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
-            setVar(dfVar(res, ResultNodeTable.colNames.recordUuid), dfVar(res, DataTable.colNameRecordUuuid)),
-            setVar(dfVar(res, ResultNodeTable.colNames.parentUuid), dfVar(res, DataView.getColUuid(entityDef))),
+            setVar(dfVar(res, ResultNodeTable.colNames.recordUuid), dfVar(res, RDBDataTable.colNameRecordUuuid)),
+            setVar(dfVar(res, ResultNodeTable.colNames.parentUuid), dfVar(res, RDBDataView.getColUuid(entityDef))),
             setVar(
               dfVar(res, ResultNodeTable.colNames.nodeDefUuid),
               `'${ProcessingStepCalculation.getUuid(calculation)}'`,
@@ -55,7 +55,6 @@ export default class RFilePersistResults extends RFileSystem {
 
             dbWriteTable(ResultNodeTable.tableName, res, true),
           )
-          */
         }
       }
     }
