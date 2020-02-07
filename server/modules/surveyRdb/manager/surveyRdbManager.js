@@ -21,11 +21,14 @@ import * as DataTableInsertRepository from '../repository/dataTableInsertReposit
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
+import * as SchemaRdbRepository from '../repository/schemaRdbRepository'
+import * as ResultNodeTableRepository from '../repository/resultNodeTableRepository'
+import * as ResultStepViewRepository from '../repository/resultStepViewRepository'
 
 // ==== DDL
 
 // schema
-export { createSchema, dropSchema, grantSelectToUserAnalysis } from '../repository/schemaRdbRepository'
+export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export { createTableAndView } from '../repository/dataViewCreateRepository'
@@ -36,8 +39,23 @@ export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarch
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
 
 // Result tables and views
-export { createResultNodeTable, grantWriteToUserAnalysis } from '../repository/resultNodeTableRepository'
+export { createResultNodeTable } from '../repository/resultNodeTableRepository'
 export { createResultStepView } from '../repository/resultStepViewRepository'
+
+export const grantPermissionsToUserAnalysis = async (surveyId, client) => {
+  // Grant SELECT on RDB schema tables and views
+  await SchemaRdbRepository.grantSelectToUserAnalysis(surveyId, client)
+
+  // Grant INSERT/UPDATE/DELETE on _res_node table
+  await ResultNodeTableRepository.grantWriteToUserAnalysis(surveyId, client)
+
+  // Change result step view owner to user analysis (to allow view refresh by user analysis)
+  const resultViewsByEntityUuid = await generateResultViews(surveyId, client)
+  const resultViewNames = R.pipe(R.values, R.flatten, R.map(ResultStepView.getViewName))(resultViewsByEntityUuid)
+  for (const resultViewName of resultViewNames) {
+    await ResultStepViewRepository.updateOwnerToUserAnalysis(surveyId, resultViewName, client)
+  }
+}
 
 // ==== DML
 

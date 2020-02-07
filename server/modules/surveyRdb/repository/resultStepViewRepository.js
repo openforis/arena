@@ -3,6 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
+import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 // ===== CREATE
 export const createResultStepView = async (surveyId, resultStepView, client) => {
@@ -42,3 +43,9 @@ export const createResultStepView = async (surveyId, resultStepView, client) => 
     ${where}
   `)
 }
+
+export const updateOwnerToUserAnalysis = async (surveyId, viewName, client) =>
+  await client.query(`
+    ALTER MATERIALIZED VIEW ${SchemaRdb.getName(surveyId)}."${viewName}"
+    OWNER TO ${UserAnalysis.getName(surveyId)}
+  `)
