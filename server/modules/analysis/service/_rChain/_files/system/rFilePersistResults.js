@@ -7,11 +7,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as RDBDataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
-import { dbWriteTable, dfVar, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
+import { dbWriteTable, dfVar, setVar, dbSendQuery } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 const _resultTableColNamesVector = `c(${R.pipe(
   R.values,
@@ -33,6 +35,7 @@ export default class RFilePersistResults extends RFileSystem {
 
     for (const step of steps) {
       if (ProcessingStep.hasEntity(step)) {
+        const stepIndex = ProcessingStep.getIndex(step) + 1
         const dfRes = 'res'
         const entityDef = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
           Survey.getNodeDefByUuid(entityUuid)(survey),
@@ -42,6 +45,7 @@ export default class RFilePersistResults extends RFileSystem {
         // Build result dataframe
         // Add common part
         await this.appendContent(
+          `# Persist results for step ${stepIndex} - start`,
           setVar(dfRes, dfSource),
           setVar(dfVar(dfRes, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
           setVar(dfVar(dfRes, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
@@ -57,17 +61,29 @@ export default class RFilePersistResults extends RFileSystem {
           )(calculationNodeDefUuid)
 
           await this.appendContent(
+            `# Calculation ${ProcessingStepCalculation.getIndex(calculation) + 1}`,
             setVar(dfVar(dfRes, ResultNodeTable.colNames.uuid), dfVar(dfSource, `${nodeDefCalculationName}_uuid`)),
             setVar(dfVar(dfRes, ResultNodeTable.colNames.nodeDefUuid), `'${calculationNodeDefUuid}'`),
             setVar(dfVar(dfRes, ResultNodeTable.colNames.value), dfVar(dfSource, nodeDefCalculationName)),
             // Reorder result columns before writing into table
             setVar(dfRes, `${dfRes}[${_resultTableColNamesVector}]`),
-
             dbWriteTable(ResultNodeTable.tableName, dfRes, true),
           )
         }
+
+        await this.appendContent(`# Persist results for step ${stepIndex} - end`)
       }
     }
+
+    // Refresh materialized views
+    const resultStepViewsByEntityUuid = await SurveyRdbManager.generateResultViews(Survey.getId(survey))
+    const refreshMaterializedViewQueries = R.pipe(
+      R.values,
+      R.flatten,
+      R.map(view => dbSendQuery(`REFRESH MATERIALIZED VIEW \\"${ResultStepView.getViewName(view)}\\"`)),
+    )(resultStepViewsByEntityUuid)
+
+    await this.appendContent('# Refresh result step materialized views', ...refreshMaterializedViewQueries)
 
     return this
   }
