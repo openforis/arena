@@ -12,18 +12,13 @@ export default class AnalysisUserCreationJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    this.total = 4
+    this.total = 3
 
     // Create user (if not existing)
     await UserAnalysisManager.insertUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
-    // Grant SELECT on RDB schema tables and views
-    await SurveyRdbManager.grantSelectToUserAnalysis(surveyId, tx)
-    this.incrementProcessedItems()
-
-    // Grant INSERT/UPDATE/DELETE on node_analysis table
-    await SurveyRdbManager.grantWriteToUserAnalysis(surveyId, tx)
+    await SurveyRdbManager.grantPermissionsToUserAnalysis(surveyId, tx)
     this.incrementProcessedItems()
 
     // Grant UPDATE on processing_chain.status_exec
