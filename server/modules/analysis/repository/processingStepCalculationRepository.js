@@ -9,7 +9,8 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-const _selectFields = `uuid, processing_step_uuid, index, node_def_uuid, props`
+export const selectFieldsArray = ['uuid', 'processing_step_uuid', 'index', 'node_def_uuid', 'props']
+const _selectFields = selectFieldsArray.join(', ')
 
 // ====== CREATE
 
