@@ -18,6 +18,12 @@ import { categoryCreate, categoryDelete, categoryUpdate } from '../categories/ac
 
 // Taxonomies actions
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
+
+// Processing chain actions
+import { processingChainSave, processingChainDelete } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { processingStepDelete } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { processingStepCalculationDelete } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+
 import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
 import * as SurveyInfoState from './surveyInfoState'
 
@@ -51,6 +57,12 @@ const actionHandlers = {
   [taxonomyUpdate]: SurveyInfoState.markDraft,
   [taxonomyPropUpdate]: SurveyInfoState.markDraft,
   [taxonomyDelete]: SurveyInfoState.markDraft,
+
+  // Processing chain
+  [processingChainSave]: SurveyInfoState.markDraft,
+  [processingChainDelete]: SurveyInfoState.markDraft,
+  [processingStepDelete]: SurveyInfoState.markDraft,
+  [processingStepCalculationDelete]: SurveyInfoState.markDraft,
 }
 
 export default exportReducer(actionHandlers)

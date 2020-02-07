@@ -24,6 +24,7 @@ import { onNodeDefsDelete } from '@webapp/survey/nodeDefs/actions'
 export const processingChainReset = 'analysis/processingChain/reset'
 export const processingChainUpdate = 'analysis/processingChain/update'
 export const processingChainPropUpdate = 'analysis/processingChain/prop/update'
+export const processingChainDelete = 'analysis/processingChain/delete'
 export const processingChainSave = 'analysis/processingChain/save'
 export const processingChainStepsLoad = 'analysis/processingChain/steps/load'
 export const processingChainValidationUpdate = 'analysis/processingChain/validation/update'
@@ -208,6 +209,7 @@ export const deleteProcessingChain = history => async (dispatch, getState) => {
 
   // Dissoc deleted node def analysis
   dispatch(onNodeDefsDelete(nodeDefUnusedDeletedUuids))
+  dispatch({ type: processingChainDelete })
 
   dispatch(navigateToProcessingChainsView(history))
   dispatch(showNotification('processingChainView.deleteComplete'))
