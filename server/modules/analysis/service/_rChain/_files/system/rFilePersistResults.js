@@ -13,6 +13,11 @@ import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 import { dbWriteTable, dfVar, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
 
+const _resultTableColNamesVector = `c(${R.pipe(
+  R.values,
+  R.map(colName => `'${colName}'`),
+)(ResultNodeTable.colNames)})`
+
 export default class RFilePersistResults extends RFileSystem {
   constructor(rChain) {
     super(rChain, 'persist-results')
@@ -28,32 +33,37 @@ export default class RFilePersistResults extends RFileSystem {
 
     for (const step of steps) {
       if (ProcessingStep.hasEntity(step)) {
-        const res = 'res'
+        const dfRes = 'res'
         const entityDef = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
           Survey.getNodeDefByUuid(entityUuid)(survey),
         )(step)
+        const dfSource = NodeDef.getName(entityDef)
+
+        // Build result dataframe
+        // Add common part
+        await this.appendContent(
+          setVar(dfRes, dfSource),
+          setVar(dfVar(dfRes, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
+          setVar(dfVar(dfRes, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
+          setVar(dfVar(dfRes, ResultNodeTable.colNames.recordUuid), dfVar(dfSource, RDBDataTable.colNameRecordUuuid)),
+          setVar(dfVar(dfRes, ResultNodeTable.colNames.parentUuid), dfVar(dfSource, RDBDataView.getColUuid(entityDef))),
+        )
 
         for (const calculation of ProcessingStep.getCalculations(step)) {
+          const calculationNodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
           const nodeDefCalculationName = R.pipe(
-            ProcessingStepCalculation.getNodeDefUuid,
             nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
             NodeDef.getName,
-          )(calculation)
+          )(calculationNodeDefUuid)
 
           await this.appendContent(
-            setVar(res, NodeDef.getName(entityDef)),
-            setVar(dfVar(res, ResultNodeTable.colNames.uuid), dfVar(res, `${nodeDefCalculationName}_uuid`)),
-            setVar(dfVar(res, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
-            setVar(dfVar(res, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
-            setVar(dfVar(res, ResultNodeTable.colNames.recordUuid), dfVar(res, RDBDataTable.colNameRecordUuuid)),
-            setVar(dfVar(res, ResultNodeTable.colNames.parentUuid), dfVar(res, RDBDataView.getColUuid(entityDef))),
-            setVar(
-              dfVar(res, ResultNodeTable.colNames.nodeDefUuid),
-              `'${ProcessingStepCalculation.getUuid(calculation)}'`,
-            ),
-            setVar(dfVar(res, ResultNodeTable.colNames.value), dfVar(res, nodeDefCalculationName)),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.uuid), dfVar(dfSource, `${nodeDefCalculationName}_uuid`)),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.nodeDefUuid), `'${calculationNodeDefUuid}'`),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.value), dfVar(dfSource, nodeDefCalculationName)),
+            // Reorder result columns before writing into table
+            setVar(dfRes, `${dfRes}[${_resultTableColNamesVector}]`),
 
-            dbWriteTable(ResultNodeTable.tableName, res, true),
+            dbWriteTable(ResultNodeTable.tableName, dfRes, true),
           )
         }
       }
