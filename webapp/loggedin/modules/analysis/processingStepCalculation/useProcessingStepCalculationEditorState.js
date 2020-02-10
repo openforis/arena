@@ -65,8 +65,12 @@ export default () => {
   const attributes = R.pipe(
     R.concat(attrDefsPrevStep),
     R.uniq,
-    // Node def type is compatible with processing step type (quantitative/categorical)
-    R.filter(R.pipe(NodeDef.getType, R.equals(ProcessingStepCalculation.getNodeDefType(calculation)))),
+    // Node def is analysis and type is compatible with processing step type (quantitative/categorical)
+    R.filter(
+      nodeDef =>
+        NodeDef.isAnalysis(nodeDef) &&
+        NodeDef.getType(nodeDef) === ProcessingStepCalculation.getNodeDefType(calculation),
+    ),
   )(attrDefsEntityChildren)
 
   const attribute = R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid =>
