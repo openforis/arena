@@ -37,24 +37,38 @@ export const navigateToProcessingChainsView = history => dispatch => {
   history.push(appModuleUri(analysisModules.processingChains))
 }
 
+export const onProcessingChainCreateOrFetch = processingChain => async (dispatch, getState) => {
+  dispatch(showAppSaving())
+  const surveyId = SurveyState.getSurveyId(getState())
+
+  if (processingChain) {
+    const processingChainUuid = ProcessingChain.getUuid(processingChain)
+
+    // Fetch calculation attribute uuids
+    const [{ data: attributeUuids }, { data: attributeUuidsOtherChains }] = await Promise.all([
+      axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/calculation-attribute-uuids`),
+      axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/attribute-uuids-other-chains`),
+    ])
+
+    dispatch({
+      type: processingChainUpdate,
+      processingChain: ProcessingChain.assocCalculationAttributeDefUuids(attributeUuids)(processingChain),
+      attributeUuidsOtherChains,
+    })
+  }
+
+  dispatch(hideAppSaving())
+}
+
 // ====== READ
 
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
-  const [{ data: processingChain }, { data: attributeUuids }, { data: attributeUuidsOtherChains }] = await Promise.all([
-    axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`),
-    axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/calculation-attribute-uuids`),
-    axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/attribute-uuids-other-chains`),
-  ])
+  const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
 
-  dispatch({
-    type: processingChainUpdate,
-    processingChain: processingChain
-      ? ProcessingChain.assocCalculationAttributeDefUuids(attributeUuids)(processingChain)
-      : null,
-    attributeUuidsOtherChains,
-  })
+  dispatch(onProcessingChainCreateOrFetch(processingChain))
+
   dispatch(hideAppSaving())
 }
 
