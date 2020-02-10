@@ -26,7 +26,7 @@ import {
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 import * as CategoryState from './categoryState'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
@@ -63,14 +63,17 @@ export const setCategoryItemForEdit = (category, level, item, edit = true) => as
 // ====== CREATE
 // ======
 
-export const createCategory = history => async (dispatch, getState) => {
+export const createCategory = (history, analysis) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
   const {
     data: { category },
   } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
 
   dispatch({ type: categoryCreate, category })
-  history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(category)}/`)
+
+  // Navigate to category edit module
+  const categoryModule = analysis ? analysisModules.category : designerModules.category
+  history.push(`${appModuleUri(categoryModule)}${Category.getUuid(category)}/`)
 
   return category
 }
