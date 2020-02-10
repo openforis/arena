@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import camelize from 'camelize'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -5,6 +6,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import { db } from '@server/db/db'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as ProcessingStepCalculationRepository from './processingStepCalculationRepository'
 
 // ====== CREATE
 export const insertStep = async (surveyId, step, client = db) =>
@@ -28,13 +30,23 @@ export const insertStep = async (surveyId, step, client = db) =>
 // ====== READ
 const _fetchStepsByChainUuid = async (surveyId, processingChainUuid, includeCalculations, client) => {
   const schema = getSurveyDBSchema(surveyId)
+  const calculationObjectAgg = includeCalculations
+    ? R.pipe(
+        R.map(field => `'${field}', c.${field}`),
+        R.join(', '),
+      )(ProcessingStepCalculationRepository.selectFieldsArray)
+    : ''
 
   return await client.map(
     `
     SELECT
       s.*,
       COUNT(c.uuid) AS calculations_count
-      ${includeCalculations ? ', json_agg(c.* order by c.index) as calculations' : ''}
+      ${
+        includeCalculations
+          ? `, json_agg(json_build_object(${calculationObjectAgg}) order by c.index) as calculations`
+          : ''
+      }
     FROM
       ${schema}.processing_step s
     LEFT OUTER JOIN

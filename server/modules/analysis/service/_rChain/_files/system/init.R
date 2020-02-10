@@ -1,6 +1,11 @@
 #= remove all objects in session
 rm(list = ls());
 
+scriptDir <- dirname(sys.frame(1)$ofile);
+if( scriptDir == 'system' ){
+  scriptDir <- '.';
+}
+
 # processing chain starting time
 arena.startTime <- Sys.time();
 
@@ -52,6 +57,41 @@ arena.error <- function(step, msg) {
 arena.debug <- function(step, msg) {
   arena.log(step, msg, "DEBUG");
 };
+
+#===
+#=== Extracts the content of a file and returns it as an SQL quoted string  
+#===
+arena.getQuotedFileContent <- function( filename ){
+  newLinePlaceHolder <- 'ARENA_NEW_LINE_PLACEHOLDER';
+  
+  filePath <- paste(scriptDir , filename , sep = .Platform$file.sep);
+  
+  c <- file(filePath, encoding = "UTF-8");
+  fileContent <- paste(readLines(c, warn = F), collapse = newLinePlaceHolder)
+  close(c);
+  
+  fileContent <- dbQuoteString( conn = connection , x = fileContent );
+  fileContent <- gsub(newLinePlaceHolder,'\n',fileContent);
+
+  return ( fileContent );
+};
+
+#===
+#=== Stores the content of the specified file into a column of the specified table.
+#===
+arena.persistUserScript <- function( filename , schema ,  table , column , uuid ){
+	fileContent <- arena.getQuotedFileContent( filename );
+	
+  query <- sprintf('UPDATE %s.%s SET %s = %s WHERE uuid = \'%s\'', schema, table, column, fileContent, uuid)
+	
+	#print( query );
+	
+	dbSendQuery(conn=connection, statement=query);
+};
+
+arena.persistCalculationScript <- function( filename , schema , calculationUuid ){
+  arena.persistUserScript(filename, schema, 'processing_step_calculation', 'script', calculationUuid)
+}
 
 # sqldf options.
 # driver is set to SQLLite in order to read from dataframe , otherwise it uses PostgreSQL which is the default driver loaded

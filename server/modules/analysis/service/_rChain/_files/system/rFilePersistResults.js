@@ -85,7 +85,7 @@ export default class RFilePersistResults extends RFileSystem {
     )(resultStepViewsByEntityUuid)
 
     await this.logInfo(`'Refresh result step materialized views'`)
-    await this.appendContent(refreshMaterializedViewQueries)
+    await this.appendContent(...refreshMaterializedViewQueries)
 
     return this
   }
