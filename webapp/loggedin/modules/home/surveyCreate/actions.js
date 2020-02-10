@@ -1,6 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as JobSerialized from '@common/job/jobSerialized'
+
 import { surveyCreate, setActiveSurvey } from '@webapp/survey/actions'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
@@ -54,7 +56,7 @@ export const importCollectSurvey = file => async dispatch => {
 
   dispatch(
     showAppJobMonitor(data.job, async job => {
-      const surveyId = job.result.surveyId
+      const surveyId = JobSerialized.getResult(job).surveyId
       dispatch(setActiveSurvey(surveyId, true, true))
     }),
   )
