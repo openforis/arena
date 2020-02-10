@@ -204,14 +204,17 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 
 // ==== UTILS
 export const canNodeDefBeMultiple = nodeDef =>
+  // Entity def but not root
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
-  R.includes(getType(nodeDef), [
-    nodeDefType.decimal,
-    nodeDefType.code,
-    nodeDefType.file,
-    nodeDefType.integer,
-    nodeDefType.text,
-  ])
+  // Attribute def but not analysis
+  (!isAnalysis(nodeDef) &&
+    R.includes(getType(nodeDef), [
+      nodeDefType.decimal,
+      nodeDefType.code,
+      nodeDefType.file,
+      nodeDefType.integer,
+      nodeDefType.text,
+    ]))
 
 export const canNodeDefBeKey = nodeDef => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
