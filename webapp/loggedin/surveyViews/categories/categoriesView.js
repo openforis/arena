@@ -13,14 +13,14 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
 import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
 
 const CategoriesView = props => {
-  const { categories, nodeDef, createCategory, deleteCategory, canSelect, readOnly, setNodeDefProp } = props
+  const { categories, nodeDef, createCategory, deleteCategory, canSelect, readOnly, analysis, setNodeDefProp } = props
   const selectedItemUuid = nodeDef && NodeDef.getCategoryUuid(nodeDef)
 
   const i18n = useI18n()
@@ -40,7 +40,7 @@ const CategoriesView = props => {
   return (
     <ItemsView
       itemLabelFunction={category => Category.getName(category)}
-      itemLink={appModuleUri(designerModules.category)}
+      itemLink={appModuleUri(analysis ? analysisModules.category : designerModules.category)}
       items={categories}
       selectedItemUuid={selectedItemUuid}
       onAdd={createCategory}
