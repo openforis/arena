@@ -42,16 +42,18 @@ export const navigateToProcessingChainsView = history => dispatch => {
 export const fetchProcessingChain = processingChainUuid => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
-  const [{ data: processingChain }, { data: calculationAttributeUuids }] = await Promise.all([
+  const [{ data: processingChain }, { data: attributeUuids }, { data: attributeUuidsOtherChains }] = await Promise.all([
     axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`),
     axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/calculation-attribute-uuids`),
+    axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/attribute-uuids-other-chains`),
   ])
 
   dispatch({
     type: processingChainUpdate,
     processingChain: processingChain
-      ? ProcessingChain.assocCalculationAttributeDefUuids(calculationAttributeUuids)(processingChain)
+      ? ProcessingChain.assocCalculationAttributeDefUuids(attributeUuids)(processingChain)
       : null,
+    attributeUuidsOtherChains,
   })
   dispatch(hideAppSaving())
 }

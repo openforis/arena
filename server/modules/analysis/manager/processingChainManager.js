@@ -228,6 +228,7 @@ export {
   fetchCalculationsByStepUuid,
   fetchCalculationAttributeUuidsByStepUuid,
   fetchCalculationAttributeUuidsByChainUuid,
+  fetchCalculationAttributeUuidsOtherChainsByChainUuid,
 } from '../repository/processingStepCalculationRepository'
 
 // ====== UPDATE - Chain

@@ -71,6 +71,9 @@ export const fetchCalculationAttributeUuidsByStepUuid = async (surveyId, stepUui
     R.prop('node_def_uuid'),
   )
 
+/**
+ * Returns the calculation attribute uuids used by the specified chain, indexed by calculation uuid
+ */
 export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainUuid, client = db) =>
   await client.oneOrNone(
     `
@@ -87,6 +90,27 @@ export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainU
     `,
     [chainUuid],
     R.prop('result'),
+  )
+
+/**
+ * Returns an array of calculation attribute definition uuids used by chains different from the specified one
+ */
+export const fetchCalculationAttributeUuidsOtherChainsByChainUuid = async (surveyId, chainUuid, client = db) =>
+  await client.map(
+    `
+    SELECT
+      c.node_def_uuid
+    FROM
+      ${getSurveyDBSchema(surveyId)}.processing_step_calculation c
+    JOIN
+      ${getSurveyDBSchema(surveyId)}.processing_step s
+    ON
+      s.uuid = c.processing_step_uuid
+    WHERE
+      s.processing_chain_uuid <> $1
+    `,
+    [chainUuid],
+    R.prop('node_def_uuid'),
   )
 
 // ====== UPDATE

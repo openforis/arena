@@ -96,6 +96,25 @@ export const init = app => {
     },
   )
 
+  app.get(
+    '/survey/:surveyId/processing-chain/:processingChainUuid/attribute-uuids-other-chains',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, processingChainUuid } = Request.getParams(req)
+
+        const attributeUuidsOtherChains = await ProcessingChainService.fetchCalculationAttributeUuidsOtherChainsByChainUuid(
+          surveyId,
+          processingChainUuid,
+        )
+
+        res.json(attributeUuidsOtherChains)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
+
   // ====== READ - Steps
 
   app.get(
