@@ -1,3 +1,5 @@
+import * as JobSerialized from '@common/job/jobSerialized'
+
 export const jobStatus = {
   pending: 'pending',
   running: 'running',
@@ -32,27 +34,28 @@ const calculatedElapsedMillis = job =>
   job.startTime ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime() : 0
 
 export const jobToJSON = job => ({
-  type: job.type,
-  userUuid: job.userUuid,
-  surveyId: job.surveyId,
+  [JobSerialized.keys.type]: job.type,
+  [JobSerialized.keys.userUuid]: job.userUuid,
+  [JobSerialized.keys.surveyId]: job.surveyId,
 
-  innerJobs: job.innerJobs.map(j => jobToJSON(j)),
+  [JobSerialized.keys.innerJobs]: job.innerJobs.map(j => jobToJSON(j)),
 
   // Status
-  status: job.status,
-  pending: job.status === jobStatus.pending,
-  running: job.status === jobStatus.running,
-  succeeded: job.status === jobStatus.succeeded,
-  canceled: job.status === jobStatus.canceled,
-  failed: job.status === jobStatus.failed,
-  ended: job.isEnded(),
+  [JobSerialized.keys.status]: job.status,
+  [JobSerialized.keys.pending]: job.status === jobStatus.pending,
+  [JobSerialized.keys.running]: job.status === jobStatus.running,
+  [JobSerialized.keys.succeeded]: job.status === jobStatus.succeeded,
+  [JobSerialized.keys.canceled]: job.status === jobStatus.canceled,
+  [JobSerialized.keys.failed]: job.status === jobStatus.failed,
+  [JobSerialized.keys.ended]: job.isEnded(),
 
-  total: job.total,
-  processed: job.processed,
-  progressPercent: calculateJobProgress(job),
-  elapsedMillis: calculatedElapsedMillis(job),
+  // Progress
+  [JobSerialized.keys.total]: job.total,
+  [JobSerialized.keys.processed]: job.processed,
+  [JobSerialized.keys.progressPercent]: calculateJobProgress(job),
+  [JobSerialized.keys.elapsedMillis]: calculatedElapsedMillis(job),
 
   // Output
-  errors: jobStatus.failed ? job.errors : null,
-  result: jobStatus.succeeded ? job.result : null,
+  [JobSerialized.keys.errors]: jobStatus.failed ? job.errors : null,
+  [JobSerialized.keys.result]: jobStatus.succeeded ? job.result : null,
 })
