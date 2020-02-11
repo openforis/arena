@@ -38,7 +38,7 @@ export const jobToJSON = job => ({
   [JobSerialized.keys.userUuid]: job.userUuid,
   [JobSerialized.keys.surveyId]: job.surveyId,
 
-  [JobSerialized.keys.innerJobs]: job.innerJobs.map(j => jobToJSON(j)),
+  [JobSerialized.keys.innerJobs]: job.innerJobs.map(jobToJSON),
 
   // Status
   [JobSerialized.keys.status]: job.status,
