@@ -1,4 +1,7 @@
 import axios from 'axios'
+
+import * as JobSerialized from '@common/job/jobSerialized'
+
 import * as JobState from './appJobState'
 
 export const appJobStart = 'app/job/start'
@@ -15,7 +18,7 @@ export const cancelActiveJob = () => async dispatch => {
 }
 
 export const activeJobUpdate = job => (dispatch, getState) => {
-  if (job && job.succeeded) {
+  if (JobSerialized.isSucceeded(job)) {
     const onComplete = JobState.getActiveJobOnCompleteCallback(getState())
     if (onComplete) {
       onComplete(job)

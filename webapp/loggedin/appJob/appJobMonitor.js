@@ -3,6 +3,8 @@ import './appJobMonitor.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import * as JobSerialized from '@common/job/jobSerialized'
+
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/commonComponents/modal'
 import ProgressBar from '@webapp/commonComponents/progressBar'
@@ -12,7 +14,9 @@ import * as JobState from './appJobState'
 
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 
-const JobProgress = ({ job }) => <ProgressBar progress={job.progressPercent} className={job.status} />
+const JobProgress = ({ job }) => (
+  <ProgressBar progress={JobSerialized.getProgressPercent(job)} className={JobSerialized.getStatus(job)} />
+)
 
 const InnerJobs = ({ innerJobs }) => {
   const i18n = useI18n()
@@ -24,7 +28,7 @@ const InnerJobs = ({ innerJobs }) => {
           <React.Fragment key={i}>
             <div className="job">
               <div className="name">
-                {i + 1}. {i18n.t(`jobs.${innerJob.type}`)}
+                {i + 1}. {i18n.t(`jobs.${JobSerialized.getType(innerJob)}`)}
               </div>
               <JobProgress job={innerJob} />
             </div>
@@ -38,29 +42,36 @@ const InnerJobs = ({ innerJobs }) => {
 
 const AppJobMonitor = props => {
   const { job, cancelActiveJob, hideAppJobMonitor } = props
-  const innerJobs = job ? job.innerJobs : null
 
   const i18n = useI18n()
 
   return (
     job &&
-    !job.canceled && (
+    !JobSerialized.isCanceled(job) && (
       <Modal className="app-job-monitor" closeOnEsc={false}>
-        <ModalHeader>{i18n.t(`jobs.${job.type}`)}</ModalHeader>
+        <ModalHeader>{i18n.t(`jobs.${JobSerialized.getType(job)}`)}</ModalHeader>
 
         <ModalBody>
           <JobProgress job={job} />
           <AppJobErrors job={job} />
 
-          <InnerJobs innerJobs={innerJobs} />
+          <InnerJobs innerJobs={JobSerialized.getInnerJobs(job)} />
         </ModalBody>
 
         <ModalFooter>
-          <button className="btn modal-footer__item" onClick={() => cancelActiveJob()} aria-disabled={!job.running}>
+          <button
+            className="btn modal-footer__item"
+            onClick={() => cancelActiveJob()}
+            aria-disabled={!JobSerialized.isRunning(job)}
+          >
             {i18n.t('common.cancel')}
           </button>
 
-          <button className="btn modal-footer__item" onClick={() => hideAppJobMonitor()} aria-disabled={!job.ended}>
+          <button
+            className="btn modal-footer__item"
+            onClick={() => hideAppJobMonitor()}
+            aria-disabled={!JobSerialized.isEnded(job)}
+          >
             {i18n.t('common.close')}
           </button>
         </ModalFooter>
