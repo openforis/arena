@@ -95,7 +95,7 @@ export const fetchCalculationAttributeUuidsByChainUuid = async (surveyId, chainU
 /**
  * Returns an array of calculation attribute definition uuids used by chains different from the specified one
  */
-export const fetchCalculationAttributeUuidsOtherChainsByChainUuid = async (surveyId, chainUuid, client = db) =>
+export const fetchCalculationAttributeUuidsByChainUuidExcluded = async (surveyId, chainUuidExcluded, client = db) =>
   await client.map(
     `
     SELECT
@@ -109,7 +109,7 @@ export const fetchCalculationAttributeUuidsOtherChainsByChainUuid = async (surve
     WHERE
       s.processing_chain_uuid <> $1
     `,
-    [chainUuid],
+    [chainUuidExcluded],
     R.prop('node_def_uuid'),
   )
 

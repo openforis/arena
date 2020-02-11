@@ -103,7 +103,7 @@ export const init = app => {
       try {
         const { surveyId, processingChainUuid } = Request.getParams(req)
 
-        const attributeUuidsOtherChains = await ProcessingChainService.fetchCalculationAttributeUuidsOtherChainsByChainUuid(
+        const attributeUuidsOtherChains = await ProcessingChainService.fetchCalculationAttributeUuidsByChainUuidExcluded(
           surveyId,
           processingChainUuid,
         )
