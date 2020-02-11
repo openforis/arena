@@ -37,7 +37,7 @@ export const navigateToProcessingChainsView = history => dispatch => {
   history.push(appModuleUri(analysisModules.processingChains))
 }
 
-export const onProcessingChainCreateOrFetch = processingChain => async (dispatch, getState) => {
+export const initProcessingChain = processingChain => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
 
@@ -67,7 +67,7 @@ export const fetchProcessingChain = processingChainUuid => async (dispatch, getS
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}`)
 
-  dispatch(onProcessingChainCreateOrFetch(processingChain))
+  dispatch(initProcessingChain(processingChain))
 
   dispatch(hideAppSaving())
 }

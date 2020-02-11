@@ -26,14 +26,11 @@ export const getAttributeUuidsOtherChains = _getStateProp(keys.attributeUuidsOth
 
 // ====== UPDATE
 
-export const assocProcessingChain = (chain, attributeUuidsOtherChains = null) =>
+export const assocProcessingChain = (chain, attributeUuidsOtherChains) =>
   R.pipe(
     R.assoc(keys.orig, chain),
     R.assoc(keys.dirty, chain),
-    R.unless(
-      R.always(R.isNil(attributeUuidsOtherChains)),
-      R.assoc(keys.attributeUuidsOtherChains, attributeUuidsOtherChains),
-    ),
+    R.assoc(keys.attributeUuidsOtherChains, attributeUuidsOtherChains),
   )
 
 const _updateChain = (key, fn) => state =>
@@ -77,7 +74,7 @@ export const resetProcessingStepCalculationAttributeUuid = calculationUuid => st
 
 export const saveDirty = (chain, step) => state =>
   R.pipe(R.when(R.always(Boolean(step)), ProcessingChain.assocProcessingStep(step)), chainUpdate =>
-    assocProcessingChain(chainUpdate)(state),
+    R.pipe(R.assoc(keys.orig, chainUpdate), R.assoc(keys.dirty, chainUpdate))(state),
   )(chain)
 
 // ====== UTILS
