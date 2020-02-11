@@ -48,6 +48,7 @@ export default () => {
   // Get survey info, calculation and attributes from store
   const survey = useSelector(SurveyState.getSurvey)
   const processingChain = useSelector(ProcessingChainState.getProcessingChain)
+  const attributeDefUuidsOtherChains = useSelector(ProcessingChainState.getAttributeUuidsOtherChains)
   const processingStep = useSelector(ProcessingStepState.getProcessingStep)
   const stepPrevCalculationAttributeUuids = useSelector(ProcessingStepState.getStepPrevCalculationAttributeUuids)
   const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
@@ -69,7 +70,8 @@ export default () => {
     R.filter(
       nodeDef =>
         NodeDef.isAnalysis(nodeDef) &&
-        NodeDef.getType(nodeDef) === ProcessingStepCalculation.getNodeDefType(calculation),
+        NodeDef.getType(nodeDef) === ProcessingStepCalculation.getNodeDefType(calculation) &&
+        !R.includes(NodeDef.getUuid(nodeDef), attributeDefUuidsOtherChains),
     ),
   )(attrDefsEntityChildren)
 
@@ -77,14 +79,15 @@ export default () => {
     Survey.getNodeDefByUuid(nodeDefUuid)(survey),
   )(calculation)
 
+  const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
+  const validation = ProcessingChain.getItemValidationByUuid(calculationUuid)(processingChain)
+
   return {
     i18n,
 
     surveyInfo: Survey.getSurveyInfo(survey),
     calculation,
-    validation: ProcessingChain.getItemValidationByUuid(ProcessingStepCalculation.getUuid(calculation))(
-      processingChain,
-    ),
+    validation,
     dirty,
     attributes,
     attribute,
