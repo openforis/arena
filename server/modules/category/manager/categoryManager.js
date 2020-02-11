@@ -323,3 +323,5 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
 
     return await validateCategory(surveyId, categoryUuid, t)
   })
+
+export { grantSelectOnCategoryItemToUserAnalysis } from '../repository/categoryRepository'

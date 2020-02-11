@@ -3,6 +3,8 @@ import * as R from 'ramda'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
+import * as UserAnalysis from '@common/analysis/userAnalysis'
+
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -271,3 +273,12 @@ export const deleteItem = async (surveyId, itemUuid, client = db) =>
 
 export const deleteItemLabels = async (surveyId, langCode, client = db) =>
   await deleteSurveySchemaTableProp(surveyId, 'category_item', ['labels', langCode], client)
+
+// ===== PERMISSIONS
+export const grantSelectOnCategoryItemToUserAnalysis = async (surveyId, client = db) =>
+  await client.query(`
+    GRANT 
+      SELECT
+      ON ${getSurveyDBSchema(surveyId)}.category_item
+      TO "${UserAnalysis.getName(surveyId)}"
+  `)
