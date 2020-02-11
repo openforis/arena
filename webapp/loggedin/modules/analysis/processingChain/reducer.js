@@ -38,7 +38,7 @@ const actionHandlers = {
   [processingChainReset]: () => ({}),
 
   [processingChainUpdate]: (state, { processingChain, attributeUuidsOtherChains }) =>
-    ProcessingChainState.assocProcessingChain(processingChain, attributeUuidsOtherChains)(state),
+    ProcessingChainState.initProcessingChain(processingChain, attributeUuidsOtherChains)(state),
 
   [processingChainPropUpdate]: (state, { key, value }) => ProcessingChainState.assocPropDirty(key, value)(state),
 
