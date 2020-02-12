@@ -11,6 +11,7 @@ export const enTranslation = {
 
 Do you want to cancel them?`,
     cantUndoWarning: 'This operation cannot be undone',
+    cantBeDeletedUsedItem: 'This {{item}} is used by some node definitions and cannot be deleted',
     close: 'Close',
     code: 'Code',
     childrenEmpty: 'Define at least one child item',
@@ -493,7 +494,7 @@ $t(common.cantUndoWarning)`,
   },
 
   taxonomy: {
-    cantBeDeleted: 'This taxonomy is used by some node definitions and cannot be deleted',
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     edit: {
       taxonomyName: 'Taxonomy name',
@@ -507,9 +508,11 @@ $t(common.cantUndoWarning)`,
   categoryEdit: {
     addLevel: 'Add level',
     categoryName: 'Category name',
-    cantBeDeleted: 'This category is used by some node definitions and cannot be removed',
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
+    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
     cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
     confirmDelete: 'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
+    confirmDeleteLevel: `Delete the category level '{{levelName}}' with all items?\n$t(common.cantUndoWarning)`,
     confirmDeleteItem: 'Delete the item with all children?\n$t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
     level: 'Level',

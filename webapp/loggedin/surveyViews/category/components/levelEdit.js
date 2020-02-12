@@ -1,6 +1,6 @@
 import React from 'react'
 import * as R from 'ramda'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
@@ -19,6 +19,8 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as Authorizer from '@core/auth/authorizer'
 import * as CategoryState from '../categoryState'
 
+import { showNotification } from '@webapp/app/appNotification/actions'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   createCategoryLevelItem,
   putCategoryItemProp,
@@ -27,17 +29,23 @@ import {
   deleteCategoryLevel,
   setCategoryItemForEdit,
 } from '../actions'
+
 import ItemEdit from './itemEdit'
 
 const LevelEdit = props => {
-  const handleDelete = () => {
-    const { survey, category, level, deleteCategoryLevel } = props
+  const dispatch = useDispatch()
 
-    const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
-    if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
-      alert('This category level is used by some node definitions and cannot be removed')
-    } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
-      deleteCategoryLevel(category, level)
+  const handleDelete = () => {
+    const { category, level, usedByNodeDefs, deleteCategoryLevel } = props
+
+    if (usedByNodeDefs) {
+      dispatch(showNotification('categoryEdit.cantBeDeletedLevel'))
+    } else {
+      dispatch(
+        showDialogConfirm('categoryEdit.confirmDeleteLevel', { levelName: CategoryLevel.getName(level) }, () =>
+          deleteCategoryLevel(category, level),
+        ),
+      )
     }
   }
 
@@ -124,6 +132,7 @@ const mapStateToProps = (state, props) => {
   const { level } = props
   const { index } = level
 
+  const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
   const category = CategoryState.getCategoryForEdit(state)
@@ -133,6 +142,8 @@ const mapStateToProps = (state, props) => {
   const canAddItem = index === 0 || parentItem
   const items = canAddItem ? CategoryState.getLevelItemsArray(index)(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
+  const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
+  const usedByNodeDefs = R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
 
   const user = AppState.getUser(state)
 
@@ -144,6 +155,7 @@ const mapStateToProps = (state, props) => {
     parentItem,
     canAddItem,
     canBeDeleted,
+    usedByNodeDefs,
     readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
