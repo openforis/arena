@@ -9,6 +9,7 @@ export const stateKey = 'processingChain'
 const keys = {
   dirty: 'dirty',
   orig: 'orig',
+  attributeUuidsOtherChains: 'attributeUuidsOtherChains',
 }
 
 export const getState = R.pipe(AnalysisState.getState, R.prop(stateKey))
@@ -21,9 +22,14 @@ const getProcessingChainOrig = _getStateProp(keys.orig, {})
 
 export const getProcessingChain = _getStateProp(keys.dirty, {})
 
+export const getAttributeUuidsOtherChains = _getStateProp(keys.attributeUuidsOtherChains, [])
+
 // ====== UPDATE
 
-export const assocProcessingChain = chain => R.pipe(R.assoc(keys.orig, chain), R.assoc(keys.dirty, chain))
+const _assocChain = chain => R.pipe(R.assoc(keys.orig, chain), R.assoc(keys.dirty, chain))
+
+export const initProcessingChain = (chain, attributeUuidsOtherChains) =>
+  R.pipe(_assocChain(chain), R.assoc(keys.attributeUuidsOtherChains, attributeUuidsOtherChains))
 
 const _updateChain = (key, fn) => state =>
   R.pipe(R.prop(key), fn, chainUpdated => R.assoc(key, chainUpdated)(state))(state)
@@ -66,7 +72,7 @@ export const resetProcessingStepCalculationAttributeUuid = calculationUuid => st
 
 export const saveDirty = (chain, step) => state =>
   R.pipe(R.when(R.always(Boolean(step)), ProcessingChain.assocProcessingStep(step)), chainUpdate =>
-    assocProcessingChain(chainUpdate)(state),
+    _assocChain(chainUpdate)(state),
   )(chain)
 
 // ====== UTILS

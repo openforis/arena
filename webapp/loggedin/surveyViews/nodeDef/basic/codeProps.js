@@ -57,6 +57,7 @@ const CodeProps = props => {
           disabled={disabled}
           categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
+          analysis={NodeDef.isAnalysis(nodeDef)}
           onChange={putCategoryProp}
         />
       </FormItem>
