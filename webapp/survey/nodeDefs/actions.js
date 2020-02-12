@@ -19,6 +19,7 @@ import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState
 
 import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -319,30 +320,30 @@ const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
 export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
-  const i18n = AppState.getI18n(state)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  if (
-    dispatch(_checkCanRemoveNodeDef(nodeDef)) &&
-    window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
-  ) {
-    const surveyId = Survey.getId(survey)
-    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+  if (dispatch(_checkCanRemoveNodeDef(nodeDef))) {
+    dispatch(
+      showDialogConfirm('surveyForm.nodeDefEditFormActions.confirmDelete', {}, async () => {
+        const surveyId = Survey.getId(survey)
+        const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-    const [
-      {
-        data: { nodeDefsValidation },
-      },
-    ] = await Promise.all([
-      axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
-      dispatch({ type: nodeDefDelete, nodeDef }),
-    ])
+        const [
+          {
+            data: { nodeDefsValidation },
+          },
+        ] = await Promise.all([
+          axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
+          dispatch({ type: nodeDefDelete, nodeDef }),
+        ])
 
-    dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
-    if (history) {
-      history.goBack()
-    }
+        dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+        if (history) {
+          history.goBack()
+        }
+      }),
+    )
   }
 }
 
