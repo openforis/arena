@@ -1,5 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
@@ -8,14 +9,21 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '../../record/actions'
+import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '@webapp/loggedin/surveyViews/record/actions'
 
-import * as RecordState from '../../record/recordState'
-
-const RecordEntryButtons = props => {
-  const { history, step, stepNext, stepPrev, valid, deleteRecord, updateRecordStep } = props
-
+const RecordEntryButtons = () => {
   const i18n = useI18n()
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const record = useSelector(RecordState.getRecord)
+
+  const stepId = Record.getStep(record)
+  const step = RecordStep.getStep(stepId)
+  const stepNext = RecordStep.getNextStep(stepId)
+  const stepPrev = RecordStep.getPreviousStep(stepId)
+  const valid = Validation.isObjValid(record)
 
   const getStepLabel = step => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
 
@@ -28,13 +36,11 @@ const RecordEntryButtons = props => {
           <button
             className="btn-s btn-transparent"
             onClick={() =>
-              confirm(
-                i18n.t('surveyForm.formEntryActions.confirmDemote', {
-                  name: getStepLabel(stepPrev),
-                }),
+              dispatch(
+                showDialogConfirm('surveyForm.formEntryActions.confirmDemote', { name: getStepLabel(stepPrev) }, () =>
+                  dispatch(updateRecordStep(RecordStep.getId(stepPrev), history)),
+                ),
               )
-                ? updateRecordStep(RecordStep.getId(stepPrev), history)
-                : null
             }
           >
             <span className="icon icon-reply icon-12px" />
@@ -53,13 +59,11 @@ const RecordEntryButtons = props => {
             className="btn-s btn-transparent"
             aria-disabled={!valid}
             onClick={() =>
-              confirm(
-                i18n.t('surveyForm.formEntryActions.confirmPromote', {
-                  name: getStepLabel(stepNext),
-                }),
+              dispatch(
+                showDialogConfirm('surveyForm.formEntryActions.confirmPromote', { name: getStepLabel(stepNext) }, () =>
+                  dispatch(updateRecordStep(RecordStep.getId(stepNext), history)),
+                ),
               )
-                ? updateRecordStep(RecordStep.getId(stepNext), history)
-                : null
             }
           >
             <span className="icon icon-redo2 icon-12px" />
@@ -70,7 +74,9 @@ const RecordEntryButtons = props => {
       <button
         className="btn-s btn-danger"
         onClick={() =>
-          window.confirm(i18n.t('surveyForm.formEntryActions.confirmDelete')) ? deleteRecord(history) : null
+          dispatch(
+            showDialogConfirm('surveyForm.formEntryActions.confirmDelete', {}, () => dispatch(deleteRecord(history))),
+          )
         }
         aria-disabled={false}
       >
@@ -82,58 +88,28 @@ const RecordEntryButtons = props => {
 }
 
 const FormEntryActions = props => {
-  const {
-    history,
-    preview,
-    step,
-    stepNext,
-    stepPrev,
-    valid,
-    deleteRecord,
-    deleteRecordUuidPreview,
-    updateRecordStep,
-  } = props
+  const { preview, entry } = props
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
 
   return (
     <div className="survey-form-header__actions">
       {preview ? (
-        <button className="btn-s btn-transparent" onClick={deleteRecordUuidPreview}>
+        <button className="btn-s btn-transparent" onClick={() => dispatch(deleteRecordUuidPreview())}>
           <span className="icon icon-eye-blocked icon-12px icon-left" />
           {i18n.t('surveyForm.formEntryActions.closePreview')}
         </button>
       ) : (
-        props.entry && (
-          <RecordEntryButtons
-            history={history}
-            deleteRecord={deleteRecord}
-            updateRecordStep={updateRecordStep}
-            step={step}
-            stepNext={stepNext}
-            stepPrev={stepPrev}
-            valid={valid}
-          />
-        )
+        entry && <RecordEntryButtons />
       )}
     </div>
   )
 }
 
-const mapStateToProps = state => {
-  const record = RecordState.getRecord(state)
-  const stepId = Record.getStep(record)
-
-  return {
-    step: RecordStep.getStep(stepId),
-    stepNext: RecordStep.getNextStep(stepId),
-    stepPrev: RecordStep.getPreviousStep(stepId),
-    valid: Validation.isObjValid(record),
-  }
+FormEntryActions.defaultProps = {
+  preview: false,
+  entry: false,
 }
 
-export default connect(mapStateToProps, {
-  deleteRecord,
-  deleteRecordUuidPreview,
-  updateRecordStep,
-})(FormEntryActions)
+export default FormEntryActions
