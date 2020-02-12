@@ -112,7 +112,7 @@ const mapStateToProps = (state, props) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
   const childDefs = nodeDefContext
     ? NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext, NodeDef.isVirtual(nodeDefContext))(survey)
+      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
       : [nodeDefContext] // Multiple attribute
     : []
 
