@@ -3,18 +3,18 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as SurveyState from '@webapp/survey/surveyState'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { processingChainUpdate } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { initProcessingChain } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 // ====== CREATE
 
 export const createProcessingChain = history => async (dispatch, getState) => {
-  const state = getState()
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(getState())
 
   const processingChain = ProcessingChain.newProcessingChain({
     [ProcessingChain.keysProps.cycles]: [surveyCycleKey],
   })
-  dispatch({ type: processingChainUpdate, processingChain })
+
+  await dispatch(initProcessingChain(processingChain))
 
   dispatch(navigateToProcessingChainView(history, ProcessingChain.getUuid(processingChain)))
 }
