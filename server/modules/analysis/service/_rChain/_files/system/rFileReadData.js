@@ -13,7 +13,6 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 import { dbGetQuery, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
@@ -48,6 +47,7 @@ export default class RFileReadData extends RFileSystem {
         )(step)
 
         const fields = ['*']
+        const fromTables = [viewName]
         for (const nodeDef of calculationAttrDefs) {
           const nodeDefName = NodeDef.getName(nodeDef)
           // Add nodeDefName_uuid field
@@ -58,7 +58,7 @@ export default class RFileReadData extends RFileSystem {
           }
         }
 
-        const selectData = dbGetQuery(schema, viewName, fields.join(', '), [
+        const selectData = dbGetQuery(schema, fromTables.join(' '), fields.join(', '), [
           `${DataTable.colNameRecordCycle} = '${cycle}'`,
         ])
         const setEntityData = setVar(NodeDef.getName(entityDef), selectData)
@@ -74,13 +74,19 @@ export default class RFileReadData extends RFileSystem {
    */
   async _fetchCategoryItemsByNodeDef(nodeDef) {
     const survey = this.rChain.survey
+    const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
     const surveyId = Survey.getId(survey)
 
-    const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-    const category = await CategoryManager.fetchCategoryAndLevelsByUuid(surveyId, categoryUuid)
+    const nodeDefName = NodeDef.getName(nodeDef)
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     const level = Category.getLevelByIndex(0)(category)
     const whereCond = `level_uuid = '${CategoryLevel.getUuid(level)}'`
-    const selectCategoryItems = dbGetQuery(getSurveyDBSchema(surveyId), 'category_item', '*', [whereCond])
+    const fields = [
+      `uuid as ${nodeDefName}_item_uuid`,
+      `props -> 'code' as ${nodeDefName}`,
+      `props #> '{labels,${defaultLang}}' as ${nodeDefName}_item_label`,
+    ].join(', ')
+    const selectCategoryItems = dbGetQuery(getSurveyDBSchema(surveyId), 'category_item', fields, [whereCond])
     await this.appendContent(setVar(Category.getName(category), selectCategoryItems))
   }
 }

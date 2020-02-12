@@ -4,6 +4,8 @@ import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
@@ -36,6 +38,8 @@ export default class RFilePersistResults extends RFileSystem {
     for (const step of steps) {
       if (ProcessingStep.hasEntity(step)) {
         const stepIndex = ProcessingStep.getIndex(step) + 1
+        await this.logInfo(`'Persist results for step ${stepIndex} (start)'`)
+
         const dfRes = 'res'
         const entityDef = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
           Survey.getNodeDefByUuid(entityUuid)(survey),
@@ -43,28 +47,43 @@ export default class RFilePersistResults extends RFileSystem {
         const dfSource = NodeDef.getName(entityDef)
 
         // Build result dataframe
-        // Add common part
-        await this.logInfo(`'Persist results for step ${stepIndex} (start)'`)
-        await this.appendContent(
-          setVar(dfRes, dfSource),
-          setVar(dfVar(dfRes, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
-          setVar(dfVar(dfRes, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
-          setVar(dfVar(dfRes, ResultNodeTable.colNames.recordUuid), dfVar(dfSource, RDBDataTable.colNameRecordUuuid)),
-          setVar(dfVar(dfRes, ResultNodeTable.colNames.parentUuid), dfVar(dfSource, RDBDataView.getColUuid(entityDef))),
-        )
-
         for (const calculation of ProcessingStep.getCalculations(step)) {
-          const calculationNodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
-          const nodeDefCalculationName = R.pipe(
-            nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-            NodeDef.getName,
-          )(calculationNodeDefUuid)
+          const calculationIndex = ProcessingStepCalculation.getIndex(calculation)
 
-          await this.logInfo(`'Persist results for calculation ${ProcessingStepCalculation.getIndex(calculation) + 1}'`)
+          await this.logInfo(`'Persist results for calculation ${calculationIndex + 1}'`)
+
+          const nodeDefCalculationUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+          const nodeDefCalculation = Survey.getNodeDefByUuid(nodeDefCalculationUuid)(survey)
+          const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
+
+          if (NodeDef.isCode(nodeDefCalculation)) {
+            // Join with category items data frame to add item_uuid, label
+            const categoryName = R.pipe(
+              NodeDef.getCategoryUuid,
+              categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey),
+              Category.getName,
+            )(nodeDefCalculation)
+            await this.appendContent(
+              setVar(dfRes, `merge(x = ${dfSource}, y = ${categoryName}, by="${nodeDefCalculationName}", all.x=TRUE)`),
+            )
+          } else {
+            await this.appendContent(setVar(dfRes, dfSource))
+          }
+
+          // Add common part
+          await this.appendContent(
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.processingChainUuid), `'${chainUuid}'`),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.processingStepUuid), `'${ProcessingStep.getUuid(step)}'`),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.recordUuid), dfVar(dfSource, RDBDataTable.colNameRecordUuuid)),
+            setVar(
+              dfVar(dfRes, ResultNodeTable.colNames.parentUuid),
+              dfVar(dfSource, RDBDataView.getColUuid(entityDef)),
+            ),
+          )
 
           await this.appendContent(
             setVar(dfVar(dfRes, ResultNodeTable.colNames.uuid), dfVar(dfSource, `${nodeDefCalculationName}_uuid`)),
-            setVar(dfVar(dfRes, ResultNodeTable.colNames.nodeDefUuid), `'${calculationNodeDefUuid}'`),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.nodeDefUuid), `'${nodeDefCalculationUuid}'`),
             setVar(dfVar(dfRes, ResultNodeTable.colNames.value), dfVar(dfSource, nodeDefCalculationName)),
             // Reorder result columns before writing into table
             setVar(dfRes, `${dfRes}[${_resultTableColNamesVector}]`),
