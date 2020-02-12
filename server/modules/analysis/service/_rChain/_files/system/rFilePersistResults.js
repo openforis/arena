@@ -5,6 +5,7 @@ import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as Node from '@core/record/node'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -16,6 +17,8 @@ import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 import { dbWriteTable, dfVar, setVar, dbSendQuery } from '@server/modules/analysis/service/_rChain/rFunctions'
+
+import * as RFileReadData from './rFileReadData'
 
 const _resultTableColNamesVector = `c(${R.pipe(
   R.values,
@@ -54,17 +57,16 @@ export default class RFilePersistResults extends RFileSystem {
 
           const nodeDefCalculationUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
           const nodeDefCalculation = Survey.getNodeDefByUuid(nodeDefCalculationUuid)(survey)
-          const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
+          const nodeDefCalcName = NodeDef.getName(nodeDefCalculation)
 
           if (NodeDef.isCode(nodeDefCalculation)) {
             // Join with category items data frame to add item_uuid, label
-            const categoryName = R.pipe(
-              NodeDef.getCategoryUuid,
-              categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey),
-              Category.getName,
+            const category = R.pipe(NodeDef.getCategoryUuid, categoryUuid =>
+              Survey.getCategoryByUuid(categoryUuid)(survey),
             )(nodeDefCalculation)
+            const dfCategoryItems = RFileReadData.getDfCategoryItems(category)
             await this.appendContent(
-              setVar(dfRes, `merge(x = ${dfSource}, y = ${categoryName}, by="${nodeDefCalculationName}", all.x=TRUE)`),
+              setVar(dfRes, `merge(x = ${dfSource}, y = ${dfCategoryItems}, by="${nodeDefCalcName}", all.x=TRUE)`),
             )
           } else {
             await this.appendContent(setVar(dfRes, dfSource))
@@ -82,9 +84,18 @@ export default class RFilePersistResults extends RFileSystem {
           )
 
           await this.appendContent(
-            setVar(dfVar(dfRes, ResultNodeTable.colNames.uuid), dfVar(dfSource, `${nodeDefCalculationName}_uuid`)),
+            setVar(dfVar(dfRes, ResultNodeTable.colNames.uuid), dfVar(dfSource, `${nodeDefCalcName}_uuid`)),
             setVar(dfVar(dfRes, ResultNodeTable.colNames.nodeDefUuid), `'${nodeDefCalculationUuid}'`),
-            setVar(dfVar(dfRes, ResultNodeTable.colNames.value), dfVar(dfSource, nodeDefCalculationName)),
+            '# Write res$value in json. For code attributes: {"itemUuid": ..., "code": ..., "label": ...}',
+            setVar(
+              dfVar(dfRes, ResultNodeTable.colNames.value),
+              NodeDef.isCode(nodeDefCalculation)
+                ? `with(${dfRes}, ifelse(is.na(${nodeDefCalcName}), NA, ` +
+                    `sprintf('{"${Node.valuePropKeys.itemUuid}": "%s", "code": "%s", "label": "%s"}', ` +
+                    `${nodeDefCalcName}_item_uuid, ${nodeDefCalcName}, ${nodeDefCalcName}_item_label)))`
+                : dfVar(dfRes, nodeDefCalcName),
+            ),
+
             // Reorder result columns before writing into table
             setVar(dfRes, `${dfRes}[${_resultTableColNamesVector}]`),
             dbWriteTable(ResultNodeTable.tableName, dfRes, true),

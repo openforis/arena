@@ -17,6 +17,8 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
 import { dbGetQuery, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
 
+export const getDfCategoryItems = category => `category_items_${Category.getName(category)}`
+
 export default class RFileReadData extends RFileSystem {
   constructor(rChain) {
     super(rChain, 'read-data')
@@ -87,6 +89,7 @@ export default class RFileReadData extends RFileSystem {
       `props #> '{labels,${defaultLang}}' as ${nodeDefName}_item_label`,
     ].join(', ')
     const selectCategoryItems = dbGetQuery(getSurveyDBSchema(surveyId), 'category_item', fields, [whereCond])
-    await this.appendContent(setVar(Category.getName(category), selectCategoryItems))
+    const dfCategoryItems = getDfCategoryItems(category)
+    await this.appendContent(setVar(dfCategoryItems, selectCategoryItems))
   }
 }
