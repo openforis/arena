@@ -38,13 +38,14 @@ export const getSelectFields = (survey, nodeDef, resultStepViews) => {
     fields.unshift(...cols)
   })(survey)
 
-  const nodeDefsCalculationNames = R.pipe(
+  const nodeDefsCalculationColNames = R.pipe(
     R.map(ResultStepView.getNodeDefColumns),
     R.flatten,
-    R.map(NodeDef.getName),
+    R.map(DataCol.getNames),
+    R.flatten,
   )(resultStepViews)
 
-  fields.push(...nodeDefsCalculationNames)
+  fields.push(...nodeDefsCalculationColNames)
 
   const fieldKey = R.pipe(
     Survey.getNodeDefKeys(nodeDef),
