@@ -1,10 +1,12 @@
 import Counter from '@core/counter'
 import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 
 import RStep from './rStep'
@@ -89,6 +91,8 @@ class RChain {
 
   async _initSurveyAndChain() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
+    const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
+    this._survey = Survey.assocCategories(categories)(this.survey)
     this._chain = await ProcessingChainManager.fetchChainByUuid(this.surveyId, this.chainUuid)
     const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)

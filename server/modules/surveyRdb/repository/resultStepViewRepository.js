@@ -17,10 +17,15 @@ export const createResultStepView = async (surveyId, resultStepView, client) => 
 
   ResultStepView.getNodeDefColumns(resultStepView).forEach((nodeDef, i) => {
     const alias = `n${i}`
+    const nodeDefName = NodeDef.getName(nodeDef)
     const tableWithAlias = `${resultNodeTable} AS ${alias}`
     const conditionNodeDefUuid = `${alias}.${ResultNodeTable.colNames.nodeDefUuid} = '${NodeDef.getUuid(nodeDef)}'`
 
-    fields.push(`${alias}.value AS ${NodeDef.getName(nodeDef)}`)
+    fields.push(
+      ...(NodeDef.isCode(nodeDef)
+        ? [`${alias}.value->'code' AS ${nodeDefName}_code`, `${alias}.value->'label' AS ${nodeDefName}_label`]
+        : [`${alias}.value AS ${nodeDefName}`]),
+    )
 
     if (i === 0) {
       fields.push(`${alias}.${ResultNodeTable.colNames.parentUuid}`)
