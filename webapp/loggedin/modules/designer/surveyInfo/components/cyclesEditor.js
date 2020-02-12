@@ -1,6 +1,7 @@
 import './cyclesEditor.scss'
 
 import React, { useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -9,6 +10,7 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const DateEditor = ({ date, onChange }) => {
   const [year, month, day] = R.pipe(R.defaultTo('--'), R.split('-'))(date)
@@ -41,6 +43,7 @@ const CycleEditor = props => {
   const { cycleKey, cycle, i18n, readOnly, validation, canDelete, onChange, onDelete } = props
 
   const stepNum = Number(cycleKey) + 1
+  const dispatch = useDispatch()
 
   return (
     <ValidationTooltip validation={validation} showKeys={false}>
@@ -67,13 +70,11 @@ const CycleEditor = props => {
           <button
             className="btn-s btn-transparent btn-delete"
             onClick={() =>
-              window.confirm(
-                i18n.t('homeView.surveyInfo.confirmDeleteCycle', {
-                  cycle: stepNum,
-                }),
+              dispatch(
+                showDialogConfirm('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }, () =>
+                  onDelete(cycleKey),
+                ),
               )
-                ? onDelete(cycleKey)
-                : null
             }
           >
             <span className="icon icon-bin2 icon-12px" />
