@@ -3,7 +3,7 @@
 ARG node_version=12.16.0
 
 FROM node:${node_version} AS base
-RUN apk add --no-cache git
+RUN apt-get install git
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
@@ -16,7 +16,7 @@ RUN cd /app; git reset --hard
 ############################################################
 
 FROM node:${node_version} AS prod_builder
-RUN apk add --no-cache git jq
+RUN apt-get install git jq
 
 COPY --from=base /app /app
 
@@ -65,7 +65,7 @@ CMD ["/run_nginx.sh"]
 #############################################################
 
 FROM node:${node_version} as test
-RUN apk add --no-cache git
+RUN apt-get install git
 
 COPY --from=base /app /app
 RUN cd /app; yarn build:server:dev

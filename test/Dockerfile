@@ -4,7 +4,7 @@
 
 FROM node:12.16.0 AS test
 
-RUN apk add --no-cache git
+RUN apt-get install git
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
