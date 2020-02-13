@@ -1,4 +1,5 @@
 version: '3.4'
+
 services:
 
   db:
@@ -11,13 +12,13 @@ services:
 
   app_server:
     env_file:
-      - .env
+      - ../.env
     depends_on:
       - db
     ports:
       - "9990:9090"
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: arena-server
 
@@ -32,19 +33,21 @@ services:
 
     # Start application server when Postgres is ready:
     command: "sh -c '
+      apt update;
+      apt-get install netcat;
       while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
       exec pm2-runtime server.js
     '"
 
   web:
     env_file:
-      - .env
+      - ../.env
     depends_on:
       - app_server
     ports:
       - "9880:80"
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: arena-web
     environment:

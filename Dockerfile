@@ -3,7 +3,8 @@
 ARG node_version=12.16.0
 
 FROM node:${node_version} AS base
-RUN apt-get install git
+RUN apt update
+RUN apt-get install git netcat
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/

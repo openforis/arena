@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+
+  app_server:
+    env_file:
+      - ../.env
+#    depends_on:
+#      - db
+    ports:
+      - "9990:9090"
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: arena-server
+
+    environment:
+      TEMP_FOLDER: /tmp/arena_upload
+      ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
+
+    # Start application server
+    # command: "sh -c 'exec pm2-runtime server.js'"
+  web:
+    env_file:
+      - ../.env
+    depends_on:
+      - app_server
+    ports:
+      - "9880:80"
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: arena-web
+    environment:
+      ARENA_HOST: app_server:9090
