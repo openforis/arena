@@ -1,7 +1,7 @@
 import './userView.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
@@ -21,11 +21,13 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 import { useUserViewState } from './useUserViewState'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const UserView = props => {
   const { surveyInfo, lang, userUuid } = props
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
 
   const {
     ready,
@@ -104,13 +106,18 @@ const UserView = props => {
             {canRemove && (
               <button
                 className="btn-s btn-danger btn-remove-user"
-                onClick={() => {
-                  const confirmMessage = i18n.t('userView.confirmRemove', {
-                    user: name,
-                    survey: Survey.getLabel(surveyInfo, lang),
-                  })
-                  if (window.confirm(confirmMessage)) removeUser()
-                }}
+                onClick={() =>
+                  dispatch(
+                    showDialogConfirm(
+                      'userView.confirmRemove',
+                      {
+                        user: name,
+                        survey: Survey.getLabel(surveyInfo, lang),
+                      },
+                      removeUser,
+                    ),
+                  )
+                }
               >
                 <span className="icon icon-bin icon-left icon-10px" />
                 {i18n.t('userView.removeFromSurvey')}

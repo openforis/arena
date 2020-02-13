@@ -1,9 +1,10 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const NodeDeleteButton = ({ nodeDef, node, disabled = false, showConfirm = true, removeNode }) => {
-  const i18n = useI18n()
+  const dispatch = useDispatch()
 
   return (
     <button
@@ -13,11 +14,11 @@ const NodeDeleteButton = ({ nodeDef, node, disabled = false, showConfirm = true,
         justifySelf: 'center',
       }}
       aria-disabled={disabled}
-      onClick={() => {
-        if (!showConfirm || confirm(i18n.t('surveyForm.confirmNodeDelete'))) {
-          removeNode(nodeDef, node)
-        }
-      }}
+      onClick={() =>
+        showConfirm
+          ? dispatch(showDialogConfirm('surveyForm.confirmNodeDelete', {}, () => removeNode(nodeDef, node)))
+          : removeNode(nodeDef, node)
+      }
     >
       <span className="icon icon-bin icon-12px" />
     </button>

@@ -1,12 +1,11 @@
 import './surveyInfo.scss'
 
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 
 import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
@@ -14,6 +13,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
@@ -23,9 +23,9 @@ const SurveyInfo = props => {
   const { surveyInfo, canEditDef, publishSurvey, deleteSurvey } = props
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [showPublishConfirm, setShowPublishConfirm] = useState(false)
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
@@ -49,7 +49,11 @@ const SurveyInfo = props => {
             <a
               className="btn-s btn-transparent"
               aria-disabled={!Survey.isDraft(surveyInfo)}
-              onClick={() => setShowPublishConfirm(true)}
+              onClick={() =>
+                dispatch(
+                  showDialogConfirm('homeView.surveyInfo.confirmPublish', { survey: surveyLabel }, publishSurvey),
+                )
+              }
             >
               <div className="triangle-left" />
               <span className="icon icon-checkmark2 icon-12px icon-left" />
@@ -80,19 +84,6 @@ const SurveyInfo = props => {
           onCancel={() => setShowDeleteDialog(false)}
           onDelete={() => deleteSurvey()}
           surveyName={Survey.getName(surveyInfo)}
-        />
-      )}
-
-      {showPublishConfirm && (
-        <ConfirmDialog
-          message={i18n.t('homeView.surveyInfo.confirmPublish', {
-            survey: surveyLabel,
-          })}
-          onOk={() => {
-            setShowPublishConfirm(false)
-            publishSurvey()
-          }}
-          onCancel={() => setShowPublishConfirm(false)}
         />
       )}
     </>

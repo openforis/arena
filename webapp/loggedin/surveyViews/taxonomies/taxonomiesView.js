@@ -1,7 +1,7 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import * as R from 'ramda'
+import { connect, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
@@ -16,27 +16,31 @@ import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
-import { createTaxonomy, deleteTaxonomy } from '../taxonomy/actions'
+import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+
 import ItemsView from '../items/itemsView'
 
 const TaxonomiesView = props => {
-  const { taxonomies, nodeDef, createTaxonomy, deleteTaxonomy, canSelect, readOnly, setNodeDefProp } = props
-
-  const selectedItemUuid = nodeDef && NodeDef.getTaxonomyUuid(nodeDef)
+  const { taxonomies, selectedItemUuid, canSelect, readOnly, createTaxonomy } = props
 
   const i18n = useI18n()
   const history = useHistory()
+  const dispatch = useDispatch()
 
-  const onClose = nodeDef ? history.goBack : null
+  const onClose = selectedItemUuid ? history.goBack : null
 
-  const canDelete = taxonomy =>
-    taxonomy.usedByNodeDefs
-      ? alert(i18n.t('taxonomy.cantBeDeleted'))
-      : window.confirm(
-          i18n.t('taxonomy.confirmDelete', {
-            taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
-          }),
-        )
+  const canDelete = taxonomy => (taxonomy.usedByNodeDefs ? dispatch(showNotification('taxonomy.cantBeDeleted')) : true)
+
+  const onDelete = taxonomy =>
+    dispatch(
+      showDialogConfirm(
+        'taxonomy.confirmDelete',
+        { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
+        () => dispatch(deleteTaxonomy(taxonomy)),
+      ),
+    )
 
   return (
     <ItemsView
@@ -46,9 +50,9 @@ const TaxonomiesView = props => {
       selectedItemUuid={selectedItemUuid}
       onAdd={createTaxonomy}
       canDelete={canDelete}
-      onDelete={deleteTaxonomy}
+      onDelete={onDelete}
       canSelect={canSelect}
-      onSelect={taxonomy => setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
+      onSelect={taxonomy => dispatch(setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy)))}
       onClose={onClose}
       readOnly={readOnly}
     />
@@ -70,17 +74,14 @@ const mapStateToProps = state => {
   // A nodeDef taxon is begin edited.
   const nodeDef = !readOnly && NodeDefState.getNodeDef(state)
   const canSelect = nodeDef && NodeDef.isTaxon(nodeDef)
+  const selectedItemUuid = canSelect && NodeDef.getTaxonomyUuid(nodeDef)
 
   return {
     taxonomies,
     readOnly,
-    nodeDef,
+    selectedItemUuid,
     canSelect,
   }
 }
 
-export default connect(mapStateToProps, {
-  createTaxonomy,
-  deleteTaxonomy,
-  setNodeDefProp,
-})(TaxonomiesView)
+export default connect(mapStateToProps, { createTaxonomy })(TaxonomiesView)

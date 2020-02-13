@@ -53,6 +53,8 @@ const assocProp = (propName, value) => R.pipe(R.assoc(propName, value), R.dissoc
 
 // ====== UTILS
 
+export const isEqual = ObjectUtils.isEqual
+
 const extractNodeDefNames = (jsExpr = '') =>
   StringUtils.isBlank(jsExpr) ? [] : Expression.getExpressionIdentifiers(Expression.fromString(jsExpr))
 

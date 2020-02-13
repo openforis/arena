@@ -1,30 +1,33 @@
 import './expressionsProp.scss'
 
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem } from '@webapp/commonComponents/form/input'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import ExpressionProp from './expressionProp'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const ExpressionsProp = props => {
   const { values, label, validation, multiple, onChange } = props
 
-  const i18n = useI18n()
+  const dispatch = useDispatch()
 
-  const getExpressionIndex = expression => R.findIndex(R.propEq('uuid', NodeDefExpression.getUuid(expression)), values)
+  const getExpressionIndex = expression => R.findIndex(NodeDefExpression.isEqual(expression), values)
 
   const onDelete = expression => {
-    if (window.confirm(i18n.t('nodeDefEdit.expressionsProp.confirmDelete'))) {
-      const index = getExpressionIndex(expression)
-      const newValues = R.remove(index, 1, values)
-      onChange(newValues)
-    }
+    dispatch(
+      showDialogConfirm('nodeDefEdit.expressionsProp.confirmDelete', {}, () => {
+        const index = getExpressionIndex(expression)
+        const newValues = R.remove(index, 1, values)
+        onChange(newValues)
+      }),
+    )
   }
 
   const onUpdate = expression => {

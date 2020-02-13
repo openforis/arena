@@ -1,10 +1,12 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
-
-import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+
+import { useI18n } from '@webapp/commonComponents/hooks'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const NodeDefEntityFormNodeSelect = props => {
   const {
@@ -21,6 +23,7 @@ const NodeDefEntityFormNodeSelect = props => {
   } = props
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
 
   return (
     <div className="survey-form__node-def-entity-form-header">
@@ -47,10 +50,12 @@ const NodeDefEntityFormNodeSelect = props => {
             style={{ marginLeft: '5px' }}
             aria-disabled={!selectedNode}
             onClick={() => {
-              if (window.confirm(i18n.t('surveyForm.nodeDefEntityForm.confirmDelete'))) {
-                onChange(null)
-                removeNode(nodeDef, selectedNode)
-              }
+              dispatch(
+                showDialogConfirm('surveyForm.nodeDefEntityForm.confirmDelete', {}, () => {
+                  onChange(null)
+                  removeNode(nodeDef, selectedNode)
+                }),
+              )
             }}
           >
             <span className="icon icon-bin icon-10px icon-left" />

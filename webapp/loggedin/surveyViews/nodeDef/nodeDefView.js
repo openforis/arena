@@ -1,7 +1,7 @@
 import './nodeDefView.scss'
 
-import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
+import React, { useEffect } from 'react'
+import { connect, useDispatch } from 'react-redux'
 import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
@@ -12,7 +12,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
-import ConfirmDialog from '@webapp/commonComponents/confirmDialog'
 import TabBar from '@webapp/commonComponents/tabBar'
 
 import ValidationsProps from './advanced/validationsProps'
@@ -33,6 +32,7 @@ import {
 } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
 import { navigateToProcessingChainsView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const NodeDefView = props => {
   const {
@@ -56,10 +56,10 @@ const NodeDefView = props => {
 
   const i18n = useI18n()
   const history = useHistory()
+  const dispatch = useDispatch()
   const { pathname } = useLocation()
   const { nodeDefUuid } = useParams()
 
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const editingNodeDefFromDesigner = Boolean(
     matchPath(pathname, appModuleUri(designerModules.nodeDef) + ':nodeDefUuid'),
   )
@@ -131,7 +131,11 @@ const NodeDefView = props => {
           <div className="button-bar">
             <button
               className="btn btn-cancel"
-              onClick={() => (isDirty ? setShowCancelConfirm(true) : cancelNodeDefEdits(history))}
+              onClick={() =>
+                isDirty
+                  ? dispatch(showDialogConfirm('common.cancelConfirm', {}, () => cancelNodeDefEdits(history)))
+                  : cancelNodeDefEdits(history)
+              }
             >
               {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
             </button>
@@ -152,18 +156,6 @@ const NodeDefView = props => {
           </div>
         </div>
       </div>
-
-      {showCancelConfirm && (
-        <ConfirmDialog
-          className="node-def-edit__cancel-confirm-dialog"
-          message={i18n.t('common.cancelConfirm')}
-          onOk={() => {
-            setShowCancelConfirm(false)
-            cancelNodeDefEdits(history)
-          }}
-          onCancel={() => setShowCancelConfirm(false)}
-        />
-      )}
     </>
   ) : null
 }

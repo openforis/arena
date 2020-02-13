@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
@@ -15,6 +15,8 @@ import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
+import { showNotification } from '@webapp/app/appNotification/actions'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
@@ -25,17 +27,21 @@ const CategoriesView = props => {
 
   const i18n = useI18n()
   const history = useHistory()
+  const dispatch = useDispatch()
 
   const onClose = nodeDef ? history.goBack : null
 
   const canDeleteCategory = category =>
-    category.usedByNodeDefs
-      ? alert(i18n.t('categoryEdit.cantBeDeleted'))
-      : window.confirm(
-          i18n.t('categoryEdit.confirmDelete', {
-            categoryName: Category.getName(category) || i18n.t('common.undefinedName'),
-          }),
-        )
+    category.usedByNodeDefs ? dispatch(showNotification('categoryEdit.cantBeDeleted')) : true
+
+  const onDelete = category =>
+    dispatch(
+      showDialogConfirm(
+        'categoryEdit.confirmDelete',
+        { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
+        () => deleteCategory(category),
+      ),
+    )
 
   return (
     <ItemsView
@@ -45,7 +51,7 @@ const CategoriesView = props => {
       selectedItemUuid={selectedItemUuid}
       onAdd={createCategory}
       canDelete={canDeleteCategory}
-      onDelete={deleteCategory}
+      onDelete={onDelete}
       canSelect={canSelect}
       onSelect={category => setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
       onClose={onClose}
