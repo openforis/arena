@@ -2,7 +2,7 @@
 # to make this work faster when there have been changes.
 ############################################################
 
-FROM node:12-alpine AS test
+FROM node:12.16.0 AS test
 
 RUN apk add --no-cache git
 

@@ -1,6 +1,8 @@
 ############################################################
 
-FROM node:12-alpine AS base
+ARG node_version=12.16.0
+
+FROM node:${node_version} AS base
 RUN apk add --no-cache git
 
 # Cache these as much as possible:
@@ -13,7 +15,7 @@ RUN cd /app; git reset --hard
 
 ############################################################
 
-FROM node:12-alpine AS prod_builder
+FROM node:${node_version} AS prod_builder
 RUN apk add --no-cache git jq
 
 COPY --from=base /app /app
@@ -22,14 +24,14 @@ RUN cd /app; yarn build-prod; mv dist dist-web
 RUN cd /app; yarn build:server:prod
 
 # Only keep the packages needed for server runtime:
-RUN cd /app; set -o pipefail; ( \
-        jq -r '.devDependencies | keys | .[] ' package.json; \
-        jq -r '.arenaClientPackages | keys | .[] | select(. != "META")' package.json; \
-    ) | xargs yarn remove --ignore-scripts --no-lockfile --production
+#RUN cd /app; set -o pipefail; ( \
+#        jq -r '.devDependencies | keys | .[] ' package.json; \
+#        jq -r '.arenaClientPackages | keys | .[] | select(. != "META")' package.json; \
+#    ) | xargs yarn remove --ignore-scripts --no-lockfile --production
 
 ############################################################
 
-FROM node:12-alpine AS arena-server
+FROM node:${node_version} AS arena-server
 RUN npm install pm2 -g
 
 COPY --from=prod_builder /app/node_modules /app/node_modules
@@ -62,7 +64,7 @@ CMD ["/run_nginx.sh"]
 
 #############################################################
 
-FROM node:12-alpine as test
+FROM node:${node_version} as test
 RUN apk add --no-cache git
 
 COPY --from=base /app /app

@@ -14,8 +14,8 @@ services:
 # before_cache:
 # - docker save -o docker_images/images.tar $(docker images -a -q)
 
-before_install:
-  - pip install --user awscli
+#before_install:
+#  - pip install --user awscli
 
 script:
   - |
@@ -23,7 +23,11 @@ script:
       docker build . # Test that everything builds properly
       test/run_docker_tests.sh # run tests
 
-      # Handle infrastructure changes now if we got this far:
-      curl -fsSL https://get.pulumi.com/ | sh
-      export PATH=$PATH:$HOME/.pulumi/bin
-      infra/travis_${TRAVIS_EVENT_TYPE}.sh
+#      # Handle infrastructure changes now if we got this far:
+#      curl -fsSL https://get.pulumi.com/ | sh
+#      export PATH=$PATH:$HOME/.pulumi/bin
+#      infra/travis_${TRAVIS_EVENT_TYPE}.sh
+
+deploy:
+  provider: script
+  branch: test/heroku-deploy
