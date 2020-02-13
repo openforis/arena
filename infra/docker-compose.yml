@@ -11,8 +11,8 @@ services:
       POSTGRES_PASSWORD: arena
 
   app_server:
-    env_file:
-      - ../.env
+#    env_file:
+#      - ../.env
     depends_on:
       - db
     ports:
@@ -40,8 +40,8 @@ services:
     '"
 
   web:
-    env_file:
-      - ../.env
+#    env_file:
+#      - ../.env
     depends_on:
       - app_server
     ports:

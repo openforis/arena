@@ -3,8 +3,8 @@ version: '3.4'
 services:
 
   app_server:
-    env_file:
-      - ../.env
+#    env_file:
+#      - ../.env
 #    depends_on:
 #      - db
     ports:
@@ -21,8 +21,8 @@ services:
     # Start application server
     # command: "sh -c 'exec pm2-runtime server.js'"
   web:
-    env_file:
-      - ../.env
+#    env_file:
+#      - ../.env
     depends_on:
       - app_server
     ports:
