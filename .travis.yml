@@ -1,4 +1,3 @@
----
 language: generic
 os: linux
 dist: bionic # Ubuntu 18.04 LTS
@@ -17,12 +16,18 @@ services:
 #before_install:
 #  - pip install --user awscli
 
+before_install:
+  # install heroku CLI
+  - wget -qO- https://toolbelt.heroku.com/install.sh | sh
+  # login to docker registries (heroku)
+  - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
+
 script:
   - |
       set -e # exit from first failure
-      docker build . # Test that everything builds properly
+#      docker build . # Test that everything builds properly
       test/run_docker_tests.sh # run tests
-
+      docker-compose -f ./infra/docker-compose.server.yml -p of-arena up --no-start
 #      # Handle infrastructure changes now if we got this far:
 #      curl -fsSL https://get.pulumi.com/ | sh
 #      export PATH=$PATH:$HOME/.pulumi/bin
@@ -30,4 +35,7 @@ script:
 
 deploy:
   provider: script
-  branch: test/heroku-deploy
+  script:
+    docker push registry.heroku.com/$HEROKU_APP_DEV/web;
+  on:
+    branch: test/heroku-deploy
