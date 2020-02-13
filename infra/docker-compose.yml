@@ -34,7 +34,7 @@ services:
     # Start application server when Postgres is ready:
     command: "sh -c '
       apt update;
-      apt-get install netcat;
+      apt-get install -y netcat;
       while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
       exec pm2-runtime server.js
     '"
