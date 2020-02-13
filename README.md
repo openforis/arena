@@ -44,7 +44,13 @@ Note that the Dockerfile build process will only use the `HEAD` commit from the 
 checked out branch. Uncommitted changes will be ignored.
 
 ```shell
-docker-compose up --build --abort-on-container-exit
+docker-compose -f ./infra/docker-compose.yml up --build --abort-on-container-exit
+```
+
+## Creating a Docker container to be deployed on a server
+
+```shell
+docker-compose -f ./infra/docker-compose.server.yml up --no-start
 ```
 
 ## Running the test suite
