@@ -16,7 +16,7 @@ RUN cd /app; git reset --hard
 ############################################################
 
 FROM node:${node_version} AS prod_builder
-RUN apt-get install git jq
+RUN apt-get install git
 
 COPY --from=base /app /app
 
