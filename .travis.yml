@@ -23,19 +23,16 @@ before_install:
   - echo "$HEROKU_PASSWORD" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
 
 script:
-  - |
-      set -e # exit from first failure
-#      docker build . # Test that everything builds properly
-      test/run_docker_tests.sh # run tests
-      docker-compose -f ./infra/docker-compose.server.yml -p of-arena up --no-start
-#      # Handle infrastructure changes now if we got this far:
-#      curl -fsSL https://get.pulumi.com/ | sh
-#      export PATH=$PATH:$HOME/.pulumi/bin
-#      infra/travis_${TRAVIS_EVENT_TYPE}.sh
+  - set -e # exit from first failure
+#  - docker build . # Test that everything builds properly
+  - test/run_docker_tests.sh # run tests
+  - docker-compose -f ./infra/docker-compose.server.yml -p of-arena up --no-start
+  - docker tag of-arena registry.heroku.com/$HEROKU_APP_DEV/web
 
 deploy:
   provider: script
   script:
     docker push registry.heroku.com/$HEROKU_APP_DEV/web;
+    heroku container:release web --app $HEROKU_APP_DEV
   on:
     branch: test/heroku-deploy
