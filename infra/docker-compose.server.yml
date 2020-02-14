@@ -13,11 +13,10 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: arena-server
-
     environment:
       TEMP_FOLDER: /tmp/arena_upload
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
-
+    image: of-arena-server
     # Start application server
     # command: "sh -c 'exec pm2-runtime server.js'"
   web:
@@ -33,3 +32,4 @@ services:
       target: arena-web
     environment:
       ARENA_HOST: app_server:9090
+    image: of-arena-web

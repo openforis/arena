@@ -21,7 +21,6 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: arena-server
-
     environment:
       PGHOST: db
       PGPORT: 5432
@@ -30,7 +29,6 @@ services:
       PGPASSWORD: arena
       TEMP_FOLDER: /tmp/arena_upload
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
-
     # Start application server when Postgres is ready:
     command: "sh -c '
       apt update;
@@ -38,6 +36,7 @@ services:
       while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
       exec pm2-runtime server.js
     '"
+    image: of-arena-server
 
   web:
 #    env_file:
@@ -52,3 +51,4 @@ services:
       target: arena-web
     environment:
       ARENA_HOST: app_server:9090
+    image: of-arena-web
