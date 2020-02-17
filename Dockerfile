@@ -23,7 +23,7 @@ COPY --from=base /app /app
 
 RUN cd /app; yarn build-prod
 # RUN mv dist dist-web
-RUN cd /app; yarn build:server:prod
+#RUN cd /app; yarn build:server:prod
 
 # Only keep the packages needed for server runtime:
 #RUN cd /app; set -o pipefail; ( \
