@@ -144,7 +144,7 @@ const environment = hosts.apply(postgresHost => [
     { name: "COGNITO_USER_POOL_ID", value: cognitoUserPoolId },
     { name: "COGNITO_CLIENT_ID", value: secret('cognitoClientId') },
 
-    { name: 'PORT', value: '9090' },
+    { name: "SERVER_PORT", value: '9090' },
     { name: "ARENA_HOST", value: "localhost:9090" },
 ])
 

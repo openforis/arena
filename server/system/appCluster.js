@@ -70,8 +70,8 @@ export const run = async () => {
   errorMiddleware.init(app)
 
   // ====== server
-  const server = app.listen(ProcessUtils.ENV.port, () => {
-    logger.info(`server initialization end - listening on port ${ProcessUtils.ENV.port}`)
+  const server = app.listen(ProcessUtils.ENV.serverPort, () => {
+    logger.info(`server initialization end - listening on port ${ProcessUtils.ENV.serverPort}`)
   })
 
   // ====== socket middleware

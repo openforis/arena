@@ -6,7 +6,7 @@ const environments = {
 export const ENV = {
   arenaRoot: process.env.ARENA_ROOT,
   arenaDist: process.env.ARENA_DIST,
-  port: process.env.PORT || '9090',
+  serverPort: process.env.SERVER_PORT || '9090',
   nodeEnv: process.env.NODE_ENV || environments.development,
   debug: Boolean(process.env.DEBUG),
   tempFolder: process.env.TEMP_FOLDER || '/tmp/arena_upload',
