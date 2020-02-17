@@ -33,6 +33,6 @@ deploy:
   provider: script
   script:
     docker push registry.heroku.com/$HEROKU_APP_DEV/web;
-    heroku container:release server web --app $HEROKU_APP_DEV
+    heroku container:release web --app $HEROKU_APP_DEV
   on:
     branch: test/heroku-deploy
