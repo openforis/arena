@@ -35,11 +35,12 @@ RUN cd /app; yarn build:server:prod
 FROM node:${node_version} AS arena-server
 RUN npm install pm2 -g
 
-COPY --from=prod_builder /app/node_modules /app/node_modules
-COPY --from=prod_builder /app/dist /app/dist
+COPY --from=base /app /app
+# COPY --from=prod_builder /app/node_modules /app/node_modules
+# COPY --from=prod_builder /app/dist /app/dist
 
-COPY --from=prod_builder /app/server/db/migration/ /app/server/db/migration/
-COPY --from=prod_builder /app/server/modules/user/api/avatar.png /app/server/modules/user/api/avatar.png
+# COPY --from=prod_builder /app/server/db/migration/ /app/server/db/migration/
+# COPY --from=prod_builder /app/server/modules/user/api/avatar.png /app/server/modules/user/api/avatar.png
 
 WORKDIR /app
 RUN ln -s dist/server.js .
