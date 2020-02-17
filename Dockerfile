@@ -21,9 +21,8 @@ RUN apt-get install -y git
 
 COPY --from=base /app /app
 
-RUN cd /app; yarn build-prod
+RUN cd /app; yarn build:server:prod; yarn build-prod
 # RUN mv dist dist-web
-#RUN cd /app; yarn build:server:prod
 
 # Only keep the packages needed for server runtime:
 #RUN cd /app; set -o pipefail; ( \
@@ -34,7 +33,7 @@ RUN cd /app; yarn build-prod
 ############################################################
 
 FROM node:${node_version} AS arena-web
-# RUN npm install pm2 -g
+RUN npm install pm2 -g
 
 COPY --from=prod_builder /app /app
 # COPY --from=prod_builder /app/node_modules /app/node_modules
@@ -45,8 +44,8 @@ COPY --from=prod_builder /app /app
 
 WORKDIR /app
 RUN ln -s dist/server.js .
-#CMD ["pm2-runtime", "server.js"]
-CMD ["node", "server.js"]
+CMD ["pm2-runtime", "server.js"]
+#CMD ["node", "server.js"]
 
 #############################################################
 
