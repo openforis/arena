@@ -36,7 +36,7 @@ RUN cd /app; yarn build-prod
 FROM node:${node_version} AS arena-web
 # RUN npm install pm2 -g
 
-COPY --from=base /app /app
+COPY --from=prod_builder /app /app
 # COPY --from=prod_builder /app/node_modules /app/node_modules
 # COPY --from=prod_builder /app/dist /app/dist
 
