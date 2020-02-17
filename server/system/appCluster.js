@@ -28,6 +28,8 @@ export const run = async () => {
 
   logger.info('server initialization start')
 
+  logger.info('Environment variables', ProcessUtils.ENV)
+
   const app = express()
 
   // ====== app initializations

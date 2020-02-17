@@ -33,7 +33,7 @@ script:
 deploy:
   provider: script
   script:
-    docker push registry.heroku.com/$HEROKU_APP_DEV/app_server;
+    docker push registry.heroku.com/$HEROKU_APP_DEV/server;
     docker push registry.heroku.com/$HEROKU_APP_DEV/web;
     heroku container:release server web --app $HEROKU_APP_DEV
   on:
