@@ -3,18 +3,11 @@ version: '3.4'
 services:
 
   web:
-#    env_file:
-#      - ../.env
-#    depends_on:
-#      - db
     ports:
       - "9990:9090"
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: infra/Dockerfile.web
       target: arena-web
-    environment:
-      TEMP_FOLDER: /tmp/arena_upload
-      ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
     image: of-arena-web
-  
+

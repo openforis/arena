@@ -4,18 +4,6 @@ dist: bionic # Ubuntu 18.04 LTS
 services:
   - docker
 
-# TODO: re-think container image caching. This approach leads to unbounded cache sizes.
-# cache:
-#   directories:
-#   - docker_images
-# before_install:
-# - docker load -i docker_images/images.tar || true
-# before_cache:
-# - docker save -o docker_images/images.tar $(docker images -a -q)
-
-#before_install:
-#  - pip install --user awscli
-
 before_install:
   # install heroku CLI
   - wget -qO- https://toolbelt.heroku.com/install.sh | sh

@@ -7,7 +7,7 @@ RUN apt update
 RUN apt-get install -y git
 
 # Cache these as much as possible:
-COPY package.json yarn.lock /app/
+COPY ../package.json yarn.lock /app/
 
 RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass
 
