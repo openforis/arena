@@ -25,8 +25,8 @@ deploy:
   on:
     branch: master
 - provider: script
-    script:
-      docker push registry.heroku.com/$HEROKU_APP_PROD/web;
-      heroku container:release web --app $HEROKU_APP_PROD
-    on:
-      tags: true
+  script:
+    docker push registry.heroku.com/$HEROKU_APP_PROD/web;
+    heroku container:release web --app $HEROKU_APP_PROD
+  on:
+    tags: true
