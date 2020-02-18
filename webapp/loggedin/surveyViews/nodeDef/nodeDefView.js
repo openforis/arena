@@ -79,85 +79,87 @@ const NodeDefView = props => {
     }
   }, [surveyCycleKey])
 
-  return nodeDef ? (
-    <>
-      <div className="node-def-edit">
-        <div className="node-def-edit__container">
-          <TabBar
-            showTabs={!NodeDef.isAnalysis(nodeDef)}
-            tabs={[
-              {
-                label: i18n.t('nodeDefEdit.basic'),
-                component: BasicProps,
-                props: {
-                  nodeDef,
-                  validation,
-                  nodeDefKeyEditDisabled,
-                  nodeDefMultipleEditDisabled,
-                  editingNodeDefFromDesigner,
-                  setNodeDefParentUuid,
-                  setNodeDefProp,
-                  putNodeDefLayoutProp,
-                  setNodeDefLayoutProp,
+  return (
+    nodeDef && (
+      <>
+        <div className="node-def-edit">
+          <div className="node-def-edit__container">
+            <TabBar
+              showTabs={!NodeDef.isAnalysis(nodeDef)}
+              tabs={[
+                {
+                  label: i18n.t('nodeDefEdit.basic'),
+                  component: BasicProps,
+                  props: {
+                    nodeDef,
+                    validation,
+                    nodeDefKeyEditDisabled,
+                    nodeDefMultipleEditDisabled,
+                    editingNodeDefFromDesigner,
+                    setNodeDefParentUuid,
+                    setNodeDefProp,
+                    putNodeDefLayoutProp,
+                    setNodeDefLayoutProp,
+                  },
                 },
-              },
-              ...(NodeDef.isRoot(nodeDef)
-                ? []
-                : [
-                    {
-                      label: i18n.t('nodeDefEdit.advanced'),
-                      component: AdvancedProps,
-                      props: {
-                        nodeDef,
-                        validation,
-                        nodeDefParent,
-                        setNodeDefProp,
+                ...(NodeDef.isRoot(nodeDef)
+                  ? []
+                  : [
+                      {
+                        label: i18n.t('nodeDefEdit.advanced'),
+                        component: AdvancedProps,
+                        props: {
+                          nodeDef,
+                          validation,
+                          nodeDefParent,
+                          setNodeDefProp,
+                        },
                       },
-                    },
-                    {
-                      label: i18n.t('nodeDefEdit.validations'),
-                      component: ValidationsProps,
-                      props: {
-                        nodeDef,
-                        validation,
-                        nodeDefParent,
-                        setNodeDefProp,
+                      {
+                        label: i18n.t('nodeDefEdit.validations'),
+                        component: ValidationsProps,
+                        props: {
+                          nodeDef,
+                          validation,
+                          nodeDefParent,
+                          setNodeDefProp,
+                        },
                       },
-                    },
-                  ]),
-            ]}
-          />
+                    ]),
+              ]}
+            />
 
-          <div className="button-bar">
-            <button
-              className="btn btn-cancel"
-              onClick={() =>
-                isDirty
-                  ? dispatch(showDialogConfirm('common.cancelConfirm', {}, () => cancelNodeDefEdits(history)))
-                  : cancelNodeDefEdits(history)
-              }
-            >
-              {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={saveNodeDefEdits}
-              aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
-            >
-              <span className="icon icon-floppy-disk icon-left icon-12px" />
-              {i18n.t('common.save')}
-            </button>
-            {!NodeDef.isRoot(nodeDef) && (
-              <button className="btn btn-danger btn-delete" onClick={() => removeNodeDef(nodeDef, history)}>
-                <span className="icon icon-bin2 icon-left icon-12px" />
-                {i18n.t('common.delete')}
+            <div className="button-bar">
+              <button
+                className="btn btn-cancel"
+                onClick={() =>
+                  isDirty
+                    ? dispatch(showDialogConfirm('common.cancelConfirm', {}, () => cancelNodeDefEdits(history)))
+                    : cancelNodeDefEdits(history)
+                }
+              >
+                {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
               </button>
-            )}
+              <button
+                className="btn btn-primary"
+                onClick={saveNodeDefEdits}
+                aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
+              >
+                <span className="icon icon-floppy-disk icon-left icon-12px" />
+                {i18n.t('common.save')}
+              </button>
+              {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
+                <button className="btn btn-danger btn-delete" onClick={() => removeNodeDef(nodeDef, history)}>
+                  <span className="icon icon-bin2 icon-left icon-12px" />
+                  {i18n.t('common.delete')}
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </>
-  ) : null
+      </>
+    )
+  )
 }
 
 NodeDefView.defaultProps = {
