@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+
+  web:
+    ports:
+      - "9990:9090"
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.web
+      target: arena-web
+    image: of-arena-web

@@ -18,7 +18,7 @@
     "dev:server": "npm run build:server:dev && npm-run-all --parallel nodemon:prod watch:server",
     "watch:server": "cross-env NODE_ENV=development webpack --display-error-details --config webpack.config.server.babel.js --watch",
     "nodemon:prod": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
-    "test": "xo && mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
+    "test": "mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
     "test:docker": "test/run_docker_tests.sh",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
