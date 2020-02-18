@@ -3,6 +3,8 @@ import * as R from 'ramda'
 
 import * as Authorizer from '@core/auth/authorizer'
 
+import * as ProcessUtils from '@core/processUtils'
+
 import {
   analysisModules,
   appModules,
@@ -45,7 +47,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
     dataModules.dataVis,
     ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
   ]),
-  ...(Authorizer.canAnalyzeRecords(user, surveyInfo)
+  ...(Authorizer.canAnalyzeRecords(user, surveyInfo) && ProcessUtils.isEnvDevelopment
     ? [getModule(appModules.analysis, [analysisModules.processingChains])]
     : []),
   getModule(appModules.users, [userModules.users]),

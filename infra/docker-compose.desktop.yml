@@ -11,14 +11,14 @@ services:
 
   app_server:
     env_file:
-      - .env
+      - ../.env
     depends_on:
       - db
     ports:
       - "9990:9090"
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: ./Dockerfile.web
       target: arena-server
 
     environment:
@@ -38,14 +38,14 @@ services:
 
   web:
     env_file:
-      - .env
+      - ../.env
     depends_on:
       - app_server
     ports:
       - "9880:80"
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: ./Dockerfile.web
       target: arena-web
     environment:
       ARENA_HOST: app_server:9090

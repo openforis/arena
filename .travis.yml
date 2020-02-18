@@ -1,29 +1,26 @@
----
 language: generic
 os: linux
 dist: bionic # Ubuntu 18.04 LTS
 services:
   - docker
 
-# TODO: re-think container image caching. This approach leads to unbounded cache sizes.
-# cache:
-#   directories:
-#   - docker_images
-# before_install:
-# - docker load -i docker_images/images.tar || true
-# before_cache:
-# - docker save -o docker_images/images.tar $(docker images -a -q)
-
 before_install:
-  - pip install --user awscli
+  # install heroku CLI
+  - wget -qO- https://toolbelt.heroku.com/install.sh | sh
+  # login to docker registries (heroku)
+  - echo "$HEROKU_API_KEY" | docker login -u "$HEROKU_USERNAME" --password-stdin registry.heroku.com
 
 script:
-  - |
-      set -e # exit from first failure
-      docker build . # Test that everything builds properly
-      test/run_docker_tests.sh # run tests
+  - set -e # exit from first failure
+  - docker build -f infra/Dockerfile.web . # Test that everything builds properly
+  - test/run_docker_tests.sh # run tests
+  - docker-compose -f ./infra/docker-compose.web.yml -p of-arena up --no-start
+  - docker tag of-arena-web registry.heroku.com/$HEROKU_APP_DEV/web
 
-      # Handle infrastructure changes now if we got this far:
-      curl -fsSL https://get.pulumi.com/ | sh
-      export PATH=$PATH:$HOME/.pulumi/bin
-      infra/travis_${TRAVIS_EVENT_TYPE}.sh
+deploy:
+  provider: script
+  script:
+    docker push registry.heroku.com/$HEROKU_APP_DEV/web;
+    heroku container:release web --app $HEROKU_APP_DEV
+  on:
+    branch: master

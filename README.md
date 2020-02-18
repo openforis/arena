@@ -35,17 +35,6 @@ The .env file is needed for development and locally running the stack.
 
 must be added to the root directory of the project and must match the template `.env.template`.
 
-## Running the stack locally
-
-The following runs the "production" stack locally with Docker Compose, (re-)buildigs.
-This creates a web server listening on `localhost` port `9880` by default.
-
-Note that the Dockerfile build process will only use the `HEAD` commit from the currently
-checked out branch. Uncommitted changes will be ignored.
-
-```shell
-docker-compose up --build --abort-on-container-exit
-```
 
 ## Running the test suite
 
