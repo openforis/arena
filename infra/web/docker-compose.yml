@@ -6,7 +6,7 @@ services:
     ports:
       - "9990:9090"
     build:
-      context: ..
-      dockerfile: infra/Dockerfile.web
+      context: ../..
+      dockerfile: Dockerfile
       target: arena-web
     image: of-arena-web
