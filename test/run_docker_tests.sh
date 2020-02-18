@@ -2,7 +2,7 @@
 set -eu
 
 cleanup() {
-    docker-compose -f test/docker-compose.test.yml rm -f
+    docker-compose -f test/docker-compose.yml rm -f
 }
 # Attempt to clean up on exit
 trap cleanup EXIT
@@ -12,7 +12,7 @@ trap cleanup EXIT
 cleanup
 
 # Run commands until server_test is finished:
-docker-compose -f test/docker-compose.test.yml \
+docker-compose -f test/docker-compose.yml \
     up \
     --build \
     --abort-on-container-exit \
