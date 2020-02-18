@@ -18,15 +18,15 @@ script:
   - docker tag of-arena-web registry.heroku.com/$HEROKU_APP_DEV/web
 
 deploy:
-  - provider: script
+- provider: script
+  script:
+    docker push registry.heroku.com/$HEROKU_APP_DEV/web;
+    heroku container:release web --app $HEROKU_APP_DEV
+  on:
+    branch: master
+- provider: script
     script:
-      docker push registry.heroku.com/$HEROKU_APP_DEV/web;
-      heroku container:release web --app $HEROKU_APP_DEV
+      docker push registry.heroku.com/$HEROKU_APP_PROD/web;
+      heroku container:release web --app $HEROKU_APP_PROD
     on:
-      branch: master
-  - provider: script
-      script:
-        docker push registry.heroku.com/$HEROKU_APP_PROD/web;
-        heroku container:release web --app $HEROKU_APP_PROD
-      on:
-        tags: true
+      tags: true
