@@ -7,6 +7,6 @@ services:
       - "9990:9090"
     build:
       context: ../..
-      dockerfile: Dockerfile
+      dockerfile: ./infra/web/Dockerfile
       target: arena-web
     image: of-arena-web
