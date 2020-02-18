@@ -3,10 +3,6 @@ version: '3.4'
 services:
 
   app_server:
-#    env_file:
-#      - ../.env
-#    depends_on:
-#      - db
     ports:
       - "9990:9090"
     build:
@@ -17,11 +13,7 @@ services:
       TEMP_FOLDER: /tmp/arena_upload
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
     image: of-arena-server
-    # Start application server
-    # command: "sh -c 'exec pm2-runtime server.js'"
   web:
-#    env_file:
-#      - ../.env
     depends_on:
       - app_server
     ports:
