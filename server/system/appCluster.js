@@ -17,6 +17,7 @@ import * as accessControlMiddleware from './middleware/accessControlMiddleware'
 import * as errorMiddleware from './middleware/errorMiddleware'
 import * as headerMiddleware from './middleware/headerMiddleware'
 import sessionMiddleware from './middleware/sessionMiddleware'
+import * as httpsMiddleware from './middleware/httpsMiddleware'
 
 import * as apiRouter from './apiRouter'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
@@ -31,6 +32,10 @@ export const run = async () => {
   const app = express()
 
   // ====== app initializations
+  if (ProcessUtils.ENV.useHttps) {
+    httpsMiddleware.init(app)
+  }
+
   app.use(bodyParser.json({ limit: '5000kb' }))
   app.use(cookieParser())
   app.use(
