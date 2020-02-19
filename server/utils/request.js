@@ -4,6 +4,10 @@ import * as User from '@core/user/user'
 
 export const getServerUrl = req => `${req.protocol}://${req.get('host')}`
 
+export const getHost = req => req.header('host')
+
+export const getUrl = R.prop('url')
+
 export const getParams = req =>
   R.pipe(
     R.mergeLeft(R.prop('query', req)),
@@ -37,3 +41,7 @@ export const getI18n = R.prop('i18n')
 const getCookie = name => R.path(['cookies', name])
 
 export const getSocketId = getCookie('io')
+
+// HTTPS
+
+export const isHttps = req => req.secure || req.header('x-forwarded-proto') === 'https'
