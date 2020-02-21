@@ -29,16 +29,14 @@ const HomeView = () => {
           component: SurveyListView,
           path: appModuleUri(homeModules.surveyList),
         },
-        {
-          ...(User.isSystemAdmin(user)
-            ? [
-                {
-                  component: SurveyCreateView,
-                  path: appModuleUri(homeModules.surveyNew),
-                },
-              ]
-            : []),
-        },
+        ...(User.isSystemAdmin(user)
+          ? [
+              {
+                component: SurveyCreateView,
+                path: appModuleUri(homeModules.surveyNew),
+              },
+            ]
+          : []),
         {
           component: SurveyInfoView,
           path: appModuleUri(homeModules.surveyInfo),
