@@ -2,10 +2,12 @@ import * as Request from '@server/utils/request'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+
 import UnauthorizedError from '@server/utils/unauthorizedError'
-import * as SurveyManager from '../survey/manager/surveyManager'
-import * as RecordService from '../record/service/recordService'
-import * as UserService from '../user/service/userService'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as RecordService from '@server/modules/record/service/recordService'
+import * as UserService from '@server/modules/user/service/userService'
 
 const checkPermission = (req, next, permissionFn, ...args) => {
   const user = Request.getUser(req)
@@ -13,11 +15,11 @@ const checkPermission = (req, next, permissionFn, ...args) => {
   if (permissionFn(user, ...args)) {
     next()
   } else {
-    next(new UnauthorizedError(user && user.name))
+    next(new UnauthorizedError(User.getName(user)))
   }
 }
 
-const requireSurveyPermission = permissionFn => async (req, res, next) => {
+const requireSurveyPermission = permissionFn => async (req, _res, next) => {
   try {
     const { surveyId } = Request.getParams(req)
     const survey = await SurveyManager.fetchSurveyById(surveyId)
@@ -29,7 +31,7 @@ const requireSurveyPermission = permissionFn => async (req, res, next) => {
   }
 }
 
-const requireRecordPermission = permissionFn => async (req, res, next) => {
+const requireRecordPermission = permissionFn => async (req, _res, next) => {
   try {
     const { surveyId, recordUuid } = Request.getParams(req)
 
@@ -41,7 +43,7 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
   }
 }
 
-const requireUserPermission = permissionFn => async (req, res, next) => {
+const requireUserPermission = permissionFn => async (req, _res, next) => {
   try {
     const { surveyId, userUuid } = Request.getParams(req)
     const survey = await SurveyManager.fetchSurveyById(surveyId)
@@ -51,6 +53,16 @@ const requireUserPermission = permissionFn => async (req, res, next) => {
     checkPermission(req, next, permissionFn, surveyInfo, user)
   } catch (error) {
     next(error)
+  }
+}
+
+// Admin
+export const requireAdminPermission = async (req, _res, next) => {
+  const user = Request.getUser(req)
+  if (User.isSystemAdmin(user)) {
+    next()
+  } else {
+    next(new UnauthorizedError(User.getName(user)))
   }
 }
 
