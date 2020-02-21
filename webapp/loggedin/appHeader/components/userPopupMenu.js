@@ -62,10 +62,12 @@ const UserPopupMenu = props => {
         {i18n.t('appModules.surveyList')}
       </Link>
 
-      <Link to={appModuleUri(homeModules.surveyNew)} className="btn-s btn-transparent" onClick={onClose}>
-        <span className="icon icon-plus icon-12px icon-left" />
-        {i18n.t('homeView.createSurvey')}
-      </Link>
+      {User.isSystemAdmin(user) && (
+        <Link to={appModuleUri(homeModules.surveyNew)} className="btn-s btn-transparent" onClick={onClose}>
+          <span className="icon icon-plus icon-12px icon-left" />
+          {i18n.t('homeView.createSurvey')}
+        </Link>
+      )}
 
       <div className="user-popup-menu__sep" />
 

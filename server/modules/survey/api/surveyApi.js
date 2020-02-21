@@ -7,13 +7,13 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
 
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import * as SurveyService from '../service/surveyService'
-import * as UserService from '../../user/service/userService'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as UserService from '@server/modules/user/service/userService'
 
 export const init = app => {
   // ==== CREATE
-  app.post('/survey', async (req, res, next) => {
+  app.post('/survey', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const surveyReq = Request.getBody(req)
