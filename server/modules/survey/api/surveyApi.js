@@ -17,7 +17,7 @@ export const init = app => {
   app.post('/survey', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      if (User.isSystemAdmin(user)) {
+      if (!User.isSystemAdmin(user)) {
         throw new UnauthorizedError(User.getName(user))
       }
 
