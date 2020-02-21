@@ -17,7 +17,9 @@ import * as UserPasswordUtils from './userPasswordUtils'
 
 // ====== CREATE
 
-export const inviteUser = async (user, surveyId, surveyCycleKey, email, groupUuid, serverUrl) => {
+export const inviteUser = async (user, surveyId, surveyCycleKey, userToInviteParam, serverUrl) => {
+  const email = User.getEmail(userToInviteParam)
+  const groupUuid = User.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -130,25 +132,24 @@ export const findResetPasswordUserByUuid = async resetPasswordUuid => {
 
 // ====== UPDATE
 
-export const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
-  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-
+export const updateUser = async (user, surveyId, userToUpdateParam, file) => {
   // If surveyId is not specified, user is updating him/her self
   if (surveyId) {
     const survey = await SurveyManager.fetchSurveyById(surveyId)
     const surveyInfo = Survey.getSurveyInfo(survey)
+    const userToUpdate = await UserManager.fetchUserByUuid(User.getUuid(userToUpdateParam))
     const groupToUpdate = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userToUpdate)
 
     // Check if group has changed and user can edit group
     if (
-      AuthGroup.getUuid(groupToUpdate) !== groupUuid &&
+      AuthGroup.getUuid(groupToUpdate) !== User.getGroupUuid(userToUpdateParam) &&
       !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)
     ) {
       throw new UnauthorizedError(User.getName(user))
     }
 
     // Check if email has changed and user can edit email
-    if (User.getEmail(userToUpdate) !== email) {
+    if (User.getEmail(userToUpdate) !== User.getEmail(userToUpdateParam)) {
       // Throw exception if user is not allowed to edit the email
       const canEditEmail = Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate)
       if (!canEditEmail) {
@@ -159,7 +160,7 @@ export const updateUser = async (user, surveyId, userUuid, name, email, groupUui
 
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
-  return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
+  return await UserManager.updateUser(user, surveyId, userToUpdateParam, profilePicture)
 }
 
 export const acceptInvitation = async (userUuid, name, password) => {

@@ -1,56 +1,50 @@
 import './userView.scss'
 
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory, useParams } from 'react-router'
+import * as R from 'ramda'
 
+import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
-
-import { getUrlParam } from '@webapp/utils/routerUtils'
+import * as Validation from '@core/validation/validation'
+import * as ObjectUtils from '@core/objectUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
-import * as AppState from '@webapp/app/appState'
+import ProfilePictureEditor from './components/profilePictureEditor'
+
 import * as SurveyState from '@webapp/survey/surveyState'
-
-import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
-
 import { useUserViewState } from './useUserViewState'
 
-import ProfilePictureEditor from './components/profilePictureEditor'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
-const UserView = props => {
-  const { surveyInfo, lang, userUuid } = props
+import { saveUser, removeUser, updateUserProp, updateUserProfilePicture } from './actions'
 
+const UserView = props => {
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+  const { userUuid } = useParams()
+  const history = useHistory()
 
   const {
     ready,
-    isInvitation,
-    name,
-    email,
-    group,
+    userToUpdate,
     surveyGroupsMenuItems,
-    objectValid,
     canEdit,
     canEditName,
     canEditGroup,
     canEditEmail,
     canRemove,
-    getFieldValidation,
-    setName,
-    setEmail,
-    setGroup,
     pictureEditorEnabled,
-    setProfilePicture,
-    saveUser,
-    removeUser,
   } = useUserViewState(props)
+
+  const isInvitation = R.isNil(userUuid)
+  const validation = User.getValidation(userToUpdate)
 
   return (
     ready && (
@@ -59,7 +53,7 @@ const UserView = props => {
           (canEdit ? (
             <ProfilePictureEditor
               userUuid={userUuid}
-              onPictureUpdate={setProfilePicture}
+              onPictureUpdate={profilePicture => dispatch(updateUserProfilePicture(profilePicture))}
               enabled={pictureEditorEnabled}
             />
           ) : (
@@ -71,10 +65,10 @@ const UserView = props => {
             <Input
               disabled={!canEditName}
               placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
-              value={name}
-              validation={canEditName ? getFieldValidation('name') : {}}
-              maxLength="128"
-              onChange={setName}
+              value={User.getName(userToUpdate)}
+              validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
+              maxLength={User.nameMaxLength}
+              onChange={value => dispatch(updateUserProp(User.keys.name, value))}
             />
           </FormItem>
         )}
@@ -82,21 +76,23 @@ const UserView = props => {
           <Input
             disabled={!canEditEmail}
             placeholder={i18n.t('common.email')}
-            value={email}
-            validation={getFieldValidation('email')}
-            onChange={setEmail}
+            value={User.getEmail(userToUpdate)}
+            validation={Validation.getFieldValidation(User.keys.email)(validation)}
+            onChange={value => dispatch(updateUserProp(User.keys.email, value))}
           />
         </FormItem>
         <FormItem label={i18n.t('common.group')}>
           <Dropdown
             disabled={!canEditGroup}
-            validation={getFieldValidation('groupUuid')}
+            validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
             placeholder={i18n.t('common.group')}
             items={surveyGroupsMenuItems}
             itemKeyProp={'uuid'}
             itemLabelProp={'label'}
-            selection={group}
-            onChange={setGroup}
+            selection={surveyGroupsMenuItems.find(
+              group => ObjectUtils.getUuid(group) === User.getGroupUuid(userToUpdate),
+            )}
+            onChange={group => dispatch(updateUserProp(User.keys.groupUuid, R.prop('uuid', group)))}
             readOnlyInput={true}
           />
         </FormItem>
@@ -111,10 +107,10 @@ const UserView = props => {
                     showDialogConfirm(
                       'userView.confirmRemove',
                       {
-                        user: name,
-                        survey: Survey.getLabel(surveyInfo, lang),
+                        user: User.getName(userToUpdate),
+                        survey: Survey.getLabel(surveyInfo, i18n.lang),
                       },
-                      removeUser,
+                      () => dispatch(removeUser(history)),
                     ),
                   )
                 }
@@ -124,7 +120,11 @@ const UserView = props => {
               </button>
             )}
 
-            <button className="btn btn-save" aria-disabled={!objectValid} onClick={saveUser}>
+            <button
+              className="btn btn-save"
+              aria-disabled={!Validation.isValid(validation)}
+              onClick={() => dispatch(saveUser(history))}
+            >
               <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`} />
               {isInvitation ? i18n.t('userView.sendInvitation') : i18n.t('common.save')}
             </button>
@@ -135,17 +135,4 @@ const UserView = props => {
   )
 }
 
-const mapStateToProps = (state, { match }) => ({
-  user: AppState.getUser(state),
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-  lang: AppState.getLang(state),
-  userUuid: getUrlParam('userUuid')(match),
-})
-
-export default connect(mapStateToProps, {
-  showAppLoader,
-  hideAppLoader,
-  showNotification,
-  setUser,
-})(UserView)
+export default UserView

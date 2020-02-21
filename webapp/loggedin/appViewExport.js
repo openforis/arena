@@ -7,6 +7,7 @@ import surveyViewsReducer from './surveyViews/reducer'
 import tableViewsReducer from './tableViews/reducer'
 import jobReducer from './appJob/reducer'
 import sidebarReducer from './appSideBar/reducer'
+import userViewReducer from './modules/users/user/reducer'
 
 import * as HomeState from './modules/home/homeState'
 import * as AnalysisState from './modules/analysis/analysisState'
@@ -15,6 +16,7 @@ import * as SurveyViewsState from './surveyViews/surveyViewsState'
 import * as TableViewsState from './tableViews/tableViewsState'
 import * as JobState from './appJob/appJobState'
 import * as SideBarState from './appSideBar/appSidebarState'
+import * as UserViewState from './modules/users/user/userViewState'
 
 const reducers = [
   { name: HomeState.stateKey, fn: homeReducer },
@@ -24,6 +26,7 @@ const reducers = [
   { name: TableViewsState.stateKey, fn: tableViewsReducer },
   { name: JobState.stateKey, fn: jobReducer },
   { name: SideBarState.stateKey, fn: sidebarReducer },
+  { name: UserViewState.stateKey, fn: userViewReducer },
 ]
 
 export { component, reducers }

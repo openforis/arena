@@ -51,7 +51,7 @@ export const getCycle = R.prop(keys.cycle)
 export const getCycles = getProp(keysProps.cycles, [])
 export const getIndex = R.pipe(R.propOr(0, keys.index), Number)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
-export const getAuthGroups = R.prop(keys.authGroups)
+export const getAuthGroups = R.propOr([], keys.authGroups)
 
 export const isTemporary = R.propEq(keys.temporary, true)
 

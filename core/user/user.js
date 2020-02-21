@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as AuthGroup from '@core/auth/authGroup'
+import * as Validation from '@core/validation/validation'
 
 import { keys } from './_user/userKeys'
 import * as UserPrefs from './_user/userPrefs'
@@ -10,6 +11,8 @@ import { userStatus } from './_user/userStatus'
 export { keys } from './_user/userKeys'
 export { userStatus } from './_user/userStatus'
 
+export const nameMaxLength = 128
+
 export const keysPrefs = UserPrefs.keysPrefs
 
 // ====== READ
@@ -17,11 +20,17 @@ export const isEqual = ObjectUtils.isEqual
 export const getUuid = ObjectUtils.getUuid
 export const getName = R.propOr('', keys.name)
 export const getEmail = R.prop(keys.email)
+export const getGroupUuid = R.prop(keys.groupUuid)
 export const getLang = R.propOr('en', keys.lang)
 export const getAuthGroups = ObjectUtils.getAuthGroups
 export const getPrefs = R.propOr({}, keys.prefs)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
+export const getValidation = Validation.getValidation
+
+// ====== UPDATE
+export const assocProp = R.assoc
+export const assocValidation = Validation.assocValidation
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))

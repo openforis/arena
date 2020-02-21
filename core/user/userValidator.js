@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as User from '@core/user/user'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -14,13 +15,13 @@ export const validateEmail = (propName, item) => {
 
 export const validateUser = async user =>
   await Validator.validate(user, {
-    name: [Validator.validateRequired(Validation.messageKeys.nameRequired)],
-    email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
-    groupUuid: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
+    [User.keys.name]: [Validator.validateRequired(Validation.messageKeys.nameRequired)],
+    [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
+    [User.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })
 
 export const validateInvitation = async user =>
   await Validator.validate(user, {
-    email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
-    groupUuid: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
+    [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
+    [User.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })
