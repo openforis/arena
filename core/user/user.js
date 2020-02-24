@@ -31,6 +31,7 @@ export const getValidation = Validation.getValidation
 // ====== UPDATE
 export const assocProp = R.assoc
 export const assocValidation = Validation.assocValidation
+export const assocGroupUuid = R.assoc(keys.groupUuid)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))

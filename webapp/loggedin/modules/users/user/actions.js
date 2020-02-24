@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
@@ -27,11 +28,15 @@ export const fetchUser = userUuid => async (dispatch, getState) => {
   const user = AppState.getUser(state)
   const userToUpdate = UserViewState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const editingSelf = User.isEqual(userToUpdate)(user)
 
   const { data: userLoaded } = await axios.get(`/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`)
 
-  dispatch({ type: userUpdate, user: userLoaded })
+  const authGroup = User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo))(userLoaded)
+  const userUpdated = User.assocGroupUuid(AuthGroup.getUuid(authGroup))(userLoaded)
+
+  dispatch({ type: userUpdate, user: userUpdated })
 }
 
 const _validateUser = user => async dispatch => {

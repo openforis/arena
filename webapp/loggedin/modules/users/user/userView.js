@@ -8,14 +8,13 @@ import * as R from 'ramda'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import * as ObjectUtils from '@core/objectUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
+import UserGroupDropdown from './components/userGroupDropdown'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { useUserViewState } from './useUserViewState'
@@ -33,8 +32,8 @@ const UserView = props => {
 
   const {
     ready,
+    user,
     userToUpdate,
-    surveyGroupsMenuItems,
     canEdit,
     canEditName,
     canEditGroup,
@@ -82,18 +81,12 @@ const UserView = props => {
           />
         </FormItem>
         <FormItem label={i18n.t('common.group')}>
-          <Dropdown
+          <UserGroupDropdown
+            editingLoggedUser={User.isEqual(user)(userToUpdate)}
             disabled={!canEditGroup}
             validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
-            placeholder={i18n.t('common.group')}
-            items={surveyGroupsMenuItems}
-            itemKeyProp={'uuid'}
-            itemLabelProp={'label'}
-            selection={surveyGroupsMenuItems.find(
-              group => ObjectUtils.getUuid(group) === User.getGroupUuid(userToUpdate),
-            )}
-            onChange={group => dispatch(updateUserProp(User.keys.groupUuid, R.prop('uuid', group)))}
-            readOnlyInput={true}
+            selectedGroupUuid={User.getGroupUuid(userToUpdate)}
+            onChange={groupUuid => dispatch(updateUserProp(User.keys.groupUuid, groupUuid))}
           />
         </FormItem>
 
