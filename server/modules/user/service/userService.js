@@ -4,6 +4,7 @@ import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
+import * as UserInvite from '@core/user/userInvite'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 
@@ -18,8 +19,7 @@ import * as UserPasswordUtils from './userPasswordUtils'
 // ====== CREATE
 
 export const inviteUser = async (user, surveyId, surveyCycleKey, userToInviteParam, serverUrl) => {
-  const email = User.getEmail(userToInviteParam)
-  const groupUuid = User.getGroupUuid(userToInviteParam)
+  const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -38,7 +38,8 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, userToInvitePar
     throw new UnauthorizedError(User.getName(user))
   }
 
-  let userToInvite = await UserManager.fetchUserByEmail(email)
+  const email = UserInvite.getEmail(userToInviteParam)
+  const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
   const groupName = AuthGroup.getName(group)
@@ -63,16 +64,7 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, userToInvitePar
   } else {
     await db.tx(async t => {
       // Add user to db
-      userToInvite = await UserManager.insertUser(
-        user,
-        surveyId,
-        surveyCycleKey,
-        email,
-        null,
-        User.userStatus.INVITED,
-        groupUuid,
-        t,
-      )
+      await UserManager.insertUser(user, surveyId, surveyCycleKey, email, null, User.userStatus.INVITED, groupUuid, t)
       // Add user to reset password table
       const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
 
