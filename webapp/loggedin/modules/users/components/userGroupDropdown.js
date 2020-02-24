@@ -19,11 +19,12 @@ const UserGroupDropdown = props => {
   const surveyInfo = useSelector(SurveyState.getSurveyInfo)
   const i18n = useI18n()
 
-  const surveyGroups = editingLoggedUser
-    ? []
-    : Survey.isPublished(surveyInfo)
-    ? Survey.getAuthGroups(surveyInfo)
-    : [Survey.getAuthGroupAdmin(surveyInfo)]
+  const surveyGroups =
+    editingLoggedUser && !surveyInfo // This can happen for system administrators when they don't have an active survey
+      ? []
+      : Survey.isPublished(surveyInfo)
+      ? Survey.getAuthGroups(surveyInfo)
+      : [Survey.getAuthGroupAdmin(surveyInfo)]
 
   // Add SystemAdmin group if current user is a SystemAdmin himself
   const groups = R.when(R.always(User.isSystemAdmin(user)), R.concat(User.getAuthGroups(user)))(surveyGroups)

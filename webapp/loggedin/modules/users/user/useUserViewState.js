@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import * as R from 'ramda'
@@ -19,34 +19,27 @@ export const useUserViewState = () => {
 
   const dispatch = useDispatch()
 
-  const isInvitation = !userUuid
-  const isUserAcceptPending = !(isInvitation || User.hasAccepted(userToUpdate))
+  const isUserAcceptPending = !User.hasAccepted(userToUpdate)
 
-  // USER ATTRIBUTES
-
-  const ready = isInvitation || !R.isEmpty(userToUpdate)
-
-  useEffect(() => {
-    return () => dispatch(resetUserState())
-  }, [])
+  const ready = !R.isEmpty(userToUpdate)
 
   useEffect(() => {
     // Init user
-    if (!ready && !isInvitation) {
-      dispatch(fetchUser(userUuid))
-    }
-  }, [ready])
+    dispatch(fetchUser(userUuid))
+
+    // Reset state on unmount
+    return () => dispatch(resetUserState())
+  }, [])
 
   const canEditUser = ready && !isUserAcceptPending && Authorizer.canEditUser(user, surveyInfo, userToUpdate)
-  const canEditName = !isInvitation && canEditUser
-  const canEditEmail = isInvitation || (canEditUser && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate))
-  const canEditGroup = isInvitation || (canEditUser && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate))
-  const canRemove = !isInvitation && Authorizer.canRemoveUser(user, surveyInfo, userToUpdate)
+  const canEditName = canEditUser
+  const canEditEmail = canEditUser && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate)
+  const canEditGroup = canEditUser && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)
+  const canRemove = Authorizer.canRemoveUser(user, surveyInfo, userToUpdate)
 
   return {
     ready,
     isUserAcceptPending,
-    isInvitation,
 
     user,
     userToUpdate,

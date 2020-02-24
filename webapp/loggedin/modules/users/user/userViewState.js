@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import * as User from '@core/user/user'
-
 export const stateKey = 'userView'
 
 export const keys = {

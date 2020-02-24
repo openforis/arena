@@ -1,0 +1,24 @@
+.user-invite-view {
+  width: 50%;
+  margin: auto;
+  padding-top: 1rem;
+  grid-row-gap: 1.5rem;
+
+  .form-item {
+    grid-template-columns: .1fr .9fr;
+
+    .tooltip {
+      &:hover {
+        cursor: default;
+      }
+    }
+  }
+
+}
+
+.user-invite-view__buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}

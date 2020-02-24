@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import * as User from '@core/user/user'
+import * as UserInvite from '@core/user/userInvite'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -20,8 +21,8 @@ export const validateUser = async user =>
     [User.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })
 
-export const validateInvitation = async user =>
-  await Validator.validate(user, {
-    [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
-    [User.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
+export const validateInvitation = async userInvite =>
+  await Validator.validate(userInvite, {
+    [UserInvite.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
+    [UserInvite.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })

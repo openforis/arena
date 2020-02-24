@@ -14,7 +14,7 @@ import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
-import UserGroupDropdown from './components/userGroupDropdown'
+import UserGroupDropdown from '../components/userGroupDropdown'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { useUserViewState } from './useUserViewState'
@@ -42,35 +42,31 @@ const UserView = props => {
     pictureEditorEnabled,
   } = useUserViewState(props)
 
-  const isInvitation = R.isNil(userUuid)
   const validation = User.getValidation(userToUpdate)
 
   return (
     ready && (
       <div className="user-view form">
-        {!isInvitation &&
-          (canEdit ? (
-            <ProfilePictureEditor
-              userUuid={userUuid}
-              onPictureUpdate={profilePicture => dispatch(updateUserProfilePicture(profilePicture))}
-              enabled={pictureEditorEnabled}
-            />
-          ) : (
-            <ProfilePicture userUuid={userUuid} />
-          ))}
-
-        {!isInvitation && (
-          <FormItem label={i18n.t('common.name')}>
-            <Input
-              disabled={!canEditName}
-              placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
-              value={User.getName(userToUpdate)}
-              validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
-              maxLength={User.nameMaxLength}
-              onChange={value => dispatch(updateUserProp(User.keys.name, value))}
-            />
-          </FormItem>
+        {canEdit ? (
+          <ProfilePictureEditor
+            userUuid={userUuid}
+            onPictureUpdate={profilePicture => dispatch(updateUserProfilePicture(profilePicture))}
+            enabled={pictureEditorEnabled}
+          />
+        ) : (
+          <ProfilePicture userUuid={userUuid} />
         )}
+
+        <FormItem label={i18n.t('common.name')}>
+          <Input
+            disabled={!canEditName}
+            placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
+            value={User.getName(userToUpdate)}
+            validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
+            maxLength={User.nameMaxLength}
+            onChange={value => dispatch(updateUserProp(User.keys.name, value))}
+          />
+        </FormItem>
         <FormItem label={i18n.t('common.email')}>
           <Input
             disabled={!canEditEmail}
@@ -118,8 +114,8 @@ const UserView = props => {
               aria-disabled={!Validation.isValid(validation)}
               onClick={() => dispatch(saveUser(history))}
             >
-              <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`} />
-              {isInvitation ? i18n.t('userView.sendInvitation') : i18n.t('common.save')}
+              <span className={`icon icon-floppy-disk icon-left icon-12px`} />
+              {i18n.t('common.save')}
             </button>
           </div>
         )}

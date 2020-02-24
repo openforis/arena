@@ -8,6 +8,7 @@ import tableViewsReducer from './tableViews/reducer'
 import jobReducer from './appJob/reducer'
 import sidebarReducer from './appSideBar/reducer'
 import userViewReducer from './modules/users/user/reducer'
+import userInviteViewReducer from './modules/users/userInvite/reducer'
 
 import * as HomeState from './modules/home/homeState'
 import * as AnalysisState from './modules/analysis/analysisState'
@@ -17,6 +18,7 @@ import * as TableViewsState from './tableViews/tableViewsState'
 import * as JobState from './appJob/appJobState'
 import * as SideBarState from './appSideBar/appSidebarState'
 import * as UserViewState from './modules/users/user/userViewState'
+import * as UserInviteViewState from './modules/users/userInvite/userInviteViewState'
 
 const reducers = [
   { name: HomeState.stateKey, fn: homeReducer },
@@ -27,6 +29,7 @@ const reducers = [
   { name: JobState.stateKey, fn: jobReducer },
   { name: SideBarState.stateKey, fn: sidebarReducer },
   { name: UserViewState.stateKey, fn: userViewReducer },
+  { name: UserInviteViewState.stateKey, fn: userInviteViewReducer },
 ]
 
 export { component, reducers }
