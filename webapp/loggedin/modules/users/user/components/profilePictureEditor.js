@@ -17,34 +17,30 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
   const dropRef = useRef(null)
   const avatarRef = useRef(null)
 
-  const [state, setState] = useState({
-    image: null,
-    scale: 1,
-    rotate: 0,
-  })
-
-  const setImage = image => setState(statePrev => ({ ...statePrev, image }))
-
-  const setScale = scale => setState(statePrev => ({ ...statePrev, scale }))
-
-  const setRotate = rotate => setState(statePrev => ({ ...statePrev, rotate }))
+  const [settingInitialPicture, setSettingInitialPicture] = useState(false)
+  const [image, setImage] = useState(null)
+  const [scale, setScale] = useState(1)
+  const [rotate, setRotate] = useState(0)
 
   useEffect(() => {
-    setImage(initialProfilePicture)
+    if (initialProfilePicture) {
+      setSettingInitialPicture(true)
+      setImage(initialProfilePicture)
+    }
   }, [initialProfilePicture])
 
   useFileDrop(setImage, dropRef, [FileTypes.image])
 
   const resetSliders = () => {
-    setState(statePrev => ({
-      ...statePrev,
-      scale: 1,
-      rotate: 0,
-    }))
+    setScale(1)
+    setRotate(0)
   }
 
   const onImageChange = () => {
-    if (avatarRef.current) {
+    if (settingInitialPicture) {
+      setSettingInitialPicture(false)
+    } else if (avatarRef.current) {
+      // Call onPictureUpdate callback only if not setting initial picture
       const canvas = avatarRef.current.getImageScaledToCanvas()
       canvas.toBlob(onPictureUpdate, 'image/webp', 0.6)
     }
@@ -53,10 +49,10 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
   return (
     <>
       <div ref={dropRef} className="profile-picture-editor">
-        {state.image && (
+        {image && (
           <AvatarEditor
             ref={avatarRef}
-            image={state.image}
+            image={image}
             onImageChange={e => enabled && onImageChange(e)}
             onImageReady={onImageChange}
             onLoadSuccess={resetSliders}
@@ -64,8 +60,8 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
             height={220}
             border={10}
             color={[255, 255, 255]}
-            scale={state.scale}
-            rotate={state.rotate}
+            scale={scale}
+            rotate={rotate}
           />
         )}
 
@@ -86,7 +82,7 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
             <label className="form-label">{i18n.t('userView.scale')}</label>
             <div>
               <input
-                value={state.scale}
+                value={scale}
                 disabled={!enabled}
                 onChange={e => setScale(Number(e.target.value))}
                 className="slider"
@@ -103,7 +99,7 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
             <label className="form-label">{i18n.t('userView.rotate')}</label>
             <div>
               <input
-                value={state.rotate}
+                value={rotate}
                 disabled={!enabled}
                 onChange={e => setRotate(Number(e.target.value))}
                 className="slider"
