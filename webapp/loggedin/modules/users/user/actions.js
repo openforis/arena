@@ -9,7 +9,6 @@ import * as Validation from '@core/validation/validation'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
-import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
