@@ -3,7 +3,6 @@ import './userView.scss'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
-import * as R from 'ramda'
 
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
@@ -14,7 +13,7 @@ import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
-import UserGroupDropdown from '../components/userGroupDropdown'
+import DropdownUserGroup from '../components/dropdownUserGroup'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { useUserViewState } from './useUserViewState'
@@ -23,7 +22,7 @@ import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 import { saveUser, removeUser, updateUserProp, updateUserProfilePicture } from './actions'
 
-const UserView = props => {
+const UserView = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyInfo = useSelector(SurveyState.getSurveyInfo)
@@ -40,7 +39,7 @@ const UserView = props => {
     canEditEmail,
     canRemove,
     pictureEditorEnabled,
-  } = useUserViewState(props)
+  } = useUserViewState()
 
   const validation = User.getValidation(userToUpdate)
 
@@ -77,11 +76,11 @@ const UserView = props => {
           />
         </FormItem>
         <FormItem label={i18n.t('common.group')}>
-          <UserGroupDropdown
+          <DropdownUserGroup
             editingLoggedUser={User.isEqual(user)(userToUpdate)}
             disabled={!canEditGroup}
             validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
-            selectedGroupUuid={User.getGroupUuid(userToUpdate)}
+            groupUuid={User.getGroupUuid(userToUpdate)}
             onChange={groupUuid => dispatch(updateUserProp(User.keys.groupUuid, groupUuid))}
           />
         </FormItem>

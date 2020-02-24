@@ -1,5 +1,4 @@
 import axios from 'axios'
-import * as R from 'ramda'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
@@ -104,8 +103,6 @@ export const saveUser = history => async (dispatch, getState) => {
 }
 
 export const removeUser = history => async (dispatch, getState) => {
-  dispatch(showAppLoader())
-
   const state = getState()
   const lang = AppState.getLang(state)
   const surveyId = SurveyState.getSurveyId(state)
@@ -113,6 +110,8 @@ export const removeUser = history => async (dispatch, getState) => {
   const userToUpdate = UserViewState.getUser(state)
 
   try {
+    dispatch(showAppLoader())
+
     await axios.delete(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`)
 
     dispatch(
@@ -122,9 +121,7 @@ export const removeUser = history => async (dispatch, getState) => {
       }),
     )
     history.push(appModuleUri(userModules.users))
-  } catch (error) {
-    dispatch(showNotification('appErrors.generic', { text: error }, AppNotificationState.severity.error))
+  } finally {
+    dispatch(hideAppLoader())
   }
-
-  dispatch(hideAppLoader())
 }

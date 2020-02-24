@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import UserGroupDropdown from '@webapp/loggedin/modules/users/components/userGroupDropdown'
+import DropdownUserGroup from '@webapp/loggedin/modules/users/components/dropdownUserGroup'
 
 import * as UserInviteState from './userInviteViewState'
 import { updateUserInviteProp, inviteUser, resetUserInviteState } from './actions'
@@ -27,7 +27,7 @@ const UserInviteView = () => {
   const validation = UserInvite.getValidation(userInvite)
 
   return (
-    <div className="user-invite-view form">
+    <div className="user-invite form">
       <FormItem label={i18n.t('common.email')}>
         <Input
           placeholder={i18n.t('common.email')}
@@ -37,14 +37,14 @@ const UserInviteView = () => {
         />
       </FormItem>
       <FormItem label={i18n.t('common.group')}>
-        <UserGroupDropdown
+        <DropdownUserGroup
           validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
-          selectedGroupUuid={UserInvite.getGroupUuid(userInvite)}
+          groupUuid={UserInvite.getGroupUuid(userInvite)}
           onChange={groupUuid => dispatch(updateUserInviteProp(UserInvite.keys.groupUuid, groupUuid))}
         />
       </FormItem>
 
-      <div className="user-invite-view__buttons">
+      <div className="user-invite__buttons">
         <button
           className="btn btn-invite"
           aria-disabled={!Validation.isValid(validation)}

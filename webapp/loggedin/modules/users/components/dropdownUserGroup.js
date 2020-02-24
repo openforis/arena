@@ -12,8 +12,8 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
-const UserGroupDropdown = props => {
-  const { editingLoggedUser, selectedGroupUuid, disabled, validation, onChange } = props
+const DropdownUserGroup = props => {
+  const { editingLoggedUser, groupUuid, disabled, validation, onChange } = props
 
   const user = useSelector(AppState.getUser)
   const surveyInfo = useSelector(SurveyState.getSurveyInfo)
@@ -37,19 +37,19 @@ const UserGroupDropdown = props => {
       items={groups}
       itemKeyProp={AuthGroup.keys.uuid}
       itemLabelFunction={group => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
-      selection={groups.find(group => AuthGroup.getUuid(group) === selectedGroupUuid)}
+      selection={groups.find(group => AuthGroup.getUuid(group) === groupUuid)}
       onChange={group => onChange(AuthGroup.getUuid(group))}
       readOnlyInput={true}
     />
   )
 }
 
-UserGroupDropdown.defaultProps = {
+DropdownUserGroup.defaultProps = {
   editingSelfUser: false, // True if user being edited is the logged one
-  selectedGroupUuid: null,
+  groupUuid: null,
   disabled: false,
   validation: null,
   onChange: null,
 }
 
-export default UserGroupDropdown
+export default DropdownUserGroup
