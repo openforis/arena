@@ -18,7 +18,40 @@ import * as UserPasswordUtils from './userPasswordUtils'
 
 // ====== CREATE
 
-export const inviteUser = async (user, surveyId, surveyCycleKey, userToInviteParam, serverUrl) => {
+const _generateResetPasswordAndSendEmail = async (email, emailParams, lang, t) => {
+  const { serverUrl } = emailParams
+  // Add user to reset password table
+  const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
+  // Send email
+  const msgParams = {
+    ...emailParams,
+    serverUrl: `${serverUrl}/guest/resetPassword/${uuid}`,
+    temporaryMsg: '$t(emails.userInvite.temporaryMsg)',
+  }
+  await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
+}
+
+const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
+  const authGroups = User.getAuthGroups(userToInvite)
+  const hasRoleInSurvey = authGroups.some(g => AuthGroup.getSurveyUuid(g) === surveyUuid)
+
+  if (!User.hasAccepted(userToInvite)) {
+    throw new SystemError('appErrors.userHasPendingInvitation', { email: User.getEmail(userToInvite) })
+  } else if (hasRoleInSurvey) {
+    throw new SystemError('appErrors.userHasRole')
+  } else if (User.isSystemAdmin(userToInvite)) {
+    throw new SystemError('appErrors.userIsAdmin')
+  }
+}
+
+export const inviteUser = async (
+  user,
+  surveyId,
+  surveyCycleKey,
+  userToInviteParam,
+  serverUrl,
+  repeatInvitation = false,
+) => {
   const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
@@ -41,41 +74,34 @@ export const inviteUser = async (user, surveyId, surveyCycleKey, userToInvitePar
   const email = UserInvite.getEmail(userToInviteParam)
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
-  const surveyLabel = Survey.getLabel(surveyInfo, lang)
-  const groupName = AuthGroup.getName(group)
-  const groupLabel = `$t(authGroups.${groupName}.label)`
+  const emailParams = {
+    serverUrl,
+    surveyLabel: Survey.getLabel(surveyInfo, lang),
+    groupLabel: `$t(authGroups.${AuthGroup.getName(group)}.label)`,
+  }
 
   if (userToInvite) {
-    const newUserGroups = User.getAuthGroups(userToInvite)
-    const hasRoleInSurvey = newUserGroups.some(g => AuthGroup.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
-
-    if (!User.hasAccepted(userToInvite)) {
-      throw new SystemError('appErrors.userHasPendingInvitation', { email })
-    } else if (hasRoleInSurvey) {
-      throw new SystemError('appErrors.userHasRole')
-    } else if (User.isSystemAdmin(userToInvite)) {
-      throw new SystemError('appErrors.userIsAdmin')
-    }
-
+    // User to invite already exists
     await db.tx(async t => {
-      await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
-      await Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, lang)
+      if (repeatInvitation) {
+        // Generate reset password and send email again
+        await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
+      } else {
+        // Check can be invited
+        _checkUserCanBeInvited(userToInvite, Survey.getUuid(surveyInfo))
+        // Add user to group
+        await UserManager.addUserToGroup(user, surveyId, groupUuid, userToInvite, t)
+        // Send email
+        await Mailer.sendEmail(email, 'emails.userInvite', emailParams, lang)
+      }
     })
   } else {
+    // User to invite does not exist
     await db.tx(async t => {
       // Add user to db
       await UserManager.insertUser(user, surveyId, surveyCycleKey, email, null, User.userStatus.INVITED, groupUuid, t)
-      // Add user to reset password table
-      const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
-
-      // Send email
-      const msgParams = {
-        serverUrl: `${serverUrl}/guest/resetPassword/${uuid}`,
-        surveyLabel,
-        groupLabel,
-        temporaryMsg: '$t(emails.userInvite.temporaryMsg)',
-      }
-      await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
+      // Generate reset password and send email
+      await _generateResetPasswordAndSendEmail(email, emailParams, lang, t)
     })
   }
 }
