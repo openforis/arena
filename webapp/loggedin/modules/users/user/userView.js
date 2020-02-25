@@ -20,7 +20,7 @@ import { useUserViewState } from './useUserViewState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
-import { saveUser, removeUser, updateUserProp, updateUserProfilePicture } from './actions'
+import { saveUser, removeUser, updateUserProp, updateUserProfilePicture, inviteUserRepeat } from './actions'
 
 const UserView = () => {
   const i18n = useI18n()
@@ -85,7 +85,7 @@ const UserView = () => {
           />
         </FormItem>
 
-        {canEdit && (
+        {(canEdit || User.isInvitationExpired(userToUpdate)) && (
           <div className="user__buttons">
             {canRemove && (
               <button
@@ -108,14 +108,23 @@ const UserView = () => {
               </button>
             )}
 
-            <button
-              className="btn btn-save"
-              aria-disabled={!Validation.isValid(validation)}
-              onClick={() => dispatch(saveUser(history))}
-            >
-              <span className={`icon icon-floppy-disk icon-left icon-12px`} />
-              {i18n.t('common.save')}
-            </button>
+            {canEdit && (
+              <button
+                className="btn btn-save"
+                aria-disabled={!Validation.isValid(validation)}
+                onClick={() => dispatch(saveUser(history))}
+              >
+                <span className={`icon icon-floppy-disk icon-left icon-12px`} />
+                {i18n.t('common.save')}
+              </button>
+            )}
+
+            {User.isInvitationExpired(userToUpdate) && (
+              <button className="btn btn-invite" onClick={() => dispatch(inviteUserRepeat(history))}>
+                <span className={`icon icon-envelop icon-left icon-12px`} />
+                {i18n.t('userView.sendNewInvitation')}
+              </button>
+            )}
           </div>
         )}
       </div>

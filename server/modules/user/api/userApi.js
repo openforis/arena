@@ -27,20 +27,38 @@ export const init = app => {
       const user = Request.getUser(req)
 
       const { surveyId, surveyCycleKey } = Request.getParams(req)
-      const userToInvite = Request.getBody(req)
-      const validation = await UserValidator.validateInvitation(userToInvite)
+      const userInvite = Request.getBody(req)
+      const validation = await UserValidator.validateInvitation(userInvite)
 
       if (!Validation.isValid(validation)) {
         throw new SystemError('appErrors.userInvalid')
       }
 
       const serverUrl = Request.getServerUrl(req)
-      await UserService.inviteUser(user, surveyId, surveyCycleKey, userToInvite, serverUrl)
+      await UserService.inviteUser(user, surveyId, surveyCycleKey, userInvite, serverUrl)
       Response.sendOk(res)
     } catch (error) {
       next(error)
     }
   })
+
+  app.post(
+    '/survey/:surveyId/users/inviteRepeat',
+    AuthMiddleware.requireUserInvitePermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, surveyCycleKey } = Request.getParams(req)
+        const userInvite = Request.getBody(req)
+        const serverUrl = Request.getServerUrl(req)
+
+        await UserService.inviteUser(user, surveyId, surveyCycleKey, userInvite, serverUrl, true)
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    },
+  )
 
   // ==== READ
 

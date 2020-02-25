@@ -11,4 +11,5 @@ export const keys = {
   status: 'status',
   validation: ObjectUtils.keys.validation,
   groupUuid: 'groupUuid', // Used only when editing user survey group
+  invitationExpired: 'invitationExpired',
 }

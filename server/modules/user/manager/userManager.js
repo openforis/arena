@@ -65,12 +65,21 @@ export const generateResetPasswordUuid = async (email, client = db) => {
 }
 // ==== READ
 
-const _assocUserAuthGroups = async user =>
-  User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
+const _initializeUser = async user => {
+  // Assoc auth groups
+  let userUpdated = User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
+  if (User.isInvited(userUpdated)) {
+    const userUuid = User.getUuid(userUpdated)
+    const invitationExpired = await UserResetPasswordRepository.existsResetPasswordExpiredByUserUuid(userUuid)
+    userUpdated = User.assocInvitationExpired(invitationExpired)(userUpdated)
+  }
+
+  return userUpdated
+}
 
 const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
-  return user ? await _assocUserAuthGroups(user) : null
+  return user ? await _initializeUser(user) : null
 }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
@@ -80,14 +89,14 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 export const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
     const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
-    return await Promise.all(users.map(_assocUserAuthGroups))
+    return await Promise.all(users.map(_initializeUser))
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
-    return await _assocUserAuthGroups(R.dissoc('password', user))
+    return await _initializeUser(R.dissoc('password', user))
 
   return null
 }

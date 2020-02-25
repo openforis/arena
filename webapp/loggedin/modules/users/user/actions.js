@@ -1,8 +1,10 @@
 import axios from 'axios'
+import * as R from 'ramda'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
+import * as UserInvite from '@core/user/userInvite'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 
@@ -119,6 +121,32 @@ export const removeUser = history => async (dispatch, getState) => {
         survey: Survey.getLabel(surveyInfo, lang),
       }),
     )
+    history.push(appModuleUri(userModules.users))
+  } finally {
+    dispatch(hideAppLoader())
+  }
+}
+
+export const inviteUserRepeat = history => async (dispatch, getState) => {
+  const state = getState()
+  const userToInvite = UserViewState.getUser(state)
+  const surveyId = SurveyState.getSurveyId(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+
+  try {
+    dispatch(showAppLoader())
+
+    const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), User.getGroupUuid(userToInvite))
+    const userInviteParams = R.assoc('surveyCycleKey', surveyCycleKey)(userInvite)
+
+    await axios.post(`/api/survey/${surveyId}/users/inviteRepeat`, userInviteParams)
+
+    dispatch(
+      showNotification('emails.userInviteRepeatConfirmation', {
+        email: UserInvite.getEmail(userInvite),
+      }),
+    )
+
     history.push(appModuleUri(userModules.users))
   } finally {
     dispatch(hideAppLoader())

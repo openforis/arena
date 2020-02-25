@@ -330,6 +330,7 @@ Do you want to cancel them?`,
     dragAndDrop: 'Drop an image above or',
     upload: 'click here to upload',
     sendInvitation: 'Send invitation',
+    sendNewInvitation: 'Send new invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
@@ -802,6 +803,8 @@ $t(common.cantUndoWarning)`,
              $t(emails.signature)`,
       temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     },
+    userInviteRepeatConfirmation:
+      'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
     userResetPassword: {
       subject: 'OpenForis Arena. Password reset',
       body: `<p>Hello {{name}},</p>

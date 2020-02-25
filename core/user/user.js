@@ -32,10 +32,13 @@ export const getValidation = Validation.getValidation
 export const assocProp = R.assoc
 export const assocValidation = Validation.assocValidation
 export const assocGroupUuid = R.assoc(keys.groupUuid)
+export const assocInvitationExpired = R.assoc(keys.invitationExpired)
 
 // ====== CHECK
 export const isSystemAdmin = user => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
 export const hasAccepted = R.propEq(keys.status, userStatus.ACCEPTED)
+export const isInvited = R.propEq(keys.status, userStatus.INVITED)
+export const isInvitationExpired = R.propEq(keys.invitationExpired, true)
 
 // ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) => user =>

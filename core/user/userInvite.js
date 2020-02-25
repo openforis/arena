@@ -7,9 +7,17 @@ export const keys = {
   groupUuid: 'groupUuid',
 }
 
+// ===== CREATE
+export const newUserInvite = (email, groupUuid) => ({
+  [keys.email]: email,
+  [keys.groupUuid]: groupUuid,
+})
+
+// ===== READ
 export const getEmail = R.propOr('', keys.email)
 export const getGroupUuid = R.prop(keys.groupUuid)
 export const getValidation = Validation.getValidation
 
+// ===== UPDATE
 export const assocProp = R.assoc
 export const assocValidation = Validation.assocValidation
