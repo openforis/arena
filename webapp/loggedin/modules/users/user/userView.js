@@ -45,7 +45,7 @@ const UserView = () => {
 
   return (
     ready && (
-      <div className="user-view form">
+      <div className="user form">
         {canEdit ? (
           <ProfilePictureEditor
             userUuid={userUuid}
@@ -86,7 +86,7 @@ const UserView = () => {
         </FormItem>
 
         {canEdit && (
-          <div className="user-view__buttons">
+          <div className="user__buttons">
             {canRemove && (
               <button
                 className="btn-s btn-danger btn-remove-user"

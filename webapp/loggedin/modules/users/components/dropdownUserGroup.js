@@ -45,7 +45,7 @@ const DropdownUserGroup = props => {
 }
 
 DropdownUserGroup.defaultProps = {
-  editingSelfUser: false, // True if user being edited is the logged one
+  editingLoggedUser: false, // True if user being edited is the logged one
   groupUuid: null,
   disabled: false,
   validation: null,
