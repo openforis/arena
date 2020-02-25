@@ -24,6 +24,15 @@ export const findUserUuidByUuid = async (uuid, client = db) =>
     R.prop('user_uuid'),
   )
 
+export const findUserUuidsExpired = async (client = db) =>
+  await client.map(
+    `SELECT user_uuid
+    FROM user_reset_password
+    WHERE ${expiredCondition}`,
+    [],
+    R.prop('user_uuid'),
+  )
+
 export const deleteUserResetPasswordByUuid = async (uuid, client = db) =>
   await client.none(`DELETE FROM user_reset_password WHERE uuid = $1`, [uuid])
 

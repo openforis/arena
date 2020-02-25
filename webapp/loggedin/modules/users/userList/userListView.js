@@ -61,7 +61,15 @@ const UsersRow = props => {
       <div>{User.getName(userListItem)}</div>
       <div>{User.getEmail(userListItem)}</div>
       <div>{i18n.t(`authGroups.${AuthGroup.getName(authGroup)}.label_plural`)}</div>
-      <div>{User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}</div>
+      <div>
+        {User.hasAccepted(userListItem) ? (
+          <span className="icon icon-user-check icon-16px" />
+        ) : User.isInvited(userListItem) ? (
+          User.isInvitationExpired(userListItem) ? (
+            <span className="icon icon-crying icon-16px icon-invitation-expired" />
+          ) : null
+        ) : null}
+      </div>
       <div>
         <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
