@@ -803,6 +803,8 @@ $t(common.cantUndoWarning)`,
              $t(emails.signature)`,
       temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     },
+    userInviteRepeatConfirmation:
+      'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
     userResetPassword: {
       subject: 'OpenForis Arena. Password reset',
       body: `<p>Hello {{name}},</p>

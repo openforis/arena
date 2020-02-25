@@ -20,7 +20,7 @@ import { useUserViewState } from './useUserViewState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
-import { saveUser, removeUser, updateUserProp, updateUserProfilePicture, inviteUserAgain } from './actions'
+import { saveUser, removeUser, updateUserProp, updateUserProfilePicture, inviteUserRepeat } from './actions'
 
 const UserView = () => {
   const i18n = useI18n()
@@ -120,7 +120,7 @@ const UserView = () => {
             )}
 
             {User.isInvitationExpired(userToUpdate) && (
-              <button className="btn btn-invite" onClick={() => dispatch(inviteUserAgain(history))}>
+              <button className="btn btn-invite" onClick={() => dispatch(inviteUserRepeat(history))}>
                 <span className={`icon icon-envelop icon-left icon-12px`} />
                 {i18n.t('userView.sendNewInvitation')}
               </button>
