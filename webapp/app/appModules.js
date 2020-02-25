@@ -130,8 +130,12 @@ export const userModules = {
     path: `${appModules.users.path}/list`,
   },
   user: {
-    key: 'view',
+    key: 'user',
     path: `${appModules.users.path}/user`,
+  },
+  userInvite: {
+    key: 'userInvite',
+    path: `${appModules.users.path}/userInvite`,
   },
 }
 

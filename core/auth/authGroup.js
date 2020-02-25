@@ -2,14 +2,14 @@ import * as R from 'ramda'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
-  uuid: 'uuid',
+  uuid: ObjectUtils.keys.uuid,
   permissions: 'permissions',
   recordSteps: 'recordSteps',
   all: 'all',
   own: 'own',
   surveyId: 'surveyId',
   surveyUuid: 'surveyUuid',
-  name: 'name',
+  name: ObjectUtils.keys.name,
 }
 
 export const permissions = {

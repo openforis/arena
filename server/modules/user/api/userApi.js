@@ -26,15 +26,16 @@ export const init = app => {
     try {
       const user = Request.getUser(req)
 
-      const { surveyId, email, groupUuid, surveyCycleKey } = Request.getParams(req)
-      const validation = await UserValidator.validateInvitation(Request.getBody(req))
+      const { surveyId, surveyCycleKey } = Request.getParams(req)
+      const userToInvite = Request.getBody(req)
+      const validation = await UserValidator.validateInvitation(userToInvite)
 
       if (!Validation.isValid(validation)) {
         throw new SystemError('appErrors.userInvalid')
       }
 
       const serverUrl = Request.getServerUrl(req)
-      await UserService.inviteUser(user, surveyId, surveyCycleKey, email, groupUuid, serverUrl)
+      await UserService.inviteUser(user, surveyId, surveyCycleKey, userToInvite, serverUrl)
       Response.sendOk(res)
     } catch (error) {
       next(error)
@@ -130,18 +131,19 @@ export const init = app => {
   })
 
   const _updateUser = async (req, res) => {
-    const validation = await UserValidator.validateUser(Request.getBody(req))
+    const userToUpdate = Request.getBody(req)
+
+    const validation = await UserValidator.validateUser(userToUpdate)
 
     if (!Validation.isValid(validation)) {
       throw new SystemError('appErrors.userInvalid')
     }
 
+    const { surveyId } = Request.getParams(req)
     const user = Request.getUser(req)
-    const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
-
     const fileReq = Request.getFile(req)
 
-    const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid, fileReq)
+    const updatedUser = await UserService.updateUser(user, surveyId, userToUpdate, fileReq)
 
     res.json(updatedUser)
   }

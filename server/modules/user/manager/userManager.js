@@ -94,8 +94,10 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
 
 // ==== UPDATE
 
-const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, profilePicture, client = db) =>
+const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client = db) =>
   await client.tx(async t => {
+    const userUuid = User.getUuid(userToUpdate)
+    const groupUuid = User.getGroupUuid(userToUpdate)
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
 
     if (AuthGroup.isSystemAdminGroup(newGroup)) {
@@ -105,16 +107,11 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, pro
     } else {
       await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
       // Log user update activity only for non system admin users
-      await ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.userUpdate,
-        { [ActivityLog.keysContent.uuid]: userUuid, name, email, groupUuid },
-        false,
-        t,
-      )
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userUpdate, userToUpdate, false, t)
     }
 
+    const name = User.getName(userToUpdate)
+    const email = User.getEmail(userToUpdate)
     return await UserRepository.updateUser(userUuid, name, email, profilePicture, t)
   })
 

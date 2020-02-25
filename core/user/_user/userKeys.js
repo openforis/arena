@@ -9,4 +9,6 @@ export const keys = {
   hasProfilePicture: 'hasProfilePicture',
   prefs: 'prefs',
   status: 'status',
+  validation: ObjectUtils.keys.validation,
+  groupUuid: 'groupUuid', // Used only when editing user survey group
 }
