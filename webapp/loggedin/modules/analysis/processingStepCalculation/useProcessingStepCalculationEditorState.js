@@ -57,11 +57,10 @@ export default () => {
     Survey.getNodeDefByUuid(nodeDefUuid)(survey),
   )
 
-  const attrDefsEntityChildren = R.pipe(
-    ProcessingStep.getEntityUuid,
-    entityDefUuid => Survey.getNodeDefByUuid(entityDefUuid)(survey),
-    entityDef => Survey.getNodeDefChildren(entityDef, true)(survey),
+  const processingStepEntityDef = R.pipe(ProcessingStep.getEntityUuid, entityDefUuid =>
+    Survey.getNodeDefByUuid(entityDefUuid)(survey),
   )(processingStep)
+  const attrDefsEntityChildren = Survey.getNodeDefChildren(processingStepEntityDef, true)(survey)
 
   const attributes = R.pipe(
     R.concat(attrDefsPrevStep),
@@ -81,6 +80,9 @@ export default () => {
 
   const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
   const validation = ProcessingChain.getItemValidationByUuid(calculationUuid)(processingChain)
+  const aggregateFunctionEnabled =
+    ProcessingStepCalculation.isQuantitative(calculation) &&
+    (ProcessingStep.getIndex(processingStep) > 0 || NodeDef.isVirtual(processingStepEntityDef))
 
   return {
     i18n,
@@ -93,6 +95,7 @@ export default () => {
     attribute,
 
     types: getTypes(i18n),
-    aggregateFns: getAggregateFns(i18n),
+    aggregateFunctionEnabled,
+    aggregateFns: aggregateFunctionEnabled ? getAggregateFns(i18n) : null,
   }
 }

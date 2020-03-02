@@ -36,6 +36,7 @@ const ProcessingStepCalculationEditor = () => {
     dirty,
     attributes,
     attribute,
+    aggregateFunctionEnabled,
 
     types,
     aggregateFns,
@@ -105,7 +106,7 @@ const ProcessingStepCalculationEditor = () => {
           </div>
         </FormItem>
 
-        {ProcessingStepCalculation.isQuantitative(calculation) && (
+        {aggregateFunctionEnabled && (
           <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
             <ButtonGroup
               selectedItemKey={ProcessingStepCalculation.getAggregateFunction(calculation)}
