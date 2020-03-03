@@ -13,7 +13,10 @@ import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@web
 import { showNotification } from '@webapp/app/appNotification/actions'
 
 import * as ProcessingStepState from './processingStepState'
+import * as ProcessingStepCalculationState from '../processingStepCalculation/processingStepCalculationState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
+
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { nodeDefCreate, onNodeDefsDelete } from '@webapp/survey/nodeDefs/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
 import { processingChainValidationUpdate } from '../processingChain/actions'
@@ -36,8 +39,21 @@ export const setProcessingStepCalculationForEdit = calculation => dispatch =>
 
 // ====== SET FOR EDIT
 
-export const setProcessingStepForEdit = processingStep => dispatch =>
-  dispatch({ type: processingStepUpdate, processingStep })
+export const setProcessingStepForEdit = processingStep => (dispatch, getState) => {
+  const processingStepUpdateAction = { type: processingStepUpdate, processingStep }
+
+  const state = getState()
+  if (ProcessingStepState.isDirty(state) || ProcessingStepCalculationState.isDirty(state)) {
+    dispatch(
+      showDialogConfirm('common.cancelConfirm', {}, async () => {
+        await dispatch(resetProcessingStepState())
+        dispatch(processingStepUpdateAction)
+      }),
+    )
+  } else {
+    dispatch(processingStepUpdateAction)
+  }
+}
 
 // ====== CREATE
 
