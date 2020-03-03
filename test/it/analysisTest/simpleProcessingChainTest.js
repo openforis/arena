@@ -8,7 +8,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
-import * as ChainB from '../utils/processingChainBuilder'
+import * as ChainB from '../utils/chainBuilder'
 
 let survey = null
 const records = []
