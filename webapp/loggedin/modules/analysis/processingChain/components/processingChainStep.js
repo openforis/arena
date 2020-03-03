@@ -28,16 +28,19 @@ const ProcessingChainStep = props => {
     Survey.getCategoryByUuid(categoryUuid)(survey),
   )(processingStep)
   const processingStepEditing = useSelector(ProcessingStepState.getProcessingStep)
+  const editing = ProcessingStep.isEqual(processingStepEditing)(processingStep)
 
   const i18n = useI18n()
   const dispatch = useDispatch()
 
   return (
     <div
-      className={`processing-chain__step${
-        ProcessingStep.isEqual(processingStepEditing)(processingStep) ? ' editing' : ''
-      }`}
-      onClick={() => dispatch(setProcessingStepForEdit(processingStep))}
+      className={`processing-chain__step${editing ? ' editing' : ''}`}
+      onClick={() => {
+        if (!editing) {
+          dispatch(setProcessingStepForEdit(processingStep))
+        }
+      }}
     >
       <div className="processing-chain__step-index">{ProcessingStep.getIndex(processingStep) + 1}</div>
       <div className="processing-chain__step-content">
