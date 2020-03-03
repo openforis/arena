@@ -2,16 +2,13 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-// Import * as ProcessingChainService from '@server/modules/analysis/service/processingChainService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
+import * as ChainBuilder from '../utils/chainBuilder'
 
 let survey = null
 const records = []
@@ -53,7 +50,7 @@ before(async () => {
     )
 
   const newPlot = (plotNo, noTrees) =>
-    RB.entity('plot', RB.attribute('plot_no', 1), ...R.range(1, noTrees + 1).map(newTree))
+    RB.entity('plot', RB.attribute('plot_no', plotNo), ...R.range(1, noTrees + 1).map(newTree))
 
   // Add 5 records
   for (let i = 0; i < 5; i++) {
@@ -73,22 +70,12 @@ before(async () => {
     records.push(record)
   }
 
-  processingChain = ProcessingChain.newProcessingChain({
-    [ProcessingChain.keysProps.cycles]: [Survey.cycleOneKey],
-  })
-  let step1 = ProcessingChain.newProcessingStep(processingChain, {
-    [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName('tree')(survey)),
-  })
-  const calc1 = ProcessingChain.newProcessingStepCalculation(
-    step1,
-    NodeDef.getUuid(Survey.getNodeDefByName('tree_volume')(survey)),
-    {
-      [ProcessingStepCalculation.keysProps.formula]: 'tree_dbh * tree_height',
-    },
-  )
-
-  step1 = ProcessingStep.assocCalculation(calc1)(step1)
-  processingChain = ProcessingChain.assocProcessingStep(step1)(processingChain)
+  processingChain = ChainBuilder.chain(
+    user,
+    survey,
+    'Simple chain',
+    ChainBuilder.step('tree', ChainBuilder.calculation('tree_volume').formula('tree_dbh * tree_height')),
+  ).build()
 })
 
 after(async () => {
@@ -102,5 +89,6 @@ export const simpleTest = async () => {
   // console.log(JSON.stringify(records))
 
   // await ProcessingChainService.generateScriptDeprecated(Survey.getId(survey), Survey.cycleOneKey, processingChain)
+  console.log('Processing chain', JSON.stringify(processingChain))
   console.log('empty test')
 }
