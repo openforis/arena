@@ -29,6 +29,11 @@ const nodeDefTypeByType = {
   [type.categorical]: NodeDef.nodeDefType.code,
 }
 
+const typeByNodeDefType = {
+  [NodeDef.nodeDefType.decimal]: type.quantitative,
+  [NodeDef.nodeDefType.code]: type.categorical,
+}
+
 export const aggregateFn = {
   sum: 'sum',
   avg: 'avg',
@@ -67,3 +72,4 @@ export const dissocTemporary = ObjectUtils.dissocTemporary
 
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, type => R.prop(type, nodeDefTypeByType))
+export const getTypeByNodeDef = R.pipe(NodeDef.getType, nodeDefType => R.prop(nodeDefType, typeByNodeDefType))

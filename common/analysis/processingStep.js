@@ -48,9 +48,11 @@ export const mergeProps = ObjectUtils.mergeProps
 export const dissocTemporary = ObjectUtils.dissocTemporary
 
 export const assocEntityUuid = entityUuid => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
-export const assocCalculations = R.assoc(keys.calculations)
-export const dissocCalculations = R.dissoc(keys.calculations)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
+export const assocCalculations = calculations => {
+  const calculationUuids = R.pluck(ProcessingStepCalculation.keys.uuid)(calculations)
+  return R.pipe(R.assoc(keys.calculations, calculations), assocCalculationUuids(calculationUuids))
+}
 
 const assocCalculationsCount = R.assoc(keys.calculationsCount)
 
