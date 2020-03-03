@@ -8,7 +8,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as RB from '../utils/recordBuilder'
-import * as ChainB from '../utils/chainBuilder'
+import * as ChainBuilder from '../utils/chainBuilder'
 
 let survey = null
 const records = []
@@ -70,11 +70,11 @@ before(async () => {
     records.push(record)
   }
 
-  processingChain = ChainB.chain(
+  processingChain = ChainBuilder.chain(
     user,
     survey,
     'Simple chain',
-    ChainB.step('tree', ChainB.calculation('tree_volume').formula('tree_dbh * tree_height')),
+    ChainBuilder.step('tree', ChainBuilder.calculation('tree_volume').formula('tree_dbh * tree_height')),
   ).build()
 })
 
