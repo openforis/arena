@@ -80,6 +80,8 @@ export const dissocTemporaryCalculation = _updateCalculations(
   R.reject(ProcessingStepCalculation.isTemporary),
 )
 
+export const dissocCalculations = R.dissoc(keys.calculations)
+
 export const dissocCalculation = calculation =>
   _updateCalculations(
     R.pipe(

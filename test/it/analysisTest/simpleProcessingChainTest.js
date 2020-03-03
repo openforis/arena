@@ -89,5 +89,6 @@ export const simpleTest = async () => {
   // console.log(JSON.stringify(records))
 
   // await ProcessingChainService.generateScriptDeprecated(Survey.getId(survey), Survey.cycleOneKey, processingChain)
+  console.log('Processing chain', JSON.stringify(processingChain))
   console.log('empty test')
 }
