@@ -795,14 +795,15 @@ $t(common.cantUndoWarning)`,
     signature: `<p>Thank you,<br>
       The OpenForis Arena team
       </p>`,
+    temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     userInvite: {
       subject: 'You have been invited to OpenForis Arena!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
-             <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
-             {{temporaryMsg}}
+             <p><a href="{{urlResetPassword}}">Click here to access OpenForis Arena</a></p>
+             $t(emails.temporaryMsg)
+             <p>In the future, after you accept the invitation and assign a password to your account, you will be able to access OpenForis Arena using this <a href="{{urlServer}}">link</a></p>
              $t(emails.signature)`,
-      temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     },
     userInviteRepeatConfirmation:
       'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
@@ -811,6 +812,7 @@ $t(common.cantUndoWarning)`,
       body: `<p>Hello {{name}},</p>
              <p>You recently requested to reset your password for your OpenForis Arena account. Click the link below to reset it.</p>
              <p><a href="{{url}}">Reset your password</a></p>
+             $t(emails.temporaryMsg)
              <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
              $t(emails.signature)`,
     },
