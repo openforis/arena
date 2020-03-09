@@ -65,13 +65,13 @@ const AppRouterSwitch = props => {
   ) : (
     isReady && (
       <>
-        {user && User.hasAccepted(user) ? (
+        {isGuestUri(location.pathname) ? (
+          <GuestView />
+        ) : user && User.hasAccepted(user) ? (
           <Route
             path="/app"
             render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}
           />
-        ) : isGuestUri(location.pathname) ? (
-          <GuestView />
         ) : (
           <LoginView />
         )}
