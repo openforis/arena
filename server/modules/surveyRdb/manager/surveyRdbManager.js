@@ -1,21 +1,22 @@
 import * as R from 'ramda'
-import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
-import * as DataTable from '../schemaRdb/dataTable'
+import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
+import { db } from '@server/db/db'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
 import * as ProcessingStepRepository from '@server/modules/analysis/repository/processingStepRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
@@ -161,12 +162,8 @@ export const countDuplicateRecords = DataViewReadRepository.countDuplicateRecord
 export const fetchRecordsCountByKeys = DataViewReadRepository.fetchRecordsCountByKeys
 export const fetchRecordsWithDuplicateEntities = DataTableReadRepository.fetchRecordsWithDuplicateEntities
 
-// Result views
-export const generateResultViews = async (surveyId, client = db) => {
-  const resultStepViewsByEntityUuid = {}
-
+const _visitProcessingSteps = async (surveyId, client, visitor) => {
   const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
-
   for (const chain of chains) {
     const steps = await ProcessingStepRepository.fetchStepsAndCalculationsByChainUuid(
       surveyId,
@@ -174,25 +171,67 @@ export const generateResultViews = async (surveyId, client = db) => {
       client,
     )
     for (const step of steps) {
-      if (ProcessingStep.hasEntity(step)) {
-        const calculationNodeDefUuids = R.pipe(
-          ProcessingStep.getCalculations,
-          R.map(ProcessingStepCalculation.getNodeDefUuid),
-        )(step)
+      await visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain))
+    }
+  }
+}
 
+// Result views
+export const generateResultViews = async (surveyId, client = db) => {
+  const resultStepViewsByEntityUuid = {}
+
+  await _visitProcessingSteps(surveyId, client, async step => {
+    if (ProcessingStep.hasEntity(step)) {
+      const calculations = ProcessingStep.getCalculations(step)
+      if (R.none(ProcessingStepCalculation.hasAggregateFunction, calculations)) {
+        const calculationNodeDefUuids = R.map(ProcessingStepCalculation.getNodeDefUuid)(calculations)
         const nodeDefColumns = await Promise.all(
           calculationNodeDefUuids.map(nodeDefUuid =>
             NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client),
           ),
         )
-
         const entityDefUuid = ProcessingStep.getEntityUuid(step)
         const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
-        resultStepViews.push(ResultStepView.newResultStepView(step, nodeDefColumns))
+        resultStepViews.push(ResultStepView.newResultStepView(step, calculations, nodeDefColumns))
         resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
       }
     }
-  }
-
+  })
   return resultStepViewsByEntityUuid
+}
+
+// Aggregated entity views
+export const generateEntityAggregatedViews = async (survey, client = db) => {
+  const entityAggregatedViewsByUuid = {}
+
+  const surveyId = Survey.getId(survey)
+
+  await _visitProcessingSteps(surveyId, client, async (step, chain) => {
+    if (ProcessingStep.hasEntity(step, chain)) {
+      const entityUuid = ProcessingStep.getEntityUuid(step)
+      const calculations = ProcessingStep.getCalculations(step)
+      for (const calculation of calculations) {
+        if (ProcessingStepCalculation.hasAggregateFunction(calculation)) {
+          let entityAggregatedView = entityAggregatedViewsByUuid[entityUuid]
+          if (entityAggregatedView) {
+            entityAggregatedView = EntityAggregatedView.addCalculation(calculation)(entityAggregatedView)
+          } else {
+            const entityDef = Survey.getNodeDefByUuid(entityUuid)(survey)
+            const entityAggregatedViewEntityDef = NodeDef.isVirtual(entityDef)
+              ? Survey.getNodeDefParent(entityDef)(survey)
+              : R.pipe(ProcessingChain.getStepPrev(step), ProcessingStep.getEntityUuid, entityDefUuid =>
+                  Survey.getNodeDefByUuid(entityDefUuid)(survey),
+                )(chain)
+
+            entityAggregatedView = EntityAggregatedView.newEntityAggregatedView(entityAggregatedViewEntityDef, [
+              calculation,
+            ])
+          }
+
+          entityAggregatedViewsByUuid[entityUuid] = entityAggregatedView
+        }
+      }
+    }
+  })
+  return entityAggregatedViewsByUuid
 }
