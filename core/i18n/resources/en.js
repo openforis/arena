@@ -157,7 +157,7 @@ Do you want to cancel them?`,
 
   resetPasswordView: {
     setNewPassword: 'Set new password',
-    forgotPasswordLinkInvalid: 'Invalid or expired link',
+    forgotPasswordLinkInvalid: 'The page you have tried to access does not exist or is no longer valid',
     passwordSuccessfullyReset: 'Your password has been successfully reset',
   },
 

@@ -6,9 +6,12 @@ import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
 import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/commonComponents/hooks'
+
 import { showNotification } from '@webapp/app/appNotification/actions'
+import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
+import { appModuleUri } from '@webapp/app/appModules'
+
 import * as LoginValidator from '@webapp/guest/login/loginValidator'
-import { appModuleUri, appModules } from '@webapp/app/appModules'
 
 export const useResetPasswordState = () => {
   const { uuid } = useParams()
@@ -37,14 +40,18 @@ export const useResetPasswordState = () => {
   }, [name, password, passwordConfirm])
 
   useOnUpdate(() => {
-    history.push(appModuleUri(appModules.home))
+    history.push(appModuleUri())
     dispatch(showNotification('resetPasswordView.passwordSuccessfullyReset'))
   }, [resetComplete])
 
   // Check that reset password uuid is valid (user exists)
   useOnUpdate(() => {
-    if (user) setName(User.getName(user))
-    else setError('resetPasswordView.forgotPasswordLinkInvalid')
+    if (user) {
+      setName(User.getName(user))
+    } else {
+      history.push(appModuleUri())
+      dispatch(showNotification('resetPasswordView.forgotPasswordLinkInvalid', {}, AppNotificationState.severity.error))
+    }
   }, [user])
 
   const onClickSetNewPassword = () => {
