@@ -6,7 +6,6 @@ const config = {
   password: ProcessUtils.ENV.pgPassword,
   host: ProcessUtils.ENV.pgHost,
   database: ProcessUtils.ENV.pgDatabase,
-  schema: ProcessUtils.ENV.pgSchema,
   ssl: ProcessUtils.ENV.pgSsl,
 }
 
