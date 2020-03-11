@@ -38,7 +38,6 @@ Do you want to cancel them?`,
     errorMessage_plural: 'Error messages',
     formContainsErrors: 'Form contains errors',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
-    goToHomePage: 'Go to home page',
     from: 'From',
     group: 'Group',
     id: 'id',
@@ -802,7 +801,6 @@ $t(common.cantUndoWarning)`,
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
              <p><a href="{{urlResetPassword}}">Click here to access OpenForis Arena</a></p>
              $t(emails.temporaryMsg)
-             <p>In the future, after you accept the invitation and assign a password to your account, you will be able to access OpenForis Arena using this <a href="{{urlServer}}">link</a></p>
              $t(emails.signature)`,
     },
     userInviteRepeatConfirmation:
