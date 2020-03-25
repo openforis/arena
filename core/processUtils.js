@@ -3,6 +3,13 @@ const environments = {
   production: 'production',
 }
 
+const dbUrl = process.env.DATABASE_URL
+const regExDbUrl = /postgres:\/\/(\w+):(\w+)@([\w-.\d]+):(\d+)\/(\w+)/
+const dbUrlMatch = dbUrl ? dbUrl.match(regExDbUrl) : null
+const [pgUser, pgPassword, pgHost, pgPort, pgDatabase] = dbUrlMatch
+  ? [dbUrlMatch[1], dbUrlMatch[2], dbUrlMatch[3], dbUrlMatch[4], dbUrlMatch[5]]
+  : [process.env.PGUSER, process.env.PGPASSWORD, process.env.PGHOST, process.env.PGPORT, process.env.PGDATABASE]
+
 export const ENV = {
   arenaRoot: process.env.ARENA_ROOT,
   arenaDist: process.env.ARENA_DIST,
@@ -16,13 +23,12 @@ export const ENV = {
   gitCommitHash: process.env.GIT_COMMIT_HASH,
   gitBranch: process.env.GIT_BRANCH,
   // DB
-  dbUrl: process.env.DATABASE_URL,
-  pgUser: process.env.PGUSER,
-  pgPassword: process.env.PGPASSWORD,
-  pgDatabase: process.env.PGDATABASE,
-  pgSchema: process.env.PGSCHEMA,
-  pgHost: process.env.PGHOST,
-  pgPort: process.env.PGPORT,
+  dbUrl,
+  pgUser,
+  pgPassword,
+  pgHost,
+  pgPort,
+  pgDatabase,
   pgSsl: process.env.PGSSL === 'true',
   migrateOnly: process.env.MIGRATE_ONLY === 'true',
   // EMAIL
