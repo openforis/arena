@@ -148,6 +148,10 @@ export const analysisModules = {
     key: 'processingChain',
     path: `${appModules.analysis.path}/processingChain`,
   },
+  rStudio: {
+    key: 'rStudio',
+    path: `${appModules.analysis.path}/rStudio`,
+  },
   nodeDef: {
     key: 'nodeDef',
     path: `${appModules.analysis.path}/nodeDef`,

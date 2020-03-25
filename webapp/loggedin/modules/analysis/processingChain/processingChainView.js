@@ -11,7 +11,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import { useOnUpdate, useAsyncGetRequest } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useAsyncGetRequest, useI18n } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import ProcessingChainSteps from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainSteps'
@@ -46,6 +46,8 @@ const ProcessingChainView = props => {
   } = props
 
   const { processingChainUuid } = useParams()
+
+  const i18n = useI18n()
 
   const { dispatch: generateScript } = useAsyncGetRequest(
     `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/processing-chain/${processingChainUuid}/script`,
@@ -88,10 +90,11 @@ const ProcessingChainView = props => {
         onClick={() => {
           ;(async () => {
             await generateScript()
+            history.push(appModuleUri(analysisModules.rStudio))
           })()
         }}
       >
-        generate script
+        {i18n.t('analysisView.processingChainView.openChain')}
       </button>
       <div className="form">
         <LabelsEditor

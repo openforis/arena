@@ -9,6 +9,7 @@ import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ProcessingChainsView from './processingChains/processingChainsView'
 import ProcessingChainView from './processingChain/processingChainView'
+import RStudioView from './rStudio/rStudioView'
 
 const AnalysisView = () => (
   <SurveyDefsLoader draft={false} validate={false} requirePublish={true}>
@@ -23,6 +24,10 @@ const AnalysisView = () => (
         {
           component: ProcessingChainView,
           path: `${appModuleUri(analysisModules.processingChain)}:processingChainUuid/`,
+        },
+        {
+          component: RStudioView,
+          path: appModuleUri(analysisModules.rStudio),
         },
         {
           component: NodeDefView,
