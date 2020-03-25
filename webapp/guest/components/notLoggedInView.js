@@ -26,11 +26,11 @@ const NotLoggedInView = props => {
         </div>
       </div>
 
-      {error && <div className="not-logged-in__form-error text-center">{i18n.t(error)}</div>}
-
       <form onSubmit={e => e.preventDefault()} className="not-logged-in__form">
         {children}
       </form>
+
+      {error && <div className="not-logged-in__form-error text-center">{i18n.t(error)}</div>}
     </>
   )
 }

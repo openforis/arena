@@ -19,15 +19,15 @@ import * as UserPasswordUtils from './userPasswordUtils'
 // ====== CREATE
 
 const _generateResetPasswordAndSendEmail = async (email, emailParams, lang, t) => {
-  const { serverUrl } = emailParams
+  const { urlServer } = emailParams
   // Add user to reset password table
   const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
-  // Send email
+  // Add reset password url to message params
   const msgParams = {
     ...emailParams,
-    serverUrl: `${serverUrl}/guest/resetPassword/${uuid}`,
-    temporaryMsg: '$t(emails.userInvite.temporaryMsg)',
+    urlResetPassword: `${urlServer}/guest/resetPassword/${uuid}`,
   }
+  // Send email
   await Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang)
 }
 
@@ -49,7 +49,7 @@ export const inviteUser = async (
   surveyId,
   surveyCycleKey,
   userToInviteParam,
-  serverUrl,
+  urlServer,
   repeatInvitation = false,
 ) => {
   const groupUuid = UserInvite.getGroupUuid(userToInviteParam)
@@ -75,7 +75,7 @@ export const inviteUser = async (
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const emailParams = {
-    serverUrl,
+    urlServer,
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${AuthGroup.getName(group)}.label)`,
   }

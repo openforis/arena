@@ -156,7 +156,7 @@ Do you want to cancel them?`,
 
   resetPasswordView: {
     setNewPassword: 'Set new password',
-    forgotPasswordLinkInvalid: 'Invalid or expired link',
+    forgotPasswordLinkInvalid: 'The page you have tried to access does not exist or is no longer valid',
     passwordSuccessfullyReset: 'Your password has been successfully reset',
   },
 
@@ -794,14 +794,14 @@ $t(common.cantUndoWarning)`,
     signature: `<p>Thank you,<br>
       The OpenForis Arena team
       </p>`,
+    temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     userInvite: {
       subject: 'You have been invited to OpenForis Arena!',
       body: `<p>Hello,</p>
              <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
-             <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
-             {{temporaryMsg}}
+             <p><a href="{{urlResetPassword}}">Click here to access OpenForis Arena</a></p>
+             $t(emails.temporaryMsg)
              $t(emails.signature)`,
-      temporaryMsg: '<p>This link is only valid for the next 7 days.</p>',
     },
     userInviteRepeatConfirmation:
       'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
@@ -810,6 +810,7 @@ $t(common.cantUndoWarning)`,
       body: `<p>Hello {{name}},</p>
              <p>You recently requested to reset your password for your OpenForis Arena account. Click the link below to reset it.</p>
              <p><a href="{{url}}">Reset your password</a></p>
+             $t(emails.temporaryMsg)
              <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
              $t(emails.signature)`,
     },
