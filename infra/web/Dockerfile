@@ -16,9 +16,7 @@ RUN cd /app; git reset --hard
 
 ############################################################
 
-ARG rstudio_version=3.6.1
-
-FROM rocker/rstudio:${rstudio_version} AS arena-web
+FROM rocker/rstudio:3.6.1 AS arena-web
 
 # Set RStudio Server working directory
 RUN mkdir -p /home/rstudio/chains
