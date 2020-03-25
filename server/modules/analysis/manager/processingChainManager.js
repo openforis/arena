@@ -247,7 +247,12 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
     }
 
     // Validate chain / step / calculation after insert/update
-    const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
+    let surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
+    if (!Survey.isPublished(surveyInfo)) {
+      // Fetch draft survey props
+      surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, t)
+    }
+
     const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
     const calculationValidation = calculation
       ? await ProcessingChainValidator.validateCalculation(calculation, surveyDefaultLang)

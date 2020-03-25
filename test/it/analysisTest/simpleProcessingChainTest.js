@@ -74,7 +74,10 @@ before(async () => {
     user,
     survey,
     'Simple chain',
-    ChainBuilder.step('tree', ChainBuilder.calculation('tree_volume').formula('tree_dbh * tree_height')),
+    ChainBuilder.step(
+      'tree',
+      ChainBuilder.calculation('tree_volume', 'Tree volume calculation').formula('tree_dbh * tree_height'),
+    ),
   ).build()
 })
 

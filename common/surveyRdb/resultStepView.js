@@ -14,14 +14,16 @@ const keys = {
 
 // ===== CREATE
 
-export const newResultStepView = (step, nodeDefColumns) => ({
+export const newResultStepView = (step, calculations, nodeDefColumns) => ({
   step,
+  calculations,
   nodeDefColumns,
 })
 
 // ===== READ
 
 export const getStep = R.prop(keys.step)
+export const getCalculations = R.propOr([], keys.calculations)
 export const getNodeDefColumns = R.propOr([], keys.nodeDefColumns)
 
 // ===== UTILS

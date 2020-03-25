@@ -73,3 +73,4 @@ export const dissocTemporary = ObjectUtils.dissocTemporary
 // ====== UTILS
 export const getNodeDefType = R.pipe(getType, type => R.prop(type, nodeDefTypeByType))
 export const getTypeByNodeDef = R.pipe(NodeDef.getType, nodeDefType => R.prop(nodeDefType, typeByNodeDefType))
+export const hasAggregateFunction = R.pipe(getAggregateFunction, R.isNil, R.not)

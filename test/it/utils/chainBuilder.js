@@ -10,15 +10,18 @@ import { db } from '@server/db/db'
 import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 
 class CalculationBuilder {
-  constructor(nodeDefName) {
+  constructor(nodeDefName, label) {
     this._nodeDefName = nodeDefName
+    this._label = label
     this._aggregateFn = null
     this._formula = null
   }
 
   build(survey, step) {
     const nodeDef = Survey.getNodeDefByName(this._nodeDefName)(survey)
+    const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
     return ProcessingChain.newProcessingStepCalculation(step, NodeDef.getUuid(nodeDef), {
+      [ProcessingStepCalculation.keysProps.labels]: { [defaultLang]: this._label },
       [ProcessingStepCalculation.keysProps.type]: ProcessingStepCalculation.getTypeByNodeDef(nodeDef),
       [ProcessingStepCalculation.keysProps.aggregateFn]: this._aggregateFn,
       [ProcessingStepCalculation.keysProps.formula]: this._formula,
@@ -60,7 +63,10 @@ class ChainBuilder {
   }
 
   build() {
-    const chain = ProcessingChain.newProcessingChain({ [ProcessingChain.keysProps.labels]: { en: this.label } })
+    const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(this.survey)
+    const chain = ProcessingChain.newProcessingChain({
+      [ProcessingChain.keysProps.labels]: { [defaultLang]: this.label },
+    })
     const steps = this.stepBuilders.map(builder => builder.build(this.survey, chain))
     return ProcessingChain.assocProcessingSteps(steps)(chain)
   }
@@ -72,7 +78,8 @@ class ChainBuilder {
       const surveyId = Survey.getId(survey)
       const steps = ProcessingChain.getProcessingSteps(chain)
       if (R.isEmpty(steps)) {
-        const chainLabel = ProcessingChain.getLabel(Survey.getDefaultLanguage(survey))(chain)
+        const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
+        const chainLabel = ProcessingChain.getLabel(defaultLang)(chain)
         throw new Error(`Cannot persist processing chain ${chainLabel}: empty steps`)
       }
 
@@ -92,4 +99,4 @@ class ChainBuilder {
 
 export const chain = (user, survey, label, stepBuilders) => new ChainBuilder(user, survey, label, stepBuilders)
 export const step = (entityName, calculationBuilders) => new StepBuilder(entityName, calculationBuilders)
-export const calculation = (type, nodeDefName, aggregateFn) => new CalculationBuilder(type, nodeDefName, aggregateFn)
+export const calculation = (type, label) => new CalculationBuilder(type, label)
