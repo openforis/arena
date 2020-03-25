@@ -38,8 +38,8 @@ RUN apt install -y curl
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt install -y nodejs git
 RUN npm install pm2 -g
-COPY --from=base /app /app	COPY --from=base /app /app
-RUN cd /app; npm run build:server:prod; npm run build-pr
+COPY --from=base /app /app
+RUN cd /app; npm run build:server:prod; npm run build-prod
 
 # Start
 WORKDIR /app
