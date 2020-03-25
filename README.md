@@ -63,3 +63,13 @@ Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>- add-ta
 You should edit the `<timestamp>-add-table-dbtable-up.sql` to contain your DDL statements.
 
 You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to undo migrations.
+
+## Run R Studio Server locally
+
+To startup RStudio Server (installed as a Docker container), run the following command:
+
+```shell
+docker run -d -p 127.0.0.1:8787:8787 -e DISABLE_AUTH=true rocker/rstudio
+```
+
+Visit http://localhost:8787 in your browser.
