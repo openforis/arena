@@ -40,6 +40,8 @@ export const ENV = {
   sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
   // SERVER
   useHttps: process.env.USE_HTTPS === 'true',
+  // RStudio Server
+  rStudioServerURL: process.env.RSTUDIO_SERVER_URL || 'http://localhost:8787',
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development
