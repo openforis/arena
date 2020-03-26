@@ -8,6 +8,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 import * as Validation from '@core/validation/validation'
+import * as ProcessUtils from '@core/processUtils'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
@@ -16,7 +17,7 @@ import * as ProcessingChainState from './processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
+import { hideAppLoader, hideAppSaving, showAppLoader, showAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import { onNodeDefsDelete } from '@webapp/survey/nodeDefs/actions'
@@ -230,4 +231,31 @@ export const deleteProcessingChain = history => async (dispatch, getState) => {
   dispatch(navigateToProcessingChainsView(history))
   dispatch(showNotification('processingChainView.deleteComplete'))
   dispatch(hideAppSaving())
+}
+
+// ====== GENERATE R SCRIPTS / OPEN RSTUDIO SERVER
+
+export const openProcessingChain = history => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+  const processingChain = ProcessingChainState.getProcessingChain(state)
+
+  // Generate scripts
+  await axios.get(`/api/survey/${surveyId}/processing-chain/${ProcessingChain.getUuid(processingChain)}/script`, {
+    params: { surveyCycleKey },
+  })
+
+  dispatch(hideAppLoader())
+
+  // Navigate to RStudio module
+  if (ProcessUtils.isEnvDevelopment) {
+    // Open in a new page
+    window.open(ProcessUtils.ENV.rStudioServerURL, 'rstudio')
+  } else {
+    // Open inside Arena
+    history.push(appModuleUri(analysisModules.rStudio))
+  }
 }

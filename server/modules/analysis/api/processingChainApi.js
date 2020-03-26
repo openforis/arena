@@ -60,7 +60,7 @@ export const init = app => {
     },
   )
 
-  // === test
+  // === GENERATE R SCRIPTS
   app.get(
     '/survey/:surveyId/processing-chain/:processingChainUuid/script',
     AuthMiddleware.requireRecordAnalysisPermission,

@@ -100,7 +100,10 @@ class RChain {
 
   async _initDirs() {
     // Init dirs
-    this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, this.chainUuid)
+    const surveyInfo = Survey.getSurveyInfo(this.survey)
+    const surveyName = Survey.getName(surveyInfo)
+    const chainLabel = ProcessingChain.getLabel(Survey.getDefaultLanguage(surveyInfo))(this.chain)
+    this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, surveyName, chainLabel)
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 

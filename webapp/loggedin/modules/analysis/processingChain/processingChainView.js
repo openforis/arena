@@ -11,7 +11,7 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import { useOnUpdate, useAsyncGetRequest } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useI18n } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import ProcessingChainSteps from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainSteps'
@@ -27,6 +27,7 @@ import {
   updateProcessingChainCycles,
   validateProcessingChain,
   resetProcessingChainState,
+  openProcessingChain,
 } from './actions'
 import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
@@ -43,14 +44,12 @@ const ProcessingChainView = props => {
     updateProcessingChainCycles,
     validateProcessingChain,
     resetProcessingChainState,
+    openProcessingChain,
   } = props
 
   const { processingChainUuid } = useParams()
 
-  const { dispatch: generateScript } = useAsyncGetRequest(
-    `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/processing-chain/${processingChainUuid}/script`,
-    { params: { surveyCycleKey } },
-  )
+  const i18n = useI18n()
 
   useEffect(() => {
     if (R.isEmpty(processingChain)) {
@@ -85,13 +84,9 @@ const ProcessingChainView = props => {
       <button
         className="btn btn-s"
         style={{ position: 'absolute', right: '0' }}
-        onClick={() => {
-          ;(async () => {
-            await generateScript()
-          })()
-        }}
+        onClick={() => openProcessingChain(history)}
       >
-        generate script
+        {i18n.t('analysisView.processingChainView.openChain')}
       </button>
       <div className="form">
         <LabelsEditor
@@ -143,4 +138,5 @@ export default connect(mapStateToProps, {
   updateProcessingChainCycles,
   validateProcessingChain,
   resetProcessingChainState,
+  openProcessingChain,
 })(ProcessingChainView)
