@@ -66,17 +66,11 @@ You could also add the corresponding `drop table` to `<timestamp>-add-table-dbta
 
 ## Run R Studio Server locally
 
-### Install RStudio Server
-
-Follow the instructions in the [RStudio](https://rstudio.com/products/rstudio/download-server/) website to download and install the Open Source Edition of RStudio.
-
-### Install RStudio Server as a Docker container
-
-To startup RStudio Server run the following command:
-(change PATH_TO_ARENA_R_SCRIPTS with the path to the local directory you want to link to the rstudio container. The content of that path will be shared between the host machine and the RStudio Server container)
+To startup RStudio Server as a Docker container run the following command:
+(replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable. The content of that path will be shared between the host machine and the container)
 
 ```shell script
-docker run -d -p 127.0.0.1:8787:8787 -v PATH_TO_ARENA_R_SCRIPTS:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+docker run -d -p 127.0.0.1:8787:8787 -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
 ```
 
 Visit http://localhost:8787 in your browser.
