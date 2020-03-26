@@ -12,6 +12,7 @@ import * as ProcessingChainManager from '@server/modules/analysis/manager/proces
 import RStep from './rStep'
 import { RFileSystem } from './rFile'
 import RFileInit from './_files/system/rFileInit'
+import RFileInitApi from './_files/system/rFileInitApi'
 import RFileResetResults from './_files/system/rFileResetResults'
 import RFileReadData from './_files/system/rFileReadData'
 import RFilePersistResults from './_files/system/rFilePersistResults'
@@ -21,12 +22,13 @@ import RFileClose from './_files/system/rFileClose'
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
 
 class RChain {
-  constructor(surveyId, cycle, chainUuid) {
+  constructor(surveyId, cycle, chainUuid, serverUrl) {
     this._surveyId = surveyId
     this._survey = null
     this._cycle = cycle
     this._chainUuid = chainUuid
     this._chain = null
+    this._serverUrl = serverUrl
 
     this._dir = null
     this._dirUser = null
@@ -36,6 +38,7 @@ class RChain {
     this._fileArena = null
     this._fileRStudioProject = null
     // System files
+    this._fileInitApi = null
     this._fileInit = null
     this._fileResetResults = null
     this._fileReadData = null
@@ -65,12 +68,20 @@ class RChain {
     return this._chain
   }
 
+  get serverUrl() {
+    return this._serverUrl
+  }
+
   get rSteps() {
     return this._rSteps
   }
 
   get cycle() {
     return this._cycle
+  }
+
+  get dir() {
+    return this._dir
   }
 
   get dirSystem() {
@@ -124,6 +135,7 @@ class RChain {
 
     // Init system files
     this._fileInit = await new RFileInit(this).init()
+    this._fileInitApi = await new RFileInitApi(this).init()
     this._fileResetResults = await new RFileResetResults(this).init()
     this._fileReadData = await new RFileReadData(this).init()
 

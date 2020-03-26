@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -21,10 +20,7 @@ class RFile {
     const fileIndex = padStart(this._rChain.scriptIndexNext)
     this._fileName = `${fileIndex}-${fileName}.R`
     this._path = FileUtils.join(this._dir, this._fileName)
-    this._pathRelative = R.pipe(
-      R.split(ProcessingChain.getUuid(this._rChain.chain) + FileUtils.sep),
-      R.last,
-    )(this._path)
+    this._pathRelative = this._path.slice(this._rChain.dir.length + 1)
   }
 
   get rChain() {
