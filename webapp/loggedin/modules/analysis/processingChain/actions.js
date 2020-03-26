@@ -8,6 +8,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 import * as Validation from '@core/validation/validation'
+import * as ProcessUtils from '@core/processUtils'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
@@ -250,5 +251,11 @@ export const openProcessingChain = history => async (dispatch, getState) => {
   dispatch(hideAppLoader())
 
   // Navigate to RStudio module
-  history.push(appModuleUri(analysisModules.rStudio))
+  if (ProcessUtils.isEnvDevelopment) {
+    // Open in a new page
+    window.open(ProcessUtils.ENV.rStudioServerURL, 'rstudio')
+  } else {
+    // Open inside Arena
+    history.push(appModuleUri(analysisModules.rStudio))
+  }
 }
