@@ -70,8 +70,8 @@ const _initializeUser = async user => {
   let userUpdated = User.assocAuthGroups(await AuthGroupRepository.fetchUserGroups(User.getUuid(user)))(user)
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
-    const invitationExpired = await UserResetPasswordRepository.existsResetPasswordExpiredByUserUuid(userUuid)
-    userUpdated = User.assocInvitationExpired(invitationExpired)(userUpdated)
+    const invitationValid = await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid)
+    userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
   return userUpdated
