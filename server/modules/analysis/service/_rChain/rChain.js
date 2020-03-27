@@ -11,8 +11,10 @@ import * as ProcessingChainManager from '@server/modules/analysis/manager/proces
 
 import RStep from './rStep'
 import { RFileSystem } from './rFile'
+import RFileInitPackages from './_files/system/rFileInitPackages'
 import RFileInit from './_files/system/rFileInit'
 import RFileInitApi from './_files/system/rFileInitApi'
+import RFileLogin from './_files/system/rFileLogin'
 import RFileResetResults from './_files/system/rFileResetResults'
 import RFileReadData from './_files/system/rFileReadData'
 import RFilePersistResults from './_files/system/rFilePersistResults'
@@ -39,7 +41,9 @@ class RChain {
     this._fileRStudioProject = null
     // System files
     this._fileInitApi = null
+    this._fileInitPackages = null
     this._fileInit = null
+    this._fileLogin = null
     this._fileResetResults = null
     this._fileReadData = null
     this._filePersistResults = null
@@ -134,8 +138,10 @@ class RChain {
     ])
 
     // Init system files
+    this._fileInitPackages = await new RFileInitPackages(this).init()
     this._fileInit = await new RFileInit(this).init()
     this._fileInitApi = await new RFileInitApi(this).init()
+    this._fileLogin = await new RFileLogin(this).init()
     this._fileResetResults = await new RFileResetResults(this).init()
     this._fileReadData = await new RFileReadData(this).init()
 
