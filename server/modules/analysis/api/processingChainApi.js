@@ -1,7 +1,3 @@
-// Import * as ProcessingStep from '@common/analysis/processingStep'
-// import * as ProcessingStepCalculationValidator from '@common/analysis/processingStepCalculationValidator'
-// import * as Validation from '@core/validation/validation'
-
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -67,8 +63,9 @@ export const init = app => {
     async (req, res, next) => {
       try {
         const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
+        const serverUrl = Request.getServerUrl(req)
 
-        await ProcessingChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid)
+        await ProcessingChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid, serverUrl)
 
         Response.sendOk(res)
       } catch (error) {

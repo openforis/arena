@@ -23,6 +23,6 @@ export {
   deleteCalculation,
 } from '../manager/processingChainManager'
 
-export const generateScript = async (surveyId, cycle, chainUuid) => {
-  await new RChain(surveyId, cycle, chainUuid).init()
+export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
+  await new RChain(surveyId, cycle, chainUuid, serverUrl).init()
 }
