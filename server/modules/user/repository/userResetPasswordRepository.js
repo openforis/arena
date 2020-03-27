@@ -24,11 +24,11 @@ export const findUserUuidByUuid = async (uuid, client = db) =>
     R.prop('user_uuid'),
   )
 
-export const existsResetPasswordExpiredByUserUuid = async (userUuid, client = db) =>
+export const existsResetPasswordValidByUserUuid = async (userUuid, client = db) =>
   await client.one(
     `SELECT COUNT(*) > 0 as result
     FROM user_reset_password
-    WHERE user_uuid = $1 AND ${expiredCondition}`,
+    WHERE user_uuid = $1 AND NOT ${expiredCondition}`,
     [userUuid],
     R.prop('result'),
   )
