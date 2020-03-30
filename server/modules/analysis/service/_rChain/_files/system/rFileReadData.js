@@ -6,16 +6,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
-import { dbGetQuery, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
+import { setVar, arenaGet } from '@server/modules/analysis/service/_rChain/rFunctions'
 
 export const getDfCategoryItems = category => `category_items_${Category.getName(category)}`
 
@@ -32,13 +26,9 @@ export default class RFileReadData extends RFileSystem {
     const cycle = this.rChain.cycle
     const steps = ProcessingChain.getProcessingSteps(this.rChain.chain)
 
-    const schema = SchemaRdb.getName(surveyId)
-
     for (const step of steps) {
       if (ProcessingStep.hasEntity(step)) {
         const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
-        const entityDefParent = Survey.getNodeDefParent(entityDef)(survey)
-        const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
         const calculationAttrDefs = R.pipe(
           ProcessingStep.getCalculations,
           R.map(
@@ -48,22 +38,18 @@ export default class RFileReadData extends RFileSystem {
           ),
         )(step)
 
-        const fields = ['*']
-        const fromTables = [viewName]
+        // Fetch category items
         for (const nodeDef of calculationAttrDefs) {
-          const nodeDefName = NodeDef.getName(nodeDef)
-          // Add nodeDefName_uuid field
-          fields.push(`uuid_generate_v4() as ${nodeDefName}_uuid`)
-
           if (NodeDef.isCode(nodeDef)) {
             await this._fetchCategoryItemsByNodeDef(nodeDef)
           }
         }
 
-        const selectData = dbGetQuery(schema, fromTables.join(' '), fields.join(', '), [
-          `${DataTable.colNameRecordCycle} = '${cycle}'`,
-        ])
-        const setEntityData = setVar(NodeDef.getName(entityDef), selectData)
+        // Fetch entity data
+        const getEntityData = arenaGet(
+          `/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(step)}/data?cycle=${cycle}`,
+        )
+        const setEntityData = setVar(NodeDef.getName(entityDef), getEntityData)
         await this.appendContent(setEntityData)
       }
     }
@@ -80,16 +66,19 @@ export default class RFileReadData extends RFileSystem {
     const surveyId = Survey.getId(survey)
 
     const nodeDefName = NodeDef.getName(nodeDef)
-    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-    const level = Category.getLevelByIndex(0)(category)
-    const whereCond = `level_uuid = '${CategoryLevel.getUuid(level)}'`
-    const fields = [
-      `uuid as ${nodeDefName}_item_uuid`,
-      `props -> 'code' as ${nodeDefName}`,
-      `props #> '{labels,${defaultLang}}' as ${nodeDefName}_item_label`,
-    ].join(', ')
-    const selectCategoryItems = dbGetQuery(getSurveyDBSchema(surveyId), 'category_item', fields, [whereCond])
+    const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+    const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+
     const dfCategoryItems = getDfCategoryItems(category)
-    await this.appendContent(setVar(dfCategoryItems, selectCategoryItems))
+
+    await this.appendContent(
+      // Fetch category items
+      setVar(
+        dfCategoryItems,
+        arenaGet(`/survey/${surveyId}/categories/${categoryUuid}/rootItemsSummary?language=${defaultLang}`),
+      ),
+      // Rename data frame columns
+      `names(${dfCategoryItems}) <- c('${nodeDefName}_item_uuid', '${nodeDefName}', '${nodeDefName}_item_label')`,
+    )
   }
 }

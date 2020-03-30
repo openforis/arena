@@ -1,9 +1,10 @@
 arena.parseResponse = function (resp) {
-  respParsed <- httr::content(resp, as="parsed")
-  if("status" %in% names(respParsed) && respParsed$status == 'error'){
-    stop( respParsed$key )
+  resp <- httr::content(resp, as="text")
+  respJson = jsonlite::fromJSON( resp )
+  if("status" %in% names(respJson) && respJson$status == 'error'){
+    stop( respJson$key )
   }
-  return( respParsed )
+  return( respJson )
 }
 
 arena.getApiUrl = function(url){

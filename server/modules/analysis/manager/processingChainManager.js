@@ -214,6 +214,14 @@ const _updateCalculationIndexes = async (user, surveyId, step, t) => {
 
 export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '../repository/processingChainRepository'
 
+export const fetchStepData = async (survey, cycle, stepUuid) => {
+  const surveyId = Survey.getId(survey)
+  let step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid)
+  const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid)
+  step = ProcessingStep.assocCalculations(calculations)(step)
+  return await ProcessingChainRepository.fetchStepData(survey, cycle, step)
+}
+
 // ====== READ - Steps
 
 export {
