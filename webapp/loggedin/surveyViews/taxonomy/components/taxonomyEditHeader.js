@@ -2,8 +2,9 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import { useI18n } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
@@ -18,6 +19,8 @@ const TaxonomyEditHeader = props => {
 
   return (
     <div className="taxonomy__header">
+      <ErrorBadge validation={validation} />
+
       <div>
         <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
           <Input
