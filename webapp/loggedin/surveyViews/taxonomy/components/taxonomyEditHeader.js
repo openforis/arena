@@ -19,7 +19,9 @@ const TaxonomyEditHeader = props => {
 
   return (
     <div className="taxonomy__header">
-      <ErrorBadge validation={validation} />
+      <div>
+        <ErrorBadge validation={validation} />
+      </div>
 
       <div>
         <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
