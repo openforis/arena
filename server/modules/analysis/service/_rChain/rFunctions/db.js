@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { setVar } from './rFunctionsUtility'
+import { setVar } from './utility'
 
 const connection = 'connection'
 
