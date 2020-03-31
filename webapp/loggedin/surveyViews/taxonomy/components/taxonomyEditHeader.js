@@ -17,7 +17,7 @@ const TaxonomyEditHeader = props => {
 
   return (
     <div className="taxonomy__header">
-      <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
+      <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
         <div>
           <Input
             value={Taxonomy.getName(taxonomy)}
