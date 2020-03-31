@@ -11,6 +11,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
+import * as ProcessUtils from '@core/processUtils'
 import * as Validation from '@core/validation/validation'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -245,8 +246,10 @@ export const deleteSurvey = async surveyId =>
       SurveyRepository.deleteSurvey(surveyId, t),
     ])
 
-    // Delete user analysis after rdb and survey schemas have been deleted
-    await DbUtils.dropUser(UserAnalysis.getName(surveyId), t)
+    if (ProcessUtils.isEnvDevelopment) {
+      // Delete user analysis after rdb and survey schemas have been deleted
+      await DbUtils.dropUser(UserAnalysis.getName(surveyId), t)
+    }
   })
 
 export const dropSurveySchema = SurveyRepository.dropSurveySchema
