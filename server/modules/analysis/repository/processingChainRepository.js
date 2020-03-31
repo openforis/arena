@@ -4,17 +4,9 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as UserAnalysis from '@common/analysis/userAnalysis'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
   'date_modified',
