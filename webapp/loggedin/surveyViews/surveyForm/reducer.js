@@ -7,7 +7,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefCreate, nodeDefDelete, nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+import { nodeDefDelete, nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 import { recordLoad } from '../record/actions'
 import {
   formActivePageNodeDefUpdate,
@@ -41,8 +41,6 @@ const actionHandlers = {
     SurveyFormState.setShowPageNavigation(showPageNavigation)(state),
 
   // Node def actions
-  [nodeDefCreate]: (state, { nodeDef }) => SurveyFormState.assocParamsOnNodeDefCreate(nodeDef)(state),
-
   [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
   [nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
