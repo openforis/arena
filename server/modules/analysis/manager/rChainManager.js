@@ -8,8 +8,10 @@ import * as RChainRepository from '../repository/rChainRepository'
 
 export const fetchStepData = async (survey, cycle, stepUuid) => {
   const surveyId = Survey.getId(survey)
-  let step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid)
-  const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid)
+  let [step, calculations] = await Promise.all([
+    ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid),
+    ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid),
+  ])
   step = ProcessingStep.assocCalculations(calculations)(step)
   return await RChainRepository.fetchStepData(survey, cycle, step)
 }
