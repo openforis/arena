@@ -10,3 +10,4 @@ usePackage <- function(p) {
 usePackage("RPostgreSQL");
 usePackage("sqldf");
 usePackage("httr");
+usePackage("jsonlite");

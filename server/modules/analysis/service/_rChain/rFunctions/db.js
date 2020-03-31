@@ -1,28 +1,6 @@
 import * as R from 'ramda'
 
-// ==== arena constants
-
-export const arenaStartTime = 'arena.startTime'
-
-export const arenaEndTime = 'arena.endTime'
-
-// ==== arena functions
-
-export const arenaInfo = (fileName, content) => `arena.info('${fileName}', ${content})`
-export const arenaPersistCalculationScript = (fileName, schema, calculationUuid) =>
-  `arena.persistCalculationScript('${fileName}', '${schema}', '${calculationUuid}')`
-
-// ==== R utility functions
-
-export const NA = 'NA'
-
-export const setVar = (name, value) => `${name} <- ${value}`
-
-export const dfVar = (dataFrame, varName) => `${dataFrame}$${varName}`
-
-export const merge = (x, y, by, allX = false) => `merge(x = ${x}, y = ${y}, by="${by}" ${allX ? ', all.x=TRUE' : ''})`
-
-// ==== db functions
+import { setVar } from './utility'
 
 const connection = 'connection'
 
@@ -44,5 +22,3 @@ export const dbSendQuery = statement => `dbSendQuery(conn=${connection}, stateme
 
 export const dbWriteTable = (tableName, dataFrame, append = false) =>
   `dbWriteTable(${connection}, '${tableName}', ${dataFrame}, row.names=F, append=${append ? 'T' : 'F'})`
-
-export const sysTime = () => `Sys.time()`
