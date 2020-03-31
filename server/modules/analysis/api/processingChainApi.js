@@ -167,24 +167,6 @@ export const init = app => {
     },
   )
 
-  // ====== READ - Chain Data
-
-  app.get(
-    '/survey/:surveyId/processing-step/:processingStepUuid/data',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, processingStepUuid } = Request.getParams(req)
-
-        const data = await ProcessingChainService.fetchStepData(surveyId, cycle, processingStepUuid)
-
-        res.json(data)
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
-
   // ====== UPDATE - Chain
 
   app.put(

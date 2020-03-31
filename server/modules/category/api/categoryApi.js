@@ -2,7 +2,6 @@ import * as Request from '@server/utils/request'
 import SystemError from '@core/systemError'
 
 import * as Category from '@core/survey/category'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as ObjectUtils from '@core/objectUtils'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -127,28 +126,6 @@ export const init = app => {
         )
 
         res.json({ items })
-      } catch (error) {
-        next(error)
-      }
-    },
-  )
-
-  // Fetch category items summary
-  app.get(
-    '/survey/:surveyId/categories/:categoryUuid/rootItemsSummary',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, categoryUuid, language, draft } = Request.getParams(req)
-
-        const items = await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, null, draft)
-
-        const itemsSummary = items.map(item => ({
-          uuid: CategoryItem.getUuid(item),
-          code: CategoryItem.getCode(item),
-          label: CategoryItem.getLabel(language)(item),
-        }))
-        res.json(itemsSummary)
       } catch (error) {
         next(error)
       }
