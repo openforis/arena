@@ -9,7 +9,7 @@ const keys = {
 
 export const keysProps = {
   name: ObjectUtils.keys.name,
-  descriptions: 'descriptions',
+  descriptions: ObjectUtils.keysProps.descriptions,
   vernacularLanguageCodes: 'vernacularLanguageCodes',
 }
 
@@ -22,6 +22,7 @@ export const newTaxonomy = (props = {}) => ({
 // READ
 export const getUuid = ObjectUtils.getUuid
 export const getName = ObjectUtils.getProp(keysProps.name, '')
-export const getDescriptions = ObjectUtils.getProp(keysProps.descriptions, {})
+export const getDescriptions = ObjectUtils.getDescriptions
+export const getDescription = ObjectUtils.getDescription
 export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
 export const isPublished = R.propOr(false, keys.published)

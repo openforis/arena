@@ -1,5 +1,7 @@
+import './taxonomiesView.scss'
+
 import React from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
@@ -20,7 +22,22 @@ import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/tax
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
-import ItemsView from '../items/itemsView'
+import ItemsView from '@webapp/loggedin/surveyViews/items/itemsView'
+import ItemsColumn from '@webapp/loggedin/surveyViews/items/itemsColumn'
+
+const columnDescription = new ItemsColumn(
+  'common.description',
+  props => {
+    const { item } = props
+    const i18n = useI18n()
+    const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+
+    const defaultLang = Survey.getDefaultLanguage(surveyInfo)
+
+    return <>{Taxonomy.getDescription(i18n.lang, defaultLang)(item)}</>
+  },
+  'description',
+)
 
 const TaxonomiesView = props => {
   const { taxonomies, selectedItemUuid, canSelect, readOnly, createTaxonomy } = props
@@ -55,6 +72,8 @@ const TaxonomiesView = props => {
       onSelect={taxonomy => dispatch(setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy)))}
       onClose={onClose}
       readOnly={readOnly}
+      columns={[...ItemsView.defaultProps.columns, columnDescription]}
+      className="taxonomies"
     />
   )
 }
