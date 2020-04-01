@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as SurveyViewsState from '../surveyViewsState'
@@ -88,19 +87,6 @@ export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
 export const setShowPageNavigation = showPageNavigation => R.assoc(keys.showPageNavigation, showPageNavigation)
 
 // ====== NodeDef update actions
-
-// on nodeDef create init form state
-export const assocParamsOnNodeDefCreate = nodeDef =>
-  R.pipe(
-    // If is entity and renders in its own page, assoc active page
-    R.ifElse(
-      () => NodeDef.isEntity(nodeDef) && NodeDefLayout.hasPage(NodeDef.getCycleFirst(nodeDef))(nodeDef),
-      assocFormActivePage(nodeDef),
-      R.identity,
-    ),
-    // If is entity remove assocNodeDefAddChildTo
-    R.ifElse(() => NodeDef.isEntity(nodeDef), assocNodeDefAddChildTo(null), R.identity),
-  )
 
 // On nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
 export const dissocParamsOnNodeDefDelete = nodeDef => surveyFormState => {
