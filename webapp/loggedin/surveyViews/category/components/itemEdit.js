@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
@@ -13,8 +12,6 @@ import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
 
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
-
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const ItemEdit = props => {
   const elemRef = useRef(null)
@@ -42,7 +39,6 @@ const ItemEdit = props => {
   const disabled = item.published
 
   const i18n = useI18n()
-  const dispatch = useDispatch()
 
   return (
     <div
@@ -94,13 +90,7 @@ const ItemEdit = props => {
             <button
               className="btn btn-delete"
               aria-disabled={disabled}
-              onClick={() =>
-                dispatch(
-                  showDialogConfirm('categoryEdit.confirmDeleteItem', {}, () =>
-                    deleteCategoryItem(category, level, item),
-                  ),
-                )
-              }
+              onClick={() => deleteCategoryItem(category, level, item)}
             >
               <span className="icon icon-bin2 icon-12px icon-left" />
               {i18n.t('categoryEdit.deleteItem')}
