@@ -519,7 +519,12 @@ $t(common.cantUndoWarning)`,
     cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
     confirmDelete: 'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
     confirmDeleteLevel: `Delete the category level '{{levelName}}' with all items?\n$t(common.cantUndoWarning)`,
-    confirmDeleteItem: 'Delete the item with all children?\n$t(common.cantUndoWarning)',
+    confirmDeleteItem: `Delete the item?
+
+$t(common.cantUndoWarning)`,
+    confirmDeleteItemWithChildren: `Delete the item with all children?
+
+$t(common.cantUndoWarning)`,
     deleteItem: 'Delete item',
     level: 'Level',
 

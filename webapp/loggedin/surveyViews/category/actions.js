@@ -1,4 +1,5 @@
 import axios from 'axios'
+import * as R from 'ramda'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -23,11 +24,12 @@ import {
   categoriesUpdate,
 } from '@webapp/survey/categories/actions'
 
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
+import { hideAppSaving, showAppSaving, showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 import * as CategoryState from './categoryState'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
 export const categoryViewLevelActiveItemUpdate = 'categoryView/levelActiveItem/update'
@@ -200,14 +202,25 @@ export const deleteCategoryLevel = (category, level) => async (dispatch, getStat
   dispatchCategoryUpdate(dispatch, data.category)
 }
 
-export const deleteCategoryItem = (category, level, item) => async (dispatch, getState) => {
-  dispatch({ type: categoryItemDelete, item, level })
+export const deleteCategoryItem = (category, level, item) => (dispatch, getState) => {
+  const state = getState()
+  const itemsChildren = CategoryState.getLevelItemsArray(CategoryLevel.getIndex(level) + 1)(state)
+  const messageKeyConfirm = R.isEmpty(itemsChildren)
+    ? 'categoryEdit.confirmDeleteItem'
+    : 'categoryEdit.confirmDeleteItemWithChildren'
 
-  const surveyId = SurveyState.getSurveyId(getState())
-  const { data } = await axios.delete(
-    `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`,
+  dispatch(
+    showDialogConfirm(messageKeyConfirm, {}, async () => {
+      dispatch(showAppLoader())
+      const surveyId = SurveyState.getSurveyId(state)
+      const { data } = await axios.delete(
+        `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`,
+      )
+      dispatch({ type: categoryItemDelete, item, level })
+      dispatchCategoryUpdate(dispatch, data.category)
+      dispatch(hideAppLoader())
+    }),
   )
-  dispatchCategoryUpdate(dispatch, data.category)
 }
 
 // ======
