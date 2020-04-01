@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
 
 import { keys } from './userKeys'
 
@@ -32,9 +33,14 @@ export const getPrefSurveyCurrentCycle = user =>
   R.pipe(getPrefSurveyCurrent, surveyId => getPrefSurveyCycle(surveyId)(user))(user)
 
 // ====== UPDATE
-export const assocPrefSurveyCurrent = surveyId => R.assocPath(pathSurveyCurrent, surveyId)
-
 export const assocPrefSurveyCycle = (surveyId, cycle) => R.assocPath(pathSurveyCycle(surveyId), cycle)
+
+export const assocPrefSurveyCurrent = surveyId => user =>
+  R.pipe(
+    // If the survey is selected for the first time, add the first cycle to its prefs
+    R.when(R.always(R.isNil(getPrefSurveyCycle(surveyId)(user))), assocPrefSurveyCycle(surveyId, Survey.cycleOneKey)),
+    R.assocPath(pathSurveyCurrent, surveyId),
+  )(user)
 
 export const assocPrefSurveyCurrentAndCycle = (surveyId, cycle) =>
   R.pipe(assocPrefSurveyCurrent(surveyId), assocPrefSurveyCycle(surveyId, cycle))
