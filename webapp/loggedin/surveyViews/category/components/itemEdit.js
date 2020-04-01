@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
@@ -40,7 +39,6 @@ const ItemEdit = props => {
   const disabled = item.published
 
   const i18n = useI18n()
-  const dispatch = useDispatch()
 
   return (
     <div
