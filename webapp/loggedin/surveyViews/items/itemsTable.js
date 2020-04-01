@@ -4,36 +4,22 @@ import { Link, useHistory } from 'react-router-dom'
 
 import * as ObjectUtils from '@core/objectUtils'
 
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import WarningBadge from '@webapp/commonComponents/warningBadge'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 const TableRow = props => {
-  const {
-    item,
-    itemLink,
-    selectedItemUuid,
-    itemLabelFunction,
-    canSelect,
-    onSelect,
-    canDelete,
-    onDelete,
-    readOnly,
-  } = props
+  const { columns, item, itemLink, selectedItemUuid, canSelect, onSelect, canDelete, onDelete, readOnly } = props
 
   const i18n = useI18n()
-
-  const name = R.defaultTo(`--- ${i18n.t('common.undefinedName')} ---`, itemLabelFunction(item))
 
   const selected = item.uuid === selectedItemUuid
 
   return (
     <div className="table__row">
-      <div className="name">
-        {name}
-        <ErrorBadge validation={item.validation} />
-        <WarningBadge show={!item.usedByNodeDefs} label={i18n.t('itemsTable.unused')} />
-      </div>
+      {columns.map((column, idx) => (
+        <div key={idx} className={column.className}>
+          {React.createElement(column.cellRenderer, props)}
+        </div>
+      ))}
 
       <div className="buttons">
         {onSelect && (canSelect || selected) && (
@@ -83,7 +69,7 @@ const Header = ({ onAdd, readOnly }) => {
 }
 
 const ItemsTable = props => {
-  const { items } = props
+  const { items, columns } = props
   const i18n = useI18n()
 
   return (
@@ -95,9 +81,14 @@ const ItemsTable = props => {
       ) : (
         <div className="table__content">
           <div className="table__row-header">
-            <div className="name">{i18n.t('common.name')}</div>
+            {columns.map((column, idx) => (
+              <div key={idx} className={column.className}>
+                {i18n.t(column.heading)}
+              </div>
+            ))}
             <div />
           </div>
+
           <div className="table__rows">
             {items.map(item => (
               <TableRow {...props} key={item.uuid} item={item} />

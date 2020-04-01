@@ -151,8 +151,7 @@ export const fetchTaxaWithVernacularNames = async (
       GROUP BY
           t.id
       ORDER BY
-        ${DbUtils.getPropColCombined(Taxon.propKeys.family, draft, 't.')},
-        ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')}
+          t.id
       LIMIT ${limit ? limit : 'ALL'} 
       OFFSET $2
     `,

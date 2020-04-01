@@ -14,6 +14,11 @@
 
 .taxonomy__header {
   display: grid;
-  grid-template-columns: .75fr .25fr;
+  grid-template-columns: .1fr .7fr .2fr;
   position: relative;
+
+  .labels-editor.with-label {
+    grid-template-columns: .3fr .65fr;
+    grid-column-gap: .5rem;
+  }
 }

@@ -2,9 +2,11 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import UploadButton from '@webapp/commonComponents/form/uploadButton'
 import { useI18n } from '@webapp/commonComponents/hooks'
+import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -17,16 +19,26 @@ const TaxonomyEditHeader = props => {
 
   return (
     <div className="taxonomy__header">
-      <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
-        <div>
+      <div>
+        <ErrorBadge validation={validation} />
+      </div>
+
+      <div>
+        <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
           <Input
             value={Taxonomy.getName(taxonomy)}
-            validation={Validation.getFieldValidation('name')(validation)}
-            onChange={value => putTaxonomyProp(taxonomy, 'name', StringUtils.normalizeName(value))}
+            validation={Validation.getFieldValidation(Taxonomy.keysProps.name)(validation)}
+            onChange={value => putTaxonomyProp(taxonomy, Taxonomy.keysProps.name, StringUtils.normalizeName(value))}
             readOnly={!canEdit}
           />
-        </div>
-      </FormItem>
+        </FormItem>
+
+        <LabelsEditor
+          formLabelKey="common.description"
+          labels={Taxonomy.getDescriptions(taxonomy)}
+          onChange={descriptions => putTaxonomyProp(taxonomy, Taxonomy.keysProps.descriptions, descriptions)}
+        />
+      </div>
 
       <div className="button-bar">
         {canEdit && (
