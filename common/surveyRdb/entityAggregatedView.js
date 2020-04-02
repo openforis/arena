@@ -18,8 +18,8 @@ export const getEntityDef = R.propOr([], keys.entityDef)
 export const getCalculations = R.propOr([], keys.calculations)
 
 // ===== UPDATE
-export const addCalculation = calculation => R.over(R.lens(keys.calculations), R.append(calculation))
+export const addCalculation = (calculation) => R.over(R.lens(keys.calculations), R.append(calculation))
 
 // ===== UTILS
-export const getViewName = entityAggregatedView =>
+export const getViewName = (entityAggregatedView) =>
   `data_${R.pipe(getEntityDef, NodeDef.getName)(entityAggregatedView)}_agg_view`

@@ -17,7 +17,7 @@ import * as SurveyState from '@webapp/survey/surveyState'
 
 import Markdown from '@webapp/commonComponents/markdown'
 
-const getValidationCountErrorText = (survey, i18n) => validationResult => {
+const getValidationCountErrorText = (survey, i18n) => (validationResult) => {
   const nodeDef = Survey.getNodeDefByUuid(ValidationResult.getParams(validationResult).nodeDefUuid)(survey)
   const nodeDefName = NodeDef.getLabel(nodeDef, i18n.lang)
   return i18n.t(ValidationResult.getKey(validationResult), {
@@ -26,15 +26,15 @@ const getValidationCountErrorText = (survey, i18n) => validationResult => {
   })
 }
 
-const getErrorText = (survey, i18n) => validationResult =>
+const getErrorText = (survey, i18n) => (validationResult) =>
   ValidationResult.hasMessages(validationResult)
     ? ValidationResult.getMessage(i18n.lang)(validationResult)
     : RecordValidation.isValidationResultErrorCount(validationResult)
     ? getValidationCountErrorText(survey, i18n)(validationResult)
     : i18n.t(ValidationResult.getKey(validationResult), ValidationResult.getParams(validationResult))
 
-const getMessages = (survey, fn, severity) => i18n =>
-  R.pipe(fn, R.map(getErrorText(survey, i18n)), R.join(', '), msg => (msg ? [severity, msg] : []))
+const getMessages = (survey, fn, severity) => (i18n) =>
+  R.pipe(fn, R.map(getErrorText(survey, i18n)), R.join(', '), (msg) => (msg ? [severity, msg] : []))
 
 const getValidationErrorMessages = (survey, i18n) =>
   R.converge(R.concat, [
@@ -48,17 +48,17 @@ const getValidationFieldErrorMessage = (survey, field, i18n) =>
     R.when(R.isEmpty, () =>
       getErrorText(
         survey,
-        i18n,
+        i18n
       )(
         ValidationResult.newInstance(
           Validation.messageKeys.invalidField, // Default error message
-          { field },
-        ),
-      ),
-    ),
+          { field }
+        )
+      )
+    )
   )
 
-const getValidationFieldMessages = (i18n, survey, showKeys = true) => validation => {
+const getValidationFieldMessages = (i18n, survey, showKeys = true) => (validation) => {
   const messages = [] // Every message is an array with 2 items (severity and message)
 
   // Add messages from fields
@@ -69,19 +69,19 @@ const getValidationFieldMessages = (i18n, survey, showKeys = true) => validation
     R.forEach(([field, childValidation]) => {
       const [severity, message] = getValidationFieldErrorMessage(survey, field, i18n)(childValidation)
       messages.push([severity, `${showKeys ? `${i18n.t(field)}: ` : ''}${message}`])
-    }),
+    })
   )(validation)
 
   // Add messages from validation errors and warnings
   R.pipe(
     getValidationErrorMessages(survey, i18n),
-    R.unless(R.isEmpty, message => messages.push(message)),
+    R.unless(R.isEmpty, (message) => messages.push(message))
   )(validation)
 
   return messages
 }
 
-const ValidationFieldMessages = props => {
+const ValidationFieldMessages = (props) => {
   const { messages, showIcons } = props
 
   return R.addIndex(R.map)(([severity, message], i) => (

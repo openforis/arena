@@ -92,14 +92,14 @@ const converters = {
       throw new SystemError('undefinedFunction', { fnName })
     }
 
-    const clauses = exprArgs.map(arg => toPreparedStatement(arg, paramsArr))
+    const clauses = exprArgs.map((arg) => toPreparedStatement(arg, paramsArr))
     return `${sqlFnName}(${clauses.join(', ')})`
   },
 }
 
 const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
-export const getWherePreparedStatement = expr => {
+export const getWherePreparedStatement = (expr) => {
   const paramsArr = []
   const prepStatement = toPreparedStatement(expr, paramsArr)
   const params = paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})

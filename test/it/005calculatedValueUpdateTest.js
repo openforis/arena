@@ -24,7 +24,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
   sourcePath,
   sourceValue,
   dependentPath,
-  dependentExpectedValue,
+  dependentExpectedValue
 ) => {
   // Update source node value
   const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
@@ -66,15 +66,15 @@ describe('Calculated value test', () => {
             NodeDefExpression.createExpression('"a"', 'num <= 0'),
             NodeDefExpression.createExpression('"b"', 'num <= 10'),
             NodeDefExpression.createExpression('"c"', 'num <= 20'),
-            NodeDefExpression.createExpression('"z"'),
-          ),
-      ),
+            NodeDefExpression.createExpression('"z"')
+          )
+      )
     ).buildAndStore()
 
     record = await RB.record(
       user,
       survey,
-      RB.entity('cluster', RB.attribute('cluster_no', 1), RB.attribute('num', 1)),
+      RB.entity('cluster', RB.attribute('cluster_no', 1), RB.attribute('num', 1))
     ).buildAndStore()
   })
 
@@ -108,7 +108,7 @@ describe('Calculated value test', () => {
         'cluster/num',
         sourceValue,
         'cluster/num_range',
-        expectedValue,
+        expectedValue
       )
     }
   })

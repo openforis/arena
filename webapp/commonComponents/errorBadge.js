@@ -2,13 +2,12 @@ import './errorBadge.scss'
 
 import React from 'react'
 
-import { useI18n } from './hooks'
-
 import * as Validation from '@core/validation/validation'
+import { useI18n } from './hooks'
 
 import ValidationTooltip from './validationTooltip'
 
-const ErrorBadge = props => {
+const ErrorBadge = (props) => {
   const { validation, children, className: classNameProps, showLabel, labelKey, showKeys } = props
 
   const i18n = useI18n()

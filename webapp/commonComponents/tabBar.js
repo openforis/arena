@@ -18,7 +18,7 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
   </div>
 )
 
-const TabBar = props => {
+const TabBar = (props) => {
   const { tabs, showTabs, selection, className, renderer, onClick } = props
   const [selectionState, setSelectionState] = useState(selection)
 
@@ -30,7 +30,7 @@ const TabBar = props => {
         <TabBarButtons
           tabs={tabs}
           selection={selectionState}
-          onClick={tabIndex => {
+          onClick={(tabIndex) => {
             setSelectionState(tabIndex)
             if (onClick) {
               onClick(tabs[tabIndex])

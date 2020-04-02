@@ -29,31 +29,31 @@ const cols = {
   [NodeDef.nodeDefType.file]: ['file_uuid', 'file_name'],
 }
 
-const getCols = nodeDef => R.propOr([], NodeDef.getType(nodeDef), cols)
+const getCols = (nodeDef) => R.propOr([], NodeDef.getType(nodeDef), cols)
 
-const getDefaultColumnName = nodeDef =>
+const getDefaultColumnName = (nodeDef) =>
   NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
 
-export const getColNames = nodeDef => {
+export const getColNames = (nodeDef) => {
   const cols = getCols(nodeDef)
-  return R.isEmpty(cols) ? [getDefaultColumnName(nodeDef)] : cols.map(col => NodeDef.getName(nodeDef) + '_' + col)
+  return R.isEmpty(cols) ? [getDefaultColumnName(nodeDef)] : cols.map((col) => `${NodeDef.getName(nodeDef)}_${col}`)
 }
 
 export const getColName = R.pipe(getColNames, R.head)
 
-export const getColNamesByUuids = nodeDefUuidCols => survey =>
+export const getColNamesByUuids = (nodeDefUuidCols) => (survey) =>
   R.reduce(
     (cols, uuid) => R.pipe(Survey.getNodeDefByUuid(uuid), getColNames, R.concat(cols))(survey),
     [],
-    nodeDefUuidCols,
+    nodeDefUuidCols
   )
 
 export const extractColName = (nodeDef, col) =>
   R.replace(
     // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
-    toSnakeCase(NodeDef.getName(nodeDef)) + '_',
+    `${toSnakeCase(NodeDef.getName(nodeDef))}_`,
     '',
-    col,
+    col
   )
 
 export const extractNodeDefNameFromViewName = R.pipe(
@@ -63,5 +63,5 @@ export const extractNodeDefNameFromViewName = R.pipe(
   R.split(viewSuffix),
   R.head,
   R.split(parentTablePrefix),
-  R.last,
+  R.last
 )

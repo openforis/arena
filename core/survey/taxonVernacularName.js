@@ -23,13 +23,13 @@ export const newTaxonVernacularName = (lang, name) => ({
 })
 
 // ===== READ
-export const getUuid = ObjectUtils.getUuid
-export const getProps = ObjectUtils.getProps
+export const { getUuid } = ObjectUtils
+export const { getProps } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name)
 export const getLang = ObjectUtils.getProp(keysProps.lang)
 
 // ===== UTILS
-export const mergeProps = vernacularNameNew => vernacularName => ({
+export const mergeProps = (vernacularNameNew) => (vernacularName) => ({
   ...vernacularName,
   [keys.props]: {
     ...getProps(vernacularName),

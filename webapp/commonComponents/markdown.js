@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import marked from 'marked'
 
-const Markdown = props => {
+const Markdown = (props) => {
   const { container: Container, className, source } = props
   const [output, setOutput] = useState('')
 

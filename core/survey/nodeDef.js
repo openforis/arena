@@ -75,7 +75,7 @@ export const newNodeDef = (
   props,
   propsAdvanced = {},
   analysis = false,
-  virtual = false,
+  virtual = false
 ) => ({
   [keys.uuid]: uuidv4(),
   [keys.parentUuid]: getUuid(nodeDefParent),
@@ -97,14 +97,14 @@ export const newNodeDef = (
 
 // ==== READ
 
-export const getUuid = ObjectUtils.getUuid
-export const getProp = ObjectUtils.getProp
-export const getProps = ObjectUtils.getProps
-export const isEqual = ObjectUtils.isEqual
+export const { getUuid } = ObjectUtils
+export const { getProp } = ObjectUtils
+export const { getProps } = ObjectUtils
+export const { isEqual } = ObjectUtils
 
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
-export const getParentUuid = ObjectUtils.getParentUuid
+export const { getParentUuid } = ObjectUtils
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = R.pipe(getProp(propKeys.key), R.equals(true))
@@ -112,16 +112,16 @@ export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = R.pipe(getProp(propKeys.multiple), R.equals(true))
 export const isSingle = R.pipe(isMultiple, R.not)
 
-const isType = type => R.pipe(getType, R.equals(type))
+const isType = (type) => R.pipe(getType, R.equals(type))
 
 export const isEntity = isType(nodeDefType.entity)
-export const isSingleEntity = nodeDef => isEntity(nodeDef) && isSingle(nodeDef)
-export const isMultipleEntity = nodeDef => isEntity(nodeDef) && isMultiple(nodeDef)
-export const isEntityOrMultiple = nodeDef => isEntity(nodeDef) || isMultiple(nodeDef)
+export const isSingleEntity = (nodeDef) => isEntity(nodeDef) && isSingle(nodeDef)
+export const isMultipleEntity = (nodeDef) => isEntity(nodeDef) && isMultiple(nodeDef)
+export const isEntityOrMultiple = (nodeDef) => isEntity(nodeDef) || isMultiple(nodeDef)
 
 export const isAttribute = R.pipe(isEntity, R.not)
-export const isSingleAttribute = nodeDef => isAttribute(nodeDef) && isSingle(nodeDef)
-export const isMultipleAttribute = nodeDef => isAttribute(nodeDef) && isMultiple(nodeDef)
+export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
+export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 
 export const isBoolean = isType(nodeDefType.boolean)
 export const isCode = isType(nodeDefType.code)
@@ -137,7 +137,7 @@ export const isPublished = R.propEq(keys.published, true)
 export const isDeleted = R.propEq(keys.deleted, true)
 export const isTemporary = R.propEq(keys.temporary, true)
 
-export const getLabels = ObjectUtils.getLabels
+export const { getLabels } = ObjectUtils
 export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
@@ -193,17 +193,17 @@ export const getParentCodeDefUuid = getProp(propKeys.parentCodeDefUuid)
 
 export const assocParentUuid = R.assoc(keys.parentUuid)
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
-export const mergeProps = ObjectUtils.mergeProps
+export const { mergeProps } = ObjectUtils
 const assocPropsAdvanced = R.assoc(keys.propsAdvanced)
-export const mergePropsAdvanced = propsAdvanced => nodeDef =>
-  R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), propsAdvancedUpdated =>
-    assocPropsAdvanced(propsAdvancedUpdated, nodeDef),
+export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
+  R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
+    assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
 
 export const dissocTemporary = R.dissoc(keys.temporary)
 
 // ==== UTILS
-export const canNodeDefBeMultiple = nodeDef =>
+export const canNodeDefBeMultiple = (nodeDef) =>
   // Entity def but not root
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
   // Attribute def but not analysis
@@ -216,9 +216,9 @@ export const canNodeDefBeMultiple = nodeDef =>
       nodeDefType.text,
     ]))
 
-export const canNodeDefBeKey = nodeDef => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
+export const canNodeDefBeKey = (nodeDef) => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
-export const canNodeDefTypeBeKey = type =>
+export const canNodeDefTypeBeKey = (type) =>
   R.includes(type, [
     nodeDefType.date,
     nodeDefType.decimal,
@@ -229,7 +229,7 @@ export const canNodeDefTypeBeKey = type =>
     nodeDefType.time,
   ])
 
-export const canHaveDefaultValue = nodeDef =>
+export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&
   R.includes(getType(nodeDef), [
     nodeDefType.boolean,
@@ -244,4 +244,4 @@ export const canHaveDefaultValue = nodeDef =>
   // Allow default value when parent code is null (for node def code)
   !getParentCodeDefUuid(nodeDef)
 
-export const belongsToAllCycles = cycles => nodeDef => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
+export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))

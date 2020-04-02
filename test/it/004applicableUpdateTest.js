@@ -31,9 +31,9 @@ describe('Applicable Test', () => {
         SB.entity(
           'plot',
           SB.attribute('plot_no').key(),
-          SB.entity('tree', SB.attribute('tree_no').key(), SB.attribute('tree_dbh').applyIf('plot_no > 10')),
-        ).multiple(),
-      ),
+          SB.entity('tree', SB.attribute('tree_no').key(), SB.attribute('tree_dbh').applyIf('plot_no > 10'))
+        ).multiple()
+      )
     ).buildAndStore()
 
     record = await RB.record(
@@ -43,8 +43,8 @@ describe('Applicable Test', () => {
         'cluster',
         RB.attribute('cluster_no', 1),
         RB.attribute('num', 1),
-        RB.entity('plot', RB.attribute('plot_no', 1), RB.entity('tree', RB.attribute('tree_no', 1))),
-      ),
+        RB.entity('plot', RB.attribute('plot_no', 1), RB.entity('tree', RB.attribute('tree_no', 1)))
+      )
     ).buildAndStore()
   })
 

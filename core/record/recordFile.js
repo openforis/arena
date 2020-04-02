@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import { truncate } from '@core/stringUtils'
 
-const getProp = prop => R.path(['props', prop])
+const getProp = (prop) => R.path(['props', prop])
 
 const keys = {
   props: 'props',
@@ -27,13 +27,13 @@ export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUu
   [keys.content]: content,
 })
 
-const getExtension = fileName => R.pipe(R.split('.'), R.tail)(fileName)
+const getExtension = (fileName) => R.pipe(R.split('.'), R.tail)(fileName)
 
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
     const extension = getExtension(fileName)
 
-    return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), name => name + '.' + extension)(fileName)
+    return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
 
   return ''

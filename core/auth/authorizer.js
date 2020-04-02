@@ -14,7 +14,7 @@ const { permissions, keys } = AuthGroup
 const _getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) =>
   User.getAuthGroupBySurveyUuid(Survey.getUuid(surveyInfo), includeSystemAdmin)(user)
 
-const _hasSurveyPermission = permission => (user, surveyInfo) =>
+const _hasSurveyPermission = (permission) => (user, surveyInfo) =>
   user &&
   surveyInfo &&
   (User.isSystemAdmin(user) ||

@@ -10,7 +10,7 @@ export const contentTypes = {
   csv: 'text/csv',
 }
 
-export const sendOk = res => res.json({ status: status.ok })
+export const sendOk = (res) => res.json({ status: status.ok })
 
 const _getErr = ({ key, params }) => ({
   status: status.error,
@@ -28,7 +28,7 @@ export const sendErr = (res, err) => {
       _getErr({
         key: 'appErrors.generic',
         params: { text: `Could not serve: ${err.toString()}` },
-      }),
+      })
     )
   }
 }

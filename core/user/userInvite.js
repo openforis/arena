@@ -16,8 +16,8 @@ export const newUserInvite = (email, groupUuid) => ({
 // ===== READ
 export const getEmail = R.propOr('', keys.email)
 export const getGroupUuid = R.prop(keys.groupUuid)
-export const getValidation = Validation.getValidation
+export const { getValidation } = Validation
 
 // ===== UPDATE
 export const assocProp = R.assoc
-export const assocValidation = Validation.assocValidation
+export const { assocValidation } = Validation

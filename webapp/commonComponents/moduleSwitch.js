@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 
 import { appModuleUri } from '@webapp/app/appModules'
 
-const ModuleSwitch = props => {
+const ModuleSwitch = (props) => {
   const { modules, moduleRoot, moduleDefault, location } = props
 
   const isRootUri = location.pathname === appModuleUri(moduleRoot)
@@ -18,7 +18,7 @@ const ModuleSwitch = props => {
           key={i}
           exact
           path={module.path}
-          render={props => React.createElement(module.component, { ...module.props, ...props })}
+          render={(props) => React.createElement(module.component, { ...module.props, ...props })}
         />
       ))}
     </Switch>

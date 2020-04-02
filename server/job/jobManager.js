@@ -9,8 +9,8 @@ import { jobThreadMessageTypes } from './jobUtils'
 
 const userJobThreads = new ThreadsCache()
 
-const _notifyJobUpdate = jobSerialized => {
-  const userUuid = jobSerialized.userUuid
+const _notifyJobUpdate = (jobSerialized) => {
+  const { userUuid } = jobSerialized
 
   WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
   if (!jobSerialized.ended) {
@@ -33,7 +33,7 @@ const _notifyJobUpdate = jobSerialized => {
 
 // ====== UPDATE
 
-export const cancelActiveJobByUserUuid = async userUuid => {
+export const cancelActiveJobByUserUuid = async (userUuid) => {
   const jobThread = userJobThreads.getThread(userUuid)
   if (!jobThread) {
     return
@@ -44,9 +44,9 @@ export const cancelActiveJobByUserUuid = async userUuid => {
 
 // ====== EXECUTE
 
-export const executeJobThread = job => {
-  const thread = new ThreadManager('jobThread.js', { jobType: job.type, jobParams: job.params }, job =>
-    _notifyJobUpdate(job),
+export const executeJobThread = (job) => {
+  const thread = new ThreadManager('jobThread.js', { jobType: job.type, jobParams: job.params }, (job) =>
+    _notifyJobUpdate(job)
   )
 
   userJobThreads.putThread(job.userUuid, thread)

@@ -17,7 +17,7 @@ const validateExpression = async (survey, nodeDefName, expression) => {
       [NodeDef.keysPropsAdvanced.validations]: {
         [NodeDefValidations.keys.expressions]: [{ [NodeDefExpression.keys.expression]: expression }],
       },
-    }),
+    })
   )(survey)
 
   return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, Survey.dependencyTypes.validations)

@@ -17,7 +17,7 @@ export const keys = {
 const _validateLabelDefaultLanguageRequire = (defaultLang, errorMessageKey) => async (_, item) =>
   StringUtils.isBlank(ObjectUtils.getLabel(defaultLang)(item)) ? ValidationResult.newInstance(errorMessageKey) : null
 
-const _validationsCommonProps = defaultLang => ({
+const _validationsCommonProps = (defaultLang) => ({
   [`${ObjectUtils.keys.props}.${ObjectUtils.keysProps.labels}`]: [
     _validateLabelDefaultLanguageRequire(defaultLang, Validation.messageKeys.analysis.labelDefaultLangRequired),
   ],
@@ -35,7 +35,7 @@ export const validateChain = async (chain, defaultLang) =>
     ],
   })
 
-export const validateStep = async step => {
+export const validateStep = async (step) => {
   const validation = await Validator.validate(step, {
     [ProcessingStep.keys.calculations]: [
       Validator.validateRequired(Validation.messageKeys.analysis.processingStep.calculationsRequired),
@@ -49,9 +49,9 @@ export const validateStep = async step => {
         keys.entityOrCategory,
         Validation.newInstance(false, {}, [
           ValidationResult.newInstance(Validation.messageKeys.analysis.processingStep.entityOrCategoryRequired),
-        ]),
-      ),
-    ),
+        ])
+      )
+    )
   )(validation)
 }
 

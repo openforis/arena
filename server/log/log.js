@@ -26,7 +26,7 @@ const levels = {
   error: 'error',
 }
 
-const _stringifyMsgs = msgs => msgs.map(msg => (typeof msg === 'object' ? JSON.stringify(msg) : msg)).join(' ')
+const _stringifyMsgs = (msgs) => msgs.map((msg) => (typeof msg === 'object' ? JSON.stringify(msg) : msg)).join(' ')
 
 /**
  * Logger class with custom prefix
@@ -77,4 +77,4 @@ class Logger {
   }
 }
 
-export const getLogger = prefix => new Logger(prefix)
+export const getLogger = (prefix) => new Logger(prefix)

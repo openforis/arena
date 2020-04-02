@@ -32,32 +32,32 @@ export const getUser = R.pipe(getState, R.prop(keys.user))
 
 export const logoutUser = R.dissoc(keys.user)
 
-export const assocUserPropsOnSurveyCreate = survey => appState => {
+export const assocUserPropsOnSurveyCreate = (survey) => (appState) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(
     R.prop(keys.user),
     User.assocPrefSurveyCurrentAndCycle(Survey.getIdSurveyInfo(surveyInfo), Survey.cycleOneKey),
-    R.unless(User.isSystemAdmin, User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo))),
+    R.unless(User.isSystemAdmin, User.assocAuthGroup(Survey.getAuthGroupAdmin(surveyInfo)))
   )(appState)
   return R.assoc(keys.user, user, appState)
 }
 
-export const assocUserPropsOnSurveyUpdate = survey => appState => {
+export const assocUserPropsOnSurveyUpdate = (survey) => (appState) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(R.prop(keys.user), User.assocPrefSurveyCurrent(Survey.getIdSurveyInfo(surveyInfo)))(appState)
   return R.assoc(keys.user, user, appState)
 }
 
-export const dissocUserPropsOnSurveyDelete = surveyInfo => appState => {
+export const dissocUserPropsOnSurveyDelete = (surveyInfo) => (appState) => {
   const authGroup = R.pipe(
     R.prop(keys.user),
     User.getAuthGroups,
-    R.find(R.propEq(AuthGroup.keys.surveyUuid, Survey.getUuid(surveyInfo))),
+    R.find(R.propEq(AuthGroup.keys.surveyUuid, Survey.getUuid(surveyInfo)))
   )(appState)
   const user = R.pipe(
     R.prop(keys.user),
     User.dissocAuthGroup(authGroup),
-    User.deletePrefSurvey(Survey.getIdSurveyInfo(surveyInfo)),
+    User.deletePrefSurvey(Survey.getIdSurveyInfo(surveyInfo))
   )(appState)
   return R.assoc(keys.user, user, appState)
 }
@@ -74,7 +74,7 @@ export const getLang = R.pipe(getI18n, R.prop(keys.lang))
 
 // ==== System ERRORS
 
-export const assocSystemError = error => R.assoc(keys.systemError, error)
+export const assocSystemError = (error) => R.assoc(keys.systemError, error)
 
 export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
 

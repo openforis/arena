@@ -53,7 +53,7 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
     const nodeCtxH = R.pipe(
       Node.getHierarchy,
       // When nodeDefCtx is entity, expression is type applicableIf (and context always starts from parent)
-      R.when(R.always(NodeDef.isEntity(nodeDefCtx)), R.append(Node.getUuid(nodeCtx))),
+      R.when(R.always(NodeDef.isEntity(nodeDefCtx)), R.append(Node.getUuid(nodeCtx)))
     )(nodeCtx)
     const nodeReferencedParentUuid = nodeCtxH[nodeDefReferencedH.length - 1]
     return Record.getNodeByUuid(nodeReferencedParentUuid)(record)
@@ -102,7 +102,7 @@ export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =
 export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
-  return applicableExpressions.map(expression => ({
+  return applicableExpressions.map((expression) => ({
     expression,
     value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression)),
   }))

@@ -54,7 +54,7 @@ export const init = (server, sessionMiddleware) => {
     sessionMiddleware(socket.request, {}, next)
   })
 
-  io.on(WebSocketEvents.connection, async socket => {
+  io.on(WebSocketEvents.connection, async (socket) => {
     const userUuid = R.path(['request', 'session', 'passport', 'user'], socket)
 
     Logger.debug(`socket connection with id: ${socket.id} for userUuid ${userUuid}`)

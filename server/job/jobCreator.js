@@ -7,7 +7,7 @@ import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJo
 
 const jobClasses = [CategoryImportJob, CollectImportJob, SurveyPublishJob, TaxonomyImportJob]
 
-const getJobClass = jobType => R.find(R.propEq('type', jobType), jobClasses)
+const getJobClass = (jobType) => R.find(R.propEq('type', jobType), jobClasses)
 
 export const createJob = (jobType, params) => {
   const JobClass = getJobClass(jobType)

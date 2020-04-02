@@ -9,7 +9,7 @@ import * as ThreadParams from './threadParams'
  */
 export default class Thread {
   constructor(params) {
-    this.params = params ? params : { ...workerData }
+    this.params = params || { ...workerData }
 
     this.logger = Log.getLogger('Thread')
 

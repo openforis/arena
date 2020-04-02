@@ -14,13 +14,13 @@ export default class DynamicImport extends React.Component {
     const { component, reducers } = module
 
     if (reducers) {
-      reducers.forEach(reducer => {
+      reducers.forEach((reducer) => {
         injectReducers(reducer.name, reducer.fn)
       })
     }
 
     this.setState({
-      component: component ? component : module.default,
+      component: component || module.default,
     })
   }
 

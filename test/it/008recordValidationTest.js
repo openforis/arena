@@ -20,7 +20,7 @@ import * as RecordUtils from './utils/recordUtils'
 let survey = null
 let record = null
 
-const _persistNode = async node => {
+const _persistNode = async (node) => {
   record = await RecordManager.persistNode(getContextUser(), survey, record, node)
 }
 
@@ -84,7 +84,7 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   // Expect duplicate node validation to be invalid
   const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
-    Record.getValidation(record),
+    Record.getValidation(record)
   )
   expect(Validation.isValid(nodePlotNumDuplicateValidation)).to.equal(false)
 }
@@ -96,7 +96,7 @@ const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =
 
   const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
-    Record.getValidation(record),
+    Record.getValidation(record)
   )
   expect(Validation.isValid(nodePlotNumDuplicateValidation)).to.equal(true)
 }
@@ -118,23 +118,18 @@ describe('Record Validation Test', () => {
         SB.entity(
           'plot',
           SB.attribute('plot_num', NodeDef.nodeDefType.integer).key(),
-          SB.entity(
-            'tree',
-            SB.attribute('tree_num', NodeDef.nodeDefType.integer)
-              .key()
-              .required(),
-          )
+          SB.entity('tree', SB.attribute('tree_num', NodeDef.nodeDefType.integer).key().required())
             .multiple()
-            .minCount(1),
+            .minCount(1)
         )
           .multiple()
           .minCount(3)
           .maxCount(4),
         SB.attribute('percent_attr', NodeDef.nodeDefType.integer).expressions(
           NodeDefExpression.createExpression('percent_attr > 0'),
-          NodeDefExpression.createExpression('percent_attr <= 100'),
-        ),
-      ),
+          NodeDefExpression.createExpression('percent_attr <= 100')
+        )
+      )
     ).buildAndStore()
 
     record = await RB.record(
@@ -149,8 +144,8 @@ describe('Record Validation Test', () => {
         RB.attribute('date_attr', '01/01/2019'),
         RB.entity('plot', RB.attribute('plot_num', 1)),
         RB.entity('plot', RB.attribute('plot_num', 2)),
-        RB.entity('plot', RB.attribute('plot_num', 3)),
-      ),
+        RB.entity('plot', RB.attribute('plot_num', 3))
+      )
     ).buildAndStore()
   })
 
@@ -242,7 +237,7 @@ describe('Record Validation Test', () => {
     const nodeDefChild = Survey.getNodeDefByName('tree')(survey)
     const validationCount = R.pipe(
       Record.getValidation,
-      RecordValidation.getValidationChildrenCount(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild)),
+      RecordValidation.getValidationChildrenCount(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild))
     )(record)
     expect(Validation.isValid(validationCount)).to.be.equals(false) // Min count = 1
 
@@ -254,7 +249,7 @@ describe('Record Validation Test', () => {
         Validation.keys.fields,
         RecordValidation.getValidationChildrenCountKey(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild)),
       ],
-      record,
+      record
     )
     expect(validationCountUpdated).to.be.undefined // Children cound validation should be deleted
   })

@@ -8,7 +8,7 @@ const keys = {
 
 export const newPoint = (srsId, x, y) => `SRID=${srsId};POINT(${x} ${y})`
 
-export const parsePoint = pointText => {
+export const parsePoint = (pointText) => {
   const match = /SRID=(\w+);POINT\((\d+(\.\d+)?) (\d+(\.\d+)?)\)/.exec(pointText)
   return match ? newPoint(match[1], match[2], match[4]) : null
 }

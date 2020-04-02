@@ -27,9 +27,9 @@ const getKeysSelf = R.propOr({}, keys.keysSelf)
 
 const isValidationCount = R.pipe(getValidationCountChildDefUuid, R.isNil, R.not)
 
-const getNodeDef = survey => item => Survey.getNodeDefByUuid(getNodeDefUuid(item))(survey)
+const getNodeDef = (survey) => (item) => Survey.getNodeDefByUuid(getNodeDefUuid(item))(survey)
 
-const getKeysHierarchy = survey => item =>
+const getKeysHierarchy = (survey) => (item) =>
   R.pipe(
     R.prop(keys.keysHierarchy),
     // If item nodeDef is root, esclude the first item of the hieerarchy (it would be null)
@@ -45,8 +45,8 @@ const getKeysHierarchy = survey => item =>
       R.append({
         keys: [],
         nodeDefUuid: getValidationCountChildDefUuid(item),
-      }),
-    ),
+      })
+    )
   )(item)
 
 export const getPath = (survey, lang) =>
@@ -59,11 +59,11 @@ export const getNodeContextUuid = R.ifElse(
     // Node is an attribute, the context node will be its parent entity (it's the last item of the hierarchy)
     R.prop(keys.keysHierarchy),
     R.last,
-    R.prop(NodeKeys.keys.nodeUuid),
-  ),
+    R.prop(NodeKeys.keys.nodeUuid)
+  )
 )
 
 export const getNodeDefContextUuid = R.ifElse(isValidationCount, getValidationCountChildDefUuid, getNodeDefUuid)
 export const getValidation = R.prop(keys.validation)
-export const getStep = Record.getStep
-export const getOwnerUuid = Record.getOwnerUuid
+export const { getStep } = Record
+export const { getOwnerUuid } = Record

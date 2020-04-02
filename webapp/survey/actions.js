@@ -63,15 +63,15 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   }
 }
 
-export const resetSurveyDefs = () => dispatch => dispatch({ type: surveyDefsReset })
+export const resetSurveyDefs = () => (dispatch) => dispatch({ type: surveyDefsReset })
 
-export const reloadSurveyDefs = (draft = false, validate = false) => async dispatch => {
+export const reloadSurveyDefs = (draft = false, validate = false) => async (dispatch) => {
   await dispatch(resetSurveyDefs())
   await dispatch(initSurveyDefs(draft, validate))
 }
 
 // ====== SET ACTIVE SURVEY
-export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate = false) => async dispatch => {
+export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate = false) => async (dispatch) => {
   // Load survey
   const params = { draft: canEdit, validate: canEdit }
   const {
@@ -91,7 +91,7 @@ export const publishSurvey = () => async (dispatch, getState) => {
     showAppJobMonitor(data.job, async () => {
       await dispatch(setActiveSurvey(surveyId, true))
       await dispatch(initSurveyDefs(true, true))
-    }),
+    })
   )
 }
 
@@ -108,6 +108,6 @@ export const deleteSurvey = () => async (dispatch, getState) => {
   dispatch(
     showNotification('homeView.surveyDeleted', {
       surveyName: Survey.getName(surveyInfo),
-    }),
+    })
   )
 }

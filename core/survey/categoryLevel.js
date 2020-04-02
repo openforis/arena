@@ -15,7 +15,7 @@ export const keysProps = {
 }
 
 // READ
-export const getUuid = ObjectUtils.getUuid
+export const { getUuid } = ObjectUtils
 export const getIndex = R.prop(keys.index)
 export const getName = ObjectUtils.getProp(keysProps.name)
 export const getCategoryUuid = R.prop(keys.categoryUuid)

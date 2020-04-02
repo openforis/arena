@@ -84,9 +84,9 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
  * ======
  */
 
-export const getUuid = ObjectUtils.getUuid
+export const { getUuid } = ObjectUtils
 
-export const getParentUuid = ObjectUtils.getParentUuid
+export const { getParentUuid } = ObjectUtils
 
 export const getRecordUuid = R.prop(keys.recordUuid)
 
@@ -94,13 +94,13 @@ export const getValue = (node = {}, defaultValue = {}) => R.propOr(defaultValue,
 
 const getValueProp = (prop, defaultValue = null) => R.pipe(getValue, R.propOr(defaultValue, prop))
 
-export const getNodeDefUuid = ObjectUtils.getNodeDefUuid
+export const { getNodeDefUuid } = ObjectUtils
 
-export const getNodeDefUuids = nodes =>
+export const getNodeDefUuids = (nodes) =>
   R.pipe(
     R.keys,
-    R.map(key => getNodeDefUuid(nodes[key])),
-    R.uniq,
+    R.map((key) => getNodeDefUuid(nodes[key])),
+    R.uniq
   )(nodes)
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)
@@ -109,20 +109,21 @@ export const isUpdated = R.propEq(keys.updated, true)
 export const isDeleted = R.propEq(keys.deleted, true)
 export const isDirty = R.propEq(keys.dirty, true)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
-export const isEqual = ObjectUtils.isEqual
+export const { isEqual } = ObjectUtils
 
-export const getValidation = Validation.getValidation
+export const { getValidation } = Validation
 
 // ===== READ metadata
 
 export const getMeta = R.propOr({}, keys.meta)
 
-export const isChildApplicable = childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
+export const isChildApplicable = (childDefUuid) =>
+  R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
 export const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
 
 export const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
 
-export const isDescendantOf = ancestor => node => R.includes(getUuid(ancestor), getHierarchy(node))
+export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancestor), getHierarchy(node))
 
 // Code metadata
 export const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
@@ -135,17 +136,17 @@ export const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode]
 
 export const assocValue = R.assoc(keys.value)
 export const assocMeta = R.assoc(keys.meta)
-export const assocValidation = Validation.assocValidation
+export const { assocValidation } = Validation
 
-export const mergeMeta = meta => node =>
-  R.pipe(getMeta, R.mergeLeft(meta), metaUpdated => R.assoc(keys.meta, metaUpdated)(node))(node)
+export const mergeMeta = (meta) => (node) =>
+  R.pipe(getMeta, R.mergeLeft(meta), (metaUpdated) => R.assoc(keys.meta, metaUpdated)(node))(node)
 
 /**
  * ======
  * UTILS
  * ======
  */
-export const isValueBlank = node => {
+export const isValueBlank = (node) => {
   const value = getValue(node, null)
 
   if (R.isNil(value)) {

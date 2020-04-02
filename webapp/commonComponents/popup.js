@@ -16,9 +16,9 @@ class Popup extends React.PureComponent {
     const elemOffset = elementOffset(this.elementRef.current)
 
     return {
-      padding: padding + 'px',
-      top: elemOffset.top - padding + 'px',
-      left: elemOffset.left - padding + 'px',
+      padding: `${padding}px`,
+      top: `${elemOffset.top - padding}px`,
+      left: `${elemOffset.left - padding}px`,
     }
   }
 

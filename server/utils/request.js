@@ -2,19 +2,19 @@ import * as R from 'ramda'
 
 import * as User from '@core/user/user'
 
-export const getServerUrl = req => `${req.protocol}://${req.get('host')}`
+export const getServerUrl = (req) => `${req.protocol}://${req.get('host')}`
 
-export const getHost = req => req.header('host')
+export const getHost = (req) => req.header('host')
 
 export const getUrl = R.prop('url')
 
-export const getParams = req =>
+export const getParams = (req) =>
   R.pipe(
     R.mergeLeft(R.prop('query', req)),
     R.mergeLeft(R.prop('params', req)),
     R.mergeLeft(R.prop('body', req)),
     // Convert String boolean values to Boolean type
-    R.mapObjIndexed(val => R.ifElse(v => v === 'true' || v === 'false', R.always(val === 'true'), R.identity)(val)),
+    R.mapObjIndexed((val) => R.ifElse((v) => v === 'true' || v === 'false', R.always(val === 'true'), R.identity)(val))
   )({})
 
 export const getJsonParam = (req, param, defaultValue = null) => {
@@ -38,10 +38,10 @@ export const getI18n = R.prop('i18n')
 
 // Cookies
 
-const getCookie = name => R.path(['cookies', name])
+const getCookie = (name) => R.path(['cookies', name])
 
 export const getSocketId = getCookie('io')
 
 // HTTPS
 
-export const isHttps = req => req.secure || req.header('x-forwarded-proto') === 'https'
+export const isHttps = (req) => req.secure || req.header('x-forwarded-proto') === 'https'

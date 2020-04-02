@@ -9,7 +9,7 @@ export const keys = {
 
 export const toHttpParams = R.pipe(R.map(R.pick(['variable', 'order'])), JSON.stringify)
 
-export const getSortPreparedStatement = sortCriteria => {
+export const getSortPreparedStatement = (sortCriteria) => {
   return sortCriteria.reduce(
     (prev, curr, i) => {
       const paramName = `sort_${i}`
@@ -20,22 +20,22 @@ export const getSortPreparedStatement = sortCriteria => {
         params: { ...prev.params, [paramName]: curr.variable },
       }
     },
-    { clause: '', params: {} },
+    { clause: '', params: {} }
   )
 }
 
-export const findVariableByValue = value => R.find(v => v.value === value)
+export const findVariableByValue = (value) => R.find((v) => v.value === value)
 
 export const getViewExpr = (ascLabel, descLabel) =>
   R.pipe(
-    R.map(c => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
-    R.join(', '),
+    R.map((c) => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
+    R.join(', ')
   )
 
 export const toString = R.pipe(R.defaultTo([]), getViewExpr('asc', 'desc'))
 
-export const getNewCriteria = availableVariables =>
-  R.filter(c => R.any(v => v.value === c.variable, availableVariables))
+export const getNewCriteria = (availableVariables) =>
+  R.filter((c) => R.any((v) => v.value === c.variable, availableVariables))
 
 export const updateOrder = (pos, order) => R.assocPath([pos, 'order'], order)
 
@@ -45,11 +45,11 @@ export const updateVariable = (pos, variable) =>
     label: R.prop('label', variable),
   })
 
-export const getUnchosenVariables = availableVariables => sortCriteria =>
-  R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(availableVariables)
+export const getUnchosenVariables = (availableVariables) => (sortCriteria) =>
+  R.reject((v) => R.any((s) => s.variable === v.value)(sortCriteria))(availableVariables)
 
 export const addCriteria = (variable, label, order) => R.append({ variable, label, order })
 
-export const deleteCriteria = pos => R.remove(pos, 1)
+export const deleteCriteria = (pos) => R.remove(pos, 1)
 
-export const retainVariables = variables => R.reject(c => R.none(v => c.variable === v, variables))
+export const retainVariables = (variables) => R.reject((c) => R.none((v) => c.variable === v, variables))

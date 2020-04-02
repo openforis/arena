@@ -588,7 +588,7 @@ export const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, 
 
 export const languages = R.pipe(
   R.keys,
-  R.map(lang => ({ key: lang, value: getLanguageLabel(lang) })),
+  R.map((lang) => ({ key: lang, value: getLanguageLabel(lang) }))
 )(languagesMap)
 
 export const languageCodes = languages.map(R.prop('key'))

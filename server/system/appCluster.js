@@ -45,7 +45,7 @@ export const run = async () => {
       abortOnLimit: true,
       useTempFiles: true,
       tempFileDir: ProcessUtils.ENV.tempFolder,
-    }),
+    })
   )
 
   headerMiddleware.init(app)

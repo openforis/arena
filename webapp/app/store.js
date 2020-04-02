@@ -29,7 +29,7 @@ const appReducers = {
   [AppErrorsState.stateKey]: AppErrorsReducer,
 }
 
-const createReducer = asyncReducers =>
+const createReducer = (asyncReducers) =>
   combineReducers({
     ...appReducers,
     ...asyncReducers,

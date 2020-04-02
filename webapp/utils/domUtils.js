@@ -1,4 +1,4 @@
-export const elementOffset = el => {
+export const elementOffset = (el) => {
   if (el) {
     const rect = el.getBoundingClientRect()
 
@@ -25,7 +25,7 @@ export const getViewportDimensions = () => ({
   height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
 })
 
-export const isElementInViewport = el => {
+export const isElementInViewport = (el) => {
   const rect = el.getBoundingClientRect()
   const viewportDim = getViewportDimensions()
 

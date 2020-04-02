@@ -5,7 +5,7 @@ import * as Validation from '@core/validation/validation'
 import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
 import Tooltip from './tooltip'
 
-const ValidationTooltip = props => {
+const ValidationTooltip = (props) => {
   const { validation, className, showKeys, children } = props
 
   const isValid = Validation.isValid(validation)

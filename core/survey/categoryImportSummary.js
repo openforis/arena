@@ -52,14 +52,14 @@ export const getColumnLang = R.prop(keysColumn.lang)
 
 export const getColumnDataType = R.prop(keysColumn.dataType)
 
-const isColumnType = type => R.pipe(getColumnType, R.equals(type))
+const isColumnType = (type) => R.pipe(getColumnType, R.equals(type))
 
 export const isColumnCode = isColumnType(columnTypes.code)
 export const isColumnExtra = isColumnType(columnTypes.extra)
 export const isColumnLabel = isColumnType(columnTypes.label)
 export const isColumnDescription = isColumnType(columnTypes.description)
 
-export const hasColumnLang = column => isColumnLabel(column) || isColumnDescription(column)
+export const hasColumnLang = (column) => isColumnLabel(column) || isColumnDescription(column)
 
 // ===== UTILS
 
@@ -70,7 +70,7 @@ export const getColumnName = (type, levelIndex) =>
     getColumns,
     Object.entries,
     R.find(([_columnName, column]) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
-    entry => (entry ? entry[0] : null),
+    (entry) => (entry ? entry[0] : null)
   )
 
 export const hasColumn = (type, levelIndex) => R.pipe(getColumnName(type, levelIndex), R.isNil, R.not)

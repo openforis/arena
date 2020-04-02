@@ -17,5 +17,5 @@ export const getKeysHierarchyPath = (survey, lang, includeRootKeys = false) =>
       // Do not show keys for root entity when includeRootKeys is false
       return R.isEmpty(keys) || (!includeRootKeys && NodeDef.isRoot(nodeDef)) ? label : `${label}[${R.values(keys)}]`
     }),
-    R.join(' / '),
+    R.join(' / ')
   )
