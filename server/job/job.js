@@ -73,7 +73,7 @@ export default class Job {
 
     // 1. crates a db transaction and run '_executeInTransaction' into it
     try {
-      await client.tx(tx => this._executeInTransaction(tx))
+      await client.tx((tx) => this._executeInTransaction(tx))
 
       // 2. notify job status change to 'succeed' (when transaction has been committed)
       if (this.isRunning()) {
@@ -210,7 +210,7 @@ export default class Job {
     throttle(
       async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
-      1000,
+      1000
     )()
   }
 
@@ -253,7 +253,7 @@ export default class Job {
   // UTILS
   getContextProp(prop, defaultValue = null) {
     const value = this.context[prop]
-    return value ? value : defaultValue
+    return value || defaultValue
   }
 
   setContext(context) {

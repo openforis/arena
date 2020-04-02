@@ -15,9 +15,9 @@ export const validateNodes = async (survey, record, nodes) => {
     Validation.newInstance(true, {
       ...attributeValidations,
       ...nodeCountValidations,
-    }),
+    })
   )
 }
 
-export const validateAttribute = AttributeValidator.validateAttribute
-export const validateChildrenCount = CountValidator.validateChildrenCount
+export const { validateAttribute } = AttributeValidator
+export const { validateChildrenCount } = CountValidator

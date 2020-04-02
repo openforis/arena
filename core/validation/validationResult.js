@@ -27,15 +27,15 @@ export const getSeverity = R.propOr(severity.error, keys.severity)
 
 // Custom messages
 export const getMessages = R.propOr({}, keys.messages)
-export const getMessage = lang =>
+export const getMessage = (lang) =>
   R.pipe(
     getMessages,
     R.ifElse(
       R.has(lang),
       R.prop(lang),
       // Default to first message
-      R.pipe(R.values, R.head),
-    ),
+      R.pipe(R.values, R.head)
+    )
   )
 export const hasMessages = R.pipe(getMessages, R.isEmpty, R.not)
 

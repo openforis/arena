@@ -9,7 +9,7 @@ const pgp = pgPromise()
 export const QueryStream = _QueryStream
 
 export const selectDate = (field, fieldAlias = null) =>
-  `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias ? fieldAlias : field}`
+  `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ssZ') as ${fieldAlias || field}`
 
 export const now = "timezone('UTC', now())"
 
@@ -18,7 +18,7 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
     table: { schema, table },
   })
 
-  const valuesIndexedByCol = itemsValues.map(itemValues => {
+  const valuesIndexedByCol = itemsValues.map((itemValues) => {
     const item = {}
     for (const [i, element] of cols.entries()) {
       item[element] = itemValues[i]
@@ -41,7 +41,7 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  * @returns Generated query string
  */
 export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColName = col => R.propOr(col, 'name', col)
+  const getColName = (col) => R.propOr(col, 'name', col)
 
   const idColName = getColName(idCol)
   const idColCast = R.propOr('text', 'cast', idCol)
@@ -52,7 +52,7 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
     table: { schema, table },
   })
 
-  const valuesIndexedByCol = itemsValues.map(itemValues => {
+  const valuesIndexedByCol = itemsValues.map((itemValues) => {
     const item = {}
     // Id column is always the first among item values
     item[idColName] = itemValues[0]
@@ -63,10 +63,10 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
     return item
   })
 
-  return (
-    pgp.helpers.update(valuesIndexedByCol, columnSet) +
-    ` WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
-  )
+  return `${pgp.helpers.update(
+    valuesIndexedByCol,
+    columnSet
+  )} WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
 }
 
 /**

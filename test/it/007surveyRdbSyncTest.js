@@ -17,7 +17,7 @@ const expectSchemaToExist = async (schemaName, exists = true) => {
      FROM information_schema.schemata 
      WHERE schema_name = $1
     `,
-    [schemaName],
+    [schemaName]
   )
   expect(result.res, `schema ${schemaName} ${exists ? 'exists' : 'not exists'}`).to.equal(exists)
 }
@@ -26,7 +26,7 @@ describe('Survey RDB Sync Test', () => {
   it('Survey RDB created on survey creation', async () => {
     const survey = await SB.survey(
       getContextUser(),
-      SB.entity('cluster', SB.attribute('cluster_no').key()),
+      SB.entity('cluster', SB.attribute('cluster_no').key())
     ).buildAndStore()
 
     const surveyId = Survey.getId(survey)
@@ -39,7 +39,7 @@ describe('Survey RDB Sync Test', () => {
   it('Survey RDB dropped on survey deletion', async () => {
     const survey = await SB.survey(
       getContextUser(),
-      SB.entity('cluster', SB.attribute('cluster_no').key()),
+      SB.entity('cluster', SB.attribute('cluster_no').key())
     ).buildAndStore()
 
     const surveyId = Survey.getId(survey)

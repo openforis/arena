@@ -39,7 +39,7 @@ export const messageKeys = ValidatorErrorKeys
 /**
  * Removes valid fields validations and updates 'valid' attribute
  */
-export const cleanup = validation => {
+export const cleanup = (validation) => {
   // Cleanup fields
   let allFieldsValid = true
   const fieldsCleaned = Object.entries(getFieldValidations(validation)).reduce(
@@ -52,31 +52,31 @@ export const cleanup = validation => {
 
       return fieldsAcc
     },
-    {},
+    {}
   )
 
   return newInstance(
     allFieldsValid && !isError(validation) && !isWarning(validation),
     fieldsCleaned,
     getErrors(validation),
-    getWarnings(validation),
+    getWarnings(validation)
   )
 }
 
-export const recalculateValidity = validation =>
+export const recalculateValidity = (validation) =>
   R.pipe(
     getFieldValidations,
     // Update validity in each field
     R.map(recalculateValidity),
-    fields => {
+    (fields) => {
       const errors = getErrors(validation)
       const warnings = getWarnings(validation)
       const valid = R.all(isValid, R.values(fields)) && R.isEmpty(errors) && R.isEmpty(warnings)
       return newInstance(valid, fields, errors, warnings)
-    },
+    }
   )(validation)
 
-export const updateCounts = validation => {
+export const updateCounts = (validation) => {
   let totalErrors = 0
   let totalWarnings = 0
 
@@ -122,14 +122,14 @@ export const newInstance = (valid = true, fields = {}, errors = [], warnings = [
 export const isValid = R.propOr(true, keys.valid)
 export const isNotValid = R.propEq(keys.valid, false)
 export const getFieldValidations = R.propOr({}, keys.fields)
-export const getFieldValidation = field => R.pathOr(newInstance(), [keys.fields, field])
+export const getFieldValidation = (field) => R.pathOr(newInstance(), [keys.fields, field])
 
 export const getErrors = R.propOr([], keys.errors)
-export const isError = validation =>
+export const isError = (validation) =>
   R.pipe(getErrors, R.isEmpty, R.not)(validation) || R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
 
 export const getWarnings = R.propOr([], keys.warnings)
-export const isWarning = validation =>
+export const isWarning = (validation) =>
   R.pipe(getWarnings, R.isEmpty, R.not)(validation) ||
   R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
 
@@ -139,18 +139,18 @@ export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
 
 // ====== UPDATE
 
-export const setValid = valid => ObjectUtils.setInPath([keys.valid], valid)
+export const setValid = (valid) => ObjectUtils.setInPath([keys.valid], valid)
 export const setField = (field, fieldValidation) => ObjectUtils.setInPath([keys.fields, field], fieldValidation)
-export const setErrors = errors => ObjectUtils.setInPath([keys.errors], errors)
+export const setErrors = (errors) => ObjectUtils.setInPath([keys.errors], errors)
 
 export const assocFieldValidation = (field, fieldValidation) =>
   R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
 
-export const dissocFieldValidation = field => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
+export const dissocFieldValidation = (field) => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
 /**
  * Iterates over all the field validations and remove the ones starting with the specified value
  */
-export const dissocFieldValidationsStartingWith = fieldStartsWith => validation =>
+export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validation) =>
   R.pipe(
     R.prop(keys.fields),
     Object.entries,
@@ -158,16 +158,16 @@ export const dissocFieldValidationsStartingWith = fieldStartsWith => validation 
       if (!field.startsWith(fieldStartsWith)) accFields[field] = fieldValidation
       return accFields
     }, {}),
-    fieldsValidations => R.assoc(keys.fields, fieldsValidations)(validation),
-    cleanup,
+    (fieldsValidations) => R.assoc(keys.fields, fieldsValidations)(validation),
+    cleanup
   )(validation)
 
-export const mergeValidation = validationNew => validationOld =>
+export const mergeValidation = (validationNew) => (validationOld) =>
   R.pipe(
-    validation => ({
+    (validation) => ({
       [keys.fields]: R.mergeDeepRight(getFieldValidations(validation), getFieldValidations(validationNew)),
     }),
-    cleanup,
+    cleanup
   )(validationOld)
 
 // Object

@@ -1,5 +1,3 @@
-import component from './appView'
-
 import homeReducer from '@webapp/loggedin/modules/home/reducer'
 import analysisReducer from '@webapp/loggedin/modules/analysis/reducer'
 import dataReducer from '@webapp/loggedin/modules/data/reducer'
@@ -19,6 +17,7 @@ import * as JobState from '@webapp/loggedin/appJob/appJobState'
 import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 import * as UserInviteViewState from '@webapp/loggedin/modules/users/userInvite/userInviteViewState'
+import component from './appView'
 
 const reducers = [
   { name: HomeState.stateKey, fn: homeReducer },

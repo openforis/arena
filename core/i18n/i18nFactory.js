@@ -4,7 +4,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import { enTranslation } from './resources/en'
 
-const createParams = lang => ({
+const createParams = (lang) => ({
   fallbackLng: 'en',
   debug: ProcessUtils.isEnvDevelopment,
 
@@ -21,7 +21,7 @@ const createParams = lang => ({
   },
 })
 
-export const createI18nPromise = lang => {
+export const createI18nPromise = (lang) => {
   // Import and require return different objects
   const createInstance = i18next.createInstance || i18next.default.createInstance
 

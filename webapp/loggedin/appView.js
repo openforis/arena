@@ -8,7 +8,7 @@ import AppJobMonitor from './appJob/appJobMonitor'
 import AppErrors from '../app/appErrors/appErrors'
 import LoggedInModuleSwitch from './modules/loggedInModuleSwitch'
 
-const AppView = props => {
+const AppView = (props) => {
   const { location } = props
   const pathName = location.pathname
 

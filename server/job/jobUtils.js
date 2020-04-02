@@ -19,7 +19,7 @@ export const jobThreadMessageTypes = {
   cancelJob: 'cancelJob',
 }
 
-const calculateJobProgress = job => {
+const calculateJobProgress = (job) => {
   const partialProgress =
     job.status === jobStatus.succeeded ? 100 : job.total > 0 ? Math.floor((100 * job.processed) / job.total) : 0
 
@@ -30,10 +30,10 @@ const calculateJobProgress = job => {
   return partialProgress + Math.floor(calculateJobProgress(job.getCurrentInnerJob()) / job.total)
 }
 
-const calculatedElapsedMillis = job =>
+const calculatedElapsedMillis = (job) =>
   job.startTime ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime() : 0
 
-export const jobToJSON = job => ({
+export const jobToJSON = (job) => ({
   [JobSerialized.keys.type]: job.type,
   [JobSerialized.keys.userUuid]: job.userUuid,
   [JobSerialized.keys.surveyId]: job.surveyId,

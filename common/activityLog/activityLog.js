@@ -127,12 +127,12 @@ export const newActivity = (type, content, system = false) => ({
 
 // ====== READ
 
-export const getId = ObjectUtils.getId
+export const { getId } = ObjectUtils
 export const getUserUuid = R.prop(keys.userUuid)
 export const getType = R.prop(keys.type)
 export const getContent = R.prop(keys.content)
 export const isSystem = R.propEq(keys.system, true)
-export const getDateCreated = ObjectUtils.getDateCreated
+export const { getDateCreated } = ObjectUtils
 
 // Props associated from fetch
 export const getUserName = R.prop(keys.userName)
@@ -147,7 +147,7 @@ export const getProcessingStepIndex = R.prop(keys.processingStepIndex)
 export const getProcessingStepCalculationIndex = R.prop(keys.processingStepCalculationIndex)
 
 // Content props
-const _getContentProp = prop => R.path([keys.content, prop])
+const _getContentProp = (prop) => R.path([keys.content, prop])
 export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)

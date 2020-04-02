@@ -2,7 +2,7 @@ import './progressBar.scss'
 
 import React from 'react'
 
-const ProgressBar = props => {
+const ProgressBar = (props) => {
   const { progress, className = '', showText } = props
 
   return (

@@ -6,7 +6,7 @@ import * as Log from '@server/log/log'
 const logger = Log.getLogger('DB')
 
 const debugOptions = {
-  query: e => {
+  query: (e) => {
     logger.debug(`QUERY: ${e.query}`)
     if (e.params) {
       logger.debug(`PARAMS: ${JSON.stringify(e.params)}`)

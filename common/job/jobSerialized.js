@@ -31,7 +31,7 @@ export const getType = R.prop(keys.type)
 export const getInnerJobs = R.propOr([], keys.innerJobs)
 export const getProgressPercent = R.propOr(0, keys.progressPercent)
 export const getResult = R.prop(keys.result)
-export const getErrors = job => {
+export const getErrors = (job) => {
   if (!isFailed(job)) {
     return []
   }
@@ -44,7 +44,7 @@ export const getErrors = job => {
 // ===== READ (status)
 export const getStatus = R.prop(keys.status)
 
-const _isPropTrue = prop => R.pipe(R.prop(prop), R.equals(true))
+const _isPropTrue = (prop) => R.pipe(R.prop(prop), R.equals(true))
 export const isRunning = _isPropTrue(keys.running)
 export const isSucceeded = _isPropTrue(keys.succeeded)
 export const isFailed = _isPropTrue(keys.failed)

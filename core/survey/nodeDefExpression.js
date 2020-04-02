@@ -30,7 +30,7 @@ export const createExpressionPlaceholder = () => createExpression('', '', true)
 
 // ====== READ
 
-export const getUuid = ObjectUtils.getUuid
+export const { getUuid } = ObjectUtils
 
 export const getExpression = R.prop(keys.expression)
 
@@ -53,26 +53,26 @@ const assocProp = (propName, value) => R.pipe(R.assoc(propName, value), R.dissoc
 
 // ====== UTILS
 
-export const isEqual = ObjectUtils.isEqual
+export const { isEqual } = ObjectUtils
 
 const extractNodeDefNames = (jsExpr = '') =>
   StringUtils.isBlank(jsExpr) ? [] : Expression.getExpressionIdentifiers(Expression.fromString(jsExpr))
 
-export const findReferencedNodeDefs = nodeDefExpressions =>
+export const findReferencedNodeDefs = (nodeDefExpressions) =>
   R.pipe(
     R.reduce(
       (acc, nodeDefExpr) =>
         R.pipe(
           R.concat(extractNodeDefNames(getExpression(nodeDefExpr))),
-          R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr))),
+          R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr)))
         )(acc),
-      [],
+      []
     ),
-    R.uniq,
+    R.uniq
   )(nodeDefExpressions)
 
 // UPDATE
-export const assocExpression = expression => assocProp(keys.expression, expression)
-export const assocApplyIf = applyIf => assocProp(keys.applyIf, applyIf)
-export const assocMessages = messages => assocProp(keys.messages, messages)
-export const assocSeverity = severity => assocProp(keys.severity, severity)
+export const assocExpression = (expression) => assocProp(keys.expression, expression)
+export const assocApplyIf = (applyIf) => assocProp(keys.applyIf, applyIf)
+export const assocMessages = (messages) => assocProp(keys.messages, messages)
+export const assocSeverity = (severity) => assocProp(keys.severity, severity)

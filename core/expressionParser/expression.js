@@ -34,7 +34,7 @@ export const fromString = (string, exprMode = modes.json) => {
           R.replace(/=/g, '=='),
           R.replace(/!==/g, '!='),
           R.replace(/>==/g, '>='),
-          R.replace(/<==/g, '<='),
+          R.replace(/<==/g, '<=')
         )(string)
 
   return jsep(exprString)
@@ -42,15 +42,15 @@ export const fromString = (string, exprMode = modes.json) => {
 
 export const evalString = (query, ctx) => Evaluator.evalExpression(fromString(query), ctx)
 
-export const isValid = ExpressionUtils.isValid
-export const getExpressionIdentifiers = Evaluator.getExpressionIdentifiers
+export const { isValid } = ExpressionUtils
+export const { getExpressionIdentifiers } = Evaluator
 
 // ====== Type checking
 
-const isType = type => R.propEq('type', type)
+const isType = (type) => R.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
-export const isValidExpressionType = nodeDef =>
+export const isValidExpressionType = (nodeDef) =>
   !NodeDef.isEntity(nodeDef) &&
   !NodeDef.isMultiple(nodeDef) &&
   !NodeDef.isCoordinate(nodeDef) &&

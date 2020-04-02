@@ -27,48 +27,48 @@ export const newRecord = (user, cycle, preview = false, dateCreated = null, step
 // ====== READ
 export const getSurveyUuid = R.prop(keys.surveyUuid)
 
-export const getUuid = ObjectUtils.getUuid
+export const { getUuid } = ObjectUtils
 export const isPreview = R.propEq(keys.preview, true)
 export const getOwnerUuid = R.prop(keys.ownerUuid)
 export const getOwnerName = R.prop(keys.ownerName)
 export const getStep = R.prop(keys.step)
 export const getCycle = R.prop(keys.cycle)
-export const getDateCreated = ObjectUtils.getDateCreated
-export const getDateModified = ObjectUtils.getDateModified
+export const { getDateCreated } = ObjectUtils
+export const { getDateModified } = ObjectUtils
 
-export const getNodes = RecordReader.getNodes
-export const getNodeByUuid = RecordReader.getNodeByUuid
-export const getRootNode = RecordReader.getRootNode
-export const getNodesByDefUuid = RecordReader.getNodesByDefUuid
+export const { getNodes } = RecordReader
+export const { getNodeByUuid } = RecordReader
+export const { getRootNode } = RecordReader
+export const { getNodesByDefUuid } = RecordReader
 
 // ==== hierarchy
-export const getParentNode = RecordReader.getParentNode
-export const getAncestorsAndSelf = RecordReader.getAncestorsAndSelf
-export const getAncestorByNodeDefUuid = RecordReader.getAncestorByNodeDefUuid
+export const { getParentNode } = RecordReader
+export const { getAncestorsAndSelf } = RecordReader
+export const { getAncestorByNodeDefUuid } = RecordReader
 
-export const getNodeChildren = RecordReader.getNodeChildren
-export const getNodeChildrenByDefUuid = RecordReader.getNodeChildrenByDefUuid
-export const getNodeChildByDefUuid = RecordReader.getNodeChildByDefUuid
-export const visitDescendantsAndSelf = RecordReader.visitDescendantsAndSelf
-export const isNodeApplicable = RecordReader.isNodeApplicable
+export const { getNodeChildren } = RecordReader
+export const { getNodeChildrenByDefUuid } = RecordReader
+export const { getNodeChildByDefUuid } = RecordReader
+export const { visitDescendantsAndSelf } = RecordReader
+export const { isNodeApplicable } = RecordReader
 
 // ==== dependency
-export const getDependentNodePointers = RecordReader.getDependentNodePointers
-export const getParentCodeAttribute = RecordReader.getParentCodeAttribute
-export const getDependentCodeAttributes = RecordReader.getDependentCodeAttributes
+export const { getDependentNodePointers } = RecordReader
+export const { getParentCodeAttribute } = RecordReader
+export const { getDependentCodeAttributes } = RecordReader
 
 // ====== Keys
-export const getEntityKeyNodes = RecordReader.getEntityKeyNodes
-export const getEntityKeyValues = RecordReader.getEntityKeyValues
+export const { getEntityKeyNodes } = RecordReader
+export const { getEntityKeyValues } = RecordReader
 
 // ====== UPDATE
-export const assocNodes = RecordUpdater.assocNodes
-export const assocNode = RecordUpdater.assocNode
-export const mergeNodes = RecordUpdater.mergeNodes
+export const { assocNodes } = RecordUpdater
+export const { assocNode } = RecordUpdater
+export const { mergeNodes } = RecordUpdater
 
 // ====== DELETE
-export const deleteNode = RecordUpdater.deleteNode
+export const { deleteNode } = RecordUpdater
 
 // ====== VALIDATION
-export const mergeNodeValidations = RecordUpdater.mergeNodeValidations
-export const getValidation = Validation.getValidation
+export const { mergeNodeValidations } = RecordUpdater
+export const { getValidation } = Validation

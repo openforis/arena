@@ -28,61 +28,61 @@ export const getCalculationsCount = R.pipe(R.propOr(0, keys.calculationsCount), 
 export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
-export const getIndex = ObjectUtils.getIndex
-export const getUuid = ObjectUtils.getUuid
-export const getProps = ObjectUtils.getProps
-export const getPropsDiff = ObjectUtils.getPropsDiff
+export const { getIndex } = ObjectUtils
+export const { getUuid } = ObjectUtils
+export const { getProps } = ObjectUtils
+export const { getPropsDiff } = ObjectUtils
 /**
  * Returns the uuids of all associated calculations.
  * Note: calculationUuids has a value only when calculation step is passed as parameter to the API
  */
 export const getCalculationUuids = R.propOr([], keys.calculationUuids)
 
-export const isEqual = ObjectUtils.isEqual
-export const isTemporary = ObjectUtils.isTemporary
+export const { isEqual } = ObjectUtils
+export const { isTemporary } = ObjectUtils
 
 // ====== UPDATE
 
-export const assocIndex = ObjectUtils.assocIndex
-export const mergeProps = ObjectUtils.mergeProps
-export const dissocTemporary = ObjectUtils.dissocTemporary
+export const { assocIndex } = ObjectUtils
+export const { mergeProps } = ObjectUtils
+export const { dissocTemporary } = ObjectUtils
 
-export const assocEntityUuid = entityUuid => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
+export const assocEntityUuid = (entityUuid) => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
-export const assocCalculations = calculations => {
+export const assocCalculations = (calculations) => {
   const calculationUuids = R.pluck(ProcessingStepCalculation.keys.uuid)(calculations)
   return R.pipe(R.assoc(keys.calculations, calculations), assocCalculationUuids(calculationUuids))
 }
 
 const assocCalculationsCount = R.assoc(keys.calculationsCount)
 
-const _updateCalculationsCount = calculationStep =>
-  R.pipe(getCalculations, R.length, calculationsCount => assocCalculationsCount(calculationsCount)(calculationStep))(
-    calculationStep,
+const _updateCalculationsCount = (calculationStep) =>
+  R.pipe(getCalculations, R.length, (calculationsCount) => assocCalculationsCount(calculationsCount)(calculationStep))(
+    calculationStep
   )
 
-export const assocCalculation = calculation =>
+export const assocCalculation = (calculation) =>
   R.pipe(
     R.assocPath([keys.calculations, ProcessingStepCalculation.getIndex(calculation)], calculation),
-    _updateCalculationsCount,
+    _updateCalculationsCount
   )
 
-const _updateCalculations = fn => processingStep =>
+const _updateCalculations = (fn) => (processingStep) =>
   R.pipe(
     getCalculations,
     fn,
-    calculations => assocCalculations(calculations)(processingStep),
-    _updateCalculationsCount,
+    (calculations) => assocCalculations(calculations)(processingStep),
+    _updateCalculationsCount
   )(processingStep)
 
 export const dissocTemporaryCalculation = _updateCalculations(
   // Remove temporary calculation
-  R.reject(ProcessingStepCalculation.isTemporary),
+  R.reject(ProcessingStepCalculation.isTemporary)
 )
 
 export const dissocCalculations = R.dissoc(keys.calculations)
 
-export const dissocCalculation = calculation =>
+export const dissocCalculation = (calculation) =>
   _updateCalculations(
     R.pipe(
       // Remove calculation
@@ -90,11 +90,11 @@ export const dissocCalculation = calculation =>
       // Update indexes of next calculations
       R.map(
         R.when(
-          calc => ProcessingStepCalculation.getIndex(calc) > ProcessingStepCalculation.getIndex(calculation),
-          calc => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc),
-        ),
-      ),
-    ),
+          (calc) => ProcessingStepCalculation.getIndex(calc) > ProcessingStepCalculation.getIndex(calculation),
+          (calc) => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc)
+        )
+      )
+    )
   )
 
 // ===== UTILS

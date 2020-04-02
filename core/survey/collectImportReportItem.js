@@ -30,7 +30,7 @@ export const newReportItem = (expressionType, expression, applyIf, messages) => 
   [propKeys.messages]: messages,
 })
 
-export const getId = ObjectUtils.getId
+export const { getId } = ObjectUtils
 export const isResolved = R.propOr(false, keys.resolved)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getProps = R.prop(keys.props)

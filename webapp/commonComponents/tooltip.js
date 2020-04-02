@@ -25,7 +25,7 @@ class Tooltip extends React.Component {
 
     if (showContent && (messageComponent || !(R.isEmpty(messages) || R.isNil(messages)))) {
       const style = this.getStyle()
-      const className = `tooltip__message${type ? '-' + type : ''}`
+      const className = `tooltip__message${type ? `-${type}` : ''}`
 
       this.setState({
         messageElement: (
@@ -45,8 +45,9 @@ class Tooltip extends React.Component {
     const { children, className, type, showContent } = this.props
     const { messageElement } = this.state
 
-    const tooltipClass =
-      `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '') + (showContent ? ' hoverable' : '')
+    const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
+      showContent ? ' hoverable' : ''
+    }`
 
     return (
       <div

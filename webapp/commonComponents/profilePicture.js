@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useProfilePicture } from './hooks'
 
-const ProfilePicture = props => {
+const ProfilePicture = (props) => {
   const { userUuid, forceUpdateKey, thumbnail } = props
 
   const src = useProfilePicture(userUuid, forceUpdateKey)

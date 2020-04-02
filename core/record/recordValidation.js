@@ -15,12 +15,12 @@ export const prefixValidationFieldChildrenCount = 'childrenCount_'
 export const getValidationChildrenCountKey = (nodeParentUuid, nodeDefChildUuid) =>
   `${prefixValidationFieldChildrenCount}${nodeParentUuid}_${nodeDefChildUuid}`
 export const isValidationFieldKeyChildrenCount = R.startsWith(prefixValidationFieldChildrenCount)
-export const isValidationResultErrorCount = validationResult =>
+export const isValidationResultErrorCount = (validationResult) =>
   R.includes(ValidationResult.getKey(validationResult), [
     Validation.messageKeys.record.nodesMinCountNotReached,
     Validation.messageKeys.record.nodesMaxCountExceeded,
   ])
-export const getValidationCountNodeDefUuid = field => R.pipe(R.split('_'), R.last)(field)
+export const getValidationCountNodeDefUuid = (field) => R.pipe(R.split('_'), R.last)(field)
 
 // ===== CREATE
 export const newValidationRecordDuplicate = (isUnique = false) =>
@@ -28,7 +28,7 @@ export const newValidationRecordDuplicate = (isUnique = false) =>
     [keys.recordKeys]: Validation.newInstance(
       isUnique,
       {},
-      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }],
+      isUnique ? [] : [{ key: Validation.messageKeys.record.keyDuplicate }]
     ),
   })
 
@@ -37,7 +37,7 @@ export const newValidationRecordDuplicate = (isUnique = false) =>
 export const getValidationChildrenCount = (nodeParentUuid, nodeDefChildUuid) =>
   Validation.getFieldValidation(getValidationChildrenCountKey(nodeParentUuid, nodeDefChildUuid))
 
-export const getNodeValidation = node => Validation.getFieldValidation(Node.getUuid(node))
+export const getNodeValidation = (node) => Validation.getFieldValidation(Node.getUuid(node))
 
 // ===== UPDATE
 export const setValidationCount = (nodeParentUuid, nodeDefChildUuid, validationCount) =>

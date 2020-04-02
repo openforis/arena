@@ -38,8 +38,8 @@ export const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vern
 })
 
 // ====== READ
-export const getUuid = ObjectUtils.getUuid
-export const getProps = ObjectUtils.getProps
+export const { getUuid } = ObjectUtils
+export const { getProps } = ObjectUtils
 export const getTaxonomyUuid = R.prop(keys.taxonomyUuid)
 export const getCode = ObjectUtils.getProp(propKeys.code, '')
 export const getFamily = ObjectUtils.getProp(propKeys.family, '')
@@ -48,7 +48,7 @@ export const getScientificName = ObjectUtils.getProp(propKeys.scientificName, ''
 
 export const getVernacularNames = R.propOr({}, keys.vernacularNames)
 
-export const getVernacularNamesByLang = lang => R.pipe(getVernacularNames, R.propOr([], lang))
+export const getVernacularNamesByLang = (lang) => R.pipe(getVernacularNames, R.propOr([], lang))
 
 export const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
 export const getVernacularNameUuid = R.prop(keys.vernacularNameUuid)
@@ -57,20 +57,20 @@ export const getVernacularName = R.propOr('', keys.vernacularName)
 export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
 export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
 
-export const isEqual = ObjectUtils.isEqual
+export const { isEqual } = ObjectUtils
 
 // ==== UPDATE
 export const assocVernacularNames = (lang, vernacularNames) =>
   R.assocPath([keys.vernacularNames, lang], vernacularNames)
 
-export const appendVernacularName = vernacularName => taxon =>
+export const appendVernacularName = (vernacularName) => (taxon) =>
   R.pipe(
     getVernacularNamesByLang(TaxonVernacularName.getLang(vernacularName)),
     R.append(vernacularName),
-    vernacularNames => assocVernacularNames(TaxonVernacularName.getLang(vernacularName), vernacularNames)(taxon),
+    (vernacularNames) => assocVernacularNames(TaxonVernacularName.getLang(vernacularName), vernacularNames)(taxon)
   )(taxon)
 
-const _mergeVernacularNames = vernacularNamesArrayNew => vernacularNamesArrayExisting =>
+const _mergeVernacularNames = (vernacularNamesArrayNew) => (vernacularNamesArrayExisting) =>
   R.reduce(
     (accVernacularNames, index) => {
       const vernacularNameNew = R.prop(index, vernacularNamesArrayNew)
@@ -82,18 +82,18 @@ const _mergeVernacularNames = vernacularNamesArrayNew => vernacularNamesArrayExi
       return R.append(vernacularNameUpdated, accVernacularNames)
     },
     [],
-    R.times(R.identity, Math.max(vernacularNamesArrayNew.length, vernacularNamesArrayExisting.length)),
+    R.times(R.identity, Math.max(vernacularNamesArrayNew.length, vernacularNamesArrayExisting.length))
   )
 
-export const mergeProps = taxonNew => taxon => {
+export const mergeProps = (taxonNew) => (taxon) => {
   const vernacularNamesUpdated = Object.entries(getVernacularNames(taxonNew)).reduce(
     (accVernacularNames, [lang, vernacularNamesArray]) =>
       R.pipe(
         getVernacularNamesByLang(lang),
         _mergeVernacularNames(vernacularNamesArray),
-        R.assoc(lang, R.__, accVernacularNames),
+        R.assoc(lang, R.__, accVernacularNames)
       )(taxon),
-    {},
+    {}
   )
 
   return {

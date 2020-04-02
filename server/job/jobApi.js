@@ -3,7 +3,7 @@ import * as Response from '@server/utils/response'
 
 import * as JobManager from './jobManager'
 
-export const init = app => {
+export const init = (app) => {
   /**
    * ====== DELETE
    */

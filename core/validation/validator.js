@@ -5,11 +5,11 @@ import * as ValidationResult from './validationResult'
 import * as ValidatorFunctions from './_validator/validatorFunctions'
 
 const validateProp = async (obj, prop, validations = []) => {
-  const validationsEvaluated = await Promise.all(validations.map(validationFn => validationFn(prop, obj)))
+  const validationsEvaluated = await Promise.all(validations.map((validationFn) => validationFn(prop, obj)))
 
   const errors = []
   const warnings = []
-  validationsEvaluated.forEach(validationResult => {
+  validationsEvaluated.forEach((validationResult) => {
     if (validationResult) {
       // Add validation result to errors or warnings
       const arr = ValidationResult.isError(validationResult) ? errors : warnings
@@ -41,10 +41,10 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
 }
 
 // Validator functions
-export const validateRequired = ValidatorFunctions.validateRequired
-export const validateItemPropUniqueness = ValidatorFunctions.validateItemPropUniqueness
-export const validateNotKeyword = ValidatorFunctions.validateNotKeyword
-export const validateName = ValidatorFunctions.validateName
-export const validateNumber = ValidatorFunctions.validateNumber
-export const validatePositiveNumber = ValidatorFunctions.validatePositiveNumber
-export const isKeyword = ValidatorFunctions.isKeyword
+export const { validateRequired } = ValidatorFunctions
+export const { validateItemPropUniqueness } = ValidatorFunctions
+export const { validateNotKeyword } = ValidatorFunctions
+export const { validateName } = ValidatorFunctions
+export const { validateNumber } = ValidatorFunctions
+export const { validatePositiveNumber } = ValidatorFunctions
+export const { isKeyword } = ValidatorFunctions

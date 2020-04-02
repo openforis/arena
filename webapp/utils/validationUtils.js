@@ -5,12 +5,12 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import Markdown from '../commonComponents/markdown'
 
-const getErrorText = i18n => error =>
+const getErrorText = (i18n) => (error) =>
   ValidationResult.hasMessages(error)
     ? ValidationResult.getMessage(i18n.lang)(error)
     : i18n.t(ValidationResult.getKey(error), ValidationResult.getParams(error))
 
-const getValidationErrorMessages = i18n => validation =>
+const getValidationErrorMessages = (i18n) => (validation) =>
   R.pipe(Validation.getErrors, R.concat(Validation.getWarnings(validation)), R.map(getErrorText(i18n)))(validation)
 
 const getValidationFieldErrorMessage = (i18n, field) =>
@@ -22,28 +22,28 @@ const getValidationFieldErrorMessage = (i18n, field) =>
         getErrorText(i18n)(
           ValidationResult.newInstance(
             Validation.messageKeys.invalidField, // Default error message
-            { field },
-          ),
+            { field }
+          )
         ),
-      R.join(', '),
-    ),
+      R.join(', ')
+    )
   )
 
-export const getValidationFieldMessages = (i18n, showKeys = true) => validation =>
+export const getValidationFieldMessages = (i18n, showKeys = true) => (validation) =>
   R.pipe(
     // Extract invalid fields error messages
     Validation.getFieldValidations,
     Object.entries,
     R.map(
       ([field, fieldValidation]) =>
-        `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`,
+        `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`
     ),
     // Prepend validation error messages
-    messages => R.pipe(getValidationErrorMessages(i18n), R.concat(messages))(validation),
+    (messages) => R.pipe(getValidationErrorMessages(i18n), R.concat(messages))(validation)
   )(validation)
 
-export const getValidationFieldMessagesHTML = (i18n, showKeys = true) => validation =>
+export const getValidationFieldMessagesHTML = (i18n, showKeys = true) => (validation) =>
   R.pipe(
     getValidationFieldMessages(i18n, showKeys),
-    R.addIndex(R.map)((msg, i) => <Markdown key={i} source={msg} />),
+    R.addIndex(R.map)((msg, i) => <Markdown key={i} source={msg} />)
   )(validation)

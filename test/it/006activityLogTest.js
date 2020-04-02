@@ -18,7 +18,7 @@ import * as RecordUtils from './utils/recordUtils'
 describe('Activity Log Test', () => {
   it('Activity Log on Survey Creation', async () => {
     const surveyParam = {
-      name: 'do_not_use__test_survey_' + uuidv4(),
+      name: `do_not_use__test_survey_${uuidv4()}`,
       label: 'DO NOT USE! Test Survey',
       languages: ['en'],
     }
@@ -49,7 +49,7 @@ describe('Activity Log Test', () => {
     expect(logs.length).to.be.at.least(1)
 
     const recordCreateLogs = R.filter(
-      activity => ObjectUtils.getUuid(ActivityLog.getContent(activity)) === Record.getUuid(record),
+      (activity) => ObjectUtils.getUuid(ActivityLog.getContent(activity)) === Record.getUuid(record)
     )(logs)
 
     expect(recordCreateLogs).to.have.lengthOf(1)

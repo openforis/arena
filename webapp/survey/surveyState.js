@@ -23,9 +23,9 @@ export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 
-export const getSurveyCycleKey = state => R.pipe(AppState.getUser, User.getPrefSurveyCycle(getSurveyId(state)))(state)
+export const getSurveyCycleKey = (state) => R.pipe(AppState.getUser, User.getPrefSurveyCycle(getSurveyId(state)))(state)
 
-export const getNodeDefLabel = nodeDef => state => {
+export const getNodeDefLabel = (nodeDef) => (state) => {
   const surveyInfo = getSurveyInfo(state)
   const langApp = AppState.getLang(state)
   const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
@@ -46,12 +46,12 @@ const _areDefsFetched = R.pathEq([survey, keys.status, statusKeys.defsFetched], 
 
 const _areDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.defsDraftFetched], true)
 
-export const areDefsFetched = draft => state => _areDefsFetched(state) && _areDefsDraftFetched(state) === draft
+export const areDefsFetched = (draft) => (state) => _areDefsFetched(state) && _areDefsDraftFetched(state) === draft
 
-export const assocDefsFetched = draft =>
+export const assocDefsFetched = (draft) =>
   R.pipe(R.assoc(statusKeys.defsFetched, true), R.assoc(statusKeys.defsDraftFetched, draft))
 
 export const resetDefsFetched = R.pipe(
   R.assoc(statusKeys.defsFetched, false),
-  R.assoc(statusKeys.defsDraftFetched, false),
+  R.assoc(statusKeys.defsDraftFetched, false)
 )
