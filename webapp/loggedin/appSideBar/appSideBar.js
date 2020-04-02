@@ -43,7 +43,7 @@ const AppSideBar = props => {
         >
           OpenForis Arena
           <br />
-          {`${i18n.t('common.version')} ${ProcessUtils.ENV.applicationVersion}`}
+          {ProcessUtils.ENV.applicationVersion}
         </div>
       )}
     </div>
