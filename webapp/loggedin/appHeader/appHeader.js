@@ -28,7 +28,7 @@ const AppHeader = props => {
   return (
     <div className="app-header">
       <div className="app-header__logo">
-        <img src="/img/of-logo-small.png" />
+        <img src="/img/of_icon_black.png" />
       </div>
 
       <div className="app-header__survey">
