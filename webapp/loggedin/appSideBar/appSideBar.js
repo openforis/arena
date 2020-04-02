@@ -4,7 +4,6 @@ import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
 import * as ProcessUtils from '@core/processUtils'
-import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -17,8 +16,6 @@ const AppSideBar = props => {
   const { pathname, user, surveyInfo, isSideBarOpened, toggleSideBar } = props
 
   const element = useRef(null)
-
-  const i18n = useI18n()
 
   return (
     <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
