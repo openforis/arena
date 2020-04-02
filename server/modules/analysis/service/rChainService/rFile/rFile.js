@@ -21,6 +21,10 @@ export default class RFile {
     return this._rChain
   }
 
+  get dir() {
+    return this._dir
+  }
+
   get path() {
     return this._path
   }

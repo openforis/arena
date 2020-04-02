@@ -12,8 +12,6 @@ import RStep from './rStep'
 import RFileSystem, {
   RFileClose,
   RFileInit,
-  RFileInitApi,
-  RFileInitPackages,
   RFileLogin,
   RFilePersistResults,
   RFilePersistScripts,
@@ -40,8 +38,6 @@ class RChain {
     this._fileArena = null
     this._fileRStudioProject = null
     // System files
-    this._fileInitApi = null
-    this._fileInitPackages = null
     this._fileInit = null
     this._fileLogin = null
     this._fileResetResults = null
@@ -138,9 +134,7 @@ class RChain {
     ])
 
     // Init system files
-    this._fileInitPackages = await new RFileInitPackages(this).init()
     this._fileInit = await new RFileInit(this).init()
-    this._fileInitApi = await new RFileInitApi(this).init()
     this._fileLogin = await new RFileLogin(this).init()
     this._fileResetResults = await new RFileResetResults(this).init()
     this._fileReadData = await new RFileReadData(this).init()
