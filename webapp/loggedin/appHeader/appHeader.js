@@ -28,27 +28,29 @@ const AppHeader = props => {
   return (
     <div className="app-header">
       <div className="app-header__logo">
-        <img src="/img/of_icon_black.png" />
+        <a href="http://www.openforis.org" target="_blank">
+          <img src="/img/of_icon_black.png"/>
+        </a>
       </div>
 
       <div className="app-header__survey">
         {Survey.isValid(surveyInfo) &&
-          (appSaving ? (
-            <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
-          ) : (
-            <>
-              <div>{Survey.getLabel(surveyInfo, lang)}</div>
-              <CycleSelector
-                surveyInfo={surveyInfo}
-                surveyCycleKey={surveyCycleKey}
-                onChange={cycle => {
-                  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-                  const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
-                  updateUserPrefs(userUpdated)
-                }}
-              />
-            </>
-          ))}
+        (appSaving ? (
+          <ProgressBar className="running progress-bar-striped" progress={100} showText={false}/>
+        ) : (
+          <>
+            <div>{Survey.getLabel(surveyInfo, lang)}</div>
+            <CycleSelector
+              surveyInfo={surveyInfo}
+              surveyCycleKey={surveyCycleKey}
+              onChange={cycle => {
+                const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+                const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
+                updateUserPrefs(userUpdated)
+              }}
+            />
+          </>
+        ))}
       </div>
 
       <div
@@ -57,14 +59,14 @@ const AppHeader = props => {
           setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
         }}
       >
-        <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail={true} />
+        <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail={true}/>
 
         <button className="btn btn-transparent">
-          <span className="icon icon-ctrl" />
+          <span className="icon icon-ctrl"/>
         </button>
       </div>
 
-      {showUserPopup && <UserPopupMenu onClose={() => setShowUserPopup(false)} />}
+      {showUserPopup && <UserPopupMenu onClose={() => setShowUserPopup(false)}/>}
     </div>
   )
 }
