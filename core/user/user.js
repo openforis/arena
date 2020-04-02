@@ -53,13 +53,16 @@ export const getAuthGroupBySurveyUuid = (surveyUuid, includeSystemAdmin = true) 
 
 export const assocAuthGroups = R.assoc(keys.authGroups)
 
-export const assocAuthGroup = (authGroup) => (user) =>
-  R.pipe(getAuthGroups, R.append(authGroup), (authGroups) => assocAuthGroups(authGroups)(user))(user)
-
-export const dissocAuthGroup = (authGroup) => (user) =>
-  R.pipe(getAuthGroups, R.reject(R.propEq(AuthGroup.keys.uuid, AuthGroup.getUuid(authGroup))), (authGroups) =>
-    assocAuthGroups(authGroups)
+const _updateAuthGroups = (updateFn) => (user) =>
+  R.pipe(
+    getAuthGroups, 
+    updateFn, 
+    (authGroups) => assocAuthGroups(authGroups)(user)
   )(user)
+
+export const assocAuthGroup = (authGroup) => _updateAuthGroups(R.append(authGroup))
+
+export const dissocAuthGroup = (authGroup) => _updateAuthGroups(R.reject(AuthGroup.isEqual(authGroup)))
 
 // PREFS
 export const { newPrefs } = UserPrefs

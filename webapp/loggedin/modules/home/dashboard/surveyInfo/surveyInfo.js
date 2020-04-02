@@ -1,8 +1,8 @@
 import './surveyInfo.scss'
 
 import React, { useState } from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useHistory } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
@@ -19,13 +19,17 @@ import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
-const SurveyInfo = props => {
-  const { surveyInfo, canEditDef, publishSurvey, deleteSurvey } = props
-
+const SurveyInfo = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const history = useHistory()
+
+  const user = useSelector(AppState.getUser)
+  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+  const canEditDef = Authorizer.canEditSurvey(user, surveyInfo)
+
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
@@ -46,27 +50,30 @@ const SurveyInfo = props => {
           </Link>
 
           {canEditDef && (
-            <a
+            <button
               className="btn-s btn-transparent"
               aria-disabled={!Survey.isDraft(surveyInfo)}
+              type="button"
               onClick={() =>
                 dispatch(
-                  showDialogConfirm('homeView.surveyInfo.confirmPublish', { survey: surveyLabel }, publishSurvey),
+                  showDialogConfirm('homeView.surveyInfo.confirmPublish', { survey: surveyLabel }, () =>
+                    dispatch(publishSurvey())
+                  )
                 )
               }
             >
               <div className="triangle-left" />
               <span className="icon icon-checkmark2 icon-12px icon-left" />
               {i18n.t('homeView.surveyInfo.publish')}
-            </a>
+            </button>
           )}
 
           {canEditDef && (
-            <a className="btn-s btn-transparent" onClick={() => setShowDeleteDialog(true)}>
+            <button className="btn-s btn-transparent" type="button" onClick={() => setShowDeleteDialog(true)}>
               <div className="triangle-left" />
               <span className="icon icon-bin icon-12px icon-left" />
               {i18n.t('common.delete')}
-            </a>
+            </button>
           )}
 
           {Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
@@ -82,7 +89,7 @@ const SurveyInfo = props => {
       {showDeleteDialog && (
         <DeleteSurveyDialog
           onCancel={() => setShowDeleteDialog(false)}
-          onDelete={() => deleteSurvey()}
+          onDelete={() => dispatch(deleteSurvey(history))}
           surveyName={Survey.getName(surveyInfo)}
         />
       )}
@@ -90,14 +97,4 @@ const SurveyInfo = props => {
   )
 }
 
-const mapStateToProps = state => {
-  const user = AppState.getUser(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-
-  return {
-    surveyInfo,
-    canEditDef: Authorizer.canEditSurvey(user, surveyInfo),
-  }
-}
-
-export default connect(mapStateToProps, { publishSurvey, deleteSurvey })(SurveyInfo)
+export default SurveyInfo
