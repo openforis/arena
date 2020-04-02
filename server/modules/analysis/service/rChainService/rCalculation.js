@@ -6,8 +6,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-import { RFileCalculation } from '@server/modules/analysis/service/_rChain/rFile'
-import { dfVar, NA, setVar } from '@server/modules/analysis/service/_rChain/rFunctions'
+import RFileCalculation from './rFile/calculation'
+import { dfVar, NA, setVar } from './rFunctions'
 
 export default class RCalculation {
   constructor(rStep, calculation) {
@@ -31,20 +31,20 @@ export default class RCalculation {
   async init() {
     await this.rFile.init()
 
-    const survey = this.rStep.rChain.survey
-    const step = this.rStep.step
+    const { step, rChain } = this.rStep
+    const { survey } = rChain
 
     if (ProcessingStep.hasEntity(step)) {
       const entityName = R.pipe(
         ProcessingStep.getEntityUuid,
-        uuid => Survey.getNodeDefByUuid(uuid)(survey),
-        NodeDef.getName,
+        (uuid) => Survey.getNodeDefByUuid(uuid)(survey),
+        NodeDef.getName
       )(step)
 
       const attributeName = R.pipe(
         ProcessingStepCalculation.getNodeDefUuid,
-        uuid => Survey.getNodeDefByUuid(uuid)(survey),
-        NodeDef.getName,
+        (uuid) => Survey.getNodeDefByUuid(uuid)(survey),
+        NodeDef.getName
       )(this.calculation)
 
       await this.rFile.appendContent(setVar(dfVar(entityName, attributeName), NA))

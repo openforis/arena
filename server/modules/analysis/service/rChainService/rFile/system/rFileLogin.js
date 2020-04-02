@@ -1,4 +1,4 @@
-import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
+import RFileSystem from './rFileSystem'
 
 export default class RFileLogin extends RFileSystem {
   constructor(rChain) {

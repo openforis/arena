@@ -3,8 +3,9 @@ import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ProcessingChainService from '../service/processingChainService'
+import * as RChainService from '../service/rChainService'
 
-export const init = app => {
+export const init = (app) => {
   // ====== READ - Chains
 
   app.get(
@@ -20,7 +21,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -36,7 +37,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== READ - Chain
@@ -53,25 +54,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
-  )
-
-  // === GENERATE R SCRIPTS
-  app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid/script',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
-        const serverUrl = Request.getServerUrl(req)
-
-        await ProcessingChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid, serverUrl)
-
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    },
+    }
   )
 
   app.get(
@@ -83,14 +66,14 @@ export const init = app => {
 
         const attributeUuids = await ProcessingChainService.fetchCalculationAttributeUuidsByChainUuid(
           surveyId,
-          processingChainUuid,
+          processingChainUuid
         )
 
         res.json(attributeUuids)
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -102,14 +85,14 @@ export const init = app => {
 
         const attributeUuidsOtherChains = await ProcessingChainService.fetchCalculationAttributeUuidsByChainUuidExcluded(
           surveyId,
-          processingChainUuid,
+          processingChainUuid
         )
 
         res.json(attributeUuidsOtherChains)
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== READ - Steps
@@ -127,7 +110,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== READ - Calculations
@@ -145,7 +128,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -157,14 +140,14 @@ export const init = app => {
 
         const attributeUuids = await ProcessingChainService.fetchCalculationAttributeUuidsByStepUuid(
           surveyId,
-          processingStepUuid,
+          processingStepUuid
         )
 
         res.json(attributeUuids)
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== UPDATE - Chain
@@ -185,7 +168,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== DELETE - Chain
@@ -204,7 +187,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== DELETE - Processing Step
@@ -223,7 +206,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== DELETE - Processing Step Calculation
@@ -240,13 +223,31 @@ export const init = app => {
           user,
           surveyId,
           processingStepUuid,
-          calculationUuid,
+          calculationUuid
         )
 
         res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
         next(error)
       }
-    },
+    }
+  )
+
+  // === GENERATE R SCRIPTS
+  app.get(
+    '/survey/:surveyId/processing-chain/:processingChainUuid/script',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
+        const serverUrl = Request.getServerUrl(req)
+
+        await RChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid, serverUrl)
+
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
   )
 }

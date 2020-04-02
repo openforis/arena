@@ -1,4 +1,4 @@
-export const arenaGet = url => `arena.get('${url}')`
+export const arenaGet = (url) => `arena.get('${url}')`
 
 export const arenaPost = (url, params) =>
   `arena.post(

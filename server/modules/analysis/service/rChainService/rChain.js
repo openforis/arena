@@ -2,26 +2,26 @@ import Counter from '@core/counter'
 import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as ProcessingChain from '@common/analysis/processingChain'
-
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
-import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
+import * as ProcessingChainManager from '../../manager/processingChainManager'
 
 import RStep from './rStep'
-import { RFileSystem } from './rFile'
-import RFileInitPackages from './_files/system/rFileInitPackages'
-import RFileInit from './_files/system/rFileInit'
-import RFileInitApi from './_files/system/rFileInitApi'
-import RFileLogin from './_files/system/rFileLogin'
-import RFileResetResults from './_files/system/rFileResetResults'
-import RFileReadData from './_files/system/rFileReadData'
-import RFilePersistResults from './_files/system/rFilePersistResults'
-import RFilePersistScripts from './_files/system/rFilePersistScripts'
-import RFileClose from './_files/system/rFileClose'
+import RFileSystem, {
+  RFileClose,
+  RFileInit,
+  RFileInitApi,
+  RFileInitPackages,
+  RFileLogin,
+  RFilePersistResults,
+  RFilePersistScripts,
+  RFileReadData,
+  RFileResetResults,
+} from './rFile/system'
 
-const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, '_files', 'r_studio_project.Rproj')
+const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
 class RChain {
   constructor(surveyId, cycle, chainUuid, serverUrl) {
@@ -150,10 +150,9 @@ class RChain {
   }
 
   async _initSteps() {
-    for (const step of ProcessingChain.getProcessingSteps(this._chain)) {
-      const rStep = await new RStep(this._surveyId, this, step).init()
-      this._rSteps.push(rStep)
-    }
+    const steps = ProcessingChain.getProcessingSteps(this._chain)
+    const rSteps = await Promise.all(steps.map((step) => new RStep(this._surveyId, this, step).init()))
+    this._rSteps.push(...rSteps)
   }
 
   async _initFilesClosing() {
