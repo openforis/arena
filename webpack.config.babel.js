@@ -7,9 +7,9 @@ import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import GoogleFontsPlugin from 'google-fonts-plugin'
 import GitRevisionPlugin from 'git-revision-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
-import uuidv4 from 'uuid/v4'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
+import { uuidv4 } from './core/uuid'
 import * as ProcessUtils from './core/processUtils'
 
 const buildReport = ProcessUtils.ENV.buildReport
