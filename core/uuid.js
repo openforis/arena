@@ -1,2 +1,1 @@
-import _uuidv4 from 'uuid/v4'
-export const uuidv4 = _uuidv4
+export { v4 as uuidv4 } from 'uuid'
