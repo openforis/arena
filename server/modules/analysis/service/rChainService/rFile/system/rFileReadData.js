@@ -34,12 +34,7 @@ export default class RFileReadData extends RFileSystem {
           })
 
           await Promise.all(
-            nodeDefAttrCalculations.map((nodeDef) => {
-              if (NodeDef.isCode(nodeDef)) {
-                return this._appendCategoryItems(nodeDef)
-              }
-              return null
-            })
+            nodeDefAttrCalculations.filter(NodeDef.isCode).map((nodeDef) => this._appendCategoryItems(nodeDef))
           )
 
           // Fetch entity data
