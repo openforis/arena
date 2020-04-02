@@ -1,16 +1,9 @@
-import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
-
 import * as ProcessingChain from '@common/analysis/processingChain'
-
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import {
-  arenaEndTime,
-  arenaStartTime,
-  dbDisconnect,
-  dbSendQuery,
-  setVar,
-  sysTime,
-} from '@server/modules/analysis/service/_rChain/rFunctions'
+
+import RFileSystem from './rFileSystem'
+
+import { arenaEndTime, arenaStartTime, dbDisconnect, dbSendQuery, setVar, sysTime } from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {
@@ -22,7 +15,7 @@ export default class RFileClose extends RFileSystem {
 
     const chainTable = `${getSurveyDBSchema(this.rChain.surveyId)}.processing_chain`
     const updateChain = dbSendQuery(
-      `update ${chainTable} set status_exec = '${ProcessingChain.statusExec.success}' where uuid = '${this.rChain.chainUuid}'`,
+      `update ${chainTable} set status_exec = '${ProcessingChain.statusExec.success}' where uuid = '${this.rChain.chainUuid}'`
     )
     await this.appendContent(updateChain)
 

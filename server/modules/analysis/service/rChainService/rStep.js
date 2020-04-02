@@ -2,8 +2,9 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import RCalculation from '@server/modules/analysis/service/_rChain/rCalculation'
-import { padStart } from '@server/modules/analysis/service/_rChain/rFile'
+import RCalculation from '@server/modules/analysis/service/rChainService/rCalculation'
+
+import { padStart } from './rFile'
 
 export default class RStep {
   constructor(surveyId, rChain, step) {
@@ -39,10 +40,10 @@ export default class RStep {
   async _initCalculations() {
     const calculations = ProcessingStep.getCalculations(this.step)
 
-    for (const calculation of calculations) {
-      const rCalculation = await new RCalculation(this, calculation).init()
-      this._rCalculations.push(rCalculation)
-    }
+    const rCalculations = await Promise.all(
+      calculations.map((calculation) => new RCalculation(this, calculation).init())
+    )
+    this._rCalculations.push(...rCalculations)
   }
 
   async init() {

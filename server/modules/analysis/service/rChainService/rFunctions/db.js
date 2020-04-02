@@ -18,7 +18,7 @@ export const dbGetQuery = (schema, table, fields = '*', whereConditions = []) =>
   return `dbGetQuery(conn=${connection}, statement="${statement}")`
 }
 
-export const dbSendQuery = statement => `dbSendQuery(conn=${connection}, statement="${statement}")`
+export const dbSendQuery = (statement) => `dbSendQuery(conn=${connection}, statement="${statement}")`
 
 export const dbWriteTable = (tableName, dataFrame, append = false) =>
   `dbWriteTable(${connection}, '${tableName}', ${dataFrame}, row.names=F, append=${append ? 'T' : 'F'})`

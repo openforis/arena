@@ -1,5 +1,6 @@
 import * as FileUtils from '@server/utils/file/fileUtils'
-import { RFileSystem } from '@server/modules/analysis/service/_rChain/rFile'
+
+import RFileSystem from './rFileSystem'
 
 const FILE_INIT_PACKAGES = FileUtils.join(__dirname, 'init-packages.R')
 
