@@ -1,22 +1,19 @@
 import './surveyInfo.scss'
 
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
 
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
-
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = () => {
@@ -26,9 +23,8 @@ const SurveyInfo = () => {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const user = useSelector(AppState.getUser)
-  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
-  const canEditDef = Authorizer.canEditSurvey(user, surveyInfo)
+  const surveyInfo = useSurveyInfo()
+  const canEditDef = useAuthCanEditSurvey()
 
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)

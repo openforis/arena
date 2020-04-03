@@ -1,24 +1,21 @@
 import './surveyInfoView.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
 
 import { Input } from '@webapp/commonComponents/form/input'
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as AppState from '@webapp/app/appState'
-import { updateSurveyInfoProps } from '@webapp/survey/surveyInfo/actions'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'
 import CyclesEditor from './components/cyclesEditor'
 import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
-const SurveyInfoView = props => {
-  const { surveyInfo, readOnly } = props
+const SurveyInfoView = () => {
+  const surveyInfo = useSurveyInfo()
+  const readOnly = !useAuthCanEditSurvey()
 
   const i18n = useI18n()
 
@@ -37,14 +34,17 @@ const SurveyInfoView = props => {
     setCycles,
     getFieldValidation,
     saveProps,
-  } = useSurveyInfoViewState(props)
+  } = useSurveyInfoViewState()
 
   return (
     <div className="home-survey-info">
       <div className="form">
         <div className="form-item">
-          <label className="form-label">{i18n.t('common.name')}</label>
+          <label className="form-label" htmlFor="survey-info-name">
+            {i18n.t('common.name')}
+          </label>
           <Input
+            id="survey-info-name"
             value={name}
             validation={getFieldValidation(Survey.infoKeys.name)}
             onChange={setName}
@@ -65,12 +65,16 @@ const SurveyInfoView = props => {
         <LanguagesEditor readOnly={readOnly} languages={languages} setLanguages={setLanguages} />
 
         <div className="form-item">
-          <label className="form-label">{i18n.t('common.srs')}</label>
+          <label className="form-label" htmlFor="survey-info-srs">
+            {i18n.t('common.srs')}
+          </label>
           <SrsEditor readOnly={readOnly} srs={srs} setSrs={setSrs} validation={getFieldValidation('srs')} />
         </div>
 
         <div className="form-item">
-          <label className="form-label">{i18n.t('common.cycle_plural')}</label>
+          <label className="form-label" htmlFor="survey-info-cycles">
+            {i18n.t('common.cycle_plural')}
+          </label>
           <CyclesEditor
             readOnly={readOnly}
             cycles={cycles}
@@ -81,7 +85,7 @@ const SurveyInfoView = props => {
         </div>
 
         {!readOnly && (
-          <button className="btn btn-save" onClick={saveProps}>
+          <button className="btn btn-save" type="button" onClick={saveProps}>
             <span className="icon icon-floppy-disk icon-12px icon-left" />
             {i18n.t('common.save')}
           </button>
@@ -91,15 +95,4 @@ const SurveyInfoView = props => {
   )
 }
 
-const mapStateToProps = state => {
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = AppState.getUser(state)
-  const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
-
-  return {
-    surveyInfo,
-    readOnly,
-  }
-}
-
-export default connect(mapStateToProps, { updateSurveyInfoProps })(SurveyInfoView)
+export default SurveyInfoView

@@ -1,27 +1,27 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-
-import * as Authorizer from '@core/auth/authorizer'
+import { useDispatch } from 'react-redux'
 
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
-import FormDesignerView from './formDesigner/formDesignerView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesView'
 import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
-import SurveyHierarchyView from './surveyHierarchy/surveyHierarchyView'
 
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
+import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
+import SurveyHierarchyView from './surveyHierarchy/surveyHierarchyView'
+import FormDesignerView from './formDesigner/formDesignerView'
 
 import { resetForm } from '../../surveyViews/surveyForm/actions'
 
-const DesignerView = ({ canEditDef, resetForm }) => {
+const DesignerView = () => {
+  const dispatch = useDispatch()
+  const canEditDef = useAuthCanEditSurvey()
+
   useEffect(() => {
-    resetForm()
+    dispatch(resetForm())
   }, [])
 
   return (
@@ -75,13 +75,4 @@ const DesignerView = ({ canEditDef, resetForm }) => {
   )
 }
 
-const mapStateToProps = state => {
-  const user = AppState.getUser(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-
-  return {
-    canEditDef: Authorizer.canEditSurvey(user, surveyInfo),
-  }
-}
-
-export default connect(mapStateToProps, { resetForm })(DesignerView)
+export default DesignerView

@@ -116,6 +116,7 @@
     "pg-promise": "^10.5.0",
     "pg-query-stream": "^3.0.4",
     "proj4": "^2.6.0",
+    "prop-types": "^15.7.2",
     "ramda": "^0.27.0",
     "react": "^16.13.1",
     "react-avatar-editor": "^12.0.0-beta.0",
