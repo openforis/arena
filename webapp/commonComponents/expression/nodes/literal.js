@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 import axios from 'axios'
-
-import { Input } from '../../form/input'
-import { BinaryOperandType } from './binaryOperand'
-import * as ExpressionParser from '../expressionParser'
-import { useAsyncGetRequest } from '../../hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
@@ -14,7 +10,12 @@ import * as StringUtils from '@core/stringUtils'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
 import Dropdown from '../../form/dropdown'
+import { useAsyncGetRequest, useI18n } from '../../hooks'
+import * as ExpressionParser from '../expressionParser'
+import { BinaryOperandType } from './binaryOperand'
+import { Input } from '../../form/input'
 
 const isValueText = (nodeDef, value) =>
   nodeDef ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value)) : false
@@ -23,26 +24,36 @@ const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? JSON.parse
 
 const getValue = (nodeDef, value) => (isValueText(nodeDef, value) ? JSON.stringify(value) : value)
 
-const loadItems = async params => {
+const loadItems = async (params) => {
   const {
     data: { items },
   } = await axios.get('/api/expression/literal/items', { params })
   return items
 }
 
-const Literal = props => {
-  const { node, nodeDefCurrent, literalSearchParams, onChange, type } = props
+const Literal = (props) => {
+  const { node, nodeDefCurrent, onChange, type } = props
+
+  const i18n = useI18n()
+  const survey = useSelector(SurveyState.getSurvey)
+  const lang = useSelector(AppState.getLang)
+
+  const literalSearchParams =
+    nodeDefCurrent && BinaryOperandType.isLeft(type)
+      ? ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
+      : null
+
   const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
 
   const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
     '/api/expression/literal/item',
     {
       params: { ...literalSearchParams, value: nodeValue },
-    },
+    }
   )
   const [items, setItems] = useState([])
 
-  const onChangeValue = val => {
+  const onChangeValue = (val) => {
     const value = getValue(nodeDefCurrent, val)
     onChange(R.pipe(R.assoc('raw', value), R.assoc('value', value))(node))
   }
@@ -60,43 +71,63 @@ const Literal = props => {
     }, [])
   }
 
-  return (
-    <div className="literal">
-      {literalSearchParams ? (
+  const getRenderer = () => {
+    if (literalSearchParams) {
+      return (
         <Dropdown
           items={items}
-          itemsLookupFunction={value => loadItems({ ...literalSearchParams, value })}
+          itemsLookupFunction={(value) => loadItems({ ...literalSearchParams, value })}
           itemKeyProp="key"
           itemLabelProp="label"
-          onChange={item => item && onChangeValue(item.key)}
+          onChange={(itm) => itm && onChangeValue(itm.key)}
           selection={item}
         />
-      ) : BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent)) ? (
+      )
+    }
+    if (BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent))) {
+      const inputTextProps = NodeDefUIProps.getInputTextProps(nodeDefCurrent)
+      const { mask, showMask, placeholderChar } = inputTextProps
+      return (
         <Input
-          {...NodeDefUIProps.getInputTextProps(nodeDefCurrent)}
+          mask={mask}
+          showMask={showMask}
+          placeholderChar={placeholderChar}
           value={nodeValue}
-          onChange={value => onChangeValue(value)}
+          onChange={(value) => onChangeValue(value)}
         />
-      ) : (
-        <input className="form-input" value={nodeValue} size={25} onChange={e => onChangeValue(e.target.value)} />
-      )}
-    </div>
-  )
-}
-
-const mapStateToProps = (state, props) => {
-  const survey = SurveyState.getSurvey(state)
-  const lang = AppState.getLang(state)
-  const { nodeDefCurrent, type } = props
-
-  const literalSearchParams =
-    nodeDefCurrent && BinaryOperandType.isLeft(type)
-      ? ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
-      : null
-
-  return {
-    literalSearchParams,
+      )
+    }
+    if (BinaryOperandType.isLeft(type) && NodeDef.isBoolean(nodeDefCurrent)) {
+      return (
+        <ButtonGroup
+          className="literal-btn-group-boolean"
+          selectedItemKey={nodeValue}
+          onChange={(value) => onChangeValue(value)}
+          items={['true', 'false'].map((value) => ({
+            key: value,
+            label: i18n.t(`common.${value}`),
+          }))}
+        />
+      )
+    }
+    return <input className="form-input" value={nodeValue} size={25} onChange={(e) => onChangeValue(e.target.value)} />
   }
+
+  return <div className="literal">{getRenderer()}</div>
 }
 
-export default connect(mapStateToProps)(Literal)
+Literal.propTypes = {
+  node: PropTypes.any,
+  nodeDefCurrent: PropTypes.any,
+  onChange: PropTypes.func,
+  type: PropTypes.any,
+}
+
+Literal.defaultProps = {
+  node: null,
+  nodeDefCurrent: null,
+  onChange: null,
+  type: null,
+}
+
+export default Literal

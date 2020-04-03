@@ -22,9 +22,9 @@ const components = {
   [Expression.types.GroupExpression]: Group,
 }
 
-const ExpressionNode = props => {
+const ExpressionNode = (props) => {
   const component = components[R.path(['node', 'type'], props)]
-  return React.createElement(component, props)
+  return React.createElement(component, { ...props, expressionNodeRenderer: ExpressionNode })
 }
 
 export default ExpressionNode
