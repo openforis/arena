@@ -1,38 +1,44 @@
-import * as R from 'ramda'
-
 import { db } from '@server/db/db'
 
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
+import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-export const fetchStepData = async (survey, cycle, step, client = db) => {
-  const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
-  const entityDefParent = Survey.getNodeDefParent(entityDef)(survey)
+// ==== READ - Step
+export const fetchStepData = async (surveyId, cycle, entityDef, entityDefParent, nodeDefCalculations, client = db) => {
   const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
-  const calculationAttrDefs = R.pipe(
-    ProcessingStep.getCalculations,
-    R.map(
-      R.pipe(ProcessingStepCalculation.getNodeDefUuid, nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)),
-    ),
-  )(step)
 
   const fields = ['*']
-  for (const nodeDef of calculationAttrDefs) {
+  nodeDefCalculations.forEach((nodeDef) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     // Add nodeDefName_uuid field
     fields.push(`uuid_generate_v4() as ${nodeDefName}_uuid`)
-  }
+  })
 
-  return await client.any(`
-        SELECT ${fields.join(', ')} 
-        FROM ${SchemaRdb.getName(Survey.getId(survey))}.${viewName}
-        WHERE ${DataTable.colNameRecordCycle} = '${cycle}' 
-      `)
+  return client.any(
+    `SELECT ${fields.join(', ')} 
+    FROM ${SchemaRdb.getName(surveyId)}.${viewName}
+    WHERE ${DataTable.colNameRecordCycle} = '${cycle}'`
+  )
 }
+
+// ==== DELETE - Chain
+export const deleteNodeResults = async (surveyId, cycle, chainUuid, client = db) =>
+  client.query(
+    `DELETE
+    FROM
+        ${SchemaRdb.getName(surveyId)}.${ResultNodeTable.tableName}
+    WHERE
+        ${ResultNodeTable.colNames.processingChainUuid} = $1
+    AND ${ResultNodeTable.colNames.recordUuid} IN
+    (
+        SELECT r.uuid
+        FROM ${getSurveyDBSchema(surveyId)}.record r
+        WHERE r.cycle = $2
+    )`,
+    [chainUuid, cycle]
+  )

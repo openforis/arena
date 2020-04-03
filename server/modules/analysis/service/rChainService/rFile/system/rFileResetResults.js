@@ -1,7 +1,7 @@
-import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
+import * as ApiRoutes from '@common/apiRoutes'
 
 import RFileSystem from './rFileSystem'
-import { dbSendQuery } from '../../rFunctions'
+import { arenaDelete } from '../../rFunctions'
 
 export default class RFileResetResults extends RFileSystem {
   constructor(rChain) {
@@ -11,11 +11,10 @@ export default class RFileResetResults extends RFileSystem {
   async init() {
     await super.init()
 
-    const { chainUuid } = this.rChain
-    const query = dbSendQuery(
-      `delete from ${ResultNodeTable.tableName} where ${ResultNodeTable.colNames.processingChainUuid} = '${chainUuid}'`
-    )
-    await this.appendContent(query)
+    const { surveyId, cycle, chainUuid } = this.rChain
+
+    const resetResults = arenaDelete(ApiRoutes.rChain.getChainNodeResultsReset(surveyId, chainUuid), { cycle })
+    await this.appendContent(resetResults)
 
     return this
   }

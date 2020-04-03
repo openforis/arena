@@ -1,11 +1,11 @@
 import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as ApiRoutes from '@common/apiRoutes'
 
 import RFileSystem from './rFileSystem'
 import { setVar, arenaGet } from '../../rFunctions'
@@ -39,7 +39,8 @@ export default class RFileReadData extends RFileSystem {
 
           // Fetch entity data
           const getEntityData = arenaGet(
-            `/survey/${surveyId}/rChain/steps/${ProcessingStep.getUuid(step)}?cycle=${cycle}`
+            ApiRoutes.rChain.getStepEntityDataRead(surveyId, ProcessingStep.getUuid(step)),
+            { cycle }
           )
           const setEntityData = setVar(NodeDef.getName(nodeDefEntity), getEntityData)
           await this.appendContent(setEntityData)
@@ -55,7 +56,7 @@ export default class RFileReadData extends RFileSystem {
    */
   async _appendCategoryItems(nodeDef) {
     const { survey } = this.rChain
-    const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
+    const language = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
     const surveyId = Survey.getId(survey)
 
     const nodeDefName = NodeDef.getName(nodeDef)
@@ -68,7 +69,7 @@ export default class RFileReadData extends RFileSystem {
       // Fetch category items
       setVar(
         dfCategoryItems,
-        arenaGet(`/survey/${surveyId}/rChain/categories/${categoryUuid}?language=${defaultLang}`)
+        arenaGet(ApiRoutes.rChain.getCategoryItemsDataRead(surveyId, categoryUuid), { language })
       ),
       // Rename data frame columns
       `names(${dfCategoryItems}) <- c('${nodeDefName}_item_uuid', '${nodeDefName}', '${nodeDefName}_item_label')`
