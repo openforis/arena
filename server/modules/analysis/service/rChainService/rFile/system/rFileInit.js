@@ -37,9 +37,9 @@ export default class RFileInit extends RFileSystem {
 
     await FileUtils.mkdir(this.dirInit)
 
-    this.appendContent(setVar('arena.host', `'${this.rChain.serverUrl}/'`))
+    await PromiseUtils.resolveGenerator(writeInitFiles(this))
 
-    await PromiseUtils.asyncGenerator(writeInitFiles(this))
+    this.appendContent(setVar('arena.host', `'${this.rChain.serverUrl}/'`))
 
     return this
   }

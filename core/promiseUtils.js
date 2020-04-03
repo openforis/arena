@@ -15,4 +15,4 @@ const handleGeneratorNext = async (generator) => {
  *
  * A useful application is when an array of promises must be resolved in order
  */
-export const asyncGenerator = handleGeneratorNext
+export const resolveGenerator = handleGeneratorNext

@@ -1,15 +1,16 @@
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as ApiRoutes from '@common/apiRoutes'
 
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as RChainService from '@server/modules/analysis/service/rChainService'
 
-export const init = app => {
-  // ====== READ - Chain Data
-
+export const init = (app) => {
+  // ====== READ - Step Data
   app.get(
-    '/survey/:surveyId/rChain/steps/:processingStepUuid',
+    ApiRoutes.rChain.getStepEntityDataRead(':surveyId', ':processingStepUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
@@ -21,12 +22,12 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
-  // ====== READ - Category items summary
+  // ====== READ - Category items
   app.get(
-    '/survey/:surveyId/rChain/categories/:categoryUuid',
+    ApiRoutes.rChain.getCategoryItemsDataRead(':surveyId', ':categoryUuid'),
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
@@ -34,7 +35,7 @@ export const init = app => {
 
         const items = await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, null, draft)
 
-        const itemsSummary = items.map(item => ({
+        const itemsSummary = items.map((item) => ({
           uuid: CategoryItem.getUuid(item),
           code: CategoryItem.getCode(item),
           label: CategoryItem.getLabel(language)(item),
@@ -43,6 +44,23 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
+  )
+
+  // ====== DELETE - Chain node results
+  app.delete(
+    ApiRoutes.rChain.getChainNodeResultsReset(':surveyId', ':chainUuid'),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, chainUuid } = Request.getParams(req)
+
+        await RChainService.deleteNodeResults(surveyId, cycle, chainUuid)
+
+        Response.sendOk(res)
+      } catch (e) {
+        next(e)
+      }
+    }
   )
 }
