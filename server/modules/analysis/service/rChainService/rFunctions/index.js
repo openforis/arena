@@ -1,4 +1,4 @@
-export { NA, dfVar, merge, setVar, sysTime } from './utility'
+export { NA, dfVar, merge, setVar, sysTime, source } from './utility'
 
 export { dbDisconnect, dbGetQuery, dbSendQuery, dbWriteTable, setConnection } from './db'
 
