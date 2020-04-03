@@ -38,10 +38,9 @@ export default class RFileReadData extends RFileSystem {
           )
 
           // Fetch entity data
-          const getEntityData = arenaGet(
-            ApiRoutes.rChain.getStepEntityDataRead(surveyId, ProcessingStep.getUuid(step)),
-            { cycle }
-          )
+          const getEntityData = arenaGet(ApiRoutes.rChain.stepEntityData(surveyId, ProcessingStep.getUuid(step)), {
+            cycle,
+          })
           const setEntityData = setVar(NodeDef.getName(nodeDefEntity), getEntityData)
           await this.appendContent(setEntityData)
         }
@@ -67,10 +66,7 @@ export default class RFileReadData extends RFileSystem {
 
     await this.appendContent(
       // Fetch category items
-      setVar(
-        dfCategoryItems,
-        arenaGet(ApiRoutes.rChain.getCategoryItemsDataRead(surveyId, categoryUuid), { language })
-      ),
+      setVar(dfCategoryItems, arenaGet(ApiRoutes.rChain.categoryItemsData(surveyId, categoryUuid), { language })),
       // Rename data frame columns
       `names(${dfCategoryItems}) <- c('${nodeDefName}_item_uuid', '${nodeDefName}', '${nodeDefName}_item_label')`
     )

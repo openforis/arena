@@ -22,6 +22,17 @@ arena.post = function(url, body) {
   return(arena.parseResponse(resp))
 }
 
+arena.put = function(url, body) {
+  resp <- httr::PUT(arena.getApiUrl(url), body = body)
+  return(arena.parseResponse(resp))
+}
+
+arena.putFile = function(url, filePath) {
+  return(
+    arena.put(url, body = list('file' = httr::upload_file(filePath)))
+  )
+}
+
 arena.delete = function(url, body) {
   resp <- httr::DELETE(arena.getApiUrl(url), body = body)
   return(arena.parseResponse(resp))

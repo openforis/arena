@@ -16,7 +16,7 @@ export const fetchStepData = async (surveyId, cycle, entityDef, entityDefParent,
   nodeDefCalculations.forEach((nodeDef) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     // Add nodeDefName_uuid field
-    fields.push(`uuid_generate_v4() as ${nodeDefName}_uuid`)
+    fields.push(`uuid_generate_v4() as ${nodeDefName}_${ResultNodeTable.colNames.nodeDefUuid}`)
   })
 
   return client.any(

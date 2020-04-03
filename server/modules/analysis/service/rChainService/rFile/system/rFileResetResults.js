@@ -13,7 +13,7 @@ export default class RFileResetResults extends RFileSystem {
 
     const { surveyId, cycle, chainUuid } = this.rChain
 
-    const resetResults = arenaDelete(ApiRoutes.rChain.getChainNodeResultsReset(surveyId, chainUuid), { cycle })
+    const resetResults = arenaDelete(ApiRoutes.rChain.chainNodeResults(surveyId, chainUuid), { cycle })
     await this.appendContent(resetResults)
 
     return this

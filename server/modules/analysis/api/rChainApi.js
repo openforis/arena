@@ -1,22 +1,24 @@
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as ApiRoutes from '@common/apiRoutes'
 
+import FileZip from '@server/utils/file/fileZip'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as RChainService from '@server/modules/analysis/service/rChainService'
+// import * as CSVReader from '@server/utils/file/csvReader'
 
 export const init = (app) => {
   // ====== READ - Step Data
   app.get(
-    ApiRoutes.rChain.getStepEntityDataRead(':surveyId', ':processingStepUuid'),
+    ApiRoutes.rChain.stepEntityData(':surveyId', ':stepUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, processingStepUuid } = Request.getParams(req)
+        const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        const data = await RChainService.fetchStepData(surveyId, cycle, processingStepUuid)
+        const data = await RChainService.fetchStepData(surveyId, cycle, stepUuid)
 
         res.json(data)
       } catch (error) {
@@ -27,7 +29,7 @@ export const init = (app) => {
 
   // ====== READ - Category items
   app.get(
-    ApiRoutes.rChain.getCategoryItemsDataRead(':surveyId', ':categoryUuid'),
+    ApiRoutes.rChain.categoryItemsData(':surveyId', ':categoryUuid'),
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
@@ -47,9 +49,52 @@ export const init = (app) => {
     }
   )
 
+  // ====== UPDATE - Step results
+  app.put(
+    ApiRoutes.rChain.stepEntityData(':surveyId', ':stepUuid'),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const file = Request.getFile(req)
+        const fileZip = new FileZip(file.tempFilePath)
+        await fileZip.init()
+
+        // const entryName = 'tree.csv'
+        //
+        // // fileZip.getEntryNames().forEach((entryName) => {
+        // console.log('====== entryName')
+        // console.log(entryName)
+        // const entryData = fileZip.getEntryData(entryName)
+        // const entryAsText = fileZip.getEntryAsText(entryName)
+        // console.log('====== entryData')
+        // console.log(entryData)
+        // console.log('====== entryAsText')
+        // console.log(entryAsText)
+        // // })
+        // let headers = null
+        // await CSVReader.createReaderFromStream(
+        //   await fileZip.getEntryStream(entryName),
+        //   (headersRead) => {
+        //     headers = headersRead
+        //   },
+        //   async (row) => {
+        //     console.log('==== reading row')
+        //     headers.forEach((header) => {
+        //       console.log('= header ', header)
+        //       console.log('= value ', row[header])
+        //     })
+        //   }
+        // ).start()
+
+        Response.sendOk(res)
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
   // ====== DELETE - Chain node results
   app.delete(
-    ApiRoutes.rChain.getChainNodeResultsReset(':surveyId', ':chainUuid'),
+    ApiRoutes.rChain.chainNodeResults(':surveyId', ':chainUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
