@@ -12,6 +12,7 @@ export {
   unlink,
   dirCreate,
   writeCsv,
+  vector,
 } from './utility'
 
 export { zipr } from './zip'

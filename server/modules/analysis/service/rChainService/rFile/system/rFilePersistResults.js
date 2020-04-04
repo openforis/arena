@@ -17,96 +17,96 @@ import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 import RFileSystem from './rFileSystem'
 // import * as RFileReadData from './rFileReadData'
 
-import { dfVar, setVar, dirCreate, writeCsv, arenaPutFile, zipr, unlink } from '../../rFunctions'
+import { dfVar, setVar, dirCreate, writeCsv, arenaPutFile, zipr, unlink, vector } from '../../rFunctions'
 
-// const dfRes = 'res'
-//
-// const _resultTableColNamesVector = `c(${R.pipe(
-//   R.values,
-//   R.map((colName) => `'${colName}'`)
-// )(ResultNodeTable.colNames)})`
+function* initDfResult(dfSource, dfResult, step, entityDefStep) {
+  const { survey, chainUuid } = this.rChain
+  const stepUuid = ProcessingStep.getUuid(step)
+  const calculations = ProcessingStep.getCalculations(step)
 
-function* persistResults(rFilePersistResults) {
-  const { rChain } = rFilePersistResults
-  const { chain, chainUuid, survey, surveyId } = rChain
+  // columns: only output attribute values
+  const dfResultColumns = calculations.reduce((columnsAggregator, calculation) => {
+    const nodeDefCalculation = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(survey)
+    const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
+    columnsAggregator.push(
+      `'${nodeDefCalculationName}'`,
+      `'${nodeDefCalculationName}_${ResultNodeTable.colNames.nodeDefUuid}'`
+    )
+    return columnsAggregator
+  }, [])
+  const setDfResult = setVar(dfResult, `${dfSource}[, ${vector(dfResultColumns)}]`)
+
+  // add uuids
+  const setUuids = [
+    { name: ResultNodeTable.colNames.processingChainUuid, value: `'${chainUuid}'` },
+    { name: ResultNodeTable.colNames.processingStepUuid, value: `'${stepUuid}'` },
+    { name: ResultNodeTable.colNames.recordUuid, value: dfVar(dfSource, RDBDataTable.colNameRecordUuuid) },
+    { name: ResultNodeTable.colNames.parentUuid, value: dfVar(dfSource, RDBDataView.getColUuid(entityDefStep)) },
+  ].map((uuidMapping) => setVar(dfVar(dfResult, uuidMapping.name), uuidMapping.value))
+
+  yield this.appendContent(setDfResult, ...setUuids)
+}
+
+function* initSetAttributeCodeValues() {
+  // TODO
+  // For code attributes, write res$[node_def_name] in json {itemUuid, code, label}
+  // for (let j = 0; j < calculations.length; j += 1) {
+  //   const calculation = calculations[j]
+  //   const nodeDefCalculation = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(survey)
+  //   const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
+  //   if(NodeDef.isCode(nodeDefCalculation)){
+  //     withDF(dfResult, ifElse(isNa(nodeDefCalculationName), NA, ))
+  //
+  //   }
+  //
+  //   const value = `with(${dfResult},
+  //     ifelse(is.na(${nodeDefCalcName}), ${NA}, ` +
+  //     `sprintf('{"${Node.valuePropKeys.itemUuid}": "%s", "code": "%s", "label": "%s"}', ` +
+  //     `${nodeDefCalcName}_item_uuid, ${nodeDefCalcName}, ${nodeDefCalcName}_item_label)))`
+  // }
+}
+
+function* initPutResults(dfSource, step) {
+  const { surveyId } = this.rChain
+  const scripts = []
+
+  // csv file
+  const fileResults = `${this.dirResults}/${dfSource}.csv`
+  scripts.push(writeCsv(dfSource, fileResults))
+  // zip file
+  const fileZip = `${this.dirResults}/${dfSource}.zip`
+  scripts.push(zipr(fileZip, fileResults))
+  // put request
+  scripts.push(arenaPutFile(ApiRoutes.rChain.stepEntityData(surveyId, ProcessingStep.getUuid(step)), fileZip))
+
+  yield this.appendContent(...scripts)
+}
+
+function* initScript() {
+  const { chain, survey } = this.rChain
   const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.hasEntity)
 
   // create results dir
-  const dirResults = 'system/results'
-  yield rFilePersistResults.appendContent(dirCreate(dirResults))
+  yield this.appendContent(dirCreate(this.dirResults))
 
   for (let i = 0; i < steps.length; i += 1) {
     const step = steps[i]
-    const stepIndex = ProcessingStep.getIndex(step) + 1
-    const stepUuid = ProcessingStep.getUuid(step)
     const entityDefStep = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
-    const calculations = ProcessingStep.getCalculations(step)
-    yield rFilePersistResults.logInfo(`'Persist results for step ${stepIndex} (start)'`)
 
-    // data frame result columns - only output attribute values
-    const dfResultColumns = calculations.reduce((columnsAggregator, calculation) => {
-      const nodeDefCalculation = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(survey)
-      const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
-      columnsAggregator.push(
-        `'${nodeDefCalculationName}'`,
-        `'${nodeDefCalculationName}_${ResultNodeTable.colNames.nodeDefUuid}'`
-      )
-      return columnsAggregator
-    }, [])
-
-    // create data frame result
     const dfSource = NodeDef.getName(entityDefStep)
     const dfResult = `${NodeDef.getName(entityDefStep)}Result`
 
-    yield rFilePersistResults.appendContent(setVar(dfResult, `${dfSource}[, c(${dfResultColumns.join(',')})]`))
+    yield this.logInfo(`'Uploading results for entity ${dfSource} started'`)
 
-    // add uuids
-    const uuidsMapping = [
-      { name: ResultNodeTable.colNames.processingChainUuid, value: `'${chainUuid}'` },
-      { name: ResultNodeTable.colNames.processingStepUuid, value: `'${stepUuid}'` },
-      { name: ResultNodeTable.colNames.recordUuid, value: dfVar(dfSource, RDBDataTable.colNameRecordUuuid) },
-      { name: ResultNodeTable.colNames.parentUuid, value: dfVar(dfSource, RDBDataView.getColUuid(entityDefStep)) },
-    ]
-    for (let j = 0; j < uuidsMapping.length; j += 1) {
-      const uuidMapping = uuidsMapping[j]
-      yield rFilePersistResults.appendContent(setVar(dfVar(dfResult, uuidMapping.name), uuidMapping.value))
-    }
+    yield* this.initDfResult(dfSource, dfResult, step, entityDefStep)
+    yield* this.initSetAttributeCodeValues()
+    yield* this.initPutResults(dfSource, step)
 
-    // TODO
-    // For code attributes, write res$[node_def_name] in json {itemUuid, code, label}
-    // for (let j = 0; j < calculations.length; j += 1) {
-    //   const calculation = calculations[j]
-    //   const nodeDefCalculation = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(survey)
-    //   const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
-    //   if(NodeDef.isCode(nodeDefCalculation)){
-    //     withDF(dfResult, ifElse(isNa(nodeDefCalculationName), NA, ))
-    //
-    //   }
-    //
-    //   const value = `with(${dfResult},
-    //     ifelse(is.na(${nodeDefCalcName}), ${NA}, ` +
-    //     `sprintf('{"${Node.valuePropKeys.itemUuid}": "%s", "code": "%s", "label": "%s"}', ` +
-    //     `${nodeDefCalcName}_item_uuid, ${nodeDefCalcName}, ${nodeDefCalcName}_item_label)))`
-    // }
-
-    // write csv file
-    const fileResults = `${dirResults}/${dfSource}.csv`
-    yield rFilePersistResults.appendContent(writeCsv(dfSource, fileResults))
-
-    // create zip file
-    const fileZip = `${dirResults}/${dfSource}.zip`
-    yield rFilePersistResults.appendContent(zipr(fileZip, fileResults))
-
-    // persist results
-    yield rFilePersistResults.appendContent(arenaPutFile(ApiRoutes.rChain.stepEntityData(surveyId, stepUuid), fileZip))
-
-    // rFilePersistResults.appendContent(arenaPutFile)
-
-    yield rFilePersistResults.logInfo(`'Persist results for step ${stepIndex} (end)'`)
+    yield this.logInfo(`'Uploading results for entity ${dfSource} completed'`)
   }
 
   // remove results dir
-  yield rFilePersistResults.appendContent(unlink(dirResults))
+  yield this.appendContent(unlink(this.dirResults))
 }
 
 export default class RFilePersistResults extends RFileSystem {
@@ -117,10 +117,13 @@ export default class RFilePersistResults extends RFileSystem {
   async init() {
     await super.init()
 
-    // const { chain, survey } = this.rChain
-    // const steps = ProcessingChain.getProcessingSteps(chain)
+    this.dirResults = 'system/results'
+    this.initScript = initScript.bind(this)
+    this.initDfResult = initDfResult.bind(this)
+    this.initSetAttributeCodeValues = initSetAttributeCodeValues.bind(this)
+    this.initPutResults = initPutResults.bind(this)
 
-    await PromiseUtils.resolveGenerator(persistResults(this))
+    await PromiseUtils.resolveGenerator(this.initScript())
 
     // await this.appendContent(comment())
     //
