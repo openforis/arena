@@ -52,6 +52,8 @@ const BinaryOperand = (props) => {
 
       {React.createElement(expressionNodeRenderer, {
         ...props,
+        type,
+        node: nodeOperand,
         onChange: (item) => onChange(R.assoc(type, item, node)),
       })}
     </>
