@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { hideAppLoader, showAppLoader } from '../app/actions'
 import { showNotification } from '../app/appNotification/actions'
 import { showAppJobMonitor } from '../loggedin/appJob/actions'
@@ -19,7 +20,7 @@ const defs = {
   taxonomies: 'taxonomies',
 }
 
-const _fetchDefs = (surveyId, defs, params = {}) => axios.get(`/api/survey/${surveyId}/${defs}`, { params })
+const _fetchDefs = (surveyId, defsType, params = {}) => axios.get(`/api/survey/${surveyId}/${defsType}`, { params })
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
@@ -97,15 +98,23 @@ export const publishSurvey = () => async (dispatch, getState) => {
 
 // ====== DELETE
 
-export const deleteSurvey = () => async (dispatch, getState) => {
+export const deleteSurvey = (history) => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
   await axios.delete(`/api/survey/${surveyId}`)
 
-  dispatch({ type: surveyDelete, surveyInfo })
-  dispatch(
+  await dispatch({ type: surveyDelete, surveyInfo })
+
+  // Navigate to survey list
+  history.push(appModuleUri(homeModules.surveyList))
+
+  await dispatch(hideAppLoader())
+
+  await dispatch(
     showNotification('homeView.surveyDeleted', {
       surveyName: Survey.getName(surveyInfo),
     })
