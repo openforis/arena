@@ -38,6 +38,7 @@ export const valuePropKeys = {
 
   // Code
   itemUuid: 'itemUuid',
+  label: 'label',
 
   // Coordinate
   x: 'x',
@@ -55,28 +56,6 @@ export const valuePropKeys = {
   scientificName: 'scientificName',
   vernacularName: 'vernacularName',
 }
-
-/**
- * ======
- * CREATE
- * ======
- */
-
-export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.nodeDefUuid]: nodeDefUuid,
-  [keys.recordUuid]: recordUuid,
-  [keys.parentUuid]: getUuid(parentNode),
-  [keys.value]: value,
-  [keys.meta]: {
-    [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
-  },
-})
-
-export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
-  [keys.placeholder]: true,
-})
 
 /**
  * ======
@@ -127,6 +106,28 @@ export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancesto
 
 // Code metadata
 export const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
+
+/**
+ * ======
+ * CREATE
+ * ======
+ */
+
+export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
+  [keys.uuid]: uuidv4(),
+  [keys.nodeDefUuid]: nodeDefUuid,
+  [keys.recordUuid]: recordUuid,
+  [keys.parentUuid]: getUuid(parentNode),
+  [keys.value]: value,
+  [keys.meta]: {
+    [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
+  },
+})
+
+export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
+  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
+  [keys.placeholder]: true,
+})
 
 /**
  * ======

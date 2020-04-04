@@ -14,6 +14,8 @@ export const merge = (x, y, by, allX = false) => `merge(x = ${x}, y = ${y}, by="
 
 export const vector = (values = []) => `c(${values.join(', ')})`
 
+export const sqldf = (query) => `sqldf('${query}')`
+
 // this is r with (reserved keyword)
 export const withDF = (dfName, body) => `with(${dfName}, ${body})`
 

@@ -13,6 +13,7 @@ export {
   dirCreate,
   writeCsv,
   vector,
+  sqldf,
 } from './utility'
 
 export { zipr } from './zip'

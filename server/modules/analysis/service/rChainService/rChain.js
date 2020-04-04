@@ -33,6 +33,7 @@ class RChain {
     this._dir = null
     this._dirUser = null
     this._dirSystem = null
+    this._dirResults = null
 
     // Root files
     this._fileArena = null
@@ -92,6 +93,10 @@ class RChain {
     return this._dirUser
   }
 
+  get dirResults() {
+    return this._dirResults
+  }
+
   get fileArena() {
     return this._fileArena
   }
@@ -118,8 +123,10 @@ class RChain {
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 
-    this._dirSystem = FileUtils.join(this._dir, 'system')
+    const system = 'system'
+    this._dirSystem = FileUtils.join(this._dir, system)
     this._dirUser = FileUtils.join(this._dir, 'user')
+    this._dirResults = FileUtils.join(system, 'results')
     await Promise.all([FileUtils.mkdir(this._dirSystem), FileUtils.mkdir(this._dirUser)])
   }
 
