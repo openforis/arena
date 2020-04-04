@@ -6,7 +6,7 @@ import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
 
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
-import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
+import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks'
 
 const FormDesignerView = () => {
   const canEditDef = useAuthCanEditSurvey()

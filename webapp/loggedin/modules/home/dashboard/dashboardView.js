@@ -2,7 +2,7 @@ import './dashboardView.scss'
 
 import React from 'react'
 
-import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
+import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import SurveyInfo from './surveyInfo/surveyInfo'
 import RecordsSummary from './recordsSummary/recordsSummary'

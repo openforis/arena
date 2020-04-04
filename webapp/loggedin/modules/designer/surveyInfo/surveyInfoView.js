@@ -2,8 +2,7 @@ import './surveyInfoView.scss'
 
 import React from 'react'
 
-import { useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
-import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
+import { useAuthCanEditSurvey, useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
 
 import { Input } from '@webapp/commonComponents/form/input'
 import * as Survey from '@core/survey/survey'

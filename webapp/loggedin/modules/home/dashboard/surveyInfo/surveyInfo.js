@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
-import { useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useAuthCanEditSurvey, useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
 import Header from '@webapp/commonComponents/header'
 
 import * as Survey from '@core/survey/survey'
@@ -13,7 +13,6 @@ import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = () => {

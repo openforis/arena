@@ -10,7 +10,7 @@ import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesVi
 import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks/useAuth'
+import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks'
 import SurveyHierarchyView from './surveyHierarchy/surveyHierarchyView'
 import FormDesignerView from './formDesigner/formDesignerView'
 
