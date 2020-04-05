@@ -5,13 +5,13 @@ import * as R from 'ramda'
 import EditButtons from './editButtons'
 
 const Group = (props) => {
-  const { node, onChange, level, expressionNodeRenderer } = props
+  const { node, onChange, level, renderNode } = props
   const { argument } = node
 
   return (
     <div className="group">
       <h3>(</h3>
-      {React.createElement(expressionNodeRenderer, {
+      {React.createElement(renderNode, {
         ...props,
         level: level + 1,
         node: argument,
@@ -26,17 +26,14 @@ const Group = (props) => {
 }
 
 Group.propTypes = {
-  node: PropTypes.any,
-  onChange: PropTypes.func,
+  node: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  renderNode: PropTypes.elementType.isRequired,
   level: PropTypes.number,
-  expressionNodeRenderer: PropTypes.func,
 }
 
 Group.defaultProps = {
-  node: null,
-  onChange: null,
   level: 0,
-  expressionNodeRenderer: null,
 }
 
 export default Group

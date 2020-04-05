@@ -7,20 +7,27 @@ import * as Expression from '@core/expressionParser/expression'
 import { useI18n } from '../../hooks'
 
 const Logical = (props) => {
-  const { node, onChange, expressionNodeRenderer } = props
+  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, renderNode, variables } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators
 
   const i18n = useI18n()
 
+  const createElementNode = (type, nodeEl, nodeElOther) =>
+    React.createElement(renderNode, {
+      node: nodeEl,
+      onChange: (item) => onChange(R.assoc(type, item, node)),
+      onDelete: () => onChange(nodeElOther),
+      canDelete,
+      nodeDefCurrent,
+      isBoolean,
+      level,
+      variables,
+    })
+
   return (
     <div className="logical">
-      {React.createElement(expressionNodeRenderer, {
-        ...props,
-        node: left,
-        onChange: (item) => onChange(R.assoc('left', item, node)),
-        onDelete: () => onChange(right),
-      })}
+      {createElementNode('left', left, right)}
 
       <div className="btns">
         <div className="btns__add">
@@ -54,12 +61,7 @@ const Logical = (props) => {
         </button>
       </div>
 
-      {React.createElement(expressionNodeRenderer, {
-        ...props,
-        node: right,
-        onChange: (item) => onChange(R.assoc('right', item, node)),
-        onDelete: () => onChange(left),
-      })}
+      {createElementNode('right', right, left)}
     </div>
   )
 }
@@ -67,7 +69,20 @@ const Logical = (props) => {
 Logical.propTypes = {
   node: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
-  expressionNodeRenderer: PropTypes.func.isRequired,
+  renderNode: PropTypes.elementType.isRequired,
+  // ExpressionNode props
+  canDelete: PropTypes.func,
+  nodeDefCurrent: PropTypes.any.isRequired,
+  isBoolean: PropTypes.bool,
+  level: PropTypes.any,
+  variables: PropTypes.array,
+}
+
+Logical.defaultProps = {
+  canDelete: null,
+  isBoolean: false,
+  level: null,
+  variables: null,
 }
 
 export default Logical

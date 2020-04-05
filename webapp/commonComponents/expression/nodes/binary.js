@@ -10,15 +10,30 @@ import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
 
 const Binary = (props) => {
-  const { canDelete, node, nodeDefCurrent, isBoolean, onChange, onDelete } = props
+  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, variables } = props
 
   const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
 
   const showOperator = (isBoolean && !NodeDef.isBoolean(nodeDefCurrent)) || !isLeftLiteral
 
+  const createOperand = (type) => (
+    <BinaryOperand
+      canDelete={canDelete}
+      isBoolean={isBoolean}
+      level={level}
+      node={node}
+      nodeDefCurrent={nodeDefCurrent}
+      onChange={onChange}
+      onDelete={onDelete}
+      renderNode={renderNode}
+      type={type}
+      variables={variables}
+    />
+  )
+
   return (
     <div className="binary">
-      {React.createElement(BinaryOperand, { ...props, type: BinaryOperandType.left })}
+      {createOperand(BinaryOperandType.left)}
 
       {showOperator && (
         <>
@@ -29,7 +44,7 @@ const Binary = (props) => {
             onChange={(item) => onChange(R.assoc('operator', R.propOr('', 'key', item), node))}
           />
 
-          {React.createElement(BinaryOperand, { ...props, type: BinaryOperandType.right })}
+          {createOperand(BinaryOperandType.right)}
 
           {isBoolean && <EditButtons node={node} onChange={onChange} onDelete={onDelete} canDelete={canDelete} />}
         </>
@@ -41,19 +56,21 @@ const Binary = (props) => {
 Binary.propTypes = {
   canDelete: PropTypes.bool,
   isBoolean: PropTypes.bool,
-  node: PropTypes.any,
-  nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func,
-  onDelete: PropTypes.func,
+  node: PropTypes.any.isRequired,
+  nodeDefCurrent: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  // ExpressionNode props
+  level: PropTypes.any,
+  renderNode: PropTypes.func.isRequired,
+  variables: PropTypes.array,
 }
 
 Binary.defaultProps = {
   canDelete: false,
   isBoolean: false,
-  node: null,
-  nodeDefCurrent: null,
-  onChange: null,
-  onDelete: null,
+  level: null,
+  variables: null,
 }
 
 export default Binary

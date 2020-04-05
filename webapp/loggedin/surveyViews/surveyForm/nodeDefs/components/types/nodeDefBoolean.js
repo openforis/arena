@@ -8,7 +8,7 @@ import * as Node from '@core/record/node'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 const NodeDefBoolean = (props) => {
-  const { nodeDef, nodes, readOnly, updateNode, edit, entry, canEditRecord } = props
+  const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
 
   const i18n = useI18n()
 

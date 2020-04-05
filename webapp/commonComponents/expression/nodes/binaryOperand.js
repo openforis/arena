@@ -14,7 +14,8 @@ BinaryOperandType.isLeft = R.equals(BinaryOperandType.left)
 BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 
 const BinaryOperand = (props) => {
-  const { node, nodeDefCurrent, isBoolean, onChange, type, expressionNodeRenderer } = props
+  const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, renderNode, variables } = props
+
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
 
@@ -50,11 +51,15 @@ const BinaryOperand = (props) => {
         {i18n.t('expressionEditor.const')}
       </button>
 
-      {React.createElement(expressionNodeRenderer, {
-        ...props,
-        type,
+      {React.createElement(renderNode, {
+        canDelete,
+        isBoolean,
+        level,
         node: nodeOperand,
+        nodeDefCurrent,
         onChange: (item) => onChange(R.assoc(type, item, node)),
+        onDelete,
+        variables,
       })}
     </>
   )
@@ -66,11 +71,20 @@ BinaryOperand.propTypes = {
   nodeDefCurrent: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
-  expressionNodeRenderer: PropTypes.func.isRequired,
+  renderNode: PropTypes.func.isRequired,
+  // ExpressionNode props
+  canDelete: PropTypes.func,
+  level: PropTypes.any,
+  onDelete: PropTypes.func,
+  variables: PropTypes.array,
 }
 
 BinaryOperand.defaultProps = {
+  canDelete: null,
   isBoolean: false,
+  level: null,
+  onDelete: null,
+  variables: null,
 }
 
 export default BinaryOperand
