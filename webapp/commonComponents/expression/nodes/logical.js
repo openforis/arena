@@ -65,15 +65,9 @@ const Logical = (props) => {
 }
 
 Logical.propTypes = {
-  node: PropTypes.any,
-  onChange: PropTypes.func,
-  expressionNodeRenderer: PropTypes.func,
-}
-
-Logical.defaultProps = {
-  node: null,
-  onChange: null,
-  expressionNodeRenderer: null,
+  node: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  expressionNodeRenderer: PropTypes.func.isRequired,
 }
 
 export default Logical

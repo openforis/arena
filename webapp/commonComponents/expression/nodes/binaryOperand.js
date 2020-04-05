@@ -62,20 +62,15 @@ const BinaryOperand = (props) => {
 
 BinaryOperand.propTypes = {
   isBoolean: PropTypes.bool,
-  node: PropTypes.any,
-  nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func,
-  type: PropTypes.any,
-  expressionNodeRenderer: PropTypes.func,
+  node: PropTypes.any.isRequired,
+  nodeDefCurrent: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  type: PropTypes.string.isRequired,
+  expressionNodeRenderer: PropTypes.func.isRequired,
 }
 
 BinaryOperand.defaultProps = {
   isBoolean: false,
-  expressionNodeRenderer: null,
-  node: null,
-  nodeDefCurrent: null,
-  onChange: null,
-  type: null,
 }
 
 export default BinaryOperand
