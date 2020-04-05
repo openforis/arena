@@ -57,11 +57,11 @@ Binary.propTypes = {
   canDelete: PropTypes.bool,
   isBoolean: PropTypes.bool,
   node: PropTypes.any.isRequired,
-  nodeDefCurrent: PropTypes.any.isRequired,
+  nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
   // ExpressionNode props
-  level: PropTypes.any,
+  level: PropTypes.number,
   renderNode: PropTypes.func.isRequired,
   variables: PropTypes.array,
 }
@@ -69,7 +69,9 @@ Binary.propTypes = {
 Binary.defaultProps = {
   canDelete: false,
   isBoolean: false,
-  level: null,
+  level: 0,
+  nodeDefCurrent: null,
+  onDelete: null,
   variables: null,
 }
 

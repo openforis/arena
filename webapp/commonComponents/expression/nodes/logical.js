@@ -13,12 +13,12 @@ const Logical = (props) => {
 
   const i18n = useI18n()
 
-  const createElementNode = (type, nodeEl, nodeElOther) =>
+  const createElementNode = (type, nodeEl, nodeElOther, canDeleteEl) =>
     React.createElement(renderNode, {
       node: nodeEl,
       onChange: (item) => onChange(R.assoc(type, item, node)),
       onDelete: () => onChange(nodeElOther),
-      canDelete,
+      canDelete: canDeleteEl,
       nodeDefCurrent,
       isBoolean,
       level,
@@ -27,7 +27,7 @@ const Logical = (props) => {
 
   return (
     <div className="logical">
-      {createElementNode('left', left, right)}
+      {createElementNode('left', left, right, canDelete)}
 
       <div className="btns">
         <div className="btns__add">
@@ -61,7 +61,7 @@ const Logical = (props) => {
         </button>
       </div>
 
-      {createElementNode('right', right, left)}
+      {createElementNode('right', right, left, true)}
     </div>
   )
 }
@@ -71,17 +71,18 @@ Logical.propTypes = {
   onChange: PropTypes.func.isRequired,
   renderNode: PropTypes.elementType.isRequired,
   // ExpressionNode props
-  canDelete: PropTypes.func,
-  nodeDefCurrent: PropTypes.any.isRequired,
+  canDelete: PropTypes.bool,
+  nodeDefCurrent: PropTypes.any,
   isBoolean: PropTypes.bool,
-  level: PropTypes.any,
+  level: PropTypes.number,
   variables: PropTypes.array,
 }
 
 Logical.defaultProps = {
-  canDelete: null,
+  canDelete: false,
   isBoolean: false,
-  level: null,
+  level: 0,
+  nodeDefCurrent: null,
   variables: null,
 }
 

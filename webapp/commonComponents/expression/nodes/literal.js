@@ -117,17 +117,14 @@ const Literal = (props) => {
 }
 
 Literal.propTypes = {
-  node: PropTypes.any,
+  node: PropTypes.any.isRequired,
   nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func,
-  type: PropTypes.any,
+  onChange: PropTypes.func.isRequired,
+  type: PropTypes.string.isRequired,
 }
 
 Literal.defaultProps = {
-  node: null,
   nodeDefCurrent: null,
-  onChange: null,
-  type: null,
 }
 
 export default Literal

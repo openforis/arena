@@ -59,6 +59,7 @@ const BinaryOperand = (props) => {
         nodeDefCurrent,
         onChange: (item) => onChange(R.assoc(type, item, node)),
         onDelete,
+        type,
         variables,
       })}
     </>
@@ -68,21 +69,22 @@ const BinaryOperand = (props) => {
 BinaryOperand.propTypes = {
   isBoolean: PropTypes.bool,
   node: PropTypes.any.isRequired,
-  nodeDefCurrent: PropTypes.any.isRequired,
+  nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
   renderNode: PropTypes.func.isRequired,
   // ExpressionNode props
-  canDelete: PropTypes.func,
-  level: PropTypes.any,
+  canDelete: PropTypes.bool,
+  level: PropTypes.number,
   onDelete: PropTypes.func,
   variables: PropTypes.array,
 }
 
 BinaryOperand.defaultProps = {
-  canDelete: null,
+  canDelete: false,
   isBoolean: false,
-  level: null,
+  level: 0,
+  nodeDefCurrent: null,
   onDelete: null,
   variables: null,
 }
