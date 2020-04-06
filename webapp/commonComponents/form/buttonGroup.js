@@ -1,25 +1,28 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
 
-const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, deselectable }) => (
-  <div>
-    {items.map(item => {
+const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => (
+  <div className={`btn-group${className ? ` ${className}` : ''}`}>
+    {items.map((item) => {
       const selected = selectedItemKey === item.key || (multiple && R.includes(item.key, selectedItemKey))
       return (
         <button
           key={item.key}
           type="button"
           className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
-          onClick={() =>
-            onChange(
-              multiple
-                ? R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
-                : selected
-                ? null
-                : item.key,
-            )
-          }
+          onClick={() => {
+            let value
+            if (multiple) {
+              value = R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
+            } else if (selected) {
+              value = null
+            } else {
+              value = item.key
+            }
+            onChange(value)
+          }}
           aria-disabled={Boolean(item.disabled) || disabled}
         >
           {item.label}
@@ -29,13 +32,24 @@ const ButtonGroup = ({ items, multiple, selectedItemKey, onChange, disabled, des
   </div>
 )
 
+ButtonGroup.propTypes = {
+  items: PropTypes.array,
+  selectedItemKey: PropTypes.any, // Array of values if multiple=true
+  onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  multiple: PropTypes.bool,
+  deselectable: PropTypes.bool,
+  className: PropTypes.string,
+}
+
 ButtonGroup.defaultProps = {
   items: [],
-  selectedItemKey: null, // Array of values if multiple=true
+  selectedItemKey: null,
   onChange: () => {},
   disabled: false,
   multiple: false,
   deselectable: false,
+  className: null,
 }
 
 export default ButtonGroup

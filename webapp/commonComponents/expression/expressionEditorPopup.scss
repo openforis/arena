@@ -1,7 +1,7 @@
 @import '~codemirror/lib/codemirror.css';
 @import '~codemirror/addon/hint/show-hint';
 
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .expression-editor-popup {
   display: grid;
@@ -9,15 +9,14 @@
   grid-row-gap: 2rem;
 
   .query {
-    background-color: rgba($blueLight, .15);
+    background-color: rgba($blueLight, 0.15);
   }
 }
 
 .expression-editor-popup__editor-help kbd {
-  border: 1px solid
-  #aaa;
+  border: 1px solid #aaa;
   border-radius: 0.2em;
-  box-shadow: 0.1em 0.1em 0.2em rgba(0,0,0,0.1);
+  box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.1);
   background-color: #f9f9f9;
   background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee);
   color: #000;
@@ -49,7 +48,8 @@
     border: 1px solid black;
     margin-bottom: 15px;
   }
-  textarea, span {
+  textarea,
+  span {
     font-size: 1rem;
   }
 
@@ -67,7 +67,6 @@
     .btns__last {
       grid-column: 4;
     }
-
   }
 
   input {
@@ -84,17 +83,18 @@
       width: 200px;
     }
 
-    .dropdown, .literal {
+    .dropdown,
+    .literal {
       margin-right: 1.5rem;
     }
 
     .btn-switch-operand {
-      font-size: .7rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      margin: 0 .1rem;
-      padding: .3rem;
+      margin: 0 0.1rem;
+      padding: 0.3rem;
       align-self: flex-end;
-      letter-spacing: -.05rem;
+      letter-spacing: -0.05rem;
     }
 
     .operator {
@@ -103,17 +103,23 @@
       }
     }
 
+    .literal-btn-group-boolean {
+      display: flex;
+      justify-content: space-between;
+      width: 8rem;
+      margin-left: 2rem;
+    }
   }
 
   .logical {
     display: grid;
-    grid-row-gap: .8rem;
+    grid-row-gap: 0.8rem;
   }
 
   .group {
     display: grid;
     grid-template-columns: 1.5rem 1fr;
-    padding: .5rem;
+    padding: 0.5rem;
     border: 2px dotted $greyBorder;
 
     .footer {
@@ -122,7 +128,6 @@
       margin-top: 1rem;
     }
   }
-
 }
 
 .expression-editor-popup__footer {
@@ -130,7 +135,7 @@
   align-self: end;
 
   > button {
-    margin: 0px .3rem;
+    margin: 0px 0.3rem;
     font-weight: 600;
   }
 }
