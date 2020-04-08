@@ -9,8 +9,9 @@ import DfResults from './dfResults'
 
 import { dirCreate, writeCsv, arenaPutFile, zipr, unlink } from '../../rFunctions'
 
-const getPutResultsScripts = (dfResults) => {
-  const { name: dfResultName, dfSourceName, stepUuid, dirResults, surveyId } = dfResults
+const getPutResultsScripts = (rChain, dfResults) => {
+  const { surveyId, cycle, dirResults } = rChain
+  const { name: dfResultName, dfSourceName, step } = dfResults
   const scripts = []
 
   // csv file
@@ -20,7 +21,7 @@ const getPutResultsScripts = (dfResults) => {
   const fileZip = `${dirResults}/${dfSourceName}.zip`
   scripts.push(zipr(fileZip, fileResults))
   // put request
-  scripts.push(arenaPutFile(ApiRoutes.rChain.stepEntityData(surveyId, stepUuid), fileZip))
+  scripts.push(arenaPutFile(ApiRoutes.rChain.stepEntityData(surveyId, cycle, ProcessingStep.getUuid(step)), fileZip))
 
   return scripts
 }
@@ -38,7 +39,7 @@ function* initScript() {
 
     yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
     yield this.appendContent(...dfResults.scripts)
-    yield this.appendContent(...getPutResultsScripts(dfResults))
+    yield this.appendContent(...getPutResultsScripts(this.rChain, dfResults))
     yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
   }
 

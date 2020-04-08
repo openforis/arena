@@ -28,28 +28,12 @@ export default class DfResults {
     return this._rChain
   }
 
-  get chainUuid() {
-    return this.rChain.chainUuid
-  }
-
   get survey() {
     return this.rChain.survey
   }
 
-  get surveyId() {
-    return this.rChain.surveyId
-  }
-
-  get dirResults() {
-    return this.rChain.dirResults
-  }
-
   get step() {
     return this._step
-  }
-
-  get stepUuid() {
-    return ProcessingStep.getUuid(this.step)
   }
 
   get calculations() {
@@ -74,24 +58,18 @@ export default class DfResults {
 
   initDf() {
     // init attribute columns: only output attribute values
-    const dfResultColumns = this.calculations.reduce((columnsAggregator, calculation) => {
-      const nodeDefCalculation = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(
-        this.survey
-      )
-      const nodeDefCalculationName = NodeDef.getName(nodeDefCalculation)
-      columnsAggregator.push(
-        `'${nodeDefCalculationName}'`,
-        `'${nodeDefCalculationName}_${ResultNodeTable.colNames.nodeDefUuid}'`
-      )
-      return columnsAggregator
+    const dfResultColumns = this.calculations.map((calculation) => {
+      const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+      const nodeDefCalculation = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
+      return `'${NodeDef.getName(nodeDefCalculation)}'`
     }, [])
     this.scripts.push(setVar(this.name, `${this.dfSourceName}[, ${vector(dfResultColumns)}]`))
   }
 
   initUuids() {
     const setUuids = [
-      { name: ResultNodeTable.colNames.processingChainUuid, value: `'${this.chainUuid}'` },
-      { name: ResultNodeTable.colNames.processingStepUuid, value: `'${this.stepUuid}'` },
+      { name: ResultNodeTable.colNames.processingChainUuid, value: `'${this.rChain.chainUuid}'` },
+      { name: ResultNodeTable.colNames.processingStepUuid, value: `'${ProcessingStep.getUuid(this.step)}'` },
       { name: ResultNodeTable.colNames.recordUuid, value: dfVar(this.dfSourceName, RDBDataTable.colNameRecordUuuid) },
       {
         name: ResultNodeTable.colNames.parentUuid,
@@ -123,7 +101,7 @@ export default class DfResults {
         const query = `
             SELECT 
                 r.*,
-                "{${Node.valuePropKeys.itemUuid}: """ || c.uuid || """, ${Node.valuePropKeys.code}: """ || c.code || """, ${Node.valuePropKeys.label}: """ || c.label || """}" AS ${nodeVarName}
+                "{""${Node.valuePropKeys.itemUuid}"": """ || c.uuid || """, ""${Node.valuePropKeys.code}"": """ || c.code || """, ""${Node.valuePropKeys.label}"": """ || c.label || """}" AS ${nodeVarName}
             FROM ${this.name} r
             LEFT OUTER JOIN ${dfCategory} c
             ON r.${nodeTmpVarName} = c.code  

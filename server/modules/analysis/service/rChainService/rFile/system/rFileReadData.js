@@ -56,8 +56,7 @@ export default class RFileReadData extends RFileSystem {
 
         // Fetch entity data
         const getEntityData = arenaGet(
-          ApiRoutes.rChain.stepEntityData(Survey.getId(survey), ProcessingStep.getUuid(step)),
-          { cycle }
+          ApiRoutes.rChain.stepEntityData(Survey.getId(survey), cycle, ProcessingStep.getUuid(step))
         )
         const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
         const setEntityData = setVar(NodeDef.getName(entityDef), getEntityData)

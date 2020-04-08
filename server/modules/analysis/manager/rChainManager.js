@@ -1,5 +1,4 @@
 import * as Survey from '@core/survey/survey'
-
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
@@ -23,6 +22,9 @@ export const fetchStepData = async (survey, cycle, stepUuid) => {
 
   return RChainRepository.fetchStepData(surveyId, cycle, entityDef, entityDefParent, nodeDefCalculations)
 }
+
+// ==== UPDATE
+export { default as MassiveInsertNodeResults } from './massiveInsertNodeResults'
 
 // ==== DELETE
 export const { deleteNodeResults } = RChainRepository
