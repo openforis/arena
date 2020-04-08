@@ -52,7 +52,7 @@ const actionHandlers = {
     CategoryState.assocLevelItem(CategoryLevel.getIndex(level), item)(state),
 
   [categoryItemPropUpdate]: (state, { level, item, key, value }) =>
-    CategoryState.assocLevelItemProp(level, item, key, value)(state),
+    CategoryState.assocLevelItemProp(CategoryLevel.getIndex(level), item, key, value)(state),
 
   [categoryItemDelete]: (state, { level, item }) =>
     CategoryState.dissocLevelItem(CategoryLevel.getIndex(level), CategoryItem.getUuid(item))(state),
@@ -64,7 +64,7 @@ const actionHandlers = {
   // ===== category import summary
   [categoryViewImportSummaryShow]: (state, { summary }) => CategoryState.assocImportSummary(summary)(state),
 
-  [categoryViewImportSummaryHide]: state => CategoryState.dissocImportSummary(state),
+  [categoryViewImportSummaryHide]: (state) => CategoryState.dissocImportSummary(state),
 
   [categoryViewImportSummaryColumnDataTypeUpdate]: (state, { columnName, dataType }) =>
     CategoryState.assocImportSummaryColumnDataType(columnName, dataType)(state),
