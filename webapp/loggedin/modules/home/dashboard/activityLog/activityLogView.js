@@ -1,7 +1,7 @@
 import './activityLogView.scss'
 
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as R from 'ramda'
 
 import * as DateUtils from '@core/dateUtils'
@@ -9,29 +9,24 @@ import * as DateUtils from '@core/dateUtils'
 import { useI18n, useOnIntersect, useInterval } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
 import Markdown from '@webapp/commonComponents/markdown'
 import { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs } from './actions'
 import * as ActivityLogMessage from './activityLogMessage'
 
-const ActivityLogView = props => {
-  const {
-    activityLogMessages,
-    activityLogLoadComplete,
-    fetchActivityLogsNewest,
-    fetchActivityLogsNext,
-    resetActivityLogs,
-  } = props
+const ActivityLogView = () => {
+  const activityLogMessages = useSelector(ActivityLogState.getMessages)
+  const activityLogLoadComplete = useSelector(ActivityLogState.isLoadComplete)
 
   const i18n = useI18n()
+  const dispatch = useDispatch()
 
-  const [setNextActivitiesFetchTrigger] = useOnIntersect(fetchActivityLogsNext)
-  useInterval(fetchActivityLogsNewest, 3000)
+  const [setNextActivitiesFetchTrigger] = useOnIntersect(() => dispatch(fetchActivityLogsNext()))
+  useInterval(() => dispatch(fetchActivityLogsNewest()), 3000)
 
   useEffect(() => {
-    return () => resetActivityLogs()
+    return () => dispatch(resetActivityLogs())
   }, [])
 
   return (
@@ -45,11 +40,11 @@ const ActivityLogView = props => {
               const className = R.pipe(
                 R.when(R.always(ActivityLogMessage.isItemDeleted(message)), R.append('item-deleted')),
                 R.when(R.always(ActivityLogMessage.isHighlighted(message)), R.append('highlighted')),
-                R.join(' '),
+                R.join(' ')
               )(['activity-log__message'])
 
-              const setRef = el =>
-                !activityLogLoadComplete && index === activityLogMessages.length - 25
+              const setRef = (el) =>
+                !activityLogLoadComplete && index === R.length(activityLogMessages) - 10
                   ? setNextActivitiesFetchTrigger(el)
                   : null
 
@@ -57,7 +52,7 @@ const ActivityLogView = props => {
                 <React.Fragment key={ActivityLogMessage.getId(message)}>
                   <div ref={setRef} className={className}>
                     <div className="activity">
-                      <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail={true} />
+                      <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail />
                       <Markdown
                         source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`}
                       />
@@ -75,12 +70,4 @@ const ActivityLogView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  surveyId: SurveyState.getSurveyId(state),
-  activityLogMessages: ActivityLogState.getMessages(state),
-  activityLogLoadComplete: ActivityLogState.isLoadComplete(state),
-})
-
-export default connect(mapStateToProps, { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs })(
-  ActivityLogView,
-)
+export default ActivityLogView
