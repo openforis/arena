@@ -45,21 +45,21 @@ const _insertChain = async (user, surveyId, chain, t) => {
 const _updateChainProps = async (user, surveyId, chain, chainDb, t) => {
   const processingChainUuid = ProcessingChain.getUuid(chain)
   const propsToUpdate = ProcessingChain.getPropsDiff(chain)(chainDb)
-  const promises = Object.entries(propsToUpdate)
-    .map(([key, value]) => [
-      ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.processingChainPropUpdate,
-        { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
-        false,
-        t
-      ),
-    ])
-    .flat()
-  await Promise.all(promises)
-
+  await Promise.all(
+    Object.entries(propsToUpdate)
+      .map(([key, value]) => [
+        ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.processingChainPropUpdate,
+          { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
+          false,
+          t
+        ),
+      ])
+      .flat()
+  )
   // Update processing_chain validation and date_modified
   await ProcessingChainRepository.updateChainValidation(
     surveyId,
@@ -89,22 +89,23 @@ const _insertStep = async (user, surveyId, step, t) => {
 
 const _updateStepProps = async (user, surveyId, step, stepDb, t) => {
   const propsToUpdate = ProcessingStep.getPropsDiff(step)(stepDb)
-  const promises = Object.entries(propsToUpdate)
-    .map(([key, value]) => {
-      const processingStepUuid = ProcessingStep.getUuid(step)
-      const logContent = {
-        [ActivityLog.keysContent.uuid]: processingStepUuid,
-        [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(step),
-        key,
-        value,
-      }
-      return [
-        ProcessingStepRepository.updateStepProp(surveyId, processingStepUuid, key, value, t),
-        ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepPropUpdate, logContent, false, t),
-      ]
-    })
-    .flat()
-  await Promise.all(promises)
+  await Promise.all(
+    Object.entries(propsToUpdate)
+      .map(([key, value]) => {
+        const processingStepUuid = ProcessingStep.getUuid(step)
+        const logContent = {
+          [ActivityLog.keysContent.uuid]: processingStepUuid,
+          [ActivityLog.keysContent.processingChainUuid]: ProcessingStep.getProcessingChainUuid(step),
+          key,
+          value,
+        }
+        return [
+          ProcessingStepRepository.updateStepProp(surveyId, processingStepUuid, key, value, t),
+          ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepPropUpdate, logContent, false, t),
+        ]
+      })
+      .flat()
+  )
 }
 
 const _insertOrUpdateStep = async (user, surveyId, step, t) => {
