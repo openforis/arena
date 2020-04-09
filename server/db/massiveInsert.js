@@ -1,4 +1,5 @@
 import pgPromise from 'pg-promise'
+import { db } from '@server/db/db'
 
 const pgp = pgPromise()
 
@@ -9,12 +10,12 @@ export default class MassiveInsert {
    * @param {string} schema - database schema name
    * @param {string} table - database table name
    * @param {object|pgp.helpers.Columns|Array} cols - The columns (see http://vitaly-t.github.io/pg-promise/helpers.ColumnSet.html)
-   * @param {Object} tx - The transaction
+   * @param {Object} [client = db] - The database client
    * @param {number} [bufferSize = 100000] - The size of the buffer
    */
-  constructor(schema, table, cols, tx, bufferSize = 100000) {
+  constructor(schema, table, cols, client = db, bufferSize = 100000) {
     this.columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
-    this.tx = tx
+    this.client = client
     this.values = []
     this.bufferSize = bufferSize
   }
@@ -29,7 +30,7 @@ export default class MassiveInsert {
 
   async flush() {
     if (this.values.length > 0) {
-      await this.tx.none(pgp.helpers.insert(this.values, this.columnSet))
+      await this.client.none(pgp.helpers.insert(this.values, this.columnSet))
       this.values.length = 0
     }
   }

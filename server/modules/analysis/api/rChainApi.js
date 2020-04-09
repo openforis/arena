@@ -53,10 +53,10 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const file = Request.getFile(req)
-
+        const filePath = Request.getFilePath(req)
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
-        await RChainService.persistResults(surveyId, cycle, stepUuid, file)
+
+        await RChainService.persistResults(surveyId, cycle, stepUuid, filePath)
 
         Response.sendOk(res)
       } catch (e) {
