@@ -16,7 +16,6 @@ import RFileSystem, {
   RFilePersistResults,
   RFilePersistScripts,
   RFileReadData,
-  RFileResetResults,
 } from './rFile/system'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -33,6 +32,7 @@ class RChain {
     this._dir = null
     this._dirUser = null
     this._dirSystem = null
+    this._dirResults = null
 
     // Root files
     this._fileArena = null
@@ -40,7 +40,6 @@ class RChain {
     // System files
     this._fileInit = null
     this._fileLogin = null
-    this._fileResetResults = null
     this._fileReadData = null
     this._filePersistResults = null
     this._filePersistScripts = null
@@ -92,6 +91,10 @@ class RChain {
     return this._dirUser
   }
 
+  get dirResults() {
+    return this._dirResults
+  }
+
   get fileArena() {
     return this._fileArena
   }
@@ -118,8 +121,10 @@ class RChain {
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 
-    this._dirSystem = FileUtils.join(this._dir, 'system')
+    const system = 'system'
+    this._dirSystem = FileUtils.join(this._dir, system)
     this._dirUser = FileUtils.join(this._dir, 'user')
+    this._dirResults = FileUtils.join(system, 'results')
     await Promise.all([FileUtils.mkdir(this._dirSystem), FileUtils.mkdir(this._dirUser)])
   }
 
@@ -136,7 +141,6 @@ class RChain {
     // Init system files
     this._fileInit = await new RFileInit(this).init()
     this._fileLogin = await new RFileLogin(this).init()
-    this._fileResetResults = await new RFileResetResults(this).init()
     this._fileReadData = await new RFileReadData(this).init()
 
     // Init user files

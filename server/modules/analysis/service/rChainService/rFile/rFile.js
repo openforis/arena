@@ -3,7 +3,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { arenaInfo } from '../rFunctions'
 
-const _lineSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
+const _contentSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
 
 export const padStart = StringUtils.padStart(3, '0')
 
@@ -34,7 +34,8 @@ export default class RFile {
   }
 
   async appendContent(...contentLines) {
-    await FileUtils.appendFile(this.path, contentLines.join(_lineSeparator) + _lineSeparator)
+    await FileUtils.appendFile(this.path, contentLines.join(StringUtils.NEW_LINE))
+    await FileUtils.appendFile(this.path, _contentSeparator)
     return this
   }
 
@@ -44,10 +45,7 @@ export default class RFile {
 
   async init() {
     await FileUtils.appendFile(this.path)
-    await FileUtils.appendFile(
-      this._rChain.fileArena,
-      `source("${this.pathRelative}")${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
-    )
+    await FileUtils.appendFile(this._rChain.fileArena, `source('${this.pathRelative}')${_contentSeparator}`)
     return this
   }
 }

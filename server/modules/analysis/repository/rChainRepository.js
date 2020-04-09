@@ -1,7 +1,5 @@
 import { db } from '@server/db/db'
 
-import * as NodeDef from '@core/survey/nodeDef'
-
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
@@ -12,15 +10,8 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 export const fetchStepData = async (surveyId, cycle, entityDef, entityDefParent, nodeDefCalculations, client = db) => {
   const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
 
-  const fields = ['*']
-  nodeDefCalculations.forEach((nodeDef) => {
-    const nodeDefName = NodeDef.getName(nodeDef)
-    // Add nodeDefName_uuid field
-    fields.push(`uuid_generate_v4() as ${nodeDefName}_uuid`)
-  })
-
   return client.any(
-    `SELECT ${fields.join(', ')} 
+    `SELECT * 
     FROM ${SchemaRdb.getName(surveyId)}.${viewName}
     WHERE ${DataTable.colNameRecordCycle} = '${cycle}'`
   )

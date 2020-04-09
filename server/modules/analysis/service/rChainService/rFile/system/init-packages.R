@@ -10,3 +10,4 @@ usePackage <- function(name) {
 usePackage("sqldf")
 usePackage("httr")
 usePackage("jsonlite")
+usePackage('zip')

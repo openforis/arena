@@ -2,13 +2,11 @@ import { getSurveyPath } from '@common/apiRoutes/survey'
 
 const getRChainPath = (surveyId) => `${getSurveyPath(surveyId)}/rChain`
 
-// chain
-export const getChainNodeResultsReset = (surveyId, chainUuid) =>
-  `${getRChainPath(surveyId)}/chain/${chainUuid}/nodeResults`
+const getRChainCyclePath = (surveyId, cycle) => `${getRChainPath(surveyId)}/cycles/${cycle}`
 
 // step
-export const getStepEntityDataRead = (surveyId, stepUuid) => `${getRChainPath(surveyId)}/step/${stepUuid}/data`
+export const stepEntityData = (surveyId, cycle, stepUuid) =>
+  `${getRChainCyclePath(surveyId, cycle)}/steps/${stepUuid}/data`
 
 // category'
-export const getCategoryItemsDataRead = (surveyId, categoryUuid) =>
-  `${getRChainPath(surveyId)}/category/${categoryUuid}`
+export const categoryItemsData = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}`

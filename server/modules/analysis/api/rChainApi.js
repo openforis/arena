@@ -8,15 +8,15 @@ import * as CategoryService from '@server/modules/category/service/categoryServi
 import * as RChainService from '@server/modules/analysis/service/rChainService'
 
 export const init = (app) => {
-  // ====== READ - Step Data
+  // ====== READ - Step entity data
   app.get(
-    ApiRoutes.rChain.getStepEntityDataRead(':surveyId', ':processingStepUuid'),
+    ApiRoutes.rChain.stepEntityData(':surveyId', ':cycle', ':stepUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, processingStepUuid } = Request.getParams(req)
+        const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        const data = await RChainService.fetchStepData(surveyId, cycle, processingStepUuid)
+        const data = await RChainService.fetchStepData(surveyId, cycle, stepUuid)
 
         res.json(data)
       } catch (error) {
@@ -27,7 +27,7 @@ export const init = (app) => {
 
   // ====== READ - Category items
   app.get(
-    ApiRoutes.rChain.getCategoryItemsDataRead(':surveyId', ':categoryUuid'),
+    ApiRoutes.rChain.categoryItemsData(':surveyId', ':categoryUuid'),
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
@@ -47,15 +47,16 @@ export const init = (app) => {
     }
   )
 
-  // ====== DELETE - Chain node results
-  app.delete(
-    ApiRoutes.rChain.getChainNodeResultsReset(':surveyId', ':chainUuid'),
+  // ====== UPDATE - Step entity data
+  app.put(
+    ApiRoutes.rChain.stepEntityData(':surveyId', ':cycle', ':stepUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, chainUuid } = Request.getParams(req)
+        const filePath = Request.getFilePath(req)
+        const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        await RChainService.deleteNodeResults(surveyId, cycle, chainUuid)
+        await RChainService.persistResults(surveyId, cycle, stepUuid, filePath)
 
         Response.sendOk(res)
       } catch (e) {
