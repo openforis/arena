@@ -22,20 +22,20 @@ export default class MassiveInsertNodeResults extends MassiveInsert {
     this.calculations = calculations
   }
 
-  async push(row) {
+  async push(rowResult) {
     const insertValues = []
     this.calculations.forEach((calculation) => {
       const nodeDef = Survey.getNodeDefByUuid(ProcessingStepCalculation.getNodeDefUuid(calculation))(this.survey)
       const nodeDefName = NodeDef.getName(nodeDef)
       const nodeDefUuid = NodeDef.getUuid(nodeDef)
-      let value = row[nodeDefName]
+      let value = rowResult[nodeDefName]
       if (value === 'NA') value = null
 
       const insertValue = {
-        [ResultNodeTable.colNames.processingChainUuid]: row[ResultNodeTable.colNames.processingChainUuid],
-        [ResultNodeTable.colNames.processingStepUuid]: row[ResultNodeTable.colNames.processingStepUuid],
-        [ResultNodeTable.colNames.recordUuid]: row[ResultNodeTable.colNames.recordUuid],
-        [ResultNodeTable.colNames.parentUuid]: row[ResultNodeTable.colNames.parentUuid],
+        [ResultNodeTable.colNames.processingChainUuid]: rowResult[ResultNodeTable.colNames.processingChainUuid],
+        [ResultNodeTable.colNames.processingStepUuid]: rowResult[ResultNodeTable.colNames.processingStepUuid],
+        [ResultNodeTable.colNames.recordUuid]: rowResult[ResultNodeTable.colNames.recordUuid],
+        [ResultNodeTable.colNames.parentUuid]: rowResult[ResultNodeTable.colNames.parentUuid],
         [ResultNodeTable.colNames.nodeDefUuid]: nodeDefUuid,
         [ResultNodeTable.colNames.value]: value,
       }
