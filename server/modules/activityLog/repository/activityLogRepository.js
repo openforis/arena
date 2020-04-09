@@ -16,35 +16,45 @@ import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/node
 
 // ===== CREATE
 export const insert = async (user, surveyId, type, content, system, client) =>
-  await client.none(
+  client.none(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
-    [type, User.getUuid(user), content || {}, system],
+    [type, User.getUuid(user), content || {}, system]
   )
 
 export const insertMany = async (user, surveyId, activities, client) =>
-  await client.batch(
-    activities.map(activity =>
+  client.batch(
+    activities.map((activity) =>
       insert(
         user,
         surveyId,
         ActivityLog.getType(activity),
         ActivityLog.getContent(activity),
         ActivityLog.isSystem(activity),
-        client,
-      ),
-    ),
+        client
+      )
+    )
   )
 
 // ===== READ
-export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit = 30, client = db) => {
+export const fetch = async (
+  surveyInfo,
+  activityTypes = null,
+  idGreaterThan = null,
+  idLessThan = null,
+  limit = 30,
+  client = db
+) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
   const schema = getSurveyDBSchema(surveyId)
 
-  return await client.map(
+  const limitedById = idGreaterThan || idLessThan
+  const conditionLimitedById = ` id ${idGreaterThan ? `> ${idGreaterThan}` : `< ${idLessThan}`}`
+
+  return client.map(
     `
   WITH
       log_days AS 
@@ -53,8 +63,10 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
         -- From this we obtain the earliest date to we need to consider in the later query.
         select date
         from ${schema}.activity_log_user_aggregate_keys
-        ${activityTypes ? ' WHERE type in ($2:csv)' : ''}
-        LIMIT $3::int + $4::int -- LIMIT + OFFSET
+        WHERE true
+        ${activityTypes ? ' AND type in ($2:csv)' : ''}
+        ${limitedById ? ` AND ${conditionLimitedById}` : ''}
+        LIMIT $3::int + 100 -- add 100 rows to get a better estimation of date
       ),
       log_days_all AS (
         -- With the date, refine the query to include ALL rows
@@ -78,9 +90,9 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
           ${DbUtils.selectDate('date_created')},
           content_uuid
         FROM log_days_all
+        ${limitedById ? `WHERE ${conditionLimitedById}` : ''}
         ORDER BY date_created DESC, id DESC -- id is a tie-breaker
-        OFFSET $3
-        LIMIT $4
+        LIMIT $3
       )
 
     SELECT
@@ -168,8 +180,8 @@ export const fetch = async (surveyInfo, activityTypes = null, offset = 0, limit 
     -- end of analysis activities part
 
     ORDER BY
-      l.date_created DESC`,
-    [surveyUuid, activityTypes, offset, limit],
-    camelize,
+      l.id DESC`,
+    [surveyUuid, activityTypes, limit],
+    camelize
   )
 }

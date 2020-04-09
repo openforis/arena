@@ -107,9 +107,9 @@ export const getName = getProp(propKeys.name, '')
 export const { getParentUuid } = ObjectUtils
 export const getCycles = getProp(propKeys.cycles, [])
 
-export const isKey = R.pipe(getProp(propKeys.key), R.equals(true))
+export const isKey = ObjectUtils.isPropTrue(propKeys.key)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
-export const isMultiple = R.pipe(getProp(propKeys.multiple), R.equals(true))
+export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
 export const isSingle = R.pipe(isMultiple, R.not)
 
 const isType = (type) => R.pipe(getType, R.equals(type))
@@ -133,17 +133,17 @@ export const isTaxon = isType(nodeDefType.taxon)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 
-export const isPublished = R.propEq(keys.published, true)
-export const isDeleted = R.propEq(keys.deleted, true)
-export const isTemporary = R.propEq(keys.temporary, true)
+export const isPublished = ObjectUtils.isKeyTrue(keys.published)
+export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
+export const isTemporary = ObjectUtils.isTemporary
 
 export const { getLabels } = ObjectUtils
 export const getDescriptions = getProp(propKeys.descriptions, {})
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 // READ Analysis
-export const isAnalysis = R.propEq(keys.analysis, true)
-export const isVirtual = R.pipe(R.propOr(false, keys.virtual), R.equals(true))
+export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
+export const isVirtual = ObjectUtils.isKeyTrue(keys.virtual)
 
 // Utils
 export const getLabel = (nodeDef, lang) => {

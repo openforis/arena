@@ -28,7 +28,8 @@ SELECT
   user_uuid,
   type,
   (content->>'uuid')::uuid,
-  content->>'key'
+  content->>'key',
+  MAX(id) as id
 FROM activity_log
 WHERE not system
 group by 1,2,3,4,5

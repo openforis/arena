@@ -34,6 +34,8 @@ export const getUuid = R.propOr(null, keys.uuid)
 
 export const getProps = R.propOr({}, keys.props)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
+export const isKeyTrue = key => R.pipe(R.propOr(false, key), R.equals(true))
+export const isPropTrue = prop => R.pipe(getProp(prop), R.equals(true))
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
 
@@ -53,7 +55,7 @@ export const getIndex = R.pipe(R.propOr(0, keys.index), Number)
 export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 export const getAuthGroups = R.propOr([], keys.authGroups)
 
-export const isTemporary = R.propEq(keys.temporary, true)
+export const isTemporary = isKeyTrue(keys.temporary)
 
 // ===== Props
 
