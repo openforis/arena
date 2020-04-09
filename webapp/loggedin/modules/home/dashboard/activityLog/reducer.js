@@ -16,10 +16,10 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [homeActivityMessagesUpdate]: (state, { activityLogMessages, loadComplete }) =>
+  [homeActivityMessagesUpdate]: (state, { messages, loadComplete }) =>
     R.pipe(
       ActivityLogState.assocInitialized,
-      ActivityLogState.assocMessages(activityLogMessages),
+      ActivityLogState.assocMessages(messages),
       R.when(R.always(loadComplete), ActivityLogState.assocLoadComplete(loadComplete))
     )(state),
 

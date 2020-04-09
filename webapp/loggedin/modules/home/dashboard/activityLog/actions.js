@@ -15,7 +15,7 @@ export const homeActivityMessagesUpdate = 'home/activityLog/messages/update'
 export const homeActivityMessagesReset = 'home/activityLog/messages/reset'
 
 const fetchActivityLogs = async (state, newest = true) => {
-  const activityLogMessagesState = ActivityLogState.getMessages(state)
+  const messages = ActivityLogState.getMessages(state)
   const initialized = ActivityLogState.isInitialized(state)
   const survey = SurveyState.getSurvey(state)
   const surveyId = Survey.getId(survey)
@@ -24,9 +24,9 @@ const fetchActivityLogs = async (state, newest = true) => {
   const params = {}
   if (initialized) {
     if (newest) {
-      params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(activityLogMessagesState)
+      params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
     } else {
-      params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(activityLogMessagesState)
+      params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
     }
   }
 
@@ -40,31 +40,26 @@ const fetchActivityLogs = async (state, newest = true) => {
   // Add new messages to messages already in state
   // Highlight new messages when fetching newest ones
   const highlighted = newest && initialized
-  const activityLogMessagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
-  const activityLogMessagesOld = R.map(ActivityLogMessage.dissocHighlighted, activityLogMessagesState)
-  return newest
-    ? R.concat(activityLogMessagesNew, activityLogMessagesOld)
-    : R.concat(activityLogMessagesOld, activityLogMessagesNew)
+  const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+  const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
+  return newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
 }
 
 export const fetchActivityLogsNewest = () => async (dispatch, getState) => {
-  const activityLogMessages = await fetchActivityLogs(getState())
-  if (activityLogMessages)
+  const messages = await fetchActivityLogs(getState())
+  if (messages)
     await dispatch({
       type: homeActivityMessagesUpdate,
-      activityLogMessages,
+      messages,
     })
 }
 
 export const fetchActivityLogsNext = () => async (dispatch, getState) => {
-  const activityLogMessages = await fetchActivityLogs(getState(), false)
-  if (activityLogMessages) {
+  const messages = await fetchActivityLogs(getState(), false)
+  if (messages) {
     // When the activity of type "surveyCreate" is loaded, activity logs load is complete
-    const loadComplete = R.any(
-      R.pipe(ActivityLogMessage.getType, R.equals(ActivityLog.type.surveyCreate)),
-      activityLogMessages
-    )
-    await dispatch({ type: homeActivityMessagesUpdate, activityLogMessages, loadComplete })
+    const loadComplete = R.any(R.pipe(ActivityLogMessage.getType, R.equals(ActivityLog.type.surveyCreate)), messages)
+    await dispatch({ type: homeActivityMessagesUpdate, messages, loadComplete })
   }
 }
 
