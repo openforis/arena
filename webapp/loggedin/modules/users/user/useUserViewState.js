@@ -6,15 +6,14 @@ import * as R from 'ramda'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { useUser, useSurveyInfo } from '@webapp/commonComponents/hooks'
 import * as UserViewState from './userViewState'
 import { fetchUser, resetUserState } from './actions'
 
 export const useUserViewState = () => {
   const { userUuid } = useParams()
-  const user = useSelector(AppState.getUser)
-  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+  const user = useUser()
+  const surveyInfo = useSurveyInfo()
   const userToUpdate = useSelector(UserViewState.getUser)
   const profilePictureUpdated = useSelector(UserViewState.isProfilePictureUpdated)
 

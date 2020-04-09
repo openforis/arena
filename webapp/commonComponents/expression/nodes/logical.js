@@ -1,38 +1,45 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '../../hooks'
 
-import ExpressionNode from './expressionNode'
-
-const Logical = props => {
-  const { node, onChange, canDelete = false } = props
+const Logical = (props) => {
+  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, renderNode, variables } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators
 
   const i18n = useI18n()
 
+  const createElementNode = (type, nodeEl, nodeElOther, canDeleteEl) =>
+    React.createElement(renderNode, {
+      node: nodeEl,
+      onChange: (item) => onChange(R.assoc(type, item, node)),
+      onDelete: () => onChange(nodeElOther),
+      canDelete: canDeleteEl,
+      nodeDefCurrent,
+      isBoolean,
+      level,
+      variables,
+    })
+
   return (
     <div className="logical">
-      <ExpressionNode
-        {...props}
-        node={left}
-        canDelete={canDelete}
-        onChange={item => onChange(R.assoc('left', item, node))}
-        onDelete={() => onChange(right)}
-      />
+      {createElementNode('left', left, right, canDelete)}
 
       <div className="btns">
         <div className="btns__add">
           <button
+            type="button"
             className={`btn btn-s${operator === logical.or.key ? ' active' : ''}`}
             onClick={() => onChange(R.assoc('operator', logical.or.key, node))}
           >
             {i18n.t('expressionEditor.or')}
           </button>
           <button
+            type="button"
             className={`btn btn-s${operator === logical.and.key ? ' active' : ''}`}
             onClick={() => onChange(R.assoc('operator', logical.and.key, node))}
           >
@@ -41,6 +48,7 @@ const Logical = props => {
         </div>
 
         <button
+          type="button"
           className="btn btn-s btns__last"
           onClick={() =>
             onChange({
@@ -53,15 +61,29 @@ const Logical = props => {
         </button>
       </div>
 
-      <ExpressionNode
-        {...props}
-        node={right}
-        canDelete={true}
-        onChange={item => onChange(R.assoc('right', item, node))}
-        onDelete={() => onChange(left)}
-      />
+      {createElementNode('right', right, left, true)}
     </div>
   )
+}
+
+Logical.propTypes = {
+  node: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  renderNode: PropTypes.elementType.isRequired,
+  // ExpressionNode props
+  canDelete: PropTypes.bool,
+  nodeDefCurrent: PropTypes.any,
+  isBoolean: PropTypes.bool,
+  level: PropTypes.number,
+  variables: PropTypes.array,
+}
+
+Logical.defaultProps = {
+  canDelete: false,
+  isBoolean: false,
+  level: 0,
+  nodeDefCurrent: null,
+  variables: null,
 }
 
 export default Logical

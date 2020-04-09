@@ -1,18 +1,48 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
-import { connect } from 'react-redux'
+import React, { useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as SurveyState from '@webapp/survey/surveyState'
+import * as Node from '@core/record/node'
+import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
-import { debounce } from '@core/functionsDefer'
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
+import * as SurveyState from '@webapp/survey/surveyState'
 
-const NodeDefEntityTableRows = props => {
-  const { entry, edit, nodeDef, nodeDefColumns, nodes } = props
+const NodeDefEntityTableRows = (props) => {
+  const {
+    canEditDef,
+    canEditRecord,
+    edit,
+    entry,
+    nodeDef,
+    nodes,
+    parentNode,
+    preview,
+    putNodeDefLayoutProp,
+    recordUuid,
+    surveyCycleKey,
+    surveyInfo,
+  } = props
+
+  const survey = useSelector(SurveyState.getSurvey)
+  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+
+  const nodeDefColumns = R.reduce(
+    (nodeDefColumnsAgg, nodeDefColumnUuid) => {
+      const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
+      if (nodeDefChild && !NodeDef.isAnalysis(nodeDefChild)) {
+        nodeDefColumnsAgg.push(nodeDefChild)
+      }
+      return nodeDefColumnsAgg
+    },
+    [],
+    nodeDefColumnUuids
+  )
 
   const tableRowsRef = useRef(null)
   const tableDataRowsRef = useRef(null)
@@ -29,7 +59,7 @@ const NodeDefEntityTableRows = props => {
     const onScroll = () => {
       const { scrollLeft } = tableRowsRef.current
       if (scrollLeft !== gridSize.left) {
-        setGridSize(gridSizePrev => ({
+        setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
           left: scrollLeft,
         }))
@@ -43,7 +73,7 @@ const NodeDefEntityTableRows = props => {
     const onScroll = () => {
       const { scrollTop } = tableDataRowsRef.current
       if (scrollTop !== gridSize.top) {
-        setGridSize(gridSizePrev => ({
+        setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
           top: scrollTop,
         }))
@@ -64,7 +94,7 @@ const NodeDefEntityTableRows = props => {
         const { width } = elementOffset(tableRowsRef.current)
         const { height } = elementOffset(tableDataRowsRef.current)
 
-        setGridSize(gridSizePrev => ({
+        setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
           width,
           height,
@@ -86,17 +116,32 @@ const NodeDefEntityTableRows = props => {
     }, [NodeDef.getUuid(nodeDef)])
   }
 
+  const createRow = (renderType, node = null, key = undefined, i = undefined) => (
+    <NodeDefEntityTableRow
+      key={key}
+      canEditDef={canEditDef}
+      canEditRecord={canEditRecord}
+      edit={edit}
+      entry={entry}
+      gridSize={gridSize}
+      i={i}
+      node={node}
+      nodeDef={nodeDef}
+      nodeDefColumns={nodeDefColumns}
+      nodes={null}
+      parentNode={parentNode}
+      preview={preview}
+      putNodeDefLayoutProp={putNodeDefLayoutProp}
+      recordUuid={recordUuid}
+      renderType={renderType}
+      surveyCycleKey={surveyCycleKey}
+      surveyInfo={surveyInfo}
+    />
+  )
+
   return (
     <div className="survey-form__node-def-entity-table-rows" ref={tableRowsRef} onScroll={onScrollTableRows}>
-      {(edit || !R.isEmpty(nodes)) && (
-        <NodeDefEntityTableRow
-          {...props}
-          node={null}
-          renderType={NodeDefLayout.renderType.tableHeader}
-          gridSize={gridSize}
-          nodeDefColumns={nodeDefColumns}
-        />
-      )}
+      {(edit || !R.isEmpty(nodes)) && createRow(NodeDefLayout.renderType.tableHeader)}
 
       {entry && (
         <div
@@ -106,44 +151,39 @@ const NodeDefEntityTableRows = props => {
         >
           {gridSize.height > 0 &&
             gridSize.width > 0 &&
-            nodes.map((node, i) => (
-              <NodeDefEntityTableRow
-                key={i}
-                i={i}
-                {...props}
-                node={node}
-                nodes={null}
-                renderType={NodeDefLayout.renderType.tableBody}
-                gridSize={gridSize}
-                nodeDefColumns={nodeDefColumns}
-              />
-            ))}
+            nodes.map((node, i) =>
+              createRow(NodeDefLayout.renderType.tableBody, node, `entity-table-row-${Node.getUuid(node)}`, i)
+            )}
         </div>
       )}
     </div>
   )
 }
 
-const mapStateToProps = (state, props) => {
-  const { nodeDef } = props
-
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
-
-  const nodeDefColumns = R.reduce(
-    (nodeDefColumnsAgg, nodeDefColumnUuid) => {
-      const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
-      if (nodeDefChild) nodeDefColumnsAgg.push(nodeDefChild)
-      return nodeDefColumnsAgg
-    },
-    [],
-    nodeDefColumnUuids,
-  )
-
-  return {
-    nodeDefColumns,
-  }
+NodeDefEntityTableRows.propTypes = {
+  canEditDef: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  entry: PropTypes.bool,
+  edit: PropTypes.bool,
+  nodeDef: PropTypes.any.isRequired,
+  nodes: PropTypes.array,
+  parentNode: PropTypes.any,
+  preview: PropTypes.bool,
+  putNodeDefLayoutProp: PropTypes.func.isRequired,
+  recordUuid: PropTypes.string,
+  surveyCycleKey: PropTypes.string.isRequired,
+  surveyInfo: PropTypes.any.isRequired,
 }
 
-export default connect(mapStateToProps)(NodeDefEntityTableRows)
+NodeDefEntityTableRows.defaultProps = {
+  canEditDef: false,
+  canEditRecord: false,
+  entry: false,
+  edit: false,
+  nodes: [],
+  parentNode: null,
+  preview: false,
+  recordUuid: null,
+}
+
+export default NodeDefEntityTableRows

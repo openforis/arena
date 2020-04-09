@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { useAsyncGetRequest } from '.'
+import useAsyncGetRequest from './useAsyncGetRequest'
 
 export default (userUuid, forceUpdateKey) => {
   const [profilePicture, setProfilePicture] = useState(null)
