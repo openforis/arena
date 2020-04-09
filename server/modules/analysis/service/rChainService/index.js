@@ -41,7 +41,10 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDefStep)}.csv`)
 
   await db.tx(async (tx) => {
-    // TODO Reset results
+    // Reset node results
+    await RChainManager.deleteNodeResults(surveyId, cycle, ProcessingStep.getProcessingChainUuid(step), tx)
+
+    // Insert node results
     const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, calculations, tx)
     await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
     await massiveInsert.flush()

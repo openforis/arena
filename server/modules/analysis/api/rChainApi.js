@@ -8,7 +8,7 @@ import * as CategoryService from '@server/modules/category/service/categoryServi
 import * as RChainService from '@server/modules/analysis/service/rChainService'
 
 export const init = (app) => {
-  // ====== READ - Step Data
+  // ====== READ - Step entity data
   app.get(
     ApiRoutes.rChain.stepEntityData(':surveyId', ':cycle', ':stepUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
@@ -47,7 +47,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== UPDATE - Step results
+  // ====== UPDATE - Step entity data
   app.put(
     ApiRoutes.rChain.stepEntityData(':surveyId', ':cycle', ':stepUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
@@ -57,22 +57,6 @@ export const init = (app) => {
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
         await RChainService.persistResults(surveyId, cycle, stepUuid, filePath)
-
-        Response.sendOk(res)
-      } catch (e) {
-        next(e)
-      }
-    }
-  )
-  // ====== DELETE - Chain node results
-  app.delete(
-    ApiRoutes.rChain.chainNodeResults(':surveyId', ':chainUuid'),
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, chainUuid } = Request.getParams(req)
-
-        await RChainService.deleteNodeResults(surveyId, cycle, chainUuid)
 
         Response.sendOk(res)
       } catch (e) {
