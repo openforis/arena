@@ -10,7 +10,7 @@ import * as ProcessingChainManager from '../../manager/processingChainManager'
 
 import RStep from './rStep'
 import { RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
-import RFileUser from './rFile/user'
+import { RFileCommon } from './rFile/user'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
@@ -105,7 +105,7 @@ class RChain {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
-    this._chain = await ProcessingChainManager.fetchChainByUuid(this.surveyId, this.chainUuid)
+    this._chain = await ProcessingChainManager.fetchChainAndScriptByUuid(this.surveyId, this.chainUuid)
     const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
   }
@@ -141,7 +141,7 @@ class RChain {
     this._fileReadData = await new RFileReadData(this).init()
 
     // Init user files
-    this._fileCommon = await new RFileUser(this, 'common').init()
+    this._fileCommon = await new RFileCommon(this).init()
   }
 
   async _initSteps() {

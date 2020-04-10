@@ -43,14 +43,20 @@ export const fetchChainsBySurveyId = async (surveyId, cycle = null, offset = 0, 
     dbTransformCallback
   )
 
-export const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
+const _fetchChainByUuid = async (surveyId, chainUuid, includeScript, client = db) =>
   client.oneOrNone(
-    `SELECT ${selectFields}
+    `SELECT ${selectFields}${includeScript ? ' ,script_common' : ''}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1`,
-    [processingChainUuid],
+    [chainUuid],
     dbTransformCallback
   )
+
+export const fetchChainByUuid = async (surveyId, chainUuid, client = db) =>
+  _fetchChainByUuid(surveyId, chainUuid, false, client)
+
+export const fetchChainAndScriptByUuid = async (surveyId, chainUuid, client = db) =>
+  _fetchChainByUuid(surveyId, chainUuid, true, client)
 
 // ====== UPDATE
 

@@ -219,7 +219,12 @@ const _updateCalculationIndexes = async (user, surveyId, step, t) => {
 
 // ====== READ - Chain
 
-export { countChainsBySurveyId, fetchChainsBySurveyId, fetchChainByUuid } from '../repository/processingChainRepository'
+export {
+  countChainsBySurveyId,
+  fetchChainsBySurveyId,
+  fetchChainByUuid,
+  fetchChainAndScriptByUuid,
+} from '../repository/processingChainRepository'
 
 // ====== READ - Steps
 
