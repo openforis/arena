@@ -29,7 +29,7 @@ export const useUserViewState = () => {
 
     // Reset state on unmount
     return () => dispatch(resetUserState())
-  }, [])
+  }, [userUuid])
 
   const canEditUser = ready && !isUserAcceptPending && Authorizer.canEditUser(user, surveyInfo, userToUpdate)
   const canEditName = canEditUser
