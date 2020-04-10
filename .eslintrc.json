@@ -1,26 +1,51 @@
 {
-    "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react"],
-    "env": {
-      "browser": true,
-      "commonjs": true,
-      "es6": true,
-      "jest": true,
-      "node": true
-    },
-    "plugins": ["prettier"],
-    "rules": {
-      "no-underscore-dangle": 0,
-      "prettier/prettier": "error",
-      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-      "react/forbid-prop-types": 0,
-      "import/prefer-default-export": 0
-    },
-    "settings": {
-      "import/resolver": {
-        "webpack": {
-          "config": "webpack.config.babel.js"
-        }
+  "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react"],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "jest": true,
+    "node": true
+  },
+  "plugins": ["prettier", "jsdoc"],
+  "rules": {
+    "no-underscore-dangle": 0,
+    "prettier/prettier": "error",
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/forbid-prop-types": 0,
+    "import/prefer-default-export": 0,
+    "jsdoc/check-alignment": 2,
+    "jsdoc/check-examples": 2,
+    "jsdoc/check-indentation": 2,
+    "jsdoc/check-param-names": 2,
+    "jsdoc/check-syntax": 2,
+    "jsdoc/check-tag-names": 2,
+    "jsdoc/check-types": 2,
+    "jsdoc/implements-on-classes": 2,
+    "jsdoc/match-description": 2,
+    "jsdoc/newline-after-description": 2,
+    "jsdoc/no-types": 0,
+    "jsdoc/no-undefined-types": 1,
+    "jsdoc/require-description": 2,
+    "jsdoc/require-description-complete-sentence": 2,
+    "jsdoc/require-example": 0,
+    "jsdoc/require-hyphen-before-param-description": 2,
+    "jsdoc/require-jsdoc": 1,
+    "jsdoc/require-param": 2,
+    "jsdoc/require-param-description": 2,
+    "jsdoc/require-param-name": 2,
+    "jsdoc/require-param-type": 2,
+    "jsdoc/require-returns": 2,
+    "jsdoc/require-returns-check": 2,
+    "jsdoc/require-returns-description": 2,
+    "jsdoc/require-returns-type": 2,
+    "jsdoc/valid-types": 2
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "webpack.config.babel.js"
       }
     }
   }
-  
+}

@@ -20,6 +20,6 @@ export { zipr } from './zip'
 
 export { dbDisconnect, dbGetQuery, dbSendQuery, dbWriteTable, setConnection } from './db'
 
-export { arenaStartTime, arenaEndTime, arenaInfo, arenaPersistCalculationScript } from './arena'
+export { arenaStartTime, arenaEndTime, arenaInfo } from './arena'
 
 export { arenaGet, arenaPost, arenaDelete, arenaPutFile } from './arenaApi'

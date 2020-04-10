@@ -1,5 +1,6 @@
 import * as PromiseUtils from '@core/promiseUtils'
 import * as ApiRoutes from '@common/apiRoutes'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -26,12 +27,9 @@ const getPutResultsScripts = (rChain, dfResults) => {
   return scripts
 }
 
-function* initScript() {
-  const { chain, dirResults } = this.rChain
+function* initPersistStepResults() {
+  const { chain } = this.rChain
   const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.hasEntity)
-
-  // create results dir
-  yield this.appendContent(dirCreate(dirResults))
 
   for (let i = 0; i < steps.length; i += 1) {
     const step = steps[i]
@@ -42,9 +40,6 @@ function* initScript() {
     yield this.appendContent(...getPutResultsScripts(this.rChain, dfResults))
     yield this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
   }
-
-  // remove results dir
-  yield this.appendContent(unlink(dirResults))
 }
 
 export default class RFilePersistResults extends RFileSystem {
@@ -52,11 +47,31 @@ export default class RFilePersistResults extends RFileSystem {
     super(rChain, 'persist-results')
   }
 
+  async initPersistUserScripts() {
+    const { surveyId, chainUuid, dirResults, dirNames } = this.rChain
+    const zipFile = FileUtils.join(dirResults, 'userScripts.zip')
+
+    await this.logInfo(`'Persisting user scripts started'`)
+    await this.appendContent(
+      zipr(zipFile, dirNames.user),
+      arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile)
+    )
+    await this.logInfo(`'Persisting user scripts completed'`)
+  }
+
   async init() {
     await super.init()
-    this.initScript = initScript.bind(this)
+    const { dirResults } = this.rChain
+    this.initPersistStepResults = initPersistStepResults.bind(this)
 
-    await PromiseUtils.resolveGenerator(this.initScript())
+    // create results dir
+    await this.appendContent(dirCreate(dirResults))
+    // persist step results
+    await PromiseUtils.resolveGenerator(this.initPersistStepResults())
+    // persist user scripts
+    await this.initPersistUserScripts()
+    // remove results dir
+    await this.appendContent(unlink(dirResults))
 
     return this
   }

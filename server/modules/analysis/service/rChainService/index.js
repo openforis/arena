@@ -58,5 +58,14 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   fileZip.close()
 }
 
-// ==== DELETE
-export const { deleteNodeResults } = RChainManager
+export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
+  const fileZip = new FileZip(filePath)
+  await fileZip.init()
+  const entryNames = fileZip.getEntryNames()
+  const findEntry = (name) => entryNames.find((entryName) => !!entryName.match(new RegExp(`\\d{3}-${name}\\.R`)))
+
+  await db.tx(async (tx) => {
+    const scriptCommon = await fileZip.getEntryAsText(findEntry('common'))
+    await ProcessingChainManager.updateChainScriptCommon(surveyId, chainUuid, scriptCommon, tx)
+  })
+}

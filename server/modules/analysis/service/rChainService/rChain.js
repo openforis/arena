@@ -9,14 +9,8 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as ProcessingChainManager from '../../manager/processingChainManager'
 
 import RStep from './rStep'
-import RFileSystem, {
-  RFileClose,
-  RFileInit,
-  RFileLogin,
-  RFilePersistResults,
-  RFilePersistScripts,
-  RFileReadData,
-} from './rFile/system'
+import { RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
+import { RFileCommon } from './rFile/user'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
@@ -29,6 +23,7 @@ class RChain {
     this._chain = null
     this._serverUrl = serverUrl
 
+    this._dirNames = { user: 'user', system: 'system' }
     this._dir = null
     this._dirUser = null
     this._dirSystem = null
@@ -42,7 +37,6 @@ class RChain {
     this._fileLogin = null
     this._fileReadData = null
     this._filePersistResults = null
-    this._filePersistScripts = null
     this._fileClose = null
     // User files
     this._fileCommon = null
@@ -79,6 +73,10 @@ class RChain {
     return this._cycle
   }
 
+  get dirNames() {
+    return this._dirNames
+  }
+
   get dir() {
     return this._dir
   }
@@ -107,7 +105,11 @@ class RChain {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
-    this._chain = await ProcessingChainManager.fetchChainByUuid(this.surveyId, this.chainUuid)
+    this._chain = await ProcessingChainManager.fetchChainByUuid({
+      surveyId: this.surveyId,
+      chainUuid: this.chainUuid,
+      includeScript: true,
+    })
     const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
   }
@@ -121,10 +123,9 @@ class RChain {
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 
-    const system = 'system'
-    this._dirSystem = FileUtils.join(this._dir, system)
+    this._dirSystem = FileUtils.join(this._dir, this.dirNames.system)
     this._dirUser = FileUtils.join(this._dir, 'user')
-    this._dirResults = FileUtils.join(system, 'results')
+    this._dirResults = FileUtils.join(this.dirNames.system, 'results')
     await Promise.all([FileUtils.mkdir(this._dirSystem), FileUtils.mkdir(this._dirUser)])
   }
 
@@ -144,7 +145,7 @@ class RChain {
     this._fileReadData = await new RFileReadData(this).init()
 
     // Init user files
-    this._fileCommon = await new RFileSystem(this, 'common').init()
+    this._fileCommon = await new RFileCommon(this).init()
   }
 
   async _initSteps() {
@@ -155,7 +156,6 @@ class RChain {
 
   async _initFilesClosing() {
     this._filePersistResults = await new RFilePersistResults(this).init()
-    this._filePersistScripts = await new RFilePersistScripts(this).init()
     this._fileClose = await new RFileClose(this).init()
   }
 

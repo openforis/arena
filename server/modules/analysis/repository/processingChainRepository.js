@@ -7,119 +7,122 @@ import * as UserAnalysis from '@common/analysis/userAnalysis'
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
-  'date_modified',
+  'date_modified'
 )}, ${DbUtils.selectDate('date_executed')}`
 
 // ====== CREATE
 
 export const insertChain = async (surveyId, chain, client = db) =>
-  await client.one(
-    `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, props, validation)
+  client.one(
+    `INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, props, validation)
     VALUES ($1, $2, $3)
-    RETURNING ${selectFields}
-    `,
+    RETURNING ${selectFields}`,
     [ProcessingChain.getUuid(chain), ProcessingChain.getProps(chain), ProcessingChain.getValidation(chain)],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 // ====== READ
 
 export const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
-  await client.one(
-    `
-    SELECT COUNT(*) 
+  client.one(
+    `SELECT COUNT(*) 
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> $1
-    `,
-    [JSON.stringify(cycle)],
+    WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> $1`,
+    [JSON.stringify(cycle)]
   )
 
 export const fetchChainsBySurveyId = async (surveyId, cycle = null, offset = 0, limit = null, client = db) =>
-  await client.map(
-    `
-    SELECT ${selectFields}
+  client.map(
+    `SELECT ${selectFields}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     ${cycle ? `WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
     ORDER BY date_created DESC
     LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}
-    `,
+    OFFSET ${offset}`,
     [],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
-export const fetchChainByUuid = async (surveyId, processingChainUuid, client = db) =>
-  await client.oneOrNone(
-    `
-    SELECT ${selectFields}
+/**
+ * Fetches a processing chain with the given surveyId and chainUuid.
+ *
+ * @param {!object} params - Query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {!string} params.chainUuid - The processing chain uuid.
+ * @param {boolean} [params.includeScript = false] - Whether to include chain script.
+ * @param {pgPromise.IDatabase} client - The database client.
+ *
+ * @returns {Promise<any | null>} - The chain if found, null otherwise.
+ */
+export const fetchChainByUuid = async ({ surveyId, chainUuid, includeScript }, client = db) =>
+  client.oneOrNone(
+    `SELECT ${selectFields}${includeScript === true ? ' ,script_common' : ''}
     FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE uuid = $1
-    `,
-    [processingChainUuid],
-    dbTransformCallback,
+    WHERE uuid = $1`,
+    [chainUuid],
+    dbTransformCallback
   )
 
 // ====== UPDATE
 
 export const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
-  await client.query(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+  client.query(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
     SET props = props || $2::jsonb,
         date_modified = ${DbUtils.now}
-    WHERE uuid = $1
-    `,
-    [processingChainUuid, { [key]: value }],
+    WHERE uuid = $1`,
+    [processingChainUuid, { [key]: value }]
   )
 
 export const updateChainValidation = async (surveyId, processingChainUuid, validation, client = db) =>
-  await client.query(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+  client.query(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
     SET validation = $2,
         date_modified = ${DbUtils.now}
-    WHERE uuid = $1
-    `,
-    [processingChainUuid, validation],
+    WHERE uuid = $1`,
+    [processingChainUuid, validation]
   )
 
 export const updateChainDateModified = async (surveyId, processingChainUuid, client = db) =>
-  await client.query(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+  client.query(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
     SET date_modified = ${DbUtils.now}
-    WHERE uuid = $1
-    `,
-    [processingChainUuid],
+    WHERE uuid = $1`,
+    [processingChainUuid]
   )
 
 export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
-  await client.query(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
+  client.query(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
     SET props = jsonb_set(props, '{${ProcessingChain.keysProps.cycles}}',
-      (props->'${ProcessingChain.keysProps.cycles}') ${cycles.map(cycle => `- '${cycle}'`).join(' ')}
-    )
-  `)
+      (props->'${ProcessingChain.keysProps.cycles}') ${cycles.map((cycle) => `- '${cycle}'`).join(' ')}
+    )`
+  )
+
+export const updateChainScriptCommon = async (surveyId, chainUuid, script, client = db) =>
+  client.query(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain 
+    SET script_common = $2
+    WHERE uuid = $1`,
+    [chainUuid, script]
+  )
 
 // ====== DELETE
 
 export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
-  await client.one(
-    `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+  client.one(
+    `DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1
-    RETURNING ${selectFields}
-    `,
+    RETURNING ${selectFields}`,
     [processingChainUuid],
-    dbTransformCallback,
+    dbTransformCallback
   )
 
 export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
-  await client.query(`
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE jsonb_array_length(props->'${ProcessingChain.keysProps.cycles}') = 0
-  `)
+  client.query(
+    `DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+    WHERE jsonb_array_length(props->'${ProcessingChain.keysProps.cycles}') = 0`
+  )
 
 // ===== GRANT PRIVILEGES
 export const grantUpdateToUserAnalysis = async (surveyId, client = db) => {

@@ -17,7 +17,7 @@ export const keys = {
   uuid: ObjectUtils.keys.uuid,
   temporary: ObjectUtils.keys.temporary,
   validation: ObjectUtils.keys.validation,
-
+  scriptCommon: 'scriptCommon',
   processingSteps: 'processingSteps',
   calculationAttributeUuids: 'calculationAttributeUuids',
 }
@@ -33,6 +33,36 @@ export const statusExec = {
   success: 'success',
   running: 'running',
 }
+
+// ====== READ
+
+export const {
+  getUuid,
+  getProps,
+  getPropsDiff,
+  getCycles,
+  getDateCreated,
+  getDateModified,
+  getDescriptions,
+  getDescription,
+  getLabels,
+  getLabel,
+  isTemporary,
+} = ObjectUtils
+export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
+export const getStatusExec = R.propOr(null, keys.statusExec)
+export const getScriptCommon = R.propOr(null, keys.scriptCommon)
+
+// ===== READ - Steps
+export const getProcessingSteps = R.propOr([], keys.processingSteps)
+const _getStepByIdx = (stepIdx) => R.pipe(getProcessingSteps, R.propOr(null, stepIdx))
+export const getStepPrev = (step) => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
+export const getStepNext = (step) => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
+
+// ===== READ - Calculation attribute uudis
+export const getCalculationAttributeUuids = R.propOr({}, keys.calculationAttributeUuids)
+export const getCalculationAttributeUuidByCalculationUuid = (calculationUuid) =>
+  R.path([keys.calculationAttributeUuids, calculationUuid])
 
 // ====== CREATE
 
@@ -59,35 +89,6 @@ export const newProcessingStepCalculation = (processingStep, nodeDefUuid = null,
   [ProcessingStepCalculation.keys.temporary]: true,
 })
 
-// ====== READ
-
-export const { getUuid } = ObjectUtils
-export const { getProps } = ObjectUtils
-export const { getPropsDiff } = ObjectUtils
-export const { getCycles } = ObjectUtils
-export const { getDateCreated } = ObjectUtils
-export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
-export const { getDateModified } = ObjectUtils
-export const getStatusExec = R.propOr(null, keys.statusExec)
-
-export const { getDescriptions } = ObjectUtils
-export const { getDescription } = ObjectUtils
-export const { getLabels } = ObjectUtils
-export const { getLabel } = ObjectUtils
-
-export const { isTemporary } = ObjectUtils
-
-// ===== READ - Steps
-export const getProcessingSteps = R.propOr([], keys.processingSteps)
-const _getStepByIdx = (stepIdx) => R.pipe(getProcessingSteps, R.propOr(null, stepIdx))
-export const getStepPrev = (step) => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
-export const getStepNext = (step) => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
-
-// ===== READ - Calculation attribute uudis
-export const getCalculationAttributeUuids = R.propOr({}, keys.calculationAttributeUuids)
-export const getCalculationAttributeUuidByCalculationUuid = (calculationUuid) =>
-  R.path([keys.calculationAttributeUuids, calculationUuid])
-
 // ====== CHECK
 
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
@@ -107,6 +108,14 @@ export const assocProcessingStep = (step) => R.assocPath([keys.processingSteps, 
 
 const _updateSteps = (fn) => (chain) =>
   R.pipe(getProcessingSteps, fn, (steps) => assocProcessingSteps(steps)(chain))(chain)
+
+export const assocCalculationAttributeDefUuids = R.assoc(keys.calculationAttributeUuids)
+
+export const assocCalculationAttributeDefUuid = (calculationUuid, attributeDefUuid) =>
+  R.assocPath([keys.calculationAttributeUuids, calculationUuid], attributeDefUuid)
+
+export const dissocCalculationAttributeDefUuid = (calculationUuid) =>
+  R.dissocPath([keys.calculationAttributeUuids, calculationUuid])
 
 export const dissocProcessingStepLast = (processingChain) =>
   R.pipe(
@@ -128,14 +137,6 @@ export const dissocProcessingStepTemporary = R.when(
   R.pipe(getProcessingSteps, R.last, ProcessingStep.isTemporary),
   dissocProcessingStepLast
 )
-
-export const assocCalculationAttributeDefUuids = R.assoc(keys.calculationAttributeUuids)
-
-export const assocCalculationAttributeDefUuid = (calculationUuid, attributeDefUuid) =>
-  R.assocPath([keys.calculationAttributeUuids, calculationUuid], attributeDefUuid)
-
-export const dissocCalculationAttributeDefUuid = (calculationUuid) =>
-  R.dissocPath([keys.calculationAttributeUuids, calculationUuid])
 
 // ====== VALIDATION
 // The validation object contains the validation of chain, steps, calculations, index by uuids

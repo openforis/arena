@@ -22,10 +22,13 @@ import * as ProcessingStepRepository from '../repository/processingStepRepositor
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
 /**
- * - mark survey as draft
- * - deletes unused node def analysis
+ * Marks survey as draft and deletes unused node def analysis.
  *
- * @returns uuids of deleted unused node defs analysis
+ * @param {string} surveyId - The survey id.
+ * @param {pgPromise.IDatabase} t - The database client.
+ * @param {boolean} [deleteNodeDefAnalysisUnused=false] - Whether to delete the unused nodeDef analysis.
+ *
+ * @returns {Array} - The uuids of deleted unused node defs analysis.
  */
 const _afterChainUpdate = async (surveyId, t, deleteNodeDefAnalysisUnused = true) => {
   const [nodeDefAnalysisDeletedUudis] = await Promise.all([
@@ -70,7 +73,10 @@ const _updateChainProps = async (user, surveyId, chain, chainDb, t) => {
 }
 
 const _insertOrUpdateChain = async (user, surveyId, chain, client) => {
-  const chainDb = await ProcessingChainRepository.fetchChainByUuid(surveyId, ProcessingChain.getUuid(chain), client)
+  const chainDb = await ProcessingChainRepository.fetchChainByUuid(
+    { surveyId, chainUuid: ProcessingChain.getUuid(chain) },
+    client
+  )
   if (chainDb) {
     // UPDATE CHAIN
     await _updateChainProps(user, surveyId, chain, chainDb, client)
@@ -291,14 +297,16 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
   })
 }
 
-export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository/processingChainRepository'
+export {
+  removeCyclesFromChains,
+  updateChainScriptCommon,
+  deleteChainsWithoutCycles,
+} from '../repository/processingChainRepository'
 
 // ====== DELETE - Chain
 
-/**
- * Deletes a processing chain.
- * It returns a list of deleted unused node def analysis uuids (if any)
- */
+// Deletes a processing chain.
+// It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
   client.tx(async (t) => {
     const processingChain = await ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t)
@@ -313,10 +321,8 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 
 // ====== DELETE - Step
 
-/**
- * Deletes a processing step.
- * It returns a list of deleted unused node def analysis uuids (if any)
- */
+// Deletes a processing step.
+// It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
   client.tx(async (t) => {
     const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
@@ -344,7 +350,7 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
 
     if (ProcessingStep.getIndex(step) === 0) {
       // Deleted processing step was the only one, chain validation must be updated (steps are required)
-      const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
+      const chain = await ProcessingChainRepository.fetchChainByUuid({ surveyId, chainUuid }, t)
       const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
       const chainValidation = await ProcessingChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
       const chainUpdated = ProcessingChain.assocItemValidation(chainUuid, chainValidation)(chain)
@@ -361,10 +367,8 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
 
 // ====== DELETE - Calculation
 
-/**
- * Deletes a processing step calculation.
- * It returns a list of deleted unused node def analysis uuids (if any)
- */
+// Deletes a processing step calculation.
+// It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = db) =>
   client.tx(async (t) => {
     const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
@@ -399,7 +403,7 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
     const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
     const stepUpdated = ProcessingStep.assocCalculations(calculations)(step)
     const stepValidation = await ProcessingChainValidator.validateStep(stepUpdated)
-    const chain = await ProcessingChainRepository.fetchChainByUuid(surveyId, chainUuid, t)
+    const chain = await ProcessingChainRepository.fetchChainByUuid({ surveyId, chainUuid }, t)
     const chainUpdated = ProcessingChain.assocItemValidation(stepUuid, stepValidation)(chain)
 
     // Update processing_chain validation and date_modified
