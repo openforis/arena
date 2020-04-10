@@ -14,12 +14,12 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
-import * as SurveyState from '../surveyState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import * as SurveyState from '../surveyState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -48,7 +48,7 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 }
 
 // ==== Internal update nodeDefs actions
-const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => dispatch => {
+const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
   if (!R.isEmpty(nodeDefsUpdated)) {
@@ -85,8 +85,8 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
       showNotification(
         'nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues',
         null,
-        NotificationState.severity.warning,
-      ),
+        NotificationState.severity.warning
+      )
     )
     return false
   }
@@ -110,7 +110,7 @@ const _validateAndNotifyNodeDefUpdate = (nodeDef, props = {}, propsAdvanced = {}
     // Associate updated node def
     Survey.assocNodeDef(nodeDef),
     // Build and associate dependency graph
-    Survey.buildAndAssocDependencyGraph,
+    Survey.buildAndAssocDependencyGraph
   )(survey)
 
   const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDef)
@@ -126,7 +126,7 @@ const _validateAndNotifyNodeDefUpdate = (nodeDef, props = {}, propsAdvanced = {}
   })
 }
 
-export const setNodeDefParentUuid = parentUuid => (dispatch, getState) => {
+export const setNodeDefParentUuid = (parentUuid) => (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
 
@@ -166,15 +166,15 @@ const _updateLayoutProp = (getState, nodeDef, key, value) => {
   return R.pipe(
     NodeDefLayout.getLayout,
     R.assocPath([surveyCycleKey, key], value),
-    R.when(R.always(key === NodeDefLayout.keys.renderType), layout => {
+    R.when(R.always(NodeDef.isEntity(nodeDef) && key === NodeDefLayout.keys.renderType), (layout) => {
       const layoutCycle = layout[surveyCycleKey]
 
       // If setting layout render mode (table | form), set the the proper layout
       const isRenderTable = value === NodeDefLayout.renderType.table
 
       if (isRenderTable) {
-        layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map(n =>
-          NodeDef.getUuid(n),
+        layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map((n) =>
+          NodeDef.getUuid(n)
         )
       } else if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
         // Entity rendered as form can only exists in its own page
@@ -182,7 +182,7 @@ const _updateLayoutProp = (getState, nodeDef, key, value) => {
       }
 
       return layout
-    }),
+    })
   )(nodeDef)
 }
 
@@ -209,7 +209,7 @@ export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, ge
   dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDefLayout.keys.layout, props))
 }
 
-export const cancelNodeDefEdits = history => async (dispatch, getState) => {
+export const cancelNodeDefEdits = (history) => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
   const nodeDefOriginal = NodeDefState.getNodeDefOriginal(state)
@@ -274,7 +274,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 
 // ==== DELETE
 
-const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
+const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const i18n = AppState.getI18n(state)
@@ -286,7 +286,7 @@ const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
   const nodeDefDependentsUuids = R.pipe(
     Survey.buildAndAssocDependencyGraph,
     Survey.getNodeDefDependencies(nodeDefUuid),
-    R.without(nodeDefUuid),
+    R.without(nodeDefUuid)
   )(survey)
 
   if (R.isEmpty(nodeDefDependentsUuids)) {
@@ -297,11 +297,11 @@ const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
   const nodeDefDependents = R.pipe(
     R.map(
       R.pipe(
-        nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-        nodeDef => NodeDef.getLabel(nodeDef, i18n.lang),
-      ),
+        (nodeDefDependentUuid) => Survey.getNodeDefByUuid(nodeDefDependentUuid)(survey),
+        (nodeDefDependent) => NodeDef.getLabel(nodeDefDependent, i18n.lang)
+      )
     ),
-    R.join(', '),
+    R.join(', ')
   )(nodeDefDependentsUuids)
 
   dispatch(
@@ -311,8 +311,8 @@ const _checkCanRemoveNodeDef = nodeDef => (dispatch, getState) => {
         nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
         nodeDefDependents,
       },
-      NotificationState.severity.warning,
-    ),
+      NotificationState.severity.warning
+    )
   )
   return false
 }
@@ -342,12 +342,12 @@ export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getSt
         if (history) {
           history.goBack()
         }
-      }),
+      })
     )
   }
 }
 
-export const onNodeDefsDelete = nodeDefUuids => dispatch => {
+export const onNodeDefsDelete = (nodeDefUuids) => (dispatch) => {
   if (!R.isEmpty(nodeDefUuids)) {
     dispatch({ type: nodeDefsDelete, nodeDefUuids })
   }
