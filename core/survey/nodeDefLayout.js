@@ -67,10 +67,16 @@ export const isRenderCheckbox = (cycle) => isRenderType(cycle, renderType.checkb
 export const isDisplayInParentPage = (cycle) => R.pipe(getDisplayIn(cycle), R.propEq(displayIn.parentPage))
 
 // ====== UPDATE
-const _assocPropLayout = (cycle, prop, value) => R.assocPath([cycle, prop], value)
+export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
+
+export const assocLayoutProp = (cycle, prop, value) => R.assocPath([cycle, prop], value)
 
 export const assocLayoutChildren = (cycle, layoutChildren) =>
-  _assocPropLayout(cycle, keys.layoutChildren, layoutChildren)
+  assocLayoutProp(cycle, keys.layoutChildren, layoutChildren)
+
+export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutChildren])
+
+export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
 
 // ====== UTILS
 

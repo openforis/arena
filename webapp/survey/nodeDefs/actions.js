@@ -135,8 +135,42 @@ export const setNodeDefParentUuid = (parentUuid) => (dispatch, getState) => {
   dispatch(_validateAndNotifyNodeDefUpdate(nodeDefUpdated))
 }
 
+const _updateLayoutProp = (nodeDef, key, value) => (_, getState) => {
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+
+  let nodeDefLayout = R.pipe(
+    NodeDefLayout.getLayout,
+    NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)
+  )(nodeDef)
+
+  // If setting layout render mode (table | form), set the the proper layout
+  if (NodeDef.isEntity(nodeDef) && key === NodeDefLayout.keys.renderType) {
+    if (value === NodeDefLayout.renderType.table) {
+      // Render mode table
+      // Assoc layout children
+      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+      nodeDefLayout = NodeDefLayout.assocLayoutChildren(
+        surveyCycleKey,
+        R.map(NodeDef.getUuid, nodeDefChildren)
+      )(nodeDefLayout)
+    } else {
+      // Render mode form
+      // Dissoc layoutChildren (applicable only if render mode is table)
+      nodeDefLayout = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(nodeDefLayout)
+      // Entity rendered as form can only exists in its own page
+      if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+        nodeDefLayout = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(nodeDefLayout)
+      }
+    }
+  }
+  return nodeDefLayout
+}
+
 export const setNodeDefProp = (key, value = null, advanced = false) => async (dispatch, getState) => {
   const state = getState()
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const nodeDef = NodeDefState.getNodeDef(state)
 
   if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
@@ -147,43 +181,29 @@ export const setNodeDefProp = (key, value = null, advanced = false) => async (di
   const propsAdvanced = advanced ? { [key]: value } : {}
 
   if (key === NodeDef.propKeys.multiple) {
-    // If setting "multiple", reset validations required or count
+    // Reset validations required or count
     propsAdvanced[NodeDef.keysPropsAdvanced.validations] = value
       ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
       : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
   }
 
-  const nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
+  let nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
+
+  // If setting "multiple" and nodeDef is single entity and renderType is table, set renderType to Form
+  if (
+    key === NodeDef.propKeys.multiple &&
+    NodeDef.isEntity(nodeDef) &&
+    !value &&
+    NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
+  ) {
+    const layoutUpdated = dispatch(
+      _updateLayoutProp(nodeDefUpdated, NodeDefLayout.keys.renderType, NodeDefLayout.renderType.form)
+    )
+    nodeDefUpdated = NodeDefLayout.assocLayout(layoutUpdated)(nodeDefUpdated)
+    props[NodeDefLayout.keys.layout] = layoutUpdated
+  }
 
   dispatch(_validateAndNotifyNodeDefUpdate(nodeDefUpdated, props, propsAdvanced))
-}
-
-const _updateLayoutProp = (getState, nodeDef, key, value) => {
-  const state = getState()
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-
-  return R.pipe(
-    NodeDefLayout.getLayout,
-    R.assocPath([surveyCycleKey, key], value),
-    R.when(R.always(NodeDef.isEntity(nodeDef) && key === NodeDefLayout.keys.renderType), (layout) => {
-      const layoutCycle = layout[surveyCycleKey]
-
-      // If setting layout render mode (table | form), set the the proper layout
-      const isRenderTable = value === NodeDefLayout.renderType.table
-
-      if (isRenderTable) {
-        layoutCycle[NodeDefLayout.keys.layoutChildren] = Survey.getNodeDefChildren(nodeDef)(survey).map((n) =>
-          NodeDef.getUuid(n)
-        )
-      } else if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
-        // Entity rendered as form can only exists in its own page
-        layoutCycle[NodeDefLayout.keys.pageUuid] = uuidv4()
-      }
-
-      return layout
-    })
-  )(nodeDef)
 }
 
 /**
@@ -192,7 +212,7 @@ const _updateLayoutProp = (getState, nodeDef, key, value) => {
 export const setNodeDefLayoutProp = (key, value) => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
-  const layoutUpdated = _updateLayoutProp(getState, nodeDef, key, value)
+  const layoutUpdated = dispatch(_updateLayoutProp(nodeDef, key, value))
 
   dispatch(setNodeDefProp(NodeDefLayout.keys.layout, layoutUpdated))
 }
@@ -200,8 +220,8 @@ export const setNodeDefLayoutProp = (key, value) => async (dispatch, getState) =
 /**
  * Updates the specified layout prop of a node def and persists the change
  */
-export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch, getState) => {
-  const layoutUpdated = _updateLayoutProp(getState, nodeDef, key, value)
+export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch) => {
+  const layoutUpdated = dispatch(_updateLayoutProp(nodeDef, key, value))
   const props = { [NodeDefLayout.keys.layout]: layoutUpdated }
   const nodeDefUpdated = NodeDef.mergeProps(props)(nodeDef)
   dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
