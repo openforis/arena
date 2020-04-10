@@ -140,32 +140,32 @@ const _updateLayoutProp = (nodeDef, key, value) => (_, getState) => {
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-  return R.pipe(
+  let nodeDefLayout = R.pipe(
     NodeDefLayout.getLayout,
-    NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value),
-    R.when(
-      // If setting layout render mode (table | form), set the the proper layout
-      R.always(NodeDef.isEntity(nodeDef) && key === NodeDefLayout.keys.renderType),
-      R.ifElse(
-        R.always(R.equals(value, NodeDefLayout.renderType.table)),
-        // Render mode table
-        NodeDefLayout.assocLayoutChildren(
-          surveyCycleKey,
-          Survey.getNodeDefChildren(nodeDef)(survey).map(NodeDef.getUuid)
-        ),
-        // Render mode form
-        R.pipe(
-          // Dissoc layoutChildren (applicable only if render mode is table)
-          NodeDefLayout.dissocLayoutChildren(surveyCycleKey),
-          // Entity rendered as form can only exists in its own page
-          R.when(
-            R.always(NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)),
-            NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())
-          )
-        )
-      )
-    )
+    NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)
   )(nodeDef)
+
+  // If setting layout render mode (table | form), set the the proper layout
+  if (NodeDef.isEntity(nodeDef) && key === NodeDefLayout.keys.renderType) {
+    if (value === NodeDefLayout.renderType.table) {
+      // Render mode table
+      // Assoc layout children
+      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+      nodeDefLayout = NodeDefLayout.assocLayoutChildren(
+        surveyCycleKey,
+        R.map(NodeDef.getUuid, nodeDefChildren)
+      )(nodeDefLayout)
+    } else {
+      // Render mode form
+      // Dissoc layoutChildren (applicable only if render mode is table)
+      nodeDefLayout = NodeDefLayout.dissocLayoutChildren(surveyCycleKey)(nodeDefLayout)
+      // Entity rendered as form can only exists in its own page
+      if (NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)) {
+        nodeDefLayout = NodeDefLayout.assocPageUuid(surveyCycleKey, uuidv4())(nodeDefLayout)
+      }
+    }
+  }
+  return nodeDefLayout
 }
 
 export const setNodeDefProp = (key, value = null, advanced = false) => async (dispatch, getState) => {
