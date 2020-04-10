@@ -52,8 +52,10 @@ export default class RFilePersistResults extends RFileSystem {
     const zipFile = FileUtils.join(dirResults, 'userScripts.zip')
 
     await this.logInfo(`'Persisting user scripts started'`)
-    await this.appendContent(zipr(zipFile, dirNames.user))
-    await this.appendContent(arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile))
+    await this.appendContent(
+      zipr(zipFile, dirNames.user),
+      arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile)
+    )
     await this.logInfo(`'Persisting user scripts completed'`)
   }
 

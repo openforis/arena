@@ -291,7 +291,11 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
   })
 }
 
-export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository/processingChainRepository'
+export {
+  removeCyclesFromChains,
+  updateChainScriptCommon,
+  deleteChainsWithoutCycles,
+} from '../repository/processingChainRepository'
 
 // ====== DELETE - Chain
 

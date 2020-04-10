@@ -8,6 +8,7 @@ CREATE TABLE
     props          jsonb       NOT NULL DEFAULT '{}'::jsonb,
     validation     jsonb       NOT NULL DEFAULT '{}'::jsonb,
     status_exec    VARCHAR(32)     NULL,
+    script_common  TEXT            NULL,
     PRIMARY KEY (uuid)
   );
 
