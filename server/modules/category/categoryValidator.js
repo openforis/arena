@@ -18,6 +18,13 @@ const keys = {
 
 // ====== LEVELS
 
+const getItemChildren = (parentItemUuid) => (itemsByParentUuid) => R.propOr([], parentItemUuid)(itemsByParentUuid)
+
+const validateNotEmptyFirstLevelItems = (itemsByParentUuid) => (_propName, level) =>
+  CategoryLevel.getIndex(level) === 0 && R.isEmpty(getItemChildren(null)(itemsByParentUuid))
+    ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
+    : null
+
 const levelValidators = (levels, itemsByParentUuid) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
@@ -27,8 +34,8 @@ const levelValidators = (levels, itemsByParentUuid) => ({
   [keys.items]: [validateNotEmptyFirstLevelItems(itemsByParentUuid)],
 })
 
-const validateLevel = (levels, itemsByParentUuid) => async level =>
-  await Validator.validate(level, levelValidators(levels, itemsByParentUuid))
+const validateLevel = (levels, itemsByParentUuid) => async (level) =>
+  Validator.validate(level, levelValidators(levels, itemsByParentUuid))
 
 const validateLevels = async (category, itemsByParentUuid) => {
   const levels = Category.getLevelsArray(category)
@@ -44,11 +51,14 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
 // ====== ITEMS
 
-const validateItemCodeUniqueness = siblingsAndSelfByCode => (_propName, item) => {
+const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
   const isUnique = R.pipe(R.prop(CategoryItem.getCode(item)), R.length, R.equals(1))(siblingsAndSelfByCode)
 
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
 }
+
+const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
+  !isLeaf && R.isEmpty(itemChildren) ? { key: Validation.messageKeys.categoryEdit.childrenEmpty } : null
 
 const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
@@ -58,16 +68,6 @@ const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
   ],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
 })
-
-const getItemChildren = parentItemUuid => itemsByParentUuid => R.propOr([], parentItemUuid)(itemsByParentUuid)
-
-const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => (_propName, _item) =>
-  !isLeaf && R.isEmpty(itemChildren) ? { key: Validation.messageKeys.categoryEdit.childrenEmpty } : null
-
-const validateNotEmptyFirstLevelItems = itemsByParentUuid => (_propName, level) =>
-  CategoryLevel.getIndex(level) === 0 && R.isEmpty(getItemChildren(null)(itemsByParentUuid))
-    ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
-    : null
 
 const _extraPropValidators = {
   [Category.itemExtraDefDataTypes.number]: (key, extra) =>
@@ -81,7 +81,7 @@ const _extraPropValidators = {
   [Category.itemExtraDefDataTypes.text]: () => null,
 }
 
-const _validateItemExtraProps = (extraDefs, validation) => item => {
+const _validateItemExtraProps = (extraDefs, validation) => (item) => {
   const _validateItemExtraProp = (key, extra) => {
     if (StringUtils.isBlank(extra[key])) {
       return null
@@ -101,12 +101,12 @@ const _validateItemExtraProps = (extraDefs, validation) => item => {
             R.always(R.isNil(validationResult)),
             Validation.assocFieldValidation(
               `${CategoryItem.keysProps.extra}_${key}`,
-              Validation.newInstance(false, {}, [validationResult]),
-            ),
+              Validation.newInstance(false, {}, [validationResult])
+            )
           )(accValidation)
-        }, validation),
+        }, validation)
       )(extra)
-    : null
+    : validation
 }
 
 const validateItems = async (category, itemsByParentUuid) => {
@@ -119,18 +119,18 @@ const validateItems = async (category, itemsByParentUuid) => {
   // Keep track of already visited items: if not leaf, they will be validated only when already visited
   const visitedUuids = new Set()
 
-  const addItemsToStack = items => {
+  const addItemsToStack = (items) => {
     // Group sibling items by code to optimize item code uniqueness check
     // do it only one time for every sibling
     const siblingsAndSelfByCode = R.groupBy(CategoryItem.getCode, items)
     stack.push(
       ...R.map(
-        item => ({
+        (item) => ({
           item,
           siblingsAndSelfByCode,
         }),
-        items,
-      ),
+        items
+      )
     )
   }
 
@@ -149,6 +149,7 @@ const validateItems = async (category, itemsByParentUuid) => {
 
     if (isLeaf || visited || R.isEmpty(itemChildren)) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
+      /* eslint-disable no-await-in-loop */
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
 
@@ -158,15 +159,15 @@ const validateItems = async (category, itemsByParentUuid) => {
       stack.pop() // It won't be visited again, remove it from stack
     } else if (visited) {
       // All descendants have been validated, add children validation to the item validation
-      const childrenValid = R.all(itemChild =>
-        Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)]),
+      const childrenValid = R.all((itemChild) =>
+        Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)])
       )(itemChildren)
 
       if (!childrenValid) {
         validation = R.pipe(
           R.defaultTo(Validation.newInstance()),
           Validation.setValid(false),
-          Validation.setErrors([{ key: Validation.messageKeys.categoryEdit.childrenInvalid }]),
+          Validation.setErrors([{ key: Validation.messageKeys.categoryEdit.childrenInvalid }])
         )(validation)
       }
 
@@ -187,7 +188,7 @@ const validateItems = async (category, itemsByParentUuid) => {
 
 // ====== CATEGORY
 
-const categoryValidators = categories => ({
+const categoryValidators = (categories) => ({
   [`${Category.keys.props}.${Category.props.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
@@ -196,7 +197,7 @@ const categoryValidators = categories => ({
 })
 
 const validateCategoryProps = async (categories, category) =>
-  await Validator.validate(category, categoryValidators(categories))
+  Validator.validate(category, categoryValidators(categories))
 
 export const validateCategory = async (categories, category, items) => {
   const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid)(items)
@@ -208,6 +209,6 @@ export const validateCategory = async (categories, category, items) => {
   return R.pipe(
     Validation.setValid(R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),
     R.unless(R.always(Validation.isValid(levelsValidation)), Validation.setField(keys.levels, levelsValidation)),
-    R.unless(R.always(Validation.isValid(itemsValidation)), Validation.setField(keys.items, itemsValidation)),
+    R.unless(R.always(Validation.isValid(itemsValidation)), Validation.setField(keys.items, itemsValidation))
   )(categoryValidation)
 }
