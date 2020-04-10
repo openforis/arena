@@ -42,16 +42,13 @@ export const init = (app) => {
 
   // ====== READ - Chain
   app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid',
+    '/survey/:surveyId/processing-chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid } = Request.getParams(req)
 
-        const processingChain = await ProcessingChainService.fetchChainByUuid({
-          [ProcessingChainService.paramsChain.surveyId]: surveyId,
-          [ProcessingChainService.paramsChain.chainUuid]: processingChainUuid,
-        })
+        const processingChain = await ProcessingChainService.fetchChainByUuid({ surveyId, chainUuid })
 
         res.json(processingChain)
       } catch (error) {

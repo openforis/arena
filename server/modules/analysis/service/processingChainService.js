@@ -1,5 +1,4 @@
 export {
-  paramsChain,
   // ======  READ - Chain
   countChainsBySurveyId,
   fetchChainsBySurveyId,

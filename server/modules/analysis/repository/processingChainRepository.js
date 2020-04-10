@@ -6,8 +6,6 @@ import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as ChainParams from './chainParams'
-
 const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
   'date_modified'
 )}, ${DbUtils.selectDate('date_executed')}`
@@ -45,12 +43,23 @@ export const fetchChainsBySurveyId = async (surveyId, cycle = null, offset = 0, 
     dbTransformCallback
   )
 
-export const fetchChainByUuid = async (params, client = db) =>
+/**
+ * Fetches a processing chain with the given surveyId and chainUuid.
+ *
+ * @param {!object} params - Query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {!string} params.chainUuid - The processing chain uuid.
+ * @param {boolean} [params.includeScript = false] - Whether to include chain script.
+ * @param {pgPromise.IDatabase} client - The database client.
+ *
+ * @returns {Promise<any | null>} - The chain if found, null otherwise.
+ */
+export const fetchChainByUuid = async ({ surveyId, chainUuid, includeScript }, client = db) =>
   client.oneOrNone(
-    `SELECT ${selectFields}${ChainParams.getIncludeScripts(params) ? ' ,script_common' : ''}
-    FROM ${getSurveyDBSchema(ChainParams.getSurveyId(params))}.processing_chain
+    `SELECT ${selectFields}${includeScript === true ? ' ,script_common' : ''}
+    FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE uuid = $1`,
-    [ChainParams.getChainUuid(params)],
+    [chainUuid],
     dbTransformCallback
   )
 
