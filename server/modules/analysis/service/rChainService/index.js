@@ -69,6 +69,3 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
     await ProcessingChainManager.updateChainScriptCommon(surveyId, chainUuid, scriptCommon, tx)
   })
 }
-
-// ==== DELETE
-export const { deleteNodeResults } = RChainManager
