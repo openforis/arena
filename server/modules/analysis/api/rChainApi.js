@@ -64,4 +64,22 @@ export const init = (app) => {
       }
     }
   )
+
+  // ====== UPDATE - Chain user scripts
+  app.put(
+    ApiRoutes.rChain.chainUserScripts(':surveyId', ':chainUuid'),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        // const filePath = Request.getFilePath(req)
+        // const { surveyId, chainUuid } = Request.getParams(req)
+
+        // await RChainService.persistResults(surveyId, cycle, stepUuid, filePath)
+
+        Response.sendOk(res)
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
 }

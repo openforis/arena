@@ -8,6 +8,4 @@ export { default as RFileLogin } from './rFileLogin'
 
 export { default as RFilePersistResults } from './rFilePersistResults'
 
-export { default as RFilePersistScripts } from './rFilePersistScripts'
-
 export { default as RFileReadData } from './rFileReadData'

@@ -4,9 +4,12 @@ const getRChainPath = (surveyId) => `${getSurveyPath(surveyId)}/rChain`
 
 const getRChainCyclePath = (surveyId, cycle) => `${getRChainPath(surveyId)}/cycles/${cycle}`
 
+// chain
+export const chainUserScripts = (surveyId, chainUuid) => `${getRChainPath(surveyId)}/chains/${chainUuid}/userScripts`
+
 // step
 export const stepEntityData = (surveyId, cycle, stepUuid) =>
   `${getRChainCyclePath(surveyId, cycle)}/steps/${stepUuid}/data`
 
-// category'
+// category
 export const categoryItemsData = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}`
