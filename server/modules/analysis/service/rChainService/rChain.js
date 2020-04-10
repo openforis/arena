@@ -105,7 +105,11 @@ class RChain {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
-    this._chain = await ProcessingChainManager.fetchChainAndScriptByUuid(this.surveyId, this.chainUuid)
+    this._chain = await ProcessingChainManager.fetchChainByUuid({
+      [ProcessingChainManager.paramsChain.surveyId]: this.surveyId,
+      [ProcessingChainManager.paramsChain.chainUuid]: this.chainUuid,
+      [ProcessingChainManager.paramsChain.includeScript]: true,
+    })
     const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(this.surveyId, this.chainUuid)
     this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
   }

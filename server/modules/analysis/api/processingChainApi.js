@@ -48,7 +48,10 @@ export const init = (app) => {
       try {
         const { surveyId, processingChainUuid } = Request.getParams(req)
 
-        const processingChain = await ProcessingChainService.fetchChainByUuid(surveyId, processingChainUuid)
+        const processingChain = await ProcessingChainService.fetchChainByUuid({
+          [ProcessingChainService.paramsChain.surveyId]: surveyId,
+          [ProcessingChainService.paramsChain.chainUuid]: processingChainUuid,
+        })
 
         res.json(processingChain)
       } catch (error) {

@@ -6,6 +6,8 @@ import * as UserAnalysis from '@common/analysis/userAnalysis'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
+import * as ChainParams from './chainParams'
+
 const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate(
   'date_modified'
 )}, ${DbUtils.selectDate('date_executed')}`
@@ -43,20 +45,14 @@ export const fetchChainsBySurveyId = async (surveyId, cycle = null, offset = 0, 
     dbTransformCallback
   )
 
-const _fetchChainByUuid = async (surveyId, chainUuid, includeScript, client = db) =>
+export const fetchChainByUuid = async (params, client = db) =>
   client.oneOrNone(
-    `SELECT ${selectFields}${includeScript ? ' ,script_common' : ''}
-    FROM ${getSurveyDBSchema(surveyId)}.processing_chain
+    `SELECT ${selectFields}${ChainParams.getIncludeScripts(params) ? ' ,script_common' : ''}
+    FROM ${getSurveyDBSchema(ChainParams.getSurveyId(params))}.processing_chain
     WHERE uuid = $1`,
-    [chainUuid],
+    [ChainParams.getChainUuid(params)],
     dbTransformCallback
   )
-
-export const fetchChainByUuid = async (surveyId, chainUuid, client = db) =>
-  _fetchChainByUuid(surveyId, chainUuid, false, client)
-
-export const fetchChainAndScriptByUuid = async (surveyId, chainUuid, client = db) =>
-  _fetchChainByUuid(surveyId, chainUuid, true, client)
 
 // ====== UPDATE
 
