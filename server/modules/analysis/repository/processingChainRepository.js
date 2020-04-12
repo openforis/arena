@@ -1,8 +1,9 @@
-import { db } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
+import * as pgPromise from 'pg-promise'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
-import * as UserAnalysis from '@common/analysis/userAnalysis'
+
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema, dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
@@ -123,31 +124,3 @@ export const deleteChainsWithoutCycles = async (surveyId, client = db) =>
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.processing_chain
     WHERE jsonb_array_length(props->'${ProcessingChain.keysProps.cycles}') = 0`
   )
-
-// ===== GRANT PRIVILEGES
-export const grantUpdateToUserAnalysis = async (surveyId, client = db) => {
-  const schema = getSurveyDBSchema(surveyId)
-  const userName = UserAnalysis.getName(surveyId)
-
-  // Grant usage on survey RDB schema
-  await client.query(`
-    GRANT
-      USAGE
-      ON SCHEMA ${schema}
-      TO "${userName}"
-    `)
-  // Grant select uuid on 'processing_chain' table and update only on 'status_exec' column
-  await client.query(`
-    GRANT 
-      SELECT (uuid), UPDATE (status_exec) 
-      ON ${schema}.processing_chain
-      TO "${userName}"
-  `)
-  // Grant select uuid on 'processing_step_calculation' and update only on 'script' column
-  await client.query(`
-    GRANT 
-      SELECT (uuid), UPDATE (script) 
-      ON ${schema}.processing_step_calculation
-      TO "${userName}"
-  `)
-}
