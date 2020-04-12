@@ -12,11 +12,13 @@ import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import {
+  publishSurveySchemaTableProps,
+  markSurveyDraft,
+} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as CategoryValidator from '../categoryValidator'
-import * as CategoryRepository from '../repository/categoryRepository'
-import { publishSurveySchemaTableProps, markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
-
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
+import * as CategoryRepository from '../repository/categoryRepository'
 
 // ====== VALIDATION
 
@@ -107,15 +109,16 @@ export const insertItems = async (user, surveyId, items, client = db) =>
     ])
   })
 
-export const { createImportSummary } = CategoryImportSummaryGenerator
-export const { createImportSummaryFromStream } = CategoryImportSummaryGenerator
+export const { createImportSummary, createImportSummaryFromStream } = CategoryImportSummaryGenerator
 
 // ====== READ
-export const { fetchCategoriesAndLevelsBySurveyId } = CategoryRepository
-export const { fetchCategoryAndLevelsByUuid } = CategoryRepository
-export const { fetchItemsByCategoryUuid } = CategoryRepository
-export const { fetchItemsByParentUuid } = CategoryRepository
-export const { fetchItemsByLevelIndex } = CategoryRepository
+export const {
+  fetchCategoriesAndLevelsBySurveyId,
+  fetchCategoryAndLevelsByUuid,
+  fetchItemsByCategoryUuid,
+  fetchItemsByParentUuid,
+  fetchItemsByLevelIndex,
+} = CategoryRepository
 
 // ====== UPDATE
 

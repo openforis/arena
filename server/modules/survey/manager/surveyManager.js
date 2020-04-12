@@ -164,8 +164,7 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
 export const fetchUserSurveysInfo = async (user, offset, limit) =>
   R.map(assocSurveyInfo, await SurveyRepository.fetchUserSurveys(user, offset, limit))
 
-export const { countUserSurveys } = SurveyRepository
-export const { fetchDependencies } = SurveyRepository
+export const { countUserSurveys, fetchDependencies } = SurveyRepository
 
 // ====== UPDATE
 export const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
