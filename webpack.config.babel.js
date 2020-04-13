@@ -22,10 +22,10 @@ class CleanUpStatsPlugin {
   }
 
   apply(compiler) {
-    compiler.hooks.done.tap('CleanUpStatsPlugin', stats => {
+    compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
       const children = stats.compilation.children
       if (Array.isArray(children)) {
-        stats.compilation.children = children.filter(child => this.shouldPickStatChild(child))
+        stats.compilation.children = children.filter((child) => this.shouldPickStatChild(child))
       }
     })
   }
@@ -95,10 +95,6 @@ const webPackConfig = {
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/react'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
-          },
         },
       },
       {

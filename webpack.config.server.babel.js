@@ -17,10 +17,8 @@ const plugins = [
   ...(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
 ]
 
-const entry = entryPath => [
+const entry = (entryPath) => [
   ...(isProduction ? [] : ['webpack/hot/poll?1000']),
-  'core-js/stable',
-  'regenerator-runtime/runtime',
   path.resolve(path.join(__dirname, entryPath)),
 ]
 
@@ -59,10 +57,6 @@ export default {
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env'],
-            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
-          },
         },
       },
     ],
