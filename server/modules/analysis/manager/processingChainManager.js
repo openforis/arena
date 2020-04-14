@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import * as pgPromise from 'pg-promise'
 
 import { db } from '@server/db/db'
 import SystemError from '@core/systemError'
@@ -416,7 +417,3 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
 
     return _afterChainUpdate(surveyId, t)
   })
-
-// ===== GRANT PRIVILEGES
-
-export { grantUpdateToUserAnalysis } from '../repository/processingChainRepository'

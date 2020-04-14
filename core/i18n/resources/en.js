@@ -689,7 +689,6 @@ $t(common.cantUndoWarning)`,
 
   // ====== Jobs
   jobs: {
-    AnalysisUserCreationJob: 'Analysis User Creation',
     CategoriesImportJob: 'Categories Import',
     CategoryImportJob: 'Category Import',
     CategoriesValidationJob: 'Categories Validation',
@@ -714,7 +713,6 @@ $t(common.cantUndoWarning)`,
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
-    UserAnalysisCreationJob: 'Creating Analysis User',
   },
 
   // ====== App Errors

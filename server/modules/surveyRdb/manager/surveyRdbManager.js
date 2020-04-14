@@ -8,6 +8,7 @@ import * as ResultStepView from '@common/surveyRdb/resultStepView'
 import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as CSVWriter from '@server/utils/file/csvWriter'
@@ -22,9 +23,6 @@ import * as DataTableInsertRepository from '../repository/dataTableInsertReposit
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewReadRepository from '../repository/dataViewReadRepository'
-import * as SchemaRdbRepository from '../repository/schemaRdbRepository'
-import * as ResultNodeTableRepository from '../repository/resultNodeTableRepository'
-import * as ResultStepViewRepository from '../repository/resultStepViewRepository'
 
 // ==== DDL
 
@@ -42,21 +40,6 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 // Result tables and views
 export { createResultNodeTable } from '../repository/resultNodeTableRepository'
 export { createResultStepView } from '../repository/resultStepViewRepository'
-
-export const grantPermissionsToUserAnalysis = async (surveyId, client) => {
-  // Grant SELECT on RDB schema tables and views
-  await SchemaRdbRepository.grantSelectToUserAnalysis(surveyId, client)
-
-  // Grant INSERT/UPDATE/DELETE on _res_node table
-  await ResultNodeTableRepository.grantWriteToUserAnalysis(surveyId, client)
-
-  // Change result step view owner to user analysis (to allow view refresh by user analysis)
-  const resultViewsByEntityUuid = await generateResultViews(surveyId, client)
-  const resultViewNames = R.pipe(R.values, R.flatten, R.map(ResultStepView.getViewName))(resultViewsByEntityUuid)
-  for (const resultViewName of resultViewNames) {
-    await ResultStepViewRepository.updateOwnerToUserAnalysis(surveyId, resultViewName, client)
-  }
-}
 
 // ==== DML
 
@@ -79,18 +62,18 @@ export const queryTable = async (
   filterExpr = null,
   sort = [],
   editMode = false,
-  streamOutput = null,
+  streamOutput = null
 ) => {
   const surveyId = Survey.getId(survey)
   const { nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(
     survey,
     nodeDefUuidTable,
-    nodeDefUuidCols,
+    nodeDefUuidCols
   )
 
   // Get hierarchy entities uuid col names
   const ancestorUuidColNames = []
-  Survey.visitAncestorsAndSelf(nodeDefTable, nodeDefCurrent => {
+  Survey.visitAncestorsAndSelf(nodeDefTable, (nodeDefCurrent) => {
     // Skip virtual entity: ancestor uuid column taken from its parent entity def
     if (!NodeDef.isVirtual(nodeDefCurrent)) {
       ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
@@ -108,20 +91,20 @@ export const queryTable = async (
     limit,
     filterExpr,
     sort,
-    Boolean(streamOutput),
+    Boolean(streamOutput)
   )
 
   // Edit mode, assoc nodes to columns
   if (editMode) {
     rows = await Promise.all(
-      rows.map(async row => {
+      rows.map(async (row) => {
         const recordUuid = row[DataTable.colNameRecordUuuid]
         const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
         const parentNodeUuid = R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
         const resultRow = { ...row, cols: {}, record, parentNodeUuid }
 
         // Assoc nodes to each columns
-        for (const nodeDefUuidCol of nodeDefUuidCols) {
+        await PromiseUtils.each(nodeDefUuidCols, async (nodeDefUuidCol) => {
           const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
           const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
           const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
@@ -135,13 +118,13 @@ export const queryTable = async (
                 )[0]
 
           resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
-        }
+        })
 
         return resultRow
-      }),
+      })
     )
   } else if (streamOutput) {
-    await db.stream(rows, stream => {
+    await db.stream(rows, (stream) => {
       stream.pipe(CSVWriter.transformToStream(streamOutput, colNames))
     })
   }
@@ -152,43 +135,41 @@ export const queryTable = async (
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, nodeDefUuidTable)
-  return await DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
+  return DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
 }
 
-export const populateTable = DataTableInsertRepository.populateTable
-export const updateTable = DataTableUpdateRepository.updateTable
+export const { populateTable } = DataTableInsertRepository
+export const { updateTable } = DataTableUpdateRepository
 
-export const countDuplicateRecords = DataViewReadRepository.countDuplicateRecords
-export const fetchRecordsCountByKeys = DataViewReadRepository.fetchRecordsCountByKeys
-export const fetchRecordsWithDuplicateEntities = DataTableReadRepository.fetchRecordsWithDuplicateEntities
+export const { countDuplicateRecords } = DataViewReadRepository
+export const { fetchRecordsCountByKeys } = DataViewReadRepository
+export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
 
 const _visitProcessingSteps = async (surveyId, client, visitor) => {
   const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
-  for (const chain of chains) {
+  await PromiseUtils.each(chains, async (chain) => {
     const steps = await ProcessingStepRepository.fetchStepsAndCalculationsByChainUuid(
       surveyId,
       ProcessingChain.getUuid(chain),
-      client,
+      client
     )
-    for (const step of steps) {
-      await visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain))
-    }
-  }
+    await PromiseUtils.each(steps, async (step) => visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain)))
+  })
 }
 
 // Result views
 export const generateResultViews = async (surveyId, client = db) => {
   const resultStepViewsByEntityUuid = {}
 
-  await _visitProcessingSteps(surveyId, client, async step => {
+  await _visitProcessingSteps(surveyId, client, async (step) => {
     if (ProcessingStep.hasEntity(step)) {
       const calculations = ProcessingStep.getCalculations(step)
       if (R.none(ProcessingStepCalculation.hasAggregateFunction, calculations)) {
         const calculationNodeDefUuids = R.map(ProcessingStepCalculation.getNodeDefUuid)(calculations)
         const nodeDefColumns = await Promise.all(
-          calculationNodeDefUuids.map(nodeDefUuid =>
-            NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client),
-          ),
+          calculationNodeDefUuids.map((nodeDefUuid) =>
+            NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client)
+          )
         )
         const entityDefUuid = ProcessingStep.getEntityUuid(step)
         const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
@@ -210,7 +191,7 @@ export const generateEntityAggregatedViews = async (survey, client = db) => {
     if (ProcessingStep.hasEntity(step, chain)) {
       const entityUuid = ProcessingStep.getEntityUuid(step)
       const calculations = ProcessingStep.getCalculations(step)
-      for (const calculation of calculations) {
+      calculations.forEach((calculation) => {
         if (ProcessingStepCalculation.hasAggregateFunction(calculation)) {
           let entityAggregatedView = entityAggregatedViewsByUuid[entityUuid]
           if (entityAggregatedView) {
@@ -219,8 +200,8 @@ export const generateEntityAggregatedViews = async (survey, client = db) => {
             const entityDef = Survey.getNodeDefByUuid(entityUuid)(survey)
             const entityAggregatedViewEntityDef = NodeDef.isVirtual(entityDef)
               ? Survey.getNodeDefParent(entityDef)(survey)
-              : R.pipe(ProcessingChain.getStepPrev(step), ProcessingStep.getEntityUuid, entityDefUuid =>
-                  Survey.getNodeDefByUuid(entityDefUuid)(survey),
+              : R.pipe(ProcessingChain.getStepPrev(step), ProcessingStep.getEntityUuid, (entityDefUuid) =>
+                  Survey.getNodeDefByUuid(entityDefUuid)(survey)
                 )(chain)
 
             entityAggregatedView = EntityAggregatedView.newEntityAggregatedView(entityAggregatedViewEntityDef, [
@@ -230,7 +211,7 @@ export const generateEntityAggregatedViews = async (survey, client = db) => {
 
           entityAggregatedViewsByUuid[entityUuid] = entityAggregatedView
         }
-      }
+      })
     }
   })
   return entityAggregatedViewsByUuid
