@@ -20,6 +20,8 @@ const ForgotPasswordView = () => {
 
   useEffect(() => {
     dispatch(setLoginError(null))
+
+    return () => dispatch(setLoginError(null))
   }, [])
 
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
@@ -27,7 +29,7 @@ const ForgotPasswordView = () => {
       email: initialEmail,
     },
     LoginValidator.validateEmail,
-    true,
+    true
   )
 
   const onSubmit = () => {
@@ -42,7 +44,7 @@ const ForgotPasswordView = () => {
     <NotLoggedInView error={error}>
       <input
         value={formObject.email}
-        onChange={e => {
+        onChange={(e) => {
           dispatch(setLoginError(null))
           setObjectField('email', e.target.value)
         }}
