@@ -1,11 +1,10 @@
 import './profilePictureEditor.scss'
 
-import * as PropTypes from 'prop-types'
+import React, { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
+import AvatarEditor from 'react-avatar-editor'
 
 import * as FileTypes from '@webapp/utils/fileTypes'
-
-import React, { useEffect, useRef, useState } from 'react'
-import AvatarEditor from 'react-avatar-editor'
 
 import { useProfilePicture, useFileDrop, useI18n } from '@webapp/commonComponents/hooks'
 
