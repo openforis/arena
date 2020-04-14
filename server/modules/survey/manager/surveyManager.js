@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import * as Promise from 'bluebird'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -12,6 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as AuthGroup from '@core/auth/authGroup'
 
@@ -185,7 +185,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById(surveyId, true, false, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-      await Promise.each(Object.entries(props), async ([key, value]) => {
+      await PromiseUtils.each(Object.entries(props), async ([key, value]) => {
         const valuePrev = propsPrev[key]
 
         if (!R.equals(value, valuePrev)) {
@@ -212,7 +212,6 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
           }
         }
       })
-
       return fetchSurveyById(surveyId, true, true, t)
     }
 

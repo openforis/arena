@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import * as Promise from 'bluebird'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -9,6 +8,7 @@ import * as ResultStepView from '@common/surveyRdb/resultStepView'
 import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as CSVWriter from '@server/utils/file/csvWriter'
@@ -104,7 +104,7 @@ export const queryTable = async (
         const resultRow = { ...row, cols: {}, record, parentNodeUuid }
 
         // Assoc nodes to each columns
-        await Promise.each(nodeDefUuidCols, async (nodeDefUuidCol) => {
+        await PromiseUtils.each(nodeDefUuidCols, async (nodeDefUuidCol) => {
           const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
           const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
           const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
@@ -147,13 +147,13 @@ export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
 
 const _visitProcessingSteps = async (surveyId, client, visitor) => {
   const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
-  await Promise.each(chains, async (chain) => {
+  await PromiseUtils.each(chains, async (chain) => {
     const steps = await ProcessingStepRepository.fetchStepsAndCalculationsByChainUuid(
       surveyId,
       ProcessingChain.getUuid(chain),
       client
     )
-    await Promise.each(steps, async (step) => visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain)))
+    await PromiseUtils.each(steps, async (step) => visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain)))
   })
 }
 
