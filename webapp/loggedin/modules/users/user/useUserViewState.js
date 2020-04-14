@@ -15,7 +15,6 @@ export const useUserViewState = () => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const userToUpdate = useSelector(UserViewState.getUser)
-  const profilePictureUpdated = useSelector(UserViewState.isProfilePictureUpdated)
 
   const dispatch = useDispatch()
 
@@ -29,7 +28,7 @@ export const useUserViewState = () => {
 
     // Reset state on unmount
     return () => dispatch(resetUserState())
-  }, [])
+  }, [userUuid])
 
   const canEditUser = ready && !isUserAcceptPending && Authorizer.canEditUser(user, surveyInfo, userToUpdate)
   const canEditName = canEditUser
@@ -49,6 +48,5 @@ export const useUserViewState = () => {
     canEditGroup,
     canEditEmail,
     canRemove,
-    pictureEditorEnabled: profilePictureUpdated,
   }
 }
