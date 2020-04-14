@@ -15,7 +15,6 @@ export const useUserViewState = () => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const userToUpdate = useSelector(UserViewState.getUser)
-  const profilePictureUpdated = useSelector(UserViewState.isProfilePictureUpdated)
 
   const dispatch = useDispatch()
 
@@ -49,6 +48,5 @@ export const useUserViewState = () => {
     canEditGroup,
     canEditEmail,
     canRemove,
-    pictureEditorEnabled: profilePictureUpdated,
   }
 }

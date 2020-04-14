@@ -12,13 +12,12 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
+import * as SurveyState from '@webapp/survey/surveyState'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import ProfilePictureEditor from './components/profilePictureEditor'
 import DropdownUserGroup from '../components/dropdownUserGroup'
 
-import * as SurveyState from '@webapp/survey/surveyState'
 import { useUserViewState } from './useUserViewState'
-
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 import { saveUser, removeUser, updateUserProp, updateUserProfilePicture, inviteUserRepeat } from './actions'
 
@@ -29,17 +28,7 @@ const UserView = () => {
   const { userUuid } = useParams()
   const history = useHistory()
 
-  const {
-    ready,
-    user,
-    userToUpdate,
-    canEdit,
-    canEditName,
-    canEditGroup,
-    canEditEmail,
-    canRemove,
-    pictureEditorEnabled,
-  } = useUserViewState()
+  const { ready, user, userToUpdate, canEdit, canEditName, canEditGroup, canEditEmail, canRemove } = useUserViewState()
 
   const validation = User.getValidation(userToUpdate)
 
@@ -49,8 +38,8 @@ const UserView = () => {
         {canEdit ? (
           <ProfilePictureEditor
             userUuid={userUuid}
-            onPictureUpdate={profilePicture => dispatch(updateUserProfilePicture(profilePicture))}
-            enabled={pictureEditorEnabled}
+            onPictureUpdate={(profilePicture) => dispatch(updateUserProfilePicture(profilePicture))}
+            enabled
           />
         ) : (
           <ProfilePicture userUuid={userUuid} />
@@ -63,7 +52,7 @@ const UserView = () => {
             value={User.getName(userToUpdate)}
             validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
             maxLength={User.nameMaxLength}
-            onChange={value => dispatch(updateUserProp(User.keys.name, value))}
+            onChange={(value) => dispatch(updateUserProp(User.keys.name, value))}
           />
         </FormItem>
         <FormItem label={i18n.t('common.email')}>
@@ -72,7 +61,7 @@ const UserView = () => {
             placeholder={i18n.t('common.email')}
             value={User.getEmail(userToUpdate)}
             validation={Validation.getFieldValidation(User.keys.email)(validation)}
-            onChange={value => dispatch(updateUserProp(User.keys.email, value))}
+            onChange={(value) => dispatch(updateUserProp(User.keys.email, value))}
           />
         </FormItem>
         <FormItem label={i18n.t('common.group')}>
@@ -81,7 +70,7 @@ const UserView = () => {
             disabled={!canEditGroup}
             validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
             groupUuid={User.getGroupUuid(userToUpdate)}
-            onChange={groupUuid => dispatch(updateUserProp(User.keys.groupUuid, groupUuid))}
+            onChange={(groupUuid) => dispatch(updateUserProp(User.keys.groupUuid, groupUuid))}
           />
         </FormItem>
 
@@ -89,6 +78,7 @@ const UserView = () => {
           <div className="user__buttons">
             {canRemove && (
               <button
+                type="button"
                 className="btn-s btn-danger btn-remove-user"
                 onClick={() =>
                   dispatch(
@@ -98,8 +88,8 @@ const UserView = () => {
                         user: User.getName(userToUpdate),
                         survey: Survey.getLabel(surveyInfo, i18n.lang),
                       },
-                      () => dispatch(removeUser(history)),
-                    ),
+                      () => dispatch(removeUser(history))
+                    )
                   )
                 }
               >
@@ -110,18 +100,19 @@ const UserView = () => {
 
             {canEdit && (
               <button
+                type="button"
                 className="btn btn-save"
                 aria-disabled={!Validation.isValid(validation)}
                 onClick={() => dispatch(saveUser(history))}
               >
-                <span className={`icon icon-floppy-disk icon-left icon-12px`} />
+                <span className="icon icon-floppy-disk icon-left icon-12px" />
                 {i18n.t('common.save')}
               </button>
             )}
 
             {User.isInvitationExpired(userToUpdate) && (
-              <button className="btn btn-invite" onClick={() => dispatch(inviteUserRepeat(history))}>
-                <span className={`icon icon-envelop icon-left icon-12px`} />
+              <button type="button" className="btn btn-invite" onClick={() => dispatch(inviteUserRepeat(history))}>
+                <span className="icon icon-envelop icon-left icon-12px" />
                 {i18n.t('userView.sendNewInvitation')}
               </button>
             )}
