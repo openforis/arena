@@ -14,6 +14,7 @@ export {
   writeCsv,
   vector,
   sqldf,
+  asNumeric,
 } from './utility'
 
 export { zipr } from './zip'

@@ -9,7 +9,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ApiRoutes from '@common/apiRoutes'
 
 import RFileSystem from './rFileSystem'
-import { dfVar, setVar, arenaGet } from '../../rFunctions'
+import { dfVar, setVar, arenaGet, asNumeric } from '../../rFunctions'
 
 export const getDfCategoryItems = (category) => `category_items_${Category.getName(category)}`
 
@@ -70,7 +70,7 @@ export default class RFileReadData extends RFileSystem {
             .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
             .forEach((nodeDef) => {
               const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColName(nodeDef))
-              contentConvertNumericFields.push(setVar(nodeDefDfVar, `as.numeric(${nodeDefDfVar})`))
+              contentConvertNumericFields.push(setVar(nodeDefDfVar, asNumeric(nodeDefDfVar)))
             })
         })(survey)
         await this.appendContent(...contentConvertNumericFields)

@@ -32,3 +32,7 @@ export const dirCreate = (path) => `dir.create(path = '${path}', showWarnings = 
 // == csv
 
 export const writeCsv = (x, file, rowNames = 'F') => `write.csv(${x}, file = '${file}', row.names = ${rowNames})`
+
+// == converters
+
+export const asNumeric = (value, ...args) => `as.numeric(${value}${args.length > 0 ? `, ${args.join(', ')}` : ''})`
