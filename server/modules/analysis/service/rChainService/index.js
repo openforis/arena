@@ -23,8 +23,7 @@ export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
 // ==== READ
 export const fetchStepData = async (surveyId, cycle, stepUuid) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
-  const data = await RChainManager.fetchStepData(survey, cycle, stepUuid)
-  return data
+  return RChainManager.fetchStepData(survey, cycle, stepUuid)
 }
 
 // ==== UPDATE

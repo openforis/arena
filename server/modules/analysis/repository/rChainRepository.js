@@ -1,17 +1,32 @@
+import * as R from 'ramda'
+
 import { db } from '@server/db/db'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
+
+import * as Survey from '@core/survey/survey'
+
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 // ==== READ - Step
-export const fetchStepData = async (surveyId, cycle, entityDef, entityDefParent, nodeDefCalculations, client = db) => {
+export const fetchStepData = async (survey, cycle, entityDef, entityDefParent, client = db) => {
+  const surveyId = Survey.getId(survey)
   const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
+  const fields = R.pipe(
+    R.map(
+      // Remove prefix and keep only alias
+      R.pipe(R.split('.'), R.last, R.split(' as '), R.last)
+    ),
+    // Exclude record_cyle, date_created, date_modified columns
+    R.without([DataTable.colNameRecordCycle, DataTable.colNameDateCreated, DataTable.colNameDateModified])
+  )(RDBDataView.getSelectFields(survey, entityDef, [], true))
 
   return client.any(
-    `SELECT * 
+    `SELECT ${fields.join(', ')} 
     FROM ${SchemaRdb.getName(surveyId)}.${viewName}
     WHERE ${DataTable.colNameRecordCycle} = '${cycle}'`
   )

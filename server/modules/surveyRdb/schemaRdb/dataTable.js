@@ -12,13 +12,15 @@ export const colNameUuuid = 'uuid'
 export const colNameParentUuuid = 'parent_uuid'
 export const colNameRecordUuuid = 'record_uuid'
 export const colNameRecordCycle = 'record_cycle'
+export const colNameDateCreated = 'date_created'
+export const colNameDateModified = 'date_modified'
 
 export const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
     ? R.pipe(
         Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef)),
         R.filter(NodeDef.isSingleAttribute),
-        R.sortBy(R.ascend(R.prop('id'))),
+        R.sortBy(R.ascend(R.prop('id')))
       )(survey)
     : [nodeDef] // Multiple attr table
 
@@ -33,30 +35,36 @@ export const getColumnNames = (survey, nodeDef) => [
 ]
 
 export const getColumnNamesAndType = (survey, nodeDef) => [
-  colNameUuuid + ' uuid NOT NULL',
-  colNameRecordUuuid + ' uuid NOT NULL',
-  colNameRecordCycle + ' varchar(2) NOT NULL',
-  colNameParentUuuid + ' uuid',
+  `${colNameUuuid} uuid NOT NULL`,
+  `${colNameRecordUuuid} uuid NOT NULL`,
+  `${colNameRecordCycle} varchar(2) NOT NULL`,
+  `${colNameParentUuuid} uuid`,
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType)),
 ]
+
+const _getConstraintFk = (schemaName, referencedTableName, constraint, foreignKey) => `
+    CONSTRAINT ${constraint}_fk 
+    FOREIGN KEY (${foreignKey}) 
+    REFERENCES ${schemaName}.${referencedTableName} (uuid) 
+    ON DELETE CASCADE`
 
 export const getRecordForeignKey = (surveyId, nodeDef) =>
   _getConstraintFk(
     SurveyRepositoryUtils.getSurveyDBSchema(surveyId),
     'record',
-    NodeDef.getName(nodeDef) + '_record',
-    colNameRecordUuuid,
+    `${NodeDef.getName(nodeDef)}_record`,
+    colNameRecordUuuid
   )
 
 export const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null) =>
   _getConstraintFk(
     schemaName,
     getName(nodeDefParent),
-    NodeDef.getName(nodeDef) + '_' + NodeDef.getName(nodeDefParent),
-    colNameParentUuuid,
+    `${NodeDef.getName(nodeDef)}_${NodeDef.getName(nodeDefParent)}`,
+    colNameParentUuuid
   )
 
-export const getUuidUniqueConstraint = nodeDef =>
+export const getUuidUniqueConstraint = (nodeDef) =>
   `CONSTRAINT ${NodeDef.getName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
 
 export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
@@ -70,9 +78,3 @@ export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
     ...rowValues,
   ]
 }
-
-const _getConstraintFk = (schemaName, referencedTableName, constraint, foreignKey) => `
-    CONSTRAINT ${constraint}_fk 
-    FOREIGN KEY (${foreignKey}) 
-    REFERENCES ${schemaName}.${referencedTableName} (uuid) 
-    ON DELETE CASCADE`
