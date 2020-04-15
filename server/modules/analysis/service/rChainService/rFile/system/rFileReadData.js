@@ -5,10 +5,11 @@ import * as Category from '@core/survey/category'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ApiRoutes from '@common/apiRoutes'
 
 import RFileSystem from './rFileSystem'
-import { setVar, arenaGet } from '../../rFunctions'
+import { dfVar, setVar, arenaGet } from '../../rFunctions'
 
 export const getDfCategoryItems = (category) => `category_items_${Category.getName(category)}`
 
@@ -59,8 +60,20 @@ export default class RFileReadData extends RFileSystem {
           ApiRoutes.rChain.stepEntityData(Survey.getId(survey), cycle, ProcessingStep.getUuid(step))
         )
         const entityDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
-        const setEntityData = setVar(NodeDef.getName(entityDef), getEntityData)
-        await this.appendContent(setEntityData)
+        const dfEntity = NodeDef.getName(entityDef)
+        await this.appendContent(setVar(dfEntity, getEntityData))
+
+        // Convert numeric node def values
+        const contentConvertNumericFields = []
+        Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
+          Survey.getNodeDefChildren(ancestorDef)(survey)
+            .filter((nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef))
+            .forEach((nodeDef) => {
+              const nodeDefDfVar = dfVar(dfEntity, NodeDefTable.getColName(nodeDef))
+              contentConvertNumericFields.push(setVar(nodeDefDfVar, `as.numeric(${nodeDefDfVar})`))
+            })
+        })(survey)
+        await this.appendContent(...contentConvertNumericFields)
       })
     )
   }
