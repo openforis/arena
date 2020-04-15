@@ -1,6 +1,7 @@
 import Counter from '@core/counter'
 import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
+import * as PromiseUtils from '@core/promiseUtils'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
@@ -150,8 +151,10 @@ class RChain {
 
   async _initSteps() {
     const steps = ProcessingChain.getProcessingSteps(this._chain)
-    const rSteps = await Promise.all(steps.map((step) => new RStep(this._surveyId, this, step).init()))
-    this._rSteps.push(...rSteps)
+    await PromiseUtils.each(steps, async (step) => {
+      const rStep = await new RStep(this._surveyId, this, step).init()
+      this._rSteps.push(rStep)
+    })
   }
 
   async _initFilesClosing() {
