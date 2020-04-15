@@ -45,11 +45,16 @@ const _getCols = (survey, nodeDef, isSelf) => {
   return fields
 }
 
-export const getSelectFields = (survey, nodeDef, resultStepViews = [], excludeFieldKeys = false) => {
-  if (NodeDef.isVirtual(nodeDef)) {
-    return ['*']
-  }
-
+/**
+ * Generates a list of fields to be used in the projection of the data view.
+ * The fields will be related to the node definition specified
+ * (columns related to it's children definitions or to it's ancestors children definitions).
+ *
+ * @param {!object} survey - The context survey.
+ * @param {!object} nodeDef - The node definition.
+ * @returns {Array} List of fields.
+ */
+export const getSelectFieldsNodeDefs = (survey, nodeDef) => {
   const fields = []
 
   Survey.visitAncestorsAndSelf(nodeDef, (nodeDefCurrent) => {
@@ -58,33 +63,42 @@ export const getSelectFields = (survey, nodeDef, resultStepViews = [], excludeFi
     fields.unshift(...cols)
   })(survey)
 
-  if (!R.isEmpty(resultStepViews)) {
-    const nodeDefsCalculationColNames = R.pipe(
-      R.map(ResultStepView.getNodeDefColumns),
-      R.flatten,
-      R.map(DataCol.getNames),
-      R.flatten
-    )(resultStepViews)
+  return fields
+}
 
-    fields.push(...nodeDefsCalculationColNames)
+export const getSelectFields = (survey, nodeDef, resultStepViews) => {
+  if (NodeDef.isVirtual(nodeDef)) {
+    return ['*']
   }
 
-  if (!excludeFieldKeys) {
-    const fieldKeys = R.pipe(
-      Survey.getNodeDefKeys(nodeDef),
-      R.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}', ${alias}.${DataCol.getName(nodeDefKey)}`),
-      R.join(', '),
-      (content) => `jsonb_build_object(${content}) AS ${columns.keys}`
-    )(survey)
-    fields.unshift(fieldKeys)
-  }
+  // Add node defs columns
+  const fields = getSelectFieldsNodeDefs(survey, nodeDef)
+
+  // Add result step columns
+  const nodeDefsCalculationColNames = R.pipe(
+    R.map(ResultStepView.getNodeDefColumns),
+    R.flatten,
+    R.map(DataCol.getNames),
+    R.flatten
+  )(resultStepViews)
+
+  fields.push(...nodeDefsCalculationColNames)
+
+  // Generate keys column
+  const fieldKey = R.pipe(
+    Survey.getNodeDefKeys(nodeDef),
+    R.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}', ${alias}.${DataCol.getName(nodeDefKey)}`),
+    R.join(', '),
+    (content) => `jsonb_build_object(${content}) AS ${columns.keys}`
+  )(survey)
 
   // Add record_uuid, date_created, date_modified, keys
   fields.unshift(
     `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${DataTable.colNameRecordUuuid}`,
     `${alias}.${DataTable.colNameRecordCycle}`,
     `${alias}.${DataTable.colNameDateCreated}`,
-    `${alias}.${DataTable.colNameDateModified}`
+    `${alias}.${DataTable.colNameDateModified}`,
+    fieldKey
   )
 
   return fields

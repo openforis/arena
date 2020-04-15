@@ -17,13 +17,10 @@ export const fetchStepData = async (survey, cycle, entityDef, entityDefParent, c
   const surveyId = Survey.getId(survey)
   const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
   const fields = R.pipe(
-    R.map(
-      // Remove prefix and keep only alias
-      R.pipe(R.split('.'), R.last, R.split(' as '), R.last)
-    ),
-    // Exclude record_cyle, date_created, date_modified columns
-    R.without([DataTable.colNameRecordCycle, DataTable.colNameDateCreated, DataTable.colNameDateModified])
-  )(RDBDataView.getSelectFields(survey, entityDef, [], true))
+    // Remove prefix and keep only alias
+    R.map(R.pipe(R.split('.'), R.last, R.split(' as '), R.last)),
+    R.prepend(DataTable.colNameRecordUuuid)
+  )(RDBDataView.getSelectFieldsNodeDefs(survey, entityDef))
 
   return client.any(
     `SELECT ${fields.join(', ')} 
