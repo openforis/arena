@@ -1,5 +1,7 @@
 import * as ProcessingStep from '@common/analysis/processingStep'
 
+import * as PromiseUtils from '@core/promiseUtils'
+
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import RCalculation from '@server/modules/analysis/service/rChainService/rCalculation'
@@ -40,10 +42,10 @@ export default class RStep {
   async _initCalculations() {
     const calculations = ProcessingStep.getCalculations(this.step)
 
-    const rCalculations = await Promise.all(
-      calculations.map((calculation) => new RCalculation(this, calculation).init())
-    )
-    this._rCalculations.push(...rCalculations)
+    await PromiseUtils.each(calculations, async (calculation) => {
+      const rCalculation = await new RCalculation(this, calculation).init()
+      this._rCalculations.push(rCalculation)
+    })
   }
 
   async init() {

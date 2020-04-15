@@ -7,25 +7,6 @@ import { setVar, source } from '../../rFunctions'
 const dirNameInit = 'init'
 const fileNamesInit = ['init-session', 'init-packages', 'init-log', 'init-api', 'init-chain']
 
-function* writeInitFiles(rFileInit) {
-  for (let i = 0; i < fileNamesInit.length; i += 1) {
-    const fileNameInit = fileNamesInit[i]
-
-    const fileName = `${fileNameInit}.R`
-    const fileInitSrc = FileUtils.join(__dirname, fileName)
-    const fileInitDest = FileUtils.join(rFileInit.dirInit, fileName)
-
-    const pathRelativeSplit = rFileInit.pathRelative.split(FileUtils.sep)
-    const dirRelativeSplit = pathRelativeSplit.slice(0, pathRelativeSplit.length - 1)
-    const fileInitSourcePath = FileUtils.join(...dirRelativeSplit, dirNameInit, fileName)
-
-    yield Promise.all([
-      FileUtils.copyFile(fileInitSrc, fileInitDest),
-      rFileInit.appendContent(source(fileInitSourcePath)),
-    ])
-  }
-}
-
 export default class RFileInit extends RFileSystem {
   constructor(rChain) {
     super(rChain, 'init')
@@ -37,10 +18,18 @@ export default class RFileInit extends RFileSystem {
 
     await FileUtils.mkdir(this.dirInit)
 
-    await PromiseUtils.resolveGenerator(writeInitFiles(this))
+    await PromiseUtils.each(fileNamesInit, async (fileNameInit) => {
+      const fileName = `${fileNameInit}.R`
+      const fileInitSrc = FileUtils.join(__dirname, fileName)
+      const fileInitDest = FileUtils.join(this.dirInit, fileName)
 
-    this.appendContent(setVar('arena.host', `'${this.rChain.serverUrl}/'`))
+      const pathRelativeSplit = this.pathRelative.split(FileUtils.sep)
+      const dirRelativeSplit = pathRelativeSplit.slice(0, pathRelativeSplit.length - 1)
+      const fileInitSourcePath = FileUtils.join(...dirRelativeSplit, dirNameInit, fileName)
 
-    return this
+      await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))])
+    })
+
+    return this.appendContent(setVar('arena.host', `'${this.rChain.serverUrl}/'`))
   }
 }
