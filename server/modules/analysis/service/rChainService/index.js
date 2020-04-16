@@ -39,17 +39,10 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
   const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDefStep)}.csv`)
-
   await db.tx(async (tx) => {
     // Reset node results
-    await SurveyRdbMamager.deleteNodeResultsByChainUuid(
-      {
-        surveyId,
-        cycle,
-        chainUuid: ProcessingStep.getProcessingChainUuid(step),
-      },
-      tx
-    )
+    const chainUuid = ProcessingStep.getProcessingChainUuid(step)
+    await SurveyRdbMamager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
 
     // Insert node results
     const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, calculations, tx)

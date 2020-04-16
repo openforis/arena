@@ -15,6 +15,7 @@ export const fetchStepData = async (survey, cycle, stepUuid) => {
   const entityDefParent = Survey.getNodeDefParent(entityDef)(survey)
   const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
   const columns = [RDBDataTable.colNameRecordUuuid, ...RDBDataView.getNodeDefColumnNames(survey, entityDef)]
+
   return DataViewReadRepository.fetchAll({ surveyId, cycle, viewName, columns })
 }
 
