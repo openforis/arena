@@ -9,6 +9,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as ResultStepViewRepository from '@server/modules/surveyRdb/repository/resultStepViewRepository'
 
 import * as ProcessingChainManager from '../../manager/processingChainManager'
@@ -41,7 +42,14 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
 
   await db.tx(async (tx) => {
     // Reset node results
-    await RChainManager.deleteNodeResults(surveyId, cycle, ProcessingStep.getProcessingChainUuid(step), tx)
+    await SurveyRdbMamager.deleteNodeResultsByChainUuid(
+      {
+        surveyId,
+        cycle,
+        chainUuid: ProcessingStep.getProcessingChainUuid(step),
+      },
+      tx
+    )
 
     // Insert node results
     const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, calculations, tx)

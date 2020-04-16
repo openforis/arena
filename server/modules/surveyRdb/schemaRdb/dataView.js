@@ -25,42 +25,80 @@ export const columns = {
 
 export const getColUuid = (nodeDef) => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
-const _getCols = (survey, nodeDef, isSelf) => {
-  const fields = R.pipe(
-    R.map(DataCol.getNames),
-    R.flatten,
-    R.map((name) => `${isSelf ? alias : aliasParent}.${name}`)
-  )(DataTable.getNodeDefColumns(survey, nodeDef))
+/**
+ * Returns the list of column names relative to the specified node def
+ * (columns relative to its children and to its ancestors' children).
+ *
+ * @param {!object} survey - The survey.
+ * @param {!object} nodeDef - The context node definition.
+ * @returns {Array} List of column names.
+ */
+export const getNodeDefColumnNames = (survey, nodeDef) => {
+  const getNodeDefCols = (nodeDefCurrent, isSelf) => {
+    const nodeDefColumns = R.pipe(
+      R.map(DataCol.getNames),
+      R.flatten
+    )(DataTable.getNodeDefColumns(survey, nodeDefCurrent))
 
-  // If is not root, prepend parent uuid
-  if (!NodeDef.isRoot(nodeDef)) {
-    fields.unshift(`${aliasParent}.${getColUuid(Survey.getNodeDefParent(nodeDef)(survey))}`)
+    // If is not root, prepend parent uuid
+    if (!NodeDef.isRoot(nodeDefCurrent)) {
+      nodeDefColumns.unshift(getColUuid(Survey.getNodeDefParent(nodeDefCurrent)(survey)))
+    }
+
+    // If nodeDef isSelf (starting nodeDef) prepend col uuid
+    if (isSelf) {
+      nodeDefColumns.unshift(getColUuid(nodeDefCurrent))
+    }
+    return nodeDefColumns
   }
 
-  // If nodeDef isSelf (starting nodeDef) prepend col uuid
-  if (isSelf) {
-    fields.unshift(`${alias}.${DataTable.colNameUuuid} as ${getColUuid(nodeDef)}`)
-  }
+  const colNames = []
 
-  return fields
+  Survey.visitAncestorsAndSelf(nodeDef, (nodeDefCurrent) => {
+    // Do not include node defs of calculation steps
+    const cols = getNodeDefCols(nodeDefCurrent, NodeDef.isEqual(nodeDefCurrent)(nodeDef))
+    colNames.unshift(...cols)
+  })(survey)
+
+  return colNames
 }
 
 /**
  * Generates a list of fields to be used in the projection of the data view.
  * The fields will be related to the node definition specified
- * (columns related to it's children definitions or to it's ancestors children definitions).
+ * (columns related to its children definitions or to its ancestors children definitions).
  *
  * @param {!object} survey - The context survey.
  * @param {!object} nodeDef - The node definition.
  * @returns {Array} List of fields.
  */
-export const getSelectFieldsNodeDefs = (survey, nodeDef) => {
+const _getSelectFieldsNodeDefs = (survey, nodeDef) => {
+  const getSelectFieldNodeDef = (nodeDefCurrent, isSelf) => {
+    const fieldsNodeDef = R.pipe(
+      R.map(DataCol.getNames),
+      R.flatten,
+      R.map((name) => `${isSelf ? alias : aliasParent}.${name}`)
+    )(DataTable.getNodeDefColumns(survey, nodeDefCurrent))
+
+    // If is not root, prepend parent uuid
+    if (!NodeDef.isRoot(nodeDefCurrent)) {
+      fieldsNodeDef.unshift(`${aliasParent}.${getColUuid(Survey.getNodeDefParent(nodeDefCurrent)(survey))}`)
+    }
+
+    // If nodeDef isSelf (starting nodeDef) prepend col uuid
+    if (isSelf) {
+      fieldsNodeDef.unshift(`${alias}.${DataTable.colNameUuuid} as ${getColUuid(nodeDefCurrent)}`)
+    }
+
+    return fieldsNodeDef
+  }
+
   const fields = []
 
   Survey.visitAncestorsAndSelf(nodeDef, (nodeDefCurrent) => {
     // Do not include node defs of calculation steps
-    const cols = _getCols(survey, nodeDefCurrent, NodeDef.isEqual(nodeDefCurrent)(nodeDef))
-    fields.unshift(...cols)
+    const fieldsNodeDef = getSelectFieldNodeDef(nodeDefCurrent, NodeDef.isEqual(nodeDefCurrent)(nodeDef))
+    fields.unshift(...fieldsNodeDef)
   })(survey)
 
   return fields
@@ -72,7 +110,7 @@ export const getSelectFields = (survey, nodeDef, resultStepViews) => {
   }
 
   // Add node defs columns
-  const fields = getSelectFieldsNodeDefs(survey, nodeDef)
+  const fields = _getSelectFieldsNodeDefs(survey, nodeDef)
 
   // Add result step columns
   const nodeDefsCalculationColNames = R.pipe(

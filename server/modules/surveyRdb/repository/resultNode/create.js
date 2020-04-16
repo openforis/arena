@@ -1,8 +1,15 @@
+import * as pgPromise from 'pg-promise'
+
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-// ===== CREATE
+/**
+ * Creates a results_node table for the specified survey.
+ *
+ * @param {!number} surveyId - The survey id.
+ * @param {!pgPromise.IDatabase} client - The database client.
+ */
 export const createResultNodeTable = async (surveyId, client) => {
   const schemaRdb = SchemaRdb.getName(surveyId)
   const schemaSurvey = SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)

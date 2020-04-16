@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
+import * as pgPromise from 'pg-promise'
 
 import { db } from '@server/db/db'
 import * as dbUtils from '@server/db/dbUtils'
@@ -30,12 +31,12 @@ export const runSelect = async (
   filterExpr,
   sort = [],
   queryStream = false,
-  client = db,
+  client = db
 ) => {
   const schemaName = SchemaRdb.getName(surveyId)
   // Columns
   const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})
-  const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
+  const colParamNames = Object.keys(colParams).map((n) => `$/${n}:name/`)
   // WHERE clause
   const { clause: filterClause, params: filterParams } = filterExpr
     ? DataFilter.getWherePreparedStatement(filterExpr)
@@ -67,7 +68,7 @@ export const runSelect = async (
     offset,
   }
 
-  return queryStream ? new dbUtils.QueryStream(dbUtils.formatQuery(select, params)) : await client.any(select, params)
+  return queryStream ? new dbUtils.QueryStream(dbUtils.formatQuery(select, params)) : client.any(select, params)
 }
 
 export const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
@@ -91,7 +92,7 @@ export const runCount = async (surveyId, cycle, tableName, filterExpr, client = 
       ...filterParams,
       schemaName,
       tableName,
-    },
+    }
   )
 
   return Number(countRS.count)
@@ -108,7 +109,7 @@ export const countDuplicateRecords = async (survey, record, client = db) => {
   const recordNotEqualCondition = Expression.newBinary(
     Expression.newIdentifier(DataTable.colNameRecordUuuid),
     Expression.newLiteral(Record.getUuid(record)),
-    Expression.operators.comparison.notEq.key,
+    Expression.operators.comparison.notEq.key
   )
 
   const whereExpr = R.reduce(
@@ -123,10 +124,10 @@ export const countDuplicateRecords = async (survey, record, client = db) => {
       return Expression.newBinary(whereExprAcc, condition, Expression.operators.logical.and.key)
     },
     recordNotEqualCondition,
-    nodeDefKeys,
+    nodeDefKeys
   )
 
-  return await runCount(surveyId, Record.getCycle(record), tableName, whereExpr, client)
+  return runCount(surveyId, Record.getCycle(record), tableName, whereExpr, client)
 }
 
 export const fetchRecordsCountByKeys = async (
@@ -135,7 +136,7 @@ export const fetchRecordsCountByKeys = async (
   keyNodes,
   recordUuidExcluded,
   excludeRecordFromCount,
-  client = db,
+  client = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
@@ -152,10 +153,10 @@ export const fetchRecordsCountByKeys = async (
       const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
       return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
     }),
-    R.join(' AND '),
+    R.join(' AND ')
   )(nodeDefKeys)
 
-  return await client.map(
+  return client.map(
     `
     WITH count_records AS (
       SELECT
@@ -173,10 +174,10 @@ export const fetchRecordsCountByKeys = async (
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
-      ON ${keyColumns.map(keyCol => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
+      ON ${keyColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
       ON n.record_uuid = r.record_uuid
-      AND n.node_def_uuid IN (${nodeDefKeys.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
+      AND n.node_def_uuid IN (${nodeDefKeys.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     WHERE
       ${rootTableAlias}.${DataTable.colNameRecordCycle} = $2
       AND ${keysCondition}
@@ -184,6 +185,23 @@ export const fetchRecordsCountByKeys = async (
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
     `,
     [recordUuidExcluded, cycle],
-    camelize,
+    camelize
   )
 }
+
+/**
+ * Fetches all the rows of the specified view.
+ *
+ * @param {!object} params - The filter parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {!string} params.cycle - The survey cycle.
+ * @param {!string} params.viewName - The name of the view.
+ * @param {!Array} params.columns - The columns to be selected.
+ * @param {pgPromise.IDatabase} client - The database client.
+ */
+export const fetchAll = async ({ surveyId, cycle, viewName, columns }, client = db) =>
+  client.any(
+    `SELECT ${columns.join(', ')} 
+    FROM ${SchemaRdb.getName(surveyId)}.${viewName}
+    WHERE ${DataTable.colNameRecordCycle} = '${cycle}'`
+  )
