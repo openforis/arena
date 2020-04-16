@@ -35,7 +35,7 @@ export const writeCsv = (x, file, rowNames = 'F') => `write.csv(${x}, file = '${
 
 // == converters
 
-export const asNumeric = (value, ...args) => `as.numeric(${value}${args.length > 0 ? `, ${args.join(', ')}` : ''})`
+export const asNumeric = (value, units = null) => `as.numeric(${value}${units ? `, units='${units}'` : ''})`
 
 // == strings
 

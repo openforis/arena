@@ -32,7 +32,7 @@ export default class RFileClose extends RFileSystem {
 
     await this.appendContent(setVar(arenaEndTime, sysTime()))
 
-    const execTime = asNumeric(`(${arenaEndTime} - ${arenaStartTime})`, `units='secs'`)
+    const execTime = asNumeric(`(${arenaEndTime} - ${arenaStartTime})`, 'secs')
     const logEnd = paste([`'Processing chain successfully executed in'`, execTime, `'seconds'`])
     return this.logInfo(logEnd)
   }
