@@ -36,3 +36,9 @@ export const writeCsv = (x, file, rowNames = 'F') => `write.csv(${x}, file = '${
 // == converters
 
 export const asNumeric = (value, ...args) => `as.numeric(${value}${args.length > 0 ? `, ${args.join(', ')}` : ''})`
+
+// == strings
+
+export const paste = (parts, separator = ' ') => `paste(${parts.join(', ')}, sep='${separator}')`
+
+export const paste0 = (parts) => paste(parts, '')
