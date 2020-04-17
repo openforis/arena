@@ -1,7 +1,5 @@
 import Table from '@server/db/table'
 
-export const name = 'processing_step_calculation'
-
 const columnSet = {
   uuid: 'uuid',
   stepUuid: 'processing_step_uuid',

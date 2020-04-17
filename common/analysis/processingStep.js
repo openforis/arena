@@ -97,13 +97,10 @@ export const hasEntity = R.pipe(getEntityUuid, R.isNil, R.not)
 export const hasCategory = R.pipe(getCategoryUuid, R.isNil, R.not)
 
 /**
- * A processing step is considered not aggregate when it has entity and none of its calculations has an aggregate function.
+ * A processing step is considered not aggregate when none of its calculations has an aggregate function.
  *
  * @returns {boolean} - True when it's disaggregate, false otherwise.
  */
-export const isNotAggregate = R.ifElse(
-  hasEntity,
-  R.pipe(getCalculations, R.none(ProcessingStepCalculation.hasAggregateFunction)),
-  R.always(false)
-)
+export const isNotAggregate = R.pipe(getCalculations, R.none(ProcessingStepCalculation.hasAggregateFunction))
+
 export const isAggregate = R.pipe(isNotAggregate, R.not)

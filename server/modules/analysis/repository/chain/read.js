@@ -2,49 +2,24 @@ import { db } from '@server/db/db'
 import { dbTransformCallback, getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
 
 import tableChain from './table'
-import { table as tableStep } from '../step'
-import { table as tableCalculation } from '../calculation'
-
-const _getSelectSteps = (surveyId, includeScript) => {
-  const schema = getSurveyDBSchema(surveyId)
-
-  const colsCalculation = includeScript ? tableCalculation.columns : tableCalculation.columnsNoScript
-  const colCalculationStepUuid = tableCalculation.addAlias(tableCalculation.columnSet.stepUuid)
-  const colStepUuid = tableStep.addAlias(tableStep.columnSet.uuid)
-
-  const jsonObjectCalculation = tableCalculation.jsonBuildObject(colsCalculation)
-  const jsonAggCalculations = tableCalculation.jsonAgg(jsonObjectCalculation, tableCalculation.columnSet.index)
-
-  return `
-    SELECT 
-        ${tableStep.addAlias('*')}, 
-        ${jsonAggCalculations} AS ${ProcessingStep.keys.calculations}
-    FROM 
-        ${schema}.${tableStep.name} AS ${tableStep.alias}
-    LEFT OUTER JOIN 
-        ${schema}.${tableCalculation.name} AS ${tableCalculation.alias}
-    ON 
-        ${colStepUuid} = ${colCalculationStepUuid}
-    GROUP BY 1`
-}
+import { table as tableStep, getSelectSteps } from '../step'
 
 const _getSelectChain = (surveyId, cycle, includeScript, includeStepsAndCalculations) => {
-  const columnsChain = includeScript ? tableChain.columns : tableChain.columnsNoScript
-  const selectFieldsChain = columnsChain.map((col) => tableChain.addAlias(col)).join(', ')
+  const colsChain = includeScript ? tableChain.columns : tableChain.columnsNoScript
+  const colChainUuid = tableChain.addAlias(tableChain.columnSet.uuid)
   const colChainProps = tableChain.addAlias(tableChain.columnSet.props)
+  const colStepChainUuid = tableStep.addAlias(tableStep.columnSet.chainUuid)
 
-  const withSteps = `WITH steps AS (${_getSelectSteps(surveyId, includeScript)})`
-  const selectFieldsSteps = `json_agg(${tableStep.addAlias('*')}) AS processing_steps`
-  const joinSteps = `LEFT OUTER JOIN steps ${tableStep.alias}
-    ON ${tableChain.addAlias(tableChain.columnSet.uuid)} = ${tableStep.addAlias(tableStep.columnSet.chainUuid)}`
+  const selectFieldsChain = colsChain.map((col) => tableChain.addAlias(col)).join(', ')
+  const selectFieldsSteps = tableStep.jsonAgg(tableStep.addAlias('*'), tableStep.columnSet.index)
 
-  return `${includeStepsAndCalculations ? withSteps : ''}
-    SELECT 
-        ${selectFieldsChain}
-        ${includeStepsAndCalculations ? `, ${selectFieldsSteps}` : ''}
+  const selectSteps = getSelectSteps({ surveyId, includeScript, includeCalculations: includeStepsAndCalculations })
+  const joinSteps = `LEFT JOIN LATERAL (${selectSteps}) AS ${tableStep.alias}  ON ${colChainUuid} = ${colStepChainUuid}`
+
+  return `SELECT 
+        ${selectFieldsChain} ${includeStepsAndCalculations ? `, ${selectFieldsSteps} AS processing_steps` : ''}
     FROM 
         ${getSurveyDBSchema(surveyId)}.${tableChain.name} AS ${tableChain.alias}
     ${includeStepsAndCalculations ? joinSteps : ''}
@@ -62,7 +37,7 @@ const _getSelectChain = (surveyId, cycle, includeScript, includeStepsAndCalculat
  * @param {number} [params.limit=null] - The select query limit.
  * @param {boolean} [params.includeStepsAndCalculations=false] - Whether to include the processing steps and calculations.
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
- * @param {pgPromise.IDatabase} client - The database client.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<any[]>} - The result promise.
  */

@@ -166,24 +166,23 @@ export const getResultStepViews = async (surveyId, client = db) => {
   const resultStepViewsByEntityUuid = {}
 
   await Promise.all(
-    chains.map((chain) =>
-      PromiseUtils.each(ProcessingChain.getProcessingSteps(chain), async (step) => {
-        if (ProcessingStep.isNotAggregate(step)) {
-          const calculations = ProcessingStep.getCalculations(step)
-          // TODO add NodeDefRepository.fetchNodeDefs({surveyId, nodeDefUuids...})
-          const nodeDefColumns = await Promise.all(
-            calculations.map((calculation) => {
-              const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
-              return NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client)
-            })
-          )
-          const entityDefUuid = ProcessingStep.getEntityUuid(step)
-          const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
-          resultStepViews.push(ResultStepView.newResultStepView(step, calculations, nodeDefColumns))
-          resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
-        }
+    chains.map((chain) => {
+      const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.isNotAggregate)
+      return PromiseUtils.each(steps, async (step) => {
+        const calculations = ProcessingStep.getCalculations(step)
+        // TODO add NodeDefRepository.fetchNodeDefs({surveyId, nodeDefUuids...})
+        const nodeDefColumns = await Promise.all(
+          calculations.map((calculation) => {
+            const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+            return NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client)
+          })
+        )
+        const entityDefUuid = ProcessingStep.getEntityUuid(step)
+        const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
+        resultStepViews.push(ResultStepView.newResultStepView(step, calculations, nodeDefColumns))
+        resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
       })
-    )
+    })
   )
 
   return resultStepViewsByEntityUuid
