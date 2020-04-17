@@ -9,6 +9,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as ResultStepViewRepository from '@server/modules/surveyRdb/repository/resultStepViewRepository'
 
 import * as ProcessingChainManager from '../../manager/processingChainManager'
@@ -23,8 +24,7 @@ export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
 // ==== READ
 export const fetchStepData = async (surveyId, cycle, stepUuid) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
-  const data = await RChainManager.fetchStepData(survey, cycle, stepUuid)
-  return data
+  return RChainManager.fetchStepData(survey, cycle, stepUuid)
 }
 
 // ==== UPDATE
@@ -39,10 +39,10 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
   const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDefStep)}.csv`)
-
   await db.tx(async (tx) => {
     // Reset node results
-    await RChainManager.deleteNodeResults(surveyId, cycle, ProcessingStep.getProcessingChainUuid(step), tx)
+    const chainUuid = ProcessingStep.getProcessingChainUuid(step)
+    await SurveyRdbMamager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
 
     // Insert node results
     const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, calculations, tx)

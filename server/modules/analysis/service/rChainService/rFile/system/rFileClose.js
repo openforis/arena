@@ -3,7 +3,16 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 
 import RFileSystem from './rFileSystem'
 
-import { arenaEndTime, arenaStartTime, dbDisconnect, dbSendQuery, setVar, sysTime } from '../../rFunctions'
+import {
+  arenaEndTime,
+  arenaStartTime,
+  dbDisconnect,
+  dbSendQuery,
+  setVar,
+  sysTime,
+  asNumeric,
+  paste,
+} from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {
@@ -23,7 +32,8 @@ export default class RFileClose extends RFileSystem {
 
     await this.appendContent(setVar(arenaEndTime, sysTime()))
 
-    const logEnd = `paste(paste('Processing chain successfully executed in' , as.numeric((${arenaEndTime} - ${arenaStartTime}) , units='secs') , sep = ' ') , 'seconds' , sep = ' ')`
+    const execTime = asNumeric(`(${arenaEndTime} - ${arenaStartTime})`, 'secs')
+    const logEnd = paste([`'Processing chain successfully executed in'`, execTime, `'seconds'`])
     return this.logInfo(logEnd)
   }
 }

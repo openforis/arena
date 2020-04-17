@@ -32,3 +32,13 @@ export const dirCreate = (path) => `dir.create(path = '${path}', showWarnings = 
 // == csv
 
 export const writeCsv = (x, file, rowNames = 'F') => `write.csv(${x}, file = '${file}', row.names = ${rowNames})`
+
+// == converters
+
+export const asNumeric = (value, units = null) => `as.numeric(${value}${units ? `, units='${units}'` : ''})`
+
+// == strings
+
+export const paste = (parts, separator = ' ') => `paste(${parts.join(', ')}, sep='${separator}')`
+
+export const paste0 = (parts) => paste(parts, '')
