@@ -4,7 +4,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 import * as RDBDataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import * as DataViewReadRepository from '@server/modules/surveyRdb/repository/dataViewReadRepository'
+import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataView'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 
 // ==== READ
@@ -16,7 +16,7 @@ export const fetchStepData = async (survey, cycle, stepUuid) => {
   const viewName = NodeDefTable.getViewName(entityDef, entityDefParent)
   const columns = [RDBDataTable.colNameRecordUuuid, ...RDBDataView.getNodeDefColumnNames(survey, entityDef)]
 
-  return DataViewReadRepository.fetchAll({ surveyId, cycle, viewName, columns })
+  return DataViewRepository.fetchAll({ surveyId, cycle, viewName, columns })
 }
 
 // ==== UPDATE

@@ -2,8 +2,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
-import * as DataTable from '../schemaRdb/dataTable'
-import * as RDBDataView from '../schemaRdb/dataView'
+import * as DataTable from '../../schemaRdb/dataTable'
+import * as RDBDataView from '../../schemaRdb/dataView'
 
 const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
   const surveyId = Survey.getSurveyInfo(survey).id
@@ -42,7 +42,7 @@ export const createTableAndView = async (survey, nodeDef, resultStepViews, clien
         ${tableViewCreate.colsAndType.join(', ')},
         ${tableViewCreate.uuidUniqueIdx},
         ${tableViewCreate.recordForeignKey}
-        ${NodeDef.isRoot(nodeDef) ? '' : ', ' + tableViewCreate.parentForeignKey},
+        ${NodeDef.isRoot(nodeDef) ? '' : `, ${tableViewCreate.parentForeignKey}`},
         PRIMARY KEY (id)
       )
     `)

@@ -16,10 +16,10 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 import * as DataFilter from '@common/surveyRdb/dataFilter'
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
-import * as DataCol from '../schemaRdb/dataCol'
-import * as DataTable from '../schemaRdb/dataTable'
+import * as DataCol from '../../schemaRdb/dataCol'
+import * as DataTable from '../../schemaRdb/dataTable'
 
 export const runSelect = async (
   surveyId,
