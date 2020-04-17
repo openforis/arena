@@ -52,7 +52,7 @@ export const createResultStepView = async ({ surveyId, resultStepView }, client 
     }
   })
 
-  await client.query(`
+  return client.query(`
     CREATE MATERIALIZED VIEW ${schemaRdb}."${ResultStepView.getViewName(resultStepView)}" AS 
     SELECT ${fields.join(', ')}
     ${from}
