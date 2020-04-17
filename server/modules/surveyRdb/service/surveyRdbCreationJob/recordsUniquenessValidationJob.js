@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,6 +15,16 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 
 const recordValidationUpdateBatchSize = 1000
 
+const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
+  const nodeValidation = Validation.getFieldValidation(nodeUuid)(validationRecord)
+
+  // Merge new validation with node validation
+  const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, validationNode)
+
+  // Replace node validation in record validation
+  return R.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
+}
+
 export default class RecordsUniquenessValidationJob extends Job {
   constructor(params) {
     super(RecordsUniquenessValidationJob.type, params)
@@ -28,9 +39,7 @@ export default class RecordsUniquenessValidationJob extends Job {
 
     this.total = R.length(cycleKeys) * 2
 
-    for (const cycle of cycleKeys) {
-      await this.validateRecordsUniquenessByCycle(cycle)
-    }
+    await Promise.all(cycleKeys.map((cycle) => this.validateRecordsUniquenessByCycle(cycle)))
   }
 
   async validateRecordsUniquenessByCycle(cycle) {
@@ -42,7 +51,7 @@ export default class RecordsUniquenessValidationJob extends Job {
       true,
       false,
       false,
-      this.tx,
+      this.tx
     )
     this.incrementProcessedItems()
 
@@ -58,14 +67,14 @@ export default class RecordsUniquenessValidationJob extends Job {
       cycle,
       nodeDefRoot,
       nodeDefKeys,
-      this.tx,
+      this.tx
     )
 
     if (!R.isEmpty(rowsRecordsDuplicate)) {
       // 3. update records validation
       const validationDuplicate = RecordValidation.newValidationRecordDuplicate()
 
-      for (const rowRecordDuplicate of rowsRecordsDuplicate) {
+      await PromiseUtils.each(rowsRecordsDuplicate, async (rowRecordDuplicate) => {
         if (this.isCanceled()) {
           return
         }
@@ -78,19 +87,19 @@ export default class RecordsUniquenessValidationJob extends Job {
           recordUuid,
           nodeRootUuid,
           nodeDefKeys.map(NodeDef.getUuid),
-          this.tx,
+          this.tx
         )
         const validationRecord = this.validationByRecordUuid[recordUuid] || validation
 
         const validationUpdated = nodesKeyDuplicate.reduce(
-          (validationRecord, nodeKeyDuplicate) =>
-            _updateNodeValidation(validationRecord, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
-          validationRecord,
+          (validationRecordAccumulator, nodeKeyDuplicate) =>
+            _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
+          validationRecord
         )
 
         // 3. add record validation to batch update
         await this.addRecordValidationToBatchUpdate(recordUuid, validationUpdated)
-      }
+      })
     }
 
     this.incrementProcessedItems()
@@ -120,13 +129,3 @@ export default class RecordsUniquenessValidationJob extends Job {
 }
 
 RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
-
-const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
-  const nodeValidation = Validation.getFieldValidation(nodeUuid)(validationRecord)
-
-  // Merge new validation with node validation
-  const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, validationNode)
-
-  // Replace node validation in record validation
-  return R.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
-}

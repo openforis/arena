@@ -20,7 +20,6 @@ import * as NodeRepository from '@server/modules/record/repository/nodeRepositor
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
-import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewRepository from '../repository/dataView'
 
@@ -139,7 +138,6 @@ export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
 }
 
 export const { populateTable } = DataTableInsertRepository
-export const { updateTable } = DataTableUpdateRepository
 
 export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
 
@@ -156,7 +154,7 @@ const _visitProcessingSteps = async (surveyId, client, visitor) => {
 }
 
 // Result views
-export const generateResultViews = async (surveyId, client = db) => {
+export const getResultStepViews = async (surveyId, client = db) => {
   const resultStepViewsByEntityUuid = {}
 
   await _visitProcessingSteps(surveyId, client, async (step) => {
@@ -180,7 +178,7 @@ export const generateResultViews = async (surveyId, client = db) => {
 }
 
 // Aggregated entity views
-export const generateEntityAggregatedViews = async (survey, client = db) => {
+export const getEntityAggregatedViews = async (survey, client = db) => {
   const entityAggregatedViewsByUuid = {}
 
   const surveyId = Survey.getId(survey)
