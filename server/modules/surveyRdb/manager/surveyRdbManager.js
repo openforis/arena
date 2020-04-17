@@ -1,4 +1,7 @@
 import * as R from 'ramda'
+import { db } from '@server/db/db'
+import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
@@ -8,15 +11,14 @@ import * as ResultStepView from '@common/surveyRdb/resultStepView'
 import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as PromiseUtils from '@core/promiseUtils'
 
-import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
 import * as ProcessingStepRepository from '@server/modules/analysis/repository/processingStepRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
@@ -141,6 +143,10 @@ export const { populateTable } = DataTableInsertRepository
 
 export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
 
+// eslint-disable-next-line jsdoc/require-description,jsdoc/require-param
+/**
+ * @deprecated - Use ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client) and iterate normally.
+ */
 const _visitProcessingSteps = async (surveyId, client, visitor) => {
   const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
   await PromiseUtils.each(chains, async (chain) => {
@@ -155,25 +161,31 @@ const _visitProcessingSteps = async (surveyId, client, visitor) => {
 
 // Result views
 export const getResultStepViews = async (surveyId, client = db) => {
+  const chains = await ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client)
+
   const resultStepViewsByEntityUuid = {}
 
-  await _visitProcessingSteps(surveyId, client, async (step) => {
-    if (ProcessingStep.hasEntity(step)) {
-      const calculations = ProcessingStep.getCalculations(step)
-      if (R.none(ProcessingStepCalculation.hasAggregateFunction, calculations)) {
-        const calculationNodeDefUuids = R.map(ProcessingStepCalculation.getNodeDefUuid)(calculations)
-        const nodeDefColumns = await Promise.all(
-          calculationNodeDefUuids.map((nodeDefUuid) =>
-            NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client)
+  await Promise.all(
+    chains.map((chain) =>
+      PromiseUtils.each(ProcessingChain.getProcessingSteps(chain), async (step) => {
+        if (ProcessingStep.isNotAggregate(step)) {
+          const calculations = ProcessingStep.getCalculations(step)
+          // TODO add NodeDefRepository.fetchNodeDefs({surveyId, nodeDefUuids...})
+          const nodeDefColumns = await Promise.all(
+            calculations.map((calculation) => {
+              const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+              return NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client)
+            })
           )
-        )
-        const entityDefUuid = ProcessingStep.getEntityUuid(step)
-        const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
-        resultStepViews.push(ResultStepView.newResultStepView(step, calculations, nodeDefColumns))
-        resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
-      }
-    }
-  })
+          const entityDefUuid = ProcessingStep.getEntityUuid(step)
+          const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
+          resultStepViews.push(ResultStepView.newResultStepView(step, calculations, nodeDefColumns))
+          resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
+        }
+      })
+    )
+  )
+
   return resultStepViewsByEntityUuid
 }
 

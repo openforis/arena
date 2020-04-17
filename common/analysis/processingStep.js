@@ -28,24 +28,18 @@ export const getCalculationsCount = R.pipe(R.propOr(0, keys.calculationsCount), 
 export const getEntityUuid = ObjectUtils.getProp(keysProps.entityUuid)
 export const getCategoryUuid = ObjectUtils.getProp(keysProps.categoryUuid)
 export const isVirtual = ObjectUtils.getProp(keysProps.virtual, false)
-export const { getIndex } = ObjectUtils
-export const { getUuid } = ObjectUtils
-export const { getProps } = ObjectUtils
-export const { getPropsDiff } = ObjectUtils
+export const { getIndex, getUuid, getProps, getPropsDiff } = ObjectUtils
 /**
  * Returns the uuids of all associated calculations.
- * Note: calculationUuids has a value only when calculation step is passed as parameter to the API
+ * Note: calculationUuids has a value only when calculation step is passed as parameter to the API.
  */
 export const getCalculationUuids = R.propOr([], keys.calculationUuids)
 
-export const { isEqual } = ObjectUtils
-export const { isTemporary } = ObjectUtils
+export const { isEqual, isTemporary } = ObjectUtils
 
 // ====== UPDATE
 
-export const { assocIndex } = ObjectUtils
-export const { mergeProps } = ObjectUtils
-export const { dissocTemporary } = ObjectUtils
+export const { mergeProps, dissocTemporary } = ObjectUtils
 
 export const assocEntityUuid = (entityUuid) => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
@@ -101,3 +95,15 @@ export const dissocCalculation = (calculation) =>
 
 export const hasEntity = R.pipe(getEntityUuid, R.isNil, R.not)
 export const hasCategory = R.pipe(getCategoryUuid, R.isNil, R.not)
+
+/**
+ * A processing step is considered not aggregate when it has entity and none of its calculations has an aggregate function.
+ *
+ * @returns {boolean} - True when it's disaggregate, false otherwise.
+ */
+export const isNotAggregate = R.ifElse(
+  hasEntity,
+  R.pipe(getCalculations, R.none(ProcessingStepCalculation.hasAggregateFunction)),
+  R.always(false)
+)
+export const isAggregate = R.pipe(isNotAggregate, R.not)
