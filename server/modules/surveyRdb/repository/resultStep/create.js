@@ -5,9 +5,17 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
-// ====== CREATE
-
-export const createResultStepView = async (surveyId, resultStepView, client) => {
+/**
+ * Creates the result step materialized view.
+ *
+ * @param {object} params - The query parameters.
+ * @param {string} params.surveyId - The survey id.
+ * @param {ResultStepView} params.resultStepView - The resultStepView to refresh.
+ * @param {pgPromise.IDatabase} client - The database client.
+ *
+ * @returns {Promise<any>} - The promise returned from the database client.
+ */
+export const createResultStepView = async ({ surveyId, resultStepView }, client = db) => {
   const schemaRdb = SchemaRdb.getName(surveyId)
   const resultNodeTable = `${schemaRdb}.${ResultNodeTable.tableName}`
 
@@ -52,10 +60,3 @@ export const createResultStepView = async (surveyId, resultStepView, client) => 
     ${where}
   `)
 }
-
-// ====== UPDATE
-
-export const refreshResultStepView = async (surveyId, resultStepView, client = db) =>
-  client.query(
-    `REFRESH MATERIALIZED VIEW ${SchemaRdb.getName(surveyId)}."${ResultStepView.getViewName(resultStepView)}"`
-  )

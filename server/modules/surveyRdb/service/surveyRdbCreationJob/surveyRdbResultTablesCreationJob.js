@@ -17,7 +17,7 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
     const resultStepViewsByEntityUuid = await SurveyRdbManager.getResultStepViews(surveyId, tx)
     const resultStepViews = R.pipe(R.values, R.flatten)(resultStepViewsByEntityUuid)
     await Promise.all(
-      resultStepViews.map((resultStepView) => SurveyRdbManager.createResultStepView(surveyId, resultStepView, tx))
+      resultStepViews.map((resultStepView) => SurveyRdbManager.createResultStepView({ surveyId, resultStepView }, tx))
     )
   }
 }
