@@ -22,7 +22,7 @@ import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableUpdateRepository from '../repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
-import * as DataViewReadRepository from '../repository/dataViewReadRepository'
+import * as DataViewRepository from '../repository/dataView'
 
 // ==== DDL
 
@@ -30,7 +30,7 @@ import * as DataViewReadRepository from '../repository/dataViewReadRepository'
 export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
-export { createTableAndView } from '../repository/dataViewCreateRepository'
+export const { createTableAndView } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -82,7 +82,7 @@ export const queryTable = async (
 
   // Fetch data
   const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
-  let rows = await DataViewReadRepository.runSelect(
+  let rows = await DataViewRepository.runSelect(
     surveyId,
     cycle,
     tableName,
@@ -135,14 +135,12 @@ export const queryTable = async (
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {
   const surveyId = Survey.getId(survey)
   const { tableName } = await _getQueryData(survey, nodeDefUuidTable)
-  return DataViewReadRepository.runCount(surveyId, cycle, tableName, filter)
+  return DataViewRepository.runCount(surveyId, cycle, tableName, filter)
 }
 
 export const { populateTable } = DataTableInsertRepository
 export const { updateTable } = DataTableUpdateRepository
 
-export const { countDuplicateRecords } = DataViewReadRepository
-export const { fetchRecordsCountByKeys } = DataViewReadRepository
 export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
 
 const _visitProcessingSteps = async (surveyId, client, visitor) => {

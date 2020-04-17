@@ -26,7 +26,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     this.total = length + 3
 
     // Traverse entities to create and populate tables
-    const traverseNodeDef = async nodeDef => {
+    const traverseNodeDef = async (nodeDef) => {
       if (this.isCanceled()) {
         return
       }
@@ -71,15 +71,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      surveyId,
-      null,
-      fetchDraft,
-      false,
-      false,
-      false,
-      tx,
-    )
+    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, null, fetchDraft, false, false, false, tx)
   }
 }
 
