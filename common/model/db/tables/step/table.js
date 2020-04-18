@@ -8,11 +8,11 @@ const columnSet = {
   props: 'props',
 }
 /**
- * @typedef {module:arena.Table} TableStep
+ * @typedef {module:arena.TableSurvey} module:arena.TableStep
  */
-class TableStep extends TableSurvey {
-  constructor() {
-    super('processing_step', columnSet)
+export default class TableStep extends TableSurvey {
+  constructor(surveyId) {
+    super(surveyId, 'processing_step', columnSet)
     this.getSelect = getSelect.bind(this)
   }
 
@@ -28,5 +28,3 @@ class TableStep extends TableSurvey {
     return this.getColumn(columnSet.index)
   }
 }
-
-export default new TableStep()

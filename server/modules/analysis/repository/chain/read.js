@@ -27,9 +27,11 @@ export const fetchChains = async (params, client = db) => {
     includeStepsAndCalculations = false,
   } = params
 
+  const tableChain = new TableChain(surveyId)
+
   return client.map(
-    `${TableChain.getSelect({ surveyId, cycle, includeScript, includeStepsAndCalculations })}
-    ORDER BY ${TableChain.columnDateCreated} DESC
+    `${tableChain.getSelect({ surveyId, cycle, includeScript, includeStepsAndCalculations })}
+    ORDER BY ${tableChain.columnDateCreated} DESC
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [],

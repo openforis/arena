@@ -11,11 +11,11 @@ const columnSet = {
 }
 
 /**
- * @typedef {module:arena.Table} TableCalculation
+ * @typedef {module:arena.TableSurvey} module:arena.TableCalculation
  */
-class TableCalculation extends TableSurvey {
-  constructor() {
-    super('processing_step_calculation', columnSet)
+export default class TableCalculation extends TableSurvey {
+  constructor(surveyId) {
+    super(surveyId, 'processing_step_calculation', columnSet)
     this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.script))
     this.getSelect = getSelect.bind(this)
   }
@@ -36,5 +36,3 @@ class TableCalculation extends TableSurvey {
     return this.getColumn(columnSet.index)
   }
 }
-
-export default new TableCalculation()

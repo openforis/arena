@@ -1,10 +1,17 @@
 import * as Schemata from '../schemata'
 import Table from './table'
 
+/**
+ * @typedef {module:arena.Table} module:arena.TableSurvey
+ */
 class TableSurvey extends Table {
-  // eslint-disable-next-line class-methods-use-this
-  getSchema(surveyId) {
-    return Schemata.getSchemaSurvey(surveyId)
+  constructor(surveyId, name, columnSet) {
+    super(Schemata.getSchemaSurvey(surveyId), name, columnSet)
+    this._surveyId = surveyId
+  }
+
+  get surveyId() {
+    return this._surveyId
   }
 }
 
