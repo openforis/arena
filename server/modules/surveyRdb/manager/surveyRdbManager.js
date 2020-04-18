@@ -159,7 +159,10 @@ const _visitProcessingSteps = async (surveyId, client, visitor) => {
   })
 }
 
-// Result views
+// eslint-disable-next-line jsdoc/require-param
+/**
+ * @deprecated - Not needed; fetch chains and survey if needed.
+ */
 export const getResultStepViews = async (surveyId, client = db) => {
   const chains = await ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client)
 

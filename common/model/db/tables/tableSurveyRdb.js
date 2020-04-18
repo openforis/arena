@@ -1,12 +1,12 @@
 import * as Schemata from '../schemata'
-import Table from './table'
+import TableSurvey from './tableSurvey'
 
 /**
- * @typedef {module:arena.Table} module:arena.TableSurveyRdb
+ * @typedef {module:arena.TableSurvey} module:arena.TableSurveyRdb
  */
-class TableSurveyRdb extends Table {
-  constructor(surveyId, name, columnSet) {
-    super(Schemata.getSchemaSurveyRdb(surveyId), name, columnSet)
+class TableSurveyRdb extends TableSurvey {
+  get schema() {
+    return Schemata.getSchemaSurveyRdb(this.surveyId)
   }
 }
 

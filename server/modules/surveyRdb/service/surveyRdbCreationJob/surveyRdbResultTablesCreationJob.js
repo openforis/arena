@@ -1,8 +1,10 @@
-import * as R from 'ramda'
+import * as ProcessingChain from '../../../../../common/analysis/processingChain'
 
-import Job from '@server/job/job'
+import Job from '../../../../job/job'
 
-import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '../../../survey/manager/surveyManager'
+import * as AnalysisManager from '../../../analysis/manager'
+import * as SurveyRdbManager from '../../manager/surveyRdbManager'
 
 export default class SurveyRdbResultTablesCreationJob extends Job {
   constructor(params) {
@@ -12,12 +14,20 @@ export default class SurveyRdbResultTablesCreationJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    await SurveyRdbManager.createResultNodeTable(surveyId, tx)
+    const [survey, chains] = await Promise.all([
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, null, false, false, false, false, tx),
+      AnalysisManager.fetchChains({ surveyId, includeStepsAndCalculations: true }, tx),
+      SurveyRdbManager.createResultNodeTable(surveyId, tx),
+    ])
 
-    const resultStepViewsByEntityUuid = await SurveyRdbManager.getResultStepViews(surveyId, tx)
-    const resultStepViews = R.pipe(R.values, R.flatten)(resultStepViewsByEntityUuid)
     await Promise.all(
-      resultStepViews.map((resultStepView) => SurveyRdbManager.createResultStepView({ surveyId, resultStepView }, tx))
+      chains.map((chain) =>
+        Promise.all(
+          ProcessingChain.getProcessingSteps(chain).map((step) =>
+            SurveyRdbManager.createResultStepView({ survey, step }, tx)
+          )
+        )
+      )
     )
   }
 }

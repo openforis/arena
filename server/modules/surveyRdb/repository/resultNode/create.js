@@ -14,7 +14,7 @@ export const createResultNodeTable = async (surveyId, client) => {
   const schemaRdb = SchemaRdb.getName(surveyId)
   const schemaSurvey = SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)
 
-  await client.query(`
+  return client.query(`
     CREATE TABLE
       ${schemaRdb}.${ResultNodeTable.tableName}
     (
