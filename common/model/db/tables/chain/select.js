@@ -1,20 +1,23 @@
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import * as SQL from '../../sql'
-import * as Schemata from '../../schemata'
-import * as TableStep from '../step'
-import * as TableChain from './table'
+import TableStep from '../step'
 
-const _getJoinSteps = ({ surveyId, includeScript, includeCalculations }) => {
-  const selectStepsParams = { surveyId, includeScript, includeCalculations, chainUuid: TableChain.columnUuid }
+/**
+ *
+ */
+function _getJoinSteps({ surveyId, includeScript, includeStepsAndCalculations }) {
+  const selectStepsParams = {
+    surveyId,
+    includeScript,
+    includeCalculations: includeStepsAndCalculations,
+    chainUuid: this.columnUuid,
+  }
   return `LEFT JOIN LATERAL (
     ${TableStep.getSelect(selectStepsParams)}
   ) AS ${TableStep.alias} 
   ON TRUE`
 }
-
-const _getConditionCycle = ({ cycle }) =>
-  `(${TableChain.columnProps})->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'`
 
 /**
  * Generate the select query for the processing_chain table by the given parameters.
@@ -28,7 +31,7 @@ const _getConditionCycle = ({ cycle }) =>
  *
  * @returns {string} - The select query.
  */
-export const getSelect = (params) => {
+export function getSelect(params) {
   const {
     surveyId,
     cycle = null,
@@ -36,24 +39,19 @@ export const getSelect = (params) => {
     includeScript = false,
     includeStepsAndCalculations = false,
   } = params
+  const getJoinSteps = _getJoinSteps.bind(this)
 
-  const selectFieldsChain = includeScript ? TableChain.columns : TableChain.columnsNoScript
-  const selectFields = [...selectFieldsChain]
+  const selectFields = [...(includeScript ? this.columns : this.columnsNoScript)]
   if (includeStepsAndCalculations) {
-    const jsonAgg = SQL.jsonAgg(SQL.addAlias(TableStep.alias, '*'), [TableStep.columnIndex])
+    const jsonAgg = SQL.jsonAgg(TableStep.getColumn('*'), [TableStep.columnIndex])
     selectFields.push(`${jsonAgg} AS processing_steps`)
   }
-
   return `SELECT
         ${selectFields.join(', ')}
     FROM 
-         ${Schemata.getSchemaNameSurvey(surveyId)}.${TableChain.name} AS ${TableChain.alias}
-    ${
-      includeStepsAndCalculations
-        ? _getJoinSteps({ surveyId, includeScript, includeCalculations: includeStepsAndCalculations })
-        : ''
-    }         
-    ${cycle ? `WHERE ${_getConditionCycle({ cycle })}` : ''}
-    ${chainUuid ? `WHERE ${TableChain.columnUuid} = ${chainUuid}` : ''}
-    ${includeStepsAndCalculations ? `GROUP BY ${selectFieldsChain}` : ''}`
+        ${this.getSchema(surveyId)}.${this.name} AS ${this.alias}
+    ${includeStepsAndCalculations ? getJoinSteps(params) : ''}
+    ${cycle ? `WHERE (${this.columnProps})->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
+    ${chainUuid ? `WHERE ${this.columnUuid} = ${chainUuid}` : ''}
+    ${includeStepsAndCalculations ? `GROUP BY ${this.columnUuid}` : ''}`
 }

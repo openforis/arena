@@ -1,6 +1,3 @@
-import * as Schemata from '../../schemata'
-import * as TableCalculation from './table'
-
 /**
  * Generate the select query for the processing_step_calculation table by the given parameters.
  *
@@ -11,10 +8,10 @@ import * as TableCalculation from './table'
  *
  * @returns {string} - The select query.
  */
-export const getSelect = (params) => {
+export function getSelect(params) {
   const { surveyId, stepUuid = null, includeScript = false } = params
 
-  return `SELECT ${includeScript ? TableCalculation.columns : TableCalculation.columnsNoScript}
-    FROM ${Schemata.getSchemaNameSurvey(surveyId)}.${TableCalculation.name} AS ${TableCalculation.alias}
-    ${stepUuid ? `WHERE ${TableCalculation.columnStepUuid} = ${stepUuid}` : ''}`
+  return `SELECT ${includeScript ? this.columns : this.columnsNoScript}
+    FROM ${this.getSchema(surveyId)}.${this.name} AS ${this.alias}
+    ${stepUuid ? `WHERE ${this.columnStepUuid} = ${stepUuid}` : ''}`
 }

@@ -1,9 +1,8 @@
 import { db } from '@server/db/db'
 import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as DB from '@common/model/db'
+import { TableChain } from '@common/model/db'
 
-const { TableChain } = DB.tables
 /**
  * Fetches all processing chains by the given survey id and the optional survey cycle if present within params.
  *

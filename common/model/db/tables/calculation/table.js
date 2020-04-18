@@ -1,8 +1,5 @@
-import * as SQL from '../../sql'
-
-export const name = 'processing_step_calculation'
-export const alias = SQL.createAlias(name)
-const addAlias = (...columnNames) => SQL.addAlias(alias, ...columnNames)
+import TableSurvey from '../tableSurvey'
+import { getSelect } from './select'
 
 const columnSet = {
   uuid: 'uuid',
@@ -12,11 +9,32 @@ const columnSet = {
   props: 'props',
   script: 'script',
 }
-const _columns = Object.values(columnSet)
-const _columnsNoScript = _columns.filter((column) => column !== columnSet.script)
-export const columns = addAlias(..._columns)
-export const columnsNoScript = addAlias(..._columnsNoScript)
 
-export const columnUuid = addAlias(columnSet.uuid)[0]
-export const columnStepUuid = addAlias(columnSet.stepUuid)[0]
-export const columnIndex = addAlias(columnSet.index)[0]
+/**
+ * @typedef {module:arena.Table} TableCalculation
+ */
+class TableCalculation extends TableSurvey {
+  constructor() {
+    super('processing_step_calculation', columnSet)
+    this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.script))
+    this.getSelect = getSelect.bind(this)
+  }
+
+  get columnsNoScript() {
+    return this._columnsNoScript
+  }
+
+  get columnUuid() {
+    return this.getColumn(columnSet.uuid)
+  }
+
+  get columnStepUuid() {
+    return this.getColumn(columnSet.stepUuid)
+  }
+
+  get columnIndex() {
+    return this.getColumn(columnSet.index)
+  }
+}
+
+export default new TableCalculation()

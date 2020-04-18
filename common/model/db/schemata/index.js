@@ -1,1 +1,3 @@
-export { getSchemaNameSurvey } from './survey'
+export { getSchemaSurvey } from './survey'
+
+export { getSchemaSurveyRdb } from './surveyRdb'

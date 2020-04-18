@@ -1,8 +1,5 @@
-import * as SQL from '../../sql'
-
-export const name = 'processing_chain'
-export const alias = SQL.createAlias(name)
-const addAlias = (...columnNames) => SQL.addAlias(alias, ...columnNames)
+import TableSurvey from '../tableSurvey'
+import { getSelect } from './select'
 
 const columnSet = {
   uuid: 'uuid',
@@ -14,11 +11,32 @@ const columnSet = {
   statusExec: 'status_exec',
   scriptCommon: 'script_common',
 }
-const _columns = Object.values(columnSet)
-const _columnsNoScript = _columns.filter((column) => column !== columnSet.scriptCommon)
-export const columns = addAlias(..._columns)
-export const columnsNoScript = addAlias(..._columnsNoScript)
 
-export const columnUuid = addAlias(columnSet.uuid)[0]
-export const columnDateCreated = addAlias(columnSet.dateCreated)[0]
-export const columnProps = addAlias(columnSet.props)[0]
+/**
+ * @typedef {module:arena.Table} TableChain
+ */
+class TableChain extends TableSurvey {
+  constructor() {
+    super('processing_chain', columnSet)
+    this._columnsNoScript = this.columns.filter((column) => column !== this.getColumn(columnSet.scriptCommon))
+    this.getSelect = getSelect.bind(this)
+  }
+
+  get columnsNoScript() {
+    return this._columnsNoScript
+  }
+
+  get columnUuid() {
+    return this.getColumn(columnSet.uuid)
+  }
+
+  get columnDateCreated() {
+    return this.getColumn(columnSet.dateCreated)
+  }
+
+  get columnProps() {
+    return this.getColumn(columnSet.props)
+  }
+}
+
+export default new TableChain()

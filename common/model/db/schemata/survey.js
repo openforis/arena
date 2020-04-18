@@ -1,1 +1,1 @@
-export const getSchemaNameSurvey = (surveyId) => `survey_${surveyId}`
+export const getSchemaSurvey = (surveyId) => `survey_${surveyId}`

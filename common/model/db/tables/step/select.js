@@ -1,13 +1,15 @@
 import * as SQL from '../../sql'
-import * as Schemata from '../../schemata/survey'
-import * as TableCalculation from '../calculation'
-import * as TableStep from './table'
+import TableCalculation from '../calculation'
 
-const _getJoinCalculation = ({ surveyId, includeScript }) =>
-  `LEFT JOIN LATERAL (
-    ${TableCalculation.getSelect({ surveyId, includeScript, stepUuid: TableStep.columnUuid })}
+/**
+ *
+ */
+function _getJoinCalculation({ surveyId, includeScript }) {
+  return `LEFT JOIN LATERAL (
+    ${TableCalculation.getSelect({ surveyId, includeScript, stepUuid: this.columnUuid })}
   ) AS ${TableCalculation.alias}
   ON TRUE`
+}
 
 /**
  * Generate the select query for the processing_step table by the given parameters.
@@ -20,20 +22,21 @@ const _getJoinCalculation = ({ surveyId, includeScript }) =>
  *
  * @returns {string} - The select query.
  */
-export const getSelect = (params) => {
+export function getSelect(params) {
   const { surveyId, chainUuid = null, includeCalculations = false, includeScript = false } = params
+  const getJoinCalculation = _getJoinCalculation.bind(this)
 
-  const selectFields = [...TableStep.columns]
+  const selectFields = [...this.columns]
   if (includeCalculations) {
-    const jsonAgg = SQL.jsonAgg(SQL.addAlias(TableCalculation.alias, '*'), [TableCalculation.columnIndex])
+    const jsonAgg = SQL.jsonAgg(TableCalculation.getColumn('*'), [TableCalculation.columnIndex])
     selectFields.push(`${jsonAgg} AS calculations`)
   }
 
   return `SELECT
         ${selectFields.join(', ')}
     FROM 
-        ${Schemata.getSchemaNameSurvey(surveyId)}.${TableStep.name} AS ${TableStep.alias}
-        ${includeCalculations ? _getJoinCalculation({ surveyId, includeScript }) : ''}
-        ${chainUuid ? `WHERE ${TableStep.columnChainUuid} = ${chainUuid}` : ''}
-        ${includeCalculations ? `GROUP BY ${TableStep.columns.join(', ')}` : ''}`
+        ${this.getSchema(surveyId)}.${this.name} AS ${this.alias}
+        ${includeCalculations ? getJoinCalculation({ surveyId, includeScript }) : ''}
+        ${chainUuid ? `WHERE ${this.columnChainUuid} = ${chainUuid}` : ''}
+        ${includeCalculations ? `GROUP BY ${this.columnUuid}` : ''}`
 }

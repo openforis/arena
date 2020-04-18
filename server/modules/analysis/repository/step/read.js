@@ -1,9 +1,7 @@
 import { db } from '@server/db/db'
 import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as DB from '@common/model/db'
-
-const { TableStep } = DB.tables
+import { TableStep } from '@common/model/db'
 
 /**
  * Fetches processing steps by the given survey id.

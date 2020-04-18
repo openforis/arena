@@ -1,8 +1,5 @@
-import * as SQL from '../../sql'
-
-export const name = 'processing_step'
-export const alias = SQL.createAlias(name)
-const addAlias = (...columnNames) => SQL.addAlias(alias, ...columnNames)
+import TableSurvey from '../tableSurvey'
+import { getSelect } from './select'
 
 const columnSet = {
   uuid: 'uuid',
@@ -10,9 +7,26 @@ const columnSet = {
   index: 'index',
   props: 'props',
 }
-const _columns = Object.values(columnSet)
-export const columns = addAlias(..._columns)
+/**
+ * @typedef {module:arena.Table} TableStep
+ */
+class TableStep extends TableSurvey {
+  constructor() {
+    super('processing_step', columnSet)
+    this.getSelect = getSelect.bind(this)
+  }
 
-export const columnUuid = addAlias(columnSet.uuid)[0]
-export const columnChainUuid = addAlias(columnSet.chainUuid)[0]
-export const columnIndex = addAlias(columnSet.index)[0]
+  get columnUuid() {
+    return this.getColumn(columnSet.uuid)
+  }
+
+  get columnChainUuid() {
+    return this.getColumn(columnSet.chainUuid)
+  }
+
+  get columnIndex() {
+    return this.getColumn(columnSet.index)
+  }
+}
+
+export default new TableStep()

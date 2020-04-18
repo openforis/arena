@@ -1,9 +1,4 @@
-import * as TableChain from './tables/chain'
-import * as TableStep from './tables/step'
-import * as TableCalculation from './tables/calculation'
-
-export const tables = {
-  TableChain,
-  TableStep,
-  TableCalculation,
-}
+// ====== Tables
+export { default as TableChain } from './tables/chain'
+export { default as TableStep } from './tables/step'
+export { default as TableCalculation } from './tables/calculation'

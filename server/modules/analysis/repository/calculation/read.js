@@ -1,9 +1,7 @@
 import { db } from '@server/db/db'
 import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as DB from '@common/model/db'
-
-const { TableCalculation } = DB.tables
+import { TableCalculation } from '@common/model/db'
 
 /**
  * Fetches calculations by the given survey id.
