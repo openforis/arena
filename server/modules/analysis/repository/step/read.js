@@ -1,29 +1,9 @@
 import { db } from '@server/db/db'
-import { dbTransformCallback, getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import tableStep from './table'
-import { table as tableCalculation, getSelectCalculations } from '../calculation'
+import * as DB from '@common/db'
 
-export const getSelectSteps = ({ surveyId, includeCalculations, includeScript }) => {
-  const colStepUuid = tableStep.addAlias(tableStep.columnSet.uuid)
-  const colCalculationStepUuid = tableCalculation.addAlias(tableCalculation.columnSet.stepUuid)
-
-  const selectFieldsStep = tableStep.columns.map((col) => tableStep.addAlias(col)).join(', ')
-  const selectFieldsCalculation = tableCalculation.jsonAgg(
-    tableCalculation.addAlias('*'),
-    tableCalculation.columnSet.index
-  )
-
-  const selectCalculations = getSelectCalculations({ surveyId, includeScript })
-  const joinCalculations = `LEFT JOIN LATERAL (${selectCalculations}) AS ${tableCalculation.alias} ON ${colStepUuid} = ${colCalculationStepUuid}`
-
-  return `SELECT 
-        ${selectFieldsStep}${includeCalculations ? `, ${selectFieldsCalculation} AS calculations` : ''}
-    FROM 
-        ${getSurveyDBSchema(surveyId)}.${tableStep.name} AS ${tableStep.alias}
-        ${includeCalculations ? joinCalculations : ''}
-        ${includeCalculations ? `GROUP BY 1` : ''}`
-}
+const { TableStep } = DB.tables
 
 /**
  * Fetches processing steps by the given survey id.
@@ -36,4 +16,4 @@ export const getSelectSteps = ({ surveyId, includeCalculations, includeScript })
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchSteps = (params, client = db) => client.map(getSelectSteps(params), [], dbTransformCallback)
+export const fetchSteps = (params, client = db) => client.map(TableStep.getSelect(params), [], dbTransformCallback)

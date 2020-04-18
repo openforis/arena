@@ -1,32 +1,9 @@
 import { db } from '@server/db/db'
-import { dbTransformCallback, getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as DB from '@common/db'
 
-import tableChain from './table'
-import { table as tableStep, getSelectSteps } from '../step'
-
-const _getSelectChain = (surveyId, cycle, includeScript, includeStepsAndCalculations) => {
-  const colsChain = includeScript ? tableChain.columns : tableChain.columnsNoScript
-  const colChainUuid = tableChain.addAlias(tableChain.columnSet.uuid)
-  const colChainProps = tableChain.addAlias(tableChain.columnSet.props)
-  const colStepChainUuid = tableStep.addAlias(tableStep.columnSet.chainUuid)
-
-  const selectFieldsChain = colsChain.map((col) => tableChain.addAlias(col)).join(', ')
-  const selectFieldsSteps = tableStep.jsonAgg(tableStep.addAlias('*'), tableStep.columnSet.index)
-
-  const selectSteps = getSelectSteps({ surveyId, includeScript, includeCalculations: includeStepsAndCalculations })
-  const joinSteps = `LEFT JOIN LATERAL (${selectSteps}) AS ${tableStep.alias}  ON ${colChainUuid} = ${colStepChainUuid}`
-
-  return `SELECT 
-        ${selectFieldsChain} ${includeStepsAndCalculations ? `, ${selectFieldsSteps} AS processing_steps` : ''}
-    FROM 
-        ${getSurveyDBSchema(surveyId)}.${tableChain.name} AS ${tableChain.alias}
-    ${includeStepsAndCalculations ? joinSteps : ''}
-    ${cycle ? `WHERE (${colChainProps})->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
-    ${includeStepsAndCalculations ? `GROUP BY ${selectFieldsChain}` : ''}`
-}
-
+const { TableChain } = DB.tables
 /**
  * Fetches all processing chains by the given survey id and the optional survey cycle if present within params.
  *
@@ -51,11 +28,9 @@ export const fetchChains = async (params, client = db) => {
     includeStepsAndCalculations = false,
   } = params
 
-  const chainColDateCreated = tableChain.addAlias(tableChain.columnSet.dateCreated)
-
   return client.map(
-    `${_getSelectChain(surveyId, cycle, includeScript, includeStepsAndCalculations)}
-    ORDER BY ${chainColDateCreated} DESC
+    `${TableChain.getSelect({ surveyId, cycle, includeScript, includeStepsAndCalculations })}
+    ORDER BY ${TableChain.columnDateCreated} DESC
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [],

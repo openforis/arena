@@ -1,15 +1,9 @@
 import { db } from '@server/db/db'
-import { dbTransformCallback, getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import tableCalculation from './table'
+import * as DB from '@common/db'
 
-export const getSelectCalculations = ({ surveyId, includeScript }) => {
-  const cols = includeScript ? tableCalculation.columns : tableCalculation.columnsNoScript
-  const selectFields = cols.map((col) => tableCalculation.addAlias(col)).join(', ')
-
-  return `SELECT ${selectFields}
-    FROM ${getSurveyDBSchema(surveyId)}.${tableCalculation.name} AS ${tableCalculation.alias}`
-}
+const { TableCalculation } = DB.tables
 
 /**
  * Fetches calculations by the given survey id.
@@ -21,5 +15,5 @@ export const getSelectCalculations = ({ surveyId, includeScript }) => {
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchCalculations = (params, client = db) =>
-  client.map(getSelectCalculations(params), [], dbTransformCallback)
+export const fetchCalculations = ({ surveyId, includeScript }, client = db) =>
+  client.map(TableCalculation.getSelect({ surveyId, includeScript }), [], dbTransformCallback)
