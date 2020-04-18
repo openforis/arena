@@ -1,7 +1,7 @@
 import { db } from '@server/db/db'
 import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
-import * as DB from '@common/db'
+import * as DB from '@common/model/db'
 
 const { TableChain } = DB.tables
 /**
