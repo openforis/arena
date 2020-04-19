@@ -28,7 +28,6 @@ export const createResultStepView = async ({ survey, step }, client = db) => {
   const joins = []
   let from = ''
   let where = ''
-  const aliasPrefix = `_r`
 
   ProcessingStep.getCalculations(viewResultStep.step).forEach((calculation, i) => {
     const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
@@ -36,7 +35,7 @@ export const createResultStepView = async ({ survey, step }, client = db) => {
     const nodeDefName = NodeDef.getName(nodeDef)
 
     const tableResultNode = new TableResultNode(viewResultStep.surveyId)
-    tableResultNode.alias = `${aliasPrefix}${i}`
+    tableResultNode.alias = `_r${i}`
     tableResultNodes.push(tableResultNode)
 
     const conditionResultNode = `${tableResultNode.columnNodeDefUuid} = '${nodeDefUuid}'`

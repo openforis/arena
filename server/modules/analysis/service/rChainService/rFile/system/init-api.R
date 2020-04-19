@@ -1,11 +1,23 @@
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
-  if ("error" %in% names(respJson)) {
-    stop(respJson$error)
+
+  # Check wheteher response containts error
+  respNames <- names(respJson)
+  error <- NA
+  if("error" %in% respNames){
+    error <- respJson$error
   }
+  if("status" %in% respNames & respJson$status == 'error'){
+    error <- respJson$params$text
+  }
+  if (!is.na(error)) {
+    stop(error)
+  }
+
   return(respJson)
 }
+
 
 arena.getApiUrl = function(url) {
   apiUrl <- paste0(arena.host, 'api', url)
