@@ -43,7 +43,7 @@ export default class TableResultNode extends TableSurveyRdbResult {
   }
 
   get columnValue() {
-    return this.getColumn(columnSet.nodeDefUuid)
+    return this.getColumn(columnSet.value)
   }
 }
 
