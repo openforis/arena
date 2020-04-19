@@ -41,6 +41,10 @@ export default class TableResultNode extends TableSurveyRdbResult {
   get columnNodeDefUuid() {
     return this.getColumn(columnSet.nodeDefUuid)
   }
+
+  get columnValue() {
+    return this.getColumn(columnSet.nodeDefUuid)
+  }
 }
 
 TableResultNode.columnSet = columnSet

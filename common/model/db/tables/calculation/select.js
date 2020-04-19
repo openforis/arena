@@ -11,6 +11,6 @@ export function getSelect(params) {
   const { stepUuid = null, includeScript = false } = params
 
   return `SELECT ${includeScript ? this.columns : this.columnsNoScript}
-    FROM ${this.schema}.${this.name} AS ${this.alias}
+    FROM ${this.nameFull}
     ${stepUuid ? `WHERE ${this.columnStepUuid} = ${stepUuid}` : ''}`
 }

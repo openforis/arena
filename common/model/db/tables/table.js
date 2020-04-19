@@ -31,12 +31,24 @@ export default class Table {
     return this._schema
   }
 
+  set schema(schema) {
+    this._schema = schema
+  }
+
   get name() {
     return this._name
   }
 
+  get nameFull() {
+    return `${this.schema}.${this.name} AS ${this.alias}`
+  }
+
   get alias() {
     return this._alias
+  }
+
+  set alias(alias) {
+    this._alias = alias
   }
 
   get columns() {

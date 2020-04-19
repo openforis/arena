@@ -44,7 +44,7 @@ export function getSelect(params) {
   return `SELECT
         ${selectFields.join(', ')}
     FROM 
-        ${this.schema}.${this.name} AS ${this.alias}
+        ${this.nameFull}
     ${includeStepsAndCalculations ? this.getJoinSteps(params) : ''}
     ${cycle ? `WHERE (${this.columnProps})->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
     ${chainUuid ? `WHERE ${this.columnUuid} = ${chainUuid}` : ''}

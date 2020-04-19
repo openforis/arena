@@ -5,8 +5,9 @@ import TableSurvey from './tableSurvey'
  * @typedef {module:arena.TableSurvey} module:arena.TableSurveyRdb
  */
 class TableSurveyRdb extends TableSurvey {
-  get schema() {
-    return Schemata.getSchemaSurveyRdb(this.surveyId)
+  constructor(surveyId, name, columnSet) {
+    super(surveyId, name, columnSet)
+    this.schema = Schemata.getSchemaSurveyRdb(this.surveyId)
   }
 }
 

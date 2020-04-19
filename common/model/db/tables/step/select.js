@@ -35,7 +35,7 @@ export function getSelect(params) {
   return `SELECT
         ${selectFields.join(', ')}
     FROM 
-        ${this.schema}.${this.name} AS ${this.alias}
+        ${this.nameFull}
         ${includeCalculations ? this.getJoinCalculation({ includeScript }) : ''}
         ${chainUuid ? `WHERE ${this.columnChainUuid} = ${chainUuid}` : ''}
         ${includeCalculations ? `GROUP BY ${this.columnUuid}` : ''}`

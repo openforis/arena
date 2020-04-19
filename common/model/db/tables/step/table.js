@@ -28,3 +28,5 @@ export default class TableStep extends TableSurvey {
     return this.getColumn(columnSet.index)
   }
 }
+
+TableStep.columnSet = columnSet

@@ -38,3 +38,5 @@ export default class TableChain extends TableSurvey {
     return this.getColumn(columnSet.props)
   }
 }
+
+TableChain.columnSet = columnSet

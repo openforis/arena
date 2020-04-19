@@ -2,7 +2,6 @@ import * as Survey from '../../../../../core/survey/survey'
 import * as ProcessingStep from '../../../../analysis/processingStep'
 
 import TableSurveyRdbResult from '../../tables/tableSurveyRdbResult'
-import { getCreate } from './create'
 
 const columnSet = {
   uuid: 'uuid',
@@ -20,7 +19,6 @@ const columnSet = {
 export default class ViewResultStep extends TableSurveyRdbResult {
   constructor(survey, step) {
     super(Survey.getId(survey), ProcessingStep.getUuid(step), columnSet)
-    this.getCreate = getCreate.bind(this)
     this._survey = survey
     this._step = step
   }
