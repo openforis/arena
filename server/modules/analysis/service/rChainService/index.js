@@ -10,7 +10,6 @@ import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import * as ResultStepViewRepository from '@server/modules/surveyRdb/repository/resultStepViewRepository'
 
 import * as ProcessingChainManager from '../../manager/processingChainManager'
 import * as RChainManager from '../../manager/rChainManager'
@@ -50,9 +49,8 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
     await massiveInsert.flush()
 
     // refresh result step materialized view
-    // TODO - Use SurveyRdbManager
-    // Repository is used because SurveyRdbMamager must be refactor later on
-    await ResultStepViewRepository.refreshResultStepView(surveyId, ResultStepView.newResultStepView(step), tx)
+    const resultStepView = ResultStepView.newResultStepView(step)
+    await SurveyRdbMamager.refreshResultStepView({ surveyId, resultStepView }, tx)
   })
 
   fileZip.close()

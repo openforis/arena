@@ -18,7 +18,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
     const survey = await this.fetchSurvey()
 
-    const resultStepViewsByEntityUuid = await SurveyRdbManager.generateResultViews(surveyId, tx)
+    const resultStepViewsByEntityUuid = await SurveyRdbManager.getResultStepViews(surveyId, tx)
 
     // Get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)

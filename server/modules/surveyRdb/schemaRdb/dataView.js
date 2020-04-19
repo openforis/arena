@@ -100,24 +100,30 @@ export const getSelectFields = (survey, nodeDef, resultStepViews) => {
 export const getJoin = (schemaName, nodeDef, nodeDefParent) =>
   NodeDef.isVirtual(nodeDef) || !nodeDefParent
     ? ''
-    : `JOIN 
-        ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
-        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
-        `
+    : `JOIN ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
+        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}`
 
-export const getJoinResultStepView = (schemaName, resultStepViews) =>
-  R.ifElse(
-    R.isEmpty,
-    R.always(''),
-    R.pipe(
-      R.map((resultStepView) => {
-        const schemaAndViewName = `${schemaName}."${ResultStepView.getViewName(resultStepView)}"`
-        return `LEFT OUTER JOIN ${schemaAndViewName}
-          ON ${alias}.${DataTable.colNameUuuid} = ${schemaAndViewName}.${ResultStepView.colNames.parentUuid}`
-      }),
-      R.join(' ')
-    )
-  )(resultStepViews)
+export const getJoinResultStepView = (survey, nodeDef, resultStepViews = []) => {
+  if (resultStepViews.length === 0) {
+    return ''
+  }
+
+  const schema = SchemaRdb.getName(Survey.getId(survey))
+
+  return resultStepViews
+    .map((resultStepView, i) => {
+      const viewName = ResultStepView.getViewName(resultStepView)
+      const aliasResTable = `r${i}`
+
+      const colUuid = NodeDef.isVirtual(nodeDef)
+        ? getColUuid(Survey.getNodeDefParent(nodeDef)(survey))
+        : DataTable.colNameUuuid
+
+      return `LEFT OUTER JOIN ${schema}."${viewName}" AS ${aliasResTable}
+          ON ${alias}.${colUuid} = ${aliasResTable}.${ResultStepView.colNames.parentUuid}`
+    })
+    .join(' ')
+}
 
 export const getFromTable = (survey, nodeDef) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

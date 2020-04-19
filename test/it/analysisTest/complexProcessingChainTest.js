@@ -45,10 +45,10 @@ before(async () => {
           SB.attribute('tree_volume', NodeDef.nodeDefType.decimal).analysis(),
 
           // --> tree virtual
-          SB.entity('tree_virtual').virtual(),
-        ).multiple(),
-      ).multiple(),
-    ),
+          SB.entity('tree_virtual').virtual()
+        ).multiple()
+      ).multiple()
+    )
   ).buildAndStore(false)
 })
 
@@ -71,7 +71,7 @@ const _insertRecords = async () => {
       'tree',
       RB.attribute('tree_no', treeNo),
       RB.attribute('tree_dbh', dbh),
-      RB.attribute('tree_height', height),
+      RB.attribute('tree_height', height)
     )
 
   // Add 5 records
@@ -82,8 +82,8 @@ const _insertRecords = async () => {
       RB.entity(
         'cluster',
         RB.attribute('cluster_no', i + 1),
-        RB.entity('plot', RB.attribute('plot_no', 1), newTree(1, 20, 50), newTree(2, 30, 60)),
-      ),
+        RB.entity('plot', RB.attribute('plot_no', 1), newTree(1, 20, 50), newTree(2, 30, 60))
+      )
     ).buildAndStore()
 
     records.push(record)
@@ -95,14 +95,14 @@ export const chainWithSimpleEntityTest = async () => {
     user,
     survey,
     'Chain with simple entity',
-    ChainBuilder.step('tree', ChainBuilder.calculation('tree_volume', 'Tree volume calculation')),
+    ChainBuilder.step('tree', ChainBuilder.calculation('tree_volume', 'Tree volume calculation'))
   ).buildAndStore()
 
   await SurveyUtils.publishSurvey(user, Survey.getId(survey))
   await _insertRecords()
 
   // No aggregated views expected
-  const entityAggregatedViews = await SurveyRdbManager.generateEntityAggregatedViews(survey)
+  const entityAggregatedViews = await SurveyRdbManager.getEntityAggregatedViews(survey)
   expect(R.isEmpty(entityAggregatedViews)).to.equal(true)
 }
 
@@ -113,15 +113,15 @@ export const chainWithVirtualEntityTest = async () => {
     'Chain with virtual entity',
     ChainBuilder.step(
       'tree_virtual',
-      ChainBuilder.calculation('tree_volume', 'Tree volume calculation').formula('tree_dbh * tree_height'),
-    ),
+      ChainBuilder.calculation('tree_volume', 'Tree volume calculation').formula('tree_dbh * tree_height')
+    )
   ).buildAndStore()
 
   await SurveyUtils.publishSurvey(user, Survey.getId(survey))
   await _insertRecords()
 
   // No aggregated views expected
-  const entityAggregatedViews = await SurveyRdbManager.generateEntityAggregatedViews(survey)
+  const entityAggregatedViews = await SurveyRdbManager.getEntityAggregatedViews(survey)
   expect(R.isEmpty(entityAggregatedViews)).to.equal(true)
 }
 
@@ -133,15 +133,15 @@ export const chainWithVirtualEntityAndAggregationTest = async () => {
     ChainBuilder.step(
       'tree_virtual',
       ChainBuilder.calculation('tree_volume', 'Tree volume calculation').aggregateFn(
-        ProcessingStepCalculation.aggregateFn.sum,
-      ),
-    ),
+        ProcessingStepCalculation.aggregateFn.sum
+      )
+    )
   ).buildAndStore()
 
   await SurveyUtils.publishSurvey(user, Survey.getId(survey))
   await _insertRecords()
 
   // One aggregated view expected
-  const entityAggregatedViews = await SurveyRdbManager.generateEntityAggregatedViews(survey)
+  const entityAggregatedViews = await SurveyRdbManager.getEntityAggregatedViews(survey)
   expect(R.isEmpty(entityAggregatedViews)).to.equal(false)
 }

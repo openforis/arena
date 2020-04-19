@@ -1,8 +1,13 @@
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
+/**
+ * @deprecated - Use TableResultNode.
+ */
 export const tableName = `${SchemaRdb.resultTablePrefix}_node`
 
-// Table column names: DO NOT REORDER THEM (order used in in rFilePersistResults)
+/**
+ * @deprecated - Use TableResultNode.
+ */
 export const colNames = {
   uuid: 'uuid',
   processingChainUuid: 'processing_chain_uuid',

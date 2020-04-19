@@ -3,10 +3,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as DataTable from '../../schemaRdb/dataTable'
-import * as RDBDataView from '../../schemaRdb/dataView'
+import * as DataView from '../../schemaRdb/dataView'
 
 const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
-  const surveyId = Survey.getSurveyInfo(survey).id
+  const surveyId = Survey.getId(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
   const schemaName = SchemaRdb.getName(surveyId)
@@ -19,12 +19,12 @@ const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
     parentForeignKey: DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent),
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
-    viewName: RDBDataView.getName(nodeDef, nodeDefParent),
-    viewFields: RDBDataView.getSelectFields(survey, nodeDef, resultStepViews),
-    viewFrom: `${RDBDataView.getFromTable(survey, nodeDef)} as ${RDBDataView.alias}`,
-    viewJoin: RDBDataView.getJoin(schemaName, nodeDef, nodeDefParent),
-    viewJoinResultViews: RDBDataView.getJoinResultStepView(schemaName, resultStepViews),
-    viewWhereCondition: RDBDataView.getWhereCondition(nodeDef),
+    viewName: DataView.getName(nodeDef, nodeDefParent),
+    viewFields: DataView.getSelectFields(survey, nodeDef, resultStepViews),
+    viewFrom: `${DataView.getFromTable(survey, nodeDef)} as ${DataView.alias}`,
+    viewJoin: DataView.getJoin(schemaName, nodeDef, nodeDefParent),
+    viewJoinResultViews: DataView.getJoinResultStepView(survey, nodeDef, resultStepViews),
+    viewWhereCondition: DataView.getWhereCondition(nodeDef),
   }
 }
 
@@ -48,7 +48,7 @@ export const createTableAndView = async (survey, nodeDef, resultStepViews, clien
     `)
   }
 
-  await client.query(`
+  return client.query(`
     CREATE VIEW
       ${tableViewCreate.schemaName}.${tableViewCreate.viewName} AS 
       SELECT ${tableViewCreate.viewFields.join(', ')}

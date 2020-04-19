@@ -1,0 +1,1 @@
+export { fetchChains } from './read'
