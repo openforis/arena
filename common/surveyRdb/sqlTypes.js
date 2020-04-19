@@ -1,3 +1,6 @@
+/**
+ * @deprecated - Use common/model/SQL.types.
+ */
 export const sqlTypes = {
   uuid: 'UUID',
   varchar: 'VARCHAR',

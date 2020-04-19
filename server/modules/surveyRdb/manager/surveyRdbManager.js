@@ -23,6 +23,7 @@ import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
+import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
 
 // ==== DDL
@@ -31,7 +32,8 @@ import * as DataViewRepository from '../repository/dataView'
 export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
-export const { createTableAndView } = DataViewRepository
+export const { createTable } = DataTableRepository
+export const { createView } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'

@@ -34,9 +34,10 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       const nodeDefName = NodeDef.getName(nodeDef)
       const resultStepViews = R.propOr([], NodeDef.getUuid(nodeDef), resultStepViewsByEntityUuid)
 
-      // ===== create table
+      // ===== create table and view
       this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createTableAndView(survey, nodeDef, resultStepViews, tx)
+      await SurveyRdbManager.createTable({ survey, nodeDef }, tx)
+      await SurveyRdbManager.createView({ survey, nodeDef, resultStepViews }, tx)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table

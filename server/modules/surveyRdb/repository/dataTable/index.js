@@ -1,0 +1,1 @@
+export { createTable } from './create'
