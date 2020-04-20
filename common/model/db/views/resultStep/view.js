@@ -1,8 +1,10 @@
 import * as Survey from '../../../../../core/survey/survey'
 import * as ProcessingStep from '../../../../analysis/processingStep'
+import * as ProcessingStepCalculation from '../../../../analysis/processingStepCalculation'
 
 import Table from '../../tables/table'
 import TableSurveyRdbResult from '../../tables/tableSurveyRdbResult'
+import { ColumnNodeDef } from '../../tables/dataNodeDef'
 
 const columnSet = {
   uuid: Table.columnSetCommon.uuid,
@@ -19,7 +21,7 @@ const columnSet = {
  */
 export default class ViewResultStep extends TableSurveyRdbResult {
   constructor(survey, step) {
-    super(Survey.getId(survey), ProcessingStep.getUuid(step), columnSet)
+    super(Survey.getId(survey), `step_${ProcessingStep.getUuid(step)}`, columnSet)
     this._survey = survey
     this._step = step
   }
@@ -51,4 +53,14 @@ export default class ViewResultStep extends TableSurveyRdbResult {
   get columnNodeDefUuid() {
     return this.getColumn(columnSet.nodeDefUuid)
   }
+
+  get columnNodeDefs() {
+    return ProcessingStep.getCalculations(this._step).map((calculation) => {
+      const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
+      return new ColumnNodeDef(this, nodeDef)
+    })
+  }
 }
+
+ViewResultStep.columnSet = columnSet

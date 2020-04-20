@@ -7,7 +7,7 @@ export { default as TableChain } from './tables/chain'
 export { default as TableStep } from './tables/step'
 export { default as TableCalculation } from './tables/calculation'
 
-export { default as TableDataNodeDef } from './tables/dataNodeDef'
+export { default as TableDataNodeDef, ColumnNodeDef } from './tables/dataNodeDef'
 export { default as TableResultNode } from './tables/resultNode'
 
 // ====== Views

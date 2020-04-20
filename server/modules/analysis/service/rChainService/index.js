@@ -6,7 +6,6 @@ import * as CSVReader from '@server/utils/file/csvReader'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -49,8 +48,7 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
     await massiveInsert.flush()
 
     // refresh result step materialized view
-    const resultStepView = ResultStepView.newResultStepView(step)
-    await SurveyRdbMamager.refreshResultStepView({ surveyId, resultStepView }, tx)
+    await SurveyRdbMamager.refreshResultStepView({ survey, step }, tx)
   })
 
   fileZip.close()

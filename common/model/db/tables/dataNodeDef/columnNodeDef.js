@@ -48,8 +48,24 @@ export default class ColumnNodeDef {
     this._types = colTypesByType[NodeDef.getType(nodeDef)]
   }
 
+  get table() {
+    return this._table
+  }
+
+  get nodeDef() {
+    return this._nodeDef
+  }
+
   get names() {
     return this._names
+  }
+
+  get namesFull() {
+    return SQL.addAlias(this.table.alias, this.names)
+  }
+
+  get name() {
+    return this.names[0]
   }
 
   get types() {

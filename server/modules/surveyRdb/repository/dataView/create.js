@@ -1,25 +1,32 @@
 import * as Survey from '../../../../../core/survey/survey'
-import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
 
-import * as DataTable from '../../schemaRdb/dataTable'
-import * as DataView from '../../schemaRdb/dataView'
+import * as SQL from '../../../../../common/model/db/sql'
+import { ColumnNodeDef, ViewDataNodeDef, TableDataNodeDef } from '../../../../../common/model/db'
 
-const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
-  const surveyId = Survey.getId(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
+  viewDataNodeDef.columnNodeDefs
+    .map((columnNodeDef) => {
+      if (NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef)) {
+        return [`${viewDataNodeDef.tableData.alias}.${TableDataNodeDef.columnSet.uuid} AS ${columnNodeDef.name}`]
+      }
+      return columnNodeDef.namesFull
+    })
+    .flat()
 
-  const schemaName = SchemaRdb.getName(surveyId)
-  const tableName = DataTable.getName(nodeDef, nodeDefParent)
-  return {
-    schemaName,
-    tableName,
-    viewName: DataView.getName(nodeDef, nodeDefParent),
-    viewFields: DataView.getSelectFields(survey, nodeDef, resultStepViews),
-    viewFrom: `${DataView.getFromTable(survey, nodeDef)} as ${DataView.alias}`,
-    viewJoin: DataView.getJoin(schemaName, nodeDef, nodeDefParent),
-    viewJoinResultViews: DataView.getJoinResultStepView(survey, nodeDef, resultStepViews),
-    viewWhereCondition: DataView.getWhereCondition(nodeDef),
-  }
+const _getSelectFieldSteps = (viewDataNodeDef) =>
+  viewDataNodeDef.viewResultSteps
+    .map((viewResultStep) => viewResultStep.columnNodeDefs.map((columnNodeDef) => columnNodeDef.namesFull))
+    .flat(Infinity)
+
+const _getSelectFieldKeys = (viewDataNodeDef) => {
+  const keys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
+    .map((nodeDef) => {
+      const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDef)
+      return [`'${NodeDef.getUuid(nodeDef)}'`, `${viewDataNodeDef.tableData.alias}.${columnNodeDef.name}`]
+    })
+    .flat()
+  return `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}`
 }
 
 /**
@@ -28,20 +35,50 @@ const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
  * @param {object} params - The query parameters.
  * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef to create the data view for.
+ * @param {ProcessingStep[]} params.steps - The processing steps linked to the nodeDef.
  * @param {pgPromise.IDatabase} client - The data base client.
  *
  * @returns {Promise<null|*>} - The result promise.
  */
-export const createDataView = async ({ survey, nodeDef, resultStepViews }, client) => {
-  const tableViewCreate = toTableViewCreate(survey, nodeDef, resultStepViews)
+export const createDataView = async ({ survey, nodeDef, steps }, client) => {
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef, steps)
+  const { schema, name, tableData, viewDataParent, viewResultSteps, root, virtual, virtualExpression } = viewDataNodeDef
 
-  return client.query(`
-    CREATE VIEW
-      ${tableViewCreate.schemaName}.${tableViewCreate.viewName} AS 
-      SELECT ${tableViewCreate.viewFields.join(', ')}
-      FROM ${tableViewCreate.viewFrom}
-      ${tableViewCreate.viewJoin}
-      ${tableViewCreate.viewJoinResultViews}
-      ${tableViewCreate.viewWhereCondition}
-  `)
+  // TODO - do not use select * from virtual entities, it includes parent_uuid column (see https://github.com/openforis/arena/issues/728)
+  const selectFields = virtual
+    ? ['*']
+    : [
+        tableData.columnRecordUuid,
+        tableData.columnRecordCycle,
+        tableData.columnDateCreated,
+        tableData.columnDateModified,
+        _getSelectFieldKeys(viewDataNodeDef),
+        ..._getSelectFieldNodeDefs(viewDataNodeDef),
+        ..._getSelectFieldSteps(viewDataNodeDef),
+      ]
+
+  const query = `
+    CREATE VIEW ${schema}.${name} AS ( 
+      SELECT 
+        ${selectFields.join(', ')}
+      FROM 
+        ${tableData.nameFull}
+      ${
+        virtual || root
+          ? ''
+          : `LEFT JOIN ${viewDataParent.nameFull}  
+            ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
+      }
+      ${viewResultSteps
+        .map(
+          (viewResultStep) =>
+            `LEFT OUTER JOIN ${viewResultStep.nameFull}
+            ON ${viewResultStep.columnParentUuid} = ${tableData.columnUuid}
+            `
+        )
+        .join('')}
+      ${virtualExpression ? `WHERE ${virtualExpression}` : ''}
+     )`
+
+  return client.query(query)
 }

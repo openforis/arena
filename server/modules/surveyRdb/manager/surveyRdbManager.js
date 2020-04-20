@@ -7,15 +7,12 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import * as ResultStepView from '@common/surveyRdb/resultStepView'
 import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
 import * as ProcessingStepRepository from '@server/modules/analysis/repository/processingStepRepository'
-import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
@@ -159,38 +156,6 @@ const _visitProcessingSteps = async (surveyId, client, visitor) => {
     )
     await PromiseUtils.each(steps, async (step) => visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain)))
   })
-}
-
-// eslint-disable-next-line jsdoc/require-param
-/**
- * @deprecated - Not needed; fetch chains and survey if needed.
- */
-export const getResultStepViews = async (surveyId, client = db) => {
-  const chains = await ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client)
-
-  const resultStepViewsByEntityUuid = {}
-
-  await Promise.all(
-    chains.map((chain) => {
-      const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.isNotAggregate)
-      return PromiseUtils.each(steps, async (step) => {
-        const calculations = ProcessingStep.getCalculations(step)
-        // TODO add NodeDefRepository.fetchNodeDefs({surveyId, nodeDefUuids...})
-        const nodeDefColumns = await Promise.all(
-          calculations.map((calculation) => {
-            const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
-            return NodeDefRepository.fetchNodeDefByUuid(surveyId, nodeDefUuid, false, false, client)
-          })
-        )
-        const entityDefUuid = ProcessingStep.getEntityUuid(step)
-        const resultStepViews = R.propOr([], entityDefUuid, resultStepViewsByEntityUuid)
-        resultStepViews.push(ResultStepView.newResultStepView(step, calculations, nodeDefColumns))
-        resultStepViewsByEntityUuid[entityDefUuid] = resultStepViews
-      })
-    })
-  )
-
-  return resultStepViewsByEntityUuid
 }
 
 // Aggregated entity views
