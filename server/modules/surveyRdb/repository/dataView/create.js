@@ -32,7 +32,7 @@ const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
  *
  * @returns {Promise<null|*>} - The result promise.
  */
-export const createView = async ({ survey, nodeDef, resultStepViews }, client) => {
+export const createDataView = async ({ survey, nodeDef, resultStepViews }, client) => {
   const tableViewCreate = toTableViewCreate(survey, nodeDef, resultStepViews)
 
   return client.query(`

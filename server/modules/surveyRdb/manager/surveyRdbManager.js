@@ -32,8 +32,8 @@ import * as DataViewRepository from '../repository/dataView'
 export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
-export const { createTable } = DataTableRepository
-export const { createView } = DataViewRepository
+export const { createDataTable } = DataTableRepository
+export const { createDataView } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'

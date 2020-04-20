@@ -1,1 +1,1 @@
-export { createTable } from './create'
+export { createDataTable } from './create'

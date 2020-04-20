@@ -11,4 +11,5 @@ export { default as TableDataNodeDef } from './tables/dataNodeDef'
 export { default as TableResultNode } from './tables/resultNode'
 
 // ====== Views
+export { default as ViewDataNodeDef } from './views/dataNodeDef'
 export { default as ViewResultStep } from './views/resultStep'
