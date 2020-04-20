@@ -204,12 +204,10 @@ export const fetchRecordsCountByKeys = async (
 export const fetchViewData = async (params, client = db) => {
   const { survey, cycle, nodeDef, columnNodeDefs = false } = params
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-  const columns = columnNodeDefs ? viewDataNodeDef.columnNodeDefNamesRead : ['*']
+  const columns = columnNodeDefs ? [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead] : ['*']
 
-  return client.any(
-    `SELECT ${columns.join(', ')} 
+  const query = `SELECT ${columns.join(', ')} 
     FROM ${viewDataNodeDef.nameFull}
-    WHERE ${ViewDataNodeDef.columnSet.recordCycle} = $1`,
-    [cycle]
-  )
+    WHERE ${viewDataNodeDef.columnRecordCycle} = $1`
+  return client.any(query, [cycle])
 }

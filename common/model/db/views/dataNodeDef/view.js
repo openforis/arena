@@ -47,8 +47,11 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get columnNodeDefs() {
     const columns = []
-    // table entity uuid and attribute columns
-    columns.push(new ColumnNodeDef(this.tableData, this.nodeDef))
+    // table entity uuid column - it doesn't exist for virtual entities
+    if (!this.virtual) {
+      columns.push(new ColumnNodeDef(this.tableData, this.nodeDef))
+    }
+    // attribute columns
     columns.push(...this.tableData.columnNodeDefs)
     // parent view columns
     if (this.viewDataParent) {
