@@ -1,11 +1,12 @@
+import Table from '../table'
 import TableSurvey from '../tableSurvey'
 import { getSelect } from './select'
 
 const columnSet = {
-  uuid: 'uuid',
+  uuid: Table.columnSetCommon.uuid,
   chainUuid: 'processing_chain_uuid',
   index: 'index',
-  props: 'props',
+  props: Table.columnSetCommon.props,
 }
 /**
  * @typedef {module:arena.TableSurvey} module:arena.TableStep
@@ -14,10 +15,6 @@ export default class TableStep extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, 'processing_step', columnSet)
     this.getSelect = getSelect.bind(this)
-  }
-
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
   }
 
   get columnChainUuid() {

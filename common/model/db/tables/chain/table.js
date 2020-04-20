@@ -1,12 +1,13 @@
+import Table from '../table'
 import TableSurvey from '../tableSurvey'
 import { getSelect } from './select'
 
 const columnSet = {
-  uuid: 'uuid',
-  dateCreated: 'date_created',
-  dateModified: 'date_modified',
+  uuid: Table.columnSetCommon.uuid,
+  dateCreated: Table.columnSetCommon.dateCreated,
+  dateModified: Table.columnSetCommon.dateModified,
   dateExecuted: 'date_executed',
-  props: 'props',
+  props: Table.columnSetCommon.props,
   validation: 'validation',
   statusExec: 'status_exec',
   scriptCommon: 'script_common',
@@ -24,18 +25,6 @@ export default class TableChain extends TableSurvey {
 
   get columnsNoScript() {
     return this._columnsNoScript
-  }
-
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
-  }
-
-  get columnDateCreated() {
-    return this.getColumn(columnSet.dateCreated)
-  }
-
-  get columnProps() {
-    return this.getColumn(columnSet.props)
   }
 }
 
