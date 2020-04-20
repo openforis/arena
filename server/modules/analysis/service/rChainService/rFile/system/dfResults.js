@@ -3,15 +3,12 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
-import * as RDBDataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import * as RDBDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
-
+import { ColumnNodeDef, TableResultNode, ViewDataNodeDef } from '@common/model/db'
 import * as RFileReadData from './rFileReadData'
-import { dfVar, setVar, sqldf, vector } from '../../rFunctions'
+import { dfVar, setVar, sqldf } from '../../rFunctions'
 
 /**
- * Class that models a data frame step results
+ * Class that models a data frame step results.
  */
 export default class DfResults {
   constructor(rChain, step) {
@@ -61,19 +58,25 @@ export default class DfResults {
     const dfResultColumns = this.calculations.map((calculation) => {
       const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
       const nodeDefCalculation = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
-      return `'${NodeDef.getName(nodeDefCalculation)}'`
+      return NodeDef.getName(nodeDefCalculation)
     }, [])
-    this.scripts.push(setVar(this.name, `${this.dfSourceName}[, ${vector(dfResultColumns)}]`))
+    this.scripts.push(setVar(this.name, sqldf(`SELECT ${dfResultColumns.join(', ')} FROM ${this.dfSourceName}`)))
   }
 
   initUuids() {
+    const columnNodeDef = NodeDef.isVirtual(this.entityDef)
+      ? Survey.getNodeDefParent(this.entityDef)(this.survey)
+      : this.entityDef
     const setUuids = [
-      { name: ResultNodeTable.colNames.processingChainUuid, value: `'${this.rChain.chainUuid}'` },
-      { name: ResultNodeTable.colNames.processingStepUuid, value: `'${ProcessingStep.getUuid(this.step)}'` },
-      { name: ResultNodeTable.colNames.recordUuid, value: dfVar(this.dfSourceName, RDBDataTable.colNameRecordUuuid) },
+      { name: TableResultNode.columnSet.chainUuid, value: `'${this.rChain.chainUuid}'` },
+      { name: TableResultNode.columnSet.stepUuid, value: `'${ProcessingStep.getUuid(this.step)}'` },
       {
-        name: ResultNodeTable.colNames.parentUuid,
-        value: dfVar(this.dfSourceName, RDBDataView.getColUuid(this.entityDef)),
+        name: TableResultNode.columnSet.recordUuid,
+        value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),
+      },
+      {
+        name: TableResultNode.columnSet.parentUuid,
+        value: dfVar(this.dfSourceName, ColumnNodeDef.getColName(columnNodeDef)),
       },
     ].map((uuidMapping) => setVar(dfVar(this.name, uuidMapping.name), uuidMapping.value))
 

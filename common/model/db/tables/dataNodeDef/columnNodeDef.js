@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as SQL from '../../sql'
 
@@ -72,3 +73,6 @@ export default class ColumnNodeDef {
     return this._types
   }
 }
+
+ColumnNodeDef.getColNames = getColNames
+ColumnNodeDef.getColName = R.pipe(ColumnNodeDef.getColNames, R.head)
