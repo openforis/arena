@@ -2,20 +2,20 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
-import { db } from '@server/db/db'
-import * as dbUtils from '@server/db/dbUtils'
+import { db } from '../../../../db/db'
+import * as dbUtils from '../../../../db/dbUtils'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '../../../../../core/survey/survey'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as Record from '../../../../../core/record/record'
+import * as Expression from '../../../../../core/expressionParser/expression'
 
-import * as Record from '@core/record/record'
+import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
+import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
-import * as Expression from '@core/expressionParser/expression'
-import * as DataSort from '@common/surveyRdb/dataSort'
-import * as DataFilter from '@common/surveyRdb/dataFilter'
+import * as DataSort from '../../../../../common/surveyRdb/dataSort'
+import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
+import { ViewDataNodeDef } from '../../../../../common/model/db'
 import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as DataCol from '../../schemaRdb/dataCol'
@@ -190,18 +190,26 @@ export const fetchRecordsCountByKeys = async (
 }
 
 /**
- * Fetches all the rows of the specified view.
+ * Fetches all the rows of the specified nodeDef view.
  *
  * @param {!object} params - The filter parameters.
- * @param {!number} params.surveyId - The survey id.
+ * @param {!Survey} params.survey - The survey.
  * @param {!string} params.cycle - The survey cycle.
- * @param {!string} params.viewName - The name of the view.
- * @param {!Array} params.columns - The columns to be selected.
- * @param {pgPromise.IDatabase} client - The database client.
+ * @param {!NodeDef} params.nodeDef - The nodeDef.
+ * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchAll = async ({ surveyId, cycle, viewName, columns }, client = db) =>
-  client.any(
+export const fetchViewData = async (params, client = db) => {
+  const { survey, cycle, nodeDef, columnNodeDefs = false } = params
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+  const columns = columnNodeDefs ? viewDataNodeDef.columnNodeDefNamesRead : ['*']
+
+  return client.any(
     `SELECT ${columns.join(', ')} 
-    FROM ${SchemaRdb.getName(surveyId)}.${viewName}
-    WHERE ${DataTable.colNameRecordCycle} = '${cycle}'`
+    FROM ${viewDataNodeDef.nameFull}
+    WHERE ${ViewDataNodeDef.columnSet.recordCycle} = $1`,
+    [cycle]
   )
+}

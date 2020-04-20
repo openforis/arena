@@ -48,8 +48,8 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
   get columnNodeDefs() {
     const columns = []
     // table entity uuid and attribute columns
-    columns.unshift(...this.tableData.columnNodeDefs)
-    columns.unshift(new ColumnNodeDef(this, this.nodeDef))
+    columns.push(new ColumnNodeDef(this.tableData, this.nodeDef))
+    columns.push(...this.tableData.columnNodeDefs)
     // parent view columns
     if (this.viewDataParent) {
       columns.unshift(
@@ -59,6 +59,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
       )
     }
     return columns
+  }
+
+  get columnNodeDefNamesRead() {
+    return this.columnNodeDefs.map((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull).flat()
   }
 
   get tableData() {

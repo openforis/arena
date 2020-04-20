@@ -30,7 +30,7 @@ export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView } = DataViewRepository
+export const { createDataView, fetchViewData } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
