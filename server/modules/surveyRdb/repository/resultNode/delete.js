@@ -1,10 +1,7 @@
 import * as pgPromise from 'pg-promise'
 
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import * as ResultNodeTable from '@common/surveyRdb/resultNodeTable'
-
 import { db } from '@server/db/db'
-import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { TableRecord, TableResultNode } from '@common/model/db'
 
 /**
  * Deletes the nodes of the result node table for the specified processing chain.
@@ -15,18 +12,22 @@ import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/
  * @param {!string} params.chainUuid - The processing chain uuid.
  * @param {!pgPromise.IDatabase} client - The database client.
  */
-export const deleteNodeResultsByChainUuid = async ({ surveyId, cycle, chainUuid }, client = db) =>
-  client.query(
+export const deleteNodeResultsByChainUuid = async ({ surveyId, cycle, chainUuid }, client = db) => {
+  const tableResultNode = new TableResultNode(surveyId)
+  const tableRecord = new TableRecord(surveyId)
+
+  return client.query(
     `DELETE
     FROM
-        ${SchemaRdb.getName(surveyId)}.${ResultNodeTable.tableName}
+        ${tableResultNode}.${tableResultNode.name}
     WHERE
-        ${ResultNodeTable.colNames.processingChainUuid} = $1
-    AND ${ResultNodeTable.colNames.recordUuid} IN
+        ${TableResultNode.columnSet.chainUuid} = $1
+    AND ${TableResultNode.columnSet.recordUuid} IN
     (
-        SELECT r.uuid
-        FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
-        WHERE r.cycle = $2
+        SELECT ${tableRecord.columnUuid}
+        FROM ${tableRecord.nameFull}
+        WHERE ${tableRecord.columnCycle} = $2
     )`,
     [chainUuid, cycle]
   )
+}

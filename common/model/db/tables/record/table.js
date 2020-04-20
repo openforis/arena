@@ -18,6 +18,10 @@ export default class TableRecord extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, 'record', columnSet)
   }
+
+  get columnCycle() {
+    return super.getColumn(columnSet.cycle)
+  }
 }
 
 TableRecord.columnSet = columnSet

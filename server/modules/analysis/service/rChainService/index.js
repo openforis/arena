@@ -12,8 +12,6 @@ import * as SurveyRdbMamager from '../../../surveyRdb/manager/surveyRdbManager'
 
 import * as AnalysisManager from '../../manager'
 import * as ProcessingChainManager from '../../manager/processingChainManager'
-import * as RChainManager from '../../manager/rChainManager'
-
 import RChain from './rChain'
 
 export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
@@ -47,7 +45,7 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
     await SurveyRdbMamager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, ProcessingStep.getCalculations(step), tx)
+    const massiveInsert = new SurveyRdbMamager.MassiveInsertResultNodes(survey, step, tx)
     await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
     await massiveInsert.flush()
 
