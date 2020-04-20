@@ -1,6 +1,5 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as Survey from '../../../../../core/survey/survey'
+import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 
 import * as DataTable from '../../schemaRdb/dataTable'
 import * as DataView from '../../schemaRdb/dataView'
@@ -14,11 +13,6 @@ const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
   return {
     schemaName,
     tableName,
-    colsAndType: DataTable.getColumnNamesAndType(survey, nodeDef),
-    recordForeignKey: DataTable.getRecordForeignKey(surveyId, nodeDef),
-    parentForeignKey: DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent),
-    uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
-
     viewName: DataView.getName(nodeDef, nodeDefParent),
     viewFields: DataView.getSelectFields(survey, nodeDef, resultStepViews),
     viewFrom: `${DataView.getFromTable(survey, nodeDef)} as ${DataView.alias}`,
@@ -28,25 +22,18 @@ const toTableViewCreate = (survey, nodeDef, resultStepViews) => {
   }
 }
 
-export const createTableAndView = async (survey, nodeDef, resultStepViews, client) => {
+/**
+ * Create a nodeDef data view.
+ *
+ * @param {object} params - The query parameters.
+ * @param {Survey} params.survey - The survey.
+ * @param {NodeDef} params.nodeDef - The nodeDef to create the data view for.
+ * @param {pgPromise.IDatabase} client - The data base client.
+ *
+ * @returns {Promise<null|*>} - The result promise.
+ */
+export const createView = async ({ survey, nodeDef, resultStepViews }, client) => {
   const tableViewCreate = toTableViewCreate(survey, nodeDef, resultStepViews)
-
-  if (!NodeDef.isVirtual(nodeDef)) {
-    await client.query(`
-      CREATE TABLE
-        ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
-      (
-        id            bigint    NOT NULL GENERATED ALWAYS AS IDENTITY,
-        date_created  TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-        date_modified TIMESTAMP NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-        ${tableViewCreate.colsAndType.join(', ')},
-        ${tableViewCreate.uuidUniqueIdx},
-        ${tableViewCreate.recordForeignKey}
-        ${NodeDef.isRoot(nodeDef) ? '' : `, ${tableViewCreate.parentForeignKey}`},
-        PRIMARY KEY (id)
-      )
-    `)
-  }
 
   return client.query(`
     CREATE VIEW

@@ -39,6 +39,10 @@ export default class Table {
     return this._name
   }
 
+  set name(name) {
+    this._name = name
+  }
+
   get nameFull() {
     return `${this.schema}.${this.name} AS ${this.alias}`
   }

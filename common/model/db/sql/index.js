@@ -1,3 +1,14 @@
+export const types = {
+  uuid: 'UUID',
+  varchar: 'VARCHAR',
+  bigint: 'BIGINT',
+  decimal: `DECIMAL(${16 + 6}, 6)`,
+  date: 'DATE',
+  time: 'TIME WITHOUT TIME ZONE',
+  timeStamp: 'TIMESTAMP',
+  geometryPoint: 'geometry(Point)',
+}
+
 // Alias
 export const createAlias = (name) =>
   name

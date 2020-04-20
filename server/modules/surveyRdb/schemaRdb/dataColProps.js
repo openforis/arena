@@ -9,15 +9,14 @@ import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import { sqlTypes } from '@common/surveyRdb/sqlTypes'
-const { nodeDefType } = NodeDef
 
 import * as Point from '@core/geo/point'
 import * as GeoUtils from '@core/geo/geoUtils'
 import * as DateTimeUtils from '@core/dateUtils'
 
+const { nodeDefType } = NodeDef
+
 const colValueProcessor = 'colValueProcessor'
-const colTypeProcessor = 'colTypeProcessor'
 
 const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
   // Remove nodeDefName from col name
@@ -26,24 +25,22 @@ const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => 
   return isInProps ? NodeDef.getProp(prop)(item) : R.propOr(null, prop, item)
 }
 
-const nodeValuePropProcessor = (_survey, nodeDefCol, _nodeCol) => (node, colName) => {
+const nodeValuePropProcessor = (_survey, nodeDefCol) => (node, colName) => {
   const nodeValue = Node.getValue(node)
   return getValueFromItem(nodeDefCol, colName, nodeValue)
 }
 
 /**
- * Convert an input value to RDB compatible output value
+ * Convert an input value to RDB compatible output value.
  * The contract is such that the value output value must always be compatible with RDB.
  * In case of any errors, return NULL.
  */
 const props = {
   [nodeDefType.entity]: {
     [colValueProcessor]: () => () => Node.getUuid,
-    [colTypeProcessor]: () => () => sqlTypes.uuid,
   },
 
   [nodeDefType.integer]: {
-    [colTypeProcessor]: () => () => sqlTypes.integer,
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const value = Node.getValue(nodeCol)
       const num = NumberUtils.toNumber(value)
@@ -52,7 +49,6 @@ const props = {
   },
 
   [nodeDefType.decimal]: {
-    [colTypeProcessor]: () => () => sqlTypes.decimal,
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const value = Node.getValue(nodeCol)
       const num = NumberUtils.toNumber(value)
@@ -61,7 +57,6 @@ const props = {
   },
 
   [nodeDefType.date]: {
-    [colTypeProcessor]: () => () => sqlTypes.date,
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
       return () => (DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null)
@@ -69,7 +64,6 @@ const props = {
   },
 
   [nodeDefType.time]: {
-    [colTypeProcessor]: () => () => sqlTypes.time,
     [colValueProcessor]: (_survey, _nodeDefCol, nodeCol) => {
       const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
       return () => (DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null)
@@ -96,6 +90,7 @@ const props = {
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
       return (node, colName) =>
+        // eslint-disable-next-line no-nested-ternary
         R.endsWith('code', colName)
           ? Taxon.getCode(taxon)
           : Taxon.isUnlistedTaxon(taxon) // Scientific_name
@@ -114,23 +109,18 @@ const props = {
 
       return () => (GeoUtils.isCoordinateValid(srsCode, x, y) ? Point.newPoint(srsCode, x, y) : null)
     },
-    [colTypeProcessor]: () => () => sqlTypes.point,
   },
 
   [nodeDefType.file]: {
     [colValueProcessor]: nodeValuePropProcessor,
-    [colTypeProcessor]: () => colName => (R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar),
   },
 }
 
-export const getColValueProcessor = nodeDef =>
+export const getColValueProcessor = (nodeDef) =>
   R.propOr(
-    () => node => {
+    () => (node) => {
       return Node.isValueBlank(node) ? null : Node.getValue(node)
     },
     colValueProcessor,
-    props[NodeDef.getType(nodeDef)],
+    props[NodeDef.getType(nodeDef)]
   )
-
-export const getColTypeProcessor = nodeDef =>
-  R.propOr(_nodeDef => _colName => 'VARCHAR', colTypeProcessor, props[NodeDef.getType(nodeDef)])(nodeDef)
