@@ -1,12 +1,11 @@
-import * as R from 'ramda'
+import Job from '../../../../job/job'
 
-import Job from '@server/job/job'
+import * as Survey from '../../../../../core/survey/survey'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyRdbManager from '../../manager/surveyRdbManager'
+import * as SurveyManager from '../../../survey/manager/surveyManager'
+import * as AnalysisManager from '../../../analysis/manager'
 
 export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   constructor(params) {
@@ -17,8 +16,6 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const { surveyId, tx } = this
 
     const survey = await this.fetchSurvey()
-
-    const resultStepViewsByEntityUuid = await SurveyRdbManager.getResultStepViews(surveyId, tx)
 
     // Get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
@@ -32,12 +29,15 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       }
 
       const nodeDefName = NodeDef.getName(nodeDef)
-      const resultStepViews = R.propOr([], NodeDef.getUuid(nodeDef), resultStepViewsByEntityUuid)
+      const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
       // ===== create table and view
       this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createTable({ survey, nodeDef }, tx)
-      await SurveyRdbManager.createView({ survey, nodeDef, resultStepViews }, tx)
+      const [steps] = await Promise.all([
+        AnalysisManager.fetchSteps({ surveyId, entityUuid: nodeDefUuid, includeCalculations: true }, tx),
+        SurveyRdbManager.createDataTable({ survey, nodeDef }, tx),
+      ])
+      await SurveyRdbManager.createDataView({ survey, nodeDef, steps }, tx)
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table
