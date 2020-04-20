@@ -1,1 +1,1 @@
-export { fetchChains } from '../../repository/chain'
+export { fetchChains, fetchChainByUuid, updateChainScriptCommon } from '../../repository/chain'

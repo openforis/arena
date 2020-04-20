@@ -5,6 +5,7 @@ import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ResultStepView from '@common/surveyRdb/resultStepView'
@@ -13,7 +14,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 import * as ProcessingChainManager from '../../manager/processingChainManager'
-import * as CalculationManager from '../../manager/calculation'
+import * as AnalysisManager from '../../manager'
 import * as RChainManager from '../../manager/rChainManager'
 import RChain from './rChain'
 import RStep from './rStep'
@@ -71,13 +72,17 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
   await db.tx(async (tx) => {
     // Persist common script
     const scriptCommon = await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))
-    await ProcessingChainManager.updateChainScriptCommon(surveyId, chainUuid, scriptCommon, tx)
+    await AnalysisManager.updateChainScriptCommon(surveyId, chainUuid, scriptCommon, tx)
 
     // Persist calculation scripts
-    const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(surveyId, chainUuid, tx)
+    const chain = await AnalysisManager.fetchChainByUuid(
+      { surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true },
+      tx
+    )
+    console.log('chain', chain)
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
     await Promise.all(
-      steps.map((step) => {
+      ProcessingChain.getProcessingSteps(chain).map((step) => {
         const stepFolder = `${RChain.dirNames.user}/${RStep.getSubFolder(step)}`
         return Promise.all(
           ProcessingStep.getCalculations(step).map(async (calculation) => {
@@ -86,7 +91,7 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
             const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
             const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
             const script = await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))
-            return CalculationManager.updateCalculationScript(surveyId, calculationUuid, script, tx)
+            return AnalysisManager.updateCalculationScript(surveyId, calculationUuid, script, tx)
           })
         )
       })

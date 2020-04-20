@@ -47,6 +47,6 @@ export function getSelect(params) {
         ${this.nameFull}
     ${includeStepsAndCalculations ? this.getJoinSteps(params) : ''}
     ${cycle ? `WHERE (${this.columnProps})->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
-    ${chainUuid ? `WHERE ${this.columnUuid} = ${chainUuid}` : ''}
+    ${chainUuid ? `WHERE ${this.columnUuid} = '${chainUuid}'` : ''}
     ${includeStepsAndCalculations ? `GROUP BY ${this.columnUuid}` : ''}`
 }
