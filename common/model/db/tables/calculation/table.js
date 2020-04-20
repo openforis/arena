@@ -33,3 +33,5 @@ export default class TableCalculation extends TableSurvey {
     return this.getColumn(columnSet.index)
   }
 }
+
+TableCalculation.columnSet = columnSet

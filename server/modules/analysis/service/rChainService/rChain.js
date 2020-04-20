@@ -24,7 +24,7 @@ class RChain {
     this._chain = null
     this._serverUrl = serverUrl
 
-    this._dirNames = { user: 'user', system: 'system' }
+    this._dirNames = RChain.dirNames
     this._dir = null
     this._dirUser = null
     this._dirSystem = null
@@ -125,7 +125,7 @@ class RChain {
     await FileUtils.mkdir(this._dir)
 
     this._dirSystem = FileUtils.join(this._dir, this.dirNames.system)
-    this._dirUser = FileUtils.join(this._dir, 'user')
+    this._dirUser = FileUtils.join(this._dir, this.dirNames.user)
     this._dirResults = FileUtils.join(this.dirNames.system, 'results')
     await Promise.all([FileUtils.mkdir(this._dirSystem), FileUtils.mkdir(this._dirUser)])
   }
@@ -172,5 +172,7 @@ class RChain {
     return this
   }
 }
+
+RChain.dirNames = { user: 'user', system: 'system' }
 
 export default RChain
