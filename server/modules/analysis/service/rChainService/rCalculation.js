@@ -5,6 +5,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as StringUtils from '../../../../../core/stringUtils'
+
+import * as CalculationManager from '../../manager/calculation'
 
 import RFileCalculation from './rFile/calculation'
 import { dfVar, NA, setVar } from './rFunctions'
@@ -32,7 +35,7 @@ export default class RCalculation {
     await this.rFile.init()
 
     const { step, rChain } = this.rStep
-    const { survey } = rChain
+    const { survey, surveyId } = rChain
 
     if (ProcessingStep.hasEntity(step)) {
       const entityName = R.pipe(
@@ -47,7 +50,10 @@ export default class RCalculation {
         NodeDef.getName
       )(this.calculation)
 
-      await this.rFile.appendContent(setVar(dfVar(entityName, attributeName), NA))
+      const calculationUuid = ProcessingStepCalculation.getUuid(this.calculation)
+      const script = await CalculationManager.fetchCalculationScript({ surveyId, calculationUuid })
+      const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
+      await this.rFile.appendContent(content)
     }
 
     return this
