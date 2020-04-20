@@ -20,6 +20,7 @@ CREATE TABLE
     index                  integer NOT NULL DEFAULT 0,
     props                  jsonb   NOT NULL DEFAULT '{}'::jsonb,
     PRIMARY KEY (uuid),
+    script                 text        NULL,
     CONSTRAINT processingstep_chain_fk FOREIGN KEY (processing_chain_uuid) REFERENCES "processing_chain" ("uuid") ON DELETE CASCADE,
     CONSTRAINT processingstep_index_idx UNIQUE (processing_chain_uuid, index)
   );
