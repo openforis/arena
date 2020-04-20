@@ -1,1 +1,1 @@
-export { fetchSteps } from './read'
+export { fetchSteps, fetchStep } from './read'

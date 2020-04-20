@@ -1,1 +1,1 @@
-export { fetchSteps } from '../../repository/step'
+export { fetchSteps, fetchStep } from '../../repository/step'

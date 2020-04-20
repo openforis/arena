@@ -1,2 +1,2 @@
 export { fetchChains } from './chain'
-export { fetchSteps } from './step'
+export { fetchSteps, fetchStep } from './step'

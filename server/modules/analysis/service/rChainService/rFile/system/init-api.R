@@ -8,7 +8,7 @@ arena.parseResponse = function(resp) {
   if("error" %in% respNames){
     error <- respJson$error
   }
-  if("status" %in% respNames & respJson$status == 'error'){
+  if("status" %in% respNames && respJson$status == 'error'){
     error <- respJson$params$text
   }
   if (!is.na(error)) {
