@@ -1,12 +1,13 @@
+import Table from '../table'
 import TableSurvey from '../tableSurvey'
 import { getSelect } from './select'
 
 const columnSet = {
-  uuid: 'uuid',
+  uuid: Table.columnSetCommon.uuid,
   stepUuid: 'processing_step_uuid',
   nodeDefUuid: 'node_def_uuid',
   index: 'index',
-  props: 'props',
+  props: Table.columnSetCommon.props,
   script: 'script',
 }
 
@@ -22,10 +23,6 @@ export default class TableCalculation extends TableSurvey {
 
   get columnsNoScript() {
     return this._columnsNoScript
-  }
-
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
   }
 
   get columnStepUuid() {

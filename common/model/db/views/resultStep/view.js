@@ -1,10 +1,11 @@
 import * as Survey from '../../../../../core/survey/survey'
 import * as ProcessingStep from '../../../../analysis/processingStep'
 
+import Table from '../../tables/table'
 import TableSurveyRdbResult from '../../tables/tableSurveyRdbResult'
 
 const columnSet = {
-  uuid: 'uuid',
+  uuid: Table.columnSetCommon.uuid,
   chainUuid: 'processing_chain_uuid',
   stepUuid: 'processing_step_uuid',
   recordUuid: 'record_uuid',
@@ -29,10 +30,6 @@ export default class ViewResultStep extends TableSurveyRdbResult {
 
   get step() {
     return this._step
-  }
-
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
   }
 
   get columnChainUuid() {

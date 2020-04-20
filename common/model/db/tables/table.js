@@ -1,4 +1,14 @@
 import * as SQL from '../sql'
+
+// common column set
+const columnSetCommon = {
+  dateCreated: 'date_created',
+  dateModified: 'date_modified',
+  id: 'id',
+  props: 'props',
+  uuid: 'uuid',
+}
+
 /**
  * A database table object.
  *
@@ -24,7 +34,8 @@ export default class Table {
     this._schema = schema
     this._name = name
     this._alias = SQL.createAlias(name)
-    this._columns = SQL.addAlias(this.alias, ...Object.values(columnSet))
+    this._columnSet = columnSet
+    this._columns = SQL.addAlias(this.alias, ...Object.values(this._columnSet))
   }
 
   get schema() {
@@ -43,16 +54,16 @@ export default class Table {
     this._name = name
   }
 
-  get nameFull() {
-    return `${this.schema}.${this.name} AS ${this.alias}`
-  }
-
   get alias() {
     return this._alias
   }
 
   set alias(alias) {
     this._alias = alias
+  }
+
+  get nameFull() {
+    return `${this.schema}.${this.name} AS ${this.alias}`
   }
 
   get columns() {
@@ -62,4 +73,34 @@ export default class Table {
   getColumn(columnName) {
     return SQL.addAlias(this.alias, columnName)[0]
   }
+
+  // ======= common columns
+  _getColumnCommon(column) {
+    if (Object.values(this._columnSet).indexOf(column) < 0) {
+      throw new TypeError(`Column ${column} does not exist`)
+    }
+    return this.getColumn(column)
+  }
+
+  get columnDateCreated() {
+    return this._getColumnCommon(columnSetCommon.dateCreated)
+  }
+
+  get columnDateModified() {
+    return this._getColumnCommon(columnSetCommon.dateModified)
+  }
+
+  get columnId() {
+    return this._getColumnCommon(columnSetCommon.id)
+  }
+
+  get columnUuid() {
+    return this._getColumnCommon(columnSetCommon.uuid)
+  }
+
+  get columnProps() {
+    return this._getColumnCommon(columnSetCommon.props)
+  }
 }
+
+Table.columnSetCommon = columnSetCommon

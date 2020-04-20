@@ -1,11 +1,12 @@
+import Table from '../table'
 import TableSurvey from '../tableSurvey'
 
 const columnSet = {
-  uuid: 'uuid',
+  uuid: Table.columnSetCommon.uuid,
   ownerUuid: 'owner_uuid',
   step: 'step',
   cycle: 'cycle',
-  dateCreated: 'date_created',
+  dateCreated: Table.columnSetCommon.dateCreated,
   preview: 'preview',
   validation: 'validation',
 }
@@ -16,10 +17,6 @@ const columnSet = {
 export default class TableRecord extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, 'record', columnSet)
-  }
-
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
   }
 }
 

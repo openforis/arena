@@ -3,15 +3,16 @@ import * as R from 'ramda'
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 
+import Table from '../table'
 import TableSurveyRdb from '../tableSurveyRdb'
 import TableRecord from '../record'
 import ColumnNodeDef from './columnNodeDef'
 
 const columnSet = {
-  id: 'id',
-  dateCreated: 'date_created',
-  dateModified: 'date_modified',
-  uuid: 'uuid',
+  id: Table.columnSetCommon.id,
+  dateCreated: Table.columnSetCommon.dateCreated,
+  dateModified: Table.columnSetCommon.dateModified,
+  uuid: Table.columnSetCommon.uuid,
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
   parentUuid: 'parent_uuid',
@@ -48,22 +49,6 @@ export default class TableDataNodeDef extends TableSurveyRdb {
 
   get nodeDef() {
     return this._nodeDef
-  }
-
-  get columnId() {
-    return this.getColumn(columnSet.id)
-  }
-
-  get columnDateCreated() {
-    return this.getColumn(columnSet.dateCreated)
-  }
-
-  get columnDateModified() {
-    return this.getColumn(columnSet.dateModified)
-  }
-
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
   }
 
   get columnRecordUuid() {
