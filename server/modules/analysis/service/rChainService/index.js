@@ -72,10 +72,10 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
   await db.tx(async (tx) => {
     // Persist common script
     const scriptCommon = await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))
-    await AnalysisManager.updateChainScriptCommon(surveyId, chainUuid, scriptCommon, tx)
+    await AnalysisManager.updateChainScriptCommon({ surveyId, chainUuid, scriptCommon }, tx)
 
     // Persist calculation scripts
-    const chain = await AnalysisManager.fetchChainByUuid(
+    const chain = await AnalysisManager.fetchChain(
       { surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true },
       tx
     )
@@ -90,7 +90,7 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
             const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
             const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
             const script = await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))
-            return AnalysisManager.updateCalculationScript(surveyId, calculationUuid, script, tx)
+            return AnalysisManager.updateCalculationScript({ surveyId, calculationUuid, script }, tx)
           })
         )
       })

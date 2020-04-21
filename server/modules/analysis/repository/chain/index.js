@@ -1,3 +1,3 @@
-export { fetchChains, fetchChainByUuid } from './read'
+export { fetchChains, fetchChain } from './read'
 
 export { updateChainScriptCommon } from './update'

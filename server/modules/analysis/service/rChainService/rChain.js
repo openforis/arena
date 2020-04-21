@@ -106,7 +106,7 @@ class RChain {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
-    this._chain = await AnalysisManager.fetchChainByUuid({
+    this._chain = await AnalysisManager.fetchChain({
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
       includeScript: true,

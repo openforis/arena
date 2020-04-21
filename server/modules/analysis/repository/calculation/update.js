@@ -7,14 +7,16 @@ import { db } from '../../../../db/db'
 /**
  * Updates the script of the given processing step calculation.
  *
- * @param {!string} surveyId - The survey id.
- * @param {!string} calculationUuid - The processing step calculation uuid.
- * @param {!string} script - The script content.
+ * @param {!object} params - The query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {!string} params.calculationUuid - The processing step calculation uuid.
+ * @param {!string} params.script - The script content.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const updateCalculationScript = async (surveyId, calculationUuid, script, client = db) => {
+export const updateCalculationScript = async (params, client = db) => {
+  const { surveyId, calculationUuid, script } = params
   const table = new TableCalculation(surveyId)
 
   return client.none(
