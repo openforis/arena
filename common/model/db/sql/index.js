@@ -21,3 +21,5 @@ export const addAlias = (alias, ...columnNames) => columnNames.map((columnName) 
 // Json
 export const jsonAgg = (expression, orderByColumns = []) =>
   `json_agg(${expression}${orderByColumns.length > 0 ? ` ORDER BY ${orderByColumns.join(', ')}` : ''})`
+
+export const jsonBuildObject = (...args) => `jsonb_build_object(${args.join(', ')})`

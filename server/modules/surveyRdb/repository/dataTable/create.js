@@ -13,7 +13,7 @@ import { TableDataNodeDef } from '../../../../../common/model/db'
  *
  * @returns {Promise<null|*>} - The result promise.
  */
-export const createTable = async ({ survey, nodeDef }, client) => {
+export const createDataTable = async ({ survey, nodeDef }, client) => {
   if (NodeDef.isVirtual(nodeDef)) {
     return null
   }

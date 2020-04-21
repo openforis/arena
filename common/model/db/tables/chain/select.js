@@ -3,9 +3,6 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import * as SQL from '../../sql'
 import TableStep from '../step'
 
-/**
- *
- */
 function _getJoinSteps({ surveyId, includeScript, includeStepsAndCalculations }) {
   const selectStepsParams = {
     surveyId,

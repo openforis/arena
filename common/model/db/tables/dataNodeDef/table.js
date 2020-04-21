@@ -22,25 +22,13 @@ const columnSet = {
  * @typedef {module:arena.TableSurveyRdb} module:arena.TableDataNodeDef
  * @property {Survey} survey - The survey.
  * @property {NodeDef} nodeDef - The nodeDef table.
- * @property {ColumnNodeDef[]} nodeDefsColumn - The nodeDef columns.
+ * @property {ColumnNodeDef[]} columnNodeDefs - The nodeDef columns.
  */
 export default class TableDataNodeDef extends TableSurveyRdb {
   constructor(survey, nodeDef) {
     super(Survey.getId(survey), `data_${NodeDef.getName(nodeDef)}`, columnSet)
     this._survey = survey
     this._nodeDef = nodeDef
-    this._nodeDefsColumn = R.pipe(
-      R.ifElse(
-        NodeDef.isEntity,
-        R.pipe(
-          () => Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef))(survey),
-          R.filter(NodeDef.isSingleAttribute),
-          R.sortBy(R.ascend(R.prop('id')))
-        ),
-        R.identity // Multiple attr table
-      ),
-      R.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
-    )(nodeDef)
   }
 
   get survey() {
@@ -63,8 +51,19 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.parentUuid)
   }
 
-  get nodeDefsColumn() {
-    return this._nodeDefsColumn
+  get columnNodeDefs() {
+    return R.pipe(
+      R.ifElse(
+        NodeDef.isEntity,
+        R.pipe(
+          () => Survey.getNodeDefChildren(this.nodeDef, NodeDef.isAnalysis(this.nodeDef))(this.survey),
+          R.filter(NodeDef.isSingleAttribute),
+          R.sortBy(R.ascend(R.prop('id')))
+        ),
+        R.identity // Multiple attr table
+      ),
+      R.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
+    )(this.nodeDef)
   }
 
   getColumnsWithType() {
@@ -78,7 +77,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       `${columnSet.recordCycle}   varchar(2)  NOT NULL`,
       `${columnSet.parentUuid}    uuid            NULL`
     )
-    this.nodeDefsColumn.forEach((nodeDefColumn) => {
+    this.columnNodeDefs.forEach((nodeDefColumn) => {
       columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
     })
     return columnsAndType

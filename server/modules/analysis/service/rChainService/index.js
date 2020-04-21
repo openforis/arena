@@ -8,11 +8,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as ResultStepView from '@common/surveyRdb/resultStepView'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
+import * as AnalysisManager from '../../manager'
 import * as ProcessingChainManager from '../../manager/processingChainManager'
 import * as AnalysisManager from '../../manager'
 import * as RChainManager from '../../manager/rChainManager'
@@ -33,10 +33,8 @@ export const fetchStepData = async (surveyId, cycle, stepUuid) => {
 // ==== UPDATE
 export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
-  const [step, calculations] = await Promise.all([
-    ProcessingChainManager.fetchStepSummaryByUuid(surveyId, stepUuid),
-    ProcessingChainManager.fetchCalculationsByStepUuid(surveyId, stepUuid),
-  ])
+  const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })
+
   const entityDefStep = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
 
   const fileZip = new FileZip(filePath)
@@ -48,13 +46,12 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
     await SurveyRdbMamager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, calculations, tx)
+    const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, ProcessingStep.getCalculations(step), tx)
     await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
     await massiveInsert.flush()
 
     // refresh result step materialized view
-    const resultStepView = ResultStepView.newResultStepView(step)
-    await SurveyRdbMamager.refreshResultStepView({ surveyId, resultStepView }, tx)
+    await SurveyRdbMamager.refreshResultStepView({ survey, step }, tx)
   })
 
   fileZip.close()
