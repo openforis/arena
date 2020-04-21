@@ -13,8 +13,6 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 import * as AnalysisManager from '../../manager'
-import * as ProcessingChainManager from '../../manager/processingChainManager'
-import * as AnalysisManager from '../../manager'
 import * as RChainManager from '../../manager/rChainManager'
 import RChain from './rChain'
 import RStep from './rStep'
