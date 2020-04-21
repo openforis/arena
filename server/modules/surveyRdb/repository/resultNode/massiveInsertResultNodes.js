@@ -5,6 +5,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import { TableResultNode } from '@common/model/db'
 
 import MassiveInsert from '@server/db/massiveInsert'
+import { NA } from '@server/modules/analysis/service/rChainService/rFunctions'
 
 export default class MassiveInsertResultNodes extends MassiveInsert {
   constructor(survey, step, tx) {
@@ -30,11 +31,11 @@ export default class MassiveInsertResultNodes extends MassiveInsert {
       const nodeDefName = NodeDef.getName(nodeDef)
       const nodeDefUuid = NodeDef.getUuid(nodeDef)
       let value = rowResult[nodeDefName]
-      if (value === 'NA') value = null
+      if (value === NA) value = null
 
       const insertValue = {
-        [TableResultNode.columnSet.chainUuid]: rowResult[TableResultNode.columnSet.processingChainUuid],
-        [TableResultNode.columnSet.stepUuid]: rowResult[TableResultNode.columnSet.processingStepUuid],
+        [TableResultNode.columnSet.chainUuid]: rowResult[TableResultNode.columnSet.chainUuid],
+        [TableResultNode.columnSet.stepUuid]: rowResult[TableResultNode.columnSet.stepUuid],
         [TableResultNode.columnSet.recordUuid]: rowResult[TableResultNode.columnSet.recordUuid],
         [TableResultNode.columnSet.parentUuid]: rowResult[TableResultNode.columnSet.parentUuid],
         [TableResultNode.columnSet.nodeDefUuid]: nodeDefUuid,

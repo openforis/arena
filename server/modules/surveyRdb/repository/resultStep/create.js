@@ -62,7 +62,7 @@ export const createResultStepView = async ({ survey, step }, client = db) => {
     }
   })
 
-  return client.query(`CREATE MATERIALIZED VIEW ${viewResultStep.schema}.${viewResultStep.name} AS
+  return client.query(`CREATE MATERIALIZED VIEW ${viewResultStep.schema}."${viewResultStep.name}" AS
     SELECT ${selectFields.join(', ')}
     ${from}
     ${joins.join(' ')}

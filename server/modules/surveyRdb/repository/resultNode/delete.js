@@ -18,16 +18,16 @@ export const deleteNodeResultsByChainUuid = async ({ surveyId, cycle, chainUuid 
 
   return client.query(
     `DELETE
-    FROM
-        ${tableResultNode}.${tableResultNode.name}
-    WHERE
-        ${TableResultNode.columnSet.chainUuid} = $1
-    AND ${TableResultNode.columnSet.recordUuid} IN
-    (
-        SELECT ${tableRecord.columnUuid}
-        FROM ${tableRecord.nameFull}
-        WHERE ${tableRecord.columnCycle} = $2
-    )`,
+  FROM
+      ${tableResultNode.schema}.${tableResultNode.name}
+  WHERE
+      ${TableResultNode.columnSet.chainUuid} = $1
+  AND ${TableResultNode.columnSet.recordUuid} IN
+  (
+      SELECT ${tableRecord.columnUuid}
+      FROM ${tableRecord.nameFull}
+      WHERE ${tableRecord.columnCycle} = $2
+  )`,
     [chainUuid, cycle]
   )
 }
