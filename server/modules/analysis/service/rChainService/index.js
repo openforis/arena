@@ -1,18 +1,17 @@
-import { db } from '@server/db/db'
+import { db } from '../../../../db/db'
 
-import FileZip from '@server/utils/file/fileZip'
-import * as CSVReader from '@server/utils/file/csvReader'
+import FileZip from '../../../../utils/file/fileZip'
+import * as CSVReader from '../../../../utils/file/csvReader'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingStep from '@common/analysis/processingStep'
+import * as Survey from '../../../../../core/survey/survey'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as ProcessingStep from '../../../../../common/analysis/processingStep'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as SurveyRdbMamager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '../../../survey/manager/surveyManager'
+import * as SurveyRdbMamager from '../../../surveyRdb/manager/surveyRdbManager'
 
 import * as AnalysisManager from '../../manager'
 import * as ProcessingChainManager from '../../manager/processingChainManager'
-import * as RChainManager from '../../manager/rChainManager'
 import RChain from './rChain'
 
 export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
@@ -22,8 +21,12 @@ export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
 
 // ==== READ
 export const fetchStepData = async (surveyId, cycle, stepUuid) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
-  return RChainManager.fetchStepData(survey, cycle, stepUuid)
+  const [survey, step] = await Promise.all([
+    SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle),
+    AnalysisManager.fetchStep({ surveyId, stepUuid }),
+  ])
+  const nodeDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
+  return SurveyRdbMamager.fetchViewData({ survey, cycle, nodeDef, columnNodeDefs: true })
 }
 
 // ==== UPDATE
@@ -42,7 +45,7 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
     await SurveyRdbMamager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new RChainManager.MassiveInsertNodeResults(survey, ProcessingStep.getCalculations(step), tx)
+    const massiveInsert = new SurveyRdbMamager.MassiveInsertResultNodes(survey, step, tx)
     await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
     await massiveInsert.flush()
 
