@@ -70,11 +70,10 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
     await AnalysisManager.updateChainScriptCommon({ surveyId, chainUuid, scriptCommon }, tx)
 
     // Persist calculation scripts
-    const chain = await AnalysisManager.fetchChain(
-      { surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true },
-      tx
-    )
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
+    const [chain, survey] = await Promise.all([
+      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true }, tx),
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId),
+    ])
     await Promise.all(
       ProcessingChain.getProcessingSteps(chain).map((step) => {
         const stepFolder = `${RChain.dirNames.user}/${RStep.getSubFolder(step)}`
