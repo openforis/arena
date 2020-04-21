@@ -1,12 +1,12 @@
 arena.log <- function(step, msg, level) {
-  row1 <- paste(Sys.time(), step, sep = "     step : ")
-  cat(row1)
-
-  row2 <- paste0("\n", level)
-  row2 <- paste0(row2, ':')
-  row2 <- paste(row2, msg, sep = " ")
-  row2 <- paste(row2, '\n', sep = " ")
-  cat(row2)
+  row <- paste(
+    paste0('[', Sys.time(), ']'),
+    paste0('[', level, ']'),
+    step
+  )
+  #append message
+  row <- paste(row, msg, sep = ' - ')
+  cat(paste(row, '\n'))
 }
 
 arena.info <- function(step, msg) {
