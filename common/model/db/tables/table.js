@@ -63,7 +63,7 @@ export default class Table {
   }
 
   get nameFull() {
-    return `${this.schema}.${this.name} AS ${this.alias}`
+    return `${this.schema}."${this.name}" AS ${this.alias}`
   }
 
   get columns() {
