@@ -14,8 +14,7 @@ export default class RStep {
     this._rChain = rChain
     this._step = step
 
-    const stepIndex = padStart(ProcessingStep.getIndex(this.step) + 1)
-    this._path = FileUtils.join(this._rChain.dirUser, `step-${stepIndex}`)
+    this._path = FileUtils.join(this._rChain.dirUser, RStep.getSubFolder(step))
     this._rCalculations = []
   }
 
@@ -54,4 +53,9 @@ export default class RStep {
 
     return this
   }
+}
+
+RStep.getSubFolder = (step) => {
+  const stepIndex = padStart(ProcessingStep.getIndex(step) + 1)
+  return `step-${stepIndex}`
 }

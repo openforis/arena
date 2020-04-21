@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as StringUtils from '../../../../../core/stringUtils'
 
 import RFileCalculation from './rFile/calculation'
 import { dfVar, NA, setVar } from './rFunctions'
@@ -47,7 +48,9 @@ export default class RCalculation {
         NodeDef.getName
       )(this.calculation)
 
-      await this.rFile.appendContent(setVar(dfVar(entityName, attributeName), NA))
+      const script = ProcessingStepCalculation.getScript(this.calculation)
+      const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
+      await this.rFile.appendContent(content)
     }
 
     return this

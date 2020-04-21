@@ -5,14 +5,16 @@ import * as CSVReader from '../../../../utils/file/csvReader'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as ProcessingChain from '../../../../../common/analysis/processingChain'
 import * as ProcessingStep from '../../../../../common/analysis/processingStep'
+import * as ProcessingStepCalculation from '../../../../../common/analysis/processingStepCalculation'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 import * as SurveyRdbMamager from '../../../surveyRdb/manager/surveyRdbManager'
-
 import * as AnalysisManager from '../../manager'
-import * as ProcessingChainManager from '../../manager/processingChainManager'
+
 import RChain from './rChain'
+import RStep from './rStep'
 
 export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
   const rChain = new RChain(surveyId, cycle, chainUuid, serverUrl)
@@ -59,11 +61,36 @@ export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
 export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
+
   const entryNames = fileZip.getEntryNames()
-  const findEntry = (name) => entryNames.find((entryName) => !!entryName.match(new RegExp(`\\d{3}-${name}\\.R`)))
+
+  const findEntry = (folder, name) =>
+    entryNames.find((entryName) => new RegExp(`^${folder}\\/\\d{3}-${name}\\.R$`).test(entryName))
 
   await db.tx(async (tx) => {
-    const scriptCommon = await fileZip.getEntryAsText(findEntry('common'))
-    await ProcessingChainManager.updateChainScriptCommon(surveyId, chainUuid, scriptCommon, tx)
+    // Persist common script
+    const scriptCommon = await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))
+    await AnalysisManager.updateChainScriptCommon({ surveyId, chainUuid, scriptCommon }, tx)
+
+    // Persist calculation scripts
+    const [chain, survey] = await Promise.all([
+      AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true }, tx),
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId),
+    ])
+    await Promise.all(
+      ProcessingChain.getProcessingSteps(chain).map((step) => {
+        const stepFolder = `${RChain.dirNames.user}/${RStep.getSubFolder(step)}`
+        return Promise.all(
+          ProcessingStep.getCalculations(step).map(async (calculation) => {
+            // Persist the script of each calculation
+            const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
+            const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+            const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
+            const script = await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))
+            return AnalysisManager.updateCalculationScript({ surveyId, calculationUuid, script }, tx)
+          })
+        )
+      })
+    )
   })
 }
