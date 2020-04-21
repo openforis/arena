@@ -23,15 +23,6 @@ export const colNameRecordUuuid = 'record_uuid'
  * @deprecated - Use TableDataNodeDef.
  */
 export const colNameRecordCycle = 'record_cycle'
-/**
- * @deprecated - Use TableDataNodeDef.
- */
-export const colNameDateCreated = 'date_created'
-/**
- * @deprecated - Use TableDataNodeDef.
- */
-export const colNameDateModified = 'date_modified'
-
 // eslint-disable-next-line
 /**
  * @deprecated - Use TableDataNodeDef

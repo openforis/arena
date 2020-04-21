@@ -1,3 +1,3 @@
 export { createDataView } from './create'
 
-export { countDuplicateRecords, fetchAll, fetchRecordsCountByKeys, runCount, runSelect } from './read'
+export { countDuplicateRecords, fetchViewData, fetchRecordsCountByKeys, runCount, runSelect } from './read'
