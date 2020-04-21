@@ -9,6 +9,7 @@ export const keys = {
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
   processingStepUuid: 'processingStepUuid',
   props: ObjectUtils.keys.props,
+  script: 'script',
   temporary: ObjectUtils.keys.temporary,
 }
 
@@ -46,31 +47,32 @@ export const aggregateFn = {
 // ====== READ
 
 export const getProcessingStepUuid = R.prop(keys.processingStepUuid)
+export const getScript = R.prop(keys.script)
 
 export const getAggregateFunction = ObjectUtils.getProp(keysProps.aggregateFn)
 export const getFormula = ObjectUtils.getProp(keysProps.formula)
-export const { getNodeDefUuid } = ObjectUtils
-export const { getLabels } = ObjectUtils
-export const { getLabel } = ObjectUtils
 export const getType = ObjectUtils.getProp(keysProps.type, type.quantitative)
 
 export const isQuantitative = R.pipe(getType, R.equals(type.quantitative))
 
-export const { getIndex } = ObjectUtils
-export const { getUuid } = ObjectUtils
-export const { getProps } = ObjectUtils
-export const { getPropsDiff } = ObjectUtils
-export const { isEqual } = ObjectUtils
-
-export const { isTemporary } = ObjectUtils
+export const {
+  getNodeDefUuid,
+  getLabels,
+  getLabel,
+  getIndex,
+  getUuid,
+  getProps,
+  getPropsDiff,
+  isEqual,
+  isTemporary,
+} = ObjectUtils
 
 // ====== UPDATE
-export const { assocIndex } = ObjectUtils
+export const { assocIndex, dissocTemporary } = ObjectUtils
 export const assocProp = ObjectUtils.setProp
 export const assocNodeDefUuid = R.assoc(keys.nodeDefUuid)
-export const { dissocTemporary } = ObjectUtils
 
 // ====== UTILS
-export const getNodeDefType = R.pipe(getType, (type) => R.prop(type, nodeDefTypeByType))
+export const getNodeDefType = R.pipe(getType, (typeValue) => R.prop(typeValue, nodeDefTypeByType))
 export const getTypeByNodeDef = R.pipe(NodeDef.getType, (nodeDefType) => R.prop(nodeDefType, typeByNodeDefType))
 export const hasAggregateFunction = R.pipe(getAggregateFunction, R.isNil, R.not)

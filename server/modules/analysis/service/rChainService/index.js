@@ -79,7 +79,6 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
       { surveyId, chainUuid, includeScript: true, includeStepsAndCalculations: true },
       tx
     )
-    console.log('chain', chain)
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
     await Promise.all(
       ProcessingChain.getProcessingSteps(chain).map((step) => {

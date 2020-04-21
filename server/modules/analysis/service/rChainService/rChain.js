@@ -7,7 +7,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
-import * as ProcessingChainManager from '../../manager/processingChainManager'
+import * as AnalysisManager from '../../manager'
 
 import RStep from './rStep'
 import { RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
@@ -106,13 +106,12 @@ class RChain {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
-    this._chain = await ProcessingChainManager.fetchChainByUuid({
+    this._chain = await AnalysisManager.fetchChainByUuid({
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
       includeScript: true,
+      includeStepsAndCalculations: true,
     })
-    const steps = await ProcessingChainManager.fetchStepsAndCalculationsByChainUuid(this.surveyId, this.chainUuid)
-    this._chain = ProcessingChain.assocProcessingSteps(steps)(this._chain)
   }
 
   async _initDirs() {
