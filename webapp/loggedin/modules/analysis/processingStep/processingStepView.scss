@@ -26,7 +26,11 @@
 }
 
 .processing-step .form-item {
-  grid-template-columns: 150px .5fr;
+  grid-template-columns: 150px 400px;
+
+  .category-selector .dropdown {
+    width: 400px;
+  }
 }
 
 .processing-step .btn-close {
@@ -50,10 +54,9 @@
 }
 
 .processing-step__entity-selector-form-item.form-item {
-  grid-template-columns: 150px .5fr .1fr .15fr;
+  grid-template-columns: 150px 400px 100px 125px;
 
   .btn-add {
     justify-self: center;
   }
 }
-
