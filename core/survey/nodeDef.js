@@ -165,6 +165,11 @@ export const getLabel = (nodeDef, lang) => {
 
 export const getCycleFirst = R.pipe(getCycles, R.head)
 
+export const isDescendantOf = (nodeDefAncestor) => (nodeDef) => {
+  const hAncestor = [...getMetaHierarchy(nodeDefAncestor), getUuid(nodeDefAncestor)]
+  return R.startsWith(hAncestor, getMetaHierarchy(nodeDef))
+}
+
 // Advanced props
 export const getPropsAdvanced = R.propOr({}, keys.propsAdvanced)
 export const getPropAdvanced = (prop, defaultTo = null) =>
