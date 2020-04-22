@@ -207,7 +207,7 @@ export const fetchViewData = async (params, client = db) => {
   const columns = columnNodeDefs ? [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead] : ['*']
 
   const query = `SELECT ${columns.join(', ')} 
-    FROM ${viewDataNodeDef.nameFull}
+    FROM ${viewDataNodeDef.nameAliased}
     WHERE ${viewDataNodeDef.columnRecordCycle} = $1`
   return client.any(query, [cycle])
 }

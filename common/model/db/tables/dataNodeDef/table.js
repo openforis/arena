@@ -39,6 +39,10 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this._nodeDef
   }
 
+  get columnUuid() {
+    return this.getColumn(columnSet.uuid)
+  }
+
   get columnRecordUuid() {
     return this.getColumn(columnSet.recordUuid)
   }
@@ -86,7 +90,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   _getConstraintFk(tableReferenced, column) {
     return `CONSTRAINT ${this.name}_${tableReferenced.name}_fk 
     FOREIGN KEY (${column}) 
-    REFERENCES ${tableReferenced.schema}.${tableReferenced.name} (${columnSet.uuid}) 
+    REFERENCES ${tableReferenced.nameQualified} (${columnSet.uuid}) 
     ON DELETE CASCADE`
   }
 

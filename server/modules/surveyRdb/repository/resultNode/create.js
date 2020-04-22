@@ -18,11 +18,11 @@ export const createResultNodeTable = async ({ surveyId }, client) => {
 
   return client.query(`
     CREATE TABLE
-      ${tableResultNode.schema}.${tableResultNode.name}
+      ${tableResultNode.nameQualified}
     (
       ${columnSet.uuid}           uuid      NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-      ${columnSet.chainUuid}      uuid      NOT NULL REFERENCES ${tableChain.schema}.${tableChain.name} ("${TableChain.columnSet.uuid}") ON DELETE CASCADE,
-      ${columnSet.stepUuid}       uuid      NOT NULL REFERENCES ${tableStep.schema}.${tableStep.name} ("${TableStep.columnSet.uuid}") ON DELETE CASCADE,
+      ${columnSet.chainUuid}      uuid      NOT NULL REFERENCES ${tableChain.nameQualified} ("${TableChain.columnSet.uuid}") ON DELETE CASCADE,
+      ${columnSet.stepUuid}       uuid      NOT NULL REFERENCES ${tableStep.nameQualified} ("${TableStep.columnSet.uuid}") ON DELETE CASCADE,
       ${columnSet.recordUuid}     uuid      NOT NULL REFERENCES ${schemaSurvey}.record ("uuid") ON DELETE CASCADE,
       ${columnSet.parentUuid}     uuid          NULL REFERENCES ${schemaSurvey}.node ("uuid") ON DELETE CASCADE,
       ${columnSet.nodeDefUuid}    uuid      NOT NULL REFERENCES ${schemaSurvey}.node_def ("uuid") ON DELETE CASCADE,
