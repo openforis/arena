@@ -15,9 +15,9 @@
   }
 }
 
-.tooltip-error {
-  .processing-chain__steps-label,
-  .processing-step__calculations-label {
+.processing-chain__steps-label,
+.processing-step__calculations-label {
+  .tooltip-error {
     color: $red;
   }
 }
