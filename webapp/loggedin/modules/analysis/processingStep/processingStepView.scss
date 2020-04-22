@@ -25,6 +25,10 @@
 
 }
 
+.processing-step .form-item {
+  grid-template-columns: 150px .5fr;
+}
+
 .processing-step .btn-close {
   position: absolute;
   top: 5px;
@@ -53,6 +57,3 @@
   }
 }
 
-.processing-step__category-selector-form-item.form-item {
-  grid-template-columns: 150px .7fr;
-}
