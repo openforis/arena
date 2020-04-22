@@ -1,5 +1,3 @@
-import * as pgPromise from 'pg-promise'
-
 import { TableChain } from '../../../../../common/model/db'
 
 import { db } from '../../../../db/db'
@@ -20,11 +18,9 @@ export const updateChainScriptCommon = (params, client = db) => {
   const table = new TableChain(surveyId)
 
   return client.none(
-    `
-    UPDATE ${table.schema}.${table.name}
+    `UPDATE ${table.nameQualified}
     SET ${TableChain.columnSet.scriptCommon} = $2
-    WHERE ${TableChain.columnSet.uuid} = $1
-    `,
+    WHERE ${TableChain.columnSet.uuid} = $1`,
     [chainUuid, scriptCommon]
   )
 }

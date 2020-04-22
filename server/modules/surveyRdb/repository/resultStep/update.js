@@ -15,5 +15,5 @@ import { ViewResultStep } from '../../../../../common/model/db'
 export const refreshResultStepView = async ({ survey, step }, client = db) => {
   const viewResultStep = new ViewResultStep(survey, step)
 
-  return client.query(`REFRESH MATERIALIZED VIEW ${viewResultStep.schema}."${viewResultStep.name}"`)
+  return client.query(`REFRESH MATERIALIZED VIEW ${viewResultStep.nameQualified}`)
 }

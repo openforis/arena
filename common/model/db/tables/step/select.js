@@ -41,7 +41,7 @@ export function getSelect(params) {
   return `SELECT
         ${selectFields.join(', ')}
     FROM 
-        ${this.nameFull}
+        ${this.nameAliased}
         ${includeCalculations ? this.getJoinCalculation({ includeScript }) : ''}
         ${chainUuid ? `WHERE ${this.columnChainUuid} = ${chainUuid}` : ''}
         ${stepUuid ? `WHERE ${this.columnUuid} = ${stepUuid}` : ''}

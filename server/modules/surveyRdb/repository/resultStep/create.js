@@ -50,12 +50,12 @@ export const createResultStepView = async ({ survey, step }, client = db) => {
 
     if (i === 0) {
       selectFields.splice(0, 0, `${tableResultNode.columnParentUuid}`)
-      from = `FROM ${tableResultNode.nameFull}`
+      from = `FROM ${tableResultNode.nameAliased}`
       where = `WHERE ${conditionResultNode}`
     } else {
       const tableResultNodePrev = tableResultNodes[i - 1]
       joins.push(`
-        FULL OUTER JOIN ${tableResultNode.nameFull}
+        FULL OUTER JOIN ${tableResultNode.nameAliased}
         ON ${tableResultNode.columnStepUuid} = '${ProcessingStep.getUuid(viewResultStep.step)}'
         AND ${tableResultNode.columnParentUuid} = ${tableResultNodePrev.columnParentUuid}
         AND ${conditionResultNode}
@@ -63,7 +63,7 @@ export const createResultStepView = async ({ survey, step }, client = db) => {
     }
   })
 
-  return client.query(`CREATE MATERIALIZED VIEW ${viewResultStep.schema}."${viewResultStep.name}" AS
+  return client.query(`CREATE MATERIALIZED VIEW ${viewResultStep.nameQualified} AS
     SELECT ${selectFields.join(', ')}
     ${from}
     ${joins.join(' ')}

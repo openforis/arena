@@ -2,13 +2,13 @@ import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 
 import * as SQL from '../../../../../common/model/db/sql'
-import { ColumnNodeDef, ViewDataNodeDef, TableDataNodeDef } from '../../../../../common/model/db'
+import { ColumnNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
 
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
   viewDataNodeDef.columnNodeDefs
     .map((columnNodeDef) => {
       if (NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef)) {
-        return [`${viewDataNodeDef.tableData.alias}.${TableDataNodeDef.columnSet.uuid} AS ${columnNodeDef.name}`]
+        return [`${viewDataNodeDef.tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
       return columnNodeDef.namesFull
     })
@@ -42,10 +42,10 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
  */
 export const createDataView = async ({ survey, nodeDef, steps }, client) => {
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef, steps)
-  const { schema, name, tableData, viewDataParent, viewResultSteps, root, virtual, virtualExpression } = viewDataNodeDef
+  const { tableData, viewDataParent } = viewDataNodeDef
 
   // TODO - do not use select * from virtual entities, it includes parent_uuid column (see https://github.com/openforis/arena/issues/728)
-  const selectFields = virtual
+  const selectFields = viewDataNodeDef.virtual
     ? ['*']
     : [
         tableData.columnRecordUuid,
@@ -58,26 +58,26 @@ export const createDataView = async ({ survey, nodeDef, steps }, client) => {
       ]
 
   const query = `
-    CREATE VIEW ${schema}.${name} AS ( 
+    CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
       SELECT 
         ${selectFields.join(', ')}
       FROM 
-        ${tableData.nameFull}
+        ${tableData.nameAliased}
       ${
-        virtual || root
+        viewDataNodeDef.virtual || viewDataNodeDef.root
           ? ''
-          : `LEFT JOIN ${viewDataParent.nameFull}  
+          : `LEFT JOIN ${viewDataParent.nameAliased}  
             ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
       }
-      ${viewResultSteps
+      ${viewDataNodeDef.viewResultSteps
         .map(
           (viewResultStep) =>
-            `LEFT OUTER JOIN ${viewResultStep.nameFull}
+            `LEFT OUTER JOIN ${viewResultStep.nameAliased}
             ON ${viewResultStep.columnParentUuid} = ${tableData.columnUuid}
             `
         )
         .join('')}
-      ${virtualExpression ? `WHERE ${virtualExpression}` : ''}
+      ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
 
   return client.query(query)

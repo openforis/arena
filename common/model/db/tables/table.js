@@ -62,8 +62,12 @@ export default class Table {
     this._alias = alias
   }
 
-  get nameFull() {
-    return `${this.schema}."${this.name}" AS ${this.alias}`
+  get nameQualified() {
+    return `${this.schema}."${this.name}"`
+  }
+
+  get nameAliased() {
+    return `${this.nameQualified} AS ${this.alias}`
   }
 
   get columns() {
