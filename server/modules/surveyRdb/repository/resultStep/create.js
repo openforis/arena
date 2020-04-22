@@ -6,6 +6,7 @@ import * as ProcessingStep from '../../../../../common/analysis/processingStep'
 import * as ProcessingStepCalculation from '../../../../../common/analysis/processingStepCalculation'
 
 import { TableResultNode, ViewResultStep } from '../../../../../common/model/db'
+import * as SQL from '../../../../../common/model/db/sql'
 
 /**
  * Creates the result step materialized view.
@@ -41,10 +42,10 @@ export const createResultStepView = async ({ survey, step }, client = db) => {
     const conditionResultNode = `${tableResultNode.columnNodeDefUuid} = '${nodeDefUuid}'`
 
     if (NodeDef.isCode(nodeDef)) {
-      selectFields.push(`${tableResultNode.columnValue}->'code' AS ${nodeDefName}_code`)
-      selectFields.push(`${tableResultNode.columnValue}->'label' AS ${nodeDefName}_label`)
+      selectFields.push(`${tableResultNode.columnValue}->'code'::${SQL.types.varchar} AS ${nodeDefName}_code`)
+      selectFields.push(`${tableResultNode.columnValue}->'label'::${SQL.types.varchar} AS ${nodeDefName}_label`)
     } else {
-      selectFields.push(`${tableResultNode.columnValue} AS ${nodeDefName}`)
+      selectFields.push(`${tableResultNode.columnValue}::${SQL.types.decimal} AS ${nodeDefName}`)
     }
 
     if (i === 0) {
