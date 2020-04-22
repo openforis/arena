@@ -168,6 +168,6 @@
     }
   },
   "lint-staged": {
-    "{code,common,server,test,webapp}/{**,!(migrations)}/*.js": "eslint --cache --fix"
+    "{common,core,server,test,webapp}/{**,!(migrations)}/*.js": "eslint --cache --fix"
   }
 }
