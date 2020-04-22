@@ -1,5 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -18,36 +19,49 @@ import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/compon
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
+import * as SurveyState from '@webapp/survey/surveyState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
 import * as NodeDefState from '../nodeDefState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
-const BasicProps = props => {
+const BasicProps = (props) => {
   const {
-    surveyCycleKey,
-    nodeDef,
     validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
     editingNodeDefFromDesigner,
-
-    cyclesKeysParent,
-    displayAsEnabled,
-    displayInEnabled,
-    displayAsFormDisabled,
-    displayAsTableDisabled,
-    displayInParentPageDisabled,
-    displayInOwnPageDisabled,
-    entitySourceHierarchy,
 
     setNodeDefParentUuid,
     setNodeDefProp,
     setNodeDefLayoutProp,
   } = props
 
+  const survey = useSelector(SurveyState.getSurvey)
+  const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
+  const nodeDef = useSelector(NodeDefState.getNodeDef)
+
   const i18n = useI18n()
+
+  const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
+  const displayAsEnabled = isEntityAndNotRoot
+  const displayInEnabled = isEntityAndNotRoot
+  const displayAsFormDisabled = false
+  const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
+
+  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
+  const displayInOwnPageDisabled = false
+
+  // Survey cycles
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
+  const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
+
+  // Analysis
+  const entitySourceHierarchy = Survey.getHierarchy(
+    (nodeDefCurrent) => NodeDef.isEntity(nodeDefCurrent) && !NodeDef.isAnalysis(nodeDefCurrent),
+    true
+  )(survey)
 
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
   const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
@@ -56,12 +70,12 @@ const BasicProps = props => {
   return (
     <div className="form">
       <FormItem label={i18n.t('common.type')}>
-        <label>{nodeDef.type}</label>
+        <p>{nodeDef.type}</p>
       </FormItem>
 
       {NodeDef.isAnalysis(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
-          <Checkbox checked={true} disabled={true} />
+          <Checkbox checked disabled />
         </FormItem>
       )}
 
@@ -69,19 +83,19 @@ const BasicProps = props => {
         <Input
           value={NodeDef.getName(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-          onChange={value => setNodeDefProp(NodeDef.propKeys.name, normalizeName(value))}
+          onChange={(value) => setNodeDefProp(NodeDef.propKeys.name, normalizeName(value))}
         />
       </FormItem>
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={labels => setNodeDefProp(NodeDef.propKeys.labels, labels)}
+        onChange={(labels) => setNodeDefProp(NodeDef.propKeys.labels, labels)}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={descriptions => setNodeDefProp(NodeDef.propKeys.descriptions, descriptions)}
+        onChange={(descriptions) => setNodeDefProp(NodeDef.propKeys.descriptions, descriptions)}
       />
 
       {NodeDef.isCode(nodeDef) && (
@@ -103,17 +117,17 @@ const BasicProps = props => {
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
-            onChange={checked => setNodeDefProp(NodeDef.propKeys.key, checked)}
+            onChange={(checked) => setNodeDefProp(NodeDef.propKeys.key, checked)}
           />
         </FormItem>
       )}
 
-      {NodeDef.canNodeDefBeMultiple(nodeDef) && (
+      {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
-            onChange={checked => setNodeDefProp(NodeDef.propKeys.multiple, checked)}
+            onChange={(checked) => setNodeDefProp(NodeDef.propKeys.multiple, checked)}
           />
         </FormItem>
       )}
@@ -122,7 +136,7 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={renderType => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, renderType)}
+            onChange={(value) => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, value)}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
@@ -143,10 +157,10 @@ const BasicProps = props => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={displayIn}
-            onChange={displayIn =>
+            onChange={(value) =>
               setNodeDefLayoutProp(
                 NodeDefLayout.keys.pageUuid,
-                displayIn === NodeDefLayout.displayIn.parentPage ? null : uuidv4(),
+                value === NodeDefLayout.displayIn.parentPage ? null : uuidv4()
               )
             }
             items={[
@@ -170,7 +184,7 @@ const BasicProps = props => {
           cyclesKeysSelectable={cyclesKeysParent}
           cyclesKeysSelected={cyclesNodeDef}
           disabled={NodeDef.isRoot(nodeDef) || !editingNodeDefFromDesigner}
-          onChange={cycles => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
+          onChange={(cycles) => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
         />
       )}
 
@@ -182,7 +196,7 @@ const BasicProps = props => {
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
               lang={i18n.lang}
               validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
-              onChange={uuid => setNodeDefParentUuid(uuid)}
+              onChange={(uuid) => setNodeDefParentUuid(uuid)}
             />
           </FormItem>
           <NodeDefExpressionsProp
@@ -195,7 +209,7 @@ const BasicProps = props => {
             multiple={false}
             nodeDefUuidContext={NodeDef.getUuid(nodeDef)}
             isContextParent={false}
-            hideAdvanced={true}
+            hideAdvanced
           />
         </>
       )}
@@ -203,44 +217,15 @@ const BasicProps = props => {
   )
 }
 
-const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
-  const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
+BasicProps.propTypes = {
+  validation: PropTypes.object.isRequired,
+  nodeDefKeyEditDisabled: PropTypes.bool.isRequired,
+  nodeDefMultipleEditDisabled: PropTypes.bool.isRequired,
+  editingNodeDefFromDesigner: PropTypes.bool.isRequired,
 
-  const displayAsFormDisabled = false
-  const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
-
-  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
-  const displayInOwnPageDisabled = false
-
-  // Survey cycles
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
-  const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
-
-  // Analysis
-  const entitySourceHierarchy = Survey.getHierarchy(
-    nodeDef => NodeDef.isEntity(nodeDef) && !NodeDef.isAnalysis(nodeDef),
-    true,
-  )(survey)
-
-  return {
-    surveyCycleKey,
-
-    displayAsEnabled: isEntityAndNotRoot,
-    displayInEnabled: isEntityAndNotRoot,
-
-    displayAsFormDisabled,
-    displayAsTableDisabled,
-    displayInParentPageDisabled,
-    displayInOwnPageDisabled,
-
-    cyclesKeysParent,
-
-    entitySourceHierarchy,
-  }
+  setNodeDefParentUuid: PropTypes.func.isRequired,
+  setNodeDefProp: PropTypes.func.isRequired,
+  setNodeDefLayoutProp: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps)(BasicProps)
+export default BasicProps
