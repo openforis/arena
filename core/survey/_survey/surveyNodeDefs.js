@@ -22,7 +22,7 @@ export const getNodeDefsByUuids = (uuids = []) =>
     R.filter((nodeDef) => R.includes(NodeDef.getUuid(nodeDef), uuids))
   )
 
-const getNodeDefSource = (nodeDef) =>
+export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
 export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
