@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .survey-hierarchy {
   display: grid;
@@ -21,12 +21,11 @@
   }
 
   .node {
-
     a {
       cursor: pointer;
-      font-size: .8rem;
+      font-size: 0.8rem;
       letter-spacing: 0;
-      padding: .2rem .5rem;
+      padding: 0.2rem 0.5rem;
       text-overflow: ellipsis;
       overflow: hidden;
       line-height: 1.5;
@@ -44,19 +43,19 @@
     transition: background-color 1s ease;
     background-color: white;
     height: 38px;
-    
+
     .btn {
       transform: rotate(-90deg);
-      padding: .3rem;
-      margin-right: .2rem;
-    }
-
-    &.highlight {
-      background-color: $blueLightActive;
+      padding: 0.3rem;
+      margin-right: 0.2rem;
     }
 
     &.node-virtual {
       background-color: $grey;
+    }
+
+    &.highlight {
+      background-color: $blueLightActive;
     }
   }
 
@@ -65,5 +64,4 @@
     stroke: $blueLightActive;
     stroke-width: 1px;
   }
-
 }

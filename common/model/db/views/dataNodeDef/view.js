@@ -24,13 +24,16 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     this._virtual = NodeDef.isVirtual(this.nodeDef)
     this._root = NodeDef.isRoot(this.nodeDef)
 
-    const nodeDefParent = Survey.getNodeDefParent(this.nodeDef)(this.survey)
-    this._tableData = this._virtual
-      ? new ViewDataNodeDef(this.survey, nodeDefParent)
-      : new TableDataNodeDef(this.survey, this.nodeDef)
+    if (this._virtual) {
+      const nodeDefSource = Survey.getNodeDefSource(this.nodeDef)(this.survey)
+      this._tableData = new ViewDataNodeDef(this.survey, nodeDefSource)
+    } else {
+      this._tableData = new TableDataNodeDef(this.survey, this.nodeDef)
+    }
 
     this._viewDataParent = null
     if (!this._root && !this._virtual) {
+      const nodeDefParent = Survey.getNodeDefParent(this.nodeDef)(this.survey)
       this._viewDataParent = new ViewDataNodeDef(this.survey, nodeDefParent)
     }
 
