@@ -11,12 +11,12 @@ import { useSurvey } from '@webapp/commonComponents/hooks'
 
 const AttributesSelector = (props) => {
   const {
-    nodeDefUuidEntity,
+    canSelectAttributes,
+    filterTypes,
     lang,
+    nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
-    filterTypes,
-    canSelectAttributes,
     showAncestors,
     showMultipleAttributes,
   } = props
@@ -91,7 +91,7 @@ AttributesSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
   filterTypes: PropTypes.array,
   lang: PropTypes.string.isRequired,
-  nodeDefUuidEntity: PropTypes.string.isRequired,
+  nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
@@ -101,6 +101,7 @@ AttributesSelector.propTypes = {
 AttributesSelector.defaultProps = {
   canSelectAttributes: true,
   filterTypes: [],
+  nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
   showAncestors: true,
   showMultipleAttributes: true,
