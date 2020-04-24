@@ -1,52 +1,17 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import * as PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefUIProps'
 
-const AttributeSelector = props => {
+import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+
+import { useSurvey } from '@webapp/commonComponents/hooks'
+
+const AttributesSelector = (props) => {
   const {
-    nodeDefContext,
-    nodeDef,
-    lang,
-    nodeDefUuidsAttributes,
-    onToggleAttribute,
-    filterTypes,
-    canSelectAttributes,
-    showMultipleAttributes,
-  } = props
-
-  const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
-  const isVisible =
-    (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
-    (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
-
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefType = NodeDef.getType(nodeDef)
-  const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
-
-  return (
-    isVisible && (
-      <button
-        className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
-        onClick={() => onToggleAttribute(nodeDefUuid)}
-        disabled={!canSelectAttributes}
-      >
-        {NodeDef.getLabel(nodeDef, lang)}
-        {NodeDefUiProps.getIconByType(nodeDefType)}
-      </button>
-    )
-  )
-}
-
-const AttributesSelector = props => {
-  const {
-    nodeDefContext,
-    nodeDefParent,
-    childDefs,
+    nodeDefUuidEntity,
     lang,
     nodeDefUuidsAttributes,
     onToggleAttribute,
@@ -56,28 +21,57 @@ const AttributesSelector = props => {
     showMultipleAttributes,
   } = props
 
+  const survey = useSurvey()
+  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
+
+  let childDefs = []
+  if (nodeDefContext) {
+    childDefs = NodeDef.isEntity(nodeDefContext)
+      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
+      : [nodeDefContext] // Multiple attribute
+  }
+
+  const AttributeSelector = ({ nodeDef }) => {
+    const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
+    const isVisible =
+      (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
+      (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
+
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const nodeDefType = NodeDef.getType(nodeDef)
+    const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
+
+    return (
+      isVisible && (
+        <button
+          type="button"
+          className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
+          onClick={() => onToggleAttribute(nodeDefUuid)}
+          disabled={!canSelectAttributes}
+        >
+          {NodeDef.getLabel(nodeDef, lang)}
+          {NodeDefUiProps.getIconByType(nodeDefType)}
+        </button>
+      )
+    )
+  }
+
+  AttributeSelector.propTypes = {
+    nodeDef: PropTypes.object.isRequired,
+  }
+
   return (
     childDefs && (
       <>
-        {!NodeDef.isVirtual(nodeDefContext) &&
-          childDefs.map((childDef, i) => (
-            <AttributeSelector
-              key={i}
-              nodeDefContext={nodeDefContext}
-              nodeDef={childDef}
-              lang={lang}
-              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-              onToggleAttribute={onToggleAttribute}
-              filterTypes={filterTypes}
-              canSelectAttributes={canSelectAttributes}
-              showMultipleAttributes={showMultipleAttributes}
-            />
-          ))}
+        {childDefs.map((childDef) => (
+          <AttributeSelector key={NodeDef.getUuid(childDef)} nodeDef={childDef} />
+        ))}
 
         {showAncestors && nodeDefParent && (
-          <React.Fragment>
+          <>
             <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
-            <AttributesSelectorConnect
+            <AttributesSelector
               lang={lang}
               nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
               nodeDefUuidsAttributes={nodeDefUuidsAttributes}
@@ -86,42 +80,30 @@ const AttributesSelector = props => {
               canSelectAttributes={canSelectAttributes}
               showMultipleAttributes={showMultipleAttributes}
             />
-          </React.Fragment>
+          </>
         )}
       </>
     )
   )
 }
 
+AttributesSelector.propTypes = {
+  canSelectAttributes: PropTypes.bool,
+  filterTypes: PropTypes.array,
+  lang: PropTypes.string.isRequired,
+  nodeDefUuidEntity: PropTypes.string.isRequired,
+  nodeDefUuidsAttributes: PropTypes.array,
+  onToggleAttribute: PropTypes.func.isRequired,
+  showAncestors: PropTypes.bool,
+  showMultipleAttributes: PropTypes.bool,
+}
+
 AttributesSelector.defaultProps = {
-  nodeDefUuidEntity: '',
-  nodeDefUuidsAttributes: [],
-  lang: null,
-  onToggleAttribute: null,
-  filterTypes: [],
   canSelectAttributes: true,
+  filterTypes: [],
+  nodeDefUuidsAttributes: [],
   showAncestors: true,
   showMultipleAttributes: true,
 }
 
-const mapStateToProps = (state, props) => {
-  const { nodeDefUuidEntity } = props
-
-  const survey = SurveyState.getSurvey(state)
-  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
-  const childDefs = nodeDefContext
-    ? NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
-      : [nodeDefContext] // Multiple attribute
-    : []
-
-  return {
-    nodeDefContext,
-    nodeDefParent,
-    childDefs,
-  }
-}
-
-const AttributesSelectorConnect = connect(mapStateToProps)(AttributesSelector)
-export default AttributesSelectorConnect
+export default AttributesSelector
