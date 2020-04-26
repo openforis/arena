@@ -31,38 +31,36 @@ const AttributesSelector = (props) => {
   }
 
   return (
-    childDefs && (
-      <>
-        {childDefs.map((childDef) => (
-          <AttributeSelector
-            key={NodeDef.getUuid(childDef)}
-            canSelectAttributes={canSelectAttributes}
-            filterTypes={filterTypes}
+    <>
+      {childDefs.map((childDef) => (
+        <AttributeSelector
+          key={NodeDef.getUuid(childDef)}
+          canSelectAttributes={canSelectAttributes}
+          filterTypes={filterTypes}
+          lang={lang}
+          nodeDef={childDef}
+          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          nodeDefContext={nodeDefContext}
+          onToggleAttribute={onToggleAttribute}
+          showMultipleAttributes={showMultipleAttributes}
+        />
+      ))}
+
+      {showAncestors && nodeDefParent && (
+        <>
+          <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
+          <AttributesSelector
             lang={lang}
-            nodeDef={childDef}
+            nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
             nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            nodeDefContext={nodeDefContext}
             onToggleAttribute={onToggleAttribute}
+            filterTypes={filterTypes}
+            canSelectAttributes={canSelectAttributes}
             showMultipleAttributes={showMultipleAttributes}
           />
-        ))}
-
-        {showAncestors && nodeDefParent && (
-          <>
-            <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
-            <AttributesSelector
-              lang={lang}
-              nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
-              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-              onToggleAttribute={onToggleAttribute}
-              filterTypes={filterTypes}
-              canSelectAttributes={canSelectAttributes}
-              showMultipleAttributes={showMultipleAttributes}
-            />
-          </>
-        )}
-      </>
-    )
+        </>
+      )}
+    </>
   )
 }
 
