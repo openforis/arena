@@ -18,7 +18,7 @@ const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, fi
 
 const propsUI = {
   [integer]: {
-    icon: <span className="icon-left node_def__icon">923</span>,
+    icon: <span className="icon-left node_def__icon">123</span>,
     inputText: {
       mask: InputMasks.integerLimited(16),
     },
@@ -26,7 +26,7 @@ const propsUI = {
   },
 
   [decimal]: {
-    icon: <span className="icon-left node_def__icon">923,4</span>,
+    icon: <span className="icon-left node_def__icon">1.23</span>,
     inputText: {
       mask: InputMasks.decimalLimited(16, 6),
     },
@@ -36,7 +36,7 @@ const propsUI = {
   [text]: {
     icon: (
       <span className="icon-left display-flex">
-        {R.range(0, 3).map(i => (
+        {R.range(0, 3).map((i) => (
           <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
         ))}
       </span>
@@ -74,7 +74,7 @@ const propsUI = {
     component: NodeDefCode,
     icon: <span className="icon icon-list icon-left" />,
     defaultValue: '',
-    defaultProps: cycle => ({
+    defaultProps: (cycle) => ({
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox),
     }),
   },
@@ -118,14 +118,15 @@ const propsUI = {
   [entity]: {
     component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left" />,
-    defaultProps: cycle => ({
+    defaultProps: (cycle) => ({
       [NodeDef.propKeys.multiple]: true,
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
     }),
   },
 }
 
-const getPropByType = (prop, defaultValue = null) => nodeDefType => R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+const getPropByType = (prop, defaultValue = null) => (nodeDefType) =>
+  R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
 const getProp = (prop, defaultValue) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
