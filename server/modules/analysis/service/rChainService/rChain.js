@@ -10,7 +10,14 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as AnalysisManager from '../../manager'
 
 import RStep from './rStep'
-import { RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
+import {
+  RFileClose,
+  RFileInit,
+  RFileReadCategories,
+  RFileLogin,
+  RFilePersistResults,
+  RFileReadData,
+} from './rFile/system'
 import { RFileCommon } from './rFile/user'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -37,6 +44,7 @@ class RChain {
     this._fileInit = null
     this._fileLogin = null
     this._fileReadData = null
+    this._fileReadCategories = null
     this._filePersistResults = null
     this._fileClose = null
     // User files
@@ -143,6 +151,7 @@ class RChain {
     this._fileInit = await new RFileInit(this).init()
     this._fileLogin = await new RFileLogin(this).init()
     this._fileReadData = await new RFileReadData(this).init()
+    this._fileReadCategories = await new RFileReadCategories(this).init()
 
     // Init user files
     this._fileCommon = await new RFileCommon(this).init()

@@ -4,7 +4,7 @@ import * as Node from '@core/record/node'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import { ColumnNodeDef, TableResultNode, ViewDataNodeDef } from '@common/model/db'
-import * as RFileReadData from './rFileReadData'
+import * as RFileInitCategories from './rFileReadCategories'
 import { dfVar, setVar, sqldf } from '../../rFunctions'
 
 /**
@@ -92,7 +92,7 @@ export default class DfResults {
         const dfNodeVar = dfVar(this.name, nodeVarName)
         const dfNodeTmpVar = dfVar(this.name, nodeTmpVarName)
         const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
-        const dfCategory = RFileReadData.getDfCategoryItems(category)
+        const dfCategory = RFileInitCategories.getDfCategoryItems(category)
 
         // copy code value into temp variable
         this.scripts.push(setVar(dfNodeTmpVar, dfNodeVar))
