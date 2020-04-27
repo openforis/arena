@@ -10,14 +10,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as AnalysisManager from '../../manager'
 
 import RStep from './rStep'
-import {
-  RFileClose,
-  RFileInit,
-  RFileReadCategories,
-  RFileLogin,
-  RFilePersistResults,
-  RFileReadData,
-} from './rFile/system'
+import { ListCategories, RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
 import { RFileCommon } from './rFile/user'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -44,11 +37,13 @@ class RChain {
     this._fileInit = null
     this._fileLogin = null
     this._fileReadData = null
-    this._fileReadCategories = null
     this._filePersistResults = null
     this._fileClose = null
     // User files
     this._fileCommon = null
+
+    // Categories
+    this._listCategories = null
 
     this._counter = new Counter()
     this._rSteps = []
@@ -110,6 +105,10 @@ class RChain {
     return this._counter.increment()
   }
 
+  get listCategories() {
+    return this._listCategories
+  }
+
   async _initSurveyAndChain() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
@@ -151,7 +150,10 @@ class RChain {
     this._fileInit = await new RFileInit(this).init()
     this._fileLogin = await new RFileLogin(this).init()
     this._fileReadData = await new RFileReadData(this).init()
-    this._fileReadCategories = await new RFileReadCategories(this).init()
+
+    // Init categories
+    this._listCategories = new ListCategories(this)
+    await this._fileReadData.appendContent(...this._listCategories.scripts)
 
     // Init user files
     this._fileCommon = await new RFileCommon(this).init()

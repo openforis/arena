@@ -4,8 +4,7 @@ import * as Node from '@core/record/node'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import { ColumnNodeDef, TableResultNode, ViewDataNodeDef } from '@common/model/db'
-import * as RFileInitCategories from './rFileReadCategories'
-import { dfVar, setVar, sqldf } from '../../rFunctions'
+import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
 
 /**
  * Class that models a data frame step results.
@@ -92,13 +91,17 @@ export default class DfResults {
         const dfNodeVar = dfVar(this.name, nodeVarName)
         const dfNodeTmpVar = dfVar(this.name, nodeTmpVarName)
         const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
-        const dfCategory = RFileInitCategories.getDfCategoryItems(category)
 
         // copy code value into temp variable
         this.scripts.push(setVar(dfNodeTmpVar, dfNodeVar))
-        // remove code variable from data frame
 
+        // remove code variable from data frame
         this.scripts.push(setVar(dfNodeVar, `NULL`))
+
+        // copy category data frame into temp variable
+        const categoryTempVar = 'category'
+        const dfCategory = this.rChain.listCategories.getDfCategoryItems(category)
+        this.scripts.push(setVar(categoryTempVar, dfCategory))
 
         // join with category data frame to create json code value
         const query = `
@@ -106,10 +109,13 @@ export default class DfResults {
                 r.*,
                 "{""${Node.valuePropKeys.itemUuid}"": """ || c.uuid || """, ""${Node.valuePropKeys.code}"": """ || c.code || """, ""${Node.valuePropKeys.label}"": """ || c.label || """}" AS ${nodeVarName}
             FROM ${this.name} r
-            LEFT OUTER JOIN ${dfCategory} c
+            LEFT OUTER JOIN ${categoryTempVar} c
             ON r.${nodeTmpVarName} = c.code  
         `
         this.scripts.push(setVar(this.name, sqldf(query)))
+
+        // remove temp category variable
+        this.scripts.push(rm(categoryTempVar))
 
         // remove tmp var
         this.scripts.push(setVar(dfNodeTmpVar, `NULL`))

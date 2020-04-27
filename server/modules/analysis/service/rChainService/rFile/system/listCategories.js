@@ -1,6 +1,5 @@
 import * as R from 'ramda'
 
-import * as PromiseUtils from '@core/promiseUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
@@ -9,36 +8,51 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 import * as ApiRoutes from '@common/apiRoutes'
 
-import RFileSystem from './rFileSystem'
-import { dfVar, setVar, arenaGet } from '../../rFunctions'
+import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
-const dfCategories = 'categories'
-export const getDfCategoryItems = (category) => dfVar(dfCategories, Category.getName(category))
-
-export default class RFileReadCategories extends RFileSystem {
+export default class ListCategories {
   constructor(rChain) {
-    super(rChain, 'read-categories')
+    this._rChain = rChain
+    this._scripts = []
+    this._name = 'categories'
+
+    this.initList()
   }
 
-  async initCategory(categoryUuid) {
+  get rChain() {
+    return this._rChain
+  }
+
+  get name() {
+    return this._name
+  }
+
+  get scripts() {
+    return this._scripts
+  }
+
+  getDfCategoryItems(category) {
+    return dfVar(this.name, Category.getName(category))
+  }
+
+  initCategory(categoryUuid) {
     const { survey } = this.rChain
     const language = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
 
     const category = Survey.getCategoryByUuid(categoryUuid)(survey)
 
-    const dfCategoryItems = getDfCategoryItems(category)
+    const dfCategoryItems = this.getDfCategoryItems(category)
     const getCategoryItems = arenaGet(ApiRoutes.rChain.categoryItemsData(Survey.getId(survey), categoryUuid), {
       language: `'${language}'`,
     })
 
-    await this.appendContent(setVar(dfCategoryItems, getCategoryItems))
+    this.scripts.push(setVar(dfCategoryItems, getCategoryItems))
   }
 
-  async init() {
-    await super.init()
-
+  initList() {
     const { survey, chain } = this.rChain
 
+    // Get unique category uuids from processing step calculations
     const categoryUuids = new Set()
     ProcessingChain.getProcessingSteps(chain).forEach((step) => {
       const calculations = ProcessingStep.getCalculations(step)
@@ -51,10 +65,8 @@ export default class RFileReadCategories extends RFileSystem {
     })
 
     // Init categories named list
-    await this.appendContent(setVar(dfCategories, 'list()'))
-    // Fetch category items
-    await PromiseUtils.each(Array.from(categoryUuids), (categoryUuid) => this.initCategory(categoryUuid))
-
-    return this
+    this.scripts.push(setVar(this.name, 'list()'))
+    // Init categories
+    categoryUuids.forEach((categoryUuid) => this.initCategory(categoryUuid))
   }
 }
