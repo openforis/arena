@@ -17,11 +17,13 @@ import * as RecordRepository from '@server/modules/record/repository/recordRepos
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as RdbDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
+import * as ResultNodeRepository from '../repository/resultNode'
 
 // ==== DDL
 
@@ -100,22 +102,35 @@ export const queryTable = async (
       rows.map(async (row) => {
         const recordUuid = row[DataTable.colNameRecordUuuid]
         const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
-        const parentNodeUuid = R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
+        const parentNodeUuid = R.prop(RdbDataView.getColUuid(nodeDefTable), row)
         const resultRow = { ...row, cols: {}, record, parentNodeUuid }
 
         // Assoc nodes to each columns
         await PromiseUtils.each(nodeDefUuidCols, async (nodeDefUuidCol) => {
           const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
           const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
-          const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
+          const parentUuidColName = RdbDataView.getColUuid(nodeDefColParent)
           const parentUuid = R.prop(parentUuidColName, row)
 
-          const node =
-            NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // Column is the multiple attribute
-              ? await NodeRepository.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefCol)}_uuid`])
-              : (
-                  await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
-                )[0]
+          let node = null
+          if (NodeDef.isAnalysis(nodeDefCol)) {
+            // Fetch node from node results table
+            node = R.head(
+              await ResultNodeRepository.fetchNodeResultsByRecordAndNodeDefUuid({
+                surveyId,
+                recordUuid,
+                parentUuid,
+                nodeDefUuid: nodeDefUuidCol,
+              })
+            )
+          } else if (NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable)) {
+            // Column is the multiple attribute
+            node = await NodeRepository.fetchNodeByUuid(surveyId, row[RdbDataView.getColUuid(nodeDefCol)])
+          } else {
+            node = R.head(
+              await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
+            )
+          }
 
           resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
         })

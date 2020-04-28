@@ -1,77 +1,76 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import * as Authorizer from '@core/auth/authorizer'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as AppState from '@webapp/app/appState'
-import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
+import { useAuthCanEditRecord, useSurveyCycleKey, useSurveyInfo } from '@webapp/commonComponents/hooks'
 
-import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
+import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
-class TableColumnEdit extends React.Component {
-  render() {
-    const {
-      surveyInfo,
-      surveyCycleKey,
-      canEditRecord,
-      nodeDef,
-      record,
-      cell,
-      updateNode,
-      removeNode,
-      createNodePlaceholder,
-    } = this.props
+import {
+  createNodePlaceholder as createNodePlaceholderAction,
+  removeNode as removeNodeAction,
+  updateNode as updateNodeAction,
+} from '@webapp/loggedin/surveyViews/record/actions'
 
-    if (cell) {
-      const { parentUuid, node } = cell
+const TableColumnEdit = (props) => {
+  const { nodeDef, record, cell, updateNode, removeNode, createNodePlaceholder } = props
 
-      const parentNode = {
-        [Node.keys.recordUuid]: Record.getUuid(record),
-        [Node.keys.parentUuid]: parentUuid,
-      }
+  const surveyInfo = useSurveyInfo()
+  const surveyCycleKey = useSurveyCycleKey()
+  const canEditRecord = useAuthCanEditRecord(record)
 
-      return (
-        <NodeDefTableCellBody
-          surveyInfo={surveyInfo}
-          surveyCycleKey={surveyCycleKey}
-          nodeDef={nodeDef}
-          parentNode={parentNode}
-          nodes={[node]}
-          entry={true}
-          entryDataQuery={true}
-          edit={false}
-          renderType={NodeDefLayout.renderType.tableBody}
-          canEditRecord={canEditRecord}
-          updateNode={updateNode}
-          removeNode={removeNode}
-          createNodePlaceholder={createNodePlaceholder}
-          windowed={false}
-        />
-      )
+  if (cell) {
+    const { parentUuid, node } = cell
+
+    const parentNode = {
+      [Node.keys.recordUuid]: Record.getUuid(record),
+      [Node.keys.parentUuid]: parentUuid,
     }
 
-    return null
+    return (
+      <NodeDefTableCellBody
+        surveyInfo={surveyInfo}
+        surveyCycleKey={surveyCycleKey}
+        nodeDef={nodeDef}
+        parentNode={parentNode}
+        nodes={[node]}
+        entry
+        entryDataQuery
+        edit={false}
+        renderType={NodeDefLayout.renderType.tableBody}
+        canEditRecord={canEditRecord}
+        updateNode={updateNode}
+        removeNode={removeNode}
+        createNodePlaceholder={createNodePlaceholder}
+        readOnly={NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef)}
+        windowed={false}
+      />
+    )
   }
+
+  return null
 }
 
-const mapStateToProps = (state, props) => {
-  const { record } = props
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = AppState.getUser(state)
-
-  return {
-    surveyInfo,
-    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-    canEditRecord: Authorizer.canEditRecord(user, record),
-  }
+TableColumnEdit.propTypes = {
+  nodeDef: PropTypes.object.isRequired,
+  record: PropTypes.object.isRequired,
+  cell: PropTypes.object,
+  updateNode: PropTypes.func.isRequired,
+  removeNode: PropTypes.func.isRequired,
+  createNodePlaceholder: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, {
-  updateNode,
-  removeNode,
-  createNodePlaceholder,
+TableColumnEdit.defaultProps = {
+  cell: null,
+}
+
+export default connect(null, {
+  updateNode: updateNodeAction,
+  removeNode: removeNodeAction,
+  createNodePlaceholder: createNodePlaceholderAction,
 })(TableColumnEdit)
