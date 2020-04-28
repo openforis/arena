@@ -109,7 +109,7 @@ class RChain {
     return this._listCategories
   }
 
-  async _initSurveyChainAndCategories() {
+  async _initSurveyAndChain() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
@@ -170,7 +170,7 @@ class RChain {
   }
 
   async init() {
-    await this._initSurveyChainAndCategories()
+    await this._initSurveyAndChain()
     await this._initDirs()
     await this._initFiles()
     await this._initSteps()
