@@ -26,24 +26,32 @@ export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
 export const getNodeDefChildren = (nodeDef, includeAnalysis = false) => (survey) => {
+  const children = []
   if (NodeDef.isVirtual(nodeDef)) {
     // If nodeDef is virtual, get children from its source
     const entitySource = getNodeDefSource(nodeDef)(survey)
-    return getNodeDefChildren(entitySource, includeAnalysis)(survey)
+    children.push(...getNodeDefChildren(entitySource, includeAnalysis)(survey))
   }
 
-  return R.pipe(
-    getNodeDefsArray,
-    R.filter((nodeDefCurrent) => {
-      if (NodeDef.isAnalysis(nodeDefCurrent) && !includeAnalysis) {
-        return false
-      }
-      const nodeDefContext = NodeDef.isVirtual(nodeDefCurrent)
-        ? getNodeDefSource(nodeDefCurrent)(survey)
-        : nodeDefCurrent
-      return NodeDef.getParentUuid(nodeDefContext) === NodeDef.getUuid(nodeDef)
-    })
-  )(survey)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  children.push(
+    ...R.pipe(
+      getNodeDefsArray,
+      R.filter((nodeDefCurrent) => {
+        if (NodeDef.isAnalysis(nodeDefCurrent) && !includeAnalysis) {
+          return false
+        }
+        if (NodeDef.isVirtual(nodeDefCurrent)) {
+          // Include virtual entities having their source as a child of the given entity
+          const entitySource = getNodeDefSource(nodeDefCurrent)(survey)
+          return NodeDef.getParentUuid(entitySource) === nodeDefUuid
+        }
+        // "natural" child
+        return NodeDef.getParentUuid(nodeDefCurrent) === nodeDefUuid
+      })
+    )(survey)
+  )
+  return children
 }
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {

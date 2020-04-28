@@ -1,18 +1,20 @@
 import './surveyHierarchyView.scss'
 
 import React, { useEffect, useState, useRef } from 'react'
-import { connect } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { useI18n, useSurvey } from '@webapp/commonComponents/hooks'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Tree from './surveyHierarchyTree'
 
-const SurveyHierarchyView = props => {
-  const { lang, hierarchy } = props
+const SurveyHierarchyView = () => {
+  const i18n = useI18n()
+  const survey = useSurvey()
+
+  const { lang } = i18n
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)
@@ -35,7 +37,10 @@ const SurveyHierarchyView = props => {
         <NodeDefsSelectorView
           hierarchy={hierarchy}
           nodeDefUuidEntity={selectedNodeDefUuid}
-          onChangeEntity={nodeDefUuidEntity => tree.expandToNode(nodeDefUuidEntity)}
+          onChangeEntity={(nodeDefUuidEntity) => {
+            tree.expandToNode(nodeDefUuidEntity)
+            setSelectedNodeDefUuid(nodeDefUuidEntity)
+          }}
           canSelectAttributes={false}
           showAncestors={false}
         />
@@ -44,15 +49,4 @@ const SurveyHierarchyView = props => {
   )
 }
 
-const mapStateToProps = state => {
-  const lang = AppState.getLang(state)
-  const survey = SurveyState.getSurvey(state)
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
-
-  return {
-    lang,
-    hierarchy,
-  }
-}
-
-export default connect(mapStateToProps)(SurveyHierarchyView)
+export default SurveyHierarchyView

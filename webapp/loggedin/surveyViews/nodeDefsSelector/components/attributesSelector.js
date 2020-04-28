@@ -1,127 +1,87 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import * as R from 'ramda'
+import * as PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefUIProps'
 
-const AttributeSelector = props => {
+import { useSurvey } from '@webapp/commonComponents/hooks'
+import AttributeSelector from './attributeSelector'
+
+const AttributesSelector = (props) => {
   const {
-    nodeDefContext,
-    nodeDef,
+    canSelectAttributes,
+    filterTypes,
     lang,
+    nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
-    filterTypes,
-    canSelectAttributes,
-    showMultipleAttributes,
-  } = props
-
-  const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
-  const isVisible =
-    (isAttributeFn(nodeDef) || NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
-    (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
-
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefType = NodeDef.getType(nodeDef)
-  const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
-
-  return (
-    isVisible && (
-      <button
-        className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
-        onClick={() => onToggleAttribute(nodeDefUuid)}
-        disabled={!canSelectAttributes}
-      >
-        {NodeDef.getLabel(nodeDef, lang)}
-        {NodeDefUiProps.getIconByType(nodeDefType)}
-      </button>
-    )
-  )
-}
-
-const AttributesSelector = props => {
-  const {
-    nodeDefContext,
-    nodeDefParent,
-    childDefs,
-    lang,
-    nodeDefUuidsAttributes,
-    onToggleAttribute,
-    filterTypes,
-    canSelectAttributes,
     showAncestors,
     showMultipleAttributes,
   } = props
 
-  return (
-    childDefs && (
-      <>
-        {!NodeDef.isVirtual(nodeDefContext) &&
-          childDefs.map((childDef, i) => (
-            <AttributeSelector
-              key={i}
-              nodeDefContext={nodeDefContext}
-              nodeDef={childDef}
-              lang={lang}
-              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-              onToggleAttribute={onToggleAttribute}
-              filterTypes={filterTypes}
-              canSelectAttributes={canSelectAttributes}
-              showMultipleAttributes={showMultipleAttributes}
-            />
-          ))}
+  const survey = useSurvey()
+  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
 
-        {showAncestors && nodeDefParent && (
-          <React.Fragment>
-            <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
-            <AttributesSelectorConnect
-              lang={lang}
-              nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
-              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-              onToggleAttribute={onToggleAttribute}
-              filterTypes={filterTypes}
-              canSelectAttributes={canSelectAttributes}
-              showMultipleAttributes={showMultipleAttributes}
-            />
-          </React.Fragment>
-        )}
-      </>
-    )
+  let childDefs = []
+  if (nodeDefContext) {
+    childDefs = NodeDef.isEntity(nodeDefContext)
+      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
+      : [nodeDefContext] // Multiple attribute
+  }
+
+  return (
+    <>
+      {childDefs.map((childDef) => (
+        <AttributeSelector
+          key={NodeDef.getUuid(childDef)}
+          canSelectAttributes={canSelectAttributes}
+          filterTypes={filterTypes}
+          lang={lang}
+          nodeDef={childDef}
+          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          nodeDefContext={nodeDefContext}
+          onToggleAttribute={onToggleAttribute}
+          showMultipleAttributes={showMultipleAttributes}
+        />
+      ))}
+
+      {showAncestors && nodeDefParent && (
+        <>
+          <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
+          <AttributesSelector
+            lang={lang}
+            nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
+            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+            onToggleAttribute={onToggleAttribute}
+            filterTypes={filterTypes}
+            canSelectAttributes={canSelectAttributes}
+            showMultipleAttributes={showMultipleAttributes}
+          />
+        </>
+      )}
+    </>
   )
 }
 
+AttributesSelector.propTypes = {
+  canSelectAttributes: PropTypes.bool,
+  filterTypes: PropTypes.array,
+  lang: PropTypes.string.isRequired,
+  nodeDefUuidEntity: PropTypes.string,
+  nodeDefUuidsAttributes: PropTypes.array,
+  onToggleAttribute: PropTypes.func.isRequired,
+  showAncestors: PropTypes.bool,
+  showMultipleAttributes: PropTypes.bool,
+}
+
 AttributesSelector.defaultProps = {
-  nodeDefUuidEntity: '',
-  nodeDefUuidsAttributes: [],
-  lang: null,
-  onToggleAttribute: null,
-  filterTypes: [],
   canSelectAttributes: true,
+  filterTypes: [],
+  nodeDefUuidEntity: null,
+  nodeDefUuidsAttributes: [],
   showAncestors: true,
   showMultipleAttributes: true,
 }
 
-const mapStateToProps = (state, props) => {
-  const { nodeDefUuidEntity } = props
-
-  const survey = SurveyState.getSurvey(state)
-  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDefContext)(survey)
-  const childDefs = nodeDefContext
-    ? NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefChildren(nodeDefContext, true)(survey)
-      : [nodeDefContext] // Multiple attribute
-    : []
-
-  return {
-    nodeDefContext,
-    nodeDefParent,
-    childDefs,
-  }
-}
-
-const AttributesSelectorConnect = connect(mapStateToProps)(AttributesSelector)
-export default AttributesSelectorConnect
+export default AttributesSelector
