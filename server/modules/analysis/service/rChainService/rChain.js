@@ -109,7 +109,7 @@ class RChain {
     return this._listCategories
   }
 
-  async _initSurveyAndChain() {
+  async _initSurveyChainAndCategories() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
     this._survey = Survey.assocCategories(categories)(this.survey)
@@ -119,6 +119,7 @@ class RChain {
       includeScript: true,
       includeStepsAndCalculations: true,
     })
+    this._listCategories = new ListCategories(this)
   }
 
   async _initDirs() {
@@ -151,10 +152,6 @@ class RChain {
     this._fileLogin = await new RFileLogin(this).init()
     this._fileReadData = await new RFileReadData(this).init()
 
-    // Init categories
-    this._listCategories = new ListCategories(this)
-    await this._fileReadData.appendContent(...this._listCategories.scripts)
-
     // Init user files
     this._fileCommon = await new RFileCommon(this).init()
   }
@@ -173,7 +170,7 @@ class RChain {
   }
 
   async init() {
-    await this._initSurveyAndChain()
+    await this._initSurveyChainAndCategories()
     await this._initDirs()
     await this._initFiles()
     await this._initSteps()

@@ -45,9 +45,14 @@ export default class RFileReadData extends RFileSystem {
     await super.init()
     this.initSteps = this.initSteps.bind(this)
 
-    const { chain } = this.rChain
+    const { chain, listCategories } = this.rChain
+
+    // Fetch steps entity data
     const steps = ProcessingChain.getProcessingSteps(chain).filter(ProcessingStep.hasEntity)
     await this.initSteps(steps)
+
+    // Append categories initialization
+    await this.appendContent(...listCategories.scripts)
 
     return this
   }
