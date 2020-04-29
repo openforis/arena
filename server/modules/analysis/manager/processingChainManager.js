@@ -23,7 +23,7 @@ import * as ProcessingStepRepository from '../repository/processingStepRepositor
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
 /**
- * Marks survey as draft and deletes unused node def analysis.
+ * Marks survey as draft and deletes unused node def analysis. //TODO: Shouldn't the unused nodeDefs be removed only on survey publish?
  *
  * @param {string} surveyId - The survey id.
  * @param {pgPromise.IDatabase} t - The database client.
@@ -262,6 +262,7 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
     }
 
     // Validate chain / step / calculation after insert/update
+    // TODO: Why, while editing a processing chain, does the user fetch published props first? shouldn't he always fetch draft props?
     let surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
     if (!Survey.isPublished(surveyInfo)) {
       // Fetch draft survey props
@@ -290,7 +291,7 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
     )
 
     if (!R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
-      // Throw error to rollabck transaction
+      // Throw error to rollback transaction
       throw new SystemError('appErrors.processingChainCannotBeSaved')
     }
 

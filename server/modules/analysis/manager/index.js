@@ -1,4 +1,4 @@
-export { fetchChains, fetchChain, updateChainScriptCommon } from './chain'
+export { fetchChains, fetchChain, updateChain } from './chain'
 
 export { fetchSteps, fetchStep } from './step'
 
