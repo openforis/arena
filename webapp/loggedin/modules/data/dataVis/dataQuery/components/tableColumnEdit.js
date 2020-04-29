@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,21 +11,18 @@ import { useAuthCanEditRecord, useSurveyCycleKey, useSurveyInfo } from '@webapp/
 
 import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
-import {
-  createNodePlaceholder as createNodePlaceholderAction,
-  removeNode as removeNodeAction,
-  updateNode as updateNodeAction,
-} from '@webapp/loggedin/surveyViews/record/actions'
+import { createNodePlaceholder, removeNode, updateNode } from '@webapp/loggedin/surveyViews/record/actions'
 
 const TableColumnEdit = (props) => {
-  const { nodeDef, record, cell, updateNode, removeNode, createNodePlaceholder } = props
-
-  const surveyInfo = useSurveyInfo()
-  const surveyCycleKey = useSurveyCycleKey()
-  const canEditRecord = useAuthCanEditRecord(record)
+  const { nodeDef, record, cell } = props
 
   if (cell) {
     const { parentUuid, node } = cell
+
+    const surveyInfo = useSurveyInfo()
+    const surveyCycleKey = useSurveyCycleKey()
+    const canEditRecord = useAuthCanEditRecord(record)
+    const dispatch = useDispatch()
 
     const parentNode = {
       [Node.keys.recordUuid]: Record.getUuid(record),
@@ -34,6 +31,7 @@ const TableColumnEdit = (props) => {
 
     return (
       <NodeDefTableCellBody
+        className="test"
         surveyInfo={surveyInfo}
         surveyCycleKey={surveyCycleKey}
         nodeDef={nodeDef}
@@ -44,10 +42,10 @@ const TableColumnEdit = (props) => {
         edit={false}
         renderType={NodeDefLayout.renderType.tableBody}
         canEditRecord={canEditRecord}
-        updateNode={updateNode}
-        removeNode={removeNode}
-        createNodePlaceholder={createNodePlaceholder}
         readOnly={NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef)}
+        updateNode={(...args) => dispatch(updateNode(...args))}
+        removeNode={(...args) => dispatch(removeNode(...args))}
+        createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
         windowed={false}
       />
     )
@@ -60,17 +58,10 @@ TableColumnEdit.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   record: PropTypes.object.isRequired,
   cell: PropTypes.object,
-  updateNode: PropTypes.func.isRequired,
-  removeNode: PropTypes.func.isRequired,
-  createNodePlaceholder: PropTypes.func.isRequired,
 }
 
 TableColumnEdit.defaultProps = {
   cell: null,
 }
 
-export default connect(null, {
-  updateNode: updateNodeAction,
-  removeNode: removeNodeAction,
-  createNodePlaceholder: createNodePlaceholderAction,
-})(TableColumnEdit)
+export default TableColumnEdit
