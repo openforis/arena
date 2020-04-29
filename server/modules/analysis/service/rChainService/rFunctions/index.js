@@ -25,4 +25,4 @@ export { dbDisconnect, dbGetQuery, dbSendQuery, dbWriteTable, setConnection } fr
 
 export { arenaStartTime, arenaEndTime, arenaInfo } from './arena'
 
-export { arenaGet, arenaPost, arenaDelete, arenaPutFile } from './arenaApi'
+export { arenaGet, arenaPost, arenaDelete, arenaPut, arenaPutFile } from './arenaApi'

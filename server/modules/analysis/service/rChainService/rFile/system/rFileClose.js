@@ -1,18 +1,9 @@
-import * as ProcessingChain from '@common/analysis/processingChain'
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as ApiRoutes from '../../../../../../../common/apiRoutes'
+import * as ProcessingChain from '../../../../../../../common/analysis/processingChain'
 
 import RFileSystem from './rFileSystem'
 
-import {
-  arenaEndTime,
-  arenaStartTime,
-  dbDisconnect,
-  dbSendQuery,
-  setVar,
-  sysTime,
-  asNumeric,
-  paste,
-} from '../../rFunctions'
+import { arenaEndTime, arenaStartTime, arenaPut, asNumeric, paste, setVar, sysTime } from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {
@@ -22,13 +13,11 @@ export default class RFileClose extends RFileSystem {
   async init() {
     await super.init()
 
-    const chainTable = `${getSurveyDBSchema(this.rChain.surveyId)}.processing_chain`
-    const updateChain = dbSendQuery(
-      `update ${chainTable} set status_exec = '${ProcessingChain.statusExec.success}' where uuid = '${this.rChain.chainUuid}'`
-    )
-    await this.appendContent(updateChain)
+    const { surveyId, chainUuid } = this.rChain
 
-    await this.appendContent(dbDisconnect())
+    const params = { statusExec: `'${ProcessingChain.statusExec.success}'` }
+    const updateChain = arenaPut(ApiRoutes.rChain.chainStatusExec(surveyId, chainUuid), params)
+    await this.appendContent(updateChain)
 
     await this.appendContent(setVar(arenaEndTime, sysTime()))
 
