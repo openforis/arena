@@ -55,7 +55,8 @@ export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 
 // ===== READ - Steps
 export const getProcessingSteps = R.propOr([], keys.processingSteps)
-const _getStepByIdx = (stepIdx) => R.pipe(getProcessingSteps, R.propOr(null, stepIdx))
+const _getStepByIdx = (stepIdx) =>
+  R.ifElse(R.always(stepIdx >= 0), R.pipe(getProcessingSteps, R.propOr(null, stepIdx)), R.always(null))
 export const getStepPrev = (step) => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
 export const getStepNext = (step) => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
 
