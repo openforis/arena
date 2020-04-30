@@ -1,23 +1,25 @@
 import * as R from 'ramda'
-import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
-import * as PromiseUtils from '@core/promiseUtils'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessingChain from '../../../../common/analysis/processingChain'
+import * as ProcessingStep from '../../../../common/analysis/processingStep'
+import * as ProcessingStepCalculation from '../../../../common/analysis/processingStepCalculation'
+import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
+import * as EntityAggregatedView from '../../../../common/surveyRdb/entityAggregatedView'
+import { ViewDataNodeDef, ColumnNodeDef } from '../../../../common/model/db'
 
-import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
-import * as ProcessingStepRepository from '@server/modules/analysis/repository/processingStepRepository'
-import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import * as Survey from '../../../../core/survey/survey'
+import * as NodeDef from '../../../../core/survey/nodeDef'
+import * as PromiseUtils from '../../../../core/promiseUtils'
 
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import * as RdbDataView from '@server/modules/surveyRdb/schemaRdb/dataView'
+import { db } from '../../../db/db'
+import * as CSVWriter from '../../../utils/file/csvWriter'
+import * as ProcessingChainRepository from '../../analysis/repository/processingChainRepository'
+import * as ProcessingStepRepository from '../../analysis/repository/processingStepRepository'
+import * as RecordRepository from '../../record/repository/recordRepository'
+import * as NodeRepository from '../../record/repository/node'
+
+import * as DataTable from '../schemaRdb/dataTable'
+import * as RdbDataView from '../schemaRdb/dataView'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -52,6 +54,46 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
     tableName: NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey)),
     colNames: NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey),
   }
+}
+
+const _fetchColumnData = async (survey, nodeDefTable, row, nodeDefUuid) => {
+  const surveyId = Survey.getId(survey)
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const parentUuidColName = RdbDataView.getColUuid(nodeDefParent)
+  const parentUuid = R.prop(parentUuidColName, row)
+  const recordUuid = row[ViewDataNodeDef.columnSet.recordUuid]
+
+  let node = null
+  if (NodeDef.isAnalysis(nodeDef)) {
+    // Fetch node from node results table
+    node = R.head(
+      await ResultNodeRepository.fetchNodeResultsByRecordAndNodeDefUuid({
+        surveyId,
+        recordUuid,
+        parentUuid,
+        nodeDefUuid,
+      })
+    )
+  } else {
+    let queryParams = null
+    if (NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDef)(nodeDefTable)) {
+      // Column is the multiple attribute
+      queryParams = {
+        surveyId,
+        uuid: row[RdbDataView.getColUuid(nodeDef)],
+      }
+    } else {
+      queryParams = {
+        surveyId,
+        recordUuid,
+        parentUuid,
+        nodeDefUuid,
+      }
+    }
+    node = R.head(await NodeRepository.fetchNodes(queryParams))
+  }
+  return { parentUuid, node }
 }
 
 export const queryTable = async (
@@ -100,42 +142,20 @@ export const queryTable = async (
   if (editMode) {
     rows = await Promise.all(
       rows.map(async (row) => {
-        const recordUuid = row[DataTable.colNameRecordUuuid]
+        const recordUuid = row[ViewDataNodeDef.columnSet.recordUuid]
         const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
-        const parentNodeUuid = R.prop(RdbDataView.getColUuid(nodeDefTable), row)
-        const resultRow = { ...row, cols: {}, record, parentNodeUuid }
+        const parentNodeUuid = R.prop(ColumnNodeDef.getColName(nodeDefTable), row)
 
         // Assoc nodes to each columns
-        await PromiseUtils.each(nodeDefUuidCols, async (nodeDefUuidCol) => {
-          const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
-          const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
-          const parentUuidColName = RdbDataView.getColUuid(nodeDefColParent)
-          const parentUuid = R.prop(parentUuidColName, row)
-
-          let node = null
-          if (NodeDef.isAnalysis(nodeDefCol)) {
-            // Fetch node from node results table
-            node = R.head(
-              await ResultNodeRepository.fetchNodeResultsByRecordAndNodeDefUuid({
-                surveyId,
-                recordUuid,
-                parentUuid,
-                nodeDefUuid: nodeDefUuidCol,
-              })
-            )
-          } else if (NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable)) {
-            // Column is the multiple attribute
-            node = await NodeRepository.fetchNodeByUuid(surveyId, row[RdbDataView.getColUuid(nodeDefCol)])
-          } else {
-            node = R.head(
-              await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
-            )
-          }
-
-          resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
-        })
-
-        return resultRow
+        const columnsData = await Promise.all(
+          nodeDefUuidCols.map((nodeDefUuidCol) => _fetchColumnData(survey, nodeDefTable, row, nodeDefUuidCol))
+        )
+        // Index columns data by nodeDefUuid
+        const cols = nodeDefUuidCols.reduce(
+          (colsAcc, nodeDefUuidCol, idx) => R.assoc(nodeDefUuidCol, columnsData[idx], colsAcc),
+          {}
+        )
+        return { ...row, cols, record, parentNodeUuid }
       })
     )
   } else if (streamOutput) {

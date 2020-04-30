@@ -1,6 +1,6 @@
 export { createResultNodeTable } from './create'
 
-export { fetchNodeResultsByRecordAndNodeDefUuid } from './read'
+export { fetchNodeResults as fetchNodeResultsByRecordAndNodeDefUuid } from './read'
 
 export { deleteNodeResultsByChainUuid } from './delete'
 
