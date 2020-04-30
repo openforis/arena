@@ -68,7 +68,7 @@ const _fetchColumnData = async (survey, nodeDefTable, row, nodeDefUuid) => {
   if (NodeDef.isAnalysis(nodeDef)) {
     // Fetch node from node results table
     node = R.head(
-      await ResultNodeRepository.fetchNodeResultsByRecordAndNodeDefUuid({
+      await ResultNodeRepository.fetchNodeResults({
         surveyId,
         recordUuid,
         parentUuid,

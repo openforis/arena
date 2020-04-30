@@ -1,4 +1,5 @@
 import * as Node from '../../../../../core/record/node'
+import * as Schemata from '../../schemata'
 
 /**
  * Generates the select query for the node table by the given parameters.
@@ -19,6 +20,8 @@ export function getSelect(params) {
   const propsTaxon = _getPropsCombined('t')
   const propsVernacularName = _getPropsCombined('v')
   const propsCategoryItem = _getPropsCombined('c')
+
+  const schemaSurvey = Schemata.getSchemaSurvey(this.surveyId)
 
   const whereConditions = []
   if (uuid) {
@@ -51,15 +54,15 @@ export function getSelect(params) {
     FROM
         ${this.nameAliased}
     LEFT OUTER JOIN
-        ${this.schema}.category_item c
+        ${schemaSurvey}.category_item c
     ON
         (${this.columnValue}->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
     LEFT OUTER JOIN
-        ${this.schema}.taxon t
+        ${schemaSurvey}.taxon t
     ON
         (${this.columnValue}->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
     LEFT OUTER JOIN
-        ${this.schema}.taxon_vernacular_name v
+        ${schemaSurvey}.taxon_vernacular_name v
     ON
         (${this.columnValue}->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid`
 
