@@ -34,8 +34,6 @@ export const fetchStepData = async (surveyId, cycle, stepUuid) => {
 
 // ==== UPDATE
 
-export { updateChainStatusExec } from '../../manager'
-
 export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
   const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })

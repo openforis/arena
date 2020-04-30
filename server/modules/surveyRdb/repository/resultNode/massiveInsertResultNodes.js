@@ -5,7 +5,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import { TableResultNode } from '@common/model/db'
 
 import MassiveInsert from '@server/db/massiveInsert'
-import { NA } from '@server/modules/analysis/service/rChainService/rFunctions'
+import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 
 export default class MassiveInsertResultNodes extends MassiveInsert {
   constructor(survey, step, tx) {

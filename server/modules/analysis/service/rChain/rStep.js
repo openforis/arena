@@ -4,7 +4,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import RCalculation from '@server/modules/analysis/service/rChainService/rCalculation'
+import RCalculation from '@server/modules/analysis/service/rChain/rCalculation'
 
 import { padStart } from './rFile'
 

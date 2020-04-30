@@ -1,11 +1,11 @@
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as ApiRoutes from '@common/apiRoutes'
+import * as CategoryItem from '../../../../core/survey/categoryItem'
+import * as ApiRoutes from '../../../../common/apiRoutes'
 
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import * as CategoryService from '@server/modules/category/service/categoryService'
-import * as RChainService from '@server/modules/analysis/service/rChainService'
+import * as Request from '../../../utils/request'
+import * as Response from '../../../utils/response'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as CategoryService from '../../category/service/categoryService'
+import * as AnalysisService from '../service'
 
 export const init = (app) => {
   // ====== READ - Step entity data
@@ -16,7 +16,7 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        const data = await RChainService.fetchStepData(surveyId, cycle, stepUuid)
+        const data = await AnalysisService.fetchStepData(surveyId, cycle, stepUuid)
 
         res.json(data)
       } catch (error) {
@@ -56,7 +56,7 @@ export const init = (app) => {
         const filePath = Request.getFilePath(req)
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        await RChainService.persistResults(surveyId, cycle, stepUuid, filePath)
+        await AnalysisService.persistResults(surveyId, cycle, stepUuid, filePath)
 
         Response.sendOk(res)
       } catch (e) {
@@ -74,7 +74,7 @@ export const init = (app) => {
         const { surveyId, chainUuid } = Request.getParams(req)
         const { statusExec } = Request.getBody(req)
 
-        await RChainService.updateChainStatusExec({ surveyId, chainUuid, statusExec })
+        await AnalysisService.updateChainStatusExec({ surveyId, chainUuid, statusExec })
 
         Response.sendOk(res)
       } catch (e) {
@@ -91,7 +91,7 @@ export const init = (app) => {
         const { surveyId, chainUuid } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        await RChainService.persistUserScripts(surveyId, chainUuid, filePath)
+        await AnalysisService.persistUserScripts(surveyId, chainUuid, filePath)
 
         Response.sendOk(res)
       } catch (e) {
