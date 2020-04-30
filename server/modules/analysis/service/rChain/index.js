@@ -71,7 +71,7 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
 
   await db.tx(async (tx) => {
     // Persist common script
-    const scriptCommon = await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))
+    const scriptCommon = (await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))).trim()
     const fields = { [TableChain.columnSet.scriptCommon]: scriptCommon }
     await AnalysisManager.updateChain({ surveyId, chainUuid, fields }, tx)
 
@@ -89,7 +89,7 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
             const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
             const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
             const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-            const script = await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))
+            const script = (await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))).trim()
             return AnalysisManager.updateCalculationScript({ surveyId, calculationUuid, script }, tx)
           })
         )
