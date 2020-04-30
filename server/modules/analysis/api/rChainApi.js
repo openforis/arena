@@ -65,7 +65,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== UPDATE - Chain user scripts
+  // ====== UPDATE - Chain
   app.put(
     ApiRoutes.rChain.chainStatusExec(':surveyId', ':chainUuid'),
     AuthMiddleware.requireRecordAnalysisPermission,
@@ -73,8 +73,8 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
         const { statusExec } = Request.getBody(req)
-
-        await AnalysisService.updateChainStatusExec({ surveyId, chainUuid, statusExec })
+        const user = Request.getUser(req)
+        await AnalysisService.updateChainStatusExec({ user, surveyId, chainUuid, statusExec })
 
         Response.sendOk(res)
       } catch (e) {

@@ -54,6 +54,7 @@ export const type = {
   // Analysis
   processingChainCreate: 'processingChainCreate',
   processingChainPropUpdate: 'processingChainPropUpdate',
+  processingChainStatusExecSuccess: 'processingChainStatusExecSuccess',
   processingChainDelete: 'processingChainDelete',
   processingStepCreate: 'processingStepCreate',
   processingStepPropUpdate: 'processingStepPropUpdate',
@@ -119,8 +120,8 @@ export const keysContent = {
 }
 
 // ====== CREATE
-export const newActivity = (type, content, system = false) => ({
-  [keys.type]: type,
+export const newActivity = (activityType, content, system = false) => ({
+  [keys.type]: activityType,
   [keys.content]: content,
   [keys.system]: system,
 })
