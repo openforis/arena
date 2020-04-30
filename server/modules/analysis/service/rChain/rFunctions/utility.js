@@ -21,6 +21,8 @@ export const list = (object) => {
   return `list(${listValues})`
 }
 
+export const rm = (obj) => `rm(${obj})`
+
 export const sqldf = (query) => `sqldf('${query}')`
 
 // this is r with (reserved keyword)

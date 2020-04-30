@@ -9,3 +9,5 @@ export { default as RFileLogin } from './rFileLogin'
 export { default as RFilePersistResults } from './rFilePersistResults'
 
 export { default as RFileReadData } from './rFileReadData'
+
+export { default as ListCategories } from './listCategories'
