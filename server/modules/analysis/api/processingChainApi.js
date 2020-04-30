@@ -2,8 +2,8 @@ import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
-import * as ProcessingChainService from '../service/processingChainService'
-import * as RChainService from '../service/rChainService'
+import * as ProcessingChainService from '../service'
+import * as RChainService from '../service/rChain'
 
 export const init = (app) => {
   // ====== READ - Chains

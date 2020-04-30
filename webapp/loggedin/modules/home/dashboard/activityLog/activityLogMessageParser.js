@@ -38,7 +38,7 @@ const isItemDeletedFns = {
   ...isItemDeletedFnsAnalysis,
 }
 
-export const toMessage = (i18n, survey, highlighted = true) => activityLog => {
+export const toMessage = (i18n, survey, highlighted = true) => (activityLog) => {
   const type = ActivityLog.getType(activityLog)
 
   const i18nMessageParamsFn = i18nMessageParamsFns[type]

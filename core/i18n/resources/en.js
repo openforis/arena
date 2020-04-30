@@ -274,6 +274,7 @@ Do you want to cancel them?`,
       // Analysis
       [ActivityLog.type.processingChainCreate]: 'added processing chain',
       [ActivityLog.type.processingChainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
+      [ActivityLog.type.processingChainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
       [ActivityLog.type.processingChainDelete]: 'deleted processing chain {{label}}',
       [ActivityLog.type.processingStepCreate]:
         'added processing step {{index}} to processing chain {{processingChainLabel}}',

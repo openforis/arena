@@ -4,19 +4,25 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
-const _getProcessingChainLabel = lang => R.pipe(ActivityLog.getProcessingChainLabels, R.prop(lang))
+const _getProcessingChainLabel = (lang) => R.pipe(ActivityLog.getProcessingChainLabels, R.prop(lang))
 
 export default {
-  [ActivityLog.type.processingChainPropUpdate]: (survey, i18n) => activityLog => ({
+  // ====== Chain
+  [ActivityLog.type.processingChainPropUpdate]: (survey, i18n) => (activityLog) => ({
     key: ActivityLog.getContentKey(activityLog),
     label: _getProcessingChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.processingChainDelete]: (survey, i18n) => activityLog => ({
+  [ActivityLog.type.processingChainStatusExecSuccess]: (survey, i18n) => (activityLog) => ({
+    label: _getProcessingChainLabel(i18n.lang)(activityLog),
+  }),
+
+  [ActivityLog.type.processingChainDelete]: (survey, i18n) => (activityLog) => ({
     label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.lang))(activityLog),
   }),
 
-  [ActivityLog.type.processingStepCreate]: (survey, i18n) => activityLog => {
+  // ====== Step
+  [ActivityLog.type.processingStepCreate]: (survey, i18n) => (activityLog) => {
     const processingStep = ActivityLog.getContent(activityLog)
     return {
       index: ProcessingStep.getIndex(processingStep),
@@ -24,15 +30,12 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepPropUpdate]: (survey, i18n) => activityLog => {
+  [ActivityLog.type.processingStepPropUpdate]: (survey, i18n) => (activityLog) => {
     const contentKey = ActivityLog.getContentKey(activityLog)
 
-    const key =
-      contentKey === ProcessingStep.keysProps.entityUuid
-        ? i18n.t('nodeDefsTypes.entity')
-        : contentKey === ProcessingStep.keysProps.categoryUuid
-        ? i18n.t('processingStepView.category')
-        : null
+    let key = null
+    if (contentKey === ProcessingStep.keysProps.entityUuid) key = i18n.t('nodeDefsTypes.entity')
+    if (contentKey === ProcessingStep.keysProps.categoryUuid) key = i18n.t('processingStepView.category')
 
     return {
       key,
@@ -41,12 +44,13 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepDelete]: (survey, i18n) => activityLog => ({
+  [ActivityLog.type.processingStepDelete]: (survey, i18n) => (activityLog) => ({
     index: ActivityLog.getContentIndex(activityLog),
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
   }),
 
-  [ActivityLog.type.processingStepCalculationCreate]: (survey, i18n) => activityLog => {
+  // ====== Calculation
+  [ActivityLog.type.processingStepCalculationCreate]: (survey, i18n) => (activityLog) => {
     const calculation = ActivityLog.getContent(activityLog)
     return {
       index: ProcessingStepCalculation.getIndex(calculation),
@@ -55,21 +59,21 @@ export default {
     }
   },
 
-  [ActivityLog.type.processingStepCalculationIndexUpdate]: (survey, i18n) => activityLog => ({
+  [ActivityLog.type.processingStepCalculationIndexUpdate]: (survey, i18n) => (activityLog) => ({
     indexFrom: ActivityLog.getContentIndexFrom(activityLog),
     indexTo: ActivityLog.getContentIndexTo(activityLog),
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
     stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
   }),
 
-  [ActivityLog.type.processingStepCalculationUpdate]: (survey, i18n) => activityLog => ({
+  [ActivityLog.type.processingStepCalculationUpdate]: (survey, i18n) => (activityLog) => ({
     index: ActivityLog.getContentIndex(activityLog),
     label: R.pipe(ActivityLog.getContent, ProcessingStepCalculation.getLabel(i18n.lang))(activityLog),
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
     stepIndex: ActivityLog.getProcessingStepIndex(activityLog),
   }),
 
-  [ActivityLog.type.processingStepCalculationDelete]: (survey, i18n) => activityLog => ({
+  [ActivityLog.type.processingStepCalculationDelete]: (survey, i18n) => (activityLog) => ({
     index: ActivityLog.getContentIndex(activityLog),
     label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.lang))(activityLog),
     processingChainLabel: _getProcessingChainLabel(i18n.lang)(activityLog),
