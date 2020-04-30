@@ -13,6 +13,7 @@ export {
   dirCreate,
   writeCsv,
   vector,
+  rm,
   sqldf,
   asNumeric,
   paste,
