@@ -12,12 +12,13 @@ const TableColumns = ({ nodeDefCols, row, colWidth, editMode = false }) =>
 
 TableColumns.propTypes = {
   nodeDefCols: PropTypes.array.isRequired,
-  row: PropTypes.object.isRequired,
+  row: PropTypes.object,
   colWidth: PropTypes.number.isRequired,
   editMode: PropTypes.bool,
 }
 
 TableColumns.defaultProps = {
+  row: null,
   editMode: false,
 }
 
