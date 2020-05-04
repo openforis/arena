@@ -22,7 +22,7 @@ export const dbTransformCallback = (node) =>
  * @param {boolean} [params.draft=false] - Whether to fetch draft props or only published ones.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
- * @returns {Promise<any[]>} - The result promise.
+ * @returns {Promise<Node[]>} - The result promise.
  */
 export const fetchNodes = async (params, client = db) => {
   const { surveyId, uuid, recordUuid, parentUuid, nodeDefUuid, draft } = params

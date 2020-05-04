@@ -69,5 +69,5 @@ export function getSelect(params) {
     ON
         (${this.columnValue}->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid`
 
-  return `${query} WHERE ${whereConditions.join(' AND ')}`
+  return `${query}${whereConditions.length > 0 ? ` WHERE ${whereConditions.join(' AND ')}` : ''}`
 }
