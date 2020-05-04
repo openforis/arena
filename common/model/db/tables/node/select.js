@@ -24,27 +24,30 @@ export function getSelect(params) {
   const schemaSurvey = Schemata.getSchemaSurvey(this.surveyId)
 
   const whereConditions = []
-  if (uuid) {
-    whereConditions.push(`${this.columnUuid} = '${uuid}'`)
+  const _addUuidEqualCondition = (column, value) => {
+    if (value) {
+      const isUuid =
+        value.length === 36 && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+      whereConditions.push(`${column} = ${isUuid ? `'${value}'` : value}`)
+    }
   }
-  if (recordUuid) {
-    whereConditions.push(`${this.columnRecordUuid} = '${recordUuid}'`)
-  }
-  if (parentUuid) {
-    whereConditions.push(`${this.columnParentUuid} = '${parentUuid}'`)
-  }
-  if (nodeDefUuid) {
-    whereConditions.push(`${this.columnNodeDefUuid} = '${nodeDefUuid}'`)
-  }
+
+  _addUuidEqualCondition(this.columnUuid, uuid)
+  _addUuidEqualCondition(this.columnRecordUuid, recordUuid)
+  _addUuidEqualCondition(this.columnParentUuid, parentUuid)
+  _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
+
+  const columnTaxonUuid = `${this.columnValue}->>'${Node.valuePropKeys.taxonUuid}'`
+  const columnCategoryItemUuid = `${this.columnValue}->>'${Node.valuePropKeys.itemUuid}'`
 
   const query = `SELECT ${this.columns},
         CASE
-            WHEN ${this.columnValue}->>'${Node.valuePropKeys.taxonUuid}' IS NOT NULL
+            WHEN ${columnTaxonUuid} IS NOT NULL
             THEN json_build_object( 
                 'taxon',
                 json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid, 'props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') 
             )
-            WHEN ${this.columnValue}->>'${Node.valuePropKeys.itemUuid}' IS NOT NULL
+            WHEN ${columnCategoryItemUuid} IS NOT NULL
             THEN json_build_object(
                 'category_item',
                 json_build_object('id',c.id, 'uuid',c.uuid, 'level_uuid',c.level_uuid, 'parent_uuid',c.parent_uuid, 'props',${propsCategoryItem}) 
@@ -56,11 +59,11 @@ export function getSelect(params) {
     LEFT OUTER JOIN
         ${schemaSurvey}.category_item c
     ON
-        (${this.columnValue}->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
+        (${columnCategoryItemUuid})::uuid = c.uuid
     LEFT OUTER JOIN
         ${schemaSurvey}.taxon t
     ON
-        (${this.columnValue}->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
+        (${columnTaxonUuid})::uuid = t.uuid
     LEFT OUTER JOIN
         ${schemaSurvey}.taxon_vernacular_name v
     ON

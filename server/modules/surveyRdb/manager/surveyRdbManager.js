@@ -5,7 +5,6 @@ import * as ProcessingStep from '../../../../common/analysis/processingStep'
 import * as ProcessingStepCalculation from '../../../../common/analysis/processingStepCalculation'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
 import * as EntityAggregatedView from '../../../../common/surveyRdb/entityAggregatedView'
-import { ViewDataNodeDef, ColumnNodeDef } from '../../../../common/model/db'
 
 import * as Survey from '../../../../core/survey/survey'
 import * as NodeDef from '../../../../core/survey/nodeDef'
@@ -15,17 +14,11 @@ import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
 import * as ProcessingChainRepository from '../../analysis/repository/processingChainRepository'
 import * as ProcessingStepRepository from '../../analysis/repository/processingStepRepository'
-import * as RecordRepository from '../../record/repository/recordRepository'
-import * as NodeRepository from '../../record/repository/node'
-
-import * as DataTable from '../schemaRdb/dataTable'
-import * as RdbDataView from '../schemaRdb/dataView'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
-import * as ResultNodeRepository from '../repository/resultNode'
 
 // ==== DDL
 
@@ -56,46 +49,6 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
   }
 }
 
-const _fetchColumnData = async (survey, nodeDefTable, row, nodeDefUuid) => {
-  const surveyId = Survey.getId(survey)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const parentUuidColName = RdbDataView.getColUuid(nodeDefParent)
-  const parentUuid = R.prop(parentUuidColName, row)
-  const recordUuid = row[ViewDataNodeDef.columnSet.recordUuid]
-
-  let node = null
-  if (NodeDef.isAnalysis(nodeDef)) {
-    // Fetch node from node results table
-    node = R.head(
-      await ResultNodeRepository.fetchNodeResults({
-        surveyId,
-        recordUuid,
-        parentUuid,
-        nodeDefUuid,
-      })
-    )
-  } else {
-    let queryParams = null
-    if (NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDef)(nodeDefTable)) {
-      // Column is the multiple attribute
-      queryParams = {
-        surveyId,
-        uuid: row[RdbDataView.getColUuid(nodeDef)],
-      }
-    } else {
-      queryParams = {
-        surveyId,
-        recordUuid,
-        parentUuid,
-        nodeDefUuid,
-      }
-    }
-    node = R.head(await NodeRepository.fetchNodes(queryParams))
-  }
-  return { parentUuid, node }
-}
-
 export const queryTable = async (
   survey,
   cycle,
@@ -108,63 +61,26 @@ export const queryTable = async (
   editMode = false,
   streamOutput = null
 ) => {
-  const surveyId = Survey.getId(survey)
-  const { nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(
-    survey,
-    nodeDefUuidTable,
-    nodeDefUuidCols
-  )
-
-  // Get hierarchy entities uuid col names
-  const ancestorUuidColNames = []
-  Survey.visitAncestorsAndSelf(nodeDefTable, (nodeDefCurrent) => {
-    // Skip virtual entity: ancestor uuid column taken from its parent entity def
-    if (!NodeDef.isVirtual(nodeDefCurrent)) {
-      ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
-    }
-  })(survey)
-
   // Fetch data
-  const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
-  let rows = await DataViewRepository.runSelect(
-    surveyId,
+  const { result, selectFields } = await DataViewRepository.runSelect({
+    survey,
     cycle,
-    tableName,
-    colNames,
+    nodeDefUuidTable,
+    nodeDefUuidCols,
     offset,
     limit,
     filterExpr,
     sort,
-    Boolean(streamOutput)
-  )
+    editMode,
+    queryStream: Boolean(streamOutput),
+  })
 
-  // Edit mode, assoc nodes to columns
-  if (editMode) {
-    rows = await Promise.all(
-      rows.map(async (row) => {
-        const recordUuid = row[ViewDataNodeDef.columnSet.recordUuid]
-        const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
-        const parentNodeUuid = R.prop(ColumnNodeDef.getColName(nodeDefTable), row)
-
-        // Assoc nodes to each columns
-        const columnsData = await Promise.all(
-          nodeDefUuidCols.map((nodeDefUuidCol) => _fetchColumnData(survey, nodeDefTable, row, nodeDefUuidCol))
-        )
-        // Index columns data by nodeDefUuid
-        const cols = nodeDefUuidCols.reduce(
-          (colsAcc, nodeDefUuidCol, idx) => R.assoc(nodeDefUuidCol, columnsData[idx], colsAcc),
-          {}
-        )
-        return { ...row, cols, record, parentNodeUuid }
-      })
-    )
-  } else if (streamOutput) {
-    await db.stream(rows, (stream) => {
-      stream.pipe(CSVWriter.transformToStream(streamOutput, colNames))
+  if (streamOutput) {
+    await db.stream(result, (stream) => {
+      stream.pipe(CSVWriter.transformToStream(streamOutput, selectFields))
     })
   }
-
-  return rows
+  return result
 }
 
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {

@@ -7,7 +7,7 @@ import * as Node from '../../../../../core/record/node'
 
 import { db } from '../../../../db/db'
 
-const dbTransformCallback = (node) =>
+export const dbTransformCallback = (node) =>
   node ? R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node) : null
 
 /**
