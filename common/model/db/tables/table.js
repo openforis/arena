@@ -6,6 +6,7 @@ const columnSetCommon = {
   dateModified: 'date_modified',
   id: 'id',
   props: 'props',
+  propsDraft: 'props_draft',
   uuid: 'uuid',
 }
 
@@ -103,6 +104,10 @@ export default class Table {
 
   get columnProps() {
     return this._getColumnCommon(columnSetCommon.props)
+  }
+
+  get columnPropsDraft() {
+    return this._getColumnCommon(columnSetCommon.propsDraft)
   }
 }
 

@@ -50,6 +50,6 @@ export default class TableNode extends TableSurvey {
 }
 
 TableNode.dbTransformCallback = (node) =>
-  node ? R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node) : null
+  R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node)
 
 TableNode.columnSet = columnSet

@@ -1,5 +1,9 @@
 import * as Node from '../../../../../core/record/node'
-import * as Schemata from '../../schemata'
+
+import TableCategoryItem from '../categoryItem'
+import TableTaxon from '../taxon'
+import TableTaxonVernacularName from '../taxonVernacularName'
+import { jsonBuildObject } from '../../sql'
 
 /**
  * Generates the select query for the node table by the given parameters.
@@ -15,13 +19,16 @@ import * as Schemata from '../../schemata'
 export function getSelect(params) {
   const { uuid = null, recordUuid = null, parentUuid = null, nodeDefUuid = null, draft = false } = params
 
-  const _getPropsCombined = (table) => (draft ? `${table}.props || ${table}.props_draft` : `${table}.props`)
+  const _getPropsCombined = (table) =>
+    draft ? `${table.columnProps} || ${table.columnPropsDraft}` : `${table.columnProps}`
 
-  const propsTaxon = _getPropsCombined('t')
-  const propsVernacularName = _getPropsCombined('v')
-  const propsCategoryItem = _getPropsCombined('c')
+  const tableCategoryItem = new TableCategoryItem(this.surveyId)
+  const tableTaxon = new TableTaxon(this.surveyId)
+  const tableTaxonVernacularName = new TableTaxonVernacularName(this.surveyId)
 
-  const schemaSurvey = Schemata.getSchemaSurvey(this.surveyId)
+  const propsTaxon = _getPropsCombined(tableTaxon)
+  const propsVernacularName = _getPropsCombined(tableTaxonVernacularName)
+  const propsCategoryItem = _getPropsCombined(tableCategoryItem)
 
   const whereConditions = []
   const _addUuidEqualCondition = (column, value) => {
@@ -37,37 +44,65 @@ export function getSelect(params) {
   _addUuidEqualCondition(this.columnParentUuid, parentUuid)
   _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
 
-  const columnTaxonUuid = `${this.columnValue}->>'${Node.valuePropKeys.taxonUuid}'`
-  const columnCategoryItemUuid = `${this.columnValue}->>'${Node.valuePropKeys.itemUuid}'`
+  const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
+  const columnTaxonUuid = _getColumnValueProp(Node.valuePropKeys.taxonUuid)
+  const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropKeys.itemUuid)
+  const columnTaxonVernacularNameUuid = _getColumnValueProp(Node.valuePropKeys.vernacularNameUuid)
 
   const query = `SELECT ${this.columns},
         CASE
             WHEN ${columnTaxonUuid} IS NOT NULL
             THEN json_build_object( 
                 'taxon',
-                json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid, 'props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') 
+                ${jsonBuildObject(
+                  `'id'`,
+                  tableTaxon.columnId,
+                  `'uuid'`,
+                  tableTaxon.columnUuid,
+                  `'taxonomy_uuid'`,
+                  tableTaxon.columnTaxonomyUuid,
+                  `'props'`,
+                  propsTaxon,
+                  `'vernacular_name_uuid'`,
+                  tableTaxonVernacularName.columnUuid,
+                  `'vernacular_language'`,
+                  `(${propsVernacularName})->>'lang'`,
+                  `'vernacular_name'`,
+                  `(${propsVernacularName})->>'name'`
+                )} 
             )
             WHEN ${columnCategoryItemUuid} IS NOT NULL
             THEN json_build_object(
                 'category_item',
-                json_build_object('id',c.id, 'uuid',c.uuid, 'level_uuid',c.level_uuid, 'parent_uuid',c.parent_uuid, 'props',${propsCategoryItem}) 
+                ${jsonBuildObject(
+                  `'id'`,
+                  tableCategoryItem.columnId,
+                  `'uuid'`,
+                  tableCategoryItem.columnUuid,
+                  `'level_uuid'`,
+                  tableCategoryItem.columnLevelUuid,
+                  `'parent_uuid'`,
+                  tableCategoryItem.columnParentUuid,
+                  `'props'`,
+                  propsCategoryItem
+                )} 
             )
             ELSE NULL
         END AS ref_data
     FROM
         ${this.nameAliased}
     LEFT OUTER JOIN
-        ${schemaSurvey}.category_item c
+        ${tableCategoryItem.nameAliased}
     ON
-        (${columnCategoryItemUuid})::uuid = c.uuid
+        (${columnCategoryItemUuid})::uuid = ${tableCategoryItem.columnUuid}
     LEFT OUTER JOIN
-        ${schemaSurvey}.taxon t
+        ${tableTaxon.nameAliased}
     ON
-        (${columnTaxonUuid})::uuid = t.uuid
+        (${columnTaxonUuid})::uuid = ${tableTaxon.columnUuid}
     LEFT OUTER JOIN
-        ${schemaSurvey}.taxon_vernacular_name v
+        ${tableTaxonVernacularName.nameAliased}
     ON
-        (${this.columnValue}->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid`
+        (${columnTaxonVernacularNameUuid})::uuid = ${tableTaxonVernacularName.columnUuid}`
 
   return `${query}${whereConditions.length > 0 ? ` WHERE ${whereConditions.join(' AND ')}` : ''}`
 }

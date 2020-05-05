@@ -21,7 +21,6 @@ import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaReposi
 import * as DataCol from '../../schemaRdb/dataCol'
 import * as DataTable from '../../schemaRdb/dataTable'
 
-// TODO move it to ViewDataNodeDef ?
 const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   const { survey } = viewDataNodeDef
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -139,7 +138,7 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
     rowUpdated.record = camelize(rowUpdated.record)
     // Parent node uuid column
     const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
-    rowUpdated.parentNodeUuid = rowUpdated[nodeDefParentColumnUuid]
+    rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
   }
   return rowUpdated
 }

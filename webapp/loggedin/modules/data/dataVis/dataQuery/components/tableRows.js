@@ -27,10 +27,10 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
 
         <div className="table__data-rows">
           {data.map((row, i) => {
-            const { parentNodeUuid, record } = row
+            const { parentUuid, record } = row
 
             const recordUuid = Record.getUuid(record)
-            const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?pageNodeUuid=${parentNodeUuid}`
+            const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?pageNodeUuid=${parentUuid}`
             const validation = Record.getValidation(record)
 
             return (
