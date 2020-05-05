@@ -10,12 +10,12 @@ Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using
 
 To install local database:
 ```shell script
-sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena mdillon/postgis:11
+sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
 ``` 
 
 To restart local database:
 ```shell script
-docker container restart of-arena-dev-db
+docker container restart arena-db
 ```
 
 To install dependencies:
