@@ -39,7 +39,7 @@ const _getSelectFields = (params) => {
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.map((nodeDefCol) => `${viewDataNodeDef.alias}.${ColumnNodeDef.getColName(nodeDefCol)}`),
+      ...nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).namesFull).flat(),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids,
     ]
