@@ -4,11 +4,12 @@ import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
-import TableColumns from './tableColumns'
+import TableColumn from './tableColumn'
 
 const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editMode }) => {
   const i18n = useI18n()
@@ -19,7 +20,9 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
       <div className="table__rows">
         <div className="table__row-header">
           <div style={{ width: defaultColWidth }}>{i18n.t('dataView.rowNum')}</div>
-          <TableColumns nodeDefCols={nodeDefCols} colWidth={colWidth} editMode={editMode} />
+          {nodeDefCols.map((nodeDef) => (
+            <TableColumn key={NodeDef.getUuid(nodeDef)} nodeDef={nodeDef} colWidth={colWidth} editMode={editMode} />
+          ))}
         </div>
 
         <div className="table__data-rows">
@@ -47,7 +50,15 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
                     </button>
                   )}
                 </div>
-                <TableColumns nodeDefCols={nodeDefCols} row={row} colWidth={colWidth} editMode={editMode} />
+                {nodeDefCols.map((nodeDef) => (
+                  <TableColumn
+                    key={NodeDef.getUuid(nodeDef)}
+                    nodeDef={nodeDef}
+                    row={row}
+                    colWidth={colWidth}
+                    editMode={editMode}
+                  />
+                ))}
               </div>
             )
           })}

@@ -31,7 +31,6 @@ const TableColumnEdit = (props) => {
 
     return (
       <NodeDefTableCellBody
-        className="test"
         surveyInfo={surveyInfo}
         surveyCycleKey={surveyCycleKey}
         nodeDef={nodeDef}
