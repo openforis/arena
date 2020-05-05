@@ -60,12 +60,10 @@ const _getSelectFields = (params) => {
 
     if (editMode) {
       selectFields.push(
-        ...[
-          // Node (every node is transformed into json in a column named with the nodeDefUuid)
-          ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
-          // Record table fields
-          'row_to_json(r.*) AS record',
-        ]
+        // Node (every node is transformed into json in a column named with the nodeDefUuid)
+        ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
+        // Record table fields
+        'row_to_json(r.*) AS record'
       )
     }
     return selectFields
@@ -96,23 +94,21 @@ const _getFromClause = (params) => {
   const fromTables = [viewDataNodeDef.nameAliased]
   if (editMode) {
     fromTables.push(
-      ...[
-        // Node table; one join per column def
-        ...nodeDefCols.map((nodeDefCol, idx) => {
-          const nodeDefParentUuidColName = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
-          const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
-          const tableNode = NodeDef.isAnalysis(nodeDefCol) ? new TableResultNode(surveyId) : new TableNode(surveyId)
-          tableNode.alias = `n${idx + 1}`
+      // Node table; one join per column def
+      ...nodeDefCols.map((nodeDefCol, idx) => {
+        const nodeDefParentUuidColName = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+        const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
+        const tableNode = NodeDef.isAnalysis(nodeDefCol) ? new TableResultNode(surveyId) : new TableNode(surveyId)
+        tableNode.alias = `n${idx + 1}`
 
-          return `LEFT JOIN LATERAL ( 
-          ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColName}`, nodeDefUuid })}
-        ) AS ${tableNode.alias} ON TRUE`
-        }),
-        // Record table
-        `LEFT JOIN ${getSurveyDBSchema(surveyId)}.record r 
-         ON r.uuid = ${viewDataNodeDef.columnRecordUuid}
-        `,
-      ]
+        return `LEFT JOIN LATERAL ( 
+        ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColName}`, nodeDefUuid })}
+      ) AS ${tableNode.alias} ON TRUE`
+      }),
+      // Record table
+      `LEFT JOIN ${getSurveyDBSchema(surveyId)}.record r 
+        ON r.uuid = ${viewDataNodeDef.columnRecordUuid}
+      `
     )
   }
   return fromTables.join(' ')

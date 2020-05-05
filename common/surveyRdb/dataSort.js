@@ -2,6 +2,12 @@ import * as R from 'ramda'
 
 import * as SortCriteria from './sortCriteria'
 
+export const keys = {
+  order: {
+    ...SortCriteria.keysOrder,
+  },
+}
+
 export const toHttpParams = R.pipe(R.map(R.pick(['variable', 'order'])), JSON.stringify)
 
 export const getSortPreparedStatement = (sortCriteria) => {
