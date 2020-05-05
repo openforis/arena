@@ -2,7 +2,6 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
@@ -41,7 +40,6 @@ const TableColumnEdit = (props) => {
         edit={false}
         renderType={NodeDefLayout.renderType.tableBody}
         canEditRecord={canEditRecord}
-        readOnly={NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef)}
         updateNode={(...args) => dispatch(updateNode(...args))}
         removeNode={(...args) => dispatch(removeNode(...args))}
         createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
