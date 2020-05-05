@@ -11,7 +11,7 @@ const columnSet = {
 }
 
 /**
- * @typedef {module:arena.TableSurvey} module:arena.TableNode
+ * @typedef {module:arena.TableSurvey} module:arena.TableCategoryItem
  */
 export default class TableCategoryItem extends TableSurvey {
   constructor(surveyId) {

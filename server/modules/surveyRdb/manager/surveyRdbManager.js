@@ -28,7 +28,7 @@ export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView, fetchViewData } = DataViewRepository
+export const { createDataView } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -50,18 +50,37 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
   }
 }
 
-export const queryTable = async (
-  survey,
-  cycle,
-  nodeDef,
-  nodeDefCols = [],
-  offset = 0,
-  limit = null,
-  filter = null,
-  sort = [],
-  editMode = false,
-  streamOutput = null
-) => {
+/**
+ * Runs a select query on a data view associated to an entity node definition.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
+ * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
+ * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.limit=null] - The query limit.
+ * @param {object} [params.filter=null] - The filter expression object.
+ * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
+ * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
+ * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ *
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewData = async (params) => {
+  const {
+    survey,
+    cycle,
+    nodeDef,
+    nodeDefCols = [],
+    offset = 0,
+    limit = null,
+    filter = null,
+    sort = [],
+    editMode = false,
+    streamOutput = null,
+  } = params
+
   // Fetch data
   const result = await DataViewRepository.fetchViewData({
     survey,

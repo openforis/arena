@@ -10,7 +10,7 @@ const columnSet = {
 }
 
 /**
- * @typedef {module:arena.TableSurvey} module:arena.TableNode
+ * @typedef {module:arena.TableSurvey} module:arena.TableTaxonVernacularName
  */
 export default class TableTaxonVernacularName extends TableSurvey {
   constructor(surveyId) {

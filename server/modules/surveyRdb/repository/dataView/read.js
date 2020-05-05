@@ -27,23 +27,14 @@ const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColName(nodeDefParent)
 }
 
-/**
- * Determines the select fields to be used in the query.
- *
- * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
- * @param {Array} [params.nodeDefCols=null] - The node defs associated to the selected columns.
- * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
- * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
- *
- * @returns {string[]} - An array of fields to be used in the select query.
- */
 const _getSelectFields = (params) => {
   const { survey, nodeDef, columnNodeDefs, nodeDefCols, editMode } = params
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
-  if (nodeDefCols) {
+  if (columnNodeDefs) {
+    return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
+  }
+  if (!R.isEmpty(nodeDefCols)) {
     const selectFields = [
       viewDataNodeDef.columnRecordUuid,
       viewDataNodeDef.columnUuid,
@@ -60,26 +51,12 @@ const _getSelectFields = (params) => {
         'row_to_json(r.*) AS record'
       )
     }
-    return selectFields
+    return selectFields.join(', ')
   }
-  if (columnNodeDefs) {
-    return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead]
-  }
+
   return '*'
 }
 
-/**
- * Generates the from clause to be used in the select query.
- *
- * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
- * @param {Array} [params.nodeDefCols=null] - The node defs associated to the selected columns.
- * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
- * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
- *
- * @returns {string} - The from clause.
- */
 const _getFromClause = (params) => {
   const { survey, nodeDef, editMode, nodeDefCols } = params
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
@@ -139,7 +116,7 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
- * @param {Array} [params.nodeDefCols=null] - The node defs associated to the selected columns.
+ * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
@@ -147,7 +124,7 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
  * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
  * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
  * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} client - The database client.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
@@ -156,7 +133,7 @@ export const fetchViewData = async (params, client = db) => {
     survey,
     cycle,
     nodeDef,
-    nodeDefCols = null,
+    nodeDefCols = [],
     offset = null,
     limit = null,
     filter = null,
@@ -179,7 +156,7 @@ export const fetchViewData = async (params, client = db) => {
 
   const select = `
     SELECT 
-        ${selectFields.join(', ')}
+        ${selectFields}
     FROM 
         ${fromClause}
     WHERE 
