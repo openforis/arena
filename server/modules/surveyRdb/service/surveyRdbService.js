@@ -14,6 +14,7 @@ const _fetchSurvey = async (surveyId, cycle) => {
  *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
  * @param {!NodeDef} [params.nodeDefUuidTable] - The UUID of the node def associated to the view to select.
  * @param {Array} [params.nodeDefUuidCols=[]] - The UUIDs of the node defs associated to the selected columns.
  * @param {number} [params.offset=null] - The query offset.

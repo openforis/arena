@@ -56,18 +56,15 @@ export const init = (app) => {
       const sort = Request.getJsonParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
-      await SurveyRdbService.queryTable(
+      await SurveyRdbService.fetchViewData({
         surveyId,
         cycle,
         nodeDefUuidTable,
         nodeDefUuidCols,
-        0,
-        null,
         filter,
         sort,
-        false,
-        res
-      )
+        streamOutput: res,
+      })
     } catch (error) {
       next(error)
     }

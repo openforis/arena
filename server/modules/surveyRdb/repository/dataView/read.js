@@ -115,6 +115,7 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
  *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
  * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
  * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.

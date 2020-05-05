@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { ColumnNodeDef } from '../../../../common/model/db'
+import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 import * as ProcessingChain from '../../../../common/analysis/processingChain'
 import * as ProcessingStep from '../../../../common/analysis/processingStep'
 import * as ProcessingStepCalculation from '../../../../common/analysis/processingStepCalculation'
@@ -55,6 +55,7 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
  *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
  * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
  * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
@@ -97,7 +98,8 @@ export const fetchViewData = async (params) => {
 
   if (streamOutput) {
     // Consider only user selected fields (from column node defs)
-    const fields = nodeDefCols.map((nodeDefCol) => ColumnNodeDef.getColName(nodeDefCol))
+    const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+    const fields = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
     await db.stream(result, (stream) => {
       stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
