@@ -49,15 +49,9 @@ const _getSelectFields = (params) => {
       viewDataNodeDef.columnUuid,
       // selected node def columns
       ...nodeDefCols.map((nodeDefCol) => `${viewDataNodeDef.alias}.${ColumnNodeDef.getColName(nodeDefCol)}`),
+      // Add ancestor uuid columns
+      ...viewDataNodeDef.columnUuids,
     ]
-    // Add ancestor uuid columns
-    Survey.visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
-      if (!(NodeDef.isVirtual(nodeDefAncestor) || NodeDef.isRoot(nodeDefAncestor))) {
-        const columnUuid = `${viewDataNodeDef.alias}.${ColumnNodeDef.getColName(nodeDefAncestor)}`
-        selectFields.push(columnUuid)
-      }
-    })(survey)
-
     if (editMode) {
       selectFields.push(
         // Node (every node is transformed into json in a column named with the nodeDefUuid)
