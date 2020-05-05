@@ -1,11 +1,6 @@
 import * as R from 'ramda'
 
-export const keys = {
-  order: {
-    asc: 'asc',
-    desc: 'desc',
-  },
-}
+import * as SortCriteria from './sortCriteria'
 
 export const toHttpParams = R.pipe(R.map(R.pick(['variable', 'order'])), JSON.stringify)
 
@@ -13,11 +8,11 @@ export const getSortPreparedStatement = (sortCriteria) => {
   return sortCriteria.reduce(
     (prev, curr, i) => {
       const paramName = `sort_${i}`
-      const order = keys.order[curr.order] || keys.order.asc
+      const order = SortCriteria.getOrder(curr)
 
       return {
         clause: `${prev.clause}${i ? ', ' : ''} $/${paramName}:name/ ${order}`,
-        params: { ...prev.params, [paramName]: curr.variable },
+        params: { ...prev.params, [paramName]: SortCriteria.getVariable(curr) },
       }
     },
     { clause: '', params: {} }
@@ -28,7 +23,10 @@ export const findVariableByValue = (value) => R.find((v) => v.value === value)
 
 export const getViewExpr = (ascLabel, descLabel) =>
   R.pipe(
-    R.map((c) => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
+    R.map(
+      (sortCriteria) =>
+        `${SortCriteria.getLabel(sortCriteria)} ${SortCriteria.isOrderAsc(sortCriteria) ? ascLabel : descLabel}`
+    ),
     R.join(', ')
   )
 

@@ -6,7 +6,7 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 const _fetchSurvey = async (surveyId, cycle) => {
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId, true))
   const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
-  return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
+  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle, loadDraftDefs)
 }
 
 export const queryTable = async (
@@ -19,24 +19,27 @@ export const queryTable = async (
   filter = null,
   sort = [],
   editMode = false,
-  streamOutput = null,
+  streamOutput = null
 ) => {
   const survey = await _fetchSurvey(surveyId, cycle)
-  return await SurveyRdbManager.queryTable(
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
+  const nodeDefCols = nodeDefUuidCols ? Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey) : []
+
+  return SurveyRdbManager.queryTable(
     survey,
     cycle,
-    nodeDefUuidTable,
-    nodeDefUuidCols,
+    nodeDef,
+    nodeDefCols,
     offset,
     limit,
     filter,
     sort,
     editMode,
-    streamOutput,
+    streamOutput
   )
 }
 
 export const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {
   const survey = await _fetchSurvey(surveyId, cycle)
-  return await SurveyRdbManager.countTable(survey, cycle, nodeDefUuidTable, filter)
+  return SurveyRdbManager.countTable(survey, cycle, nodeDefUuidTable, filter)
 }

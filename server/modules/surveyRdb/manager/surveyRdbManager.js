@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import { ColumnNodeDef } from '../../../../common/model/db'
 import * as ProcessingChain from '../../../../common/analysis/processingChain'
 import * as ProcessingStep from '../../../../common/analysis/processingStep'
 import * as ProcessingStepCalculation from '../../../../common/analysis/processingStepCalculation'
@@ -52,32 +53,34 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
 export const queryTable = async (
   survey,
   cycle,
-  nodeDefUuidTable,
-  nodeDefUuidCols = [],
+  nodeDef,
+  nodeDefCols = [],
   offset = 0,
   limit = null,
-  filterExpr = null,
+  filter = null,
   sort = [],
   editMode = false,
   streamOutput = null
 ) => {
   // Fetch data
-  const { result, selectFields } = await DataViewRepository.runSelect({
+  const result = await DataViewRepository.fetchViewData({
     survey,
     cycle,
-    nodeDefUuidTable,
-    nodeDefUuidCols,
+    nodeDef,
+    nodeDefCols,
     offset,
     limit,
-    filterExpr,
+    filter,
     sort,
     editMode,
-    queryStream: Boolean(streamOutput),
+    stream: Boolean(streamOutput),
   })
 
   if (streamOutput) {
+    // Consider only user selected fields (from column node defs)
+    const fields = nodeDefCols.map((nodeDefCol) => ColumnNodeDef.getColName(nodeDefCol))
     await db.stream(result, (stream) => {
-      stream.pipe(CSVWriter.transformToStream(streamOutput, selectFields))
+      stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
   }
   return result

@@ -1,14 +1,7 @@
 import * as pgPromise from 'pg-promise'
-import camelize from 'camelize'
-import * as R from 'ramda'
-
 import { TableNode } from '../../../../../common/model/db'
-import * as Node from '../../../../../core/record/node'
 
 import { db } from '../../../../db/db'
-
-export const dbTransformCallback = (node) =>
-  node ? R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node) : null
 
 /**
  * Fetches nodes by the given survey id and the optional parameters.
@@ -27,5 +20,9 @@ export const dbTransformCallback = (node) =>
 export const fetchNodes = async (params, client = db) => {
   const { surveyId, uuid, recordUuid, parentUuid, nodeDefUuid, draft } = params
   const table = new TableNode(surveyId)
-  return client.map(table.getSelect({ uuid, recordUuid, parentUuid, nodeDefUuid, draft }), [], dbTransformCallback)
+  return client.map(
+    table.getSelect({ uuid, recordUuid, parentUuid, nodeDefUuid, draft }),
+    [],
+    TableNode.dbTransformCallback
+  )
 }
