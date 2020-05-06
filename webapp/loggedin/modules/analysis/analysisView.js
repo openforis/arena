@@ -7,18 +7,18 @@ import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesVi
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
-import ProcessingChainsView from './processingChains/processingChainsView'
+import ChainsView from './chains/view'
 import ProcessingChainView from './processingChain/processingChainView'
 import RStudioView from './rStudio/rStudioView'
 
 const AnalysisView = () => (
-  <SurveyDefsLoader draft={false} validate={false} requirePublish={true}>
+  <SurveyDefsLoader draft={false} validate={false} requirePublish>
     <ModuleSwitch
       moduleRoot={appModules.analysis}
       moduleDefault={analysisModules.processingChains}
       modules={[
         {
-          component: ProcessingChainsView,
+          component: ChainsView,
           path: appModuleUri(analysisModules.processingChains),
         },
         {

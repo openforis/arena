@@ -1,10 +1,21 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
 import * as R from 'ramda'
+
+import * as TableViewsState from '@webapp/loggedin/tableViews/tableViewsState'
+import { fetchListItems } from '@webapp/loggedin/tableViews/actions'
 
 import TablePaginator from './tablePaginator'
 
-const TableHeader = props => {
-  const { module, moduleApiUri, restParams, headerLeftComponent, list, offset, limit, count, fetchListItems } = props
+const TableHeader = (props) => {
+  const { headerLeftComponent, module, apiUri, restParams } = props
+
+  const dispatch = useDispatch()
+  const list = useSelector(TableViewsState.getList(module))
+  const count = useSelector(TableViewsState.getCount(module))
+  const limit = useSelector(TableViewsState.getLimit(module))
+  const offset = useSelector(TableViewsState.getOffset(module))
 
   return (
     <div className="table__header">
@@ -15,11 +26,18 @@ const TableHeader = props => {
           offset={offset}
           limit={limit}
           count={count}
-          fetchFn={offset => fetchListItems(module, moduleApiUri, offset, restParams)}
+          fetchFn={(offsetUpdate) => dispatch(fetchListItems(module, apiUri, offsetUpdate, restParams))}
         />
       )}
     </div>
   )
+}
+
+TableHeader.propTypes = {
+  apiUri: PropTypes.string.isRequired,
+  headerLeftComponent: PropTypes.elementType.isRequired,
+  module: PropTypes.string.isRequired,
+  restParams: PropTypes.object.isRequired,
 }
 
 export default TableHeader

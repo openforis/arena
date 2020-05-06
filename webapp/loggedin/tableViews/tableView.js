@@ -1,57 +1,89 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { useOnSurveyCycleUpdate, useSurveyId } from '@webapp/commonComponents/hooks'
 import TableHeader from './components/tableHeader'
 import TableContent from './components/tableContent'
 
-import * as TableViewsState from './tableViewsState'
+import { initListItems, reloadListItems } from './actions'
 
-import { initListItems, fetchListItems } from './actions'
+const TableView = (props) => {
+  const {
+    className,
+    gridTemplateColumns,
+    headerLeftComponent,
+    isRowActive,
+    module,
+    moduleApiUri,
+    noItemsLabelKey,
+    onRowClick,
+    reloadOnSurveyCycleUpdate,
+    restParams,
+    rowComponent,
+    rowHeaderComponent,
+  } = props
 
-const TableView = props => {
-  const { module, moduleApiUri, restParams, className, initListItems } = props
+  const dispatch = useDispatch()
+  const surveyId = useSurveyId()
+  const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   useEffect(() => {
-    initListItems(module, moduleApiUri, restParams)
+    dispatch(initListItems(module, apiUri, restParams))
   }, [])
+
+  if (reloadOnSurveyCycleUpdate) {
+    useOnSurveyCycleUpdate(() => {
+      dispatch(reloadListItems(module, restParams))
+    })
+  }
 
   return (
     <div className={`table ${className}`}>
-      <TableHeader {...props} />
+      <TableHeader apiUri={apiUri} headerLeftComponent={headerLeftComponent} module={module} restParams={restParams} />
 
-      <TableContent {...props} />
+      <TableContent
+        module={module}
+        gridTemplateColumns={gridTemplateColumns}
+        isRowActive={isRowActive}
+        noItemsLabelKey={noItemsLabelKey}
+        onRowClick={onRowClick}
+        rowComponent={rowComponent}
+        rowHeaderComponent={rowHeaderComponent}
+      />
     </div>
   )
 }
 
-const DummyComponent = () => <div></div>
+const DummyComponent = () => <div />
+
+TableView.propTypes = {
+  className: PropTypes.string,
+  gridTemplateColumns: PropTypes.string,
+  headerLeftComponent: PropTypes.elementType,
+  isRowActive: PropTypes.func, // Checks whether a row must be highlighted
+  module: PropTypes.string.isRequired,
+  moduleApiUri: PropTypes.string,
+  noItemsLabelKey: PropTypes.string,
+  onRowClick: PropTypes.func, // Row click handler
+  reloadOnSurveyCycleUpdate: PropTypes.bool,
+  restParams: PropTypes.object,
+  rowComponent: PropTypes.elementType,
+  rowHeaderComponent: PropTypes.elementType,
+}
 
 TableView.defaultProps = {
-  module: '',
-  moduleApiUri: null,
-  restParams: {},
   className: '',
   gridTemplateColumns: '1fr',
   headerLeftComponent: DummyComponent,
+  isRowActive: null,
+  moduleApiUri: null,
+  noItemsLabelKey: 'common.noItems',
+  onRowClick: null,
+  reloadOnSurveyCycleUpdate: false,
+  restParams: {},
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,
-  noItemsLabelKey: 'common.noItems',
-  onRowClick: null, // Function to be passed when an action has to be performed on row click
-  isRowActive: null, // Function to be passed when a row must be highlighted
 }
 
-const mapStateToProps = (state, props) => {
-  let { module, moduleApiUri } = props
-  moduleApiUri = moduleApiUri || `/api/survey/${SurveyState.getSurveyId(state)}/${module}`
-
-  return {
-    moduleApiUri,
-    offset: TableViewsState.getOffset(module)(state),
-    limit: TableViewsState.getLimit(module)(state),
-    count: TableViewsState.getCount(module)(state),
-    list: TableViewsState.getList(module)(state),
-  }
-}
-
-export default connect(mapStateToProps, { initListItems, fetchListItems })(TableView)
+export default TableView

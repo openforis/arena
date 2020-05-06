@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import * as ProcessingChain from '@common/analysis/processingChain'
 import * as DateUtils from '@core/dateUtils'
 
-import ProgressBar from '@webapp/commonComponents/progressBar'
 import { useI18n } from '@webapp/commonComponents/hooks'
+import ProgressBar from '@webapp/commonComponents/progressBar'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 const statusComponent = {
@@ -16,26 +16,23 @@ const statusComponent = {
   ),
 }
 
-const ProcessingChainsRow = (props) => {
-  const { row: processingChainsListItem } = props
+const Row = (props) => {
+  const { row } = props
   const i18n = useI18n()
 
-  const statusExec = ProcessingChain.getStatusExec(processingChainsListItem)
+  const statusExec = ProcessingChain.getStatusExec(row)
 
   return (
     <>
       <div className="chain-label">
-        <div>{ProcessingChain.getLabel(i18n.lang)(processingChainsListItem)}</div>
-        <ErrorBadge
-          validation={ProcessingChain.getValidation(processingChainsListItem)}
-          className="error-badge-inverse"
-        />
+        <div>{ProcessingChain.getLabel(i18n.lang)(row)}</div>
+        <ErrorBadge validation={ProcessingChain.getValidation(row)} className="error-badge-inverse" />
       </div>
-      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateCreated(processingChainsListItem))}</div>
-      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateModified(processingChainsListItem))}</div>
-      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateExecuted(processingChainsListItem))}</div>
+      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateCreated(row))}</div>
+      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateModified(row))}</div>
+      <div>{DateUtils.getRelativeDate(i18n, ProcessingChain.getDateExecuted(row))}</div>
       <div className="column-draft">
-        {ProcessingChain.isDraft(processingChainsListItem) && <span className="icon icon-wrench icon-14px" />}
+        {ProcessingChain.isDraft(row) && <span className="icon icon-wrench icon-14px" />}
       </div>
       <div className={`column-status ${statusExec}`}>{statusComponent[statusExec]}</div>
       <div>
@@ -45,8 +42,8 @@ const ProcessingChainsRow = (props) => {
   )
 }
 
-ProcessingChainsRow.propTypes = {
+Row.propTypes = {
   row: PropTypes.object.isRequired,
 }
 
-export default ProcessingChainsRow
+export default Row

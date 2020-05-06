@@ -25,7 +25,7 @@ const _initList = (module, moduleApiUri, restParams, offset) => async (dispatch,
     moduleApiUri,
     offset,
     limit,
-    ...countResp.data,
+    count: Number(countResp.data.count),
     ...itemsResp.data,
   })
 }
