@@ -1,8 +1,8 @@
 import './processingChainView.scss'
 
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { useParams } from 'react-router'
+import { useParams, useHistory } from 'react-router'
+import { useSelector, useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -11,49 +11,40 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import { useOnUpdate, useI18n } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useI18n, useSurveyInfo, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import ProcessingChainSteps from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainSteps'
 import ProcessingChainButtonBar from '@webapp/loggedin/modules/analysis/processingChain/components/processingChainButtonBar'
 
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 
 import {
+  fetchProcessingChain,
   navigateToProcessingChainsView,
   updateProcessingChainProp,
   updateProcessingChainCycles,
   validateProcessingChain,
   resetProcessingChainState,
   openProcessingChain,
-} from './actions'
-import { fetchProcessingChain } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+} from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
-const ProcessingChainView = props => {
-  const {
-    surveyInfo,
-    surveyCycleKey,
-    processingChain,
-    editingStep,
-    history,
-    fetchProcessingChain,
-    navigateToProcessingChainsView,
-    updateProcessingChainProp,
-    updateProcessingChainCycles,
-    validateProcessingChain,
-    resetProcessingChainState,
-    openProcessingChain,
-  } = props
-
+const ProcessingChainView = () => {
   const { processingChainUuid } = useParams()
 
+  const surveyInfo = useSurveyInfo()
+  const surveyCycleKey = useSurveyCycleKey()
+  const processingChain = useSelector(ProcessingChainState.getProcessingChain)
+  const editingStep = useSelector(ProcessingStepState.isEditingStep)
+
   const i18n = useI18n()
+  const dispatch = useDispatch()
+  const history = useHistory()
 
   useEffect(() => {
     if (R.isEmpty(processingChain)) {
-      fetchProcessingChain(processingChainUuid)
+      dispatch(fetchProcessingChain(processingChainUuid))
     }
 
     return () => {
@@ -61,19 +52,19 @@ const ProcessingChainView = props => {
       if (
         R.pipe(R.path(['location', 'pathname']), R.startsWith(appModuleUri(analysisModules.nodeDef)), R.not)(history)
       ) {
-        resetProcessingChainState()
+        dispatch(resetProcessingChainState())
       }
     }
   }, [])
 
   useOnUpdate(() => {
-    navigateToProcessingChainsView(history)
+    dispatch(navigateToProcessingChainsView(history))
   }, [surveyCycleKey])
 
   useOnUpdate(() => {
     if (!editingStep) {
       // Validate chain on step editor close
-      validateProcessingChain()
+      dispatch(validateProcessingChain())
     }
   }, [editingStep])
 
@@ -82,9 +73,10 @@ const ProcessingChainView = props => {
   return R.isEmpty(processingChain) ? null : (
     <div className={`processing-chain${editingStep ? ' step-editor-open' : ''}`}>
       <button
+        type="button"
         className="btn btn-s"
         style={{ position: 'absolute', right: '0' }}
-        onClick={() => openProcessingChain(history)}
+        onClick={() => dispatch(openProcessingChain(history))}
       >
         {i18n.t('analysisView.processingChainView.openChain')}
       </button>
@@ -95,7 +87,7 @@ const ProcessingChainView = props => {
           formLabelKey="processingChainView.formLabel"
           readOnly={editingStep}
           validation={Validation.getFieldValidation(ProcessingChain.keysProps.labels)(validation)}
-          onChange={labels => updateProcessingChainProp(ProcessingChain.keysProps.labels, labels)}
+          onChange={(labels) => dispatch(updateProcessingChainProp(ProcessingChain.keysProps.labels, labels))}
         />
 
         {!editingStep && (
@@ -104,11 +96,13 @@ const ProcessingChainView = props => {
               formLabelKey="common.description"
               languages={Survey.getLanguages(surveyInfo)}
               labels={ProcessingChain.getDescriptions(processingChain)}
-              onChange={descriptions => updateProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions)}
+              onChange={(descriptions) =>
+                dispatch(updateProcessingChainProp(ProcessingChain.keysProps.descriptions, descriptions))
+              }
             />
             <CyclesSelect
               cyclesKeysSelected={ProcessingChain.getCycles(processingChain)}
-              onChange={cycles => updateProcessingChainCycles(cycles)}
+              onChange={(cycles) => dispatch(updateProcessingChainCycles(cycles))}
             />
           </>
         )}
@@ -124,19 +118,4 @@ const ProcessingChainView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-  processingChain: ProcessingChainState.getProcessingChain(state),
-  editingStep: ProcessingStepState.isEditingStep(state),
-})
-
-export default connect(mapStateToProps, {
-  fetchProcessingChain,
-  navigateToProcessingChainsView,
-  updateProcessingChainProp,
-  updateProcessingChainCycles,
-  validateProcessingChain,
-  resetProcessingChainState,
-  openProcessingChain,
-})(ProcessingChainView)
+export default ProcessingChainView
