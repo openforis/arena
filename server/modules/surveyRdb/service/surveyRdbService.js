@@ -17,6 +17,7 @@ const _fetchSurvey = async (surveyId, cycle) => {
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!NodeDef} [params.nodeDefUuidTable] - The UUID of the node def associated to the view to select.
  * @param {Array} [params.nodeDefUuidCols=[]] - The UUIDs of the node defs associated to the selected columns.
+ * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {object} [params.filter=null] - The filter expression object.
@@ -32,6 +33,7 @@ export const fetchViewData = async (params) => {
     cycle,
     nodeDefUuidTable,
     nodeDefUuidCols = [],
+    columnNodeDefs = false,
     offset = 0,
     limit = null,
     filter = null,
@@ -42,13 +44,14 @@ export const fetchViewData = async (params) => {
 
   const survey = await _fetchSurvey(surveyId, cycle)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
-  const nodeDefCols = nodeDefUuidCols ? Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey) : []
+  const nodeDefCols = nodeDefUuidCols.length > 0 ? Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey) : []
 
   return SurveyRdbManager.fetchViewData({
     survey,
     cycle,
     nodeDef,
     nodeDefCols,
+    columnNodeDefs,
     offset,
     limit,
     filter,
