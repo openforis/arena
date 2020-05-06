@@ -21,15 +21,14 @@ export const userUpdate = 'user/update'
 export const userProfilePictureUpdate = 'user/profilePicture/update'
 export const userStateReset = 'user/reset'
 
-export const resetUserState = () => dispatch => dispatch({ type: userStateReset })
+export const resetUserState = () => (dispatch) => dispatch({ type: userStateReset })
 
-export const fetchUser = userUuid => async (dispatch, getState) => {
+export const fetchUser = (userUuid) => async (dispatch, getState) => {
   const state = getState()
   const user = AppState.getUser(state)
-  const userToUpdate = UserViewState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const editingSelf = User.isEqual(userToUpdate)(user)
+  const editingSelf = User.getUuid(user) === userUuid
 
   const { data: userLoaded } = await axios.get(`/api${editingSelf ? '' : `/survey/${surveyId}`}/user/${userUuid}`)
 
@@ -39,7 +38,7 @@ export const fetchUser = userUuid => async (dispatch, getState) => {
   dispatch({ type: userUpdate, user: userUpdated })
 }
 
-const _validateUser = user => async dispatch => {
+const _validateUser = (user) => async (dispatch) => {
   const validation = await UserValidator.validateUser(user)
   const userValidated = User.assocValidation(validation)(user)
   dispatch({ type: userUpdate, user: userValidated })
@@ -55,10 +54,10 @@ export const updateUserProp = (key, value) => (dispatch, getState) => {
   dispatch(_validateUser(userUpdated))
 }
 
-export const updateUserProfilePicture = profilePicture => async dispatch =>
+export const updateUserProfilePicture = (profilePicture) => async (dispatch) =>
   dispatch({ type: userProfilePictureUpdate, profilePicture })
 
-export const saveUser = history => async (dispatch, getState) => {
+export const saveUser = (history) => async (dispatch, getState) => {
   const state = getState()
   const user = AppState.getUser(state)
   const userToUpdate = UserViewState.getUser(state)
@@ -91,7 +90,7 @@ export const saveUser = history => async (dispatch, getState) => {
       dispatch(
         showNotification('usersView.updateUserConfirmation', {
           name: User.getName(userToUpdate),
-        }),
+        })
       )
 
       if (!editingSelf) {
@@ -103,7 +102,7 @@ export const saveUser = history => async (dispatch, getState) => {
   }
 }
 
-export const removeUser = history => async (dispatch, getState) => {
+export const removeUser = (history) => async (dispatch, getState) => {
   const state = getState()
   const lang = AppState.getLang(state)
   const surveyId = SurveyState.getSurveyId(state)
@@ -119,7 +118,7 @@ export const removeUser = history => async (dispatch, getState) => {
       showNotification('userView.removeUserConfirmation', {
         user: User.getName(userToUpdate),
         survey: Survey.getLabel(surveyInfo, lang),
-      }),
+      })
     )
     history.push(appModuleUri(userModules.users))
   } finally {
@@ -127,7 +126,7 @@ export const removeUser = history => async (dispatch, getState) => {
   }
 }
 
-export const inviteUserRepeat = history => async (dispatch, getState) => {
+export const inviteUserRepeat = (history) => async (dispatch, getState) => {
   const state = getState()
   const userToInvite = UserViewState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
@@ -144,7 +143,7 @@ export const inviteUserRepeat = history => async (dispatch, getState) => {
     dispatch(
       showNotification('emails.userInviteRepeatConfirmation', {
         email: UserInvite.getEmail(userInvite),
-      }),
+      })
     )
 
     history.push(appModuleUri(userModules.users))
