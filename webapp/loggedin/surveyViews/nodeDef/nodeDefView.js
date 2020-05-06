@@ -34,7 +34,7 @@ import { setNodeDefUuidForEdit } from './actions'
 import { navigateToProcessingChainsView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
-const NodeDefView = props => {
+const NodeDefView = (props) => {
   const {
     surveyCycleKey,
     nodeDef,
@@ -61,7 +61,7 @@ const NodeDefView = props => {
   const { nodeDefUuid } = useParams()
 
   const editingNodeDefFromDesigner = Boolean(
-    matchPath(pathname, appModuleUri(designerModules.nodeDef) + ':nodeDefUuid'),
+    matchPath(pathname, appModuleUri(designerModules.nodeDef) + ':nodeDefUuid')
   )
 
   useEffect(() => {
@@ -175,16 +175,16 @@ const isNodeDefKeyEditDisabled = (survey, nodeDef) =>
     Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes) ||
   NodeDef.isReadOnly(nodeDef)
 
-const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
+const isNodeDefMultipleEditDisabled = (survey, surveyCycleKey, nodeDef) =>
   !nodeDef ||
   NodeDef.isPublished(nodeDef) ||
   NodeDef.isKey(nodeDef) ||
-  NodeDefLayout.isRenderTable(nodeDef) ||
+  NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef) ||
   Survey.isNodeDefParentCode(nodeDef)(survey) ||
   NodeDef.isReadOnly(nodeDef) ||
   NodeDef.isAnalysis(nodeDef)
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const nodeDef = NodeDefState.getNodeDef(state)
@@ -193,7 +193,7 @@ const mapStateToProps = state => {
   const isDirty = NodeDefState.isDirty(state)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
-  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
+  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
 
   return {
     surveyCycleKey,
