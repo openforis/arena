@@ -31,7 +31,7 @@ import {
   removeNodeDef,
 } from '@webapp/survey/nodeDefs/actions'
 import { setNodeDefUuidForEdit } from './actions'
-import { navigateToProcessingChainsView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const NodeDefView = props => {
@@ -51,7 +51,7 @@ const NodeDefView = props => {
     cancelNodeDefEdits,
     saveNodeDefEdits,
     removeNodeDef,
-    navigateToProcessingChainsView,
+    navigateToChainsView,
   } = props
 
   const i18n = useI18n()
@@ -75,7 +75,7 @@ const NodeDefView = props => {
     if (editingNodeDefFromDesigner) {
       history.goBack()
     } else {
-      navigateToProcessingChainsView(history)
+      navigateToChainsView(history)
     }
   }, [surveyCycleKey])
 
@@ -215,5 +215,5 @@ export default connect(mapStateToProps, {
   cancelNodeDefEdits,
   saveNodeDefEdits,
   removeNodeDef,
-  navigateToProcessingChainsView,
+  navigateToChainsView,
 })(NodeDefView)
