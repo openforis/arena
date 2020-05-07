@@ -31,16 +31,14 @@ import {
 } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 
 const ProcessingChainView = () => {
-  const { processingChainUuid } = useParams()
-
-  const surveyInfo = useSurveyInfo()
-  const surveyCycleKey = useSurveyCycleKey()
-  const processingChain = useSelector(ProcessingChainState.getProcessingChain)
-  const editingStep = useSelector(ProcessingStepState.isEditingStep)
-
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const history = useHistory()
+  const i18n = useI18n()
+  const surveyInfo = useSurveyInfo()
+  const surveyCycleKey = useSurveyCycleKey()
+  const { processingChainUuid } = useParams()
+  const processingChain = useSelector(ProcessingChainState.getProcessingChain)
+  const editingStep = useSelector(ProcessingStepState.isEditingStep)
 
   useEffect(() => {
     if (R.isEmpty(processingChain)) {
