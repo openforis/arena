@@ -20,9 +20,9 @@ import {
 import { stepCreate, stepReset, stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
 
 import {
-  processingStepCalculationDirtyUpdate,
-  processingStepCalculationDelete,
-  processingStepCalculationReset,
+  calculationDirtyUpdate,
+  calculationDelete,
+  calculationReset,
 } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const actionHandlers = {
@@ -54,16 +54,16 @@ const actionHandlers = {
   [stepDelete]: (state) => ChainState.dissocStepLast(state),
 
   // Calculations
-  [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
+  [calculationDirtyUpdate]: (state, { calculation }) =>
     ChainState.assocProcessingStepCalculationAttributeUuid(
       ProcessingStepCalculation.getUuid(calculation),
       ProcessingStepCalculation.getNodeDefUuid(calculation)
     )(state),
 
-  [processingStepCalculationDelete]: (state, { calculation }) =>
+  [calculationDelete]: (state, { calculation }) =>
     ChainState.dissocProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation))(state),
 
-  [processingStepCalculationReset]: (state, { calculation }) =>
+  [calculationReset]: (state, { calculation }) =>
     R.ifElse(
       R.always(ProcessingStepCalculation.isTemporary(calculation)),
       ChainState.dissocProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation)),

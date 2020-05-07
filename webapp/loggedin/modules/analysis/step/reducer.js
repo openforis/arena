@@ -19,10 +19,7 @@ import {
   calculationCreate,
   calculationIndexUpdate,
 } from '@webapp/loggedin/modules/analysis/step/actions'
-import {
-  processingStepCalculationDelete,
-  processingStepCalculationReset,
-} from '@webapp/loggedin/modules/analysis/calculation/actions'
+import { calculationDelete, calculationReset } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const actionHandlers = {
   // Reset state
@@ -56,9 +53,9 @@ const actionHandlers = {
   [calculationIndexUpdate]: (state, { indexFrom, indexTo }) =>
     StepState.updateCalculationIndex(indexFrom, indexTo)(state),
 
-  [processingStepCalculationDelete]: (state, { calculation }) => StepState.dissocCalculation(calculation)(state),
+  [calculationDelete]: (state, { calculation }) => StepState.dissocCalculation(calculation)(state),
 
-  [processingStepCalculationReset]: (state) => StepState.dissocTemporaryCalculation(state),
+  [calculationReset]: (state) => StepState.dissocTemporaryCalculation(state),
 
   // NodeDef (Virtual Entity)
   [nodeDefSave]: (state, { nodeDef }) =>

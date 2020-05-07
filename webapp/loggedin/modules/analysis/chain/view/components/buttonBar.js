@@ -15,7 +15,7 @@ import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { deleteStep } from '@webapp/loggedin/modules/analysis/step/actions'
-import { deleteStepCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
+import { deleteCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const ButtonBar = () => {
   const i18n = useI18n()
@@ -77,7 +77,7 @@ const ButtonBar = () => {
             const messageKey = `${messageKeyPrefix}.deleteConfirm`
 
             let deleteAction = deleteChain(history)
-            if (editingCalculation) deleteAction = deleteStepCalculation()
+            if (editingCalculation) deleteAction = deleteCalculation()
             if (editingStep) deleteAction = deleteStep()
 
             dispatch(showDialogConfirm(messageKey, {}, deleteAction))

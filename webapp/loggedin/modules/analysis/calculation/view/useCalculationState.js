@@ -14,7 +14,7 @@ import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
-import { validateStepCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
+import { validateCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const getTypes = (i18n) =>
   R.pipe(
@@ -48,7 +48,7 @@ export default () => {
   const calculation = useSelector(CalculationState.getCalculation)
   const dirty = useSelector(CalculationState.isDirty)
 
-  const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)
+  const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)(survey)
   const attribute = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
 
@@ -72,7 +72,7 @@ export default () => {
 
   useEffect(() => {
     if (!R.isEmpty(calculation)) {
-      dispatch(validateStepCalculation())
+      dispatch(validateCalculation())
     }
   }, [])
 

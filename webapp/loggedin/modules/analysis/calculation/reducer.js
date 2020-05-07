@@ -7,11 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { calculationUpdate, calculationCreate, stepUpdate } from '@webapp/loggedin/modules/analysis/step/actions'
-import {
-  processingStepCalculationDirtyUpdate,
-  processingStepCalculationReset,
-  processingStepCalculationDelete,
-} from './actions'
+import { calculationDirtyUpdate, calculationReset, calculationDelete } from './actions'
 
 import * as CalculationState from './state/calculationState'
 
@@ -28,12 +24,11 @@ const actionHandlers = {
 
   [calculationCreate]: (state, { calculation }) => CalculationState.assocCalculation(calculation)(state),
 
-  [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
-    CalculationState.assocCalculationDirty(calculation)(state),
+  [calculationDirtyUpdate]: (state, { calculation }) => CalculationState.assocCalculationDirty(calculation)(state),
 
-  [processingStepCalculationDelete]: () => ({}),
+  [calculationDelete]: () => ({}),
 
-  [processingStepCalculationReset]: () => ({}),
+  [calculationReset]: () => ({}),
 
   // Update calculation attribute on node def edit cancel / back
   [nodeDefSave]: (state, { nodeDef }) =>

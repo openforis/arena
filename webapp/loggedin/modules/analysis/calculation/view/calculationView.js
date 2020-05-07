@@ -17,9 +17,9 @@ import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { checkCanSelectNodeDef, navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
 import {
-  updateProcessingStepCalculationProp,
-  updateProcessingStepCalculationAttribute,
-  resetProcessingStepCalculationState,
+  updateCalculationProp,
+  updateCalculationAttribute,
+  resetCalculation,
   createNodeDefAnalysis,
 } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
@@ -51,8 +51,8 @@ const CalculationView = () => {
           className="btn-s btn-close"
           onClick={() =>
             dirty
-              ? dispatch(showDialogConfirm('common.cancelConfirm', {}, resetProcessingStepCalculationState()))
-              : dispatch(resetProcessingStepCalculationState())
+              ? dispatch(showDialogConfirm('common.cancelConfirm', {}, resetCalculation()))
+              : dispatch(resetCalculation())
           }
         >
           <span className="icon icon-10px icon-cross" />
@@ -62,13 +62,13 @@ const CalculationView = () => {
           languages={Survey.getLanguages(surveyInfo)}
           labels={Calculation.getLabels(calculation)}
           validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
-          onChange={(labels) => dispatch(updateProcessingStepCalculationProp(Calculation.keysProps.labels, labels))}
+          onChange={(labels) => dispatch(updateCalculationProp(Calculation.keysProps.labels, labels))}
         />
 
         <FormItem label={i18n.t('common.type')}>
           <ButtonGroup
             selectedItemKey={Calculation.getType(calculation)}
-            onChange={(type) => dispatch(updateProcessingStepCalculationProp(Calculation.keysProps.type, type))}
+            onChange={(type) => dispatch(updateCalculationProp(Calculation.keysProps.type, type))}
             items={types}
           />
         </FormItem>
@@ -82,7 +82,7 @@ const CalculationView = () => {
               itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
               validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
               onBeforeChange={(attrDef) => dispatch(checkCanSelectNodeDef(attrDef))}
-              onChange={(def) => dispatch(updateProcessingStepCalculationAttribute(def))}
+              onChange={(def) => dispatch(updateCalculationAttribute(def))}
             />
             <button
               type="button"
@@ -109,7 +109,7 @@ const CalculationView = () => {
             <ButtonGroup
               selectedItemKey={Calculation.getAggregateFunction(calculation)}
               onChange={(aggregateFn) =>
-                dispatch(updateProcessingStepCalculationProp(Calculation.keysProps.aggregateFn, aggregateFn))
+                dispatch(updateCalculationProp(Calculation.keysProps.aggregateFn, aggregateFn))
               }
               items={aggregateFns}
               deselectable
