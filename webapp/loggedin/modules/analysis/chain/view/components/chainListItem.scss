@@ -1,10 +1,13 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
-.processing-chain__step,
+.chain-list-item,
 .processing-step__calculation {
   position: relative;
   display: flex;
   margin-left: 16px;
+  padding: unset;
+  border: unset;
+  background-color: unset;
 
   &:not(:last-child) {
     padding-bottom: 10px;
@@ -21,12 +24,12 @@
     left: 0;
     display: block;
     width: 2px;
-    content: "";
+    content: '';
     background-color: $greyBorder;
   }
 }
 
-.processing-chain__step-index,
+.chain-list-item__index,
 .processing-step__calculation-index {
   z-index: 1;
   width: 32px;
@@ -41,34 +44,34 @@
   background-color: $blueLightFocus;
   color: lighten($black, 20%);
   font-weight: 600;
-  font-size: .75rem;
+  font-size: 0.75rem;
   transition: all 300ms ease;
 }
 
-.processing-chain__step.editing,
+.chain-list-item.editing,
 .processing-step__calculation.editing {
-  .processing-chain__step-index,
+  .chain-list-item__index,
   .processing-step__calculation-index {
     background-color: $yellow;
   }
 }
 
-.processing-chain__step-content,
+.chain-list-item__content,
 .processing-step__calculation-content {
   position: relative;
-  transition: .2s all;
+  transition: 0.2s all;
   display: grid;
   grid-template-columns: repeat(2, auto);
   grid-column-gap: 20px;
   align-items: center;
   height: 32px;
   padding: 0 10px;
-  font-size: .9rem;
+  font-size: 0.9rem;
 
   .icon-edit {
-    transition: .3s all;
+    transition: 0.3s all;
     opacity: 0;
-    color: lighten($black, 20%)
+    color: lighten($black, 20%);
   }
 
   &:hover {
@@ -81,17 +84,17 @@
   }
 }
 
-.processing-chain.step-editor-open .processing-chain__step-content,
+.chain.step-editor-open .chain-list-item__content,
 .processing-step.calculation-editor-opened .processing-step__calculation-content {
   grid-template-columns: 80px auto;
 }
 
-.processing-chain__step-label,
+.chain-list-item__label,
 .processing-step__calculation-label {
   display: grid;
   grid-template-columns: 1fr 24px;
 
-  .error-badge  {
+  .error-badge {
     position: relative;
   }
 }

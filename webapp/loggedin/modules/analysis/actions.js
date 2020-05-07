@@ -6,17 +6,17 @@ import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
-import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
+import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 
 export const navigateToNodeDefEdit = (history, nodeDefUuid) => () =>
   history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
 
-export const checkCanSelectNodeDef = nodeDef => (dispatch, getState) => {
+export const checkCanSelectNodeDef = (nodeDef) => (dispatch, getState) => {
   const state = getState()
   // Check that the node def belongs to all processing chain cycles
-  const processingChain = ProcessingChainState.getProcessingChain(state)
+  const processingChain = ChainState.getProcessingChain(state)
   if (NodeDef.belongsToAllCycles(ProcessingChain.getCycles(processingChain))(nodeDef)) {
     return true
   }
@@ -26,8 +26,8 @@ export const checkCanSelectNodeDef = nodeDef => (dispatch, getState) => {
     showNotification(
       'processingChainView.cannotSelectNodeDefNotBelongingToCycles',
       { label: NodeDef.getLabel(nodeDef, lang) },
-      NotificationState.severity.error,
-    ),
+      NotificationState.severity.error
+    )
   )
   return false
 }

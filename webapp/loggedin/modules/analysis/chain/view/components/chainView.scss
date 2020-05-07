@@ -1,4 +1,4 @@
-.processing-chain {
+.chain {
   display: grid;
   grid-template-rows: 1fr 60px;
 
@@ -11,7 +11,7 @@
   }
 }
 
-.processing-chain,
+.chain,
 .processing-step,
 .processing-step__calculation-editor {
   position: relative;

@@ -2,33 +2,29 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
+import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
+import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
-import {
-  saveProcessingChain,
-  deleteProcessingChain,
-  navigateToProcessingChainsView,
-} from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { deleteProcessingStep } from '@webapp/loggedin/modules/analysis/processingStep/actions'
 import { deleteProcessingStepCalculation } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
-const ProcessingChainButtonBar = () => {
+const ButtonBar = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const chain = useSelector(ProcessingChainState.getProcessingChain)
-  const chainDirty = useSelector(ProcessingChainState.isDirty)
-  const editingChain = useSelector(ProcessingChainState.isEditingChain)
+  const chain = useSelector(ChainState.getProcessingChain)
+  const chainDirty = useSelector(ChainState.isDirty)
+  const editingChain = useSelector(ChainState.isEditingChain)
 
   const step = useSelector(ProcessingStepState.getProcessingStep)
   const stepNext = useSelector(ProcessingStepState.getProcessingStepNext)
@@ -44,11 +40,12 @@ const ProcessingChainButtonBar = () => {
       <div className="button-bar">
         {editingChain && !editingStep && !editingCalculation && (
           <button
+            type="button"
             className="btn-s btn-cancel"
             onClick={() =>
               chainDirty
-                ? dispatch(showDialogConfirm('common.cancelConfirm', {}, navigateToProcessingChainsView(history)))
-                : dispatch(navigateToProcessingChainsView(history))
+                ? dispatch(showDialogConfirm('common.cancelConfirm', {}, navigateToChainsView(history)))
+                : dispatch(navigateToChainsView(history))
             }
           >
             <span className="icon icon-cross icon-left icon-10px" />
@@ -57,36 +54,33 @@ const ProcessingChainButtonBar = () => {
         )}
 
         <button
+          type="button"
           className="btn-s btn-primary"
-          onClick={() => dispatch(saveProcessingChain())}
+          onClick={() => dispatch(saveChain())}
           aria-disabled={!calculationDirty && !stepDirty && !chainDirty}
         >
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
         </button>
         <button
+          type="button"
           className="btn-s btn-danger btn-delete"
           aria-disabled={
-            (editingCalculation && ProcessingStepCalculation.isTemporary(calculation)) ||
-            (editingStep && (ProcessingStep.isTemporary(step) || Boolean(stepNext))) ||
-            (editingChain && ProcessingChain.isTemporary(chain))
+            (editingCalculation && Calculation.isTemporary(calculation)) ||
+            (editingStep && (Step.isTemporary(step) || Boolean(stepNext))) ||
+            (editingChain && Chain.isTemporary(chain))
           }
           onClick={() => {
-            const messageKeyConfirm = `${
-              editingCalculation
-                ? 'processingStepCalculationView'
-                : editingStep
-                ? 'processingStepView'
-                : 'processingChainView'
-            }.deleteConfirm`
+            let messageKeyPrefix = 'processingChainView'
+            if (editingCalculation) messageKeyPrefix = 'processingStepCalculationView'
+            if (editingStep) messageKeyPrefix = 'processingStepView'
+            const messageKey = `${messageKeyPrefix}.deleteConfirm`
 
-            const onDeleteConfirm = editingCalculation
-              ? deleteProcessingStepCalculation()
-              : editingStep
-              ? deleteProcessingStep()
-              : deleteProcessingChain(history)
+            let deleteAction = deleteChain(history)
+            if (editingCalculation) deleteAction = deleteProcessingStepCalculation()
+            if (editingStep) deleteAction = deleteProcessingStep()
 
-            dispatch(showDialogConfirm(messageKeyConfirm, {}, onDeleteConfirm))
+            dispatch(showDialogConfirm(messageKey, {}, deleteAction))
           }}
         >
           <span className="icon icon-bin icon-left icon-12px" />
@@ -97,4 +91,4 @@ const ProcessingChainButtonBar = () => {
   )
 }
 
-export default ProcessingChainButtonBar
+export default ButtonBar
