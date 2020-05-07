@@ -20,6 +20,7 @@ const TableContent = (props) => {
 
   const i18n = useI18n()
   const list = useSelector(TableViewsState.getList(module))
+  const offset = useSelector(TableViewsState.getOffset(module))
 
   return R.isEmpty(list) ? (
     <div className="table__empty-rows">{i18n.t(noItemsLabelKey)}</div>
@@ -43,7 +44,7 @@ const TableContent = (props) => {
               className={className}
               style={{ gridTemplateColumns }}
             >
-              {React.createElement(rowComponent, { ...props, idx: i, row })}
+              {React.createElement(rowComponent, { ...props, idx: i, offset, row })}
             </div>
           )
         })}

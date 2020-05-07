@@ -1,3 +1,5 @@
+/* eslint react/jsx-props-no-spreading: 0 */
+// TODO: Now TableHeader and TableContent need to pass the dynamic ...rest props to components - All components using TableView must be refactor
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
@@ -22,6 +24,7 @@ const TableView = (props) => {
     restParams,
     rowComponent,
     rowHeaderComponent,
+    ...rest
   } = props
 
   const dispatch = useDispatch()
@@ -40,7 +43,13 @@ const TableView = (props) => {
 
   return (
     <div className={`table ${className}`}>
-      <TableHeader apiUri={apiUri} headerLeftComponent={headerLeftComponent} module={module} restParams={restParams} />
+      <TableHeader
+        apiUri={apiUri}
+        headerLeftComponent={headerLeftComponent}
+        module={module}
+        restParams={restParams}
+        {...rest}
+      />
 
       <TableContent
         module={module}
@@ -50,6 +59,7 @@ const TableView = (props) => {
         onRowClick={onRowClick}
         rowComponent={rowComponent}
         rowHeaderComponent={rowHeaderComponent}
+        {...rest}
       />
     </div>
   )

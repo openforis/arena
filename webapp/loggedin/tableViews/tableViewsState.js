@@ -34,7 +34,10 @@ export const assocListUpdateProps = (props) => (state) => {
   }
 }
 
-export const getModuleProp = (module, prop) => R.pipe(getState, R.pathOr(defaults[prop], [module, prop]))
+const _getDefaultValue = (prop, defaultValue) => R.propOr(defaultValue, prop)(defaults)
+
+export const getModuleProp = (module, prop, defaultValue = null) =>
+  R.pipe(getState, R.pathOr(_getDefaultValue(prop, defaultValue), [module, prop]))
 
 export const getLimit = (module) => getModuleProp(module, keys.limit)
 
