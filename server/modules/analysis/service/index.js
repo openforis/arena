@@ -20,3 +20,7 @@ export {
   // ======  DELETE - Calculation
   deleteCalculation,
 } from '../manager/processingChainManager'
+
+export { updateChainStatusExec } from '../manager'
+
+export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'

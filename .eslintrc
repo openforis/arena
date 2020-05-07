@@ -9,6 +9,7 @@
   },
   "plugins": ["prettier", "jsdoc"],
   "rules": {
+    "no-console": "error",
     "no-underscore-dangle": 0,
     "prettier/prettier": "error",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],

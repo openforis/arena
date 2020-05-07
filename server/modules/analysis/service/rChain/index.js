@@ -8,6 +8,7 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as ProcessingChain from '../../../../../common/analysis/processingChain'
 import * as ProcessingStep from '../../../../../common/analysis/processingStep'
 import * as ProcessingStepCalculation from '../../../../../common/analysis/processingStepCalculation'
+import { TableChain } from '../../../../../common/model/db'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
 import * as SurveyRdbMamager from '../../../surveyRdb/manager/surveyRdbManager'
@@ -32,6 +33,7 @@ export const fetchStepData = async (surveyId, cycle, stepUuid) => {
 }
 
 // ==== UPDATE
+
 export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
   const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })
@@ -69,8 +71,9 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
 
   await db.tx(async (tx) => {
     // Persist common script
-    const scriptCommon = await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))
-    await AnalysisManager.updateChainScriptCommon({ surveyId, chainUuid, scriptCommon }, tx)
+    const scriptCommon = (await fileZip.getEntryAsText(findEntry(RChain.dirNames.user, 'common'))).trim()
+    const fields = { [TableChain.columnSet.scriptCommon]: scriptCommon }
+    await AnalysisManager.updateChain({ surveyId, chainUuid, fields }, tx)
 
     // Persist calculation scripts
     const [chain, survey] = await Promise.all([
@@ -86,7 +89,7 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
             const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
             const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
             const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-            const script = await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))
+            const script = (await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))).trim()
             return AnalysisManager.updateCalculationScript({ surveyId, calculationUuid, script }, tx)
           })
         )

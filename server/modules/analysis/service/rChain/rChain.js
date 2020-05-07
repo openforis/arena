@@ -10,7 +10,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as AnalysisManager from '../../manager'
 
 import RStep from './rStep'
-import { RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
+import { ListCategories, RFileClose, RFileInit, RFileLogin, RFilePersistResults, RFileReadData } from './rFile/system'
 import { RFileCommon } from './rFile/user'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -41,6 +41,9 @@ class RChain {
     this._fileClose = null
     // User files
     this._fileCommon = null
+
+    // Categories
+    this._listCategories = null
 
     this._counter = new Counter()
     this._rSteps = []
@@ -102,6 +105,10 @@ class RChain {
     return this._counter.increment()
   }
 
+  get listCategories() {
+    return this._listCategories
+  }
+
   async _initSurveyAndChain() {
     this._survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.cycle)
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(this.surveyId)
@@ -112,6 +119,7 @@ class RChain {
       includeScript: true,
       includeStepsAndCalculations: true,
     })
+    this._listCategories = new ListCategories(this)
   }
 
   async _initDirs() {

@@ -11,6 +11,8 @@ export default {
 
   [ActivityLog.type.processingChainPropUpdate]: _isProcessingChainDeleted,
 
+  [ActivityLog.type.processingChainStatusExecSuccess]: _isProcessingChainDeleted,
+
   [ActivityLog.type.processingStepCreate]: _isProcessingStepDeleted,
 
   [ActivityLog.type.processingStepPropUpdate]: _isProcessingStepDeleted,

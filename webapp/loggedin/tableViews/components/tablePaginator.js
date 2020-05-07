@@ -1,8 +1,10 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-const TablePaginator = ({ offset, limit, count, fetchFn }) => {
+const TablePaginator = (props) => {
+  const { offset, limit, count, fetchFn } = props
   const currentPage = offset / limit + 1
   const totalPage = Math.ceil(count / limit)
 
@@ -11,6 +13,7 @@ const TablePaginator = ({ offset, limit, count, fetchFn }) => {
   return (
     <div className="table__paginator">
       <button
+        type="button"
         className="btn btn-transparent"
         aria-disabled={count < limit || currentPage === 1}
         onClick={() => fetchFn(0)}
@@ -18,6 +21,7 @@ const TablePaginator = ({ offset, limit, count, fetchFn }) => {
         <span className="icon icon-backward2 icon-14px" />
       </button>
       <button
+        type="button"
         className="btn btn-transparent"
         aria-disabled={currentPage === 1}
         onClick={() => fetchFn(offset - limit)}
@@ -31,6 +35,7 @@ const TablePaginator = ({ offset, limit, count, fetchFn }) => {
       </span>
 
       <button
+        type="button"
         className="btn btn-transparent"
         aria-disabled={currentPage === totalPage}
         onClick={() => fetchFn(offset + limit)}
@@ -38,6 +43,7 @@ const TablePaginator = ({ offset, limit, count, fetchFn }) => {
         <span className="icon icon-play3 icon-14px" />
       </button>
       <button
+        type="button"
         className="btn btn-transparent"
         aria-disabled={currentPage === totalPage}
         onClick={() => fetchFn((totalPage - 1) * limit)}
@@ -46,6 +52,13 @@ const TablePaginator = ({ offset, limit, count, fetchFn }) => {
       </button>
     </div>
   )
+}
+
+TablePaginator.propTypes = {
+  offset: PropTypes.number.isRequired,
+  limit: PropTypes.number.isRequired,
+  count: PropTypes.number.isRequired,
+  fetchFn: PropTypes.func.isRequired,
 }
 
 export default TablePaginator

@@ -1,7 +1,6 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .processing-chains {
-
   .column-draft {
     .icon {
       color: lighten($black, 30%);
@@ -9,12 +8,17 @@
   }
 
   .column-status {
-    width: 50%;
     display: flex;
     justify-content: center;
 
+    .icon {
+      padding: 5px;
+      color: $white;
+      border-radius: 100%;
+    }
+
     &.success .icon {
-      color: $green;
+      background-color: $green;
     }
 
     &.error .icon {
@@ -31,5 +35,4 @@
       left: 26rem;
     }
   }
-
 }
