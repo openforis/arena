@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
@@ -31,9 +31,9 @@ const ButtonBar = () => {
   const stepDirty = useSelector(StepState.isDirty)
   const editingStep = useSelector(StepState.isEditingStep)
 
-  const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
-  const calculationDirty = useSelector(ProcessingStepCalculationState.isDirty)
-  const editingCalculation = useSelector(ProcessingStepCalculationState.isEditingCalculation)
+  const calculation = useSelector(CalculationState.getCalculation)
+  const calculationDirty = useSelector(CalculationState.isDirty)
+  const editingCalculation = useSelector(CalculationState.isEditingCalculation)
 
   return (
     <>

@@ -16,7 +16,7 @@ import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {

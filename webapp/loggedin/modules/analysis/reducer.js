@@ -6,10 +6,10 @@ import processingStepCalculation from './calculation/reducer'
 
 import * as ChainState from './chain/state'
 import * as StepState from './step/state'
-import * as ProcessingStepCalculationState from './calculation/processingStepCalculationState'
+import * as CalculationState from './calculation/state'
 
 export default combineReducers({
   [ChainState.stateKey]: processingChain,
   [StepState.stateKey]: processingStep,
-  [ProcessingStepCalculationState.stateKey]: processingStepCalculation,
+  [CalculationState.stateKey]: processingStepCalculation,
 })

@@ -12,7 +12,7 @@ import { useI18n, useNodeDefByUuid, useSurvey, useSurveyInfo } from '@webapp/com
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { validateStepCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
 

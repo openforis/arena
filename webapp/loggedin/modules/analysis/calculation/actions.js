@@ -16,7 +16,7 @@ import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { nodeDefCreate, onNodeDefsDelete } from '@webapp/survey/nodeDefs/actions'
 import { navigateToNodeDefEdit, chainValidationUpdate } from '@webapp/loggedin/modules/analysis/chain/actions'
-import * as ProcessingStepCalculationState from './processingStepCalculationState'
+import * as ProcessingStepCalculationState from './state/calculationState'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'

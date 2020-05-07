@@ -13,23 +13,23 @@ import {
   processingStepCalculationDelete,
 } from './actions'
 
-import * as ProcessingStepCalculationState from './processingStepCalculationState'
+import * as CalculationState from './state/calculationState'
 
 const actionHandlers = {
   // Chain
   [chainReset]: () => ({}),
   [chainSave]: (state, { calculation }) =>
-    R.when(R.always(Boolean(calculation)), ProcessingStepCalculationState.saveDirty(calculation))(state),
+    R.when(R.always(Boolean(calculation)), CalculationState.saveDirty(calculation))(state),
 
   // Step
   [stepUpdate]: () => ({}),
 
-  [calculationUpdate]: (state, { calculation }) => ProcessingStepCalculationState.assocCalculation(calculation)(state),
+  [calculationUpdate]: (state, { calculation }) => CalculationState.assocCalculation(calculation)(state),
 
-  [calculationCreate]: (state, { calculation }) => ProcessingStepCalculationState.assocCalculation(calculation)(state),
+  [calculationCreate]: (state, { calculation }) => CalculationState.assocCalculation(calculation)(state),
 
   [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculationDirty(calculation)(state),
+    CalculationState.assocCalculationDirty(calculation)(state),
 
   [processingStepCalculationDelete]: () => ({}),
 
@@ -39,7 +39,7 @@ const actionHandlers = {
   [nodeDefSave]: (state, { nodeDef }) =>
     R.when(
       R.always(NodeDef.isAnalysis(nodeDef) && NodeDef.isAttribute(nodeDef)),
-      ProcessingStepCalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef))
+      CalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef))
     )(state),
 }
 

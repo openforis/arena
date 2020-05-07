@@ -10,7 +10,7 @@ import { useI18n, useLang, useNodeDefByUuid } from '@webapp/commonComponents/hoo
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setCalculationForEdit } from '@webapp/loggedin/modules/analysis/step/actions'
