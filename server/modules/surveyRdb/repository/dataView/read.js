@@ -12,63 +12,174 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
-
 import * as DataSort from '../../../../../common/surveyRdb/dataSort'
+import * as SortCriteria from '../../../../../common/surveyRdb/sortCriteria'
 import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
-import { ViewDataNodeDef } from '../../../../../common/model/db'
+import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef } from '../../../../../common/model/db'
 import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as DataCol from '../../schemaRdb/dataCol'
 import * as DataTable from '../../schemaRdb/dataTable'
 
-export const runSelect = async (
-  surveyId,
-  cycle,
-  tableName,
-  cols,
-  offset,
-  limit,
-  filterExpr,
-  sort = [],
-  queryStream = false,
-  client = db
-) => {
-  const schemaName = SchemaRdb.getName(surveyId)
-  // Columns
-  const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})
-  const colParamNames = Object.keys(colParams).map((n) => `$/${n}:name/`)
+const _getParentNodeUuidColName = (viewDataNodeDef, nodeDef) => {
+  const { survey } = viewDataNodeDef
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  return ColumnNodeDef.getColName(nodeDefParent)
+}
+
+const _getSelectFields = (params) => {
+  const { survey, nodeDef, columnNodeDefs, nodeDefCols, editMode } = params
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  if (columnNodeDefs) {
+    return [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead].join(', ')
+  }
+  if (!R.isEmpty(nodeDefCols)) {
+    const selectFields = [
+      viewDataNodeDef.columnRecordUuid,
+      viewDataNodeDef.columnUuid,
+      // selected node def columns
+      ...nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).namesFull).flat(),
+      // Add ancestor uuid columns
+      ...viewDataNodeDef.columnUuids,
+    ]
+    if (editMode) {
+      selectFields.push(
+        // Node (every node is transformed into json in a column named with the nodeDefUuid)
+        ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
+        // Record table fields
+        'row_to_json(r.*) AS record'
+      )
+    }
+    return selectFields.join(', ')
+  }
+
+  return '*'
+}
+
+const _getFromClause = (params) => {
+  const { survey, nodeDef, editMode, nodeDefCols } = params
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+  const { surveyId } = viewDataNodeDef
+
+  const fromTables = [viewDataNodeDef.nameAliased]
+  if (editMode) {
+    fromTables.push(
+      // Node table; one join per column def
+      ...nodeDefCols.map((nodeDefCol, idx) => {
+        const nodeDefParentUuidColName = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+        const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
+        const tableNode = NodeDef.isAnalysis(nodeDefCol) ? new TableResultNode(surveyId) : new TableNode(surveyId)
+        tableNode.alias = `n${idx + 1}`
+
+        return `LEFT JOIN LATERAL ( 
+        ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColName}`, nodeDefUuid })}
+      ) AS ${tableNode.alias} ON TRUE`
+      }),
+      // Record table
+      `LEFT JOIN ${getSurveyDBSchema(surveyId)}.record r 
+        ON r.uuid = ${viewDataNodeDef.columnRecordUuid}
+      `
+    )
+  }
+  return fromTables.join(' ')
+}
+
+const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (row) => {
+  const rowUpdated = { ...row }
+  if (editMode) {
+    // Node columns (one column for each selected node def)
+    rowUpdated.cols = {}
+    nodeDefCols.forEach((nodeDefCol) => {
+      const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
+      const nodeJson = rowUpdated[nodeDefColUuid]
+      const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, nodeDefCol)
+      const parentUuid = rowUpdated[nodeDefParentColumnUuid]
+      rowUpdated.cols[nodeDefColUuid] = {
+        node: TableNode.dbTransformCallback(nodeJson),
+        parentUuid,
+      }
+      delete rowUpdated[nodeDefColUuid]
+    })
+    // Record column
+    rowUpdated.record = camelize(rowUpdated.record)
+    // Parent node uuid column
+    const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
+    rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
+  }
+  return rowUpdated
+}
+
+/**
+ * Runs a select query on a data view associated to an entity node definition.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
+ * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
+ * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.limit=null] - The query limit.
+ * @param {object} [params.filter=null] - The filter expression object.
+ * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
+ * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
+ * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewData = async (params, client = db) => {
+  const {
+    survey,
+    cycle,
+    nodeDef,
+    nodeDefCols = [],
+    offset = null,
+    limit = null,
+    filter = null,
+    sort = [],
+    editMode = false,
+    stream = false,
+  } = params
+
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  const selectFields = _getSelectFields(params)
+
+  const fromClause = _getFromClause(params)
+
   // WHERE clause
-  const { clause: filterClause, params: filterParams } = filterExpr
-    ? DataFilter.getWherePreparedStatement(filterExpr)
-    : {}
+  const { clause: filterClause, params: filterParams } = filter ? DataFilter.getWherePreparedStatement(filter) : {}
+
   // SORT clause
   const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
 
   const select = `
     SELECT 
-        ${colParamNames.join(', ')}
+        ${selectFields}
     FROM 
-        $/schemaName:name/.$/tableName:name/
+        ${fromClause}
     WHERE 
-      ${DataTable.colNameRecordCycle} = $/cycle/
+      ${viewDataNodeDef.columnRecordCycle} = $/cycle/
       ${R.isNil(filterClause) ? '' : `AND ${filterClause}`}
     ORDER BY 
-        ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}date_modified DESC NULLS LAST
+        ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}${viewDataNodeDef.columnDateModified} DESC NULLS LAST
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    OFFSET $/offset/`
+    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}
+  `
 
-  const params = {
+  const queryParams = {
     cycle,
     ...filterParams,
-    ...colParams,
     ...sortParams,
-    schemaName,
-    tableName,
     limit,
     offset,
   }
 
-  return queryStream ? new dbUtils.QueryStream(dbUtils.formatQuery(select, params)) : client.any(select, params)
+  return stream
+    ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
+    : client.map(select, queryParams, _dbTransformCallbackSelect(viewDataNodeDef, editMode, nodeDefCols))
 }
 
 export const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
@@ -187,27 +298,4 @@ export const fetchRecordsCountByKeys = async (
     [recordUuidExcluded, cycle],
     camelize
   )
-}
-
-/**
- * Fetches all the rows of the specified nodeDef view.
- *
- * @param {!object} params - The filter parameters.
- * @param {!Survey} params.survey - The survey.
- * @param {!string} params.cycle - The survey cycle.
- * @param {!NodeDef} params.nodeDef - The nodeDef.
- * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
- * @returns {Promise<any[]>} - The result promise.
- */
-export const fetchViewData = async (params, client = db) => {
-  const { survey, cycle, nodeDef, columnNodeDefs = false } = params
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-  const columns = columnNodeDefs ? [viewDataNodeDef.columnRecordUuid, ...viewDataNodeDef.columnNodeDefNamesRead] : ['*']
-
-  const query = `SELECT ${columns.join(', ')} 
-    FROM ${viewDataNodeDef.nameAliased}
-    WHERE ${viewDataNodeDef.columnRecordCycle} = $1`
-  return client.any(query, [cycle])
 }

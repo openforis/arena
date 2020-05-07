@@ -1,5 +1,6 @@
 import Table from '../table'
 import TableSurveyRdbResult from '../tableSurveyRdbResult'
+import { getSelect } from '../node/select'
 
 const columnSet = {
   uuid: Table.columnSetCommon.uuid,
@@ -17,6 +18,7 @@ const columnSet = {
 export default class TableResultNode extends TableSurveyRdbResult {
   constructor(surveyId) {
     super(surveyId, 'node', columnSet)
+    this.getSelect = getSelect.bind(this)
   }
 
   get columnChainUuid() {

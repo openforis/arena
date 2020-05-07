@@ -7,3 +7,8 @@ export const useAuthCanEditSurvey = () => {
   const surveyInfo = useSurveyInfo()
   return Authorizer.canEditSurvey(user, surveyInfo)
 }
+
+export const useAuthCanEditRecord = (record) => {
+  const user = useUser()
+  return Authorizer.canEditRecord(user, record)
+}

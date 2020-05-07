@@ -3,6 +3,7 @@ export { getSchemaSurvey, getSchemaSurveyRdb } from './schemata'
 
 // ====== Tables
 export { default as TableRecord } from './tables/record'
+export { default as TableNode } from './tables/node'
 export { default as TableChain } from './tables/chain'
 export { default as TableStep } from './tables/step'
 export { default as TableCalculation } from './tables/calculation'
