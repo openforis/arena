@@ -4,9 +4,8 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as ProcessingStepCalculationState from './processingStepCalculationState'
-
-import { processingChainReset, processingChainSave } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
 import {
   processingStepCalculationUpdate,
   processingStepCalculationCreate,
@@ -17,13 +16,13 @@ import {
   processingStepCalculationReset,
   processingStepCalculationDelete,
 } from './actions'
-import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+
+import * as ProcessingStepCalculationState from './processingStepCalculationState'
 
 const actionHandlers = {
   // Chain
-  [processingChainReset]: () => ({}),
-
-  [processingChainSave]: (state, { calculation }) =>
+  [chainReset]: () => ({}),
+  [chainSave]: (state, { calculation }) =>
     R.when(R.always(Boolean(calculation)), ProcessingStepCalculationState.saveDirty(calculation))(state),
 
   // Step
@@ -46,7 +45,7 @@ const actionHandlers = {
   [nodeDefSave]: (state, { nodeDef }) =>
     R.when(
       R.always(NodeDef.isAnalysis(nodeDef) && NodeDef.isAttribute(nodeDef)),
-      ProcessingStepCalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef)),
+      ProcessingStepCalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef))
     )(state),
 }
 

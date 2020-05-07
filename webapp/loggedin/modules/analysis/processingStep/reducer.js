@@ -9,7 +9,7 @@ import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
 import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 
-import { processingChainReset, processingChainSave } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
 import {
   processingStepReset,
   processingStepCreate,
@@ -33,9 +33,8 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // Chain
-  [processingChainReset]: () => ({}),
-
-  [processingChainSave]: (state, { step, calculation }) =>
+  [chainReset]: () => ({}),
+  [chainSave]: (state, { step, calculation }) =>
     R.when(R.always(Boolean(step)), ProcessingStepState.saveDirty(step, calculation))(state),
 
   // Step
@@ -62,7 +61,7 @@ const actionHandlers = {
   [processingStepCalculationDelete]: (state, { calculation }) =>
     ProcessingStepState.dissocCalculation(calculation)(state),
 
-  [processingStepCalculationReset]: state => ProcessingStepState.dissocTemporaryCalculation(state),
+  [processingStepCalculationReset]: (state) => ProcessingStepState.dissocTemporaryCalculation(state),
 
   // NodeDef (Virtual Entity)
   [nodeDefSave]: (state, { nodeDef }) =>
