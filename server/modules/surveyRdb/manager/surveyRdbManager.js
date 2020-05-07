@@ -1,22 +1,20 @@
 import * as R from 'ramda'
-import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
-import * as PromiseUtils from '@core/promiseUtils'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import * as EntityAggregatedView from '@common/surveyRdb/entityAggregatedView'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
+import * as ProcessingChain from '../../../../common/analysis/processingChain'
+import * as ProcessingStep from '../../../../common/analysis/processingStep'
+import * as ProcessingStepCalculation from '../../../../common/analysis/processingStepCalculation'
+import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
+import * as EntityAggregatedView from '../../../../common/surveyRdb/entityAggregatedView'
 
-import * as ProcessingChainRepository from '@server/modules/analysis/repository/processingChainRepository'
-import * as ProcessingStepRepository from '@server/modules/analysis/repository/processingStepRepository'
-import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import * as Survey from '../../../../core/survey/survey'
+import * as NodeDef from '../../../../core/survey/nodeDef'
+import * as PromiseUtils from '../../../../core/promiseUtils'
 
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import { db } from '../../../db/db'
+import * as CSVWriter from '../../../utils/file/csvWriter'
+import * as ProcessingChainRepository from '../../analysis/repository/processingChainRepository'
+import * as ProcessingStepRepository from '../../analysis/repository/processingStepRepository'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -30,7 +28,7 @@ export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView, fetchViewData } = DataViewRepository
+export const { createDataView } = DataViewRepository
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -52,84 +50,63 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
   }
 }
 
-export const queryTable = async (
-  survey,
-  cycle,
-  nodeDefUuidTable,
-  nodeDefUuidCols = [],
-  offset = 0,
-  limit = null,
-  filterExpr = null,
-  sort = [],
-  editMode = false,
-  streamOutput = null
-) => {
-  const surveyId = Survey.getId(survey)
-  const { nodeDefTable, tableName, colNames: colNamesParams } = await _getQueryData(
+/**
+ * Runs a select query on a data view associated to an entity node definition.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
+ * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
+ * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.limit=null] - The query limit.
+ * @param {object} [params.filter=null] - The filter expression object.
+ * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
+ * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
+ * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ *
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewData = async (params) => {
+  const {
     survey,
-    nodeDefUuidTable,
-    nodeDefUuidCols
-  )
-
-  // Get hierarchy entities uuid col names
-  const ancestorUuidColNames = []
-  Survey.visitAncestorsAndSelf(nodeDefTable, (nodeDefCurrent) => {
-    // Skip virtual entity: ancestor uuid column taken from its parent entity def
-    if (!NodeDef.isVirtual(nodeDefCurrent)) {
-      ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
-    }
-  })(survey)
+    cycle,
+    nodeDef,
+    nodeDefCols = [],
+    columnNodeDefs = false,
+    offset = 0,
+    limit = null,
+    filter = null,
+    sort = [],
+    editMode = false,
+    streamOutput = null,
+  } = params
 
   // Fetch data
-  const colNames = [DataTable.colNameRecordUuuid, ...ancestorUuidColNames, ...colNamesParams]
-  let rows = await DataViewRepository.runSelect(
-    surveyId,
+  const result = await DataViewRepository.fetchViewData({
+    survey,
     cycle,
-    tableName,
-    colNames,
+    nodeDef,
+    nodeDefCols,
+    columnNodeDefs,
     offset,
     limit,
-    filterExpr,
+    filter,
     sort,
-    Boolean(streamOutput)
-  )
+    editMode,
+    stream: Boolean(streamOutput),
+  })
 
-  // Edit mode, assoc nodes to columns
-  if (editMode) {
-    rows = await Promise.all(
-      rows.map(async (row) => {
-        const recordUuid = row[DataTable.colNameRecordUuuid]
-        const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
-        const parentNodeUuid = R.prop(`${NodeDef.getName(nodeDefTable)}_uuid`, row)
-        const resultRow = { ...row, cols: {}, record, parentNodeUuid }
-
-        // Assoc nodes to each columns
-        await PromiseUtils.each(nodeDefUuidCols, async (nodeDefUuidCol) => {
-          const nodeDefCol = Survey.getNodeDefByUuid(nodeDefUuidCol)(survey)
-          const nodeDefColParent = Survey.getNodeDefParent(nodeDefCol)(survey)
-          const parentUuidColName = `${NodeDef.getName(nodeDefColParent)}_uuid`
-          const parentUuid = R.prop(parentUuidColName, row)
-
-          const node =
-            NodeDef.isMultiple(nodeDefTable) && NodeDef.isEqual(nodeDefCol)(nodeDefTable) // Column is the multiple attribute
-              ? await NodeRepository.fetchNodeByUuid(surveyId, row[`${NodeDef.getName(nodeDefCol)}_uuid`])
-              : (
-                  await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, parentUuid, [nodeDefUuidCol])
-                )[0]
-
-          resultRow.cols[nodeDefUuidCol] = { parentUuid, node }
-        })
-
-        return resultRow
-      })
-    )
-  } else if (streamOutput) {
-    await db.stream(rows, (stream) => {
-      stream.pipe(CSVWriter.transformToStream(streamOutput, colNames))
+  if (streamOutput) {
+    // Consider only user selected fields (from column node defs)
+    const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+    const fields = nodeDefCols.map((nodeDefCol) => new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names).flat()
+    await db.stream(result, (stream) => {
+      stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
     })
   }
-
-  return rows
+  return result
 }
 
 export const countTable = async (survey, cycle, nodeDefUuidTable, filter) => {

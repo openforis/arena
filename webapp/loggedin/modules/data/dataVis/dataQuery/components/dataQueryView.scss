@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 $dataTableMarginTop: 43px;
 $rowHeaderHeight: 45px;
@@ -16,7 +16,6 @@ $rowHeaderHeight: 45px;
 }
 
 .data-query__table {
-
   &.edit {
     .table__content {
       border: 1px dashed $greyBorder;
@@ -28,7 +27,11 @@ $rowHeaderHeight: 45px;
 
     .survey-form__node-def-table-cell-header {
       background-color: transparent;
-      grid-row-gap: .5rem;
+      grid-row-gap: 0.5rem;
+    }
+
+    .table__cell.readonly {
+      background-color: $greyBorder;
     }
   }
 
@@ -43,20 +46,19 @@ $rowHeaderHeight: 45px;
 
       .btn {
         border: none;
-        padding: .6rem 1rem;
+        padding: 0.6rem 1rem;
 
         &.highlight {
           background-color: $yellowHighlight;
         }
       }
-
     }
   }
 
   .table__rows {
     overflow-y: hidden;
     overflow-x: auto;
-    height: calc(100% - #{$dataTableMarginTop})
+    height: calc(100% - #{$dataTableMarginTop});
   }
 
   .table__data-rows {
@@ -91,7 +93,8 @@ $rowHeaderHeight: 45px;
     }
   }
 
-  .table__row, .table__row-header {
+  .table__row,
+  .table__row-header {
     display: flex;
 
     > div {
@@ -114,5 +117,4 @@ $rowHeaderHeight: 45px;
     display: flex;
     flex-wrap: wrap;
   }
-
 }
