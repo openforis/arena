@@ -23,7 +23,7 @@ import {
   processingStepCalculationDirtyUpdate,
   processingStepCalculationDelete,
   processingStepCalculationReset,
-} from '../processingStepCalculation/actions'
+} from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const actionHandlers = {
   // Reset state

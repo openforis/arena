@@ -24,21 +24,19 @@ export const getCalculation = getStateProp(keys.dirty, {})
 export const assocCalculationDirty = R.assoc(keys.dirty)
 export const assocCalculationOrig = R.assoc(keys.orig)
 
-export const assocCalculation = calculation =>
+export const assocCalculation = (calculation) =>
   R.pipe(assocCalculationDirty(calculation), assocCalculationOrig(calculation))
 
-export const assocCalculationDirtyNodeDefUuid = nodeDefUuid => state =>
-  R.pipe(R.prop(keys.dirty), ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid), calculation =>
-    R.assoc(keys.dirty, calculation)(state),
+export const assocCalculationDirtyNodeDefUuid = (nodeDefUuid) => (state) =>
+  R.pipe(R.prop(keys.dirty), ProcessingStepCalculation.assocNodeDefUuid(nodeDefUuid), (calculation) =>
+    R.assoc(keys.dirty, calculation)(state)
   )(state)
 
 export const saveDirty = assocCalculation
 
 // ===== UTILS
-/**
- * Returns true if processingStepCalculation and processingStepCalculation are not equals
- */
-export const isDirty = state => {
+// Returns true if processingStepCalculation and processingStepCalculation are not equals
+export const isDirty = (state) => {
   const calculationDirty = getCalculation(state)
   return (
     ProcessingStepCalculation.isTemporary(calculationDirty) || !R.equals(calculationDirty, getCalculationOrig(state))

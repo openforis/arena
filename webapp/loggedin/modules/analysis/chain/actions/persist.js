@@ -12,7 +12,7 @@ import * as NotificationState from '@webapp/app/appNotification/appNotificationS
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'

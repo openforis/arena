@@ -22,7 +22,7 @@ import {
 import {
   processingStepCalculationDelete,
   processingStepCalculationReset,
-} from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+} from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const actionHandlers = {
   // Reset state

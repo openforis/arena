@@ -3,7 +3,7 @@ import * as Survey from '@core/survey/survey'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
 
 import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'

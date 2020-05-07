@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .processing-step__calculation-editor {
   position: absolute;
@@ -21,10 +21,9 @@
 
 .processing-step-calculation__attribute-container {
   display: grid;
-  grid-template-columns: .8fr 100px 100px;
+  grid-template-columns: 0.8fr 100px 100px;
 
   button {
     justify-self: center;
   }
 }
-

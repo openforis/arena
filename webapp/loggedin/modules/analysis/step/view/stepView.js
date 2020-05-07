@@ -11,12 +11,12 @@ import * as Step from '@common/analysis/processingStep'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
-import ProcessingStepCalculationEditor from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationEditor'
 import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
+import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
@@ -140,7 +140,7 @@ const StepView = () => {
         />
       </div>
 
-      <ProcessingStepCalculationEditor />
+      <CalculationView />
     </div>
   )
 }

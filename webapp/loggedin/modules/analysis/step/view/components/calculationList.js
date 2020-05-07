@@ -11,7 +11,7 @@ import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
 import { createCalculation } from '@webapp/loggedin/modules/analysis/step/actions'
 
 import CalculationItem from './calculationItem'

@@ -7,7 +7,7 @@ import { appPropsChange, appUserLogout } from '@webapp/app/actions'
 // Processing chain actions
 import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
-import { processingStepCalculationDelete } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import { processingStepCalculationDelete } from '@webapp/loggedin/modules/analysis/calculation/actions'
 // Survey actions
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
 // SurveyInfo actions

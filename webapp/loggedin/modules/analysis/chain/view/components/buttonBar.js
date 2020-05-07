@@ -10,12 +10,12 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
+import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/calculation/processingStepCalculationState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { deleteStep } from '@webapp/loggedin/modules/analysis/step/actions'
-import { deleteStepCalculation } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import { deleteStepCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 const ButtonBar = () => {
   const i18n = useI18n()

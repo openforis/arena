@@ -9,37 +9,36 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as ProcessingChainValidator from '@common/analysis/processingChainValidator'
 
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as ProcessingChainState from '@webapp/loggedin/modules/analysis/processingChain/processingChainState'
-import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
-import * as ProcessingStepCalculationState from './processingStepCalculationState'
+import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
+import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
 import { showNotification } from '@webapp/app/appNotification/actions'
 import { nodeDefCreate, onNodeDefsDelete } from '@webapp/survey/nodeDefs/actions'
-import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/actions'
-import { processingChainValidationUpdate } from '@webapp/loggedin/modules/analysis/processingChain/actions'
+import { navigateToNodeDefEdit, chainValidationUpdate } from '@webapp/loggedin/modules/analysis/chain/actions'
+import * as ProcessingStepCalculationState from './processingStepCalculationState'
 
 export const processingStepCalculationDirtyUpdate = 'analysis/processingStep/calculation/dirty/update'
 export const processingStepCalculationDelete = 'analysis/processingStep/calculation/delete'
 export const processingStepCalculationReset = 'analysis/processingStep/calculation/reset'
 
-const _updateProcessingStepCalculationDirty = calculation => async (dispatch, getState) => {
+const _updateProcessingStepCalculationDirty = (calculation) => async (dispatch, getState) => {
   dispatch({ type: processingStepCalculationDirtyUpdate, calculation })
 
   // Validate calculation and update validation in chain
   const state = getState()
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const chain = ProcessingChainState.getProcessingChain(state)
+  const chain = ChainState.getProcessingChain(state)
   const calculationValidation = await ProcessingChainValidator.validateCalculation(
     calculation,
-    Survey.getDefaultLanguage(surveyInfo),
+    Survey.getDefaultLanguage(surveyInfo)
   )
   const chainUpdated = ProcessingChain.assocItemValidation(
     ProcessingStepCalculation.getUuid(calculation),
-    calculationValidation,
+    calculationValidation
   )(chain)
 
-  dispatch({ type: processingChainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })
+  dispatch({ type: chainValidationUpdate, validation: ProcessingChain.getValidation(chainUpdated) })
 }
 
 export const resetProcessingStepCalculationState = () => (dispatch, getState) => {
@@ -49,7 +48,7 @@ export const resetProcessingStepCalculationState = () => (dispatch, getState) =>
 
 // ====== UPDATE
 
-export const validateProcessingStepCalculation = () => (dispatch, getState) => {
+export const validateStepCalculation = () => (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(getState())
   dispatch(_updateProcessingStepCalculationDirty(calculation))
 }
@@ -67,16 +66,16 @@ export const updateProcessingStepCalculationProp = (prop, value) => async (dispa
         // When type is categorical, reset aggregate function
         R.when(
           R.always(R.equals(value, ProcessingStepCalculation.type.categorical)),
-          ProcessingStepCalculation.assocProp(ProcessingStepCalculation.keysProps.aggregateFn, null),
-        ),
-      ),
-    ),
+          ProcessingStepCalculation.assocProp(ProcessingStepCalculation.keysProps.aggregateFn, null)
+        )
+      )
+    )
   )(calculation)
 
   dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
 }
 
-export const updateProcessingStepCalculationAttribute = attrDef => async (dispatch, getState) => {
+export const updateProcessingStepCalculationAttribute = (attrDef) => async (dispatch, getState) => {
   const calculation = ProcessingStepCalculationState.getCalculation(getState())
   const calculationUpdated = ProcessingStepCalculation.assocNodeDefUuid(NodeDef.getUuid(attrDef))(calculation)
   dispatch(_updateProcessingStepCalculationDirty(calculationUpdated))
@@ -84,17 +83,17 @@ export const updateProcessingStepCalculationAttribute = attrDef => async (dispat
 
 // ====== DELETE
 
-export const deleteProcessingStepCalculation = () => async (dispatch, getState) => {
+export const deleteStepCalculation = () => async (dispatch, getState) => {
   dispatch(showAppLoader())
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
-  const processingStep = ProcessingStepState.getProcessingStep(state)
+  const processingStep = StepState.getProcessingStep(state)
   const calculation = ProcessingStepCalculationState.getCalculation(state)
 
   const { data: nodeDefUnusedDeletedUuids = [] } = await axios.delete(
     `/api/survey/${surveyId}/processing-step/${ProcessingStep.getUuid(
-      processingStep,
-    )}/calculation/${ProcessingStepCalculation.getUuid(calculation)}`,
+      processingStep
+    )}/calculation/${ProcessingStepCalculation.getUuid(calculation)}`
   )
 
   dispatch({ type: processingStepCalculationDelete, calculation })
@@ -109,12 +108,12 @@ export const deleteProcessingStepCalculation = () => async (dispatch, getState) 
 
 // ====== NODE DEF ANALYSIS
 
-export const createNodeDefAnalysis = history => async (dispatch, getState) => {
+export const createNodeDefAnalysis = (history) => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
-  const processingStep = ProcessingStepState.getProcessingStep(state)
-  const nodeDefParent = R.pipe(ProcessingStep.getEntityUuid, entityDefUuid =>
-    Survey.getNodeDefByUuid(entityDefUuid)(survey),
+  const processingStep = StepState.getProcessingStep(state)
+  const nodeDefParent = R.pipe(ProcessingStep.getEntityUuid, (entityDefUuid) =>
+    Survey.getNodeDefByUuid(entityDefUuid)(survey)
   )(processingStep)
   const calculation = ProcessingStepCalculationState.getCalculation(state)
   const nodeDefType = ProcessingStepCalculation.getNodeDefType(calculation)
@@ -125,7 +124,7 @@ export const createNodeDefAnalysis = history => async (dispatch, getState) => {
     R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey),
     {},
     {},
-    true,
+    true
   )
 
   await dispatch({ type: nodeDefCreate, nodeDef })
