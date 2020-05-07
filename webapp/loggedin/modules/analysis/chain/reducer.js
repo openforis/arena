@@ -17,11 +17,7 @@ import {
   stepsLoad,
 } from '@webapp/loggedin/modules/analysis/chain/actions'
 
-import {
-  processingStepCreate,
-  processingStepReset,
-  processingStepDelete,
-} from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { stepCreate, stepReset, stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
 
 import {
   processingStepCalculationDirtyUpdate,
@@ -51,11 +47,11 @@ const actionHandlers = {
   // Steps
   [stepsLoad]: (state, { processingSteps }) => ChainState.assocProcessingSteps(processingSteps)(state),
 
-  [processingStepCreate]: (state, { processingStep }) => ChainState.appendProcessingStep(processingStep)(state),
+  [stepCreate]: (state, { processingStep }) => ChainState.appendProcessingStep(processingStep)(state),
 
-  [processingStepReset]: (state) => ChainState.dissocStepTemporary(state),
+  [stepReset]: (state) => ChainState.dissocStepTemporary(state),
 
-  [processingStepDelete]: (state) => ChainState.dissocStepLast(state),
+  [stepDelete]: (state) => ChainState.dissocStepLast(state),
 
   // Calculations
   [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>

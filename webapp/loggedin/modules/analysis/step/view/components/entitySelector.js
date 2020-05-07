@@ -1,8 +1,9 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurvey } from '@webapp/commonComponents/hooks'
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
 import * as Survey from '@core/survey/survey'
@@ -11,13 +12,11 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as ProcessingStep from '@common/analysis/processingStep'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-
-import { checkCanSelectNodeDef } from '../../actions'
+import { checkCanSelectNodeDef } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 const getEntities = (survey, processingStepPrev, lang) => {
-  const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, entityUuid =>
-    Survey.getNodeDefByUuid(entityUuid)(survey),
+  const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, (entityUuid) =>
+    Survey.getNodeDefByUuid(entityUuid)(survey)
   )(processingStepPrev)
 
   const entities = []
@@ -44,21 +43,19 @@ const getEntities = (survey, processingStepPrev, lang) => {
   return entities
 }
 
-const EntitySelector = props => {
-  const { processingStep, processingStepPrev, readOnly, validation, children, onChange } = props
+const EntitySelector = (props) => {
+  const { step, stepPrev, readOnly, validation, children, onChange } = props
 
-  const survey = useSelector(SurveyState.getSurvey)
-
-  const i18n = useI18n()
   const dispatch = useDispatch()
+  const i18n = useI18n()
+  const survey = useSurvey()
 
-  const entities = getEntities(survey, processingStepPrev, i18n.lang)
-
-  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(processingStep)))
+  const entities = getEntities(survey, stepPrev, i18n.lang)
+  const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(step)))
 
   return (
     <div className="form-item processing-step__entity-selector-form-item">
-      <div className="form-label processing-chain__steps-label">{i18n.t('nodeDefsTypes.entity')}</div>
+      <div className="form-label chain-list__label">{i18n.t('nodeDefsTypes.entity')}</div>
 
       <Dropdown
         className="processing-step__entity-selector"
@@ -67,8 +64,8 @@ const EntitySelector = props => {
         selection={entity}
         readOnly={readOnly}
         validation={validation}
-        onBeforeChange={item => dispatch(checkCanSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey)))}
-        onChange={item => onChange(R.prop('key', item))}
+        onBeforeChange={(item) => dispatch(checkCanSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey)))}
+        onChange={(item) => onChange(R.prop('key', item))}
       />
 
       {children}
@@ -76,12 +73,17 @@ const EntitySelector = props => {
   )
 }
 
+EntitySelector.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+  onChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool.isRequired,
+  step: PropTypes.object.isRequired,
+  stepPrev: PropTypes.object,
+  validation: PropTypes.object.isRequired,
+}
+
 EntitySelector.defaultProps = {
-  processingStep: null,
-  processingStepPrev: null,
-  readOnly: false,
-  validation: null,
-  onChange: null,
+  stepPrev: null,
 }
 
 export default EntitySelector

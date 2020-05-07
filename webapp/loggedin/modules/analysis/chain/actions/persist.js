@@ -11,7 +11,7 @@ import * as ChainValidator from '@common/analysis/processingChainValidator'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'

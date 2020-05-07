@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .processing-step {
   border-left: 1px solid $greyBorder;
@@ -18,11 +18,10 @@
       overflow-x: hidden;
     }
 
-    .processing-step__calculations {
+    .chain-list {
       padding-left: 0;
     }
   }
-
 }
 
 .processing-step .form-item {

@@ -11,3 +11,5 @@ export { chainReset, chainUpdate, initChain, navigateToChainsView, resetChain } 
 export { chainValidationUpdate, validateChain } from './validation'
 
 export { openRChain } from './rChain'
+
+export { checkCanSelectNodeDef, navigateToNodeDefEdit } from './common'

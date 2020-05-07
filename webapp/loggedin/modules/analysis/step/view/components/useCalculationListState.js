@@ -3,19 +3,19 @@ import { useDispatch } from 'react-redux'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
-import { updateProcessingStepCalculationIndex } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { updateCalculationIndex } from '@webapp/loggedin/modules/analysis/step/actions'
 
-export default placeholderRef => {
+export default (placeholderRef) => {
   const dispatch = useDispatch()
   const [dragging, setDragging] = useState(false)
 
   // Current element being dragged
   const elementDragRef = useRef(null)
 
-  const onDragStart = evt => {
+  const onDragStart = (event) => {
     setDragging(true)
 
-    const { currentTarget } = evt
+    const { currentTarget } = event
     elementDragRef.current = currentTarget
     const placeholder = placeholderRef.current
 
@@ -23,13 +23,14 @@ export default placeholderRef => {
     placeholder.style.width = `${width}px`
     placeholder.style.height = `${height}px`
 
-    evt.dataTransfer.effectAllowed = 'move'
+    // eslint-disable-next-line no-param-reassign
+    event.dataTransfer.effectAllowed = 'move'
     // Firefox requires dataTransfer data to be set
-    evt.dataTransfer.setData('text/html', currentTarget)
+    event.dataTransfer.setData('text/html', currentTarget)
   }
 
-  const onDragOver = evt => {
-    const { target } = evt
+  const onDragOver = (event) => {
+    const { target } = event
     const placeholder = placeholderRef.current
     const elementDrag = elementDragRef.current
 
@@ -38,7 +39,7 @@ export default placeholderRef => {
 
     if (target !== placeholder) {
       const { top } = elementOffset(target)
-      const relY = evt.clientY - top
+      const relY = event.clientY - top
       const height = target.offsetHeight / 2
       const parent = target.parentNode
 
@@ -49,7 +50,7 @@ export default placeholderRef => {
   const onDragEnd = () => {
     const placeholder = placeholderRef.current
     const elementDrag = elementDragRef.current
-    const parentNode = elementDrag.parentNode
+    const { parentNode } = elementDrag
 
     elementDrag.style.display = 'flex'
     placeholder.style.display = 'none'
@@ -59,7 +60,7 @@ export default placeholderRef => {
     const indexTo = elements.indexOf(elementDrag)
     const indexFrom = Number(elementDrag.dataset.index)
     if (indexFrom !== indexTo) {
-      dispatch(updateProcessingStepCalculationIndex(indexFrom, indexTo))
+      dispatch(updateCalculationIndex(indexFrom, indexTo))
     }
 
     elementDragRef.current = null

@@ -6,11 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
 import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
-import {
-  processingStepCalculationUpdate,
-  processingStepCalculationCreate,
-  processingStepUpdate,
-} from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { calculationUpdate, calculationCreate, stepUpdate } from '@webapp/loggedin/modules/analysis/step/actions'
 import {
   processingStepCalculationDirtyUpdate,
   processingStepCalculationReset,
@@ -26,13 +22,11 @@ const actionHandlers = {
     R.when(R.always(Boolean(calculation)), ProcessingStepCalculationState.saveDirty(calculation))(state),
 
   // Step
-  [processingStepUpdate]: () => ({}),
+  [stepUpdate]: () => ({}),
 
-  [processingStepCalculationUpdate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculation(calculation)(state),
+  [calculationUpdate]: (state, { calculation }) => ProcessingStepCalculationState.assocCalculation(calculation)(state),
 
-  [processingStepCalculationCreate]: (state, { calculation }) =>
-    ProcessingStepCalculationState.assocCalculation(calculation)(state),
+  [calculationCreate]: (state, { calculation }) => ProcessingStepCalculationState.assocCalculation(calculation)(state),
 
   [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
     ProcessingStepCalculationState.assocCalculationDirty(calculation)(state),

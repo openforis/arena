@@ -1,7 +1,6 @@
 @import 'webapp/style/vars';
 
-.chain-list-item,
-.processing-step__calculation {
+.chain-list-item {
   position: relative;
   display: flex;
   margin-left: 16px;
@@ -29,8 +28,7 @@
   }
 }
 
-.chain-list-item__index,
-.processing-step__calculation-index {
+.chain-list-item__index {
   z-index: 1;
   width: 32px;
   height: 32px;
@@ -48,16 +46,22 @@
   transition: all 300ms ease;
 }
 
-.chain-list-item.editing,
-.processing-step__calculation.editing {
+.chain-list-item.editing {
   .chain-list-item__index,
   .processing-step__calculation-index {
     background-color: $yellow;
   }
 }
 
-.chain-list-item__content,
-.processing-step__calculation-content {
+.chain-list-item.placeholder {
+  display: none;
+}
+
+.chain-list-item.dragging * {
+  pointer-events: none;
+}
+
+.chain-list-item__content {
   position: relative;
   transition: 0.2s all;
   display: grid;
@@ -84,13 +88,22 @@
   }
 }
 
-.chain.step-editor-open .chain-list-item__content,
-.processing-step.calculation-editor-opened .processing-step__calculation-content {
-  grid-template-columns: 80px auto;
+.chain.step-editor-open .step-item,
+.processing-step.calculation-editor-opened .calculation-item {
+  grid-template-columns: 120px 10px;
+  grid-column-gap: 0;
+  justify-items: start;
+  padding-left: unset;
+  padding-right: 5px;
+
+  .chain-list-item__label {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 }
 
-.chain-list-item__label,
-.processing-step__calculation-label {
+.chain-list-item__label {
   display: grid;
   grid-template-columns: 1fr 24px;
 

@@ -1,12 +1,10 @@
 @import 'webapp/style/vars';
 
-.chain-list,
-.processing-step__calculations {
+.chain-list {
   padding-left: 20px;
 }
 
-.chain-list__label,
-.processing-step__calculations-label {
+.chain-list__label {
   display: flex;
   align-items: center;
 
@@ -15,8 +13,7 @@
   }
 }
 
-.chain-list__label,
-.processing-step__calculations-label {
+.chain-list__label {
   .tooltip-error {
     color: $red;
   }

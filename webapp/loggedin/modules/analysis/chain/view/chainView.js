@@ -16,7 +16,7 @@ import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import {
   fetchChain,

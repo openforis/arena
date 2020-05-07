@@ -13,9 +13,9 @@ import { useI18n, useSurvey } from '@webapp/commonComponents/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
-import { setProcessingStepForEdit } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { setStepForEdit } from '@webapp/loggedin/modules/analysis/step/actions'
 
 const StepItem = (props) => {
   const { step } = props
@@ -36,12 +36,12 @@ const StepItem = (props) => {
       className={`chain-list-item${editing ? ' editing' : ''}`}
       onClick={() => {
         if (!editing) {
-          dispatch(setProcessingStepForEdit(step))
+          dispatch(setStepForEdit(step))
         }
       }}
     >
       <div className="chain-list-item__index">{Step.getIndex(step) + 1}</div>
-      <div className="chain-list-item__content">
+      <div className="chain-list-item__content step-item">
         <div className="chain-list-item__label">
           {(entity && NodeDef.getLabel(entity, i18n.lang)) || (category && Category.getName(category))}
           <ErrorBadge validation={validation} className="error-badge-inverse" showLabel={false} />

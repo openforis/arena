@@ -9,13 +9,13 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as ProcessingStepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as ProcessingStepCalculationState from '@webapp/loggedin/modules/analysis/processingStepCalculation/processingStepCalculationState'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
-import { deleteProcessingStep } from '@webapp/loggedin/modules/analysis/processingStep/actions'
-import { deleteProcessingStepCalculation } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
+import { deleteStep } from '@webapp/loggedin/modules/analysis/step/actions'
+import { deleteStepCalculation } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 
 const ButtonBar = () => {
   const i18n = useI18n()
@@ -26,10 +26,10 @@ const ButtonBar = () => {
   const chainDirty = useSelector(ChainState.isDirty)
   const editingChain = useSelector(ChainState.isEditingChain)
 
-  const step = useSelector(ProcessingStepState.getProcessingStep)
-  const stepNext = useSelector(ProcessingStepState.getProcessingStepNext)
-  const stepDirty = useSelector(ProcessingStepState.isDirty)
-  const editingStep = useSelector(ProcessingStepState.isEditingStep)
+  const step = useSelector(StepState.getProcessingStep)
+  const stepNext = useSelector(StepState.getProcessingStepNext)
+  const stepDirty = useSelector(StepState.isDirty)
+  const editingStep = useSelector(StepState.isEditingStep)
 
   const calculation = useSelector(ProcessingStepCalculationState.getCalculation)
   const calculationDirty = useSelector(ProcessingStepCalculationState.isDirty)
@@ -77,8 +77,8 @@ const ButtonBar = () => {
             const messageKey = `${messageKeyPrefix}.deleteConfirm`
 
             let deleteAction = deleteChain(history)
-            if (editingCalculation) deleteAction = deleteProcessingStepCalculation()
-            if (editingStep) deleteAction = deleteProcessingStep()
+            if (editingCalculation) deleteAction = deleteStepCalculation()
+            if (editingStep) deleteAction = deleteStep()
 
             dispatch(showDialogConfirm(messageKey, {}, deleteAction))
           }}

@@ -8,13 +8,13 @@ import * as Step from '@common/analysis/processingStep'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
-import StepView from '@webapp/loggedin/modules/analysis/processingStep/processingStepView'
+import StepView from '@webapp/loggedin/modules/analysis/step/view'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/processingStep/processingStepState'
+import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { fetchSteps } from '@webapp/loggedin/modules/analysis/chain/actions'
-import { createProcessingStep } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { createStep } from '@webapp/loggedin/modules/analysis/step/actions'
 
 import StepItem from './stepItem'
 
@@ -46,7 +46,7 @@ const StepList = () => {
           <button
             type="button"
             className="btn-s btn-transparent"
-            onClick={() => dispatch(createProcessingStep())}
+            onClick={() => dispatch(createStep())}
             aria-disabled={lastStepHasCategory}
           >
             <span className="icon icon-plus icon-14px" />

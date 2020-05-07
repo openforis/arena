@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 import { appPropsChange, appUserLogout } from '@webapp/app/actions'
 // Processing chain actions
 import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
-import { processingStepDelete } from '@webapp/loggedin/modules/analysis/processingStep/actions'
+import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
 import { processingStepCalculationDelete } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
 // Survey actions
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
@@ -55,7 +55,7 @@ const actionHandlers = {
   // Processing chain
   [chainSave]: SurveyInfoState.markDraft,
   [chainDelete]: SurveyInfoState.markDraft,
-  [processingStepDelete]: SurveyInfoState.markDraft,
+  [stepDelete]: SurveyInfoState.markDraft,
   [processingStepCalculationDelete]: SurveyInfoState.markDraft,
 }
 
