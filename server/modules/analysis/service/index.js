@@ -1,7 +1,4 @@
 export {
-  // ======  READ - Steps
-  fetchStepsByChainUuid,
-  fetchStepSummaryByIndex,
   // ======  READ - Calculations
   fetchCalculationsByStepUuid,
   fetchCalculationAttributeUuidsByStepUuid,

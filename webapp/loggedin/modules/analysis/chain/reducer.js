@@ -14,7 +14,6 @@ import {
   chainPropUpdate,
   chainSave,
   chainValidationUpdate,
-  stepsLoad,
 } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 import { stepCreate, stepReset, stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
@@ -45,8 +44,6 @@ const actionHandlers = {
   [chainValidationUpdate]: (state, { validation }) => ChainState.assocProcessingChainValidation(validation)(state),
 
   // Steps
-  [stepsLoad]: (state, { processingSteps }) => ChainState.assocProcessingSteps(processingSteps)(state),
-
   [stepCreate]: (state, { processingStep }) => ChainState.appendProcessingStep(processingStep)(state),
 
   [stepReset]: (state) => ChainState.dissocStepTemporary(state),

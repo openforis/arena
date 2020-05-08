@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
-import * as ProcessingChain from '../../../../common/analysis/processingChain'
-import * as ProcessingStep from '../../../../common/analysis/processingStep'
-import * as ProcessingStepCalculation from '../../../../common/analysis/processingStepCalculation'
+import * as Chain from '../../../../common/analysis/processingChain'
+import * as Step from '../../../../common/analysis/processingStep'
+import * as Calculation from '../../../../common/analysis/processingStepCalculation'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
 import * as EntityAggregatedView from '../../../../common/surveyRdb/entityAggregatedView'
 
@@ -14,7 +14,6 @@ import * as PromiseUtils from '../../../../core/promiseUtils'
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
 import * as ChainRepository from '../../analysis/repository/chain'
-import * as ProcessingStepRepository from '../../analysis/repository/processingStepRepository'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
@@ -124,15 +123,10 @@ export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
  * @deprecated - Use ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client) and iterate normally.
  */
 const _visitProcessingSteps = async (surveyId, client, visitor) => {
-  const chains = await ChainRepository.fetchChains({ surveyId }, client)
-  await PromiseUtils.each(chains, async (chain) => {
-    const steps = await ProcessingStepRepository.fetchStepsAndCalculationsByChainUuid(
-      surveyId,
-      ProcessingChain.getUuid(chain),
-      client
-    )
-    await PromiseUtils.each(steps, async (step) => visitor(step, ProcessingChain.assocProcessingSteps(steps)(chain)))
-  })
+  const chains = await ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client)
+  await PromiseUtils.each(chains, async (chain) =>
+    PromiseUtils.each(Chain.getProcessingSteps(chain), async (step) => visitor(step, chain))
+  )
 }
 
 // Aggregated entity views
@@ -142,11 +136,11 @@ export const getEntityAggregatedViews = async (survey, client = db) => {
   const surveyId = Survey.getId(survey)
 
   await _visitProcessingSteps(surveyId, client, async (step, chain) => {
-    if (ProcessingStep.hasEntity(step, chain)) {
-      const entityUuid = ProcessingStep.getEntityUuid(step)
-      const calculations = ProcessingStep.getCalculations(step)
+    if (Step.hasEntity(step, chain)) {
+      const entityUuid = Step.getEntityUuid(step)
+      const calculations = Step.getCalculations(step)
       calculations.forEach((calculation) => {
-        if (ProcessingStepCalculation.hasAggregateFunction(calculation)) {
+        if (Calculation.hasAggregateFunction(calculation)) {
           let entityAggregatedView = entityAggregatedViewsByUuid[entityUuid]
           if (entityAggregatedView) {
             entityAggregatedView = EntityAggregatedView.addCalculation(calculation)(entityAggregatedView)
@@ -154,7 +148,7 @@ export const getEntityAggregatedViews = async (survey, client = db) => {
             const entityDef = Survey.getNodeDefByUuid(entityUuid)(survey)
             const entityAggregatedViewEntityDef = NodeDef.isVirtual(entityDef)
               ? Survey.getNodeDefParent(entityDef)(survey)
-              : R.pipe(ProcessingChain.getStepPrev(step), ProcessingStep.getEntityUuid, (entityDefUuid) =>
+              : R.pipe(Chain.getStepPrev(step), Step.getEntityUuid, (entityDefUuid) =>
                   Survey.getNodeDefByUuid(entityDefUuid)(survey)
                 )(chain)
 

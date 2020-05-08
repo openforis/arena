@@ -31,23 +31,13 @@ const _assocChain = (chain) => R.pipe(R.assoc(keys.orig, chain), R.assoc(keys.di
 export const initProcessingChain = (chain, attributeUuidsOtherChains) =>
   R.pipe(_assocChain(chain), R.assoc(keys.attributeUuidsOtherChains, attributeUuidsOtherChains))
 
-const _updateChain = (key, fn) => (state) =>
-  R.pipe(R.prop(key), fn, (chainUpdated) => R.assoc(key, chainUpdated)(state))(state)
-
-const _updateChainOrig = (fn) => _updateChain(keys.orig, fn)
-
-const _updateChainDirty = (fn) => _updateChain(keys.dirty, fn)
+const _updateChainDirty = (fn) => (state) =>
+  R.pipe(R.prop(keys.dirty), fn, (chainUpdated) => R.assoc(keys.dirty, chainUpdated)(state))(state)
 
 export const assocPropDirty = (key, value) => _updateChainDirty(ProcessingChain.assocProp(key, value))
 
 export const assocProcessingChainValidation = (validation) =>
   _updateChainDirty(ProcessingChain.assocValidation(validation))
-
-export const assocProcessingSteps = (steps) =>
-  R.pipe(
-    _updateChainDirty(ProcessingChain.assocProcessingSteps(steps)),
-    _updateChainOrig(ProcessingChain.assocProcessingSteps(steps))
-  )
 
 export const appendProcessingStep = (step) => _updateChainDirty(ProcessingChain.assocProcessingStep(step))
 

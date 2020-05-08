@@ -20,7 +20,7 @@ import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
-  fetchStepData,
+  fetchStepPrevAttributeUuids,
   resetStep,
   updateStepProps,
   addEntityVirtual,
@@ -50,7 +50,7 @@ const StepView = () => {
 
   useEffect(() => {
     if (editingStep && !editingCalculation) {
-      dispatch(fetchStepData())
+      dispatch(fetchStepPrevAttributeUuids())
     }
   }, [Step.getUuid(step)])
 

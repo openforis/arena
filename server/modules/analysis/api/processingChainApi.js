@@ -40,6 +40,7 @@ export const init = (app) => {
   )
 
   // ====== READ - Chain
+
   app.get(
     '/survey/:surveyId/processing-chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
@@ -94,41 +95,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== READ - Steps
-
-  app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid/processing-steps',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
-
-        const processingSteps = await AnalysisService.fetchStepsByChainUuid(surveyId, processingChainUuid)
-
-        res.json(processingSteps)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
   // ====== READ - Calculations
-
-  app.get(
-    '/survey/:surveyId/processing-step/:processingStepUuid/calculations',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, processingStepUuid } = Request.getParams(req)
-
-        const calculations = await AnalysisService.fetchCalculationsByStepUuid(surveyId, processingStepUuid)
-
-        res.json(calculations)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   app.get(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation-attribute-uuids',
@@ -189,7 +156,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== DELETE - Processing Step
+  // ====== DELETE - Step
 
   app.delete(
     '/survey/:surveyId/processing-step/:processingStepUuid',
@@ -208,7 +175,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== DELETE - Processing Step Calculation
+  // ====== DELETE - Calculation
 
   app.delete(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation/:calculationUuid',
