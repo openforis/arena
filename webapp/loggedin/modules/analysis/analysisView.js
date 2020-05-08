@@ -8,7 +8,7 @@ import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ChainsView from './chains/view'
-import ProcessingChainView from './processingChain/processingChainView'
+import ChainView from './chain/view'
 import RStudioView from './rStudio/rStudioView'
 
 const AnalysisView = () => (
@@ -22,8 +22,8 @@ const AnalysisView = () => (
           path: appModuleUri(analysisModules.processingChains),
         },
         {
-          component: ProcessingChainView,
-          path: `${appModuleUri(analysisModules.processingChain)}:processingChainUuid/`,
+          component: ChainView,
+          path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
         },
         {
           component: RStudioView,

@@ -1,0 +1,29 @@
+@import 'webapp/style/vars';
+
+.processing-step__calculation-editor {
+  position: absolute;
+  display: grid;
+  grid-row-gap: 1.5rem;
+  top: 0;
+  width: calc(100% - 200px);
+  transform: translate(calc(100% + 230px), 0);
+  transition: all 300ms ease;
+  border-left: 1px solid $greyBorder;
+  height: 100%;
+  align-content: start;
+}
+
+.processing-step.calculation-editor-opened {
+  .processing-step__calculation-editor {
+    transform: translate(200px, 0);
+  }
+}
+
+.processing-step-calculation__attribute-container {
+  display: grid;
+  grid-template-columns: 0.8fr 100px 100px;
+
+  button {
+    justify-self: center;
+  }
+}
