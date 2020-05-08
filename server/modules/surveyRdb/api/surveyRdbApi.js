@@ -5,7 +5,7 @@ import * as SurveyRdbService from '../service/surveyRdbService'
 
 import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
 
-export const init = app => {
+export const init = (app) => {
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, nodeDefUuidTable, cycle, offset, limit, editMode = false } = Request.getParams(req)
@@ -13,7 +13,7 @@ export const init = app => {
       const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getJsonParam(req, 'sort')
 
-      const rows = await SurveyRdbService.queryTable(
+      const rows = await SurveyRdbService.fetchViewData({
         surveyId,
         cycle,
         nodeDefUuidTable,
@@ -23,7 +23,7 @@ export const init = app => {
         filter,
         sort,
         editMode,
-      )
+      })
 
       res.json(rows)
     } catch (error) {
@@ -45,7 +45,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
@@ -56,18 +56,15 @@ export const init = app => {
       const sort = Request.getJsonParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
-      await SurveyRdbService.queryTable(
+      await SurveyRdbService.fetchViewData({
         surveyId,
         cycle,
         nodeDefUuidTable,
         nodeDefUuidCols,
-        0,
-        null,
         filter,
         sort,
-        false,
-        res,
-      )
+        streamOutput: res,
+      })
     } catch (error) {
       next(error)
     }

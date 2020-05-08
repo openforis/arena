@@ -48,6 +48,23 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.getColumn(`${NodeDef.getName(this.nodeDef)}_uuid`)
   }
 
+  get columnNodeDefUuid() {
+    return new ColumnNodeDef(this, this.nodeDef)
+  }
+
+  get columnNodeDefUuids() {
+    return [
+      this.columnNodeDefUuid,
+      ...(this.viewDataParent
+        ? this.viewDataParent.columnNodeDefUuids.map((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef))
+        : []),
+    ]
+  }
+
+  get columnUuids() {
+    return this.columnNodeDefUuids.map((columnNodeDef) => columnNodeDef.namesFull).flat()
+  }
+
   get columnNodeDefs() {
     const columns = []
     // table entity uuid column - it doesn't exist for virtual entities

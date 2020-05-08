@@ -6,6 +6,7 @@ const columnSetCommon = {
   dateModified: 'date_modified',
   id: 'id',
   props: 'props',
+  propsDraft: 'props_draft',
   uuid: 'uuid',
 }
 
@@ -35,7 +36,6 @@ export default class Table {
     this._name = name
     this._alias = SQL.createAlias(name)
     this._columnSet = columnSet
-    this._columns = SQL.addAlias(this.alias, ...Object.values(this._columnSet))
   }
 
   get schema() {
@@ -71,7 +71,7 @@ export default class Table {
   }
 
   get columns() {
-    return this._columns
+    return SQL.addAlias(this.alias, ...Object.values(this._columnSet))
   }
 
   getColumn(columnName) {
@@ -104,6 +104,10 @@ export default class Table {
 
   get columnProps() {
     return this._getColumnCommon(columnSetCommon.props)
+  }
+
+  get columnPropsDraft() {
+    return this._getColumnCommon(columnSetCommon.propsDraft)
   }
 }
 

@@ -54,27 +54,27 @@ const actionHandlers = {
   [processingStepCreate]: (state, { processingStep }) =>
     ProcessingChainState.appendProcessingStep(processingStep)(state),
 
-  [processingStepReset]: state => ProcessingChainState.dissocStepTemporary(state),
+  [processingStepReset]: (state) => ProcessingChainState.dissocStepTemporary(state),
 
-  [processingStepDelete]: state => ProcessingChainState.dissocStepLast(state),
+  [processingStepDelete]: (state) => ProcessingChainState.dissocStepLast(state),
 
   // Calculations
   [processingStepCalculationDirtyUpdate]: (state, { calculation }) =>
     ProcessingChainState.assocProcessingStepCalculationAttributeUuid(
       ProcessingStepCalculation.getUuid(calculation),
-      ProcessingStepCalculation.getNodeDefUuid(calculation),
+      ProcessingStepCalculation.getNodeDefUuid(calculation)
     )(state),
 
   [processingStepCalculationDelete]: (state, { calculation }) =>
     ProcessingChainState.dissocProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation))(
-      state,
+      state
     ),
 
   [processingStepCalculationReset]: (state, { calculation }) =>
     R.ifElse(
       R.always(ProcessingStepCalculation.isTemporary(calculation)),
       ProcessingChainState.dissocProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation)),
-      ProcessingChainState.resetProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation)),
+      ProcessingChainState.resetProcessingStepCalculationAttributeUuid(ProcessingStepCalculation.getUuid(calculation))
     )(state),
 }
 

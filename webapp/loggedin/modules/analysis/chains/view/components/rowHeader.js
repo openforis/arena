@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-const ProcessingChainsRowHeader = () => {
+const RowHeader = () => {
   const i18n = useI18n()
 
   return (
@@ -18,4 +18,4 @@ const ProcessingChainsRowHeader = () => {
   )
 }
 
-export default ProcessingChainsRowHeader
+export default RowHeader
