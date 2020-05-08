@@ -5,7 +5,23 @@ import { TableChain } from '../../../../../common/model/db'
 import * as ProcessingChain from '../../../../../common/analysis/processingChain'
 
 /**
- * Fetches all processing chains by the given survey id and the optional survey cycle if present within params.
+ * Count the processing chains by the given survey id and the optional survey cycle.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {string} [params.cycle=null] - The survey cycle.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<number>} - The result promise.
+ */
+export const countChains = async (params, client = db) => {
+  const { surveyId, cycle = null } = params
+  const tableChain = new TableChain(surveyId)
+  return client.one(`${tableChain.getSelect({ surveyId, cycle, count: true })}`)
+}
+
+/**
+ * Fetches all processing chains by the given survey id and the optional survey cycle.
  *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.

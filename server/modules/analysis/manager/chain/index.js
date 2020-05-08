@@ -7,7 +7,7 @@ import { db } from '../../../../db/db'
 import * as ChainRepository from '../../repository/chain'
 import * as ActivityLogRepository from '../../../activityLog/repository/activityLogRepository'
 
-export { fetchChains, fetchChain, updateChain } from '../../repository/chain'
+export { countChains, fetchChains, fetchChain, updateChain } from '../../repository/chain'
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
   db.tx(async (tx) => {

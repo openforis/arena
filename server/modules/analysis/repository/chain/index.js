@@ -1,3 +1,3 @@
-export { fetchChains, fetchChain } from './read'
+export { countChains, fetchChains, fetchChain } from './read'
 
 export { updateChain } from './update'

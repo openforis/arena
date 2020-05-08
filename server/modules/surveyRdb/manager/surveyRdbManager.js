@@ -13,7 +13,7 @@ import * as PromiseUtils from '../../../../core/promiseUtils'
 
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
-import * as ProcessingChainRepository from '../../analysis/repository/processingChainRepository'
+import * as ChainRepository from '../../analysis/repository/chain'
 import * as ProcessingStepRepository from '../../analysis/repository/processingStepRepository'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
@@ -124,7 +124,7 @@ export const { fetchRecordsWithDuplicateEntities } = DataTableReadRepository
  * @deprecated - Use ChainRepository.fetchChains({ surveyId, includeStepsAndCalculations: true }, client) and iterate normally.
  */
 const _visitProcessingSteps = async (surveyId, client, visitor) => {
-  const chains = await ProcessingChainRepository.fetchChainsBySurveyId(surveyId, null, 0, null, client)
+  const chains = await ChainRepository.fetchChains({ surveyId }, client)
   await PromiseUtils.each(chains, async (chain) => {
     const steps = await ProcessingStepRepository.fetchStepsAndCalculationsByChainUuid(
       surveyId,

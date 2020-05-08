@@ -1,8 +1,4 @@
 export {
-  // ======  READ - Chain
-  countChainsBySurveyId,
-  fetchChainsBySurveyId,
-  fetchChainByUuid,
   // ======  READ - Steps
   fetchStepsByChainUuid,
   fetchStepSummaryByIndex,
@@ -21,6 +17,14 @@ export {
   deleteCalculation,
 } from '../manager/processingChainManager'
 
-export { updateChainStatusExec } from '../manager'
+// read
+export {
+  // ======  READ - Chain
+  countChains,
+  fetchChains,
+  fetchChain,
+  // ======  UPDATE - Chain
+  updateChainStatusExec,
+} from '../manager'
 
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'
