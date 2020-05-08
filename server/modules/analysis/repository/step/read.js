@@ -1,7 +1,7 @@
-import { db } from '@server/db/db'
-import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { db } from '../../../../db/db'
+import { dbTransformCallback } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
-import { TableStep } from '@common/model/db'
+import { TableStep } from '../../../../../common/model/db'
 
 /**
  * Fetches all processing steps by the given survey id.

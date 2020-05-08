@@ -1,8 +1,4 @@
 export {
-  // ======  READ - Calculations
-  fetchCalculationAttributeUuidsByStepUuid,
-  fetchCalculationAttributeUuidsByChainUuid,
-  fetchCalculationAttributeUuidsByChainUuidExcluded,
   // ======  UPDATE - Chain
   updateChain,
   // ======  DELETE - Chain
@@ -19,6 +15,8 @@ export {
   countChains,
   fetchChains,
   fetchChain,
+  // ======  READ - Calculations
+  fetchCalculationAttributeUuids,
   // ======  UPDATE - Chain
   updateChainStatusExec,
 } from '../manager'

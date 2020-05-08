@@ -218,14 +218,6 @@ const _updateCalculationIndexes = async (user, surveyId, step, t) => {
   )
 }
 
-// ====== READ - Calculations
-
-export {
-  fetchCalculationAttributeUuidsByStepUuid,
-  fetchCalculationAttributeUuidsByChainUuid,
-  fetchCalculationAttributeUuidsByChainUuidExcluded,
-} from '../repository/processingStepCalculationRepository'
-
 // ====== UPDATE - Chain
 
 export const updateChain = async (user, surveyId, chain, step = null, calculation = null, client = db) => {
@@ -275,11 +267,7 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
   })
 }
 
-export {
-  removeCyclesFromChains,
-  updateChainScriptCommon,
-  deleteChainsWithoutCycles,
-} from '../repository/processingChainRepository'
+export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository/processingChainRepository'
 
 // ====== DELETE - Chain
 

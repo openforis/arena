@@ -36,6 +36,10 @@ export default class TableCalculation extends TableSurvey {
   get columnScript() {
     return this.getColumn(columnSet.script)
   }
+
+  get columnNodeDefUuid() {
+    return this.getColumn(columnSet.nodeDefUuid)
+  }
 }
 
 TableCalculation.columnSet = columnSet

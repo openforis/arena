@@ -58,16 +58,14 @@ export const init = (app) => {
   )
 
   app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid/calculation-attribute-uuids',
+    '/survey/:surveyId/processing-chain/:chainUuid/calculation-attribute-uuids',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid } = Request.getParams(req)
 
-        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuidsByChainUuid(
-          surveyId,
-          processingChainUuid
-        )
+        const params = { surveyId, chainUuid, mapByUuid: true }
+        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuids(params)
 
         res.json(attributeUuids)
       } catch (error) {
@@ -77,18 +75,16 @@ export const init = (app) => {
   )
 
   app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid/attribute-uuids-other-chains',
+    '/survey/:surveyId/processing-chain/:chainUuid/attribute-uuids-other-chains',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid } = Request.getParams(req)
 
-        const attributeUuidsOtherChains = await AnalysisService.fetchCalculationAttributeUuidsByChainUuidExcluded(
-          surveyId,
-          processingChainUuid
-        )
+        const params = { surveyId, chainUuidExclude: chainUuid }
+        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuids(params)
 
-        res.json(attributeUuidsOtherChains)
+        res.json(attributeUuids)
       } catch (error) {
         next(error)
       }
@@ -98,16 +94,14 @@ export const init = (app) => {
   // ====== READ - Step
 
   app.get(
-    '/survey/:surveyId/processing-step/:processingStepUuid/calculation-attribute-uuids',
+    '/survey/:surveyId/processing-step/:stepUuid/calculation-attribute-uuids',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingStepUuid } = Request.getParams(req)
+        const { surveyId, stepUuid } = Request.getParams(req)
 
-        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuidsByStepUuid(
-          surveyId,
-          processingStepUuid
-        )
+        const params = { surveyId, stepUuid }
+        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuids(params)
 
         res.json(attributeUuids)
       } catch (error) {

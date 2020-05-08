@@ -56,14 +56,6 @@ export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
     )`
   )
 
-export const updateChainScriptCommon = async (surveyId, chainUuid, script, client = db) =>
-  client.query(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain 
-    SET script_common = $2
-    WHERE uuid = $1`,
-    [chainUuid, script]
-  )
-
 // ====== DELETE
 
 export const deleteChain = async (surveyId, processingChainUuid, client = db) =>
