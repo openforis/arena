@@ -1,3 +1,4 @@
+import './entitySelector.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
@@ -54,12 +55,12 @@ const EntitySelector = (props) => {
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(step)))
 
   return (
-    <div className="form-item processing-step__entity-selector-form-item">
+    <div className="form-item step-entity-selector">
       <div className="form-label chain-list__label">{i18n.t('nodeDefsTypes.entity')}</div>
 
       <Dropdown
-        className="processing-step__entity-selector"
-        autocompleteDialogClassName="processing-step__entity-selector-dialog"
+        className="step-entity-selector__dropdown"
+        autocompleteDialogClassName="step-entity-selector__dropdown-dialog"
         items={entities}
         selection={entity}
         readOnly={readOnly}

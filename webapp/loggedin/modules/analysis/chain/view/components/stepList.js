@@ -8,7 +8,6 @@ import * as Step from '@common/analysis/processingStep'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
-import StepView from '@webapp/loggedin/modules/analysis/step/view'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
@@ -59,8 +58,6 @@ const StepList = () => {
           <StepItem key={Step.getIndex(processingStep)} step={processingStep} />
         ))}
       </div>
-
-      {editingStep && <StepView />}
     </div>
   )
 }

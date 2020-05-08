@@ -1,6 +1,7 @@
 import './components/chainView.scss'
 import './components/chainList.scss'
 import './components/chainListItem.scss'
+import './components/chainForm.scss'
 import React, { useEffect } from 'react'
 import { useParams, useHistory } from 'react-router'
 import { useSelector, useDispatch } from 'react-redux'
@@ -14,6 +15,7 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useOnUpdate, useI18n, useSurveyInfo, useOnSurveyCycleUpdate } from '@webapp/commonComponents/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
+import StepView from '@webapp/loggedin/modules/analysis/step/view'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
@@ -66,8 +68,10 @@ const ChainView = () => {
 
   const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
 
-  return R.isEmpty(chain) ? null : (
-    <div className={`chain${editingStep ? ' step-editor-open' : ''}`}>
+  if (R.isEmpty(chain)) return null
+
+  return (
+    <div className={`chain${editingStep ? ' show-step' : ''}`}>
       <button
         type="button"
         className="btn btn-s"
@@ -104,6 +108,7 @@ const ChainView = () => {
         <StepList />
       </div>
 
+      <StepView />
       <ButtonBar />
     </div>
   )

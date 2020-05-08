@@ -46,6 +46,7 @@ export default () => {
   const attributeDefUuidsOtherChains = useSelector(ChainState.getAttributeUuidsOtherChains)
   const stepPrevCalculationAttributeUuids = useSelector(StepState.getStepPrevCalculationAttributeUuids)
   const calculation = useSelector(CalculationState.getCalculation)
+  const editingCalculation = useSelector(CalculationState.isEditingCalculation)
   const dirty = useSelector(CalculationState.isDirty)
 
   const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)(survey)
@@ -80,6 +81,7 @@ export default () => {
     i18n,
     surveyInfo,
     calculation,
+    editingCalculation,
     validation,
     dirty,
     attributes,

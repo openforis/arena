@@ -1,5 +1,4 @@
 import './calculationView.scss'
-
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
@@ -30,6 +29,7 @@ const CalculationView = () => {
     i18n,
     surveyInfo,
     calculation,
+    editingCalculation,
     validation,
     dirty,
     attributes,
@@ -45,7 +45,7 @@ const CalculationView = () => {
 
   return (
     <>
-      <div className="processing-step__calculation-editor">
+      <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
         <button
           type="button"
           className="btn-s btn-close"
@@ -74,7 +74,7 @@ const CalculationView = () => {
         </FormItem>
 
         <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
-          <div className="processing-step-calculation__attribute-container">
+          <div className="calculation__attribute-container">
             <Dropdown
               items={attributes}
               selection={attribute}

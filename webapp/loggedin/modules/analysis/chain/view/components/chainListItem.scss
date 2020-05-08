@@ -8,11 +8,11 @@
   border: unset;
   background-color: unset;
 
-  &:not(:last-child) {
+  &:not(:last-of-type) {
     padding-bottom: 10px;
   }
 
-  &:not(:first-child) {
+  &:not(:first-of-type) {
     padding-top: 10px;
   }
 
@@ -88,8 +88,8 @@
   }
 }
 
-.chain.step-editor-open .step-item,
-.processing-step.calculation-editor-opened .calculation-item {
+.chain.show-step .step-item,
+.step.show-calculation .calculation-item {
   grid-template-columns: 120px 10px;
   grid-column-gap: 0;
   justify-items: start;
@@ -106,6 +106,7 @@
 .chain-list-item__label {
   display: grid;
   grid-template-columns: 1fr 24px;
+  align-items: center;
 
   .error-badge {
     position: relative;

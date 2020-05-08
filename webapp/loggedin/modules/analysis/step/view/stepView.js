@@ -40,6 +40,7 @@ const StepView = () => {
   const stepPrev = useSelector(StepState.getProcessingStepPrev)
   const stepNext = useSelector(StepState.getProcessingStepNext)
   const dirty = useSelector(StepState.isDirty)
+  const editingStep = useSelector(StepState.isEditingStep)
   const editingCalculation = useSelector(CalculationState.isEditingCalculation)
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
@@ -48,7 +49,7 @@ const StepView = () => {
   const entityUuid = Step.getEntityUuid(step)
 
   useEffect(() => {
-    if (!editingCalculation) {
+    if (editingStep && !editingCalculation) {
       dispatch(fetchStepData())
     }
   }, [Step.getUuid(step)])
@@ -60,8 +61,12 @@ const StepView = () => {
     }
   }, [editingCalculation])
 
+  let className = 'step chain-form'
+  if (editingStep) className += ' show'
+  if (editingCalculation) className += ' show-calculation'
+
   return (
-    <div className={`processing-step${editingCalculation ? ' calculation-editor-opened' : ''}`}>
+    <div className={className}>
       <div className="form">
         {!editingCalculation && (
           <>
