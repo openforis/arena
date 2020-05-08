@@ -24,5 +24,4 @@ export {
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
 } from './useSurvey'
-export { default as useNodeDef } from './useNodeDef'
 export { default as useUser } from './useUser'
