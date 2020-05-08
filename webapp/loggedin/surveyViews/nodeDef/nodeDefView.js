@@ -14,6 +14,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey, useNodeDef } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
 
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   setNodeDefParentUuid,
   setNodeDefProp,
@@ -23,11 +24,8 @@ import {
   saveNodeDefEdits,
   removeNodeDef,
 } from '@webapp/survey/nodeDefs/actions'
-import { navigateToProcessingChainsView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
-
+import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
-
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
@@ -83,7 +81,7 @@ const NodeDefView = () => {
     if (editingNodeDefFromDesigner) {
       history.goBack()
     } else {
-      dispatch(navigateToProcessingChainsView(history))
+      dispatch(navigateToChainsView(history))
     }
   }, [surveyCycleKey])
 

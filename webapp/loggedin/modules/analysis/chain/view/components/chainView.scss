@@ -1,0 +1,23 @@
+.chain {
+  display: grid;
+  grid-template-rows: 1fr 60px;
+
+  .form {
+    grid-row-gap: 2rem;
+  }
+
+  .button-bar {
+    align-self: center;
+  }
+}
+
+.chain,
+.processing-step,
+.processing-step__calculation-editor {
+  position: relative;
+
+  .form-item {
+    grid-template-columns: .2fr .8fr;
+  }
+
+}
