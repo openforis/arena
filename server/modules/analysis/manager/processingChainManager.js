@@ -13,6 +13,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
+import { TableChain } from '@common/model/db'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
@@ -44,41 +45,33 @@ const _afterChainUpdate = async (surveyId, t, deleteNodeDefAnalysisUnused = true
 // ====== CREATE OR UPDATE Chain
 
 const _insertChain = async (user, surveyId, chain, t) => {
-  const chainDb = await ProcessingChainRepository.insertChain(surveyId, chain, t)
+  const chainDb = await ChainRepository.insertChain({ surveyId, chain }, t)
   await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainCreate, chainDb, false, t)
 }
 
-const _updateChainProps = async (user, surveyId, chain, chainDb, t) => {
-  const processingChainUuid = Chain.getUuid(chain)
+const _updateChain = async (user, surveyId, chain, chainDb, client) => {
+  const chainUuid = Chain.getUuid(chain)
   const propsToUpdate = Chain.getPropsDiff(chain)(chainDb)
-  await Promise.all(
-    Object.entries(propsToUpdate)
-      .map(([key, value]) => [
-        ProcessingChainRepository.updateChainProp(surveyId, processingChainUuid, key, value, t),
-        ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.processingChainPropUpdate,
-          { [ActivityLog.keysContent.uuid]: processingChainUuid, key, value },
-          false,
-          t
-        ),
-      ])
-      .flat()
-  )
-  // Update processing_chain validation and date_modified
-  await ProcessingChainRepository.updateChainValidation(surveyId, processingChainUuid, Chain.getValidation(chain), t)
+  // activity log for each updated prop
+  const promises = Object.entries(propsToUpdate).map(([key, value]) => {
+    const content = { [ActivityLog.keysContent.uuid]: chainUuid, key, value }
+    const type = ActivityLog.type.processingChainPropUpdate
+    return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
+  })
+  // chain props and validation update
+  const fields = {
+    [TableChain.columnSet.props]: propsToUpdate,
+    [TableChain.columnSet.validation]: Chain.getValidation(chain),
+  }
+  const params = { surveyId, chainUuid, dateModified: true, fields }
+  promises.push(ChainRepository.updateChain(params, client))
+
+  return Promise.all(promises)
 }
 
 const _insertOrUpdateChain = async (user, surveyId, chain, client) => {
   const chainDb = await ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain) }, client)
-  if (chainDb) {
-    // UPDATE CHAIN
-    await _updateChainProps(user, surveyId, chain, chainDb, client)
-  } else {
-    // CREATE CHAIN
-    await _insertChain(user, surveyId, chain, client)
-  }
+  return chainDb ? _updateChain(user, surveyId, chain, chainDb, client) : _insertChain(user, surveyId, chain, client)
 }
 
 // ====== CREATE OR UPDATE - Step
@@ -174,10 +167,11 @@ const _insertOrUpdateCalculation = async (user, surveyId, chain, calculation, t)
 const _updateCalculationIndexes = async (user, surveyId, step, t) => {
   const stepUuid = Step.getUuid(step)
   const calculationUuids = Step.getCalculationUuids(step)
-  const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
+  const stepDb = await StepRepository.fetchStep({ surveyId, stepUuid, includeCalculations: true }, t)
+  const calculations = Step.getCalculations(stepDb)
   const calculationsDbUuids = R.pluck(Calculation.keys.uuid, calculations)
   if (R.equals(calculationsDbUuids, calculationUuids)) {
-    // Calculation indexes  not changed
+    // Calculation indexes haven't changed
     return
   }
 
@@ -197,21 +191,15 @@ const _updateCalculationIndexes = async (user, surveyId, step, t) => {
       const indexFrom = Calculation.getIndex(calculation)
       const indexTo = R.indexOf(calculationUuid, calculationUuids)
       if (indexFrom !== indexTo) {
-        const logContent = {
+        const content = {
           [ActivityLog.keysContent.uuid]: calculationUuid,
           [ActivityLog.keysContent.processingChainUuid]: Step.getProcessingChainUuid(step),
           [ActivityLog.keysContent.processingStepUuid]: stepUuid,
           [ActivityLog.keysContent.indexFrom]: indexFrom,
           [ActivityLog.keysContent.indexTo]: indexTo,
         }
-        return ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.processingStepCalculationIndexUpdate,
-          logContent,
-          false,
-          t
-        )
+        const type = ActivityLog.type.processingStepCalculationIndexUpdate
+        return ActivityLogRepository.insert(user, surveyId, type, content, false, t)
       }
       return null
     })
@@ -229,29 +217,27 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
       if (calculation) {
         await _insertOrUpdateCalculation(user, surveyId, chain, calculation, t)
       }
-
       await _updateCalculationIndexes(user, surveyId, step, t)
     }
 
     // Validate chain / step / calculation after insert/update
-    const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, t)
+    const [surveyInfo, chainDb] = await Promise.all([
+      SurveyRepository.fetchSurveyById(surveyId, true, t),
+      ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain), includeStepsAndCalculations: true }, t),
+    ])
 
-    const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
+    const defaultLanguage = Survey.getDefaultLanguage(surveyInfo)
     const calculationValidation = calculation
-      ? await ChainValidator.validateCalculation(calculation, surveyDefaultLang)
+      ? await ChainValidator.validateCalculation(calculation, defaultLanguage)
       : Validation.newInstance()
 
     let stepValidation = null
-    const chainDb = await ChainRepository.fetchChain(
-      { surveyId, chainUuid: Chain.getUuid(chain), includeStepsAndCalculations: true },
-      t
-    )
     if (step) {
       const stepDb = Chain.getStepByIdx(Step.getIndex(step))(chainDb)
       stepValidation = await ChainValidator.validateStep(stepDb)
     }
 
-    const chainValidation = await ChainValidator.validateChain(chainDb, surveyDefaultLang)
+    const chainValidation = await ChainValidator.validateChain(chainDb, defaultLanguage)
 
     if (!R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
       // Throw error to rollback transaction
@@ -301,17 +287,20 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
     }
     await Promise.all([
       ProcessingStepRepository.deleteStep(surveyId, stepUuid, t),
-      ProcessingChainRepository.updateChainDateModified(surveyId, chainUuid, t),
+      ChainRepository.updateChain({ surveyId, chainUuid, dateModified: true }, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, logContent, false, t),
     ])
 
     if (Step.getIndex(step) === 0) {
       // Deleted processing step was the only one, chain validation must be updated (steps are required)
-      const chain = await ChainRepository.fetchChain({ surveyId, chainUuid }, t)
-      const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
+      const [surveyInfo, chain] = await Promise.all([
+        SurveyRepository.fetchSurveyById(surveyId, false, t),
+        ChainRepository.fetchChain({ surveyId, chainUuid }, t),
+      ])
       const chainValidation = await ChainValidator.validateChain(chain, Survey.getDefaultLanguage(surveyInfo))
       const chainUpdated = Chain.assocItemValidation(chainUuid, chainValidation)(chain)
-      await ProcessingChainRepository.updateChainValidation(surveyId, chainUuid, Chain.getValidation(chainUpdated), t)
+      const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }
+      await ChainRepository.updateChain({ surveyId, chainUuid, fields }, t)
     }
 
     return _afterChainUpdate(surveyId, t)
@@ -333,7 +322,8 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       t
     )
 
-    const logContent = {
+    // insert activity log
+    const content = {
       [ActivityLog.keysContent.uuid]: stepUuid,
       [ActivityLog.keysContent.processingChainUuid]: chainUuid,
       [ActivityLog.keysContent.processingStepUuid]: stepUuid,
@@ -341,25 +331,16 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       [ActivityLog.keysContent.index]: Calculation.getIndex(calculation),
       [ActivityLog.keysContent.labels]: Calculation.getLabels(calculation),
     }
-
-    await ActivityLogRepository.insert(
-      user,
-      surveyId,
-      ActivityLog.type.processingStepCalculationDelete,
-      logContent,
-      false,
-      t
-    )
+    const type = ActivityLog.type.processingStepCalculationDelete
+    await ActivityLogRepository.insert(user, surveyId, type, content, false, t)
 
     // Update step validation
-    const calculations = await ProcessingStepCalculationRepository.fetchCalculationsByStepUuid(surveyId, stepUuid, t)
-    const stepUpdated = Step.assocCalculations(calculations)(step)
-    const stepValidation = await ChainValidator.validateStep(stepUpdated)
-    const chain = await ChainRepository.fetchChain({ surveyId, chainUuid }, t)
+    const chain = await ChainRepository.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true }, t)
+    const stepValidation = await ChainValidator.validateStep(Chain.getStepByIdx(Step.getIndex(step))(chain))
     const chainUpdated = Chain.assocItemValidation(stepUuid, stepValidation)(chain)
-
-    // Update processing_chain validation and date_modified
-    await ProcessingChainRepository.updateChainValidation(surveyId, chainUuid, Chain.getValidation(chainUpdated), t)
+    // Update processing_chain validation
+    const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }
+    await ChainRepository.updateChain({ surveyId, chainUuid, fields, dateModified: true }, t)
 
     return _afterChainUpdate(surveyId, t)
   })

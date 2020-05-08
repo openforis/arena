@@ -9,44 +9,7 @@ const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate
   'date_modified'
 )}, ${DbUtils.selectDate('date_executed')}`
 
-// ====== CREATE
-
-export const insertChain = async (surveyId, chain, client = db) =>
-  client.one(
-    `INSERT INTO ${getSurveyDBSchema(surveyId)}.processing_chain (uuid, props, validation)
-    VALUES ($1, $2, $3)
-    RETURNING ${selectFields}`,
-    [ProcessingChain.getUuid(chain), ProcessingChain.getProps(chain), ProcessingChain.getValidation(chain)],
-    dbTransformCallback
-  )
-
 // ====== UPDATE
-
-export const updateChainProp = async (surveyId, processingChainUuid, key, value, client = db) =>
-  client.query(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET props = props || $2::jsonb,
-        date_modified = ${DbUtils.now}
-    WHERE uuid = $1`,
-    [processingChainUuid, { [key]: value }]
-  )
-
-export const updateChainValidation = async (surveyId, processingChainUuid, validation, client = db) =>
-  client.query(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET validation = $2,
-        date_modified = ${DbUtils.now}
-    WHERE uuid = $1`,
-    [processingChainUuid, validation]
-  )
-
-export const updateChainDateModified = async (surveyId, processingChainUuid, client = db) =>
-  client.query(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET date_modified = ${DbUtils.now}
-    WHERE uuid = $1`,
-    [processingChainUuid]
-  )
 
 export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
   client.query(

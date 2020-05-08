@@ -42,16 +42,6 @@ export const fetchCalculationByUuid = async (surveyId, uuid, client = db) =>
     camelize
   )
 
-export const fetchCalculationsByStepUuid = async (surveyId, processingStepUuid, client = db) =>
-  client.map(
-    `SELECT ${_selectFields} 
-    FROM ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-    WHERE processing_step_uuid = $1
-    ORDER BY index`,
-    [processingStepUuid],
-    camelize
-  )
-
 // ====== UPDATE
 
 export const incrementCalculationIndexesByStepUuid = async (surveyId, processingStepUuid, increment, client = db) =>

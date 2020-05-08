@@ -19,7 +19,11 @@ export const createAlias = (name) =>
 export const addAlias = (alias, ...columnNames) => columnNames.map((columnName) => `${alias}.${columnName}`)
 
 // Json
-export const jsonAgg = (expression, orderByColumns = []) =>
-  `json_agg(${expression}${orderByColumns.length > 0 ? ` ORDER BY ${orderByColumns.join(', ')}` : ''})`
+export const jsonAgg = (expression, orderByColumns = []) => {
+  const whenExpr = `WHEN count(${expression}) = 0 THEN '[]'`
+  const orderBy = orderByColumns.length > 0 ? ` ORDER BY ${orderByColumns.join(', ')}` : ''
+  const elseExpr = `ELSE json_agg(${expression}${orderBy})`
+  return `CASE ${whenExpr} ${elseExpr} END`
+}
 
 export const jsonBuildObject = (...args) => `jsonb_build_object(${args.join(', ')})`
