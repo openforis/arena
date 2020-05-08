@@ -45,7 +45,7 @@ export function getSelect(params) {
   if (stepIndex) whereConditions.push(`${this.columnIndex} = ${stepIndex}`)
   if (stepUuid) whereConditions.push(`${this.columnUuid} = ${stepUuid}`)
   if (entityUuid)
-    whereConditions.push(`WHERE ${this.columnProps}->'${ProcessingStep.keysProps.entityUuid}' @> '"${entityUuid}"'`)
+    whereConditions.push(`${this.columnProps}->'${ProcessingStep.keysProps.entityUuid}' @> '"${entityUuid}"'`)
 
   return `SELECT
         ${selectFields.join(', ')}
