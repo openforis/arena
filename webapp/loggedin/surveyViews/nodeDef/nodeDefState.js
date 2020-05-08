@@ -16,7 +16,7 @@ const keys = {
 export const stateKey = 'nodeDef'
 
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = (prop, defaultValue) => R.pipe(getState, R.propOr(defaultValue, prop))
+const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ===== READ
 
@@ -31,7 +31,7 @@ export const getPropsAdvancedUpdated = getStateProp(keys.propsAdvancedUpdated, {
  * Determines if the nodeDef in the state has been updated.
  *
  * @param {!object} state - The survey views / node def state object.
- * @returns {boolean} - True when nodeDef and nodeDefOriginal are not equals
+ * @returns {boolean} - True when nodeDef and nodeDefOriginal are not equals.
  */
 export const isDirty = (state) => {
   const nodeDef = getNodeDef(state)

@@ -1,7 +1,7 @@
 import './nodeDefView.scss'
 
 import React, { useEffect } from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
@@ -11,15 +11,16 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import {
+  useI18n,
+  useOnUpdate,
+  useSurvey,
+  useSurveyCycleKey,
+  useNodeDef,
+  useNodeDefValidation,
+  useNodeDefIsDirty,
+} from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
-
-import ValidationsProps from './advanced/validationsProps'
-import AdvancedProps from './advanced/advancedProps'
-import BasicProps from './basic/basicProps'
-
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as NodeDefState from './nodeDefState'
 
 import {
   setNodeDefParentUuid,
@@ -30,44 +31,56 @@ import {
   saveNodeDefEdits,
   removeNodeDef,
 } from '@webapp/survey/nodeDefs/actions'
-import { setNodeDefUuidForEdit } from './actions'
 import { navigateToProcessingChainsView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import ValidationsProps from './advanced/validationsProps'
+import AdvancedProps from './advanced/advancedProps'
+import BasicProps from './basic/basicProps'
 
-const NodeDefView = (props) => {
-  const {
-    surveyCycleKey,
-    nodeDef,
-    nodeDefParent,
-    validation,
-    isDirty,
-    nodeDefKeyEditDisabled,
-    nodeDefMultipleEditDisabled,
-    setNodeDefParentUuid,
-    setNodeDefProp,
-    putNodeDefLayoutProp,
-    setNodeDefLayoutProp,
-    setNodeDefUuidForEdit,
-    cancelNodeDefEdits,
-    saveNodeDefEdits,
-    removeNodeDef,
-    navigateToProcessingChainsView,
-  } = props
+import { setNodeDefUuidForEdit } from './actions'
 
+const _isNodeDefKeyEditDisabled = (survey, nodeDef) =>
+  !nodeDef ||
+  NodeDef.isRoot(nodeDef) ||
+  NodeDef.isMultiple(nodeDef) ||
+  (!NodeDef.isKey(nodeDef) &&
+    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes) ||
+  NodeDef.isReadOnly(nodeDef)
+
+const _isNodeDefMultipleEditDisabled = (survey, surveyCycleKey, nodeDef) =>
+  !nodeDef ||
+  NodeDef.isPublished(nodeDef) ||
+  NodeDef.isKey(nodeDef) ||
+  NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef) ||
+  Survey.isNodeDefParentCode(nodeDef)(survey) ||
+  NodeDef.isReadOnly(nodeDef) ||
+  NodeDef.isAnalysis(nodeDef)
+
+const NodeDefView = () => {
   const i18n = useI18n()
   const history = useHistory()
   const dispatch = useDispatch()
   const { pathname } = useLocation()
   const { nodeDefUuid } = useParams()
 
+  const survey = useSurvey()
+  const surveyCycleKey = useSurveyCycleKey()
+  const nodeDef = useNodeDef()
+  const validation = useNodeDefValidation()
+  const isDirty = useNodeDefIsDirty()
+
+  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
+  const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
+  const nodeDefMultipleEditDisabled = _isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
+
   const editingNodeDefFromDesigner = Boolean(
-    matchPath(pathname, appModuleUri(designerModules.nodeDef) + ':nodeDefUuid')
+    matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`)
   )
 
   useEffect(() => {
     // Editing a nodeDef
     if (nodeDefUuid) {
-      setNodeDefUuidForEdit(nodeDefUuid)
+      dispatch(setNodeDefUuidForEdit(nodeDefUuid))
     }
   }, [])
 
@@ -75,7 +88,7 @@ const NodeDefView = (props) => {
     if (editingNodeDefFromDesigner) {
       history.goBack()
     } else {
-      navigateToProcessingChainsView(history)
+      dispatch(navigateToProcessingChainsView(history))
     }
   }, [surveyCycleKey])
 
@@ -96,10 +109,10 @@ const NodeDefView = (props) => {
                     nodeDefKeyEditDisabled,
                     nodeDefMultipleEditDisabled,
                     editingNodeDefFromDesigner,
-                    setNodeDefParentUuid,
-                    setNodeDefProp,
-                    putNodeDefLayoutProp,
-                    setNodeDefLayoutProp,
+                    setNodeDefParentUuid: (...args) => dispatch(setNodeDefParentUuid(...args)),
+                    setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
+                    putNodeDefLayoutProp: (...args) => dispatch(putNodeDefLayoutProp(...args)),
+                    setNodeDefLayoutProp: (...args) => dispatch(setNodeDefLayoutProp(...args)),
                   },
                 },
                 ...(NodeDef.isRoot(nodeDef)
@@ -112,7 +125,7 @@ const NodeDefView = (props) => {
                           nodeDef,
                           validation,
                           nodeDefParent,
-                          setNodeDefProp,
+                          setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
                         },
                       },
                       {
@@ -122,7 +135,7 @@ const NodeDefView = (props) => {
                           nodeDef,
                           validation,
                           nodeDefParent,
-                          setNodeDefProp,
+                          setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
                         },
                       },
                     ]),
@@ -131,25 +144,31 @@ const NodeDefView = (props) => {
 
             <div className="button-bar">
               <button
+                type="button"
                 className="btn btn-cancel"
                 onClick={() =>
                   isDirty
-                    ? dispatch(showDialogConfirm('common.cancelConfirm', {}, () => cancelNodeDefEdits(history)))
-                    : cancelNodeDefEdits(history)
+                    ? dispatch(showDialogConfirm('common.cancelConfirm', {}, cancelNodeDefEdits(history)))
+                    : dispatch(cancelNodeDefEdits(history))
                 }
               >
                 {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
               </button>
               <button
+                type="button"
                 className="btn btn-primary"
-                onClick={saveNodeDefEdits}
+                onClick={() => dispatch(saveNodeDefEdits())}
                 aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
                 {i18n.t('common.save')}
               </button>
               {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
-                <button className="btn btn-danger btn-delete" onClick={() => removeNodeDef(nodeDef, history)}>
+                <button
+                  type="button"
+                  className="btn btn-danger btn-delete"
+                  onClick={() => dispatch(removeNodeDef(nodeDef, history))}
+                >
                   <span className="icon icon-bin2 icon-left icon-12px" />
                   {i18n.t('common.delete')}
                 </button>
@@ -162,58 +181,4 @@ const NodeDefView = (props) => {
   )
 }
 
-NodeDefView.defaultProps = {
-  nodeDef: null,
-  nodeDefParent: null,
-}
-
-const isNodeDefKeyEditDisabled = (survey, nodeDef) =>
-  !nodeDef ||
-  NodeDef.isRoot(nodeDef) ||
-  NodeDef.isMultiple(nodeDef) ||
-  (!NodeDef.isKey(nodeDef) &&
-    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes) ||
-  NodeDef.isReadOnly(nodeDef)
-
-const isNodeDefMultipleEditDisabled = (survey, surveyCycleKey, nodeDef) =>
-  !nodeDef ||
-  NodeDef.isPublished(nodeDef) ||
-  NodeDef.isKey(nodeDef) ||
-  NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef) ||
-  Survey.isNodeDefParentCode(nodeDef)(survey) ||
-  NodeDef.isReadOnly(nodeDef) ||
-  NodeDef.isAnalysis(nodeDef)
-
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
-  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
-  const validation = NodeDefState.getValidation(state)
-  const isDirty = NodeDefState.isDirty(state)
-
-  const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
-  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
-
-  return {
-    surveyCycleKey,
-    nodeDef,
-    nodeDefParent,
-    validation,
-    isDirty,
-    nodeDefKeyEditDisabled,
-    nodeDefMultipleEditDisabled,
-  }
-}
-
-export default connect(mapStateToProps, {
-  setNodeDefParentUuid,
-  setNodeDefProp,
-  putNodeDefLayoutProp,
-  setNodeDefLayoutProp,
-  setNodeDefUuidForEdit,
-  cancelNodeDefEdits,
-  saveNodeDefEdits,
-  removeNodeDef,
-  navigateToProcessingChainsView,
-})(NodeDefView)
+export default NodeDefView
