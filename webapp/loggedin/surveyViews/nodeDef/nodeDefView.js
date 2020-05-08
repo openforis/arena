@@ -11,7 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey, useNodeDef } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
@@ -58,7 +58,7 @@ const NodeDefView = () => {
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
-  const nodeDef = useNodeDef()
+  const nodeDef = useSelector(NodeDefState.getNodeDef)
   const validation = useSelector(NodeDefState.getValidation)
   const isDirty = useSelector(NodeDefState.isDirty)
 
