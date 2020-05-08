@@ -5,7 +5,7 @@ import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions
 
 import { dataVisReset } from '../actions'
 
-import { nodesUpdate, validationsUpdate } from '../../../../surveyViews/record/actions'
+import { nodesUpdate } from '../../../../surveyViews/record/actions'
 import {
   dataQueryTableNodeDefUuidUpdate,
   dataQueryTableNodeDefUuidColsUpdate,
@@ -16,6 +16,7 @@ import {
   dataQueryTableFilterUpdate,
   dataQueryTableSortUpdate,
   dataQueryNodeDefSelectorsShowUpdate,
+  dataQueryTableDataValidationUpdate,
 } from './actions'
 import * as DataQueryState from './dataQueryState'
 
@@ -39,7 +40,7 @@ const actionHandlers = {
 
   [dataQueryTableInit]: (
     state,
-    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode },
+    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode }
   ) =>
     DataQueryState.initTableData(
       offset,
@@ -50,7 +51,7 @@ const actionHandlers = {
       data,
       nodeDefUuidTable,
       nodeDefUuidCols,
-      editMode,
+      editMode
     )(state),
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => DataQueryState.assocTableData(offset, data)(state),
@@ -59,14 +60,14 @@ const actionHandlers = {
 
   [dataQueryTableSortUpdate]: (state, { sort }) => DataQueryState.assocTableSort(sort)(state),
 
+  [dataQueryTableDataValidationUpdate]: (state, { recordUuid, recordValid }) =>
+    DataQueryState.assocTableDataRecordNodeValidations(recordUuid, recordValid)(state),
+
   // Data vis
   [dataVisReset]: () => ({}),
 
   // Record nodes update
   [nodesUpdate]: (state, { nodes }) => DataQueryState.assocTableDataRecordNodes(nodes)(state),
-
-  [validationsUpdate]: (state, { recordUuid, recordValid }) =>
-    DataQueryState.assocTableDataRecordNodeValidations(recordUuid, recordValid)(state),
 
   // NodeDefsSelector
   [dataQueryNodeDefSelectorsShowUpdate]: (state, { show }) => DataQueryState.assocShowNodeDefSelectors(show)(state),

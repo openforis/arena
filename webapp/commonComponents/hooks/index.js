@@ -8,7 +8,7 @@ export { default as useAsyncPutRequest } from './useAsyncPutRequest'
 export { default as useAsyncDeleteRequest } from './useAsyncDeleteRequest'
 export { useAsyncMultipartPostRequest } from './useAsyncMultipartRequest'
 export { useAsyncMultipartPutRequest } from './useAsyncMultipartRequest'
-export { useAuthCanEditSurvey, useAuthCanEditRecord } from './useAuth'
+export { useAuthCanEditSurvey, useAuthCanEditRecord, useAuthCanCleanseRecords } from './useAuth'
 export { default as useFormObject } from './useFormObject'
 export { default as useOnResize } from './useOnResize'
 export { useI18n, useLang } from './useI18n'
@@ -24,5 +24,4 @@ export {
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
 } from './useSurvey'
-export { default as useNodeDef } from './useNodeDef'
 export { default as useUser } from './useUser'
