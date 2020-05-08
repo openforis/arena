@@ -1,7 +1,7 @@
 import './nodeDefView.scss'
 
 import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
@@ -11,15 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import {
-  useI18n,
-  useOnUpdate,
-  useSurvey,
-  useSurveyCycleKey,
-  useNodeDef,
-  useNodeDefValidation,
-  useNodeDefIsDirty,
-} from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey, useNodeDef } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
 
 import {
@@ -33,6 +25,9 @@ import {
 } from '@webapp/survey/nodeDefs/actions'
 import { navigateToProcessingChainsView } from '@webapp/loggedin/modules/analysis/processingChain/actions'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
+
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
@@ -66,8 +61,8 @@ const NodeDefView = () => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDef = useNodeDef()
-  const validation = useNodeDefValidation()
-  const isDirty = useNodeDefIsDirty()
+  const validation = useSelector(NodeDefState.getValidation)
+  const isDirty = useSelector(NodeDefState.isDirty)
 
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
