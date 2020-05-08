@@ -234,12 +234,7 @@ export const updateChain = async (user, surveyId, chain, step = null, calculatio
     }
 
     // Validate chain / step / calculation after insert/update
-    // TODO: Why, while editing a processing chain, does the user fetch published props first? shouldn't he always fetch draft props?
-    let surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, false, t)
-    if (!Survey.isPublished(surveyInfo)) {
-      // Fetch draft survey props
-      surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, t)
-    }
+    const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, t)
 
     const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
     const calculationValidation = calculation
