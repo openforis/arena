@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as R from 'ramda'
 
@@ -12,7 +12,6 @@ import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
-import { fetchSteps } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { createStep } from '@webapp/loggedin/modules/analysis/step/actions'
 
 import StepItem from './stepItem'
@@ -24,14 +23,6 @@ const StepList = () => {
   const chain = useSelector(ChainState.getProcessingChain)
   const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
   const stepsValidation = Validation.getFieldValidation(Chain.keys.processingSteps)(validation)
-
-  // Fetch steps on mount
-  useEffect(() => {
-    if (!Chain.isTemporary(chain) && !editingStep) {
-      dispatch(fetchSteps(Chain.getUuid(chain)))
-    }
-  }, [])
-
   const steps = Chain.getProcessingSteps(chain)
   const lastStepHasCategory = R.pipe(R.last, Step.hasCategory)(steps)
 

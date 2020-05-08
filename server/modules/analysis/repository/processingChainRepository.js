@@ -1,5 +1,3 @@
-import * as pgPromise from 'pg-promise'
-
 import * as ProcessingChain from '@common/analysis/processingChain'
 
 import { db } from '@server/db/db'
@@ -19,48 +17,6 @@ export const insertChain = async (surveyId, chain, client = db) =>
     VALUES ($1, $2, $3)
     RETURNING ${selectFields}`,
     [ProcessingChain.getUuid(chain), ProcessingChain.getProps(chain), ProcessingChain.getValidation(chain)],
-    dbTransformCallback
-  )
-
-// ====== READ
-
-export const countChainsBySurveyId = async (surveyId, cycle, client = db) =>
-  client.one(
-    `SELECT COUNT(*) 
-    FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> $1`,
-    [JSON.stringify(cycle)]
-  )
-
-export const fetchChainsBySurveyId = async (surveyId, cycle = null, offset = 0, limit = null, client = db) =>
-  client.map(
-    `SELECT ${selectFields}
-    FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    ${cycle ? `WHERE (props)->'${ProcessingChain.keysProps.cycles}' @> '"${cycle}"'` : ''}
-    ORDER BY date_created DESC
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}`,
-    [],
-    dbTransformCallback
-  )
-
-/**
- * Fetches a processing chain with the given surveyId and chainUuid.
- *
- * @param {!object} params - Query parameters.
- * @param {!string} params.surveyId - The survey id.
- * @param {!string} params.chainUuid - The processing chain uuid.
- * @param {boolean} [params.includeScript = false] - Whether to include chain script.
- * @param {pgPromise.IDatabase} client - The database client.
- *
- * @returns {Promise<any | null>} - The chain if found, null otherwise.
- */
-export const fetchChainByUuid = async ({ surveyId, chainUuid, includeScript }, client = db) =>
-  client.oneOrNone(
-    `SELECT ${selectFields}${includeScript === true ? ' ,script_common' : ''}
-    FROM ${getSurveyDBSchema(surveyId)}.processing_chain
-    WHERE uuid = $1`,
-    [chainUuid],
     dbTransformCallback
   )
 

@@ -43,11 +43,10 @@ export const getStepPrevCalculationAttributeUuids = R.pipe(getState, R.propOr([]
 export const assocProcessingStep = (processingStep) =>
   R.pipe(R.assoc(keys.dirty, processingStep), R.assoc(keys.orig, processingStep))
 
-const _updateStep = (key, fn) => (state) => R.pipe(R.prop(key), fn, (step) => R.assoc(key, step, state))(state)
-const _updateStepDirty = (fn) => _updateStep(keys.dirty, fn)
-const _updateStepOrig = (fn) => _updateStep(keys.orig, fn)
+const _updateStepDirty = (fn) => (state) =>
+  R.pipe(R.prop(keys.dirty), fn, (step) => R.assoc(keys.dirty, step, state))(state)
 
-export const mergeProcessingStepProps = (props) => _updateStepDirty(Step.mergeProps(props))
+export const updateProps = (props) => _updateStepDirty(Step.mergeProps(props))
 
 export const saveDirty = (step, calculation) => (state) =>
   R.pipe(R.when(R.always(Boolean(calculation)), Step.assocCalculation(calculation)), (stepUpdate) =>
@@ -56,13 +55,7 @@ export const saveDirty = (step, calculation) => (state) =>
 
 // Calculations
 
-const _assocCalculations = (calculations) =>
-  R.pipe(_updateStepDirty(Step.assocCalculations(calculations)), _updateStepOrig(Step.assocCalculations(calculations)))
-
-const _assocStepPrevCalculationAttributeUuids = R.assoc(keys.stepPrevAttributeUuids)
-
-export const assocStepData = (calculations, stepPrevAttributeUuids) =>
-  R.pipe(_assocCalculations(calculations), _assocStepPrevCalculationAttributeUuids(stepPrevAttributeUuids))
+export const assocStepPrevAttributeUuids = R.assoc(keys.stepPrevAttributeUuids)
 
 export const assocCalculation = (calculation) => _updateStepDirty(Step.assocCalculation(calculation))
 
@@ -74,7 +67,8 @@ export const updateCalculationIndex = (indexFrom, indexTo) => (processingStepSta
 
 export const updateEntityUuid = (entityDefUuid) => _updateStepDirty(Step.assocEntityUuid(entityDefUuid))
 
-export const dissocTemporaryCalculation = _updateStepDirty(Step.dissocTemporaryCalculation)
+export const dissocTemporaryCalculation = (calculation) =>
+  R.when(R.always(Calculation.isTemporary(calculation)), _updateStepDirty(Step.dissocTemporaryCalculation))
 
 export const dissocCalculation = (calculation) => (state) =>
   R.pipe(R.prop(keys.dirty), Step.dissocCalculation(calculation), (processingStep) =>

@@ -2,8 +2,7 @@ import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
-import * as ProcessingChainService from '../service'
-import * as RChainService from '../service/rChain'
+import * as AnalysisService from '../service'
 
 export const init = (app) => {
   // ====== READ - Chains
@@ -13,9 +12,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, surveyCycleKey } = Request.getParams(req)
+        const { surveyId, surveyCycleKey: cycle } = Request.getParams(req)
 
-        const count = await ProcessingChainService.countChainsBySurveyId(surveyId, surveyCycleKey)
+        const count = await AnalysisService.countChains({ surveyId, cycle })
 
         res.json(count)
       } catch (error) {
@@ -29,9 +28,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, surveyCycleKey, offset, limit } = Request.getParams(req)
+        const { surveyId, surveyCycleKey: cycle, offset, limit } = Request.getParams(req)
 
-        const list = await ProcessingChainService.fetchChainsBySurveyId(surveyId, surveyCycleKey, offset, limit)
+        const list = await AnalysisService.fetchChains({ surveyId, cycle, offset, limit })
 
         res.json({ list })
       } catch (error) {
@@ -41,6 +40,7 @@ export const init = (app) => {
   )
 
   // ====== READ - Chain
+
   app.get(
     '/survey/:surveyId/processing-chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
@@ -48,9 +48,9 @@ export const init = (app) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
 
-        const processingChain = await ProcessingChainService.fetchChainByUuid({ surveyId, chainUuid })
+        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true })
 
-        res.json(processingChain)
+        res.json(chain)
       } catch (error) {
         next(error)
       }
@@ -64,7 +64,7 @@ export const init = (app) => {
       try {
         const { surveyId, processingChainUuid } = Request.getParams(req)
 
-        const attributeUuids = await ProcessingChainService.fetchCalculationAttributeUuidsByChainUuid(
+        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuidsByChainUuid(
           surveyId,
           processingChainUuid
         )
@@ -83,7 +83,7 @@ export const init = (app) => {
       try {
         const { surveyId, processingChainUuid } = Request.getParams(req)
 
-        const attributeUuidsOtherChains = await ProcessingChainService.fetchCalculationAttributeUuidsByChainUuidExcluded(
+        const attributeUuidsOtherChains = await AnalysisService.fetchCalculationAttributeUuidsByChainUuidExcluded(
           surveyId,
           processingChainUuid
         )
@@ -95,41 +95,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== READ - Steps
-
-  app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid/processing-steps',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
-
-        const processingSteps = await ProcessingChainService.fetchStepsByChainUuid(surveyId, processingChainUuid)
-
-        res.json(processingSteps)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  // ====== READ - Calculations
-
-  app.get(
-    '/survey/:surveyId/processing-step/:processingStepUuid/calculations',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, processingStepUuid } = Request.getParams(req)
-
-        const calculations = await ProcessingChainService.fetchCalculationsByStepUuid(surveyId, processingStepUuid)
-
-        res.json(calculations)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+  // ====== READ - Step
 
   app.get(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation-attribute-uuids',
@@ -138,7 +104,7 @@ export const init = (app) => {
       try {
         const { surveyId, processingStepUuid } = Request.getParams(req)
 
-        const attributeUuids = await ProcessingChainService.fetchCalculationAttributeUuidsByStepUuid(
+        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuidsByStepUuid(
           surveyId,
           processingStepUuid
         )
@@ -162,7 +128,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
 
         const { chain, step, calculation } = Request.getBody(req)
-        await ProcessingChainService.updateChain(user, surveyId, chain, step, calculation)
+        await AnalysisService.updateChain(user, surveyId, chain, step, calculation)
 
         Response.sendOk(res)
       } catch (error) {
@@ -181,7 +147,7 @@ export const init = (app) => {
         const { surveyId, processingChainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteChain(user, surveyId, processingChainUuid)
+        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteChain(user, surveyId, processingChainUuid)
 
         res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
@@ -190,7 +156,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== DELETE - Processing Step
+  // ====== DELETE - Step
 
   app.delete(
     '/survey/:surveyId/processing-step/:processingStepUuid',
@@ -200,7 +166,7 @@ export const init = (app) => {
         const { surveyId, processingStepUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteStep(user, surveyId, processingStepUuid)
+        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteStep(user, surveyId, processingStepUuid)
 
         res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
@@ -209,7 +175,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== DELETE - Processing Step Calculation
+  // ====== DELETE - Calculation
 
   app.delete(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation/:calculationUuid',
@@ -219,7 +185,7 @@ export const init = (app) => {
         const { surveyId, processingStepUuid, calculationUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await ProcessingChainService.deleteCalculation(
+        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteCalculation(
           user,
           surveyId,
           processingStepUuid,
@@ -242,7 +208,7 @@ export const init = (app) => {
         const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
 
-        await RChainService.generateScript(surveyId, surveyCycleKey, processingChainUuid, serverUrl)
+        await AnalysisService.generateScript(surveyId, surveyCycleKey, processingChainUuid, serverUrl)
 
         Response.sendOk(res)
       } catch (error) {
