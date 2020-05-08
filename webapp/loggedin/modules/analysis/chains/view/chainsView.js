@@ -3,7 +3,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/processingChain'
 
 import { useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import TableView from '@webapp/loggedin/tableViews/tableView'
@@ -23,11 +23,11 @@ const ChainsView = () => {
 
   return (
     <TableView
-      className="processing-chains"
+      className="chains"
       gridTemplateColumns="repeat(4, 1fr) repeat(2, 80px) 50px"
       headerLeftComponent={HeaderLeft}
       module={chainsModule}
-      onRowClick={(processingChain) => dispatch(navigateToChainView(history, ProcessingChain.getUuid(processingChain)))}
+      onRowClick={(processingChain) => dispatch(navigateToChainView(history, Chain.getUuid(processingChain)))}
       reloadOnSurveyCycleUpdate
       restParams={{ surveyCycleKey }}
       rowHeaderComponent={RowHeader}

@@ -4,27 +4,21 @@ import * as Survey from '@core/survey/survey'
 
 // App actions
 import { appPropsChange, appUserLogout } from '@webapp/app/actions'
-
+// Processing chain actions
+import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
+import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
+import { calculationDelete } from '@webapp/loggedin/modules/analysis/calculation/actions'
 // Survey actions
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
-
 // SurveyInfo actions
-
+import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
 // nodeDefs actions
 import { nodeDefCreate, nodeDefUpdate, nodeDefDelete } from '../nodeDefs/actions'
-
 // Category actions
 import { categoryCreate, categoryDelete, categoryUpdate } from '../categories/actions'
-
 // Taxonomies actions
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
 
-// Processing chain actions
-import { processingChainSave, processingChainDelete } from '@webapp/loggedin/modules/analysis/processingChain/actions'
-import { processingStepDelete } from '@webapp/loggedin/modules/analysis/processingStep/actions'
-import { processingStepCalculationDelete } from '@webapp/loggedin/modules/analysis/processingStepCalculation/actions'
-
-import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
 import * as SurveyInfoState from './surveyInfoState'
 
 const actionHandlers = {
@@ -59,10 +53,10 @@ const actionHandlers = {
   [taxonomyDelete]: SurveyInfoState.markDraft,
 
   // Processing chain
-  [processingChainSave]: SurveyInfoState.markDraft,
-  [processingChainDelete]: SurveyInfoState.markDraft,
-  [processingStepDelete]: SurveyInfoState.markDraft,
-  [processingStepCalculationDelete]: SurveyInfoState.markDraft,
+  [chainSave]: SurveyInfoState.markDraft,
+  [chainDelete]: SurveyInfoState.markDraft,
+  [stepDelete]: SurveyInfoState.markDraft,
+  [calculationDelete]: SurveyInfoState.markDraft,
 }
 
 export default exportReducer(actionHandlers)

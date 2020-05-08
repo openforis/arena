@@ -1,15 +1,15 @@
 import { combineReducers } from 'redux'
 
-import processingChain from './processingChain/reducer'
-import processingStep from './processingStep/reducer'
-import processingStepCalculation from './processingStepCalculation/reducer'
+import processingChain from './chain/reducer'
+import processingStep from './step/reducer'
+import processingStepCalculation from './calculation/reducer'
 
-import * as ProcessingChainState from './processingChain/processingChainState'
-import * as ProcessingStepState from './processingStep/processingStepState'
-import * as ProcessingStepCalculationState from './processingStepCalculation/processingStepCalculationState'
+import * as ChainState from './chain/state'
+import * as StepState from './step/state'
+import * as CalculationState from './calculation/state'
 
 export default combineReducers({
-  [ProcessingChainState.stateKey]: processingChain,
-  [ProcessingStepState.stateKey]: processingStep,
-  [ProcessingStepCalculationState.stateKey]: processingStepCalculation,
+  [ChainState.stateKey]: processingChain,
+  [StepState.stateKey]: processingStep,
+  [CalculationState.stateKey]: processingStepCalculation,
 })
