@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -10,7 +11,7 @@ import * as Validation from '@core/validation/validation'
 import { uuidv4 } from '@core/uuid'
 import { normalizeName } from '@core/stringUtils'
 
-import { useI18n, useSurvey, useSurveyCycleKey, useNodeDef } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
@@ -18,6 +19,7 @@ import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/compon
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
@@ -35,7 +37,7 @@ const BasicProps = (props) => {
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
-  const nodeDef = useNodeDef()
+  const nodeDef = useSelector(NodeDefState.getNodeDef)
 
   const i18n = useI18n()
 
