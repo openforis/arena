@@ -12,12 +12,11 @@
 }
 
 .chain,
-.processing-step,
-.processing-step__calculation-editor {
+.step,
+.calculation {
   position: relative;
 
   .form-item {
-    grid-template-columns: .2fr .8fr;
+    grid-template-columns: 0.2fr 0.8fr;
   }
-
 }
