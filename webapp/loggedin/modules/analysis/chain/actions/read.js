@@ -10,9 +10,9 @@ export const stepsLoad = 'analysis/chain/steps/load'
 export const fetchChain = (chainUuid) => async (dispatch, getState) => {
   dispatch(showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data: processingChain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
+  const { data: chain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
 
-  dispatch(initChain(processingChain))
+  dispatch(initChain(chain))
   dispatch(hideAppSaving())
 }
 
