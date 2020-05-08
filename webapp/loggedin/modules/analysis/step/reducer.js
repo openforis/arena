@@ -55,7 +55,7 @@ const actionHandlers = {
 
   [calculationDelete]: (state, { calculation }) => StepState.dissocCalculation(calculation)(state),
 
-  [calculationReset]: (state) => StepState.dissocTemporaryCalculation(state),
+  [calculationReset]: (state, { calculation }) => StepState.dissocTemporaryCalculation(calculation)(state),
 
   // NodeDef (Virtual Entity)
   [nodeDefSave]: (state, { nodeDef }) =>

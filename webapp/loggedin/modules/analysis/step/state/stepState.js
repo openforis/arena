@@ -67,7 +67,8 @@ export const updateCalculationIndex = (indexFrom, indexTo) => (processingStepSta
 
 export const updateEntityUuid = (entityDefUuid) => _updateStepDirty(Step.assocEntityUuid(entityDefUuid))
 
-export const dissocTemporaryCalculation = _updateStepDirty(Step.dissocTemporaryCalculation)
+export const dissocTemporaryCalculation = (calculation) =>
+  R.when(R.always(Calculation.isTemporary(calculation)), _updateStepDirty(Step.dissocTemporaryCalculation))
 
 export const dissocCalculation = (calculation) => (state) =>
   R.pipe(R.prop(keys.dirty), Step.dissocCalculation(calculation), (processingStep) =>
