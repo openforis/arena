@@ -1,6 +1,5 @@
 export {
   // ======  READ - Calculations
-  fetchCalculationsByStepUuid,
   fetchCalculationAttributeUuidsByStepUuid,
   fetchCalculationAttributeUuidsByChainUuid,
   fetchCalculationAttributeUuidsByChainUuidExcluded,

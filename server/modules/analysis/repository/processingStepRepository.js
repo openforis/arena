@@ -25,31 +25,6 @@ export const insertStep = async (surveyId, step, client = db) =>
     camelize
   )
 
-// ====== READ
-
-export const fetchStepSummaryByUuid = async (surveyId, processingStepUuid, client = db) =>
-  client.oneOrNone(
-    `
-    SELECT *
-    FROM ${getSurveyDBSchema(surveyId)}.processing_step
-    WHERE uuid = $1
-    `,
-    [processingStepUuid],
-    camelize
-  )
-
-export const fetchStepSummaryByIndex = async (surveyId, processingChainUuid, index, client = db) =>
-  client.oneOrNone(
-    `
-    SELECT *
-    FROM ${getSurveyDBSchema(surveyId)}.processing_step
-    WHERE processing_chain_uuid = $1
-    AND index = $2
-    `,
-    [processingChainUuid, index],
-    camelize
-  )
-
 // ====== UPDATE
 
 export const updateStepProp = async (surveyId, processingStepUuid, key, value, client = db) =>

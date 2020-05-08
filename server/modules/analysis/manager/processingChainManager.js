@@ -19,6 +19,7 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 import * as ChainRepository from '../repository/chain'
+import * as StepRepository from '../repository/step'
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
@@ -109,7 +110,7 @@ const _updateStepProps = async (user, surveyId, step, stepDb, t) => {
 }
 
 const _insertOrUpdateStep = async (user, surveyId, step, t) => {
-  const stepDb = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, Step.getUuid(step), t)
+  const stepDb = await StepRepository.fetchStep({ surveyId, stepUuid: Step.getUuid(step) }, t)
   if (stepDb) {
     await _updateStepProps(user, surveyId, step, stepDb, t)
   } else {
@@ -220,7 +221,6 @@ const _updateCalculationIndexes = async (user, surveyId, step, t) => {
 // ====== READ - Calculations
 
 export {
-  fetchCalculationsByStepUuid,
   fetchCalculationAttributeUuidsByStepUuid,
   fetchCalculationAttributeUuidsByChainUuid,
   fetchCalculationAttributeUuidsByChainUuidExcluded,
@@ -303,14 +303,10 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 // It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
   client.tx(async (t) => {
-    const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
+    const step = await StepRepository.fetchStep({ surveyId, stepUuid }, t)
+
     const chainUuid = Step.getProcessingChainUuid(step)
-    const stepNext = await ProcessingStepRepository.fetchStepSummaryByIndex(
-      surveyId,
-      chainUuid,
-      Step.getIndex(step) + 1,
-      t
-    )
+    const stepNext = await StepRepository.fetchStep({ surveyId, chainUuid, stepIndex: Step.getIndex(step) + 1 }, t)
     if (stepNext) {
       throw new SystemError('appErrors.processingStepOnlyLastCanBeDeleted')
     }
@@ -344,7 +340,7 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
 // It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = db) =>
   client.tx(async (t) => {
-    const step = await ProcessingStepRepository.fetchStepSummaryByUuid(surveyId, stepUuid, t)
+    const step = await StepRepository.fetchStep({ surveyId, stepUuid }, t)
     const chainUuid = Step.getProcessingChainUuid(step)
 
     const calculation = await ProcessingStepCalculationRepository.deleteCalculationStep(

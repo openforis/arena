@@ -95,7 +95,7 @@ export const init = (app) => {
     }
   )
 
-  // ====== READ - Calculations
+  // ====== READ - Step
 
   app.get(
     '/survey/:surveyId/processing-step/:processingStepUuid/calculation-attribute-uuids',
