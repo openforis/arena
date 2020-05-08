@@ -12,3 +12,9 @@ export const useAuthCanEditRecord = (record) => {
   const user = useUser()
   return Authorizer.canEditRecord(user, record)
 }
+
+export const useAuthCanCleanseRecords = () => {
+  const user = useUser()
+  const surveyInfo = useSurveyInfo()
+  return Authorizer.canCleanseRecords(user, surveyInfo)
+}

@@ -53,33 +53,40 @@ export const getTableEditMode = getTableProp(tableKeys.editMode, false)
 
 const hasTable = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
 const hasCols = R.pipe(getTableNodeDefUuidCols, R.isEmpty, R.not)
-export const hasTableAndCols = state => hasTable(state) && hasCols(state)
+export const hasTableAndCols = (state) => hasTable(state) && hasCols(state)
+
+export const assocTableData = (offset, data) =>
+  R.pipe(R.assocPath([keys.table, tableKeys.offset], offset), R.assocPath([keys.table, tableKeys.data], data))
+
+export const assocNodeDefUuidCols = (nodeDefUuidCols) =>
+  R.assocPath([keys.table, tableKeys.nodeDefUuidCols], nodeDefUuidCols)
+
+export const assocTableSort = (sort) => R.assocPath([keys.table, tableKeys.sort], sort)
+
+export const assocTableFilter = (filter) => R.assocPath([keys.table, tableKeys.filter], filter)
 
 // On nodeDefUuid table change, reset table data, sort and filter
-export const assocNodeDefUuidTable = nodeDefUuidTable =>
+export const assocNodeDefUuidTable = (nodeDefUuidTable) =>
   R.pipe(
     R.assocPath([keys.table, tableKeys.nodeDefUuidTable], nodeDefUuidTable),
     assocTableData(defaults.offset, defaults.data),
     assocNodeDefUuidCols(defaults.nodeDefUuidCols),
     assocTableSort(defaults.sort),
-    assocTableFilter(defaults.filter),
+    assocTableFilter(defaults.filter)
   )
 
-export const assocNodeDefUuidCols = nodeDefUuidCols =>
-  R.assocPath([keys.table, tableKeys.nodeDefUuidCols], nodeDefUuidCols)
-
-export const assocTableDataCol = data => state =>
+export const assocTableDataCol = (data) => (state) =>
   R.pipe(
     R.pathOr([{}], [keys.table, tableKeys.data]),
-    dataState => dataState.map((d, i) => R.mergeDeepLeft(d, data[i])),
-    dataUpdate => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state),
+    (dataState) => dataState.map((d, i) => R.mergeDeepLeft(d, data[i])),
+    (dataUpdate) => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state)
   )(state)
 
-export const dissocTableDataCols = cols => state =>
+export const dissocTableDataCols = (cols) => (state) =>
   R.pipe(
     R.pathOr([{}], [keys.table, tableKeys.data]),
-    dataState => dataState.map(R.omit(cols)),
-    dataUpdate => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state),
+    (dataState) => dataState.map(R.omit(cols)),
+    (dataUpdate) => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state)
   )(state)
 
 export const initTableData = (offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode) =>
@@ -95,52 +102,48 @@ export const initTableData = (offset, limit, filter, sort, count, data, nodeDefU
     editMode,
   })
 
-export const assocTableData = (offset, data) =>
-  R.pipe(R.assocPath([keys.table, tableKeys.offset], offset), R.assocPath([keys.table, tableKeys.data], data))
-
-export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.filter], filter)
-
-export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)
-
 // ===== Edit mode
 
-export const assocTableDataRecordNodes = nodes => state => {
+export const assocTableDataRecordNodes = (nodes) => (state) => {
   // Replace nodes in table rows
   const data = R.pathOr([], [keys.table, tableKeys.data], state)
 
-  for (const node of R.values(nodes)) {
-    const nodeDefUuid = Node.getNodeDefUuid(node)
-    const nodeRecordUuid = Node.getRecordUuid(node)
+  const dataUpdated = Object.values(nodes).reduce(
+    (accData, node) =>
+      accData.map((row) => {
+        const nodeDefUuid = Node.getNodeDefUuid(node)
+        const rowUpdated = { ...row }
+        const { record } = rowUpdated
+        if (Record.getUuid(record) === Node.getRecordUuid(node)) {
+          const cell = rowUpdated.cols[nodeDefUuid]
 
-    for (const row of data) {
-      if (Record.getUuid(row.record) === nodeRecordUuid) {
-        const cell = row.cols[nodeDefUuid]
-
-        if (cell && Node.isEqual(node)(cell.node)) {
-          row.cols[nodeDefUuid] = R.ifElse(
-            R.always(Node.isDeleted(node)),
-            R.dissoc('node'),
-            R.assoc('node', node),
-          )(cell)
+          if (cell && Node.isEqual(node)(cell.node)) {
+            rowUpdated.cols[nodeDefUuid] = R.ifElse(
+              R.always(Node.isDeleted(node)),
+              R.dissoc('node'),
+              R.assoc('node', node)
+            )(cell)
+          }
         }
-      }
-    }
-  }
+        return rowUpdated
+      }),
+    [...data]
+  )
 
-  return R.assocPath([keys.table, tableKeys.data], data, state)
+  return R.assocPath([keys.table, tableKeys.data], dataUpdated, state)
 }
 
-export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) => state =>
+export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) => (state) =>
   R.pipe(
     R.pathOr([], [keys.table, tableKeys.data]),
-    R.map(row =>
+    R.map((row) =>
       R.ifElse(
         R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
         R.assocPath([rowKeys.record, Validation.keys.validation, Validation.keys.valid], recordValid),
-        R.identity,
-      )(row),
+        R.identity
+      )(row)
     ),
-    data => R.assocPath([keys.table, tableKeys.data], data)(state),
+    (data) => R.assocPath([keys.table, tableKeys.data], data)(state)
   )(state)
 
 // ====== nodeDefSelectors
