@@ -239,10 +239,10 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
 // It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.client) =>
   client.tx(async (tx) => {
-    const chain = await ChainRepository.deleteChain({ surveyId, chainUuid }, tx)
+    const chains = await ChainRepository.deleteChain({ surveyId, chainUuid }, tx)
     const content = {
       [ActivityLog.keysContent.uuid]: chainUuid,
-      [ActivityLog.keysContent.labels]: Chain.getLabels(chain),
+      [ActivityLog.keysContent.labels]: Chain.getLabels(chains[0]),
     }
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx)
 
