@@ -3,6 +3,31 @@ import * as DB from '../../../../db'
 import { TableStep, TableCalculation } from '../../../../../common/model/db'
 
 /**
+ * Fetches a processing step by the given survey id and
+ * one between step uuid or chainUuid-stepIndex.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {!string} params.calculationUuid - The calculation uuid to filter by.
+ * @param {boolean} [params.includeScript=false] - Whether to include calculation script.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<Calculation | null>} - The result promise.
+ */
+export const fetchCalculation = async (params, client = DB.client) => {
+  const { surveyId, calculationUuid = null, includeScript = false } = params
+  if (!calculationUuid) {
+    throw new Error('Calculation uuid must be specified')
+  }
+
+  const tableCalculation = new TableCalculation(surveyId)
+  return client.oneOrNone(
+    tableCalculation.getSelect({ surveyId, calculationUuid: '$1', includeScript }),
+    [calculationUuid],
+    DB.transformCallback
+  )
+}
+/**
  * Fetch the calculation attribute definition uuids by the given parameters.
  *
  * @param {!object} params - The query parameters.

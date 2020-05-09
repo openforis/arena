@@ -1,1 +1,1 @@
-export { fetchCalculationAttributeUuids, updateCalculationScript } from '../../repository/calculation'
+export { fetchCalculationAttributeUuids, updateCalculation } from '../../repository/calculation'

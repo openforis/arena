@@ -5,4 +5,4 @@ export { countChains, fetchChains, fetchChain, updateChain, updateChainStatusExe
 export { fetchSteps, fetchStep } from './step'
 
 // ====== Calculation
-export { fetchCalculationAttributeUuids, updateCalculationScript } from './calculation'
+export { fetchCalculationAttributeUuids, updateCalculation } from './calculation'

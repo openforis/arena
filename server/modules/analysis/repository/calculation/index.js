@@ -1,3 +1,5 @@
-export { fetchCalculationAttributeUuids } from './read'
+export { insertCalculation } from './create'
 
-export { updateCalculationScript, updateCalculationIndexes } from './update'
+export { fetchCalculation, fetchCalculationAttributeUuids } from './read'
+
+export { updateCalculation, updateCalculationIndexes } from './update'

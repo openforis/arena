@@ -122,7 +122,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
 
         const { chain, step, calculation } = Request.getBody(req)
-        await AnalysisService.persistChainStepCalculation({ user, surveyId, chain, step, calculation })
+        await AnalysisService.persistAll({ user, surveyId, chain, step, calculation })
 
         Response.sendOk(res)
       } catch (error) {

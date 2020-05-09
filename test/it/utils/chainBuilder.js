@@ -95,7 +95,7 @@ class ChainBuilder {
         // eslint-disable-next-line no-restricted-syntax
         for (const calculation of calculations) {
           // eslint-disable-next-line no-await-in-loop
-          await ProcessingChainManager.persistChainStepCalculation(user, surveyId, chain, step, calculation, t)
+          await ProcessingChainManager.persistAll(user, surveyId, chain, step, calculation, t)
         }
       }
     })
