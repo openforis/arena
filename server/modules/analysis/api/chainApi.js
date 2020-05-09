@@ -141,9 +141,9 @@ export const init = (app) => {
         const { surveyId, chainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteChain({ user, surveyId, chainUuid })
+        await AnalysisService.deleteChain({ user, surveyId, chainUuid })
 
-        res.json(nodeDefUnusedDeletedUuids)
+        Response.sendOk(res)
       } catch (error) {
         next(error)
       }

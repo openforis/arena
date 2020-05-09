@@ -30,7 +30,7 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
     this.incrementProcessedItems()
 
     // 3. delete processing chains with no cycles
-    await AnalysisManager.deleteChain({ surveyId, noCycle: true }, tx)
+    await AnalysisManager.deleteChainWithoutCycle({ surveyId }, tx)
     this.incrementProcessedItems()
 
     // 4. delete analysis nodeDef if they are not used

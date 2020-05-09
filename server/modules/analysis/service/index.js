@@ -1,16 +1,4 @@
 export {
-  // ======  UPDATE - Chain
-  persistAll,
-  // ======  DELETE - Chain
-  deleteChain,
-  // ======  DELETE - Step
-  deleteStep,
-  // ======  DELETE - Calculation
-  deleteCalculation,
-} from '../manager/processingChainManager'
-
-// read
-export {
   // ======  READ - Chain
   countChains,
   fetchChains,
@@ -19,6 +7,14 @@ export {
   fetchCalculationAttributeUuids,
   // ======  UPDATE - Chain
   updateChainStatusExec,
+  // ======  DELETE - Chain
+  deleteChain,
+  // ======  DELETE - Step
+  deleteStep,
+  // ======  DELETE - Calculation
+  deleteCalculation,
+  // ==== ALL
+  persistAll,
 } from '../manager'
 
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'
