@@ -234,7 +234,7 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
     return _afterChainUpdate(surveyId, tx, false)
   })
 
-export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository/processingChainRepository'
+export { deleteChainsWithoutCycles } from '../repository/processingChainRepository'
 
 // ====== DELETE - Chain
 

@@ -9,16 +9,6 @@ const selectFields = `uuid, props, validation, status_exec, ${DbUtils.selectDate
   'date_modified'
 )}, ${DbUtils.selectDate('date_executed')}`
 
-// ====== UPDATE
-
-export const removeCyclesFromChains = async (surveyId, cycles, client = db) =>
-  client.query(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.processing_chain
-    SET props = jsonb_set(props, '{${ProcessingChain.keysProps.cycles}}',
-      (props->'${ProcessingChain.keysProps.cycles}') ${cycles.map((cycle) => `- '${cycle}'`).join(' ')}
-    )`
-  )
-
 // ====== DELETE
 
 export const deleteChain = async (surveyId, processingChainUuid, client = db) =>

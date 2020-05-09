@@ -1,5 +1,6 @@
 import * as DB from '../../../../db'
 
+import * as Chain from '../../../../../common/analysis/processingChain'
 import { TableChain } from '../../../../../common/model/db'
 
 /**
@@ -38,5 +39,25 @@ export const updateChain = (params, client = DB.client) => {
     SET ${setFields.join(', ')}
     WHERE ${TableChain.columnSet.uuid} = $1`,
     [chainUuid, ...Object.values(fields)]
+  )
+}
+
+/**
+ * Remove survey cycles from all processing chains.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!string} params.surveyId - The survey id.
+ * @param {!Array.<string>} params.cycles - The cycles to remove.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<null>} - The result promise.
+ */
+export const removeChainCycles = (params, client) => {
+  const { surveyId, cycles } = params
+  const tableChain = new TableChain(surveyId)
+  return client.none(
+    `UPDATE ${tableChain.nameQualified}
+  SET ${TableChain.columnSet.props} = jsonb_set(${TableChain.columnSet.props}, '{${Chain.keysProps.cycles}}',
+    (${TableChain.columnSet.props}->'${Chain.keysProps.cycles}') ${cycles.map((cycle) => `- '${cycle}'`).join(' ')})`
   )
 }
