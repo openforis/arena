@@ -22,7 +22,6 @@ import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaR
 import * as ChainRepository from '../repository/chain'
 import * as StepRepository from '../repository/step'
 import * as CalculationRepository from '../repository/calculation'
-import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
 /**
  * Marks survey as draft and deletes unused node def analysis. //TODO: Shouldn't the unused nodeDefs be removed only on survey publish?
@@ -292,17 +291,13 @@ export const deleteStep = async ({ user, surveyId, stepUuid }, client = DB.clien
 
 // Deletes a processing step calculation.
 // It returns a list of deleted unused node def analysis uuids (if any)
-export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = DB.client) =>
-  client.tx(async (t) => {
-    const step = await StepRepository.fetchStep({ surveyId, stepUuid }, t)
+export const deleteCalculation = async ({ user, surveyId, stepUuid, calculationUuid }, client = DB.client) =>
+  client.tx(async (tx) => {
+    const [step, calculation] = await Promise.all([
+      StepRepository.fetchStep({ surveyId, stepUuid }, tx),
+      CalculationRepository.deleteCalculation({ surveyId, calculationUuid }, tx),
+    ])
     const chainUuid = Step.getProcessingChainUuid(step)
-
-    const calculation = await ProcessingStepCalculationRepository.deleteCalculationStep(
-      surveyId,
-      stepUuid,
-      calculationUuid,
-      t
-    )
 
     // insert activity log
     const content = {
@@ -314,15 +309,15 @@ export const deleteCalculation = async (user, surveyId, stepUuid, calculationUui
       [ActivityLog.keysContent.labels]: Calculation.getLabels(calculation),
     }
     const type = ActivityLog.type.processingStepCalculationDelete
-    await ActivityLogRepository.insert(user, surveyId, type, content, false, t)
+    await ActivityLogRepository.insert(user, surveyId, type, content, false, tx)
 
     // Update step validation
-    const chain = await ChainRepository.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true }, t)
+    const chain = await ChainRepository.fetchChain({ surveyId, chainUuid, includeStepsAndCalculations: true }, tx)
     const stepValidation = await ChainValidator.validateStep(Chain.getStepByIdx(Step.getIndex(step))(chain))
     const chainUpdated = Chain.assocItemValidation(stepUuid, stepValidation)(chain)
     // Update processing_chain validation
     const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }
-    await ChainRepository.updateChain({ surveyId, chainUuid, fields, dateModified: true }, t)
+    await ChainRepository.updateChain({ surveyId, chainUuid, fields, dateModified: true }, tx)
 
-    return _afterChainUpdate(surveyId, t)
+    return _afterChainUpdate(surveyId, tx)
   })

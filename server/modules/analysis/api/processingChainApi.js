@@ -172,19 +172,15 @@ export const init = (app) => {
   // ====== DELETE - Calculation
 
   app.delete(
-    '/survey/:surveyId/processing-step/:processingStepUuid/calculation/:calculationUuid',
+    '/survey/:surveyId/processing-step/:stepUuid/calculation/:calculationUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingStepUuid, calculationUuid } = Request.getParams(req)
+        const { surveyId, stepUuid, calculationUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteCalculation(
-          user,
-          surveyId,
-          processingStepUuid,
-          calculationUuid
-        )
+        const params = { user, surveyId, stepUuid, calculationUuid }
+        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteCalculation(params)
 
         res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
@@ -195,14 +191,14 @@ export const init = (app) => {
 
   // === GENERATE R SCRIPTS
   app.get(
-    '/survey/:surveyId/processing-chain/:processingChainUuid/script',
+    '/survey/:surveyId/processing-chain/:chainUuid/script',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, surveyCycleKey, processingChainUuid } = Request.getParams(req)
+        const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
 
-        await AnalysisService.generateScript(surveyId, surveyCycleKey, processingChainUuid, serverUrl)
+        await AnalysisService.generateScript(surveyId, surveyCycleKey, chainUuid, serverUrl)
 
         Response.sendOk(res)
       } catch (error) {
