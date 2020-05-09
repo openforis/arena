@@ -1,8 +1,7 @@
+import * as DB from '../../../../db'
+
 import * as Chain from '../../../../../common/analysis/processingChain'
 import { TableChain } from '../../../../../common/model/db'
-
-import { db } from '../../../../db/db'
-import { dbTransformCallback } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Create a processing chain.
@@ -14,17 +13,17 @@ import { dbTransformCallback } from '../../../survey/repository/surveySchemaRepo
  *
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChain = (params, client = db) => {
+export const insertChain = (params, client = DB.client) => {
   const { surveyId, chain } = params
   const tableChain = new TableChain(surveyId)
 
   return client.one(
     `INSERT INTO 
-        ${tableChain.nameQualified}.processing_chain 
+        ${tableChain.nameQualified} 
         (${TableChain.columnSet.uuid}, ${TableChain.columnSet.props}, ${TableChain.columnSet.validation})
     VALUES ($1, $2, $3)
     RETURNING *`,
     [Chain.getUuid(chain), Chain.getProps(chain), Chain.getValidation(chain)],
-    dbTransformCallback
+    DB.transformCallback
   )
 }

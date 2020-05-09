@@ -1,8 +1,8 @@
+import * as DB from '../../../../db'
+
 import * as ProcessingChain from '../../../../../common/analysis/processingChain'
 import * as ActivityLog from '../../../../../common/activityLog/activityLog'
 import { TableChain } from '../../../../../common/model/db'
-
-import { db } from '../../../../db/db'
 
 import * as ChainRepository from '../../repository/chain'
 import * as ActivityLogRepository from '../../../activityLog/repository/activityLogRepository'
@@ -10,7 +10,7 @@ import * as ActivityLogRepository from '../../../activityLog/repository/activity
 export { countChains, fetchChains, fetchChain, updateChain } from '../../repository/chain'
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
-  db.tx(async (tx) => {
+  DB.tx(async (tx) => {
     const promises = [
       ChainRepository.updateChain(
         { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },

@@ -1,7 +1,6 @@
-import { TableChain } from '../../../../../common/model/db'
+import * as DB from '../../../../db'
 
-import { db } from '../../../../db/db'
-import * as DbUtils from '../../../../db/dbUtils'
+import { TableChain } from '../../../../../common/model/db'
 
 /**
  * Updates the fields passed as argument of a processing chain.
@@ -16,7 +15,7 @@ import * as DbUtils from '../../../../db/dbUtils'
  *
  * @returns {Promise<null>} - The result promise.
  */
-export const updateChain = (params, client = db) => {
+export const updateChain = (params, client = DB.client) => {
   const { surveyId, chainUuid, fields = {}, dateExecuted = false, dateModified = false } = params
 
   if (!surveyId || !chainUuid)
@@ -29,8 +28,8 @@ export const updateChain = (params, client = db) => {
       ? `${TableChain.columnSet.props} = ${TableChain.columnSet.props} || $${i + 2}::jsonb`
       : `${field} = $${i + 2}`
   )
-  if (dateExecuted) setFields.push(`${TableChain.columnSet.dateExecuted} = ${DbUtils.now}`)
-  if (dateModified) setFields.push(`${TableChain.columnSet.dateModified} = ${DbUtils.now}`)
+  if (dateExecuted) setFields.push(`${TableChain.columnSet.dateExecuted} = ${DB.now}`)
+  if (dateModified) setFields.push(`${TableChain.columnSet.dateModified} = ${DB.now}`)
 
   if (setFields.length === 0) throw new Error(`At least one among fields, dateExecuted or dateModified is required`)
 

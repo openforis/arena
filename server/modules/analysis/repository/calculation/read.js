@@ -1,4 +1,4 @@
-import { db } from '../../../../db/db'
+import * as DB from '../../../../db'
 
 import { TableStep, TableCalculation } from '../../../../../common/model/db'
 
@@ -15,7 +15,7 @@ import { TableStep, TableCalculation } from '../../../../../common/model/db'
  *
  * @returns {Promise<string[]|object<string,string>>} - The result promise.
  */
-export const fetchCalculationAttributeUuids = async (params, client = db) => {
+export const fetchCalculationAttributeUuids = async (params, client = DB.client) => {
   const { surveyId, chainUuid = null, chainUuidExclude = null, stepUuid = null, mapByUuid = false } = params
 
   const tableStep = new TableStep(surveyId)

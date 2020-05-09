@@ -5,13 +5,13 @@ const pgp = pgPromise()
 
 export default class MassiveInsert {
   /**
-   * @constructor
+   * @class
    *
-   * @param {string} schema - database schema name
-   * @param {string} table - database table name
-   * @param {object|pgp.helpers.Columns|Array} cols - The columns (see http://vitaly-t.github.io/pg-promise/helpers.ColumnSet.html)
-   * @param {Object} [client = db] - The database client
-   * @param {number} [bufferSize = 100000] - The size of the buffer
+   * @param {string} schema - The database schema name.
+   * @param {string} table - The  database table name.
+   * @param {object|pgp.helpers.Columns|Array} cols - The columns (see http://vitaly-t.github.io/pg-promise/helpers.ColumnSet.html).
+   * @param {pgPromise.IDatabase} [client=db] - The database client.
+   * @param {number} [bufferSize=100000] - The size of the buffer.
    */
   constructor(schema, table, cols, client = db, bufferSize = 100000) {
     this.columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })

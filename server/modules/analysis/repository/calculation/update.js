@@ -1,6 +1,6 @@
-import { TableCalculation } from '../../../../../common/model/db'
+import * as DB from '../../../../db'
 
-import { db } from '../../../../db/db'
+import { TableCalculation } from '../../../../../common/model/db'
 
 /**
  * Updates the script of the given processing step calculation.
@@ -13,7 +13,7 @@ import { db } from '../../../../db/db'
  *
  * @returns {Promise<null>} - The result promise.
  */
-export const updateCalculationScript = async (params, client = db) => {
+export const updateCalculationScript = async (params, client = DB.client) => {
   const { surveyId, calculationUuid, script } = params
   const table = new TableCalculation(surveyId)
 
