@@ -1,6 +1,6 @@
 export {
   // ======  UPDATE - Chain
-  updateChain,
+  persistChainStepCalculation,
   // ======  DELETE - Chain
   deleteChain,
   // ======  DELETE - Step

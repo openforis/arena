@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as pgPromise from 'pg-promise'
 
-import { db } from '@server/db/db'
+import * as DB from '@server/db'
 import SystemError from '@core/systemError'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -122,10 +122,10 @@ const _updateStep = async ({ user, surveyId, step, stepDb }, client) => {
   const stepUuid = Step.getUuid(step)
   const promises = []
 
-  // update props
   const propsToUpdate = Step.getPropsDiff(step)(stepDb)
   const entries = Object.entries(propsToUpdate)
   if (entries.length > 0) {
+    // activity log
     promises.push(
       ...entries.map(([key, value]) => {
         const content = {
@@ -138,6 +138,7 @@ const _updateStep = async ({ user, surveyId, step, stepDb }, client) => {
         return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
       })
     )
+    // update props
     const fields = { [TableStep.columnSet.props]: propsToUpdate }
     promises.push(StepRepository.updateStep({ surveyId, stepUuid, fields }, client))
   }
@@ -202,35 +203,30 @@ const _insertOrUpdateCalculation = async (user, surveyId, chain, calculation, cl
 
 // ====== UPDATE - Chain
 
-export const updateChain = async ({ user, surveyId, chain, step = null, calculation = null }, client = db) => {
-  await client.tx(async (tx) => {
+export const persistChainStepCalculation = async (params, client = DB.client) => {
+  const { user, surveyId, chain, step = null, calculation = null } = params
+  return client.tx(async (tx) => {
+    // 1. Persist chain / step / calculation
     await _insertOrUpdateChain({ user, surveyId, chain }, tx)
-
     if (step) {
+      // calculation must be persisted before step in order to guarantee the calculation index update is respected
       if (calculation) {
         await _insertOrUpdateCalculation(user, surveyId, chain, calculation, tx)
       }
       await _insertOrUpdateStep({ user, surveyId, step }, tx)
     }
 
-    // Validate chain / step / calculation after insert/update
+    // 2. Validate chain / step / calculation
     const [surveyInfo, chainDb] = await Promise.all([
       SurveyRepository.fetchSurveyById(surveyId, true, tx),
       ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain), includeStepsAndCalculations: true }, tx),
     ])
+    const stepDb = step ? Chain.getStepByIdx(Step.getIndex(step))(chainDb) : null
+    const lang = Survey.getDefaultLanguage(surveyInfo)
 
-    const defaultLanguage = Survey.getDefaultLanguage(surveyInfo)
-    const calculationValidation = calculation
-      ? await ChainValidator.validateCalculation(calculation, defaultLanguage)
-      : Validation.newInstance()
-
-    let stepValidation = null
-    if (step) {
-      const stepDb = Chain.getStepByIdx(Step.getIndex(step))(chainDb)
-      stepValidation = await ChainValidator.validateStep(stepDb)
-    }
-
-    const chainValidation = await ChainValidator.validateChain(chainDb, defaultLanguage)
+    const calculationValidation = calculation ? await ChainValidator.validateCalculation(calculation, lang) : null
+    const stepValidation = stepDb ? await ChainValidator.validateStep(stepDb) : null
+    const chainValidation = await ChainValidator.validateChain(chainDb, lang)
 
     if (!R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
       // Throw error to rollback transaction
@@ -247,7 +243,7 @@ export { removeCyclesFromChains, deleteChainsWithoutCycles } from '../repository
 
 // Deletes a processing chain.
 // It returns a list of deleted unused node def analysis uuids (if any)
-export const deleteChain = async (user, surveyId, processingChainUuid, client = db) =>
+export const deleteChain = async (user, surveyId, processingChainUuid, client = DB.client) =>
   client.tx(async (t) => {
     const processingChain = await ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t)
     const logContent = {
@@ -263,7 +259,7 @@ export const deleteChain = async (user, surveyId, processingChainUuid, client = 
 
 // Deletes a processing step.
 // It returns a list of deleted unused node def analysis uuids (if any)
-export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
+export const deleteStep = async (user, surveyId, stepUuid, client = DB.client) =>
   client.tx(async (t) => {
     const step = await StepRepository.fetchStep({ surveyId, stepUuid }, t)
 
@@ -303,7 +299,7 @@ export const deleteStep = async (user, surveyId, stepUuid, client = db) =>
 
 // Deletes a processing step calculation.
 // It returns a list of deleted unused node def analysis uuids (if any)
-export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = db) =>
+export const deleteCalculation = async (user, surveyId, stepUuid, calculationUuid, client = DB.client) =>
   client.tx(async (t) => {
     const step = await StepRepository.fetchStep({ surveyId, stepUuid }, t)
     const chainUuid = Step.getProcessingChainUuid(step)

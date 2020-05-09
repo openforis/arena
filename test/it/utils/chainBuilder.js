@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -49,7 +50,7 @@ class StepBuilder {
     const step = ProcessingChain.newProcessingStep(chain, {
       [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
     })
-    const calculations = this.calculationBuilders.map(builder => builder.build(survey, step))
+    const calculations = this.calculationBuilders.map((builder) => builder.build(survey, step))
     return ProcessingStep.assocCalculations(calculations)(step)
   }
 }
@@ -67,13 +68,14 @@ class ChainBuilder {
     const chain = ProcessingChain.newProcessingChain({
       [ProcessingChain.keysProps.labels]: { [defaultLang]: this.label },
     })
-    const steps = this.stepBuilders.map(builder => builder.build(this.survey, chain))
+    const steps = this.stepBuilders.map((builder) => builder.build(this.survey, chain))
     return ProcessingChain.assocProcessingSteps(steps)(chain)
   }
 
   async buildAndStore(client = db) {
     const { user, survey } = this
-    return await client.tx(async t => {
+    // eslint-disable-next-line no-return-await
+    return await client.tx(async (t) => {
       const chain = this.build()
       const surveyId = Survey.getId(survey)
       const steps = ProcessingChain.getProcessingSteps(chain)
@@ -83,14 +85,17 @@ class ChainBuilder {
         throw new Error(`Cannot persist processing chain ${chainLabel}: empty steps`)
       }
 
+      // eslint-disable-next-line no-restricted-syntax
       for (const step of steps) {
         const calculations = ProcessingStep.getCalculations(step)
         if (R.isEmpty(calculations)) {
           throw new Error(`Cannot persist processing step #${ProcessingStep.getIndex(step)}: empty calculations`)
         }
 
+        // eslint-disable-next-line no-restricted-syntax
         for (const calculation of calculations) {
-          await ProcessingChainManager.updateChain(user, surveyId, chain, step, calculation, t)
+          // eslint-disable-next-line no-await-in-loop
+          await ProcessingChainManager.persistChainStepCalculation(user, surveyId, chain, step, calculation, t)
         }
       }
     })
