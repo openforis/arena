@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import * as pgPromise from 'pg-promise'
 
 import * as DB from '@server/db'
 import SystemError from '@core/systemError'
@@ -16,29 +15,11 @@ import * as ChainValidator from '@common/analysis/processingChainValidator'
 import { TableChain, TableStep, TableCalculation } from '@common/model/db'
 
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 import * as ChainRepository from '../repository/chain'
 import * as StepRepository from '../repository/step'
 import * as CalculationRepository from '../repository/calculation'
-
-/**
- * Marks survey as draft and deletes unused node def analysis. //TODO: Shouldn't the unused nodeDefs be removed only on survey publish?
- *
- * @param {string} surveyId - The survey id.
- * @param {pgPromise.IDatabase} t - The database client.
- * @param {boolean} [deleteNodeDefAnalysisUnused=false] - Whether to delete the unused nodeDef analysis.
- *
- * @returns {Array} - The uuids of deleted unused node defs analysis.
- */
-const _afterChainUpdate = async (surveyId, t, deleteNodeDefAnalysisUnused = true) => {
-  const [nodeDefAnalysisDeletedUudis] = await Promise.all([
-    ...(deleteNodeDefAnalysisUnused ? [NodeDefRepository.deleteNodeDefsAnalysisUnused(surveyId, t)] : []),
-    markSurveyDraft(surveyId, t),
-  ])
-  return nodeDefAnalysisDeletedUudis
-}
 
 // ====== CREATE OR UPDATE Chain
 
@@ -202,7 +183,7 @@ const _insertOrUpdateCalculation = async ({ user, surveyId, chain, calculation }
 export const persistAll = async ({ user, surveyId, chain, step = null, calculation = null }, client = DB.client) =>
   client.tx(async (tx) => {
     // 1. Persist chain / step / calculation
-    await _insertOrUpdateChain({ user, surveyId, chain }, tx)
+    await Promise.all([_insertOrUpdateChain({ user, surveyId, chain }, tx), markSurveyDraft(surveyId, tx)])
     if (step) {
       await _insertOrUpdateStep({ user, surveyId, step }, tx)
       if (calculation) {
@@ -227,14 +208,10 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
       // Throw error to rollback transaction
       throw new SystemError('appErrors.processingChainCannotBeSaved')
     }
-
-    return _afterChainUpdate(surveyId, tx, false)
   })
 
 // ====== DELETE - Chain
 
-// Deletes a processing chain.
-// It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.client) =>
   client.tx(async (tx) => {
     const chains = await ChainRepository.deleteChain({ surveyId, chainUuid }, tx)
@@ -242,15 +219,14 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.uuid]: chainUuid,
       [ActivityLog.keysContent.labels]: Chain.getLabels(chains[0]),
     }
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx)
-
-    return _afterChainUpdate(surveyId, tx)
+    return Promise.all([
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx),
+      markSurveyDraft(surveyId, tx),
+    ])
   })
 
 // ====== DELETE - Step
 
-// Deletes a processing step.
-// It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteStep = async ({ user, surveyId, stepUuid }, client = DB.client) =>
   client.tx(async (tx) => {
     const step = await StepRepository.fetchStep({ surveyId, stepUuid }, tx)
@@ -270,6 +246,7 @@ export const deleteStep = async ({ user, surveyId, stepUuid }, client = DB.clien
       StepRepository.deleteStep({ surveyId, stepUuid }, tx),
       ChainRepository.updateChain({ surveyId, chainUuid, dateModified: true }, tx),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepDelete, content, false, tx),
+      markSurveyDraft(surveyId, tx),
     ])
 
     if (Step.getIndex(step) === 0) {
@@ -283,19 +260,16 @@ export const deleteStep = async ({ user, surveyId, stepUuid }, client = DB.clien
       const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }
       await ChainRepository.updateChain({ surveyId, chainUuid, fields }, tx)
     }
-
-    return _afterChainUpdate(surveyId, tx)
   })
 
 // ====== DELETE - Calculation
 
-// Deletes a processing step calculation.
-// It returns a list of deleted unused node def analysis uuids (if any)
 export const deleteCalculation = async ({ user, surveyId, stepUuid, calculationUuid }, client = DB.client) =>
   client.tx(async (tx) => {
     const [step, calculation] = await Promise.all([
       StepRepository.fetchStep({ surveyId, stepUuid }, tx),
       CalculationRepository.deleteCalculation({ surveyId, calculationUuid }, tx),
+      markSurveyDraft(surveyId, tx),
     ])
     const chainUuid = Step.getProcessingChainUuid(step)
 
@@ -317,7 +291,5 @@ export const deleteCalculation = async ({ user, surveyId, stepUuid, calculationU
     const chainUpdated = Chain.assocItemValidation(stepUuid, stepValidation)(chain)
     // Update processing_chain validation
     const fields = { [TableChain.columnSet.validation]: Chain.getValidation(chainUpdated) }
-    await ChainRepository.updateChain({ surveyId, chainUuid, fields, dateModified: true }, tx)
-
-    return _afterChainUpdate(surveyId, tx)
+    return ChainRepository.updateChain({ surveyId, chainUuid, fields, dateModified: true }, tx)
   })
