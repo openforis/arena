@@ -13,7 +13,7 @@ import { TableStep } from '../../../../../common/model/db'
  *
  * @returns {Promise<Step>} - The result promise.
  */
-export const insertStep = (params, client = DB.client) => {
+export const insertStep = async (params, client = DB.client) => {
   const { surveyId, step } = params
   const tableStep = new TableStep(surveyId)
 

@@ -134,14 +134,14 @@ export const init = (app) => {
   // ====== DELETE - Chain
 
   app.delete(
-    '/survey/:surveyId/processing-chain/:processingChainUuid',
+    '/survey/:surveyId/processing-chain/:chainUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingChainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteChain(user, surveyId, processingChainUuid)
+        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteChain({ user, surveyId, chainUuid })
 
         res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {

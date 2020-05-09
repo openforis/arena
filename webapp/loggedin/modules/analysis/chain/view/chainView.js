@@ -57,7 +57,7 @@ const ChainView = () => {
     }
   }, [])
 
-  useOnSurveyCycleUpdate(() => navigateToChainsView(history))
+  useOnSurveyCycleUpdate(() => dispatch(navigateToChainsView(history)))
 
   useOnUpdate(() => {
     if (!editingStep) {

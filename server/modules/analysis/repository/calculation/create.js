@@ -13,7 +13,7 @@ import { TableCalculation } from '../../../../../common/model/db'
  *
  * @returns {Promise<Calculation>} - The result promise.
  */
-export const insertCalculation = (params, client = DB.client) => {
+export const insertCalculation = async (params, client = DB.client) => {
   const { surveyId, calculation } = params
   const tableCalculation = new TableCalculation(surveyId)
 

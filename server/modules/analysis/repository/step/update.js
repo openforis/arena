@@ -13,7 +13,7 @@ import { TableStep } from '../../../../../common/model/db'
  *
  * @returns {Promise<null>} - The result promise.
  */
-export const updateStep = (params, client = DB.client) => {
+export const updateStep = async (params, client = DB.client) => {
   const { surveyId, stepUuid, fields = {} } = params
 
   if (!surveyId || !stepUuid)

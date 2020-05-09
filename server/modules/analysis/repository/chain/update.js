@@ -16,7 +16,7 @@ import { TableChain } from '../../../../../common/model/db'
  *
  * @returns {Promise<null>} - The result promise.
  */
-export const updateChain = (params, client = DB.client) => {
+export const updateChain = async (params, client = DB.client) => {
   const { surveyId, chainUuid, fields = {}, dateExecuted = false, dateModified = false } = params
 
   if (!surveyId || !chainUuid)
@@ -52,7 +52,7 @@ export const updateChain = (params, client = DB.client) => {
  *
  * @returns {Promise<null>} - The result promise.
  */
-export const removeChainCycles = (params, client) => {
+export const removeChainCycles = async (params, client) => {
   const { surveyId, cycles } = params
   const tableChain = new TableChain(surveyId)
   return client.none(

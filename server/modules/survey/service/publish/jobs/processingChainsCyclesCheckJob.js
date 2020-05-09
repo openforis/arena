@@ -6,7 +6,6 @@ import * as Survey from '@core/survey/survey'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 
 export default class ProcessingChainsCyclesCheckJob extends Job {
@@ -31,7 +30,7 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
     this.incrementProcessedItems()
 
     // 3. delete processing chains with no cycles
-    await ProcessingChainManager.deleteChainsWithoutCycles(surveyId, tx)
+    await AnalysisManager.deleteChain({ surveyId, noCycle: true }, tx)
     this.incrementProcessedItems()
 
     // 4. delete analysis nodeDef if they are not used

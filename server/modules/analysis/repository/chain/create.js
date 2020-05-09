@@ -13,7 +13,7 @@ import { TableChain } from '../../../../../common/model/db'
  *
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChain = (params, client = DB.client) => {
+export const insertChain = async (params, client = DB.client) => {
   const { surveyId, chain } = params
   const tableChain = new TableChain(surveyId)
 

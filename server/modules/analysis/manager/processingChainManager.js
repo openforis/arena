@@ -22,7 +22,6 @@ import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaR
 import * as ChainRepository from '../repository/chain'
 import * as StepRepository from '../repository/step'
 import * as CalculationRepository from '../repository/calculation'
-import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
 
@@ -234,22 +233,20 @@ export const persistAll = async ({ user, surveyId, chain, step = null, calculati
     return _afterChainUpdate(surveyId, tx, false)
   })
 
-export { deleteChainsWithoutCycles } from '../repository/processingChainRepository'
-
 // ====== DELETE - Chain
 
 // Deletes a processing chain.
 // It returns a list of deleted unused node def analysis uuids (if any)
-export const deleteChain = async (user, surveyId, processingChainUuid, client = DB.client) =>
-  client.tx(async (t) => {
-    const processingChain = await ProcessingChainRepository.deleteChain(surveyId, processingChainUuid, t)
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: processingChainUuid,
-      [ActivityLog.keysContent.labels]: Chain.getLabels(processingChain),
+export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.client) =>
+  client.tx(async (tx) => {
+    const chain = await ChainRepository.deleteChain({ surveyId, chainUuid }, tx)
+    const content = {
+      [ActivityLog.keysContent.uuid]: chainUuid,
+      [ActivityLog.keysContent.labels]: Chain.getLabels(chain),
     }
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, logContent, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingChainDelete, content, false, tx)
 
-    return _afterChainUpdate(surveyId, t)
+    return _afterChainUpdate(surveyId, tx)
   })
 
 // ====== DELETE - Step
