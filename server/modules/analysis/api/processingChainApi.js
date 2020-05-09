@@ -153,14 +153,14 @@ export const init = (app) => {
   // ====== DELETE - Step
 
   app.delete(
-    '/survey/:surveyId/processing-step/:processingStepUuid',
+    '/survey/:surveyId/processing-step/:stepUuid',
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, processingStepUuid } = Request.getParams(req)
+        const { surveyId, stepUuid } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteStep(user, surveyId, processingStepUuid)
+        const nodeDefUnusedDeletedUuids = await AnalysisService.deleteStep({ user, surveyId, stepUuid })
 
         res.json(nodeDefUnusedDeletedUuids)
       } catch (error) {
