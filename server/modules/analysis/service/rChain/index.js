@@ -5,62 +5,62 @@ import * as CSVReader from '../../../../utils/file/csvReader'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as ProcessingChain from '../../../../../common/analysis/processingChain'
-import * as ProcessingStep from '../../../../../common/analysis/processingStep'
-import * as ProcessingStepCalculation from '../../../../../common/analysis/processingStepCalculation'
+import * as Chain from '../../../../../common/analysis/processingChain'
+import * as Step from '../../../../../common/analysis/processingStep'
+import * as Calculation from '../../../../../common/analysis/processingStepCalculation'
 import { TableChain, TableCalculation } from '../../../../../common/model/db'
 
 import * as SurveyManager from '../../../survey/manager/surveyManager'
-import * as SurveyRdbMamager from '../../../surveyRdb/manager/surveyRdbManager'
+import * as SurveyRdbManager from '../../../surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
 import RStep from './rStep'
 
-export const generateScript = async (surveyId, cycle, chainUuid, serverUrl) => {
+export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) => {
   const rChain = new RChain(surveyId, cycle, chainUuid, serverUrl)
   await rChain.init()
 }
 
 // ==== READ
-export const fetchStepData = async (surveyId, cycle, stepUuid) => {
+export const fetchStepData = async ({ surveyId, cycle, stepUuid }) => {
   const [survey, step] = await Promise.all([
     SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle),
     AnalysisManager.fetchStep({ surveyId, stepUuid }),
   ])
-  const nodeDef = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
-  return SurveyRdbMamager.fetchViewData({ survey, cycle, nodeDef, columnNodeDefs: true })
+  const nodeDef = Survey.getNodeDefByUuid(Step.getEntityUuid(step))(survey)
+  return SurveyRdbManager.fetchViewData({ survey, cycle, nodeDef, columnNodeDefs: true })
 }
 
 // ==== UPDATE
 
-export const persistResults = async (surveyId, cycle, stepUuid, filePath) => {
+export const persistResults = async ({ surveyId, cycle, stepUuid, filePath }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, cycle)
   const step = await AnalysisManager.fetchStep({ surveyId, stepUuid, includeCalculations: true })
 
-  const entityDefStep = Survey.getNodeDefByUuid(ProcessingStep.getEntityUuid(step))(survey)
+  const entityDefStep = Survey.getNodeDefByUuid(Step.getEntityUuid(step))(survey)
 
   const fileZip = new FileZip(filePath)
   await fileZip.init()
   const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDefStep)}.csv`)
   await db.tx(async (tx) => {
     // Reset node results
-    const chainUuid = ProcessingStep.getProcessingChainUuid(step)
-    await SurveyRdbMamager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
+    const chainUuid = Step.getProcessingChainUuid(step)
+    await SurveyRdbManager.deleteNodeResultsByChainUuid({ surveyId, cycle, chainUuid }, tx)
 
     // Insert node results
-    const massiveInsert = new SurveyRdbMamager.MassiveInsertResultNodes(survey, step, tx)
+    const massiveInsert = new SurveyRdbManager.MassiveInsertResultNodes(survey, step, tx)
     await CSVReader.createReaderFromStream(stream, null, massiveInsert.push.bind(massiveInsert)).start()
     await massiveInsert.flush()
 
     // refresh result step materialized view
-    await SurveyRdbMamager.refreshResultStepView({ survey, step }, tx)
+    await SurveyRdbManager.refreshResultStepView({ survey, step }, tx)
   })
 
   fileZip.close()
 }
 
-export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
+export const persistUserScripts = async ({ surveyId, chainUuid, filePath }) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
 
@@ -83,13 +83,13 @@ export const persistUserScripts = async (surveyId, chainUuid, filePath) => {
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId),
     ])
     await Promise.all(
-      ProcessingChain.getProcessingSteps(chain).map((step) => {
+      Chain.getProcessingSteps(chain).map((step) => {
         const stepFolder = `${RChain.dirNames.user}/${RStep.getSubFolder(step)}`
         return Promise.all(
-          ProcessingStep.getCalculations(step).map(async (calculation) => {
+          Step.getCalculations(step).map(async (calculation) => {
             // Persist the script of each calculation
-            const calculationUuid = ProcessingStepCalculation.getUuid(calculation)
-            const nodeDefUuid = ProcessingStepCalculation.getNodeDefUuid(calculation)
+            const calculationUuid = Calculation.getUuid(calculation)
+            const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
             const nodeDefName = NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
             const script = (await fileZip.getEntryAsText(findEntry(stepFolder, nodeDefName))).trim()
             return AnalysisManager.updateCalculation(

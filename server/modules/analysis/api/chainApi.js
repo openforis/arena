@@ -198,7 +198,7 @@ export const init = (app) => {
         const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
         const serverUrl = Request.getServerUrl(req)
 
-        await AnalysisService.generateScript(surveyId, surveyCycleKey, chainUuid, serverUrl)
+        await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl })
 
         Response.sendOk(res)
       } catch (error) {
