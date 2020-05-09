@@ -21,6 +21,7 @@ import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaR
 
 import * as ChainRepository from '../repository/chain'
 import * as StepRepository from '../repository/step'
+import * as CalculationRepository from '../repository/calculation'
 import * as ProcessingChainRepository from '../repository/processingChainRepository'
 import * as ProcessingStepRepository from '../repository/processingStepRepository'
 import * as ProcessingStepCalculationRepository from '../repository/processingStepCalculationRepository'
@@ -83,32 +84,74 @@ const _insertStep = async ({ user, surveyId, step }, client) => {
   await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.processingStepCreate, stepDb, false, client)
 }
 
+const _getUpdateCalculationIndexes = ({ user, surveyId, step, stepDb }, client) => {
+  const stepUuid = Step.getUuid(step)
+  const calculationUuids = Step.getCalculationUuids(step)
+  const calculationsDbUuids = Step.getCalculations(stepDb).map(Calculation.getUuid)
+  const calculationsDb = Step.getCalculations(stepDb)
+  const promises = []
+  // Calculation indexes haven't changed
+  if (!R.equals(calculationsDbUuids, calculationUuids)) {
+    promises.push(CalculationRepository.updateCalculationIndexes({ surveyId, stepUuid, calculationUuids }, client))
+    // Insert activity logs
+    promises.push(
+      ...calculationsDb.map((calculation) => {
+        const calculationUuid = Calculation.getUuid(calculation)
+        const indexFrom = Calculation.getIndex(calculation)
+        const indexTo = R.indexOf(calculationUuid, calculationUuids)
+        if (indexFrom !== indexTo) {
+          const content = {
+            [ActivityLog.keysContent.uuid]: calculationUuid,
+            [ActivityLog.keysContent.processingChainUuid]: Step.getProcessingChainUuid(step),
+            [ActivityLog.keysContent.processingStepUuid]: stepUuid,
+            [ActivityLog.keysContent.indexFrom]: indexFrom,
+            [ActivityLog.keysContent.indexTo]: indexTo,
+          }
+          const type = ActivityLog.type.processingStepCalculationIndexUpdate
+          return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
+        }
+        return null
+      })
+    )
+  }
+  return promises
+}
+
 const _updateStep = async ({ user, surveyId, step, stepDb }, client) => {
   const chainUuid = Step.getProcessingChainUuid(step)
   const stepUuid = Step.getUuid(step)
+  const promises = []
+
+  // update props
   const propsToUpdate = Step.getPropsDiff(step)(stepDb)
   const entries = Object.entries(propsToUpdate)
   if (entries.length > 0) {
-    const promises = entries.map(([key, value]) => {
-      const content = {
-        [ActivityLog.keysContent.uuid]: stepUuid,
-        [ActivityLog.keysContent.processingChainUuid]: chainUuid,
-        key,
-        value,
-      }
-      const type = ActivityLog.type.processingStepPropUpdate
-      return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
-    })
+    promises.push(
+      ...entries.map(([key, value]) => {
+        const content = {
+          [ActivityLog.keysContent.uuid]: stepUuid,
+          [ActivityLog.keysContent.processingChainUuid]: chainUuid,
+          key,
+          value,
+        }
+        const type = ActivityLog.type.processingStepPropUpdate
+        return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
+      })
+    )
     const fields = { [TableStep.columnSet.props]: propsToUpdate }
     promises.push(StepRepository.updateStep({ surveyId, stepUuid, fields }, client))
-
-    return Promise.all(promises)
   }
-  return null
+
+  promises.push(..._getUpdateCalculationIndexes({ user, surveyId, step, stepDb }, client))
+
+  return Promise.all(promises)
 }
 
 const _insertOrUpdateStep = async ({ user, surveyId, step }, client) => {
-  const stepDb = await StepRepository.fetchStep({ surveyId, stepUuid: Step.getUuid(step) }, client)
+  const stepDb = await StepRepository.fetchStep(
+    { surveyId, stepUuid: Step.getUuid(step), includeCalculations: true },
+    client
+  )
   return stepDb ? _updateStep({ user, surveyId, step, stepDb }, client) : _insertStep({ user, surveyId, step }, client)
 }
 
@@ -157,60 +200,17 @@ const _insertOrUpdateCalculation = async (user, surveyId, chain, calculation, cl
   }
 }
 
-const _updateCalculationIndexes = async (user, surveyId, step, client) => {
-  const stepUuid = Step.getUuid(step)
-  const calculationUuids = Step.getCalculationUuids(step)
-  const stepDb = await StepRepository.fetchStep({ surveyId, stepUuid, includeCalculations: true }, client)
-  const calculations = Step.getCalculations(stepDb)
-  const calculationsDbUuids = R.pluck(Calculation.keys.uuid, calculations)
-  if (R.equals(calculationsDbUuids, calculationUuids)) {
-    // Calculation indexes haven't changed
-    return
-  }
-
-  // Update indexes in db
-  await ProcessingStepCalculationRepository.incrementCalculationIndexesByStepUuid(
-    surveyId,
-    stepUuid,
-    calculations.length,
-    client
-  )
-  await ProcessingStepCalculationRepository.updateCalculationIndexesByUuids(surveyId, calculationUuids, client)
-
-  // Insert activity logs
-  await Promise.all(
-    calculations.map((calculation) => {
-      const calculationUuid = Calculation.getUuid(calculation)
-      const indexFrom = Calculation.getIndex(calculation)
-      const indexTo = R.indexOf(calculationUuid, calculationUuids)
-      if (indexFrom !== indexTo) {
-        const content = {
-          [ActivityLog.keysContent.uuid]: calculationUuid,
-          [ActivityLog.keysContent.processingChainUuid]: Step.getProcessingChainUuid(step),
-          [ActivityLog.keysContent.processingStepUuid]: stepUuid,
-          [ActivityLog.keysContent.indexFrom]: indexFrom,
-          [ActivityLog.keysContent.indexTo]: indexTo,
-        }
-        const type = ActivityLog.type.processingStepCalculationIndexUpdate
-        return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
-      }
-      return null
-    })
-  )
-}
-
 // ====== UPDATE - Chain
 
-export const updateChain = async (user, surveyId, chain, step = null, calculation = null, client = db) => {
+export const updateChain = async ({ user, surveyId, chain, step = null, calculation = null }, client = db) => {
   await client.tx(async (tx) => {
     await _insertOrUpdateChain({ user, surveyId, chain }, tx)
 
     if (step) {
-      await _insertOrUpdateStep({ user, surveyId, step }, tx)
       if (calculation) {
         await _insertOrUpdateCalculation(user, surveyId, chain, calculation, tx)
       }
-      await _updateCalculationIndexes(user, surveyId, step, tx)
+      await _insertOrUpdateStep({ user, surveyId, step }, tx)
     }
 
     // Validate chain / step / calculation after insert/update

@@ -1,7 +1,7 @@
+import * as DB from '../../../../db'
+
 import * as Step from '../../../../../common/analysis/processingStep'
 import { TableStep } from '../../../../../common/model/db'
-
-import * as DB from '../../../../db'
 
 /**
  * Create a processing step.

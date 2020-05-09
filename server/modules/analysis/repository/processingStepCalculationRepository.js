@@ -3,7 +3,6 @@ import camelize from 'camelize'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
 import { db } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
@@ -43,26 +42,6 @@ export const fetchCalculationByUuid = async (surveyId, uuid, client = db) =>
   )
 
 // ====== UPDATE
-
-export const incrementCalculationIndexesByStepUuid = async (surveyId, processingStepUuid, increment, client = db) =>
-  client.none(
-    `
-    UPDATE ${getSurveyDBSchema(surveyId)}.processing_step_calculation
-    SET index = index + $2
-    WHERE processing_step_uuid = $1`,
-    [processingStepUuid, increment]
-  )
-
-export const updateCalculationIndexesByUuids = async (surveyId, calculationUuids, client = db) =>
-  client.none(
-    DbUtils.updateAllQuery(
-      getSurveyDBSchema(surveyId),
-      'processing_step_calculation',
-      { name: 'uuid', cast: 'uuid' },
-      ['index'],
-      calculationUuids.map((uuid, index) => [uuid, index])
-    )
-  )
 
 export const updateCalculationStep = async (surveyId, calculation, client = db) =>
   client.one(

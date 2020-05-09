@@ -1,3 +1,3 @@
 export { fetchCalculationAttributeUuids } from './read'
 
-export { updateCalculationScript } from './update'
+export { updateCalculationScript, updateCalculationIndexes } from './update'

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
@@ -44,7 +44,7 @@ export const { mergeProps, dissocTemporary } = ObjectUtils
 export const assocEntityUuid = (entityUuid) => ObjectUtils.setProp(keysProps.entityUuid, entityUuid)
 export const assocCalculationUuids = R.assoc(keys.calculationUuids)
 export const assocCalculations = (calculations) => {
-  const calculationUuids = R.pluck(ProcessingStepCalculation.keys.uuid)(calculations)
+  const calculationUuids = R.pluck(Calculation.keys.uuid)(calculations)
   return R.pipe(R.assoc(keys.calculations, calculations), assocCalculationUuids(calculationUuids))
 }
 
@@ -56,10 +56,7 @@ const _updateCalculationsCount = (calculationStep) =>
   )
 
 export const assocCalculation = (calculation) =>
-  R.pipe(
-    R.assocPath([keys.calculations, ProcessingStepCalculation.getIndex(calculation)], calculation),
-    _updateCalculationsCount
-  )
+  R.pipe(R.assocPath([keys.calculations, Calculation.getIndex(calculation)], calculation), _updateCalculationsCount)
 
 const _updateCalculations = (fn) => (processingStep) =>
   R.pipe(
@@ -71,7 +68,7 @@ const _updateCalculations = (fn) => (processingStep) =>
 
 export const dissocTemporaryCalculation = _updateCalculations(
   // Remove temporary calculation
-  R.reject(ProcessingStepCalculation.isTemporary)
+  R.reject(Calculation.isTemporary)
 )
 
 export const dissocCalculations = R.dissoc(keys.calculations)
@@ -80,12 +77,12 @@ export const dissocCalculation = (calculation) =>
   _updateCalculations(
     R.pipe(
       // Remove calculation
-      R.reject(ProcessingStepCalculation.isEqual(calculation)),
+      R.reject(Calculation.isEqual(calculation)),
       // Update indexes of next calculations
       R.map(
         R.when(
-          (calc) => ProcessingStepCalculation.getIndex(calc) > ProcessingStepCalculation.getIndex(calculation),
-          (calc) => ProcessingStepCalculation.assocIndex(ProcessingStepCalculation.getIndex(calc) - 1)(calc)
+          (calc) => Calculation.getIndex(calc) > Calculation.getIndex(calculation),
+          (calc) => Calculation.assocIndex(Calculation.getIndex(calc) - 1)(calc)
         )
       )
     )
@@ -101,6 +98,6 @@ export const hasCategory = R.pipe(getCategoryUuid, R.isNil, R.not)
  *
  * @returns {boolean} - True when it's disaggregate, false otherwise.
  */
-export const isNotAggregate = R.pipe(getCalculations, R.none(ProcessingStepCalculation.hasAggregateFunction))
+export const isNotAggregate = R.pipe(getCalculations, R.none(Calculation.hasAggregateFunction))
 
 export const isAggregate = R.pipe(isNotAggregate, R.not)

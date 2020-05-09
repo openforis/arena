@@ -10,7 +10,7 @@ import * as ActivityLogRepository from '../../../activityLog/repository/activity
 export { countChains, fetchChains, fetchChain, updateChain } from '../../repository/chain'
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
-  DB.tx(async (tx) => {
+  DB.client.tx(async (tx) => {
     const promises = [
       ChainRepository.updateChain(
         { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
