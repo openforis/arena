@@ -1,5 +1,5 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
@@ -7,10 +7,8 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
-
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { createStep } from '@webapp/loggedin/modules/analysis/step/actions'
 
@@ -19,8 +17,7 @@ import StepItem from './stepItem'
 const StepList = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const editingStep = useSelector(StepState.isEditingStep)
-  const chain = useSelector(ChainState.getProcessingChain)
+  const { chain, editingStep } = useChainEdit()
   const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
   const stepsValidation = Validation.getFieldValidation(Chain.keys.processingSteps)(validation)
   const steps = Chain.getProcessingSteps(chain)
