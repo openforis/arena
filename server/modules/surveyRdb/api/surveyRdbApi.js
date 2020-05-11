@@ -13,17 +13,8 @@ export const init = (app) => {
       const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getJsonParam(req, 'sort')
 
-      const rows = await SurveyRdbService.fetchViewData({
-        surveyId,
-        cycle,
-        nodeDefUuidTable,
-        nodeDefUuidCols,
-        offset,
-        limit,
-        filter,
-        sort,
-        editMode,
-      })
+      const params = { surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, offset, limit, filter, sort, editMode }
+      const rows = await SurveyRdbService.fetchViewData(params)
 
       res.json(rows)
     } catch (error) {
@@ -56,15 +47,9 @@ export const init = (app) => {
       const sort = Request.getJsonParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
-      await SurveyRdbService.fetchViewData({
-        surveyId,
-        cycle,
-        nodeDefUuidTable,
-        nodeDefUuidCols,
-        filter,
-        sort,
-        streamOutput: res,
-      })
+      const params = { surveyId, cycle, nodeDefUuidTable, nodeDefUuidCols, filter, sort, streamOutput: res }
+
+      await SurveyRdbService.fetchViewData(params)
     } catch (error) {
       next(error)
     }
