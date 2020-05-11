@@ -10,8 +10,7 @@ import * as geoApi from '@server/modules/geo/api/geoApi'
 import * as collectImportApi from '@server/modules/collectImport/api/collectImportApi'
 import * as recordApi from '@server/modules/record/api/recordApi'
 import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
-import * as processingChainApi from '@server/modules/analysis/api/processingChainApi'
-import * as rChainApi from '@server/modules/analysis/api/rChainApi'
+import * as analysisApi from '@server/modules/analysis/api'
 import * as jobApi from '@server/job/jobApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
 
@@ -34,8 +33,7 @@ recordApi.init(router)
 
 surveyRdbApi.init(router)
 
-processingChainApi.init(router)
-rChainApi.init(router)
+analysisApi.init(router)
 
 jobApi.init(router)
 

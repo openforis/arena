@@ -1,5 +1,7 @@
 // ====== Schema
-export { getSchemaSurvey, getSchemaSurveyRdb } from './schemata'
+import * as Schemata from './schemata'
+
+export { Schemata }
 
 // ====== Tables
 export { default as TableRecord } from './tables/record'

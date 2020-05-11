@@ -1,3 +1,7 @@
-export { fetchChains, fetchChain } from './read'
+export { insertChain } from './create'
 
-export { updateChain } from './update'
+export { countChains, fetchChains, fetchChain } from './read'
+
+export { updateChain, removeChainCycles } from './update'
+
+export { deleteChain } from './delete'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Chain from '@common/analysis/processingChain'
@@ -7,10 +7,7 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
-
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
@@ -22,18 +19,17 @@ const ButtonBar = () => {
   const dispatch = useDispatch()
   const history = useHistory()
 
-  const chain = useSelector(ChainState.getProcessingChain)
-  const chainDirty = useSelector(ChainState.isDirty)
-  const editingChain = useSelector(ChainState.isEditingChain)
-
-  const step = useSelector(StepState.getProcessingStep)
-  const stepNext = useSelector(StepState.getProcessingStepNext)
-  const stepDirty = useSelector(StepState.isDirty)
-  const editingStep = useSelector(StepState.isEditingStep)
-
-  const calculation = useSelector(CalculationState.getCalculation)
-  const calculationDirty = useSelector(CalculationState.isDirty)
-  const editingCalculation = useSelector(CalculationState.isEditingCalculation)
+  const {
+    chain,
+    chainDirty,
+    editingChain,
+    step,
+    editingStep,
+    stepNext,
+    calculation,
+    editingCalculation,
+    dirty,
+  } = useChainEdit()
 
   return (
     <>
@@ -57,7 +53,7 @@ const ButtonBar = () => {
           type="button"
           className="btn-s btn-primary"
           onClick={() => dispatch(saveChain())}
-          aria-disabled={!calculationDirty && !stepDirty && !chainDirty}
+          aria-disabled={!dirty}
         >
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
@@ -72,13 +68,13 @@ const ButtonBar = () => {
           }
           onClick={() => {
             let messageKeyPrefix = 'processingChainView'
-            if (editingCalculation) messageKeyPrefix = 'processingStepCalculationView'
             if (editingStep) messageKeyPrefix = 'processingStepView'
+            if (editingCalculation) messageKeyPrefix = 'processingStepCalculationView'
             const messageKey = `${messageKeyPrefix}.deleteConfirm`
 
             let deleteAction = deleteChain(history)
-            if (editingCalculation) deleteAction = deleteCalculation()
             if (editingStep) deleteAction = deleteStep()
+            if (editingCalculation) deleteAction = deleteCalculation()
 
             dispatch(showDialogConfirm(messageKey, {}, deleteAction))
           }}

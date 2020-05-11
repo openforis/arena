@@ -292,11 +292,6 @@ Do you want to cancel them?`,
     },
   },
 
-  analysisView: {
-    processingChainView: {
-      openChain: 'Open Chain',
-    },
-  },
   designerView: {
     formPreview: 'Form preview',
   },

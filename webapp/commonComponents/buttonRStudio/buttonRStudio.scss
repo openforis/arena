@@ -1,0 +1,60 @@
+.btn-rstudio {
+  padding: 0.2rem 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.btn-rstudio[aria-disabled='true'] {
+  opacity: 0.4;
+}
+
+.btn-rstudio svg {
+  width: 60px;
+
+  .st0 {
+    fill: #75aadb;
+  }
+  .st1 {
+    fill: #4d4d4d;
+  }
+  .st2 {
+    fill: #ffffff;
+  }
+  .st3 {
+    fill: url(#SVGID_1_);
+  }
+  .st4 {
+    fill: url(#SVGID_2_);
+  }
+  .st5 {
+    fill: url(#SVGID_3_);
+  }
+  .st6 {
+    fill: url(#SVGID_4_);
+  }
+  .st7 {
+    fill: url(#SVGID_5_);
+  }
+  .st8 {
+    fill: url(#SVGID_6_);
+  }
+  .st9 {
+    fill: url(#SVGID_7_);
+  }
+  .st10 {
+    fill: url(#SVGID_8_);
+  }
+  .st11 {
+    fill: url(#SVGID_9_);
+  }
+  .st12 {
+    fill: url(#SVGID_10_);
+  }
+  .st13 {
+    opacity: 0.18;
+    fill: url(#SVGID_11_);
+  }
+  .st14 {
+    opacity: 0.3;
+  }
+}

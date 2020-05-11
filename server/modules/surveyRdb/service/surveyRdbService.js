@@ -1,5 +1,4 @@
 import * as Survey from '../../../../core/survey/survey'
-import * as NodeDef from '../../../../core/survey/nodeDef'
 
 import * as SortCriteria from '../../../../common/surveyRdb/sortCriteria'
 
@@ -13,20 +12,20 @@ const _fetchSurvey = async (surveyId, cycle) => {
 }
 
 /**
- * Runs a select query on a data view associated to an entity node definition.
+ * Executes a select query on an entity definition data view.
  *
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.surveyId] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
- * @param {!NodeDef} [params.nodeDefUuidTable] - The UUID of the node def associated to the view to select.
- * @param {Array} [params.nodeDefUuidCols=[]] - The UUIDs of the node defs associated to the selected columns.
+ * @param {!string} [params.nodeDefUuidTable] - The UUID of the node def associated to the view to select.
+ * @param {Array.<string>} [params.nodeDefUuidCols=[]] - The UUIDs of the node defs associated to the selected columns.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {object} [params.filter=null] - The filter expression object.
  * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
  * @param {boolean} [params.editMode=false] - Whether to fetch row ready to be edited (fetches nodes and records).
- * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */

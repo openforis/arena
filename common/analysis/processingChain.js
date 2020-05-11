@@ -55,10 +55,10 @@ export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 
 // ===== READ - Steps
 export const getProcessingSteps = R.propOr([], keys.processingSteps)
-const _getStepByIdx = (stepIdx) =>
+export const getStepByIdx = (stepIdx) =>
   R.ifElse(R.always(stepIdx >= 0), R.pipe(getProcessingSteps, R.propOr(null, stepIdx)), R.always(null))
-export const getStepPrev = (step) => _getStepByIdx(ProcessingStep.getIndex(step) - 1)
-export const getStepNext = (step) => _getStepByIdx(ProcessingStep.getIndex(step) + 1)
+export const getStepPrev = (step) => getStepByIdx(ProcessingStep.getIndex(step) - 1)
+export const getStepNext = (step) => getStepByIdx(ProcessingStep.getIndex(step) + 1)
 
 // ===== READ - Calculation attribute uudis
 export const getCalculationAttributeUuids = R.propOr({}, keys.calculationAttributeUuids)

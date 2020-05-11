@@ -1,16 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n, useLang, useNodeDefByUuid } from '@webapp/commonComponents/hooks'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setCalculationForEdit } from '@webapp/loggedin/modules/analysis/step/actions'
@@ -18,17 +16,13 @@ import { setCalculationForEdit } from '@webapp/loggedin/modules/analysis/step/ac
 const CalculationItem = (props) => {
   const { calculation, dragging, onDragStart, onDragEnd, onDragOver } = props
 
-  const lang = useLang()
-  const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
-  const chain = useSelector(ChainState.getProcessingChain)
-  const calculationEditDirty = useSelector(CalculationState.isDirty)
-  const editingCalculation = useSelector(CalculationState.isEditingCalculation)
-  const calculationForEdit = useSelector(CalculationState.getCalculation)
-  const validation = Chain.getItemValidationByUuid(Calculation.getUuid(calculation))(chain)
-
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const lang = useLang()
+  const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
+  const { chain, calculation: calculationForEdit, calculationDirty, editingCalculation } = useChainEdit()
 
+  const validation = Chain.getItemValidationByUuid(Calculation.getUuid(calculation))(chain)
   const editingSelf = Calculation.isEqual(calculationForEdit)(calculation)
 
   let className = 'chain-list-item'
@@ -48,7 +42,7 @@ const CalculationItem = (props) => {
       data-index={index}
       onClick={() => {
         if (!editingSelf) {
-          if (calculationEditDirty)
+          if (calculationDirty)
             dispatch(showDialogConfirm('common.cancelConfirm', {}, setCalculationForEdit(calculation)))
           else dispatch(setCalculationForEdit(calculation))
         }

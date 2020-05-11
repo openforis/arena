@@ -1,34 +1,28 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
-import * as R from 'ramda'
+import { useDispatch } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
-import { useI18n, useSurvey } from '@webapp/commonComponents/hooks'
+import { useCategoryByUuid, useI18n, useNodeDefByUuid } from '@webapp/commonComponents/hooks'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
-
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { setStepForEdit } from '@webapp/loggedin/modules/analysis/step/actions'
 
 const StepItem = (props) => {
   const { step } = props
-  const survey = useSurvey()
-  const entity = R.pipe(Step.getEntityUuid, (entityUuid) => Survey.getNodeDefByUuid(entityUuid)(survey))(step)
-  const category = R.pipe(Step.getCategoryUuid, (categoryUuid) => Survey.getCategoryByUuid(categoryUuid)(survey))(step)
-  const chain = useSelector(ChainState.getProcessingChain)
-  const stepEditing = useSelector(StepState.getProcessingStep)
-  const editing = Step.isEqual(stepEditing)(step)
-  const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
 
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const entity = useNodeDefByUuid(Step.getEntityUuid(step))
+  const category = useCategoryByUuid(Step.getCategoryUuid(step))
+  const { chain, step: stepEditing } = useChainEdit()
+  const editing = Step.isEqual(stepEditing)(step)
+  const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
 
   return (
     <button

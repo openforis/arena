@@ -17,3 +17,6 @@ export const useOnSurveyCycleUpdate = (effect) => {
 
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
+
+// ==== Categories
+export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())

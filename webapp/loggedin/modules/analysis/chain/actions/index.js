@@ -1,4 +1,4 @@
-export { stepsLoad, fetchChain, fetchSteps } from './read'
+export { fetchChain } from './read'
 
 export { chainPropUpdate, updateChainCycles, updateChainProp } from './update'
 

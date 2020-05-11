@@ -1,6 +1,6 @@
 import * as pgPromise from 'pg-promise'
 
-import { getSchemaSurvey, TableResultNode, TableChain, TableStep } from '../../../../../common/model/db'
+import { Schemata, TableResultNode, TableChain, TableStep } from '../../../../../common/model/db'
 
 /**
  * Creates a results_node table for the specified survey.
@@ -10,7 +10,7 @@ import { getSchemaSurvey, TableResultNode, TableChain, TableStep } from '../../.
  * @param {!pgPromise.IDatabase} client - The database client.
  */
 export const createResultNodeTable = async ({ surveyId }, client) => {
-  const schemaSurvey = getSchemaSurvey(surveyId)
+  const schemaSurvey = Schemata.getSchemaSurvey(surveyId)
   const tableResultNode = new TableResultNode(surveyId)
   const tableChain = new TableChain(surveyId)
   const tableStep = new TableStep(surveyId)

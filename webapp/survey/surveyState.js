@@ -7,19 +7,14 @@ import * as User from '@core/user/user'
 import * as AppState from '@webapp/app/appState'
 
 const survey = 'survey'
-
 export const stateKey = survey
-
-/**
- * ======================
- * Survey State
- * ======================
- */
 
 // READ
 export const getSurvey = R.prop(survey)
 
 export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
+
+export const getSurveyDefaultLang = R.pipe(getSurveyInfo, Survey.getDefaultLanguage)
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 

@@ -1,13 +1,14 @@
+// eslint-disable-next-line max-classes-per-file
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessingChain from '@common/analysis/processingChain'
-import * as ProcessingStep from '@common/analysis/processingStep'
-import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
+import * as Chain from '@common/analysis/processingChain'
+import * as Step from '@common/analysis/processingStep'
+import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { db } from '@server/db/db'
-import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
+import * as DB from '@server/db'
+import * as AnalysisManager from '@server/modules/analysis/manager'
 
 class CalculationBuilder {
   constructor(nodeDefName, label) {
@@ -20,11 +21,11 @@ class CalculationBuilder {
   build(survey, step) {
     const nodeDef = Survey.getNodeDefByName(this._nodeDefName)(survey)
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-    return ProcessingChain.newProcessingStepCalculation(step, NodeDef.getUuid(nodeDef), {
-      [ProcessingStepCalculation.keysProps.labels]: { [defaultLang]: this._label },
-      [ProcessingStepCalculation.keysProps.type]: ProcessingStepCalculation.getTypeByNodeDef(nodeDef),
-      [ProcessingStepCalculation.keysProps.aggregateFn]: this._aggregateFn,
-      [ProcessingStepCalculation.keysProps.formula]: this._formula,
+    return Chain.newProcessingStepCalculation(step, NodeDef.getUuid(nodeDef), {
+      [Calculation.keysProps.labels]: { [defaultLang]: this._label },
+      [Calculation.keysProps.type]: Calculation.getTypeByNodeDef(nodeDef),
+      [Calculation.keysProps.aggregateFn]: this._aggregateFn,
+      [Calculation.keysProps.formula]: this._formula,
     })
   }
 
@@ -46,11 +47,11 @@ class StepBuilder {
   }
 
   build(survey, chain) {
-    const step = ProcessingChain.newProcessingStep(chain, {
-      [ProcessingStep.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
+    const step = Chain.newProcessingStep(chain, {
+      [Step.keysProps.entityUuid]: NodeDef.getUuid(Survey.getNodeDefByName(this.entityName)(survey)),
     })
-    const calculations = this.calculationBuilders.map(builder => builder.build(survey, step))
-    return ProcessingStep.assocCalculations(calculations)(step)
+    const calculations = this.calculationBuilders.map((builder) => builder.build(survey, step))
+    return Step.assocCalculations(calculations)(step)
   }
 }
 
@@ -64,33 +65,37 @@ class ChainBuilder {
 
   build() {
     const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(this.survey)
-    const chain = ProcessingChain.newProcessingChain({
-      [ProcessingChain.keysProps.labels]: { [defaultLang]: this.label },
+    const chain = Chain.newProcessingChain({
+      [Chain.keysProps.labels]: { [defaultLang]: this.label },
     })
-    const steps = this.stepBuilders.map(builder => builder.build(this.survey, chain))
-    return ProcessingChain.assocProcessingSteps(steps)(chain)
+    const steps = this.stepBuilders.map((builder) => builder.build(this.survey, chain))
+    return Chain.assocProcessingSteps(steps)(chain)
   }
 
-  async buildAndStore(client = db) {
+  async buildAndStore(client = DB.client) {
     const { user, survey } = this
-    return await client.tx(async t => {
+    // eslint-disable-next-line no-return-await
+    return await client.tx(async (t) => {
       const chain = this.build()
       const surveyId = Survey.getId(survey)
-      const steps = ProcessingChain.getProcessingSteps(chain)
+      const steps = Chain.getProcessingSteps(chain)
       if (R.isEmpty(steps)) {
         const defaultLang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
-        const chainLabel = ProcessingChain.getLabel(defaultLang)(chain)
+        const chainLabel = Chain.getLabel(defaultLang)(chain)
         throw new Error(`Cannot persist processing chain ${chainLabel}: empty steps`)
       }
 
+      // eslint-disable-next-line no-restricted-syntax
       for (const step of steps) {
-        const calculations = ProcessingStep.getCalculations(step)
+        const calculations = Step.getCalculations(step)
         if (R.isEmpty(calculations)) {
-          throw new Error(`Cannot persist processing step #${ProcessingStep.getIndex(step)}: empty calculations`)
+          throw new Error(`Cannot persist processing step #${Step.getIndex(step)}: empty calculations`)
         }
 
+        // eslint-disable-next-line no-restricted-syntax
         for (const calculation of calculations) {
-          await ProcessingChainManager.updateChain(user, surveyId, chain, step, calculation, t)
+          // eslint-disable-next-line no-await-in-loop
+          await AnalysisManager.persistAll({ user, surveyId, chain, step, calculation }, t)
         }
       }
     })
