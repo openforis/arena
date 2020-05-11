@@ -6,8 +6,8 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as Validation from '@core/validation/validation'
 
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import TableColumn from './tableColumn'
 
@@ -34,9 +34,7 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
             const validation = Record.getValidation(record)
 
             return (
-              <div key={String(i)} className="table__row">
-                <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
-
+              <div key={String(i)} className={`table__row${Validation.isValid(validation) ? '' : ' invalid'}`}>
                 <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
                   {editMode && (

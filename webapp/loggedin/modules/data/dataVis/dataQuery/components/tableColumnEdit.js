@@ -5,9 +5,12 @@ import PropTypes from 'prop-types'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as RecordValidation from '@core/record/recordValidation'
+import * as Validation from '@core/validation/validation'
 
 import { useAuthCanEditRecord, useSurveyCycleKey, useSurveyInfo } from '@webapp/commonComponents/hooks'
 
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
 import { createNodePlaceholder, removeNode, updateNode } from '@webapp/loggedin/surveyViews/record/actions'
@@ -28,26 +31,33 @@ const TableColumnEdit = (props) => {
       [Node.keys.parentUuid]: parentUuid,
     }
 
+    const recordValidation = Record.getValidation(record)
+    const validation = RecordValidation.getNodeValidation(node)(recordValidation)
+
     return (
-      <NodeDefTableCellBody
-        surveyInfo={surveyInfo}
-        surveyCycleKey={surveyCycleKey}
-        nodeDef={nodeDef}
-        parentNode={parentNode}
-        nodes={[node]}
-        entry
-        entryDataQuery
-        edit={false}
-        renderType={NodeDefLayout.renderType.tableBody}
-        canEditRecord={canEditRecord}
-        updateNode={(...args) => dispatch(updateNode(...args))}
-        removeNode={(...args) => dispatch(removeNode(...args))}
-        createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
-        windowed={false}
-      />
+      <div>
+        {!Validation.isValid(validation) && (
+          <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
+        )}
+        <NodeDefTableCellBody
+          surveyInfo={surveyInfo}
+          surveyCycleKey={surveyCycleKey}
+          nodeDef={nodeDef}
+          parentNode={parentNode}
+          nodes={[node]}
+          entry
+          entryDataQuery
+          edit={false}
+          renderType={NodeDefLayout.renderType.tableBody}
+          canEditRecord={canEditRecord}
+          updateNode={(...args) => dispatch(updateNode(...args))}
+          removeNode={(...args) => dispatch(removeNode(...args))}
+          createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
+          windowed={false}
+        />
+      </div>
     )
   }
-
   return null
 }
 

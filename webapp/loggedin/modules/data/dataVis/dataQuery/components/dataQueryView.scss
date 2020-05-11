@@ -88,8 +88,12 @@ $rowHeaderHeight: 45px;
       }
     }
 
-    .error-badge {
-      pointer-events: none;
+    &.invalid {
+      background-color: rgba($red, 0.1);
+
+      button {
+        background-color: transparent;
+      }
     }
   }
 

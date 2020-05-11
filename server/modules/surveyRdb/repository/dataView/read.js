@@ -15,7 +15,7 @@ import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import * as DataSort from '../../../../../common/surveyRdb/dataSort'
 import * as SortCriteria from '../../../../../common/surveyRdb/sortCriteria'
 import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
-import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef } from '../../../../../common/model/db'
+import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef, TableRecord } from '../../../../../common/model/db'
 import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
 import * as DataCol from '../../schemaRdb/dataCol'
@@ -44,11 +44,12 @@ const _getSelectFields = (params) => {
       ...viewDataNodeDef.columnUuids,
     ]
     if (editMode) {
+      const tableRecord = new TableRecord(Survey.getId(survey))
       selectFields.push(
         // Node (every node is transformed into json in a column named with the nodeDefUuid)
         ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
         // Record table fields
-        'row_to_json(r.*) AS record'
+        `row_to_json(${tableRecord.alias}.*) AS record`
       )
     }
     return selectFields.join(', ')
@@ -64,6 +65,7 @@ const _getFromClause = (params) => {
 
   const fromTables = [viewDataNodeDef.nameAliased]
   if (editMode) {
+    const tableRecord = new TableRecord(surveyId)
     fromTables.push(
       // Node table; one join per column def
       ...nodeDefCols.map((nodeDefCol, idx) => {
@@ -73,12 +75,12 @@ const _getFromClause = (params) => {
         tableNode.alias = `n${idx + 1}`
 
         return `LEFT JOIN LATERAL ( 
-        ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColName}`, nodeDefUuid })}
-      ) AS ${tableNode.alias} ON TRUE`
+          ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColName}`, nodeDefUuid })}
+        ) AS ${tableNode.alias} ON TRUE`
       }),
       // Record table
-      `LEFT JOIN ${getSurveyDBSchema(surveyId)}.record r 
-        ON r.uuid = ${viewDataNodeDef.columnRecordUuid}
+      `LEFT JOIN ${tableRecord.nameAliased} 
+        ON ${tableRecord.columnUuid} = ${viewDataNodeDef.columnRecordUuid}
       `
     )
   }
@@ -102,7 +104,7 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
       delete rowUpdated[nodeDefColUuid]
     })
     // Record column
-    rowUpdated.record = camelize(rowUpdated.record)
+    rowUpdated.record = TableRecord.dbTransformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
     // Parent node uuid column
     const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
     rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]

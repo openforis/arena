@@ -40,8 +40,8 @@ export const useTableState = () => {
   useOnUpdate(() => {
     if (editMode) {
       AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, () => dispatch(nodesUpdateCompleted()))
-      AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, ({ recordUuid, recordValid, validations }) =>
-        dispatch(nodeValidationsUpdate({ recordUuid, recordValid, validations }))
+      AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, ({ recordUuid, validations }) =>
+        dispatch(nodeValidationsUpdate({ recordUuid, validations }))
       )
     }
 
