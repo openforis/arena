@@ -10,10 +10,11 @@ import * as Validation from '../../../../../core/validation/validation'
  * @returns {Record} - The record object.
  */
 export default (surveyId, includeValidationFields = true) => (record) => {
-  const { validation, ...rest } = record
+  const validation = Validation.getValidation(record)
+
   return {
+    ...camelize(Validation.dissocValidation(record)),
     surveyId,
-    ...camelize(rest),
     [Validation.keys.validation]: includeValidationFields
       ? validation
       : {
