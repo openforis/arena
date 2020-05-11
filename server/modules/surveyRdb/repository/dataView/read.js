@@ -49,7 +49,7 @@ const _getSelectFields = (params) => {
         // Node (every node is transformed into json in a column named with the nodeDefUuid)
         ...nodeDefCols.map((nodeDefCol, idx) => `row_to_json(n${idx + 1}.*) AS "${NodeDef.getUuid(nodeDefCol)}"`),
         // Record table fields
-        `row_to_json(${tableRecord.alias}.*) AS record`
+        `row_to_json(${tableRecord.getColumn('*')}) AS record`
       )
     }
     return selectFields.join(', ')
@@ -104,7 +104,7 @@ const _dbTransformCallbackSelect = (viewDataNodeDef, editMode, nodeDefCols) => (
       delete rowUpdated[nodeDefColUuid]
     })
     // Record column
-    rowUpdated.record = TableRecord.dbTransformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
+    rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
     // Parent node uuid column
     const nodeDefParentColumnUuid = _getParentNodeUuidColName(viewDataNodeDef, viewDataNodeDef.nodeDef)
     rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
