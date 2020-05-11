@@ -19,6 +19,8 @@ export const updateStep = async (params, client = DB.client) => {
   if (!surveyId || !stepUuid)
     throw new Error(`Survey id and step uuid are required. {surveyId:${surveyId}, stepUuid:${stepUuid}`)
 
+  if (Object.keys(fields).length === 0) throw new Error(`At least one field is required`)
+
   const tableStep = new TableStep(surveyId)
 
   const setFields = Object.keys(fields).map((field, i) =>
@@ -26,8 +28,6 @@ export const updateStep = async (params, client = DB.client) => {
       ? `${TableStep.columnSet.props} = ${TableStep.columnSet.props} || $${i + 2}::jsonb`
       : `${field} = $${i + 2}`
   )
-
-  if (setFields.length === 0) throw new Error(`At least one field is required`)
 
   return client.none(
     `UPDATE ${tableStep.nameQualified}
