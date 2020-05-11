@@ -3,7 +3,7 @@
  *
  * @param {!object} params - The query parameters.
  * @param {string} [params.stepUuid=null] - The step uuid to by.
- * @param {!string} [params.calculationUuid=null] - The calculation uuid to filter by.
+ * @param {string} [params.calculationUuid=null] - The calculation uuid to filter by.
  * @param {boolean} [params.includeScript=false] - Whether to include the R script.
  *
  * @returns {string} - The select query.
