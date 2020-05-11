@@ -1,7 +1,6 @@
-import { db } from '@server/db/db'
-import { dbTransformCallback } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as DB from '../../../../db'
 
-import { TableStep } from '@common/model/db'
+import { TableStep } from '../../../../../common/model/db'
 
 /**
  * Fetches all processing steps by the given survey id.
@@ -16,14 +15,14 @@ import { TableStep } from '@common/model/db'
  *
  * @returns {Promise<Step[]>} - The result promise.
  */
-export const fetchSteps = async (params, client = db) => {
+export const fetchSteps = async (params, client = DB.client) => {
   const { surveyId, chainUuid = null, entityUuid = null, includeScript = false, includeCalculations = false } = params
   const tableStep = new TableStep(surveyId)
   return client.map(
     `${tableStep.getSelect({ chainUuid, entityUuid, includeScript, includeCalculations })}
     ORDER BY ${tableStep.columnIndex}`,
     [],
-    dbTransformCallback
+    DB.transformCallback
   )
 }
 
@@ -42,7 +41,7 @@ export const fetchSteps = async (params, client = db) => {
  *
  * @returns {Promise<Step | null>} - The result promise.
  */
-export const fetchStep = async (params, client = db) => {
+export const fetchStep = async (params, client = DB.client) => {
   const {
     surveyId,
     chainUuid = null,
@@ -63,6 +62,6 @@ export const fetchStep = async (params, client = db) => {
   return client.oneOrNone(
     tableStep.getSelect({ ...paramsSelect, includeCalculations, includeScript }),
     byUuid ? [stepUuid] : [chainUuid, stepIndex],
-    dbTransformCallback
+    DB.transformCallback
   )
 }

@@ -16,7 +16,7 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        const data = await AnalysisService.fetchStepData(surveyId, cycle, stepUuid)
+        const data = await AnalysisService.fetchStepData({ surveyId, cycle, stepUuid })
 
         res.json(data)
       } catch (error) {
@@ -56,7 +56,7 @@ export const init = (app) => {
         const filePath = Request.getFilePath(req)
         const { surveyId, cycle, stepUuid } = Request.getParams(req)
 
-        await AnalysisService.persistResults(surveyId, cycle, stepUuid, filePath)
+        await AnalysisService.persistResults({ surveyId, cycle, stepUuid, filePath })
 
         Response.sendOk(res)
       } catch (e) {
@@ -91,7 +91,7 @@ export const init = (app) => {
         const { surveyId, chainUuid } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        await AnalysisService.persistUserScripts(surveyId, chainUuid, filePath)
+        await AnalysisService.persistUserScripts({ surveyId, chainUuid, filePath })
 
         Response.sendOk(res)
       } catch (e) {

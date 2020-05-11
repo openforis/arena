@@ -72,13 +72,13 @@ const ButtonBar = () => {
           }
           onClick={() => {
             let messageKeyPrefix = 'processingChainView'
-            if (editingCalculation) messageKeyPrefix = 'processingStepCalculationView'
             if (editingStep) messageKeyPrefix = 'processingStepView'
+            if (editingCalculation) messageKeyPrefix = 'processingStepCalculationView'
             const messageKey = `${messageKeyPrefix}.deleteConfirm`
 
             let deleteAction = deleteChain(history)
-            if (editingCalculation) deleteAction = deleteCalculation()
             if (editingStep) deleteAction = deleteStep()
+            if (editingCalculation) deleteAction = deleteCalculation()
 
             dispatch(showDialogConfirm(messageKey, {}, deleteAction))
           }}

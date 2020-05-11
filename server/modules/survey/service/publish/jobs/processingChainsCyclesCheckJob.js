@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import * as ProcessingChainManager from '@server/modules/analysis/manager/processingChainManager'
+import * as AnalysisManager from '@server/modules/analysis/manager'
 
 export default class ProcessingChainsCyclesCheckJob extends Job {
   constructor(params) {
@@ -16,24 +16,25 @@ export default class ProcessingChainsCyclesCheckJob extends Job {
   async execute() {
     this.total = 4
 
+    const { surveyId, tx } = this
     const { cycleKeys, cycleKeysDeleted = [] } = await this._getCycleKeys()
     // 1. set all survey cycles to all nodeDef analysis
-    await NodeDefManager.updateNodeDefAnalysisCycles(this.surveyId, cycleKeys, this.tx)
+    await NodeDefManager.updateNodeDefAnalysisCycles(surveyId, cycleKeys, tx)
     this.incrementProcessedItems()
 
     // 2. dissoc deleted survey cycles from processing chains
     if (!R.isEmpty(cycleKeysDeleted)) {
-      await ProcessingChainManager.removeCyclesFromChains(this.surveyId, cycleKeysDeleted, this.tx)
+      await AnalysisManager.removeChainCycles({ surveyId, cycles: cycleKeysDeleted }, tx)
     }
 
     this.incrementProcessedItems()
 
     // 3. delete processing chains with no cycles
-    await ProcessingChainManager.deleteChainsWithoutCycles(this.surveyId, this.tx)
+    await AnalysisManager.deleteChainWithoutCycle({ surveyId }, tx)
     this.incrementProcessedItems()
 
     // 4. delete analysis nodeDef if they are not used
-    await NodeDefManager.deleteNodeDefsAnalysisUnused(this.surveyId, this.tx)
+    await NodeDefManager.deleteNodeDefsAnalysisUnused(surveyId, tx)
     this.incrementProcessedItems()
   }
 

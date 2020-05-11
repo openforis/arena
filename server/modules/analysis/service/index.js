@@ -1,26 +1,20 @@
 export {
+  // ======  READ - Chain
+  countChains,
+  fetchChains,
+  fetchChain,
   // ======  READ - Calculations
-  fetchCalculationAttributeUuidsByStepUuid,
-  fetchCalculationAttributeUuidsByChainUuid,
-  fetchCalculationAttributeUuidsByChainUuidExcluded,
+  fetchCalculationAttributeUuids,
   // ======  UPDATE - Chain
-  updateChain,
+  updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
   // ======  DELETE - Step
   deleteStep,
   // ======  DELETE - Calculation
   deleteCalculation,
-} from '../manager/processingChainManager'
-
-// read
-export {
-  // ======  READ - Chain
-  countChains,
-  fetchChains,
-  fetchChain,
-  // ======  UPDATE - Chain
-  updateChainStatusExec,
+  // ==== ALL
+  persistAll,
 } from '../manager'
 
 export { generateScript, fetchStepData, persistResults, persistUserScripts } from './rChain'

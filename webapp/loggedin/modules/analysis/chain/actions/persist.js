@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
@@ -20,64 +20,57 @@ import { chainValidationUpdate } from './validation'
 
 export const chainSave = 'analysis/chain/save'
 
+const _getStateObject = (fn) => R.pipe(fn, ObjectUtils.dissocTemporary, R.when(R.isEmpty, R.always(null)))
+const _getChain = _getStateObject(ChainState.getProcessingChain)
+const _getStep = _getStateObject(StepState.getProcessingStep)
+const _getCalculation = _getStateObject(CalculationState.getCalculation)
+
+const _getChainAndValidation = (params) => async (state) => {
+  const { lang, step, stepValidation, calculation, calculationValidation } = params
+  const chain = _getChain(state)
+  const chainValidation = await ChainValidator.validateChain(chain, lang)
+  return [
+    R.pipe(
+      Chain.assocItemValidation(Chain.getUuid(chain), chainValidation),
+      R.unless(R.always(R.isNil(step)), Chain.assocItemValidation(Step.getUuid(step), stepValidation)),
+      R.unless(
+        R.always(R.isNil(calculation)),
+        Chain.assocItemValidation(Calculation.getUuid(calculation), calculationValidation)
+      )
+    )(chain),
+    chainValidation,
+  ]
+}
+
+const _getStepParam = (step) =>
+  R.unless(
+    R.isNil,
+    R.pipe(
+      Step.getCalculations,
+      R.map(Calculation.getUuid),
+      (calculationUuids) => Step.assocCalculationUuids(calculationUuids)(step),
+      Step.dissocCalculations
+    )
+  )(step)
+
 export const saveChain = () => async (dispatch, getState) => {
   dispatch(showAppSaving())
 
   const state = getState()
-
   const surveyId = SurveyState.getSurveyId(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
+  const lang = SurveyState.getSurveyDefaultLang(state)
 
-  const step = R.pipe(StepState.getProcessingStep, Step.dissocTemporary, R.when(R.isEmpty, R.always(null)))(state)
-
+  const step = _getStep(state)
   const stepValidation = step ? await ChainValidator.validateStep(step) : null
-
-  const calculation = R.pipe(
-    CalculationState.getCalculation,
-    Calculation.dissocTemporary,
-    R.when(R.isEmpty, R.always(null))
-  )(state)
-
-  const calculationValidation = calculation
-    ? await ChainValidator.validateCalculation(calculation, surveyDefaultLang)
-    : null
-
-  let chain = R.pipe(ChainState.getProcessingChain, Chain.dissocTemporary)(state)
-
-  const chainValidation = await ChainValidator.validateChain(chain, surveyDefaultLang)
-
-  // Update chain, step and calculation validation in chain validation
-  chain = R.pipe(
-    Chain.assocItemValidation(Chain.getUuid(chain), chainValidation),
-    R.unless(R.always(R.isNil(step)), Chain.assocItemValidation(Step.getUuid(step), stepValidation)),
-    R.unless(
-      R.always(R.isNil(calculation)),
-      Chain.assocItemValidation(Calculation.getUuid(calculation), calculationValidation)
-    )
-  )(chain)
+  const calculation = _getCalculation(state)
+  const calculationValidation = calculation ? await ChainValidator.validateCalculation(calculation, lang) : null
+  const params = { lang, step, stepValidation, calculation, calculationValidation }
+  const [chain, chainValidation] = await _getChainAndValidation(params)(state)
 
   // Do not save if one of chain, step or calculation is invalid
   if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
-    // POST Params
-    const chainParam = Chain.dissocProcessingSteps(chain)
-
-    // Step, get only calculation uuid for order
-    const stepParam = R.unless(
-      R.isNil,
-      R.pipe(
-        Step.getCalculations,
-        R.pluck(Calculation.keys.uuid),
-        (calculationUuids) => Step.assocCalculationUuids(calculationUuids)(step),
-        Step.dissocCalculations
-      )
-    )(step)
-
-    await axios.put(`/api/survey/${surveyId}/processing-chain/`, {
-      chain: chainParam,
-      step: stepParam,
-      calculation,
-    })
+    const data = { chain: Chain.dissocProcessingSteps(chain), step: _getStepParam(step), calculation }
+    await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
 
     dispatch(showNotification('common.saved'))
     dispatch({ type: chainSave, chain, step, calculation })

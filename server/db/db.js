@@ -36,6 +36,10 @@ const initOptions = {
 
 const pgp = pgPromise(initOptions)
 
+// Timestamp will automatically be converted to UTC time-zone - No need to convert in select queries anymore
+// 1114 is OID for timestamp in Postgres
+pgp.pg.types.setTypeParser(1114, (str) => new Date(`${str} GMT`))
+
 const configCommon = {
   // How long a client is allowed to remain idle before being closed
   idleTimeoutMillis: 30000,

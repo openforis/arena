@@ -1,5 +1,4 @@
-import { db } from '../../../../db/db'
-import { dbTransformCallback } from '../../../survey/repository/surveySchemaRepositoryUtils'
+import * as DB from '../../../../db'
 
 import { TableChain } from '../../../../../common/model/db'
 import * as Chain from '../../../../../common/analysis/processingChain'
@@ -14,7 +13,7 @@ import * as Chain from '../../../../../common/analysis/processingChain'
  *
  * @returns {Promise<number>} - The result promise.
  */
-export const countChains = async (params, client = db) => {
+export const countChains = async (params, client = DB.client) => {
   const { surveyId, cycle = null } = params
   const tableChain = new TableChain(surveyId)
   return client.one(`${tableChain.getSelect({ surveyId, cycle, count: true })}`)
@@ -34,7 +33,7 @@ export const countChains = async (params, client = db) => {
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchChains = async (params, client = db) => {
+export const fetchChains = async (params, client = DB.client) => {
   const {
     surveyId,
     cycle = null,
@@ -52,7 +51,7 @@ export const fetchChains = async (params, client = db) => {
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [],
-    dbTransformCallback
+    DB.transformCallback
   )
 }
 
@@ -68,7 +67,7 @@ export const fetchChains = async (params, client = db) => {
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
-export const fetchChain = async (params, client = db) => {
+export const fetchChain = async (params, client = DB.client) => {
   const { surveyId, chainUuid, includeScript = false, includeStepsAndCalculations = false } = params
 
   const tableChain = new TableChain(surveyId)
@@ -76,6 +75,6 @@ export const fetchChain = async (params, client = db) => {
   return client.oneOrNone(
     tableChain.getSelect({ surveyId, chainUuid, includeScript, includeStepsAndCalculations }),
     [],
-    dbTransformCallback
+    DB.transformCallback
   )
 }
