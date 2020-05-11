@@ -51,13 +51,13 @@ const _getQueryData = async (survey, nodeDefUuidTable, nodeDefUuidCols = []) => 
 }
 
 /**
- * Runs a select query on a data view associated to an entity node definition.
+ * Executes a select query on an entity definition data view.
  *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!NodeDef} [params.nodeDef] - The node def associated to the view to select.
- * @param {Array} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
+ * @param {Array.<NodeDef>} [params.nodeDefCols=[]] - The node defs associated to the selected columns.
  * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.

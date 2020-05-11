@@ -23,5 +23,6 @@ export {
   useSurveyCycleKey,
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
+  useCategoryByUuid,
 } from './useSurvey'
 export { default as useUser } from './useUser'

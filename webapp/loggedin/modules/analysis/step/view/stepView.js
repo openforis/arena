@@ -1,6 +1,6 @@
 import './stepView.scss'
 import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
@@ -11,12 +11,9 @@ import * as Step from '@common/analysis/processingStep'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
 import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
 import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
-
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
@@ -35,13 +32,7 @@ const StepView = () => {
   const dispatch = useDispatch()
   const history = useHistory()
   const i18n = useI18n()
-  const chain = useSelector(ChainState.getProcessingChain)
-  const step = useSelector(StepState.getProcessingStep)
-  const stepPrev = useSelector(StepState.getProcessingStepPrev)
-  const stepNext = useSelector(StepState.getProcessingStepNext)
-  const dirty = useSelector(StepState.isDirty)
-  const editingStep = useSelector(StepState.isEditingStep)
-  const editingCalculation = useSelector(CalculationState.isEditingCalculation)
+  const { chain, step, stepDirty, editingStep, stepNext, stepPrev, editingCalculation } = useChainEdit()
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
   const hasCalculationSteps = R.pipe(Step.getCalculationsCount, (cnt) => cnt > 0)(step)
@@ -74,7 +65,7 @@ const StepView = () => {
               type="button"
               className="btn-s btn-close"
               onClick={() => {
-                if (dirty) dispatch(showDialogConfirm('common.cancelConfirm', {}, resetStep()))
+                if (stepDirty) dispatch(showDialogConfirm('common.cancelConfirm', {}, resetStep()))
                 else dispatch(resetStep())
               }}
             >

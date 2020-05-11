@@ -9,10 +9,10 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useI18n, useNodeDefByUuid, useSurvey, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { validateCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
@@ -37,21 +37,14 @@ const getAggregateFns = (i18n) =>
 export default () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
-
-  // Get survey info, calculation and attributes from store
   const survey = useSurvey()
   const surveyInfo = useSurveyInfo()
-  const chain = useSelector(ChainState.getProcessingChain)
-  const step = useSelector(StepState.getProcessingStep)
+  const { chain, step, calculation, calculationDirty, editingCalculation } = useChainEdit()
   const attributeDefUuidsOtherChains = useSelector(ChainState.getAttributeUuidsOtherChains)
   const stepPrevCalculationAttributeUuids = useSelector(StepState.getStepPrevCalculationAttributeUuids)
-  const calculation = useSelector(CalculationState.getCalculation)
-  const editingCalculation = useSelector(CalculationState.isEditingCalculation)
-  const dirty = useSelector(CalculationState.isDirty)
-
-  const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)(survey)
-  const attribute = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
+  const attribute = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
+  const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)(survey)
 
   const attributes = R.pipe(
     Survey.getNodeDefChildren(entity, true),
@@ -83,7 +76,7 @@ export default () => {
     calculation,
     editingCalculation,
     validation,
-    dirty,
+    calculationDirty,
     attributes,
     attribute,
     types: getTypes(i18n),

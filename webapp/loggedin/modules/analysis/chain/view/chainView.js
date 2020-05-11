@@ -4,7 +4,7 @@ import './components/chainListItem.scss'
 import './components/chainForm.scss'
 import React, { useEffect } from 'react'
 import { useParams, useHistory } from 'react-router'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -12,13 +12,12 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useOnUpdate, useI18n, useSurveyInfo, useOnSurveyCycleUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurveyInfo, useOnSurveyCycleUpdate } from '@webapp/commonComponents/hooks'
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import StepView from '@webapp/loggedin/modules/analysis/step/view'
-
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
+import ButtonRStudio from '@webapp/commonComponents/buttonRStudio'
 
 import {
   fetchChain,
@@ -36,11 +35,10 @@ import ButtonBar from './components/buttonBar'
 const ChainView = () => {
   const dispatch = useDispatch()
   const history = useHistory()
-  const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const { chainUuid } = useParams()
-  const chain = useSelector(ChainState.getProcessingChain)
-  const editingStep = useSelector(StepState.isEditingStep)
+
+  const { chain, editingStep, dirty } = useChainEdit()
 
   useEffect(() => {
     if (R.isEmpty(chain)) {
@@ -72,14 +70,8 @@ const ChainView = () => {
 
   return (
     <div className={`chain${editingStep ? ' show-step' : ''}`}>
-      <button
-        type="button"
-        className="btn btn-s"
-        style={{ position: 'absolute', right: '0' }}
-        onClick={() => dispatch(openRChain(history))}
-      >
-        {i18n.t('analysisView.processingChainView.openChain')}
-      </button>
+      <ButtonRStudio onClick={() => dispatch(openRChain(history))} disabled={Survey.isDraft(surveyInfo) || dirty} />
+
       <div className="form">
         <LabelsEditor
           languages={Survey.getLanguages(surveyInfo)}

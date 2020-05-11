@@ -31,7 +31,7 @@ const CalculationView = () => {
     calculation,
     editingCalculation,
     validation,
-    dirty,
+    calculationDirty,
     attributes,
     attribute,
     aggregateFunctionEnabled,
@@ -50,7 +50,7 @@ const CalculationView = () => {
           type="button"
           className="btn-s btn-close"
           onClick={() =>
-            dirty
+            calculationDirty
               ? dispatch(showDialogConfirm('common.cancelConfirm', {}, resetCalculation()))
               : dispatch(resetCalculation())
           }
