@@ -87,14 +87,6 @@ $rowHeaderHeight: 45px;
         color: $orange;
       }
     }
-
-    &.invalid {
-      background-color: rgba($red, 0.1);
-
-      button {
-        background-color: transparent;
-      }
-    }
   }
 
   .table__row,
@@ -114,6 +106,16 @@ $rowHeaderHeight: 45px;
 
     .form-input {
       overflow: hidden;
+    }
+
+    .error-badge {
+      position: relative;
+      background-color: rgba($red, 0.5);
+      padding: 0;
+
+      .form-input.focus-visible {
+        background-color: rgba($red, 0.3);
+      }
     }
   }
 

@@ -6,7 +6,6 @@ import { useI18n } from '@webapp/commonComponents/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import TableColumn from './tableColumn'
@@ -31,10 +30,9 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
 
             const recordUuid = Record.getUuid(record)
             const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?pageNodeUuid=${parentUuid}`
-            const validation = Record.getValidation(record)
 
             return (
-              <div key={String(i)} className={`table__row${Validation.isValid(validation) ? '' : ' invalid'}`}>
+              <div key={String(i)} className="table__row">
                 <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
                   {editMode && (

@@ -34,28 +34,30 @@ const TableColumnEdit = (props) => {
     const recordValidation = Record.getValidation(record)
     const validation = RecordValidation.getNodeValidation(node)(recordValidation)
 
-    return (
-      <div>
-        {!Validation.isValid(validation) && (
-          <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
-        )}
-        <NodeDefTableCellBody
-          surveyInfo={surveyInfo}
-          surveyCycleKey={surveyCycleKey}
-          nodeDef={nodeDef}
-          parentNode={parentNode}
-          nodes={[node]}
-          entry
-          entryDataQuery
-          edit={false}
-          renderType={NodeDefLayout.renderType.tableBody}
-          canEditRecord={canEditRecord}
-          updateNode={(...args) => dispatch(updateNode(...args))}
-          removeNode={(...args) => dispatch(removeNode(...args))}
-          createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
-          windowed={false}
-        />
-      </div>
+    const cellBody = (
+      <NodeDefTableCellBody
+        surveyInfo={surveyInfo}
+        surveyCycleKey={surveyCycleKey}
+        nodeDef={nodeDef}
+        parentNode={parentNode}
+        nodes={[node]}
+        entry
+        entryDataQuery
+        edit={false}
+        renderType={NodeDefLayout.renderType.tableBody}
+        canEditRecord={canEditRecord}
+        updateNode={(...args) => dispatch(updateNode(...args))}
+        removeNode={(...args) => dispatch(removeNode(...args))}
+        createNodePlaceholder={(...args) => dispatch(createNodePlaceholder(...args))}
+        windowed={false}
+      />
+    )
+    return !Validation.isValid(validation) ? (
+      <ErrorBadge validation={validation} showIcon={false} showLabel={false}>
+        {cellBody}
+      </ErrorBadge>
+    ) : (
+      cellBody
     )
   }
   return null
