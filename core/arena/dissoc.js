@@ -7,10 +7,8 @@ import { _curry2 } from './internal/_curry2'
  * @param {!object} obj - The object to clone.
  * @returns {object} - The new object.
  */
-const dissoc = (prop, obj) => {
+export const dissoc = _curry2((prop, obj) => {
   const objUpdated = { ...obj }
   delete objUpdated[prop]
   return objUpdated
-}
-
-export default _curry2(dissoc)
+})

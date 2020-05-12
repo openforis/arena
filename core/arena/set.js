@@ -9,10 +9,8 @@ import { _curry3 } from './internal/_curry3'
  * @param {!object} obj - The object to modify.
  * @returns {object} - The object itself.
  */
-const set = (prop, value, obj) => {
+export const set = _curry3((prop, value, obj) => {
   /* eslint-disable no-param-reassign */
   obj[prop] = value
   return obj
-}
-
-export default _curry3(set)
+})

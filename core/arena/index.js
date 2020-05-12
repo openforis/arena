@@ -1,2 +1,2 @@
-export { default as dissoc } from './dissoc'
-export { default as set } from './set'
+export { dissoc } from './dissoc'
+export { set } from './set'
