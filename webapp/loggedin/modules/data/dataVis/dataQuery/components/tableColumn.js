@@ -38,6 +38,7 @@ const TableColumn = (props) => {
     editMode && isData ? (
       <TableColumnEdit nodeDef={nodeDef} record={row.record} cell={row.cols[NodeDef.getUuid(nodeDef)]} />
     ) : null
+
   return (
     <div className={`table__cell${!isHeader && readOnly ? ' readonly' : ''}`} style={{ width: widthOuter }}>
       {isHeader && (

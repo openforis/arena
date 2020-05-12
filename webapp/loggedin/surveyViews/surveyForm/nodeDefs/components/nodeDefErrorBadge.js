@@ -1,79 +1,51 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 
-import * as R from 'ramda'
+import * as Validation from '@core/validation/validation'
 
 import ErrorBadge from '@webapp/commonComponents/errorBadge'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
-import * as Validation from '@core/validation/validation'
+import useValidation from './useValidation'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as RecordState from '../../../record/recordState'
-
-const NodeDefErrorBadge = props => {
-  const { validation, children } = props
+const NodeDefErrorBadge = (props) => {
+  const { children, edit, node, nodeDef, nodes, parentNode } = props
+  const validation = useValidation({ edit, node, nodeDef, nodes, parentNode })
 
   const valid = Validation.isValid(validation)
 
-  return valid && children ? (
-    children
-  ) : !valid ? (
-    <ErrorBadge
-      validation={validation}
-      showLabel={false}
-      showKeys={false}
-      className="error-badge-inverse survey-form__node-def-error-badge"
-    >
-      {children}
-    </ErrorBadge>
-  ) : null
+  if (valid && children) {
+    return children
+  }
+  if (!valid) {
+    return (
+      <ErrorBadge
+        validation={validation}
+        showLabel={false}
+        showKeys={false}
+        className="error-badge-inverse survey-form__node-def-error-badge"
+      >
+        {children}
+      </ErrorBadge>
+    )
+  }
+  return null
+}
+
+NodeDefErrorBadge.propTypes = {
+  children: PropTypes.node,
+  edit: PropTypes.bool,
+  node: PropTypes.object, // Passed when validating a single node of a nodeDef multiple
+  nodeDef: PropTypes.object.isRequired,
+  nodes: PropTypes.array,
+  parentNode: PropTypes.object,
 }
 
 NodeDefErrorBadge.defaultProps = {
-  nodeDef: null,
-  parentNode: null,
-  nodes: null,
-  node: null, // Passed when validating a single node of a nodeDef multiple
+  children: null,
   edit: false,
+  node: null,
+  nodes: null,
+  parentNode: null,
 }
 
-const mapStateToProps = (state, props) => {
-  const { nodeDef, parentNode, nodes, node, edit } = props
-
-  let validation = Validation.newInstance()
-
-  if (edit) {
-    const survey = SurveyState.getSurvey(state)
-    validation = Survey.getNodeDefValidation(nodeDef)(survey)
-  } else {
-    const recordValidation = R.pipe(RecordState.getRecord, Record.getValidation)(state)
-
-    if (NodeDef.isMultiple(nodeDef)) {
-      // Showing validation for a single node instance of multiple nodeDef
-      if (node) {
-        validation = RecordValidation.getNodeValidation(node)(recordValidation)
-      } else if (NodeDef.isEntity(nodeDef)) {
-        // Only entities can have children with min/max count validation
-        validation = RecordValidation.getValidationChildrenCount(
-          Node.getUuid(parentNode),
-          NodeDef.getUuid(nodeDef),
-        )(recordValidation)
-      } else if (!R.all(Validation.isValid)(nodes)) {
-        validation = Validation.newInstance(false, {}, [{ key: Validation.messageKeys.record.oneOrMoreInvalidValues }])
-      }
-    } else if (!R.isEmpty(nodes)) {
-      validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
-    }
-  }
-
-  return {
-    validation,
-  }
-}
-
-export default connect(mapStateToProps)(NodeDefErrorBadge)
+export default NodeDefErrorBadge

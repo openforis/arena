@@ -1,5 +1,6 @@
 import Table from '../table'
 import TableSurvey from '../tableSurvey'
+import tranformCallback from './transformCallback'
 
 const columnSet = {
   uuid: Table.columnSetCommon.uuid,
@@ -25,3 +26,5 @@ export default class TableRecord extends TableSurvey {
 }
 
 TableRecord.columnSet = columnSet
+
+TableRecord.transformCallback = tranformCallback
