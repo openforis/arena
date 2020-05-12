@@ -11,7 +11,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as UserService from '@server/modules/user/service/userService'
 
-export const init = app => {
+export const init = (app) => {
   // ==== CREATE
   app.post('/survey', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
     try {
@@ -20,10 +20,7 @@ export const init = app => {
       const validation = await SurveyService.validateNewSurvey(surveyReq)
 
       if (Validation.isValid(validation)) {
-        const survey = await SurveyService.createSurvey(user, {
-          ...surveyReq,
-          languages: [surveyReq.lang],
-        })
+        const survey = await SurveyService.createSurvey({ user, ...surveyReq, languages: [surveyReq.lang] })
 
         res.json({ survey })
       } else {

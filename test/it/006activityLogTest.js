@@ -18,11 +18,12 @@ import * as RecordUtils from './utils/recordUtils'
 describe('Activity Log Test', () => {
   it('Activity Log on Survey Creation', async () => {
     const surveyParam = {
+      user: getContextUser(),
       name: `do_not_use__test_survey_${uuidv4()}`,
       label: 'DO NOT USE! Test Survey',
       languages: ['en'],
     }
-    const survey = await SurveyManager.createSurvey(getContextUser(), surveyParam)
+    const survey = await SurveyManager.createSurvey(surveyParam)
     const surveyId = Survey.getId(survey)
 
     const surveyCreateLogs = await ActivityLogRepository.fetch(Survey.getSurveyInfo(survey), [

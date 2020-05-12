@@ -6,13 +6,13 @@ import * as Survey from '@core/survey/survey'
 import { setContextSurvey, getContextUser } from '../../testContext'
 
 const testSurvey = {
-  name: 'do_not_use__test_survey_' + uuidv4(),
+  name: `do_not_use__test_survey_${uuidv4()}`,
   label: 'DO NOT USE! Test Survey',
   languages: ['en'],
 }
 
 export const createSurveyTest = async () => {
-  const survey = await SurveyManager.createSurvey(getContextUser(), testSurvey)
+  const survey = await SurveyManager.createSurvey({ user: getContextUser(), ...testSurvey })
 
   setContextSurvey(survey)
 

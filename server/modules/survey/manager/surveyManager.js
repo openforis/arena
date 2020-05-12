@@ -1,3 +1,4 @@
+import pgPromise from 'pg-promise'
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -43,17 +44,29 @@ const validateSurveyInfo = async (surveyInfo) =>
 
 // ====== CREATE
 
-export const insertSurvey = async (user, surveyParam, createRootEntityDef = true, system = false, client = db) => {
+/**
+ * Creates a new survey given the specified parameters.
+ *
+ * @param {!object} params - The survey creation parameters.
+ * @param {!object} params.user - The user creating the survey.
+ * @param {!object} params.surveyInfo - The survey info to insert.
+ * @param {boolean} [params.createRootEntityDef=true] - Whether to create the root entity definition.
+ * @param {boolean} [params.system=true] - Whether the creation comes from a real user or it's a system activity (survey import).
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @returns {Promise<Survey>} - The newly created survey object.
+ */
+export const insertSurvey = async (params, client = db) => {
+  const { user, surveyInfo: surveyInfoParam, createRootEntityDef = true, system = false } = params
   const survey = await client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(surveyParam, t)
+    const surveyInfo = await SurveyRepository.insertSurvey(surveyInfoParam, t)
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
     // Create survey data schema
     await migrateSurveySchema(surveyId)
 
     // Log survey create activity
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, system, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
 
     if (createRootEntityDef) {
       // Insert root entity def
@@ -98,15 +111,24 @@ export const insertSurvey = async (user, surveyParam, createRootEntityDef = true
   return assocSurveyInfo(survey)
 }
 
-export const createSurvey = async (
-  user,
-  { name, label, languages, collectUri = null },
-  createRootEntityDef = true,
-  system = false,
-  client = db
-) => {
-  const surveyParam = Survey.newSurvey(User.getUuid(user), name, label, languages, collectUri)
-  return insertSurvey(user, surveyParam, createRootEntityDef, system, client)
+/**
+ * Creates a new survey given the specified parameters.
+ *
+ * @param {!object} params - The survey creation parameters.
+ * @param {!string} params.name - The survey name.
+ * @param {!string} params.label - The survey label in the default language.
+ * @param {!Array.<string>} params.languages - The survey languages.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @returns {Promise<Survey>} - The newly created survey object.
+ */
+export const createSurvey = async ({ user, name, label, languages }, client = db) => {
+  const surveyInfo = Survey.newSurvey({
+    ownerUuid: User.getUuid(user),
+    name,
+    label,
+    languages,
+  })
+  return insertSurvey({ user, surveyInfo }, client)
 }
 
 // ====== READ
