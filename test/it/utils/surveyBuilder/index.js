@@ -6,6 +6,7 @@ import { db } from '../../../../server/db/db'
 import * as Survey from '../../../../core/survey/survey'
 import * as NodeDef from '../../../../core/survey/nodeDef'
 import * as User from '../../../../core/user/user'
+import * as PromiseUtils from '../../../../core/promiseUtils'
 
 import * as SurveyManager from '../../../../server/modules/survey/manager/surveyManager'
 import * as NodeDefRepository from '../../../../server/modules/nodeDef/repository/nodeDefRepository'
@@ -15,6 +16,19 @@ import * as SurveyUtils from '../surveyUtils'
 import NodeDefEntityBuilder from './nodeDefEntityBuilder'
 import NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
 import { TaxonomyBuilder, TaxonBuilder } from './surveyBuilderTaxonomy'
+
+const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
+  await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
+
+  if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
+    const children = Survey.getNodeDefChildren(nodeDef, true)(survey)
+    // insert virtual node defs after source entity defs
+    children.sort((nodeDefA, nodeDefB) => NodeDef.isVirtual(nodeDefA) - NodeDef.isVirtual(nodeDefB))
+
+    // insert node defs in order to avoid foreign keys violations
+    await PromiseUtils.each(children, _insertNodeDefRecursively(surveyId, survey, t))
+  }
+}
 
 class SurveyBuilder {
   constructor(user, rootDefBuilder) {
@@ -67,8 +81,9 @@ class SurveyBuilder {
       const surveyId = Survey.getId(survey)
 
       // Node defs
-      const { root } = Survey.getHierarchy(R.always, true)(surveyParam)
-      await Survey.traverseHierarchyItem(root, async (nodeDef) => NodeDefRepository.insertNodeDef(surveyId, nodeDef, t))
+      const nodeDefRoot = Survey.getNodeDefRoot(surveyParam)
+
+      await _insertNodeDefRecursively(surveyId, surveyParam, t)(nodeDefRoot)
 
       // Taxonomies
       await Promise.all(
