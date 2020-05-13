@@ -129,7 +129,15 @@ export const getHierarchy = (filterFn = NodeDef.isEntity, includeAnalysis = fals
   const h = (array, nodeDef) => {
     const childDefs = [
       ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
-        ? R.pipe(getNodeDefChildren(nodeDef, includeAnalysis), R.filter(filterFn))(survey)
+        ? R.pipe(
+            getNodeDefChildren(nodeDef, includeAnalysis),
+            R.filter(filterFn),
+            // return virtual entities last (useful when inserting node defs into db)
+            R.when(
+              R.always(includeAnalysis),
+              R.sort((nodeDefA, nodeDefB) => NodeDef.isVirtual(nodeDefA) - NodeDef.isVirtual(nodeDefB))
+            )
+          )(survey)
         : []),
     ]
 

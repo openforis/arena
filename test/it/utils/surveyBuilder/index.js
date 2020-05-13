@@ -27,6 +27,12 @@ class SurveyBuilder {
     this.taxonomyBuilders = []
   }
 
+  taxonomy(name, ...taxonBuilders) {
+    const taxonomyBuilder = new TaxonomyBuilder(name, ...taxonBuilders)
+    this.taxonomyBuilders.push(taxonomyBuilder)
+    return this
+  }
+
   build() {
     const survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
@@ -36,15 +42,7 @@ class SurveyBuilder {
     })
     const nodeDefs = this.rootDefBuilder.build(survey)
 
-    return R.pipe(Survey.assocNodeDefs(nodeDefs), (s) =>
-      Survey.assocDependencyGraph(Survey.buildDependencyGraph(s))(s)
-    )(survey)
-  }
-
-  taxonomy(name, ...taxonBuilders) {
-    const taxonomyBuilder = new TaxonomyBuilder(name, ...taxonBuilders)
-    this.taxonomyBuilders.push(taxonomyBuilder)
-    return this
+    return R.pipe(Survey.assocNodeDefs(nodeDefs), Survey.buildAndAssocDependencyGraph)(survey)
   }
 
   /**

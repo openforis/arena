@@ -12,18 +12,18 @@ export const startPublishJob = (user, surveyId) => {
   return job
 }
 
-// CREATE
-export const createSurvey = SurveyManager.createSurvey
-export const validateNewSurvey = SurveyManager.validateNewSurvey
-
-// READ
-export const fetchUserSurveysInfo = SurveyManager.fetchUserSurveysInfo
-export const countUserSurveys = SurveyManager.countUserSurveys
-export const fetchSurveyById = SurveyManager.fetchSurveyById
-export const fetchSurveyAndNodeDefsBySurveyId = SurveyManager.fetchSurveyAndNodeDefsBySurveyId
-
-// UPDATE
-export const updateSurveyProps = SurveyManager.updateSurveyProps
-
-// DELETE
-export const deleteSurvey = SurveyManager.deleteSurvey
+export const {
+  // CREATE
+  insertSurvey,
+  // READ
+  fetchUserSurveysInfo,
+  countUserSurveys,
+  fetchSurveyById,
+  fetchSurveyAndNodeDefsBySurveyId,
+  // UPDATE
+  updateSurveyProps,
+  // DELETE
+  deleteSurvey,
+  // UTILS
+  validateNewSurvey,
+} = SurveyManager

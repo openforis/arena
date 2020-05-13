@@ -111,26 +111,6 @@ export const insertSurvey = async (params, client = db) => {
   return assocSurveyInfo(survey)
 }
 
-/**
- * Creates a new survey given the specified parameters.
- *
- * @param {!object} params - The survey creation parameters.
- * @param {!string} params.name - The survey name.
- * @param {!string} params.label - The survey label in the default language.
- * @param {!Array.<string>} params.languages - The survey languages.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- * @returns {Promise<Survey>} - The newly created survey object.
- */
-export const createSurvey = async ({ user, name, label, languages }, client = db) => {
-  const surveyInfo = Survey.newSurvey({
-    ownerUuid: User.getUuid(user),
-    name,
-    label,
-    languages,
-  })
-  return insertSurvey({ user, surveyInfo }, client)
-}
-
 // ====== READ
 export const { fetchAllSurveyIds } = SurveyRepository
 
