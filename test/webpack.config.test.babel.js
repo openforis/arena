@@ -1,10 +1,8 @@
-// import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import nodeExternals from 'webpack-node-externals'
 import mainConfig from '../webpack.config.babel'
 
 export default {
-  //entry: ['core-js/stable', 'regenerator-runtime/runtime'],
   target: 'node', // In order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // In order to ignore all modules in node_modules folder
   mode: 'development',
