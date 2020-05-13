@@ -39,11 +39,9 @@ export default class SurveyCreatorJob extends Job {
       name,
       label,
       languages,
-      otherProps: {
-        [Survey.infoKeys.collectUri]: collectUri,
-        [Survey.infoKeys.descriptions]: descriptions,
-        [Survey.infoKeys.labels]: labels,
-      },
+      [Survey.infoKeys.collectUri]: collectUri,
+      [Survey.infoKeys.descriptions]: descriptions,
+      [Survey.infoKeys.labels]: labels,
     })
 
     const survey = await SurveyManager.insertSurvey(
