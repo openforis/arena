@@ -16,19 +16,11 @@ export const initChain = (chain) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
 
   if (chain) {
-    const processingChainUuid = Chain.getUuid(chain)
-
-    // Fetch calculation attribute uuids
-    const [{ data: attributeUuids }, { data: attributeUuidsOtherChains }] = await Promise.all([
-      axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/calculation-attribute-uuids`),
-      axios.get(`/api/survey/${surveyId}/processing-chain/${processingChainUuid}/attribute-uuids-other-chains`),
-    ])
-
-    dispatch({
-      type: chainUpdate,
-      processingChain: Chain.assocCalculationAttributeDefUuids(attributeUuids)(chain),
-      attributeUuidsOtherChains,
-    })
+    // Fetch other chains attribute uuids
+    const { data: attributeUuidsOtherChains } = await axios.get(
+      `/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}/attribute-uuids-other-chains`
+    )
+    dispatch({ type: chainUpdate, chain, attributeUuidsOtherChains })
   }
 
   dispatch(hideAppSaving())

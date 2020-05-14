@@ -1,5 +1,5 @@
 import './stepView.scss'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
@@ -17,7 +17,6 @@ import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
-  fetchStepPrevAttributeUuids,
   resetStep,
   updateStepProps,
   addEntityVirtual,
@@ -38,12 +37,6 @@ const StepView = () => {
   const hasCalculationSteps = R.pipe(Step.getCalculationsCount, (cnt) => cnt > 0)(step)
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
   const entityUuid = Step.getEntityUuid(step)
-
-  useEffect(() => {
-    if (editingStep && !editingCalculation) {
-      dispatch(fetchStepPrevAttributeUuids())
-    }
-  }, [Step.getUuid(step)])
 
   useOnUpdate(() => {
     // Validate step on calculation editor close (calculations may have been added / deleted)

@@ -12,7 +12,6 @@ export const stateKey = 'processingStep'
 const keys = {
   dirty: 'dirty',
   orig: 'orig',
-  stepPrevAttributeUuids: 'stepPrevAttributeUuids',
 }
 
 // ====== READ
@@ -35,8 +34,6 @@ export const getProcessingStepNext = (state) => {
   return Chain.getStepNext(step)(chain)
 }
 
-export const getStepPrevCalculationAttributeUuids = R.pipe(getState, R.propOr([], keys.stepPrevAttributeUuids))
-
 // ====== UPDATE
 
 // Step
@@ -54,8 +51,6 @@ export const saveDirty = (step, calculation) => (state) =>
   )(step)
 
 // Calculations
-
-export const assocStepPrevAttributeUuids = R.assoc(keys.stepPrevAttributeUuids)
 
 export const assocCalculation = (calculation) => _updateStepDirty(Step.assocCalculation(calculation))
 
