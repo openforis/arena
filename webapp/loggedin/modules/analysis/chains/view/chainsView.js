@@ -24,7 +24,7 @@ const ChainsView = () => {
   return (
     <TableView
       className="chains"
-      gridTemplateColumns="repeat(4, 1fr) repeat(2, 80px) 50px"
+      gridTemplateColumns="30px repeat(4, 1fr) repeat(2, 80px) 50px"
       headerLeftComponent={HeaderLeft}
       module={chainsModule}
       onRowClick={(processingChain) => dispatch(navigateToChainView(history, Chain.getUuid(processingChain)))}

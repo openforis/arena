@@ -12,17 +12,15 @@ const ErrorBadge = (props) => {
   const { children, className: classNameProps, labelKey, showIcon, showLabel, showKeys, validation } = props
 
   const i18n = useI18n()
-  const invalid = !Validation.isValid(validation)
+  const valid = Validation.isValid(validation)
 
-  // When there are warnings add 'warning' class to className
   let className = classNameProps
-  if (Validation.isError(validation)) {
-    className += ' error'
-  } else if (Validation.isWarning(validation)) {
-    className += ' warning'
-  }
+  if (Validation.isError(validation)) className += ' error'
+  else if (Validation.isWarning(validation)) className += ' warning'
 
-  return invalid ? (
+  if (valid) return null
+
+  return (
     <ValidationTooltip validation={validation} showKeys={showKeys} className={`badge error-badge ${className}`}>
       <div className="badge__content">
         {children}
@@ -32,7 +30,7 @@ const ErrorBadge = (props) => {
         {showLabel && <span>{i18n.t(labelKey)}</span>}
       </div>
     </ValidationTooltip>
-  ) : null
+  )
 }
 
 ErrorBadge.propTypes = {
