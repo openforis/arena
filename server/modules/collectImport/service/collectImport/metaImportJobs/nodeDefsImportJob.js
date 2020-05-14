@@ -295,9 +295,13 @@ export default class NodeDefsImportJob extends Job {
           : listName
         const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
 
+        const layoutCollect = CollectSurvey.getUiAttribute('layoutType')(collectNodeDef)
+        const renderType =
+          layoutCollect === 'radio' ? NodeDefLayout.renderType.checkbox : NodeDefLayout.renderType.dropdown
+
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
-          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, NodeDefLayout.renderType.dropdown),
+          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, renderType),
         }
       }
 
