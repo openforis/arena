@@ -12,7 +12,6 @@ import { useI18n, useNodeDefByUuid, useSurvey, useSurveyInfo } from '@webapp/com
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { validateCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
@@ -40,26 +39,21 @@ export default () => {
   const survey = useSurvey()
   const surveyInfo = useSurveyInfo()
   const { chain, step, calculation, calculationDirty, editingCalculation } = useChainEdit()
-  const stepPrevCalculationAttributeUuids = useSelector(StepState.getStepPrevCalculationAttributeUuids)
+
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
   const attribute = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
-  const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)(survey)
   const attributeUuidsOtherChains = useSelector(ChainState.getAttributeUuidsOtherChains)
   const attributeUuidsOtherCalculations = Step.getCalculations(step)
     .filter((c) => !Calculation.isEqual(c)(calculation))
     .map(Calculation.getNodeDefUuid)
-  const attributes = R.pipe(
-    Survey.getNodeDefChildren(entity, true),
-    R.concat(attributesPrevStep),
-    R.uniq,
-    R.filter(
-      (nodeDef) =>
-        NodeDef.isAnalysis(nodeDef) && // // Node def must be analysis
-        NodeDef.getType(nodeDef) === Calculation.getNodeDefType(calculation) && // And type is compatible with processing step type (quantitative/categorical)
-        !R.includes(NodeDef.getUuid(nodeDef), attributeUuidsOtherChains) && // And must not be used by other chains
-        !R.includes(NodeDef.getUuid(nodeDef), attributeUuidsOtherCalculations) // And must not be used by other calculations
-    )
-  )(survey)
+  const children = Survey.getNodeDefChildren(entity, true)(survey)
+  const attributes = children.filter(
+    (nodeDef) =>
+      NodeDef.isAnalysis(nodeDef) && // // Node def must be analysis
+      NodeDef.getType(nodeDef) === Calculation.getNodeDefType(calculation) && // And type is compatible with processing step type (quantitative/categorical)
+      !R.includes(NodeDef.getUuid(nodeDef), attributeUuidsOtherChains) && // And must not be used by other chains
+      !R.includes(NodeDef.getUuid(nodeDef), attributeUuidsOtherCalculations) // And must not be used by other calculations
+  )
 
   const calculationUuid = Calculation.getUuid(calculation)
   const validation = Chain.getItemValidationByUuid(calculationUuid)(chain)

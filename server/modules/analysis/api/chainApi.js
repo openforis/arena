@@ -91,25 +91,6 @@ export const init = (app) => {
     }
   )
 
-  // ====== READ - Step
-
-  app.get(
-    '/survey/:surveyId/processing-step/:stepUuid/calculation-attribute-uuids',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, stepUuid } = Request.getParams(req)
-
-        const params = { surveyId, stepUuid }
-        const attributeUuids = await AnalysisService.fetchCalculationAttributeUuids(params)
-
-        res.json(attributeUuids)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
   // ====== UPDATE - Chain
 
   app.put(
