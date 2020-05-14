@@ -40,22 +40,24 @@ export default () => {
   const survey = useSurvey()
   const surveyInfo = useSurveyInfo()
   const { chain, step, calculation, calculationDirty, editingCalculation } = useChainEdit()
-  const attributeDefUuidsOtherChains = useSelector(ChainState.getAttributeUuidsOtherChains)
   const stepPrevCalculationAttributeUuids = useSelector(StepState.getStepPrevCalculationAttributeUuids)
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
   const attribute = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
   const attributesPrevStep = Survey.getNodeDefsByUuids(stepPrevCalculationAttributeUuids)(survey)
-
+  const attributeUuidsOtherChains = useSelector(ChainState.getAttributeUuidsOtherChains)
+  const attributeUuidsOtherCalculations = Step.getCalculations(step)
+    .filter((c) => !Calculation.isEqual(c)(calculation))
+    .map(Calculation.getNodeDefUuid)
   const attributes = R.pipe(
     Survey.getNodeDefChildren(entity, true),
     R.concat(attributesPrevStep),
     R.uniq,
-    // Node def is analysis and type is compatible with processing step type (quantitative/categorical)
     R.filter(
       (nodeDef) =>
-        NodeDef.isAnalysis(nodeDef) &&
-        NodeDef.getType(nodeDef) === Calculation.getNodeDefType(calculation) &&
-        !R.includes(NodeDef.getUuid(nodeDef), attributeDefUuidsOtherChains)
+        NodeDef.isAnalysis(nodeDef) && // // Node def must be analysis
+        NodeDef.getType(nodeDef) === Calculation.getNodeDefType(calculation) && // And type is compatible with processing step type (quantitative/categorical)
+        !R.includes(NodeDef.getUuid(nodeDef), attributeUuidsOtherChains) && // And must not be used by other chains
+        !R.includes(NodeDef.getUuid(nodeDef), attributeUuidsOtherCalculations) // And must not be used by other calculations
     )
   )(survey)
 
