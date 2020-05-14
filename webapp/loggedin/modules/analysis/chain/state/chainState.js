@@ -45,21 +45,6 @@ export const dissocStepTemporary = _updateChainDirty(ProcessingChain.dissocProce
 
 export const dissocStepLast = _updateChainDirty(ProcessingChain.dissocProcessingStepLast)
 
-export const assocProcessingStepCalculationAttributeUuid = (calculationUuid, attributeDefUuid) =>
-  _updateChainDirty(ProcessingChain.assocCalculationAttributeDefUuid(calculationUuid, attributeDefUuid))
-
-export const dissocProcessingStepCalculationAttributeUuid = (calculationUuid) =>
-  _updateChainDirty(ProcessingChain.dissocCalculationAttributeDefUuid(calculationUuid))
-
-export const resetProcessingStepCalculationAttributeUuid = (calculationUuid) => (state) =>
-  R.pipe(
-    // Get original calculation attribute def uuid
-    R.prop(keys.orig),
-    ProcessingChain.getCalculationAttributeUuidByCalculationUuid(calculationUuid),
-    // Assoc original calculation attribute def uuid to dirty processing chain
-    (attributeDefUuidOrig) => assocProcessingStepCalculationAttributeUuid(calculationUuid, attributeDefUuidOrig)(state)
-  )(state)
-
 export const saveDirty = (chain, step) => (state) =>
   R.pipe(R.when(R.always(Boolean(step)), ProcessingChain.assocProcessingStep(step)), (chainUpdate) =>
     _assocChain(chainUpdate)(state)
