@@ -178,5 +178,5 @@ export const toggleNodeDefsSelector = () => (dispatch, getState) =>
 
 export const nodesUpdateCompleted = () => (dispatch) => dispatch(hideAppSaving())
 
-export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => (dispatch) =>
-  dispatch({ type: dataQueryTableDataValidationUpdate, recordUuid, recordValid, validations })
+export const nodeValidationsUpdate = ({ recordUuid, validations }) => (dispatch) =>
+  dispatch({ type: dataQueryTableDataValidationUpdate, recordUuid, validations })

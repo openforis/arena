@@ -60,8 +60,8 @@ const actionHandlers = {
 
   [dataQueryTableSortUpdate]: (state, { sort }) => DataQueryState.assocTableSort(sort)(state),
 
-  [dataQueryTableDataValidationUpdate]: (state, { recordUuid, recordValid }) =>
-    DataQueryState.assocTableDataRecordNodeValidations(recordUuid, recordValid)(state),
+  [dataQueryTableDataValidationUpdate]: (state, { recordUuid, validations }) =>
+    DataQueryState.assocTableDataRecordNodeValidations(recordUuid, validations)(state),
 
   // Data vis
   [dataVisReset]: () => ({}),

@@ -5,9 +5,12 @@ import PropTypes from 'prop-types'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as RecordValidation from '@core/record/recordValidation'
+import * as Validation from '@core/validation/validation'
 
 import { useAuthCanEditRecord, useSurveyCycleKey, useSurveyInfo } from '@webapp/commonComponents/hooks'
 
+import ErrorBadge from '@webapp/commonComponents/errorBadge'
 import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
 import { createNodePlaceholder, removeNode, updateNode } from '@webapp/loggedin/surveyViews/record/actions'
@@ -28,7 +31,10 @@ const TableColumnEdit = (props) => {
       [Node.keys.parentUuid]: parentUuid,
     }
 
-    return (
+    const recordValidation = Record.getValidation(record)
+    const validation = RecordValidation.getNodeValidation(node)(recordValidation)
+
+    const cellBody = (
       <NodeDefTableCellBody
         surveyInfo={surveyInfo}
         surveyCycleKey={surveyCycleKey}
@@ -46,8 +52,14 @@ const TableColumnEdit = (props) => {
         windowed={false}
       />
     )
+    return !Validation.isValid(validation) ? (
+      <ErrorBadge validation={validation} showIcon={false} showLabel={false}>
+        {cellBody}
+      </ErrorBadge>
+    ) : (
+      cellBody
+    )
   }
-
   return null
 }
 

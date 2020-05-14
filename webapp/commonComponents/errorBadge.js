@@ -1,6 +1,7 @@
 import './errorBadge.scss'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 import { useI18n } from './hooks'
@@ -8,7 +9,7 @@ import { useI18n } from './hooks'
 import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = (props) => {
-  const { validation, children, className: classNameProps, showLabel, labelKey, showKeys } = props
+  const { children, className: classNameProps, labelKey, showIcon, showLabel, showKeys, validation } = props
 
   const i18n = useI18n()
   const invalid = !Validation.isValid(validation)
@@ -26,7 +27,7 @@ const ErrorBadge = (props) => {
       <div className="badge__content">
         {children}
 
-        <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`} />
+        {showIcon && <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`} />}
 
         {showLabel && <span>{i18n.t(labelKey)}</span>}
       </div>
@@ -34,12 +35,24 @@ const ErrorBadge = (props) => {
   ) : null
 }
 
+ErrorBadge.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  labelKey: PropTypes.string,
+  showIcon: PropTypes.bool,
+  showKeys: PropTypes.bool,
+  showLabel: PropTypes.bool,
+  validation: PropTypes.object,
+}
+
 ErrorBadge.defaultProps = {
-  validation: null,
-  showLabel: true,
-  labelKey: 'common.invalid',
-  showKeys: false,
+  children: null,
   className: '',
+  labelKey: 'common.invalid',
+  showIcon: false,
+  showKeys: false,
+  showLabel: true,
+  validation: null,
 }
 
 export default ErrorBadge

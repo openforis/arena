@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as A from '@core/arena'
+
 import * as ObjectUtils from '@core/objectUtils'
 import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 
@@ -34,10 +36,42 @@ export const keys = {
 
 export const messageKeys = ValidatorErrorKeys
 
+// ====== CREATE
+
+export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
+  [keys.valid]: valid,
+  [keys.fields]: fields,
+  [keys.errors]: errors,
+  [keys.warnings]: warnings,
+})
+
+// ====== READ
+
+export const isValid = R.propOr(true, keys.valid)
+export const isNotValid = R.propEq(keys.valid, false)
+export const getFieldValidations = R.propOr({}, keys.fields)
+export const getFieldValidation = (field) => R.pathOr(newInstance(), [keys.fields, field])
+
+export const getErrors = R.propOr([], keys.errors)
+export const isError = (validation) =>
+  R.pipe(getErrors, R.isEmpty, R.not)(validation) || R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
+
+export const getWarnings = R.propOr([], keys.warnings)
+export const isWarning = (validation) =>
+  R.pipe(getWarnings, R.isEmpty, R.not)(validation) ||
+  R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
+
+export const getCounts = R.propOr({}, keys.counts)
+export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
+export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
+
 // ====== UTILS
 
 /**
- * Removes valid fields validations and updates 'valid' attribute
+ * Removes valid fields validations and updates 'valid' attribute.
+ *
+ * @param {!object} validation - The validation object to cleanup.
+ * @returns {object} - The updated validation object.
  */
 export const cleanup = (validation) => {
   // Cleanup fields
@@ -47,7 +81,7 @@ export const cleanup = (validation) => {
       const fieldValidationCleaned = cleanup(fieldValidation)
       if (!isValid(fieldValidationCleaned)) {
         allFieldsValid = false
-        fieldsAcc[field] = fieldValidationCleaned
+        A.set(field, fieldValidationCleaned)(fieldsAcc)
       }
 
       return fieldsAcc
@@ -108,35 +142,6 @@ export const updateCounts = (validation) => {
   }
 }
 
-// ====== CREATE
-
-export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
-  [keys.valid]: valid,
-  [keys.fields]: fields,
-  [keys.errors]: errors,
-  [keys.warnings]: warnings,
-})
-
-// ====== READ
-
-export const isValid = R.propOr(true, keys.valid)
-export const isNotValid = R.propEq(keys.valid, false)
-export const getFieldValidations = R.propOr({}, keys.fields)
-export const getFieldValidation = (field) => R.pathOr(newInstance(), [keys.fields, field])
-
-export const getErrors = R.propOr([], keys.errors)
-export const isError = (validation) =>
-  R.pipe(getErrors, R.isEmpty, R.not)(validation) || R.pipe(getFieldValidations, R.values, R.any(isError))(validation)
-
-export const getWarnings = R.propOr([], keys.warnings)
-export const isWarning = (validation) =>
-  R.pipe(getWarnings, R.isEmpty, R.not)(validation) ||
-  R.pipe(getFieldValidations, R.values, R.any(isWarning))(validation)
-
-export const getCounts = R.propOr({}, keys.counts)
-export const getErrorsCount = R.pipe(getCounts, R.propOr(0, keys.errors))
-export const getWarningsCount = R.pipe(getCounts, R.propOr(0, keys.warnings))
-
 // ====== UPDATE
 
 export const setValid = (valid) => ObjectUtils.setInPath([keys.valid], valid)
@@ -148,14 +153,19 @@ export const assocFieldValidation = (field, fieldValidation) =>
 
 export const dissocFieldValidation = (field) => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
 /**
- * Iterates over all the field validations and remove the ones starting with the specified value
+ * Iterates over all the field validations and remove the ones starting with the specified value.
+ *
+ * @param {!string} fieldStartsWith - The start with value.
+ * @returns {object} The updated validation object.
  */
 export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validation) =>
   R.pipe(
     R.prop(keys.fields),
     Object.entries,
     R.reduce((accFields, [field, fieldValidation]) => {
-      if (!field.startsWith(fieldStartsWith)) accFields[field] = fieldValidation
+      if (!field.startsWith(fieldStartsWith)) {
+        A.set(field, fieldValidation)(accFields)
+      }
       return accFields
     }, {}),
     (fieldsValidations) => R.assoc(keys.fields, fieldsValidations)(validation),
@@ -176,4 +186,4 @@ export const getValidation = R.propOr(newInstance(), keys.validation)
 export const hasValidation = R.has(keys.validation)
 export const isObjValid = R.pipe(getValidation, isValid)
 export const assocValidation = R.assoc(keys.validation)
-export const dissocValidation = R.dissoc(keys.validation)
+export const dissocValidation = A.dissoc(keys.validation)
