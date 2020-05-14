@@ -1,14 +1,13 @@
-import * as AuthGroup from '@core/auth/authGroup'
-import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
+import * as AuthGroup from '../core/auth/authGroup'
+import * as Survey from '../core/survey/survey'
+import * as User from '../core/user/user'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as UserManager from '@server/modules/user/manager/userManager'
+import { db } from '../server/db/db'
+import * as SurveyManager from '../server/modules/survey/manager/surveyManager'
+import * as UserManager from '../server/modules/user/manager/userManager'
 
 let user = null
 let survey = null
-
-import { db } from '@server/db/db'
 
 const createAdminUser = async () => {
   await db.multi(`
@@ -40,7 +39,7 @@ export const destroyTestContext = async () => {
   }
 }
 
-export const setContextSurvey = s => {
+export const setContextSurvey = (s) => {
   survey = s
   user = User.assocPrefSurveyCurrent(Survey.getId(survey))(user)
 }

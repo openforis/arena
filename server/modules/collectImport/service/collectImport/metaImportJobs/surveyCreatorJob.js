@@ -1,13 +1,15 @@
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
+import * as Survey from '../../../../../../core/survey/survey'
+import * as User from '../../../../../../core/user/user'
 
-import Job from '@server/job/job'
+import * as ActivityLog from '../../../../../../common/activityLog/activityLog'
 
-import * as ActivityLog from '@common/activityLog/activityLog'
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import Job from '../../../../../job/job'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
+
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
 
 import * as CollectSurvey from '../model/collectSurvey'
 
@@ -17,7 +19,6 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { tx } = this
     const { collectSurvey } = this.context
 
     const collectUri = CollectSurvey.getChildElementText('uri')(collectSurvey)
@@ -28,19 +29,24 @@ export default class SurveyCreatorJob extends Job {
 
     const defaultLanguage = languages[0]
 
-    const label = R.pipe(CollectSurvey.toLabels('project', defaultLanguage), R.prop(defaultLanguage))(collectSurvey)
+    const labels = CollectSurvey.toLabels('project', defaultLanguage)(collectSurvey)
+    const label = R.prop(defaultLanguage, labels)
 
-    const survey = await SurveyManager.createSurvey(
-      this.user,
-      {
-        name,
-        label,
-        languages,
-        collectUri,
-      },
-      false,
-      true,
-      tx,
+    const descriptions = CollectSurvey.toLabels('description', defaultLanguage)(collectSurvey)
+
+    const surveyInfo = Survey.newSurvey({
+      ownerUuid: User.getUuid(this.user),
+      name,
+      label,
+      languages,
+      [Survey.infoKeys.collectUri]: collectUri,
+      [Survey.infoKeys.descriptions]: descriptions,
+      [Survey.infoKeys.labels]: labels,
+    })
+
+    const survey = await SurveyManager.insertSurvey(
+      { user: this.user, surveyInfo, createRootEntityDef: false, system: true },
+      this.tx
     )
 
     const surveyId = Survey.getId(survey)

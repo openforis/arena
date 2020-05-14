@@ -1,17 +1,18 @@
 import * as R from 'ramda'
 
-import * as Response from '@server/utils/response'
-import * as Request from '@server/utils/request'
-import * as JobUtils from '@server/job/jobUtils'
+import * as Response from '../../../utils/response'
+import * as Request from '../../../utils/request'
+import * as JobUtils from '../../../job/jobUtils'
 
-import * as Validation from '@core/validation/validation'
-import * as User from '@core/user/user'
+import * as Survey from '../../../../core/survey/survey'
+import * as Validation from '../../../../core/validation/validation'
+import * as User from '../../../../core/user/user'
 
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
-import * as UserService from '@server/modules/user/service/userService'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as SurveyService from '../service/surveyService'
+import * as UserService from '../../user/service/userService'
 
-export const init = app => {
+export const init = (app) => {
   // ==== CREATE
   app.post('/survey', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
     try {
@@ -20,10 +21,15 @@ export const init = app => {
       const validation = await SurveyService.validateNewSurvey(surveyReq)
 
       if (Validation.isValid(validation)) {
-        const survey = await SurveyService.createSurvey(user, {
-          ...surveyReq,
-          languages: [surveyReq.lang],
+        const { name, label, lang } = surveyReq
+
+        const surveyInfo = Survey.newSurvey({
+          ownerUuid: User.getUuid(user),
+          name,
+          label,
+          languages: [lang],
         })
+        const survey = await SurveyService.insertSurvey({ user, surveyInfo })
 
         res.json({ survey })
       } else {

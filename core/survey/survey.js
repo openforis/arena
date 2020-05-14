@@ -13,17 +13,28 @@ import * as SurveyDefaults from './_survey/surveyDefaults'
 import * as SurveyDependencies from './_survey/surveyDependencies'
 import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
 
-export const newSurvey = (ownerUuid, name, label, languages, collectUri = null) => ({
+/**
+ * Creates a new survey info object with the specified parameters.
+ *
+ * @param {!object} params - The cration parameters.
+ * @param {!string} params.ownerUuid - The owner user UUID.
+ * @param {!string} params.name - The survey name.
+ * @param {!Array.<string>} params.languages - The survey languages.
+ * @param {string} [params.label=null] - The label in the default language.
+ * @param {object} [params.otherProps=null] - Other props to set.
+ * @returns {object} The newly created survey info object.
+ */
+export const newSurvey = ({ ownerUuid, name, label = null, languages, ...rest }) => ({
   [SurveyInfo.keys.uuid]: uuidv4(),
   [SurveyInfo.keys.props]: {
     [SurveyInfo.keys.name]: name,
-    [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.languages]: languages,
+    [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.srs]: [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    ...(collectUri ? { collectUri } : {}),
     [SurveyInfo.keys.cycles]: {
       [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
     },
+    ...rest,
   },
   [SurveyInfo.keys.ownerUuid]: ownerUuid,
 })
