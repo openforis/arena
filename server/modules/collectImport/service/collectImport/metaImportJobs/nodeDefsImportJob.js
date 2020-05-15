@@ -128,18 +128,12 @@ export default class NodeDefsImportJob extends Job {
         CollectSurvey.layoutTypes.table
 
     const nodeDefNameSuffix = field ? `_${field}` : ''
-    const nodeDefLabelSuffix = field ? ` (${field})` : ''
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName + nodeDefNameSuffix),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
-      [NodeDef.propKeys.labels]: CollectSurvey.toLabels(
-        'label',
-        defaultLanguage,
-        ['instance', 'heading'],
-        nodeDefLabelSuffix
-      )(collectNodeDef),
+      [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
       // Layout props (render)
       ...(type === NodeDef.nodeDefType.entity // Calculated
         ? {
@@ -159,6 +153,7 @@ export default class NodeDefsImportJob extends Job {
     // 2. insert node def into db
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
     const nodeDefUuid = NodeDef.getUuid(nodeDefParam)
+
     let nodeDef = (
       await NodeDefManager.insertNodeDef(this.user, surveyId, Survey.cycleOneKey, nodeDefParam, true, this.tx)
     )[nodeDefUuid]
@@ -245,6 +240,19 @@ export default class NodeDefsImportJob extends Job {
     }
 
     return childrenUuids
+  }
+
+  extractLabels(collectNodeDef, type, field, defaultLang) {
+    let suffix = field ? ` (${field})` : ''
+    if (type === NodeDef.nodeDefType.integer || type === NodeDef.nodeDefType.decimal) {
+      // Add unit suffix to every label, if specified
+      const elPrecision = CollectSurvey.getElementByName('precision')(collectNodeDef)
+      if (elPrecision) {
+        const unit = CollectSurvey.getAttribute('unit')(elPrecision)
+        suffix += ` (${unit})`
+      }
+    }
+    return CollectSurvey.toLabels('label', defaultLang, ['instance', 'heading'], suffix)(collectNodeDef)
   }
 
   async extractNodeDefAdvancedProps(nodeDefUuid, type, collectNodeDef) {
