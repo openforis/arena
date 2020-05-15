@@ -362,14 +362,12 @@ export default class NodeDefsImportJob extends Job {
       if (checkExpressionParser) {
         const collectExpr = checkExpressionParser(element)
         const messages = CollectSurvey.toLabels('message', defaultLanguage)(element)
-        const { if: condition } = CollectSurvey.getAttributes(element)
-        await this.addNodeDefImportIssue(
-          nodeDefUuid,
-          CollectImportReportItem.exprTypes.validationRules,
-          collectExpr,
-          condition,
-          messages
-        )
+        const { if: condition, flag } = CollectSurvey.getAttributes(element)
+        const exprType =
+          flag === 'error'
+            ? CollectImportReportItem.exprTypes.validationRuleError
+            : CollectImportReportItem.exprTypes.validationRuleWarning
+        await this.addNodeDefImportIssue(nodeDefUuid, exprType, collectExpr, condition, messages)
       }
     }
   }

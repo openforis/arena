@@ -17,8 +17,20 @@ import { updateCollectImportReportItem } from '../actions'
 const _getNodeDefPath = (survey, nodeDef, lang) => {
   const nodeDefPathParts = []
   Survey.visitAncestorsAndSelf(nodeDef, (def) => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang)))(survey)
-
   return nodeDefPathParts.join(' > ')
+}
+
+const _isValidationRule = (type) =>
+  type === CollectImportReportItem.exprTypes.validationRuleError ||
+  type === CollectImportReportItem.exprTypes.validationRuleWarning
+
+const _getTypeIcon = (type) => {
+  if (_isValidationRule(type)) {
+    const severity = type === CollectImportReportItem.exprTypes.validationRuleError ? 'error' : 'warning'
+    return <span className={`icon icon-12px icon-left icon-warning ${severity}`} />
+  } else {
+    return null
+  }
 }
 
 const TableRow = (props) => {
@@ -35,12 +47,18 @@ const TableRow = (props) => {
   const nodeDefUuid = CollectImportReportItem.getNodeDefUuid(item)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const nodeDefPath = _getNodeDefPath(survey, nodeDef, lang)
+  const type = CollectImportReportItem.getExpressionType(item)
 
   return (
     <div key={idx} className="table__row">
       <div>{idx + 1}</div>
       <div>{nodeDefPath}</div>
-      <div>{i18n.t(`homeView.collectImportReport.exprType.${CollectImportReportItem.getExpressionType(item)}`)}</div>
+      <div>
+        {_getTypeIcon(type)}
+        {_isValidationRule(type)
+          ? i18n.t(`homeView.collectImportReport.exprType.validationRule`)
+          : i18n.t(`homeView.collectImportReport.exprType.${type}`)}
+      </div>
       <div>{CollectImportReportItem.getExpression(item)}</div>
       <div>{CollectImportReportItem.getApplyIf(item)}</div>
       <div>
