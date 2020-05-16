@@ -1,9 +1,8 @@
-import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
+import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as SurveyState from '@webapp/survey/surveyState'
@@ -26,26 +25,19 @@ export const updateChainCycles = (cycles) => (dispatch, getState) => {
   const state = getState()
 
   const survey = SurveyState.getSurvey(state)
-  const processingChain = ChainState.getProcessingChain(state)
+  const chain = ChainState.getProcessingChain(state)
+
+  const nodeDefsBelongToCycles = (nodeDefUuids) =>
+    Survey.getNodeDefsByUuids(nodeDefUuids)(survey).every(NodeDef.belongsToAllCycles(cycles))
 
   // Check that all step entity defs belong to the specified cycles
-  const steps = Chain.getProcessingSteps(processingChain)
-  const allStepEntitiesBelongToCycles = R.all(
-    R.pipe(
-      Step.getEntityUuid,
-      (nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-      NodeDef.belongsToAllCycles(cycles)
-    )
-  )(steps)
+  const steps = Chain.getProcessingSteps(chain)
+  const allStepEntitiesBelongToCycles = nodeDefsBelongToCycles(steps.map(Step.getEntityUuid))
 
-  let allStepCalculationAttriutesBelongToCycles = false
-  if (allStepEntitiesBelongToCycles) {
-    // Check that all step calculation attribute defs belong to the specified cycles
-    allStepCalculationAttriutesBelongToCycles = R.pipe(
-      Chain.getCalculationAttributeUuids,
-      R.all(R.pipe((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey), NodeDef.belongsToAllCycles(cycles)))
-    )(processingChain)
-  }
+  // Check that all step calculation attribute defs belong to the specified cycles
+  const allStepCalculationAttriutesBelongToCycles = nodeDefsBelongToCycles(
+    steps.flatMap((step) => Step.getCalculations(step).map(Calculation.getNodeDefUuid))
+  )
 
   if (allStepEntitiesBelongToCycles && allStepCalculationAttriutesBelongToCycles) {
     dispatch(_onChainPropUpdate(Chain.keysProps.cycles, cycles))

@@ -32,7 +32,8 @@
       align-items: center;
     }
     .error-badge {
-      left: 0;
+      pointer-events: none;
+      position: relative;
     }
   }
 }

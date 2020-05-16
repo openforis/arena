@@ -15,7 +15,6 @@ import {
   stepUpdate,
   stepPropsUpdate,
   stepDelete,
-  stepPrevAttributeUuidsUpdate,
   calculationCreate,
   calculationIndexUpdate,
 } from '@webapp/loggedin/modules/analysis/step/actions'
@@ -47,9 +46,6 @@ const actionHandlers = {
   [stepPropsUpdate]: (state, { props }) => StepState.updateProps(props)(state),
 
   [stepDelete]: () => ({}),
-
-  [stepPrevAttributeUuidsUpdate]: (state, { stepPrevAttributeUuids }) =>
-    StepState.assocStepPrevAttributeUuids(stepPrevAttributeUuids)(state),
 
   // Calculations
   [calculationCreate]: (state, { calculation }) => StepState.assocCalculation(calculation)(state),
