@@ -151,11 +151,12 @@ export const init = (app) => {
       try {
         const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
-        const survey = await SurveyService.fetchSurveyById(surveyId, draft)
+        const [survey, taxonomy] = await Promise.all([
+          SurveyService.fetchSurveyById(surveyId, draft),
+          TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft),
+        ])
         const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
-        const taxonomy = await TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
-        const timestamp = DateUtils.format(Date.now(), 'yyyy-MM-dd_HH-mm-ss')
-        const fileName = `${surveyName}_taxonomy_${Taxonomy.getName(taxonomy)}_${timestamp}.csv`
+        const fileName = `${surveyName}_taxonomy_${Taxonomy.getName(taxonomy)}_${DateUtils.nowFormatDefault()}.csv`
         Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
         await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
