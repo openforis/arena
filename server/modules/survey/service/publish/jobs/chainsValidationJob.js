@@ -1,11 +1,10 @@
-import Job from '@server/job/job'
-
 import * as Chain from '../../../../../../common/analysis/processingChain'
 import * as ChainValidator from '../../../../../../common/analysis/processingChainValidator'
 
 import * as Survey from '../../../../../../core/survey/survey'
 import * as Validation from '../../../../../../core/validation/validation'
 
+import Job from '../../../../../job/job'
 import * as AnalysisManager from '../../../../analysis/manager'
 import * as SurveyManager from '../../../manager/surveyManager'
 
@@ -15,14 +14,19 @@ export default class ChainsValidationJob extends Job {
   }
 
   async execute() {
-    const { surveyId } = this
+    const { surveyId, tx } = this
 
-    const chains = await AnalysisManager.fetchChains({
-      surveyId,
-      includeStepsAndCalculations: true,
-    })
+    const [survey, chains] = await Promise.all([
+      SurveyManager.fetchSurveyById(surveyId, true, false, tx),
+      AnalysisManager.fetchChains(
+        {
+          surveyId,
+          includeStepsAndCalculations: true,
+        },
+        tx
+      ),
+    ])
 
-    const survey = await SurveyManager.fetchSurveyById(surveyId, true)
     const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
     const validations = await Promise.all(chains.map((chain) => ChainValidator.validateChain(chain, defaultLang)))
