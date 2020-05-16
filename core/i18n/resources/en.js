@@ -206,7 +206,7 @@ Do you want to cancel them?`,
         applicable: '$t(nodeDefEdit.advancedProps.applicableIf)',
         codeParent: 'Parent code',
         defaultValue: 'Default value',
-        validationRules: 'Validation rules',
+        validationRule: 'Validation rule',
       },
     },
     recordsSummary: {

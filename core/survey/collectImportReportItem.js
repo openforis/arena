@@ -20,7 +20,8 @@ export const exprTypes = {
   applicable: 'applicable',
   codeParent: 'codeParent',
   defaultValue: 'defaultValue',
-  validationRules: 'validationRules',
+  validationRuleError: 'validationRuleError',
+  validationRuleWarning: 'validationRuleWarning',
 }
 
 export const newReportItem = (expressionType, expression, applyIf, messages) => ({
