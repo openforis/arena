@@ -1,10 +1,14 @@
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
+import * as Request from '../../../utils/request'
+import * as Response from '../../../utils/response'
 
-import * as ObjectUtils from '@core/objectUtils'
-import * as Taxon from '@core/survey/taxon'
+import * as DateUtils from '../../../../core/dateUtils'
+import * as ObjectUtils from '../../../../core/objectUtils'
+import * as Survey from '../../../../core/survey/survey'
+import * as Taxon from '../../../../core/survey/taxon'
+import * as Taxonomy from '../../../../core/survey/taxonomy'
 
-import { jobToJSON } from '@server/job/jobUtils'
+import { jobToJSON } from '../../../job/jobUtils'
+import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -14,7 +18,7 @@ const sendTaxonomies = async (res, surveyId, draft, validate) => {
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
-export const init = app => {
+export const init = (app) => {
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
@@ -55,7 +59,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -71,7 +75,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -98,7 +102,7 @@ export const init = app => {
               taxonomyUuid,
               filterValue,
               draft,
-              includeUnlUnk,
+              includeUnlUnk
             )
           } else if (filterProp === Taxon.propKeys.code) {
             list = await TaxonomyService.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
@@ -108,7 +112,7 @@ export const init = app => {
               taxonomyUuid,
               filterValue,
               draft,
-              includeUnlUnk,
+              includeUnlUnk
             )
           }
         } else {
@@ -119,7 +123,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -137,7 +141,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.get(
@@ -147,13 +151,18 @@ export const init = app => {
       try {
         const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
-        Response.setContentTypeFile(res, `taxonomy_${taxonomyUuid}.csv`, null, Response.contentTypes.csv)
+        const survey = await SurveyService.fetchSurveyById(surveyId, draft)
+        const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+        const taxonomy = await TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
+        const timestamp = DateUtils.format(Date.now(), 'yyyy-MM-dd_HH-mm-ss')
+        const fileName = `${surveyName}_taxonomy_${Taxonomy.getName(taxonomy)}_${timestamp}.csv`
+        Response.setContentTypeFile(res, fileName, null, Response.contentTypes.csv)
 
         await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   // ====== UPDATE
@@ -172,7 +181,7 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 
   app.post(
@@ -186,7 +195,7 @@ export const init = app => {
       const job = TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
 
       res.json({ job: jobToJSON(job) })
-    },
+    }
   )
 
   // ====== DELETE
@@ -205,6 +214,6 @@ export const init = app => {
       } catch (error) {
         next(error)
       }
-    },
+    }
   )
 }
