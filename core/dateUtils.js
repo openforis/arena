@@ -26,8 +26,8 @@ export {
   subYears,
 } from 'date-fns'
 
-const normalizeDateTimeValue = length => value =>
-  R.pipe(R.ifElse(R.is(String), R.identity, R.toString), val => val.padStart(length, '0'))(value)
+const normalizeDateTimeValue = (length) => (value) =>
+  R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val) => val.padStart(length, '0'))(value)
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
@@ -105,3 +105,5 @@ export const formatDate = (day, month, year) =>
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
+
+export const nowFormatDefault = () => format(Date.now(), 'yyyy-MM-dd_HH-mm-ss')
