@@ -26,38 +26,37 @@ import SamplingPointDataImportJob from './samplingPointDataImportJob'
 const specifyAttributeSuffix = 'specify'
 
 const checkExpressionParserByType = {
-  compare: collectCheck => {
+  compare: (collectCheck) => {
     const attributeToOperator = {
       gt: '>',
       gte: '>=',
       lt: '<',
       lte: '<=',
     }
-    const exprParts = []
-
     const attributes = CollectSurvey.getAttributes(collectCheck)
-    for (const attr of R.keys(attributes)) {
-      const operator = attributeToOperator[attr]
+    const exprParts = Object.entries(attributes).reduce((accParts, [attrName, attribute]) => {
+      const operator = attributeToOperator[attrName]
       if (operator) {
-        exprParts.push(`$this ${operator} ${attributes[attr]}`)
+        accParts.push(`$this ${operator} ${attribute}`)
       }
-    }
+      return accParts
+    }, [])
 
     return R.join(' and ', exprParts)
   },
-  check: collectCheck => {
+  check: (collectCheck) => {
     const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
-  distance: collectCheck => {
+  distance: (collectCheck) => {
     const { max, to } = CollectSurvey.getAttributes(collectCheck)
     return `distance from $this to ${to} must be <= ${max}m`
   },
-  pattern: collectCheck => {
+  pattern: (collectCheck) => {
     const { regex } = CollectSurvey.getAttributes(collectCheck)
     return `$this must respect the pattern: ${regex}`
   },
-  unique: collectCheck => {
+  unique: (collectCheck) => {
     const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
@@ -97,7 +96,7 @@ export default class NodeDefsImportJob extends Job {
       true,
       false,
       false,
-      this.tx,
+      this.tx
     )
 
     this.setContext({
@@ -129,25 +128,19 @@ export default class NodeDefsImportJob extends Job {
         CollectSurvey.layoutTypes.table
 
     const nodeDefNameSuffix = field ? `_${field}` : ''
-    const nodeDefLabelSuffix = field ? ` (${field})` : ''
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName + nodeDefNameSuffix),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
-      [NodeDef.propKeys.labels]: CollectSurvey.toLabels(
-        'label',
-        defaultLanguage,
-        ['instance', 'heading'],
-        nodeDefLabelSuffix,
-      )(collectNodeDef),
+      [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
       // Layout props (render)
       ...(type === NodeDef.nodeDefType.entity // Calculated
         ? {
             [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
               Survey.cycleOneKey,
               tableLayout ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form,
-              determineNodeDefPageUuid(type, collectNodeDef),
+              determineNodeDefPageUuid(type, collectNodeDef)
             ),
           }
         : {
@@ -160,6 +153,7 @@ export default class NodeDefsImportJob extends Job {
     // 2. insert node def into db
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
     const nodeDefUuid = NodeDef.getUuid(nodeDefParam)
+
     let nodeDef = (
       await NodeDefManager.insertNodeDef(this.user, surveyId, Survey.cycleOneKey, nodeDefParam, true, this.tx)
     )[nodeDefUuid]
@@ -178,7 +172,7 @@ export default class NodeDefsImportJob extends Job {
         // Update layout prop
         propsUpdated[NodeDefLayout.keys.layout] = R.pipe(
           NodeDefLayout.getLayout,
-          R.assocPath([Survey.cycleOneKey, NodeDefLayout.keys.layoutChildren], childrenUuids),
+          R.assocPath([Survey.cycleOneKey, NodeDefLayout.keys.layoutChildren], childrenUuids)
         )(nodeDef)
       }
     } else if (type === NodeDef.nodeDefType.code) {
@@ -204,7 +198,7 @@ export default class NodeDefsImportJob extends Job {
         propsUpdated,
         propsAdvanced,
         true,
-        this.tx,
+        this.tx
       )
     )[nodeDefUuid]
 
@@ -246,6 +240,19 @@ export default class NodeDefsImportJob extends Job {
     }
 
     return childrenUuids
+  }
+
+  extractLabels(collectNodeDef, type, field, defaultLang) {
+    let suffix = field ? ` (${field})` : ''
+    if (type === NodeDef.nodeDefType.integer || type === NodeDef.nodeDefType.decimal) {
+      // Add unit suffix to every label, if specified
+      const elPrecision = CollectSurvey.getElementByName('precision')(collectNodeDef)
+      if (elPrecision) {
+        const unit = CollectSurvey.getAttribute('unit')(elPrecision)
+        suffix += ` [${unit}]`
+      }
+    }
+    return CollectSurvey.toLabels('label', defaultLang, ['instance', 'heading'], suffix)(collectNodeDef)
   }
 
   async extractNodeDefAdvancedProps(nodeDefUuid, type, collectNodeDef) {
@@ -296,9 +303,13 @@ export default class NodeDefsImportJob extends Job {
           : listName
         const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
 
+        const layoutCollect = CollectSurvey.getUiAttribute('layoutType')(collectNodeDef)
+        const renderType =
+          layoutCollect === 'radio' ? NodeDefLayout.renderType.checkbox : NodeDefLayout.renderType.dropdown
+
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
-          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, NodeDefLayout.renderType.dropdown),
+          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, renderType),
         }
       }
 
@@ -334,7 +345,7 @@ export default class NodeDefsImportJob extends Job {
           CollectImportReportItem.exprTypes.defaultValue,
           expr,
           applyIf,
-          messages,
+          messages
         )
       } else if (StringUtils.isNotBlank(value)) {
         // Default value is a constant
@@ -359,15 +370,12 @@ export default class NodeDefsImportJob extends Job {
       if (checkExpressionParser) {
         const collectExpr = checkExpressionParser(element)
         const messages = CollectSurvey.toLabels('message', defaultLanguage)(element)
-        const { condition } = CollectSurvey.getAttributes(element)
-
-        await this.addNodeDefImportIssue(
-          nodeDefUuid,
-          CollectImportReportItem.exprTypes.validationRules,
-          collectExpr,
-          condition,
-          messages,
-        )
+        const { if: condition, flag } = CollectSurvey.getAttributes(element)
+        const exprType =
+          flag === 'error'
+            ? CollectImportReportItem.exprTypes.validationRuleError
+            : CollectImportReportItem.exprTypes.validationRuleWarning
+        await this.addNodeDefImportIssue(nodeDefUuid, exprType, collectExpr, condition, messages)
       }
     }
   }
@@ -404,7 +412,7 @@ export default class NodeDefsImportJob extends Job {
       this.surveyId,
       nodeDefUuid,
       CollectImportReportItem.newReportItem(expressionType, expression, applyIf, messages),
-      this.tx,
+      this.tx
     )
 
     this.issuesCount++
@@ -415,7 +423,7 @@ export default class NodeDefsImportJob extends Job {
    */
   async addSpecifyTextAttribute(parentNodeDef, nodeDef) {
     const categories = this.getContextProp('categories', {})
-    const category = R.find(category => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
+    const category = R.find((category) => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
     const categoryName = Category.getName(category)
     const survey = {
       nodeDefs: this.nodeDefs,
@@ -426,7 +434,7 @@ export default class NodeDefsImportJob extends Job {
     const qualifiableItemCodes = R.pathOr(
       [],
       [categoryName, String(levelIndex)],
-      qualifiableItemCodesByCategoryAndLevel,
+      qualifiableItemCodesByCategoryAndLevel
     )
 
     for (const itemCode of qualifiableItemCodes) {
@@ -434,11 +442,11 @@ export default class NodeDefsImportJob extends Job {
       const props = {
         [NodeDef.propKeys.name]: this.getUniqueNodeDefName(
           parentNodeDef,
-          `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`,
+          `${nodeDefName}_${StringUtils.normalizeName(itemCode)}`
         ),
         [NodeDef.propKeys.labels]: R.pipe(
           NodeDef.getLabels,
-          R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`),
+          R.mapObjIndexed((label) => `${label} ${specifyAttributeSuffix}`)
         )(nodeDef),
       }
 
@@ -454,7 +462,7 @@ export default class NodeDefsImportJob extends Job {
           Survey.cycleOneKey,
           qualifierNodeDefParam,
           true,
-          this.tx,
+          this.tx
         )
       )[qualifierNodeDefUuid]
 
@@ -509,7 +517,7 @@ export default class NodeDefsImportJob extends Job {
           await this.addNodeDefImportIssue(
             NodeDef.getUuid(nodeDef),
             CollectImportReportItem.exprTypes.codeParent,
-            collectCodeParentExpr,
+            collectCodeParentExpr
           )
           return null
         }
