@@ -9,7 +9,6 @@ import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import ChainsView from './chains/view'
 import ChainView from './chain/view'
-import RStudioView from './rStudio/rStudioView'
 
 const AnalysisView = () => (
   <SurveyDefsLoader draft={false} validate={false} requirePublish>
@@ -24,10 +23,6 @@ const AnalysisView = () => (
         {
           component: ChainView,
           path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
-        },
-        {
-          component: RStudioView,
-          path: appModuleUri(analysisModules.rStudio),
         },
         {
           component: NodeDefView,
