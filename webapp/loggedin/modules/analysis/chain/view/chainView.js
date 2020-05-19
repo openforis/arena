@@ -70,7 +70,7 @@ const ChainView = () => {
 
   return (
     <div className={`chain${editingStep ? ' show-step' : ''}`}>
-      <ButtonRStudio onClick={() => dispatch(openRChain(history))} disabled={Survey.isDraft(surveyInfo) || dirty} />
+      <ButtonRStudio onClick={() => dispatch(openRChain())} disabled={Survey.isDraft(surveyInfo) || dirty} />
 
       <div className="form">
         <LabelsEditor

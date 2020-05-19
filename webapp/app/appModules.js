@@ -16,9 +16,6 @@ export const guestModules = {
 
 // ==== Logged in modules
 
-const app = 'app'
-export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
-
 // ==== App Root modules
 export const appModules = {
   home: {
@@ -148,10 +145,6 @@ export const analysisModules = {
     key: 'processingChain',
     path: `${appModules.analysis.path}/processingChain`,
   },
-  rStudio: {
-    key: 'rStudio',
-    path: `${appModules.analysis.path}/rStudio`,
-  },
   nodeDef: {
     key: 'nodeDef',
     path: `${appModules.analysis.path}/nodeDef`,
@@ -165,3 +158,6 @@ export const analysisModules = {
     path: `${appModules.analysis.path}/category`,
   },
 }
+
+const app = 'app'
+export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
