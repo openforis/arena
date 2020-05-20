@@ -6,7 +6,7 @@ import TableRows from './tableRows'
 import TableHeader from './tableHeader'
 import { useTableState } from './useTableState'
 
-const defaultColWidth = 80
+const defaultColWidth = 70
 
 const Table = () => {
   const {
@@ -34,7 +34,7 @@ const Table = () => {
 
   const tableRef = useRef(null)
   const { width = defaultColWidth } = elementOffset(tableRef.current)
-  const widthMax = width - defaultColWidth - 35
+  const widthMax = width - defaultColWidth - 20
   const colWidthMin = 150
 
   const colWidth = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
