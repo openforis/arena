@@ -1,3 +1,4 @@
+import './table.scss'
 import React, { useRef } from 'react'
 
 import { elementOffset } from '@webapp/utils/domUtils'
@@ -11,8 +12,6 @@ const defaultColWidth = 70
 const Table = () => {
   const {
     history,
-    surveyId,
-    surveyCycleKey,
     canEdit,
     lang,
     appSaving,
@@ -34,19 +33,16 @@ const Table = () => {
 
   const tableRef = useRef(null)
   const { width = defaultColWidth } = elementOffset(tableRef.current)
-  const widthMax = width - defaultColWidth - 20
+  const widthMax = width - defaultColWidth - 22
   const colWidthMin = 150
-
   const colWidth = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
 
   return (
-    <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={tableRef}>
+    <div className={`data-query-table table${editMode ? ' edit' : ''}`} ref={tableRef}>
       {showTable && (
         <>
           <TableHeader
             appSaving={appSaving}
-            surveyId={surveyId}
-            surveyCycleKey={surveyCycleKey}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCols={nodeDefUuidCols}
             filter={filter}

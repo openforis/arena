@@ -8,7 +8,7 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import { useOnUpdate, useSurvey, useSurveyCycleKey, useAuthCanCleanseRecords } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurvey, useAuthCanCleanseRecords } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
@@ -21,7 +21,6 @@ export const useTableState = () => {
   const dispatch = useDispatch()
 
   const survey = useSurvey()
-  const surveyCycleKey = useSurveyCycleKey()
   const canEdit = useAuthCanCleanseRecords()
   const lang = useSelector(AppState.getLang)
   const appSaving = useSelector(AppState.isSaving)
@@ -53,8 +52,6 @@ export const useTableState = () => {
 
   return {
     history,
-    surveyId: Survey.getId(survey),
-    surveyCycleKey,
     canEdit,
     lang,
     appSaving,
