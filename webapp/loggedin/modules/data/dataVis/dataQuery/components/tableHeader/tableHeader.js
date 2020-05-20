@@ -69,6 +69,14 @@ const TableHeader = (props) => {
               <span className="icon icon-pencil2 icon-14px" />
             </button>
           )}
+          <button
+            type="button"
+            className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
+            onClick={() => {}}
+            aria-disabled={appSaving || editMode}
+          >
+            <span className="icon icon-sigma icon-14px" />
+          </button>
         </div>
       </div>
 
