@@ -2,10 +2,9 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import { nodesUpdate } from '@webapp/loggedin/surveyViews/record/actions'
+import { dataVisReset } from '@webapp/loggedin/modules/data/dataVis/actions'
 
-import { dataVisReset } from '../actions'
-
-import { nodesUpdate } from '../../../../surveyViews/record/actions'
 import {
   dataQueryTableNodeDefUuidUpdate,
   dataQueryTableNodeDefUuidColsUpdate,
@@ -18,7 +17,7 @@ import {
   dataQueryNodeDefSelectorsShowUpdate,
   dataQueryTableDataValidationUpdate,
 } from './actions'
-import * as DataQueryState from './dataQueryState'
+import * as DataQueryState from './state'
 
 const actionHandlers = {
   // Reset state

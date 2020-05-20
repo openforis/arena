@@ -1,4 +1,4 @@
-import * as DataQueryState from '@webapp/loggedin/modules/data/dataVis/dataQuery/dataQueryState'
+import * as DataQueryState from '@webapp/loggedin/modules/data/dataVis/dataQuery/state'
 
 export const dataQueryNodeDefSelectorsShowUpdate = 'dataQuery/nodeDefSelectors/show/update'
 

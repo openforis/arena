@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as DataSort from '@common/surveyRdb/dataSort'
 import * as SurveyState from '@webapp/survey/surveyState'
-import * as DataQueryState from '@webapp/loggedin/modules/data/dataVis/dataQuery/dataQueryState'
+import * as DataQueryState from '@webapp/loggedin/modules/data/dataVis/dataQuery/state'
 
 import { fetchData, initTableData } from './fetch'
 

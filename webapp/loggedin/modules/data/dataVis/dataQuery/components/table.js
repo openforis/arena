@@ -1,5 +1,5 @@
 import './table.scss'
-import React, { useRef } from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
@@ -29,16 +29,20 @@ const Table = () => {
     showTable,
     nodeDefSelectorsVisible,
   } = useTableState()
-
   const tableRef = useRef(null)
-  const { width = defaultColWidth } = elementOffset(tableRef.current)
-  const widthMax = width - defaultColWidth - 22
-  const colWidthMin = 150
-  const colWidth = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
+  const [colWidth, setColWidth] = useState(null)
+
+  useLayoutEffect(() => {
+    const { width } = elementOffset(tableRef.current)
+    const widthMax = width - defaultColWidth - 22
+    const colWidthMin = 150
+    const colWidthUpdate = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
+    setColWidth(colWidthUpdate)
+  }, [nodeDefSelectorsVisible, colsNumber])
 
   return (
     <div className={`data-query-table table${editMode ? ' edit' : ''}`} ref={tableRef}>
-      {showTable && (
+      {showTable && colWidth && (
         <>
           <TableHeader
             appSaving={appSaving}

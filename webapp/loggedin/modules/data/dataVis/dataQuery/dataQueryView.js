@@ -1,32 +1,29 @@
 import './components/dataQueryView.scss'
 
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import NodeDefsSelectorView from '../../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import { useSurvey } from '@webapp/commonComponents/hooks'
+import NodeDefsSelectorView from '@webapp/loggedin/surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Table from './components/table'
 
 import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
 
-import * as DataQueryState from './dataQueryState'
+import * as DataQueryState from './state'
 
-const DataQueryView = props => {
-  const {
-    hierarchy,
-    nodeDefUuidEntity,
-    nodeDefUuidsAttributes,
-    nodeDefSelectorsVisible,
-    initTableData,
-    updateTableNodeDefUuid,
-    updateTableNodeDefUuidCols,
-  } = props
+const DataQueryView = () => {
+  const dispatch = useDispatch()
+  const survey = useSurvey()
+  const nodeDefUuidEntity = useSelector(DataQueryState.getTableNodeDefUuidTable)
+  const nodeDefUuidsAttributes = useSelector(DataQueryState.getTableNodeDefUuidCols)
+  const nodeDefSelectorsVisible = useSelector(DataQueryState.isNodeDefSelectorsVisible)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
 
   useEffect(() => {
-    initTableData()
+    dispatch(initTableData())
   }, [])
 
   return (
@@ -36,8 +33,8 @@ const DataQueryView = props => {
           hierarchy={hierarchy}
           nodeDefUuidEntity={nodeDefUuidEntity}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-          onChangeEntity={updateTableNodeDefUuid}
-          onChangeAttributes={updateTableNodeDefUuidCols}
+          onChangeEntity={(...args) => dispatch(updateTableNodeDefUuid(...args))}
+          onChangeAttributes={(...args) => dispatch(updateTableNodeDefUuidCols(...args))}
           showMultipleAttributes={false}
         />
       )}
@@ -47,26 +44,4 @@ const DataQueryView = props => {
   )
 }
 
-DataQueryView.defaultProps = {
-  nodeDefUuidEntity: '',
-  nodeDefUuidsAttributes: [],
-}
-
-const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
-
-  return {
-    hierarchy,
-    surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-    nodeDefUuidEntity: DataQueryState.getTableNodeDefUuidTable(state),
-    nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state),
-    nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
-  }
-}
-
-export default connect(mapStateToProps, {
-  initTableData,
-  updateTableNodeDefUuid,
-  updateTableNodeDefUuidCols,
-})(DataQueryView)
+export default DataQueryView

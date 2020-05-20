@@ -13,7 +13,7 @@ import * as AppState from '@webapp/app/appState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 import { nodesUpdateCompleted, nodeValidationsUpdate } from '../actions'
 
-import * as DataQueryState from '../dataQueryState'
+import * as DataQueryState from '../state'
 
 export const useTableState = () => {
   const dispatch = useDispatch()
@@ -27,7 +27,7 @@ export const useTableState = () => {
   const editMode = useSelector(DataQueryState.getTableEditMode)
 
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const colNames = nodeDefCols.map((nodeDefCol) => ColumnNodeDef.getColNames(nodeDefCol)).flat()
+  const colNames = nodeDefCols.flatMap((nodeDefCol) => ColumnNodeDef.getColNames(nodeDefCol))
   const colsNumber = editMode
     ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
     : colNames.length

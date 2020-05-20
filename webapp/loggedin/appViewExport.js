@@ -10,7 +10,7 @@ import userInviteViewReducer from '@webapp/loggedin/modules/users/userInvite/red
 
 import * as HomeState from '@webapp/loggedin/modules/home/homeState'
 import * as AnalysisState from '@webapp/loggedin/modules/analysis/analysisState'
-import * as DataState from '@webapp/loggedin/modules/data/dataState'
+import * as DataState from '@webapp/loggedin/modules/data/state'
 import * as SurveyViewsState from '@webapp/loggedin/surveyViews/surveyViewsState'
 import * as TableViewsState from '@webapp/loggedin/tableViews/tableViewsState'
 import * as JobState from '@webapp/loggedin/appJob/appJobState'
