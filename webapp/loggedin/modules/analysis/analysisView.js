@@ -11,7 +11,7 @@ import ChainsView from './chains/view'
 import ChainView from './chain/view'
 
 const AnalysisView = () => (
-  <SurveyDefsLoader draft={false} validate={false} requirePublish>
+  <SurveyDefsLoader draft validate={false} requirePublish>
     <ModuleSwitch
       moduleRoot={appModules.analysis}
       moduleDefault={analysisModules.processingChains}
