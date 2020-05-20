@@ -1,5 +1,4 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import { ColumnNodeDef } from '@common/model/db'
@@ -17,7 +16,6 @@ import { nodesUpdateCompleted, nodeValidationsUpdate } from '../actions'
 import * as DataQueryState from '../dataQueryState'
 
 export const useTableState = () => {
-  const history = useHistory()
   const dispatch = useDispatch()
 
   const survey = useSurvey()
@@ -51,7 +49,6 @@ export const useTableState = () => {
   }, [editMode])
 
   return {
-    history,
     canEdit,
     lang,
     appSaving,

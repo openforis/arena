@@ -3,7 +3,7 @@ import React, { useRef } from 'react'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
-import TableRows from './tableRows'
+import TableContent from './tableContent'
 import TableHeader from './tableHeader'
 import { useTableState } from './useTableState'
 
@@ -11,7 +11,6 @@ const defaultColWidth = 70
 
 const Table = () => {
   const {
-    history,
     canEdit,
     lang,
     appSaving,
@@ -57,7 +56,7 @@ const Table = () => {
           />
 
           {hasData && (
-            <TableRows
+            <TableContent
               lang={lang}
               nodeDefCols={nodeDefCols}
               data={data}
@@ -65,7 +64,6 @@ const Table = () => {
               colWidth={colWidth}
               defaultColWidth={defaultColWidth}
               editMode={editMode}
-              history={history}
             />
           )}
         </>

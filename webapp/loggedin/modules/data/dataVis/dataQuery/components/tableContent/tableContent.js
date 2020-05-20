@@ -10,7 +10,8 @@ import * as Record from '@core/record/record'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import TableColumn from './tableColumn'
 
-const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editMode }) => {
+const TableContent = (props) => {
+  const { nodeDefCols, data, offset, colWidth, defaultColWidth, editMode } = props
   const i18n = useI18n()
   const history = useHistory()
 
@@ -64,7 +65,7 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
   )
 }
 
-TableRows.propTypes = {
+TableContent.propTypes = {
   nodeDefCols: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
   offset: PropTypes.number.isRequired,
@@ -73,4 +74,4 @@ TableRows.propTypes = {
   editMode: PropTypes.bool.isRequired,
 }
 
-export default TableRows
+export default TableContent
