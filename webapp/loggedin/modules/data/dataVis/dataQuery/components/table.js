@@ -75,7 +75,6 @@ const Table = () => {
           defaultColWidth={defaultColWidth}
           editMode={editMode}
           hasData={hasData}
-          hasTableAndCols={hasTableAndCols}
         />
       )}
     </div>
