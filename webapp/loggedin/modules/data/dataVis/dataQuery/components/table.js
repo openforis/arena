@@ -1,18 +1,16 @@
-import React, { useRef } from 'react'
+import './table.scss'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
-import TableRows from './tableRows'
+import TableContent from './tableContent'
 import TableHeader from './tableHeader'
 import { useTableState } from './useTableState'
 
-const defaultColWidth = 80
+const defaultColWidth = 70
 
 const Table = () => {
   const {
-    history,
-    surveyId,
-    surveyCycleKey,
     canEdit,
     lang,
     appSaving,
@@ -20,6 +18,7 @@ const Table = () => {
     nodeDefUuidCols,
     nodeDefCols,
     editMode,
+    aggregateMode,
     colsNumber,
     data,
     hasData,
@@ -31,22 +30,23 @@ const Table = () => {
     showTable,
     nodeDefSelectorsVisible,
   } = useTableState()
-
   const tableRef = useRef(null)
-  const { width = defaultColWidth } = elementOffset(tableRef.current)
-  const widthMax = width - defaultColWidth - 35
-  const colWidthMin = 150
+  const [colWidth, setColWidth] = useState(null)
 
-  const colWidth = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
+  useLayoutEffect(() => {
+    const { width } = elementOffset(tableRef.current)
+    const widthMax = width - defaultColWidth - 22
+    const colWidthMin = 150
+    const colWidthUpdate = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
+    setColWidth(colWidthUpdate)
+  }, [nodeDefSelectorsVisible, colsNumber])
 
   return (
-    <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={tableRef}>
-      {showTable && (
+    <div className={`data-query-table table${editMode ? ' edit' : ''}`} ref={tableRef}>
+      {showTable && colWidth && (
         <>
           <TableHeader
             appSaving={appSaving}
-            surveyId={surveyId}
-            surveyCycleKey={surveyCycleKey}
             nodeDefUuidContext={nodeDefUuidContext}
             nodeDefUuidCols={nodeDefUuidCols}
             filter={filter}
@@ -56,12 +56,13 @@ const Table = () => {
             count={count}
             showPaginator={hasData}
             editMode={editMode}
+            aggregateMode={aggregateMode}
             canEdit={canEdit}
             nodeDefSelectorsVisible={nodeDefSelectorsVisible}
           />
 
           {hasData && (
-            <TableRows
+            <TableContent
               lang={lang}
               nodeDefCols={nodeDefCols}
               data={data}
@@ -69,7 +70,6 @@ const Table = () => {
               colWidth={colWidth}
               defaultColWidth={defaultColWidth}
               editMode={editMode}
-              history={history}
             />
           )}
         </>

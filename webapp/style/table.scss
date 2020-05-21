@@ -1,4 +1,6 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
+
+$tableHeaderHeight: 30px;
 
 .table {
   overflow: hidden;
@@ -6,7 +8,7 @@
 }
 
 .table__header {
-  height: 40px;
+  height: $tableHeaderHeight;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,9 +16,9 @@
 
 .table__content {
   position: relative;
-  padding: 15px;
+  padding: 10px;
   background-color: $white;
-  height: calc(100% - 40px);
+  height: calc(100% - #{$tableHeaderHeight});
   border: $tableRowBorder;
 }
 
@@ -30,8 +32,8 @@
   position: absolute;
   overflow-y: auto;
   height: calc(100% - 50px);
-  right: 15px;
-  left: 15px;
+  right: 10px;
+  left: 10px;
 }
 
 .table__row {
@@ -41,7 +43,7 @@
   border-bottom: $tableRowBorder;
   height: $tableRowHeight;
   position: relative;
-  font-size: .9rem;
+  font-size: 0.9rem;
 
   &:last-child {
     border-bottom: none;
@@ -66,10 +68,10 @@
 
 .table__row.hoverable {
   cursor: pointer;
-  transition: .2s all;
+  transition: 0.2s all;
 
   .icon-action {
-    transition: .2s all;
+    transition: 0.2s all;
   }
 
   &:hover {
@@ -97,7 +99,7 @@
   color: white;
   text-transform: uppercase;
   font-weight: 600;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .table__paginator {
@@ -105,8 +107,8 @@
   display: flex;
 
   button {
-    padding: .3rem;
-    margin: 0 .2rem;
+    padding: 0.3rem;
+    margin: 0 0.2rem;
     border: none;
     background-color: inherit;
 
