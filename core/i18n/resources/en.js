@@ -310,6 +310,7 @@ Do you want to cancel them?`,
     rowNum: 'Row #',
     invalidRecord: 'Invalid record',
     dataVis: {
+      noData: 'This query returned no data',
       dataSort: {
         orderBy: 'Order by:',
         thenBy: 'Then by:',

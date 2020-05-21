@@ -12,7 +12,7 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useOnUpdate, useSurveyInfo, useOnSurveyCycleUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurveyInfo } from '@webapp/commonComponents/hooks'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
@@ -21,7 +21,6 @@ import ButtonRStudio from '@webapp/commonComponents/buttonRStudio'
 
 import {
   fetchChain,
-  navigateToChainsView,
   openRChain,
   resetChain,
   updateChainCycles,
@@ -54,8 +53,6 @@ const ChainView = () => {
       }
     }
   }, [])
-
-  useOnSurveyCycleUpdate(() => dispatch(navigateToChainsView(history)))
 
   useOnUpdate(() => {
     if (!editingStep) {

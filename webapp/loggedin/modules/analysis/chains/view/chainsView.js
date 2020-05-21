@@ -28,7 +28,6 @@ const ChainsView = () => {
       headerLeftComponent={HeaderLeft}
       module={chainsModule}
       onRowClick={(processingChain) => dispatch(navigateToChainView(history, Chain.getUuid(processingChain)))}
-      reloadOnSurveyCycleUpdate
       restParams={{ surveyCycleKey }}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}

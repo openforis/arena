@@ -21,7 +21,9 @@ const TableHeader = (props) => {
     offset,
     count,
     nodeDefSelectorsVisible,
-    showPaginator,
+    data,
+    hasData,
+    hasTableAndCols,
     editMode,
     aggregateMode,
     canEdit,
@@ -40,36 +42,6 @@ const TableHeader = (props) => {
           >
             <span className="icon icon-tab icon-14px" />
           </button>
-        </div>
-
-        <div>
-          <ButtonFilter editMode={editMode} filter={filter} nodeDefUuidContext={nodeDefUuidContext} />
-          <ButtonSort
-            editMode={editMode}
-            nodeDefUuidContext={nodeDefUuidContext}
-            nodeDefUuidCols={nodeDefUuidCols}
-            sort={sort}
-          />
-          <ButtonDownload
-            editMode={editMode}
-            filter={filter}
-            nodeDefUuidContext={nodeDefUuidContext}
-            nodeDefUuidCols={nodeDefUuidCols}
-            sort={sort}
-          />
-        </div>
-
-        <div>
-          {canEdit && (
-            <button
-              type="button"
-              className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
-              onClick={() => dispatch(toggleTableModeEdit())}
-              aria-disabled={appSaving || aggregateMode}
-            >
-              <span className="icon icon-pencil2 icon-14px" />
-            </button>
-          )}
           <button
             type="button"
             className={`btn btn-s btn-edit${aggregateMode ? ' highlight' : ''}`}
@@ -78,10 +50,39 @@ const TableHeader = (props) => {
           >
             <span className="icon icon-sigma icon-14px" />
           </button>
+          {canEdit && hasTableAndCols && (
+            <button
+              type="button"
+              className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
+              onClick={() => dispatch(toggleTableModeEdit())}
+              aria-disabled={appSaving || aggregateMode || !hasData}
+            >
+              <span className="icon icon-pencil2 icon-14px" />
+            </button>
+          )}
         </div>
+
+        {hasTableAndCols && (
+          <div>
+            <ButtonFilter editMode={editMode} filter={filter} nodeDefUuidContext={nodeDefUuidContext} />
+            <ButtonSort
+              nodeDefUuidContext={nodeDefUuidContext}
+              nodeDefUuidCols={nodeDefUuidCols}
+              sort={sort}
+              disabled={editMode || !hasData}
+            />
+            <ButtonDownload
+              filter={filter}
+              nodeDefUuidContext={nodeDefUuidContext}
+              nodeDefUuidCols={nodeDefUuidCols}
+              sort={sort}
+              disabled={editMode || !hasData}
+            />
+          </div>
+        )}
       </div>
 
-      {showPaginator && (
+      {data && hasData && (
         <TablePaginator
           offset={offset}
           limit={limit}
@@ -96,23 +97,28 @@ const TableHeader = (props) => {
 TableHeader.propTypes = {
   appSaving: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
-  nodeDefUuidContext: PropTypes.string.isRequired,
+  nodeDefUuidContext: PropTypes.string,
   nodeDefUuidCols: PropTypes.arrayOf(String).isRequired,
   filter: PropTypes.object,
   sort: PropTypes.arrayOf(Object).isRequired,
   limit: PropTypes.number,
-  offset: PropTypes.number.isRequired,
+  offset: PropTypes.number,
   count: PropTypes.number,
-  showPaginator: PropTypes.bool.isRequired,
+  data: PropTypes.array,
+  hasData: PropTypes.bool.isRequired,
+  hasTableAndCols: PropTypes.bool.isRequired,
   editMode: PropTypes.bool.isRequired,
   aggregateMode: PropTypes.bool.isRequired,
   nodeDefSelectorsVisible: PropTypes.bool.isRequired,
 }
 
 TableHeader.defaultProps = {
+  nodeDefUuidContext: null,
   filter: null,
   limit: null,
+  offset: null,
   count: null,
+  data: null,
 }
 
 export default TableHeader

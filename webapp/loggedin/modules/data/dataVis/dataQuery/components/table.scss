@@ -41,6 +41,10 @@ $rowHeaderHeight: 45px;
     .btn-transparent {
       color: $black;
       font-weight: 400;
+
+      &:hover {
+        color: $orange;
+      }
     }
 
     .table__cell {
@@ -76,6 +80,13 @@ $rowHeaderHeight: 45px;
   .table__inner-cell {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .no-data {
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    font-style: italic;
   }
 }
 

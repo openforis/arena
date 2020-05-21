@@ -27,7 +27,7 @@ const Table = () => {
     filter,
     sort,
     count,
-    showTable,
+    hasTableAndCols,
     nodeDefSelectorsVisible,
   } = useTableState()
   const tableRef = useRef(null)
@@ -41,38 +41,41 @@ const Table = () => {
     setColWidth(colWidthUpdate)
   }, [nodeDefSelectorsVisible, colsNumber])
 
-  return (
-    <div className={`data-query-table table${editMode ? ' edit' : ''}`} ref={tableRef}>
-      {showTable && colWidth && (
-        <>
-          <TableHeader
-            appSaving={appSaving}
-            nodeDefUuidContext={nodeDefUuidContext}
-            nodeDefUuidCols={nodeDefUuidCols}
-            filter={filter}
-            sort={sort}
-            limit={limit}
-            offset={offset}
-            count={count}
-            showPaginator={hasData}
-            editMode={editMode}
-            aggregateMode={aggregateMode}
-            canEdit={canEdit}
-            nodeDefSelectorsVisible={nodeDefSelectorsVisible}
-          />
+  let className = 'data-query-table table'
+  className += editMode ? ' edit' : ''
+  className += data && hasTableAndCols ? '' : ' no-content'
 
-          {hasData && (
-            <TableContent
-              lang={lang}
-              nodeDefCols={nodeDefCols}
-              data={data}
-              offset={offset}
-              colWidth={colWidth}
-              defaultColWidth={defaultColWidth}
-              editMode={editMode}
-            />
-          )}
-        </>
+  return (
+    <div className={className} ref={tableRef}>
+      <TableHeader
+        appSaving={appSaving}
+        nodeDefUuidContext={nodeDefUuidContext}
+        nodeDefUuidCols={nodeDefUuidCols}
+        filter={filter}
+        sort={sort}
+        limit={limit}
+        offset={offset}
+        count={count}
+        data={data}
+        hasData={hasData}
+        hasTableAndCols={hasTableAndCols}
+        editMode={editMode}
+        aggregateMode={aggregateMode}
+        canEdit={canEdit}
+        nodeDefSelectorsVisible={nodeDefSelectorsVisible}
+      />
+
+      {hasTableAndCols && data && colWidth && (
+        <TableContent
+          lang={lang}
+          nodeDefCols={nodeDefCols}
+          data={data}
+          offset={offset}
+          colWidth={colWidth}
+          defaultColWidth={defaultColWidth}
+          editMode={editMode}
+          hasData={hasData}
+        />
       )}
     </div>
   )

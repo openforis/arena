@@ -4,11 +4,11 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
-import { useOnSurveyCycleUpdate, useSurveyId } from '@webapp/commonComponents/hooks'
+import { useSurveyId } from '@webapp/commonComponents/hooks'
 import TableHeader from './components/tableHeader'
 import TableContent from './components/tableContent'
 
-import { initListItems, reloadListItems } from './actions'
+import { initListItems } from './actions'
 
 const TableView = (props) => {
   const {
@@ -20,7 +20,6 @@ const TableView = (props) => {
     moduleApiUri,
     noItemsLabelKey,
     onRowClick,
-    reloadOnSurveyCycleUpdate,
     restParams,
     rowComponent,
     rowHeaderComponent,
@@ -34,12 +33,6 @@ const TableView = (props) => {
   useEffect(() => {
     dispatch(initListItems(module, apiUri, restParams))
   }, [])
-
-  if (reloadOnSurveyCycleUpdate) {
-    useOnSurveyCycleUpdate(() => {
-      dispatch(reloadListItems(module, restParams))
-    })
-  }
 
   return (
     <div className={`table ${className}`}>
@@ -76,7 +69,6 @@ TableView.propTypes = {
   moduleApiUri: PropTypes.string,
   noItemsLabelKey: PropTypes.string,
   onRowClick: PropTypes.func, // Row click handler
-  reloadOnSurveyCycleUpdate: PropTypes.bool,
   restParams: PropTypes.object,
   rowComponent: PropTypes.elementType,
   rowHeaderComponent: PropTypes.elementType,
@@ -90,7 +82,6 @@ TableView.defaultProps = {
   moduleApiUri: null,
   noItemsLabelKey: 'common.noItems',
   onRowClick: null,
-  reloadOnSurveyCycleUpdate: false,
   restParams: {},
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,

@@ -11,7 +11,7 @@ import SortEditor from '@webapp/loggedin/modules/data/dataVis/dataQuery/componen
 import { updateTableSort } from '@webapp/loggedin/modules/data/dataVis/dataQuery/actions'
 
 const ButtonSort = (props) => {
-  const { nodeDefUuidContext, nodeDefUuidCols, sort, editMode } = props
+  const { nodeDefUuidContext, nodeDefUuidCols, sort, disabled } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -33,7 +33,7 @@ const ButtonSort = (props) => {
           type="button"
           className={`btn btn-s btn-edit${sort.length > 0 ? ' highlight' : ''}`}
           onClick={toggleSortEditor}
-          aria-disabled={editMode}
+          aria-disabled={disabled}
         >
           <span className="icon icon-sort-amount-asc icon-14px" />
         </button>
@@ -55,10 +55,10 @@ const ButtonSort = (props) => {
 }
 
 ButtonSort.propTypes = {
-  editMode: PropTypes.bool.isRequired,
   nodeDefUuidContext: PropTypes.string.isRequired,
   nodeDefUuidCols: PropTypes.arrayOf(String).isRequired,
   sort: PropTypes.arrayOf(Object).isRequired,
+  disabled: PropTypes.bool.isRequired,
 }
 
 export default ButtonSort

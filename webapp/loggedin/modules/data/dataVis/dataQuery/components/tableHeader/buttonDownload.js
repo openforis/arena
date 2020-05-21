@@ -7,7 +7,7 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/commonComponents/hooks'
 import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 
 const ButtonDownload = (props) => {
-  const { nodeDefUuidContext, nodeDefUuidCols, filter, sort, editMode } = props
+  const { nodeDefUuidContext, nodeDefUuidCols, filter, sort, disabled } = props
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
@@ -22,7 +22,7 @@ const ButtonDownload = (props) => {
     .join('&')
   const downloadLink = `/api/surveyRdb/${surveyId}/${nodeDefUuidContext}/export?${downloadParamsStr}`
 
-  return <DownloadButton href={downloadLink} showLabel={false} disabled={editMode} />
+  return <DownloadButton href={downloadLink} showLabel={false} disabled={disabled} />
 }
 
 ButtonDownload.propTypes = {
@@ -30,7 +30,7 @@ ButtonDownload.propTypes = {
   nodeDefUuidCols: PropTypes.arrayOf(String).isRequired,
   filter: PropTypes.object,
   sort: PropTypes.arrayOf(Object).isRequired,
-  editMode: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
 }
 
 ButtonDownload.defaultProps = {
