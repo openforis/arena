@@ -38,12 +38,9 @@ $rowHeaderHeight: 45px;
   }
 
   .table__row {
-    .btn-edit {
-      border: none;
-
-      &:hover {
-        color: $orange;
-      }
+    .btn-transparent {
+      color: $black;
+      font-weight: 400;
     }
 
     .table__cell {
