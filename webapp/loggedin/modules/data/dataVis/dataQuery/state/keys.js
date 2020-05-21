@@ -13,8 +13,14 @@ export const tableKeys = {
   nodeDefUuidTable: 'nodeDefUuidTable',
   nodeDefUuidCols: 'nodeDefUuidCols',
   editMode: 'editMode',
+  mode: 'mode',
 }
 
 export const rowKeys = {
   record: 'record',
+}
+
+export const modes = {
+  edit: 'edit',
+  aggregate: 'aggregate',
 }

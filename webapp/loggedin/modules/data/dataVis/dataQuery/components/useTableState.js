@@ -24,7 +24,8 @@ export const useTableState = () => {
   const appSaving = useSelector(AppState.isSaving)
   const nodeDefUuidContext = useSelector(DataQueryState.getTableNodeDefUuidTable)
   const nodeDefUuidCols = useSelector(DataQueryState.getTableNodeDefUuidCols)
-  const editMode = useSelector(DataQueryState.getTableEditMode)
+  const editMode = useSelector(DataQueryState.isTableModeEdit)
+  const aggregateMode = useSelector(DataQueryState.isTableModeAggregate)
 
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = nodeDefCols.flatMap((nodeDefCol) => ColumnNodeDef.getColNames(nodeDefCol))
@@ -56,6 +57,7 @@ export const useTableState = () => {
     nodeDefUuidCols,
     nodeDefCols,
     editMode,
+    aggregateMode,
     colsNumber,
     data,
     hasData: !R.isEmpty(data),

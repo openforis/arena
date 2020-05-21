@@ -39,19 +39,11 @@ const actionHandlers = {
 
   [dataQueryTableInit]: (
     state,
-    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode }
+    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }
   ) =>
-    DataQueryState.initTableData(
-      offset,
-      limit,
-      filter,
-      sort,
-      count,
-      data,
-      nodeDefUuidTable,
-      nodeDefUuidCols,
-      editMode
-    )(state),
+    DataQueryState.initTableData({ offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode })(
+      state
+    ),
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => DataQueryState.assocTableData(offset, data)(state),
 

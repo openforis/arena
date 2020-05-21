@@ -13,7 +13,7 @@ export const fetchData = async (params) => {
     offset = DataQueryState.getTableOffset(state),
     filter = DataQueryState.getTableFilter(state),
     sort = DataQueryState.getTableSort(state),
-    editMode = DataQueryState.getTableEditMode(state),
+    mode = DataQueryState.getTableMode(state),
   } = params
   if (DataQueryState.hasTableAndCols(state)) {
     const dataPost = {
@@ -23,7 +23,7 @@ export const fetchData = async (params) => {
       limit: DataQueryState.defaults.limit,
       filter: filter ? JSON.stringify(filter) : null,
       sort: DataSort.toHttpParams(sort),
-      editMode,
+      editMode: mode === DataQueryState.modes.edit,
     }
     const surveyId = SurveyState.getSurveyId(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
@@ -39,33 +39,22 @@ export const initTableData = (params = {}) => async (dispatch, getState) => {
   const {
     filter = DataQueryState.getTableFilter(state),
     sort = DataQueryState.getTableSort(state),
-    editMode = DataQueryState.getTableEditMode(state),
+    mode = DataQueryState.getTableMode(state),
   } = params
 
   if (DataQueryState.hasTableAndCols(state)) {
     const cycle = SurveyState.getSurveyCycleKey(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
     const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
-
     const { offset, limit } = DataQueryState.defaults
 
     const dataCountParams = { cycle, filter: filter && JSON.stringify(filter) }
     const [{ data: count }, data] = await Promise.all([
       axios.post(`/api/surveyRdb/${surveyId}/${nodeDefUuidTable}/query/count`, dataCountParams),
-      fetchData({ state, editMode, offset, filter, sort }),
+      fetchData({ state, mode, offset, filter, sort }),
     ])
 
-    dispatch({
-      type: dataQueryTableInit,
-      offset,
-      limit,
-      filter,
-      sort,
-      count,
-      data,
-      nodeDefUuidTable,
-      nodeDefUuidCols,
-      editMode,
-    })
+    const payload = { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }
+    dispatch({ type: dataQueryTableInit, ...payload })
   }
 }

@@ -14,7 +14,8 @@ export {
   resetTableFilter,
   updateTableOffset,
   updateTableSort,
-  updateTableEditMode,
+  toggleTableModeEdit,
+  toggleTableModeAggregate,
 } from './update'
 
 export { dataQueryTableDataValidationUpdate, nodesUpdateCompleted, nodeValidationsUpdate } from './updateNode'

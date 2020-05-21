@@ -1,3 +1,5 @@
+export { modes } from './keys'
+
 export { defaults } from './defaults'
 
 export {
@@ -10,7 +12,9 @@ export {
   dissocTableDataCols,
   getTableCount,
   getTableData,
-  getTableEditMode,
+  isTableModeEdit,
+  isTableModeAggregate,
+  getTableMode,
   getTableFilter,
   getTableLimit,
   getTableNodeDefUuidCols,

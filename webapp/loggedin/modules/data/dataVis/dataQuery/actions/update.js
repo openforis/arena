@@ -1,11 +1,10 @@
-import * as R from 'ramda'
-
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as Survey from '@core/survey/survey'
+import { ColumnNodeDef } from '@common/model/db'
 import * as DataSort from '@common/surveyRdb/dataSort'
 import * as SurveyState from '@webapp/survey/surveyState'
 import * as DataQueryState from '@webapp/loggedin/modules/data/dataVis/dataQuery/state'
 
-import { fetchData, initTableData } from './fetch'
+import { fetchData, initTableData, dataQueryTableInit } from './fetch'
 
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
 export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
@@ -24,7 +23,8 @@ export const updateTableNodeDefUuid = (nodeDefUuidTable) => ({
 // ==== Table columns
 const getColNames = (state, nodeDefUuidCols) => {
   const survey = SurveyState.getSurvey(state)
-  return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+  const nodeDefs = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  return nodeDefs.flatMap(ColumnNodeDef.getColNames)
 }
 
 export const updateTableNodeDefUuidCols = (
@@ -42,11 +42,10 @@ export const updateTableNodeDefUuidCols = (
     dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
   }
 
-  const fetch = !R.isEmpty(nodeDefUuidCols) && Boolean(nodeDefUuidCol) && !nodeDefUuidColDeleted
+  const fetch = nodeDefUuidCols.length > 0 && Boolean(nodeDefUuidCol) && !nodeDefUuidColDeleted
 
   if (fetch) {
-    const hasTableAndCols = DataQueryState.hasTableAndCols(state)
-    if (hasTableAndCols) {
+    if (DataQueryState.hasTableAndCols(state)) {
       const data = await fetchData({ state, nodeDefUuidCols: [nodeDefUuidCol] })
       dispatch({ type: dataQueryTableDataColUpdate, data })
     } else {
@@ -54,7 +53,7 @@ export const updateTableNodeDefUuidCols = (
     }
   } else if (nodeDefUuidColDeleted) {
     // Reset data
-    if (R.isEmpty(nodeDefUuidCols)) {
+    if (nodeDefUuidCols.length === 0) {
       dispatch({ type: dataQueryTableDataUpdate, offset: 0, data: [] })
     }
     // Delete cols from data rows
@@ -85,4 +84,17 @@ export const updateTableFilter = (filter) => (dispatch) => dispatch(initTableDat
 export const updateTableSort = (sort) => (dispatch) => dispatch(initTableData({ sort }))
 
 // ==== Table mode
-export const updateTableEditMode = (editMode) => (dispatch) => dispatch(initTableData({ editMode }))
+export const toggleTableModeEdit = () => (dispatch, getState) => {
+  const modeEdit = DataQueryState.isTableModeEdit(getState())
+  dispatch(initTableData({ mode: modeEdit ? null : DataQueryState.modes.edit }))
+}
+
+export const toggleTableModeAggregate = () => (dispatch, getState) => {
+  const state = getState()
+  const modeAggregate = DataQueryState.isTableModeAggregate(state)
+  const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
+  const { data, sort, nodeDefUuidCols, limit, filter, offset, count } = DataQueryState.defaults
+  const mode = modeAggregate ? null : DataQueryState.modes.aggregate
+  const payload = { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }
+  dispatch({ type: dataQueryTableInit, ...payload })
+}

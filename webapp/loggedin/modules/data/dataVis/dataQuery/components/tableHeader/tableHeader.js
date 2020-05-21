@@ -8,7 +8,7 @@ import TablePaginator from '@webapp/loggedin/tableViews/components/tablePaginato
 import ButtonDownload from './buttonDownload'
 import ButtonFilter from './buttonFilter'
 import ButtonSort from './buttonSort'
-import { updateTableOffset, updateTableEditMode, toggleNodeDefsSelector } from '../../actions'
+import { updateTableOffset, toggleTableModeEdit, toggleTableModeAggregate, toggleNodeDefsSelector } from '../../actions'
 
 const TableHeader = (props) => {
   const {
@@ -23,6 +23,7 @@ const TableHeader = (props) => {
     nodeDefSelectorsVisible,
     showPaginator,
     editMode,
+    aggregateMode,
     canEdit,
   } = props
 
@@ -63,16 +64,16 @@ const TableHeader = (props) => {
             <button
               type="button"
               className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
-              onClick={() => dispatch(updateTableEditMode(!editMode))}
-              aria-disabled={appSaving}
+              onClick={() => dispatch(toggleTableModeEdit())}
+              aria-disabled={appSaving || aggregateMode}
             >
               <span className="icon icon-pencil2 icon-14px" />
             </button>
           )}
           <button
             type="button"
-            className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
-            onClick={() => {}}
+            className={`btn btn-s btn-edit${aggregateMode ? ' highlight' : ''}`}
+            onClick={() => dispatch(toggleTableModeAggregate())}
             aria-disabled={appSaving || editMode}
           >
             <span className="icon icon-sigma icon-14px" />
@@ -104,6 +105,7 @@ TableHeader.propTypes = {
   count: PropTypes.number,
   showPaginator: PropTypes.bool.isRequired,
   editMode: PropTypes.bool.isRequired,
+  aggregateMode: PropTypes.bool.isRequired,
   nodeDefSelectorsVisible: PropTypes.bool.isRequired,
 }
 

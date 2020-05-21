@@ -18,6 +18,7 @@ const Table = () => {
     nodeDefUuidCols,
     nodeDefCols,
     editMode,
+    aggregateMode,
     colsNumber,
     data,
     hasData,
@@ -55,6 +56,7 @@ const Table = () => {
             count={count}
             showPaginator={hasData}
             editMode={editMode}
+            aggregateMode={aggregateMode}
             canEdit={canEdit}
             nodeDefSelectorsVisible={nodeDefSelectorsVisible}
           />
