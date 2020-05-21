@@ -1,3 +1,4 @@
+import './attributesSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 
@@ -48,7 +49,7 @@ const AttributesSelector = (props) => {
 
       {showAncestors && nodeDefParent && (
         <>
-          <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
+          <div className="attributes-selector__node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
           <AttributesSelector
             lang={lang}
             nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}

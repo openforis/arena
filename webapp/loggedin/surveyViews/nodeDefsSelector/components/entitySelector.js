@@ -1,14 +1,15 @@
+import './entitySelector.scss'
 import React from 'react'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import * as StringUtils from '@core/stringUtils'
 
 import Dropdown from '@webapp/commonComponents/form/dropdown'
 
-const _generateDropdownItems = (hierarchy, lang) => {
+const getDropdownItems = (hierarchy, lang) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
@@ -24,30 +25,35 @@ const _generateDropdownItems = (hierarchy, lang) => {
   return entities
 }
 
-const EntitySelector = props => {
+const EntitySelector = (props) => {
   const { hierarchy, nodeDefUuidEntity, lang, validation, onChange } = props
 
-  const dropdownItems = _generateDropdownItems(hierarchy, lang)
+  const dropdownItems = getDropdownItems(hierarchy, lang)
   const selection = dropdownItems.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
     <Dropdown
-      className="node-defs-selector__entity-selector"
-      autocompleteDialogClassName="node-defs-selector__entity-selector-dialog"
+      className="entity-selector"
+      autocompleteDialogClassName="entity-selector__dialog"
       items={dropdownItems}
       selection={selection}
       validation={validation}
-      onChange={item => onChange(R.prop('key', item))}
+      onChange={(item) => onChange(R.prop('key', item))}
     />
   )
 }
 
+EntitySelector.propTypes = {
+  hierarchy: PropTypes.object.isRequired, // Survey hierarchy
+  lang: PropTypes.string.isRequired,
+  nodeDefUuidEntity: PropTypes.string, // Selected entity def uuid
+  validation: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+}
+
 EntitySelector.defaultProps = {
-  hierarchy: null, // Survey hierarchy
-  nodeDefUuidEntity: null, // Selected entity def uuid
-  lang: null,
+  nodeDefUuidEntity: null,
   validation: null,
-  onChange: null,
 }
 
 export default EntitySelector
