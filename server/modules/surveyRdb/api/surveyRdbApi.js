@@ -39,7 +39,7 @@ export const init = (app) => {
     }
   )
 
-  app.get('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
+  app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, nodeDefUuidTable } = Request.getParams(req)
       const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])

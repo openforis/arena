@@ -8,21 +8,28 @@ import DownloadButton from '@webapp/commonComponents/form/downloadButton'
 
 const ButtonDownload = (props) => {
   const { nodeDefUuidContext, nodeDefUuidCols, filter, sort, disabled } = props
+
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
 
-  const downloadParams = {
+  const requestParams = {
     filter: JSON.stringify(filter),
     sort: DataSort.toHttpParams(sort),
     nodeDefUuidCols: JSON.stringify(nodeDefUuidCols),
     cycle: surveyCycleKey,
   }
-  const downloadParamsStr = Object.entries(downloadParams)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&')
-  const downloadLink = `/api/surveyRdb/${surveyId}/${nodeDefUuidContext}/export?${downloadParamsStr}`
 
-  return <DownloadButton href={downloadLink} showLabel={false} disabled={disabled} />
+  const href = `/api/surveyRdb/${surveyId}/${nodeDefUuidContext}/export`
+
+  return (
+    <DownloadButton
+      href={href}
+      requestMethod="POST"
+      requestParams={requestParams}
+      showLabel={false}
+      disabled={disabled}
+    />
+  )
 }
 
 ButtonDownload.propTypes = {
