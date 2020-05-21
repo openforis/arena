@@ -1,6 +1,6 @@
 import React from 'react'
-import { useHistory } from 'react-router'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
@@ -10,9 +10,9 @@ import * as Record from '@core/record/record'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import TableColumn from './tableColumn'
 
-const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editMode }) => {
+const TableContent = (props) => {
+  const { nodeDefCols, data, offset, colWidth, defaultColWidth, editMode } = props
   const i18n = useI18n()
-  const history = useHistory()
 
   return (
     <div className="table__content">
@@ -27,23 +27,20 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
         <div className="table__data-rows">
           {data.map((row, i) => {
             const { parentUuid, record } = row
-
+            const rowNo = i + offset + 1
             const recordUuid = Record.getUuid(record)
             const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?pageNodeUuid=${parentUuid}`
 
             return (
               <div key={String(i)} className="table__row">
                 <div style={{ width: defaultColWidth }}>
-                  {i + offset + 1}
-                  {editMode && (
-                    <button
-                      type="button"
-                      className="btn btn-s btn-edit"
-                      title="View record"
-                      onClick={() => history.push(recordEditUrl)}
-                    >
-                      <span className="icon icon-pencil2 icon-12px" />
-                    </button>
+                  {editMode ? (
+                    <Link type="button" className="btn-transparent" title="View record" to={recordEditUrl}>
+                      {rowNo}
+                      <span className="icon icon-link icon-right icon-12px" />
+                    </Link>
+                  ) : (
+                    rowNo
                   )}
                 </div>
                 {nodeDefCols.map((nodeDef) => (
@@ -64,7 +61,7 @@ const TableRows = ({ nodeDefCols, data, offset, colWidth, defaultColWidth, editM
   )
 }
 
-TableRows.propTypes = {
+TableContent.propTypes = {
   nodeDefCols: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
   offset: PropTypes.number.isRequired,
@@ -73,4 +70,4 @@ TableRows.propTypes = {
   editMode: PropTypes.bool.isRequired,
 }
 
-export default TableRows
+export default TableContent

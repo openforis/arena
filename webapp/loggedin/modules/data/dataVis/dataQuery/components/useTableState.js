@@ -1,5 +1,4 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import { ColumnNodeDef } from '@common/model/db'
@@ -8,29 +7,28 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import { useOnUpdate, useSurvey, useSurveyCycleKey, useAuthCanCleanseRecords } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurvey, useAuthCanCleanseRecords } from '@webapp/commonComponents/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 import { nodesUpdateCompleted, nodeValidationsUpdate } from '../actions'
 
-import * as DataQueryState from '../dataQueryState'
+import * as DataQueryState from '../state'
 
 export const useTableState = () => {
-  const history = useHistory()
   const dispatch = useDispatch()
 
   const survey = useSurvey()
-  const surveyCycleKey = useSurveyCycleKey()
   const canEdit = useAuthCanCleanseRecords()
   const lang = useSelector(AppState.getLang)
   const appSaving = useSelector(AppState.isSaving)
   const nodeDefUuidContext = useSelector(DataQueryState.getTableNodeDefUuidTable)
   const nodeDefUuidCols = useSelector(DataQueryState.getTableNodeDefUuidCols)
-  const editMode = useSelector(DataQueryState.getTableEditMode)
+  const editMode = useSelector(DataQueryState.isTableModeEdit)
+  const aggregateMode = useSelector(DataQueryState.isTableModeAggregate)
 
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const colNames = nodeDefCols.map((nodeDefCol) => ColumnNodeDef.getColNames(nodeDefCol)).flat()
+  const colNames = nodeDefCols.flatMap((nodeDefCol) => ColumnNodeDef.getColNames(nodeDefCol))
   const colsNumber = editMode
     ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFields(nodeDefCol).length, 0)
     : colNames.length
@@ -52,9 +50,6 @@ export const useTableState = () => {
   }, [editMode])
 
   return {
-    history,
-    surveyId: Survey.getId(survey),
-    surveyCycleKey,
     canEdit,
     lang,
     appSaving,
@@ -62,6 +57,7 @@ export const useTableState = () => {
     nodeDefUuidCols,
     nodeDefCols,
     editMode,
+    aggregateMode,
     colsNumber,
     data,
     hasData: !R.isEmpty(data),
