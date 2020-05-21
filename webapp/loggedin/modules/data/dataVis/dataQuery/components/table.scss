@@ -105,12 +105,16 @@ $rowHeaderHeight: 45px;
   }
 
   .table__cell.readonly {
-    background-color: $greyBorder;
+    background-color: rgba($greyBorder, 0.5);
   }
 
   .table__row {
     .table__cell {
       padding: 0;
+      > * {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
