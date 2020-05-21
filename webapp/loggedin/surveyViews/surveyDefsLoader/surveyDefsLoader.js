@@ -41,7 +41,7 @@ const SurveyDefsLoader = (props) => {
 }
 
 SurveyDefsLoader.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]).isRequired,
+  children: PropTypes.element.isRequired,
   draft: PropTypes.bool,
   requirePublish: PropTypes.bool,
   validate: PropTypes.bool,
