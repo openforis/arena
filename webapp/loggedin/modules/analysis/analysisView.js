@@ -1,4 +1,6 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
@@ -10,37 +12,48 @@ import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surv
 import ChainsView from './chains/view'
 import ChainView from './chain/view'
 
-const AnalysisView = () => (
-  <SurveyDefsLoader draft validate={false} requirePublish>
-    <ModuleSwitch
-      moduleRoot={appModules.analysis}
-      moduleDefault={analysisModules.processingChains}
-      modules={[
-        {
-          component: ChainsView,
-          path: appModuleUri(analysisModules.processingChains),
-        },
-        {
-          component: ChainView,
-          path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
-        },
-        {
-          component: NodeDefView,
-          path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
-        },
-        {
-          component: CategoriesView,
-          path: appModuleUri(analysisModules.categories),
-          props: { analysis: true },
-        },
-        {
-          component: CategoryView,
-          path: `${appModuleUri(analysisModules.category)}:categoryUuid`,
-          props: { analysis: true },
-        },
-      ]}
-    />
-  </SurveyDefsLoader>
-)
+import { navigateToChainsView } from './chain/actions'
+
+const AnalysisView = () => {
+  const dispatch = useDispatch()
+  const history = useHistory()
+  return (
+    <SurveyDefsLoader
+      draft
+      validate={false}
+      requirePublish
+      onSurveyCycleUpdate={() => dispatch(navigateToChainsView(history))}
+    >
+      <ModuleSwitch
+        moduleRoot={appModules.analysis}
+        moduleDefault={analysisModules.processingChains}
+        modules={[
+          {
+            component: ChainsView,
+            path: appModuleUri(analysisModules.processingChains),
+          },
+          {
+            component: ChainView,
+            path: `${appModuleUri(analysisModules.processingChain)}:chainUuid/`,
+          },
+          {
+            component: NodeDefView,
+            path: `${appModuleUri(analysisModules.nodeDef)}:nodeDefUuid/`,
+          },
+          {
+            component: CategoriesView,
+            path: appModuleUri(analysisModules.categories),
+            props: { analysis: true },
+          },
+          {
+            component: CategoryView,
+            path: `${appModuleUri(analysisModules.category)}:categoryUuid`,
+            props: { analysis: true },
+          },
+        ]}
+      />
+    </SurveyDefsLoader>
+  )
+}
 
 export default AnalysisView

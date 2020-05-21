@@ -1,64 +1,58 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { useI18n, useOnSurveyCycleUpdate, useSurveyInfo } from '@webapp/commonComponents/hooks'
 
+import * as SurveyState from '@webapp/survey/surveyState'
 import { initSurveyDefs, reloadSurveyDefs } from '@webapp/survey/actions'
 
-const SurveyDefsLoader = props => {
-  const {
-    surveyInfo,
-    surveyCycleKey,
-    draft,
-    validate,
-    ready,
-    requirePublish,
-    children,
-    initSurveyDefs,
-    reloadSurveyDefs,
-  } = props
+const SurveyDefsLoader = (props) => {
+  const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
 
+  const dispatch = useDispatch()
+  const i18n = useI18n()
+  const surveyInfo = useSurveyInfo()
+  const ready = useSelector(SurveyState.areDefsFetched(draft))
   const surveyUuid = Survey.getUuid(surveyInfo)
 
   useEffect(() => {
     if (surveyUuid) {
-      initSurveyDefs(draft, validate)
+      dispatch(initSurveyDefs(draft, validate))
     }
   }, [surveyUuid])
 
-  useOnUpdate(() => {
+  useOnSurveyCycleUpdate(() => {
     if (surveyUuid) {
-      reloadSurveyDefs(draft, validate)
+      if (onSurveyCycleUpdate) onSurveyCycleUpdate()
+      dispatch(reloadSurveyDefs(draft, validate))
     }
-  }, [surveyCycleKey])
+  })
 
-  const i18n = useI18n()
+  if (!ready) return null
 
-  return ready ? (
-    !requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) ? (
-      children
-    ) : (
-      <div className="table__empty-rows">{i18n.t('surveyDefsLoader.requireSurveyPublish')}</div>
-    )
-  ) : null
+  return !requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) ? (
+    children
+  ) : (
+    <div className="table__empty-rows">{i18n.t('surveyDefsLoader.requireSurveyPublish')}</div>
+  )
 }
 
-const mapStateToProps = (state, { draft }) => ({
-  ready: SurveyState.areDefsFetched(draft)(state),
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-})
+SurveyDefsLoader.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]).isRequired,
+  draft: PropTypes.bool,
+  requirePublish: PropTypes.bool,
+  validate: PropTypes.bool,
+  onSurveyCycleUpdate: PropTypes.func,
+}
 
 SurveyDefsLoader.defaultProps = {
-  ready: false,
-  surveyInfo: null,
   draft: false,
   validate: false,
   requirePublish: false,
+  onSurveyCycleUpdate: null,
 }
 
-export default connect(mapStateToProps, { initSurveyDefs, reloadSurveyDefs })(SurveyDefsLoader)
+export default SurveyDefsLoader

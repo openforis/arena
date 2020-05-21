@@ -41,6 +41,10 @@ $rowHeaderHeight: 45px;
     .btn-transparent {
       color: $black;
       font-weight: 400;
+
+      &:hover {
+        color: $orange;
+      }
     }
 
     .table__cell {
