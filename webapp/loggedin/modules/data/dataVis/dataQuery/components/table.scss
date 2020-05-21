@@ -81,6 +81,13 @@ $rowHeaderHeight: 45px;
     display: flex;
     flex-wrap: wrap;
   }
+
+  .no-data {
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    font-style: italic;
+  }
 }
 
 .data-query-table.edit {

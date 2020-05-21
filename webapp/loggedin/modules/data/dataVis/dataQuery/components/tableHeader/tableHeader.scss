@@ -22,3 +22,9 @@
     }
   }
 }
+
+.data-query-table.no-content .table__header-button-bar {
+  > div {
+    border-bottom: 1px solid $greyBorder;
+  }
+}

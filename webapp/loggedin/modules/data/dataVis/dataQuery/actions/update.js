@@ -54,7 +54,11 @@ export const updateTableNodeDefUuidCols = (
   } else if (nodeDefUuidColDeleted) {
     // Reset data
     if (nodeDefUuidCols.length === 0) {
-      dispatch({ type: dataQueryTableDataUpdate, offset: 0, data: [] })
+      dispatch({
+        type: dataQueryTableDataUpdate,
+        offset: DataQueryState.defaults.offset,
+        data: DataQueryState.defaults.data,
+      })
     }
     // Delete cols from data rows
     else {

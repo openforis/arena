@@ -66,7 +66,7 @@ export const useTableState = () => {
     filter: useSelector(DataQueryState.getTableFilter),
     sort: useSelector(DataQueryState.getTableSort),
     count: useSelector(DataQueryState.getTableCount),
-    showTable: useSelector(DataQueryState.hasTableAndCols),
+    hasTableAndCols: useSelector(DataQueryState.hasTableAndCols),
     nodeDefSelectorsVisible: useSelector(DataQueryState.isNodeDefSelectorsVisible),
   }
 }
