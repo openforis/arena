@@ -65,7 +65,7 @@ const Table = () => {
         nodeDefSelectorsVisible={nodeDefSelectorsVisible}
       />
 
-      {hasTableAndCols && data && (
+      {hasTableAndCols && data && colWidth && (
         <TableContent
           lang={lang}
           nodeDefCols={nodeDefCols}
