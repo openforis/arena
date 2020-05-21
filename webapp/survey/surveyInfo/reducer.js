@@ -13,7 +13,7 @@ import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
 // SurveyInfo actions
 import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
 // nodeDefs actions
-import { nodeDefCreate, nodeDefUpdate, nodeDefDelete } from '../nodeDefs/actions'
+import { nodeDefCreate, nodeDefDelete, nodeDefSave, nodeDefUpdate } from '../nodeDefs/actions'
 // Category actions
 import { categoryCreate, categoryDelete, categoryUpdate } from '../categories/actions'
 // Taxonomies actions
@@ -38,8 +38,9 @@ const actionHandlers = {
 
   // NodeDef
   [nodeDefCreate]: SurveyInfoState.markDraft,
-  [nodeDefUpdate]: SurveyInfoState.markDraft,
   [nodeDefDelete]: SurveyInfoState.markDraft,
+  [nodeDefSave]: SurveyInfoState.markDraft,
+  [nodeDefUpdate]: SurveyInfoState.markDraft,
 
   // Category
   [categoryCreate]: SurveyInfoState.markDraft,
