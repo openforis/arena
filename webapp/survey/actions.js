@@ -3,9 +3,12 @@ import axios from 'axios'
 import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { hideAppLoader, showAppLoader } from '../app/actions'
-import { showNotification } from '../app/appNotification/actions'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
+import * as AppState from '@webapp/app/appState'
 import { showAppJobMonitor } from '../loggedin/appJob/actions'
+
 import * as SurveyState from './surveyState'
 
 export const surveyCreate = 'survey/create'
@@ -84,14 +87,23 @@ export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate =
 // ====== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
-
-  const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
+  const state = getState()
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const lang = AppState.getLang(state)
+  const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
   dispatch(
-    showAppJobMonitor(data.job, async () => {
-      await dispatch(setActiveSurvey(surveyId, true))
-      await dispatch(initSurveyDefs(true, true))
+    showDialogConfirm('homeView.surveyInfo.confirmPublish', { survey: surveyLabel }, async () => {
+      const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+
+      const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
+
+      dispatch(
+        showAppJobMonitor(data.job, async () => {
+          await dispatch(setActiveSurvey(surveyId, true))
+          await dispatch(initSurveyDefs(true, true))
+        })
+      )
     })
   )
 }

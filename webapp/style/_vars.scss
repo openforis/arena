@@ -9,19 +9,20 @@ $green: #84ac67;
 $greenLight: #f0f2e7;
 $yellow: #fee997;
 
-$grey: #E7E9EE;
+$grey: #e7e9ee;
+$greyLight: #f6f7f9;
 $greyAppBg: lighten($grey, 5%);
-$greyBorder: #D1D1DD;
-$blue: #3885CA;
+$greyBorder: #d1d1dd;
+$blue: #3885ca;
 $blueLight: lighten($blue, 35%);
 $blueLightFocus: lighten($blue, 45%);
 $blueLightActive: lighten($blue, 25%);
 $blueDark: darken($blue, 20%);
-$orange: #EBA444;
-$orangeLight: #F9CCB2;
-$black: #2F3138;
-$yellowHighlight: #F8F6CC;
-$white: #FFFFFF;
+$orange: #eba444;
+$orangeLight: #f9ccb2;
+$black: #2f3138;
+$yellowHighlight: #f8f6cc;
+$white: #ffffff;
 
 //z-indexes
 
@@ -37,8 +38,8 @@ $zIndex180UserMenu: 180;
 /* Policy: everything is below app loader to stop user action */
 $zIndex190AppLoader: 190;
 
-$shadow1: 0 0 4px rgba($black, .2);
-$shadow2: 0 0 8px rgba($black, .2);
+$shadow1: 0 0 4px rgba($black, 0.2);
+$shadow2: 0 0 8px rgba($black, 0.2);
 $shadow3: 0 0 8px 1px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.1);
 
 // table

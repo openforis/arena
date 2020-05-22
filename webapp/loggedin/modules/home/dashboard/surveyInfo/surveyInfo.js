@@ -9,7 +9,6 @@ import Header from '@webapp/commonComponents/header'
 
 import * as Survey from '@core/survey/survey'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
@@ -49,13 +48,7 @@ const SurveyInfo = () => {
               className="btn-s btn-transparent"
               aria-disabled={!Survey.isDraft(surveyInfo)}
               type="button"
-              onClick={() =>
-                dispatch(
-                  showDialogConfirm('homeView.surveyInfo.confirmPublish', { survey: surveyLabel }, () =>
-                    dispatch(publishSurvey())
-                  )
-                )
-              }
+              onClick={() => dispatch(publishSurvey())}
             >
               <div className="triangle-left" />
               <span className="icon icon-checkmark2 icon-12px icon-left" />
