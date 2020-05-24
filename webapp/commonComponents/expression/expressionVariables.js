@@ -18,26 +18,26 @@ const toSqlType = (nodeDef) => {
   return sqlTypes.varchar
 }
 
-const getNodeDefLabel = (nodeDef, nodeDefCurrent, lang, i18n) =>
-  `${NodeDef.getLabel(nodeDef, lang)}${
-    nodeDefCurrent && NodeDef.isEqual(nodeDef)(nodeDefCurrent) ? ` (${i18n.t('expressionEditor.this')})` : ''
-  }`
+// Returns the name of the given nodeDef and appends "THIS" if it's equal to the current one
+const getVariableLabel = (nodeDef, nodeDefCurrent, i18n) =>
+  NodeDef.getName(nodeDef) +
+  (nodeDefCurrent && NodeDef.isEqual(nodeDef)(nodeDefCurrent) ? ` (${i18n.t('expressionEditor.this')})` : '')
 
-const getJsVariables = (nodeDef, nodeDefCurrent, lang, i18n) => [
+const getJsVariables = (nodeDef, nodeDefCurrent, i18n) => [
   {
     value: NodeDef.getName(nodeDef),
-    label: getNodeDefLabel(nodeDef, nodeDefCurrent, lang, i18n),
+    label: getVariableLabel(nodeDef, nodeDefCurrent, i18n),
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
   },
 ]
 
-const getSqlVariables = (nodeDef, nodeDefCurrent, lang) => {
+const getSqlVariables = (nodeDef, nodeDefCurrent, i18n) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
 
   // TODO: Explain what getLabel does and why
   const getLabel = (col) =>
-    getNodeDefLabel(nodeDef, nodeDefCurrent, lang) +
+    getVariableLabel(nodeDef, nodeDefCurrent, i18n) +
     (colNames.length === 1 ? '' : ` - ${NodeDefTable.extractColName(nodeDef, col)}`)
 
   return colNames.map((col) => ({
@@ -48,9 +48,8 @@ const getSqlVariables = (nodeDef, nodeDefCurrent, lang) => {
   }))
 }
 
-const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n) => {
-  const lang = Survey.getLanguage(i18n.lang)(Survey.getSurveyInfo(survey))
-  return R.pipe(
+const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n) =>
+  R.pipe(
     Survey.getNodeDefChildren(nodeDefContext, Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)),
     R.map((childDef) => {
       if (!Expression.isValidExpressionType(childDef)) {
@@ -66,11 +65,11 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n
       }
 
       if (mode === Expression.modes.sql) {
-        return getSqlVariables(childDef, nodeDefCurrent, lang)
+        return getSqlVariables(childDef, nodeDefCurrent, i18n)
       }
 
       if (mode === Expression.modes.json) {
-        return getJsVariables(childDef, nodeDefCurrent, lang, i18n)
+        return getJsVariables(childDef, nodeDefCurrent, i18n)
       }
 
       return null
@@ -78,7 +77,6 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n
     R.flatten,
     R.reject(R.isNil)
   )(survey)
-}
 
 export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n) => {
   const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
