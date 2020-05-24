@@ -38,7 +38,7 @@ const AppHeader = () => {
     <div className="app-header">
       <div className="app-header__logo">
         <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">
-          <img src="/img/of_icon_black.png" alt="Open Foris logo" />
+          <img src="/img/of_icon_black.png" alt="Open Foris" />
         </a>
       </div>
 
@@ -65,7 +65,7 @@ const AppHeader = () => {
                   onClick={() => dispatch(publishSurvey())}
                 >
                   <span className="icon icon-warning icon-left icon-10px" />
-                  {i18n.t('homeView.surveyInfo.publish')}
+                  {i18n.t('common.publish')}
                 </button>
               )}
             </>

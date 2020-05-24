@@ -52,7 +52,7 @@ const SurveyInfo = () => {
             >
               <div className="triangle-left" />
               <span className="icon icon-checkmark2 icon-12px icon-left" />
-              {i18n.t('homeView.surveyInfo.publish')}
+              {i18n.t('common.publish')}
             </button>
           )}
 
