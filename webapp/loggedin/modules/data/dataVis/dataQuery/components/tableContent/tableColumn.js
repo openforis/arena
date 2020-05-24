@@ -32,6 +32,15 @@ const TableColumn = (props) => {
     return `surveyForm.${nodeDefTypePrefix}.${colName}`
   }
 
+  const getColValue = (col) => {
+    const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
+    if (value && NodeDef.isDecimal(nodeDef)) {
+      // Round decimal values to 2 decimal digits
+      return Number(value).toFixed(2)
+    }
+    return value
+  }
+
   const readOnly = NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef)
 
   const editModeCell =
@@ -57,11 +66,10 @@ const TableColumn = (props) => {
         <div className="table__inner-cell">
           {colNames.map((col) => {
             if (isData) {
+              const value = getColValue(col)
               return (
                 <div key={col} style={{ width: widthInner }} className="ellipsis">
-                  {Object.prototype.hasOwnProperty.call(row, col) ? (
-                    row[col]
-                  ) : (
+                  {value || (
                     <div style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}>
                       <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
                     </div>
