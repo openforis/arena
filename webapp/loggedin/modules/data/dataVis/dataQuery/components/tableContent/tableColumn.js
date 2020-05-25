@@ -2,8 +2,9 @@ import React from 'react'
 import camelize from 'camelize'
 import PropTypes from 'prop-types'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
@@ -34,9 +35,9 @@ const TableColumn = (props) => {
 
   const getColValue = (col) => {
     const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
-    if (value && NodeDef.isDecimal(nodeDef)) {
-      // Round decimal values to 2 decimal digits
-      return Number(value).toFixed(2)
+    if (value) {
+      if (NodeDef.isInteger(nodeDef)) return NumberUtils.formatInteger(value)
+      if (NodeDef.isDecimal(nodeDef)) return NumberUtils.formatDecimal(value)
     }
     return value
   }
