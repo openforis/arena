@@ -9,11 +9,10 @@ import * as Survey from '@core/survey/survey'
 import { usePrevious, useUser, useSurveyCycleKey, useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
 import ProfilePicture from '@webapp/commonComponents/profilePicture'
 import ProgressBar from '@webapp/commonComponents/progressBar'
+import ButtonPublishSurvey from '@webapp/commonComponents/buttonPublishSurvey'
 
 import * as AppState from '@webapp/app/appState'
-
 import { updateUserPrefs } from '@webapp/app/actions'
-import { publishSurvey } from '@webapp/survey/actions'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
 
@@ -58,16 +57,7 @@ const AppHeader = () => {
                   dispatch(updateUserPrefs(userUpdated))
                 }}
               />
-              {Survey.isDraft(surveyInfo) && (
-                <button
-                  type="button"
-                  className="btn btn-s btn-secondary btn-publish"
-                  onClick={() => dispatch(publishSurvey())}
-                >
-                  <span className="icon icon-warning icon-left icon-10px" />
-                  {i18n.t('common.publish')}
-                </button>
-              )}
+              {Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
             </>
           ))}
       </div>

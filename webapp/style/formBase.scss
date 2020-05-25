@@ -142,10 +142,10 @@ button,
 }
 
 .btn-secondary {
-  background-color: $greyLight;
+  background-color: $greyAppBg;
 
   &:hover {
-    background-color: darken($greyLight, 20%);
+    background-color: darken($greyAppBg, 20%);
   }
 }
 

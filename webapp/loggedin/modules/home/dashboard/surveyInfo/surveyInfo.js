@@ -4,14 +4,14 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
-import { useAuthCanEditSurvey, useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
-import Header from '@webapp/commonComponents/header'
-
 import * as Survey from '@core/survey/survey'
 
-import { deleteSurvey, publishSurvey } from '@webapp/survey/actions'
-
+import { useAuthCanEditSurvey, useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import Header from '@webapp/commonComponents/header'
+import ButtonPublishSurvey from '@webapp/commonComponents/buttonPublishSurvey'
+
+import { deleteSurvey } from '@webapp/survey/actions'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = () => {
@@ -43,18 +43,7 @@ const SurveyInfo = () => {
             {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
-          {canEditDef && (
-            <button
-              className="btn-s btn-transparent"
-              aria-disabled={!Survey.isDraft(surveyInfo)}
-              type="button"
-              onClick={() => dispatch(publishSurvey())}
-            >
-              <div className="triangle-left" />
-              <span className="icon icon-checkmark2 icon-12px icon-left" />
-              {i18n.t('common.publish')}
-            </button>
-          )}
+          {canEditDef && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
 
           {canEditDef && (
             <button className="btn-s btn-transparent" type="button" onClick={() => setShowDeleteDialog(true)}>
