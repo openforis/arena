@@ -6,6 +6,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey } from '@webapp/commonComponents/hooks'
+import Accordion from '@webapp/commonComponents/accordion'
+
 import AttributeSelector from './attributeSelector'
 
 const AttributesSelector = (props) => {
@@ -18,6 +20,7 @@ const AttributesSelector = (props) => {
     onToggleAttribute,
     showAncestors,
     showAncestorsLabel,
+    showLabel,
     showMultipleAttributes,
   } = props
 
@@ -33,39 +36,37 @@ const AttributesSelector = (props) => {
   }
 
   return (
-    <>
-      {childDefs.map((childDef) => (
-        <AttributeSelector
-          key={NodeDef.getUuid(childDef)}
-          canSelectAttributes={canSelectAttributes}
-          filterTypes={filterTypes}
-          lang={lang}
-          nodeDef={childDef}
-          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-          nodeDefContext={nodeDefContext}
-          onToggleAttribute={onToggleAttribute}
-          showMultipleAttributes={showMultipleAttributes}
-        />
-      ))}
-
-      {showAncestors && nodeDefParent && (
-        <>
-          {showAncestorsLabel && (
-            <div className="attributes-selector__node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
-          )}
-          <AttributesSelector
-            lang={lang}
-            nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            onToggleAttribute={onToggleAttribute}
-            filterTypes={filterTypes}
+    <div className="attributes-selector">
+      <Accordion buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
+        {childDefs.map((childDef) => (
+          <AttributeSelector
+            key={NodeDef.getUuid(childDef)}
             canSelectAttributes={canSelectAttributes}
-            showAncestorsLabel={showAncestorsLabel}
+            filterTypes={filterTypes}
+            lang={lang}
+            nodeDef={childDef}
+            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+            nodeDefContext={nodeDefContext}
+            onToggleAttribute={onToggleAttribute}
             showMultipleAttributes={showMultipleAttributes}
           />
-        </>
+        ))}
+      </Accordion>
+
+      {showAncestors && nodeDefParent && (
+        <AttributesSelector
+          lang={lang}
+          nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
+          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          onToggleAttribute={onToggleAttribute}
+          filterTypes={filterTypes}
+          canSelectAttributes={canSelectAttributes}
+          showLabel={showAncestorsLabel}
+          showAncestorsLabel={showAncestorsLabel}
+          showMultipleAttributes={showMultipleAttributes}
+        />
       )}
-    </>
+    </div>
   )
 }
 
@@ -77,6 +78,7 @@ AttributesSelector.propTypes = {
   nodeDefUuidsAttributes: PropTypes.array,
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
+  showLabel: PropTypes.bool,
   showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
 }
@@ -88,6 +90,7 @@ AttributesSelector.defaultProps = {
   nodeDefUuidsAttributes: [],
   showAncestors: true,
   showAncestorsLabel: true,
+  showLabel: false,
   showMultipleAttributes: true,
 }
 

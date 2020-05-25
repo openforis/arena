@@ -1,4 +1,3 @@
-import './components/nodeDefsSelectorAggregateView.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -19,43 +18,41 @@ const NodeDefsSelectorAggregateView = (props) => {
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
 
   return (
-    <div className="node-defs-selector-aggregate">
-      <div className="node-defs-selector-aggregate__container">
-        <EntitySelector
-          hierarchy={hierarchy}
-          lang={lang}
-          nodeDefUuidEntity={nodeDefUuidEntity}
-          onChange={onChangeEntity}
-        />
+    <div className="node-defs-selector">
+      <EntitySelector
+        hierarchy={hierarchy}
+        lang={lang}
+        nodeDefUuidEntity={nodeDefUuidEntity}
+        onChange={onChangeEntity}
+      />
 
-        {nodeDefUuidEntity && (
-          <>
-            <Accordion buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
-              <AttributesSelector
-                onToggleAttribute={() => {}}
-                lang={lang}
-                filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
-                nodeDefUuidEntity={nodeDefUuidEntity}
-                nodeDefUuidsAttributes={[]}
-                showAncestorsLabel={false}
-                showMultipleAttributes={false}
-              />
-            </Accordion>
+      {nodeDefUuidEntity && (
+        <>
+          <Accordion buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
+            <AttributesSelector
+              onToggleAttribute={() => {}}
+              lang={lang}
+              filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
+              nodeDefUuidEntity={nodeDefUuidEntity}
+              nodeDefUuidsAttributes={[]}
+              showAncestorsLabel={false}
+              showMultipleAttributes={false}
+            />
+          </Accordion>
 
-            <Accordion buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
-              <AttributesSelector
-                onToggleAttribute={() => {}}
-                lang={lang}
-                filterTypes={[NodeDef.nodeDefType.code]}
-                nodeDefUuidEntity={nodeDefUuidEntity}
-                nodeDefUuidsAttributes={[]}
-                showAncestorsLabel={false}
-                showMultipleAttributes={false}
-              />
-            </Accordion>
-          </>
-        )}
-      </div>
+          <Accordion buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
+            <AttributesSelector
+              onToggleAttribute={() => {}}
+              lang={lang}
+              filterTypes={[NodeDef.nodeDefType.code]}
+              nodeDefUuidEntity={nodeDefUuidEntity}
+              nodeDefUuidsAttributes={[]}
+              showAncestorsLabel={false}
+              showMultipleAttributes={false}
+            />
+          </Accordion>
+        </>
+      )}
     </div>
   )
 }
