@@ -3,9 +3,10 @@ import axios from 'axios'
 import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { hideAppLoader, showAppLoader } from '../app/actions'
-import { showNotification } from '../app/appNotification/actions'
+import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
+import { showNotification } from '@webapp/app/appNotification/actions'
 import { showAppJobMonitor } from '../loggedin/appJob/actions'
+
 import * as SurveyState from './surveyState'
 
 export const surveyCreate = 'survey/create'
@@ -84,7 +85,8 @@ export const setActiveSurvey = (surveyId, canEdit = true, dispatchSurveyCreate =
 // ====== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
 
   const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
 
