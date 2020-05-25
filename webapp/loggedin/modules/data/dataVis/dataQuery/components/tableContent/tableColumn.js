@@ -35,10 +35,8 @@ const TableColumn = (props) => {
 
   const getColValue = (col) => {
     const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
-    if (value) {
-      if (NodeDef.isInteger(nodeDef)) return NumberUtils.formatInteger(value)
-      if (NodeDef.isDecimal(nodeDef)) return NumberUtils.formatDecimal(value)
-    }
+    if (NodeDef.isInteger(nodeDef)) return NumberUtils.formatInteger(value)
+    if (NodeDef.isDecimal(nodeDef)) return NumberUtils.formatDecimal(value)
     return value
   }
 
