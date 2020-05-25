@@ -1,4 +1,4 @@
-@import "./vars";
+@import './vars';
 
 input,
 label,
@@ -18,7 +18,7 @@ button,
   outline: none;
 
   /* Browsers have different default form fonts */
-  font-size: .9rem;
+  font-size: 0.9rem;
   font-family: $fontFamily;
   letter-spacing: 1px;
   font-weight: inherit;
@@ -44,7 +44,7 @@ input {
 a {
   text-decoration: none;
   cursor: pointer;
-  transition: .2s all;
+  transition: 0.2s all;
 }
 
 a:hover {
@@ -59,18 +59,19 @@ a:visited {
 }
 
 // buttons
-button, .btn {
-  padding: .7rem .8rem;
+button,
+.btn {
+  padding: 0.7rem 0.8rem;
   font-weight: 400;
   border: 1px solid $greyBorder;
   text-decoration: none;
   background-color: white;
-  transition: .2s all;
+  transition: 0.2s all;
 
   &:hover {
     background-color: $blueLightFocus;
 
-    &:not([aria-disabled="true"]) {
+    &:not([aria-disabled='true']) {
       cursor: pointer;
     }
   }
@@ -84,21 +85,21 @@ button, .btn {
   }
 }
 
-*[aria-disabled="true"] {
+*[aria-disabled='true'] {
   color: currentColor;
   display: inline-block; /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .btn-s {
-  padding: .5rem;
+  padding: 0.5rem;
   font-size: 0.8rem;
 }
 
 .btn-xs {
-  padding: .3rem;
+  padding: 0.3rem;
   font-size: 0.8rem;
 }
 
@@ -124,7 +125,9 @@ button, .btn {
   }
 }
 
-.btn-primary, .btn-cancel {
+.btn-primary,
+.btn-secondary,
+.btn-cancel {
   font-weight: 600;
   min-width: 80px;
 }
@@ -135,6 +138,14 @@ button, .btn {
 
   &:hover {
     background-color: lighten($blue, 15%);
+  }
+}
+
+.btn-secondary {
+  background-color: $greyAppBg;
+
+  &:hover {
+    background-color: darken($greyAppBg, 20%);
   }
 }
 
@@ -150,7 +161,7 @@ button, .btn {
   position: relative;
 
   button {
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
   }
 
   .btn-delete {
