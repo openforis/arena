@@ -121,14 +121,14 @@ export const useAdvancedExpressionEditorPopupState = (props) => {
 
 export const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
-  const i18n = AppState.getI18n(state)
+  const lang = AppState.getLang(state)
 
   const { nodeDefUuidContext, nodeDefUuidCurrent, mode = Expression.modes.json } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, i18n)
+  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, lang)
 
   return {
     nodeDefContext,

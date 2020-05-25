@@ -756,7 +756,6 @@ $t(common.cantUndoWarning)`,
     group: 'Group',
     var: 'Var',
     const: 'Const',
-    this: 'THIS',
   },
 
   // ====== Auth

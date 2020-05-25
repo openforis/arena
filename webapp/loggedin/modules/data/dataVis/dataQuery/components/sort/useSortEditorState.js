@@ -3,13 +3,12 @@ import { useState, useEffect } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
-import { useI18n, usePrevious, useSurvey } from '@webapp/commonComponents/hooks'
+import { usePrevious, useSurvey } from '@webapp/commonComponents/hooks'
 import * as ExpressionVariables from '@webapp/commonComponents/expression/expressionVariables'
 
 export default (props) => {
   const { mode, nodeDefUuidContext, nodeDefUuidCols, onChange, onClose, sort } = props
 
-  const i18n = useI18n()
   const survey = useSurvey()
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
@@ -23,7 +22,7 @@ export default (props) => {
   const [updated, setUpdated] = useState(false)
 
   const getAvailableVariables = () => {
-    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, null, mode, i18n)
+    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, null, mode)
     return variables.filter((v) => nodeDefUuidCols.includes(v.uuid))
   }
 

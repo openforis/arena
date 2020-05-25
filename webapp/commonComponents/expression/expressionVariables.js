@@ -18,27 +18,21 @@ const toSqlType = (nodeDef) => {
   return sqlTypes.varchar
 }
 
-// Returns the name of the given nodeDef and appends "THIS" if it's equal to the current one
-const getVariableLabel = (nodeDef, nodeDefCurrent, i18n) =>
-  NodeDef.getName(nodeDef) +
-  (nodeDefCurrent && NodeDef.isEqual(nodeDef)(nodeDefCurrent) ? ` (${i18n.t('expressionEditor.this')})` : '')
-
-const getJsVariables = (nodeDef, nodeDefCurrent, i18n) => [
+const getJsVariables = (nodeDef) => [
   {
     value: NodeDef.getName(nodeDef),
-    label: getVariableLabel(nodeDef, nodeDefCurrent, i18n),
+    label: NodeDef.getName(nodeDef),
     type: toSqlType(nodeDef),
     uuid: NodeDef.getUuid(nodeDef),
   },
 ]
 
-const getSqlVariables = (nodeDef, nodeDefCurrent, i18n) => {
+const getSqlVariables = (nodeDef, lang) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
 
-  // TODO: Explain what getLabel does and why
+  // Returns the label of the nodeDef with the col name as suffix (when there are multiple columns)
   const getLabel = (col) =>
-    getVariableLabel(nodeDef, nodeDefCurrent, i18n) +
-    (colNames.length === 1 ? '' : ` - ${NodeDefTable.extractColName(nodeDef, col)}`)
+    NodeDef.getLabel(nodeDef, lang) + (colNames.length === 1 ? '' : ` - ${NodeDefTable.extractColName(nodeDef, col)}`)
 
   return colNames.map((col) => ({
     value: col,
@@ -48,7 +42,7 @@ const getSqlVariables = (nodeDef, nodeDefCurrent, i18n) => {
   }))
 }
 
-const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n) =>
+const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, lang) =>
   R.pipe(
     Survey.getNodeDefChildren(nodeDefContext, Boolean(nodeDefContext) && NodeDef.isAnalysis(nodeDefContext)),
     R.map((childDef) => {
@@ -65,11 +59,11 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n
       }
 
       if (mode === Expression.modes.sql) {
-        return getSqlVariables(childDef, nodeDefCurrent, i18n)
+        return getSqlVariables(childDef, lang)
       }
 
       if (mode === Expression.modes.json) {
-        return getJsVariables(childDef, nodeDefCurrent, i18n)
+        return getJsVariables(childDef)
       }
 
       return null
@@ -78,21 +72,29 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n
     R.reject(R.isNil)
   )(survey)
 
-export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, i18n) => {
+export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, langPreferred) => {
   const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
+  const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
   const variables = []
   Survey.visitAncestorsAndSelf(nodeDefContext, (nodeDef) => {
     if (!NodeDef.isVirtual(nodeDef) || !NodeDef.isEqual(nodeDefContext)(nodeDef)) {
-      const childVariables = getChildDefVariables(surveyWithDependencies, nodeDef, nodeDefCurrent, mode, i18n)
+      const childVariables = getChildDefVariables(surveyWithDependencies, nodeDef, nodeDefCurrent, mode, lang)
       variables.push(...childVariables)
     }
   })(surveyWithDependencies)
 
-  if (nodeDefCurrent) {
-    // Move current node def variable to the first position
-    const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
-    variables.sort((varA, varB) => (varB.uuid === nodeDefCurrentUuid) - (varA.uuid === nodeDefCurrentUuid))
-  }
+  // Show current node def variable in the first position
+  const nodeDefCurrentUuid = NodeDef.getUuid(nodeDefCurrent)
+  variables.sort((varA, varB) => {
+    if (varA.uuid === nodeDefCurrentUuid) {
+      return -1
+    }
+    if (varB.uuid === nodeDefCurrentUuid) {
+      return 1
+    }
+    return varA.label.localeCompare(varB.label)
+  })
+
   return variables
 }
