@@ -17,6 +17,7 @@ const AttributesSelector = (props) => {
     nodeDefUuidsAttributes,
     onToggleAttribute,
     showAncestors,
+    showAncestorsLabel,
     showMultipleAttributes,
   } = props
 
@@ -49,7 +50,9 @@ const AttributesSelector = (props) => {
 
       {showAncestors && nodeDefParent && (
         <>
-          <div className="attributes-selector__node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
+          {showAncestorsLabel && (
+            <div className="attributes-selector__node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
+          )}
           <AttributesSelector
             lang={lang}
             nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
@@ -57,6 +60,7 @@ const AttributesSelector = (props) => {
             onToggleAttribute={onToggleAttribute}
             filterTypes={filterTypes}
             canSelectAttributes={canSelectAttributes}
+            showAncestorsLabel={showAncestorsLabel}
             showMultipleAttributes={showMultipleAttributes}
           />
         </>
@@ -73,6 +77,7 @@ AttributesSelector.propTypes = {
   nodeDefUuidsAttributes: PropTypes.array,
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
+  showAncestorsLabel: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
 }
 
@@ -82,6 +87,7 @@ AttributesSelector.defaultProps = {
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
   showAncestors: true,
+  showAncestorsLabel: true,
   showMultipleAttributes: true,
 }
 

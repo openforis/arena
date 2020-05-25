@@ -1,0 +1,10 @@
+.accordion.close {
+  .btn-toggle {
+    transform: rotate(45deg);
+  }
+}
+
+.accordion__panel {
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
