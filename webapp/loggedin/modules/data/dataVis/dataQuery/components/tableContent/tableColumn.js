@@ -2,8 +2,9 @@ import React from 'react'
 import camelize from 'camelize'
 import PropTypes from 'prop-types'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
@@ -32,6 +33,13 @@ const TableColumn = (props) => {
     return `surveyForm.${nodeDefTypePrefix}.${colName}`
   }
 
+  const getColValue = (col) => {
+    const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
+    if (NodeDef.isInteger(nodeDef)) return NumberUtils.formatInteger(value)
+    if (NodeDef.isDecimal(nodeDef)) return NumberUtils.formatDecimal(value)
+    return value
+  }
+
   const readOnly = NodeDef.isReadOnly(nodeDef) || NodeDef.isAnalysis(nodeDef)
 
   const editModeCell =
@@ -57,11 +65,10 @@ const TableColumn = (props) => {
         <div className="table__inner-cell">
           {colNames.map((col) => {
             if (isData) {
+              const value = getColValue(col)
               return (
                 <div key={col} style={{ width: widthInner }} className="ellipsis">
-                  {Object.prototype.hasOwnProperty.call(row, col) ? (
-                    row[col]
-                  ) : (
+                  {value || (
                     <div style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}>
                       <ProgressBar className="running progress-bar-striped" progress={100} showText={false} />
                     </div>
