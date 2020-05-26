@@ -1,3 +1,4 @@
+import './attributeSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 import * as R from 'ramda'
@@ -30,7 +31,7 @@ const AttributeSelector = (props) => {
     isVisible && (
       <button
         type="button"
-        className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
+        className={`btn btn-s deselectable attribute-selector${isActive ? ' active' : ''}`}
         onClick={() => onToggleAttribute(nodeDefUuid)}
         disabled={!canSelectAttributes}
       >

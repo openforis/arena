@@ -1,0 +1,26 @@
+@import 'webapp/style/vars';
+
+.attribute-selector {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0.5rem;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px dotted $greyBorder;
+
+  &[disabled] {
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  .icon {
+    font-size: 11px !important;
+  }
+
+  .node_def__icon {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+}

@@ -1,84 +1,59 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .node-defs-selector {
   position: relative;
   height: 100%;
   overflow-y: auto;
   display: grid;
-  justify-items: center;
-}
-
-
-.node-defs-selector__container {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  display: grid;
+  justify-items: stretch;
   align-content: start;
-  grid-row-gap: .3rem;
-
-
-  .node-def-label {
-    justify-self: center;
-    margin-top: 1rem;
-    font-weight: 600;
-    font-size: .8rem;
-    background-color: $greyBorder;
-    width: 100%;
-    text-align: center;
-    padding: .3rem 0;
-  }
-
-  .btn-node-def {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 .5rem;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px dotted $greyBorder;
-
-    &.active {
-      pointer-events: auto;
-    }
-
-    &[disabled] {
-      opacity: 1;
-      pointer-events: none;
-    }
-
-    .icon {
-      font-size: 11px !important;
-    }
-
-    .node_def__icon {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0;
-    }
-  }
-
 
   .btn-toggle-settings {
     position: absolute;
     padding: 0;
     height: 30px;
     width: 30px;
+    left: 0;
+  }
+
+  .entity-selector {
+    margin-bottom: 0.3rem;
+  }
+
+  .expansion-panel__header {
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    margin-top: 0.5rem;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background-color: $greyBorder;
+    width: 100%;
+    text-align: center;
+    padding: 0.3rem 0;
+  }
+
+  .expansion-panel__content {
+    display: grid;
+    align-content: start;
+    grid-row-gap: 0.3rem;
   }
 }
 
 .node-defs-selector__settings {
-  background-color: rgba($grey, .5);
+  background-color: rgba($grey, 0.5);
   display: flex;
   flex-wrap: wrap;
   padding: 1rem;
   justify-content: center;
-  margin-top: -.3rem;
+  margin-top: -0.3rem;
 
   .btn-node-def-type {
-    font-size: .7rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    padding: .3rem .5rem;
+    padding: 0.3rem 0.5rem;
 
     .icon-left {
       margin-left: 0px !important;
@@ -91,27 +66,5 @@
     &.active {
       pointer-events: auto;
     }
-  }
-}
-
-.node-defs-selector__entity-selector {
-  background-color: $greyBorder;
-  height: 30px;
-
-  input {
-    justify-self: center;
-    border-bottom: none;
-    font-weight: 600;
-    font-size: .8rem;
-    width: 100%;
-    text-align: center;
-    padding: .3rem 0;
-  }
-}
-
-.node-defs-selector__entity-selector-dialog {
-  .dropdown__list-item {
-
-    text-align: left !important;
   }
 }
