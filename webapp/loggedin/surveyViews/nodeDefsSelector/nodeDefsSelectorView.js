@@ -1,26 +1,37 @@
 import './components/nodeDefsSelectorView.scss'
-
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurvey, useSurveyLang } from '@webapp/commonComponents/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
 import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'
 
-const NodeDefsSelectorView = props => {
-  const { nodeDefUuidsAttributes, nodeDefUuidEntity, onChangeAttributes, onChangeEntity } = props
+const NodeDefsSelectorView = (props) => {
+  const {
+    nodeDefUuidsAttributes,
+    nodeDefUuidEntity,
+    hierarchy,
+    canSelectAttributes,
+    showAncestors,
+    showMultipleAttributes,
+    onChangeAttributes,
+    onChangeEntity,
+  } = props
+
+  const i18n = useI18n()
+  const survey = useSurvey()
+  const lang = useSurveyLang()
 
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
 
-  const onToggleAttribute = nodeDefUuid => {
+  const onToggleAttribute = (nodeDefUuid) => {
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefUuidsAttributes)
     const isDeleted = idx >= 0
     const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
@@ -29,49 +40,46 @@ const NodeDefsSelectorView = props => {
     onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
 
-  const { surveyInfo, hierarchy, canSelectAttributes, showAncestors, showMultipleAttributes } = props
-
-  const i18n = useI18n()
-  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
-
   return (
     <div className="node-defs-selector">
-      <div className="node-defs-selector__container">
-        <button
-          className="btn btn-s btn-toggle-settings"
-          aria-disabled={R.isNil(nodeDefUuidEntity)}
-          onClick={() => setShowSettings(!showSettings)}
-        >
-          <span className="icon icon-cog icon-12px" />
-        </button>
+      <EntitySelector
+        hierarchy={hierarchy || Survey.getHierarchy()(survey)}
+        lang={lang}
+        nodeDefUuidEntity={nodeDefUuidEntity}
+        onChange={onChangeEntity}
+      />
 
-        <EntitySelector
-          hierarchy={hierarchy}
-          lang={lang}
-          nodeDefUuidEntity={nodeDefUuidEntity}
-          onChange={onChangeEntity}
-        />
+      <button
+        type="button"
+        className="btn btn-s btn-toggle-settings"
+        aria-disabled={R.isNil(nodeDefUuidEntity)}
+        onClick={() => setShowSettings(!showSettings)}
+      >
+        <span className="icon icon-cog icon-12px" />
+      </button>
 
-        {showSettings && (
-          <div className="node-defs-selector__settings">
-            {R.keys(NodeDef.nodeDefType).map(type =>
-              NodeDef.nodeDefType.entity !== type ? (
-                <button
-                  key={type}
-                  className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
-                  onClick={() => {
-                    const idx = R.findIndex(R.equals(type), filterTypes)
-                    const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
-                    setFilterTypes(fn(filterTypes))
-                  }}
-                >
-                  {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}
-                </button>
-              ) : null,
-            )}
-          </div>
-        )}
+      {showSettings && (
+        <div className="node-defs-selector__settings">
+          {R.keys(NodeDef.nodeDefType).map((type) =>
+            NodeDef.nodeDefType.entity !== type ? (
+              <button
+                type="button"
+                key={type}
+                className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                onClick={() => {
+                  const idx = R.findIndex(R.equals(type), filterTypes)
+                  const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
+                  setFilterTypes(fn(filterTypes))
+                }}
+              >
+                {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}
+              </button>
+            ) : null
+          )}
+        </div>
+      )}
 
+      {nodeDefUuidEntity && (
         <AttributesSelector
           lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
@@ -82,33 +90,31 @@ const NodeDefsSelectorView = props => {
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
         />
-      </div>
+      )}
     </div>
   )
+}
+
+NodeDefsSelectorView.propTypes = {
+  nodeDefUuidEntity: PropTypes.string,
+  nodeDefUuidsAttributes: PropTypes.arrayOf(String),
+  hierarchy: PropTypes.object,
+  canSelectAttributes: PropTypes.bool,
+  showAncestors: PropTypes.bool,
+  showMultipleAttributes: PropTypes.bool,
+  onChangeAttributes: PropTypes.func,
+  onChangeEntity: PropTypes.func,
 }
 
 NodeDefsSelectorView.defaultProps = {
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
-  onChangeEntity: () => {},
-  onChangeAttributes: () => {},
-
+  hierarchy: null,
   canSelectAttributes: true,
   showAncestors: true,
   showMultipleAttributes: true,
-
-  lang: null,
-  hierarchy: null,
+  onChangeEntity: () => {},
+  onChangeAttributes: () => {},
 }
 
-const mapStateToProps = (state, props) => {
-  const survey = SurveyState.getSurvey(state)
-  const surveyInfo = Survey.getSurveyInfo(survey)
-
-  return {
-    surveyInfo,
-    hierarchy: props.hierarchy || Survey.getHierarchy()(survey),
-  }
-}
-
-export default connect(mapStateToProps)(NodeDefsSelectorView)
+export default NodeDefsSelectorView

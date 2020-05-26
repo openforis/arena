@@ -25,6 +25,8 @@ Do you want to cancel them?`,
     deleted: 'Deleted!',
     description: 'Description',
     description_plural: 'Descriptions',
+    dimension: 'Dimension',
+    dimension_plural: 'Dimensions',
     done: 'Done',
     download: 'Download',
     draft: 'Draft',
@@ -51,6 +53,8 @@ Do you want to cancel them?`,
     language: 'Language',
     manage: 'Manage',
     message_plural: 'Messages',
+    measure: 'Measure',
+    measure_plural: 'Measures',
     name: 'Name',
     new: 'New',
     no: 'No',
@@ -58,6 +62,22 @@ Do you want to cancel them?`,
     of: 'of',
     ok: 'Ok',
     path: 'Path',
+    publish: 'Publish',
+    publishConfirm: `#### You are about to publish the survey {{survey}} ####
+
+###### The publishing process will *permanently delete* the following information ###### 
+- Labels associated with deleted languages.
+- Records associated with deleted cycles.
+- Data associated with deleted form fields.
+
+###### After publishing: ###### 
+- Form fields cannot be changed from single to multiple and vice versa.
+- Category items' codes cannot be changed.
+- Category items cannot be deleted.
+- Taxonomy codes cannot be changed.
+- Taxa cannot be deleted.
+
+**Are you sure you want to continue?**`,
     required: 'Required',
     reset: 'Reset',
     save: 'Save',
@@ -165,24 +185,8 @@ Do you want to cancel them?`,
     createSurvey: 'Create Survey',
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      confirmPublish: `#### You are about to publish the survey {{survey}} ####
-
-###### The publishing process will *permanently delete* the following information ###### 
-- Labels associated with deleted languages.
-- Records associated with deleted cycles.
-- Data associated with deleted form fields.
-
-###### After publishing: ###### 
-- Form fields cannot be changed from single to multiple and vice versa.
-- Category items' codes cannot be changed.
-- Category items cannot be deleted.
-- Taxonomy codes cannot be changed.
-- Taxa cannot be deleted.
-
-**Are you sure you want to continue?**`,
       confirmDeleteCycle: 'Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)',
       editInfo: 'Edit info',
-      publish: 'Publish',
       viewInfo: 'View info',
     },
     deleteSurveyDialog: {
