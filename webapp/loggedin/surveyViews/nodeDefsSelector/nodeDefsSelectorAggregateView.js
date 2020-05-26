@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { useSurvey, useSurveyLang } from '@webapp/commonComponents/hooks'
 
-import Accordion from '@webapp/commonComponents/accordion'
+import ExpansionPanel from '@webapp/commonComponents/expansionPanel'
 
 import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'
@@ -28,7 +28,7 @@ const NodeDefsSelectorAggregateView = (props) => {
 
       {nodeDefUuidEntity && (
         <>
-          <Accordion buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
+          <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={() => {}}
               lang={lang}
@@ -38,9 +38,9 @@ const NodeDefsSelectorAggregateView = (props) => {
               showAncestorsLabel={false}
               showMultipleAttributes={false}
             />
-          </Accordion>
+          </ExpansionPanel>
 
-          <Accordion buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
+          <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={() => {}}
               lang={lang}
@@ -50,7 +50,7 @@ const NodeDefsSelectorAggregateView = (props) => {
               showAncestorsLabel={false}
               showMultipleAttributes={false}
             />
-          </Accordion>
+          </ExpansionPanel>
         </>
       )}
     </div>

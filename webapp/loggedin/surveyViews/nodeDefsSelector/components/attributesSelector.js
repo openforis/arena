@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey } from '@webapp/commonComponents/hooks'
-import Accordion from '@webapp/commonComponents/accordion'
+import ExpansionPanel from '@webapp/commonComponents/expansionPanel'
 
 import AttributeSelector from './attributeSelector'
 
@@ -37,7 +37,7 @@ const AttributesSelector = (props) => {
 
   return (
     <div className="attributes-selector">
-      <Accordion buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
+      <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
         {childDefs.map((childDef) => (
           <AttributeSelector
             key={NodeDef.getUuid(childDef)}
@@ -51,7 +51,7 @@ const AttributesSelector = (props) => {
             showMultipleAttributes={showMultipleAttributes}
           />
         ))}
-      </Accordion>
+      </ExpansionPanel>
 
       {showAncestors && nodeDefParent && (
         <AttributesSelector

@@ -1,32 +1,33 @@
-import './accordion.scss'
+import './expansionPanel.scss'
 import React, { useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/commonComponents/hooks'
 
-const Accordion = (props) => {
+const ExpansionPanel = (props) => {
   const { buttonLabel, buttonLabelParams, children, showHeader } = props
   const i18n = useI18n()
-  const accordionRef = useRef(null)
-  const accordionPanelRef = useRef(null)
+  const panelRef = useRef(null)
+  const contentRef = useRef(null)
 
-  useLayoutEffect(() => {
-    accordionPanelRef.current.style.maxHeight = `${accordionPanelRef.current.scrollHeight}px`
-  }, [])
+  const setContentHeight = () => {
+    const content = contentRef.current
+    const closed = panelRef.current.classList.contains('close')
+    content.style.maxHeight = `${closed ? 0 : content.scrollHeight}px`
+  }
+
+  useLayoutEffect(setContentHeight, [])
 
   return (
-    <div className="accordion" ref={accordionRef}>
+    <div className="expansion-panel" ref={panelRef}>
       {showHeader && (
-        <div className="accordion__header">
+        <div className="expansion-panel__header">
           <button
             type="button"
             className="btn-xs btn-transparent btn-toggle"
             onClick={() => {
-              const accordion = accordionRef.current
-              const panel = accordionPanelRef.current
-              const closed = accordion.classList.contains('close')
-              accordion.classList.toggle('close')
-              panel.style.maxHeight = `${closed ? panel.scrollHeight : 0}px`
+              panelRef.current.classList.toggle('close')
+              setContentHeight()
             }}
           >
             <span className="icon icon-cross icon-10px" />
@@ -34,23 +35,25 @@ const Accordion = (props) => {
           {i18n.t(buttonLabel, buttonLabelParams)}
         </div>
       )}
-      <div className="accordion__panel" ref={accordionPanelRef}>
+
+      <div className="expansion-panel__content" ref={contentRef}>
         {React.Children.toArray(children)}
       </div>
     </div>
   )
 }
 
-Accordion.propTypes = {
-  buttonLabel: PropTypes.string.isRequired,
+ExpansionPanel.propTypes = {
+  buttonLabel: PropTypes.string,
   buttonLabelParams: PropTypes.object,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   showHeader: PropTypes.bool,
 }
 
-Accordion.defaultProps = {
+ExpansionPanel.defaultProps = {
+  buttonLabel: '',
   buttonLabelParams: {},
   showHeader: true,
 }
 
-export default Accordion
+export default ExpansionPanel

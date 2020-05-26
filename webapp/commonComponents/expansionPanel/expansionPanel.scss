@@ -1,0 +1,23 @@
+@import 'webapp/style/vars';
+
+.expansion-panel {
+  .btn-toggle {
+    color: $black;
+    padding: 1px 0.3rem 0;
+
+    &:hover {
+      color: lighten($black, 25%);
+    }
+  }
+}
+
+.expansion-panel.close {
+  .btn-toggle {
+    transform: rotate(45deg);
+  }
+}
+
+.expansion-panel__content {
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
