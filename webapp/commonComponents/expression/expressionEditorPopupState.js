@@ -16,7 +16,7 @@ const initialState = {
   exprDraftValid: true,
 }
 
-export const useExpressionEditorPopupState = props => {
+export const useExpressionEditorPopupState = (props) => {
   const { query, expr, mode, canBeConstant, setExpressionCanBeApplied } = props
 
   // An encoding trick. Newlines can only appear in a textarea,
@@ -41,10 +41,10 @@ export const useExpressionEditorPopupState = props => {
     })
   }, [])
 
-  const updateDraft = exprDraft => {
+  const updateDraft = (exprDraft) => {
     const queryDraft = Expression.toString(exprDraft, mode)
     const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
-    setState(prevState => {
+    setState((prevState) => {
       setExpressionCanBeApplied(query !== queryDraft && exprDraftValid)
       return {
         ...prevState,
@@ -56,7 +56,7 @@ export const useExpressionEditorPopupState = props => {
   }
 
   const resetDraft = () => {
-    setState(prevState => {
+    setState((prevState) => {
       setExpressionCanBeApplied(query !== '')
       return {
         ...prevState,
@@ -76,7 +76,7 @@ export const useExpressionEditorPopupState = props => {
   }
 }
 
-export const useAdvancedExpressionEditorPopupState = props => {
+export const useAdvancedExpressionEditorPopupState = (props) => {
   const { query, expr, mode, canBeConstant } = props
 
   const [state, setState] = useState(initialState)
@@ -93,9 +93,9 @@ export const useAdvancedExpressionEditorPopupState = props => {
     })
   }, [])
 
-  const updateDraft = queryDraft => {
+  const updateDraft = (queryDraft) => {
     if (queryDraft === '') {
-      setState(prevState => ({
+      setState((prevState) => ({
         ...prevState,
         queryDraft,
         exprDraft: null,
@@ -104,7 +104,7 @@ export const useAdvancedExpressionEditorPopupState = props => {
     } else {
       const exprDraft = Expression.fromString(queryDraft)
       const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
-      setState(prevState => ({
+      setState((prevState) => ({
         ...prevState,
         queryDraft,
         exprDraft,
