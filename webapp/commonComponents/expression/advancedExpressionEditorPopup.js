@@ -1,29 +1,22 @@
 import './expressionEditorPopup.scss'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { connect } from 'react-redux'
-
+import PropTypes from 'prop-types'
 import CodeMirror from 'codemirror/lib/codemirror'
 import 'codemirror/addon/hint/show-hint'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
 import { useI18n } from '@webapp/commonComponents/hooks'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
-import { mapStateToProps } from './expressionEditorPopupState'
 
-const validateExpression = (nodeDefCurrent, variables, exprString) => {
+const validateExpression = (variablesIds, exprString) => {
   try {
     const expr = Expression.fromString(exprString)
     const ids = getExpressionIdentifiers(expr)
-    const unknownIds = ids.filter(
-      id =>
-        !variables
-          .filter(v => v.value !== nodeDefCurrent.props.name)
-          .map(v => v.value)
-          .includes(id),
-    )
+    const unknownIds = ids.filter((id) => !variablesIds.includes(id))
 
     if (unknownIds.length > 0)
       return { error: 'identifierError', message: `Unknown variable: ${unknownIds.join(', ')}` }
@@ -35,20 +28,17 @@ const validateExpression = (nodeDefCurrent, variables, exprString) => {
   }
 }
 
-const CodeMirrorComponent = props => {
+const AdvancedExpressionEditorPopup = (props) => {
+  const { nodeDefCurrent, query, setExpressionCanBeApplied, variables, updateDraftQuery } = props
+
   const inputRef = useRef()
   const i18n = useI18n()
 
-  const { nodeDefCurrent, setValidation, setExpressionCanBeApplied, query, updateDraft, variables } = props
+  const [validation, setValidation] = useState({})
 
-  // NB: updateDraft is an unstable dependency so don't use it
-  const effectDependencies = [
-    nodeDefCurrent,
-    setValidation,
-    setExpressionCanBeApplied,
-    query,
-    ...variables.map(x => x.value),
-  ]
+  const variablesOtherNodeDefs = variables.filter((v) => v.uuid !== NodeDef.getUuid(nodeDefCurrent))
+
+  const variablesIds = variablesOtherNodeDefs.map((x) => x.value)
 
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {
@@ -56,55 +46,35 @@ const CodeMirrorComponent = props => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint.bind(null, i18n, variables) },
+      hintOptions: { hint: arenaExpressionHint.bind(null, i18n, variablesOtherNodeDefs) },
     })
     editor.setSize('100%', 'auto')
 
     editor.setValue(query)
-    const onChange = cm => {
+
+    editor.on('change', (cm) => {
       const value = cm.getValue()
-      const newValidation = value.trim() === '' ? {} : validateExpression(nodeDefCurrent, variables, value)
+      const newValidation = value.trim() === '' ? {} : validateExpression(variablesIds, value)
       setValidation(newValidation)
       setExpressionCanBeApplied(query !== value && !newValidation.error)
-      if (!newValidation.error) updateDraft(value.trim())
-    }
+      if (!newValidation.error) updateDraftQuery(value.trim())
+    })
 
-    editor.on('change', onChange)
     return () => editor.toTextArea()
-  }, effectDependencies)
+  }, [query, ...variablesIds])
 
-  return (
-    <div>
-      <textarea ref={inputRef} />
-      <div className="expression-editor-popup__editor-help">
-        <p>{i18n.t('nodeDefEdit.editorHelp')}</p>
-        <p>
-          <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-const AdvancedExpressionEditorPopup = props => {
-  const [validation, setValidation] = useState({})
-
-  const { nodeDefCurrent, variables, setExpressionCanBeApplied, query, updateDraft } = props
-
-  const variables2 = variables.filter(v => v.value !== nodeDefCurrent.props.name)
-
-  const updateInputProps = {
-    nodeDefCurrent,
-    variables: variables2,
-    setValidation,
-    setExpressionCanBeApplied,
-    query,
-    updateDraft,
-  }
   return (
     <div>
       <div className="expression-editor-popup__expr-container" style={{ fontSize: '1rem' }}>
-        <CodeMirrorComponent {...updateInputProps} />
+        <div>
+          <textarea ref={inputRef} />
+          <div className="expression-editor-popup__editor-help">
+            <p>{i18n.t('nodeDefEdit.editorHelp')}</p>
+            <p>
+              <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
+            </p>
+          </div>
+        </div>
       </div>
 
       <br />
@@ -116,15 +86,17 @@ const AdvancedExpressionEditorPopup = props => {
   )
 }
 
-AdvancedExpressionEditorPopup.defaultProps = {
-  query: '', // String representing the expression
-  // NOTE: One of the two above is passed on component creation
-  nodeDefUuidContext: '', // Entity
-  nodeDefUuidCurrent: null, // Attribute
-  isBoolean: true, // True if expression returns a boolean condition
-
-  onClose: _ => {},
-  onChange: _ => {},
+AdvancedExpressionEditorPopup.propTypes = {
+  nodeDefCurrent: PropTypes.object,
+  query: PropTypes.string, // String representing the expression
+  setExpressionCanBeApplied: PropTypes.func.isRequired,
+  updateDraftQuery: PropTypes.func.isRequired,
+  variables: PropTypes.arrayOf(Object).isRequired,
 }
 
-export default connect(mapStateToProps)(AdvancedExpressionEditorPopup)
+AdvancedExpressionEditorPopup.defaultProps = {
+  nodeDefCurrent: null,
+  query: '',
+}
+
+export default AdvancedExpressionEditorPopup
