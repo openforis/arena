@@ -30,11 +30,13 @@ const _getNodeValue = (survey, node) => {
   }
 
   const value = Node.getValue(node)
-  return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
-    ? Number(value)
-    : NodeDef.isBoolean(nodeDef)
-    ? value === 'true'
-    : value
+  if (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) {
+    return Number(value)
+  }
+  if (NodeDef.isBoolean(nodeDef)) {
+    return value === 'true'
+  }
+  return value
 }
 
 const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) => {
@@ -48,7 +50,7 @@ const _getReferencedNodesParent = (survey, record, nodeCtx, nodeDefReferenced) =
     return nodeCtx
   }
 
-  if (R.startsWith(nodeDefCtxH, nodeDefReferencedH)) {
+  if (R.startsWith(nodeDefReferencedH, nodeDefCtxH)) {
     // NodeDefReferenced belongs to an ancestor of nodeDefContext
     const nodeCtxH = R.pipe(
       Node.getHierarchy,
@@ -96,21 +98,11 @@ export const evalNodeQuery = (survey, record, node, query) => {
   return Expression.evalString(query, { node, functions })
 }
 
-export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
-  R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
-
-export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
-  const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
-
-  return applicableExpressions.map((expression) => ({
-    expression,
-    value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression)),
-  }))
-}
-
 const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = []
-  for (const expression of expressions) {
+  for (let i = 0; i < expressions.length; i += 1) {
+    const expression = expressions[i]
+
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
 
     if (StringUtils.isBlank(applyIfExpr) || evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
@@ -124,3 +116,15 @@ const _getApplicableExpressions = (survey, record, nodeCtx, expressions, stopAtF
 
   return applicableExpressions
 }
+
+export const evalApplicableExpressions = (survey, record, node, expressions, stopAtFirstFound = false) => {
+  const applicableExpressions = _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
+
+  return applicableExpressions.map((expression) => ({
+    expression,
+    value: evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression)),
+  }))
+}
+
+export const evalApplicableExpression = (survey, record, nodeCtx, expressions) =>
+  R.head(evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
