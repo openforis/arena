@@ -19,7 +19,9 @@ export const getParams = (req) =>
 
 export const getJsonParam = (req, param, defaultValue = null) => {
   const jsonStr = R.prop(param, getParams(req))
-  return jsonStr ? JSON.parse(jsonStr) : defaultValue
+  if (jsonStr && typeof jsonStr === 'string') return JSON.parse(jsonStr)
+  if (jsonStr && typeof jsonStr === 'object') return jsonStr // already parsed to a JSON object
+  return defaultValue
 }
 
 export const getFile = R.pathOr(null, ['files', 'file'])
