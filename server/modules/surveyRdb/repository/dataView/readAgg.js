@@ -10,17 +10,6 @@ import * as DataSort from '../../../../../common/surveyRdb/dataSort'
 import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
 import { ViewDataNodeDef } from '../../../../../common/model/db'
 
-const _getSelectFieldsDimensions = (dimensions) => {
-  const fields = []
-  const params = {}
-  dimensions.forEach((dimension, i) => {
-    const paramName = `dimension_field_${i}`
-    fields.push(`$/${paramName}:name/`)
-    params[paramName] = dimension
-  })
-  return { fields, params }
-}
-
 const _getSelectFieldsMesaures = (measures) => {
   const fields = []
   const params = {}
@@ -42,82 +31,19 @@ const _getSelectFieldsMesaures = (measures) => {
   return { fields, params }
 }
 
-/**
- * Counts the number of rows of a data view associated to an entity node definition,
- * aggregated by the given measures aggregate functions, grouped by the given dimensions and
- * filtered by the given filter.
- *
- * @param {!object} params - The query parameters.
- * @param {!number} [params.surveyId] - The survey ID.
- * @param {!string} [params.cycle] - The survey cycle.
- * @param {!string} [params.table] - The view to select.
- * @param {!object} [params.measures] - The measures object, indexed by column names.
- * @param {boolean} [params.dimensions=[]] - The dimensions to select.
- * @param {object} [params.filter=null] - The filter expression object.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
- * @returns {Promise<number>} - The count of rows.
- */
-export const countViewDataAgg = async (params, client = db) => {
-  const { surveyId, cycle, table, measures, dimensions, filter } = params
-
-  // SELECT fields measures
-  const { fields: selectFieldsMeasures, params: selectParamsMeasures } = _getSelectFieldsMesaures(measures)
-
-  // SELECT fields dimensions
-  const { fields: selectFieldsDimensions, params: selectParamsDimensions } = _getSelectFieldsDimensions(dimensions)
-
-  // WHERE clause
-  const { clause: filterClause, params: filterParams } = filter ? DataFilter.getWherePreparedStatement(filter) : {}
-
-  // GROUP clause
-  const groupClause = selectFieldsDimensions.length > 0 ? `GROUP BY ${selectFieldsDimensions.join(', ')}` : ''
-
-  return client.one(
-    `
-    SELECT COUNT(*) AS count
-    FROM (
-      SELECT ${selectFieldsMeasures.concat(selectFieldsDimensions).join(', ')}, COUNT(*) AS count
-      FROM 
-        ${Schemata.getSchemaSurveyRdb(surveyId)}.$/table:name/
-      WHERE 
-        ${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/
-        ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
-      ${groupClause}
-    ) AS t
-    `,
-    {
-      table,
-      cycle,
-      ...selectParamsMeasures,
-      ...selectParamsDimensions,
-      ...filterParams,
-    },
-    (row) => Number(row.count)
-  )
+const _getSelectFieldsDimensions = (dimensions) => {
+  const fields = []
+  const params = {}
+  dimensions.forEach((dimension, i) => {
+    const paramName = `dimension_field_${i}`
+    fields.push(`$/${paramName}:name/`)
+    params[paramName] = dimension
+  })
+  return { fields, params }
 }
 
-/**
- * Runs a select query on a data view associated to an entity node definition,
- * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
- *
- * @param {!object} params - The query parameters.
- * @param {!number} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
- * @param {!string} [params.table] - The view to select.
- * @param {!object} [params.measures] - The measures object, indexed by column names.
- * @param {boolean} [params.dimensions=[]] - The dimensions to select.
- * @param {object} [params.filter=null] - The filter expression object.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
- * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
- * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
- */
-export const fetchViewDataAgg = async (params, client = db) => {
-  const { surveyId, cycle, table, measures, dimensions, filter, limit, offset, sort, stream } = params
+const _getSelectQuery = (params) => {
+  const { surveyId, cycle, table, measures, dimensions, filter, sort } = params
 
   // SELECT fields measures
   const { fields: selectFieldsMeasures, params: selectParamsMeasures } = _getSelectFieldsMesaures(measures)
@@ -146,8 +72,6 @@ export const fetchViewDataAgg = async (params, client = db) => {
     GROUP BY ${groupFields.join(', ')}
     ORDER BY
       ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}${ViewDataNodeDef.columnSet.dateModified} DESC NULLS LAST
-    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}
   `
   const queryParams = {
     table,
@@ -156,9 +80,77 @@ export const fetchViewDataAgg = async (params, client = db) => {
     ...selectParamsDimensions,
     ...filterParams,
     ...sortParams,
+  }
+
+  return { select, queryParams }
+}
+
+/**
+ * Counts the number of rows of a data view associated to an entity node definition,
+ * aggregated by the given measures aggregate functions, grouped by the given dimensions and
+ * filtered by the given filter.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!number} [params.surveyId] - The survey ID.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!string} [params.table] - The view to select.
+ * @param {!object} [params.measures] - The measures object, indexed by column names.
+ * @param {boolean} [params.dimensions=[]] - The dimensions to select.
+ * @param {object} [params.filter=null] - The filter expression object.
+ * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<number>} - The count of rows.
+ */
+export const countViewDataAgg = async (params, client = db) => {
+  const { select, queryParams } = _getSelectQuery(params)
+
+  return client.one(
+    `
+    SELECT COUNT(*) AS count
+    FROM (
+      ${select}
+    ) AS t
+    `,
+    { ...queryParams },
+    (row) => Number(row.count)
+  )
+}
+
+/**
+ * Runs a select query on a data view associated to an entity node definition,
+ * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!number} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!string} [params.table] - The view to select.
+ * @param {!object} [params.measures] - The measures object, indexed by column names.
+ * @param {boolean} [params.dimensions=[]] - The dimensions to select.
+ * @param {object} [params.filter=null] - The filter expression object.
+ * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.limit=null] - The query limit.
+ * @param {SortCriteria[]} [params.sort=[]] - The sort conditions.
+ * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewDataAgg = async (params, client = db) => {
+  const { limit, offset, stream } = params
+  const { select, queryParams } = _getSelectQuery(params)
+
+  const selectWithLimit = `${select}     
+    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
+    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`
+
+  const queryParamsWithLimit = {
+    ...queryParams,
     limit,
     offset,
   }
 
-  return stream ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams)) : client.any(select, queryParams)
+  return stream
+    ? new dbUtils.QueryStream(dbUtils.formatQuery(selectWithLimit, queryParamsWithLimit))
+    : client.any(selectWithLimit, queryParamsWithLimit)
 }
