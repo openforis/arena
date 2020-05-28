@@ -1,5 +1,7 @@
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
+import * as DateUtils from '../../../../core/dateUtils'
+
+import * as Request from '../../../utils/request'
+import * as Response from '../../../utils/response'
 
 import * as SurveyRdbService from '../service/surveyRdbService'
 
@@ -28,7 +30,9 @@ export const init = (app) => {
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const params = _getParamsQuery(req)
+
       const rows = await SurveyRdbService.fetchViewData(params)
+
       res.json(rows)
     } catch (error) {
       next(error)
@@ -41,6 +45,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const params = _getParamsQuery(req)
+
         const count = await SurveyRdbService.countTable(params)
 
         res.json(count)
@@ -52,11 +57,10 @@ export const init = (app) => {
 
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const params = {
-        ..._getParamsQuery(req),
-        streamOutput: res,
-      }
-      Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
+      const params = { ..._getParamsQuery(req), streamOutput: res }
+
+      const outputFileName = `data-export-${DateUtils.nowFormatDefault()}.csv`
+      Response.setContentTypeFile(res, outputFileName, null, Response.contentTypes.csv)
 
       await SurveyRdbService.fetchViewData(params)
     } catch (error) {
@@ -70,6 +74,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const params = _getParamsQueryAgg(req)
+
         const rows = await SurveyRdbService.fetchViewDataAgg(params)
 
         res.json(rows)
@@ -85,6 +90,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const params = _getParamsQueryAgg(req)
+
         const count = await SurveyRdbService.countViewDataAgg(params)
 
         res.json(count)
@@ -99,11 +105,10 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const params = {
-          ..._getParamsQueryAgg(req),
-          streamOutput: res,
-        }
-        Response.setContentTypeFile(res, 'data-aggregate.csv', null, Response.contentTypes.csv)
+        const params = { ..._getParamsQueryAgg(req), streamOutput: res }
+
+        const outputFileName = `data-export-${DateUtils.nowFormatDefault()}.csv`
+        Response.setContentTypeFile(res, outputFileName, null, Response.contentTypes.csv)
 
         await SurveyRdbService.fetchViewDataAgg(params)
       } catch (error) {
