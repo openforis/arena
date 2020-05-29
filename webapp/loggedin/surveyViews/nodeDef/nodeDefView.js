@@ -62,6 +62,7 @@ const NodeDefView = () => {
   const validation = useSelector(NodeDefState.getValidation)
   const isDirty = useSelector(NodeDefState.isDirty)
 
+  const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = _isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
@@ -90,6 +91,9 @@ const NodeDefView = () => {
       <>
         <div className="node-def-edit">
           <div className="node-def-edit__container">
+            <div className="node-def-edit__title">
+              {nodeDefName || ' - '} ({NodeDef.getType(nodeDef)})
+            </div>
             <TabBar
               showTabs={!NodeDef.isAnalysis(nodeDef)}
               tabs={[
@@ -151,7 +155,7 @@ const NodeDefView = () => {
                 type="button"
                 className="btn btn-primary"
                 onClick={() => dispatch(saveNodeDefEdits())}
-                aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
+                aria-disabled={!isDirty || StringUtils.isBlank(nodeDefName)}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
                 {i18n.t('common.save')}

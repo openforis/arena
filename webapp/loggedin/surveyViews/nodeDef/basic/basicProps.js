@@ -67,10 +67,6 @@ const BasicProps = (props) => {
 
   return (
     <div className="form">
-      <FormItem label={i18n.t('common.type')}>
-        <p>{nodeDef.type}</p>
-      </FormItem>
-
       {NodeDef.isAnalysis(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
           <Checkbox checked disabled />
