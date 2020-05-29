@@ -13,7 +13,7 @@
 .node-def-edit__container {
   height: 100%;
   display: grid;
-  grid-template-rows: 0.05fr 0.85fr 0.1fr;
+  grid-template-rows: 6rem 0.9fr 0.1fr;
 
   .form {
     grid-row-gap: 1.5rem;
@@ -25,7 +25,6 @@
 }
 
 .node-def-edit__title {
-  text-align: center;
   align-self: center;
 }
 

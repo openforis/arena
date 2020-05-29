@@ -8,11 +8,13 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
@@ -91,8 +93,20 @@ const NodeDefView = () => {
       <>
         <div className="node-def-edit">
           <div className="node-def-edit__container">
-            <div className="node-def-edit__title">
-              {nodeDefName || ' - '} ({NodeDef.getType(nodeDef)})
+            <div className="node-def-edit__title form">
+              <FormItem label={i18n.t('common.type')}>
+                <p>{NodeDef.getType(nodeDef)}</p>
+              </FormItem>
+
+              <FormItem label={i18n.t('common.name')}>
+                <Input
+                  value={NodeDef.getName(nodeDef)}
+                  validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+                  onChange={(value) =>
+                    dispatch(setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
+                  }
+                />
+              </FormItem>
             </div>
             <TabBar
               showTabs={!NodeDef.isAnalysis(nodeDef)}

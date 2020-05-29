@@ -9,16 +9,17 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { uuidv4 } from '@core/uuid'
-import { normalizeName } from '@core/stringUtils'
 
 import { useI18n, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import { FormItem } from '@webapp/commonComponents/form/input'
 import Checkbox from '@webapp/commonComponents/form/checkbox'
 import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+
 import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
+
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
@@ -72,14 +73,6 @@ const BasicProps = (props) => {
           <Checkbox checked disabled />
         </FormItem>
       )}
-
-      <FormItem label={i18n.t('common.name')}>
-        <Input
-          value={NodeDef.getName(nodeDef)}
-          validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-          onChange={(value) => setNodeDefProp(NodeDef.propKeys.name, normalizeName(value))}
-        />
-      </FormItem>
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
