@@ -15,6 +15,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
 import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
@@ -65,6 +66,7 @@ const NodeDefView = () => {
   const isDirty = useSelector(NodeDefState.isDirty)
 
   const nodeDefName = NodeDef.getName(nodeDef)
+  const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = _isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
@@ -93,21 +95,17 @@ const NodeDefView = () => {
       <>
         <div className="node-def-edit">
           <div className="node-def-edit__container">
-            <div className="node-def-edit__title form">
-              <FormItem label={i18n.t('common.type')}>
-                <p>{NodeDef.getType(nodeDef)}</p>
-              </FormItem>
+            <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
+              <Input
+                value={NodeDef.getName(nodeDef)}
+                validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+                onChange={(value) => dispatch(setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))}
+              />
+              <div className="attribute-selector">
+                {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}
+              </div>
+            </FormItem>
 
-              <FormItem label={i18n.t('common.name')}>
-                <Input
-                  value={NodeDef.getName(nodeDef)}
-                  validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-                  onChange={(value) =>
-                    dispatch(setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
-                  }
-                />
-              </FormItem>
-            </div>
             <TabBar
               showTabs={!NodeDef.isAnalysis(nodeDef)}
               tabs={[
