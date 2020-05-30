@@ -8,11 +8,14 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
 import TabBar from '@webapp/commonComponents/tabBar'
+import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
@@ -62,6 +65,8 @@ const NodeDefView = () => {
   const validation = useSelector(NodeDefState.getValidation)
   const isDirty = useSelector(NodeDefState.isDirty)
 
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = _isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
@@ -90,6 +95,17 @@ const NodeDefView = () => {
       <>
         <div className="node-def-edit">
           <div className="node-def-edit__container">
+            <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
+              <Input
+                value={NodeDef.getName(nodeDef)}
+                validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+                onChange={(value) => dispatch(setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))}
+              />
+              <div className="attribute-selector">
+                {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}
+              </div>
+            </FormItem>
+
             <TabBar
               showTabs={!NodeDef.isAnalysis(nodeDef)}
               tabs={[
@@ -151,7 +167,7 @@ const NodeDefView = () => {
                 type="button"
                 className="btn btn-primary"
                 onClick={() => dispatch(saveNodeDefEdits())}
-                aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
+                aria-disabled={!isDirty || StringUtils.isBlank(nodeDefName)}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
                 {i18n.t('common.save')}
