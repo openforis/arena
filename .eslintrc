@@ -7,6 +7,9 @@
     "jest": true,
     "node": true
   },
+  "globals": {
+    "step": "readonly"
+  },
   "plugins": ["prettier", "jsdoc"],
   "rules": {
     "no-console": "error",
@@ -42,6 +45,7 @@
     "jsdoc/require-returns-type": 2,
     "jsdoc/valid-types": 2
   },
+
   "settings": {
     "import/resolver": {
       "webpack": {

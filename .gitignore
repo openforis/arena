@@ -267,3 +267,5 @@ modules.xml
 .idea/sonarlint
 
 # End of https://www.gitignore.io/api/node,terraform,visualstudiocode,webstorm+all,macos,linux
+reports
+.gauge
