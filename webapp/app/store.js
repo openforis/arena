@@ -3,7 +3,6 @@ import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly'
 
-import * as ProcessUtils from '@core/processUtils'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
