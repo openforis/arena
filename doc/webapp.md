@@ -1,0 +1,94 @@
+- webapp
+    - Main.js
+    - Routes.js
+    - components
+    - main
+        - style
+        - middleware
+        - store.js
+    - service
+        - api
+        - socket
+    - utils
+    - views
+        - guest
+        - app
+            - index.js
+            - AppView.js
+            - AppView.scss
+            - components
+                - header
+                - job
+                - sideBar
+            - views
+                - home
+                    - index.js
+                    - HomeView.js
+                    - HomeView.scss
+                    - views
+                        - collectImportReport
+                        - dashboard
+                        - surveyCreate
+                        - surveyList
+                - designer
+                - data
+                - analysis
+                - user
+                - table
+                - survey
+                    - categories
+                    - category
+                    - categorySelector
+                    - cyclesSelect
+                    - items
+                    - labelsEditor
+                    - nodeDef
+                    - nodeDefsSelector
+                    - record
+                    - surveyDefsLoader
+                    - surveyForm
+                    - taxonomies
+                    - taxonomy
+    - store
+        - app
+            - dialogConfirm
+            - errors
+            - job
+            - notification
+            - i18n
+            - user
+            - loader
+            - status
+            - sideBar
+        - survey
+            - actions
+                - read
+                - update
+                - index.js
+            - state
+            - reducer
+            - hooks
+            - index.js
+        - collectImportReport
+        - recordsSummary
+        - activityLog
+        - surveyCreate
+        - dataVis
+        - category
+        - nodeDef
+        - record
+        - surveyForm
+        - taxonomy
+        - table
+            - records
+            - validationReports
+            - surveys
+        - user
+        - userInvite
+
+```
+import {SurveyState, SurveyActions, useSurveyInfo} from '@webapp/store/survey'
+
+dispatch(SurveyActions.updateSomething())
+useSurveyInfo()
+```
