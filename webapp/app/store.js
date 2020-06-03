@@ -1,6 +1,7 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux'
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly'
 
 import * as ProcessUtils from '@core/processUtils'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
@@ -20,6 +21,7 @@ import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
 import * as LoginState from '@webapp/guest/login/loginState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
+
 const appReducers = {
   [AppState.stateKey]: AppReducer,
   [LoginState.stateKey]: LoginReducer,
@@ -38,13 +40,13 @@ const createReducer = (asyncReducers) =>
 // App middleware
 const middleware = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
-if (ProcessUtils.isEnvDevelopment) {
-  const { logger } = require('redux-logger')
-  middleware.push(logger)
-}
-
 // App store
-export const store = createStore(createReducer({}), applyMiddleware(...middleware))
+export const store = createStore(
+    createReducer({}),
+    composeWithDevTools(
+      applyMiddleware(...middleware)
+    )
+)
 
 store.asyncReducers = {}
 
