@@ -33,7 +33,7 @@ const SurveyListView = props => {
     <TableView
       module="surveys"
       moduleApiUri="/api/surveys"
-      gridTemplateColumns="50px repeat(5, 1.5fr)"
+      gridTemplateColumns="50px repeat(6, 1.5fr)"
       headerLeftComponent={SurveyListHeaderLeft}
       rowHeaderComponent={SurveyListRowHeader}
       rowComponent={SurveyListRow}

@@ -13,6 +13,7 @@ const SurveyListRowHeader = () => {
       <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>
       <div>{i18n.t('homeView.surveyList.status')}</div>
+      <div>{i18n.t('common.owner')}</div>
     </>
   )
 }

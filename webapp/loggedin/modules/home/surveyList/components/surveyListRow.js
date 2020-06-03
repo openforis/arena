@@ -19,6 +19,7 @@ const SurveyListRow = props => {
       <div>{DateUtils.getRelativeDate(i18n, Survey.getDateCreated(surveyInfoRow))}</div>
       <div>{DateUtils.getRelativeDate(i18n, Survey.getDateModified(surveyInfoRow))}</div>
       <div>{Survey.getStatus(surveyInfoRow)}</div>
+      <div>{Survey.getOwnerName(surveyInfoRow)}</div>
     </>
   )
 }
