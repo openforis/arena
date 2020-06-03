@@ -43,7 +43,7 @@ export const getUuid = ObjectUtils.getUuid
 
 export const getName = ObjectUtils.getProp(keys.name, '')
 
-export const getOwnerName = ObjectUtils.getOwnerName
+export const getOwnerName = R.propOr('', keys.ownerName)
 
 export const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
 

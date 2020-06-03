@@ -11,7 +11,6 @@ export const keys = {
   id: 'id',
   index: 'index',
   name: 'name',
-  ownerName: 'ownerName',
   nodeDefUuid: 'nodeDefUuid',
   parentUuid: 'parentUuid',
   props: 'props',
@@ -32,7 +31,6 @@ export const isEqual = other => self => getUuid(other) === getUuid(self)
 // ====== READ
 export const getId = R.prop(keys.id)
 export const getUuid = R.propOr(null, keys.uuid)
-export const getOwnerName = R.propOr(null, keys.ownerName)
 
 export const getProps = R.propOr({}, keys.props)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
