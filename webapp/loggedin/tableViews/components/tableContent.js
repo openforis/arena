@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 import * as TableViewsState from '@webapp/loggedin/tableViews/tableViewsState'
 
 const TableContent = (props) => {

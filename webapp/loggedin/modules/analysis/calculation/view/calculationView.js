@@ -8,9 +8,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as Validation from '@core/validation/validation'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
+import { FormItem } from '@webapp/components/form/input'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import Dropdown from '@webapp/components/form/dropdown'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'

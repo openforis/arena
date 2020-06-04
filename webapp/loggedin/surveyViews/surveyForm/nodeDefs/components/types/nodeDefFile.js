@@ -3,8 +3,8 @@ import './nodeDefFile.scss'
 import React from 'react'
 import { uuidv4 } from '@core/uuid'
 
-import UploadButton from '@webapp/commonComponents/form/uploadButton'
-import DownloadButton from '@webapp/commonComponents/form/downloadButton'
+import UploadButton from '@webapp/components/form/uploadButton'
+import DownloadButton from '@webapp/components/form/downloadButton'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'

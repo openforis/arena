@@ -4,7 +4,7 @@ import React from 'react'
 
 import * as User from '@core/user/user'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 import NotLoggedInView from '../components/notLoggedInView'
 

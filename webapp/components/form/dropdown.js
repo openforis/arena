@@ -49,10 +49,10 @@ class Dropdown extends React.Component {
 
   toggleOpened(callback = null) {
     if (!(this.props.readOnly || this.props.disabled)) {
-      this.setState(
-        {
-          opened: !this.state.opened,
-        },
+      this.setState( prevState => ({
+        ...prevState,
+        opened: !prevState.opened,
+      }),
         callback,
       )
     }

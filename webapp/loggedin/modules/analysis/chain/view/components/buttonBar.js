@@ -6,7 +6,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'

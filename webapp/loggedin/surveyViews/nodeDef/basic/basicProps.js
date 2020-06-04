@@ -10,10 +10,10 @@ import * as Validation from '@core/validation/validation'
 
 import { uuidv4 } from '@core/uuid'
 
-import { useI18n, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
-import { FormItem } from '@webapp/commonComponents/form/input'
-import Checkbox from '@webapp/commonComponents/form/checkbox'
-import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import { useI18n, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
+import { FormItem } from '@webapp/components/form/input'
+import Checkbox from '@webapp/components/form/checkbox'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'

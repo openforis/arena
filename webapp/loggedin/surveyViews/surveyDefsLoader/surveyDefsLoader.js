@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n, useOnSurveyCycleUpdate, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnSurveyCycleUpdate, useSurveyInfo } from '@webapp/components/hooks'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { initSurveyDefs, reloadSurveyDefs } from '@webapp/survey/actions'

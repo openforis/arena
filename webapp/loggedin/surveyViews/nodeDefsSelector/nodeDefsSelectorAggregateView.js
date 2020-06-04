@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { useSurvey, useSurveyLang } from '@webapp/commonComponents/hooks'
+import { useSurvey, useSurveyLang } from '@webapp/components/hooks'
 
-import ExpansionPanel from '@webapp/commonComponents/expansionPanel'
+import ExpansionPanel from '@webapp/components/expansionPanel'
 
 import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
+import { FormItem } from '@webapp/components/form/input'
 
 import * as NodeDef from '@core/survey/nodeDef'
 

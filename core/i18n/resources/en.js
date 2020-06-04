@@ -61,6 +61,7 @@ Do you want to cancel them?`,
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
     ok: 'Ok',
+    owner: 'Owner',
     path: 'Path',
     publish: 'Publish',
     publishConfirm: `#### You are about to publish the survey {{survey}} ####

@@ -4,10 +4,10 @@ import PropTypes from 'prop-types'
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import Checkbox from '@webapp/commonComponents/form/checkbox'
+import { FormItem } from '@webapp/components/form/input'
+import Checkbox from '@webapp/components/form/checkbox'
 
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 

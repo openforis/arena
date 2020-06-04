@@ -8,8 +8,8 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
+import { FormItem } from '@webapp/components/form/input'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionProp from './expressionProp'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 

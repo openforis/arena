@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useOnResize } from '@webapp/commonComponents/hooks'
+import { useOnResize } from '@webapp/components/hooks'
 import { elementOffset } from '@webapp/utils/domUtils'
 import YAxis, { getScale as getYScale } from './components/yAxis'
 import XAxis, { getScale as getXScale } from './components/xAxis'

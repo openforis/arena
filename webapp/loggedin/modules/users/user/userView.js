@@ -8,9 +8,9 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ProfilePicture from '@webapp/commonComponents/profilePicture'
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import { useI18n } from '@webapp/components/hooks'
+import ProfilePicture from '@webapp/components/profilePicture'
+import { FormItem, Input } from '@webapp/components/form/input'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'

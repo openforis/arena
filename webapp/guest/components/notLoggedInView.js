@@ -2,7 +2,7 @@ import './notLoggedInView.scss'
 
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 const WordSplitter = ({ word }) => word.split('').map((letter, i) => <div key={i}>{letter}</div>)
 

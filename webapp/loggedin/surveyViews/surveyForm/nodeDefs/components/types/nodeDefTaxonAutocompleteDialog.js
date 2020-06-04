@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
-import AutocompleteDialog from '@webapp/commonComponents/form/autocompleteDialog'
-import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
+import AutocompleteDialog from '@webapp/components/form/autocompleteDialog'
+import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import * as Taxon from '@core/survey/taxon'
 

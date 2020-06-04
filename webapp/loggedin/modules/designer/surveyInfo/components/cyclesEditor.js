@@ -8,8 +8,8 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
+import { useI18n } from '@webapp/components/hooks'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 

@@ -8,7 +8,7 @@ import * as RecordValidationReportItem from '@core/record/recordValidationReport
 import TableView from '@webapp/loggedin/tableViews/tableView'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 import * as SurveyState from '@webapp/survey/surveyState'
 

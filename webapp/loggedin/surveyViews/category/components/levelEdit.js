@@ -2,9 +2,9 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect, useDispatch } from 'react-redux'
 
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem, Input } from '@webapp/components/form/input'
+import ErrorBadge from '@webapp/components/errorBadge'
+import { useI18n } from '@webapp/components/hooks'
 
 import { normalizeName } from '@core/stringUtils'
 
