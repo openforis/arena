@@ -44,12 +44,14 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     })
   }
 
-  get columnUuid() {
-    return this.getColumn(`${NodeDef.getName(this.nodeDef)}_uuid`)
+  get columnNodeDefUuid() {
+    // node def can be the entity itself or it's source entity (if virtual)
+    const { nodeDef } = this.tableData
+    return new ColumnNodeDef(this, nodeDef)
   }
 
-  get columnNodeDefUuid() {
-    return new ColumnNodeDef(this, this.nodeDef)
+  get columnUuid() {
+    return this.columnNodeDefUuid.namesFull[0]
   }
 
   get columnNodeDefUuids() {
@@ -62,7 +64,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
   }
 
   get columnUuids() {
-    return this.columnNodeDefUuids.map((columnNodeDef) => columnNodeDef.namesFull).flat()
+    return this.columnNodeDefUuids.flatMap((columnNodeDef) => columnNodeDef.namesFull)
   }
 
   get columnNodeDefs() {
@@ -85,7 +87,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
   }
 
   get columnNodeDefNamesRead() {
-    return this.columnNodeDefs.map((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull).flat()
+    return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
   }
 
   get tableData() {
