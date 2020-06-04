@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { languages } from '@core/app/languages'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 const TaxaTableRowHeader = (props) => {
   const { vernacularLanguageCodes, taxonomy } = props

@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/components/form/input'
+import { useI18n } from '@webapp/components/hooks'
 
 import * as Taxon from '@core/survey/taxon'
 import * as NodeDef from '@core/survey/nodeDef'

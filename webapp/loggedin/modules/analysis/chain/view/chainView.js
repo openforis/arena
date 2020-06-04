@@ -12,12 +12,12 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useOnUpdate, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurveyInfo } from '@webapp/components/hooks'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import StepView from '@webapp/loggedin/modules/analysis/step/view'
-import ButtonRStudio from '@webapp/commonComponents/buttonRStudio'
+import ButtonRStudio from '@webapp/components/buttonRStudio'
 
 import {
   fetchChain,

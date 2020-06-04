@@ -1,8 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import InputChips from '@webapp/commonComponents/form/inputChips'
+import { useI18n } from '@webapp/components/hooks'
+import InputChips from '@webapp/components/form/inputChips'
 
 import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
 

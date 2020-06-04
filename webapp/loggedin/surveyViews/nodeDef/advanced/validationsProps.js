@@ -1,11 +1,11 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
-import Checkbox from '@webapp/commonComponents/form/checkbox'
+import { FormItem, Input } from '@webapp/components/form/input'
+import * as InputMasks from '@webapp/components/form/inputMasks'
+import Checkbox from '@webapp/components/form/checkbox'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'

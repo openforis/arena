@@ -9,7 +9,7 @@ import { withRouter } from 'react-router-dom'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'

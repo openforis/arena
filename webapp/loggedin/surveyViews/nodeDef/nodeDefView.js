@@ -12,9 +12,9 @@ import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
-import TabBar from '@webapp/commonComponents/tabBar'
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
+import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
+import TabBar from '@webapp/components/tabBar'
+import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'

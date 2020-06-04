@@ -3,9 +3,9 @@ import './itemsView.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
-import WarningBadge from '@webapp/commonComponents/warningBadge'
+import { useI18n } from '@webapp/components/hooks'
+import ErrorBadge from '@webapp/components/errorBadge'
+import WarningBadge from '@webapp/components/warningBadge'
 
 import ItemsTable from './itemsTable'
 import ItemsColumn from './itemsColumn'

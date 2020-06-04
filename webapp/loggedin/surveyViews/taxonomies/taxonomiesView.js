@@ -5,7 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

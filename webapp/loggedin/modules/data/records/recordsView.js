@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import * as Record from '@core/record/record'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import TableView from '../../../tableViews/tableView'

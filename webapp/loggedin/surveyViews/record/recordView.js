@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'

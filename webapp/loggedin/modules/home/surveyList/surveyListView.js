@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'
 import { setActiveSurvey } from '@webapp/survey/actions'

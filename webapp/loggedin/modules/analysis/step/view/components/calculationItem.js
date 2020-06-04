@@ -6,9 +6,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { useI18n, useLang, useNodeDefByUuid } from '@webapp/commonComponents/hooks'
+import { useI18n, useLang, useNodeDefByUuid } from '@webapp/components/hooks'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import ErrorBadge from '@webapp/components/errorBadge'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setCalculationForEdit } from '@webapp/loggedin/modules/analysis/step/actions'

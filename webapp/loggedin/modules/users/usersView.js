@@ -2,7 +2,7 @@ import React from 'react'
 
 import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
-import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import UsersListView from './userList/userListView'
 import UserView from './user/userView'
 import UserInviteView from './userInvite/userInviteView'

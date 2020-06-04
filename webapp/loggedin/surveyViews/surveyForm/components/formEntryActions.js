@@ -2,8 +2,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import { useI18n } from '@webapp/components/hooks'
+import ErrorBadge from '@webapp/components/errorBadge'
 
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'

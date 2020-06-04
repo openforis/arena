@@ -6,7 +6,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
-import { useFormObject, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useFormObject, useSurveyInfo } from '@webapp/components/hooks'
 import { updateSurveyInfoProps } from '@webapp/survey/surveyInfo/actions'
 
 export const useSurveyInfoViewState = () => {

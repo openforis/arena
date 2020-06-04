@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import Tooltip from '@webapp/commonComponents/tooltip'
-import ExpressionEditorPopup from '@webapp/commonComponents/expression/expressionEditorPopup'
+import Tooltip from '@webapp/components/tooltip'
+import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
 
 import { resetTableFilter, updateTableFilter } from '@webapp/loggedin/modules/data/dataVis/dataQuery/actions'
 

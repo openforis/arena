@@ -8,7 +8,7 @@ import { useHistory, useParams } from 'react-router'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 import TableView from '../../tableViews/tableView'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'

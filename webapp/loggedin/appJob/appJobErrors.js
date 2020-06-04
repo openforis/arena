@@ -3,9 +3,9 @@ import * as R from 'ramda'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
-import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
+import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 
 const validationWrapper = fields => ({
   valid: false,

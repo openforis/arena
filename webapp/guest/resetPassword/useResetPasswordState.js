@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
-import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/components/hooks'
 
 import { showNotification } from '@webapp/app/appNotification/actions'
 import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'

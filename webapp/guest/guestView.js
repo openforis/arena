@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import ResetPasswordView from '@webapp/guest/resetPassword/resetPasswordView'
 import ForgotPasswordView from '@webapp/guest/forgotPassword/forgotPasswordView'
 

@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
+import * as InputMasks from '@webapp/components/form/inputMasks'
 
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'

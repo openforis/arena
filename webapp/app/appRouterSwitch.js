@@ -9,13 +9,13 @@ import * as AppWebSocket from './appWebSocket'
 
 import * as User from '@core/user/user'
 
-import DynamicImport from '@webapp/commonComponents/dynamicImport'
+import DynamicImport from '@webapp/components/dynamicImport'
 import LoginView from '@webapp/guest/login/loginView'
 import AppLoaderView from './appLoader/appLoaderView'
 import AppDialogConfirm from './appDialogConfirm/appDialogConfirm'
 import AppNotificationView from './appNotification/appNotificationView'
 import GuestView from '@webapp/guest/guestView'
-import { useI18n, useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useI18n, useOnUpdate } from '@webapp/components/hooks'
 
 import * as AppState from './appState'
 

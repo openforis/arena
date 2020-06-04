@@ -4,9 +4,9 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import { FormItem } from '@webapp/commonComponents/form/input'
-import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import { useI18n } from '@webapp/components/hooks'
+import { FormItem } from '@webapp/components/form/input'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
 import * as SurveyState from '@webapp/survey/surveyState'
 
 const CyclesSelect = props => {

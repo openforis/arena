@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import ProgressBar from '@webapp/commonComponents/progressBar'
+import ProgressBar from '@webapp/components/progressBar'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'

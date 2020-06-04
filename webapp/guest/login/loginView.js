@@ -4,7 +4,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
+import { useI18n, useFormObject } from '@webapp/components/hooks'
 import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
 
 import { guestModules } from '@webapp/app/appModules'

@@ -3,7 +3,7 @@ import './nodeDefTableCellBody.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

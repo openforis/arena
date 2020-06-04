@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/components/form/input'
+import Dropdown from '@webapp/components/form/dropdown'
+import { useI18n } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

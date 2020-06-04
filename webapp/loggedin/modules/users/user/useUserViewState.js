@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 
-import { useUser, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useUser, useSurveyInfo } from '@webapp/components/hooks'
 import * as UserViewState from './userViewState'
 import { fetchUser, resetUserState } from './actions'
 

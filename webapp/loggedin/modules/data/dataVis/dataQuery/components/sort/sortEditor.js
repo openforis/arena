@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import * as Expression from '@core/expressionParser/expression'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
-import Popup from '@webapp/commonComponents/popup'
+import Popup from '@webapp/components/popup'
 
 import SortRow from './sortRow'
 import useSortEditorState from './useSortEditorState'

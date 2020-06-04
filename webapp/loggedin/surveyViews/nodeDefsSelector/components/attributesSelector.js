@@ -5,8 +5,8 @@ import * as PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey } from '@webapp/commonComponents/hooks'
-import ExpansionPanel from '@webapp/commonComponents/expansionPanel'
+import { useSurvey } from '@webapp/components/hooks'
+import ExpansionPanel from '@webapp/components/expansionPanel'
 
 import AttributeSelector from './attributeSelector'
 

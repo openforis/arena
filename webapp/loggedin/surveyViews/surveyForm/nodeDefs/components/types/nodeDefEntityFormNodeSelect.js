@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const NodeDefEntityFormNodeSelect = props => {
