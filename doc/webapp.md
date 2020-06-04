@@ -11,63 +11,74 @@
         - socket
     - utils
     - views
-        - guest
-        - app
+        - Guest
+        - App
             - index.js
-            - AppView.js
-            - AppView.scss
+            - App.js
+            - App.scss
             - components
-                - header
-                - job
-                - sideBar
+                - Header
+                - Job
+                - SideBar
             - views
-                - home
+                - Home
                     - index.js
-                    - HomeView.js
-                    - HomeView.scss
+                    - Home.js
+                    - Home.scss
                     - views
-                        - collectImportReport
-                        - dashboard
-                        - surveyCreate
-                        - surveyList
-                - designer
-                - data
-                - analysis
-                - user
-                - table
+                        - CollectImportReport
+                        - Dashboard
+                        - SurveyCreate
+                        - SurveyList
+                - Designer
+                - Data
+                - Analysis
+                - User
+                - Table
                 - survey
-                    - categories
-                    - category
-                    - categorySelector
-                    - cyclesSelect
-                    - items
-                    - labelsEditor
-                    - nodeDef
-                    - nodeDefsSelector
-                    - record
-                    - surveyDefsLoader
-                    - surveyForm
-                    - taxonomies
-                    - taxonomy
+                    - Categories
+                    - Category
+                    - CategorySelector
+                    - CyclesSelect
+                    - Items
+                    - LabelsEditor
+                    - NodeDef
+                    - NodeDefsSelector
+                    - Record
+                    - SurveyDefsLoader
+                    - SurveyForm
+                    - Taxonomies
+                    - Taxonomy
     - store
         - app
-            - dialogConfirm
-            - errors
-            - job
-            - notification
-            - i18n
-            - user
-            - loader
-            - status
-            - sideBar
+            - actions
+            - hooks
+            - state
+                - i18n
+                - user
+            - reducer.js
+            - index.js
+        - ui
+            - actions
+            - state
+                - dialogConfirm
+                - errors
+                - job
+                - notification
+                - loader
+                - status
+                - sideBar
+            - hooks
+            - reducer.js
+            - index.js                
         - survey
             - actions
                 - read
                 - update
                 - index.js
-            - state
-            - reducer
             - hooks
+            - state
+            - reducer.js
             - index.js
         - collectImportReport
         - recordsSummary
