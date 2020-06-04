@@ -51,7 +51,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
   }
 
   get columnUuid() {
-    return this.columnNodeDefUuid.namesFull[0]
+    return this.columnNodeDefUuid.nameFull
   }
 
   get columnNodeDefUuids() {
