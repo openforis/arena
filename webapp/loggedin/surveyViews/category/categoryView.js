@@ -10,9 +10,9 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import UploadButton from '@webapp/commonComponents/form/uploadButton'
+import { useI18n } from '@webapp/components/hooks'
+import { FormItem, Input } from '@webapp/components/form/input'
+import UploadButton from '@webapp/components/form/uploadButton'
 
 import * as AppState from '@webapp/app/appState'
 import * as SurveyState from '@webapp/survey/surveyState'

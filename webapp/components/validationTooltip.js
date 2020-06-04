@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as Validation from '@core/validation/validation'
 
-import ValidationFieldMessages from '@webapp/commonComponents/validationFieldMessages'
+import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import Tooltip from './tooltip'
 
 const ValidationTooltip = (props) => {

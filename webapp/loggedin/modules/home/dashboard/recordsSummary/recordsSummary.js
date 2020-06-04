@@ -4,8 +4,8 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
+import { useI18n } from '@webapp/components/hooks'
+import Dropdown from '@webapp/components/form/dropdown'
 
 import * as DateUtils from '@core/dateUtils'
 

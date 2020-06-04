@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n, useSurvey } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurvey } from '@webapp/components/hooks'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 import Tree from './surveyHierarchyTree'
 

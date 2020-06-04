@@ -7,7 +7,7 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import { useOnUpdate, useSurvey, useAuthCanCleanseRecords } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurvey, useAuthCanCleanseRecords } from '@webapp/components/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'

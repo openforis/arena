@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import ErrorBadge from '@webapp/components/errorBadge'
 
 import useValidation from './useValidation'
 

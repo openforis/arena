@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import { useI18n, useSurvey, useSurveyLang } from '@webapp/commonComponents/hooks'
+import { useI18n, useSurvey, useSurveyLang } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

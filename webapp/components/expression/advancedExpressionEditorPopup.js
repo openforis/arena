@@ -8,7 +8,7 @@ import 'codemirror/addon/hint/show-hint'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { getExpressionIdentifiers } from '@core/expressionParser/helpers/evaluator'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
-import { useI18n, useFormObject } from '@webapp/commonComponents/hooks'
+import { useI18n, useFormObject } from '@webapp/components/hooks'
 
 import * as LoginState from '@webapp/guest/login/loginState'
 

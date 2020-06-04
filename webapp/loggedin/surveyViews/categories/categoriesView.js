@@ -2,7 +2,7 @@ import React from 'react'
 import { connect, useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'

@@ -4,8 +4,8 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ProfilePicture from '@webapp/commonComponents/profilePicture'
+import { useI18n } from '@webapp/components/hooks'
+import ProfilePicture from '@webapp/components/profilePicture'
 
 import * as User from '@core/user/user'
 import * as AppState from '@webapp/app/appState'

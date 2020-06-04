@@ -3,9 +3,9 @@ import './appDialogConfirm.scss'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/commonComponents/modal'
-import { useI18n } from '@webapp/commonComponents/hooks'
-import Markdown from '@webapp/commonComponents/markdown'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { useI18n } from '@webapp/components/hooks'
+import Markdown from '@webapp/components/markdown'
 
 import * as AppDialogConfirmState from './appDialogConfirmState'
 import { onDialogConfirmOk, onDialogConfirmCancel } from './actions'

@@ -2,10 +2,10 @@ import './deleteSurveyDialog.scss'
 
 import React, { useState } from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import Markdown from '@webapp/commonComponents/markdown'
+import { useI18n } from '@webapp/components/hooks'
+import Markdown from '@webapp/components/markdown'
 
-import { Modal, ModalBody, ModalHeader, ModalFooter } from '@webapp/commonComponents/modal'
+import { Modal, ModalBody, ModalHeader, ModalFooter } from '@webapp/components/modal'
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const i18n = useI18n()

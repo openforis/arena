@@ -5,7 +5,7 @@ import { useHistory } from 'react-router'
 
 import * as Chain from '@common/analysis/processingChain'
 
-import { useSurveyCycleKey } from '@webapp/commonComponents/hooks'
+import { useSurveyCycleKey } from '@webapp/components/hooks'
 import TableView from '@webapp/loggedin/tableViews/tableView'
 
 import { navigateToChainView } from '@webapp/loggedin/modules/analysis/chains/actions'

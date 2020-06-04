@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 

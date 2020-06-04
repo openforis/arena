@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 
 import * as DataSort from '@common/surveyRdb/dataSort'
 
-import { useSurveyCycleKey, useSurveyId } from '@webapp/commonComponents/hooks'
-import DownloadButton from '@webapp/commonComponents/form/downloadButton'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/components/hooks'
+import DownloadButton from '@webapp/components/form/downloadButton'
 
 const ButtonDownload = (props) => {
   const { nodeDefUuidContext, nodeDefUuidCols, filter, sort, disabled } = props

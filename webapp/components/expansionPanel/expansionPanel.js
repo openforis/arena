@@ -2,7 +2,7 @@ import './expansionPanel.scss'
 import React, { useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 
 const ExpansionPanel = (props) => {
   const { buttonLabel, buttonLabelParams, children, showHeader } = props

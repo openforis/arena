@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import { useAsyncGetRequest } from '@webapp/commonComponents/hooks'
+import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/components/hooks'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
