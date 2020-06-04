@@ -10,6 +10,7 @@ export const keys = {
   uuid: ObjectUtils.keys.uuid,
   info: 'info',
   ownerUuid: 'ownerUuid',
+  ownerName: 'ownerName',
   draft: 'draft',
   published: 'published',
   authGroups: 'authGroups',
@@ -41,6 +42,8 @@ export const getId = ObjectUtils.getId
 export const getUuid = ObjectUtils.getUuid
 
 export const getName = ObjectUtils.getProp(keys.name, '')
+
+export const getOwnerName = R.propOr('', keys.ownerName)
 
 export const getDescriptions = ObjectUtils.getProp(keys.descriptions, {})
 

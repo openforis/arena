@@ -37,9 +37,12 @@ export const fetchUserSurveys = async (user, offset = 0, limit = null, client = 
 
   return await client.map(
     `
-    SELECT ${surveySelectFields('s')} 
+    SELECT ${surveySelectFields('s')},
+    u.name as owner_name
       ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
     FROM survey s
+    JOIN "user" u 
+    ON u.uuid = s.owner_uuid
     ${
       checkAccess
         ? `
