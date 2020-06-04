@@ -32,8 +32,8 @@ const Routes = props => {
 
     const openSocket = () => {
         ;(async () => {
-            await AppWebSocket.openSocket(e => dispatch(throwSystemError(e)))
-            AppWebSocket.on(WebSocketEvents.jobUpdate, j => dispatch(activeJobUpdate(j)))
+            await AppWebSocket.openSocket(error => dispatch(throwSystemError(error)))
+            AppWebSocket.on(WebSocketEvents.jobUpdate, job => dispatch(activeJobUpdate(job)))
         })()
     }
 
