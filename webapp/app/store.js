@@ -1,8 +1,7 @@
-import { applyMiddleware, combineReducers, createStore } from 'redux'
+import { applyMiddleware, combineReducers, createStore, compose } from 'redux'
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
 
-import * as ProcessUtils from '@core/processUtils'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
@@ -38,13 +37,17 @@ const createReducer = (asyncReducers) =>
 // App middleware
 const middleware = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
-if (ProcessUtils.isEnvDevelopment) {
-  const { logger } = require('redux-logger')
-  middleware.push(logger)
-}
+const composeEnhancers = typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        : compose;
 
 // App store
-export const store = createStore(createReducer({}), applyMiddleware(...middleware))
+export const store = createStore(
+    createReducer({}),
+    composeEnhancers(
+      applyMiddleware(...middleware)
+    )
+)
 
 store.asyncReducers = {}
 
