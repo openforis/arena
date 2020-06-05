@@ -4,7 +4,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import NotLoggedIn from '@webapp/views/Guest/views/components/NotLoggedIn'
+import NotLoggedIn from '@webapp/components/NotLoggedIn/NotLoggedIn'
 
 import * as LoginState from '@webapp/guest/login/loginState'
 import { useFormObject, useI18n } from '@webapp/components/hooks'
@@ -33,21 +33,21 @@ const Login = () => {
     }
   }
 
-  const onChangeEmail = (e) => {
-    const emailChanged = e.target.value
+  const onChangeEmail = (event) => {
+    const emailChanged = event.target.value
     dispatch(setEmail(emailChanged))
     setObjectField('email', emailChanged)
   }
 
-  const onChangePassword = (e) => {
+  const onChangePassword = (event) => {
     dispatch(setLoginError(null))
-    setObjectField('password', e.target.value)
+    setObjectField('password', event.target.value)
   }
 
   return (
     <NotLoggedIn error={error}>
       <input
-        value={formObject.email}
+        defaultValue={formObject.email}
         onChange={onChangeEmail}
         type="text"
         name="email"
@@ -55,7 +55,7 @@ const Login = () => {
       />
 
       <input
-        value={formObject.password}
+        defaultValue={formObject.password}
         onChange={onChangePassword}
         type="password"
         name="password"

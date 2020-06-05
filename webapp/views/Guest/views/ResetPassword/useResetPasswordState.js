@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useHistory } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -64,19 +64,29 @@ export const useResetPasswordState = () => {
       setError(
         Validation.isValid(validation)
           ? null
-          : LoginValidator.getFirstError(validation, ['name', 'password', 'passwordConfirm']),
+          : LoginValidator.getFirstError(validation, ['name', 'password', 'passwordConfirm'])
       )
     })()
   }
 
+  const setFormField = useCallback((event) => {
+    const handlerByName = {
+      name: setName,
+      password: setPassword,
+      passwordConfirm: setPasswordConfirm,
+    }
+
+    const inputName = event.target.name
+    const { value } = event.target
+    if (handlerByName && handlerByName[inputName]) {
+      handlerByName[inputName](value)
+    }
+  })
+
   return {
     user,
-    name,
-    setName,
-    password,
-    setPassword,
-    passwordConfirm,
-    setPasswordConfirm,
+    resetPasswordState: { name, password, passwordConfirm },
+    setFormField,
     error,
     onClickSetNewPassword,
   }

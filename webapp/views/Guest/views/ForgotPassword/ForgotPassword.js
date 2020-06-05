@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import NotLoggedIn from '@webapp/views/Guest/views/components/NotLoggedIn'
+import NotLoggedIn from '@webapp/components/NotLoggedIn/NotLoggedIn'
 import { useI18n, useFormObject } from '@webapp/components/hooks'
 
 import * as LoginState from '@webapp/guest/login/loginState'
@@ -11,7 +11,7 @@ import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actio
 
 import * as LoginValidator from '@webapp/guest/login/loginValidator'
 
-const ForgotPasswordView = () => {
+const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)
   const error = useSelector(LoginState.getError)
   const dispatch = useDispatch()
@@ -44,9 +44,9 @@ const ForgotPasswordView = () => {
     <NotLoggedIn error={error}>
       <input
         value={formObject.email}
-        onChange={(e) => {
+        onChange={(event) => {
           dispatch(setLoginError(null))
-          setObjectField('email', e.target.value)
+          setObjectField('email', event.target.value)
         }}
         type="text"
         name="username"
@@ -63,4 +63,4 @@ const ForgotPasswordView = () => {
   )
 }
 
-export default ForgotPasswordView
+export default ForgotPassword

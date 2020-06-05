@@ -28,7 +28,7 @@ const NotLoggedInView = (props) => {
         </div>
       </div>
 
-      <form onSubmit={(e) => e.preventDefault()} className="not-logged-in__form">
+      <form onSubmit={(event) => event.preventDefault()} className="not-logged-in__form">
         {children}
       </form>
 
