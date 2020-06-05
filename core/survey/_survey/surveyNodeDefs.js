@@ -81,7 +81,7 @@ export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
 export const getNodeDefKeys = (nodeDef) =>
   R.pipe(
     getNodeDefChildren(nodeDef),
-    R.filter((n) => NodeDef.isKey(n))
+    R.filter((n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n))
   )
 
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
