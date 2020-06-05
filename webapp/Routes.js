@@ -9,11 +9,11 @@ import * as AppWebSocket from '@webapp/app/appWebSocket'
 import * as User from '@core/user/user'
 
 import DynamicImport from '@webapp/components/dynamicImport'
-import LoginView from '@webapp/guest/login/loginView'
 import AppLoaderView from '@webapp/app/appLoader/appLoaderView'
 import AppDialogConfirm from '@webapp/app/appDialogConfirm/appDialogConfirm'
 import AppNotificationView from '@webapp/app/appNotification/appNotificationView'
-import GuestView from '@webapp/guest/guestView'
+import Guest, { Login } from '@webapp/views/Guest'
+
 import { useI18n, useOnUpdate } from '@webapp/components/hooks'
 
 import * as AppState from '@webapp/app/appState'
@@ -69,14 +69,14 @@ const Routes = props => {
         isReady && (
             <>
                 {isGuestUri(location.pathname) ? (
-                    <GuestView />
+                    <Guest />
                 ) : user && User.hasAccepted(user) ? (
                     <Route
                         path="/app"
                         render={props => <DynamicImport {...props} load={() => import('@webapp/loggedin/appViewExport')} />}
                     />
                 ) : (
-                    <LoginView />
+                    <Login />
                 )}
 
                 <AppLoaderView />

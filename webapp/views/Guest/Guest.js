@@ -6,7 +6,7 @@ import ForgotPasswordView from '@webapp/guest/forgotPassword/forgotPasswordView'
 
 import { guestModules } from '@webapp/app/appModules'
 
-const GuestView = () => (
+const Guest = () => (
   <ModuleSwitch
     modules={[
       {
@@ -21,4 +21,4 @@ const GuestView = () => (
   />
 )
 
-export default GuestView
+export default Guest

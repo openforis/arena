@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
+import NotLoggedIn from '@webapp/views/Guest/views/components/NotLoggedIn'
 import { useI18n, useFormObject } from '@webapp/components/hooks'
 
 import * as LoginState from '@webapp/guest/login/loginState'
@@ -41,7 +41,7 @@ const ForgotPasswordView = () => {
   }
 
   return (
-    <NotLoggedInView error={error}>
+    <NotLoggedIn error={error}>
       <input
         value={formObject.email}
         onChange={(e) => {
@@ -59,7 +59,7 @@ const ForgotPasswordView = () => {
           {i18n.t('loginView.sendPasswordResetEmail')}
         </button>
       </div>
-    </NotLoggedInView>
+    </NotLoggedIn>
   )
 }
 

@@ -6,7 +6,7 @@ import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/components/hooks'
 
-import NotLoggedInView from '../components/notLoggedInView'
+import NotLoggedIn from '@webapp/views/Guest/views/components/NotLoggedIn'
 
 import { useResetPasswordState } from './useResetPasswordState'
 
@@ -25,21 +25,21 @@ const ResetPasswordView = () => {
   } = useResetPasswordState()
 
   return (
-    <NotLoggedInView error={error}>
+    <NotLoggedIn error={error}>
       {user && (
         <>
-          <input value={User.getEmail(user)} readOnly={true} type="text" name="email" />
+          <input value={User.getEmail(user)} readOnly type="text" name="email" />
 
           <input
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             name="name"
             placeholder={i18n.t('loginView.yourName')}
           />
 
           <input
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             type="password"
             name="password"
             placeholder={i18n.t('loginView.yourNewPassword')}
@@ -47,7 +47,7 @@ const ResetPasswordView = () => {
 
           <input
             value={passwordConfirm}
-            onChange={e => setPasswordConfirm(e.target.value)}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
             type="password"
             name="passwordConfirm"
             placeholder={i18n.t('loginView.repeatYourNewPassword')}
@@ -60,7 +60,7 @@ const ResetPasswordView = () => {
           </div>
         </>
       )}
-    </NotLoggedInView>
+    </NotLoggedIn>
   )
 }
 

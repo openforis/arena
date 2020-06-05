@@ -1,19 +1,19 @@
-import './loginView.scss'
+import './Login.scss'
 
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n, useFormObject } from '@webapp/components/hooks'
-import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
+import NotLoggedIn from '@webapp/views/Guest/views/components/NotLoggedIn'
+
+import * as LoginState from '@webapp/guest/login/loginState'
+import { useFormObject, useI18n } from '@webapp/components/hooks'
+import * as LoginValidator from '@webapp/guest/login/loginValidator'
+import { login, setEmail, setLoginError } from '@webapp/guest/login/actions'
 
 import { guestModules } from '@webapp/app/appModules'
 
-import * as LoginValidator from '@webapp/guest/login/loginValidator'
-import * as LoginState from './loginState'
-import { setEmail, login, setLoginError } from '@webapp/guest/login/actions'
-
-const LoginView = () => {
+const Login = () => {
   const error = useSelector(LoginState.getError)
   const email = useSelector(LoginState.getEmail)
   const i18n = useI18n()
@@ -22,7 +22,7 @@ const LoginView = () => {
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     { email, password: '' },
     LoginValidator.validateLoginObj,
-    true,
+    true
   )
 
   const onClickLogin = () => {
@@ -33,19 +33,19 @@ const LoginView = () => {
     }
   }
 
-  const onChangeEmail = e => {
-    const email = e.target.value
-    dispatch(setEmail(email))
-    setObjectField('email', email)
+  const onChangeEmail = (e) => {
+    const emailChanged = e.target.value
+    dispatch(setEmail(emailChanged))
+    setObjectField('email', emailChanged)
   }
 
-  const onChangePassword = e => {
+  const onChangePassword = (e) => {
     dispatch(setLoginError(null))
     setObjectField('password', e.target.value)
   }
 
   return (
-    <NotLoggedInView error={error}>
+    <NotLoggedIn error={error}>
       <input
         value={formObject.email}
         onChange={onChangeEmail}
@@ -71,8 +71,8 @@ const LoginView = () => {
           {i18n.t('loginView.forgotPassword')}
         </Link>
       </div>
-    </NotLoggedInView>
+    </NotLoggedIn>
   )
 }
 
-export default LoginView
+export default Login
