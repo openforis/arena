@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useHistory } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -69,7 +69,7 @@ export const useResetPasswordState = () => {
     })()
   }
 
-  const setFormField = useCallback((event) => {
+  const setFormField = (event) => {
     const handlerByName = {
       name: setName,
       password: setPassword,
@@ -78,10 +78,10 @@ export const useResetPasswordState = () => {
 
     const inputName = event.target.name
     const { value } = event.target
-    if (handlerByName && handlerByName[inputName]) {
+    if (handlerByName[inputName]) {
       handlerByName[inputName](value)
     }
-  })
+  }
 
   return {
     user,
