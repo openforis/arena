@@ -2,14 +2,12 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import NotLoggedIn from '@webapp/components/NotLoggedIn/NotLoggedIn'
 import { useI18n, useFormObject } from '@webapp/components/hooks'
+import Error from '@webapp/views/Guest/components/Error'
 
 import * as LoginState from '@webapp/guest/login/loginState'
-
-import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actions'
-
 import * as LoginValidator from '@webapp/guest/login/loginValidator'
+import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actions'
 
 const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)
@@ -41,7 +39,7 @@ const ForgotPassword = () => {
   }
 
   return (
-    <NotLoggedIn error={error}>
+    <>
       <input
         value={formObject.email}
         onChange={(event) => {
@@ -53,13 +51,15 @@ const ForgotPassword = () => {
         placeholder={i18n.t('loginView.yourEmail')}
       />
 
-      <div className="not-logged-in__buttons">
+      <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onSubmit}>
           <span className="icon icon-envelop icon-12px icon-left" />
           {i18n.t('loginView.sendPasswordResetEmail')}
         </button>
       </div>
-    </NotLoggedIn>
+
+      <Error error={error} />
+    </>
   )
 }
 

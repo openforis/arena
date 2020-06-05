@@ -1,17 +1,15 @@
 import './Login.scss'
-
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import NotLoggedIn from '@webapp/components/NotLoggedIn/NotLoggedIn'
+import { guestModules } from '@webapp/app/appModules'
+import { useFormObject, useI18n } from '@webapp/components/hooks'
+import Error from '@webapp/views/Guest/components/Error'
 
 import * as LoginState from '@webapp/guest/login/loginState'
-import { useFormObject, useI18n } from '@webapp/components/hooks'
 import * as LoginValidator from '@webapp/guest/login/loginValidator'
 import { login, setEmail, setLoginError } from '@webapp/guest/login/actions'
-
-import { guestModules } from '@webapp/app/appModules'
 
 const Login = () => {
   const error = useSelector(LoginState.getError)
@@ -45,7 +43,7 @@ const Login = () => {
   }
 
   return (
-    <NotLoggedIn error={error}>
+    <>
       <input
         defaultValue={formObject.email}
         onChange={onChangeEmail}
@@ -62,16 +60,18 @@ const Login = () => {
         placeholder={i18n.t('loginView.yourPassword')}
       />
 
-      <div className="not-logged-in__buttons">
+      <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onClickLogin}>
           {i18n.t('loginView.login')}
         </button>
-        <Link className="btn btn-s btn-transparent btn-forgot-pwd" to={guestModules.forgotPassword.path}>
+        <Link className="btn btn-s btn-transparent guest-login__btn-forgot-pwd" to={guestModules.forgotPassword.path}>
           <span className="icon icon-question icon-left icon-12px" />
           {i18n.t('loginView.forgotPassword')}
         </Link>
       </div>
-    </NotLoggedIn>
+
+      <Error error={error} />
+    </>
   )
 }
 

@@ -1,5 +1,1 @@
-import Guest from './Guest'
-import Login from './views/Login/Login'
-
-export default Guest
-export { Login }
+export { default } from './Guest'
