@@ -46,7 +46,7 @@ export const initTableData = (params = {}) => async (dispatch, getState) => {
     const cycle = SurveyState.getSurveyCycleKey(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
     const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
-    const { offset, limit } = DataQueryState.defaults
+    const { offset, limit, dimensions, measures } = DataQueryState.defaults
 
     const dataCountParams = { cycle, filter: filter && JSON.stringify(filter) }
     const [{ data: count }, data] = await Promise.all([
@@ -54,7 +54,19 @@ export const initTableData = (params = {}) => async (dispatch, getState) => {
       fetchData({ state, mode, offset, filter, sort }),
     ])
 
-    const payload = { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }
+    const payload = {
+      offset,
+      limit,
+      filter,
+      sort,
+      count,
+      data,
+      nodeDefUuidTable,
+      nodeDefUuidCols,
+      dimensions,
+      measures,
+      mode,
+    }
     dispatch({ type: dataQueryTableInit, ...payload })
   }
 }

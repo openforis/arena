@@ -30,10 +30,12 @@
   grid-template-columns: 0.2fr 0.6fr 0.1fr;
 
   .attribute-selector {
-    padding: 0.1rem 0.5rem;
-    font-size: 0.7rem;
-    text-transform: uppercase;
     align-self: flex-end;
+    align-items: center;
+    padding: 0.1rem 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 600;
   }
 }
 
