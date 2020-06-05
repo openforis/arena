@@ -9,14 +9,13 @@ import AppReducer from '@webapp/app/reducer'
 import AppErrorsReducer from '@webapp/app/appErrors/reducer'
 import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
 import AppNotificationReducer from '@webapp/app/appNotification/reducer'
-import LoginReducer from '@webapp/guest/login/reducer'
+import { LoginReducer, LoginState } from '@webapp/store/login'
 import SurveyReducer from '@webapp/survey/reducer'
 
 import * as AppState from '@webapp/app/appState'
 import * as AppDialogConfirmState from '@webapp/app/appDialogConfirm/appDialogConfirmState'
 import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
-import * as LoginState from '@webapp/guest/login/loginState'
 import * as SurveyState from '@webapp/survey/surveyState'
 
 const appReducers = {
@@ -37,17 +36,13 @@ const createReducer = (asyncReducers) =>
 // App middleware
 const middleware = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
-const composeEnhancers = typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-        : compose;
+const composeEnhancers =
+  typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    : compose
 
 // App store
-export const store = createStore(
-    createReducer({}),
-    composeEnhancers(
-      applyMiddleware(...middleware)
-    )
-)
+export const store = createStore(createReducer({}), composeEnhancers(applyMiddleware(...middleware)))
 
 store.asyncReducers = {}
 

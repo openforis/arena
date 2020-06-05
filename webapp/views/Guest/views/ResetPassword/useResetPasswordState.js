@@ -11,18 +11,17 @@ import { showNotification } from '@webapp/app/appNotification/actions'
 import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 import { appModuleUri } from '@webapp/app/appModules'
 
-import * as LoginValidator from '@webapp/guest/login/loginValidator'
+import { LoginValidator } from '@webapp/store/login'
 
 export const useResetPasswordState = () => {
   const { uuid } = useParams()
   const history = useHistory()
+  const dispatch = useDispatch()
 
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [error, setError] = useState()
-
-  const dispatch = useDispatch()
+  const [error, setError] = useState(null)
 
   const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 

@@ -13,4 +13,4 @@ export const getError = getStateProp(keys.error)
 export const assocError = R.assoc(keys.error)
 
 export const getEmail = getStateProp(keys.email, '')
-export const assocEmail = email => R.pipe(R.assoc(keys.email, email), assocError(null))
+export const assocEmail = (email) => R.pipe(R.assoc(keys.email, email), assocError(null))

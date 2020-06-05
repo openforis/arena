@@ -5,9 +5,7 @@ import { useHistory } from 'react-router'
 import { useI18n, useFormObject } from '@webapp/components/hooks'
 import Error from '@webapp/views/Guest/components/Error'
 
-import * as LoginState from '@webapp/guest/login/loginState'
-import * as LoginValidator from '@webapp/guest/login/loginValidator'
-import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actions'
+import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
 const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)
@@ -17,9 +15,9 @@ const ForgotPassword = () => {
   const i18n = useI18n()
 
   useEffect(() => {
-    dispatch(setLoginError(null))
+    dispatch(LoginActions.setLoginError(null))
 
-    return () => dispatch(setLoginError(null))
+    return () => dispatch(LoginActions.setLoginError(null))
   }, [])
 
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
@@ -32,9 +30,9 @@ const ForgotPassword = () => {
 
   const onSubmit = () => {
     if (objectValid) {
-      dispatch(sendPasswordResetEmail(formObject.email, history))
+      dispatch(LoginActions.sendPasswordResetEmail(formObject.email, history))
     } else {
-      dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email'])))
+      dispatch(LoginActions.setLoginError(LoginValidator.getFirstError(validation, ['email'])))
     }
   }
 
@@ -43,7 +41,7 @@ const ForgotPassword = () => {
       <input
         value={formObject.email}
         onChange={(event) => {
-          dispatch(setLoginError(null))
+          dispatch(LoginActions.setLoginError(null))
           setObjectField('email', event.target.value)
         }}
         type="text"

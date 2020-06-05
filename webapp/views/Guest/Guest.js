@@ -3,7 +3,7 @@ import React from 'react'
 import { Route, Switch } from 'react-router'
 
 import { guestModules } from '@webapp/app/appModules'
-import ResetPasswordView from '@webapp/views/Guest/views/ResetPassword'
+import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
 import ForgotPassword from '@webapp/views/Guest/views/ForgotPassword'
 import Login from '@webapp/views/Guest/views/Login'
 
@@ -26,7 +26,7 @@ const Guest = () => (
 
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       <Switch>
-        <Route path={guestModules.resetPassword.path} exact component={ResetPasswordView} />
+        <Route path={guestModules.resetPassword.path} exact component={ResetPassword} />
         <Route path={guestModules.forgotPassword.path} exact component={ForgotPassword} />
         <Route>
           <Login />

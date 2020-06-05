@@ -7,9 +7,7 @@ import { guestModules } from '@webapp/app/appModules'
 import { useFormObject, useI18n } from '@webapp/components/hooks'
 import Error from '@webapp/views/Guest/components/Error'
 
-import * as LoginState from '@webapp/guest/login/loginState'
-import * as LoginValidator from '@webapp/guest/login/loginValidator'
-import { login, setEmail, setLoginError } from '@webapp/guest/login/actions'
+import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
 const Login = () => {
   const error = useSelector(LoginState.getError)
@@ -25,20 +23,20 @@ const Login = () => {
 
   const onClickLogin = () => {
     if (objectValid) {
-      dispatch(login(formObject.email, formObject.password))
+      dispatch(LoginActions.login(formObject.email, formObject.password))
     } else {
-      dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email', 'password'])))
+      dispatch(LoginActions.setLoginError(LoginValidator.getFirstError(validation, ['email', 'password'])))
     }
   }
 
   const onChangeEmail = (event) => {
     const emailChanged = event.target.value
-    dispatch(setEmail(emailChanged))
+    dispatch(LoginActions.setEmail(emailChanged))
     setObjectField('email', emailChanged)
   }
 
   const onChangePassword = (event) => {
-    dispatch(setLoginError(null))
+    dispatch(LoginActions.setLoginError(null))
     setObjectField('password', event.target.value)
   }
 
