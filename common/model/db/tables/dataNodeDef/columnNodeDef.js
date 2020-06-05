@@ -61,12 +61,16 @@ export default class ColumnNodeDef {
     return this._names
   }
 
+  get name() {
+    return this.names[0]
+  }
+
   get namesFull() {
     return SQL.addAlias(this.table.alias, this.names)
   }
 
-  get name() {
-    return this.names[0]
+  get nameFull() {
+    return this.namesFull[0]
   }
 
   get types() {
