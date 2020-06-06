@@ -8,7 +8,6 @@ import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import * as User from '@core/user/user'
 
-import { useOnUpdate } from '@webapp/components/hooks'
 import DynamicImport from '@webapp/components/dynamicImport'
 import AppLoaderView from '@webapp/app/appLoader/appLoaderView'
 import AppDialogConfirm from '@webapp/app/appDialogConfirm/appDialogConfirm'
@@ -40,7 +39,7 @@ const Routes = () => {
     return closeSocket
   }, [])
 
-  useOnUpdate(() => {
+  useEffect(() => {
     if (user) {
       openSocket()
     } else {
