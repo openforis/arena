@@ -71,7 +71,7 @@ if (buildReport) {
 
 // ====== webpack config
 const webPackConfig = {
-  entry: ['./webapp/main.js'],
+  entry: ['./webapp/Main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
   resolve: {
     extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
