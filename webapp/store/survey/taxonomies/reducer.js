@@ -1,37 +1,36 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
+import * as SurveyActions from '../actions'
+import * as TaxonomiesActions from './actions'
 
-import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
-import * as TaxonomiesState from './taxonomiesState'
-
-import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate, taxonomiesUpdate } from './actions'
+import * as TaxonomiesState from './state'
 
 const actionHandlers = {
   // Reset state
   [appUserLogout]: () => ({}),
 
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
 
-  [surveyDefsReset]: () => ({}),
+  [SurveyActions.surveyDefsReset]: () => ({}),
 
   // Taxonomies
-  [surveyDefsLoad]: (state, { taxonomies }) => taxonomies,
-  [taxonomiesUpdate]: (state, { taxonomies }) => taxonomies,
+  [SurveyActions.surveyDefsLoad]: (state, { taxonomies }) => taxonomies,
+  [TaxonomiesActions.taxonomiesUpdate]: (state, { taxonomies }) => taxonomies,
 
   // Create
-  [taxonomyCreate]: (state, { taxonomy }) => TaxonomiesState.assocTaxonomy(taxonomy)(state),
+  [TaxonomiesActions.taxonomyCreate]: (state, { taxonomy }) => TaxonomiesState.assocTaxonomy(taxonomy)(state),
 
   // Update
-  [taxonomyUpdate]: (state, { taxonomy }) => TaxonomiesState.assocTaxonomy(taxonomy)(state),
+  [TaxonomiesActions.taxonomyUpdate]: (state, { taxonomy }) => TaxonomiesState.assocTaxonomy(taxonomy)(state),
 
-  [taxonomyPropUpdate]: (state, { taxonomy, key, value }) =>
+  [TaxonomiesActions.taxonomyPropUpdate]: (state, { taxonomy, key, value }) =>
     TaxonomiesState.assocTaxonomyProp(taxonomy, key, value)(state),
 
   // Delete
-  [taxonomyDelete]: (state, { taxonomy }) => TaxonomiesState.dissocTaxonomy(taxonomy)(state),
+  [TaxonomiesActions.taxonomyDelete]: (state, { taxonomy }) => TaxonomiesState.dissocTaxonomy(taxonomy)(state),
 }
 
 export default exportReducer(actionHandlers)

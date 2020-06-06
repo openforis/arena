@@ -7,6 +7,8 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
 
+export const stateKey = 'categories'
+
 // Category
 
 export const assocCategory = (category) => R.assoc(Category.getUuid(category), category)

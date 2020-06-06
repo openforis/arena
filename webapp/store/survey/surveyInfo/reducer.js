@@ -13,7 +13,7 @@ import * as SurveyActions from '../actions'
 import * as SurveyInfoActions from './actions'
 import { nodeDefCreate, nodeDefDelete, nodeDefSave, nodeDefUpdate } from '../nodeDefs/actions'
 import { CategoriesActions } from '../categories'
-import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
+import { TaxonomiesActions } from '../taxonomies'
 
 import * as SurveyInfoState from './state'
 
@@ -44,10 +44,10 @@ const actionHandlers = {
   [CategoriesActions.categoryDelete]: SurveyInfoState.markDraft,
 
   // Taxonomy
-  [taxonomyCreate]: SurveyInfoState.markDraft,
-  [taxonomyUpdate]: SurveyInfoState.markDraft,
-  [taxonomyPropUpdate]: SurveyInfoState.markDraft,
-  [taxonomyDelete]: SurveyInfoState.markDraft,
+  [TaxonomiesActions.taxonomyCreate]: SurveyInfoState.markDraft,
+  [TaxonomiesActions.taxonomyUpdate]: SurveyInfoState.markDraft,
+  [TaxonomiesActions.taxonomyPropUpdate]: SurveyInfoState.markDraft,
+  [TaxonomiesActions.taxonomyDelete]: SurveyInfoState.markDraft,
 
   // Processing chain
   [chainSave]: SurveyInfoState.markDraft,
