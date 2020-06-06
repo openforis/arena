@@ -1,0 +1,5 @@
+export const surveyCreate = 'survey/create'
+export const surveyUpdate = 'survey/update'
+export const surveyDelete = 'survey/delete'
+export const surveyDefsLoad = 'survey/defs/load'
+export const surveyDefsReset = 'survey/defs/reset'
