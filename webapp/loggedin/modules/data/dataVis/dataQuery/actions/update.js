@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import { ColumnNodeDef } from '@common/model/db'
 import * as DataSort from '@common/surveyRdb/dataSort'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as DataQueryState from '@webapp/loggedin/modules/data/dataVis/dataQuery/state'
 
 import { fetchData, initTableData, dataQueryTableInit } from './fetch'

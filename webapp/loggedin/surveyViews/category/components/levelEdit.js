@@ -15,7 +15,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as Authorizer from '@core/auth/authorizer'
 import * as CategoryState from '../categoryState'
 
@@ -32,7 +32,7 @@ import {
 
 import ItemEdit from './itemEdit'
 
-const LevelEdit = props => {
+const LevelEdit = (props) => {
   const dispatch = useDispatch()
 
   const handleDelete = () => {
@@ -43,8 +43,8 @@ const LevelEdit = props => {
     } else {
       dispatch(
         showDialogConfirm('categoryEdit.confirmDeleteLevel', { levelName: CategoryLevel.getName(level) }, () =>
-          deleteCategoryLevel(category, level),
-        ),
+          deleteCategoryLevel(category, level)
+        )
       )
     }
   }
@@ -89,7 +89,7 @@ const LevelEdit = props => {
         <Input
           value={CategoryLevel.getName(level)}
           validation={Validation.getFieldValidation('name')(validation)}
-          onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
+          onChange={(value) => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
           readOnly={readOnly}
         />
       </FormItem>
@@ -109,7 +109,7 @@ const LevelEdit = props => {
       </div>
 
       <div className="category__level-items">
-        {items.map(item => (
+        {items.map((item) => (
           <ItemEdit
             key={CategoryItem.getUuid(item)}
             lang={lang}
@@ -143,7 +143,7 @@ const mapStateToProps = (state, props) => {
   const items = canAddItem ? CategoryState.getLevelItemsArray(index)(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
   const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
-  const usedByNodeDefs = R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
+  const usedByNodeDefs = R.any((def) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
 
   const user = AppState.getUser(state)
 

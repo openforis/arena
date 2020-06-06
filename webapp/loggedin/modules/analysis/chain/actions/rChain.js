@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as ProcessUtils from '@core/processUtils'
 import * as Chain from '@common/analysis/processingChain'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { hideAppLoader, showAppLoader } from '@webapp/app/actions'

@@ -11,8 +11,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import { setNodeDefProp, putNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as RecordState from '../../record/recordState'
 
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
@@ -103,11 +102,11 @@ const mapStateToProps = (state, props) => {
       : []
 
     const nodesValidated = R.pipe(
-      R.map(n =>
+      R.map((n) =>
         Validation.assocValidation(
-          R.pipe(Validation.getValidation, Validation.getFieldValidation(Node.getUuid(n)))(record),
-        )(n),
-      ),
+          R.pipe(Validation.getValidation, Validation.getFieldValidation(Node.getUuid(n)))(record)
+        )(n)
+      )
     )(nodes)
 
     const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
@@ -134,8 +133,8 @@ const mapStateToProps = (state, props) => {
 }
 
 export default connect(mapStateToProps, {
-  setNodeDefProp,
-  putNodeDefLayoutProp,
+  setNodeDefProp: NodeDefsActions.setNodeDefProp,
+  putNodeDefLayoutProp: NodeDefsActions.putNodeDefLayoutProp,
   updateNode,
   removeNode,
   createNodePlaceholder,

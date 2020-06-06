@@ -11,7 +11,7 @@ import * as Record from '@core/record/record'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 import * as RecordState from '../record/recordState'
 import FormHeader from './components/formHeader'
@@ -23,7 +23,7 @@ import * as SurveyFormState from './surveyFormState'
 
 import { setFormNodeDefAddChildTo, resetForm } from './actions'
 
-const SurveyFormView = props => {
+const SurveyFormView = (props) => {
   const {
     surveyInfo,
     surveyCycleKey,

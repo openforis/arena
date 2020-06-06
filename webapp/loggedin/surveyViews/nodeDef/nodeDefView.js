@@ -18,15 +18,7 @@ import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
-import {
-  setNodeDefParentUuid,
-  setNodeDefProp,
-  putNodeDefLayoutProp,
-  setNodeDefLayoutProp,
-  cancelNodeDefEdits,
-  saveNodeDefEdits,
-  removeNodeDef,
-} from '@webapp/survey/nodeDefs/actions'
+import { NodeDefsActions } from '@webapp/store/survey'
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import ValidationsProps from './advanced/validationsProps'
@@ -99,7 +91,9 @@ const NodeDefView = () => {
               <Input
                 value={NodeDef.getName(nodeDef)}
                 validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-                onChange={(value) => dispatch(setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))}
+                onChange={(value) =>
+                  dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
+                }
               />
               <div className="attribute-selector">
                 {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}
@@ -118,10 +112,10 @@ const NodeDefView = () => {
                     nodeDefKeyEditDisabled,
                     nodeDefMultipleEditDisabled,
                     editingNodeDefFromDesigner,
-                    setNodeDefParentUuid: (...args) => dispatch(setNodeDefParentUuid(...args)),
-                    setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
-                    putNodeDefLayoutProp: (...args) => dispatch(putNodeDefLayoutProp(...args)),
-                    setNodeDefLayoutProp: (...args) => dispatch(setNodeDefLayoutProp(...args)),
+                    setNodeDefParentUuid: (...args) => dispatch(NodeDefsActions.setNodeDefParentUuid(...args)),
+                    setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
+                    putNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.putNodeDefLayoutProp(...args)),
+                    setNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.setNodeDefLayoutProp(...args)),
                   },
                 },
                 ...(NodeDef.isRoot(nodeDef)
@@ -134,7 +128,7 @@ const NodeDefView = () => {
                           nodeDef,
                           validation,
                           nodeDefParent,
-                          setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
+                          setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
                         },
                       },
                       {
@@ -144,7 +138,7 @@ const NodeDefView = () => {
                           nodeDef,
                           validation,
                           nodeDefParent,
-                          setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
+                          setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
                         },
                       },
                     ]),
@@ -157,8 +151,10 @@ const NodeDefView = () => {
                 className="btn btn-cancel"
                 onClick={() =>
                   isDirty
-                    ? dispatch(showDialogConfirm('common.cancelConfirm', {}, cancelNodeDefEdits(history)))
-                    : dispatch(cancelNodeDefEdits(history))
+                    ? dispatch(
+                        showDialogConfirm('common.cancelConfirm', {}, NodeDefsActions.cancelNodeDefEdits(history))
+                      )
+                    : dispatch(NodeDefsActions.cancelNodeDefEdits(history))
                 }
               >
                 {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
@@ -166,7 +162,7 @@ const NodeDefView = () => {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => dispatch(saveNodeDefEdits())}
+                onClick={() => dispatch(NodeDefsActions.saveNodeDefEdits())}
                 aria-disabled={!isDirty || StringUtils.isBlank(nodeDefName)}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
@@ -176,7 +172,7 @@ const NodeDefView = () => {
                 <button
                   type="button"
                   className="btn btn-danger btn-delete"
-                  onClick={() => dispatch(removeNodeDef(nodeDef, history))}
+                  onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, history))}
                 >
                   <span className="icon icon-bin2 icon-left icon-12px" />
                   {i18n.t('common.delete')}

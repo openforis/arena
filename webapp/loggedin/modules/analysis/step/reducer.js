@@ -5,8 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 
 import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
 import {
@@ -27,9 +26,9 @@ import {
 const actionHandlers = {
   // Reset state
   [appUserLogout]: () => ({}),
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
 
   // Chain
   [chainReset]: () => ({}),
@@ -60,7 +59,7 @@ const actionHandlers = {
   [calculationReset]: (state, { calculation }) => StepState.dissocTemporaryCalculation(calculation)(state),
 
   // NodeDef (Virtual Entity)
-  [nodeDefSave]: (state, { nodeDef }) =>
+  [NodeDefsActions.nodeDefSave]: (state, { nodeDef }) =>
     R.when(R.always(NodeDef.isVirtual(nodeDef)), StepState.updateEntityUuid(NodeDef.getUuid(nodeDef)))(state),
 }
 

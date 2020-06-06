@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'

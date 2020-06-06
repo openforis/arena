@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
+
 import NodeDefEntityForm from './nodeDefEntityForm'
 import NodeDefEntityTable from './nodeDefEntityTable'
 
@@ -13,7 +14,7 @@ const componentsByRenderType = {
   [NodeDefLayout.renderType.table]: NodeDefEntityTable,
 }
 
-const NodeDefEntitySwitch = props => {
+const NodeDefEntitySwitch = (props) => {
   const { surveyCycleKey, nodeDef } = props
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
 

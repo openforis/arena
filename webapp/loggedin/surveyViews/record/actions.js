@@ -9,7 +9,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as AppState from '@webapp/app/appState'
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
@@ -28,7 +28,7 @@ export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 export const validationsUpdate = 'survey/record/validation/update'
 
-export const recordNodesUpdate = nodes => (dispatch, getState) => {
+export const recordNodesUpdate = (nodes) => (dispatch, getState) => {
   const record = RecordState.getRecord(getState())
   // Hide app loader on record create
   if (R.isEmpty(Record.getNodes(record))) {
@@ -38,28 +38,28 @@ export const recordNodesUpdate = nodes => (dispatch, getState) => {
   dispatch({ type: nodesUpdate, nodes })
 }
 
-export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
+export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => (dispatch) =>
   dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-const _navigateToModuleDataHome = history => history.push(appModuleUri(appModules.data))
+const _navigateToModuleDataHome = (history) => history.push(appModuleUri(appModules.data))
 
-export const recordDeleted = history => dispatch => {
+export const recordDeleted = (history) => (dispatch) => {
   dispatch({ type: recordDelete })
   dispatch(showNotification('recordView.justDeleted'))
   history.goBack()
 }
 
-export const sessionExpired = history => dispatch => {
+export const sessionExpired = (history) => (dispatch) => {
   dispatch(showNotification('recordView.sessionExpired'))
   _navigateToModuleDataHome(history)
 }
 
-export const applicationError = (history, key, params) => dispatch => {
+export const applicationError = (history, key, params) => (dispatch) => {
   dispatch(showNotification(key, params, NotificationState.severity.error))
   history.push(appModuleUri(appModules.designer))
 }
 
-export const cycleChanged = history => () => _navigateToModuleDataHome(history)
+export const cycleChanged = (history) => () => _navigateToModuleDataHome(history)
 
 /**
  * ============
@@ -86,7 +86,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   }
 }
 
-export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => dispatch => {
+export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => (dispatch) => {
   const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
   dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
 }
@@ -97,13 +97,13 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => disp
  * ============
  */
 
-export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => dispatch => {
+export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => (dispatch) => {
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
     Node.assocValue(value),
     Node.mergeMeta(meta),
     NodeRefData.assocRefData(refData),
-    R.assoc(Node.keys.dirty, true),
+    R.assoc(Node.keys.dirty, true)
   )(node)
 
   dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
@@ -141,7 +141,7 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
   history.push(appModuleUri(appModules.data))
 }
 
-export const nodesUpdateCompleted = () => dispatch => dispatch(hideAppSaving())
+export const nodesUpdateCompleted = () => (dispatch) => dispatch(hideAppSaving())
 
 /**
  * ============
@@ -156,7 +156,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
-export const deleteRecord = history => async (dispatch, getState) => {
+export const deleteRecord = (history) => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getSurveyId(state)
@@ -167,7 +167,7 @@ export const deleteRecord = history => async (dispatch, getState) => {
   dispatch(recordDeleted(history))
 }
 
-export const deleteRecordUuidPreview = () => dispatch => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
+export const deleteRecordUuidPreview = () => (dispatch) => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
 
 /**
  * ============
@@ -203,15 +203,15 @@ export const checkInRecord = (recordUuid, draft, pageNodeUuid, pageNodeDefUuid) 
       pageNodeDef && NodeDefLayout.hasPage(cycle)(pageNodeDef)
         ? pageNodeDef
         : R.pipe(
-            R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
-            R.find(NodeDefLayout.hasPage(cycle)),
+            R.map((ancestor) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
+            R.find(NodeDefLayout.hasPage(cycle))
           )(ancestors)
 
     // Getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(
       (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
       [],
-      ancestors,
+      ancestors
     )
 
     dispatch({
@@ -230,7 +230,7 @@ export const checkInRecord = (recordUuid, draft, pageNodeUuid, pageNodeDefUuid) 
   }
 }
 
-export const checkOutRecord = recordUuid => async (dispatch, getState) => {
+export const checkOutRecord = (recordUuid) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
   // Checkout can be called after logout, therefore checking if survey still exists in state
   if (surveyId) {

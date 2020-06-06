@@ -5,7 +5,7 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 

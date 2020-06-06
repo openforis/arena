@@ -11,7 +11,7 @@ import * as Validation from '@core/validation/validation'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
 import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'

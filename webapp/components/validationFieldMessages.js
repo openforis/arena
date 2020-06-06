@@ -13,7 +13,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import Markdown from '@webapp/components/markdown'
 
