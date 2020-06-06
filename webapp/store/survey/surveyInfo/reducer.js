@@ -8,18 +8,14 @@ import { appPropsChange, appUserLogout } from '@webapp/app/actions'
 import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
 import { calculationDelete } from '@webapp/loggedin/modules/analysis/calculation/actions'
-// Survey actions
-import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
-// SurveyInfo actions
-import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
-// nodeDefs actions
+
+import * as SurveyActions from '../actions'
+import * as SurveyInfoActions from './actions'
 import { nodeDefCreate, nodeDefDelete, nodeDefSave, nodeDefUpdate } from '../nodeDefs/actions'
-// Category actions
-import { categoryCreate, categoryDelete, categoryUpdate } from '../categories/actions'
-// Taxonomies actions
+import { CategoriesActions } from '../categories'
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
 
-import * as SurveyInfoState from './surveyInfoState'
+import * as SurveyInfoState from './state'
 
 const actionHandlers = {
   // App initialization
@@ -27,14 +23,14 @@ const actionHandlers = {
   [appUserLogout]: () => ({}),
 
   // Survey Update
-  [surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),
-  [surveyUpdate]: (state, { survey }) => Survey.getSurveyInfo(survey),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [SurveyActions.surveyUpdate]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [SurveyActions.surveyDelete]: () => ({}),
 
   // Survey info update
-  [surveyInfoUpdate]: (state, { surveyInfo }) => surveyInfo,
-
-  [surveyInfoValidationUpdate]: (state, { validation }) => SurveyInfoState.assocValidation(validation)(state),
+  [SurveyInfoActions.surveyInfoUpdate]: (state, { surveyInfo }) => surveyInfo,
+  [SurveyInfoActions.surveyInfoValidationUpdate]: (state, { validation }) =>
+    SurveyInfoState.assocValidation(validation)(state),
 
   // NodeDef
   [nodeDefCreate]: SurveyInfoState.markDraft,
@@ -43,9 +39,9 @@ const actionHandlers = {
   [nodeDefUpdate]: SurveyInfoState.markDraft,
 
   // Category
-  [categoryCreate]: SurveyInfoState.markDraft,
-  [categoryUpdate]: SurveyInfoState.markDraft,
-  [categoryDelete]: SurveyInfoState.markDraft,
+  [CategoriesActions.categoryCreate]: SurveyInfoState.markDraft,
+  [CategoriesActions.categoryUpdate]: SurveyInfoState.markDraft,
+  [CategoriesActions.categoryDelete]: SurveyInfoState.markDraft,
 
   // Taxonomy
   [taxonomyCreate]: SurveyInfoState.markDraft,
