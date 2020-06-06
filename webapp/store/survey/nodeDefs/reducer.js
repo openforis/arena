@@ -2,49 +2,40 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
 
-import { surveyCreate, surveyDefsLoad, surveyDefsReset, surveyDelete, surveyUpdate } from '../actions'
+import * as SurveyActions from '../actions'
+import * as NodeDefsActions from './actions'
 
-import {
-  nodeDefCreate,
-  nodeDefDelete,
-  nodeDefUpdate,
-  nodeDefsUpdate,
-  nodeDefPropsUpdate,
-  nodeDefPropsUpdateCancel,
-  nodeDefsDelete,
-} from './actions'
-
-import * as NodeDefsState from './nodeDefsState'
+import * as NodeDefsState from './state'
 
 const actionHandlers = {
   [appUserLogout]: () => ({}),
 
   // Reset state
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
 
-  [surveyDefsReset]: () => ({}),
+  [SurveyActions.surveyDefsReset]: () => ({}),
 
-  [surveyDefsLoad]: (_state, { nodeDefs }) => nodeDefs,
+  [SurveyActions.surveyDefsLoad]: (_state, { nodeDefs }) => nodeDefs,
 
   // Single nodeDef actions
-  [nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
+  [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
 
-  [nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
+  [NodeDefsActions.nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
-  [nodeDefPropsUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [NodeDefsActions.nodeDefPropsUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
     isNodeDefNew
       ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
       : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def
 
-  [nodeDefsDelete]: (state, { nodeDefUuids }) => NodeDefsState.dissocNodeDefs(nodeDefUuids)(state),
+  [NodeDefsActions.nodeDefsDelete]: (state, { nodeDefUuids }) => NodeDefsState.dissocNodeDefs(nodeDefUuids)(state),
 }
 
 export default exportReducer(actionHandlers)

@@ -11,7 +11,7 @@ import { calculationDelete } from '@webapp/loggedin/modules/analysis/calculation
 
 import * as SurveyActions from '../actions'
 import * as SurveyInfoActions from './actions'
-import { nodeDefCreate, nodeDefDelete, nodeDefSave, nodeDefUpdate } from '../nodeDefs/actions'
+import { NodeDefsActions } from '../nodeDefs'
 import { CategoriesActions } from '../categories'
 import { TaxonomiesActions } from '../taxonomies'
 
@@ -33,10 +33,10 @@ const actionHandlers = {
     SurveyInfoState.assocValidation(validation)(state),
 
   // NodeDef
-  [nodeDefCreate]: SurveyInfoState.markDraft,
-  [nodeDefDelete]: SurveyInfoState.markDraft,
-  [nodeDefSave]: SurveyInfoState.markDraft,
-  [nodeDefUpdate]: SurveyInfoState.markDraft,
+  [NodeDefsActions.nodeDefCreate]: SurveyInfoState.markDraft,
+  [NodeDefsActions.nodeDefDelete]: SurveyInfoState.markDraft,
+  [NodeDefsActions.nodeDefSave]: SurveyInfoState.markDraft,
+  [NodeDefsActions.nodeDefUpdate]: SurveyInfoState.markDraft,
 
   // Category
   [CategoriesActions.categoryCreate]: SurveyInfoState.markDraft,

@@ -2,6 +2,8 @@ import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+export const stateKey = 'nodeDefs'
+
 // ====== UPDATE
 
 export const assocNodeDef = (nodeDef) => R.assoc(NodeDef.getUuid(nodeDef), nodeDef)
