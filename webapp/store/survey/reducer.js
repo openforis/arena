@@ -5,7 +5,7 @@ import nodeDefs from './nodeDefs/reducer'
 import nodeDefsValidation from './nodeDefsValidation/reducer'
 import categories from './categories/reducer'
 import taxonomies from './taxonomies/reducer'
-import status from './status/reducer'
+import { SurveyStatusState, SurveyStatusReducer } from './status'
 
 export default combineReducers({
   info,
@@ -13,5 +13,5 @@ export default combineReducers({
   nodeDefsValidation,
   categories,
   taxonomies,
-  status,
+  [SurveyStatusState.stateKey]: SurveyStatusReducer,
 })

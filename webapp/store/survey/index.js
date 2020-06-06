@@ -4,4 +4,7 @@ import SurveyReducer from './reducer'
 
 export { SurveyActions, SurveyState, SurveyReducer }
 
-export { CategoriesState, CategoriesActions, CategoryReducer } from './categories'
+export { CategoriesActions, CategoriesState, CategoryReducer } from './categories'
+
+// ==== hooks
+export { useSurveyDefsFetched } from './hooks'

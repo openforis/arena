@@ -1,6 +1,6 @@
 import { assocActionProps, exportReducer } from '@webapp/utils/reduxUtils'
 
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import { SurveyActions } from '@webapp/store/survey'
 import * as AppState from './appState'
 
 import { appPropsChange, appUserLogout, appSavingUpdate, systemErrorThrow } from './actions'
@@ -14,11 +14,11 @@ const actionHandlers = {
 
   [appUserLogout]: (state) => AppState.logoutUser(state),
 
-  [surveyCreate]: (state, { survey }) => AppState.assocUserPropsOnSurveyCreate(survey)(state),
+  [SurveyActions.surveyCreate]: (state, { survey }) => AppState.assocUserPropsOnSurveyCreate(survey)(state),
 
-  [surveyUpdate]: (state, { survey }) => AppState.assocUserPropsOnSurveyUpdate(survey)(state),
+  [SurveyActions.surveyUpdate]: (state, { survey }) => AppState.assocUserPropsOnSurveyUpdate(survey)(state),
 
-  [surveyDelete]: (state, { surveyInfo }) => AppState.dissocUserPropsOnSurveyDelete(surveyInfo)(state),
+  [SurveyActions.surveyDelete]: (state, { surveyInfo }) => AppState.dissocUserPropsOnSurveyDelete(surveyInfo)(state),
 
   // ====== saving
   [appSavingUpdate]: (state, { saving }) => AppState.assocSaving(saving)(state),

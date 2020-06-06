@@ -3,6 +3,7 @@ import axios from 'axios'
 import * as LoaderActions from '@webapp/app/actions'
 
 import * as SurveyState from '../surveyState'
+import { SurveyStatusState } from '../status'
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
 
 const _fetchDefs = (surveyId, defsType, params = {}) => axios.get(`/api/survey/${surveyId}/${defsType}`, { params })
@@ -10,7 +11,7 @@ const _fetchDefs = (surveyId, defsType, params = {}) => axios.get(`/api/survey/$
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
 
-  if (!SurveyState.areDefsFetched(draft)(state)) {
+  if (!SurveyStatusState.areDefsFetched(draft)(state)) {
     dispatch(LoaderActions.showAppLoader())
 
     const surveyId = SurveyState.getSurveyId(state)
