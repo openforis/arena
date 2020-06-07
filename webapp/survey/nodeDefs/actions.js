@@ -95,7 +95,7 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
 }
 
 /**
- * Applies changes only to node def in state
+ * Applies changes only to node def in state.
  */
 
 const _validateAndNotifyNodeDefUpdate = (nodeDef, props = {}, propsAdvanced = {}) => async (dispatch, getState) => {
@@ -206,9 +206,7 @@ export const setNodeDefProp = (key, value = null, advanced = false) => async (di
   dispatch(_validateAndNotifyNodeDefUpdate(nodeDefUpdated, props, propsAdvanced))
 }
 
-/**
- * Updates the specified layout prop of the node def being edited, without persisting the change
- */
+// Updates the specified layout prop of the node def being edited, without persisting the change
 export const setNodeDefLayoutProp = (key, value) => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
@@ -217,9 +215,7 @@ export const setNodeDefLayoutProp = (key, value) => async (dispatch, getState) =
   dispatch(setNodeDefProp(NodeDefLayout.keys.layout, layoutUpdated))
 }
 
-/**
- * Updates the specified layout prop of a node def and persists the change
- */
+// Updates the specified layout prop of a node def and persists the change
 export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch) => {
   const layoutUpdated = dispatch(_updateLayoutProp(nodeDef, key, value))
   const props = { [NodeDefLayout.keys.layout]: layoutUpdated }
@@ -244,9 +240,7 @@ export const cancelNodeDefEdits = (history) => async (dispatch, getState) => {
   history.goBack()
 }
 
-/**
- * Persists the temporary changes applied to the node def in the state
- */
+// Persists the temporary changes applied to the node def in the state
 export const saveNodeDefEdits = () => async (dispatch, getState) => {
   const state = getState()
   const nodeDef = NodeDefState.getNodeDef(state)
@@ -256,13 +250,25 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
     dispatch(showAppLoader())
 
     const survey = SurveyState.getSurvey(state)
-    const surveyId = SurveyState.getSurveyId(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
+    const surveyId = Survey.getId(survey)
     const isNodeDefNew = NodeDef.isTemporary(nodeDef)
-    const nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
+    const nodeDefCycleKeys = NodeDef.getCycles(nodeDef)
+    let nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
 
     if (isNodeDefNew) {
+      if (nodeDefCycleKeys.length > 1) {
+        // copy layout of current cycle to all selected cycles
+        const layoutCycle = NodeDefLayout.getLayoutCycle(surveyCycleKey)(nodeDefUpdated)
+        const layoutUpdated = nodeDefCycleKeys
+          .filter((cycleKey) => cycleKey !== surveyCycleKey)
+          .reduce(
+            (layoutAcc, cycleKey) => NodeDefLayout.assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc),
+            NodeDefLayout.getLayout(nodeDef)
+          )
+        nodeDefUpdated = NodeDefLayout.assocLayout(layoutUpdated)(nodeDefUpdated)
+      }
       const {
         data: { nodeDefsValidation, nodeDefsUpdated },
       } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef: nodeDefUpdated })

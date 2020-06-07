@@ -31,9 +31,9 @@ export const displayIn = {
 
 // ====== CREATE
 
-export const newLayout = (cycle, renderType, pageUuid = null) =>
+export const newLayout = (cycle, renderAs, pageUuid = null) =>
   R.pipe(
-    R.assocPath([cycle, keys.renderType], renderType),
+    R.assocPath([cycle, keys.renderType], renderAs),
     R.when(R.always(pageUuid), R.assocPath([cycle, keys.pageUuid], pageUuid))
   )({})
 
@@ -41,7 +41,9 @@ export const newLayout = (cycle, renderType, pageUuid = null) =>
 
 export const getLayout = ObjectUtils.getProp(keys.layout, {})
 
-const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(getLayout, R.pathOr(defaultTo, [cycle, prop]))
+export const getLayoutCycle = (cycle) => R.pipe(getLayout, R.prop(cycle))
+
+const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(getLayoutCycle(cycle), R.propOr(defaultTo, prop))
 
 export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
 
@@ -51,12 +53,10 @@ export const getColumnsNo = (cycle) => _getPropLayout(cycle, keys.columnsNo, 3)
 
 export const getPageUuid = (cycle) => _getPropLayout(cycle, keys.pageUuid)
 
+export const hasPage = (cycle) => R.pipe(getPageUuid(cycle), R.isNil, R.not)
+
 export const getDisplayIn = (cycle) =>
   R.ifElse(hasPage(cycle), R.always(displayIn.ownPage), R.always(displayIn.parentPage))
-
-// ====== CHECK
-
-export const hasPage = (cycle) => R.pipe(getPageUuid(cycle), R.isNil, R.not)
 
 const isRenderType = (cycle, type) => R.pipe(getRenderType(cycle), R.equals(type))
 export const isRenderTable = (cycle) => isRenderType(cycle, renderType.table)
@@ -68,6 +68,8 @@ export const isDisplayInParentPage = (cycle) => R.pipe(getDisplayIn(cycle), R.pr
 
 // ====== UPDATE
 export const assocLayout = (layout) => ObjectUtils.setProp(keys.layout, layout)
+
+export const assocLayoutCycle = (cycle, layoutCycle) => R.assoc(cycle, layoutCycle)
 
 export const assocLayoutProp = (cycle, prop, value) => R.assocPath([cycle, prop], value)
 
