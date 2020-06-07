@@ -8,7 +8,7 @@ import * as NotificationState from '@webapp/app/appNotification/appNotificationS
 import * as LoaderActions from '@webapp/app/actions'
 import * as NotificationActions from '@webapp/app/appNotification/actions'
 import * as SurveyActions from '../actions'
-import * as SurveyState from '../surveyState'
+import * as SurveyState from '../state'
 
 export const surveyInfoUpdate = 'survey/info/update'
 export const surveyInfoValidationUpdate = 'survey/info/validation/update'

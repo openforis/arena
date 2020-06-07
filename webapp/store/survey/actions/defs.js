@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as LoaderActions from '@webapp/app/actions'
 
-import * as SurveyState from '../surveyState'
+import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
 

@@ -6,7 +6,7 @@ import * as LoaderActions from '@webapp/app/actions'
 import * as NotificationActions from '@webapp/app/appNotification/actions'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
-import * as SurveyState from '../surveyState'
+import * as SurveyState from '../state'
 import { surveyDelete } from './actionTypes'
 
 export const deleteSurvey = (history) => async (dispatch, getState) => {

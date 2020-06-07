@@ -1,6 +1,6 @@
 // ====== survey
 import * as SurveyActions from './actions'
-import * as SurveyState from './surveyState'
+import * as SurveyState from './state'
 import SurveyReducer from './reducer'
 
 export { SurveyActions, SurveyState, SurveyReducer }

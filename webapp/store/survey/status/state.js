@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import * as SurveyState from '../surveyState'
+import * as SurveyState from '../state'
 
 export const stateKey = 'status'
 

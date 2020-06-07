@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as JobActions from '@webapp/loggedin/appJob/actions'
 
-import * as SurveyState from '../surveyState'
+import * as SurveyState from '../state'
 import { setActiveSurvey } from './active'
 import { initSurveyDefs } from './defs'
 
