@@ -11,6 +11,8 @@ export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidC
 export const dataQueryTableDataColUpdate = 'dataQuery/table/data/col/update'
 export const dataQueryTableDataColDelete = 'dataQuery/table/data/col/delete'
 export const dataQueryTableDataUpdate = 'dataQuery/table/data/update'
+export const dataQueryDimensionsUpdate = 'dataQuery/dimensions/update'
+export const dataQueryMeasuresUpdate = 'dataQuery/measures/update'
 export const dataQueryTableFilterUpdate = 'dataQuery/table/filter/update'
 export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
 
@@ -70,6 +72,15 @@ export const updateTableNodeDefUuidCols = (
   }
 }
 
+export const updateTableMeasures = (measuresUpdate) => (dispatch) => {
+  // const measures = DataQueryState.getTableMeasures
+  dispatch({ type: dataQueryMeasuresUpdate, measures: measuresUpdate })
+}
+
+export const updateTableDimensions = (dimensionsUpdate) => (dispatch) => {
+  dispatch({ type: dataQueryDimensionsUpdate, dimensions: dimensionsUpdate })
+}
+
 // ==== Table offset
 export const updateTableOffset = (offset = 0) => async (dispatch, getState) => {
   const data = await fetchData({ state: getState(), offset })
@@ -95,10 +106,10 @@ export const toggleTableModeEdit = () => (dispatch, getState) => {
 
 export const toggleTableModeAggregate = () => (dispatch, getState) => {
   const state = getState()
-  const modeAggregate = DataQueryState.isTableModeAggregate(state)
-  const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
-  const { data, sort, nodeDefUuidCols, limit, filter, offset, count } = DataQueryState.defaults
-  const mode = modeAggregate ? null : DataQueryState.modes.aggregate
-  const payload = { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }
-  dispatch({ type: dataQueryTableInit, ...payload })
+  dispatch({
+    type: dataQueryTableInit,
+    ...DataQueryState.defaults,
+    nodeDefUuidTable: DataQueryState.getTableNodeDefUuidTable(state),
+    mode: DataQueryState.isTableModeAggregate(state) ? null : DataQueryState.modes.aggregate,
+  })
 }

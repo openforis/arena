@@ -56,6 +56,7 @@
             - state
                 - i18n
                 - user
+                - status
             - reducer.js
             - index.js
         - ui
@@ -66,7 +67,6 @@
                 - job
                 - notification
                 - loader
-                - status
                 - sideBar
             - hooks
             - reducer.js
@@ -80,22 +80,23 @@
             - state
             - reducer.js
             - index.js
-        - collectImportReport
-        - recordsSummary
-        - activityLog
-        - surveyCreate
-        - dataVis
-        - category
-        - nodeDef
-        - record
-        - surveyForm
-        - taxonomy
-        - table
-            - records
-            - validationReports
-            - surveys
-        - user
-        - userInvite
+        - views
+            - collectImportReport
+            - recordsSummary
+            - activityLog
+            - surveyCreate
+            - dataVis
+            - category
+            - nodeDef
+            - record
+            - surveyForm
+            - taxonomy
+            - table
+                - records
+                - validationReports
+                - surveys
+            - user
+            - userInvite
 
 ```
 import {SurveyState, SurveyActions, useSurveyInfo} from '@webapp/store/survey'
