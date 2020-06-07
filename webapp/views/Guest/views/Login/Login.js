@@ -1,19 +1,15 @@
-import './loginView.scss'
-
+import './Login.scss'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n, useFormObject } from '@webapp/components/hooks'
-import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
-
 import { guestModules } from '@webapp/app/appModules'
+import { useFormObject, useI18n } from '@webapp/components/hooks'
+import Error from '@webapp/views/Guest/components/Error'
 
-import * as LoginValidator from '@webapp/guest/login/loginValidator'
-import * as LoginState from './loginState'
-import { setEmail, login, setLoginError } from '@webapp/guest/login/actions'
+import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
-const LoginView = () => {
+const Login = () => {
   const error = useSelector(LoginState.getError)
   const email = useSelector(LoginState.getEmail)
   const i18n = useI18n()
@@ -22,32 +18,32 @@ const LoginView = () => {
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
     { email, password: '' },
     LoginValidator.validateLoginObj,
-    true,
+    true
   )
 
   const onClickLogin = () => {
     if (objectValid) {
-      dispatch(login(formObject.email, formObject.password))
+      dispatch(LoginActions.login(formObject.email, formObject.password))
     } else {
-      dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email', 'password'])))
+      dispatch(LoginActions.setLoginError(LoginValidator.getFirstError(validation, ['email', 'password'])))
     }
   }
 
-  const onChangeEmail = e => {
-    const email = e.target.value
-    dispatch(setEmail(email))
-    setObjectField('email', email)
+  const onChangeEmail = (event) => {
+    const emailChanged = event.target.value
+    dispatch(LoginActions.setEmail(emailChanged))
+    setObjectField('email', emailChanged)
   }
 
-  const onChangePassword = e => {
-    dispatch(setLoginError(null))
-    setObjectField('password', e.target.value)
+  const onChangePassword = (event) => {
+    dispatch(LoginActions.setLoginError(null))
+    setObjectField('password', event.target.value)
   }
 
   return (
-    <NotLoggedInView error={error}>
+    <>
       <input
-        value={formObject.email}
+        defaultValue={formObject.email}
         onChange={onChangeEmail}
         type="text"
         name="email"
@@ -55,24 +51,26 @@ const LoginView = () => {
       />
 
       <input
-        value={formObject.password}
+        defaultValue={formObject.password}
         onChange={onChangePassword}
         type="password"
         name="password"
         placeholder={i18n.t('loginView.yourPassword')}
       />
 
-      <div className="not-logged-in__buttons">
+      <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onClickLogin}>
           {i18n.t('loginView.login')}
         </button>
-        <Link className="btn btn-s btn-transparent btn-forgot-pwd" to={guestModules.forgotPassword.path}>
+        <Link className="btn btn-s btn-transparent guest-login__btn-forgot-pwd" to={guestModules.forgotPassword.path}>
           <span className="icon icon-question icon-left icon-12px" />
           {i18n.t('loginView.forgotPassword')}
         </Link>
       </div>
-    </NotLoggedInView>
+
+      <Error error={error} />
+    </>
   )
 }
 
-export default LoginView
+export default Login

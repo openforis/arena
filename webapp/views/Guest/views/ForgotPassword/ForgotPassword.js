@@ -2,16 +2,12 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import NotLoggedInView from '@webapp/guest/components/notLoggedInView'
 import { useI18n, useFormObject } from '@webapp/components/hooks'
+import Error from '@webapp/views/Guest/components/Error'
 
-import * as LoginState from '@webapp/guest/login/loginState'
+import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
-import { sendPasswordResetEmail, setLoginError } from '@webapp/guest/login/actions'
-
-import * as LoginValidator from '@webapp/guest/login/loginValidator'
-
-const ForgotPasswordView = () => {
+const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)
   const error = useSelector(LoginState.getError)
   const dispatch = useDispatch()
@@ -19,9 +15,9 @@ const ForgotPasswordView = () => {
   const i18n = useI18n()
 
   useEffect(() => {
-    dispatch(setLoginError(null))
+    dispatch(LoginActions.setLoginError(null))
 
-    return () => dispatch(setLoginError(null))
+    return () => dispatch(LoginActions.setLoginError(null))
   }, [])
 
   const { object: formObject, setObjectField, objectValid, validation } = useFormObject(
@@ -34,33 +30,35 @@ const ForgotPasswordView = () => {
 
   const onSubmit = () => {
     if (objectValid) {
-      dispatch(sendPasswordResetEmail(formObject.email, history))
+      dispatch(LoginActions.sendPasswordResetEmail(formObject.email, history))
     } else {
-      dispatch(setLoginError(LoginValidator.getFirstError(validation, ['email'])))
+      dispatch(LoginActions.setLoginError(LoginValidator.getFirstError(validation, ['email'])))
     }
   }
 
   return (
-    <NotLoggedInView error={error}>
+    <>
       <input
         value={formObject.email}
-        onChange={(e) => {
-          dispatch(setLoginError(null))
-          setObjectField('email', e.target.value)
+        onChange={(event) => {
+          dispatch(LoginActions.setLoginError(null))
+          setObjectField('email', event.target.value)
         }}
         type="text"
         name="username"
         placeholder={i18n.t('loginView.yourEmail')}
       />
 
-      <div className="not-logged-in__buttons">
+      <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onSubmit}>
           <span className="icon icon-envelop icon-12px icon-left" />
           {i18n.t('loginView.sendPasswordResetEmail')}
         </button>
       </div>
-    </NotLoggedInView>
+
+      <Error error={error} />
+    </>
   )
 }
 
-export default ForgotPasswordView
+export default ForgotPassword

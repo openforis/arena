@@ -1,9 +1,6 @@
-import * as R from 'ramda'
-
 // ==== Guest modules
 
-const guest = 'guest'
-export const isGuestUri = R.startsWith(`/${guest}`)
+export const guest = 'guest'
 
 export const guestModules = {
   resetPassword: {
@@ -159,5 +156,5 @@ export const analysisModules = {
   },
 }
 
-const app = 'app'
+export const app = 'app'
 export const appModuleUri = (module = appModules.home) => `/${[app, module.path].join('/')}/`
