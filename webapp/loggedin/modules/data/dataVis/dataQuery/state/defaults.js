@@ -7,4 +7,6 @@ export const defaults = {
   sort: [],
   nodeDefUuidCols: [],
   nodeDefUuidTable: null,
+  dimensions: [],
+  measures: new Map(),
 }

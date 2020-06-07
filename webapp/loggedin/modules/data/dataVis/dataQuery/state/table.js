@@ -16,6 +16,8 @@ export const getTableFilter = getTableProp(tableKeys.filter)
 export const getTableSort = getTableProp(tableKeys.sort, defaults.sort)
 export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
 export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, defaults.nodeDefUuidCols)
+export const getTableDimensions = getTableProp(tableKeys.dimensions, defaults.dimensions)
+export const getTableMeasures = getTableProp(tableKeys.measures, defaults.measures)
 export const getTableMode = getTableProp(tableKeys.mode)
 const _isMode = (mode) => R.pipe(getTableMode, R.equals(mode))
 export const isTableModeEdit = _isMode(modes.edit)
@@ -28,13 +30,11 @@ export const hasTableAndCols = (state) => hasTable(state) && hasCols(state)
 // ====== UPDATE
 export const assocTableData = (offset, data) =>
   R.pipe(R.assocPath([keys.table, tableKeys.offset], offset), R.assocPath([keys.table, tableKeys.data], data))
-
-export const assocNodeDefUuidCols = (nodeDefUuidCols) =>
-  R.assocPath([keys.table, tableKeys.nodeDefUuidCols], nodeDefUuidCols)
-
-export const assocTableSort = (sort) => R.assocPath([keys.table, tableKeys.sort], sort)
-
-export const assocTableFilter = (filter) => R.assocPath([keys.table, tableKeys.filter], filter)
+export const assocNodeDefUuidCols = R.assocPath([keys.table, tableKeys.nodeDefUuidCols])
+export const assocDimensions = R.assocPath([keys.table, tableKeys.dimensions])
+export const assocMeasures = R.assocPath([keys.table, tableKeys.measures])
+export const assocTableSort = R.assocPath([keys.table, tableKeys.sort])
+export const assocTableFilter = R.assocPath([keys.table, tableKeys.filter])
 
 // On nodeDefUuid table change, reset table data, sort and filter
 export const assocNodeDefUuidTable = (nodeDefUuidTable) =>
@@ -42,6 +42,8 @@ export const assocNodeDefUuidTable = (nodeDefUuidTable) =>
     R.assocPath([keys.table, tableKeys.nodeDefUuidTable], nodeDefUuidTable),
     assocTableData(defaults.offset, defaults.data),
     assocNodeDefUuidCols(defaults.nodeDefUuidCols),
+    assocDimensions(defaults.dimensions),
+    assocMeasures(defaults.measures),
     assocTableSort(defaults.sort),
     assocTableFilter(defaults.filter)
   )
@@ -60,5 +62,4 @@ export const dissocTableDataCols = (cols) => (state) =>
     (dataUpdate) => assocTableData(R.pathOr(0, [keys.table, tableKeys.offset], state), dataUpdate)(state)
   )(state)
 
-export const initTableData = ({ offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }) =>
-  R.assoc(keys.table, { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode })
+export const initTableData = R.assoc(keys.table)
