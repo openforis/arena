@@ -6,6 +6,8 @@ export {
   dataQueryTableDataColUpdate,
   dataQueryTableDataColDelete,
   dataQueryTableDataUpdate,
+  dataQueryDimensionsUpdate,
+  dataQueryMeasuresUpdate,
   dataQueryTableFilterUpdate,
   dataQueryTableSortUpdate,
   updateTableNodeDefUuid,
@@ -14,6 +16,8 @@ export {
   resetTableFilter,
   updateTableOffset,
   updateTableSort,
+  updateTableMeasures,
+  updateTableDimensions,
   toggleTableModeEdit,
   toggleTableModeAggregate,
 } from './update'

@@ -16,6 +16,8 @@ import {
   dataQueryTableSortUpdate,
   dataQueryNodeDefSelectorsShowUpdate,
   dataQueryTableDataValidationUpdate,
+  dataQueryMeasuresUpdate,
+  dataQueryDimensionsUpdate,
 } from './actions'
 import * as DataQueryState from './state'
 
@@ -39,11 +41,21 @@ const actionHandlers = {
 
   [dataQueryTableInit]: (
     state,
-    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode }
+    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, dimensions, measures, mode }
   ) =>
-    DataQueryState.initTableData({ offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, mode })(
-      state
-    ),
+    DataQueryState.initTableData({
+      offset,
+      limit,
+      filter,
+      sort,
+      count,
+      data,
+      nodeDefUuidTable,
+      nodeDefUuidCols,
+      dimensions,
+      measures,
+      mode,
+    })(state),
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => DataQueryState.assocTableData(offset, data)(state),
 
@@ -53,6 +65,10 @@ const actionHandlers = {
 
   [dataQueryTableDataValidationUpdate]: (state, { recordUuid, validations }) =>
     DataQueryState.assocTableDataRecordNodeValidations(recordUuid, validations)(state),
+
+  [dataQueryMeasuresUpdate]: (state, { measures }) => DataQueryState.assocMeasures(measures)(state),
+
+  [dataQueryDimensionsUpdate]: (state, { dimensions }) => DataQueryState.assocDimensions(dimensions)(state),
 
   // Data vis
   [dataVisReset]: () => ({}),
