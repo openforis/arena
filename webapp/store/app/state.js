@@ -2,6 +2,6 @@ export const keys = {
   error: 'error',
 }
 
-export const stateKey = 'app'
+export const stateKey = '_app'
 
 export const getState = (state) => state[stateKey] || {}
