@@ -7,7 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as SurveyFormState from '../surveyFormState'
 import { toggleFormPageNavigation } from '../actions'

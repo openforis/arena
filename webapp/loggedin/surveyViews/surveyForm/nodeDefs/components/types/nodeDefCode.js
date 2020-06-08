@@ -20,6 +20,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../../../../record/recordState'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './nodeDefCodeDropdown'
+import { I18nState } from '@webapp/store/system/i18n'
 
 const NodeDefCode = (props) => {
   const {
@@ -108,7 +109,7 @@ const NodeDefCode = (props) => {
 }
 
 const mapStateToProps = (state, props) => {
-  const lang = AppState.getLang(state)
+  const lang = I18nState.getLang(state)
 
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)

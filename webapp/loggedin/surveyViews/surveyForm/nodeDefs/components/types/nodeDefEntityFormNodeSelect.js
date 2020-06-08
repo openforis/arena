@@ -7,7 +7,7 @@ import * as Node from '@core/record/node'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const NodeDefEntityFormNodeSelect = (props) => {
   const {

@@ -6,7 +6,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as InputMasks from '@webapp/components/form/inputMasks'

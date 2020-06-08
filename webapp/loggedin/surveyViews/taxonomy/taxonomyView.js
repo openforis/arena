@@ -8,7 +8,7 @@ import { useHistory, useParams } from 'react-router'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'

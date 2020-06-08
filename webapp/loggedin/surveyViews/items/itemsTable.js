@@ -4,7 +4,7 @@ import { Link, useHistory } from 'react-router-dom'
 
 import * as ObjectUtils from '@core/objectUtils'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const TableRow = props => {
   const { columns, item, itemLink, selectedItemUuid, canSelect, onSelect, canDelete, onDelete, readOnly } = props

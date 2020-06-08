@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import { useI18n } from '../hooks'
+import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
 
 const BasicExpressionEditorPopup = (props) => {

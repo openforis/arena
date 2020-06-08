@@ -10,6 +10,7 @@ import * as RecordValidationReportItem from '@core/record/recordValidationReport
 import * as Authorizer from '@core/auth/authorizer'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
+import { I18nState } from '@webapp/store/system/i18n'
 
 const ValidationReportRow = (props) => {
   const { idx, offset, path, validation, canEdit } = props
@@ -33,7 +34,7 @@ const mapStateToProps = (state, props) => {
 
   const user = AppState.getUser(state)
   const survey = SurveyState.getSurvey(state)
-  const i18n = AppState.getI18n(state)
+  const i18n = I18nState.getState(state)
 
   const path = RecordValidationReportItem.getPath(survey, i18n.lang)(row)
 

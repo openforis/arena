@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Header from '@webapp/components/header'
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const SurveyListHeaderLeft = () => {
   const i18n = useI18n()

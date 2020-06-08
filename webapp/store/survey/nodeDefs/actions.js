@@ -17,6 +17,7 @@ import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState
 
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 import * as SurveyState from '../state'
+import { I18nState } from '@webapp/store/system/i18n'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -298,7 +299,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
-  const i18n = AppState.getI18n(state)
+  const i18n = I18nState.getI18n(state)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 

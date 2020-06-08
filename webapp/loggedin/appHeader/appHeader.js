@@ -15,12 +15,12 @@ import * as AppState from '@webapp/app/appState'
 import { updateUserPrefs } from '@webapp/app/actions'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
+import { useLang } from '@webapp/store/system'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
   const user = useUser()
-  const i18n = useI18n()
-  const { lang } = i18n
+  const lang = useLang()
   const appSaving = useSelector(AppState.isSaving)
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()

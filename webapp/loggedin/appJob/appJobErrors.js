@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 

@@ -6,7 +6,8 @@ import * as Survey from '@core/survey/survey'
 
 import { SurveyActions } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { useSurveyInfo, useI18n } from '@webapp/components/hooks'
+import { useSurveyInfo } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const ButtonPublishSurvey = (props) => {
   const { className, disabled } = props

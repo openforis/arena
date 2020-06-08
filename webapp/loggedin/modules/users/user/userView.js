@@ -11,7 +11,7 @@ import * as Validation from '@core/validation/validation'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/input'
 

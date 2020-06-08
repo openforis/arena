@@ -6,7 +6,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { useI18n, useLang, useNodeDefByUuid } from '@webapp/components/hooks'
+import { useNodeDefByUuid } from '@webapp/components/hooks'
+import { useI18n, useLang } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ErrorBadge from '@webapp/components/errorBadge'
 

@@ -6,7 +6,8 @@ import * as R from 'ramda'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useI18n, useOnIntersect, useInterval } from '@webapp/components/hooks'
+import { useOnIntersect, useInterval } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ProfilePicture from '@webapp/components/profilePicture'
 
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'

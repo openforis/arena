@@ -10,7 +10,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 

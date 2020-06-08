@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '@webapp/loggedin/surveyViews/record/actions'

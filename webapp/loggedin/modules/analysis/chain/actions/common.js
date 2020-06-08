@@ -6,6 +6,7 @@ import * as AppState from '@webapp/app/appState'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { NotificationActions } from '@webapp/store/ui'
+import { I18nState } from '@webapp/store/system/i18n'
 
 export const navigateToNodeDefEdit = (history, nodeDefUuid) => () =>
   history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
@@ -18,7 +19,7 @@ export const checkCanSelectNodeDef = (nodeDef) => (dispatch, getState) => {
     return true
   }
 
-  const lang = AppState.getLang(state)
+  const lang = I18nState.getLang(state)
   dispatch(
     NotificationActions.notifyError({
       key: 'processingChainView.cannotSelectNodeDefNotBelongingToCycles',

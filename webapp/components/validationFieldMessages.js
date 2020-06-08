@@ -12,10 +12,10 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 
 import Markdown from '@webapp/components/markdown'
+import { I18nState } from '@webapp/store/system/i18n'
 
 const getValidationCountErrorText = (survey, i18n) => (validationResult) => {
   const nodeDef = Survey.getNodeDefByUuid(ValidationResult.getParams(validationResult).nodeDefUuid)(survey)
@@ -102,7 +102,7 @@ ValidationFieldMessages.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { validation, showKeys } = props
 
-  const i18n = AppState.getI18n(state)
+  const i18n = I18nState.getI18n(state)
   const survey = SurveyState.getSurvey(state)
 
   return {

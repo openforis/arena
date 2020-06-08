@@ -18,7 +18,7 @@ import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState
 
 import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ItemsView from '@webapp/loggedin/surveyViews/items/itemsView'
 import ItemsColumn from '@webapp/loggedin/surveyViews/items/itemsColumn'
 

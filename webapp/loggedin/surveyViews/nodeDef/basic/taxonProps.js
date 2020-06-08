@@ -4,7 +4,7 @@ import { Link, useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/dropdown'
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

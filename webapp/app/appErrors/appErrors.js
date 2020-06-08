@@ -7,7 +7,7 @@ import Markdown from '../../components/markdown'
 
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as ErrorsState from './appErrorsState'
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'

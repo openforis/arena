@@ -16,6 +16,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
 import { setUser } from '@webapp/app/actions'
+import { I18nState } from '@webapp/store/system/i18n'
 
 export const userUpdate = 'user/update'
 export const userProfilePictureUpdate = 'user/profilePicture/update'
@@ -105,7 +106,7 @@ export const saveUser = (history) => async (dispatch, getState) => {
 
 export const removeUser = (history) => async (dispatch, getState) => {
   const state = getState()
-  const lang = AppState.getLang(state)
+  const lang = I18nState.getLang(state)
   const surveyId = SurveyState.getSurveyId(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const userToUpdate = UserViewState.getUser(state)

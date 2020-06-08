@@ -5,7 +5,7 @@ import { FormItem, Input } from '@webapp/components/form/input'
 import DownloadButton from '@webapp/components/form/downloadButton'
 import ErrorBadge from '@webapp/components/errorBadge'
 import UploadButton from '@webapp/components/form/uploadButton'
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 import * as Taxonomy from '@core/survey/taxonomy'

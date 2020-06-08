@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux'
 
 import * as DataSort from '@common/surveyRdb/dataSort'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+
 import Tooltip from '@webapp/components/tooltip'
 import SortEditor from '@webapp/loggedin/modules/data/dataVis/dataQuery/components/sort/sortEditor'
 
