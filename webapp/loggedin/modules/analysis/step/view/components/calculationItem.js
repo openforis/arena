@@ -7,7 +7,7 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { useNodeDefByUuid } from '@webapp/components/hooks'
-import { useI18n, useLang } from '@webapp/store/system'
+import { useLang } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ErrorBadge from '@webapp/components/errorBadge'
 
@@ -17,7 +17,6 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 const CalculationItem = (props) => {
   const { calculation, dragging, onDragStart, onDragEnd, onDragOver } = props
 
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const lang = useLang()
   const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
@@ -60,7 +59,7 @@ const CalculationItem = (props) => {
 
       <div className="chain-list-item__content calculation-item">
         <div className="chain-list-item__label">
-          {Calculation.getLabel(i18n.lang)(calculation)} ({nodeDef && NodeDef.getLabel(nodeDef, lang)})
+          {Calculation.getLabel(lang)(calculation)} ({nodeDef && NodeDef.getLabel(nodeDef, lang)})
           <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
         </div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />
