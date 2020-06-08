@@ -8,9 +8,8 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import { LoaderActions } from '@webapp/store/ui'
+import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { SurveyState, CategoriesActions } from '@webapp/store/survey'
-import { showDialogConfirm } from '@webapp/store/ui/dialogConfirm/actions'
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
@@ -196,15 +195,18 @@ export const deleteCategoryItem = (category, level, item) => (dispatch, getState
     : 'categoryEdit.confirmDeleteItemWithChildren'
 
   dispatch(
-    showDialogConfirm(messageKeyConfirm, {}, async () => {
-      dispatch(LoaderActions.showLoader())
-      const surveyId = SurveyState.getSurveyId(state)
-      const { data } = await axios.delete(
-        `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`
-      )
-      dispatch({ type: CategoriesActions.categoryItemDelete, item, level })
-      dispatchCategoryUpdate(dispatch, data.category)
-      dispatch(LoaderActions.hideLoader())
+    DialogConfirmActions.showDialogConfirm({
+      key: messageKeyConfirm,
+      onOk: async () => {
+        dispatch(LoaderActions.showLoader())
+        const surveyId = SurveyState.getSurveyId(state)
+        const { data } = await axios.delete(
+          `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`
+        )
+        dispatch({ type: CategoriesActions.categoryItemDelete, item, level })
+        dispatchCategoryUpdate(dispatch, data.category)
+        dispatch(LoaderActions.hideLoader())
+      },
     })
   )
 }
