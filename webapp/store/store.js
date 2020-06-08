@@ -5,17 +5,19 @@ import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
-import AppReducer from '@webapp/app/reducer'
+import AppReducerDeprecated from '@webapp/app/reducer'
 import AppErrorsReducer from '@webapp/app/appErrors/reducer'
+import { SystemState, SystemReducer } from '@webapp/store/system'
 import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
 import { UiReducer, UiState } from '@webapp/store/ui'
 
-import * as AppState from '@webapp/app/appState'
+import * as AppStateDeprecated from '@webapp/app/appState'
 import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
 
 const appReducers = {
-  [AppState.stateKey]: AppReducer,
+  [AppStateDeprecated.stateKey]: AppReducerDeprecated,
+  [SystemState.stateKey]: SystemReducer,
   [LoginState.stateKey]: LoginReducer,
   [SurveyState.stateKey]: SurveyReducer,
   [UiState.stateKey]: UiReducer,

@@ -11,10 +11,6 @@ import * as AppState from './appState'
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
 
-export const systemErrorThrow = 'system/error'
-
-export const throwSystemError = (error) => (dispatch) => dispatch({ type: systemErrorThrow, error })
-
 // ====== INIT
 
 export const initApp = () => async (dispatch) => {

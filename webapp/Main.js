@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 
-import { store } from '@webapp/app/store'
+import { store } from '@webapp/store'
 import Arena from '@webapp/views/Arena'
 
 function renderApp() {

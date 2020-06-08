@@ -5,9 +5,10 @@ import * as User from '@core/user/user'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
+import { SystemErrorActions } from '@webapp/store/system'
+
 import { useUser } from '@webapp/components/hooks'
 
-import { throwSystemError } from '@webapp/app/actions'
 import { activeJobUpdate } from '@webapp/loggedin/appJob/actions'
 
 export const useWebSocket = () => {
@@ -16,7 +17,7 @@ export const useWebSocket = () => {
 
   const openSocket = () => {
     ;(async () => {
-      await AppWebSocket.openSocket((error) => dispatch(throwSystemError(error)))
+      await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
       AppWebSocket.on(WebSocketEvents.jobUpdate, (job) => dispatch(activeJobUpdate(job)))
     })()
   }

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useSystemError } from '@webapp/store/system'
 import { useI18n } from '@webapp/components/hooks'
 import * as AppState from '@webapp/app/appState'
 import { initApp } from '@webapp/app/actions'
@@ -11,7 +12,7 @@ const Arena = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const ready = useSelector(AppState.isReady)
-  const systemError = useSelector(AppState.getSystemError)
+  const systemError = useSystemError()
 
   useEffect(() => {
     dispatch(initApp())
