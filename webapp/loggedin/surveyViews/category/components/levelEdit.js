@@ -19,7 +19,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as Authorizer from '@core/auth/authorizer'
 import * as CategoryState from '../categoryState'
 
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   createCategoryLevelItem,
@@ -39,7 +39,7 @@ const LevelEdit = (props) => {
     const { category, level, usedByNodeDefs, deleteCategoryLevel } = props
 
     if (usedByNodeDefs) {
-      dispatch(showNotification('categoryEdit.cantBeDeletedLevel'))
+      dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeletedLevel' }))
     } else {
       dispatch(
         showDialogConfirm('categoryEdit.confirmDeleteLevel', { levelName: CategoryLevel.getName(level) }, () =>

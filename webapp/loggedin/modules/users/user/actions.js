@@ -15,7 +15,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
 import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 export const userUpdate = 'user/update'
 export const userProfilePictureUpdate = 'user/profilePicture/update'
@@ -88,8 +88,9 @@ export const saveUser = (history) => async (dispatch, getState) => {
       }
 
       dispatch(
-        showNotification('usersView.updateUserConfirmation', {
-          name: User.getName(userToUpdate),
+        NotificationActions.notifyInfo({
+          key: 'usersView.updateUserConfirmation',
+          params: { name: User.getName(userToUpdate) },
         })
       )
 
@@ -115,9 +116,12 @@ export const removeUser = (history) => async (dispatch, getState) => {
     await axios.delete(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`)
 
     dispatch(
-      showNotification('userView.removeUserConfirmation', {
-        user: User.getName(userToUpdate),
-        survey: Survey.getLabel(surveyInfo, lang),
+      NotificationActions.notifyInfo({
+        key: 'userView.removeUserConfirmation',
+        params: {
+          user: User.getName(userToUpdate),
+          survey: Survey.getLabel(surveyInfo, lang),
+        },
       })
     )
     history.push(appModuleUri(userModules.users))
@@ -141,8 +145,9 @@ export const inviteUserRepeat = (history) => async (dispatch, getState) => {
     await axios.post(`/api/survey/${surveyId}/users/inviteRepeat`, userInviteParams)
 
     dispatch(
-      showNotification('emails.userInviteRepeatConfirmation', {
-        email: UserInvite.getEmail(userInvite),
+      NotificationActions.notifyInfo({
+        key: 'emails.userInviteRepeatConfirmation',
+        params: { email: UserInvite.getEmail(userInvite) },
       })
     )
 

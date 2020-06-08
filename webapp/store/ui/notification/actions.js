@@ -1,21 +1,26 @@
+import { cancelDebouncedAction, debounceAction } from '@webapp/utils/reduxUtils'
+
 import * as NotificationState from './state'
-import { cancelDebouncedAction, debounceAction } from '../../../utils/reduxUtils'
 
-export const appNotificationShow = 'app/notification/show'
-export const appNotificationHide = 'app/notification/hide'
+export const NOTIFICATION_SHOW = 'ui/notification/show'
+export const NOTIFICATION_HIDE = 'ui/notification/hide'
 
-export const showNotification = (key, params, severity = NotificationState.severityType.info, timeout = 10000) => (
-  dispatch
-) => {
-  dispatch({
-    type: appNotificationShow,
-    notification: NotificationState.newNotification({ key, params, severity }),
-  })
-
-  dispatch(debounceAction({ type: appNotificationHide }, appNotificationHide, timeout))
+export const showNotification = ({ key, params, severity, timeout = 10000 }) => (dispatch) => {
+  const notification = NotificationState.newNotification({ key, params, severity })
+  dispatch({ type: NOTIFICATION_SHOW, notification })
+  dispatch(debounceAction({ type: NOTIFICATION_HIDE }, NOTIFICATION_HIDE, timeout))
 }
 
+export const notifyInfo = ({ key, params, timeout }) =>
+  showNotification({ key, params, timeout, severity: NotificationState.severityType.info })
+
+export const notifyWarning = ({ key, params, timeout }) =>
+  showNotification({ key, params, timeout, severity: NotificationState.severityType.warning })
+
+export const notifyError = ({ key, params, timeout }) =>
+  showNotification({ key, params, timeout, severity: NotificationState.severityType.error })
+
 export const hideNotification = () => (dispatch) => {
-  dispatch(cancelDebouncedAction(appNotificationHide))
-  dispatch({ type: appNotificationHide })
+  dispatch(cancelDebouncedAction(NOTIFICATION_HIDE))
+  dispatch({ type: NOTIFICATION_HIDE })
 }

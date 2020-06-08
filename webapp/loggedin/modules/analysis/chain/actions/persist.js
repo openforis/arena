@@ -8,14 +8,13 @@ import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
-import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import { SurveyState } from '@webapp/store/survey'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { chainValidationUpdate } from './validation'
 
 export const chainSave = 'analysis/chain/save'
@@ -72,11 +71,11 @@ export const saveChain = () => async (dispatch, getState) => {
     const data = { chain: Chain.dissocProcessingSteps(chain), step: _getStepParam(step), calculation }
     await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
 
-    dispatch(showNotification('common.saved'))
+    dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
     dispatch({ type: chainSave, chain, step, calculation })
   } else {
     dispatch({ type: chainValidationUpdate, validation: Chain.getValidation(chain) })
-    dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
+    dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
   }
 
   dispatch(hideAppSaving())

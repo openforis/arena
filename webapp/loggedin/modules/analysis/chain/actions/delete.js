@@ -6,7 +6,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { navigateToChainsView } from './state'
 
@@ -23,6 +23,6 @@ export const deleteChain = (history) => async (dispatch, getState) => {
 
   dispatch({ type: chainDelete })
   dispatch(navigateToChainsView(history))
-  dispatch(showNotification('processingChainView.deleteComplete'))
+  dispatch(NotificationActions.notifyInfo({ key: 'processingChainView.deleteComplete' }))
   dispatch(hideAppSaving())
 }

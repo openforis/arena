@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as Survey from '@core/survey/survey'
 
 import * as LoaderActions from '@webapp/app/actions'
-import * as NotificationActions from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import * as SurveyState from '../state'
@@ -26,8 +26,9 @@ export const deleteSurvey = (history) => async (dispatch, getState) => {
   await dispatch(LoaderActions.hideAppLoader())
 
   await dispatch(
-    NotificationActions.showNotification('homeView.surveyDeleted', {
-      surveyName: Survey.getName(surveyInfo),
+    NotificationActions.notifyInfo({
+      key: 'homeView.surveyDeleted',
+      params: { surveyName: Survey.getName(surveyInfo) },
     })
   )
 }

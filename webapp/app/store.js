@@ -10,7 +10,7 @@ import AppErrorsReducer from '@webapp/app/appErrors/reducer'
 import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
 import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
-import { UiReducerPartial, UiState } from '@webapp/store/ui'
+import { UiReducer, UiState } from '@webapp/store/ui'
 
 import * as AppState from '@webapp/app/appState'
 import * as AppDialogConfirmState from '@webapp/app/appDialogConfirm/appDialogConfirmState'
@@ -20,7 +20,7 @@ const appReducers = {
   [AppState.stateKey]: AppReducer,
   [LoginState.stateKey]: LoginReducer,
   [SurveyState.stateKey]: SurveyReducer,
-  [UiState.stateKey]: UiReducerPartial,
+  [UiState.stateKey]: UiReducer,
   [AppDialogConfirmState.stateKey]: AppDialogConfirmReducer,
   [AppErrorsState.stateKey]: AppErrorsReducer,
 }

@@ -18,7 +18,7 @@ import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 import ItemsView from '@webapp/loggedin/surveyViews/items/itemsView'
@@ -48,7 +48,7 @@ const TaxonomiesView = (props) => {
   const onClose = selectedItemUuid ? history.goBack : null
 
   const canDelete = (taxonomy) =>
-    taxonomy.usedByNodeDefs ? dispatch(showNotification('taxonomy.cantBeDeleted')) : true
+    taxonomy.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'taxonomy.cantBeDeleted' })) : true
 
   const onDelete = (taxonomy) =>
     dispatch(

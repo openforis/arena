@@ -11,10 +11,9 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { SurveyState } from '@webapp/store/survey'
 import * as AppState from '@webapp/app/appState'
-import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 
 import { showAppLoader, hideAppLoader, showAppSaving, hideAppSaving } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import * as RecordState from './recordState'
@@ -45,17 +44,17 @@ const _navigateToModuleDataHome = (history) => history.push(appModuleUri(appModu
 
 export const recordDeleted = (history) => (dispatch) => {
   dispatch({ type: recordDelete })
-  dispatch(showNotification('recordView.justDeleted'))
+  dispatch(NotificationActions.notifyInfo({ key: 'recordView.justDeleted' }))
   history.goBack()
 }
 
 export const sessionExpired = (history) => (dispatch) => {
-  dispatch(showNotification('recordView.sessionExpired'))
+  dispatch(NotificationActions.notifyInfo({ key: 'recordView.sessionExpired' }))
   _navigateToModuleDataHome(history)
 }
 
 export const applicationError = (history, key, params) => (dispatch) => {
-  dispatch(showNotification(key, params, NotificationState.severity.error))
+  dispatch(NotificationActions.notifyError({ key, params }))
   history.push(appModuleUri(appModules.designer))
 }
 

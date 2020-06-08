@@ -15,7 +15,7 @@ import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
@@ -31,7 +31,7 @@ const CategoriesView = (props) => {
   const onClose = nodeDef ? history.goBack : null
 
   const canDeleteCategory = (category) =>
-    category.usedByNodeDefs ? dispatch(showNotification('categoryEdit.cantBeDeleted')) : true
+    category.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' })) : true
 
   const onDelete = (category) =>
     dispatch(
