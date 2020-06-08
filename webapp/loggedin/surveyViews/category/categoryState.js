@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as SurveyViewsState from '../surveyViewsState'
 
 // DOCS

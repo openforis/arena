@@ -12,11 +12,11 @@ import Dropdown from '@webapp/components/form/dropdown'
 
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import { createCategory } from '@webapp/loggedin/surveyViews/category/actions'
 
-const CategorySelector = props => {
+const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, analysis, onChange } = props
 
   const i18n = useI18n()

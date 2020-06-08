@@ -10,8 +10,8 @@ import { useI18n, useLang, useNodeDefByUuid } from '@webapp/components/hooks'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ErrorBadge from '@webapp/components/errorBadge'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setCalculationForEdit } from '@webapp/loggedin/modules/analysis/step/actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 const CalculationItem = (props) => {
   const { calculation, dragging, onDragStart, onDragEnd, onDragOver } = props
@@ -42,9 +42,16 @@ const CalculationItem = (props) => {
       data-index={index}
       onClick={() => {
         if (!editingSelf) {
-          if (calculationDirty)
-            dispatch(showDialogConfirm('common.cancelConfirm', {}, setCalculationForEdit(calculation)))
-          else dispatch(setCalculationForEdit(calculation))
+          if (calculationDirty) {
+            dispatch(
+              DialogConfirmActions.showDialogConfirm({
+                key: 'common.cancelConfirm',
+                onOk: setCalculationForEdit(calculation),
+              })
+            )
+          } else {
+            dispatch(setCalculationForEdit(calculation))
+          }
         }
       }}
     >

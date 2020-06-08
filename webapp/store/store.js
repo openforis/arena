@@ -5,27 +5,22 @@ import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
-import AppReducer from '@webapp/store/reducer'
+import AppReducerDeprecated from '@webapp/app/reducer'
 import AppErrorsReducer from '@webapp/app/appErrors/reducer'
-import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
-import AppNotificationReducer from '@webapp/app/appNotification/reducer'
+import { SystemState, SystemReducer } from '@webapp/store/system'
 import { LoginReducer, LoginState } from '@webapp/store/login'
-import SurveyReducer from '@webapp/survey/reducer'
+import { SurveyReducer, SurveyState } from '@webapp/store/survey'
+import { UiReducer, UiState } from '@webapp/store/ui'
 
-import * as AppState from '@webapp/app/appState'
-import { AppState as _AppState, AppReducer as _AppReducer } from '@webapp/store/app'
-import * as AppDialogConfirmState from '@webapp/app/appDialogConfirm/appDialogConfirmState'
-import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
+import * as AppStateDeprecated from '@webapp/app/appState'
 import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 const appReducers = {
-  [AppState.stateKey]: AppReducer,
-  [_AppState.stateKey]: _AppReducer,
+  [AppStateDeprecated.stateKey]: AppReducerDeprecated,
+  [SystemState.stateKey]: SystemReducer,
   [LoginState.stateKey]: LoginReducer,
   [SurveyState.stateKey]: SurveyReducer,
-  [AppDialogConfirmState.stateKey]: AppDialogConfirmReducer,
-  [AppNotificationState.stateKey]: AppNotificationReducer,
+  [UiState.stateKey]: UiReducer,
   [AppErrorsState.stateKey]: AppErrorsReducer,
 }
 

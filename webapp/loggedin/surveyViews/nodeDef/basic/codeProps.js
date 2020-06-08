@@ -14,11 +14,10 @@ import * as Category from '@core/survey/category'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as NodeDefState from '../nodeDefState'
-import { setNodeDefProp, setNodeDefLayoutProp } from '@webapp/survey/nodeDefs/actions'
 
-const CodeProps = props => {
+const CodeProps = (props) => {
   const {
     surveyCycleKey,
     nodeDef,
@@ -45,7 +44,7 @@ const CodeProps = props => {
 
   const disabled = !canUpdateCategory
 
-  const putCategoryProp = category => {
+  const putCategoryProp = (category) => {
     setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
     setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
@@ -77,7 +76,7 @@ const CodeProps = props => {
                 selection={parentCodeDef}
                 itemKeyProp={'uuid'}
                 itemLabelFunction={NodeDef.getName}
-                onChange={def => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
+                onChange={(def) => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
               />
             </div>
           </FormItem>
@@ -85,7 +84,7 @@ const CodeProps = props => {
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-              onChange={render => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render)}
+              onChange={(render) => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render)}
               items={displayAsItems}
             />
           </FormItem>
@@ -95,7 +94,7 @@ const CodeProps = props => {
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefState.getNodeDef(state)
 
@@ -106,4 +105,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setNodeDefProp, setNodeDefLayoutProp })(CodeProps)
+export default connect(mapStateToProps, {
+  setNodeDefProp: NodeDefsActions.setNodeDefProp,
+  setNodeDefLayoutProp: NodeDefsActions.setNodeDefLayoutProp(),
+})(CodeProps)

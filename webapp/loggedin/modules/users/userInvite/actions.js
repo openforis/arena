@@ -7,18 +7,18 @@ import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as UserInviteViewState from './userInviteViewState'
+import { SurveyState } from '@webapp/store/survey'
 
-import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
+
+import * as UserInviteViewState from './userInviteViewState'
 
 export const userInviteUpdate = 'user/invite/update'
 export const userInviteStateReset = 'user/invite/reset'
 
-export const resetUserInviteState = () => dispatch => dispatch({ type: userInviteStateReset })
+export const resetUserInviteState = () => (dispatch) => dispatch({ type: userInviteStateReset })
 
-const _validateUserInvite = userInvite => async dispatch => {
+const _validateUserInvite = (userInvite) => async (dispatch) => {
   const validation = await UserValidator.validateInvitation(userInvite)
   const userInviteValidated = UserInvite.assocValidation(validation)(userInvite)
   dispatch({ type: userInviteUpdate, userInvite: userInviteValidated })
@@ -34,7 +34,7 @@ export const updateUserInviteProp = (key, value) => (dispatch, getState) => {
   dispatch(_validateUserInvite(userInviteUpdated))
 }
 
-export const inviteUser = history => async (dispatch, getState) => {
+export const inviteUser = (history) => async (dispatch, getState) => {
   const state = getState()
   const userInvite = UserInviteViewState.getUserInvite(state)
   const surveyId = SurveyState.getSurveyId(state)
@@ -44,23 +44,24 @@ export const inviteUser = history => async (dispatch, getState) => {
 
   if (Validation.isObjValid(userInviteValidated)) {
     try {
-      dispatch(showAppLoader())
+      dispatch(LoaderActions.showLoader())
 
       const userInviteParams = R.pipe(
         R.omit([UserInvite.keys.validation]),
-        R.assoc('surveyCycleKey', surveyCycleKey),
+        R.assoc('surveyCycleKey', surveyCycleKey)
       )(userInviteValidated)
       await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
 
       dispatch(
-        showNotification('common.emailSentConfirmation', {
-          email: UserInvite.getEmail(userInvite),
-        }),
+        NotificationActions.notifyInfo({
+          key: 'common.emailSentConfirmation',
+          params: { email: UserInvite.getEmail(userInvite) },
+        })
       )
 
       history.push(appModuleUri(userModules.users))
     } finally {
-      dispatch(hideAppLoader())
+      dispatch(LoaderActions.hideLoader())
     }
   }
 }

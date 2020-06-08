@@ -1,23 +1,25 @@
 import './appNotification.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
-
+import { useDispatch } from 'react-redux'
 import { CSSTransition } from 'react-transition-group'
 
-import * as AppState from '../appState'
+import { useI18n } from '@webapp/components/hooks'
+import { NotificationActions, useNotification } from '@webapp/store/ui'
 
-import * as NotificationState from './appNotificationState'
-
-import { hideNotification } from './actions'
-
-const AppNotificationView = props => {
-  const { visible, messageKey, messageParams, severity, i18n, hideNotification } = props
+const AppNotificationView = () => {
+  const dispatch = useDispatch()
+  const i18n = useI18n()
+  const { messageParams, messageKey, severity, visible } = useNotification()
 
   return (
     <CSSTransition in={visible} timeout={250} unmountOnExit>
       <div className={`app-notification ${severity}`}>
-        <button className="btn-s btn-transparent app-notification__btn-close" onClick={hideNotification}>
+        <button
+          type="button"
+          className="btn-s btn-transparent app-notification__btn-close"
+          onClick={() => dispatch(NotificationActions.hideNotification())}
+        >
           <span className="icon icon-cross icon-8px" />
         </button>
 
@@ -27,12 +29,4 @@ const AppNotificationView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  messageKey: NotificationState.getMessageKey(state),
-  messageParams: NotificationState.getMessageParams(state),
-  severity: NotificationState.getSeverity(state),
-  visible: NotificationState.isVisible(state),
-  i18n: AppState.getI18n(state),
-})
-
-export default connect(mapStateToProps, { hideNotification })(AppNotificationView)
+export default AppNotificationView

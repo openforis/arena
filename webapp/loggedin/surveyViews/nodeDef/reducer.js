@@ -1,8 +1,7 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefPropsUpdate, nodeDefPropsUpdateCancel, nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import { nodeDefEditUpdate } from './actions'
 
 import * as NodeDefState from './nodeDefState'
@@ -10,20 +9,20 @@ import * as NodeDefState from './nodeDefState'
 const actionHandlers = {
   // Reset form
   [appUserLogout]: () => ({}),
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
 
   [nodeDefEditUpdate]: (state, { nodeDef, nodeDefValidation }) =>
     NodeDefState.assocNodeDefForEdit(nodeDef, nodeDefValidation)(state),
 
-  [nodeDefSave]: (state, { nodeDef, nodeDefValidation }) =>
+  [NodeDefsActions.nodeDefSave]: (state, { nodeDef, nodeDefValidation }) =>
     NodeDefState.assocNodeDefForEdit(nodeDef, nodeDefValidation)(state),
 
-  [nodeDefPropsUpdate]: (state, { nodeDef, nodeDefValidation, props, propsAdvanced }) =>
+  [NodeDefsActions.nodeDefPropsUpdate]: (state, { nodeDef, nodeDefValidation, props, propsAdvanced }) =>
     NodeDefState.assocNodeDefProps(nodeDef, nodeDefValidation, props, propsAdvanced)(state),
 
-  [nodeDefPropsUpdateCancel]: () => ({}),
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)

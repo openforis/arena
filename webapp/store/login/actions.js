@@ -2,8 +2,8 @@ import axios from 'axios'
 
 import * as Validation from '@core/validation/validation'
 
-import { hideAppLoader, initUser, showAppLoader } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { initUser } from '@webapp/app/actions'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
@@ -14,14 +14,14 @@ export const setLoginError = (message) => (dispatch) => dispatch({ type: loginEr
 
 const _createAction = (handlerFn) => async (dispatch, getState) => {
   try {
-    dispatch(showAppLoader())
+    dispatch(LoaderActions.showLoader())
     dispatch(setLoginError(null))
 
     await handlerFn(dispatch, getState)
   } catch (error) {
     dispatch(setLoginError(Validation.messageKeys.user[error.code]))
   } finally {
-    dispatch(hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
   }
 }
 
@@ -48,7 +48,7 @@ export const sendPasswordResetEmail = (email, history) =>
     if (error) {
       dispatch(setLoginError(error))
     } else {
-      dispatch(showNotification('common.emailSentConfirmation', { email }))
+      dispatch(NotificationActions.notifyInfo({ key: 'common.emailSentConfirmation', params: { email } }))
       history.goBack()
     }
   })

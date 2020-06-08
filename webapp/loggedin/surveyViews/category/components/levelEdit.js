@@ -2,25 +2,24 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect, useDispatch } from 'react-redux'
 
-import { FormItem, Input } from '@webapp/components/form/input'
-import ErrorBadge from '@webapp/components/errorBadge'
-import { useI18n } from '@webapp/components/hooks'
-
-import { normalizeName } from '@core/stringUtils'
-
+import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
+import { normalizeName } from '@core/stringUtils'
 
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { SurveyState } from '@webapp/store/survey'
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as Authorizer from '@core/auth/authorizer'
+
+import { FormItem, Input } from '@webapp/components/form/input'
+import ErrorBadge from '@webapp/components/errorBadge'
+import { useI18n } from '@webapp/components/hooks'
+
 import * as CategoryState from '../categoryState'
 
-import { showNotification } from '@webapp/app/appNotification/actions'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   createCategoryLevelItem,
   putCategoryItemProp,
@@ -32,19 +31,21 @@ import {
 
 import ItemEdit from './itemEdit'
 
-const LevelEdit = props => {
+const LevelEdit = (props) => {
   const dispatch = useDispatch()
 
   const handleDelete = () => {
     const { category, level, usedByNodeDefs, deleteCategoryLevel } = props
 
     if (usedByNodeDefs) {
-      dispatch(showNotification('categoryEdit.cantBeDeletedLevel'))
+      dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeletedLevel' }))
     } else {
       dispatch(
-        showDialogConfirm('categoryEdit.confirmDeleteLevel', { levelName: CategoryLevel.getName(level) }, () =>
-          deleteCategoryLevel(category, level),
-        ),
+        DialogConfirmActions.showDialogConfirm({
+          key: 'categoryEdit.confirmDeleteLevel',
+          params: { levelName: CategoryLevel.getName(level) },
+          onOk: () => deleteCategoryLevel(category, level),
+        })
       )
     }
   }
@@ -89,7 +90,7 @@ const LevelEdit = props => {
         <Input
           value={CategoryLevel.getName(level)}
           validation={Validation.getFieldValidation('name')(validation)}
-          onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
+          onChange={(value) => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
           readOnly={readOnly}
         />
       </FormItem>
@@ -109,7 +110,7 @@ const LevelEdit = props => {
       </div>
 
       <div className="category__level-items">
-        {items.map(item => (
+        {items.map((item) => (
           <ItemEdit
             key={CategoryItem.getUuid(item)}
             lang={lang}
@@ -143,7 +144,7 @@ const mapStateToProps = (state, props) => {
   const items = canAddItem ? CategoryState.getLevelItemsArray(index)(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
   const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
-  const usedByNodeDefs = R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
+  const usedByNodeDefs = R.any((def) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
 
   const user = AppState.getUser(state)
 

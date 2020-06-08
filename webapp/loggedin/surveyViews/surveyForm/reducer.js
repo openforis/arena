@@ -6,8 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import { nodeDefDelete, nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import { recordLoad } from '../record/actions'
 import {
   formActivePageNodeDefUpdate,
@@ -22,9 +21,9 @@ const actionHandlers = {
   // Reset form
   [appUserLogout]: () => ({}),
 
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
 
   [formReset]: () => ({}),
 
@@ -41,9 +40,9 @@ const actionHandlers = {
     SurveyFormState.setShowPageNavigation(showPageNavigation)(state),
 
   // Node def actions
-  [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
+  [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
-  [nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
+  [NodeDefsActions.nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
     if (NodeDef.isEntity(nodeDef)) {
       const pageUuid = NodeDefLayout.getPageUuid(surveyCycleKey)(nodeDef)
       // When changing displayIn (pageUuid) change form active page
@@ -59,7 +58,7 @@ const actionHandlers = {
     R.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
       SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
-      SurveyFormState.assocFormActivePage(nodeDefActivePage),
+      SurveyFormState.assocFormActivePage(nodeDefActivePage)
     )(state),
 }
 

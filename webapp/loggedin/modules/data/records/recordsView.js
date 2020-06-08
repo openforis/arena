@@ -7,7 +7,7 @@ import * as Record from '@core/record/record'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import TableView from '../../../tableViews/tableView'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { createRecord } from '../../../surveyViews/record/actions'
@@ -18,7 +18,7 @@ import RecordsRow from './components/recordsRow'
 
 import * as RecordsState from './recordsState'
 
-const RecordsView = props => {
+const RecordsView = (props) => {
   const { surveyInfo, surveyCycleKey, user, nodeDefKeys, lang, createRecord, reloadListItems, history } = props
 
   const noCols = 3 + nodeDefKeys.length
@@ -26,7 +26,7 @@ const RecordsView = props => {
 
   const restParams = { cycle: surveyCycleKey }
 
-  const onRowClick = record => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
+  const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
   useOnUpdate(() => {
     reloadListItems(RecordsState.keys.records, restParams)
@@ -53,7 +53,7 @@ const RecordsView = props => {
   )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   lang: AppState.getLang(state),
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),

@@ -15,7 +15,7 @@ import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as CategoryState from './categoryState'
 import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'

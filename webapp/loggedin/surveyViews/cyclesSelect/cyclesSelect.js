@@ -7,9 +7,9 @@ import * as Survey from '@core/survey/survey'
 import { useI18n } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
-const CyclesSelect = props => {
+const CyclesSelect = (props) => {
   const { cycleKeyCurrent, cyclesKeysSurvey, cyclesKeysSelectable, cyclesKeysSelected, disabled, onChange } = props
   const i18n = useI18n()
 
@@ -22,8 +22,8 @@ const CyclesSelect = props => {
           multiple={true}
           deselectable={true}
           selectedItemKey={cyclesKeysSelected}
-          onChange={cycles => onChange(cycles.sort((a, b) => Number(a) - Number(b)))}
-          items={cyclesKeys.map(cycle => ({
+          onChange={(cycles) => onChange(cycles.sort((a, b) => Number(a) - Number(b)))}
+          items={cyclesKeys.map((cycle) => ({
             key: cycle,
             label: Number(cycle) + 1,
             disabled:
@@ -43,10 +43,10 @@ CyclesSelect.defaultProps = {
   cyclesKeysSelectable: null, // Selectable cycle keys (default: all cycle keys)
   cyclesKeysSelected: [], // Selected cycle keys
   disabled: false,
-  onChange: selection => selection, // Required onChange function
+  onChange: (selection) => selection, // Required onChange function
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
   const cycleKeyCurrent = SurveyState.getSurveyCycleKey(state)
   const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)

@@ -2,7 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/processingChain'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 export const chainValidationUpdate = 'analysis/chain/validation/update'

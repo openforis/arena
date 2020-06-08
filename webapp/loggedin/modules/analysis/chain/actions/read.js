@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { initChain } from './state'

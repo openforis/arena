@@ -1,12 +1,11 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
-import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 export const stepReset = 'analysis/step/reset'
@@ -23,9 +22,12 @@ export const setStepForEdit = (processingStep) => (dispatch, getState) => {
   const state = getState()
   if (StepState.isDirty(state) || CalculationState.isDirty(state)) {
     dispatch(
-      showDialogConfirm('common.cancelConfirm', {}, async () => {
-        await dispatch(resetStep())
-        dispatch(stepUpdateAction)
+      DialogConfirmActions.showDialogConfirm({
+        key: 'common.cancelConfirm',
+        onOk: async () => {
+          await dispatch(resetStep())
+          dispatch(stepUpdateAction)
+        },
       })
     )
   } else {
@@ -48,7 +50,7 @@ export const addEntityVirtual = (history) => async (dispatch, getState) => {
     true
   )
 
-  await dispatch({ type: nodeDefCreate, nodeDef })
+  await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
 
   dispatch(navigateToNodeDefEdit(history, NodeDef.getUuid(nodeDef)))
 }

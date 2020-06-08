@@ -8,12 +8,13 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { SurveyState } from '@webapp/store/survey'
+
 import { useI18n } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/input'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import ProfilePictureEditor from './components/profilePictureEditor'
 import DropdownUserGroup from '../components/dropdownUserGroup'
 
@@ -82,14 +83,14 @@ const UserView = () => {
                 className="btn-s btn-danger btn-remove-user"
                 onClick={() =>
                   dispatch(
-                    showDialogConfirm(
-                      'userView.confirmRemove',
-                      {
+                    DialogConfirmActions.showDialogConfirm({
+                      key: 'userView.confirmRemove',
+                      params: {
                         user: User.getName(userToUpdate),
                         survey: Survey.getLabel(surveyInfo, i18n.lang),
                       },
-                      () => dispatch(removeUser(history))
-                    )
+                      onOk: () => dispatch(removeUser(history)),
+                    })
                   )
                 }
               >

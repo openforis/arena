@@ -7,9 +7,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 export const keys = {
   status: 'status',
   user: 'user',
-  systemError: 'systemError',
   saving: 'saving',
-  loaderVisible: 'loaderVisible',
 
   // I18n
   i18n: 'i18n',
@@ -71,7 +69,3 @@ export const isSaving = R.pipe(getState, R.propEq(keys.saving, true))
 export const getI18n = R.pipe(getState, R.prop(keys.i18n))
 
 export const getLang = R.pipe(getI18n, R.prop(keys.lang))
-
-// ==== App Loader
-
-export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))

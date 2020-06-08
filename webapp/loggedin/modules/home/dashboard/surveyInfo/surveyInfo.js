@@ -11,7 +11,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 
-import { deleteSurvey } from '@webapp/survey/actions'
+import { SurveyActions } from '@webapp/store/survey'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = () => {
@@ -66,7 +66,7 @@ const SurveyInfo = () => {
       {showDeleteDialog && (
         <DeleteSurveyDialog
           onCancel={() => setShowDeleteDialog(false)}
-          onDelete={() => dispatch(deleteSurvey(history))}
+          onDelete={() => dispatch(SurveyActions.deleteSurvey(history))}
           surveyName={Survey.getName(surveyInfo)}
         />
       )}

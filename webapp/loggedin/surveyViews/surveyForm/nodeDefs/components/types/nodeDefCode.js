@@ -16,12 +16,12 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../../../../record/recordState'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './nodeDefCodeDropdown'
 
-const NodeDefCode = props => {
+const NodeDefCode = (props) => {
   const {
     surveyId,
     surveyCycleKey,
@@ -43,7 +43,7 @@ const NodeDefCode = props => {
     `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
     {
       params: { draft, parentUuid: nodeParentCodeUuid },
-    },
+    }
   )
   const itemsArray = Object.values(items)
   const [selectedItems, setSelectedItems] = useState([])
@@ -61,12 +61,12 @@ const NodeDefCode = props => {
     // On items or nodes change, update selectedItems
     useEffect(() => {
       const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = itemsArray.filter(item => selectedItemUuids.includes(CategoryItem.getUuid(item)))
+      const selectedItemsUpdate = itemsArray.filter((item) => selectedItemUuids.includes(CategoryItem.getUuid(item)))
       setSelectedItems(selectedItemsUpdate)
     }, [items, nodes])
   }
 
-  const onItemAdd = item => {
+  const onItemAdd = (item) => {
     const node =
       NodeDef.isSingle(nodeDef) || entryDataQuery
         ? nodes[0]
@@ -79,11 +79,11 @@ const NodeDefCode = props => {
     updateNode(nodeDef, node, value, null, meta, refData)
   }
 
-  const onItemRemove = item => {
+  const onItemRemove = (item) => {
     if (NodeDef.isSingle(nodeDef) || entryDataQuery) {
       updateNode(nodeDef, nodes[0], {}, null, {}, {})
     } else {
-      const nodeToRemove = nodes.find(node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
+      const nodeToRemove = nodes.find((node) => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
       removeNode(nodeDef, nodeToRemove)
     }
   }

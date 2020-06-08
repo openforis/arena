@@ -7,12 +7,12 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as SurveyFormState from '../surveyFormState'
 
 import { setFormActivePage } from '../actions'
 
-const NavigationButton = props => {
+const NavigationButton = (props) => {
   const {
     surveyCycleKey,
     nodeDef,
@@ -55,7 +55,7 @@ const NavigationButton = props => {
       </div>
 
       {showChildren &&
-        outerPageChildDefs.map(child => (
+        outerPageChildDefs.map((child) => (
           <FormPageNavigation
             key={NodeDef.getUuid(child)}
             surveyCycleKey={surveyCycleKey}

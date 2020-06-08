@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import { surveyCreate, setActiveSurvey } from '@webapp/survey/actions'
+import { SurveyActions } from '@webapp/store/survey'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
 import * as SurveyCreateState from './surveyCreateState'
@@ -14,7 +14,7 @@ export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
   const newSurvey = R.pipe(
     SurveyCreateState.getNewSurvey,
     R.dissocPath(['validation', 'fields', name]),
-    R.assoc(name, value),
+    R.assoc(name, value)
   )(getState())
 
   dispatch({
@@ -23,13 +23,13 @@ export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
   })
 }
 
-export const createSurvey = surveyProps => async (dispatch, getState) => {
+export const createSurvey = (surveyProps) => async (dispatch, getState) => {
   const {
     data: { survey, validation },
   } = await axios.post('/api/survey', surveyProps)
 
   if (survey) {
-    dispatch({ type: surveyCreate, survey })
+    dispatch({ type: SurveyActions.surveyCreate, survey })
   } else {
     dispatch({
       type: surveyCreateNewSurveyUpdate,
@@ -41,23 +41,23 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   }
 }
 
-export const resetNewSurvey = () => dispatch => {
+export const resetNewSurvey = () => (dispatch) => {
   dispatch({
     type: surveyCreateNewSurveyUpdate,
     [SurveyCreateState.keys.newSurvey]: SurveyCreateState.newSurveyDefault,
   })
 }
 
-export const importCollectSurvey = file => async dispatch => {
+export const importCollectSurvey = (file) => async (dispatch) => {
   const formData = new FormData()
   formData.append('file', file)
 
   const { data } = await axios.post('/api/survey/collect-import', formData)
 
   dispatch(
-    showAppJobMonitor(data.job, async job => {
-      const surveyId = JobSerialized.getResult(job).surveyId
-      dispatch(setActiveSurvey(surveyId, true, true))
-    }),
+    showAppJobMonitor(data.job, async (job) => {
+      const { surveyId } = JobSerialized.getResult(job)
+      dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
+    })
   )
 }
