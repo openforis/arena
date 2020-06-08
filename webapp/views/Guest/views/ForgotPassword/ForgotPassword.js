@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import { useI18n, useFormObject } from '@webapp/components/hooks'
-import Error from '@webapp/views/Guest/components/Error'
+import Error from '@webapp/views/Guest/Error'
 
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
