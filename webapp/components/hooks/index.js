@@ -15,14 +15,4 @@ export { default as useFileDrop } from './useFileDrop'
 export { default as useProfilePicture } from './useProfilePicture'
 export { default as useOnIntersect } from './useOnIntersect'
 export { default as useInterval } from './useInterval'
-export {
-  useSurvey,
-  useSurveyId,
-  useSurveyInfo,
-  useSurveyCycleKey,
-  useSurveyLang,
-  useOnSurveyCycleUpdate,
-  useNodeDefByUuid,
-  useCategoryByUuid,
-} from './useSurvey'
 export { default as useUser } from './useUser'

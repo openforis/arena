@@ -4,15 +4,15 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
-import { useSurvey } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
-import Dropdown from '@webapp/components/form/dropdown'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
-
 import * as ProcessingStep from '@common/analysis/processingStep'
+
+import { useI18n } from '@webapp/store/system'
+import { useSurvey } from '@webapp/store/survey'
+
+import Dropdown from '@webapp/components/form/dropdown'
 
 import { checkCanSelectNodeDef } from '@webapp/loggedin/modules/analysis/chain/actions'
 

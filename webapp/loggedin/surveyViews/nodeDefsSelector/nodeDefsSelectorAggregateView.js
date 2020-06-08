@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { useSurvey, useSurveyLang } from '@webapp/components/hooks'
+
+import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 

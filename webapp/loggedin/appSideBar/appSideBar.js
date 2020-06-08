@@ -2,10 +2,12 @@ import './appSideBar.scss'
 
 import React, { useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import { useSurveyInfo, useUser } from '@webapp/components/hooks'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useUser } from '@webapp/components/hooks'
 
 import * as SideBarState from './appSidebarState'
 
@@ -13,10 +15,9 @@ import AppSideBarModules from './components/appSideBarModules'
 
 import { toggleSideBar } from './actions'
 
-const AppSideBar = (props) => {
-  const { pathname } = props
-
+const AppSideBar = () => {
   const dispatch = useDispatch()
+  const { pathname } = useLocation()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const isSideBarOpened = useSelector(SideBarState.isOpened)

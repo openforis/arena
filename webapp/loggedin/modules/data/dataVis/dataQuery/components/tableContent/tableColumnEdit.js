@@ -8,8 +8,9 @@ import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanEditRecord, useSurveyCycleKey, useSurveyInfo } from '@webapp/components/hooks'
+import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 
+import { useAuthCanEditRecord } from '@webapp/components/hooks'
 import ErrorBadge from '@webapp/components/errorBadge'
 import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 

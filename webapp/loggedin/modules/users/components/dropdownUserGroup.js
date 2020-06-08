@@ -6,10 +6,11 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
-import Dropdown from '@webapp/components/form/dropdown'
-import { useUser, useSurveyInfo } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
+import { useSurveyInfo } from '@webapp/store/survey'
 
+import { useUser } from '@webapp/components/hooks'
+import Dropdown from '@webapp/components/form/dropdown'
 
 const DropdownUserGroup = (props) => {
   const { editingLoggedUser, groupUuid, disabled, validation, onChange } = props

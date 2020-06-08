@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 
 import * as DataSort from '@common/surveyRdb/dataSort'
 
-import { useSurveyCycleKey, useSurveyId } from '@webapp/components/hooks'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+
 import DownloadButton from '@webapp/components/form/downloadButton'
 
 const ButtonDownload = (props) => {

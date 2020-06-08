@@ -11,14 +11,13 @@ import LoggedInModuleSwitch from './modules/loggedInModuleSwitch'
 
 const AppView = () => {
   const location = useLocation()
-  const { pathName } = location
 
   return (
     <>
       <AppHeader />
 
       <div className="app__container">
-        <AppSideBar pathname={pathName} />
+        <AppSideBar />
         <LoggedInModuleSwitch location={location} />
       </div>
 

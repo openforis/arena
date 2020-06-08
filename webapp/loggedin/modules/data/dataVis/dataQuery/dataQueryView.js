@@ -6,7 +6,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/store/survey'
+
 import { NodeDefsSelectorView, NodeDefsSelectorAggregateView } from '@webapp/loggedin/surveyViews/nodeDefsSelector'
 import Table from './components/table'
 

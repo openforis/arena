@@ -6,8 +6,9 @@ import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
-import { useFormObject, useSurveyInfo } from '@webapp/components/hooks'
-import { SurveyInfoActions } from '@webapp/store/survey'
+import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
+
+import { useFormObject } from '@webapp/components/hooks'
 
 export const useSurveyInfoViewState = () => {
   const dispatch = useDispatch()
