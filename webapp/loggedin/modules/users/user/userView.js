@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/input'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import ProfilePictureEditor from './components/profilePictureEditor'
 import DropdownUserGroup from '../components/dropdownUserGroup'

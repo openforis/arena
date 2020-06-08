@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 $sidebarWidthClosed: 70px;
 $sidebarWidthOpened: 200px;
@@ -26,21 +26,22 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   display: grid;
 }
 
-.app-sidebar__module, .app-sidebar__module-placeholder {
+.app-sidebar__module,
+.app-sidebar__module-placeholder {
   display: grid;
   grid-row-gap: 15px;
   border-right: 1px solid $greyBorder;
   padding: 25px 15px;
   cursor: pointer;
 
-  &[aria-disabled="true"] {
-    opacity: .4;
+  &[aria-disabled='true'] {
+    opacity: 0.4;
   }
 
   &.active {
     border-right-color: $blue;
 
-    &[aria-disabled="true"] {
+    &[aria-disabled='true'] {
       opacity: 1;
     }
 
@@ -54,9 +55,9 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   display: flex;
   align-items: center;
   padding: 0 10px;
-  font-size: .85rem;
+  font-size: 0.85rem;
 
-  &[aria-disabled="true"] {
+  &[aria-disabled='true'] {
     opacity: 1;
   }
 
@@ -68,14 +69,13 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
 
 .app-sidebar__module-child-btn {
   margin-left: 30px;
-  font-size: .8rem;
+  font-size: 0.8rem;
 
   &.active {
     font-weight: bold;
     color: $blue;
   }
 }
-
 
 //=== sidebar opened
 .app-sidebar.opened {
@@ -108,7 +108,6 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   .app-sidebar__module-child-btn {
     margin: 0;
   }
-
 }
 
 .app-sidebar__modules.popup-menu-opened {
@@ -123,9 +122,8 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   bottom: 0;
   width: $sidebarWidthOpened;
   padding: 10px 20px;
-  font-size: .75rem;
+  font-size: 0.75rem;
   color: lighten($black, 25%);
   font-weight: 600;
   text-align: center;
 }
-

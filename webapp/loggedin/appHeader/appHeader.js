@@ -36,7 +36,7 @@ const AppHeader = () => {
   return (
     <div className="app-header">
       <div className="app-header__logo">
-        <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">
+        <a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer" className="flex-center">
           <img src="/img/of_icon.png" alt="Open Foris" />
         </a>
       </div>

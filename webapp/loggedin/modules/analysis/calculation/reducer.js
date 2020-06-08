@@ -4,7 +4,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { nodeDefSave } from '@webapp/survey/nodeDefs/actions'
+import { NodeDefsActions } from '@webapp/store/survey'
 import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { calculationUpdate, calculationCreate, stepUpdate } from '@webapp/loggedin/modules/analysis/step/actions'
 import { calculationDirtyUpdate, calculationReset, calculationDelete } from './actions'
@@ -31,7 +31,7 @@ const actionHandlers = {
   [calculationReset]: () => ({}),
 
   // Update calculation attribute on node def edit cancel / back
-  [nodeDefSave]: (state, { nodeDef }) =>
+  [NodeDefsActions.nodeDefSave]: (state, { nodeDef }) =>
     R.when(
       R.always(NodeDef.isAnalysis(nodeDef) && NodeDef.isAttribute(nodeDef)),
       CalculationState.assocCalculationDirtyNodeDefUuid(NodeDef.getUuid(nodeDef))

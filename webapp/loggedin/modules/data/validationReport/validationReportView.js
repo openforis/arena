@@ -10,7 +10,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
 
@@ -19,19 +19,19 @@ import ValidationReportRow from './validationReportRow'
 
 const validationReportModule = 'validationReport'
 
-const ValidationReportView = props => {
+const ValidationReportView = (props) => {
   const { surveyCycleKey, reloadListItems, history } = props
 
   useOnUpdate(() => {
     reloadListItems(validationReportModule, { cycle: surveyCycleKey })
   }, [surveyCycleKey])
 
-  const onRowClick = row => {
+  const onRowClick = (row) => {
     const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
     const pageNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
     const recordUuid = RecordValidationReportItem.getRecordUuid(row)
     const recordEditUrl = `${appModuleUri(
-      dataModules.record,
+      dataModules.record
     )}${recordUuid}?pageNodeUuid=${pageNodeUuid}&pageNodeDefUuid=${pageNodeDefUuid}`
 
     history.push(recordEditUrl)
@@ -54,7 +54,7 @@ const ValidationReportView = props => {
   )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 

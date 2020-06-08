@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
-import { publishSurvey } from '@webapp/survey/actions'
+import { SurveyActions } from '@webapp/store/survey'
 import { useSurveyInfo, useI18n } from './hooks'
 
 const ButtonPublishSurvey = (props) => {
@@ -22,7 +22,9 @@ const ButtonPublishSurvey = (props) => {
       type="button"
       aria-disabled={disabled}
       className={`btn btn-s btn-publish ${className || ''}`}
-      onClick={() => dispatch(showDialogConfirm('common.publishConfirm', { survey: surveyLabel }, publishSurvey()))}
+      onClick={() =>
+        dispatch(showDialogConfirm('common.publishConfirm', { survey: surveyLabel }, SurveyActions.publishSurvey()))
+      }
     >
       <span className="icon icon-warning icon-left icon-10px" />
       {i18n.t('common.publish')}

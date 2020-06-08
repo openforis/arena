@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -11,7 +11,7 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 
-const ValidationReportRow = props => {
+const ValidationReportRow = (props) => {
   const { idx, offset, path, validation, canEdit } = props
 
   return (

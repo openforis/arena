@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 

@@ -1,20 +1,25 @@
 import './appSideBar.scss'
 
 import React, { useRef } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { useSurveyInfo, useUser } from '@webapp/components/hooks'
+
 import * as SideBarState from './appSidebarState'
+
 import AppSideBarModules from './components/appSideBarModules'
 
 import { toggleSideBar } from './actions'
 
-const AppSideBar = props => {
-  const { pathname, user, surveyInfo, isSideBarOpened, toggleSideBar } = props
+const AppSideBar = (props) => {
+  const { pathname } = props
 
+  const dispatch = useDispatch()
+  const user = useUser()
+  const surveyInfo = useSurveyInfo()
+  const isSideBarOpened = useSelector(SideBarState.isOpened)
   const element = useRef(null)
 
   return (
@@ -24,7 +29,7 @@ const AppSideBar = props => {
         className="app-sidebar__btn-toggle"
         onClick={() => {
           element.current.classList.toggle('opened')
-          toggleSideBar()
+          dispatch(toggleSideBar())
         }}
       >
         <span className="icon icon-16px icon-menu" />
@@ -47,10 +52,4 @@ const AppSideBar = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  user: AppState.getUser(state),
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  isSideBarOpened: SideBarState.isOpened(state),
-})
-
-export default connect(mapStateToProps, { toggleSideBar })(AppSideBar)
+export default AppSideBar

@@ -1,0 +1,41 @@
+import { exportReducer } from '@webapp/utils/reduxUtils'
+
+import { appUserLogout } from '@webapp/app/actions'
+
+import * as SurveyActions from '../actions'
+import * as NodeDefsActions from './actions'
+
+import * as NodeDefsState from './state'
+
+const actionHandlers = {
+  [appUserLogout]: () => ({}),
+
+  // Reset state
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
+
+  [SurveyActions.surveyDefsReset]: () => ({}),
+
+  [SurveyActions.surveyDefsLoad]: (_state, { nodeDefs }) => nodeDefs,
+
+  // Single nodeDef actions
+  [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+
+  [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
+
+  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+
+  [NodeDefsActions.nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
+
+  [NodeDefsActions.nodeDefPropsUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+    isNodeDefNew
+      ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
+      : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def
+
+  [NodeDefsActions.nodeDefsDelete]: (state, { nodeDefUuids }) => NodeDefsState.dissocNodeDefs(nodeDefUuids)(state),
+}
+
+export default exportReducer(actionHandlers)

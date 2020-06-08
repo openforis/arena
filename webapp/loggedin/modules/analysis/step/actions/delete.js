@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as Step from '@common/analysis/processingStep'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'

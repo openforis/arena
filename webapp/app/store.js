@@ -10,13 +10,12 @@ import AppErrorsReducer from '@webapp/app/appErrors/reducer'
 import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
 import AppNotificationReducer from '@webapp/app/appNotification/reducer'
 import { LoginReducer, LoginState } from '@webapp/store/login'
-import SurveyReducer from '@webapp/survey/reducer'
+import { SurveyState, SurveyReducer } from '@webapp/store/survey'
 
 import * as AppState from '@webapp/app/appState'
 import * as AppDialogConfirmState from '@webapp/app/appDialogConfirm/appDialogConfirmState'
 import * as AppNotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 const appReducers = {
   [AppState.stateKey]: AppReducer,
