@@ -5,7 +5,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 
 import { SurveyState } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import { I18nState } from '@webapp/store/system'
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
 import * as ActivityLogMessage from './activityLogMessage'
@@ -19,7 +19,7 @@ const fetchActivityLogs = async (state, newest = true) => {
   const initialized = ActivityLogState.isInitialized(state)
   const survey = SurveyState.getSurvey(state)
   const surveyId = Survey.getId(survey)
-  const i18n = useI18n()
+  const i18n = I18nState.getI18n()
 
   const params = {}
   if (initialized) {

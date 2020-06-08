@@ -5,8 +5,7 @@ import * as i18nFactory from '@core/i18n/i18nFactory'
 import Counter from '@core/counter'
 
 import { LoaderActions } from '@webapp/store/ui'
-
-import * as AppState from './appState'
+import { SystemStatusState } from '@webapp/store/system'
 
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
@@ -18,7 +17,7 @@ export const initApp = () => async (dispatch) => {
   const { user, survey } = await _fetchUserAndSurvey()
   dispatch({
     type: appPropsChange,
-    status: AppState.appStatus.ready,
+    status: SystemStatusState.systemStatus.ready,
     i18n,
     user,
     survey,
