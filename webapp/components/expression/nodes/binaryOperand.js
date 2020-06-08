@@ -4,7 +4,8 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
-import { useI18n } from '../../hooks'
+
+import { useI18n } from '@webapp/store/system'
 
 export const BinaryOperandType = {
   left: 'left',

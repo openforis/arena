@@ -1,7 +1,7 @@
 import './ResetPassword.scss'
 import React from 'react'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
 
 import { useResetPassword } from './store/hooks'

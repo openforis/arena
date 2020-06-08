@@ -10,7 +10,9 @@ import * as Validation from '@core/validation/validation'
 
 import { uuidv4 } from '@core/uuid'
 
-import { useI18n, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+
+import { useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 import ButtonGroup from '@webapp/components/form/buttonGroup'

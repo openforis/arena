@@ -7,12 +7,12 @@ import axios from 'axios'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '../../form/dropdown'
-import { useAsyncGetRequest, useI18n } from '../../hooks'
+import { useAsyncGetRequest } from '../../hooks'
+import { useI18n, useLang } from '@webapp/store/system'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
 import { Input } from '../../form/input'
@@ -35,8 +35,8 @@ const Literal = (props) => {
   const { node, nodeDefCurrent, onChange, type } = props
 
   const i18n = useI18n()
+  const lang = useLang()
   const survey = useSelector(SurveyState.getSurvey)
-  const lang = useSelector(AppState.getLang)
 
   const literalSearchParams =
     nodeDefCurrent && BinaryOperandType.isLeft(type)

@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '../../hooks'
+import { useI18n } from '@webapp/store/system'
 
 const EditButtons = props => {
   const { node, onChange, canDelete = false, onDelete } = props

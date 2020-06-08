@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n, useSurvey } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/dropdown'
 
 import * as Survey from '@core/survey/survey'

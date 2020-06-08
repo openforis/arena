@@ -7,7 +7,7 @@ import { useHistory } from 'react-router'
 import * as UserInvite from '@core/user/userInvite'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/input'
 import DropdownUserGroup from '@webapp/loggedin/modules/users/components/dropdownUserGroup'
 

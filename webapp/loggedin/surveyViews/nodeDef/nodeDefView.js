@@ -13,7 +13,8 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { NodeDefsActions } from '@webapp/store/survey'
 
-import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
+import { useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'

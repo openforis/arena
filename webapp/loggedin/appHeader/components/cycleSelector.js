@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/dropdown'
 
 const CycleSelector = props => {

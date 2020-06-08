@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const NodeDefBoolean = (props) => {
   const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props

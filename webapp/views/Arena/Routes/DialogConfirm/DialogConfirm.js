@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 import { DialogConfirmActions, useDialogConfirm } from '@webapp/store/ui'
 
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import Markdown from '@webapp/components/markdown'
 
 const DialogConfirm = () => {

@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
 
 import * as AppState from '@webapp/app/appState'
+import { I18nState } from '@webapp/store/system'
 
 const survey = 'survey'
 export const stateKey = survey
@@ -22,7 +23,7 @@ export const getSurveyCycleKey = (state) => R.pipe(AppState.getUser, User.getPre
 
 export const getNodeDefLabel = (nodeDef) => (state) => {
   const surveyInfo = getSurveyInfo(state)
-  const langApp = AppState.getLang(state)
+  const langApp = I18nState.getLang(state)
   const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
   return NodeDef.getLabel(nodeDef, langSurvey)
 }

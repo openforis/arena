@@ -16,7 +16,7 @@ import * as AppState from '@webapp/app/appState'
 
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as CategoryState from '../categoryState'
 

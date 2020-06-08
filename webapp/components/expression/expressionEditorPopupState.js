@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 
-import { useSurvey, useLang } from '../hooks'
+import { useLang } from '@webapp/store/system'
+
+import { useSurvey } from '../hooks'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'

@@ -6,7 +6,8 @@ import { Link, useHistory } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 
-import { useAuthCanEditSurvey, useI18n, useSurveyInfo } from '@webapp/components/hooks'
+import { useAuthCanEditSurvey, useSurveyInfo } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'

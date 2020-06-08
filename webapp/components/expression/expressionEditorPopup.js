@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '../hooks'
+import { useI18n } from '@webapp/store/system'
 import Popup from '../popup'
 
 import { useExpressionEditorPopupState } from './expressionEditorPopupState'

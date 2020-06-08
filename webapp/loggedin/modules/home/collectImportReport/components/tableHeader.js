@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const TableHeader = () => {
   const i18n = useI18n()

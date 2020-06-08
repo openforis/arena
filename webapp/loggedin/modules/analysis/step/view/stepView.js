@@ -12,7 +12,8 @@ import * as ChainValidator from '@common/analysis/processingChainValidator'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { useI18n, useOnUpdate } from '@webapp/components/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
 import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'

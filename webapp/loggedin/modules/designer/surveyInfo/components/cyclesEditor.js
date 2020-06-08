@@ -10,7 +10,7 @@ import * as Validation from '@core/validation/validation'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const DateEditor = ({ date, onChange }) => {
