@@ -5,7 +5,7 @@ import { useSystemError, useI18n } from '@webapp/store/system'
 import * as AppState from '@webapp/app/appState'
 import { initApp } from '@webapp/app/actions'
 
-import Routes from './components/Routes'
+import Routes from './Routes'
 
 const Arena = () => {
   const dispatch = useDispatch()

@@ -1,6 +1,6 @@
 @import 'webapp/style/vars';
 
-.app-loader {
+.loader {
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -10,16 +10,16 @@
   z-index: $zIndex190AppLoader;
 }
 
-.app-loader.enter-active {
+.loader.enter-active {
   animation: animate-in 750ms ease-out;
 }
 
-.app-loader.exit-active {
+.loader.exit-active {
   animation: animate-out 750ms ease-out;
 }
 
-.app-loader.exit,
-.app-loader.exit-done {
+.loader.exit,
+.loader.exit-done {
   opacity: 0;
 }
 
@@ -41,7 +41,7 @@
   }
 }
 
-.app-loader__boxes {
+.loader__boxes {
   position: absolute;
   width: 80px;
   height: 80px;

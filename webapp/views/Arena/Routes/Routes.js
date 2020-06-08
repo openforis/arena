@@ -7,12 +7,12 @@ import { app, guest } from '@webapp/app/appModules'
 import { useUser } from '@webapp/components/hooks'
 
 import DynamicImport from '@webapp/components/dynamicImport'
-import AppLoaderView from '@webapp/app/appLoader/appLoaderView'
-import AppDialogConfirm from '@webapp/app/appDialogConfirm/appDialogConfirm'
-import AppNotificationView from '@webapp/app/appNotification/appNotificationView'
 import Guest from '@webapp/views/Guest'
 
 import { useWebSocket } from './useWebSocket'
+import Loader from './Loader'
+import DialogConfirm from './DialogConfirm'
+import Notification from './Notification'
 
 const Routes = () => {
   const user = useUser()
@@ -32,9 +32,9 @@ const Routes = () => {
         )}
       </Switch>
 
-      <AppLoaderView />
-      <AppDialogConfirm />
-      <AppNotificationView />
+      <Loader />
+      <DialogConfirm />
+      <Notification />
     </>
   )
 }

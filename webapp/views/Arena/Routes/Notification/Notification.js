@@ -1,5 +1,4 @@
-import './appNotification.scss'
-
+import './Notification.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { CSSTransition } from 'react-transition-group'
@@ -7,17 +6,17 @@ import { CSSTransition } from 'react-transition-group'
 import { useI18n } from '@webapp/store/system'
 import { NotificationActions, useNotification } from '@webapp/store/ui'
 
-const AppNotificationView = () => {
+const Notification = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const { messageParams, messageKey, severity, visible } = useNotification()
 
   return (
     <CSSTransition in={visible} timeout={250} unmountOnExit>
-      <div className={`app-notification ${severity}`}>
+      <div className={`notification ${severity}`}>
         <button
           type="button"
-          className="btn-s btn-transparent app-notification__btn-close"
+          className="btn-s btn-transparent notification__btn-close"
           onClick={() => dispatch(NotificationActions.hideNotification())}
         >
           <span className="icon icon-cross icon-8px" />
@@ -29,4 +28,4 @@ const AppNotificationView = () => {
   )
 }
 
-export default AppNotificationView
+export default Notification
