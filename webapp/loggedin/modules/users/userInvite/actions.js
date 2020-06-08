@@ -9,8 +9,7 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import { SurveyState } from '@webapp/store/survey'
 
-import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as UserInviteViewState from './userInviteViewState'
 
@@ -45,7 +44,7 @@ export const inviteUser = (history) => async (dispatch, getState) => {
 
   if (Validation.isObjValid(userInviteValidated)) {
     try {
-      dispatch(showAppLoader())
+      dispatch(LoaderActions.showLoader())
 
       const userInviteParams = R.pipe(
         R.omit([UserInvite.keys.validation]),
@@ -62,7 +61,7 @@ export const inviteUser = (history) => async (dispatch, getState) => {
 
       history.push(appModuleUri(userModules.users))
     } finally {
-      dispatch(hideAppLoader())
+      dispatch(LoaderActions.hideLoader())
     }
   }
 }

@@ -4,9 +4,8 @@ import * as ProcessUtils from '@core/processUtils'
 import * as Chain from '@common/analysis/processingChain'
 
 import { SurveyState } from '@webapp/store/survey'
+import { LoaderActions } from '@webapp/store/ui'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-
-import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
 
 const _getRStudioUrl = () => {
   if (ProcessUtils.ENV.rStudioServerURL) {
@@ -19,7 +18,7 @@ const _getRStudioUrl = () => {
 }
 
 export const openRChain = () => async (dispatch, getState) => {
-  dispatch(showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
@@ -30,7 +29,7 @@ export const openRChain = () => async (dispatch, getState) => {
   const config = { params: { surveyCycleKey } }
   await axios.get(`/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}/script`, config)
 
-  dispatch(hideAppLoader())
+  dispatch(LoaderActions.hideLoader())
 
   // Open RStudio in a new page
   window.open(_getRStudioUrl(), 'rstudio')

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import * as LoaderActions from '@webapp/app/actions'
+import { LoaderActions } from '@webapp/store/ui'
 
 import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
@@ -12,7 +12,7 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   const state = getState()
 
   if (!SurveyStatusState.areDefsFetched(draft)(state)) {
-    dispatch(LoaderActions.showAppLoader())
+    dispatch(LoaderActions.showLoader())
 
     const surveyId = SurveyState.getSurveyId(state)
     const params = { draft, validate, cycle: SurveyState.getSurveyCycleKey(state) }
@@ -34,7 +34,7 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
       taxonomies,
       draft,
     })
-    dispatch(LoaderActions.hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
   }
 }
 

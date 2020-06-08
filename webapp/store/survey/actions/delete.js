@@ -1,16 +1,15 @@
 import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
-
-import * as LoaderActions from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as SurveyState from '../state'
 import { surveyDelete } from './actionTypes'
 
 export const deleteSurvey = (history) => async (dispatch, getState) => {
-  dispatch(LoaderActions.showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
@@ -23,7 +22,7 @@ export const deleteSurvey = (history) => async (dispatch, getState) => {
   // Navigate to survey list
   history.push(appModuleUri(homeModules.surveyList))
 
-  await dispatch(LoaderActions.hideAppLoader())
+  await dispatch(LoaderActions.hideLoader())
 
   await dispatch(
     NotificationActions.notifyInfo({

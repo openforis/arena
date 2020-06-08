@@ -12,8 +12,8 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import { SurveyState } from '@webapp/store/survey'
 import * as AppState from '@webapp/app/appState'
 
-import { showAppLoader, hideAppLoader, showAppSaving, hideAppSaving } from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
+import { showAppSaving, hideAppSaving } from '@webapp/app/actions'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import * as RecordState from './recordState'
@@ -31,7 +31,7 @@ export const recordNodesUpdate = (nodes) => (dispatch, getState) => {
   const record = RecordState.getRecord(getState())
   // Hide app loader on record create
   if (R.isEmpty(Record.getNodes(record))) {
-    dispatch(hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
   }
 
   dispatch({ type: nodesUpdate, nodes })
@@ -60,13 +60,9 @@ export const applicationError = (history, key, params) => (dispatch) => {
 
 export const cycleChanged = (history) => () => _navigateToModuleDataHome(history)
 
-/**
- * ============
- * CREATE
- * ============
- */
+// ====== CREATE
 export const createRecord = (history, preview = false) => async (dispatch, getState) => {
-  dispatch(showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   const state = getState()
   const user = AppState.getUser(state)
@@ -90,12 +86,7 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => (dis
   dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
 }
 
-/**
- * ============
- * UPDATE
- * ============
- */
-
+// ====== UPDATE
 export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => (dispatch) => {
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
@@ -142,11 +133,7 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
 
 export const nodesUpdateCompleted = () => (dispatch) => dispatch(hideAppSaving())
 
-/**
- * ============
- * DELETE
- * ============
- */
+// ====== DELETE
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch(showAppSaving())
   dispatch({ type: nodeDelete, node })
@@ -168,13 +155,9 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
 
 export const deleteRecordUuidPreview = () => (dispatch) => dispatch({ type: recordUuidPreviewUpdate, recordUuid: null })
 
-/**
- * ============
- * Check in / check out record
- * ============
- */
+// ====== Check in / check out record
 export const checkInRecord = (recordUuid, draft, pageNodeUuid, pageNodeDefUuid) => async (dispatch, getState) => {
-  dispatch(showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   const surveyId = SurveyState.getSurveyId(getState())
   const {
@@ -225,7 +208,7 @@ export const checkInRecord = (recordUuid, draft, pageNodeUuid, pageNodeDefUuid) 
 
   // Hide app loader on record edit
   if (!R.isEmpty(Record.getNodes(record))) {
-    dispatch(hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
   }
 }
 

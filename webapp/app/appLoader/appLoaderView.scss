@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .app-loader {
   position: fixed;
@@ -18,7 +18,8 @@
   animation: animate-out 750ms ease-out;
 }
 
-.app-loader.exit, .app-loader.exit-done {
+.app-loader.exit,
+.app-loader.exit-done {
   opacity: 0;
 }
 
@@ -61,13 +62,13 @@
   }
 
   > div:nth-child(2) {
-    -webkit-animation-delay: -.4s;
-    animation-delay: -.4s;
+    -webkit-animation-delay: -0.4s;
+    animation-delay: -0.4s;
   }
 
   > div:nth-child(3) {
-    -webkit-animation-delay: -.2s;
-    animation-delay: -.2s;
+    -webkit-animation-delay: -0.2s;
+    animation-delay: -0.2s;
   }
 }
 
@@ -75,16 +76,16 @@
   0% {
     -webkit-transform: scale(0);
     transform: scale(0);
-    opacity: 0
+    opacity: 0;
   }
 
   5% {
-    opacity: 1
+    opacity: 1;
   }
 
   100% {
     -webkit-transform: scale(1);
     transform: scale(1);
-    opacity: 0
+    opacity: 0;
   }
 }
