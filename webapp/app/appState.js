@@ -5,24 +5,13 @@ import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 
 export const keys = {
-  status: 'status',
   user: 'user',
   saving: 'saving',
-
-  // I18n
-  i18n: 'i18n',
-  lang: 'lang',
 }
 
 export const stateKey = 'app'
 
 export const getState = R.prop(stateKey)
-
-export const appStatus = {
-  ready: 'ready',
-}
-
-export const isReady = R.pipe(getState, R.propEq(keys.status, appStatus.ready))
 
 // ==== APP USER
 
