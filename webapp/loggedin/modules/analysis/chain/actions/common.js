@@ -5,7 +5,7 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { NotificationActions } from '@webapp/store/ui'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 export const navigateToNodeDefEdit = (history, nodeDefUuid) => () =>
   history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)

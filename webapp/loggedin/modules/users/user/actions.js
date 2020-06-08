@@ -16,7 +16,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
 import { setUser } from '@webapp/app/actions'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 export const userUpdate = 'user/update'
 export const userProfilePictureUpdate = 'user/profilePicture/update'

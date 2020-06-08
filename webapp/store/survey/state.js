@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
 
 import * as AppState from '@webapp/app/appState'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 const survey = 'survey'
 export const stateKey = survey

@@ -7,4 +7,4 @@ export { SystemState, SystemReducer }
 export { SystemErrorActions, useSystemError } from './error'
 
 // ====== i18n
-export { useI18n, useLang } from './i18n'
+export { I18nState, useI18n, useLang } from './i18n'

@@ -10,7 +10,7 @@ import * as RecordValidationReportItem from '@core/record/recordValidationReport
 import * as Authorizer from '@core/auth/authorizer'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 const ValidationReportRow = (props) => {
   const { idx, offset, path, validation, canEdit } = props

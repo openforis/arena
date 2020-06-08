@@ -19,7 +19,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../../../../record/recordState'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './nodeDefCodeDropdown'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 const NodeDefCode = (props) => {
   const {

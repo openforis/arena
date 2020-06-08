@@ -15,7 +15,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 import * as SurveyState from '../state'
 

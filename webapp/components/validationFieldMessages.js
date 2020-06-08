@@ -15,7 +15,7 @@ import * as RecordValidation from '@core/record/recordValidation'
 import { SurveyState } from '@webapp/store/survey'
 
 import Markdown from '@webapp/components/markdown'
-import { I18nState } from '@webapp/store/system/i18n'
+import { I18nState } from '@webapp/store/system'
 
 const getValidationCountErrorText = (survey, i18n) => (validationResult) => {
   const nodeDef = Survey.getNodeDefByUuid(ValidationResult.getParams(validationResult).nodeDefUuid)(survey)
