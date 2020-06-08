@@ -6,4 +6,4 @@ const actionHandlers = {
   [ErrorActionsTypes.APP_ERROR_THROW]: (state, { payload: { error } }) => error,
 }
 
-export default exportReducer(actionHandlers)
+export default exportReducer(actionHandlers, '')
