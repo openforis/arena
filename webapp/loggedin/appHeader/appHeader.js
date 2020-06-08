@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 
-import { usePrevious, useUser, useSurveyCycleKey, useI18n, useSurveyInfo } from '@webapp/components/hooks'
+import { usePrevious, useUser, useSurveyCycleKey, useSurveyInfo } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'

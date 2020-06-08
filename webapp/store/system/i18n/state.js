@@ -10,4 +10,5 @@ export const keys = {
 }
 
 // ====== READ
+export const getI18n = getState
 export const getLang = R.pipe(getState, R.prop(keys.lang))

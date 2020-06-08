@@ -15,7 +15,6 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../../../../record/recordState'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'

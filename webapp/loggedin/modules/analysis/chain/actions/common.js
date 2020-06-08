@@ -2,7 +2,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import * as AppState from '@webapp/app/appState'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
 import { NotificationActions } from '@webapp/store/ui'
