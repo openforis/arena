@@ -9,14 +9,13 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Authorizer from '@core/auth/authorizer'
-
-import * as AppState from '@webapp/app/appState'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import { NotificationActions } from '@webapp/store/ui'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
+import * as AppState from '@webapp/app/appState'
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
+
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
 
@@ -35,11 +34,11 @@ const CategoriesView = (props) => {
 
   const onDelete = (category) =>
     dispatch(
-      showDialogConfirm(
-        'categoryEdit.confirmDelete',
-        { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
-        () => deleteCategory(category)
-      )
+      DialogConfirmActions.showDialogConfirm({
+        key: 'categoryEdit.confirmDelete',
+        params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
+        onOk: () => deleteCategory(category),
+      })
     )
 
   return (

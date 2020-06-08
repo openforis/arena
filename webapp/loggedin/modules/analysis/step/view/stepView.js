@@ -10,12 +10,13 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
+import { DialogConfirmActions } from '@webapp/store/ui'
+
 import { useI18n, useOnUpdate } from '@webapp/components/hooks'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import CategorySelector from '@webapp/loggedin/surveyViews/categorySelector/categorySelector'
 import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   resetStep,
   updateStepProps,
@@ -58,7 +59,13 @@ const StepView = () => {
               type="button"
               className="btn-s btn-close"
               onClick={() => {
-                if (stepDirty) dispatch(showDialogConfirm('common.cancelConfirm', {}, resetStep()))
+                if (stepDirty)
+                  dispatch(
+                    DialogConfirmActions.showDialogConfirm({
+                      key: 'common.cancelConfirm',
+                      onOk: resetStep(),
+                    })
+                  )
                 else dispatch(resetStep())
               }}
             >

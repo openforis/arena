@@ -8,29 +8,33 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
+import { DialogConfirmActions } from '@webapp/store/ui'
+
 import { FormItem } from '@webapp/components/form/input'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionProp from './expressionProp'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
-const ExpressionsProp = props => {
+const ExpressionsProp = (props) => {
   const { values, label, validation, multiple, onChange } = props
 
   const dispatch = useDispatch()
 
-  const getExpressionIndex = expression => R.findIndex(NodeDefExpression.isEqual(expression), values)
+  const getExpressionIndex = (expression) => R.findIndex(NodeDefExpression.isEqual(expression), values)
 
-  const onDelete = expression => {
+  const onDelete = (expression) => {
     dispatch(
-      showDialogConfirm('nodeDefEdit.expressionsProp.confirmDelete', {}, () => {
-        const index = getExpressionIndex(expression)
-        const newValues = R.remove(index, 1, values)
-        onChange(newValues)
-      }),
+      DialogConfirmActions.showDialogConfirm({
+        key: 'nodeDefEdit.expressionsProp.confirmDelete',
+        onOk: () => {
+          const index = getExpressionIndex(expression)
+          const newValues = R.remove(index, 1, values)
+          onChange(newValues)
+        },
+      })
     )
   }
 
-  const onUpdate = expression => {
+  const onUpdate = (expression) => {
     if (NodeDefExpression.isEmpty(expression)) {
       onDelete(expression)
     } else {

@@ -5,10 +5,11 @@ import * as R from 'ramda'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
-import { useI18n } from '@webapp/components/hooks'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
-const NodeDefEntityFormNodeSelect = props => {
+import { useI18n } from '@webapp/components/hooks'
+
+const NodeDefEntityFormNodeSelect = (props) => {
   const {
     nodeDef,
     nodes,
@@ -30,13 +31,13 @@ const NodeDefEntityFormNodeSelect = props => {
       <select
         className="node-select"
         value={selectedNode ? Node.getUuid(selectedNode) : 'placeholder'}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         aria-disabled={R.isEmpty(nodes)}
       >
         <option value="placeholder" disabled hidden={true}>
           {i18n.t('surveyForm.nodeDefEntityForm.select')}
         </option>
-        {nodes.map(n => (
+        {nodes.map((n) => (
           <option key={Node.getUuid(n)} value={Node.getUuid(n)}>
             {getNodeKeyLabelValues(nodeDef, n)}
           </option>
@@ -51,10 +52,13 @@ const NodeDefEntityFormNodeSelect = props => {
             aria-disabled={!selectedNode}
             onClick={() => {
               dispatch(
-                showDialogConfirm('surveyForm.nodeDefEntityForm.confirmDelete', {}, () => {
-                  onChange(null)
-                  removeNode(nodeDef, selectedNode)
-                }),
+                DialogConfirmActions.showDialogConfirm({
+                  key: 'surveyForm.nodeDefEntityForm.confirmDelete',
+                  onOk: () => {
+                    onChange(null)
+                    removeNode(nodeDef, selectedNode)
+                  },
+                })
               )
             }}
           >

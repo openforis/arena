@@ -9,3 +9,6 @@ export { NotificationActions, NotificationState, useNotification } from './notif
 
 // ====== Loader
 export { LoaderActions, useLoader } from './loader'
+
+// ====== DialogConfirm
+export { DialogConfirmActions, useDialogConfirm } from './dialogConfirm'

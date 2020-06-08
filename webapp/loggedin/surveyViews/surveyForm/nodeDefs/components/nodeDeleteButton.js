@@ -2,7 +2,8 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
+
 import { removeNode } from '@webapp/loggedin/surveyViews/record/actions'
 
 const NodeDeleteButton = (props) => {
@@ -22,7 +23,12 @@ const NodeDeleteButton = (props) => {
       onClick={() => {
         const performDelete = () => dispatch(removeNode(nodeDef, node))
         if (showConfirm) {
-          dispatch(showDialogConfirm('surveyForm.confirmNodeDelete', {}, performDelete))
+          dispatch(
+            DialogConfirmActions.showDialogConfirm({
+              key: 'surveyForm.confirmNodeDelete',
+              onOk: performDelete,
+            })
+          )
         } else {
           performDelete()
         }
