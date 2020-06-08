@@ -5,22 +5,20 @@ import { connect, useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/components/hooks'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Authorizer from '@core/auth/authorizer'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
-import { NotificationActions } from '@webapp/store/ui'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
+import { useI18n } from '@webapp/components/hooks'
 import ItemsView from '@webapp/loggedin/surveyViews/items/itemsView'
 import ItemsColumn from '@webapp/loggedin/surveyViews/items/itemsColumn'
 
@@ -52,11 +50,11 @@ const TaxonomiesView = (props) => {
 
   const onDelete = (taxonomy) =>
     dispatch(
-      showDialogConfirm(
-        'taxonomy.confirmDelete',
-        { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
-        () => dispatch(deleteTaxonomy(taxonomy))
-      )
+      DialogConfirmActions.showDialogConfirm({
+        key: 'taxonomy.confirmDelete',
+        params: { taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName') },
+        onOk: () => dispatch(deleteTaxonomy(taxonomy)),
+      })
     )
 
   return (

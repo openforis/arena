@@ -9,16 +9,15 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
-
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
+
+import { NodeDefsActions } from '@webapp/store/survey'
 
 import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
-import { NodeDefsActions } from '@webapp/store/survey'
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import ValidationsProps from './advanced/validationsProps'
@@ -26,6 +25,7 @@ import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
 
 import { setNodeDefUuidForEdit } from './actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 const _isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
@@ -152,7 +152,10 @@ const NodeDefView = () => {
                 onClick={() =>
                   isDirty
                     ? dispatch(
-                        showDialogConfirm('common.cancelConfirm', {}, NodeDefsActions.cancelNodeDefEdits(history))
+                        DialogConfirmActions.showDialogConfirm({
+                          key: 'common.cancelConfirm',
+                          onOk: NodeDefsActions.cancelNodeDefEdits(history),
+                        })
                       )
                     : dispatch(NodeDefsActions.cancelNodeDefEdits(history))
                 }

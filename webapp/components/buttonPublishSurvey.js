@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { SurveyActions } from '@webapp/store/survey'
-import { useSurveyInfo, useI18n } from './hooks'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { useSurveyInfo, useI18n } from '@webapp/components/hooks'
 
 const ButtonPublishSurvey = (props) => {
   const { className, disabled } = props
@@ -23,7 +23,13 @@ const ButtonPublishSurvey = (props) => {
       aria-disabled={disabled}
       className={`btn btn-s btn-publish ${className || ''}`}
       onClick={() =>
-        dispatch(showDialogConfirm('common.publishConfirm', { survey: surveyLabel }, SurveyActions.publishSurvey()))
+        dispatch(
+          DialogConfirmActions.showDialogConfirm({
+            key: 'common.publishConfirm',
+            params: { survey: surveyLabel },
+            onOk: SurveyActions.publishSurvey(),
+          })
+        )
       }
     >
       <span className="icon icon-warning icon-left icon-10px" />

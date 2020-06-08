@@ -7,13 +7,11 @@ import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 // == app reducer
 import AppReducer from '@webapp/app/reducer'
 import AppErrorsReducer from '@webapp/app/appErrors/reducer'
-import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
 import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
 import { UiReducer, UiState } from '@webapp/store/ui'
 
 import * as AppState from '@webapp/app/appState'
-import * as AppDialogConfirmState from '@webapp/app/appDialogConfirm/appDialogConfirmState'
 import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
 
 const appReducers = {
@@ -21,7 +19,6 @@ const appReducers = {
   [LoginState.stateKey]: LoginReducer,
   [SurveyState.stateKey]: SurveyReducer,
   [UiState.stateKey]: UiReducer,
-  [AppDialogConfirmState.stateKey]: AppDialogConfirmReducer,
   [AppErrorsState.stateKey]: AppErrorsReducer,
 }
 

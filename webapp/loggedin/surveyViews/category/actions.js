@@ -10,7 +10,7 @@ import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appM
 
 import { LoaderActions } from '@webapp/store/ui'
 import { SurveyState, CategoriesActions } from '@webapp/store/survey'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { showDialogConfirm } from '@webapp/store/ui/dialogConfirm/actions'
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 

@@ -2,16 +2,17 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import { useI18n } from '@webapp/components/hooks'
-import ErrorBadge from '@webapp/components/errorBadge'
-
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+
+import { useI18n } from '@webapp/components/hooks'
+import ErrorBadge from '@webapp/components/errorBadge'
+
 import { deleteRecord, deleteRecordUuidPreview, updateRecordStep } from '@webapp/loggedin/surveyViews/record/actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()
@@ -25,7 +26,7 @@ const RecordEntryButtons = () => {
   const stepPrev = RecordStep.getPreviousStep(stepId)
   const valid = Validation.isObjValid(record)
 
-  const getStepLabel = step => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
+  const getStepLabel = (step) => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
 
   return (
     <React.Fragment>
@@ -37,9 +38,11 @@ const RecordEntryButtons = () => {
             className="btn-s btn-transparent"
             onClick={() =>
               dispatch(
-                showDialogConfirm('surveyForm.formEntryActions.confirmDemote', { name: getStepLabel(stepPrev) }, () =>
-                  dispatch(updateRecordStep(RecordStep.getId(stepPrev), history)),
-                ),
+                DialogConfirmActions.showDialogConfirm({
+                  key: 'surveyForm.formEntryActions.confirmDemote',
+                  params: { name: getStepLabel(stepPrev) },
+                  onOk: () => dispatch(updateRecordStep(RecordStep.getId(stepPrev), history)),
+                })
               )
             }
           >
@@ -60,9 +63,11 @@ const RecordEntryButtons = () => {
             aria-disabled={!valid}
             onClick={() =>
               dispatch(
-                showDialogConfirm('surveyForm.formEntryActions.confirmPromote', { name: getStepLabel(stepNext) }, () =>
-                  dispatch(updateRecordStep(RecordStep.getId(stepNext), history)),
-                ),
+                DialogConfirmActions.showDialogConfirm({
+                  key: 'surveyForm.formEntryActions.confirmPromote',
+                  params: { name: getStepLabel(stepNext) },
+                  onOk: () => dispatch(updateRecordStep(RecordStep.getId(stepNext), history)),
+                })
               )
             }
           >
@@ -75,7 +80,10 @@ const RecordEntryButtons = () => {
         className="btn-s btn-danger"
         onClick={() =>
           dispatch(
-            showDialogConfirm('surveyForm.formEntryActions.confirmDelete', {}, () => dispatch(deleteRecord(history))),
+            DialogConfirmActions.showDialogConfirm({
+              key: 'surveyForm.formEntryActions.confirmDelete',
+              onOk: () => dispatch(deleteRecord(history)),
+            })
           )
         }
         aria-disabled={false}
@@ -87,7 +95,7 @@ const RecordEntryButtons = () => {
   )
 }
 
-const FormEntryActions = props => {
+const FormEntryActions = (props) => {
   const { preview, entry } = props
 
   const i18n = useI18n()

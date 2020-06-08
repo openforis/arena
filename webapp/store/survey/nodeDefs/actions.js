@@ -15,8 +15,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 import * as SurveyState from '../state'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
@@ -346,23 +345,26 @@ export const removeNodeDef = (nodeDef, history = null) => async (dispatch, getSt
 
   if (dispatch(_checkCanRemoveNodeDef(nodeDef))) {
     dispatch(
-      showDialogConfirm('surveyForm.nodeDefEditFormActions.confirmDelete', {}, async () => {
-        const surveyId = Survey.getId(survey)
-        const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
+      DialogConfirmActions.showDialogConfirm({
+        key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
+        onOk: async () => {
+          const surveyId = Survey.getId(survey)
+          const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-        const [
-          {
-            data: { nodeDefsValidation },
-          },
-        ] = await Promise.all([
-          axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
-          dispatch({ type: nodeDefDelete, nodeDef }),
-        ])
+          const [
+            {
+              data: { nodeDefsValidation },
+            },
+          ] = await Promise.all([
+            axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}`, { params: { surveyCycleKey } }),
+            dispatch({ type: nodeDefDelete, nodeDef }),
+          ])
 
-        dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
-        if (history) {
-          history.goBack()
-        }
+          dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+          if (history) {
+            history.goBack()
+          }
+        },
       })
     )
   }

@@ -2,25 +2,24 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect, useDispatch } from 'react-redux'
 
-import { FormItem, Input } from '@webapp/components/form/input'
-import ErrorBadge from '@webapp/components/errorBadge'
-import { useI18n } from '@webapp/components/hooks'
-
-import { normalizeName } from '@core/stringUtils'
-
+import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
+import { normalizeName } from '@core/stringUtils'
 
-import * as AppState from '@webapp/app/appState'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import * as AppState from '@webapp/app/appState'
+
+import { FormItem, Input } from '@webapp/components/form/input'
+import ErrorBadge from '@webapp/components/errorBadge'
+import { useI18n } from '@webapp/components/hooks'
+
 import * as CategoryState from '../categoryState'
 
-import { NotificationActions } from '@webapp/store/ui'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import {
   createCategoryLevelItem,
   putCategoryItemProp,
@@ -42,9 +41,11 @@ const LevelEdit = (props) => {
       dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeletedLevel' }))
     } else {
       dispatch(
-        showDialogConfirm('categoryEdit.confirmDeleteLevel', { levelName: CategoryLevel.getName(level) }, () =>
-          deleteCategoryLevel(category, level)
-        )
+        DialogConfirmActions.showDialogConfirm({
+          key: 'categoryEdit.confirmDeleteLevel',
+          params: { levelName: CategoryLevel.getName(level) },
+          onOk: () => deleteCategoryLevel(category, level),
+        })
       )
     }
   }

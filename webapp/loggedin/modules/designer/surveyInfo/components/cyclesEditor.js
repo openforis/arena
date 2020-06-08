@@ -8,10 +8,10 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
 
+import { DialogConfirmActions } from '@webapp/store/ui'
+
 import { useI18n } from '@webapp/components/hooks'
 import ValidationTooltip from '@webapp/components/validationTooltip'
-
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 const DateEditor = ({ date, onChange }) => {
   const [year, month, day] = R.pipe(R.defaultTo('--'), R.split('-'))(date)
@@ -40,7 +40,7 @@ const DateContainer = ({ date, i18n, keyLabel, readOnly, onChange }) => (
   </div>
 )
 
-const CycleEditor = props => {
+const CycleEditor = (props) => {
   const { cycleKey, cycle, i18n, readOnly, validation, canDelete, onChange, onDelete } = props
 
   const stepNum = Number(cycleKey) + 1
@@ -55,7 +55,7 @@ const CycleEditor = props => {
           keyLabel="common.from"
           i18n={i18n}
           readOnly={readOnly}
-          onChange={date => onChange(SurveyCycle.setDateStart(date)(cycle))}
+          onChange={(date) => onChange(SurveyCycle.setDateStart(date)(cycle))}
         />
         {(SurveyCycle.getDateEnd(cycle) || !readOnly) && (
           <DateContainer
@@ -63,7 +63,7 @@ const CycleEditor = props => {
             keyLabel="common.to"
             i18n={i18n}
             readOnly={readOnly}
-            onChange={date => onChange(SurveyCycle.setDateEnd(date)(cycle))}
+            onChange={(date) => onChange(SurveyCycle.setDateEnd(date)(cycle))}
           />
         )}
 
@@ -72,9 +72,11 @@ const CycleEditor = props => {
             className="btn-s btn-transparent btn-delete"
             onClick={() =>
               dispatch(
-                showDialogConfirm('homeView.surveyInfo.confirmDeleteCycle', { cycle: stepNum }, () =>
-                  onDelete(cycleKey),
-                ),
+                DialogConfirmActions.showDialogConfirm({
+                  key: 'homeView.surveyInfo.confirmDeleteCycle',
+                  params: { cycle: stepNum },
+                  onOk: () => onDelete(cycleKey),
+                })
               )
             }
           >
@@ -86,13 +88,13 @@ const CycleEditor = props => {
   )
 }
 
-const CyclesEditor = props => {
+const CyclesEditor = (props) => {
   const { cycles, readOnly, setCycles, validation } = props
   const cycleEntries = Object.entries(cycles)
 
   const i18n = useI18n()
 
-  const onDelete = stepToDelete => {
+  const onDelete = (stepToDelete) => {
     delete cycles[stepToDelete]
     setCycles(cycles)
   }
@@ -108,7 +110,7 @@ const CyclesEditor = props => {
             i18n={i18n}
             readOnly={readOnly}
             validation={Validation.getFieldValidation(cycleKey)(validation)}
-            onChange={cycleUpdate => setCycles(R.assoc(cycleKey, cycleUpdate)(cycles))}
+            onChange={(cycleUpdate) => setCycles(R.assoc(cycleKey, cycleUpdate)(cycles))}
             canDelete={!readOnly && cycleKey !== Survey.cycleOneKey && i === cycleEntries.length - 1}
             onDelete={onDelete}
           />
