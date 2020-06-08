@@ -1,7 +1,5 @@
-import * as R from 'ramda'
-
 import { useSelector } from 'react-redux'
 
-import * as StatusState from './state'
+import * as SystemStatusState from './state'
 
-export const useIsReady = () => R.equals(useSelector(StatusState.getStatus), StatusState.appStatus.ready)
+export const useSystemStatusReady = () => useSelector(SystemStatusState.isReady)

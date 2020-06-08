@@ -10,4 +10,4 @@ export { SystemErrorActions, useSystemError } from './error'
 export { I18nState, useI18n, useLang } from './i18n'
 
 // ====== status
-export { StatusState, useIsReady } from './status'
+export { SystemStatusState, useSystemStatusReady } from './status'

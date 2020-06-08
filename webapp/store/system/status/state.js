@@ -3,11 +3,11 @@ import * as SystemState from '../state'
 
 export const stateKey = 'status'
 
-export const appStatus = {
+export const systemStatus = {
   ready: 'ready',
 }
 
 export const getState = R.pipe(SystemState.getState, R.propOr({}, stateKey))
 
 // ====== READ
-export const getStatus = getState
+export const isReady = R.pipe(SystemState.getState, R.propEq(stateKey, systemStatus.ready))
