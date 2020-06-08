@@ -8,7 +8,7 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'

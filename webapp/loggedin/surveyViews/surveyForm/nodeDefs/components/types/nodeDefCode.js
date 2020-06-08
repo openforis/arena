@@ -15,11 +15,11 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../../../../record/recordState'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './nodeDefCodeDropdown'
+import { I18nState } from '@webapp/store/system'
 
 const NodeDefCode = (props) => {
   const {
@@ -108,7 +108,7 @@ const NodeDefCode = (props) => {
 }
 
 const mapStateToProps = (state, props) => {
-  const lang = AppState.getLang(state)
+  const lang = I18nState.getLang(state)
 
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)

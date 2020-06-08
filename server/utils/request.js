@@ -35,10 +35,6 @@ export const getUser = R.prop('user')
 export const getUserUuid = R.pipe(getUser, R.prop('uuid'))
 export const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
-// I18n
-
-export const getI18n = R.prop('i18n')
-
 // Cookies
 
 const getCookie = (name) => R.path(['cookies', name])

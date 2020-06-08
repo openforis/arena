@@ -2,7 +2,7 @@ import './uploadButton.scss'
 
 import React, { useRef } from 'react'
 import * as R from 'ramda'
-import { useI18n } from '../hooks'
+import { useI18n } from '@webapp/store/system'
 
 const checkFilesSize = (files, maxSizeMB) =>
   R.find(file => file.size > maxSizeMB * 1024 * 1024, files)

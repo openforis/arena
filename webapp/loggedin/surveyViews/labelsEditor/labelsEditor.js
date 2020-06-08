@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { Input } from '@webapp/components/form/input'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 

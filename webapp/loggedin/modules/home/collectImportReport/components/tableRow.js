@@ -8,7 +8,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useSurvey, useI18n } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import Checkbox from '@webapp/components/form/checkbox'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import * as Chain from '@common/analysis/processingChain'
 import * as DateUtils from '@core/dateUtils'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import ProgressBar from '@webapp/components/progressBar'
 import ErrorBadge from '@webapp/components/errorBadge'
 

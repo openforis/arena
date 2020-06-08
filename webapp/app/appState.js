@@ -64,8 +64,3 @@ export const dissocUserPropsOnSurveyDelete = (surveyInfo) => (appState) => {
 export const assocSaving = R.assoc(keys.saving)
 
 export const isSaving = R.pipe(getState, R.propEq(keys.saving, true))
-
-// ==== APP I18N
-export const getI18n = R.pipe(getState, R.prop(keys.i18n))
-
-export const getLang = R.pipe(getI18n, R.prop(keys.lang))

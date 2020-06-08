@@ -2,7 +2,7 @@ import React from 'react'
 
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionEditor from '@webapp/components/expression/expressionEditor'
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'

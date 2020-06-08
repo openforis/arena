@@ -2,7 +2,7 @@ import React from 'react'
 import camelize from 'camelize'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 

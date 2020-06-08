@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import { SurveyState } from '@webapp/store/survey'
 
-import { useLang } from './useI18n'
+import { useLang } from '@webapp/store/system'
 import useOnUpdate from './useOnUpdate'
 
 // ==== Survey

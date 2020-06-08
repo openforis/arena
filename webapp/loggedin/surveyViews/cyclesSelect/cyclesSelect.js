@@ -4,7 +4,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { SurveyState } from '@webapp/store/survey'

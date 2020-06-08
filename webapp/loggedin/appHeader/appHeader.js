@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 
-import { usePrevious, useUser, useSurveyCycleKey, useI18n, useSurveyInfo } from '@webapp/components/hooks'
+import { usePrevious, useUser, useSurveyCycleKey, useSurveyInfo } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
@@ -15,12 +15,12 @@ import * as AppState from '@webapp/app/appState'
 import { updateUserPrefs } from '@webapp/app/actions'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
+import { useLang } from '@webapp/store/system'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
   const user = useUser()
-  const i18n = useI18n()
-  const { lang } = i18n
+  const lang = useLang()
   const appSaving = useSelector(AppState.isSaving)
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()

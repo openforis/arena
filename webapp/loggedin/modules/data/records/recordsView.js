@@ -17,10 +17,11 @@ import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
 
 import * as RecordsState from './recordsState'
+import { useLang } from '@webapp/store/system'
 
 const RecordsView = (props) => {
-  const { surveyInfo, surveyCycleKey, user, nodeDefKeys, lang, createRecord, reloadListItems, history } = props
-
+  const { surveyInfo, surveyCycleKey, user, nodeDefKeys, createRecord, reloadListItems, history } = props
+  const lang = useLang()
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
@@ -54,7 +55,6 @@ const RecordsView = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-  lang: AppState.getLang(state),
   user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),

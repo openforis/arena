@@ -3,7 +3,7 @@ import './nodeDefCoordinate.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as InputMasks from '@webapp/components/form/inputMasks'

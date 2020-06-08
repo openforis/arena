@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { guestModules } from '@webapp/app/appModules'
-import { useFormObject, useI18n } from '@webapp/components/hooks'
+import { useFormObject } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/components/Error'
 
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/dropdown'
 import ButtonGroup from '@webapp/components/form/buttonGroup'

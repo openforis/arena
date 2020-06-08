@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useSystemError } from '@webapp/store/system'
-import { useI18n } from '@webapp/components/hooks'
+import { useSystemError, useI18n } from '@webapp/store/system'
 import * as AppState from '@webapp/app/appState'
 import { initApp } from '@webapp/app/actions'
 
