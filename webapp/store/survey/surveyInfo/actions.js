@@ -2,9 +2,7 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import * as LoaderActions from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import * as SurveyActions from '../actions'
 import * as SurveyState from '../state'
 
@@ -12,7 +10,7 @@ export const surveyInfoUpdate = 'survey/info/update'
 export const surveyInfoValidationUpdate = 'survey/info/validation/update'
 
 export const updateSurveyInfoProps = (props) => async (dispatch, getState) => {
-  dispatch(LoaderActions.showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.put(`/api/survey/${surveyId}/info`, props)
@@ -30,5 +28,5 @@ export const updateSurveyInfoProps = (props) => async (dispatch, getState) => {
     })
   }
 
-  dispatch(LoaderActions.hideAppLoader())
+  dispatch(LoaderActions.hideLoader())
 }

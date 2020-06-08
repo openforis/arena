@@ -9,7 +9,6 @@ export const keys = {
   user: 'user',
   systemError: 'systemError',
   saving: 'saving',
-  loaderVisible: 'loaderVisible',
 
   // I18n
   i18n: 'i18n',
@@ -77,7 +76,3 @@ export const getLang = R.pipe(getI18n, R.prop(keys.lang))
 export const assocSystemError = (error) => R.assoc(keys.systemError, error)
 
 export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
-
-// ==== App Loader
-
-export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))

@@ -15,8 +15,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
-import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import * as SurveyState from '../state'
 
@@ -244,7 +243,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
   const validation = NodeDefState.getValidation(state)
 
   if (SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) {
-    dispatch(showAppLoader())
+    dispatch(LoaderActions.showLoader())
 
     const survey = SurveyState.getSurvey(state)
     const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
@@ -286,7 +285,7 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
       nodeDefValidation: NodeDefState.getValidation(state),
     })
 
-    dispatch(hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
 
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
   } else {

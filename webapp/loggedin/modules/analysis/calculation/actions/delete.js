@@ -7,13 +7,12 @@ import { SurveyState } from '@webapp/store/survey'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
-import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const calculationDelete = 'analysis/calculation/delete'
 
 export const deleteCalculation = () => async (dispatch, getState) => {
-  dispatch(showAppLoader())
+  dispatch(LoaderActions.showLoader())
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const step = StepState.getProcessingStep(state)
@@ -25,5 +24,5 @@ export const deleteCalculation = () => async (dispatch, getState) => {
 
   dispatch({ type: calculationDelete, calculation })
   dispatch(NotificationActions.notifyInfo({ key: 'common.deleted', timeout: 3000 }))
-  dispatch(hideAppLoader())
+  dispatch(LoaderActions.hideLoader())
 }

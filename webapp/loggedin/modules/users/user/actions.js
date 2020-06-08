@@ -11,11 +11,11 @@ import * as Validation from '@core/validation/validation'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
-import { showAppLoader, hideAppLoader, setUser } from '@webapp/app/actions'
-import { NotificationActions } from '@webapp/store/ui'
+import { setUser } from '@webapp/app/actions'
 
 export const userUpdate = 'user/update'
 export const userProfilePictureUpdate = 'user/profilePicture/update'
@@ -69,7 +69,7 @@ export const saveUser = (history) => async (dispatch, getState) => {
   if (Validation.isObjValid(userValidated)) {
     const editingSelf = User.isEqual(user)(userToUpdate)
     try {
-      dispatch(showAppLoader())
+      dispatch(LoaderActions.showLoader())
 
       const formData = new FormData()
       formData.append(User.keys.uuid, User.getUuid(userToUpdate))
@@ -98,7 +98,7 @@ export const saveUser = (history) => async (dispatch, getState) => {
         history.push(appModuleUri(userModules.users))
       }
     } finally {
-      dispatch(hideAppLoader())
+      dispatch(LoaderActions.hideLoader())
     }
   }
 }
@@ -111,7 +111,7 @@ export const removeUser = (history) => async (dispatch, getState) => {
   const userToUpdate = UserViewState.getUser(state)
 
   try {
-    dispatch(showAppLoader())
+    dispatch(LoaderActions.showLoader())
 
     await axios.delete(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`)
 
@@ -126,7 +126,7 @@ export const removeUser = (history) => async (dispatch, getState) => {
     )
     history.push(appModuleUri(userModules.users))
   } finally {
-    dispatch(hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
   }
 }
 
@@ -137,7 +137,7 @@ export const inviteUserRepeat = (history) => async (dispatch, getState) => {
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
   try {
-    dispatch(showAppLoader())
+    dispatch(LoaderActions.showLoader())
 
     const userInvite = UserInvite.newUserInvite(User.getEmail(userToInvite), User.getGroupUuid(userToInvite))
     const userInviteParams = R.assoc('surveyCycleKey', surveyCycleKey)(userInvite)
@@ -153,6 +153,6 @@ export const inviteUserRepeat = (history) => async (dispatch, getState) => {
 
     history.push(appModuleUri(userModules.users))
   } finally {
-    dispatch(hideAppLoader())
+    dispatch(LoaderActions.hideLoader())
   }
 }

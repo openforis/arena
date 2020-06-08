@@ -4,6 +4,8 @@ import * as User from '@core/user/user'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import Counter from '@core/counter'
 
+import { LoaderActions } from '@webapp/store/ui'
+
 import * as AppState from './appState'
 
 export const appPropsChange = 'app/props/change'
@@ -51,12 +53,12 @@ export const updateUserPrefs = (user) => async (dispatch) => {
 }
 
 export const logout = () => async (dispatch) => {
-  dispatch(showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   await axios.post('/auth/logout')
 
   dispatch({ type: appUserLogout })
-  dispatch(hideAppLoader())
+  dispatch(LoaderActions.hideLoader())
 }
 
 // ====== SAVING
@@ -78,10 +80,3 @@ export const hideAppSaving = () => (dispatch) => {
     dispatch({ type: appSavingUpdate, saving: false })
   }
 }
-
-// ====== APP LOADER
-
-export const showAppLoader = () => (dispatch) => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
-
-export const hideAppLoader = () => (dispatch) =>
-  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })

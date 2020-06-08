@@ -3,18 +3,18 @@ import * as R from 'ramda'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import { SurveyState, CategoriesActions } from '@webapp/store/survey'
-
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import { hideAppSaving, showAppSaving, showAppLoader, hideAppLoader } from '@webapp/app/actions'
+import { LoaderActions } from '@webapp/store/ui'
+import { SurveyState, CategoriesActions } from '@webapp/store/survey'
+import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
+import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 
-import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 import * as CategoryState from './categoryState'
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
 export const categoryViewLevelActiveItemUpdate = 'categoryView/levelActiveItem/update'
@@ -197,14 +197,14 @@ export const deleteCategoryItem = (category, level, item) => (dispatch, getState
 
   dispatch(
     showDialogConfirm(messageKeyConfirm, {}, async () => {
-      dispatch(showAppLoader())
+      dispatch(LoaderActions.showLoader())
       const surveyId = SurveyState.getSurveyId(state)
       const { data } = await axios.delete(
         `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`
       )
       dispatch({ type: CategoriesActions.categoryItemDelete, item, level })
       dispatchCategoryUpdate(dispatch, data.category)
-      dispatch(hideAppLoader())
+      dispatch(LoaderActions.hideLoader())
     })
   )
 }
