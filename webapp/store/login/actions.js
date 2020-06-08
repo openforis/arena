@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as Validation from '@core/validation/validation'
 
 import { hideAppLoader, initUser, showAppLoader } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
@@ -48,7 +48,7 @@ export const sendPasswordResetEmail = (email, history) =>
     if (error) {
       dispatch(setLoginError(error))
     } else {
-      dispatch(showNotification('common.emailSentConfirmation', { email }))
+      dispatch(NotificationActions.notifyInfo({ key: 'common.emailSentConfirmation', params: { email } }))
       history.goBack()
     }
   })

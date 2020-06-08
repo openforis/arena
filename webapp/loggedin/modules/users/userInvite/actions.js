@@ -10,7 +10,7 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { SurveyState } from '@webapp/store/survey'
 
 import { showAppLoader, hideAppLoader } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 import * as UserInviteViewState from './userInviteViewState'
 
@@ -54,8 +54,9 @@ export const inviteUser = (history) => async (dispatch, getState) => {
       await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
 
       dispatch(
-        showNotification('common.emailSentConfirmation', {
-          email: UserInvite.getEmail(userInvite),
+        NotificationActions.notifyInfo({
+          key: 'common.emailSentConfirmation',
+          params: { email: UserInvite.getEmail(userInvite) },
         })
       )
 

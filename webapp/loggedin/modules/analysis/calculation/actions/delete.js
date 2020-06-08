@@ -8,7 +8,7 @@ import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 export const calculationDelete = 'analysis/calculation/delete'
 
@@ -24,6 +24,6 @@ export const deleteCalculation = () => async (dispatch, getState) => {
   )
 
   dispatch({ type: calculationDelete, calculation })
-  dispatch(showNotification('common.deleted', {}, null, 3000))
+  dispatch(NotificationActions.notifyInfo({ key: 'common.deleted', timeout: 3000 }))
   dispatch(hideAppLoader())
 }

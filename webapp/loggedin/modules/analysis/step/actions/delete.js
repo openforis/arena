@@ -6,7 +6,7 @@ import { SurveyState } from '@webapp/store/survey'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 export const stepDelete = 'analysis/step/delete'
 
@@ -20,6 +20,6 @@ export const deleteStep = () => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/processing-step/${Step.getUuid(step)}`)
 
   dispatch({ type: stepDelete })
-  dispatch(showNotification('processingStepView.deleteComplete'))
+  dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   dispatch(hideAppSaving())
 }

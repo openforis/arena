@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 import { LoginValidator } from '@webapp/store/login'
 import * as Validation from '@core/validation/validation'
 import { appModuleUri } from '@webapp/app/appModules'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 
 import * as actions from './actions'
 import reducer from './reducer'
@@ -50,7 +50,7 @@ export const useResetPassword = () => {
 
   useOnUpdate(() => {
     history.push(appModuleUri())
-    dispatchRedux(showNotification('resetPasswordView.passwordSuccessfullyReset'))
+    dispatchRedux(NotificationActions.notifyInfo({ key: 'resetPasswordView.passwordSuccessfullyReset' }))
   }, [resetComplete])
 
   return {

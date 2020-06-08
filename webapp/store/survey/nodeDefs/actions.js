@@ -13,11 +13,10 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import * as AppState from '@webapp/app/appState'
-import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { hideAppLoader, showAppLoader } from '@webapp/app/actions'
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import * as SurveyState from '../state'
 
@@ -82,11 +81,9 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // NodeDef has default values, cannot change into multiple
     dispatch(
-      showNotification(
-        'nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues',
-        null,
-        NotificationState.severity.warning
-      )
+      NotificationActions.notifyWarning({
+        key: 'nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues',
+      })
     )
     return false
   }
@@ -291,10 +288,10 @@ export const saveNodeDefEdits = () => async (dispatch, getState) => {
 
     dispatch(hideAppLoader())
 
-    dispatch(showNotification('common.saved', {}, null, 3000))
+    dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
   } else {
     // Cannot save node def: show notification
-    dispatch(showNotification('common.formContainsErrorsCannotSave', {}, NotificationState.severity.error))
+    dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
   }
 }
 
@@ -331,14 +328,13 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
   )(nodeDefDependentsUuids)
 
   dispatch(
-    showNotification(
-      'nodeDefEdit.cannotDeleteNodeDefReferenced',
-      {
+    NotificationActions.notifyWarning({
+      key: 'nodeDefEdit.cannotDeleteNodeDefReferenced',
+      params: {
         nodeDef: NodeDef.getLabel(nodeDef, i18n.lang),
         nodeDefDependents,
       },
-      NotificationState.severity.warning
-    )
+    })
   )
   return false
 }
