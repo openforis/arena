@@ -1,16 +1,16 @@
-import './appLoaderView.scss'
+import './Loader.scss'
 import React from 'react'
 import { CSSTransition } from 'react-transition-group'
 
 import { useLoader } from '@webapp/store/ui'
 
-const AppLoaderView = () => {
+const Loader = () => {
   const visible = useLoader()
 
   return (
-    <CSSTransition in={visible} timeout={750} unmountOnExit className="app-loader">
+    <CSSTransition in={visible} timeout={750} unmountOnExit className="loader">
       <div>
-        <div className="app-loader__boxes">
+        <div className="loader__boxes">
           <div />
           <div />
           <div />
@@ -20,4 +20,4 @@ const AppLoaderView = () => {
   )
 }
 
-export default AppLoaderView
+export default Loader

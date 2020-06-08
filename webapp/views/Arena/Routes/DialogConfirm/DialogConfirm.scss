@@ -1,7 +1,6 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
-.app-dialog-confirm {
-
+.dialog-confirm {
   .modal-content {
     background-color: $white;
     text-align: center;
@@ -10,5 +9,4 @@
       text-align: left;
     }
   }
-
 }

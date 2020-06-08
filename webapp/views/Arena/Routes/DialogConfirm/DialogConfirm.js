@@ -1,4 +1,4 @@
-import './appDialogConfirm.scss'
+import './DialogConfirm.scss'
 
 import React from 'react'
 import { useDispatch } from 'react-redux'
@@ -9,13 +9,13 @@ import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/components/hooks'
 import Markdown from '@webapp/components/markdown'
 
-const AppDialogConfirm = () => {
+const DialogConfirm = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const { key, params } = useDialogConfirm()
 
   return key ? (
-    <Modal className="app-dialog-confirm">
+    <Modal className="dialog-confirm">
       <ModalBody>
         <Markdown source={i18n.t(key, params)} />
       </ModalBody>
@@ -41,4 +41,4 @@ const AppDialogConfirm = () => {
   ) : null
 }
 
-export default AppDialogConfirm
+export default DialogConfirm
