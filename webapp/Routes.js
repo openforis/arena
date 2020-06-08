@@ -15,7 +15,8 @@ import AppDialogConfirm from '@webapp/app/appDialogConfirm/appDialogConfirm'
 import AppNotificationView from '@webapp/app/appNotification/appNotificationView'
 import Guest from '@webapp/views/Guest'
 
-import { throwSystemError } from '@webapp/app/actions'
+import { ErrorActions } from '@webapp/store/app/error'
+
 import { activeJobUpdate } from '@webapp/loggedin/appJob/actions'
 
 import { useUser } from '@webapp/components/hooks'
@@ -26,7 +27,7 @@ const Routes = () => {
 
   const openSocket = () => {
     ;(async () => {
-      await AppWebSocket.openSocket((error) => dispatch(throwSystemError(error)))
+      await AppWebSocket.openSocket((error) => dispatch(ErrorActions.throwSystemError({ error })))
       AppWebSocket.on(WebSocketEvents.jobUpdate, (job) => dispatch(activeJobUpdate(job)))
     })()
   }

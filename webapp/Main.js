@@ -9,14 +9,15 @@ import { BrowserRouter } from 'react-router-dom'
 import { useI18n } from '@webapp/components/hooks'
 import Routes from '@webapp/Routes'
 import * as AppState from '@webapp/app/appState'
+import { ErrorState } from '@webapp/store/app/error'
 import { initApp } from '@webapp/app/actions'
-import { store } from '@webapp/app/store'
+import { store } from '@webapp/store/store'
 
 const Arena = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const ready = useSelector(AppState.isReady)
-  const systemError = useSelector(AppState.getSystemError)
+  const systemError = useSelector(ErrorState.getSystemError)
 
   useEffect(() => {
     dispatch(initApp())

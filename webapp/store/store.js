@@ -5,7 +5,7 @@ import thunkMiddleware from 'redux-thunk'
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
-import AppReducer from '@webapp/app/reducer'
+import AppReducer from '@webapp/store/reducer'
 import AppErrorsReducer from '@webapp/app/appErrors/reducer'
 import AppDialogConfirmReducer from '@webapp/app/appDialogConfirm/reducer'
 import AppNotificationReducer from '@webapp/app/appNotification/reducer'
