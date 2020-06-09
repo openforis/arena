@@ -5,6 +5,7 @@ import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { useHistory } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -38,11 +39,11 @@ const SurveyFormView = (props) => {
     recordUuid,
     parentNode,
     isSideBarOpened,
-    history,
     setFormNodeDefAddChildTo,
     resetForm,
   } = props
 
+  const history = useHistory()
   const editAllowed = edit && canEditDef
 
   let className = editAllowed ? ' edit' : ''
@@ -85,7 +86,6 @@ const SurveyFormView = (props) => {
         edit={edit}
         entry={entry && canEditRecord}
         preview={preview}
-        history={history}
         canEditDef={canEditDef}
       />
 

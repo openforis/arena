@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { useHistory } from 'react-router'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
@@ -14,7 +15,6 @@ import * as Authorizer from '@core/auth/authorizer'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import { resetForm } from '../surveyForm/actions'
@@ -31,6 +31,7 @@ import {
   cycleChanged,
   applicationError,
 } from './actions'
+import { UserState } from '@webapp/store/user'
 
 const RecordView = (props) => {
   const {
@@ -40,10 +41,10 @@ const RecordView = (props) => {
     surveyCycleKey,
     sessionExpired,
     cycleChanged,
-    history,
     applicationError,
   } = props
 
+  const history = useHistory()
   const recordLoadedRef = useRef(false)
 
   const componentLoad = () => {
@@ -120,7 +121,7 @@ const RecordView = (props) => {
 }
 
 const mapStateToProps = (state, { match, location }) => {
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const record = RecordState.getRecord(state)
