@@ -6,14 +6,12 @@ import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
 import AppReducerDeprecated from '@webapp/app/reducer'
-import AppErrorsReducer from '@webapp/app/appErrors/reducer'
 import { SystemState, SystemReducer } from '@webapp/store/system'
 import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
 import { UiReducer, UiState } from '@webapp/store/ui'
 
 import * as AppStateDeprecated from '@webapp/app/appState'
-import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
 
 const appReducers = {
   [AppStateDeprecated.stateKey]: AppReducerDeprecated,
@@ -21,7 +19,6 @@ const appReducers = {
   [LoginState.stateKey]: LoginReducer,
   [SurveyState.stateKey]: SurveyReducer,
   [UiState.stateKey]: UiReducer,
-  [AppErrorsState.stateKey]: AppErrorsReducer,
 }
 
 const createReducer = (asyncReducers) =>

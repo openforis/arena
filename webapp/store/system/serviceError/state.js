@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-export const stateKey = 'appErrors'
+export const stateKey = 'serviceErrors'
 
 const getState = R.propOr({}, stateKey)
 

@@ -3,15 +3,14 @@ import './appErrors.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
-import Markdown from '../../components/markdown'
-
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
 
-import * as ErrorsState from './appErrorsState'
+import Markdown from '../../components/markdown'
 
-import { closeAppError } from './actions'
+import * as ErrorsState from '../../store/system/serviceError/state'
+import { closeAppError } from '../../store/system/serviceError/actions'
 
 const AppError = ({ error, closeAppError }) => {
   const i18n = useI18n()
@@ -31,7 +30,7 @@ const AppError = ({ error, closeAppError }) => {
 
 const AppErrors = ({ errors, closeAppError }) => (
   <TransitionGroup className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter={true} appear={true}>
-    {errors.map(error => (
+    {errors.map((error) => (
       <CSSTransition key={error.id} timeout={500} classNames="fade">
         <AppError error={error} closeAppError={closeAppError} />
       </CSSTransition>
@@ -39,7 +38,7 @@ const AppErrors = ({ errors, closeAppError }) => (
   </TransitionGroup>
 )
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   errors: ErrorsState.getAppErrors(state),
 })
 
