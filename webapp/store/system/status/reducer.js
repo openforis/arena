@@ -1,9 +1,10 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appPropsChange } from '@webapp/app/actions'
+import * as SystemActions from '@webapp/store/system/actions'
+import * as SystemStatusState from './state'
 
 const actionHandlers = {
-  [appPropsChange]: (state, { status }) => status || state,
+  [SystemActions.SYSTEM_INIT]: () => SystemStatusState.systemStatus.ready,
 }
 
 export default exportReducer(actionHandlers)
