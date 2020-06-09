@@ -5,7 +5,6 @@ import * as ServiceErrorState from './state'
 
 const actionHandlers = {
   [ServiceErrorActions.appErrorCreate]: (state, { error }) => ServiceErrorState.assocAppError(error)(state),
-
   [ServiceErrorActions.appErrorDelete]: (state, { error }) => ServiceErrorState.dissocAppError(error)(state),
 }
 
