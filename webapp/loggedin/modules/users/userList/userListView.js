@@ -12,10 +12,10 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import TableView from '../../../tableViews/tableView'
+import { UserState } from '@webapp/store/user'
 
 const UsersHeaderLeft = (props) => {
   const i18n = useI18n()
@@ -97,7 +97,7 @@ const UsersListView = ({ canInvite, user, surveyInfo, history }) => {
 }
 
 const mapStateToProps = (state) => {
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
   return {

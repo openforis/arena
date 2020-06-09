@@ -7,7 +7,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import { toggleSidebar, useIsSidebarOpened } from '@webapp/service/storage'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/components/hooks'
+import { useUser } from '@webapp/store/user'
 
 import AppSideBarModules from './components/appSideBarModules'
 

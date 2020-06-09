@@ -10,7 +10,8 @@ import * as Validation from '@core/validation/validation'
 
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 
-import { useAuthCanEditRecord } from '@webapp/components/hooks'
+import { useAuthCanEditRecord } from '@webapp/store/user'
+
 import ErrorBadge from '@webapp/components/errorBadge'
 import NodeDefTableCellBody from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 

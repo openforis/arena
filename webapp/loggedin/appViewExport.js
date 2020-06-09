@@ -20,7 +20,6 @@ import component from './appView'
 
 const reducers = [
   { name: AppState.stateKey, fn: AppReducer },
-
   { name: HomeState.stateKey, fn: homeReducer },
   { name: AnalysisState.stateKey, fn: analysisReducer },
   { name: DataState.stateKey, fn: dataReducer },

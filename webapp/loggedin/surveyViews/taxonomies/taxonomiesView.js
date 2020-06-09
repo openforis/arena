@@ -13,7 +13,6 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import * as AppState from '@webapp/app/appState'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
@@ -21,6 +20,7 @@ import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/tax
 import { useI18n } from '@webapp/store/system'
 import ItemsView from '@webapp/loggedin/surveyViews/items/itemsView'
 import ItemsColumn from '@webapp/loggedin/surveyViews/items/itemsColumn'
+import { UserState } from '@webapp/store/user'
 
 const columnDescription = new ItemsColumn(
   'common.description',
@@ -81,7 +81,7 @@ const TaxonomiesView = (props) => {
 const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
   const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
   const taxonomies = R.pipe(
     Survey.getTaxonomiesArray,

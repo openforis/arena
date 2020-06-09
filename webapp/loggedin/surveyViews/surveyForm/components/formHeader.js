@@ -2,6 +2,7 @@ import './formHeader.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -20,7 +21,6 @@ const FormHeader = (props) => {
     edit,
     entry,
     preview,
-    history,
     canEditDef,
     nodeDefPage,
     nodeDefPageLabel,
@@ -30,6 +30,7 @@ const FormHeader = (props) => {
   } = props
 
   const i18n = useI18n()
+  const history = useHistory()
 
   return (
     <div className="survey-form-header">
@@ -72,7 +73,7 @@ const FormHeader = (props) => {
       {edit && canEditDef ? (
         <FormEditActions />
       ) : (
-        <FormEntryActions preview={preview} history={history} entry={entry} />
+        <FormEntryActions preview={preview} entry={entry} />
       )}
     </div>
   )

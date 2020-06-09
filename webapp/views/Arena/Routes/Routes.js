@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom'
 import * as User from '@core/user/user'
 import { app, guest } from '@webapp/app/appModules'
 
-import { useUser } from '@webapp/components/hooks'
+import { useUser } from '@webapp/store/user'
 
 import DynamicImport from '@webapp/components/dynamicImport'
 import Guest from '@webapp/views/Guest'
@@ -17,7 +17,7 @@ import Notification from './Notification'
 const Routes = () => {
   const user = useUser()
   useWebSocket()
-
+  
   return (
     <>
       <Switch>
