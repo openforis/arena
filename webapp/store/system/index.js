@@ -3,9 +3,6 @@ import SystemReducer from './reducer'
 
 export { SystemState, SystemReducer }
 
-// ====== user
-export { UserActions, useUser } from './user'
-
 // ====== system error
 export { SystemErrorActions, useSystemError } from './error'
 

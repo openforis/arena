@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 
 import * as SurveyActions from '../actions'
 import { NodeDefsActions } from '../nodeDefs'

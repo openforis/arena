@@ -10,7 +10,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 
-import { useAuthCanEditSurvey } from '@webapp/components/hooks'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 

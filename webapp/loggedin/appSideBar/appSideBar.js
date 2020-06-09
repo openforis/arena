@@ -7,7 +7,7 @@ import { useLocation } from 'react-router'
 import * as ProcessUtils from '@core/processUtils'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/components/hooks'
+import { useUser } from '@webapp/store/user'
 
 import * as SideBarState from './appSidebarState'
 

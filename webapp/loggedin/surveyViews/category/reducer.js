@@ -3,7 +3,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 import { SurveyActions, CategoriesActions } from '@webapp/store/survey'
 import { formReset } from '../surveyForm/actions'
 

@@ -4,7 +4,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 
 import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'

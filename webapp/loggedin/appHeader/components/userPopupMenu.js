@@ -9,7 +9,8 @@ import * as User from '@core/user/user'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
 
-import { useI18n, useUser, UserActions } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
+import { useUser, UserActions } from '@webapp/store/user'
 
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 

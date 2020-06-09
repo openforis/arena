@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 import { userUpdate, userProfilePictureUpdate, userStateReset } from './actions'
 import * as UserViewState from './userViewState'
 

@@ -10,7 +10,9 @@ import { useLang } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useIsAppSaving } from '@webapp/store/app'
 
-import { usePrevious, useUser } from '@webapp/components/hooks'
+import { usePrevious } from '@webapp/components/hooks'
+import { useUser } from '@webapp/store/user'
+
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'

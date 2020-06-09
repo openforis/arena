@@ -4,11 +4,9 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 
-import * as SystemState from '../state'
-
 export const stateKey = 'user'
 
-export const getState = R.pipe(SystemState.getState, R.propOr({}, stateKey))
+export const getState = R.propOr({}, stateKey)
 
 // ====== READ
 export const getUser = getState

@@ -5,7 +5,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import { recordLoad } from '../record/actions'
 import {

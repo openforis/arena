@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 
 // App actions
 import { appPropsChange } from '@webapp/app/actions'
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 // Processing chain actions
 import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'

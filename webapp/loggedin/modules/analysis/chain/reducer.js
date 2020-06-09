@@ -2,7 +2,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
-import { UserActions } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 import { SurveyActions } from '@webapp/store/survey'
 import {
   chainReset,
