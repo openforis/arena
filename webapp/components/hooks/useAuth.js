@@ -1,5 +1,7 @@
 import * as Authorizer from '@core/auth/authorizer'
-import { useSurveyInfo } from './useSurvey'
+
+import { useSurveyInfo } from '@webapp/store/survey'
+
 import useUser from './useUser'
 
 export const useAuthCanEditSurvey = () => {

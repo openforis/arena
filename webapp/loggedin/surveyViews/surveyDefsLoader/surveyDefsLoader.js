@@ -4,10 +4,9 @@ import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import { useOnSurveyCycleUpdate, useSurveyInfo } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 
-import { SurveyActions, useSurveyDefsFetched } from '@webapp/store/survey'
+import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props

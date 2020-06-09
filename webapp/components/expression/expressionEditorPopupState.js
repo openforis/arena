@@ -4,8 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useLang } from '@webapp/store/system'
-
-import { useSurvey } from '../hooks'
+import { useSurvey } from '@webapp/store/survey'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'

@@ -10,9 +10,12 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
-
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useOnUpdate, useSurveyInfo } from '@webapp/components/hooks'
+
+import { useSurveyInfo } from '@webapp/store/survey'
+
+import { useOnUpdate } from '@webapp/components/hooks'
+
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'

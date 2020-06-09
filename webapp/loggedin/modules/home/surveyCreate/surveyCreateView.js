@@ -7,14 +7,16 @@ import { useHistory } from 'react-router'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
+
+import { useI18n } from '@webapp/store/system'
+import { useSurveyInfo } from '@webapp/store/survey'
 
 import { Input } from '@webapp/components/form/input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import UploadButton from '@webapp/components/form/uploadButton'
-import { useOnUpdate, useSurveyInfo } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { useOnUpdate } from '@webapp/components/hooks'
 
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import * as SurveyCreateState from './surveyCreateState'
 
 import { updateNewSurveyProp, resetNewSurvey, createSurvey, importCollectSurvey } from './actions'

@@ -8,7 +8,7 @@ import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
-import { useSurvey } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/store/survey'
 
 import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 

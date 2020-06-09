@@ -4,7 +4,8 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
-import { useSurveyId } from '@webapp/components/hooks'
+import { useSurveyId } from '@webapp/store/survey'
+
 import TableHeader from './components/tableHeader'
 import TableContent from './components/tableContent'
 

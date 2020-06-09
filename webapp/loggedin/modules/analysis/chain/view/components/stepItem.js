@@ -7,8 +7,8 @@ import * as Category from '@core/survey/category'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
-import { useCategoryByUuid, useNodeDefByUuid } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
+import { useCategoryByUuid, useNodeDefByUuid } from '@webapp/store/survey'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import ErrorBadge from '@webapp/components/errorBadge'
 
