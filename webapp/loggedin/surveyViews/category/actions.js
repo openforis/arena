@@ -10,9 +10,9 @@ import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appM
 
 import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { SurveyState, CategoriesActions } from '@webapp/store/survey'
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
-import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
+import { JobActions } from '@webapp/store/app'
 
+import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import * as CategoryState from './categoryState'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
@@ -227,10 +227,13 @@ export const importCategory = () => async (dispatch, getState) => {
   } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, importSummary)
 
   dispatch(
-    showAppJobMonitor(job, (jobCompleted) => {
-      // Reload category
-      dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
-      dispatch(setCategoryForEdit(categoryUuid))
+    JobActions.showJobMonitor({
+      job,
+      onComplete: (jobCompleted) => {
+        // Reload category
+        dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
+        dispatch(setCategoryForEdit(categoryUuid))
+      },
     })
   )
 }
