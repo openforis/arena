@@ -1,6 +1,7 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/user'
+import { SystemActions } from '@webapp/store/system'
+
 import * as SurveyActions from '../actions'
 import * as TaxonomiesActions from './actions'
 
@@ -8,7 +9,7 @@ import * as TaxonomiesState from './state'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

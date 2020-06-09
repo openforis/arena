@@ -1,6 +1,5 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/user'
 import { SurveyActions } from '@webapp/store/survey'
 
 import {
@@ -10,9 +9,10 @@ import {
 } from './actions'
 
 import * as CollectImportReportState from './collectImportReportState'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

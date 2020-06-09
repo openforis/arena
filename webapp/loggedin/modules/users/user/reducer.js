@@ -1,12 +1,12 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/user'
 import { userUpdate, userProfilePictureUpdate, userStateReset } from './actions'
 import * as UserViewState from './userViewState'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
   [userStateReset]: () => ({}),
 
   [userUpdate]: (state, { user }) => UserViewState.assocUser(user)(state),

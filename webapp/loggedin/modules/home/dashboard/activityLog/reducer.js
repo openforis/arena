@@ -2,16 +2,16 @@ import * as R from 'ramda'
 
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/user'
 import { SurveyActions } from '@webapp/store/survey'
 import {
   homeActivityMessagesReset,
   homeActivityMessagesUpdate,
 } from '@webapp/loggedin/modules/home/dashboard/activityLog/actions'
 import * as ActivityLogState from './activityLogState'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
