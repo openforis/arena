@@ -9,7 +9,7 @@ export const keys = {
   saving: 'saving',
 }
 
-export const stateKey = 'app'
+export const stateKey = 'appDeprecated'
 
 export const getState = R.prop(stateKey)
 
