@@ -8,7 +8,7 @@ import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { SystemErrorActions } from '@webapp/store/system'
 import { JobActions } from '@webapp/store/app'
 
-import { useUser } from '@webapp/components/hooks'
+import { useUser } from '@webapp/store/user'
 
 export const useWebSocket = () => {
   const dispatch = useDispatch()

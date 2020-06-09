@@ -2,11 +2,15 @@ import './recordsView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
 
+import { useLang } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
+
 import { useOnUpdate } from '@webapp/components/hooks'
-import * as AppState from '@webapp/app/appState'
+
 import { SurveyState } from '@webapp/store/survey'
 import TableView from '../../../tableViews/tableView'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
@@ -17,11 +21,13 @@ import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
 
 import * as RecordsState from './recordsState'
-import { useLang } from '@webapp/store/system'
+
 
 const RecordsView = (props) => {
-  const { surveyInfo, surveyCycleKey, user, nodeDefKeys, createRecord, reloadListItems, history } = props
+  const { surveyInfo, surveyCycleKey, nodeDefKeys, createRecord, reloadListItems } = props
+  const history = useHistory()
   const lang = useLang()
+  const user = useUser()
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
@@ -46,7 +52,6 @@ const RecordsView = (props) => {
       surveyInfo={surveyInfo}
       user={user}
       createRecord={createRecord}
-      history={history}
       nodeDefKeys={nodeDefKeys}
       lang={lang}
       onRowClick={onRowClick}
@@ -55,7 +60,6 @@ const RecordsView = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-  user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   nodeDefKeys: RecordsState.getNodeDefKeys(state),

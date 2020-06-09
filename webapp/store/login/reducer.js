@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as AppActions from '@webapp/app/actions'
+import { UserActions } from '@webapp/store/user'
 
 import * as LoginState from './state'
 import * as LoginActions from './actions'
@@ -10,7 +10,7 @@ const actionHandlers = {
 
   [LoginActions.loginErrorUpdate]: (state, { message }) => LoginState.assocError(message)(state),
 
-  [AppActions.appUserLogout]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)

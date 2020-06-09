@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import * as AppState from '@webapp/app/appState'
+
 import { SurveyState } from '@webapp/store/survey'
 
 import * as Survey from '@core/survey/survey'
@@ -11,6 +11,7 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { I18nState } from '@webapp/store/system'
+import { UserState } from '@webapp/store/user'
 
 const ValidationReportRow = (props) => {
   const { idx, offset, path, validation, canEdit } = props
@@ -32,7 +33,7 @@ const ValidationReportRow = (props) => {
 const mapStateToProps = (state, props) => {
   const { row } = props
 
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
   const survey = SurveyState.getSurvey(state)
   const i18n = I18nState.getState(state)
 

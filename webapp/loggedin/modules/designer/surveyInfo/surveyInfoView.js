@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/components/hooks'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { Input } from '@webapp/components/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'

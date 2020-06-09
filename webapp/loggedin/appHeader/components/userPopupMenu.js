@@ -1,28 +1,32 @@
 import './userPopupMenu.scss'
 
 import React, { useEffect, useRef } from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '@webapp/store/system'
-import ProfilePicture from '@webapp/components/profilePicture'
-
 import * as User from '@core/user/user'
-import * as AppState from '@webapp/app/appState'
-
-import { logout } from '@webapp/app/actions'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
+
+import { useI18n } from '@webapp/store/system'
+import { useUser, UserActions } from '@webapp/store/user'
+
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 
-const UserPopupMenu = props => {
-  const { user, logout, onClose } = props
+import ProfilePicture from '@webapp/components/profilePicture'
 
+const UserPopupMenu = (props) => {
+  const { onClose } = props
+
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const elementRef = useRef(null)
 
+  const user = useUser()
+
   useEffect(() => {
-    const onClickListener = e => {
+    const onClickListener = (e) => {
       if (clickedOutside(elementRef.current, e)) {
         onClose()
       }
@@ -63,7 +67,7 @@ const UserPopupMenu = props => {
       </Link>
 
       {User.isSystemAdmin(user) && (
-        <Link to={appModuleUri(homeModules.surveyNew)} className="btn-s btn-transparent" onClick={onClose}>
+        <Link to={appModuleUri(homeModules.surveyNew)} onClick={onClose} className="btn-s btn-transparent">
           <span className="icon icon-plus icon-12px icon-left" />
           {i18n.t('homeView.createSurvey')}
         </Link>
@@ -75,7 +79,7 @@ const UserPopupMenu = props => {
         className="btn-s btn-transparent"
         onClick={() => {
           onClose()
-          logout()
+          dispatch(UserActions.logout())
         }}
       >
         <span className="icon icon-switch icon-12px icon-left" />
@@ -85,8 +89,12 @@ const UserPopupMenu = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  user: AppState.getUser(state),
-})
+UserPopupMenu.propTypes = {
+  onClose: PropTypes.func,
+}
 
-export default connect(mapStateToProps, { logout })(UserPopupMenu)
+UserPopupMenu.defaultProps = {
+  onClose: () => ({}),
+}
+
+export default UserPopupMenu

@@ -13,7 +13,7 @@ import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appM
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import * as AppState from '@webapp/app/appState'
+import { UserState } from '@webapp/store/user'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { createCategory, deleteCategory } from '../category/actions'
@@ -61,7 +61,7 @@ const CategoriesView = (props) => {
 const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
   const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
   const categories = R.pipe(
     Survey.getCategoriesArray,

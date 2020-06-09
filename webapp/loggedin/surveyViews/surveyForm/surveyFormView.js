@@ -38,7 +38,6 @@ const SurveyFormView = (props) => {
     recordUuid,
     parentNode,
     isSideBarOpened,
-    history,
     setFormNodeDefAddChildTo,
     resetForm,
   } = props
@@ -85,7 +84,6 @@ const SurveyFormView = (props) => {
         edit={edit}
         entry={entry && canEditRecord}
         preview={preview}
-        history={history}
         canEditDef={canEditDef}
       />
 

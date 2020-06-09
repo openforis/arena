@@ -12,7 +12,7 @@ import { normalizeName } from '@core/stringUtils'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
-import * as AppState from '@webapp/app/appState'
+
 
 import { FormItem, Input } from '@webapp/components/form/input'
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -30,6 +30,7 @@ import {
 } from '../actions'
 
 import ItemEdit from './itemEdit'
+import { UserState } from '@webapp/store/user'
 
 const LevelEdit = (props) => {
   const dispatch = useDispatch()
@@ -146,7 +147,7 @@ const mapStateToProps = (state, props) => {
   const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
   const usedByNodeDefs = R.any((def) => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= index)(nodeDefsCode)
 
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
 
   return {
     surveyInfo,

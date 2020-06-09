@@ -10,11 +10,12 @@ import { useLang } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useIsAppSaving } from '@webapp/store/app'
 
-import { usePrevious, useUser } from '@webapp/components/hooks'
+import { usePrevious } from '@webapp/components/hooks'
+import { UserActions, useUser } from '@webapp/store/user'
+
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
-import { updateUserPrefs } from '@webapp/app/actions'
 import UserPopupMenu from './components/userPopupMenu'
 import CycleSelector from './components/cycleSelector'
 
@@ -55,7 +56,7 @@ const AppHeader = () => {
                 onChange={(cycle) => {
                   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
                   const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
-                  dispatch(updateUserPrefs(userUpdated))
+                  dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
                 }}
               />
               {Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
