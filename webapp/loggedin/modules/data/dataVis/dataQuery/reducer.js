@@ -1,6 +1,5 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/user'
 import { SurveyActions } from '@webapp/store/survey'
 import { nodesUpdate } from '@webapp/loggedin/surveyViews/record/actions'
 import { dataVisReset } from '@webapp/loggedin/modules/data/dataVis/actions'
@@ -20,10 +19,11 @@ import {
   dataQueryDimensionsUpdate,
 } from './actions'
 import * as DataQueryState from './state'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),

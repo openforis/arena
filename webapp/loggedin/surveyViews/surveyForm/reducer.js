@@ -5,7 +5,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { UserActions } from '@webapp/store/user'
+import { SystemActions } from '@webapp/store/system'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import { recordLoad } from '../record/actions'
 import {
@@ -19,7 +19,7 @@ import * as SurveyFormState from './surveyFormState'
 
 const actionHandlers = {
   // Reset form
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

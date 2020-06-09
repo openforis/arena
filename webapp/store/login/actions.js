@@ -2,8 +2,9 @@ import axios from 'axios'
 
 import * as Validation from '@core/validation/validation'
 
-import { UserActions } from '@webapp/store/user'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
+
+import { SystemActions } from '@webapp/store/system'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
@@ -33,11 +34,20 @@ export const login = (email, password) =>
 
     if (user) {
       dispatch(setEmail(''))
-      dispatch(UserActions.initUser())
+      dispatch(SystemActions.initSystem())
     } else {
       dispatch(setLoginError(message))
     }
   })
+
+export const logout = () => async (dispatch) => {
+  dispatch(LoaderActions.showLoader())
+
+  await axios.post('/auth/logout')
+
+  dispatch(SystemActions.resetSystem())
+  dispatch(LoaderActions.hideLoader())
+}
 
 export const sendPasswordResetEmail = (email, history) =>
   _createAction(async (dispatch) => {

@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 
 // App actions
 import { SystemActions } from '@webapp/store/system'
-import { UserActions } from '@webapp/store/user'
+
 // Processing chain actions
 import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
@@ -21,8 +21,7 @@ import * as SurveyInfoState from './state'
 const actionHandlers = {
   // App initialization
   [SystemActions.SYSTEM_INIT]: (state, { survey }) => (survey ? Survey.getSurveyInfo(survey) : state),
-  [UserActions.USER_INIT]: (state, { survey }) => (survey ? Survey.getSurveyInfo(survey) : state),
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   // Survey Update
   [SurveyActions.surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),
