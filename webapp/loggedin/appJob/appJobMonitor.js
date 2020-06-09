@@ -1,18 +1,16 @@
 import './appJobMonitor.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { useI18n } from '@webapp/store/system'
+import { useJob, JobActions } from '@webapp/store/app'
+
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/modal'
 import ProgressBar from '@webapp/components/progressBar'
 import AppJobErrors from './appJobErrors'
-
-import * as JobState from './appJobState'
-
-import { cancelActiveJob, hideAppJobMonitor } from './actions'
 
 const JobProgress = ({ job }) => (
   <ProgressBar progress={JobSerialized.getProgressPercent(job)} className={JobSerialized.getStatus(job)} />
@@ -40,10 +38,10 @@ const InnerJobs = ({ innerJobs }) => {
   )
 }
 
-const AppJobMonitor = props => {
-  const { job, cancelActiveJob, hideAppJobMonitor } = props
-
+const AppJobMonitor = () => {
+  const dispatch = useDispatch()
   const i18n = useI18n()
+  const job = useJob()
 
   return (
     job &&
@@ -60,16 +58,18 @@ const AppJobMonitor = props => {
 
         <ModalFooter>
           <button
+            type="button"
             className="btn modal-footer__item"
-            onClick={() => cancelActiveJob()}
+            onClick={() => dispatch(JobActions.cancelJob())}
             aria-disabled={!JobSerialized.isRunning(job)}
           >
             {i18n.t('common.cancel')}
           </button>
 
           <button
+            type="button"
             className="btn modal-footer__item"
-            onClick={() => hideAppJobMonitor()}
+            onClick={() => dispatch(JobActions.hideJobMonitor())}
             aria-disabled={!JobSerialized.isEnded(job)}
           >
             {i18n.t('common.close')}
@@ -80,8 +80,4 @@ const AppJobMonitor = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  job: JobState.getActiveJob(state),
-})
-
-export default connect(mapStateToProps, { cancelActiveJob, hideAppJobMonitor })(AppJobMonitor)
+export default AppJobMonitor
