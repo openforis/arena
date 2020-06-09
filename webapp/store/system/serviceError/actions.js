@@ -1,4 +1,4 @@
-export const appErrorCreate = 'app/error/create'
-export const appErrorDelete = 'app/error/delete'
+export const serviceErrorCreate = 'service/error/create'
+export const serviceErrorDelete = 'service/error/delete'
 
-export const closeAppError = error => dispatch => dispatch({ type: appErrorDelete, error })
+export const closeAppError = (error) => (dispatch) => dispatch({ type: serviceErrorDelete, error })

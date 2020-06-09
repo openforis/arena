@@ -1,24 +1,24 @@
+// TODO: This becomes serviceErrors.js
 import './appErrors.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18n, ServiceErrorActions, useServiceErrors } from '@webapp/store/system'
 
 import Markdown from '../../components/markdown'
 
-import * as ErrorsState from '../../store/system/serviceError/state'
-import { closeAppError } from '../../store/system/serviceError/actions'
-
-const AppError = ({ error, closeAppError }) => {
+const AppError = ({ error }) => {
   const i18n = useI18n()
+  const dispatch = useDispatch()
   const { key, params } = R.path(['response', 'data'], error)
 
   return (
     <div className="app-errors__error">
-      <button className="btn-s btn-close" onClick={() => closeAppError(error)}>
+      <button className="btn-s btn-close" onClick={() => dispatch(ServiceErrorActions.closeAppError(error))}>
         <span className="icon icon-cross icon-12px" />
       </button>
 
@@ -28,18 +28,21 @@ const AppError = ({ error, closeAppError }) => {
   )
 }
 
-const AppErrors = ({ errors, closeAppError }) => (
-  <TransitionGroup className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter={true} appear={true}>
-    {errors.map((error) => (
-      <CSSTransition key={error.id} timeout={500} classNames="fade">
-        <AppError error={error} closeAppError={closeAppError} />
-      </CSSTransition>
-    ))}
-  </TransitionGroup>
-)
+AppError.propTypes = {
+  error: PropTypes.object.isRequired,
+}
 
-const mapStateToProps = (state) => ({
-  errors: ErrorsState.getAppErrors(state),
-})
+const AppErrors = () => {
+  const { errors } = useServiceErrors()
+  return (
+    <TransitionGroup className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
+      {errors.map((error) => (
+        <CSSTransition key={error.id} timeout={500} classNames="fade">
+          <AppError error={error} />
+        </CSSTransition>
+      ))}
+    </TransitionGroup>
+  )
+}
 
-export default connect(mapStateToProps, { closeAppError })(AppErrors)
+export default AppErrors

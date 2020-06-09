@@ -1,12 +1,12 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { appErrorCreate } from '../store/system/serviceError/actions'
+import { ServiceErrorActions } from '@webapp/store/system'
 
-const createAxiosMiddleware = (axios) => ({ dispatch }) => {
-  axios.interceptors.response.use(null, (error) => {
+const createAxiosMiddleware = (axiosInstance) => ({ dispatch }) => {
+  axiosInstance.interceptors.response.use(null, (error) => {
     const message = R.pathOr(error.message, ['response', 'data', 'error'], error)
-    dispatch({ type: appErrorCreate, error: { ...error, message } })
+    dispatch({ type: ServiceErrorActions.appErrorCreate, error: { ...error, message } })
 
     return Promise.reject(error)
   })
