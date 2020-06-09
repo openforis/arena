@@ -1,5 +1,6 @@
+import * as UserActions from './actions'
 import * as userState from './state'
 import userReducer from './reducer'
 import { useUser } from './hooks'
 
-export { userState, userReducer, useUser }
+export { UserActions, userState, userReducer, useUser }

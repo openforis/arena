@@ -3,7 +3,6 @@ import axios from 'axios'
 import * as User from '@core/user/user'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 
-import { LoaderActions } from '@webapp/store/ui'
 import { SystemStatusState } from '@webapp/store/system'
 
 export const appPropsChange = 'app/props/change'
@@ -44,13 +43,4 @@ export const setUser = (user) => async (dispatch) => {
 export const updateUserPrefs = (user) => async (dispatch) => {
   dispatch(setUser(user))
   await axios.post(`/api/user/${User.getUuid(user)}/prefs`, user)
-}
-
-export const logout = () => async (dispatch) => {
-  dispatch(LoaderActions.showLoader())
-
-  await axios.post('/auth/logout')
-
-  dispatch({ type: appUserLogout })
-  dispatch(LoaderActions.hideLoader())
 }
