@@ -251,6 +251,7 @@ describe('Record Validation Test', () => {
       ],
       record
     )
+    /* eslint-disable no-unused-expressions */
     expect(validationCountUpdated).to.be.undefined // Children cound validation should be deleted
   })
 

@@ -16,7 +16,7 @@ import { getContextUser } from '../../testContext'
 import * as SB from '../utils/surveyBuilder'
 import * as TaxonomyUtils from './taxonomyUtils'
 
-const taxonomyName = 'species_list'
+const taxonomyNameDefault = 'species_list'
 let survey = null
 
 before(async () => {
@@ -24,14 +24,14 @@ before(async () => {
   survey = await SB.survey(
     user,
     // Cluster
-    SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key()),
+    SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
   )
     .taxonomy(
-      taxonomyName,
+      taxonomyNameDefault,
       SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')
         .vernacularName('eng', 'Mahogany')
         .vernacularName('swa', 'Mbambakofi'),
-      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis'),
+      SB.taxon('OLE/CAP', 'Oleacea', 'Olea', 'Olea capensis')
     )
     .buildAndStore(false)
 })
@@ -46,12 +46,12 @@ export const taxonomyTests = async () => {
   const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(Survey.getId(survey), true)
   expect(taxonomies.length).to.be.equal(1, 'None or more than one taxonomies found')
   const taxonomy = R.head(taxonomies)
-  expect(Taxonomy.getName(taxonomy)).to.be.equal(taxonomyName)
+  expect(Taxonomy.getName(taxonomy)).to.be.equal(taxonomyNameDefault)
 
   const taxaCount = await TaxonomyManager.countTaxaByTaxonomyUuid(
     Survey.getId(survey),
     Taxonomy.getUuid(taxonomy),
-    true,
+    true
   )
   expect(taxaCount).to.be.equal(2)
 }
@@ -59,16 +59,17 @@ export const taxonomyTests = async () => {
 export const taxonomyUpdateTest = async () => {
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
-  const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyName, true)
+  const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyNameDefault, true)
 
   const taxonomyNameUpdated = 'species_list_updated'
   await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, Taxonomy.keysProps.name, taxonomyNameUpdated)
 
   const taxonomyUpdated = TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyNameUpdated, true)
+  /* eslint-disable no-unused-expressions */
   expect(taxonomyUpdated).to.be.not.undefined
 
   // Restore original taxonomy name
-  await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, Taxonomy.keysProps.name, taxonomyName)
+  await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, Taxonomy.keysProps.name, taxonomyNameDefault)
 }
 
 /**
@@ -77,7 +78,7 @@ export const taxonomyUpdateTest = async () => {
 export const taxaInsertTest = async () => {
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
-  const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyName, true)
+  const taxonomyUuid = await TaxonomyUtils.fetchTaxonomyUuidByName(surveyId, taxonomyNameDefault, true)
 
   const taxa = [
     Taxon.newTaxon(taxonomyUuid, 'ALB', 'Fabaceae', 'Albizia', 'Albizia'),
@@ -102,7 +103,7 @@ export const taxaInsertTest = async () => {
 export const taxonUpdateTest = async () => {
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
-  const taxonomy = await TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyName, true)
+  const taxonomy = await TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyNameDefault, true)
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
   const taxonCode = 'ALB/GLA'
@@ -112,7 +113,7 @@ export const taxonUpdateTest = async () => {
     taxonCode,
     'Fabaceae updated',
     'Albizia updated',
-    'Albizia glaberrima updated',
+    'Albizia glaberrima updated'
   )
 
   const taxonUpdated = Taxon.mergeProps(taxonNew)(taxon)
@@ -120,6 +121,7 @@ export const taxonUpdateTest = async () => {
 
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
 
+  /* eslint-disable no-unused-expressions */
   expect(taxonReloaded).to.be.not.undefined
 
   expect(Taxon.getProps(taxonReloaded)).to.deep.equal(Taxon.getProps(taxonNew))
@@ -130,17 +132,17 @@ const _importFile = async (taxonomyName, importFileName) =>
 
 export const taxonomyImportErrorMissingColumnsTest = async () => {
   const { job } = await _importFile(
-    taxonomyName,
-    'species list test (short with vernacular names) (errors) (missing columns).csv',
+    taxonomyNameDefault,
+    'species list test (short with vernacular names) (errors) (missing columns).csv'
   )
   expect(job.status).to.be.equal(jobStatus.failed)
   expect(R.path(['errors', '1', 'all', 'errors', '0', 'key'], job)).to.be.equal(
-    Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
+    Validation.messageKeys.taxonomyImportJob.missingRequiredColumns
   )
 }
 
 export const taxonomyImportErrorDuplicateItemsTest = async () => {
-  const { job } = await _importFile(taxonomyName, 'species list test (short with vernacular names) (errors).csv')
+  const { job } = await _importFile(taxonomyNameDefault, 'species list test (short with vernacular names) (errors).csv')
   expect(job.status).to.be.equal(jobStatus.failed)
 }
 
@@ -155,7 +157,8 @@ export const taxonomyImportNewTest = async () => {
 
   // Check that all taxon props have been imported
   {
-    const taxon = R.find(taxon => Taxon.getCode(taxon) === 'AFZ/QUA', taxa)
+    const taxon = taxa.find((t) => Taxon.getCode(t) === 'AFZ/QUA')
+    /* eslint-disable no-unused-expressions */
     expect(taxon).to.not.be.undefined
     expect(Taxon.getProps(taxon)).to.be.deep.equal(
       {
@@ -164,18 +167,19 @@ export const taxonomyImportNewTest = async () => {
         [Taxon.propKeys.genus]: 'Afzelia',
         [Taxon.propKeys.scientificName]: 'Afzelia quanzensis',
       },
-      'Taxon not imported correctly',
+      'Taxon not imported correctly'
     )
     // Check vernacular names
     expect(TaxonomyUtils.getTaxonSingleVernacularNameText('eng')(taxon)).to.be.equal(
       'Mahogany',
-      'Vernacular name not imported correctly',
+      'Vernacular name not imported correctly'
     )
   }
 
   // Check that multiple vernacular names are imported correctly
   {
-    const taxon = R.find(taxon => Taxon.getCode(taxon) === 'ALB/GLA', taxa)
+    const taxon = taxa.find((t) => Taxon.getCode(t) === 'ALB/GLA')
+    /* eslint-disable no-unused-expressions */
     expect(taxon).to.not.be.undefined
     const vernacularNames = TaxonomyUtils.getTaxonVernacularNamesText('swa')(taxon)
     expect(vernacularNames).to.be.deep.equal(['Mchani', 'Mgerenge'])

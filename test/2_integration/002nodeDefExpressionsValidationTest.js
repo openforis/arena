@@ -20,15 +20,15 @@ const validateExpression = async (survey, nodeDefName, expression) => {
     })
   )(survey)
 
-  return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, Survey.dependencyTypes.validations)
+  return SurveyValidator.validateNodeDefExpressions(survey, nodeDef, Survey.dependencyTypes.validations)
 }
 
 /**
  * Expression: {
- *   t = title
- *   n = context node
- *   e = expression
- *   v = true/false expected to be valid or not
+ * t = title
+ * n = context node
+ * e = expression
+ * v = true/false expected to be valid or not
  * }
  */
 const expressions = [
@@ -100,17 +100,14 @@ const expressions = [
   },
 ]
 
-// eslint-disable-next-line mocha/no-async-describe
 describe('NodeDefExpressions Validation Test', async () => {
-  // Somehow the obvious alternatives to this don't work:
-  // eslint-disable-next-line mocha/no-setup-in-describe
   const survey = await fetchFullContextSurvey()
 
-  for (const expr of expressions) {
+  expressions.forEach((expr) => {
     it(expr.t, async () => {
       const validation = await validateExpression(survey, expr.n, expr.e)
       expect(expr.v).to.equal(Validation.isValid(validation))
       expect(expr.v).to.equal(Validation.isValid(Validation.getFieldValidation('0')(validation)))
     })
-  }
+  })
 })

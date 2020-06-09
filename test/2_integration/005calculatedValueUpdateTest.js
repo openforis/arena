@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -19,8 +20,6 @@ let survey
 let record
 
 const updateNodeAndExpectDependentNodeValueToBe = async (
-  survey,
-  record,
   sourcePath,
   sourceValue,
   dependentPath,
@@ -85,7 +84,7 @@ describe('Calculated value test', () => {
   })
 
   it('Calculated value updated', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'cluster/num', 2, 'cluster/num_double', 4)
+    await updateNodeAndExpectDependentNodeValueToBe('cluster/num', 2, 'cluster/num_double', 4)
   })
 
   it('Calculated value with apply if updated', async () => {
@@ -99,7 +98,7 @@ describe('Calculated value test', () => {
       [99, 'z'],
     ]
 
-    for (const testValue of testValues) {
+    await PromiseUtils.each(testValues, async (testValue) => {
       const [sourceValue, expectedValue] = testValue
 
       record = await updateNodeAndExpectDependentNodeValueToBe(
@@ -110,10 +109,10 @@ describe('Calculated value test', () => {
         'cluster/num_range',
         expectedValue
       )
-    }
+    })
   })
 
   it('Calculated value cascade update', async () => {
-    await updateNodeAndExpectDependentNodeValueToBe(survey, record, 'cluster/num', 2, 'cluster/num_double_square', 16)
+    await updateNodeAndExpectDependentNodeValueToBe('cluster/num', 2, 'cluster/num_double_square', 16)
   })
 })

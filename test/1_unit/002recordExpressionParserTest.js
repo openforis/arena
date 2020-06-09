@@ -4,9 +4,9 @@ import { assert } from 'chai'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
-import * as RecordUtils from '../it/utils/recordUtils'
-import * as SB from '../it/utils/surveyBuilder'
-import * as RB from '../it/utils/recordBuilder'
+import * as RecordUtils from '../2_integration/utils/recordUtils'
+import * as SB from '../2_integration/utils/surveyBuilder'
+import * as RB from '../2_integration/utils/recordBuilder'
 import { getContextUser } from '../testContext'
 
 let survey = {}
@@ -84,7 +84,7 @@ describe('RecordExpressionParser Test', () => {
     { q: '(dbh * 0.5) >= pow(tree, 3)', r: false },
   ]
 
-  for (const { q, r } of queries) {
+  queries.forEach(({ q, r }) => {
     it(q, () => {
       const resKeys = R.keys(r)
       const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
@@ -95,5 +95,5 @@ describe('RecordExpressionParser Test', () => {
         resKeys.forEach((key) => assert.equal(res[key], r[key]))
       }
     })
-  }
+  })
 })
