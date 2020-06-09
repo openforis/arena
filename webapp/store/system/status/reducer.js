@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as SystemActions from '@webapp/store/system/actions'
+import * as SystemActions from '../actions'
 import * as SystemStatusState from './state'
 
 const actionHandlers = {

@@ -1,8 +1,8 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as SystemActions from '@webapp/store/system/actions'
 import * as SurveyActions from '@webapp/store/survey/actions'
 
+import { SystemActions } from '@webapp/store/system'
 import * as UserState from './state'
 import * as UserActions from './actions'
 
