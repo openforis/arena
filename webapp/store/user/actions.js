@@ -1,7 +1,18 @@
 import axios from 'axios'
 import { LoaderActions } from '@webapp/store/ui'
+import * as User from '@core/user/user'
 
-export const USER_LOGOUT = 'user/logout'
+export const USER_LOGOUT = 'store/user/logout'
+
+export const USER_INIT = 'store/user/init'
+export const USER_UPDATE = 'store/user/update'
+
+const _fetchUserAndSurvey = async () => {
+  const {
+    data: { user, survey },
+  } = await axios.get('/auth/user')
+  return { user, survey }
+}
 
 export const logout = () => async (dispatch) => {
   dispatch(LoaderActions.showLoader())
@@ -10,4 +21,18 @@ export const logout = () => async (dispatch) => {
 
   dispatch({ type: USER_LOGOUT })
   dispatch(LoaderActions.hideLoader())
+}
+
+export const initUser = () => async (dispatch) => {
+  const { user, survey } = await _fetchUserAndSurvey()
+  dispatch({ type: USER_INIT, user, survey })
+}
+
+export const setUser = ({ user }) => async (dispatch) => {
+  dispatch({ type: USER_UPDATE, user })
+}
+
+export const updateUserPrefs = ({ user }) => async (dispatch) => {
+  dispatch(setUser({ user }))
+  await axios.post(`/api/user/${User.getUuid(user)}/prefs`, user)
 }

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as Validation from '@core/validation/validation'
 
-import { initUser } from '@webapp/app/actions'
+import { UserActions } from '@webapp/store/user'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const loginEmailUpdate = 'login/email/update'
@@ -33,7 +33,7 @@ export const login = (email, password) =>
 
     if (user) {
       dispatch(setEmail(''))
-      dispatch(initUser())
+      dispatch(UserActions.initUser())
     } else {
       dispatch(setLoginError(message))
     }

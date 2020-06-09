@@ -10,12 +10,11 @@ import * as Validation from '@core/validation/validation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
-import { UserState } from '@webapp/store/user'
+import { UserState, UserActions } from '@webapp/store/user'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 import * as UserViewState from '@webapp/loggedin/modules/users/user/userViewState'
 
-import { setUser } from '@webapp/app/actions'
 import { I18nState } from '@webapp/store/system'
 
 export const userUpdate = 'user/update'
@@ -85,7 +84,7 @@ export const saveUser = (history) => async (dispatch, getState) => {
 
       // Update user in redux state if self
       if (User.isEqual(user)(userToUpdate)) {
-        dispatch(setUser(userToUpdate))
+        dispatch(UserActions.setUser({ user: userToUpdate }))
       }
 
       dispatch(

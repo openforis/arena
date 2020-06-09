@@ -8,6 +8,8 @@ import * as UserActions from './actions'
 
 const actionHandlers = {
   [appPropsChange]: (state, { user }) => user || state,
+  [UserActions.USER_INIT]: (state, { user }) => user || state,
+  [UserActions.USER_UPDATE]: (state, { user }) => ({ ...state, ...user}),
   [UserActions.USER_LOGOUT]: () => ({}),
 
   [SurveyActions.surveyCreate]: (state, { survey }) => UserState.assocUserPropsOnSurveyCreate(survey)(state),
