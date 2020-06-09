@@ -1,13 +1,13 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appPropsChange } from '@webapp/app/actions'
 import * as SurveyActions from '@webapp/store/survey/actions'
 
+import { SystemActions } from '@webapp/store/system'
 import * as UserState from './state'
 import * as UserActions from './actions'
 
 const actionHandlers = {
-  [appPropsChange]: (state, { user }) => user || state,
+  [SystemActions.SYSTEM_INIT]: (state, { user }) => user || state,
   [UserActions.USER_INIT]: (state, { user }) => user || state,
   [UserActions.USER_UPDATE]: (state, { user }) => ({ ...state, ...user}),
   [UserActions.USER_LOGOUT]: () => ({}),

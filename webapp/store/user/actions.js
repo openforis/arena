@@ -1,4 +1,6 @@
 import axios from 'axios'
+import * as API from '@webapp/service/api'
+
 import { LoaderActions } from '@webapp/store/ui'
 import * as User from '@core/user/user'
 
@@ -6,13 +8,6 @@ export const USER_LOGOUT = 'store/user/logout'
 
 export const USER_INIT = 'store/user/init'
 export const USER_UPDATE = 'store/user/update'
-
-const _fetchUserAndSurvey = async () => {
-  const {
-    data: { user, survey },
-  } = await axios.get('/auth/user')
-  return { user, survey }
-}
 
 export const logout = () => async (dispatch) => {
   dispatch(LoaderActions.showLoader())
@@ -24,7 +19,7 @@ export const logout = () => async (dispatch) => {
 }
 
 export const initUser = () => async (dispatch) => {
-  const { user, survey } = await _fetchUserAndSurvey()
+  const { user, survey } = await API.fetchUserAndSurvey()
   dispatch({ type: USER_INIT, user, survey })
 }
 
