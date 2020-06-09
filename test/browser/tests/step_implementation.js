@@ -2,10 +2,10 @@
 const { $, waitFor, openBrowser, currentURL, closeBrowser, text } = require('taiko')
 const assert = require('assert')
 
-const headless = process.env.headless_chrome.toLowerCase() === 'true'
+const headless = Boolean(process.env.headless_chrome.toLowerCase())
 
 beforeSuite(async () => {
-  await openBrowser({ headless })
+  await openBrowser({ headless, args: headless ? ['--no-sandbox'] : [] })
 })
 
 afterSuite(async () => {

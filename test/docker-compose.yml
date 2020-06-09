@@ -1,8 +1,7 @@
 version: '3.4'
 services:
-
   arena_db:
-    image: "mdillon/postgis:11"
+    image: 'postgis/postgis:12-3.0'
     environment:
       # Must duplicate variables due to limitations of docker-compose:
       POSTGRES_DB: of-arena-test
@@ -32,5 +31,7 @@ services:
         set -e # exit on first failure
         while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
         mkdir -p $$TEMP_FOLDER $$ANALYSIS_OUTPUT_DIR;
-        yarn run npm-run-all server:migrate test
+        yarn run npm-run-all server:migrate test;
+        # run Gauge tests
+        gauge run -d test/browser/;
       '
