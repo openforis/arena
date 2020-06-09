@@ -16,8 +16,6 @@ export const getState = R.prop(stateKey)
 
 export const getUser = R.pipe(getState, R.prop(keys.user))
 
-export const logoutUser = R.dissoc(keys.user)
-
 export const assocUserPropsOnSurveyCreate = (survey) => (appState) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const user = R.pipe(

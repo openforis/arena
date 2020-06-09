@@ -3,7 +3,8 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as Survey from '@core/survey/survey'
 
 // App actions
-import { appPropsChange, appUserLogout } from '@webapp/app/actions'
+import { appPropsChange } from '@webapp/app/actions'
+import { UserActions } from '@webapp/store/system'
 // Processing chain actions
 import { chainSave, chainDelete } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { stepDelete } from '@webapp/loggedin/modules/analysis/step/actions'
@@ -20,7 +21,7 @@ import * as SurveyInfoState from './state'
 const actionHandlers = {
   // App initialization
   [appPropsChange]: (state, { survey }) => (survey ? Survey.getSurveyInfo(survey) : state),
-  [appUserLogout]: () => ({}),
+  [UserActions.APP_USER_LOGOUT]: () => ({}),
 
   // Survey Update
   [SurveyActions.surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),

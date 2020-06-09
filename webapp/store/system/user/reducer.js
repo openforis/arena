@@ -1,13 +1,14 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appPropsChange, appUserLogout } from '@webapp/app/actions'
+import { appPropsChange } from '@webapp/app/actions'
 // import { SurveyActions } from '@webapp/store/survey'
 
 // import * as UserState from './state'
+import * as UserActions from './actions'
 
 const actionHandlers = {
   [appPropsChange]: (state, { user }) => user || state,
-  [appUserLogout]: () => ({}),
+  [UserActions.APP_USER_LOGOUT]: () => ({}),
 
   /*[SurveyActions.surveyCreate]: (state, { survey }) => UserState.assocUserPropsOnSurveyCreate(survey)(state),
 

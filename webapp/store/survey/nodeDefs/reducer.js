@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appUserLogout } from '@webapp/app/actions'
+import { UserActions } from '@webapp/store/system'
 
 import * as SurveyActions from '../actions'
 import * as NodeDefsActions from './actions'
@@ -8,7 +8,7 @@ import * as NodeDefsActions from './actions'
 import * as NodeDefsState from './state'
 
 const actionHandlers = {
-  [appUserLogout]: () => ({}),
+  [UserActions.APP_USER_LOGOUT]: () => ({}),
 
   // Reset state
   [SurveyActions.surveyCreate]: () => ({}),
