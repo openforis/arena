@@ -5,8 +5,8 @@ The order shows the hierarchy
 - **system**
   - i18n
   - systemStatus
-  - system error
-  - errors
+  - systemError
+  - serviceError
 - **ui**
   - notification
   - dialogConfirm
