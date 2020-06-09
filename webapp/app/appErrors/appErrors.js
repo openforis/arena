@@ -33,7 +33,7 @@ AppError.propTypes = {
 }
 
 const AppErrors = () => {
-  const { errors } = useServiceErrors()
+  const errors = useServiceErrors()
   return (
     <TransitionGroup className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
       {errors.map((error) => (
