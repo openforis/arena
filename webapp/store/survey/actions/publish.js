@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import * as JobActions from '@webapp/loggedin/appJob/actions'
+import { JobActions } from '@webapp/store/app'
 
 import * as SurveyState from '../state'
 import { setActiveSurvey } from './active'
@@ -13,9 +13,12 @@ export const publishSurvey = () => async (dispatch, getState) => {
   const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
 
   dispatch(
-    JobActions.showAppJobMonitor(data.job, async () => {
-      await dispatch(setActiveSurvey(surveyId, true))
-      await dispatch(initSurveyDefs(true, true))
+    JobActions.showJobMonitor({
+      job: data.job,
+      onComplete: async () => {
+        await dispatch(setActiveSurvey(surveyId, true))
+        await dispatch(initSurveyDefs(true, true))
+      },
     })
   )
 }

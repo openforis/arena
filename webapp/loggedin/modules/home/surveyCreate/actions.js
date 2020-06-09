@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { SurveyActions } from '@webapp/store/survey'
-import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
+import { JobActions } from '@webapp/store/app'
 
 import * as SurveyCreateState from './surveyCreateState'
 
@@ -55,9 +55,12 @@ export const importCollectSurvey = (file) => async (dispatch) => {
   const { data } = await axios.post('/api/survey/collect-import', formData)
 
   dispatch(
-    showAppJobMonitor(data.job, async (job) => {
-      const { surveyId } = JobSerialized.getResult(job)
-      dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
+    JobActions.showJobMonitor({
+      job: data.job,
+      onComplete: async (job) => {
+        const { surveyId } = JobSerialized.getResult(job)
+        dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
+      },
     })
   )
 }
