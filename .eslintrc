@@ -5,6 +5,7 @@
     "commonjs": true,
     "es6": true,
     "jest": true,
+    "mocha": true,
     "node": true
   },
   "globals": {
@@ -48,6 +49,7 @@
 
   "settings": {
     "import/resolver": {
+      "node": {},
       "webpack": {
         "config": "webpack.config.babel.js"
       }
