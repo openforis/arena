@@ -1,6 +1,6 @@
 /* globals beforeSuite, afterSuite */
 const { $, waitFor, openBrowser, currentURL, closeBrowser, text } = require('taiko')
-const assert = require('assert')
+const { expect } = require('chai')
 
 const headless = Boolean(process.env.headless_chrome.toLowerCase())
 
@@ -26,7 +26,8 @@ afterSuite(async () => {
 })
 
 step('Page contains <content>', async (content) => {
-  assert.ok(await text(content).exists())
+  /* eslint-disable no-unused-expressions */
+  expect(await text(content).exists()).to.be.true
 })
 
 step('Wait for <element> to exist', async (element) => {
@@ -35,5 +36,6 @@ step('Wait for <element> to exist', async (element) => {
 
 step('Url contains <str>', async (str) => {
   const url = await currentURL()
-  assert.ok(url.includes(str))
+  /* eslint-disable no-unused-expressions */
+  expect(url.includes(str)).to.be.true
 })
