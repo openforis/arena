@@ -15,11 +15,11 @@ export const homeActivityMessagesUpdate = 'home/activityLog/messages/update'
 export const homeActivityMessagesReset = 'home/activityLog/messages/reset'
 
 const fetchActivityLogs = async (state, newest = true) => {
+  const i18n = I18nState.getI18n(state)
   const messages = ActivityLogState.getMessages(state)
   const initialized = ActivityLogState.isInitialized(state)
   const survey = SurveyState.getSurvey(state)
   const surveyId = Survey.getId(survey)
-  const i18n = I18nState.getI18n()
 
   const params = {}
   if (initialized) {
