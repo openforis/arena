@@ -16,6 +16,7 @@
   - _empty line_
   - service, store
   - _empty line_
+  - common hooks
   - common components
   - _empty line_
   - local components
