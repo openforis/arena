@@ -8,11 +8,13 @@ import { withRouter } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
+import { dispatchWindowResize } from '@webapp/utils/domUtils'
+
+import { useIsSidebarOpened } from '@webapp/service/storage'
+import { SurveyState } from '@webapp/store/survey'
 
 import { useOnUpdate } from '@webapp/components/hooks'
-import * as SideBarState from '@webapp/loggedin/appSideBar/appSidebarState'
-import { SurveyState } from '@webapp/store/survey'
-import { dispatchWindowResize } from '@webapp/utils/domUtils'
+
 import * as RecordState from '../record/recordState'
 import FormHeader from './components/formHeader'
 import FormPageNavigation from './components/formPageNavigation'
@@ -37,11 +39,11 @@ const SurveyFormView = (props) => {
     canEditRecord,
     recordUuid,
     parentNode,
-    isSideBarOpened,
     setFormNodeDefAddChildTo,
     resetForm,
   } = props
 
+  const isSideBarOpened = useIsSidebarOpened()
   const editAllowed = edit && canEditDef
 
   let className = editAllowed ? ' edit' : ''
@@ -141,7 +143,6 @@ const mapStateToProps = (state, props) => {
   const hasNodeDefAddChildTo = Boolean(SurveyFormState.getNodeDefAddChildTo(state))
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
-  const isSideBarOpened = SideBarState.isOpened(state)
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
@@ -154,7 +155,6 @@ const mapStateToProps = (state, props) => {
     nodeDef,
     hasNodeDefAddChildTo,
     showPageNavigation,
-    isSideBarOpened,
     ...(props.entry ? mapEntryProps() : {}),
   }
 }
