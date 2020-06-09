@@ -7,7 +7,7 @@ import * as CategoriesActions from './actions'
 import * as CategoriesState from './state'
 
 const actionHandlers = {
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 
   // Reset state
   [SurveyActions.surveyCreate]: () => ({}),

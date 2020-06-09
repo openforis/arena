@@ -21,7 +21,7 @@ import * as SurveyInfoState from './state'
 const actionHandlers = {
   // App initialization
   [appPropsChange]: (state, { survey }) => (survey ? Survey.getSurveyInfo(survey) : state),
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 
   // Survey Update
   [SurveyActions.surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),

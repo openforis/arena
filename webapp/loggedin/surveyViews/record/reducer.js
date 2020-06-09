@@ -19,7 +19,7 @@ import * as RecordState from './recordState'
 
 const actionHandlers = {
   // Reset form
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

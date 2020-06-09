@@ -10,7 +10,7 @@ const actionHandlers = {
 
   [LoginActions.loginErrorUpdate]: (state, { message }) => LoginState.assocError(message)(state),
 
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 }
 
 export default exportReducer(actionHandlers)

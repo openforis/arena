@@ -6,7 +6,7 @@ import * as UserInviteViewState from './userInviteViewState'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
   [userInviteStateReset]: () => ({}),
 
   [userInviteUpdate]: (state, { userInvite }) => UserInviteViewState.assocUserInvite(userInvite)(state),

@@ -12,7 +12,7 @@ import {
 import * as CollectImportReportState from './collectImportReportState'
 
 const actionHandlers = {
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

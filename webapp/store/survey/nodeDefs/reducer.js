@@ -8,7 +8,7 @@ import * as NodeDefsActions from './actions'
 import * as NodeDefsState from './state'
 
 const actionHandlers = {
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
 
   // Reset state
   [SurveyActions.surveyCreate]: () => ({}),

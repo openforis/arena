@@ -7,7 +7,7 @@ import { recordsSummaryUpdate } from './actions'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),

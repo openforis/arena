@@ -16,7 +16,7 @@ import { stepCreate, stepReset, stepDelete } from '@webapp/loggedin/modules/anal
 
 const actionHandlers = {
   // Reset state
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),

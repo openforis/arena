@@ -6,7 +6,7 @@ import * as UserViewState from './userViewState'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.APP_USER_LOGOUT]: () => ({}),
+  [UserActions.USER_LOGOUT]: () => ({}),
   [userStateReset]: () => ({}),
 
   [userUpdate]: (state, { user }) => UserViewState.assocUser(user)(state),
