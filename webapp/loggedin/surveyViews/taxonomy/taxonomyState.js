@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as SurveyViewsState from '../surveyViewsState'
 
 export const keys = {
@@ -16,9 +16,9 @@ const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(de
 
 // ==== taxonomy for edit
 
-export const initTaxonomyEdit = taxonomyUuid => (taxonomyUuid ? { taxonomyUuid } : null)
+export const initTaxonomyEdit = (taxonomyUuid) => (taxonomyUuid ? { taxonomyUuid } : null)
 
-export const getTaxonomy = state => {
+export const getTaxonomy = (state) => {
   const survey = SurveyState.getSurvey(state)
   const taxonomyUuid = getStateProp(keys.taxonomyUuid)(state)
   return Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
@@ -26,4 +26,4 @@ export const getTaxonomy = state => {
 
 // ==== taxonomyEdit Props
 
-export const mergeTaxonomyEditProps = props => R.mergeDeepLeft(props)
+export const mergeTaxonomyEditProps = (props) => R.mergeDeepLeft(props)

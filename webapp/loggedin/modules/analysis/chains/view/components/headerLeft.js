@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 import { createChain } from '@webapp/loggedin/modules/analysis/chains/actions'
 
 const HeaderLeft = () => {

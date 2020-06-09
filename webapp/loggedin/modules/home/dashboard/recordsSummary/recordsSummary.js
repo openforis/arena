@@ -4,20 +4,20 @@ import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
+import { useI18n } from '@webapp/store/system'
+import Dropdown from '@webapp/components/form/dropdown'
 
 import * as DateUtils from '@core/dateUtils'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import RecordsSummaryChart from './chart/recordsSummaryChart'
 import * as RecordsSummaryState from './recordsSummaryState'
 
 import { fetchRecordsSummary } from './actions'
 
-const formatDate = dateStr => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : '')
+const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : '')
 
-const RecordsSummary = props => {
+const RecordsSummary = (props) => {
   const { surveyCycleKey, timeRange, from, to, counts, fetchRecordsSummary } = props
 
   const i18n = useI18n()
@@ -67,7 +67,7 @@ const RecordsSummary = props => {
           <Dropdown
             items={timeRangeItems}
             selection={timeRangeSelection}
-            onChange={item => fetchRecordsSummary(surveyCycleKey, item.key)}
+            onChange={(item) => fetchRecordsSummary(surveyCycleKey, item.key)}
             sourceElement={timeRangeElementRef.current}
             readOnlyInput={true}
           />
@@ -79,7 +79,7 @@ const RecordsSummary = props => {
   )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
   timeRange: RecordsSummaryState.getTimeRange(state),
   from: RecordsSummaryState.getFrom(state),

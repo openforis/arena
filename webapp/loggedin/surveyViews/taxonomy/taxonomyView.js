@@ -8,19 +8,20 @@ import { useHistory, useParams } from 'react-router'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
+
+import * as AppState from '@webapp/app/appState'
+import { SurveyState } from '@webapp/store/survey'
+
 import TableView from '../../tableViews/tableView'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
-
-import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
 import * as TaxonomyState from './taxonomyState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
 
-const TaxonomyView = props => {
+const TaxonomyView = (props) => {
   const { surveyId, taxonomy, canEdit, setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile } = props
 
   const history = useHistory()
@@ -72,7 +73,7 @@ const TaxonomyView = props => {
   ) : null
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 

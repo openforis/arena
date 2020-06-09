@@ -2,11 +2,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import * as AppState from '@webapp/app/appState'
-import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
+import { I18nState } from '@webapp/store/system'
 
 export const navigateToNodeDefEdit = (history, nodeDefUuid) => () =>
   history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)
@@ -19,13 +18,12 @@ export const checkCanSelectNodeDef = (nodeDef) => (dispatch, getState) => {
     return true
   }
 
-  const lang = AppState.getLang(state)
+  const lang = I18nState.getLang(state)
   dispatch(
-    showNotification(
-      'processingChainView.cannotSelectNodeDefNotBelongingToCycles',
-      { label: NodeDef.getLabel(nodeDef, lang) },
-      NotificationState.severity.error
-    )
+    NotificationActions.notifyError({
+      key: 'processingChainView.cannotSelectNodeDefNotBelongingToCycles',
+      params: { label: NodeDef.getLabel(nodeDef, lang) },
+    })
   )
   return false
 }

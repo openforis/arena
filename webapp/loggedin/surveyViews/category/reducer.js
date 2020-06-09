@@ -4,15 +4,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
-import {
-  categoryItemCreate,
-  categoryItemDelete,
-  categoryItemPropUpdate,
-  categoryItemsUpdate,
-  categoryItemUpdate,
-  categoryLevelDelete,
-} from '@webapp/survey/categories/actions'
+import { SurveyActions, CategoriesActions } from '@webapp/store/survey'
 import { formReset } from '../surveyForm/actions'
 
 import {
@@ -29,9 +21,9 @@ const actionHandlers = {
   // Reset form
   [appUserLogout]: () => ({}),
 
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
   [categoryViewCategoryUpdate]: (state, { categoryUuid }) => CategoryState.initCategoryEdit(categoryUuid),
@@ -39,22 +31,24 @@ const actionHandlers = {
   // Category
 
   // ===== category level
-  [categoryLevelDelete]: (state, { level }) => CategoryState.dissocLevel(CategoryLevel.getIndex(level))(state),
+  [CategoriesActions.categoryLevelDelete]: (state, { level }) =>
+    CategoryState.dissocLevel(CategoryLevel.getIndex(level))(state),
 
   // ===== category level items
-  [categoryItemsUpdate]: (state, { levelIndex, items }) => CategoryState.assocLevelItems(levelIndex, items)(state),
+  [CategoriesActions.categoryItemsUpdate]: (state, { levelIndex, items }) =>
+    CategoryState.assocLevelItems(levelIndex, items)(state),
 
   // ===== category level item
-  [categoryItemCreate]: (state, { level, item }) =>
+  [CategoriesActions.categoryItemCreate]: (state, { level, item }) =>
     CategoryState.createLevelItem(CategoryLevel.getIndex(level), item)(state),
 
-  [categoryItemUpdate]: (state, { level, item }) =>
+  [CategoriesActions.categoryItemUpdate]: (state, { level, item }) =>
     CategoryState.assocLevelItem(CategoryLevel.getIndex(level), item)(state),
 
-  [categoryItemPropUpdate]: (state, { level, item, key, value }) =>
+  [CategoriesActions.categoryItemPropUpdate]: (state, { level, item, key, value }) =>
     CategoryState.assocLevelItemProp(CategoryLevel.getIndex(level), item, key, value)(state),
 
-  [categoryItemDelete]: (state, { level, item }) =>
+  [CategoriesActions.categoryItemDelete]: (state, { level, item }) =>
     CategoryState.dissocLevelItem(CategoryLevel.getIndex(level), CategoryItem.getUuid(item))(state),
 
   // ===== category level active item

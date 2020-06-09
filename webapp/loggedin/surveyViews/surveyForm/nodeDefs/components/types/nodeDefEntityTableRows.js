@@ -10,8 +10,9 @@ import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
+import { SurveyState } from '@webapp/store/survey'
+
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
-import * as SurveyState from '@webapp/survey/surveyState'
 
 const NodeDefEntityTableRows = (props) => {
   const {

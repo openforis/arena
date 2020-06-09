@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 
 import { getUrlParam } from '@webapp/utils/routerUtils'
 
-import { useOnUpdate } from '@webapp/commonComponents/hooks'
+import { useOnUpdate } from '@webapp/components/hooks'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -15,7 +15,7 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import * as AppState from '@webapp/app/appState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import { resetForm } from '../surveyForm/actions'
 import * as RecordState from './recordState'
@@ -32,7 +32,7 @@ import {
   applicationError,
 } from './actions'
 
-const RecordView = props => {
+const RecordView = (props) => {
   const {
     recordLoaded,
     preview,
@@ -152,7 +152,7 @@ const enhance = compose(
     sessionExpired,
     cycleChanged,
     applicationError,
-  }),
+  })
 )
 
 export default enhance(RecordView)

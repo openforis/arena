@@ -2,10 +2,10 @@ import React from 'react'
 
 import * as User from '@core/user/user'
 
-import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyInfoView from '@webapp/loggedin/modules/designer/surveyInfo/surveyInfoView'
 import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useUser } from '@webapp/commonComponents/hooks'
+import { useUser } from '@webapp/components/hooks'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'

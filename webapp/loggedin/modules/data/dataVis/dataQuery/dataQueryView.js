@@ -6,11 +6,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey } from '@webapp/commonComponents/hooks'
+import { useSurvey } from '@webapp/components/hooks'
 import { NodeDefsSelectorView, NodeDefsSelectorAggregateView } from '@webapp/loggedin/surveyViews/nodeDefsSelector'
 import Table from './components/table'
 
-import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
+import {
+  initTableData,
+  updateTableNodeDefUuid,
+  updateTableNodeDefUuidCols,
+  updateTableMeasures,
+  updateTableDimensions,
+} from './actions'
 
 import * as DataQueryState from './state'
 
@@ -19,6 +25,8 @@ const DataQueryView = () => {
   const survey = useSurvey()
   const nodeDefUuidEntity = useSelector(DataQueryState.getTableNodeDefUuidTable)
   const nodeDefUuidsAttributes = useSelector(DataQueryState.getTableNodeDefUuidCols)
+  const dimensions = useSelector(DataQueryState.getTableDimensions)
+  const measures = useSelector(DataQueryState.getTableMeasures)
   const nodeDefSelectorsVisible = useSelector(DataQueryState.isNodeDefSelectorsVisible)
   const modeAggregate = useSelector(DataQueryState.isTableModeAggregate)
   const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple, true)(survey)
@@ -33,7 +41,14 @@ const DataQueryView = () => {
     <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
       {nodeDefSelectorsVisible &&
         (modeAggregate ? (
-          <NodeDefsSelectorAggregateView onChangeEntity={onChangeEntity} nodeDefUuidEntity={nodeDefUuidEntity} />
+          <NodeDefsSelectorAggregateView
+            nodeDefUuidEntity={nodeDefUuidEntity}
+            dimensions={dimensions}
+            measures={measures}
+            onChangeEntity={onChangeEntity}
+            onChangeMeasures={(measuresUpdate) => dispatch(updateTableMeasures(measuresUpdate))}
+            onChangeDimensions={(dimensionsUpdate) => dispatch(updateTableDimensions(dimensionsUpdate))}
+          />
         ) : (
           <NodeDefsSelectorView
             hierarchy={hierarchy}

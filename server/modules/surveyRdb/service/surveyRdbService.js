@@ -63,7 +63,21 @@ export const fetchViewData = async (params) => {
   })
 }
 
-export const countTable = async (surveyId, cycle, nodeDefUuidTable, filter) => {
+/**
+ * Counts the number of rows in an entity definition data view, filtered by the given filter object.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!string} [params.surveyId] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!string} [params.nodeDefUuidTable] - The UUID of the node def associated to the view to select.
+ * @param {object} [params.filter=null] - The filter expression object.
+ *
+ * @returns {Promise<number>} - The count of rows.
+ */
+export const countTable = async (params) => {
+  const { surveyId, cycle, nodeDefUuidTable, filter } = params
   const survey = await _fetchSurvey(surveyId, cycle)
   return SurveyRdbManager.countTable(survey, cycle, nodeDefUuidTable, filter)
 }
+
+export const { countViewDataAgg, fetchViewDataAgg } = SurveyRdbManager

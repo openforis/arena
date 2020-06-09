@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 import * as Chain from '@common/analysis/processingChain'
 import * as DateUtils from '@core/dateUtils'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import ProgressBar from '@webapp/commonComponents/progressBar'
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import { useI18n } from '@webapp/store/system'
+import ProgressBar from '@webapp/components/progressBar'
+import ErrorBadge from '@webapp/components/errorBadge'
 
 const statusComponent = {
   [Chain.statusExec.success]: <span className="icon icon-checkmark icon-10px" />,

@@ -6,13 +6,13 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import { Input } from '@webapp/commonComponents/form/input'
-import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
+import { useI18n } from '@webapp/store/system'
+import { Input } from '@webapp/components/form/input'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { getLanguageLabel } from '@core/app/languages'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 const LanguageBadge = ({ lang, compact }) => (
   <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>
@@ -26,13 +26,13 @@ const LabelRow = ({ labels, lang, onChange, readOnly, showLanguageBadge, compact
 
     <Input
       value={R.propOr('', lang, labels)}
-      onChange={value => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
+      onChange={(value) => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
       readOnly={readOnly}
     />
   </div>
 )
 
-const LabelsEditor = props => {
+const LabelsEditor = (props) => {
   const [preview, setPreview] = useState(true)
 
   const i18n = useI18n()
@@ -75,7 +75,7 @@ const LabelsEditor = props => {
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
-          {displayLangs.map(lang => (
+          {displayLangs.map((lang) => (
             <LabelRow
               key={lang}
               lang={lang}

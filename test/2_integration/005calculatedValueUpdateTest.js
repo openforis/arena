@@ -102,8 +102,6 @@ describe('Calculated value test', () => {
       const [sourceValue, expectedValue] = testValue
 
       record = await updateNodeAndExpectDependentNodeValueToBe(
-        survey,
-        record,
         'cluster/num',
         sourceValue,
         'cluster/num_range',

@@ -2,9 +2,9 @@ import React from 'react'
 import camelize from 'camelize'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import ErrorBadge from '@webapp/components/errorBadge'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

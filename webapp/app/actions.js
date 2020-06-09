@@ -4,14 +4,11 @@ import * as User from '@core/user/user'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import Counter from '@core/counter'
 
-import * as AppState from './appState'
+import { LoaderActions } from '@webapp/store/ui'
+import { SystemStatusState } from '@webapp/store/system'
 
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
-
-export const systemErrorThrow = 'system/error'
-
-export const throwSystemError = (error) => (dispatch) => dispatch({ type: systemErrorThrow, error })
 
 // ====== INIT
 
@@ -20,7 +17,7 @@ export const initApp = () => async (dispatch) => {
   const { user, survey } = await _fetchUserAndSurvey()
   dispatch({
     type: appPropsChange,
-    status: AppState.appStatus.ready,
+    status: SystemStatusState.systemStatus.ready,
     i18n,
     user,
     survey,
@@ -51,12 +48,12 @@ export const updateUserPrefs = (user) => async (dispatch) => {
 }
 
 export const logout = () => async (dispatch) => {
-  dispatch(showAppLoader())
+  dispatch(LoaderActions.showLoader())
 
   await axios.post('/auth/logout')
 
   dispatch({ type: appUserLogout })
-  dispatch(hideAppLoader())
+  dispatch(LoaderActions.hideLoader())
 }
 
 // ====== SAVING
@@ -78,10 +75,3 @@ export const hideAppSaving = () => (dispatch) => {
     dispatch({ type: appSavingUpdate, saving: false })
   }
 }
-
-// ====== APP LOADER
-
-export const showAppLoader = () => (dispatch) => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
-
-export const hideAppLoader = () => (dispatch) =>
-  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })

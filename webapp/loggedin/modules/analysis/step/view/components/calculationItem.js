@@ -6,17 +6,17 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { useI18n, useLang, useNodeDefByUuid } from '@webapp/commonComponents/hooks'
+import { useNodeDefByUuid } from '@webapp/components/hooks'
+import { useLang } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import ErrorBadge from '@webapp/commonComponents/errorBadge'
+import ErrorBadge from '@webapp/components/errorBadge'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { setCalculationForEdit } from '@webapp/loggedin/modules/analysis/step/actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 const CalculationItem = (props) => {
   const { calculation, dragging, onDragStart, onDragEnd, onDragOver } = props
 
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const lang = useLang()
   const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
@@ -42,9 +42,16 @@ const CalculationItem = (props) => {
       data-index={index}
       onClick={() => {
         if (!editingSelf) {
-          if (calculationDirty)
-            dispatch(showDialogConfirm('common.cancelConfirm', {}, setCalculationForEdit(calculation)))
-          else dispatch(setCalculationForEdit(calculation))
+          if (calculationDirty) {
+            dispatch(
+              DialogConfirmActions.showDialogConfirm({
+                key: 'common.cancelConfirm',
+                onOk: setCalculationForEdit(calculation),
+              })
+            )
+          } else {
+            dispatch(setCalculationForEdit(calculation))
+          }
         }
       }}
     >
@@ -52,7 +59,7 @@ const CalculationItem = (props) => {
 
       <div className="chain-list-item__content calculation-item">
         <div className="chain-list-item__label">
-          {Calculation.getLabel(i18n.lang)(calculation)} ({nodeDef && NodeDef.getLabel(nodeDef, lang)})
+          {Calculation.getLabel(lang)(calculation)} ({nodeDef && NodeDef.getLabel(nodeDef, lang)})
           <ErrorBadge validation={validation} showLabel={false} className="error-badge-inverse" />
         </div>
         <span className="icon icon-pencil2 icon-10px icon-edit" />

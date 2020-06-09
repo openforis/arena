@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import { useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useSurveyInfo } from '@webapp/components/hooks'
 import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
-import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
 import DataVisView from './dataVis/dataVisView'

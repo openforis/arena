@@ -2,12 +2,12 @@ import axios from 'axios'
 
 import * as DateUtils from '@core/dateUtils'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import * as RecordsSummaryState from './recordsSummaryState'
 
 export const recordsSummaryUpdate = 'home/recordsSummary/update'
 
-const formatDate = date => DateUtils.format(date, 'yyyy-MM-dd')
+const formatDate = (date) => DateUtils.format(date, 'yyyy-MM-dd')
 
 const getFromDate = (date, timeRange) => {
   switch (timeRange) {

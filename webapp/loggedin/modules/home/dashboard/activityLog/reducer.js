@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { appUserLogout } from '@webapp/app/actions'
-import { surveyCreate, surveyDelete, surveyUpdate } from '@webapp/survey/actions'
+import { SurveyActions } from '@webapp/store/survey'
 import {
   homeActivityMessagesReset,
   homeActivityMessagesUpdate,
@@ -12,9 +12,9 @@ import * as ActivityLogState from './activityLogState'
 
 const actionHandlers = {
   [appUserLogout]: () => ({}),
-  [surveyCreate]: () => ({}),
-  [surveyUpdate]: () => ({}),
-  [surveyDelete]: () => ({}),
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
 
   [homeActivityMessagesUpdate]: (state, { messages, loadComplete }) =>
     R.pipe(

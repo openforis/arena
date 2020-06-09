@@ -7,15 +7,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import * as SurveyState from '@webapp/survey/surveyState'
-import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
+import { useI18n } from '@webapp/store/system'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as SurveyFormState from '../surveyFormState'
 import { toggleFormPageNavigation } from '../actions'
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 
-const FormHeader = props => {
+const FormHeader = (props) => {
   const {
     surveyCycleKey,
     edit,
@@ -57,10 +56,10 @@ const FormHeader = props => {
                   [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
                     surveyCycleKey,
                     NodeDefLayout.renderType.form,
-                    uuidv4(),
+                    uuidv4()
                   ),
                 },
-                history,
+                history
               )
             }
           >
@@ -79,7 +78,7 @@ const FormHeader = props => {
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const nodeDefPage = SurveyFormState.getFormActivePageNodeDef(state)
   const nodeDefPageLabel = SurveyState.getNodeDefLabel(nodeDefPage)(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
@@ -93,5 +92,5 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   toggleFormPageNavigation,
-  createNodeDef,
+  createNodeDef: NodeDefsActions.createNodeDef,
 })(FormHeader)

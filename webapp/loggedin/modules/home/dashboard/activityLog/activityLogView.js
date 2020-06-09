@@ -6,12 +6,13 @@ import * as R from 'ramda'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useI18n, useOnIntersect, useInterval } from '@webapp/commonComponents/hooks'
-import ProfilePicture from '@webapp/commonComponents/profilePicture'
+import { useOnIntersect, useInterval } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+import ProfilePicture from '@webapp/components/profilePicture'
 
 import * as ActivityLogState from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogState'
 
-import Markdown from '@webapp/commonComponents/markdown'
+import Markdown from '@webapp/components/markdown'
 import { fetchActivityLogsNewest, fetchActivityLogsNext, resetActivityLogs } from './actions'
 import * as ActivityLogMessage from './activityLogMessage'
 

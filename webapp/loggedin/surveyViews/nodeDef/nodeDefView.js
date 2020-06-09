@@ -8,22 +8,17 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import * as Validation from '@core/validation/validation'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { useI18n, useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/commonComponents/hooks'
-import TabBar from '@webapp/commonComponents/tabBar'
+import { NodeDefsActions } from '@webapp/store/survey'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
-import {
-  setNodeDefParentUuid,
-  setNodeDefProp,
-  putNodeDefLayoutProp,
-  setNodeDefLayoutProp,
-  cancelNodeDefEdits,
-  saveNodeDefEdits,
-  removeNodeDef,
-} from '@webapp/survey/nodeDefs/actions'
+import { useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+import TabBar from '@webapp/components/tabBar'
+import { FormItem, Input } from '@webapp/components/form/input'
+import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import ValidationsProps from './advanced/validationsProps'
@@ -31,6 +26,7 @@ import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
 
 import { setNodeDefUuidForEdit } from './actions'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 const _isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
@@ -62,6 +58,8 @@ const NodeDefView = () => {
   const validation = useSelector(NodeDefState.getValidation)
   const isDirty = useSelector(NodeDefState.isDirty)
 
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const nodeDefType = NodeDef.getType(nodeDef)
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = _isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
@@ -90,6 +88,19 @@ const NodeDefView = () => {
       <>
         <div className="node-def-edit">
           <div className="node-def-edit__container">
+            <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
+              <Input
+                value={NodeDef.getName(nodeDef)}
+                validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+                onChange={(value) =>
+                  dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
+                }
+              />
+              <div className="attribute-selector">
+                {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}
+              </div>
+            </FormItem>
+
             <TabBar
               showTabs={!NodeDef.isAnalysis(nodeDef)}
               tabs={[
@@ -102,10 +113,10 @@ const NodeDefView = () => {
                     nodeDefKeyEditDisabled,
                     nodeDefMultipleEditDisabled,
                     editingNodeDefFromDesigner,
-                    setNodeDefParentUuid: (...args) => dispatch(setNodeDefParentUuid(...args)),
-                    setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
-                    putNodeDefLayoutProp: (...args) => dispatch(putNodeDefLayoutProp(...args)),
-                    setNodeDefLayoutProp: (...args) => dispatch(setNodeDefLayoutProp(...args)),
+                    setNodeDefParentUuid: (...args) => dispatch(NodeDefsActions.setNodeDefParentUuid(...args)),
+                    setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
+                    putNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.putNodeDefLayoutProp(...args)),
+                    setNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.setNodeDefLayoutProp(...args)),
                   },
                 },
                 ...(NodeDef.isRoot(nodeDef)
@@ -118,7 +129,7 @@ const NodeDefView = () => {
                           nodeDef,
                           validation,
                           nodeDefParent,
-                          setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
+                          setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
                         },
                       },
                       {
@@ -128,7 +139,7 @@ const NodeDefView = () => {
                           nodeDef,
                           validation,
                           nodeDefParent,
-                          setNodeDefProp: (...args) => dispatch(setNodeDefProp(...args)),
+                          setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
                         },
                       },
                     ]),
@@ -141,8 +152,13 @@ const NodeDefView = () => {
                 className="btn btn-cancel"
                 onClick={() =>
                   isDirty
-                    ? dispatch(showDialogConfirm('common.cancelConfirm', {}, cancelNodeDefEdits(history)))
-                    : dispatch(cancelNodeDefEdits(history))
+                    ? dispatch(
+                        DialogConfirmActions.showDialogConfirm({
+                          key: 'common.cancelConfirm',
+                          onOk: NodeDefsActions.cancelNodeDefEdits(history),
+                        })
+                      )
+                    : dispatch(NodeDefsActions.cancelNodeDefEdits(history))
                 }
               >
                 {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
@@ -150,8 +166,8 @@ const NodeDefView = () => {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => dispatch(saveNodeDefEdits())}
-                aria-disabled={!isDirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
+                onClick={() => dispatch(NodeDefsActions.saveNodeDefEdits())}
+                aria-disabled={!isDirty || StringUtils.isBlank(nodeDefName)}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
                 {i18n.t('common.save')}
@@ -160,7 +176,7 @@ const NodeDefView = () => {
                 <button
                   type="button"
                   className="btn btn-danger btn-delete"
-                  onClick={() => dispatch(removeNodeDef(nodeDef, history))}
+                  onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, history))}
                 >
                   <span className="icon icon-bin2 icon-left icon-12px" />
                   {i18n.t('common.delete')}

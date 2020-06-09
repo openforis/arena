@@ -1,14 +1,14 @@
 import * as R from 'ramda'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Calculation from '@common/analysis/processingStepCalculation'
-
-import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
-import * as SurveyState from '@webapp/survey/surveyState'
-import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
-import * as ChainValidator from '@common/analysis/processingChainValidator'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/processingChain'
+import * as Calculation from '@common/analysis/processingStepCalculation'
+import * as ChainValidator from '@common/analysis/processingChainValidator'
+
+import { SurveyState } from '@webapp/store/survey'
+import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
+import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
 import { chainValidationUpdate } from '@webapp/loggedin/modules/analysis/chain/actions'
 

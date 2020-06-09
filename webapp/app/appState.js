@@ -5,26 +5,13 @@ import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 
 export const keys = {
-  status: 'status',
   user: 'user',
-  systemError: 'systemError',
   saving: 'saving',
-  loaderVisible: 'loaderVisible',
-
-  // I18n
-  i18n: 'i18n',
-  lang: 'lang',
 }
 
 export const stateKey = 'app'
 
 export const getState = R.prop(stateKey)
-
-export const appStatus = {
-  ready: 'ready',
-}
-
-export const isReady = R.pipe(getState, R.propEq(keys.status, appStatus.ready))
 
 // ==== APP USER
 
@@ -66,18 +53,3 @@ export const dissocUserPropsOnSurveyDelete = (surveyInfo) => (appState) => {
 export const assocSaving = R.assoc(keys.saving)
 
 export const isSaving = R.pipe(getState, R.propEq(keys.saving, true))
-
-// ==== APP I18N
-export const getI18n = R.pipe(getState, R.prop(keys.i18n))
-
-export const getLang = R.pipe(getI18n, R.prop(keys.lang))
-
-// ==== System ERRORS
-
-export const assocSystemError = (error) => R.assoc(keys.systemError, error)
-
-export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
-
-// ==== App Loader
-
-export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))

@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/commonComponents/modal'
-import ProgressBar from '@webapp/commonComponents/progressBar'
+import { useI18n } from '@webapp/store/system'
+import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/modal'
+import ProgressBar from '@webapp/components/progressBar'
 import AppJobErrors from './appJobErrors'
 
 import * as JobState from './appJobState'

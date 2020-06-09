@@ -2,7 +2,7 @@ import './nodeDefText.scss'
 
 import React from 'react'
 
-import { Input } from '@webapp/commonComponents/form/input'
+import { Input } from '@webapp/components/form/input'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'

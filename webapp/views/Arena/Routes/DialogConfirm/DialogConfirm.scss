@@ -1,0 +1,12 @@
+@import 'webapp/style/vars';
+
+.dialog-confirm {
+  .modal-content {
+    background-color: $white;
+    text-align: center;
+
+    ul {
+      text-align: left;
+    }
+  }
+}

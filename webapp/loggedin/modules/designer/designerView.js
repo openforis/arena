@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
-import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
@@ -10,7 +10,7 @@ import TaxonomiesView from '@webapp/loggedin/surveyViews/taxonomies/taxonomiesVi
 import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useAuthCanEditSurvey } from '@webapp/commonComponents/hooks'
+import { useAuthCanEditSurvey } from '@webapp/components/hooks'
 import SurveyHierarchyView from './surveyHierarchy/surveyHierarchyView'
 import FormDesignerView from './formDesigner/formDesignerView'
 

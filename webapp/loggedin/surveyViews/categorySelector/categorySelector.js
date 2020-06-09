@@ -7,16 +7,16 @@ import { Link, useHistory } from 'react-router-dom'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
+import { useI18n } from '@webapp/store/system'
+import Dropdown from '@webapp/components/form/dropdown'
 
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import { createCategory } from '@webapp/loggedin/surveyViews/category/actions'
 
-const CategorySelector = props => {
+const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, analysis, onChange } = props
 
   const i18n = useI18n()

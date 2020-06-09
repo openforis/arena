@@ -1,0 +1,13 @@
+@import 'webapp/style/vars';
+
+.guest-errors {
+  background-color: $red;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  padding: 0.5rem 0;
+  position: fixed;
+  width: 30vw;
+  left: 35vw;
+  top: 15vh;
+}

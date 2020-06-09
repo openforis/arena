@@ -5,11 +5,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
-import { nodeDefCreate } from '@webapp/survey/nodeDefs/actions'
 import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 export const calculationReset = 'analysis/calculation/reset'
@@ -38,7 +37,7 @@ export const createNodeDefAnalysis = (history) => async (dispatch, getState) => 
     true
   )
 
-  await dispatch({ type: nodeDefCreate, nodeDef })
+  await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
 
   dispatch(navigateToNodeDefEdit(history, NodeDef.getUuid(nodeDef)))
 }

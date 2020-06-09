@@ -12,7 +12,8 @@ export const tableKeys = {
   sort: 'sort',
   nodeDefUuidTable: 'nodeDefUuidTable',
   nodeDefUuidCols: 'nodeDefUuidCols',
-  editMode: 'editMode',
+  dimensions: 'dimensions',
+  measures: 'measures',
   mode: 'mode',
 }
 

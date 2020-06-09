@@ -4,7 +4,7 @@ import * as Chain from '@common/analysis/processingChain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 

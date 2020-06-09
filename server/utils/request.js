@@ -19,7 +19,9 @@ export const getParams = (req) =>
 
 export const getJsonParam = (req, param, defaultValue = null) => {
   const jsonStr = R.prop(param, getParams(req))
-  return jsonStr ? JSON.parse(jsonStr) : defaultValue
+  if (jsonStr && typeof jsonStr === 'string') return JSON.parse(jsonStr)
+  if (jsonStr && typeof jsonStr === 'object') return jsonStr // already parsed to a JSON object
+  return defaultValue
 }
 
 export const getFile = R.pathOr(null, ['files', 'file'])
@@ -32,10 +34,6 @@ export const getBody = R.propOr(null, 'body')
 export const getUser = R.prop('user')
 export const getUserUuid = R.pipe(getUser, R.prop('uuid'))
 export const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
-
-// I18n
-
-export const getI18n = R.prop('i18n')
 
 // Cookies
 

@@ -7,20 +7,21 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import { useOnUpdate, useSurvey, useAuthCanCleanseRecords } from '@webapp/commonComponents/hooks'
+import { useOnUpdate, useSurvey, useAuthCanCleanseRecords } from '@webapp/components/hooks'
 
 import * as AppState from '@webapp/app/appState'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 import { nodesUpdateCompleted, nodeValidationsUpdate } from '../actions'
 
 import * as DataQueryState from '../state'
+import { useLang } from '@webapp/store/system'
 
 export const useTableState = () => {
   const dispatch = useDispatch()
 
   const survey = useSurvey()
   const canEdit = useAuthCanCleanseRecords()
-  const lang = useSelector(AppState.getLang)
+  const lang = useLang()
   const appSaving = useSelector(AppState.isSaving)
   const nodeDefUuidContext = useSelector(DataQueryState.getTableNodeDefUuidTable)
   const nodeDefUuidCols = useSelector(DataQueryState.getTableNodeDefUuidCols)

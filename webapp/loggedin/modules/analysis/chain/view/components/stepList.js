@@ -6,9 +6,9 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { createStep } from '@webapp/loggedin/modules/analysis/step/actions'
 

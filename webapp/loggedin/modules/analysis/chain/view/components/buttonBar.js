@@ -6,10 +6,11 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { DialogConfirmActions } from '@webapp/store/ui'
+
+import { useI18n } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 
-import { showDialogConfirm } from '@webapp/app/appDialogConfirm/actions'
 import { deleteChain, navigateToChainsView, saveChain } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { deleteStep } from '@webapp/loggedin/modules/analysis/step/actions'
 import { deleteCalculation } from '@webapp/loggedin/modules/analysis/calculation/actions'
@@ -40,7 +41,12 @@ const ButtonBar = () => {
             className="btn-s btn-cancel"
             onClick={() =>
               chainDirty
-                ? dispatch(showDialogConfirm('common.cancelConfirm', {}, navigateToChainsView(history)))
+                ? dispatch(
+                    DialogConfirmActions.showDialogConfirm({
+                      key: 'common.cancelConfirm',
+                      onOk: navigateToChainsView(history),
+                    })
+                  )
                 : dispatch(navigateToChainsView(history))
             }
           >
@@ -76,7 +82,7 @@ const ButtonBar = () => {
             if (editingStep) deleteAction = deleteStep()
             if (editingCalculation) deleteAction = deleteCalculation()
 
-            dispatch(showDialogConfirm(messageKey, {}, deleteAction))
+            dispatch(DialogConfirmActions.showDialogConfirm({ key: messageKey, onOk: deleteAction }))
           }}
         >
           <span className="icon icon-bin icon-left icon-12px" />

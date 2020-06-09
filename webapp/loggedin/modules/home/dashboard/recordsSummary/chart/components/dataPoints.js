@@ -4,7 +4,7 @@ import ReactDOMServer from 'react-dom/server.browser'
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as DateUtils from '@core/dateUtils'
 

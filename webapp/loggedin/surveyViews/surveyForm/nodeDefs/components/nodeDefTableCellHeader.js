@@ -2,7 +2,7 @@ import './nodeDefTableCellHeader.scss'
 
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as NodeDef from '@core/survey/nodeDef'
 

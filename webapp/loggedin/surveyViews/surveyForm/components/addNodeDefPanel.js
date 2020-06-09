@@ -5,24 +5,23 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 import { useHistory } from 'react-router'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as SurveyState from '@webapp/survey/surveyState'
-import { createNodeDef } from '@webapp/survey/nodeDefs/actions'
+import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
 import * as SurveyFormState from '../surveyFormState'
 
 import { setFormNodeDefAddChildTo } from '../actions'
 
-const AddNodeDefButtons = props => {
+const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props
 
   return (
     <React.Fragment>
-      {R.values(NodeDef.nodeDefType).map(type => {
+      {R.values(NodeDef.nodeDefType).map((type) => {
         const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
         // Cannot add entities when entity is rendered as table
@@ -46,7 +45,7 @@ const AddNodeDefButtons = props => {
   )
 }
 
-const AddNodeDefPanel = props => {
+const AddNodeDefPanel = (props) => {
   const { surveyCycleKey, nodeDef, nodeDefLabel, createNodeDef, setFormNodeDefAddChildTo } = props
 
   const i18n = useI18n()
@@ -77,7 +76,7 @@ const AddNodeDefPanel = props => {
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const nodeDef = SurveyFormState.getNodeDefAddChildTo(state)
   return {
     surveyCycleKey: SurveyState.getSurveyCycleKey(state),
@@ -87,6 +86,6 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  createNodeDef,
+  createNodeDef: NodeDefsActions.createNodeDef,
   setFormNodeDefAddChildTo,
 })(AddNodeDefPanel)

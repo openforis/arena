@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
 const SurveyListRowHeader = () => {
   const i18n = useI18n()
@@ -9,6 +9,7 @@ const SurveyListRowHeader = () => {
     <>
       <div />
       <div>{i18n.t('common.name')}</div>
+      <div>{i18n.t('common.owner')}</div>
       <div>{i18n.t('common.label')}</div>
       <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>

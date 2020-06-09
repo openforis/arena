@@ -1,15 +1,15 @@
 import React from 'react'
 
-import ValidationTooltip from '@webapp/commonComponents/validationTooltip'
-import ExpressionEditor from '@webapp/commonComponents/expression/expressionEditor'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import ValidationTooltip from '@webapp/components/validationTooltip'
+import ExpressionEditor from '@webapp/components/expression/expressionEditor'
+import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as Expression from '@core/expressionParser/expression'
 
-import ButtonGroup from '@webapp/commonComponents/form/buttonGroup'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 
 const ExpressionProp = props => {

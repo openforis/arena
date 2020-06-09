@@ -3,19 +3,34 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { useSurvey, useSurveyLang } from '@webapp/commonComponents/hooks'
+import { useSurvey, useSurveyLang } from '@webapp/components/hooks'
 
-import ExpansionPanel from '@webapp/commonComponents/expansionPanel'
+import ExpansionPanel from '@webapp/components/expansionPanel'
 
 import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'
 
 const NodeDefsSelectorAggregateView = (props) => {
-  const { nodeDefUuidEntity, onChangeEntity } = props
+  const { dimensions, measures, nodeDefUuidEntity, onChangeEntity, onChangeMeasures, onChangeDimensions } = props
 
   const survey = useSurvey()
   const lang = useSurveyLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity, true)(survey)
+
+  const onToggleMeasure = (nodeDefUuid) => {
+    const measuresUpdate = new Map(measures)
+    if (measuresUpdate.has(nodeDefUuid)) measuresUpdate.delete(nodeDefUuid)
+    else measuresUpdate.set(nodeDefUuid, ['SUM'])
+
+    onChangeMeasures(measuresUpdate)
+  }
+
+  const onToggleDimension = (nodeDefUuid) => {
+    const dimensionsUpdate = dimensions.includes(nodeDefUuid)
+      ? dimensions.filter((uuid) => uuid !== nodeDefUuid)
+      : [...dimensions, nodeDefUuid]
+    onChangeDimensions(dimensionsUpdate)
+  }
 
   return (
     <div className="node-defs-selector">
@@ -30,11 +45,11 @@ const NodeDefsSelectorAggregateView = (props) => {
         <>
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
-              onToggleAttribute={() => {}}
+              onToggleAttribute={onToggleMeasure}
               lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
               nodeDefUuidEntity={nodeDefUuidEntity}
-              nodeDefUuidsAttributes={[]}
+              nodeDefUuidsAttributes={[...measures.keys()]}
               showAncestorsLabel={false}
               showMultipleAttributes={false}
             />
@@ -42,11 +57,11 @@ const NodeDefsSelectorAggregateView = (props) => {
 
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
-              onToggleAttribute={() => {}}
+              onToggleAttribute={onToggleDimension}
               lang={lang}
               filterTypes={[NodeDef.nodeDefType.code]}
               nodeDefUuidEntity={nodeDefUuidEntity}
-              nodeDefUuidsAttributes={[]}
+              nodeDefUuidsAttributes={dimensions}
               showAncestorsLabel={false}
               showMultipleAttributes={false}
             />
@@ -58,8 +73,12 @@ const NodeDefsSelectorAggregateView = (props) => {
 }
 
 NodeDefsSelectorAggregateView.propTypes = {
+  dimensions: PropTypes.arrayOf(String).isRequired,
+  measures: PropTypes.instanceOf(Map).isRequired,
   nodeDefUuidEntity: PropTypes.string,
   onChangeEntity: PropTypes.func.isRequired,
+  onChangeMeasures: PropTypes.func.isRequired,
+  onChangeDimensions: PropTypes.func.isRequired,
 }
 
 NodeDefsSelectorAggregateView.defaultProps = {

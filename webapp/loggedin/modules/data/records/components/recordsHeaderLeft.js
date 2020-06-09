@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import * as Survey from '@core/survey/survey'
 

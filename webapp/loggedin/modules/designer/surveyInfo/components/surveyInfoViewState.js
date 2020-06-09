@@ -6,8 +6,8 @@ import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
-import { useFormObject, useSurveyInfo } from '@webapp/commonComponents/hooks'
-import { updateSurveyInfoProps } from '@webapp/survey/surveyInfo/actions'
+import { useFormObject, useSurveyInfo } from '@webapp/components/hooks'
+import { SurveyInfoActions } from '@webapp/store/survey'
 
 export const useSurveyInfoViewState = () => {
   const dispatch = useDispatch()
@@ -33,7 +33,7 @@ export const useSurveyInfoViewState = () => {
 
   const saveProps = () => {
     enableValidation()
-    dispatch(updateSurveyInfoProps(object))
+    dispatch(SurveyInfoActions.updateSurveyInfoProps(object))
   }
 
   return {

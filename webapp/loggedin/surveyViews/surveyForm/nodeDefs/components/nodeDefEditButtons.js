@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,10 +13,10 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/surveyFormState'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { putNodeDefLayoutProp, removeNodeDef } from '@webapp/survey/nodeDefs/actions'
+import { NodeDefsActions } from '@webapp/store/survey'
 import { setFormNodeDefAddChildTo } from '@webapp/loggedin/surveyViews/surveyForm/actions'
 
-const NodeDefEditButtons = props => {
+const NodeDefEditButtons = (props) => {
   const {
     surveyCycleKey,
     nodeDef,
@@ -57,7 +57,7 @@ const NodeDefEditButtons = props => {
               min="1"
               max="12"
               step="1"
-              onChange={e =>
+              onChange={(e) =>
                 e.target.value > 0
                   ? putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.columnsNo, Number(e.target.value))
                   : null
@@ -77,7 +77,7 @@ const NodeDefEditButtons = props => {
           <button
             className="btn btn-s btn-transparent"
             onClick={() => setFormNodeDefAddChildTo(nodeDef)}
-            onMouseDown={e => {
+            onMouseDown={(e) => {
               e.stopPropagation()
             }}
           >
@@ -89,7 +89,7 @@ const NodeDefEditButtons = props => {
           <button
             className="btn btn-s btn-transparent"
             onClick={() => removeNodeDef(nodeDef)}
-            onMouseDown={e => {
+            onMouseDown={(e) => {
               e.stopPropagation()
             }}
           >
@@ -101,12 +101,12 @@ const NodeDefEditButtons = props => {
   )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   hasNodeDefAddChildTo: Boolean(SurveyFormState.getNodeDefAddChildTo(state)),
 })
 
 export default connect(mapStateToProps, {
   setFormNodeDefAddChildTo,
-  putNodeDefLayoutProp,
-  removeNodeDef,
+  putNodeDefLayoutProp: NodeDefsActions.putNodeDefLayoutProp,
+  removeNodeDef: NodeDefsActions.removeNodeDef,
 })(NodeDefEditButtons)

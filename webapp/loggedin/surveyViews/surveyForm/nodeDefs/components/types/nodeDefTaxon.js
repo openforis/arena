@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/components/form/input'
+import { useI18n } from '@webapp/store/system'
 
 import * as Taxon from '@core/survey/taxon'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,14 +14,10 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as StringUtils from '@core/stringUtils'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-const code = Node.valuePropKeys.code
-const scientificName = Node.valuePropKeys.scientificName
-const vernacularName = Node.valuePropKeys.vernacularName
-const vernacularNameUuid = Node.valuePropKeys.vernacularNameUuid
-const taxonUuid = Node.valuePropKeys.taxonUuid
+const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropKeys
 
 const selectionDefault = {
   [code]: '',
@@ -29,7 +25,7 @@ const selectionDefault = {
   [vernacularName]: '',
 }
 
-const NodeDefTaxon = props => {
+const NodeDefTaxon = (props) => {
   const { surveyId, nodeDef, taxonomyUuid, node, edit, draft, renderType, canEditRecord, readOnly, updateNode } = props
 
   const [selection, setSelection] = useState(selectionDefault)
@@ -54,7 +50,7 @@ const NodeDefTaxon = props => {
   const updateNodeValue = (nodeValue, taxon = null) =>
     updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
 
-  const onChangeTaxon = taxon => {
+  const onChangeTaxon = (taxon) => {
     if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
       const nodeValue = {
         [taxonUuid]: Taxon.getUuid(taxon),
@@ -107,7 +103,7 @@ const NodeDefTaxon = props => {
 
   return (
     <div className={className} ref={elementRef}>
-      {R.keys(selectionDefault).map(field => {
+      {R.keys(selectionDefault).map((field) => {
         const inputField = (
           <NodeDefTaxonInputField
             key={field}

@@ -3,12 +3,12 @@ import './nodeDefCoordinate.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { useI18n } from '@webapp/store/system'
 
-import { FormItem, Input } from '@webapp/commonComponents/form/input'
-import * as InputMasks from '@webapp/commonComponents/form/inputMasks'
+import { FormItem, Input } from '@webapp/components/form/input'
+import * as InputMasks from '@webapp/components/form/inputMasks'
 
-import Dropdown from '@webapp/commonComponents/form/dropdown'
+import Dropdown from '@webapp/components/form/dropdown'
 
 import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'

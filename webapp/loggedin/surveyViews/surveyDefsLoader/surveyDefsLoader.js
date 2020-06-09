@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n, useOnSurveyCycleUpdate, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useOnSurveyCycleUpdate, useSurveyInfo } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import { initSurveyDefs, reloadSurveyDefs } from '@webapp/survey/actions'
+import { SurveyActions, useSurveyDefsFetched } from '@webapp/store/survey'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
@@ -15,19 +15,19 @@ const SurveyDefsLoader = (props) => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
-  const ready = useSelector(SurveyState.areDefsFetched(draft))
+  const ready = useSurveyDefsFetched(draft)
   const surveyUuid = Survey.getUuid(surveyInfo)
 
   useEffect(() => {
     if (surveyUuid) {
-      dispatch(initSurveyDefs(draft, validate))
+      dispatch(SurveyActions.initSurveyDefs(draft, validate))
     }
   }, [surveyUuid])
 
   useOnSurveyCycleUpdate(() => {
     if (surveyUuid) {
       if (onSurveyCycleUpdate) onSurveyCycleUpdate()
-      dispatch(reloadSurveyDefs(draft, validate))
+      dispatch(SurveyActions.reloadSurveyDefs(draft, validate))
     }
   })
 

@@ -2,17 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
-import { FormItem } from '@webapp/commonComponents/form/input'
-import Dropdown from '@webapp/commonComponents/form/dropdown'
-import { useI18n } from '@webapp/commonComponents/hooks'
+import { FormItem } from '@webapp/components/form/input'
+import Dropdown from '@webapp/components/form/dropdown'
+import { useI18n } from '@webapp/store/system'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
-import * as SurveyState from '@webapp/survey/surveyState'
-import { setNodeDefProp } from '@webapp/survey/nodeDefs/actions'
+import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import * as NodeDefState from '../nodeDefState'
 
@@ -20,7 +19,7 @@ import { createTaxonomy, deleteTaxonomy } from '../../taxonomy/actions'
 
 const { propKeys } = NodeDef
 
-const TaxonProps = props => {
+const TaxonProps = (props) => {
   const {
     validation,
     taxonomies,
@@ -31,7 +30,7 @@ const TaxonProps = props => {
     createTaxonomy,
   } = props
 
-  const updateTaxonomyProp = taxonomy => setNodeDefProp(propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
+  const updateTaxonomyProp = (taxonomy) => setNodeDefProp(propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
 
   const i18n = useI18n()
   const history = useHistory()
@@ -74,7 +73,7 @@ const TaxonProps = props => {
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefState.getNodeDef(state)
 
@@ -86,7 +85,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
-  setNodeDefProp,
+  setNodeDefProp: NodeDefsActions.setNodeDefProp,
   createTaxonomy,
   deleteTaxonomy,
 })(TaxonProps)

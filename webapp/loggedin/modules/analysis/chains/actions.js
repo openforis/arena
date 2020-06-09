@@ -1,6 +1,6 @@
 import * as ProcessingChain from '@common/analysis/processingChain'
 
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { initChain } from '@webapp/loggedin/modules/analysis/chain/actions'

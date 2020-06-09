@@ -1,0 +1,44 @@
+import { exportReducer } from '@webapp/utils/reduxUtils'
+
+import * as AppActions from '@webapp/app/actions'
+import * as SurveyActions from '../actions'
+import * as CategoriesActions from './actions'
+import * as CategoriesState from './state'
+
+const actionHandlers = {
+  [AppActions.appUserLogout]: () => ({}),
+
+  // Reset state
+  [SurveyActions.surveyCreate]: () => ({}),
+  [SurveyActions.surveyUpdate]: () => ({}),
+  [SurveyActions.surveyDelete]: () => ({}),
+
+  [SurveyActions.surveyDefsReset]: () => ({}),
+
+  // Categories
+  [SurveyActions.surveyDefsLoad]: (state, { categories }) => categories,
+  [CategoriesActions.categoriesUpdate]: (state, { categories }) => categories,
+
+  // Category
+  [CategoriesActions.categoryCreate]: (state, { category }) => CategoriesState.assocCategory(category)(state),
+
+  [CategoriesActions.categoryUpdate]: (state, { category }) => CategoriesState.assocCategory(category)(state),
+
+  [CategoriesActions.categoryPropUpdate]: (state, { category, key, value }) =>
+    CategoriesState.assocCategoryProp(category, key, value)(state),
+
+  [CategoriesActions.categoryDelete]: (state, { category }) => CategoriesState.dissocCategory(category)(state),
+
+  // Category level
+  [CategoriesActions.categoryLevelPropUpdate]: (state, { category, level, key, value }) =>
+    CategoriesState.assocCategoryLevelProp(category, level, key, value)(state),
+
+  [CategoriesActions.categoryLevelDelete]: (state, { category, level }) =>
+    CategoriesState.dissocCategoryLevel(category, level)(state),
+
+  // Category level items
+  [CategoriesActions.categoryItemPropUpdate]: (state, { category, item, key }) =>
+    CategoriesState.dissocCategoryLevelItemValidation(category, item, key)(state),
+}
+
+export default exportReducer(actionHandlers)

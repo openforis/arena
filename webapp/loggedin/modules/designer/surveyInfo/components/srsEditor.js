@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 
-import InputChips from '@webapp/commonComponents/form/inputChips'
+import InputChips from '@webapp/components/form/inputChips'
 
 import * as Srs from '@core/geo/srs'
 

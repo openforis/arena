@@ -4,12 +4,11 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 
-import * as NotificationState from '@webapp/app/appNotification/appNotificationState'
-import * as SurveyState from '@webapp/survey/surveyState'
+import { SurveyState } from '@webapp/store/survey'
 
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
-import { showNotification } from '@webapp/app/appNotification/actions'
+import { NotificationActions } from '@webapp/store/ui'
 import { validateChain } from './validation'
 
 export const chainPropUpdate = 'analysis/chain/prop/update'
@@ -42,6 +41,6 @@ export const updateChainCycles = (cycles) => (dispatch, getState) => {
   if (allStepEntitiesBelongToCycles && allStepCalculationAttriutesBelongToCycles) {
     dispatch(_onChainPropUpdate(Chain.keysProps.cycles, cycles))
   } else {
-    dispatch(showNotification('processingChainView.cannotSelectCycle', {}, NotificationState.severity.error))
+    dispatch(NotificationActions.notifyError({ key: 'processingChainView.cannotSelectCycle' }))
   }
 }

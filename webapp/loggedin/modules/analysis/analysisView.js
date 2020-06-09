@@ -4,7 +4,7 @@ import { useHistory } from 'react-router'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
-import ModuleSwitch from '@webapp/commonComponents/moduleSwitch'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'

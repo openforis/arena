@@ -6,9 +6,10 @@ import AvatarEditor from 'react-avatar-editor'
 
 import * as FileTypes from '@webapp/utils/fileTypes'
 
-import { useProfilePicture, useFileDrop, useI18n } from '@webapp/commonComponents/hooks'
+import { useProfilePicture, useFileDrop } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
-import UploadButton from '@webapp/commonComponents/form/uploadButton'
+import UploadButton from '@webapp/components/form/uploadButton'
 
 const ProfilePictureEditor = (props) => {
   const { userUuid, onPictureUpdate } = props

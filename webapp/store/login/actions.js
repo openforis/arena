@@ -1,0 +1,54 @@
+import axios from 'axios'
+
+import * as Validation from '@core/validation/validation'
+
+import { initUser } from '@webapp/app/actions'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
+
+export const loginEmailUpdate = 'login/email/update'
+export const loginErrorUpdate = 'login/error'
+
+export const setEmail = (email) => (dispatch) => dispatch({ type: loginEmailUpdate, email })
+
+export const setLoginError = (message) => (dispatch) => dispatch({ type: loginErrorUpdate, message })
+
+const _createAction = (handlerFn) => async (dispatch, getState) => {
+  try {
+    dispatch(LoaderActions.showLoader())
+    dispatch(setLoginError(null))
+
+    await handlerFn(dispatch, getState)
+  } catch (error) {
+    dispatch(setLoginError(Validation.messageKeys.user[error.code]))
+  } finally {
+    dispatch(LoaderActions.hideLoader())
+  }
+}
+
+export const login = (email, password) =>
+  _createAction(async (dispatch) => {
+    const {
+      data: { message, user },
+    } = await axios.post('/auth/login', { email, password })
+
+    if (user) {
+      dispatch(setEmail(''))
+      dispatch(initUser())
+    } else {
+      dispatch(setLoginError(message))
+    }
+  })
+
+export const sendPasswordResetEmail = (email, history) =>
+  _createAction(async (dispatch) => {
+    const {
+      data: { error },
+    } = await axios.post('/auth/reset-password', { email })
+
+    if (error) {
+      dispatch(setLoginError(error))
+    } else {
+      dispatch(NotificationActions.notifyInfo({ key: 'common.emailSentConfirmation', params: { email } }))
+      history.goBack()
+    }
+  })

@@ -6,12 +6,13 @@ import { Link, useHistory } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 
-import { useAuthCanEditSurvey, useI18n, useSurveyInfo } from '@webapp/commonComponents/hooks'
+import { useAuthCanEditSurvey, useSurveyInfo } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import Header from '@webapp/commonComponents/header'
-import ButtonPublishSurvey from '@webapp/commonComponents/buttonPublishSurvey'
+import Header from '@webapp/components/header'
+import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 
-import { deleteSurvey } from '@webapp/survey/actions'
+import { SurveyActions } from '@webapp/store/survey'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = () => {
@@ -66,7 +67,7 @@ const SurveyInfo = () => {
       {showDeleteDialog && (
         <DeleteSurveyDialog
           onCancel={() => setShowDeleteDialog(false)}
-          onDelete={() => dispatch(deleteSurvey(history))}
+          onDelete={() => dispatch(SurveyActions.deleteSurvey(history))}
           surveyName={Survey.getName(surveyInfo)}
         />
       )}
