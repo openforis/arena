@@ -13,8 +13,9 @@ import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 import * as CalculationState from '@webapp/loggedin/modules/analysis/calculation/state'
 
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { NotificationActions } from '@webapp/store/ui'
+import { AppSavingActions } from '@webapp/store/app'
+
 import { chainValidationUpdate } from './validation'
 
 export const chainSave = 'analysis/chain/save'
@@ -53,7 +54,7 @@ const _getStepParam = (step) =>
   )(step)
 
 export const saveChain = () => async (dispatch, getState) => {
-  dispatch(showAppSaving())
+  dispatch(AppSavingActions.showAppSaving())
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
@@ -78,5 +79,5 @@ export const saveChain = () => async (dispatch, getState) => {
     dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
   }
 
-  dispatch(hideAppSaving())
+  dispatch(AppSavingActions.hideAppSaving())
 }
