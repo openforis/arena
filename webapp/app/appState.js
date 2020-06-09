@@ -6,7 +6,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 export const keys = {
   user: 'user',
-  saving: 'saving',
 }
 
 export const stateKey = 'appDeprecated'
@@ -48,8 +47,3 @@ export const dissocUserPropsOnSurveyDelete = (surveyInfo) => (appState) => {
   )(appState)
   return R.assoc(keys.user, user, appState)
 }
-
-// ==== SAVING
-export const assocSaving = R.assoc(keys.saving)
-
-export const isSaving = R.pipe(getState, R.propEq(keys.saving, true))

@@ -10,9 +10,8 @@ import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appM
 
 import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { SurveyState, CategoriesActions } from '@webapp/store/survey'
-import { JobActions } from '@webapp/store/app'
+import { AppSavingActions, JobActions } from '@webapp/store/app'
 
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import * as CategoryState from './categoryState'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
@@ -151,13 +150,13 @@ export const putCategoryItemProp = (category, level, item, key, value) => async 
   const itemUuid = CategoryItem.getUuid(item)
 
   const action = async () => {
-    dispatch(showAppSaving())
+    dispatch(AppSavingActions.showAppSaving())
     const surveyId = SurveyState.getSurveyId(getState())
     const { data } = await axios.put(
       `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${itemUuid}`,
       { key, value }
     )
-    dispatch(hideAppSaving())
+    dispatch(AppSavingActions.hideAppSaving())
     dispatchCategoryUpdate(dispatch, data.category)
   }
 

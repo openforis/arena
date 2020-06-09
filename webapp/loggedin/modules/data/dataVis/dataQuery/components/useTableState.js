@@ -1,4 +1,4 @@
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as R from 'ramda'
 
 import { ColumnNodeDef } from '@common/model/db'
@@ -8,9 +8,9 @@ import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import { useLang } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { useIsAppSaving } from '@webapp/store/app'
 
-import { useOnUpdate, useAuthCanCleanseRecords } from '@webapp/components/hooks'
-import * as AppState from '@webapp/app/appState'
+import { useAuthCanCleanseRecords, useOnUpdate } from '@webapp/components/hooks'
 import * as NodeDefUIProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 import { nodesUpdateCompleted, nodeValidationsUpdate } from '../actions'
 
@@ -22,7 +22,7 @@ export const useTableState = () => {
   const survey = useSurvey()
   const canEdit = useAuthCanCleanseRecords()
   const lang = useLang()
-  const appSaving = useSelector(AppState.isSaving)
+  const appSaving = useIsAppSaving()
   const nodeDefUuidContext = useSelector(DataQueryState.getTableNodeDefUuidTable)
   const nodeDefUuidCols = useSelector(DataQueryState.getTableNodeDefUuidCols)
   const editMode = useSelector(DataQueryState.isTableModeEdit)

@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import * as User from '@core/user/user'
 import * as i18nFactory from '@core/i18n/i18nFactory'
-import Counter from '@core/counter'
 
 import { LoaderActions } from '@webapp/store/ui'
 import { SystemStatusState } from '@webapp/store/system'
@@ -54,24 +53,4 @@ export const logout = () => async (dispatch) => {
 
   dispatch({ type: appUserLogout })
   dispatch(LoaderActions.hideLoader())
-}
-
-// ====== SAVING
-export const appSavingUpdate = 'app/saving/update'
-
-const appSavingCounter = new Counter()
-
-export const showAppSaving = () => (dispatch) => {
-  if (appSavingCounter.count === 0) {
-    dispatch({ type: appSavingUpdate, saving: true })
-  }
-
-  appSavingCounter.increment()
-}
-
-export const hideAppSaving = () => (dispatch) => {
-  appSavingCounter.decrement()
-  if (appSavingCounter.count === 0) {
-    dispatch({ type: appSavingUpdate, saving: false })
-  }
 }
