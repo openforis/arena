@@ -8,4 +8,4 @@ import { _curry2 } from './internal/_curry2'
  *
  * @returns {any} - The value at `object.property`.
  */
-export const prop = _curry2((property, object) => object[prop])
+export const prop = _curry2((property, object) => object[property])
