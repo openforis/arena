@@ -3,26 +3,27 @@ import './App.scss'
 import React from 'react'
 import { useLocation } from 'react-router'
 
-import AppHeader from './appHeader/appHeader'
-import AppSideBar from './appSideBar/appSideBar'
-import AppJobMonitor from './appJob/appJobMonitor'
-import AppErrors from '../app/appErrors/appErrors'
-import LoggedInModuleSwitch from './modules/loggedInModuleSwitch'
+import LoggedInModuleSwitch from '@webapp/loggedin/modules/loggedInModuleSwitch'
+
+import Header from './Header'
+import SideBar from './SideBar'
+import JobMonitor from './JobMonitor'
+import ServiceErrors from './ServiceErrors'
 
 const AppView = () => {
   const location = useLocation()
 
   return (
     <>
-      <AppHeader />
+      <Header />
 
       <div className="app__container">
-        <AppSideBar />
+        <SideBar />
         <LoggedInModuleSwitch location={location} />
       </div>
 
-      <AppJobMonitor />
-      <AppErrors />
+      <JobMonitor />
+      <ServiceErrors />
     </>
   )
 }
