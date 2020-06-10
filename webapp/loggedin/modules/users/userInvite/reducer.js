@@ -1,12 +1,12 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { UserActions } from '@webapp/store/user'
 import { userInviteStateReset, userInviteUpdate } from './actions'
 import * as UserInviteViewState from './userInviteViewState'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
   [userInviteStateReset]: () => ({}),
 
   [userInviteUpdate]: (state, { userInvite }) => UserInviteViewState.assocUserInvite(userInvite)(state),

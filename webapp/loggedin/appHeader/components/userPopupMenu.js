@@ -9,12 +9,14 @@ import * as User from '@core/user/user'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
 
+import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
-import { useUser, UserActions } from '@webapp/store/user'
+import { useUser } from '@webapp/store/user'
 
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 
 import ProfilePicture from '@webapp/components/profilePicture'
+
 
 const UserPopupMenu = (props) => {
   const { onClose } = props
@@ -79,7 +81,7 @@ const UserPopupMenu = (props) => {
         className="btn-s btn-transparent"
         onClick={() => {
           onClose()
-          dispatch(UserActions.logout())
+          dispatch(LoginActions.logout())
         }}
       >
         <span className="icon icon-switch icon-12px icon-left" />

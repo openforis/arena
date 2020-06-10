@@ -4,7 +4,6 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StepState from '@webapp/loggedin/modules/analysis/step/state'
 
-import { UserActions } from '@webapp/store/user'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 
 import { chainReset, chainSave } from '@webapp/loggedin/modules/analysis/chain/actions'
@@ -22,10 +21,11 @@ import {
   calculationDirtyUpdate,
   calculationReset,
 } from '@webapp/loggedin/modules/analysis/calculation/actions'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
   // Reset state
-  [UserActions.USER_LOGOUT]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
