@@ -8,7 +8,7 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 
-import { useUser } from '@webapp/components/hooks'
+import { useUser } from '@webapp/store/user'
 import * as UserViewState from './userViewState'
 import { fetchUser, resetUserState } from './actions'
 

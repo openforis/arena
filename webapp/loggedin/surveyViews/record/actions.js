@@ -10,13 +10,14 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { SurveyState } from '@webapp/store/survey'
-import * as AppState from '@webapp/app/appState'
+
 
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { AppSavingActions } from '@webapp/store/app'
 
 import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import * as RecordState from './recordState'
+import { UserState } from '@webapp/store/user'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
@@ -65,7 +66,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   dispatch(LoaderActions.showLoader())
 
   const state = getState()
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
 

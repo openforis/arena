@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
-import { initApp } from '@webapp/app/actions'
+import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
 
 import Routes from './Routes'
 
@@ -13,7 +12,7 @@ const Arena = () => {
   const systemError = useSystemError()
 
   useEffect(() => {
-    dispatch(initApp())
+    dispatch(SystemActions.initSystem())
   }, [])
 
   if (!ready) return null
