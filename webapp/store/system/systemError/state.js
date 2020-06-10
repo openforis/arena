@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as SystemState from '../state'
 
-export const stateKey = 'error'
+export const stateKey = 'systemError'
 
 // ====== READ
 export const getSystemError = R.pipe(SystemState.getState, R.prop(stateKey))
