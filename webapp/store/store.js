@@ -6,15 +6,11 @@ import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
 // == app reducer
 
-import AppErrorsReducer from '@webapp/app/appErrors/reducer'
-
 import { SystemState, SystemReducer } from '@webapp/store/system'
 import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
 import { UiReducer, UiState } from '@webapp/store/ui'
 import { UserReducer, UserState } from '@webapp/store/user'
-
-import * as AppErrorsState from '@webapp/app/appErrors/appErrorsState'
 
 const appReducers = {
   [SystemState.stateKey]: SystemReducer,
