@@ -18,15 +18,15 @@ const SurveyDefsLoader = (props) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
 
   useEffect(() => {
-    if (surveyUuid) {
-      dispatch(SurveyActions.initSurveyDefs(draft, validate))
+    if (surveyUuid && !ready) {
+      dispatch(SurveyActions.initSurveyDefs({ draft, validate }))
     }
-  }, [surveyUuid])
+  }, [surveyUuid, ready])
 
   useOnSurveyCycleUpdate(() => {
     if (surveyUuid) {
       if (onSurveyCycleUpdate) onSurveyCycleUpdate()
-      dispatch(SurveyActions.reloadSurveyDefs(draft, validate))
+      dispatch(SurveyActions.resetSurveyDefs())
     }
   })
 

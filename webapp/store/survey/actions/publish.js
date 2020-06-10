@@ -4,7 +4,6 @@ import { JobActions } from '@webapp/store/app'
 
 import * as SurveyState from '../state'
 import { setActiveSurvey } from './active'
-import { initSurveyDefs } from './defs'
 
 export const publishSurvey = () => async (dispatch, getState) => {
   const state = getState()
@@ -17,7 +16,6 @@ export const publishSurvey = () => async (dispatch, getState) => {
       job: data.job,
       onComplete: async () => {
         await dispatch(setActiveSurvey(surveyId, true))
-        await dispatch(initSurveyDefs(true, true))
       },
     })
   )

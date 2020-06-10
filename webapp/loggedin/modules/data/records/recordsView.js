@@ -8,23 +8,20 @@ import * as Record from '@core/record/record'
 
 import { useLang } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
-
-import { useOnUpdate } from '@webapp/components/hooks'
-
 import { SurveyState } from '@webapp/store/survey'
-import TableView from '../../../tableViews/tableView'
+
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+
+import TableView from '../../../tableViews/tableView'
 import { createRecord } from '../../../surveyViews/record/actions'
-import { reloadListItems } from '../../../tableViews/actions'
 import RecordsHeaderLeft from './components/recordsHeaderLeft'
 import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
 
 import * as RecordsState from './recordsState'
 
-
 const RecordsView = (props) => {
-  const { surveyInfo, surveyCycleKey, nodeDefKeys, createRecord, reloadListItems } = props
+  const { surveyInfo, surveyCycleKey, nodeDefKeys, createRecord } = props
   const history = useHistory()
   const lang = useLang()
   const user = useUser()
@@ -34,10 +31,6 @@ const RecordsView = (props) => {
   const restParams = { cycle: surveyCycleKey }
 
   const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
-
-  useOnUpdate(() => {
-    reloadListItems(RecordsState.keys.records, restParams)
-  }, [surveyCycleKey])
 
   return (
     <TableView
@@ -65,4 +58,4 @@ const mapStateToProps = (state) => ({
   nodeDefKeys: RecordsState.getNodeDefKeys(state),
 })
 
-export default connect(mapStateToProps, { createRecord, reloadListItems })(RecordsView)
+export default connect(mapStateToProps, { createRecord })(RecordsView)
