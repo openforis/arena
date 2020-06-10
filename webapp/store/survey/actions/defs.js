@@ -3,7 +3,7 @@ import axios from 'axios'
 import { LoaderActions } from '@webapp/store/ui'
 
 import * as SurveyState from '../state'
-import { SurveyStatusState } from '../status'
+import * as SurveyStatusState from '../status/state'
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
 
 const _fetchDefs = (surveyId, defsType, params = {}) => axios.get(`/api/survey/${surveyId}/${defsType}`, { params })
