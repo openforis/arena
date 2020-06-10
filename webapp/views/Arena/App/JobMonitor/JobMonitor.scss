@@ -1,12 +1,12 @@
-@import "~@webapp/style/vars";
+@import "webapp/style/vars";
 
-.app-job-monitor {
+.job-monitor {
   .modal-body {
     padding-top: 0;
   }
 }
 
-.app-job-monitor__job-errors {
+.job-monitor__job-errors {
   justify-self: stretch;
 
   .header, .row {
@@ -50,7 +50,7 @@
 
 }
 
-.app-job-monitor__inner-jobs {
+.job-monitor__inner-jobs {
   max-height: 45vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -71,7 +71,7 @@
     margin-bottom: 2rem;
   }
 
-  .app-job-monitor__job-errors {
+  .job-monitor__job-errors {
     padding: 0 1rem 2rem 1rem;
 
     .validation-field_message {
