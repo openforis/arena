@@ -1,8 +1,9 @@
 import * as R from 'ramda'
+import * as SystemState from '../state'
 
 export const stateKey = 'serviceErrors'
 
-const getState = R.propOr({}, stateKey)
+const getState = R.pipe(SystemState.getState, R.propOr({}, stateKey))
 
 // ==== APP ERRORS
 
