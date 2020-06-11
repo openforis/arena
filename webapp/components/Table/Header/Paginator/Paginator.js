@@ -7,20 +7,22 @@ import { getLink } from '@webapp/components/Table/tableLink'
 
 const Paginator = (props) => {
   const { offset, limit, count } = props
-  const currentPage = offset / limit + 1
-  const totalPage = Math.ceil(count / limit)
+  const pageNo = offset / limit + 1
+  const totalNoPages = Math.ceil(count / limit)
+  const isFirstPage = pageNo === 1
+  const isLastPage = pageNo === totalNoPages
 
   const i18n = useI18n()
 
   return (
     <div className="table__paginator">
-      <Link className="btn btn-transparent" aria-disabled={count < limit || currentPage === 1} to={getLink(0)}>
+      <Link className="btn btn-transparent" aria-disabled={count < limit || isFirstPage} to={getLink(0)}>
         <span className="icon icon-backward2 icon-14px" />
       </Link>
       <Link
         type="button"
         className="btn btn-transparent"
-        aria-disabled={currentPage === 1}
+        aria-disabled={isFirstPage}
         to={getLink(offset - limit)}
         style={{ transform: 'scaleX(-1)' }}
       >
@@ -31,14 +33,10 @@ const Paginator = (props) => {
         {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')} {count}
       </span>
 
-      <Link className="btn btn-transparent" aria-disabled={currentPage === totalPage} to={getLink(offset + limit)}>
+      <Link className="btn btn-transparent" aria-disabled={isLastPage} to={getLink(offset + limit)}>
         <span className="icon icon-play3 icon-14px" />
       </Link>
-      <Link
-        className="btn btn-transparent"
-        aria-disabled={currentPage === totalPage}
-        to={getLink((totalPage - 1) * limit)}
-      >
+      <Link className="btn btn-transparent" aria-disabled={isLastPage} to={getLink((totalNoPages - 1) * limit)}>
         <span className="icon icon-forward3 icon-14px" />
       </Link>
     </div>
