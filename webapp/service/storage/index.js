@@ -1,5 +1,1 @@
-// ====== actions
-export { toggleSidebar } from './actions'
-
-// ====== hooks
-export { useIsSidebarOpened } from './hooks'
+export { SidebarActions, useIsSidebarOpened } from './sidebar'
