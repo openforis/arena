@@ -9,13 +9,13 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
-import DataVisView from './dataVis/dataVisView'
-import ValidationReportView from './validationReport/validationReportView'
-import RecordsView from './records/recordsView'
+import DataVisView from '@webapp/loggedin/modules/data/dataVis/dataVisView'
+import ValidationReportView from '@webapp/loggedin/modules/data/validationReport/validationReportView'
+import RecordsView from '@webapp/loggedin/modules/data/records/recordsView'
 
-import { resetDataVis } from './dataVis/actions'
+import { resetDataVis } from '@webapp/loggedin/modules/data/dataVis/actions'
 
-const DataView = () => {
+const Data = () => {
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
   const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
@@ -58,4 +58,4 @@ const DataView = () => {
   )
 }
 
-export default DataView
+export default Data

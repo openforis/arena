@@ -3,23 +3,22 @@ import { Route, Switch, useLocation } from 'react-router'
 
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 
-import UsersView from '@webapp/views/Users'
-
-import DesignerView from './designer/designerView'
-import HomeView from './home/homeView'
-import DataViewComponent from './data/dataView'
-import AnalysisView from './analysis/analysisView'
+import Designer from '@webapp/views/Designer'
+import Users from '@webapp/views/Users'
+import Data from '@webapp/views/Data'
+import Analysis from '@webapp/views/Analysis'
+import Home from '@webapp/views/Home'
 
 const LoggedInModuleSwitch = () => {
   const location = useLocation()
   return (
     <div className="app-module">
       <Switch location={location}>
-        <Route path={appModuleUri(appModules.home)} component={HomeView} />
-        <Route path={appModuleUri(appModules.designer)} component={DesignerView} />
-        <Route path={appModuleUri(appModules.data)} component={DataViewComponent} />
-        <Route path={appModuleUri(appModules.users)} component={UsersView} />
-        <Route path={appModuleUri(appModules.analysis)} component={AnalysisView} />
+        <Route path={appModuleUri(appModules.home)} component={Home} />
+        <Route path={appModuleUri(appModules.designer)} component={Designer} />
+        <Route path={appModuleUri(appModules.data)} component={Data} />
+        <Route path={appModuleUri(appModules.users)} component={Users} />
+        <Route path={appModuleUri(appModules.analysis)} component={Analysis} />
       </Switch>
     </div>
   )
