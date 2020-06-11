@@ -16,7 +16,7 @@ import * as UserInviteViewState from '@webapp/loggedin/modules/users/userInvite/
 
 import { AppReducer, AppState } from '@webapp/store/app'
 
-import component from '@webapp/views/Arena/App'
+import component from './index'
 
 const reducers = [
   { name: AppState.stateKey, fn: AppReducer },

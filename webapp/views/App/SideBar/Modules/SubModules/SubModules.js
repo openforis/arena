@@ -2,14 +2,14 @@ import React from 'react'
 
 import * as SideBarModule from '../utils'
 
-import AppSideBarModuleLink from '../ModuleLink'
+import ModuleLink from '../ModuleLink'
 
 const SubModules = (props) => {
   const { module, pathname, sideBarOpened, disabled } = props
   const children = SideBarModule.getChildren(module)
 
   return children.map((childModule) => (
-    <AppSideBarModuleLink
+    <ModuleLink
       key={childModule.key}
       module={childModule}
       pathname={pathname}
