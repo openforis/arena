@@ -1,17 +1,11 @@
-/* eslint react/jsx-props-no-spreading: 0 */
-// TODO: Now TableHeader and TableContent need to pass the dynamic ...rest props to components - All components using TableView must be refactor
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 
-import { useSurveyId } from '@webapp/store/survey'
+import Header from './Header'
+import Content from './Content'
+import { useTable } from './useTable'
 
-import TableHeader from './components/tableHeader'
-import TableContent from './components/tableContent'
-
-import { initListItems } from './actions'
-
-const TableView = (props) => {
+const Table = (props) => {
   const {
     className,
     gridTemplateColumns,
@@ -24,36 +18,24 @@ const TableView = (props) => {
     restParams,
     rowComponent,
     rowHeaderComponent,
-    ...rest
   } = props
 
-  const dispatch = useDispatch()
-  const surveyId = useSurveyId()
-  const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
-
-  useEffect(() => {
-    dispatch(initListItems(module, apiUri, restParams))
-  }, [])
+  const { list, offset, limit, count } = useTable({ moduleApiUri, module, restParams })
 
   return (
     <div className={`table ${className}`}>
-      <TableHeader
-        apiUri={apiUri}
-        headerLeftComponent={headerLeftComponent}
-        module={module}
-        restParams={restParams}
-        {...rest}
-      />
+      <Header offset={offset} list={list} limit={limit} count={count} headerLeftComponent={headerLeftComponent} />
 
-      <TableContent
-        module={module}
+      <Content
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
+        list={list}
+        module={module}
         noItemsLabelKey={noItemsLabelKey}
+        offset={offset}
         onRowClick={onRowClick}
         rowComponent={rowComponent}
         rowHeaderComponent={rowHeaderComponent}
-        {...rest}
       />
     </div>
   )
@@ -61,7 +43,7 @@ const TableView = (props) => {
 
 const DummyComponent = () => <div />
 
-TableView.propTypes = {
+Table.propTypes = {
   className: PropTypes.string,
   gridTemplateColumns: PropTypes.string,
   headerLeftComponent: PropTypes.elementType,
@@ -75,7 +57,7 @@ TableView.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
 }
 
-TableView.defaultProps = {
+Table.defaultProps = {
   className: '',
   gridTemplateColumns: '1fr',
   headerLeftComponent: DummyComponent,
@@ -88,4 +70,4 @@ TableView.defaultProps = {
   rowComponent: DummyComponent,
 }
 
-export default TableView
+export default Table

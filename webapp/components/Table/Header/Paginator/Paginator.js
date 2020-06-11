@@ -1,10 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 
 import { useI18n } from '@webapp/store/system'
+import { getLink } from '@webapp/components/Table/tableLink'
 
-const TablePaginator = (props) => {
-  const { offset, limit, count, fetchFn } = props
+const Paginator = (props) => {
+  const { offset, limit, count } = props
   const currentPage = offset / limit + 1
   const totalPage = Math.ceil(count / limit)
 
@@ -12,53 +14,41 @@ const TablePaginator = (props) => {
 
   return (
     <div className="table__paginator">
-      <button
-        type="button"
-        className="btn btn-transparent"
-        aria-disabled={count < limit || currentPage === 1}
-        onClick={() => fetchFn(0)}
-      >
+      <Link className="btn btn-transparent" aria-disabled={count < limit || currentPage === 1} to={getLink(0)}>
         <span className="icon icon-backward2 icon-14px" />
-      </button>
-      <button
+      </Link>
+      <Link
         type="button"
         className="btn btn-transparent"
         aria-disabled={currentPage === 1}
-        onClick={() => fetchFn(offset - limit)}
+        to={getLink(offset - limit)}
         style={{ transform: 'scaleX(-1)' }}
       >
         <span className="icon icon-play3 icon-14px" />
-      </button>
+      </Link>
 
       <span className="counts">
         {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')} {count}
       </span>
 
-      <button
-        type="button"
-        className="btn btn-transparent"
-        aria-disabled={currentPage === totalPage}
-        onClick={() => fetchFn(offset + limit)}
-      >
+      <Link className="btn btn-transparent" aria-disabled={currentPage === totalPage} to={getLink(offset + limit)}>
         <span className="icon icon-play3 icon-14px" />
-      </button>
-      <button
-        type="button"
+      </Link>
+      <Link
         className="btn btn-transparent"
         aria-disabled={currentPage === totalPage}
-        onClick={() => fetchFn((totalPage - 1) * limit)}
+        to={getLink((totalPage - 1) * limit)}
       >
         <span className="icon icon-forward3 icon-14px" />
-      </button>
+      </Link>
     </div>
   )
 }
 
-TablePaginator.propTypes = {
+Paginator.propTypes = {
   offset: PropTypes.number.isRequired,
   limit: PropTypes.number.isRequired,
   count: PropTypes.number.isRequired,
-  fetchFn: PropTypes.func.isRequired,
 }
 
-export default TablePaginator
+export default Paginator

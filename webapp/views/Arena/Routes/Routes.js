@@ -17,7 +17,7 @@ import Notification from './Notification'
 const Routes = () => {
   const user = useUser()
   useWebSocket()
-  
+
   return (
     <>
       <Switch>

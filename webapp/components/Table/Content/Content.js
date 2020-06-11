@@ -1,26 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
 
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
-import * as TableViewsState from '@webapp/loggedin/tableViews/tableViewsState'
 
-const TableContent = (props) => {
+const Content = (props) => {
   const {
     gridTemplateColumns,
-    module,
     isRowActive,
+    list,
     noItemsLabelKey,
+    offset,
     onRowClick,
     rowHeaderComponent,
     rowComponent,
   } = props
 
   const i18n = useI18n()
-  const list = useSelector(TableViewsState.getList(module))
-  const offset = useSelector(TableViewsState.getOffset(module))
 
   return R.isEmpty(list) ? (
     <div className="table__empty-rows">{i18n.t(noItemsLabelKey)}</div>
@@ -31,9 +28,10 @@ const TableContent = (props) => {
       </div>
       <div className="table__rows">
         {list.map((row, i) => {
+          const active = isRowActive && isRowActive(row)
           let className = 'table__row'
           className += onRowClick ? ' hoverable' : ''
-          className += isRowActive && isRowActive(row) ? ' active' : ''
+          className += active ? ' active' : ''
 
           return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
@@ -44,7 +42,7 @@ const TableContent = (props) => {
               className={className}
               style={{ gridTemplateColumns }}
             >
-              {React.createElement(rowComponent, { ...props, idx: i, offset, row })}
+              {React.createElement(rowComponent, { idx: i, offset, row, active })}
             </div>
           )
         })}
@@ -53,19 +51,20 @@ const TableContent = (props) => {
   )
 }
 
-TableContent.propTypes = {
+Content.propTypes = {
   gridTemplateColumns: PropTypes.string.isRequired,
   isRowActive: PropTypes.func,
-  module: PropTypes.string.isRequired,
+  list: PropTypes.array.isRequired,
   noItemsLabelKey: PropTypes.string.isRequired,
+  offset: PropTypes.number.isRequired,
   onRowClick: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
 }
 
-TableContent.defaultProps = {
+Content.defaultProps = {
   isRowActive: null,
   onRowClick: null,
 }
 
-export default TableContent
+export default Content
