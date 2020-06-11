@@ -25,7 +25,7 @@ const Routes = () => {
 
         {user && User.hasAccepted(user) ? (
           <Route path={`/${app}`}>
-            <DynamicImport load={() => import('@webapp/loggedin/appViewExport')} />
+            <DynamicImport load={() => import('@webapp/views/App/appExport')} />
           </Route>
         ) : (
           <Route component={Guest} />
