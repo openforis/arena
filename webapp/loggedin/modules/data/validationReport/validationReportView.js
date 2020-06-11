@@ -1,18 +1,13 @@
 import './validationReportView.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-
-import TableView from '@webapp/loggedin/tableViews/tableView'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
-import { useOnUpdate } from '@webapp/components/hooks'
 
 import { SurveyState } from '@webapp/store/survey'
 
-import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
+import TableView from '@webapp/loggedin/tableViews/tableView'
 
 import ValidationReportRowHeader from './validationReportRowHeader'
 import ValidationReportRow from './validationReportRow'
@@ -20,11 +15,7 @@ import ValidationReportRow from './validationReportRow'
 const validationReportModule = 'validationReport'
 
 const ValidationReportView = (props) => {
-  const { surveyCycleKey, reloadListItems, history } = props
-
-  useOnUpdate(() => {
-    reloadListItems(validationReportModule, { cycle: surveyCycleKey })
-  }, [surveyCycleKey])
+  const { surveyCycleKey, history } = props
 
   const onRowClick = (row) => {
     const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
@@ -58,4 +49,4 @@ const mapStateToProps = (state) => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(mapStateToProps, { reloadListItems })(ValidationReportView)
+export default connect(mapStateToProps)(ValidationReportView)

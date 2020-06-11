@@ -3,12 +3,12 @@ import axios from 'axios'
 import { LoaderActions } from '@webapp/store/ui'
 
 import * as SurveyState from '../state'
-import { SurveyStatusState } from '../status'
+import * as SurveyStatusState from '../status/state'
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
 
 const _fetchDefs = (surveyId, defsType, params = {}) => axios.get(`/api/survey/${surveyId}/${defsType}`, { params })
 
-export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
+export const initSurveyDefs = ({ draft = false, validate = false }) => async (dispatch, getState) => {
   const state = getState()
 
   if (!SurveyStatusState.areDefsFetched(draft)(state)) {
@@ -38,9 +38,4 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   }
 }
 
-export const resetSurveyDefs = () => (dispatch) => dispatch({ type: surveyDefsReset })
-
-export const reloadSurveyDefs = (draft = false, validate = false) => async (dispatch) => {
-  await dispatch(resetSurveyDefs())
-  await dispatch(initSurveyDefs(draft, validate))
-}
+export const resetSurveyDefs = () => ({ type: surveyDefsReset })
