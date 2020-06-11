@@ -6,6 +6,8 @@ import {
   useAuthCanEditSurvey,
   useAuthCanEditRecord,
   useAuthCanCleanseRecords,
+  useAuthCanEditUser,
+  useAuthCanInviteUser,
   useProfilePicture,
 } from './hooks'
 
@@ -17,5 +19,7 @@ export {
   useAuthCanEditSurvey,
   useAuthCanEditRecord,
   useAuthCanCleanseRecords,
+  useAuthCanEditUser,
+  useAuthCanInviteUser,
   useProfilePicture,
 }
