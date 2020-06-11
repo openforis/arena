@@ -7,8 +7,6 @@ import { SurveyState, TaxonomiesActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { reloadListItems } from '../../tableViews/actions'
-import * as TaxonomyState from './taxonomyState'
 
 // Taxonomy editor actions
 export const taxonomyViewTaxonomyUpdate = 'taxonomyView/taxonomy/update'
@@ -71,7 +69,6 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
       onComplete: () => {
         // On import complete validate taxonomy and reload taxa
         dispatch(fetchTaxonomy(Taxonomy.getUuid(taxonomy)))
-        dispatch(reloadListItems(TaxonomyState.keys.taxa, { draft: true }))
       },
     })
   )

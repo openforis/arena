@@ -1,9 +1,12 @@
+// ====== This is a clone of old Paginator
+// ====== TODO: DataVis must be refactored in order to use new Paginator
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 
-const TablePaginator = (props) => {
+const Paginator = (props) => {
   const { offset, limit, count, fetchFn } = props
   const currentPage = offset / limit + 1
   const totalPage = Math.ceil(count / limit)
@@ -54,11 +57,11 @@ const TablePaginator = (props) => {
   )
 }
 
-TablePaginator.propTypes = {
+Paginator.propTypes = {
   offset: PropTypes.number.isRequired,
   limit: PropTypes.number.isRequired,
   count: PropTypes.number.isRequired,
   fetchFn: PropTypes.func.isRequired,
 }
 
-export default TablePaginator
+export default Paginator

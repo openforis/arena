@@ -1,61 +1,43 @@
 import './recordsView.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
 
-import { useLang } from '@webapp/store/system'
-import { useUser } from '@webapp/store/user'
-import { SurveyState } from '@webapp/store/survey'
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import TableView from '../../../tableViews/tableView'
-import { createRecord } from '../../../surveyViews/record/actions'
+import Table from '@webapp/components/Table'
+
 import RecordsHeaderLeft from './components/recordsHeaderLeft'
 import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
 
-import * as RecordsState from './recordsState'
-
-const RecordsView = (props) => {
-  const { surveyInfo, surveyCycleKey, nodeDefKeys, createRecord } = props
+const RecordsView = () => {
   const history = useHistory()
-  const lang = useLang()
-  const user = useUser()
+  const cycle = useSurveyCycleKey()
+  const nodeDefKeys = [] // TODO: fetch them
+
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
-
-  const restParams = { cycle: surveyCycleKey }
 
   const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
 
   return (
-    <TableView
-      module={RecordsState.keys.records}
-      restParams={restParams}
+    <Table
+      module="records"
+      restParams={{ cycle }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={RecordsHeaderLeft}
       rowHeaderComponent={RecordsRowHeader}
       rowComponent={RecordsRow}
-      noItemsLabelKey={'dataView.records.noRecordsAdded'}
-      surveyInfo={surveyInfo}
-      user={user}
-      createRecord={createRecord}
-      nodeDefKeys={nodeDefKeys}
-      lang={lang}
+      noItemsLabelKey="dataView.records.noRecordsAdded"
       onRowClick={onRowClick}
     />
   )
 }
 
-const mapStateToProps = (state) => ({
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-  nodeDefKeys: RecordsState.getNodeDefKeys(state),
-})
-
-export default connect(mapStateToProps, { createRecord })(RecordsView)
+export default RecordsView

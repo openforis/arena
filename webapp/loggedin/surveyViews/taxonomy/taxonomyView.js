@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { SurveyState } from '@webapp/store/survey'
 
-import TableView from '../../tableViews/tableView'
+import Table from '@webapp/components/Table/Table'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
@@ -42,7 +42,7 @@ const TaxonomyView = (props) => {
     <div className="taxonomy">
       <TaxonomyEditHeader {...props} />
 
-      <TableView
+      <Table
         module={TaxonomyState.keys.taxa}
         moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
         restParams={{ draft: canEdit }}
