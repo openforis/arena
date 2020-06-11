@@ -42,7 +42,7 @@ const Content = (props) => {
               className={className}
               style={{ gridTemplateColumns }}
             >
-              {React.createElement(rowComponent, { idx: i, offset, row, active })}
+              {React.createElement(rowComponent, { idx: i, offset, row, rowNo: i + offset + 1, active })}
             </div>
           )
         })}
