@@ -3,9 +3,11 @@ import React from 'react'
 import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import UsersListView from '@webapp/loggedin/modules/users/userList/userListView'
+
 import UserView from '@webapp/loggedin/modules/users/user/userView'
 import UserInviteView from '@webapp/loggedin/modules/users/userInvite/userInviteView'
+
+import UsersList from './UsersList'
 
 const Users = () => (
   <ModuleSwitch
@@ -13,7 +15,7 @@ const Users = () => (
     moduleDefault={userModules.users}
     modules={[
       {
-        component: UsersListView,
+        component: UsersList,
         path: appModuleUri(userModules.users),
       },
       {
