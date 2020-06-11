@@ -7,7 +7,7 @@ import { guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
-import Error from '@webapp/views/App/views/Guest/Error'
+import Error from '@webapp/views/Guest/Error'
 
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 

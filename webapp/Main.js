@@ -7,7 +7,7 @@ import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 
 import { store } from '@webapp/store'
-import Arena from '@webapp/views/App/views/Arena'
+import Arena from '@webapp/views/Arena'
 
 function renderApp() {
   ReactDOM.render(

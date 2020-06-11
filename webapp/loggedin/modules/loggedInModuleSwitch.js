@@ -6,7 +6,7 @@ import { appModules, appModuleUri } from '@webapp/app/appModules'
 import Designer from '@webapp/views/App/views/Designer'
 import Users from '@webapp/views/App/views/Users'
 import Data from '@webapp/views/App/views/Data'
-import Analysis from '@webapp/views/Analysis'
+import Analysis from '@webapp/views/App/views/Analysis'
 import Home from '@webapp/views/App/views/Home'
 
 const LoggedInModuleSwitch = () => {
