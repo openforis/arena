@@ -2,7 +2,7 @@
 const { $, waitFor, openBrowser, currentURL, closeBrowser, text } = require('taiko')
 const { expect } = require('chai')
 
-const headless = Boolean(process.env.headless_chrome.toLowerCase())
+const headless = Boolean(process.env.HEADLESS_CHROME)
 
 beforeSuite(async () => {
   await openBrowser({
