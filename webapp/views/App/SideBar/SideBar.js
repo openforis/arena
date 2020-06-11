@@ -3,7 +3,7 @@ import './SideBar.scss'
 import React, { useRef } from 'react'
 import { useLocation } from 'react-router'
 
-import { toggleSidebar, useIsSidebarOpened } from '@webapp/service/storage'
+import { SidebarActions, useIsSidebarOpened } from '@webapp/service/storage'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
@@ -19,7 +19,7 @@ const SideBar = () => {
 
   return (
     <div className={`sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
-      <button type="button" className="btn-transparent sidebar__btn-toggle" onClick={toggleSidebar}>
+      <button type="button" className="btn-transparent sidebar__btn-toggle" onClick={SidebarActions.toggleSidebar}>
         <span className="icon icon-16px icon-menu" />
       </button>
 
