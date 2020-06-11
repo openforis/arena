@@ -7,7 +7,7 @@ import * as Chain from '@common/analysis/processingChain'
 
 import { useSurveyCycleKey } from '@webapp/store/survey'
 
-import TableView from '@webapp/loggedin/tableViews/tableView'
+import Table from '@webapp/components/Table'
 
 import { navigateToChainView } from '@webapp/loggedin/modules/analysis/chains/actions'
 
@@ -15,19 +15,17 @@ import Row from './components/row'
 import RowHeader from './components/rowHeader'
 import HeaderLeft from './components/headerLeft'
 
-const chainsModule = 'processing-chains'
-
 const ChainsView = () => {
   const history = useHistory()
   const dispatch = useDispatch()
   const surveyCycleKey = useSurveyCycleKey()
 
   return (
-    <TableView
+    <Table
       className="chains"
       gridTemplateColumns="30px repeat(4, 1fr) repeat(2, 80px) 50px"
       headerLeftComponent={HeaderLeft}
-      module={chainsModule}
+      module="processing-chains"
       onRowClick={(processingChain) => dispatch(navigateToChainView(history, Chain.getUuid(processingChain)))}
       restParams={{ surveyCycleKey }}
       rowHeaderComponent={RowHeader}
