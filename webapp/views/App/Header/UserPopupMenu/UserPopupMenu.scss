@@ -1,0 +1,56 @@
+@import 'webapp/style/vars';
+
+.user-popup-menu {
+  position: fixed;
+  right: 0;
+  top: $headerHeight - 1px;
+  border-bottom: 1px solid $greyBorder;
+  border-left: 1px solid $greyBorder;
+  z-index: $zIndex180UserMenu;
+  background-color: white;
+  display: grid;
+  padding: 20px 10px 10px;
+  justify-items: center;
+  grid-row-gap: 10px;
+
+  a {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.user-popup-menu__user {
+  display: grid;
+  grid-template-columns: 100px 120px;
+
+  img {
+    border-radius: 100%;
+    width: 100px;
+    height: 100px;
+    padding: 5px;
+    border: 2px solid $greyBorder;
+  }
+
+  .user-details {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    align-items: center;
+    justify-items: center;
+    font-size: 0.9rem;
+    grid-row-gap: 10px;
+
+    > :first-child {
+      align-self: end;
+    }
+
+    > :last-child {
+      align-self: start;
+    }
+  }
+}
+
+.user-popup-menu__sep {
+  background-color: $greyBorder;
+  height: 1px;
+  width: 80%;
+}
