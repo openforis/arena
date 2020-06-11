@@ -7,8 +7,7 @@ export const resetUserInvite = () => (dispatch) => dispatch({ type: actionTypes.
 
 export const validateUserInvite = async (userInvite) => {
   const validation = await UserValidator.validateInvitation(userInvite)
-  const userInviteValidated = UserInvite.assocValidation(validation)(userInvite)
-  return userInviteValidated
+  return UserInvite.assocValidation(validation)(userInvite)
 }
 
 export const updateUserInvite = ({ userInviteUpdated }) => async (dispatch) => {
