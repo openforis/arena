@@ -3,11 +3,11 @@ import { Route, Switch, useLocation } from 'react-router'
 
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 
-import Designer from '@webapp/views/Designer'
-import Users from '@webapp/views/Users'
-import Data from '@webapp/views/Data'
+import Designer from '@webapp/views/App/views/Designer'
+import Users from '@webapp/views/App/views/Users'
+import Data from '@webapp/views/App/views/Data'
 import Analysis from '@webapp/views/Analysis'
-import Home from '@webapp/views/Home'
+import Home from '@webapp/views/App/views/Home'
 
 const LoggedInModuleSwitch = () => {
   const location = useLocation()

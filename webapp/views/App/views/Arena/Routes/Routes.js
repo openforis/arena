@@ -7,7 +7,7 @@ import { app, guest } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 
 import DynamicImport from '@webapp/components/dynamicImport'
-import Guest from '@webapp/views/Guest'
+import Guest from '@webapp/views/App/views/Guest'
 
 import { useWebSocket } from './useWebSocket'
 import Loader from './Loader'

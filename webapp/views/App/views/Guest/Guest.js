@@ -3,9 +3,9 @@ import React from 'react'
 import { Route, Switch } from 'react-router'
 
 import { guestModules } from '@webapp/app/appModules'
-import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
-import ForgotPassword from '@webapp/views/Guest/views/ForgotPassword'
-import Login from '@webapp/views/Guest/views/Login'
+import ResetPassword from '@webapp/views/App/views/Guest/views/ResetPassword'
+import ForgotPassword from '@webapp/views/App/views/Guest/views/ForgotPassword'
+import Login from '@webapp/views/App/views/Guest/views/Login'
 
 const WordSplitter = ({ word }) => word.split('').map((letter, i) => <div key={String(i)}>{letter}</div>)
 
