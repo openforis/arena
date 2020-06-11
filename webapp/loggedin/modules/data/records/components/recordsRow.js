@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import camelize from 'camelize'
 import * as R from 'ramda'
 
@@ -12,22 +13,26 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
-const RecordsRow = props => {
-  const { row: record, nodeDefKeys, surveyInfo, user, idx, offset } = props
+const RecordsRow = (props) => {
+  const { row: record, rowNo } = props
+  const nodeDefKeys = [] // TODO
 
   const i18n = useI18n()
-
+  const surveyInfo = useSurveyInfo()
+  const user = useUser()
   const canEdit = Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record)
 
   return (
     <>
       <div>
         <ErrorBadge validation={Validation.getValidation(record)} showLabel={false} className="error-badge-inverse" />
-        {idx + offset + 1}
+        {rowNo}
       </div>
-      {nodeDefKeys.map((n, i) => (
-        <div key={i}>{record[camelize(NodeDef.getName(n))]}</div>
+      {nodeDefKeys.map((nodeDef) => (
+        <div key={NodeDef.getUuid(nodeDef)}>{record[camelize(NodeDef.getName(nodeDef))]}</div>
       ))}
       <div>{DateUtils.getRelativeDate(i18n, Record.getDateCreated(record))}</div>
       <div>{DateUtils.getRelativeDate(i18n, Record.getDateModified(record))}</div>
@@ -40,6 +45,11 @@ const RecordsRow = props => {
       </div>
     </>
   )
+}
+
+RecordsRow.propTypes = {
+  row: PropTypes.object.isRequired,
+  rowNo: PropTypes.number.isRequired,
 }
 
 export default RecordsRow

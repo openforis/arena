@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import * as Authorizer from '@core/auth/authorizer'
-import useAsyncGetRequest from '@webapp/components/hooks/useAsyncGetRequest'
+import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 
@@ -9,23 +10,14 @@ import * as UserState from './state'
 
 export const useUser = () => useSelector(UserState.getUser)
 
-export const useAuthCanEditSurvey = () => {
-  const user = useUser()
-  const surveyInfo = useSurveyInfo()
-  return Authorizer.canEditSurvey(user, surveyInfo)
-}
+// ====== Auth
+export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
+export const useAuthCanEditRecord = (record) => Authorizer.canEditRecord(useUser(), record)
+export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUser(), useSurveyInfo())
+export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
+export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
 
-export const useAuthCanEditRecord = (record) => {
-  const user = useUser()
-  return Authorizer.canEditRecord(user, record)
-}
-
-export const useAuthCanCleanseRecords = () => {
-  const user = useUser()
-  const surveyInfo = useSurveyInfo()
-  return Authorizer.canCleanseRecords(user, surveyInfo)
-}
-
+// ====== Profile picture
 export const useProfilePicture = (userUuid, forceUpdateKey) => {
   const [profilePicture, setProfilePicture] = useState(null)
 

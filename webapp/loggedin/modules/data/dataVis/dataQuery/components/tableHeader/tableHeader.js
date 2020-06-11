@@ -3,7 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
-import TablePaginator from '@webapp/loggedin/tableViews/components/tablePaginator'
+import Paginator from './Paginator'
 
 import ButtonDownload from './buttonDownload'
 import ButtonFilter from './buttonFilter'
@@ -83,7 +83,7 @@ const TableHeader = (props) => {
       </div>
 
       {data && hasData && (
-        <TablePaginator
+        <Paginator
           offset={offset}
           limit={limit}
           count={count}
