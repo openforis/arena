@@ -9,12 +9,12 @@ import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesVi
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
-import ChainsView from './chains/view'
-import ChainView from './chain/view'
+import ChainsView from '@webapp/loggedin/modules/analysis/chains/view'
+import ChainView from '@webapp/loggedin/modules/analysis/chain/view'
 
-import { navigateToChainsView } from './chain/actions'
+import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
-const AnalysisView = () => {
+const Analysis = () => {
   const dispatch = useDispatch()
   const history = useHistory()
   return (
@@ -56,4 +56,4 @@ const AnalysisView = () => {
   )
 }
 
-export default AnalysisView
+export default Analysis

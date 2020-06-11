@@ -3,11 +3,11 @@ import React from 'react'
 import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import UsersListView from './userList/userListView'
-import UserView from './user/userView'
-import UserInviteView from './userInvite/userInviteView'
+import UsersListView from '@webapp/loggedin/modules/users/userList/userListView'
+import UserView from '@webapp/loggedin/modules/users/user/userView'
+import UserInviteView from '@webapp/loggedin/modules/users/userInvite/userInviteView'
 
-const UsersView = () => (
+const Users = () => (
   <ModuleSwitch
     moduleRoot={appModules.users}
     moduleDefault={userModules.users}
@@ -28,4 +28,4 @@ const UsersView = () => (
   />
 )
 
-export default UsersView
+export default Users
