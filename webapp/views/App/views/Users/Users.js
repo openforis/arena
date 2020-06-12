@@ -4,8 +4,6 @@ import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
-// import UserView from '@webapp/loggedin/modules/users/user/userView'
-
 import UsersList from './UsersList'
 import UserInvite from './UserInvite'
 import UserEdit from './UserEdit'
