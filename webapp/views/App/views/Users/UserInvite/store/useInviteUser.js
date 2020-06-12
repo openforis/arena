@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useActions } from './actions'
+
+import { useActions } from './actions/index'
 
 export const useInviteUser = () => {
   const [userInvite, setUserInvite] = useState({})
