@@ -1,4 +1,4 @@
-import './profilePictureEditor.scss'
+import './ProfilePictureEditor.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'

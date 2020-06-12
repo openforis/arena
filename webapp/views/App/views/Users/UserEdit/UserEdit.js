@@ -1,45 +1,50 @@
-import './userView.scss'
+import './UserEdit.scss'
 
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 import * as User from '@core/user/user'
-import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
-import { SurveyState } from '@webapp/store/survey'
-
 import { useI18n } from '@webapp/store/system'
+
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input } from '@webapp/components/form/input'
 
-import ProfilePictureEditor from './components/profilePictureEditor'
-import DropdownUserGroup from '../components/dropdownUserGroup'
+import DropdownUserGroup from '../DropdownUserGroup'
 
-import { useUserViewState } from './useUserViewState'
+import ProfilePictureEditor from './ProfilePictureEditor'
 
-import { saveUser, removeUser, updateUserProp, updateUserProfilePicture, inviteUserRepeat } from './actions'
+import { useEditUser } from './store'
 
-const UserView = () => {
-  const i18n = useI18n()
-  const dispatch = useDispatch()
-  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+const UserEdit = () => {
+  const {
+    ready,
+    user,
+    userToUpdate,
+    canEdit,
+    canEditName,
+    canEditGroup,
+    canEditEmail,
+    canRemove,
+
+    onUpdate,
+    onUpdateProfilePicture,
+    onSave,
+    onRemove,
+    onInviteRepeat,
+  } = useEditUser()
   const { userUuid } = useParams()
-  const history = useHistory()
-
-  const { ready, user, userToUpdate, canEdit, canEditName, canEditGroup, canEditEmail, canRemove } = useUserViewState()
-
+  const i18n = useI18n()
   const validation = User.getValidation(userToUpdate)
 
   return (
     ready && (
-      <div className="user form">
+      <div className="user-edit form">
         {canEdit ? (
           <ProfilePictureEditor
             userUuid={userUuid}
-            onPictureUpdate={(profilePicture) => dispatch(updateUserProfilePicture(profilePicture))}
+            onPictureUpdate={(profilePicture) => onUpdateProfilePicture({ profilePicture })}
             enabled
           />
         ) : (
@@ -53,7 +58,7 @@ const UserView = () => {
             value={User.getName(userToUpdate)}
             validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
             maxLength={User.nameMaxLength}
-            onChange={(value) => dispatch(updateUserProp(User.keys.name, value))}
+            onChange={(value) => onUpdate({ name: User.keys.name, value })}
           />
         </FormItem>
         <FormItem label={i18n.t('common.email')}>
@@ -62,7 +67,7 @@ const UserView = () => {
             placeholder={i18n.t('common.email')}
             value={User.getEmail(userToUpdate)}
             validation={Validation.getFieldValidation(User.keys.email)(validation)}
-            onChange={(value) => dispatch(updateUserProp(User.keys.email, value))}
+            onChange={(value) => onUpdate({ name: User.keys.email, value })}
           />
         </FormItem>
         <FormItem label={i18n.t('common.group')}>
@@ -71,29 +76,14 @@ const UserView = () => {
             disabled={!canEditGroup}
             validation={Validation.getFieldValidation(User.keys.groupUuid)(validation)}
             groupUuid={User.getGroupUuid(userToUpdate)}
-            onChange={(groupUuid) => dispatch(updateUserProp(User.keys.groupUuid, groupUuid))}
+            onChange={(value) => onUpdate({ name: User.keys.groupUuid, value })}
           />
         </FormItem>
 
         {(canEdit || User.isInvitationExpired(userToUpdate)) && (
-          <div className="user__buttons">
+          <div className="user-edit__buttons">
             {canRemove && (
-              <button
-                type="button"
-                className="btn-s btn-danger btn-remove-user"
-                onClick={() =>
-                  dispatch(
-                    DialogConfirmActions.showDialogConfirm({
-                      key: 'userView.confirmRemove',
-                      params: {
-                        user: User.getName(userToUpdate),
-                        survey: Survey.getLabel(surveyInfo, i18n.lang),
-                      },
-                      onOk: () => dispatch(removeUser(history)),
-                    })
-                  )
-                }
-              >
+              <button type="button" className="btn-s btn-danger btn-remove-user" onClick={onRemove}>
                 <span className="icon icon-bin icon-left icon-10px" />
                 {i18n.t('userView.removeFromSurvey')}
               </button>
@@ -104,7 +94,7 @@ const UserView = () => {
                 type="button"
                 className="btn btn-save"
                 aria-disabled={!Validation.isValid(validation)}
-                onClick={() => dispatch(saveUser(history))}
+                onClick={onSave}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
                 {i18n.t('common.save')}
@@ -112,7 +102,7 @@ const UserView = () => {
             )}
 
             {User.isInvitationExpired(userToUpdate) && (
-              <button type="button" className="btn btn-invite" onClick={() => dispatch(inviteUserRepeat(history))}>
+              <button type="button" className="btn btn-invite" onClick={onInviteRepeat}>
                 <span className="icon icon-envelop icon-left icon-12px" />
                 {i18n.t('userView.sendNewInvitation')}
               </button>
@@ -124,4 +114,4 @@ const UserView = () => {
   )
 }
 
-export default UserView
+export default UserEdit
