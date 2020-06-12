@@ -15,14 +15,14 @@ export const validateEmail = (propName, item) => {
 }
 
 export const validateUser = async (user) =>
-  await Validator.validate(user, {
+  Validator.validate(user, {
     [User.keys.name]: [Validator.validateRequired(Validation.messageKeys.nameRequired)],
     [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
     [User.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })
 
 export const validateInvitation = async (userInvite) =>
-  await Validator.validate(userInvite, {
+  Validator.validate(userInvite, {
     [UserInvite.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
     [UserInvite.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })

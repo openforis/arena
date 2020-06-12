@@ -5,9 +5,9 @@ import { appModules, appModuleUri, userModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import UserView from '@webapp/loggedin/modules/users/user/userView'
-import UserInviteView from '@webapp/loggedin/modules/users/userInvite/userInviteView'
 
 import UsersList from './UsersList'
+import UserInvite from './UserInvite'
 
 const Users = () => (
   <ModuleSwitch
@@ -23,7 +23,7 @@ const Users = () => (
         path: `${appModuleUri(userModules.user)}:userUuid`,
       },
       {
-        component: UserInviteView,
+        component: UserInvite,
         path: `${appModuleUri(userModules.userInvite)}`,
       },
     ]}
