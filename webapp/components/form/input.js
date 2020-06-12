@@ -30,7 +30,7 @@ const InputComponent = (props, ref) => {
           mask={mask}
           className="form-input"
           aria-disabled={disabled}
-          isControlled={true}
+          isControlled={false}
           value={value}
           onChange={(e, { value }) => onChangeValue(value)}
           {...inputProps}
@@ -40,7 +40,7 @@ const InputComponent = (props, ref) => {
           ref={ref}
           className="form-input"
           aria-disabled={disabled}
-          value={value}
+          defaultValue={value}
           onChange={e => onChangeValue(e.target.value)}
           {...inputProps}
         />
