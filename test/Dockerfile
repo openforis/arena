@@ -22,9 +22,11 @@ RUN apt-get update; \
 # Install Gauge
 RUN npm install -g @getgauge/cli --unsafe-perm
 # Install Gauge plugins
-RUN gauge install js html-report && gauge install html-report && gauge install screenshot
-# Install Taiko
-RUN npm install taiko -g --allow-root --unsafe-perm=true
+RUN gauge install js && gauge install html-report && gauge install screenshot
+# Install Chromium
+RUN npm install -g chromium --unsafe-perm
+# Install PM2
+RUN npm install pm2 -g
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
@@ -32,7 +34,7 @@ COPY package.json yarn.lock /app/
 RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass
 
 COPY .git /app/.git
-RUN cd /app; git reset --hard; yarn build:server:dev
+RUN cd /app; git reset --hard; yarn build:server:dev &
 
 WORKDIR /app
 
