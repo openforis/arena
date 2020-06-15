@@ -7,7 +7,8 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/input'
-import DropdownUserGroup from '@webapp/loggedin/modules/users/components/dropdownUserGroup'
+
+import DropdownUserGroup from '../DropdownUserGroup'
 
 import { useInviteUser } from './store'
 
