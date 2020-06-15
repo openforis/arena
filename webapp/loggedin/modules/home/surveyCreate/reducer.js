@@ -1,11 +1,11 @@
 import { assocActionProps, exportReducer } from '@webapp/utils/reduxUtils'
 
-import { appUserLogout } from '@webapp/app/actions'
 import { SurveyActions } from '@webapp/store/survey'
 import { surveyCreateNewSurveyUpdate } from './actions'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
-  [appUserLogout]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
 

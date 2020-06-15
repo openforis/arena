@@ -3,7 +3,6 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { appUserLogout } from '@webapp/app/actions'
 import { SurveyActions, CategoriesActions } from '@webapp/store/survey'
 import { formReset } from '../surveyForm/actions'
 
@@ -16,10 +15,11 @@ import {
 } from './actions'
 
 import * as CategoryState from './categoryState'
+import { SystemActions } from '@webapp/store/system'
 
 const actionHandlers = {
   // Reset form
-  [appUserLogout]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

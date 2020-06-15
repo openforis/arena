@@ -4,11 +4,9 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { SurveyState, TaxonomiesActions } from '@webapp/store/survey'
+import { JobActions } from '@webapp/store/app'
 
-import { showAppJobMonitor } from '@webapp/loggedin/appJob/actions'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { reloadListItems } from '../../tableViews/actions'
-import * as TaxonomyState from './taxonomyState'
 
 // Taxonomy editor actions
 export const taxonomyViewTaxonomyUpdate = 'taxonomyView/taxonomy/update'
@@ -66,10 +64,12 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
   const { data } = await axios.post(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/upload`, formData)
 
   dispatch(
-    showAppJobMonitor(data.job, () => {
-      // On import complete validate taxonomy and reload taxa
-      dispatch(fetchTaxonomy(Taxonomy.getUuid(taxonomy)))
-      dispatch(reloadListItems(TaxonomyState.keys.taxa, { draft: true }))
+    JobActions.showJobMonitor({
+      job: data.job,
+      onComplete: () => {
+        // On import complete validate taxonomy and reload taxa
+        dispatch(fetchTaxonomy(Taxonomy.getUuid(taxonomy)))
+      },
     })
   )
 }

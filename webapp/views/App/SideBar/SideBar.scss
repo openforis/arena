@@ -1,0 +1,129 @@
+@import 'webapp/style/vars';
+
+$sidebarWidthClosed: 70px;
+$sidebarWidthOpened: 200px;
+//== buttons
+$sidebarBtnMargin: 1px;
+$sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
+//== popup-menu
+$sidebarPopupMenuBgColor: lighten($blue, 40%);
+
+.sidebar {
+  display: grid;
+  align-content: center;
+  position: relative;
+  width: $sidebarWidthClosed;
+}
+
+.sidebar__btn-toggle {
+  padding: 10px;
+  position: absolute;
+  top: 0;
+  left: 12px;
+}
+
+.sidebar__modules {
+  display: grid;
+}
+
+.sidebar__module,
+.sidebar__module-placeholder {
+  display: grid;
+  grid-row-gap: 15px;
+  border-right: 1px solid $greyBorder;
+  padding: 25px 15px;
+  cursor: pointer;
+
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+  }
+
+  &.active {
+    border-right-color: $blue;
+
+    &[aria-disabled='true'] {
+      opacity: 1;
+    }
+
+    .icon {
+      color: $blue;
+    }
+  }
+}
+
+.sidebar__module-btn {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 0.85rem;
+
+  &[aria-disabled='true'] {
+    opacity: 1;
+  }
+
+  &:only-child.active {
+    font-weight: bold;
+    color: $blue;
+  }
+}
+
+.sidebar__module-child-btn {
+  margin-left: 30px;
+  font-size: 0.8rem;
+
+  &.active {
+    font-weight: bold;
+    color: $blue;
+  }
+}
+
+//=== sidebar opened
+.sidebar.opened {
+  width: $sidebarWidthOpened;
+
+  .sidebar__module {
+    cursor: auto;
+    padding: 12px 15px;
+  }
+
+  .sidebar__module-placeholder {
+    height: 30px;
+    padding: 0;
+  }
+}
+
+//=== popup menu opened
+.sidebar__popup-menu {
+  position: fixed;
+  z-index: $zIndex10TopOfApp;
+  left: $sidebarWidthClosed - 1px;
+  background-color: $sidebarPopupMenuBgColor;
+  border-top: 1px solid $greyBorder;
+  border-right: 1px solid $greyBorder;
+  border-bottom: 1px solid $greyBorder;
+  display: grid;
+  grid-row-gap: 1.5rem;
+  padding: 30px 10px;
+
+  .sidebar__module-child-btn {
+    margin: 0;
+  }
+}
+
+.sidebar__modules.popup-menu-opened {
+  .sidebar__module.over {
+    background-color: $sidebarPopupMenuBgColor;
+  }
+}
+
+.version {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: $sidebarWidthOpened;
+  padding: 10px 20px;
+  font-size: 0.75rem;
+  color: lighten($black, 25%);
+  font-weight: 600;
+  text-align: center;
+}

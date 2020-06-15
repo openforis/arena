@@ -1,0 +1,39 @@
+.user-edit {
+  width: 50%;
+  margin: auto;
+  padding-top: 1rem;
+  grid-row-gap: 1.5rem;
+
+  .profile-picture {
+    margin-bottom: 20px;
+    justify-self: center;
+  }
+
+  .form-item {
+    grid-template-columns: .1fr .9fr;
+
+    .tooltip {
+      &:hover {
+        cursor: default;
+      }
+    }
+  }
+
+}
+
+.user-edit__buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  .btn-save {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+  .btn-remove-user {
+    position: absolute;
+    right: 0;
+  }
+}

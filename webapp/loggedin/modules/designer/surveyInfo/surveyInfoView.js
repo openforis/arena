@@ -1,12 +1,13 @@
 import './surveyInfoView.scss'
-
 import React from 'react'
 
-import { useAuthCanEditSurvey, useSurveyInfo } from '@webapp/components/hooks'
+import * as Survey from '@core/survey/survey'
+
 import { useI18n } from '@webapp/store/system'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { Input } from '@webapp/components/form/input'
-import * as Survey from '@core/survey/survey'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'

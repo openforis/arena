@@ -5,15 +5,15 @@ import * as ProcessingChain from '@common/analysis/processingChain'
 import { SurveyState } from '@webapp/store/survey'
 import * as ChainState from '@webapp/loggedin/modules/analysis/chain/state'
 
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
 import { NotificationActions } from '@webapp/store/ui'
+import { AppSavingActions } from '@webapp/store/app'
 
 import { navigateToChainsView } from './state'
 
 export const chainDelete = 'analysis/chain/delete'
 
 export const deleteChain = (history) => async (dispatch, getState) => {
-  dispatch(showAppSaving())
+  dispatch(AppSavingActions.showAppSaving())
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
@@ -24,5 +24,5 @@ export const deleteChain = (history) => async (dispatch, getState) => {
   dispatch({ type: chainDelete })
   dispatch(navigateToChainsView(history))
   dispatch(NotificationActions.notifyInfo({ key: 'processingChainView.deleteComplete' }))
-  dispatch(hideAppSaving())
+  dispatch(AppSavingActions.hideAppSaving())
 }

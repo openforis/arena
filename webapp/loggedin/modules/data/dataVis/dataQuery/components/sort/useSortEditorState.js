@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as DataSort from '@common/surveyRdb/dataSort'
 
-import { usePrevious, useSurvey } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/store/survey'
+
+import { usePrevious } from '@webapp/components/hooks'
 import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
 
 export default (props) => {

@@ -1,30 +1,23 @@
 import './validationReportView.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-
-import TableView from '@webapp/loggedin/tableViews/tableView'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import { useOnUpdate } from '@webapp/components/hooks'
+import { SurveyState, useSurveyCycleKey } from '@webapp/store/survey'
 
-import { SurveyState } from '@webapp/store/survey'
-
-import { reloadListItems } from '@webapp/loggedin/tableViews/actions'
+import Table from '@webapp/components/Table'
 
 import ValidationReportRowHeader from './validationReportRowHeader'
 import ValidationReportRow from './validationReportRow'
 
 const validationReportModule = 'validationReport'
 
-const ValidationReportView = (props) => {
-  const { surveyCycleKey, reloadListItems, history } = props
-
-  useOnUpdate(() => {
-    reloadListItems(validationReportModule, { cycle: surveyCycleKey })
-  }, [surveyCycleKey])
+const ValidationReportView = () => {
+  const history = useHistory()
+  const surveyCycleKey = useSurveyCycleKey()
 
   const onRowClick = (row) => {
     const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
@@ -42,7 +35,7 @@ const ValidationReportView = (props) => {
   const restParams = { cycle: surveyCycleKey }
 
   return (
-    <TableView
+    <Table
       className="validation-report__table"
       module={validationReportModule}
       restParams={restParams}
@@ -58,4 +51,4 @@ const mapStateToProps = (state) => ({
   surveyCycleKey: SurveyState.getSurveyCycleKey(state),
 })
 
-export default connect(mapStateToProps, { reloadListItems })(ValidationReportView)
+export default connect(mapStateToProps)(ValidationReportView)

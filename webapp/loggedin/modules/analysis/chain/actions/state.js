@@ -5,14 +5,13 @@ import * as Chain from '@common/analysis/processingChain'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
 import { SurveyState } from '@webapp/store/survey'
-
-import { hideAppSaving, showAppSaving } from '@webapp/app/actions'
+import { AppSavingActions } from '@webapp/store/app'
 
 export const chainUpdate = 'analysis/chain/update'
 export const chainReset = 'analysis/chain/reset'
 
 export const initChain = (chain) => async (dispatch, getState) => {
-  dispatch(showAppSaving())
+  dispatch(AppSavingActions.showAppSaving())
   const surveyId = SurveyState.getSurveyId(getState())
 
   if (chain) {
@@ -23,7 +22,7 @@ export const initChain = (chain) => async (dispatch, getState) => {
     dispatch({ type: chainUpdate, chain, attributeUuidsOtherChains })
   }
 
-  dispatch(hideAppSaving())
+  dispatch(AppSavingActions.hideAppSaving())
 }
 
 export const resetChain = () => (dispatch) => dispatch({ type: chainReset })

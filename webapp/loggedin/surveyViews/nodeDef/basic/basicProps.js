@@ -3,16 +3,15 @@ import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
-import { uuidv4 } from '@core/uuid'
-
 import { useI18n } from '@webapp/store/system'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-import { useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 import ButtonGroup from '@webapp/components/form/buttonGroup'

@@ -11,16 +11,17 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
+import { UserState } from '@webapp/store/user'
 import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 import * as CategoryState from './categoryState'
 import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'
 
 import { putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory } from './actions'
+
 
 const CategoryView = props => {
   const {
@@ -104,7 +105,7 @@ const CategoryView = props => {
 
 const mapStateToProps = state => ({
   category: CategoryState.getCategoryForEdit(state),
-  readOnly: !Authorizer.canEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
+  readOnly: !Authorizer.canEditSurvey(UserState.getUser(state), SurveyState.getSurveyInfo(state)),
   importSummary: CategoryState.getImportSummary(state),
 })
 

@@ -1,12 +1,13 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import * as AppActions from '@webapp/app/actions'
+import { SystemActions } from '@webapp/store/system'
+
 import * as SurveyActions from '../actions'
 import * as CategoriesActions from './actions'
 import * as CategoriesState from './state'
 
 const actionHandlers = {
-  [AppActions.appUserLogout]: () => ({}),
+  [SystemActions.SYSTEM_RESET]: () => ({}),
 
   // Reset state
   [SurveyActions.surveyCreate]: () => ({}),

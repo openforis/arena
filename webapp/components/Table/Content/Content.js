@@ -1,0 +1,70 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+
+import * as R from 'ramda'
+
+import { useI18n } from '@webapp/store/system'
+
+const Content = (props) => {
+  const {
+    gridTemplateColumns,
+    isRowActive,
+    list,
+    noItemsLabelKey,
+    offset,
+    onRowClick,
+    rowHeaderComponent,
+    rowComponent,
+  } = props
+
+  const i18n = useI18n()
+
+  return R.isEmpty(list) ? (
+    <div className="table__empty-rows">{i18n.t(noItemsLabelKey)}</div>
+  ) : (
+    <div className="table__content">
+      <div className="table__row-header" style={{ gridTemplateColumns }}>
+        {React.createElement(rowHeaderComponent, props)}
+      </div>
+      <div className="table__rows">
+        {list.map((row, i) => {
+          const active = isRowActive && isRowActive(row)
+          let className = 'table__row'
+          className += onRowClick ? ' hoverable' : ''
+          className += active ? ' active' : ''
+
+          return (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
+            <div
+              role="button"
+              key={String(i)}
+              onClick={() => onRowClick && onRowClick(row)}
+              className={className}
+              style={{ gridTemplateColumns }}
+            >
+              {React.createElement(rowComponent, { idx: i, offset, row, rowNo: i + offset + 1, active })}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+Content.propTypes = {
+  gridTemplateColumns: PropTypes.string.isRequired,
+  isRowActive: PropTypes.func,
+  list: PropTypes.array.isRequired,
+  noItemsLabelKey: PropTypes.string.isRequired,
+  offset: PropTypes.number.isRequired,
+  onRowClick: PropTypes.func,
+  rowHeaderComponent: PropTypes.elementType.isRequired,
+  rowComponent: PropTypes.elementType.isRequired,
+}
+
+Content.defaultProps = {
+  isRowActive: null,
+  onRowClick: null,
+}
+
+export default Content

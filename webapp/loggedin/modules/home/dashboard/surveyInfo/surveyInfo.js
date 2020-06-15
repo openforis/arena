@@ -5,14 +5,15 @@ import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
-
-import { useAuthCanEditSurvey, useSurveyInfo } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+
+import { useI18n } from '@webapp/store/system'
+import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
+
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 
-import { SurveyActions } from '@webapp/store/survey'
 import DeleteSurveyDialog from './components/deleteSurveyDialog'
 
 const SurveyInfo = () => {

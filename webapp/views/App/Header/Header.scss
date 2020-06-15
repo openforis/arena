@@ -1,0 +1,60 @@
+@import 'webapp/style/vars';
+
+.header {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $greyBorder;
+}
+
+.header__logo {
+  display: flex;
+  margin-left: 15px;
+
+  img {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+.header__survey {
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: lighten($black, 20%);
+
+  .dropdown {
+    margin-left: 10px;
+    grid-template-columns: 60px 40px;
+    border-bottom: none;
+
+    input {
+      font-size: 0.85rem;
+      color: lighten($black, 20%);
+    }
+  }
+
+  .progress-bar {
+    width: 80px;
+    height: 8px;
+  }
+
+  .btn-publish {
+    margin-left: 15px;
+  }
+}
+
+.header__user {
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  .btn {
+    padding: 1.2rem 0.5rem 0.7rem;
+    transform: scaleY(-0.6);
+  }
+}

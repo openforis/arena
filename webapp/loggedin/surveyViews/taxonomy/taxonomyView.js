@@ -10,16 +10,16 @@ import * as Taxonomy from '@core/survey/taxonomy'
 
 import { useI18n } from '@webapp/store/system'
 
-import * as AppState from '@webapp/app/appState'
 import { SurveyState } from '@webapp/store/survey'
 
-import TableView from '../../tableViews/tableView'
+import Table from '@webapp/components/Table/Table'
 import TaxonomyEditHeader from './components/taxonomyEditHeader'
 import TaxaTableRowHeader from './components/taxaTableRowHeader'
 import TaxaTableRow from './components/taxaTableRow'
 import * as TaxonomyState from './taxonomyState'
 
 import { putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from './actions'
+import { UserState } from '@webapp/store/user'
 
 const TaxonomyView = (props) => {
   const { surveyId, taxonomy, canEdit, setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile } = props
@@ -42,7 +42,7 @@ const TaxonomyView = (props) => {
     <div className="taxonomy">
       <TaxonomyEditHeader {...props} />
 
-      <TableView
+      <Table
         module={TaxonomyState.keys.taxa}
         moduleApiUri={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`}
         restParams={{ draft: canEdit }}
@@ -75,7 +75,7 @@ const TaxonomyView = (props) => {
 
 const mapStateToProps = (state) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = AppState.getUser(state)
+  const user = UserState.getUser(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),

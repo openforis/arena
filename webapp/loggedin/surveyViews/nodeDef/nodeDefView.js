@@ -11,10 +11,11 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
-import { NodeDefsActions } from '@webapp/store/survey'
-
-import { useOnUpdate, useSurvey, useSurveyCycleKey } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
+import { NodeDefsActions, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { DialogConfirmActions } from '@webapp/store/ui'
+
+import { useOnUpdate } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
@@ -26,7 +27,6 @@ import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
 
 import { setNodeDefUuidForEdit } from './actions'
-import { DialogConfirmActions } from '@webapp/store/ui'
 
 const _isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||

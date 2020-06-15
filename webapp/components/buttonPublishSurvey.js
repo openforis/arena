@@ -4,10 +4,9 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { SurveyActions } from '@webapp/store/survey'
-import { DialogConfirmActions } from '@webapp/store/ui'
-import { useSurveyInfo } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
+import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 const ButtonPublishSurvey = (props) => {
   const { className, disabled } = props
