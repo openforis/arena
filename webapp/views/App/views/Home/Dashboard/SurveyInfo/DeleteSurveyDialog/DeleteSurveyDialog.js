@@ -51,7 +51,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
             type="button"
             className="btn btn-danger modal-footer__item"
             onClick={onDelete}
-            aria-disabled={!(surveyName === confirmName)}
+            aria-disabled={surveyName !== confirmName}
           >
             <span className="icon icon-bin icon-12px icon-left" />
             {i18n.t('common.delete')}
