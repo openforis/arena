@@ -8,9 +8,9 @@ import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 
 import SurveyCreateView from '@webapp/loggedin/modules/home/surveyCreate/surveyCreateView'
-import CollectImportReportView from '@webapp/loggedin/modules/home/collectImportReport/collectImportReportView'
 
 import Dashboard from './Dashboard'
+import CollectImportReport from './CollectImportReport'
 import SurveyList from './SurveyList'
 
 const Home = () => {
@@ -42,7 +42,7 @@ const Home = () => {
           path: appModuleUri(homeModules.surveyInfo),
         },
         {
-          component: CollectImportReportView,
+          component: CollectImportReport,
           path: appModuleUri(homeModules.collectImportReport),
         },
       ]}
