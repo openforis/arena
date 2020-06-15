@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
 
-const SurveyListRowHeader = () => {
+const RowHeader = () => {
   const i18n = useI18n()
 
   return (
@@ -18,4 +18,4 @@ const SurveyListRowHeader = () => {
   )
 }
 
-export default SurveyListRowHeader
+export default RowHeader

@@ -7,9 +7,11 @@ import SurveyInfoView from '@webapp/loggedin/modules/designer/surveyInfo/surveyI
 import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 import DashboardView from '@webapp/loggedin/modules/home/dashboard/dashboardView'
-import SurveyListView from '@webapp/loggedin/modules/home/surveyList/surveyListView'
+
 import SurveyCreateView from '@webapp/loggedin/modules/home/surveyCreate/surveyCreateView'
 import CollectImportReportView from '@webapp/loggedin/modules/home/collectImportReport/collectImportReportView'
+
+import SurveyList from './SurveyList'
 
 const Home = () => {
   const user = useUser()
@@ -24,7 +26,7 @@ const Home = () => {
           path: appModuleUri(homeModules.dashboard),
         },
         {
-          component: SurveyListView,
+          component: SurveyList,
           path: appModuleUri(homeModules.surveyList),
         },
         ...(User.isSystemAdmin(user)

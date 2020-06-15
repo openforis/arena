@@ -6,7 +6,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'
 
-const SurveyListRow = (props) => {
+const Row = (props) => {
   const { row, active } = props
   const surveyInfoRow = Survey.getSurveyInfo(row)
 
@@ -25,9 +25,9 @@ const SurveyListRow = (props) => {
   )
 }
 
-SurveyListRow.propTypes = {
+Row.propTypes = {
   active: PropTypes.bool.isRequired,
   row: PropTypes.object.isRequired,
 }
 
-export default SurveyListRow
+export default Row

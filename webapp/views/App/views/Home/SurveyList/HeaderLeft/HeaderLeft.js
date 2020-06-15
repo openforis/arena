@@ -3,7 +3,7 @@ import React from 'react'
 import Header from '@webapp/components/header'
 import { useI18n } from '@webapp/store/system'
 
-const SurveyListHeaderLeft = () => {
+const HeaderLeft = () => {
   const i18n = useI18n()
 
   return (
@@ -13,4 +13,4 @@ const SurveyListHeaderLeft = () => {
   )
 }
 
-export default SurveyListHeaderLeft
+export default HeaderLeft

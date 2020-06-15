@@ -12,11 +12,11 @@ import { useUser } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table'
 
-import SurveyListHeaderLeft from './components/surveyListHeaderLeft'
-import SurveyListRowHeader from './components/surveyListRowHeader'
-import SurveyListRow from './components/surveyListRow'
+import HeaderLeft from './HeaderLeft'
+import RowHeader from './RowHeader'
+import Row from './Row'
 
-const SurveyListView = () => {
+const SurveyList = () => {
   const dispatch = useDispatch()
   const history = useHistory()
   const user = useUser()
@@ -39,13 +39,13 @@ const SurveyListView = () => {
       module="surveys"
       moduleApiUri="/api/surveys"
       gridTemplateColumns="50px repeat(6, 1.5fr)"
-      headerLeftComponent={SurveyListHeaderLeft}
-      rowHeaderComponent={SurveyListRowHeader}
-      rowComponent={SurveyListRow}
+      headerLeftComponent={HeaderLeft}
+      rowHeaderComponent={RowHeader}
+      rowComponent={Row}
       onRowClick={onRowClick}
       isRowActive={isRowActive}
     />
   )
 }
 
-export default SurveyListView
+export default SurveyList
