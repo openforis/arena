@@ -1,7 +1,6 @@
-import './surveyCreateView.scss'
+import './SurveyCreate.scss'
 
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React from 'react'
 import { useHistory } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
@@ -17,23 +16,15 @@ import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
 
-import * as SurveyCreateState from './surveyCreateState'
+import { useCreateSurvey } from './store'
 
-import { updateNewSurveyProp, resetNewSurvey, createSurvey, importCollectSurvey } from './actions'
-
-const SurveyCreateView = () => {
-  const newSurvey = useSelector(SurveyCreateState.getNewSurvey)
+const SurveyCreate = () => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const history = useHistory()
-  const dispatch = useDispatch()
 
+  const { newSurvey, onUpdate, onCreate, onImport } = useCreateSurvey()
   const { name, label, lang, validation } = newSurvey
-
-  // OnMount reset new survey
-  useEffect(() => {
-    dispatch(resetNewSurvey())
-  }, [])
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -47,7 +38,7 @@ const SurveyCreateView = () => {
           placeholder={i18n.t('common.name')}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
-          onChange={(value) => dispatch(updateNewSurveyProp('name', StringUtils.normalizeName(value)))}
+          onChange={(value) => onUpdate({ name: 'name', value: StringUtils.normalizeName(value) })}
         />
       </div>
       <div>
@@ -55,17 +46,17 @@ const SurveyCreateView = () => {
           placeholder={i18n.t('common.label')}
           value={label}
           validation={Validation.getFieldValidation('label')(validation)}
-          onChange={(value) => dispatch(updateNewSurveyProp('label', value))}
+          onChange={(value) => onUpdate({ name: 'label', value })}
         />
       </div>
       <div>
         <LanguageDropdown
           selection={lang}
-          onChange={(e) => dispatch(updateNewSurveyProp('lang', e))}
           validation={Validation.getFieldValidation('lang')(validation)}
+          onChange={(value) => onUpdate({ name: 'lang', value })}
         />
       </div>
-      <button type="button" className="btn" onClick={() => dispatch(createSurvey({ name, label, lang }))}>
+      <button type="button" className="btn" onClick={onCreate}>
         <span className="icon icon-plus icon-left icon-12px" />
         {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>
@@ -75,11 +66,11 @@ const SurveyCreateView = () => {
           label={i18n.t('homeView.surveyCreate.importFromCollect')}
           accept=".collect,.collect-backup"
           maxSize={1000}
-          onChange={(files) => dispatch(importCollectSurvey(files[0]))}
+          onChange={(files) => onImport({ file: files[0] })}
         />
       </div>
     </div>
   )
 }
 
-export default SurveyCreateView
+export default SurveyCreate
