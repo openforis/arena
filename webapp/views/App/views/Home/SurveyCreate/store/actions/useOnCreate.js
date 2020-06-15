@@ -15,7 +15,7 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
       } = await axios.post('/api/survey', { name, label, lang })
 
       if (survey) {
-        dispatch({ type: SurveyActions.surveyCreate, survey })
+        dispatch(SurveyActions.createSurvey({ survey }))
       } else {
         setNewSurvey({
           ...newSurvey,
