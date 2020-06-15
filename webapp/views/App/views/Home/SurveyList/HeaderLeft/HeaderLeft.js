@@ -1,7 +1,8 @@
 import React from 'react'
 
-import Header from '@webapp/components/header'
 import { useI18n } from '@webapp/store/system'
+
+import Header from '@webapp/components/header'
 
 const HeaderLeft = () => {
   const i18n = useI18n()

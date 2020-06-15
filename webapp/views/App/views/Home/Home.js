@@ -6,11 +6,11 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyInfoView from '@webapp/loggedin/modules/designer/surveyInfo/surveyInfoView'
 import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
-import DashboardView from '@webapp/loggedin/modules/home/dashboard/dashboardView'
 
 import SurveyCreateView from '@webapp/loggedin/modules/home/surveyCreate/surveyCreateView'
 import CollectImportReportView from '@webapp/loggedin/modules/home/collectImportReport/collectImportReportView'
 
+import Dashboard from './Dashboard'
 import SurveyList from './SurveyList'
 
 const Home = () => {
@@ -22,7 +22,7 @@ const Home = () => {
       moduleDefault={homeModules.dashboard}
       modules={[
         {
-          component: DashboardView,
+          component: Dashboard,
           path: appModuleUri(homeModules.dashboard),
         },
         {
