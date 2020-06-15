@@ -5,7 +5,7 @@
   grid-row-gap: 1.5rem;
 
   .form-item {
-    grid-template-columns: .1fr .9fr;
+    grid-template-columns: 0.1fr 0.9fr;
 
     .tooltip {
       &:hover {
@@ -13,7 +13,6 @@
       }
     }
   }
-
 }
 
 .user-invite__buttons {

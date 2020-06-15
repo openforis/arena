@@ -6,10 +6,11 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyInfoView from '@webapp/loggedin/modules/designer/surveyInfo/surveyInfoView'
 import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
-import DashboardView from '@webapp/loggedin/modules/home/dashboard/dashboardView'
-import SurveyListView from '@webapp/loggedin/modules/home/surveyList/surveyListView'
-import SurveyCreateView from '@webapp/loggedin/modules/home/surveyCreate/surveyCreateView'
-import CollectImportReportView from '@webapp/loggedin/modules/home/collectImportReport/collectImportReportView'
+
+import Dashboard from './Dashboard'
+import CollectImportReport from './CollectImportReport'
+import SurveyList from './SurveyList'
+import SurveyCreate from './SurveyCreate'
 
 const Home = () => {
   const user = useUser()
@@ -20,17 +21,17 @@ const Home = () => {
       moduleDefault={homeModules.dashboard}
       modules={[
         {
-          component: DashboardView,
+          component: Dashboard,
           path: appModuleUri(homeModules.dashboard),
         },
         {
-          component: SurveyListView,
+          component: SurveyList,
           path: appModuleUri(homeModules.surveyList),
         },
         ...(User.isSystemAdmin(user)
           ? [
               {
-                component: SurveyCreateView,
+                component: SurveyCreate,
                 path: appModuleUri(homeModules.surveyNew),
               },
             ]
@@ -40,7 +41,7 @@ const Home = () => {
           path: appModuleUri(homeModules.surveyInfo),
         },
         {
-          component: CollectImportReportView,
+          component: CollectImportReport,
           path: appModuleUri(homeModules.collectImportReport),
         },
       ]}

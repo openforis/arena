@@ -1,0 +1,16 @@
+.home-survey-create {
+  display: grid;
+  grid-template-columns: repeat(4, 0.25fr);
+  grid-template-rows: 0.5fr 0.5fr;
+  align-items: center;
+  grid-column-gap: 0.5rem;
+  grid-row-gap: 2rem;
+}
+
+.home-survey-create__collect-import {
+  grid-column: 2 / 4;
+  justify-self: auto;
+  align-self: normal;
+  text-align: center;
+  padding-top: 2rem;
+}

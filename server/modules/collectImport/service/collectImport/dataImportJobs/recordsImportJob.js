@@ -178,7 +178,7 @@ export default class RecordsImportJob extends Job {
 
         if (NodeDef.isEntity(nodeDef)) {
           // Create child nodes to insert
-          const { nodesToInsert, recordValidation } = this._createNodeChildrenToInsert(
+          const { nodesToInsert } = this._createNodeChildrenToInsert(
             survey,
             collectNodeDef,
             collectNodeDefPath,
