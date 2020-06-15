@@ -1,5 +1,3 @@
 import * as ActionTypes from './actionTypes'
 
-export const createSurvey = ({ survey }) => (dispatch) => {
-  dispatch({ type: ActionTypes.surveyCreate, survey })
-}
+export const createSurvey = ({ survey }) => ({ type: ActionTypes.surveyCreate, survey })
