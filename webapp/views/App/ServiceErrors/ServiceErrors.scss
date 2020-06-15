@@ -1,4 +1,4 @@
-@import "webapp/style/vars";
+@import 'webapp/style/vars';
 
 .service-errors {
   position: fixed;
@@ -16,7 +16,7 @@
 
 .service-errors__error {
   background-color: $red;
-  margin: 0 .5rem;
+  margin: 0 0.5rem;
   min-height: 100px;
   padding: 1rem;
   position: relative;
@@ -36,13 +36,13 @@
   .status {
     text-transform: uppercase;
     font-weight: 600;
-    font-size: .9rem;
+    font-size: 0.9rem;
     text-align: center;
   }
 
   .message {
-    padding-top: .5rem;
-    font-size: .9rem;
+    padding-top: 0.5rem;
+    font-size: 0.9rem;
 
     p {
       margin: 0;

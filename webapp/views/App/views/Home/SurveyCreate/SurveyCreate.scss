@@ -1,9 +1,9 @@
 .home-survey-create {
   display: grid;
-  grid-template-columns: repeat(4, .25fr);
-  grid-template-rows: .5fr .5fr;
+  grid-template-columns: repeat(4, 0.25fr);
+  grid-template-rows: 0.5fr 0.5fr;
   align-items: center;
-  grid-column-gap: .5rem;
+  grid-column-gap: 0.5rem;
   grid-row-gap: 2rem;
 }
 

@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .profile-picture-editor {
   display: grid;
@@ -37,14 +37,14 @@
     }
 
     &:disabled {
-      background: rgba($blueLight, .5);
+      background: rgba($blueLight, 0.5);
 
       &::-webkit-slider-thumb {
-        background: rgba($blue, .3);
+        background: rgba($blue, 0.3);
       }
 
       &::-moz-range-thumb {
-        background: rgba($blue, .3);
+        background: rgba($blue, 0.3);
       }
     }
 
