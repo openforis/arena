@@ -1,5 +1,4 @@
-@import "~@webapp/style/vars";
-
+@import 'webapp/style/vars';
 
 .home-survey-info__cycles-editor {
   .cycles {
@@ -16,13 +15,15 @@
       align-items: center;
       min-width: 315px;
       margin: 2px 10px 2px 0;
-      padding: .15rem .5rem;
+      padding: 0.15rem 0.5rem;
       border: 1px solid $greyBorder;
-      font-size: .9rem;
+      font-size: 0.9rem;
 
       .step {
         font-weight: 600;
         color: lighten($black, 15%);
+        top: inherit;
+        height: initial;
       }
 
       .date-container {
@@ -30,7 +31,7 @@
       }
 
       .date-label {
-        font-size: .7rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
         color: lighten($black, 15%);
         font-weight: 600;
@@ -40,14 +41,13 @@
         margin-left: 5px;
 
         input {
-          padding: .25rem .1rem;
+          padding: 0.25rem 0.1rem;
         }
       }
 
       .btn-delete {
-        padding: .1rem;
+        padding: 0.1rem;
       }
     }
   }
 }
-

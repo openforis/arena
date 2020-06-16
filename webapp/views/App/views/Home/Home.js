@@ -3,7 +3,7 @@ import React from 'react'
 import * as User from '@core/user/user'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import SurveyInfoView from '@webapp/loggedin/modules/designer/surveyInfo/surveyInfoView'
+
 import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 
@@ -11,6 +11,7 @@ import Dashboard from './Dashboard'
 import CollectImportReport from './CollectImportReport'
 import SurveyList from './SurveyList'
 import SurveyCreate from './SurveyCreate'
+import SurveyInfo from './SurveyInfo'
 
 const Home = () => {
   const user = useUser()
@@ -37,7 +38,7 @@ const Home = () => {
             ]
           : []),
         {
-          component: SurveyInfoView,
+          component: SurveyInfo,
           path: appModuleUri(homeModules.surveyInfo),
         },
         {

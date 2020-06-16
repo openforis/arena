@@ -1,4 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -6,10 +8,10 @@ import InputChips from '@webapp/components/form/inputChips'
 
 import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
 
-const LanguagesEditor = props => {
+const LanguagesEditor = (props) => {
   const { languages, setLanguages, readOnly } = props
 
-  const selection = languages.map(lang => ({
+  const selection = languages.map((lang) => ({
     key: lang,
     value: getLanguageLabel(lang),
   }))
@@ -24,7 +26,7 @@ const LanguagesEditor = props => {
         items={appLanguages}
         itemKeyProp="key"
         selection={selection}
-        onChange={items => {
+        onChange={(items) => {
           setLanguages(R.pluck('key', items))
         }}
         requiredItems={1}
@@ -32,6 +34,12 @@ const LanguagesEditor = props => {
       />
     </div>
   )
+}
+
+LanguagesEditor.propTypes = {
+  languages: PropTypes.array.isRequired,
+  setLanguages: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool.isRequired,
 }
 
 export default LanguagesEditor
