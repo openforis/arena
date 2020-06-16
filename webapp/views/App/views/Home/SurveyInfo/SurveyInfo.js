@@ -1,4 +1,5 @@
-import './surveyInfoView.scss'
+import './SurveyInfo.scss'
+
 import React from 'react'
 
 import * as Survey from '@core/survey/survey'
@@ -8,13 +9,16 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { Input } from '@webapp/components/form/input'
-import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
-import LanguagesEditor from './components/languagesEditor'
-import SrsEditor from './components/srsEditor'
-import CyclesEditor from './components/cyclesEditor'
-import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
-const SurveyInfoView = () => {
+import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+
+import CyclesEditor from './CyclesEditor'
+import SrsEditor from './SrsEditor'
+import LanguagesEditor from './LanguagesEditor'
+
+import { useSurveyInfoForm } from './store'
+
+const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
   const readOnly = !useAuthCanEditSurvey()
 
@@ -35,7 +39,7 @@ const SurveyInfoView = () => {
     setCycles,
     getFieldValidation,
     saveProps,
-  } = useSurveyInfoViewState()
+  } = useSurveyInfoForm()
 
   return (
     <div className="home-survey-info">
@@ -96,4 +100,4 @@ const SurveyInfoView = () => {
   )
 }
 
-export default SurveyInfoView
+export default SurveyInfo

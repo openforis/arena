@@ -10,7 +10,7 @@ import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
 
 import { useFormObject } from '@webapp/components/hooks'
 
-export const useSurveyInfoViewState = () => {
+export const useSurveyInfoForm = () => {
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
 
