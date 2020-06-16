@@ -1,5 +1,8 @@
+import * as pgPromise from 'pg-promise'
+
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as ProcessingStep from '../../../../../common/analysis/processingStep'
 
 import * as SQL from '../../../../../common/model/db/sql'
 import { ColumnNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
@@ -7,7 +10,10 @@ import { ColumnNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
   viewDataNodeDef.columnNodeDefs
     .map((columnNodeDef) => {
-      if (NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef)) {
+      if (
+        NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef) &&
+        !NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)
+      ) {
         return [`${viewDataNodeDef.tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
       return columnNodeDef.namesFull
