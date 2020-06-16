@@ -33,9 +33,8 @@ export default class Table {
     }
 
     this._schema = schema
-    this._name = name
-    this._alias = SQL.createAlias(name)
     this._columnSet = columnSet
+    this.name = name
   }
 
   get schema() {
@@ -52,6 +51,7 @@ export default class Table {
 
   set name(name) {
     this._name = name
+    this._alias = SQL.createAlias(name)
   }
 
   get alias() {
