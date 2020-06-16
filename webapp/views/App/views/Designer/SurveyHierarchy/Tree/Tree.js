@@ -14,7 +14,7 @@ const transitionDuration = 750
 const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
 
-export default class SurveyHierarchyTree {
+export default class Tree {
   constructor(domElement, data, lang, onEntityClick) {
     this.nodesByUuidMap = {}
     this.lang = lang
