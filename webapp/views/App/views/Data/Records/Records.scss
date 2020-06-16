@@ -1,11 +1,11 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .records {
   .table__row {
     .error-badge {
       left: 4rem;
       pointer-events: none;
-      top: .5rem;
+      top: 0.5rem;
     }
   }
 }

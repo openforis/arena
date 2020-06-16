@@ -10,11 +10,11 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
 import DataVisView from '@webapp/loggedin/modules/data/dataVis/dataVisView'
-import RecordsView from '@webapp/loggedin/modules/data/records/recordsView'
 
 import { resetDataVis } from '@webapp/loggedin/modules/data/dataVis/actions'
 
 import ValidationReport from './ValidationReport'
+import Records from './Records'
 
 const Data = () => {
   const dispatch = useDispatch()
@@ -34,7 +34,7 @@ const Data = () => {
         modules={[
           // Records list
           {
-            component: RecordsView,
+            component: Records,
             path: appModuleUri(dataModules.records),
           },
           // Edit record

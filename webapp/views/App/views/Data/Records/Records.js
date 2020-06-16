@@ -1,26 +1,26 @@
-import './recordsView.scss'
+import './Records.scss'
 
 import React from 'react'
 import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
 
-import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyNodeDefs } from '@webapp/store/survey'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import Table from '@webapp/components/Table'
 
-import RecordsHeaderLeft from './components/recordsHeaderLeft'
-import RecordsRowHeader from './components/recordsRowHeader'
-import RecordsRow from './components/recordsRow'
+import HeaderLeft from './HeaderLeft'
+import RowHeader from './RowHeader'
+import Row from './Row'
 
-const RecordsView = () => {
+const Records = () => {
   const history = useHistory()
   const cycle = useSurveyCycleKey()
-  const nodeDefKeys = [] // TODO: fetch them
+  const nodeDefKeys = useSurveyNodeDefs()
 
-  const noCols = 3 + nodeDefKeys.length
+  const noCols = 3 + Object.keys(nodeDefKeys).length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`
 
   const onRowClick = (record) => history.push(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`)
@@ -31,13 +31,13 @@ const RecordsView = () => {
       restParams={{ cycle }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
-      headerLeftComponent={RecordsHeaderLeft}
-      rowHeaderComponent={RecordsRowHeader}
-      rowComponent={RecordsRow}
+      headerLeftComponent={HeaderLeft}
+      rowHeaderComponent={RowHeader}
+      rowComponent={Row}
       noItemsLabelKey="dataView.records.noRecordsAdded"
       onRowClick={onRowClick}
     />
   )
 }
 
-export default RecordsView
+export default Records

@@ -20,6 +20,8 @@ export const getSurveyDefaultLang = R.pipe(getSurveyInfo, Survey.getDefaultLangu
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 
+export const getNodeDefs = R.pipe(getSurvey, Survey.getNodeDefs)
+
 export const getSurveyCycleKey = (state) =>
   R.pipe(UserState.getUser, User.getPrefSurveyCycle(getSurveyId(state)))(state)
 

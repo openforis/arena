@@ -13,12 +13,12 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyInfo, useSurveyNodeDefs } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
-const RecordsRow = (props) => {
+const Row = (props) => {
   const { row: record, rowNo } = props
-  const nodeDefKeys = [] // TODO
+  const nodeDefs = useSurveyNodeDefs()
 
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
@@ -31,7 +31,7 @@ const RecordsRow = (props) => {
         <ErrorBadge validation={Validation.getValidation(record)} showLabel={false} className="error-badge-inverse" />
         {rowNo}
       </div>
-      {nodeDefKeys.map((nodeDef) => (
+      {Object.values(nodeDefs).map((nodeDef) => (
         <div key={NodeDef.getUuid(nodeDef)}>{record[camelize(NodeDef.getName(nodeDef))]}</div>
       ))}
       <div>{DateUtils.getRelativeDate(i18n, Record.getDateCreated(record))}</div>
@@ -47,9 +47,9 @@ const RecordsRow = (props) => {
   )
 }
 
-RecordsRow.propTypes = {
+Row.propTypes = {
   row: PropTypes.object.isRequired,
   rowNo: PropTypes.number.isRequired,
 }
 
-export default RecordsRow
+export default Row
