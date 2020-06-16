@@ -1,5 +1,5 @@
 /* globals beforeSuite, afterSuite */
-const { $, waitFor, openBrowser, currentURL, closeBrowser, text } = require('taiko')
+const { $, waitFor, click, openBrowser, currentURL, closeBrowser, text } = require('taiko')
 const { expect } = require('chai')
 
 const headless = Boolean(process.env.HEADLESS_CHROME)
@@ -28,6 +28,10 @@ afterSuite(async () => {
 step('Page contains <content>', async (content) => {
   /* eslint-disable no-unused-expressions */
   expect(await text(content).exists()).to.be.true
+})
+
+step('Click on <content>', async (content) => {
+  await click(content)
 })
 
 step('Wait for <element> to exist', async (element) => {
