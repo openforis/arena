@@ -11,10 +11,11 @@ import TaxonomyView from '@webapp/loggedin/surveyViews/taxonomy/taxonomyView'
 
 import { appModules, appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import SurveyHierarchyView from '@webapp/loggedin/modules/designer/surveyHierarchy/surveyHierarchyView'
-import FormDesignerView from '@webapp/loggedin/modules/designer/formDesigner/formDesignerView'
 
 import { resetForm } from '@webapp/loggedin/surveyViews/surveyForm/actions'
+
+import FormDesigner from './FormDesigner'
+import SurveyHierarchy from './SurveyHierarchy'
 
 const Designer = () => {
   const dispatch = useDispatch()
@@ -31,7 +32,7 @@ const Designer = () => {
         moduleDefault={designerModules.formDesigner}
         modules={[
           {
-            component: FormDesignerView,
+            component: FormDesigner,
             path: appModuleUri(designerModules.formDesigner),
           },
 
@@ -46,7 +47,7 @@ const Designer = () => {
           },
 
           {
-            component: SurveyHierarchyView,
+            component: SurveyHierarchy,
             path: appModuleUri(designerModules.surveyHierarchy),
           },
 

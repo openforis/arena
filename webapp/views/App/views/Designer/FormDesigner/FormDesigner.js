@@ -8,7 +8,7 @@ import * as RecordState from '@webapp/loggedin/surveyViews/record/recordState'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-const FormDesignerView = () => {
+const FormDesigner = () => {
   const canEditDef = useAuthCanEditSurvey()
   const recordPreviewUuid = useSelector(RecordState.getRecordUuidPreview)
 
@@ -19,4 +19,4 @@ const FormDesignerView = () => {
   )
 }
 
-export default FormDesignerView
+export default FormDesigner

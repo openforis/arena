@@ -1,4 +1,4 @@
-import './surveyHierarchyView.scss'
+import './SurveyHierarchy.scss'
 
 import React, { useEffect, useState, useRef } from 'react'
 
@@ -8,10 +8,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
-import Tree from './surveyHierarchyTree'
+import NodeDefsSelectorView from '@webapp/loggedin/surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import Tree from './Tree'
 
-const SurveyHierarchyView = () => {
+const SurveyHierarchy = () => {
   const i18n = useI18n()
   const survey = useSurvey()
 
@@ -51,4 +51,4 @@ const SurveyHierarchyView = () => {
   )
 }
 
-export default SurveyHierarchyView
+export default SurveyHierarchy
