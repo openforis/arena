@@ -76,7 +76,7 @@ export const {
   getCollectUri,
   getCollectReport,
   hasCollectReportIssues,
-  getOwnerName
+  getOwnerName,
 } = SurveyInfo
 
 export const { getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
@@ -90,6 +90,7 @@ export const {
   getNodeDefsArray,
   getNodeDefsByUuids,
   getNodeDefRoot,
+  getNodeDefRootKeys,
   getNodeDefByUuid,
   getNodeDefChildren,
   hasNodeDefChildrenEntities,
