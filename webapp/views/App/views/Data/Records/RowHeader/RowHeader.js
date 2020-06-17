@@ -3,19 +3,18 @@ import React from 'react'
 import { useI18n, useLang } from '@webapp/store/system'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { useNodeDefRootKeys } from '@webapp/store/survey'
 
-const RecordsRowHeader = () => {
-  const nodeDefKeys = [] // TODO: fetch them
+const RowHeader = () => {
+  const nodeDefKeys = useNodeDefRootKeys()
   const i18n = useI18n()
   const lang = useLang()
   return (
     <>
       <div>#</div>
-      {
-        nodeDefKeys.map((k) => (
-          <div key={NodeDef.getUuid(k)}>{NodeDef.getLabel(k, lang)}</div>
-        )) // TODO use SurveyState.getNodeDefLabel
-      }
+      {nodeDefKeys.map((nodeDef) => (
+        <div key={NodeDef.getUuid(nodeDef)}>{NodeDef.getLabel(nodeDef, lang)}</div>
+      ))}
       <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>
       <div>{i18n.t('dataView.records.owner')}</div>
@@ -26,4 +25,4 @@ const RecordsRowHeader = () => {
   )
 }
 
-export default RecordsRowHeader
+export default RowHeader

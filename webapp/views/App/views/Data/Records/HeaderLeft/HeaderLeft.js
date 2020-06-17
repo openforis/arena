@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { createRecord } from '@webapp/loggedin/surveyViews/record/actions'
 
-const RecordsHeaderLeft = () => {
+const HeaderLeft = () => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyInfo = useSurveyInfo()
@@ -24,4 +24,4 @@ const RecordsHeaderLeft = () => {
   )
 }
 
-export default RecordsHeaderLeft
+export default HeaderLeft

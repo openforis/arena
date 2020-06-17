@@ -1,21 +1,19 @@
-import './validationReportView.scss'
+import './ValidationReport.scss'
+
 import React from 'react'
-import { connect } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import { SurveyState, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import Table from '@webapp/components/Table'
 
-import ValidationReportRowHeader from './validationReportRowHeader'
-import ValidationReportRow from './validationReportRow'
+import RowHeader from './RowHeader'
+import Row from './Row'
 
-const validationReportModule = 'validationReport'
-
-const ValidationReportView = () => {
+const ValidationReport = () => {
   const history = useHistory()
   const surveyCycleKey = useSurveyCycleKey()
 
@@ -30,25 +28,19 @@ const ValidationReportView = () => {
     history.push(recordEditUrl)
   }
 
-  const gridTemplateColumns = `70px 1fr 2fr 50px`
-
   const restParams = { cycle: surveyCycleKey }
 
   return (
     <Table
       className="validation-report__table"
-      module={validationReportModule}
+      module="validationReport"
       restParams={restParams}
-      gridTemplateColumns={gridTemplateColumns}
-      rowHeaderComponent={ValidationReportRowHeader}
-      rowComponent={ValidationReportRow}
+      gridTemplateColumns="70px 1fr 2fr 50px"
+      rowHeaderComponent={RowHeader}
+      rowComponent={Row}
       onRowClick={onRowClick}
     />
   )
 }
 
-const mapStateToProps = (state) => ({
-  surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-})
-
-export default connect(mapStateToProps)(ValidationReportView)
+export default ValidationReport

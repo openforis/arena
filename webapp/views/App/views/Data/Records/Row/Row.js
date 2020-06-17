@@ -13,12 +13,12 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyInfo, useNodeDefRootKeys } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
-const RecordsRow = (props) => {
+const Row = (props) => {
   const { row: record, rowNo } = props
-  const nodeDefKeys = [] // TODO
+  const nodeDefKeys = useNodeDefRootKeys()
 
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
@@ -47,9 +47,9 @@ const RecordsRow = (props) => {
   )
 }
 
-RecordsRow.propTypes = {
+Row.propTypes = {
   row: PropTypes.object.isRequired,
   rowNo: PropTypes.number.isRequired,
 }
 
-export default RecordsRow
+export default Row
