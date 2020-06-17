@@ -3,10 +3,10 @@ import React from 'react'
 import { useI18n, useLang } from '@webapp/store/system'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { useSurveyNodeDefs } from '@webapp/store/survey'
+import { useNodeDefRootKeys } from '@webapp/store/survey'
 
 const RowHeader = () => {
-  const nodeDefs = useSurveyNodeDefs()
+  const nodeDefs = useNodeDefRootKeys()
   const i18n = useI18n()
   const lang = useLang()
   return (

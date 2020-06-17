@@ -5,7 +5,7 @@ import { useHistory } from 'react-router'
 
 import * as Record from '@core/record/record'
 
-import { useSurveyCycleKey, useSurveyNodeDefs } from '@webapp/store/survey'
+import { useSurveyCycleKey, useNodeDefRootKeys } from '@webapp/store/survey'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
@@ -18,7 +18,7 @@ import Row from './Row'
 const Records = () => {
   const history = useHistory()
   const cycle = useSurveyCycleKey()
-  const nodeDefKeys = useSurveyNodeDefs()
+  const nodeDefKeys = useNodeDefRootKeys()
 
   const noCols = 3 + Object.keys(nodeDefKeys).length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 80px 80px 50px`

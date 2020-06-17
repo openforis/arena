@@ -13,12 +13,12 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
-import { useSurveyInfo, useSurveyNodeDefs } from '@webapp/store/survey'
+import { useSurveyInfo, useNodeDefRootKeys } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 const Row = (props) => {
   const { row: record, rowNo } = props
-  const nodeDefs = useSurveyNodeDefs()
+  const nodeDefs = useNodeDefRootKeys()
 
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
