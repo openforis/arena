@@ -74,9 +74,9 @@ const Header = () => {
       >
         <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail />
 
-        <button type="button" className="btn btn-transparent">
+        <div className="btn btn-transparent">
           <span className="icon icon-ctrl" />
-        </button>
+        </div>
       </button>
 
       {showUserPopup && <UserPopupMenu onClose={() => setShowUserPopup(false)} />}
