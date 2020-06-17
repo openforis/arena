@@ -1,6 +1,6 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils'
+import * as ActivityLogMessageParserUtils from '../utils'
 
 export default {
   [ActivityLog.type.taxonomyCreate]: ActivityLogMessageParserUtils.isTaxonomyDeleted,

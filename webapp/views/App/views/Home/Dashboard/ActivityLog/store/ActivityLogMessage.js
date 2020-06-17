@@ -19,11 +19,11 @@ export const newMessage = (activityLog, message, itemDeleted, highlighted = fals
 
 // ====== READ
 
-export const getId = ActivityLog.getId
-export const getUserUuid = ActivityLog.getUserUuid
-export const getUserName = ActivityLog.getUserName
-export const getType = ActivityLog.getType
-export const getDateCreated = ActivityLog.getDateCreated
+export const { getId } = ActivityLog
+export const { getUserUuid } = ActivityLog
+export const { getUserName } = ActivityLog
+export const { getType } = ActivityLog
+export const { getDateCreated } = ActivityLog
 export const getMessage = R.prop(keys.message)
 export const isItemDeleted = R.propEq(keys.itemDeleted, true)
 export const isHighlighted = R.propEq(keys.highlighted, true)

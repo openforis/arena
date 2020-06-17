@@ -1,4 +1,4 @@
-@import "../../../../../style/vars";
+@import 'webapp/style/vars';
 
 .activity-log {
   grid-row: 1/4;
@@ -20,7 +20,7 @@
   color: $white;
   text-transform: uppercase;
   font-weight: 600;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .activity-log__messages {
@@ -35,7 +35,7 @@
   display: grid;
   grid-template-columns: 1fr 120px;
   align-items: center;
-  font-size: .8rem;
+  font-size: 0.8rem;
   grid-column-gap: 10px;
 
   &.item-deleted {
@@ -78,7 +78,7 @@
     background-color: inherit;
   }
   30% {
-    background-color: rgba($yellow, .7);
+    background-color: rgba($yellow, 0.7);
   }
   100% {
     background-color: inherit;

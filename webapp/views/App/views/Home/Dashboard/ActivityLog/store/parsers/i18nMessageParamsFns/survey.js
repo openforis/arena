@@ -5,17 +5,17 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils'
+import * as ActivityLogMessageParserUtils from '../utils'
 
 export default {
-  [ActivityLog.type.surveyPropUpdate]: () => activityLog => ({
+  [ActivityLog.type.surveyPropUpdate]: () => (activityLog) => ({
     key: ActivityLog.getContentKey(activityLog),
   }),
 
-  [ActivityLog.type.nodeDefCreate]: survey => activityLog => {
+  [ActivityLog.type.nodeDefCreate]: (survey) => (activityLog) => {
     const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
-    const nodeDefParent = R.pipe(ActivityLog.getContentParentUuid, nodeDefUuid =>
-      Survey.getNodeDefByUuid(nodeDefUuid)(survey),
+    const nodeDefParent = R.pipe(ActivityLog.getContentParentUuid, (nodeDefUuid) =>
+      Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     )(activityLog)
 
     return {
@@ -24,7 +24,7 @@ export default {
     }
   },
 
-  [ActivityLog.type.nodeDefUpdate]: survey => activityLog => {
+  [ActivityLog.type.nodeDefUpdate]: (survey) => (activityLog) => {
     const content = ActivityLog.getContent(activityLog)
     const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
     return {
@@ -36,7 +36,7 @@ export default {
     }
   },
 
-  [ActivityLog.type.nodeDefMarkDeleted]: () => activityLog => ({
+  [ActivityLog.type.nodeDefMarkDeleted]: () => (activityLog) => ({
     name: ActivityLog.getContentName(activityLog),
   }),
 }

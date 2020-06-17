@@ -6,14 +6,14 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 export default {
-  [ActivityLog.type.userInvite]: (survey, i18n) => activityLog => {
+  [ActivityLog.type.userInvite]: (survey, i18n) => (activityLog) => {
     const groupUuid = ActivityLog.getContentGroupUuid(activityLog)
     const groupName = R.pipe(
       Survey.getSurveyInfo,
       Survey.getAuthGroups,
-      R.find(g => AuthGroup.getUuid(g) === groupUuid),
+      R.find((g) => AuthGroup.getUuid(g) === groupUuid),
       AuthGroup.getName,
-      R.defaultTo(AuthGroup.groupNames.systemAdmin),
+      R.defaultTo(AuthGroup.groupNames.systemAdmin)
     )(survey)
 
     return {
@@ -22,11 +22,11 @@ export default {
     }
   },
 
-  [ActivityLog.type.userUpdate]: () => activityLog => ({
+  [ActivityLog.type.userUpdate]: () => (activityLog) => ({
     name: ActivityLog.getTargetUserName(activityLog),
   }),
 
-  [ActivityLog.type.userRemove]: () => activityLog => ({
+  [ActivityLog.type.userRemove]: () => (activityLog) => ({
     name: ActivityLog.getTargetUserName(activityLog),
   }),
 }

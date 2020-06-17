@@ -2,10 +2,10 @@ import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as ActivityLogMessageParserUtils from '../activityLogMessageParserUtils'
+import * as ActivityLogMessageParserUtils from '../utils'
 
 export default {
-  [ActivityLog.type.taxonomyPropUpdate]: survey => activityLog => {
+  [ActivityLog.type.taxonomyPropUpdate]: (survey) => (activityLog) => {
     const taxonomy = ActivityLogMessageParserUtils.getTaxonomy(survey)(activityLog)
 
     return {
@@ -14,11 +14,11 @@ export default {
     }
   },
 
-  [ActivityLog.type.taxonomyDelete]: () => activityLog => ({
+  [ActivityLog.type.taxonomyDelete]: () => (activityLog) => ({
     taxonomyName: ActivityLog.getContentTaxonomyName(activityLog),
   }),
 
-  [ActivityLog.type.taxonomyTaxaImport]: survey => activityLog => {
+  [ActivityLog.type.taxonomyTaxaImport]: (survey) => (activityLog) => {
     const taxonomy = ActivityLogMessageParserUtils.getTaxonomy(survey)(activityLog)
 
     return {

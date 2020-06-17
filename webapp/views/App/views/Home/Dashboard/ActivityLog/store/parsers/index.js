@@ -1,0 +1,1 @@
+export { toMessage } from './parser'
