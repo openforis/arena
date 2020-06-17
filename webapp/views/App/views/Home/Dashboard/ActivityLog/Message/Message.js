@@ -8,7 +8,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 
 import Markdown from '@webapp/components/markdown'
 
-import * as ActivityLogMessage from '../store/ActivityLogMessage'
+import { ActivityLogMessage } from '../store'
 
 const getMessageClassName = ({ message }) => `activity-log__message 
 ${ActivityLogMessage.isItemDeleted(message) ? 'item-deleted' : ''}
@@ -20,7 +20,7 @@ const Message = ({ message }) => {
   const className = getMessageClassName({ message })
 
   return (
-    <React.Fragment key={ActivityLogMessage.getId(message)}>
+    <>
       <div className={className}>
         <div className="activity">
           <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail />
@@ -29,7 +29,7 @@ const Message = ({ message }) => {
         <div className="date">{DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}</div>
       </div>
       <div className="activity-log__message-separator" />
-    </React.Fragment>
+    </>
   )
 }
 

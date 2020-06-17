@@ -6,7 +6,7 @@ import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
 import { useI18n } from '@webapp/store/system'
 
-import * as ActivityLogMessage from '../ActivityLogMessage'
+import * as ActivityLogMessage from '../activityLogMessage'
 import * as ActivityLogMessageParser from '../parsers'
 
 export const useGetActivityLogMessages = ({ messages, setMessages }) => {

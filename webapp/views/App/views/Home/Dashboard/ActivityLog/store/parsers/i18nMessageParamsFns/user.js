@@ -11,7 +11,7 @@ export default {
     const groupName = R.pipe(
       Survey.getSurveyInfo,
       Survey.getAuthGroups,
-      R.find((g) => AuthGroup.getUuid(g) === groupUuid),
+      R.find((authGroup) => AuthGroup.getUuid(authGroup) === groupUuid),
       AuthGroup.getName,
       R.defaultTo(AuthGroup.groupNames.systemAdmin)
     )(survey)
