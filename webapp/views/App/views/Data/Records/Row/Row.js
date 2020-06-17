@@ -18,7 +18,7 @@ import { useUser } from '@webapp/store/user'
 
 const Row = (props) => {
   const { row: record, rowNo } = props
-  const nodeDefs = useNodeDefRootKeys()
+  const nodeDefKeys = useNodeDefRootKeys()
 
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
@@ -31,7 +31,7 @@ const Row = (props) => {
         <ErrorBadge validation={Validation.getValidation(record)} showLabel={false} className="error-badge-inverse" />
         {rowNo}
       </div>
-      {Object.values(nodeDefs).map((nodeDef) => (
+      {nodeDefKeys.map((nodeDef) => (
         <div key={NodeDef.getUuid(nodeDef)}>{record[camelize(NodeDef.getName(nodeDef))]}</div>
       ))}
       <div>{DateUtils.getRelativeDate(i18n, Record.getDateCreated(record))}</div>

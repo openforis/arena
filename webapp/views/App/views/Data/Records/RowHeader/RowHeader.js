@@ -6,13 +6,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useNodeDefRootKeys } from '@webapp/store/survey'
 
 const RowHeader = () => {
-  const nodeDefs = useNodeDefRootKeys()
+  const nodeDefKeys = useNodeDefRootKeys()
   const i18n = useI18n()
   const lang = useLang()
   return (
     <>
       <div>#</div>
-      {Object.values(nodeDefs).map((nodeDef) => (
+      {nodeDefKeys.map((nodeDef) => (
         <div key={NodeDef.getUuid(nodeDef)}>{NodeDef.getLabel(nodeDef, lang)}</div>
       ))}
       <div>{i18n.t('common.dateCreated')}</div>
