@@ -6,30 +6,27 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'
-const parentTablePrefix = '_$parent$_'
 
-const composeTableName = (nodeDefName, nodeDefParentName = '') => `${tablePrefix}${nodeDefParentName}${nodeDefName}`
+const composeTableName = (nodeDefName) => `${tablePrefix}${nodeDefName}`
 
 export const getTableName = (nodeDef, nodeDefParent) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefParentName = NodeDef.getName(nodeDefParent)
 
-  return NodeDef.isEntity(nodeDef)
+  return NodeDef.isEntity(nodeDef) || NodeDef.isMultiple(nodeDef)
     ? composeTableName(nodeDefName)
-    : NodeDef.isMultiple(nodeDef)
-    ? composeTableName(nodeDefName, nodeDefParentName + parentTablePrefix)
     : composeTableName(nodeDefParentName)
 }
 
 export const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
-const cols = {
+const colsByType = {
   [NodeDef.nodeDefType.code]: ['code', 'label'],
   [NodeDef.nodeDefType.taxon]: ['code', 'scientific_name'], // ?, 'vernacular_names?'],
   [NodeDef.nodeDefType.file]: ['file_uuid', 'file_name'],
 }
 
-const getCols = (nodeDef) => R.propOr([], NodeDef.getType(nodeDef), cols)
+const getCols = (nodeDef) => R.propOr([], NodeDef.getType(nodeDef), colsByType)
 
 const getDefaultColumnName = (nodeDef) =>
   NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
@@ -61,7 +58,5 @@ export const extractNodeDefNameFromViewName = R.pipe(
   R.split(tablePrefix),
   R.last,
   R.split(viewSuffix),
-  R.head,
-  R.split(parentTablePrefix),
-  R.last
+  R.head
 )
