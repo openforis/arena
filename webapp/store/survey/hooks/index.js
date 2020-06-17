@@ -20,7 +20,7 @@ export const useOnSurveyCycleUpdate = (effect) => {
   useOnUpdate(effect, [surveyCycleKey])
 }
 
-export const useNodeDefRootKeys = () => Survey.getNodeDefKeys(Survey.getNodeDefRoot(useSurvey()))(useSurvey())
+export const useNodeDefRootKeys = () => Survey.getNodeDefRootKeys(useSurvey())
 
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
