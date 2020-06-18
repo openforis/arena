@@ -5,7 +5,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 /**
  * Hook to be used when an async effect must be executed with a certain interval
  */
-export default (effect, duration = 1000, inputs) => {
+export default (effect, duration = 1000, inputs = []) => {
   let run = true
 
   const stop = () => {

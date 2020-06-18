@@ -9,12 +9,12 @@ import { useI18n } from '@webapp/store/system'
 import * as ActivityLogMessage from '../activityLogMessage'
 import * as ActivityLogMessageParser from '../parsers'
 
-export const useFetchMessages = () => {
+export const useFetchMessages = ({ messages, setMessages }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
 
-  return ({ newest, messages, setMessages }) => {
+  return ({ newest }) => {
     ;(async () => {
       const params = {}
       const initialized = messages.length > 0
@@ -48,22 +48,22 @@ export const useFetchMessages = () => {
 }
 
 export const useGetActivityLogMessages = ({ messages, setMessages }) => {
-  const fetchMessages = useFetchMessages()
+  const fetchMessages = useFetchMessages({ messages, setMessages })
 
-  useInterval(() => fetchMessages({ newest: true, messages, setMessages }), 3000, [messages])
+  useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), 3000, [messages])
 
   return () => {
     ;(async () => {
-      await fetchMessages({ newest: true, messages, setMessages })
+      await fetchMessages({ newest: true })
     })()
   }
 }
 
 export const useGetActivityLogMessagesNext = ({ messages, setMessages }) => {
-  const fetchMessages = useFetchMessages()
+  const fetchMessages = useFetchMessages({ messages, setMessages })
   return () => {
     ;(async () => {
-      await fetchMessages({ newest: false, messages, setMessages })
+      await fetchMessages({ newest: false })
     })()
   }
 }
