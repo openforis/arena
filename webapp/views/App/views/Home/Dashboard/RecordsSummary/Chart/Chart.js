@@ -1,6 +1,8 @@
-import './recordsSummaryChart.scss'
+/* eslint-disable react/jsx-props-no-spreading */
+import './Chart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as DateUtils from '@core/dateUtils'
 
@@ -11,7 +13,7 @@ import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
 
-const RecordsSummaryChart = props => {
+const Chart = (props) => {
   const { counts, from, to } = props
 
   const chartRef = useRef(null)
@@ -33,7 +35,7 @@ const RecordsSummaryChart = props => {
 
     setChartProps({
       ...chartPropsUpdate,
-      xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
+      xScale: (date) => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
       yScale: getYScale(counts, chartPropsUpdate),
     })
   }
@@ -56,4 +58,10 @@ const RecordsSummaryChart = props => {
   )
 }
 
-export default RecordsSummaryChart
+Chart.propTypes = {
+  counts: PropTypes.array.isRequired,
+  from: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+}
+
+export default Chart

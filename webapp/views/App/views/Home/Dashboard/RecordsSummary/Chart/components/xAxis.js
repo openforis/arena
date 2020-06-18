@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-
+import PropTypes from 'prop-types'
 import * as R from 'ramda'
 import * as d3 from 'd3'
 import * as DateUtils from '@core/dateUtils'
@@ -29,11 +29,11 @@ const getAxis = (from, to, counts, chartProps) =>
   d3
     .axisBottom(getScale(counts, from, to, chartProps))
     .tickValues(getAxisValues(from, to))
-    .tickFormat(d => DateUtils.format(d, 'dd-MMM-yyyy')) // TODO put year on a new line https://bl.ocks.org/mbostock/7555321
+    .tickFormat((d) => DateUtils.format(d, 'dd-MMM-yyyy')) // TODO put year on a new line https://bl.ocks.org/mbostock/7555321
     .tickSize(5)
     .tickPadding(15)
 
-const XAxis = props => {
+const XAxis = (props) => {
   const { counts, from, to, chartProps } = props
   const { height, bottom } = chartProps
 
@@ -51,6 +51,13 @@ const XAxis = props => {
   }, [chartProps])
 
   return <g className="x-axis" ref={elementRef} />
+}
+
+XAxis.propTypes = {
+  counts: PropTypes.array.isRequired,
+  chartProps: PropTypes.object.isRequired,
+  from: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
 }
 
 export default XAxis

@@ -7,6 +7,7 @@ import d3Tip from 'd3-tip'
 import { useI18n } from '@webapp/store/system'
 
 import * as DateUtils from '@core/dateUtils'
+import PropTypes from 'prop-types'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>
@@ -19,7 +20,7 @@ const DataPointTooltip = ({ dataPoint, i18n }) => (
   </>
 )
 
-const DataPoints = props => {
+const DataPoints = (props) => {
   const i18n = useI18n()
 
   const { counts, chartProps } = props
@@ -33,7 +34,7 @@ const DataPoints = props => {
     tooltipRef.current = d3Tip()
       .attr('class', tooltipClassName)
       .offset([-10, 0])
-      .html(d => ReactDOMServer.renderToString(<DataPointTooltip dataPoint={d} i18n={i18n} />))
+      .html((d) => ReactDOMServer.renderToString(<DataPointTooltip dataPoint={d} i18n={i18n} />))
 
     d3.select(elementRef.current).call(tooltipRef.current)
 
@@ -43,18 +44,15 @@ const DataPoints = props => {
   }, [])
 
   useEffect(() => {
-    const circle = d3
-      .select(elementRef.current)
-      .selectAll('circle')
-      .data(counts)
+    const circle = d3.select(elementRef.current).selectAll('circle').data(counts)
 
     // Update
     circle
       .transition()
       .duration(transitionDuration)
       .ease(d3.easePolyOut)
-      .attr('cx', d => xScale(d.date))
-      .attr('cy', d => yScale(d.count))
+      .attr('cx', (d) => xScale(d.date))
+      .attr('cy', (d) => yScale(d.count))
       .attr('r', radius)
       .style('opacity', '1')
 
@@ -75,18 +73,23 @@ const DataPoints = props => {
       .on('mouseover', tooltipRef.current.show)
       .on('mouseout', tooltipRef.current.hide)
       .attr('r', 0)
-      .attr('cx', d => xScale(d.date))
+      .attr('cx', (d) => xScale(d.date))
       .attr('cy', yScale(0))
       .transition()
       .duration(transitionDuration)
       .ease(d3.easePolyOut)
-      .attr('cx', d => xScale(d.date))
-      .attr('cy', d => yScale(d.count))
+      .attr('cx', (d) => xScale(d.date))
+      .attr('cy', (d) => yScale(d.count))
       .attr('r', radius)
       .style('opacity', '1')
   }, [chartProps])
 
   return <g className="data-points" ref={elementRef} />
+}
+
+DataPoints.propTypes = {
+  counts: PropTypes.array.isRequired,
+  chartProps: PropTypes.object.isRequired,
 }
 
 export default DataPoints
