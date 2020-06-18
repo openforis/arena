@@ -14,7 +14,7 @@ import Message from './Message'
 const ActivityLog = () => {
   const i18n = useI18n()
 
-  const { messages, activityLogLoadComplete, onGetActivityLogMessagesNext } = useActivityLog()
+  const { messages, onGetActivityLogMessagesNext } = useActivityLog()
   const [setNextActivitiesFetchTrigger] = useOnIntersect(onGetActivityLogMessagesNext)
 
   return (
@@ -23,8 +23,7 @@ const ActivityLog = () => {
 
       <div className="activity-log__messages">
         {messages.map((message, index) => {
-          const setRef = (el) =>
-            !activityLogLoadComplete && index === R.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null
+          const setRef = (el) => (index === R.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null)
 
           return <Message setRef={setRef} key={ActivityLogMessage.getId(message)} message={message} />
         })}
