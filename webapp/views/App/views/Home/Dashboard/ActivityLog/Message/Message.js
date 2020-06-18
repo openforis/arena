@@ -15,13 +15,13 @@ ${ActivityLogMessage.isItemDeleted(message) ? 'item-deleted' : ''}
 ${ActivityLogMessage.isHighlighted(message) ? 'highlighted' : ''}
 `
 
-const Message = ({ message }) => {
+const Message = ({ message, setRef }) => {
   const i18n = useI18n()
   const className = getMessageClassName({ message })
 
   return (
     <>
-      <div className={className}>
+      <div ref={setRef} className={className}>
         <div className="activity">
           <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail />
           <Markdown source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`} />
@@ -35,6 +35,7 @@ const Message = ({ message }) => {
 
 Message.propTypes = {
   message: PropTypes.object.isRequired,
+  setRef: PropTypes.func.isRequired,
 }
 
 export default Message

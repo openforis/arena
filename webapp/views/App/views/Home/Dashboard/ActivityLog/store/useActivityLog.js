@@ -5,7 +5,7 @@ import { useActions } from './actions'
 export const useActivityLog = () => {
   const [messages, setMessages] = useState([])
 
-  const { onGetActivityLogMessages } = useActions({
+  const { onGetActivityLogMessages, onGetActivityLogMessagesNext } = useActions({
     messages,
     setMessages,
   })
@@ -16,5 +16,6 @@ export const useActivityLog = () => {
 
   return {
     messages,
+    onGetActivityLogMessagesNext,
   }
 }
