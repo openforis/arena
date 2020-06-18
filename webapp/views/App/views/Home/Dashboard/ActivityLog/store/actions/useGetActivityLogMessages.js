@@ -50,20 +50,16 @@ export const useFetchMessages = ({ messages, setMessages }) => {
 export const useGetActivityLogMessages = ({ messages, setMessages }) => {
   const fetchMessages = useFetchMessages({ messages, setMessages })
 
-  useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), 3000, [messages])
+  useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), 3000)
 
   return () => {
-    ;(async () => {
-      await fetchMessages({ newest: true })
-    })()
+    ;(async () => fetchMessages({ newest: true }))()
   }
 }
 
 export const useGetActivityLogMessagesNext = ({ messages, setMessages }) => {
   const fetchMessages = useFetchMessages({ messages, setMessages })
   return () => {
-    ;(async () => {
-      await fetchMessages({ newest: false })
-    })()
+    ;(async () => fetchMessages({ newest: false }))()
   }
 }

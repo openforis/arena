@@ -1,34 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-/**
- * Hook to be used when an async effect must be executed with a certain interval
- */
-export default (effect, duration = 1000, inputs = []) => {
-  let run = true
-
-  const stop = () => {
-    run = false
-  }
-
-  // Used to avoid the ESLint error: no-unmodified-loop-condition
-  const isRunning = () => run
+export default (effect, duration) => {
+  const savedCallback = useRef()
 
   useEffect(() => {
-    ;(async () => {
-      const start = async () => {
-        while (isRunning()) {
-          await effect()
-          await sleep(duration)
-        }
-      }
+    savedCallback.current = effect
+  }, [effect])
 
-      start()
-    })()
+  useEffect(() => {
+    function tick() {
+      savedCallback.current()
+    }
+    if (duration !== null) {
+      const id = setInterval(tick, duration)
+      return () => clearInterval(id)
+    }
+    return null
+  }, [duration])
 
-    return stop
-  }, [...inputs])
-
-  return [stop]
+  return []
 }
