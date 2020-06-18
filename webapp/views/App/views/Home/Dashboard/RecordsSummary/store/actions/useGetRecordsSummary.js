@@ -1,0 +1,28 @@
+import axios from 'axios'
+
+import * as DateUtils from '@core/dateUtils'
+
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+
+import { getFromDate } from '../utils'
+
+const formatDate = (date) => DateUtils.format(date, 'yyyy-MM-dd')
+
+export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
+  const surveyId = useSurveyId()
+  const surveyCycleKey = useSurveyCycleKey()
+
+  return () => {
+    ;(async () => {
+      const { timeRange } = recordsSummary
+      const now = Date.now()
+      const from = formatDate(getFromDate(now, timeRange))
+      const to = formatDate(now)
+      const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/summary/count`, {
+        params: { cycle: surveyCycleKey, from, to },
+      })
+
+      setRecordsSummary({ counts, from, to, timeRange })
+    })()
+  }
+}

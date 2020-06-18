@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 
 import * as R from 'ramda'
 import * as d3 from 'd3'
+import PropTypes from 'prop-types'
 
 const getMax = (counts) => counts.reduce((maxAcc, item) => Math.max(maxAcc, item.count), 0)
 
@@ -41,6 +42,11 @@ const YAxis = (props) => {
   }, [chartProps])
 
   return <g className="y-axis" ref={elementRef} />
+}
+
+YAxis.propTypes = {
+  counts: PropTypes.array.isRequired,
+  chartProps: PropTypes.object.isRequired,
 }
 
 export default YAxis

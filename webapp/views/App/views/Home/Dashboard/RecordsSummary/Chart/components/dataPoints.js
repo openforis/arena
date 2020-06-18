@@ -7,6 +7,7 @@ import d3Tip from 'd3-tip'
 import { useI18n } from '@webapp/store/system'
 
 import * as DateUtils from '@core/dateUtils'
+import PropTypes from 'prop-types'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => (
   <>
@@ -84,6 +85,11 @@ const DataPoints = (props) => {
   }, [chartProps])
 
   return <g className="data-points" ref={elementRef} />
+}
+
+DataPoints.propTypes = {
+  counts: PropTypes.array.isRequired,
+  chartProps: PropTypes.object.isRequired,
 }
 
 export default DataPoints

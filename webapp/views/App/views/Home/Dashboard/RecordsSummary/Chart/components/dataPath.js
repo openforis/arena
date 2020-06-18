@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
 import * as d3 from 'd3'
@@ -41,6 +42,13 @@ const DataPath = (props) => {
   }, [chartProps])
 
   return <path className="data-path" style={{ opacity: 0 }} ref={elementRef} />
+}
+
+DataPath.propTypes = {
+  counts: PropTypes.array.isRequired,
+  chartProps: PropTypes.object.isRequired,
+  from: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
 }
 
 export default DataPath

@@ -1,6 +1,8 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import './Chart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as DateUtils from '@core/dateUtils'
 
@@ -54,6 +56,12 @@ const Chart = (props) => {
       )}
     </div>
   )
+}
+
+Chart.propTypes = {
+  counts: PropTypes.array.isRequired,
+  from: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
 }
 
 export default Chart
