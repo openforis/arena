@@ -8,7 +8,7 @@ Tags: survey, success
 
 With correct data, user is able to create a survey
 
-* Login with "test@arena.com" and "test"
+//* Login with "test@arena.com" and "test"
 * Wait for ".home-dashboard" to exist
 * Navigate to "Create Survey"
 * Create a new survey with "survey_1" and "Survey 1"
