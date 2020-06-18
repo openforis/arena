@@ -15,7 +15,7 @@ export default (effect, duration) => {
       const id = setInterval(tick, duration)
       return () => clearInterval(id)
     }
-    return null
+    return () => ({})
   }, [duration])
 
   return []
