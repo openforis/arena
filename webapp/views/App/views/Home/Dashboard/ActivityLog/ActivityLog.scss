@@ -47,6 +47,14 @@
     animation-duration: 4s;
   }
 
+  &:after {
+    content: ' ';
+    width: 100%;
+    height: 1px;
+    margin: 8px 15%;
+    border-bottom: 1px dotted #d1d1dd;
+  }
+
   .activity {
     display: flex;
     align-items: center;
@@ -64,13 +72,6 @@
     padding-right: 5px;
     color: $blueDark;
   }
-}
-
-.activity-log__message-separator {
-  width: 70%;
-  height: 1px;
-  margin: 8px 15%;
-  border-bottom: 1px dotted $greyBorder;
 }
 
 @keyframes animate-highlight {

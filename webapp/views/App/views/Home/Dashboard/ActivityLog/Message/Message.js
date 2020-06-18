@@ -20,16 +20,13 @@ const Message = ({ message, setRef }) => {
   const className = getMessageClassName({ message })
 
   return (
-    <>
-      <div ref={setRef} className={className}>
-        <div className="activity">
-          <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail />
-          <Markdown source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`} />
-        </div>
-        <div className="date">{DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}</div>
+    <div ref={setRef} className={className}>
+      <div className="activity">
+        <ProfilePicture userUuid={ActivityLogMessage.getUserUuid(message)} thumbnail />
+        <Markdown source={`${ActivityLogMessage.getUserName(message)} ${ActivityLogMessage.getMessage(message)}`} />
       </div>
-      <div className="activity-log__message-separator" />
-    </>
+      <div className="date">{DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}</div>
+    </div>
   )
 }
 
