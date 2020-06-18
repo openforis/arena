@@ -10,7 +10,7 @@ import Dropdown from '@webapp/components/form/dropdown'
 import * as DateUtils from '@core/dateUtils'
 
 import { SurveyState } from '@webapp/store/survey'
-import RecordsSummaryChart from './chart/recordsSummaryChart'
+import Chart from './chart/Chart'
 import * as RecordsSummaryState from './recordsSummaryState'
 
 import { fetchRecordsSummary } from './actions'
@@ -69,12 +69,12 @@ const RecordsSummary = (props) => {
             selection={timeRangeSelection}
             onChange={(item) => fetchRecordsSummary(surveyCycleKey, item.key)}
             sourceElement={timeRangeElementRef.current}
-            readOnlyInput={true}
+            readOnlyInput
           />
         </div>
       </div>
 
-      {from && to && <RecordsSummaryChart counts={counts} from={from} to={to} />}
+      {from && to && <Chart counts={counts} from={from} to={to} />}
     </div>
   )
 }

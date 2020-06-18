@@ -1,4 +1,4 @@
-import './recordsSummaryChart.scss'
+import './Chart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -11,7 +11,7 @@ import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
 
-const RecordsSummaryChart = props => {
+const Chart = (props) => {
   const { counts, from, to } = props
 
   const chartRef = useRef(null)
@@ -33,7 +33,7 @@ const RecordsSummaryChart = props => {
 
     setChartProps({
       ...chartPropsUpdate,
-      xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
+      xScale: (date) => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
       yScale: getYScale(counts, chartPropsUpdate),
     })
   }
@@ -56,4 +56,4 @@ const RecordsSummaryChart = props => {
   )
 }
 
-export default RecordsSummaryChart
+export default Chart

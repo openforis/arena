@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .home-dashboard__records-summary {
   padding: 10px;
@@ -17,7 +17,7 @@
   .time-range {
     display: flex;
     align-items: center;
-    padding: .5rem 1rem;
+    padding: 0.5rem 1rem;
     background-color: $blueLightFocus;
 
     .dropdown {
@@ -25,7 +25,7 @@
       grid-template-columns: 100px 20px;
 
       * {
-        font-size: .8rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: lighten($black, 20%);
       }

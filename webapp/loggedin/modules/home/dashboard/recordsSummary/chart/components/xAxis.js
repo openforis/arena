@@ -29,11 +29,11 @@ const getAxis = (from, to, counts, chartProps) =>
   d3
     .axisBottom(getScale(counts, from, to, chartProps))
     .tickValues(getAxisValues(from, to))
-    .tickFormat(d => DateUtils.format(d, 'dd-MMM-yyyy')) // TODO put year on a new line https://bl.ocks.org/mbostock/7555321
+    .tickFormat((d) => DateUtils.format(d, 'dd-MMM-yyyy')) // TODO put year on a new line https://bl.ocks.org/mbostock/7555321
     .tickSize(5)
     .tickPadding(15)
 
-const XAxis = props => {
+const XAxis = (props) => {
   const { counts, from, to, chartProps } = props
   const { height, bottom } = chartProps
 

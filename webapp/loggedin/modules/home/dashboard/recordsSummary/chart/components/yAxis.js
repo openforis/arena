@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import * as R from 'ramda'
 import * as d3 from 'd3'
 
-const getMax = counts => counts.reduce((maxAcc, item) => Math.max(maxAcc, item.count), 0)
+const getMax = (counts) => counts.reduce((maxAcc, item) => Math.max(maxAcc, item.count), 0)
 
 export const getScale = (counts, { height, bottom, top }) =>
   d3
@@ -20,7 +20,7 @@ const getAxis = (counts, chartProps) =>
     .tickFormat(d3.format(',.0f'))
     .tickPadding(8)
 
-const YAxis = props => {
+const YAxis = (props) => {
   const { counts, chartProps } = props
   const { left, transitionDuration } = chartProps
 
