@@ -5,10 +5,9 @@ import React from 'react'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
 
-import RecordsSummary from '@webapp/loggedin/modules/home/dashboard/recordsSummary/recordsSummary'
-import ActivityLogView from '@webapp/loggedin/modules/home/dashboard/activityLog/activityLogView'
-
 import SurveyInfo from './SurveyInfo'
+import ActivityLog from './ActivityLog'
+import RecordsSummary from './RecordsSummary'
 
 const Dashboard = () => {
   const canEditDef = useAuthCanEditSurvey()
@@ -20,7 +19,7 @@ const Dashboard = () => {
 
         <RecordsSummary />
 
-        <ActivityLogView />
+        <ActivityLog />
       </div>
     </SurveyDefsLoader>
   )
