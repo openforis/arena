@@ -1,0 +1,16 @@
+@import 'webapp/style/vars';
+
+.validation-report__table {
+  .table__row {
+    height: unset;
+    padding: 6px 0;
+  }
+}
+
+.validation-report__message {
+  justify-self: left;
+
+  .validation-field_message {
+    color: $black;
+  }
+}

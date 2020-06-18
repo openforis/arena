@@ -5,12 +5,14 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-export const fetchItems = async (surveyId, client = db) =>
-  await client.map(
+export const fetchItems = async (surveyId, offset = 0, limit = null, client = db) =>
+  client.map(
     `
       SELECT * 
       FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
       ORDER BY id
+       LIMIT ${limit || 'ALL'}
+    OFFSET ${offset}
     `,
     [],
     dbTransformCallback,

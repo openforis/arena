@@ -64,7 +64,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
           R.filter(NodeDef.isSingleAttribute),
           R.sortBy(R.ascend(R.prop('id')))
         ),
-        R.identity // Multiple attr table
+        (nodeDef) => [nodeDef] // Multiple attr table
       ),
       R.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
     )(this.nodeDef)

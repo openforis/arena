@@ -1,0 +1,31 @@
+@import 'webapp/style/vars';
+
+.collect-import-report {
+  .table__row-header,
+  .table__row {
+    grid-template-columns: 60px repeat(5, 0.2fr) 0.1fr 30px;
+  }
+
+  .table__rows {
+    height: calc(100% - 15px);
+  }
+
+  .table__row {
+    padding: 0.5rem 0;
+    min-height: 40px;
+    height: auto;
+    font-size: 0.8rem;
+
+    input {
+      font-size: 0.8rem;
+    }
+
+    div {
+      white-space: pre-line;
+    }
+
+    .icon-warning.warning {
+      color: $orange;
+    }
+  }
+}

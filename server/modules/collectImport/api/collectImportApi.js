@@ -28,11 +28,11 @@ export const init = app => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId } = Request.getParams(req)
+        const { surveyId, offset, limit } = Request.getParams(req)
 
-        const items = await CollectImportService.fetchReportItems(surveyId)
+        const list = await CollectImportService.fetchReportItems(surveyId, offset, limit)
 
-        res.json({ items })
+        res.json({ list })
       } catch (error) {
         next(error)
       }

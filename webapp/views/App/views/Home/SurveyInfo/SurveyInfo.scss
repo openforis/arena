@@ -1,0 +1,17 @@
+@import 'webapp/style/vars';
+
+.home-survey-info {
+  padding-top: 2rem;
+
+  .form {
+    max-height: calc(100vh - 100px);
+  }
+
+  .form-item {
+    grid-template-columns: 0.2fr 0.7fr;
+  }
+
+  .btn-save {
+    justify-self: center;
+  }
+}

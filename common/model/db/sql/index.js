@@ -11,10 +11,11 @@ export const types = {
 
 // Alias
 export const createAlias = (name) =>
-  name
+  // add '_' prefix to avoid collision with reserved words
+  `_${name
     .split('_')
     .map((word) => word[0])
-    .join('')
+    .join('')}`
 
 export const addAlias = (alias, ...columnNames) => columnNames.map((columnName) => `${alias}.${columnName}`)
 
