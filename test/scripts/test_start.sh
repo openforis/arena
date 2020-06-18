@@ -12,8 +12,9 @@ mkdir -p $TEMP_FOLDER $ANALYSIS_OUTPUT_DIR;
 # wait for postgres to startup
 while ! nc -z $PGHOST $PGPORT; do sleep 1; done;
 
-cp -r test/db_migration/*.js server/db/migration/public/migrations
-cp -r test/db_migration/sqls/*.sql server/db/migration/public/migrations/sqls
+# Copy db migrations from test to server folder
+cp test/db_migration/*.js server/db/migration/public/migrations
+cp test/db_migration/sqls/*.sql server/db/migration/public/migrations/sqls
 
 # Run unit and integration tests
 yarn run npm-run-all server:migrate test
