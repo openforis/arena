@@ -3,7 +3,7 @@ import './Dashboard.scss'
 import React from 'react'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import SurveyInfo from './SurveyInfo'
 import ActivityLog from './ActivityLog'
