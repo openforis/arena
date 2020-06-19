@@ -10,7 +10,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { Input } from '@webapp/components/form/input'
 
-import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import CyclesEditor from './CyclesEditor'
 import SrsEditor from './SrsEditor'

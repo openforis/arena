@@ -1,26 +1,27 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import * as R from 'ramda'
-
-import * as Survey from '@core/survey/survey'
+import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
+import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
+
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import { SurveyState } from '@webapp/store/survey'
 
-const CyclesSelect = (props) => {
-  const { cycleKeyCurrent, cyclesKeysSurvey, cyclesKeysSelectable, cyclesKeysSelected, disabled, onChange } = props
+const CyclesSelector = (props) => {
+  const { cyclesKeysSelectable, cyclesKeysSelected, disabled, onChange } = props
+
+  const cyclesKeysSurvey = useSurveyCycleKeys()
+  const cycleKeyCurrent = useSurveyCycleKey()
   const i18n = useI18n()
 
-  const cyclesKeys = cyclesKeysSelectable ? cyclesKeysSelectable : cyclesKeysSurvey
+  const cyclesKeys = cyclesKeysSelectable && cyclesKeysSelectable.length >= 1 ? cyclesKeysSelectable : cyclesKeysSurvey
 
   return (
-    cyclesKeysSurvey.length !== 1 && (
+    cyclesKeys.length > 1 && (
       <FormItem label={i18n.t('common.cycle_plural')}>
         <ButtonGroup
-          multiple={true}
-          deselectable={true}
+          multiple
+          deselectable
           selectedItemKey={cyclesKeysSelected}
           onChange={(cycles) => onChange(cycles.sort((a, b) => Number(a) - Number(b)))}
           items={cyclesKeys.map((cycle) => ({
@@ -37,24 +38,18 @@ const CyclesSelect = (props) => {
   )
 }
 
-CyclesSelect.defaultProps = {
-  cycleKeyCurrent: null, // Selected survey cycle (from store)
-  cyclesKeysSurvey: [], // All survey cycles (from store)
+CyclesSelector.propTypes = {
+  cyclesKeysSelectable: PropTypes.array,
+  cyclesKeysSelected: PropTypes.array,
+  disabled: PropTypes.bool,
+  onChange: PropTypes.func,
+}
+
+CyclesSelector.defaultProps = {
   cyclesKeysSelectable: null, // Selectable cycle keys (default: all cycle keys)
   cyclesKeysSelected: [], // Selected cycle keys
   disabled: false,
   onChange: (selection) => selection, // Required onChange function
 }
 
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const cycleKeyCurrent = SurveyState.getSurveyCycleKey(state)
-  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
-
-  return {
-    cycleKeyCurrent,
-    cyclesKeysSurvey,
-  }
-}
-
-export default connect(mapStateToProps)(CyclesSelect)
+export default CyclesSelector

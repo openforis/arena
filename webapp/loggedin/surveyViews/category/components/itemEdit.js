@@ -11,7 +11,7 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as InputMasks from '@webapp/components/form/inputMasks'
 
-import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 const ItemEdit = props => {
   const elemRef = useRef(null)

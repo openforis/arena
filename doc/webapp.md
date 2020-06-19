@@ -39,7 +39,7 @@
                     - Categories
                     - Category
                     - CategorySelector
-                    - CyclesSelect
+                    - CyclesSelector
                     - Items
                     - LabelsEditor
                     - NodeDef
