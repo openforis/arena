@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import { useI18n, useLang } from '@webapp/store/system'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, useSurveyLanguages } from '@webapp/store/survey'
+import { useSurvey, useSurveyLangs } from '@webapp/store/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useActions } from './actions/index'
@@ -50,7 +50,7 @@ export const useCollectImportReportItem = ({ row, rowNo }) => {
   const [rowItem, setRowItem] = useState({ rowNo, ...row })
 
   const survey = useSurvey()
-  const languages = useSurveyLanguages()
+  const languages = useSurveyLangs()
 
   const { onUpdate } = useActions({ rowItem, setRowItem })
 

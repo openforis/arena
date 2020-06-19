@@ -10,11 +10,13 @@
     text-align: end;
   }
 
-  .btn-toggle-labels {
-    padding: 0.4rem;
-    margin-left: 0.5rem;
-    height: 30px;
-  }
+}
+
+.labels-editor__btn-toggle {
+  padding: 0.4rem;
+  margin-left: 0.5rem;
+  height: 30px;
+  justify-self: end;
 }
 
 .labels-editor__labels {
@@ -28,7 +30,7 @@
   position: relative;
 }
 
-.labels-editor__label-lang-badge {
+.labels-editor__badge {
   position: absolute;
   right: 0;
   text-transform: uppercase;
