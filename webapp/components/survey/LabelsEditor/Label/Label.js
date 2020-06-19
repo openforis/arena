@@ -4,9 +4,9 @@ import * as R from 'ramda'
 
 import { Input } from '@webapp/components/form/input'
 
-import Badge from '../Badge'
+import Badge from './Badge'
 
-const Row = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
+const Label = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLanguage }) => (
   <div className="labels-editor__label">
     {showLanguageBadge && <Badge lang={lang} compact={compactLanguage} />}
 
@@ -18,7 +18,7 @@ const Row = ({ labels, lang, onChange, readOnly, showLanguageBadge, compactLangu
   </div>
 )
 
-Row.propTypes = {
+Label.propTypes = {
   labels: PropTypes.object,
   lang: PropTypes.string,
   onChange: PropTypes.func,
@@ -27,7 +27,7 @@ Row.propTypes = {
   compactLanguage: PropTypes.bool,
 }
 
-Row.defaultProps = {
+Label.defaultProps = {
   labels: {},
   lang: '',
   onChange: null,
@@ -36,4 +36,4 @@ Row.defaultProps = {
   compactLanguage: false,
 }
 
-export default Row
+export default Label

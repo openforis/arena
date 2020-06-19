@@ -5,12 +5,12 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyLanguages } from '@webapp/store/survey'
+import { useSurveyLangs } from '@webapp/store/survey'
 
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
-import Row from './Row'
-import More from './More'
+import Label from './Label'
+import ButtonToggle from './ButtonToggle'
 
 const MAX_PREVIEW_LANGUAGES = 2
 
@@ -29,7 +29,7 @@ const LabelsEditor = (props) => {
   } = props
 
   const i18n = useI18n()
-  const languages = !R.isEmpty(languagesFromProps) ? languagesFromProps : useSurveyLanguages()
+  const languages = !R.isEmpty(languagesFromProps) ? languagesFromProps : useSurveyLangs()
 
   const displayLangs = preview ? R.slice(0, MAX_PREVIEW_LANGUAGES, languages) : languages
 
@@ -41,12 +41,12 @@ const LabelsEditor = (props) => {
     <div className={className}>
       <div className="labels-editor-label">
         {showFormLabel && <label className="form-label">{i18n.t(formLabelKey, { count: languages.length })}</label>}
-        {canTogglePreview && <More onClick={() => setPreview(!preview)} open={preview} />}
+        {canTogglePreview && <ButtonToggle onClick={() => setPreview(!preview)} open={preview} />}
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
           {displayLangs.map((lang) => (
-            <Row
+            <Label
               key={lang}
               lang={lang}
               labels={labels}

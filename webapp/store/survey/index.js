@@ -26,7 +26,7 @@ export {
   useSurveyCycleKey,
   useSurveyCycleKeys,
   useSurveyLang,
-  useSurveyLanguages,
+  useSurveyLangs,
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
   useCategoryByUuid,
