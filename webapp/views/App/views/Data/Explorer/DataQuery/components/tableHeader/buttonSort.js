@@ -7,9 +7,9 @@ import * as DataSort from '@common/surveyRdb/dataSort'
 import { useI18n } from '@webapp/store/system'
 
 import Tooltip from '@webapp/components/tooltip'
-import SortEditor from '@webapp/loggedin/modules/data/dataVis/dataQuery/components/sort/sortEditor'
+import SortEditor from '@webapp/views/App/views/Data/Explorer/DataQuery/components/sort/sortEditor'
 
-import { updateTableSort } from '@webapp/loggedin/modules/data/dataVis/dataQuery/actions'
+import { updateTableSort } from '@webapp/views/App/views/Data/Explorer/DataQuery/actions'
 
 const ButtonSort = (props) => {
   const { nodeDefUuidContext, nodeDefUuidCols, sort, disabled } = props

@@ -7,7 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 import Tooltip from '@webapp/components/tooltip'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
 
-import { resetTableFilter, updateTableFilter } from '@webapp/loggedin/modules/data/dataVis/dataQuery/actions'
+import { resetTableFilter, updateTableFilter } from '@webapp/views/App/views/Data/Explorer/DataQuery/actions'
 
 const ButtonFilter = (props) => {
   const { nodeDefUuidContext, filter, editMode } = props
