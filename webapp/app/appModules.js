@@ -108,9 +108,9 @@ export const dataModules = {
     key: 'records',
     path: `${appModules.data.path}/records`,
   },
-  dataVis: {
-    key: 'dataVis',
-    path: `${appModules.data.path}/dataVis`,
+  explorer: {
+    key: 'explorer',
+    path: `${appModules.data.path}/explorer`,
   },
   validationReport: {
     key: 'validationReport',

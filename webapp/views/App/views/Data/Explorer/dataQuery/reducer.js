@@ -2,7 +2,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { SurveyActions } from '@webapp/store/survey'
 import { nodesUpdate } from '@webapp/loggedin/surveyViews/record/actions'
-import { dataVisReset } from '@webapp/loggedin/modules/data/dataVis/actions'
+import { dataVisReset } from '@webapp/views/App/views/Data/Explorer/actions'
 
 import {
   dataQueryTableNodeDefUuidUpdate,
