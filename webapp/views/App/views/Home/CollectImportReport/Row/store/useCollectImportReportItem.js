@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import { useI18n, useLang } from '@webapp/store/system'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, useSurveyInfo, useSurveyLanguages } from '@webapp/store/survey'
+import { useSurvey, useSurveyLanguages } from '@webapp/store/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useActions } from './actions/index'
@@ -49,9 +49,7 @@ const useNodeDefPath = ({ item, survey }) => {
 export const useCollectImportReportItem = ({ row, rowNo }) => {
   const [rowItem, setRowItem] = useState({ rowNo, ...row })
 
-
   const survey = useSurvey()
-  const surveyInfo = useSurveyInfo()
   const languages = useSurveyLanguages()
 
   const { onUpdate } = useActions({ rowItem, setRowItem })
