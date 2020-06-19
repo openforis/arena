@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey } from '@webapp/store/survey'
 
-import { NodeDefsSelectorView, NodeDefsSelectorAggregateView } from '@webapp/loggedin/surveyViews/nodeDefsSelector'
+import { NodeDefsSelector, NodeDefsSelectorAggregate } from '@webapp/components/survey/NodeDefsSelector'
 import Table from './components/table'
 
 import {
@@ -42,7 +42,7 @@ const DataQueryView = () => {
     <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
       {nodeDefSelectorsVisible &&
         (modeAggregate ? (
-          <NodeDefsSelectorAggregateView
+          <NodeDefsSelectorAggregate
             nodeDefUuidEntity={nodeDefUuidEntity}
             dimensions={dimensions}
             measures={measures}
@@ -51,7 +51,7 @@ const DataQueryView = () => {
             onChangeDimensions={(dimensionsUpdate) => dispatch(updateTableDimensions(dimensionsUpdate))}
           />
         ) : (
-          <NodeDefsSelectorView
+          <NodeDefsSelector
             hierarchy={hierarchy}
             nodeDefUuidEntity={nodeDefUuidEntity}
             nodeDefUuidsAttributes={nodeDefUuidsAttributes}
