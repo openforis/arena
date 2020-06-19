@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
