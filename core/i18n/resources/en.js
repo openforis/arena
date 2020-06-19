@@ -149,7 +149,7 @@ Do you want to cancel them?`,
 
     data: 'Data',
     records: 'Records',
-    dataVis: 'Data vis',
+    explorer: 'Explorer',
     validationReport: 'Validation report',
 
     users: 'Users',
