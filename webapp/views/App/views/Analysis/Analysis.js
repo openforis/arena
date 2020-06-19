@@ -8,7 +8,7 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
-import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ChainsView from '@webapp/loggedin/modules/analysis/chains/view'
 import ChainView from '@webapp/loggedin/modules/analysis/chain/view'
 
