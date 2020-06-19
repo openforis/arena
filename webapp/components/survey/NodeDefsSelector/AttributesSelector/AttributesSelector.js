@@ -1,4 +1,4 @@
-import './attributesSelector.scss'
+import './AttributesSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 
@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useSurvey } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
-import AttributeSelector from './attributeSelector'
+import AttributeSelector from './AttributeSelector'
 
 const AttributesSelector = (props) => {
   const {

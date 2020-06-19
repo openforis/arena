@@ -1,4 +1,4 @@
-import './components/NodeDefsSelector.scss'
+import './NodeDefsSelector.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
@@ -10,8 +10,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefUiProps from '../../../loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import AttributesSelector from './components/attributesSelector'
-import EntitySelector from './components/entitySelector'
+import AttributesSelector from './AttributesSelector'
+import EntitySelector from './EntitySelector'
 
 const NodeDefsSelector = (props) => {
   const {

@@ -8,8 +8,8 @@ import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 
-import AttributesSelector from './components/attributesSelector'
-import EntitySelector from './components/entitySelector'
+import AttributesSelector from './AttributesSelector/AttributesSelector'
+import EntitySelector from './EntitySelector'
 
 const NodeDefsSelectorAggregate = (props) => {
   const { dimensions, measures, nodeDefUuidEntity, onChangeEntity, onChangeMeasures, onChangeDimensions } = props
