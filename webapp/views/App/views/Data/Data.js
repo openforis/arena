@@ -7,7 +7,7 @@ import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import RecordView from '@webapp/loggedin/surveyViews/record/recordView'
 import DataVisView from '@webapp/loggedin/modules/data/dataVis/dataVisView'
 
