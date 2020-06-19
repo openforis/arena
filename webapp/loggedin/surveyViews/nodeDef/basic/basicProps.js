@@ -17,8 +17,8 @@ import Checkbox from '@webapp/components/form/checkbox'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
-import LabelsEditor from '@webapp/views/App/views/Survey/LabelsEditor'
-import CyclesSelector from '@webapp/views/App/views/Survey/CyclesSelector'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
 
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'

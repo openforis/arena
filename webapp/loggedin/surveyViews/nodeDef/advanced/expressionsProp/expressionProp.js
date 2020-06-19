@@ -10,7 +10,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as Expression from '@core/expressionParser/expression'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import LabelsEditor from '@webapp/views/App/views/Survey/LabelsEditor'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 const ExpressionProp = props => {
   const {

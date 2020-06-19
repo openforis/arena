@@ -17,8 +17,8 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import LabelsEditor from '@webapp/views/App/views/Survey/LabelsEditor'
-import CyclesSelector from '@webapp/views/App/views/Survey/CyclesSelector'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import StepView from '@webapp/loggedin/modules/analysis/step/view'
 import ButtonRStudio from '@webapp/components/buttonRStudio'
 

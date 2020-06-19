@@ -12,7 +12,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/dropdown'
-import LabelsEditor from '@webapp/views/App/views/Survey/LabelsEditor'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { checkCanSelectNodeDef, navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
 import {

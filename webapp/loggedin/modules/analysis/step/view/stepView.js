@@ -15,7 +15,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import CategorySelector from '@webapp/views/App/views/Survey/CategorySelector'
+import CategorySelector from '@webapp/components/survey/CategorySelector'
 import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 
 import {
