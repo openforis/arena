@@ -1,4 +1,4 @@
-import * as DataQueryState from '@webapp/views/App/views/Data/Explorer/dataQuery/state'
+import * as DataQueryState from '@webapp/views/App/views/Data/Explorer/DataQuery/state'
 
 export const dataQueryNodeDefSelectorsShowUpdate = 'dataQuery/nodeDefSelectors/show/update'
 

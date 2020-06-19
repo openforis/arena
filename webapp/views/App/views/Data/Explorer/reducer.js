@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import query from './dataQuery/reducer'
+import query from './DataQuery/reducer'
 
 export default combineReducers({
   query,

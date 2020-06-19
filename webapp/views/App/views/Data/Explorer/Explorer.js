@@ -1,9 +1,9 @@
 import React from 'react'
 
-import DataQueryView from './dataQuery'
+import DataQuery from './DataQuery'
 
 const Explorer = () => {
-  return <DataQueryView />
+  return <DataQuery />
 }
 
 export default Explorer

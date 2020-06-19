@@ -21,7 +21,7 @@ import {
 
 import * as DataQueryState from './state'
 
-const DataQueryView = () => {
+const DataQuery = () => {
   const dispatch = useDispatch()
   const survey = useSurvey()
   const nodeDefUuidEntity = useSelector(DataQueryState.getTableNodeDefUuidTable)
@@ -66,4 +66,4 @@ const DataQueryView = () => {
   )
 }
 
-export default DataQueryView
+export default DataQuery

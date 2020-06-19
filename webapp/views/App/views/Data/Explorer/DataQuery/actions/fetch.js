@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import * as DataSort from '@common/surveyRdb/dataSort'
 import { SurveyState } from '@webapp/store/survey'
-import * as DataQueryState from '@webapp/views/App/views/Data/Explorer/dataQuery/state'
+import * as DataQueryState from '@webapp/views/App/views/Data/Explorer/DataQuery/state'
 
 export const dataQueryTableInit = 'dataQuery/table/init'
 
