@@ -1,6 +1,5 @@
-import './chainsView.scss'
+import './Chains.scss'
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
 import * as Chain from '@common/analysis/processingChain'
@@ -9,16 +8,18 @@ import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import Table from '@webapp/components/Table'
 
-import { navigateToChainView } from '@webapp/loggedin/modules/analysis/chains/actions'
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import Row from './components/row'
-import RowHeader from './components/rowHeader'
-import HeaderLeft from './components/headerLeft'
+import Row from './Row'
+import RowHeader from './RowHeader'
+import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
   const history = useHistory()
-  const dispatch = useDispatch()
   const surveyCycleKey = useSurveyCycleKey()
+
+  const onRowClick = (processingChain) =>
+    history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(processingChain)}`)
 
   return (
     <Table
@@ -26,7 +27,7 @@ const ChainsView = () => {
       gridTemplateColumns="30px repeat(4, 1fr) repeat(2, 80px) 50px"
       headerLeftComponent={HeaderLeft}
       module="processing-chains"
-      onRowClick={(processingChain) => dispatch(navigateToChainView(history, Chain.getUuid(processingChain)))}
+      onRowClick={onRowClick}
       restParams={{ surveyCycleKey }}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
