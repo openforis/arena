@@ -6,7 +6,7 @@ import Table from '@webapp/components/Table'
 
 import { useSurveyId } from '@webapp/store/survey'
 
-import SurveyDefsLoader from '@webapp/loggedin/surveyViews/surveyDefsLoader/surveyDefsLoader'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import HeaderLeft from './HeaderLeft'
 import RowHeader from './RowHeader'
