@@ -17,8 +17,8 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
-import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import StepView from '@webapp/loggedin/modules/analysis/step/view'
 import ButtonRStudio from '@webapp/components/buttonRStudio'
 
@@ -74,7 +74,6 @@ const ChainView = () => {
 
       <div className="form">
         <LabelsEditor
-          languages={Survey.getLanguages(surveyInfo)}
           labels={Chain.getLabels(chain)}
           formLabelKey="processingChainView.formLabel"
           readOnly={editingStep}
@@ -86,11 +85,10 @@ const ChainView = () => {
           <>
             <LabelsEditor
               formLabelKey="common.description"
-              languages={Survey.getLanguages(surveyInfo)}
               labels={Chain.getDescriptions(chain)}
               onChange={(descriptions) => dispatch(updateChainProp(Chain.keysProps.descriptions, descriptions))}
             />
-            <CyclesSelect
+            <CyclesSelector
               cyclesKeysSelected={Chain.getCycles(chain)}
               onChange={(cycles) => dispatch(updateChainCycles(cycles))}
             />
