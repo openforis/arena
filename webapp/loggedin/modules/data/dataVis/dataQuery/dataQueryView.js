@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey } from '@webapp/store/survey'
 
-import { NodeDefsSelectorView, NodeDefsSelectorAggregateView } from '@webapp/loggedin/surveyViews/nodeDefsSelector'
+import { NodeDefsSelectorView, NodeDefsSelectorAggregateView } from '@webapp/components/survey/NodeDefsSelector'
 import Table from './components/table'
 
 import {

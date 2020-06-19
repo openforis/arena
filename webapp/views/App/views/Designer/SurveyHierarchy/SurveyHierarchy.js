@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import NodeDefsSelectorView from '@webapp/loggedin/surveyViews/nodeDefsSelector/nodeDefsSelectorView'
+import { NodeDefsSelectorView } from '@webapp/components/survey/NodeDefsSelector'
 import Tree from './Tree'
 
 const SurveyHierarchy = () => {

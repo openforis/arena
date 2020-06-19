@@ -16,7 +16,7 @@ import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
-import EntitySelector from '@webapp/loggedin/surveyViews/nodeDefsSelector/components/entitySelector'
+import EntitySelector from '@webapp/components/survey/NodeDefsSelector/components/entitySelector'
 import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
 import CyclesSelect from '@webapp/loggedin/surveyViews/cyclesSelect/cyclesSelect'
 import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'

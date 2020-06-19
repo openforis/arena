@@ -1,4 +1,4 @@
-import './components/nodeDefsSelectorView.scss'
+import './components/NodeDefsSelector.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
@@ -8,12 +8,12 @@ import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
+import * as NodeDefUiProps from '../../../loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'
 
-const NodeDefsSelectorView = (props) => {
+const NodeDefsSelector = (props) => {
   const {
     nodeDefUuidsAttributes,
     nodeDefUuidEntity,
@@ -96,7 +96,7 @@ const NodeDefsSelectorView = (props) => {
   )
 }
 
-NodeDefsSelectorView.propTypes = {
+NodeDefsSelector.propTypes = {
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.arrayOf(String),
   hierarchy: PropTypes.object,
@@ -107,7 +107,7 @@ NodeDefsSelectorView.propTypes = {
   onChangeEntity: PropTypes.func,
 }
 
-NodeDefsSelectorView.defaultProps = {
+NodeDefsSelector.defaultProps = {
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
   hierarchy: null,
@@ -118,4 +118,4 @@ NodeDefsSelectorView.defaultProps = {
   onChangeAttributes: () => {},
 }
 
-export default NodeDefsSelectorView
+export default NodeDefsSelector

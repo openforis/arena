@@ -11,7 +11,7 @@ import ExpansionPanel from '@webapp/components/expansionPanel'
 import AttributesSelector from './components/attributesSelector'
 import EntitySelector from './components/entitySelector'
 
-const NodeDefsSelectorAggregateView = (props) => {
+const NodeDefsSelectorAggregate = (props) => {
   const { dimensions, measures, nodeDefUuidEntity, onChangeEntity, onChangeMeasures, onChangeDimensions } = props
 
   const survey = useSurvey()
@@ -73,7 +73,7 @@ const NodeDefsSelectorAggregateView = (props) => {
   )
 }
 
-NodeDefsSelectorAggregateView.propTypes = {
+NodeDefsSelectorAggregate.propTypes = {
   dimensions: PropTypes.arrayOf(String).isRequired,
   measures: PropTypes.instanceOf(Map).isRequired,
   nodeDefUuidEntity: PropTypes.string,
@@ -82,8 +82,8 @@ NodeDefsSelectorAggregateView.propTypes = {
   onChangeDimensions: PropTypes.func.isRequired,
 }
 
-NodeDefsSelectorAggregateView.defaultProps = {
+NodeDefsSelectorAggregate.defaultProps = {
   nodeDefUuidEntity: null,
 }
 
-export default NodeDefsSelectorAggregateView
+export default NodeDefsSelectorAggregate
