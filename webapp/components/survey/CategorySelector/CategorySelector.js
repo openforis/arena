@@ -1,7 +1,9 @@
-import './categorySelector.scss'
+import './CategorySelector.scss'
 
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
+
+import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
@@ -12,7 +14,7 @@ import Dropdown from '@webapp/components/form/dropdown'
 
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
-import { SurveyState } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import { createCategory } from '@webapp/loggedin/surveyViews/category/actions'
 
@@ -23,7 +25,7 @@ const CategorySelector = (props) => {
 
   const dispatch = useDispatch()
   const history = useHistory()
-  const survey = useSelector(SurveyState.getSurvey)
+  const survey = useSurvey()
   const categories = Survey.getCategoriesArray(survey)
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
 
@@ -40,11 +42,12 @@ const CategorySelector = (props) => {
       />
       {showAdd && (
         <button
+          type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
           onClick={async () => {
-            const category = await dispatch(createCategory(history, analysis))
-            onChange(category)
+            const newCategory = await dispatch(createCategory(history, analysis))
+            onChange(newCategory)
           }}
           aria-disabled={disabled}
         >
@@ -64,6 +67,16 @@ const CategorySelector = (props) => {
       )}
     </div>
   )
+}
+
+CategorySelector.propTypes = {
+  categoryUuid: PropTypes.string,
+  validation: PropTypes.object,
+  disabled: PropTypes.bool,
+  showManage: PropTypes.bool,
+  showAdd: PropTypes.bool,
+  analysis: PropTypes.bool,
+  onChange: PropTypes.func,
 }
 
 CategorySelector.defaultProps = {

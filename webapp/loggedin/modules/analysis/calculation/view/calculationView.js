@@ -3,7 +3,6 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as Validation from '@core/validation/validation'
@@ -13,7 +12,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/dropdown'
-import LabelsEditor from '@webapp/loggedin/surveyViews/labelsEditor/labelsEditor'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { checkCanSelectNodeDef, navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
 import {
@@ -28,7 +27,6 @@ import useCalculationState from './useCalculationState'
 const CalculationView = () => {
   const {
     i18n,
-    surveyInfo,
     calculation,
     editingCalculation,
     validation,
@@ -62,7 +60,6 @@ const CalculationView = () => {
         </button>
 
         <LabelsEditor
-          languages={Survey.getLanguages(surveyInfo)}
           labels={Calculation.getLabels(calculation)}
           validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
           onChange={(labels) => dispatch(updateCalculationProp(Calculation.keysProps.labels, labels))}
