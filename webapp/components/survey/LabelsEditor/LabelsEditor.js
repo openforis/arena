@@ -29,7 +29,7 @@ const LabelsEditor = (props) => {
   } = props
 
   const i18n = useI18n()
-  const languages = languagesFromProps || useSurveyLanguages()
+  const languages = !R.isEmpty(languagesFromProps) ? languagesFromProps : useSurveyLanguages()
 
   const displayLangs = preview ? R.slice(0, MAX_PREVIEW_LANGUAGES, languages) : languages
 
