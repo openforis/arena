@@ -9,10 +9,11 @@ import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesVi
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import ChainsView from '@webapp/loggedin/modules/analysis/chains/view'
 import ChainView from '@webapp/loggedin/modules/analysis/chain/view'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
+
+import Chains from './Chains'
 
 const Analysis = () => {
   const dispatch = useDispatch()
@@ -29,7 +30,7 @@ const Analysis = () => {
         moduleDefault={analysisModules.processingChains}
         modules={[
           {
-            component: ChainsView,
+            component: Chains,
             path: appModuleUri(analysisModules.processingChains),
           },
           {

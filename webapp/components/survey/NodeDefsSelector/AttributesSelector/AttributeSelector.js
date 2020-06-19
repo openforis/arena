@@ -1,4 +1,4 @@
-import './attributeSelector.scss'
+import './AttributeSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
 import * as R from 'ramda'
