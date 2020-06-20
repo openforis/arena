@@ -15,11 +15,11 @@ import * as StepRepository from '../../repository/step'
 import * as CalculationRepository from '../../repository/calculation'
 
 // ====== CREATE
-const _insertCalculation = async ({ user, surveyId, chain, calculation }, client) => {
+const _insertCalculation = async ({ user, surveyId, chainUuid, calculation }, client) => {
   const calculationDb = await CalculationRepository.insertCalculation({ surveyId, calculation }, client)
   const content = {
     ...calculationDb,
-    [ActivityLog.keysContent.processingChainUuid]: Chain.getUuid(chain),
+    [ActivityLog.keysContent.processingChainUuid]: chainUuid,
   }
   const type = ActivityLog.type.processingStepCalculationCreate
   return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
@@ -31,7 +31,7 @@ export const { fetchCalculationAttributeUuids } = CalculationRepository
 // ====== UPDATE
 export const { updateCalculation } = CalculationRepository
 
-const _updateCalculation = async ({ user, surveyId, chain, calculation, calculationDb }, client) => {
+const _updateCalculation = async ({ user, surveyId, chainUuid, calculation, calculationDb }, client) => {
   const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
   const nodeDefUuidDb = Calculation.getNodeDefUuid(calculationDb)
   const propsDiff = Calculation.getPropsDiff(calculation)(calculationDb)
@@ -45,7 +45,7 @@ const _updateCalculation = async ({ user, surveyId, chain, calculation, calculat
     const calculationUpdated = await CalculationRepository.updateCalculation(params, client)
     const content = {
       ...calculationUpdated,
-      [ActivityLog.keysContent.processingChainUuid]: Chain.getUuid(chain),
+      [ActivityLog.keysContent.processingChainUuid]: chainUuid,
     }
     const type = ActivityLog.type.processingStepCalculationUpdate
     return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
@@ -56,10 +56,11 @@ const _updateCalculation = async ({ user, surveyId, chain, calculation, calculat
 // ====== PERSIST
 export const persistCalculation = async ({ user, surveyId, chain, calculation }, client) => {
   const params = { surveyId, calculationUuid: Calculation.getUuid(calculation) }
+  const chainUuid = Chain.getUuid(chain)
   const calculationDb = await CalculationRepository.fetchCalculation(params, client)
   return calculationDb
-    ? _updateCalculation({ user, surveyId, chain, calculation, calculationDb }, client)
-    : _insertCalculation({ user, surveyId, chain, calculation }, client)
+    ? _updateCalculation({ user, surveyId, chainUuid, calculation, calculationDb }, client)
+    : _insertCalculation({ user, surveyId, chainUuid, calculation }, client)
 }
 
 // ====== DELETE
