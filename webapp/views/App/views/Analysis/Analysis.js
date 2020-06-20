@@ -14,6 +14,7 @@ import ChainView from '@webapp/loggedin/modules/analysis/chain/view'
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 import Chains from './Chains'
+import Chain from './Chain'
 
 const Analysis = () => {
   const dispatch = useDispatch()
@@ -32,6 +33,10 @@ const Analysis = () => {
           {
             component: Chains,
             path: appModuleUri(analysisModules.processingChains),
+          },
+          {
+            component: Chain,
+            path: `${appModuleUri(analysisModules.processingChain)}`,
           },
           {
             component: ChainView,
