@@ -16,6 +16,8 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
+const persistChain = async ({ surveyId, data }) => axios.post(`/api/survey/${surveyId}/processing-chain/`, data)
+
 export const useOnSave = ({ chain, setChain }) => {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -30,7 +32,7 @@ export const useOnSave = ({ chain, setChain }) => {
 
       if (R.all(Validation.isValid, [chainValidation])) {
         const data = { chain: Chain.dissocProcessingSteps(chain) }
-        await axios.post(`/api/survey/${surveyId}/processing-chain/`, data)
+        await persistChain({ surveyId, data })
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chain)}/`)
