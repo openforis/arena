@@ -4,8 +4,14 @@ import { useActions } from './actions/index'
 
 export const useChain = () => {
   const [chain, setChain] = useState({})
+  const [dirty, setDirty] = useState(false)
 
-  const { onInit, onUpdate, onSave } = useActions({ chain, setChain })
+  const { onInit, onUpdate, onSave, onDismiss } = useActions({
+    chain,
+    setChain,
+    dirty,
+    setDirty,
+  })
 
   useEffect(() => {
     onInit()
@@ -13,7 +19,9 @@ export const useChain = () => {
 
   return {
     chain,
+    dirty,
     onUpdate,
     onSave,
+    onDismiss,
   }
 }

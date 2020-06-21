@@ -6,6 +6,9 @@ import { useHistory } from 'react-router'
 
 import * as Validation from '@core/validation/validation'
 
+import * as ChainValidator from '@common/analysis/processingChainValidator'
+import * as Chain from '@common/analysis/processingChain'
+
 import { AppSavingActions } from '@webapp/store/app'
 import { useLang } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
@@ -13,11 +16,7 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 
-import * as ChainValidator from '@common/analysis/processingChainValidator'
-
-import * as Chain from '@common/analysis/processingChain'
-
-export const useOnSave = ({ chain }) => {
+export const useOnSave = ({ chain, setChain }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const lang = useLang()
@@ -36,7 +35,7 @@ export const useOnSave = ({ chain }) => {
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chain)}/`)
       } else {
-        // dispatch({ type: chainValidationUpdate, validation: Chain.getValidation(chain) })
+        setChain(Validation.assocValidation(chainValidation)(chain))
         dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
       }
 
