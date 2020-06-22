@@ -24,7 +24,6 @@ import { validateStep } from '@webapp/loggedin/modules/analysis/step/actions'
 
 import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
-import CalculationList from './CalculationList'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -86,7 +85,7 @@ const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep })
               <button
                 type="button"
                 className="btn btn-s btn-add"
-                onClick={useAddEntityVirtual()()}
+                onClick={useAddEntityVirtual()}
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
@@ -112,10 +111,7 @@ const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep })
             </div>
           </>
         )}
-        <CalculationList
-          calculationEditorOpened={editingCalculation}
-          validation={Validation.getFieldValidation(Step.keys.calculations)(validation)}
-        />
+        <p>CalculationList</p>
       </div>
 
       <CalculationView />
