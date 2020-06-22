@@ -5,8 +5,6 @@ export {
   fetchChain,
   // ======  READ - Calculations
   fetchCalculationAttributeUuids,
-  // ======  CREATE - Chain
-  createChain,
   // ======  UPDATE - Chain
   updateChainStatusExec,
   // ======  DELETE - Chain

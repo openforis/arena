@@ -34,26 +34,6 @@ export { fetchSteps, fetchStep, deleteStep } from './step'
 // ====== Calculation
 export { fetchCalculationAttributeUuids, updateCalculation, deleteCalculation } from './calculation'
 
-// ===== Create chain
-
-export const createChain = async ({ user, surveyId, chain }, client = DB.client) =>
-  client.tx(async (tx) => {
-    await Promise.all([persistChain({ user, surveyId, chain }, tx), markSurveyDraft(surveyId, tx)])
-
-    const [surveyInfo, chainDb] = await Promise.all([
-      SurveyRepository.fetchSurveyById(surveyId, true, tx),
-      ChainRepository.fetchChain({ surveyId, chainUuid: Chain.getUuid(chain), includeStepsAndCalculations: true }, tx),
-    ])
-
-    const lang = Survey.getDefaultLanguage(surveyInfo)
-
-    const chainValidation = await ChainValidator.validateChain(chainDb, lang)
-
-    if (!R.all(Validation.isValid, [chainValidation])) {
-      throw new SystemError('appErrors.processingChainCannotBeSaved')
-    }
-  })
-
 // ====== Persist all
 
 export const persistAll = async ({ user, surveyId, chain, step = null, calculation = null }, client = DB.client) =>

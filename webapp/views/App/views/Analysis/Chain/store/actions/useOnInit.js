@@ -1,15 +1,23 @@
 import * as ProcessingChain from '@common/analysis/processingChain'
 
+import { AnalysisActions } from '@webapp/service/storage'
+
 import { useSurveyCycleKey } from '@webapp/store/survey'
 
 export const useOnInit = ({ setChain }) => {
   const surveyCycleKey = useSurveyCycleKey()
 
-  return () => {
-    const newChain = ProcessingChain.newProcessingChain({
-      [ProcessingChain.keysProps.cycles]: [surveyCycleKey],
-    })
+  const chainSaved = AnalysisActions.getChain()
 
-    setChain(newChain)
+  return () => {
+    if (chainSaved) {
+      setChain(chainSaved)
+    } else {
+      const newChain = ProcessingChain.newProcessingChain({
+        [ProcessingChain.keysProps.cycles]: [surveyCycleKey],
+      })
+
+      setChain(newChain)
+    }
   }
 }
