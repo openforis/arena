@@ -125,10 +125,9 @@ const NodeDefView = () => {
                         label: i18n.t('nodeDefEdit.validations'),
                         component: ValidationsProps,
                         props: {
-                          nodeDef,
-                          validation,
+                          nodeDefState,
+                          setNodeDefState,
                           nodeDefParent,
-                          setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
                         },
                       },
                     ]),
