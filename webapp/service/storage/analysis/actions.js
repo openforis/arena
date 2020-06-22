@@ -9,3 +9,13 @@ export const persistChain = ({ chain }) => {
 export const getChain = () => AnalysisStorage.getChain()
 
 export const resetChain = () => AnalysisStorage.clearChain()
+
+// ===== step
+export const persistStep = ({ step }) => {
+  AnalysisStorage.setStep({ step })
+  window.dispatchEvent(new CustomEvent(AnalysisStorage.eventTypes.setStep))
+}
+
+export const getStep = () => AnalysisStorage.getStep()
+
+export const resetStep = () => AnalysisStorage.clearStep()
