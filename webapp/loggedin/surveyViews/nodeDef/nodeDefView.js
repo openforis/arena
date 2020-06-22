@@ -2,25 +2,22 @@ import './nodeDefView.scss'
 
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { matchPath, useHistory, useLocation } from 'react-router'
+import { useHistory } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { useOnUpdate } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
@@ -50,12 +47,11 @@ const NodeDefView = () => {
   const i18n = useI18n()
   const history = useHistory()
   const dispatch = useDispatch()
-  const { pathname } = useLocation()
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
-  const { nodeDefState, setNodeDefState } = useNodeDefState()
-  const { setNodeDefProp } = useActions({ nodeDefState, setNodeDefState })
+  const { nodeDefState, setNodeDefState, editingNodeDefFromDesigner } = useNodeDefState()
+  const { setNodeDefProp, cancelNodeDefEdits } = useActions({ nodeDefState, setNodeDefState })
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
@@ -66,18 +62,6 @@ const NodeDefView = () => {
   const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
   const nodeDefKeyEditDisabled = _isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = _isNodeDefMultipleEditDisabled(survey, surveyCycleKey, nodeDef)
-
-  const editingNodeDefFromDesigner = Boolean(
-    matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`)
-  )
-
-  useOnUpdate(() => {
-    if (editingNodeDefFromDesigner) {
-      history.goBack()
-    } else {
-      dispatch(navigateToChainsView(history))
-    }
-  }, [surveyCycleKey])
 
   return (
     nodeDef && (
@@ -143,10 +127,10 @@ const NodeDefView = () => {
                     ? dispatch(
                         DialogConfirmActions.showDialogConfirm({
                           key: 'common.cancelConfirm',
-                          onOk: NodeDefsActions.cancelNodeDefEdits(history),
+                          onOk: cancelNodeDefEdits(history),
                         })
                       )
-                    : dispatch(NodeDefsActions.cancelNodeDefEdits(history))
+                    : dispatch(cancelNodeDefEdits(history))
                 }
               >
                 {i18n.t(isDirty ? 'common.cancel' : 'common.back')}
