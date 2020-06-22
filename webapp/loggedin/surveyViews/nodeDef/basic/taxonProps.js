@@ -1,5 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/components/form/input'
@@ -11,33 +12,35 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
-import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import * as NodeDefState from '../nodeDefState'
+import { createTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
+import * as NodeDefState from '../store/nodeDefState'
 
-import { createTaxonomy, deleteTaxonomy } from '../../taxonomy/actions'
-
-const { propKeys } = NodeDef
+import { useActions } from '../store/actions/index'
 
 const TaxonProps = (props) => {
-  const {
-    validation,
-    taxonomies,
-    taxonomy,
-    canUpdateTaxonomy,
+  const { nodeDefState, setNodeDefState } = props
 
-    setNodeDefProp,
-    createTaxonomy,
-  } = props
-
-  const updateTaxonomyProp = (taxonomy) => setNodeDefProp(propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
-
-  const i18n = useI18n()
+  const dispatch = useDispatch()
   const history = useHistory()
 
+  const survey = useSurvey()
+  const i18n = useI18n()
+  const { setNodeDefProp } = useActions({ nodeDefState, setNodeDefState })
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const validation = NodeDefState.getValidation(nodeDefState)
+  const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
+  const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
+  const taxonomies = Survey.getTaxonomiesArray(survey)
+
+  const updateTaxonomyProp = (taxonomySelected) =>
+    dispatch(setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomySelected)))
+
   return (
-    <React.Fragment>
-      <FormItem label={'Taxonomy'}>
+    <>
+      <FormItem label="Taxonomy">
         <div
           style={{
             display: 'grid',
@@ -46,18 +49,19 @@ const TaxonProps = (props) => {
         >
           <Dropdown
             items={taxonomies}
-            itemKeyProp={'uuid'}
+            itemKeyProp="uuid"
             itemLabelFunction={Taxonomy.getName}
-            validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={updateTaxonomyProp}
           />
           <button
+            type="button"
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
             onClick={async () => {
-              updateTaxonomyProp(await createTaxonomy(history))
+              updateTaxonomyProp(await dispatch(createTaxonomy(history)))
             }}
           >
             <span className="icon icon-plus icon-12px icon-left" />
@@ -69,23 +73,13 @@ const TaxonProps = (props) => {
           </Link>
         </div>
       </FormItem>
-    </React.Fragment>
+    </>
   )
 }
 
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
-
-  return {
-    taxonomy: Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey),
-    taxonomies: Survey.getTaxonomiesArray(survey),
-    canUpdateTaxonomy: !NodeDef.isPublished(nodeDef),
-  }
+TaxonProps.propTypes = {
+  nodeDefState: PropTypes.object.isRequired,
+  setNodeDefState: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, {
-  setNodeDefProp: NodeDefsActions.setNodeDefProp,
-  createTaxonomy,
-  deleteTaxonomy,
-})(TaxonProps)
+export default TaxonProps

@@ -91,13 +91,9 @@ const BasicProps = (props) => {
         onChange={(descriptions) => dispatch(setNodeDefProp(NodeDef.propKeys.descriptions, descriptions))}
       />
 
-      {NodeDef.isCode(nodeDef) && (
-        <CodeProps surveyCycleKey={surveyCycleKey} nodeDefState={nodeDefState} setNodeDefState={setNodeDefState} />
-      )}
+      {NodeDef.isCode(nodeDef) && <CodeProps nodeDefState={nodeDefState} setNodeDefState={setNodeDefState} />}
 
-      {NodeDef.isTaxon(nodeDef) && (
-        <TaxonProps nodeDef={nodeDef} validation={validation} setNodeDefProp={setNodeDefProp} />
-      )}
+      {NodeDef.isTaxon(nodeDef) && <TaxonProps nodeDefState={nodeDefState} setNodeDefState={setNodeDefState} />}
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
