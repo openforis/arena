@@ -74,27 +74,6 @@ export const init = (app) => {
     }
   )
 
-  // ====== CREATE - Chain
-
-  app.post(
-    '/survey/:surveyId/processing-chain/',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-
-        const user = Request.getUser(req)
-
-        const { chain } = Request.getBody(req)
-        await AnalysisService.createChain({ user, surveyId, chain })
-
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
   // ====== UPDATE - Chain
 
   app.put(

@@ -6,7 +6,7 @@ export const useChain = () => {
   const [chain, setChain] = useState({})
   const [dirty, setDirty] = useState(false)
 
-  const { onInit, onUpdate, onSave, onDismiss } = useActions({
+  const { onInit, onUpdate, onDismiss } = useActions({
     chain,
     setChain,
     dirty,
@@ -21,7 +21,7 @@ export const useChain = () => {
     chain,
     dirty,
     onUpdate,
-    onSave,
+    onSave: () => ({}),
     onDismiss,
   }
 }

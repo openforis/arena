@@ -6,6 +6,7 @@ import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 
+import * as ProcessingChain from '@common/analysis/processingChain'
 import * as ProcessingStep from '@common/analysis/processingStep'
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
 
@@ -25,6 +26,9 @@ const _validationsCommonProps = (defaultLang) => ({
 export const validateChain = async (chain, defaultLang) =>
   Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
+    [ProcessingChain.keys.processingSteps]: [
+      Validator.validateRequired(Validation.messageKeys.analysis.processingChain.stepsRequired),
+    ],
   })
 
 export const validateStep = async (step) => {
