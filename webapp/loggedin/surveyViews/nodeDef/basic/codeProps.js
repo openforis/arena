@@ -1,5 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -14,22 +15,24 @@ import * as Category from '@core/survey/category'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import * as NodeDefState from '../nodeDefState'
+import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
+import * as NodeDefState from '../store/nodeDefState'
+import { useActions } from '../store/actions/index'
 
 const CodeProps = (props) => {
-  const {
-    surveyCycleKey,
-    nodeDef,
-    validation,
-    setNodeDefProp,
-    setNodeDefLayoutProp,
-    canUpdateCategory,
-    candidateParentCodeNodeDefs,
-    parentCodeDef,
-  } = props
+  const { nodeDefState, setNodeDefState } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
+  const surveyCycleKey = useSurveyCycleKey()
+  const survey = useSurvey()
+  const { setNodeDefProp, setNodeDefLayoutProp } = useActions({ nodeDefState, setNodeDefState })
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const validation = NodeDefState.getValidation(nodeDefState)
+  const canUpdateCategory = Survey.canUpdateCategory(nodeDef)(survey)
+  const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents(nodeDef)(survey)
+  const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
 
   const displayAsItems = [
     {
@@ -45,8 +48,8 @@ const CodeProps = (props) => {
   const disabled = !canUpdateCategory
 
   const putCategoryProp = (category) => {
-    setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
-    setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))
+    dispatch(setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, null)) // Reset parent code
+    dispatch(setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category)))
   }
 
   return (
@@ -74,9 +77,9 @@ const CodeProps = (props) => {
                 disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
-                itemKeyProp={'uuid'}
+                itemKeyProp="uuid"
                 itemLabelFunction={NodeDef.getName}
-                onChange={(def) => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
+                onChange={(def) => dispatch(setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def)))}
               />
             </div>
           </FormItem>
@@ -84,7 +87,7 @@ const CodeProps = (props) => {
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-              onChange={(render) => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render)}
+              onChange={(render) => dispatch(setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render))}
               items={displayAsItems}
             />
           </FormItem>
@@ -94,18 +97,9 @@ const CodeProps = (props) => {
   )
 }
 
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
-
-  return {
-    canUpdateCategory: Survey.canUpdateCategory(nodeDef)(survey),
-    candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(survey),
-    parentCodeDef: Survey.getNodeDefParentCode(nodeDef)(survey),
-  }
+CodeProps.propTypes = {
+  nodeDefState: PropTypes.object.isRequired,
+  setNodeDefState: PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps, {
-  setNodeDefProp: NodeDefsActions.setNodeDefProp,
-  setNodeDefLayoutProp: NodeDefsActions.setNodeDefLayoutProp(),
-})(CodeProps)
+export default CodeProps

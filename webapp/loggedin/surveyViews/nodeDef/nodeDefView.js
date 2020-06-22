@@ -1,8 +1,8 @@
 import './nodeDefView.scss'
 
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { matchPath, useHistory, useLocation, useParams } from 'react-router'
+import React from 'react'
+import { useDispatch } from 'react-redux'
+import { matchPath, useHistory, useLocation } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -21,12 +21,13 @@ import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import ValidationsProps from './advanced/validationsProps'
 import AdvancedProps from './advanced/advancedProps'
 import BasicProps from './basic/basicProps'
 
-import { setNodeDefUuidForEdit } from './actions'
+import { useNodeDefState } from './store/useNodeDefState'
+import { useActions } from './store/actions/index'
+import * as NodeDefState from './store/nodeDefState'
 
 const _isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
@@ -50,13 +51,15 @@ const NodeDefView = () => {
   const history = useHistory()
   const dispatch = useDispatch()
   const { pathname } = useLocation()
-  const { nodeDefUuid } = useParams()
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
-  const nodeDef = useSelector(NodeDefState.getNodeDef)
-  const validation = useSelector(NodeDefState.getValidation)
-  const isDirty = useSelector(NodeDefState.isDirty)
+  const { nodeDefState, setNodeDefState } = useNodeDefState()
+  const { setNodeDefProp } = useActions({ nodeDefState, setNodeDefState })
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const validation = NodeDefState.getValidation(nodeDefState)
+  const isDirty = NodeDefState.isDirty(nodeDefState)
 
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
@@ -67,13 +70,6 @@ const NodeDefView = () => {
   const editingNodeDefFromDesigner = Boolean(
     matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`)
   )
-
-  useEffect(() => {
-    // Editing a nodeDef
-    if (nodeDefUuid) {
-      dispatch(setNodeDefUuidForEdit(nodeDefUuid))
-    }
-  }, [])
 
   useOnUpdate(() => {
     if (editingNodeDefFromDesigner) {
@@ -92,9 +88,7 @@ const NodeDefView = () => {
               <Input
                 value={NodeDef.getName(nodeDef)}
                 validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-                onChange={(value) =>
-                  dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
-                }
+                onChange={(value) => dispatch(setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))}
               />
               <div className="attribute-selector">
                 {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}
@@ -108,15 +102,11 @@ const NodeDefView = () => {
                   label: i18n.t('nodeDefEdit.basic'),
                   component: BasicProps,
                   props: {
-                    nodeDef,
-                    validation,
+                    nodeDefState,
+                    setNodeDefState,
                     nodeDefKeyEditDisabled,
                     nodeDefMultipleEditDisabled,
                     editingNodeDefFromDesigner,
-                    setNodeDefParentUuid: (...args) => dispatch(NodeDefsActions.setNodeDefParentUuid(...args)),
-                    setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
-                    putNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.putNodeDefLayoutProp(...args)),
-                    setNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.setNodeDefLayoutProp(...args)),
                   },
                 },
                 ...(NodeDef.isRoot(nodeDef)
