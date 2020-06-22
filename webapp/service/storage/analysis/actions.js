@@ -7,3 +7,5 @@ export const persistChain = ({ chain }) => {
 }
 
 export const getChain = () => AnalysisStorage.getChain()
+
+export const resetChain = () => AnalysisStorage.clearChain()
