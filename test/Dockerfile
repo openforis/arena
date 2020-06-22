@@ -4,8 +4,29 @@
 
 FROM node:12.16.0 AS test
 
-RUN apt update
-RUN apt-get install -y git netcat
+# add Gauge key
+RUN apt-key adv --no-tty --keyserver hkp://keyserver.ubuntu.com --recv-keys 023EDB0B
+RUN echo deb http://dl.bintray.com/gauge/gauge-deb stable main | tee -a /etc/apt/sources.list
+
+# Install Chromium dependencies, git and netcat
+RUN apt-get update; \
+    apt-get install -y wget unzip fontconfig \
+    locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
+    libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \
+    libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \
+    libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
+    libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates \
+    fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils \
+    git netcat; \
+    apt-get autoremove; apt-get autoclean;
+# Install Gauge
+RUN npm install -g @getgauge/cli --unsafe-perm
+# Install Gauge plugins
+RUN gauge install js && gauge install html-report && gauge install screenshot
+# Install Chromium
+RUN npm install -g chromium --unsafe-perm
+# Install PM2
+RUN npm install pm2 -g
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/

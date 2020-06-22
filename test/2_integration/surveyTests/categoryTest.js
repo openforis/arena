@@ -15,16 +15,22 @@ export const createCategoryTest = async () => {
   const categoryReq = Category.newCategory({ name: 'category_test' })
   const category = await CategoryManager.insertCategory(user, surveyId, categoryReq)
 
+  /* eslint-disable no-unused-expressions */
   expect(Category.getUuid(category)).to.exist
 
   const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid(
     surveyId,
     Category.getUuid(category),
     true,
-    true,
+    true
   )
 
   expect(reloadedCategory).to.deep.equal(category)
+}
+
+const _fetchFirstCategory = async (surveyId) => {
+  const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(surveyId, true, false)
+  return R.pipe(R.values, R.head)(categories)
 }
 
 export const createCategoryLevelTest = async () => {
@@ -45,7 +51,7 @@ export const createCategoryLevelTest = async () => {
     surveyId,
     Category.getUuid(category),
     true,
-    false,
+    false
   )
 
   // Levels must be 2
@@ -86,13 +92,8 @@ export const updateCategoryTest = async () => {
     surveyId,
     Category.getUuid(category),
     'name',
-    newName,
+    newName
   )
 
   expect(Category.getName(updatedCategory)).to.be.equal(newName)
-}
-
-const _fetchFirstCategory = async surveyId => {
-  const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId(surveyId, true, false)
-  return R.pipe(R.values, R.head)(categories)
 }

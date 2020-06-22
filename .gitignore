@@ -1,4 +1,10 @@
+### Custom excluded folders ###
+# Distribution folder
 /dist
+# Gauge exclusions
+.gauge
+gauge-reports
+### End of custom excluded folders ###
 
 # Created by https://www.gitignore.io/api/node,terraform,visualstudiocode,webstorm+all,macos,linux
 # Edit at https://www.gitignore.io/?templates=node,terraform,visualstudiocode,webstorm+all,macos,linux

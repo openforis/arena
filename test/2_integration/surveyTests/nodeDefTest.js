@@ -3,13 +3,14 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import { getContextSurvey } from '../../testContext'
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
-  return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
+  return NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
 const createNodeDef = (nodeDefParent, type, name) =>
@@ -20,7 +21,7 @@ const createNodeDef = (nodeDefParent, type, name) =>
 const createAndStoreNodeDef = async (nodeDefParent, type, name) => {
   const survey = getContextSurvey()
   const nodeDef = createNodeDef(nodeDefParent, type, name)
-  return await NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
+  return NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
 }
 
 export const createNodeDefsTest = async () => {
@@ -29,16 +30,17 @@ export const createNodeDefsTest = async () => {
 
   const rootDef = await fetchRootNodeDef()
 
-  for (const nodeType of Object.keys(NodeDef.nodeDefType)) {
+  await PromiseUtils.each(Object.keys(NodeDef.nodeDefType), async (nodeType) => {
     const nodeDefReq = createNodeDef(rootDef, nodeType, `node_def_${nodeType}`)
     const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
+    /* eslint-disable no-unused-expressions */
     expect(nodeDefDb.id).to.not.be.undefined
     expect(nodeDefDb.type).to.equal(nodeType)
     expect(nodeDefDb.parentUuid).to.equal(NodeDef.getParentUuid(nodeDefReq))
     expect(nodeDefDb.uuid).to.equal(NodeDef.getUuid(nodeDefReq))
     expect(nodeDefDb.props).to.eql(nodeDefReq.props)
-  }
+  })
 }
 
 export const updateNodeDefTest = async () => {
@@ -56,17 +58,17 @@ export const updateNodeDefTest = async () => {
     surveyId,
     nodeDef1Uuid,
     NodeDef.getParentUuid(nodeDef1),
-    { name: newName },
+    { name: newName }
   )
   expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, true)
 
   // Only one node def with that name
-  expect(R.filter(n => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)
+  expect(R.filter((n) => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)
 
   // Do not modify existing nodes
-  const reloadedNodeDef2 = R.find(n => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
+  const reloadedNodeDef2 = R.find((n) => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
   expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
   expect(NodeDef.getName(reloadedNodeDef2)).to.equal(NodeDef.getName(nodeDef2))
 }

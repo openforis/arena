@@ -6,6 +6,7 @@ import * as ProcessingStepCalculation from '@common/analysis/processingStepCalcu
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -60,9 +61,7 @@ after(async () => {
 
 const _insertRecords = async () => {
   // Delete records
-  for (const record of records) {
-    await RecordManager.deleteRecord(user, survey, Record.getUuid(record))
-  }
+  await Promise.all(records.map((record) => RecordManager.deleteRecord(user, survey, Record.getUuid(record))))
 
   records = []
 
@@ -75,19 +74,19 @@ const _insertRecords = async () => {
     )
 
   // Add 5 records
-  for (let i = 0; i < 5; i++) {
+  await PromiseUtils.each([1, 2, 3, 4, 5], async (clusterNum) => {
     const record = await RB.record(
       user,
       survey,
       RB.entity(
         'cluster',
-        RB.attribute('cluster_no', i + 1),
+        RB.attribute('cluster_no', clusterNum),
         RB.entity('plot', RB.attribute('plot_no', 1), newTree(1, 20, 50), newTree(2, 30, 60))
       )
     ).buildAndStore()
 
     records.push(record)
-  }
+  })
 }
 
 export const chainWithSimpleEntityTest = async () => {

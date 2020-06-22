@@ -17,6 +17,9 @@ import { getContextUser, fetchFullContextSurvey } from '../../testContext'
 
 import * as RecordUtils from '../utils/recordUtils'
 
+// ==== helper methods
+const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
+
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
     [NodeDef.keysPropsAdvanced.defaultValues]: defaultValueExpressions,
@@ -26,7 +29,7 @@ const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => 
     NodeDef.getUuid(nodeDef),
     NodeDef.getParentUuid(nodeDef),
     {},
-    propsAdvanced,
+    propsAdvanced
   )
 }
 
@@ -41,6 +44,7 @@ export const recordCreationTest = async () => {
 
   const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(record))
 
+  /* eslint-disable no-unused-expressions */
   expect(reloadedRecord).to.not.be.undefined
 
   expect(R.isEmpty(nodes)).to.equal(false)
@@ -63,7 +67,7 @@ export const defaultValueAppliedTest = async () => {
 
   // Create record
 
-  await db.tx(async t => {
+  await db.tx(async (t) => {
     const record = await RecordUtils.insertAndInitRecord(user, survey, true, t)
 
     const root = Record.getRootNode(record)
@@ -76,6 +80,3 @@ export const defaultValueAppliedTest = async () => {
     expect(Node.getValue(reloadedNode)).to.equal('default value 2')
   })
 }
-
-// ==== helper methods
-const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)

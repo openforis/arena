@@ -83,17 +83,17 @@ const badExpressions = [
 ]
 
 describe('dataFilter test', () => {
-  for (const { q, r } of goodExpressions) {
+  goodExpressions.forEach(({ q, r }) => {
     it(q, () => {
       const ps = getWherePreparedStatement(jsep(q))
       assert.deepEqual(ps, r)
     })
-  }
+  })
 
-  for (const { q } of badExpressions) {
+  badExpressions.forEach(({ q }) => {
     it(q, () => {
       const ps = () => getWherePreparedStatement(jsep(q))
       expect(ps).to.throw()
     })
-  }
+  })
 })

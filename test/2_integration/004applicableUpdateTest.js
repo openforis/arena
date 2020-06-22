@@ -4,6 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as PromiseUtils from '@core/promiseUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -70,7 +71,7 @@ describe('Applicable Test', () => {
       [50, false],
     ]
 
-    for (const testValue of testValues) {
+    await PromiseUtils.each(testValues, async (testValue) => {
       const [sourceValue, expectedValue] = testValue
 
       // Update source node value
@@ -88,7 +89,7 @@ describe('Applicable Test', () => {
       const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
 
       expect(applicable).to.equal(expectedValue, sourceValue)
-    }
+    })
   })
 
   it('Applicable evaluated on entity creation', async () => {

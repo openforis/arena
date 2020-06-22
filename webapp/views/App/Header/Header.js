@@ -65,19 +65,19 @@ const Header = () => {
           ))}
       </div>
 
-      <div
-        className="header__user"
+      <button
+        className="header__btn-user"
         onClick={toggleShowUserPopup}
         onKeyDown={toggleShowUserPopup}
-        role="button"
         tabIndex="0"
+        type="button"
       >
         <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail />
 
-        <button type="button" className="btn btn-transparent">
+        <div className="btn btn-transparent">
           <span className="icon icon-ctrl" />
-        </button>
-      </div>
+        </div>
+      </button>
 
       {showUserPopup && <UserPopupMenu onClose={() => setShowUserPopup(false)} />}
     </div>

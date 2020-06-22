@@ -10,7 +10,7 @@ const [pgUser, pgPassword, pgHost, pgPort, pgDatabase] = dbUrlMatch
   ? [dbUrlMatch[1], dbUrlMatch[2], dbUrlMatch[3], dbUrlMatch[4], dbUrlMatch[5]]
   : [process.env.PGUSER, process.env.PGPASSWORD, process.env.PGHOST, process.env.PGPORT, process.env.PGDATABASE]
 
-export const ENV = {
+const ENV = {
   arenaRoot: process.env.ARENA_ROOT,
   arenaDist: process.env.ARENA_DIST,
   arenaPort: process.env.ARENA_PORT || '9090',
@@ -44,5 +44,8 @@ export const ENV = {
   rStudioServerURL: process.env.RSTUDIO_SERVER_URL,
 }
 
-export const isEnvDevelopment = ENV.nodeEnv === environments.development
-export const isEnvProduction = ENV.nodeEnv === environments.production
+module.exports = {
+  ENV,
+  isEnvDevelopment: ENV.nodeEnv === environments.development,
+  isEnvProduction: ENV.nodeEnv === environments.production,
+}
