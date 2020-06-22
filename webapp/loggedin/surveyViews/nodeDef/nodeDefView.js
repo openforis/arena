@@ -51,7 +51,7 @@ const NodeDefView = () => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
   const { nodeDefState, setNodeDefState, editingNodeDefFromDesigner } = useNodeDefState()
-  const { setNodeDefProp, cancelNodeDefEdits } = useActions({ nodeDefState, setNodeDefState })
+  const { setNodeDefProp, cancelNodeDefEdits, saveNodeDefEdits } = useActions({ nodeDefState, setNodeDefState })
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
@@ -138,7 +138,7 @@ const NodeDefView = () => {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => dispatch(NodeDefsActions.saveNodeDefEdits())}
+                onClick={() => dispatch(saveNodeDefEdits())}
                 aria-disabled={!isDirty || StringUtils.isBlank(nodeDefName)}
               >
                 <span className="icon icon-floppy-disk icon-left icon-12px" />
