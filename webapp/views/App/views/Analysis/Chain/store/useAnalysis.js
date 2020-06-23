@@ -3,14 +3,20 @@ import * as R from 'ramda'
 import { useState, useEffect } from 'react'
 
 import { useActions } from './actions/index'
+import { useChain } from './chain'
+import { useStep } from './step'
+import { useCalculation } from './calculation'
 
 export const useAnalysis = () => {
-  const [chain, setChain] = useState({})
-  const [step, setStep] = useState({})
-  const [calculation, setCalculation] = useState({})
   const [dirty, setDirty] = useState(false)
+  const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
+  const { step, setStep, actions: stepActions } = useStep({}, { dirty, setDirty, chain, setChain })
+  const { calculation, setCalculation, actions: calculationActions } = useCalculation(
+    {},
+    { dirty, setDirty, chain, setChain, step, setStep }
+  )
 
-  const { onInit, onDismiss, chain: chainActions, step: stepActions, calculation: calculationActions } = useActions({
+  const { onInit, onDismiss } = useActions({
     chain,
     setChain,
     dirty,
