@@ -23,6 +23,8 @@ const ChainComponent = () => {
     dirty,
     editingStep,
     step,
+    calculation,
+    editingCalculation,
     onUpdate,
     onSave,
     onDismiss,
@@ -30,6 +32,9 @@ const ChainComponent = () => {
     onSelectStep,
     onUpdateStep,
     onDeleteStep,
+    onNewCalculation,
+    onMoveCalculation,
+    onDeleteCalculation,
   } = useChain()
   const validation = Chain.getValidation(chain)
 
@@ -73,11 +78,16 @@ const ChainComponent = () => {
       </div>
 
       <Step
-        step={step}
         chain={chain}
+        step={step}
+        calculation={calculation}
         editingStep={editingStep}
+        editingCalculation={editingCalculation}
         onUpdateStep={onUpdateStep}
         onDeleteStep={onDeleteStep}
+        onNewCalculation={onNewCalculation}
+        onMoveCalculation={onMoveCalculation}
+        onDeleteCalculation={onDeleteCalculation}
       />
 
       <ButtonBar dirty={dirty} onDismiss={onDismiss} onSave={onSave} />
