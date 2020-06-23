@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { AnalysisActions } from '@webapp/service/storage'
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/processingChain'
 
 export const useOnDeleteStep = ({ chain, setChain, step, setStep }) => {
   const dispatch = useDispatch()
@@ -10,7 +10,7 @@ export const useOnDeleteStep = ({ chain, setChain, step, setStep }) => {
   const resetStep = () => {
     AnalysisActions.resetStep()
     setStep({})
-    const withoutSteps = ProcessingChain.dissocProcessingStepTemporary(chain)
+    const withoutSteps = Chain.dissocProcessingStepTemporary(chain)
     const newChain = { ...chain, ...withoutSteps }
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
