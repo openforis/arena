@@ -62,7 +62,6 @@ CalculationItem.propTypes = {
   analysisState: PropTypes.object.isRequired,
   calculation: PropTypes.object.isRequired,
   dragging: PropTypes.bool.isRequired,
-  editingCalculation: PropTypes.bool.isRequired,
   onDragEnd: PropTypes.func.isRequired,
   onDragOver: PropTypes.func.isRequired,
   onDragStart: PropTypes.func.isRequired,
