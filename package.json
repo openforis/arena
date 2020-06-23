@@ -1,6 +1,7 @@
 {
   "license": "MIT",
   "name": "open-foris-arena",
+  "proxy": "http://localhost:9090",
   "engines": {
     "node": ">=12.16.0",
     "yarn": ">=1.16.0"
@@ -122,6 +123,7 @@
     "react-avatar-editor": "^12.0.0-beta.0",
     "react-dom": "^16.13.1",
     "react-grid-layout": "^0.18.3",
+    "react-hot-loader": "^4.12.21",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",

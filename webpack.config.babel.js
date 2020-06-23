@@ -71,7 +71,7 @@ if (buildReport) {
 
 // ====== webpack config
 const webPackConfig = {
-  entry: ['./webapp/Main.js'],
+  entry: ['react-hot-loader/patch', './webapp/Main.js'],
   mode: ProcessUtils.ENV.nodeEnv,
   resolve: {
     extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
@@ -95,6 +95,11 @@ const webPackConfig = {
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
+          options: {
+            // cache for faster rebuild
+            cacheDirectory: true,
+            plugins: ['react-hot-loader/babel'],
+          },
         },
       },
       {
