@@ -24,7 +24,7 @@ import BasicProps from './basic/basicProps'
 
 import { useNodeDefState } from './store/useNodeDefState'
 import { useActions } from './store/actions/index'
-import * as NodeDefState from './store/nodeDefState'
+import * as NodeDefState from './store/state'
 
 const _isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||

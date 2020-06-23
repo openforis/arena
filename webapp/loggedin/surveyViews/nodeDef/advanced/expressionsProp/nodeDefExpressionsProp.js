@@ -10,7 +10,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './expressionsProp'
 
-import * as NodeDefState from '../../store/nodeDefState'
+import * as NodeDefState from '../../store/state'
 import { useActions } from '../../store/actions'
 
 const NodeDefExpressionsProp = (props) => {

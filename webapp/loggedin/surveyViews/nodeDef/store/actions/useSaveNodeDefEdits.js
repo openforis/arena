@@ -10,8 +10,9 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as SurveyState from '@webapp/store/survey/state'
 
-import * as NodeDefState from '../nodeDefState'
+import * as NodeDefState from '../state'
 
+import { usePutNodeDefProps } from './usePutNodeDefProps'
 import types from './types'
 
 // ==== Internal update nodeDefs actions
@@ -21,25 +22,6 @@ const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) =>
   if (!R.isEmpty(nodeDefsUpdated)) {
     dispatch({ type: types.nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
   }
-}
-
-const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const cycle = SurveyState.getSurveyCycleKey(state)
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const parentUuid = NodeDef.getParentUuid(nodeDef)
-
-  const {
-    data: { nodeDefsValidation, nodeDefsUpdated },
-  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
-    parentUuid,
-    cycle,
-    props,
-    propsAdvanced,
-  })
-
-  dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
 
 // Persists the temporary changes applied to the node def in the state
@@ -79,7 +61,15 @@ export const useSaveNodeDefEdits = ({ nodeDefState, setNodeDefState }) => () => 
       const props = NodeDefState.getPropsUpdated(nodeDefState)
       const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(nodeDefState)
 
-      await dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
+      const putNodeDefProps = usePutNodeDefProps()
+      await dispatch(
+        putNodeDefProps({
+          nodeDefUuid: NodeDef.getUuid(nodeDef),
+          parentUuid: NodeDef.getParentUuid(nodeDef),
+          props,
+          propsAdvanced,
+        })
+      )
     }
 
     // Update node def state

@@ -15,7 +15,7 @@ import * as Validation from '@core/validation/validation'
 import { useSurvey } from '@webapp/store/survey'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { createTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
-import * as NodeDefState from '../store/nodeDefState'
+import * as NodeDefState from '../store/state'
 
 import { useActions } from '../store/actions/index'
 

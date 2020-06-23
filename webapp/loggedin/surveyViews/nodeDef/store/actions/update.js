@@ -7,6 +7,16 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyState from '@webapp/store/survey/state'
 
+import types from './types'
+
+export const onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
+  dispatch({ type: types.nodeDefsValidationUpdate, nodeDefsValidation })
+
+  if (!R.isEmpty(nodeDefsUpdated)) {
+    dispatch({ type: types.nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
+  }
+}
+
 export const updateLayoutProp = (nodeDef, key, value) => (_, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)

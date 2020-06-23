@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 
 import NodeDefSwitch from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefSwitch'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { useActions } from '@webapp/loggedin/surveyViews/nodeDef/store/actions'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-const NodeDefEntityFormGrid = props => {
+const NodeDefEntityFormGrid = (props) => {
   const {
     surveyInfo,
     surveyCycleKey,
@@ -22,7 +25,6 @@ const NodeDefEntityFormGrid = props => {
     canEditDef,
     canEditRecord,
     canAddNode,
-    putNodeDefLayoutProp,
   } = props
 
   const [mounted, setMounted] = useState(false)
@@ -33,9 +35,12 @@ const NodeDefEntityFormGrid = props => {
     }, 200)
   }, [])
 
-  const onChangeLayout = layout => {
+  const dispatch = useDispatch()
+  const { putNodeDefLayoutProp } = useActions({})
+
+  const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
-      putNodeDefLayoutProp(nodeDef, NodeDefLayout.keys.layoutChildren, layout)
+      dispatch(putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: layout }))
     }
   }
 
@@ -61,7 +66,7 @@ const NodeDefEntityFormGrid = props => {
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
     >
-      {innerPageChildren.map(childDef => (
+      {innerPageChildren.map((childDef) => (
         <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}>
           <NodeDefSwitch
             edit={edit}
@@ -80,6 +85,34 @@ const NodeDefEntityFormGrid = props => {
       ))}
     </ResponsiveGridLayout>
   ) : null
+}
+
+NodeDefEntityFormGrid.propTypes = {
+  surveyInfo: PropTypes.any.isRequired,
+  surveyCycleKey: PropTypes.string.isRequired,
+  nodeDef: PropTypes.any.isRequired,
+  childDefs: PropTypes.array,
+  recordUuid: PropTypes.string,
+
+  node: PropTypes.object,
+  edit: PropTypes.bool,
+  entry: PropTypes.bool,
+  preview: PropTypes.bool,
+  canEditDef: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  canAddNode: PropTypes.bool,
+}
+
+NodeDefEntityFormGrid.defaultProps = {
+  childDefs: [],
+  recordUuid: null,
+  node: null,
+  edit: false,
+  entry: false,
+  preview: false,
+  canEditDef: false,
+  canEditRecord: false,
+  canAddNode: false,
 }
 
 export default NodeDefEntityFormGrid

@@ -1,5 +1,5 @@
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefState from '../nodeDefState'
+import * as NodeDefState from '../state'
 
 export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 

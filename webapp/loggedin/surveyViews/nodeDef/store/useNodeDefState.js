@@ -10,7 +10,7 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
-import * as NodeDefState from './nodeDefState'
+import * as NodeDefState from './state'
 
 export const useNodeDefState = () => {
   const { nodeDefUuid } = useParams()

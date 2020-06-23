@@ -7,7 +7,7 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as SurveyState from '@webapp/store/survey/state'
 import * as NotificationActions from '@webapp/store/ui'
 
-import * as NodeDefState from '../nodeDefState'
+import * as NodeDefState from '../state'
 import { updateLayoutProp } from './update'
 import { useValidateNodeDef } from './useValidateNodeDef'
 
@@ -64,5 +64,5 @@ export const useSetNodeDefProp = ({ nodeDefState, setNodeDefState }) => (key, va
   }
 
   const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
-  dispatch(validateNodeDef({ nodeDef: nodeDefUpdated, props, propsAdvanced }))
+  dispatch(validateNodeDef(nodeDefUpdated))
 }

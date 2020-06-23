@@ -16,7 +16,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
-import * as NodeDefState from '../store/nodeDefState'
+import * as NodeDefState from '../store/state'
 import { useActions } from '../store/actions/index'
 
 const CodeProps = (props) => {

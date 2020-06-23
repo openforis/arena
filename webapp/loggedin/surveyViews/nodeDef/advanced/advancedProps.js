@@ -12,7 +12,7 @@ import Checkbox from '@webapp/components/form/checkbox'
 
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 
-import * as NodeDefState from '../store/nodeDefState'
+import * as NodeDefState from '../store/state'
 import { useActions } from '../store/actions'
 
 const AdvancedProps = (props) => {

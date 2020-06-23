@@ -1,6 +1,6 @@
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as NodeDefState from '../nodeDefState'
+import * as NodeDefState from '../state'
 import { useSetNodeDefProp } from './useSetNodeDefProp'
 import { updateLayoutProp } from './update'
 

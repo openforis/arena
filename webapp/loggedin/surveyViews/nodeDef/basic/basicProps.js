@@ -21,7 +21,7 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
 
-import * as NodeDefState from '../store/nodeDefState'
+import * as NodeDefState from '../store/state'
 import { useActions } from '../store/actions/index'
 
 import CodeProps from './codeProps'

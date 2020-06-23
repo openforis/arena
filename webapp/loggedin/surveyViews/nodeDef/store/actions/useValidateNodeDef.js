@@ -5,18 +5,12 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 
 import * as SurveyState from '@webapp/store/survey/state'
 
-import * as NodeDefState from '../nodeDefState'
+import * as NodeDefState from '../state'
+import types from './types'
 
-export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => ({
-  nodeDef,
-  props = {},
-  propsAdvanced = {},
-}) => async (_, getState) => {
+export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => (nodeDef) => async (dispatch, getState) => {
   const state = getState()
-
   const survey = SurveyState.getSurvey(state)
-  //   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  //   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
   // Validate node def
   const surveyUpdated = R.pipe(
@@ -28,16 +22,10 @@ export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => ({
 
   const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDef)
 
-  setNodeDefState(NodeDefState.assocNodeDefProps(nodeDef, nodeDefValidation, props, propsAdvanced)(nodeDefState))
-  /*
-    dispatch({
-      type: nodeDefPropsUpdate,
-      nodeDef,
-      nodeDefValidation,
-      parentNodeDef,
-      props,
-      propsAdvanced,
-      surveyCycleKey,
-    })
-    */
+  setNodeDefState(NodeDefState.assocNodeDefAndValidation(nodeDef, nodeDefValidation)(nodeDefState))
+
+  dispatch({
+    type: types.nodeDefPropsUpdate,
+    nodeDef,
+  })
 }

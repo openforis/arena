@@ -15,7 +15,7 @@ import * as Validation from '@core/validation/validation'
 
 import ExpressionsProp from './expressionsProp/expressionsProp'
 
-import * as NodeDefState from '../store/nodeDefState'
+import * as NodeDefState from '../store/state'
 import { useActions } from '../store/actions'
 
 const ValidationsProps = (props) => {
