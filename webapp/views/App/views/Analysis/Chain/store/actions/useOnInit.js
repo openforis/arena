@@ -1,4 +1,4 @@
-import * as ProcessingChain from '@common/analysis/processingChain'
+import * as Chain from '@common/analysis/processingChain'
 
 import { AnalysisActions } from '@webapp/service/storage'
 
@@ -17,8 +17,8 @@ export const useOnInit = ({ setChain, setStep }) => {
         setStep(stepSaved)
       }
     } else {
-      const newChain = ProcessingChain.newProcessingChain({
-        [ProcessingChain.keysProps.cycles]: [surveyCycleKey],
+      const newChain = Chain.newProcessingChain({
+        [Chain.keysProps.cycles]: [surveyCycleKey],
       })
 
       setChain(newChain)
