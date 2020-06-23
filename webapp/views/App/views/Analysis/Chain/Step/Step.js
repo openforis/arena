@@ -39,7 +39,7 @@ const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep })
   const { stepNext, stepPrev, editingCalculation } = useChainEdit()
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
-  const hasCalculationSteps = R.pipe(Step.getCalculationsCount, (cnt) => cnt > 0)(step)
+  const hasCalculationSteps = R.pipe(Step.getCalculationsCount, (count) => count > 0)(step)
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
   const entityUuid = Step.getEntityUuid(step)
 
