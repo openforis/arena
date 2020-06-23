@@ -19,3 +19,13 @@ export const persistStep = ({ step }) => {
 export const getStep = () => AnalysisStorage.getStep()
 
 export const resetStep = () => AnalysisStorage.clearStep()
+
+// ===== calculation
+export const persistCalculation = ({ calculation }) => {
+  AnalysisStorage.setCalculation({ calculation })
+  window.dispatchEvent(new CustomEvent(AnalysisStorage.eventTypes.setCalculation))
+}
+
+export const getCalculation = () => AnalysisStorage.getCalculation()
+
+export const resetCalculation = () => AnalysisStorage.clearCalculation()
