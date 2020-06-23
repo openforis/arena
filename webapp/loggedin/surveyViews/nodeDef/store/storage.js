@@ -1,19 +1,19 @@
 const keys = {
-  nodeDef: 'nodeDef',
+  nodeDefState: 'nodeDef',
 }
 
 export const eventTypes = {
-  setNodeDef: 'node-def/set-node-def',
+  setNodeDefState: 'node-def/set-node-def-state',
 }
 
 // ====== READ
-export const getNodeDef = () => {
-  const nodeDef = window.localStorage.getItem(keys.nodeDef)
-  return nodeDef ? JSON.parse(nodeDef) : null
+export const getNodeDefState = () => {
+  const state = window.localStorage.getItem(keys.nodeDefState)
+  return state ? JSON.parse(state) : null
 }
 
 // ====== UPDATE
-export const setNodeDef = ({ nodeDef }) => window.localStorage.setItem(keys.nodeDef, JSON.stringify(nodeDef))
+export const setNodeDefState = (state) => window.localStorage.setItem(keys.nodeDefState, JSON.stringify(state))
 
 // ====== DELETE
-export const clearNodeDef = () => window.localStorage.removeItem(keys.nodeDef)
+export const clearNodeDefState = () => window.localStorage.removeItem(keys.nodeDefState)

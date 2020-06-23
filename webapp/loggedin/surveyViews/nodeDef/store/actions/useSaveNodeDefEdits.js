@@ -73,7 +73,7 @@ export const useSaveNodeDefEdits = ({ nodeDefState, setNodeDefState }) => () => 
     }
 
     // Update node def state
-    setNodeDefState(NodeDefState.assocNodeDefForEdit(nodeDefUpdated, validation)(nodeDefState))
+    setNodeDefState(NodeDefState.createNodeDefState({ nodeDef: nodeDefUpdated, validation }))
 
     // Dispatch nodeDefSave action
     dispatch({

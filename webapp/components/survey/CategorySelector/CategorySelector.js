@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -12,14 +12,12 @@ import * as Category from '@core/survey/category'
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/dropdown'
 
-import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
-
 import { useSurvey } from '@webapp/store/survey'
 
-import { createCategory } from '@webapp/loggedin/surveyViews/category/actions'
+import { createCategory, openCategoriesManager } from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
-  const { disabled, categoryUuid, validation, showManage, showAdd, analysis, onChange } = props
+  const { disabled, categoryUuid, validation, showManage, showAdd, analysis, nodeDefState, onChange } = props
 
   const i18n = useI18n()
 
@@ -46,7 +44,7 @@ const CategorySelector = (props) => {
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
           onClick={async () => {
-            const newCategory = await dispatch(createCategory(history, analysis))
+            const newCategory = await dispatch(createCategory(history, analysis, nodeDefState))
             onChange(newCategory)
           }}
           aria-disabled={disabled}
@@ -56,14 +54,16 @@ const CategorySelector = (props) => {
         </button>
       )}
       {showManage && (
-        <Link
+        <button
+          type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
-          to={appModuleUri(analysis ? analysisModules.categories : designerModules.categories)}
+          onClick={() => dispatch(openCategoriesManager({ history, analysis, nodeDefState }))}
+          aria-disabled={disabled}
         >
           <span className="icon icon-list icon-12px icon-left" />
           {i18n.t('common.manage')}
-        </Link>
+        </button>
       )}
     </div>
   )
@@ -76,6 +76,7 @@ CategorySelector.propTypes = {
   showManage: PropTypes.bool,
   showAdd: PropTypes.bool,
   analysis: PropTypes.bool,
+  nodeDefState: PropTypes.object,
   onChange: PropTypes.func,
 }
 
@@ -86,6 +87,7 @@ CategorySelector.defaultProps = {
   showManage: true,
   showAdd: true,
   analysis: false, // True if used inside analysis/nodeDef editor
+  nodeDefState: null,
   onChange: () => ({}),
 }
 

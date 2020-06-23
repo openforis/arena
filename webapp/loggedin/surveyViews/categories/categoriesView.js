@@ -1,5 +1,6 @@
-import React from 'react'
-import { connect, useDispatch } from 'react-redux'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -8,26 +9,49 @@ import { useHistory } from 'react-router'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
-import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import { UserState } from '@webapp/store/user'
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
+import { useSurvey } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
+import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/store/state'
+import * as NodeDefStorage from '@webapp/loggedin/surveyViews/nodeDef/store/storage'
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
 
 const CategoriesView = (props) => {
-  const { categories, nodeDef, createCategory, deleteCategory, canSelect, readOnly, analysis, setNodeDefProp } = props
-  const selectedItemUuid = nodeDef && NodeDef.getCategoryUuid(nodeDef)
+  const { analysis } = props
 
   const i18n = useI18n()
   const history = useHistory()
   const dispatch = useDispatch()
 
-  const onClose = nodeDef ? history.goBack : null
+  const survey = useSurvey()
+  const readOnly = !useAuthCanEditSurvey()
+  const categories = R.pipe(
+    Survey.getCategoriesArray,
+    R.map((category) => ({
+      ...category,
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)),
+    }))
+  )(survey)
+
+  // A nodeDef code is begin edited.
+  const nodeDefState = NodeDefStorage.getNodeDefState()
+  const nodeDef = !readOnly && nodeDefState && NodeDefState.getNodeDef(nodeDefState)
+  const canSelect = nodeDef && NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
+
+  const [nodeDefCategoryUuid, setNodeDefCategoryUuid] = useState(nodeDef && NodeDef.getCategoryUuid(nodeDef))
+
+  const onClose = () => {
+    if (nodeDef) {
+      const nodeDefUpdated = NodeDef.mergeProps({ [NodeDef.propKeys.categoryUuid]: nodeDefCategoryUuid })(nodeDef)
+      const nodeDefStateUpdated = NodeDefState.assocNodeDef(nodeDefUpdated)(nodeDefState)
+      NodeDefStorage.setNodeDefState(nodeDefStateUpdated)
+      history.goBack()
+    }
+  }
 
   const canDeleteCategory = (category) =>
     category.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' })) : true
@@ -37,7 +61,7 @@ const CategoriesView = (props) => {
       DialogConfirmActions.showDialogConfirm({
         key: 'categoryEdit.confirmDelete',
         params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
-        onOk: () => deleteCategory(category),
+        onOk: () => dispatch(deleteCategory(category)),
       })
     )
 
@@ -46,44 +70,24 @@ const CategoriesView = (props) => {
       itemLabelFunction={(category) => Category.getName(category)}
       itemLink={appModuleUri(analysis ? analysisModules.category : designerModules.category)}
       items={categories}
-      selectedItemUuid={selectedItemUuid}
-      onAdd={createCategory}
+      selectedItemUuid={nodeDefCategoryUuid}
+      onAdd={() => dispatch(createCategory(history, analysis, nodeDefState))}
       canDelete={canDeleteCategory}
       onDelete={onDelete}
       canSelect={canSelect}
-      onSelect={(category) => setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
+      onSelect={(category) => setNodeDefCategoryUuid(Category.getUuid(category))}
       onClose={onClose}
       readOnly={readOnly}
     />
   )
 }
 
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = UserState.getUser(state)
-  const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
-  const categories = R.pipe(
-    Survey.getCategoriesArray,
-    R.map((category) => ({
-      ...category,
-      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)),
-    }))
-  )(survey)
-  // A nodeDef code is begin edited.
-  const nodeDef = !readOnly && NodeDefState.getNodeDef(state)
-  const canSelect = nodeDef && NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
-
-  return {
-    categories,
-    readOnly,
-    nodeDef,
-    canSelect,
-  }
+CategoriesView.propTypes = {
+  analysis: PropTypes.bool,
 }
 
-export default connect(mapStateToProps, {
-  createCategory,
-  deleteCategory,
-  setNodeDefProp: NodeDefsActions.setNodeDefProp,
-})(CategoriesView)
+CategoriesView.defaultProps = {
+  analysis: false,
+}
+
+export default CategoriesView

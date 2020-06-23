@@ -10,6 +10,14 @@ const keys = {
   validation: 'validation', // Node def validation
 }
 
+// ===== CREATE
+
+export const createNodeDefState = ({ nodeDef, validation }) => ({
+  [keys.nodeDefOriginal]: nodeDef,
+  [keys.nodeDef]: nodeDef,
+  [keys.validation]: validation,
+})
+
 // ===== READ
 
 export const getNodeDef = A.propOr({}, keys.nodeDef)
@@ -41,9 +49,7 @@ export const getPropsAdvancedUpdated = (state) => {
 }
 
 // ===== UPDATE
+export const assocNodeDef = R.assoc(keys.nodeDef)
 
 export const assocNodeDefAndValidation = (nodeDef, nodeDefValidation) =>
-  R.pipe(R.assoc(keys.nodeDef, nodeDef), R.assoc(keys.validation, nodeDefValidation))
-
-export const assocNodeDefForEdit = (nodeDef, nodeDefValidation) =>
-  R.pipe(R.assoc(keys.nodeDefOriginal, nodeDef), assocNodeDefAndValidation(nodeDef, nodeDefValidation))
+  R.pipe(assocNodeDef(nodeDef), R.assoc(keys.validation, nodeDefValidation))

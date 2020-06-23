@@ -60,6 +60,7 @@ const CodeProps = (props) => {
           categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
           analysis={NodeDef.isAnalysis(nodeDef)}
+          nodeDefState={nodeDefState}
           onChange={putCategoryProp}
         />
       </FormItem>

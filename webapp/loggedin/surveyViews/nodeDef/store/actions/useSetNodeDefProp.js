@@ -5,7 +5,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as SurveyState from '@webapp/store/survey/state'
-import * as NotificationActions from '@webapp/store/ui'
+import { NotificationActions } from '@webapp/store/ui'
 
 import * as NodeDefState from '../state'
 import { updateLayoutProp } from './update'
