@@ -7,17 +7,34 @@ import * as Chain from '@common/analysis/processingChain'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 
-import { useI18n } from '@webapp/store/system'
+import ButtonRStudio from '@webapp/components/buttonRStudio'
+import ButtonBar from '@webapp/loggedin/modules/analysis/chain/view/components/buttonBar'
 
 import { useChain } from './store'
 
+import StepList from './StepList'
+import Step from './Step'
+
 const ChainComponent = () => {
-  const i18n = useI18n()
-  const { chain, dirty, onUpdate, onSave, onDismiss } = useChain()
+  const {
+    chain,
+    dirty,
+    editingStep,
+    step,
+    onUpdate,
+    onSave,
+    onDismiss,
+    onNewStep,
+    onSelectStep,
+    onUpdateStep,
+    onDeleteStep,
+  } = useChain()
   const validation = Chain.getValidation(chain)
 
   return (
     <div className="chain">
+      <ButtonRStudio onClick={onDismiss} disabled />
+
       <div className="form">
         <LabelsEditor
           labels={Chain.getLabels(chain)}
@@ -27,29 +44,40 @@ const ChainComponent = () => {
           onChange={(labels) => onUpdate({ name: Chain.keysProps.labels, value: labels })}
         />
 
-        <LabelsEditor
-          formLabelKey="common.description"
-          labels={Chain.getDescriptions(chain)}
-          onChange={(descriptions) => onUpdate({ name: Chain.keysProps.descriptions, value: descriptions })}
-        />
+        {!editingStep && (
+          <>
+            <LabelsEditor
+              formLabelKey="common.description"
+              labels={Chain.getDescriptions(chain)}
+              onChange={(descriptions) => onUpdate({ name: Chain.keysProps.descriptions, value: descriptions })}
+            />
 
-        <CyclesSelector
-          cyclesKeysSelected={Chain.getCycles(chain)}
-          onChange={(cycles) => onUpdate({ name: Chain.keysProps.cycles, value: cycles })}
+            <CyclesSelector
+              cyclesKeysSelected={Chain.getCycles(chain)}
+              onChange={(cycles) => onUpdate({ name: Chain.keysProps.cycles, value: cycles })}
+            />
+          </>
+        )}
+
+        <StepList
+          chain={chain}
+          dirty={dirty}
+          editingStep={editingStep}
+          step={step}
+          onNewStep={onNewStep}
+          onSelectStep={onSelectStep}
         />
       </div>
 
-      <div className="button-bar">
-        <button type="button" className="btn-s btn-cancel" onClick={onDismiss}>
-          <span className="icon icon-cross icon-left icon-10px" />
-          {i18n.t(dirty ? 'common.cancel' : 'common.back')}
-        </button>
+      <Step
+        step={step}
+        chain={chain}
+        editingStep={editingStep}
+        onUpdateStep={onUpdateStep}
+        onDeleteStep={onDeleteStep}
+      />
 
-        <button type="button" className="btn-s btn-primary" onClick={onSave} aria-disabled={false}>
-          <span className="icon icon-floppy-disk icon-left icon-12px" />
-          {i18n.t('common.save')}
-        </button>
-      </div>
+      <ButtonBar dirty={dirty} onDismiss={onDismiss} onSave={onSave} />
     </div>
   )
 }
