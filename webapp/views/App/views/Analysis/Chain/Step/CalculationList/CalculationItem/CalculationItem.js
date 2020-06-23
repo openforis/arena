@@ -17,17 +17,8 @@ const getClassName = ({ editingSelf, dragging }) => {
   return className
 }
 const CalculationItem = (props) => {
-  const {
-    chain,
-    calculation,
-    editingCalculation,
-    calculationForEdit,
-    dragging,
-    onDragStart,
-    onDragEnd,
-    onDragOver,
-    onDeleteCalculation,
-  } = props
+  const { calculation, dragging, onDragStart, onDragEnd, onDragOver, onDeleteCalculation, analysisState } = props
+  const { chain, calculation: calculationForEdit, editingCalculation } = analysisState
 
   const lang = useLang()
   const nodeDef = useNodeDefByUuid(Calculation.getNodeDefUuid(calculation))
@@ -68,9 +59,8 @@ const CalculationItem = (props) => {
 }
 
 CalculationItem.propTypes = {
-  chain: PropTypes.object.isRequired,
+  analysisState: PropTypes.object.isRequired,
   calculation: PropTypes.object.isRequired,
-  calculationForEdit: PropTypes.object.isRequired,
   dragging: PropTypes.bool.isRequired,
   editingCalculation: PropTypes.bool.isRequired,
   onDragEnd: PropTypes.func.isRequired,

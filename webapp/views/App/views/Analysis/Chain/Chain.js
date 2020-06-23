@@ -12,36 +12,22 @@ import ButtonBar from '@webapp/loggedin/modules/analysis/chain/view/components/b
 
 import { useSurveyInfo } from '@webapp/store/survey'
 
-import { useChain } from './store'
+import { useAnalysis } from './store'
 
 import StepList from './StepList'
 import Step from './Step'
 
 const ChainComponent = () => {
-  const {
-    chain,
-    dirty,
-    editingStep,
-    step,
-    calculation,
-    editingCalculation,
-    onUpdate,
-    onSave,
-    onDismiss,
-    onNewStep,
-    onSelectStep,
-    onUpdateStep,
-    onDeleteStep,
-    onNewCalculation,
-    onMoveCalculation,
-    onDeleteCalculation,
-  } = useChain()
+  const { state: analysisState, actions: analysisActions } = useAnalysis()
+  const { chain, dirty, editingStep } = analysisState
+  const { chain: chainActions, onSave, openRButton, onDismiss } = analysisActions
+
   const validation = Chain.getValidation(chain)
 
   const surveyInfo = useSurveyInfo()
   return (
     <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-      <ButtonRStudio onClick={onDismiss} disabled={Survey.isDraft(surveyInfo) || dirty} />
+      <ButtonRStudio onClick={openRButton} disabled={Survey.isDraft(surveyInfo) || dirty} />
 
       <div className="form">
         <LabelsEditor
@@ -49,7 +35,7 @@ const ChainComponent = () => {
           formLabelKey="processingChainView.formLabel"
           readOnly={editingStep}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-          onChange={(labels) => onUpdate({ name: Chain.keysProps.labels, value: labels })}
+          onChange={(labels) => chainActions.update({ name: Chain.keysProps.labels, value: labels })}
         />
 
         {!editingStep && (
@@ -57,38 +43,22 @@ const ChainComponent = () => {
             <LabelsEditor
               formLabelKey="common.description"
               labels={Chain.getDescriptions(chain)}
-              onChange={(descriptions) => onUpdate({ name: Chain.keysProps.descriptions, value: descriptions })}
+              onChange={(descriptions) =>
+                chainActions.update({ name: Chain.keysProps.descriptions, value: descriptions })
+              }
             />
 
             <CyclesSelector
               cyclesKeysSelected={Chain.getCycles(chain)}
-              onChange={(cycles) => onUpdate({ name: Chain.keysProps.cycles, value: cycles })}
+              onChange={(cycles) => chainActions.update({ name: Chain.keysProps.cycles, value: cycles })}
             />
           </>
         )}
 
-        <StepList
-          chain={chain}
-          dirty={dirty}
-          editingStep={editingStep}
-          step={step}
-          onNewStep={onNewStep}
-          onSelectStep={onSelectStep}
-        />
+        <StepList analysisState={analysisState} analysisActions={analysisActions} />
       </div>
 
-      <Step
-        chain={chain}
-        step={step}
-        calculation={calculation}
-        editingStep={editingStep}
-        editingCalculation={editingCalculation}
-        onUpdateStep={onUpdateStep}
-        onDeleteStep={onDeleteStep}
-        onNewCalculation={onNewCalculation}
-        onMoveCalculation={onMoveCalculation}
-        onDeleteCalculation={onDeleteCalculation}
-      />
+      <Step analysisState={analysisState} analysisActions={analysisActions} />
 
       <ButtonBar dirty={dirty} onDismiss={onDismiss} onSave={onSave} />
     </div>

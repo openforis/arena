@@ -4,7 +4,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { AnalysisActions } from '@webapp/service/storage'
 import * as Step from '@common/analysis/processingStep'
 
-export const useOnDeleteCalculation = ({ step, setStep, calculation, setCalculation }) => {
+export const useDelete = ({ step, setStep, calculation, setCalculation }) => {
   const dispatch = useDispatch()
 
   const resetCalculation = () => {

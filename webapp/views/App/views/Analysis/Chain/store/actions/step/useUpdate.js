@@ -3,7 +3,7 @@ import * as Step from '@common/analysis/processingStep'
 
 import { AnalysisActions } from '@webapp/service/storage'
 
-export const useOnUpdateStep = ({ step, setStep, chain, setChain, setDirty }) => (props) => {
+export const useUpdate = ({ step, setStep, chain, setChain, setDirty }) => (props) => {
   const stepUpdated = Step.mergeProps(props)(step)
   const chainUpdated = Chain.assocProcessingStep(stepUpdated)(chain)
 

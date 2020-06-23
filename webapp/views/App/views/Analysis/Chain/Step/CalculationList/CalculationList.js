@@ -1,5 +1,4 @@
 import React, { useRef } from 'react'
-import * as R from 'ramda'
 import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
@@ -14,8 +13,9 @@ import CalculationItem from './CalculationItem'
 import useDragDrop from './useDragDrop'
 
 const CalculationList = (props) => {
-  const { chain, step, calculation, onNewCalculation, onMoveCalculation, onDeleteCalculation } = props
-  const editingCalculation = !R.isEmpty(calculation)
+  const { analysisState, analysisActions } = props
+  const { chain, step, calculation, editingCalculation } = analysisState
+  const { calculation: calculationActions } = analysisActions
 
   const i18n = useI18n()
   const calculations = Step.getCalculations(step)
@@ -25,7 +25,7 @@ const CalculationList = (props) => {
   const placeholderRef = useRef(null)
   const { dragging, onDragStart, onDragEnd, onDragOver } = useDragDrop({
     placeholderRef,
-    onDragEndFn: onMoveCalculation,
+    onDragEndFn: calculationActions.move,
   })
 
   return (
@@ -35,7 +35,7 @@ const CalculationList = (props) => {
           <ValidationTooltip validation={calculationsValidation}>
             {i18n.t('processingStepView.calculationSteps')}
           </ValidationTooltip>
-          <button type="button" className="btn-s btn-transparent" onClick={onNewCalculation}>
+          <button type="button" className="btn-s btn-transparent" onClick={calculationActions.create}>
             <span className="icon icon-plus icon-14px" />
           </button>
         </div>
@@ -53,7 +53,8 @@ const CalculationList = (props) => {
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
-            onDeleteCalculation={onDeleteCalculation}
+            onDeleteCalculation={calculationActions.delete}
+            analysisState={analysisState}
           />
         ))}
 
@@ -67,12 +68,8 @@ const CalculationList = (props) => {
 }
 
 CalculationList.propTypes = {
-  chain: PropTypes.object.isRequired,
-  step: PropTypes.object.isRequired,
-  calculation: PropTypes.object.isRequired,
-  onNewCalculation: PropTypes.func.isRequired,
-  onMoveCalculation: PropTypes.func.isRequired,
-  onDeleteCalculation: PropTypes.func.isRequired,
+  analysisState: PropTypes.object.isRequired,
+  analysisActions: PropTypes.object.isRequired,
 }
 
 export default CalculationList

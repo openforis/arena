@@ -28,18 +28,9 @@ const getClassName = ({ editingStep, editingCalculation }) => {
   return className
 }
 
-const StepComponent = ({
-  chain,
-  step,
-  editingStep,
-  onUpdateStep,
-  onDeleteStep,
-  onNewCalculation,
-  onMoveCalculation,
-  calculation,
-  editingCalculation,
-  onDeleteCalculation,
-}) => {
+const StepComponent = ({ analysisState, analysisActions }) => {
+  const { chain, step, calculation, editingStep, editingCalculation } = analysisState
+  const { step: stepActions } = analysisActions
   const history = useHistory()
   const i18n = useI18n()
 
@@ -67,7 +58,7 @@ const StepComponent = ({
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={onDeleteStep}>
+            <button type="button" className="btn-s btn-close" onClick={stepActions.delete}>
               <span className="icon icon-10px icon-cross" />
             </button>
 
@@ -76,7 +67,7 @@ const StepComponent = ({
               stepPrev={stepPrev}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
-                onUpdateStep({
+                stepActions.update({
                   [Step.keysProps.entityUuid]: entityUuidUpdate,
                   [Step.keysProps.categoryUuid]: null,
                 })
@@ -112,7 +103,7 @@ const StepComponent = ({
                 showManage={false}
                 showAdd={false}
                 onChange={(category) => {
-                  onUpdateStep({
+                  stepActions.update({
                     [Step.keysProps.entityUuid]: null,
                     [Step.keysProps.categoryUuid]: Category.getUuid(category),
                   })
@@ -121,14 +112,7 @@ const StepComponent = ({
             </div>
           </>
         )}
-        <CalculationList
-          chain={chain}
-          step={step}
-          calculation={calculation}
-          onNewCalculation={onNewCalculation}
-          onMoveCalculation={onMoveCalculation}
-          onDeleteCalculation={onDeleteCalculation}
-        />
+        <CalculationList analysisState={analysisState} analysisActions={analysisActions} />
       </div>
 
       <p>{JSON.stringify(calculation)}</p>
@@ -137,16 +121,8 @@ const StepComponent = ({
 }
 
 StepComponent.propTypes = {
-  step: PropTypes.object.isRequired,
-  chain: PropTypes.object.isRequired,
-  calculation: PropTypes.object.isRequired,
-  editingStep: PropTypes.bool.isRequired,
-  editingCalculation: PropTypes.bool.isRequired,
-  onUpdateStep: PropTypes.func.isRequired,
-  onDeleteStep: PropTypes.func.isRequired,
-  onNewCalculation: PropTypes.func.isRequired,
-  onMoveCalculation: PropTypes.func.isRequired,
-  onDeleteCalculation: PropTypes.func.isRequired,
+  analysisState: PropTypes.object.isRequired,
+  analysisActions: PropTypes.object.isRequired,
 }
 
 export default StepComponent

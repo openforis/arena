@@ -1,1 +1,1 @@
-export { useChain } from './useChain'
+export { useAnalysis } from './useAnalysis'
