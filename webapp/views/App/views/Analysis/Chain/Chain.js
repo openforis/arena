@@ -1,5 +1,3 @@
-import './Chain.scss'
-
 import React from 'react'
 
 import * as Validation from '@core/validation/validation'
