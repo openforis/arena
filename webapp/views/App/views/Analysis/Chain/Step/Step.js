@@ -1,9 +1,8 @@
 import './Step.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+
 import { useHistory } from 'react-router'
-import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
 import * as Validation from '@core/validation/validation'
@@ -14,16 +13,13 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import * as ChainValidator from '@common/analysis/processingChainValidator'
 
-import { useOnUpdate } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
-import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import CategorySelector from '@webapp/components/survey/CategorySelector'
-import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 
-import { validateStep } from '@webapp/loggedin/modules/analysis/step/actions'
+import CategorySelector from '@webapp/components/survey/CategorySelector'
 
 import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
+import CalculationList from './CalculationList'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -32,25 +28,39 @@ const getClassName = ({ editingStep, editingCalculation }) => {
   return className
 }
 
-const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep }) => {
-  const dispatch = useDispatch()
+const StepComponent = ({
+  chain,
+  step,
+  editingStep,
+  onUpdateStep,
+  onDeleteStep,
+  onNewCalculation,
+  onMoveCalculation,
+  calculation,
+  editingCalculation,
+  onDeleteCalculation,
+}) => {
   const history = useHistory()
   const i18n = useI18n()
-  const { stepNext, stepPrev, editingCalculation } = useChainEdit()
+
+  const stepPrev = {}
+  const stepNext = {}
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
-  const hasCalculationSteps = R.pipe(Step.getCalculationsCount, (cnt) => cnt > 0)(step)
+  const hasCalculationSteps = (Step.getCalculationsCount(step) || []).length > 0
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
   const entityUuid = Step.getEntityUuid(step)
 
-  useOnUpdate(() => {
+  /* useOnUpdate(() => {
     // Validate step on calculation editor close (calculations may have been added / deleted)
     if (!editingCalculation) {
       dispatch(validateStep())
     }
-  }, [editingCalculation])
+  }, [editingCalculation]) */
 
   const className = getClassName({ editingStep, editingCalculation })
+
+  const onAddEntityVirtual = () => React.useCallback(useAddEntityVirtual(), [])
 
   return (
     <div className={className}>
@@ -85,7 +95,7 @@ const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep })
               <button
                 type="button"
                 className="btn btn-s btn-add"
-                onClick={useAddEntityVirtual()}
+                onClick={onAddEntityVirtual}
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
@@ -111,10 +121,17 @@ const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep })
             </div>
           </>
         )}
-        <p>CalculationList</p>
+        <CalculationList
+          chain={chain}
+          step={step}
+          calculation={calculation}
+          onNewCalculation={onNewCalculation}
+          onMoveCalculation={onMoveCalculation}
+          onDeleteCalculation={onDeleteCalculation}
+        />
       </div>
 
-      <CalculationView />
+      <p>{JSON.stringify(calculation)}</p>
     </div>
   )
 }
@@ -122,9 +139,14 @@ const StepComponent = ({ step, chain, editingStep, onUpdateStep, onDeleteStep })
 StepComponent.propTypes = {
   step: PropTypes.object.isRequired,
   chain: PropTypes.object.isRequired,
+  calculation: PropTypes.object.isRequired,
   editingStep: PropTypes.bool.isRequired,
+  editingCalculation: PropTypes.bool.isRequired,
   onUpdateStep: PropTypes.func.isRequired,
   onDeleteStep: PropTypes.func.isRequired,
+  onNewCalculation: PropTypes.func.isRequired,
+  onMoveCalculation: PropTypes.func.isRequired,
+  onDeleteCalculation: PropTypes.func.isRequired,
 }
 
 export default StepComponent

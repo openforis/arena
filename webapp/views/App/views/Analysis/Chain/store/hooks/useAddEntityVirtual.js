@@ -14,17 +14,19 @@ export const useAddEntityVirtual = () => {
   const history = useHistory()
 
   return () => {
-    const nodeDef = NodeDef.newNodeDef(
-      null,
-      NodeDef.nodeDefType.entity,
-      Survey.getCycleKeys(surveyInfo),
-      { [NodeDef.propKeys.multiple]: true },
-      {},
-      true,
-      true
-    )
-    dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
+    ;(async () => {
+      const nodeDef = NodeDef.newNodeDef(
+        null,
+        NodeDef.nodeDefType.entity,
+        Survey.getCycleKeys(surveyInfo),
+        { [NodeDef.propKeys.multiple]: true },
+        {},
+        true,
+        true
+      )
+      dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
 
-    history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+      history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+    })()
   }
 }
