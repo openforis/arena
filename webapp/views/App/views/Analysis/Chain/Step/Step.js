@@ -17,6 +17,7 @@ import { useI18n } from '@webapp/store/system'
 
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
+import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
@@ -34,8 +35,8 @@ const StepComponent = ({ analysisState, analysisActions }) => {
   const history = useHistory()
   const i18n = useI18n()
 
-  const stepPrev = {}
-  const stepNext = {}
+  // TO REFACTOR
+  const { stepNext, stepPrev } = useChainEdit()
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
   const hasCalculationSteps = (Step.getCalculationsCount(step) || []).length > 0
