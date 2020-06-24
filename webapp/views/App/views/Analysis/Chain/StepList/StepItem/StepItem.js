@@ -12,8 +12,9 @@ import { useCategoryByUuid, useNodeDefByUuid } from '@webapp/store/survey'
 import ErrorBadge from '@webapp/components/errorBadge'
 
 const StepItem = (props) => {
-  const { step, chain, stepEditing, selectStep } = props
-
+  const { step, analysisState, analysisActions } = props
+  const { chain, step: stepEditing } = analysisState
+  const { step: stepActions } = analysisActions
   const lang = useLang()
   const entity = useNodeDefByUuid(Step.getEntityUuid(step))
   const category = useCategoryByUuid(Step.getCategoryUuid(step))
@@ -26,7 +27,7 @@ const StepItem = (props) => {
       className={`chain-list-item${editing ? ' editing' : ''}`}
       onClick={() => {
         if (!editing) {
-          selectStep(step)
+          stepActions.select(step)
         }
       }}
     >
@@ -43,10 +44,9 @@ const StepItem = (props) => {
 }
 
 StepItem.propTypes = {
+  analysisState: PropTypes.object.isRequired,
+  analysisActions: PropTypes.object.isRequired,
   step: PropTypes.object.isRequired,
-  stepEditing: PropTypes.object.isRequired,
-  chain: PropTypes.object.isRequired,
-  selectStep: PropTypes.func.isRequired,
 }
 
 export default StepItem

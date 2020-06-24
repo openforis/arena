@@ -4,7 +4,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { AnalysisActions } from '@webapp/service/storage'
 import * as Chain from '@common/analysis/processingChain'
 
-export const useOnDeleteStep = ({ chain, setChain, step, setStep }) => {
+export const useDelete = ({ chain, setChain, step, setStep }) => {
   const dispatch = useDispatch()
 
   const resetStep = () => {
