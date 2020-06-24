@@ -51,7 +51,7 @@ export const validateStep = async (step) => {
   )(validation)
 }
 
-export const validateCalculation = async (calculation, defaultLang) =>
+export const validateCalculation = (calculation, defaultLang) =>
   Validator.validate(calculation, {
     ..._validationsCommonProps(defaultLang),
     [ProcessingStepCalculation.keys.nodeDefUuid]: [

@@ -16,10 +16,10 @@ import { useI18n } from '@webapp/store/system'
 
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
-import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
+import Calculation from './Calculation'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -113,7 +113,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
         <CalculationList analysisState={analysisState} analysisActions={analysisActions} />
       </div>
 
-      <CalculationView analysisState={analysisState} analysisActions={analysisActions} />
+      <Calculation analysisState={analysisState} analysisActions={analysisActions} />
       <p>{JSON.stringify(calculation)}</p>
     </div>
   )
