@@ -5,8 +5,8 @@ export const defaults = {
   [keys.displayType]: displayTypes.table,
   [keys.filter]: null,
   [keys.sort]: [],
-  [keys.nodeDefUuidTable]: null,
-  [keys.nodeDefUuidCols]: [],
+  [keys.entityDefUuid]: null,
+  [keys.attributeDefUuids]: [],
   [keys.dimensions]: [],
   [keys.measures]: new Map(),
 }

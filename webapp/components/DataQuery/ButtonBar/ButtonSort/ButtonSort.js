@@ -12,8 +12,8 @@ const SortEditor = () => <div /> // TODO: restore SortEditor
 
 const ButtonSort = (props) => {
   const { disabled, query } = props
-  const entityDefUuid = Query.getNodeDefUuidTable(query)
-  const attributeDefUuids = Query.getNodeDefUuidCols(query)
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const attributeDefUuids = Query.getAttributeDefUuids(query)
   const sort = Query.getSort(query)
 
   const i18n = useI18n()

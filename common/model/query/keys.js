@@ -3,8 +3,8 @@ export const keys = {
   displayType: 'displayType',
   filter: 'filter',
   sort: 'sort',
-  nodeDefUuidTable: 'nodeDefUuidTable',
-  nodeDefUuidCols: 'nodeDefUuidCols',
+  entityDefUuid: 'entityDefUuid',
+  attributeDefUuids: 'attributeDefUuids',
   dimensions: 'dimensions',
   measures: 'measures',
 }

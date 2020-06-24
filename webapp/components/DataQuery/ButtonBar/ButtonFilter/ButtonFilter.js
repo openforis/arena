@@ -9,7 +9,7 @@ import ExpressionEditorPopup from '@webapp/components/expression/expressionEdito
 
 const ButtonFilter = (props) => {
   const { disabled, query } = props
-  const entityDefUuid = Query.getNodeDefUuidTable(query)
+  const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
   const [showExpressionEditor, setShowExpressionEditor] = useState(false)

@@ -18,7 +18,7 @@ const QueryNodeDefsSelector = (props) => {
 
   return Query.isModeAggregate(query) ? (
     <NodeDefsSelectorAggregate
-      nodeDefUuidEntity={Query.getNodeDefUuidTable(query)}
+      nodeDefUuidEntity={Query.getEntityDefUuid(query)}
       dimensions={Query.getDimensions(query)}
       measures={Query.getMeasures(query)}
       onChangeEntity={onChangeEntity}
@@ -32,11 +32,11 @@ const QueryNodeDefsSelector = (props) => {
   ) : (
     <NodeDefsSelector
       hierarchy={hierarchy}
-      nodeDefUuidEntity={Query.getNodeDefUuidTable(query)}
-      nodeDefUuidsAttributes={Query.getNodeDefUuidCols(query)}
+      nodeDefUuidEntity={Query.getEntityDefUuid(query)}
+      nodeDefUuidsAttributes={Query.getAttributeDefUuids(query)}
       onChangeEntity={onChangeEntity}
       onChangeAttributes={(nodeDefUuidsAttributesUpdated) => {
-        onChangeQuery(Query.assocNodeDefUuidCols(nodeDefUuidsAttributesUpdated)(query))
+        onChangeQuery(Query.assocAttributeDefUuids(nodeDefUuidsAttributesUpdated)(query))
       }}
       showMultipleAttributes={false}
     />

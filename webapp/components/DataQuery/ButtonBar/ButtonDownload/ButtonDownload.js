@@ -10,8 +10,8 @@ import { Query } from '@common/model/query'
 
 const ButtonDownload = (props) => {
   const { disabled, query } = props
-  const entityDefUuid = Query.getNodeDefUuidTable(query)
-  const attributeDefUuids = Query.getNodeDefUuidCols(query)
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const attributeDefUuids = Query.getAttributeDefUuids(query)
   const filter = Query.getFilter(query)
   const sort = Query.getSort(query)
 
