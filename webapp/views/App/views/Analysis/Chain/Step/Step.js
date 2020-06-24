@@ -1,7 +1,6 @@
 import './Step.scss'
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
-
 import { useHistory } from 'react-router'
 
 import * as Category from '@core/survey/category'
@@ -17,7 +16,7 @@ import { useI18n } from '@webapp/store/system'
 
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
-import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
+import CalculationView from '@webapp/loggedin/modules/analysis/calculation/view'
 import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
@@ -34,9 +33,9 @@ const StepComponent = ({ analysisState, analysisActions }) => {
   const { step: stepActions } = analysisActions
   const history = useHistory()
   const i18n = useI18n()
+  const addEntityVirtual = useAddEntityVirtual()
 
-  // TO REFACTOR
-  const { stepNext, stepPrev } = useChainEdit()
+  const stepNext = Chain.getStepNext(step)(chain)
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
   const hasCalculationSteps = (Step.getCalculationsCount(step) || []).length > 0
@@ -50,9 +49,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
     }
   }, [editingCalculation]) */
 
-  const className = getClassName({ editingStep, editingCalculation })
-
-  const onAddEntityVirtual = () => React.useCallback(useAddEntityVirtual(), [])
+  const className = useMemo(() => getClassName({ editingStep, editingCalculation }), [editingStep, editingCalculation])
 
   return (
     <div className={className}>
@@ -64,8 +61,8 @@ const StepComponent = ({ analysisState, analysisActions }) => {
             </button>
 
             <EntitySelector
-              step={step}
-              stepPrev={stepPrev}
+              analysisActions={analysisActions}
+              analysisState={analysisState}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
                 stepActions.update({
@@ -87,7 +84,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
               <button
                 type="button"
                 className="btn btn-s btn-add"
-                onClick={onAddEntityVirtual}
+                onClick={addEntityVirtual}
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
@@ -116,6 +113,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
         <CalculationList analysisState={analysisState} analysisActions={analysisActions} />
       </div>
 
+      <CalculationView analysisState={analysisState} analysisActions={analysisActions} />
       <p>{JSON.stringify(calculation)}</p>
     </div>
   )

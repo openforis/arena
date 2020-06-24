@@ -1,9 +1,8 @@
 import './EntitySelector.scss'
 
+import * as R from 'ramda'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
-import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,8 +13,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import Dropdown from '@webapp/components/form/dropdown'
-
-import { checkCanSelectNodeDef } from '@webapp/loggedin/modules/analysis/chain/actions'
+import * as Chain from '@common/analysis/processingChain'
 
 const getEntities = (survey, processingStepPrev, lang) => {
   const entityStepPrev = R.pipe(ProcessingStep.getEntityUuid, (entityUuid) =>
@@ -47,11 +45,13 @@ const getEntities = (survey, processingStepPrev, lang) => {
 }
 
 const EntitySelector = (props) => {
-  const { step, stepPrev, readOnly, validation, children, onChange } = props
+  const { readOnly, validation, children, onChange, analysisState, analysisActions } = props
 
-  const dispatch = useDispatch()
+  const { chain, step } = analysisState
+  const { canSelectNodeDef } = analysisActions
   const i18n = useI18n()
   const survey = useSurvey()
+  const stepPrev = Chain.getStepPrev(step)(chain)
 
   const entities = getEntities(survey, stepPrev, i18n.lang)
   const entity = entities.find(R.propEq('key', ProcessingStep.getEntityUuid(step)))
@@ -67,7 +67,7 @@ const EntitySelector = (props) => {
         selection={entity}
         readOnly={readOnly}
         validation={validation}
-        onBeforeChange={(item) => dispatch(checkCanSelectNodeDef(Survey.getNodeDefByUuid(R.prop('key', item))(survey)))}
+        onBeforeChange={canSelectNodeDef}
         onChange={(item) => onChange(R.prop('key', item))}
       />
 
@@ -81,12 +81,9 @@ EntitySelector.propTypes = {
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
   step: PropTypes.object.isRequired,
-  stepPrev: PropTypes.object,
+  analysisState: PropTypes.object.isRequired,
+  analysisActions: PropTypes.object.isRequired,
   validation: PropTypes.object.isRequired,
-}
-
-EntitySelector.defaultProps = {
-  stepPrev: null,
 }
 
 export default EntitySelector
