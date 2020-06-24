@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import DataQuery from './DataQuery'
+import { Query } from '@common/model/query'
+
+import DataQuery from '@webapp/components/DataQuery'
 
 const Explorer = () => {
-  return <DataQuery />
+  const [query, setQuery] = useState(Query.create())
+
+  return <DataQuery query={query} onChangeQuery={setQuery} />
 }
 
 export default Explorer
