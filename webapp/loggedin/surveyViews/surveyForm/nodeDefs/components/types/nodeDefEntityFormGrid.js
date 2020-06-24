@@ -7,7 +7,7 @@ import NodeDefSwitch from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/node
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import { useActions } from '@webapp/loggedin/surveyViews/nodeDef/store/actions'
+import { useActions } from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/actions'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 

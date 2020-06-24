@@ -1,26 +1,27 @@
 import './taxonomiesView.scss'
 
-import React from 'react'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
+import { SurveyState, useSurvey } from '@webapp/store/survey'
 
 import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
 
 import { useI18n } from '@webapp/store/system'
 import ItemsView from '@webapp/loggedin/surveyViews/items/itemsView'
 import ItemsColumn from '@webapp/loggedin/surveyViews/items/itemsColumn'
-import { UserState } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+
+import * as NodeDefState from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/state'
+import * as NodeDefStorage from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/storage'
 
 const columnDescription = new ItemsColumn(
   'common.description',
@@ -36,14 +37,37 @@ const columnDescription = new ItemsColumn(
   'description'
 )
 
-const TaxonomiesView = (props) => {
-  const { taxonomies, selectedItemUuid, canSelect, readOnly, createTaxonomy } = props
-
+const TaxonomiesView = () => {
   const i18n = useI18n()
   const history = useHistory()
   const dispatch = useDispatch()
 
-  const onClose = selectedItemUuid ? history.goBack : null
+  const survey = useSurvey()
+  const readOnly = !useAuthCanEditSurvey()
+  const taxonomies = R.pipe(
+    Survey.getTaxonomiesArray,
+    R.map((t) => ({
+      ...t,
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
+    }))
+  )(survey)
+
+  // A nodeDef taxon is begin edited.
+  const nodeDefState = NodeDefStorage.getNodeDefState()
+  const nodeDef = !readOnly && nodeDefState && NodeDefState.getNodeDef(nodeDefState)
+  const canSelect = nodeDef && NodeDef.isTaxon(nodeDef)
+  const [nodeDefTaxonomyUuid, setNodeDefTaxonomyUuid] = useState(canSelect && NodeDef.getTaxonomyUuid(nodeDef))
+
+  const onClose = () => {
+    if (nodeDef) {
+      const nodeDefStateUpdated = NodeDefState.assocNodeDefProp(
+        NodeDef.propKeys.taxonomyUuid,
+        nodeDefTaxonomyUuid
+      )(nodeDefState)
+      NodeDefStorage.setNodeDefState(nodeDefStateUpdated)
+      history.goBack()
+    }
+  }
 
   const canDelete = (taxonomy) =>
     taxonomy.usedByNodeDefs ? dispatch(NotificationActions.notifyInfo({ key: 'taxonomy.cantBeDeleted' })) : true
@@ -62,14 +86,12 @@ const TaxonomiesView = (props) => {
       itemLabelFunction={(taxonomy) => Taxonomy.getName(taxonomy)}
       itemLink={appModuleUri(designerModules.taxonomy)}
       items={taxonomies}
-      selectedItemUuid={selectedItemUuid}
+      selectedItemUuid={nodeDefTaxonomyUuid}
       onAdd={createTaxonomy}
       canDelete={canDelete}
       onDelete={onDelete}
       canSelect={canSelect}
-      onSelect={(taxonomy) =>
-        dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy)))
-      }
+      onSelect={(taxonomy) => setNodeDefTaxonomyUuid(Taxonomy.getUuid(taxonomy))}
       onClose={onClose}
       readOnly={readOnly}
       columns={[...ItemsView.defaultProps.columns, columnDescription]}
@@ -78,29 +100,4 @@ const TaxonomiesView = (props) => {
   )
 }
 
-const mapStateToProps = (state) => {
-  const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const user = UserState.getUser(state)
-  const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
-  const taxonomies = R.pipe(
-    Survey.getTaxonomiesArray,
-    R.map((t) => ({
-      ...t,
-      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
-    }))
-  )(survey)
-  // A nodeDef taxon is begin edited.
-  const nodeDef = !readOnly && NodeDefState.getNodeDef(state)
-  const canSelect = nodeDef && NodeDef.isTaxon(nodeDef)
-  const selectedItemUuid = canSelect && NodeDef.getTaxonomyUuid(nodeDef)
-
-  return {
-    taxonomies,
-    readOnly,
-    selectedItemUuid,
-    canSelect,
-  }
-}
-
-export default connect(mapStateToProps, { createTaxonomy })(TaxonomiesView)
+export default TaxonomiesView

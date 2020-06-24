@@ -16,7 +16,7 @@ import * as SurveyFormState from '@webapp/loggedin/surveyViews/surveyForm/survey
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { NodeDefsActions } from '@webapp/store/survey'
 import { setFormNodeDefAddChildTo } from '@webapp/loggedin/surveyViews/surveyForm/actions'
-import { useActions } from '@webapp/loggedin/surveyViews/nodeDef/store/actions'
+import { useActions } from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/actions'
 
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef, edit, canEditDef } = props

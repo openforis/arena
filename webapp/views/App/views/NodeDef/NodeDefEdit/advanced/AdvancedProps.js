@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 
-import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
+import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 
 import * as NodeDefState from '../store/state'
 import { useActions } from '../store/actions'

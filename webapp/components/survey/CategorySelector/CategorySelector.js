@@ -14,7 +14,7 @@ import Dropdown from '@webapp/components/form/dropdown'
 
 import { useSurvey } from '@webapp/store/survey'
 
-import { createCategory, openCategoriesManager } from '@webapp/loggedin/surveyViews/category/actions'
+import { createCategory, navigateToCategoriesManager } from '@webapp/loggedin/surveyViews/category/actions'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, analysis, nodeDefState, onChange } = props
@@ -58,7 +58,7 @@ const CategorySelector = (props) => {
           type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
-          onClick={() => dispatch(openCategoriesManager({ history, analysis, nodeDefState }))}
+          onClick={() => dispatch(navigateToCategoriesManager({ history, analysis, nodeDefState }))}
           aria-disabled={disabled}
         >
           <span className="icon icon-list icon-12px icon-left" />

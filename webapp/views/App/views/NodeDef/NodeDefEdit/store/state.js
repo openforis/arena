@@ -20,8 +20,8 @@ export const createNodeDefState = ({ nodeDef, validation }) => ({
 
 // ===== READ
 
-export const getNodeDef = A.propOr({}, keys.nodeDef)
-export const getNodeDefOriginal = A.propOr({}, keys.nodeDefOriginal)
+export const getNodeDef = A.prop(keys.nodeDef)
+export const getNodeDefOriginal = A.prop(keys.nodeDefOriginal)
 export const getValidation = A.propOr(Validation.newInstance(), keys.validation)
 
 // ===== UTILS
@@ -53,3 +53,9 @@ export const assocNodeDef = R.assoc(keys.nodeDef)
 
 export const assocNodeDefAndValidation = (nodeDef, nodeDefValidation) =>
   R.pipe(assocNodeDef(nodeDef), R.assoc(keys.validation, nodeDefValidation))
+
+export const assocNodeDefProp = (key, value) => (state) => {
+  const nodeDef = getNodeDef(state)
+  const nodeDefUpdated = NodeDef.mergeProps({ [key]: value })(nodeDef)
+  return assocNodeDef(nodeDefUpdated)(state)
+}

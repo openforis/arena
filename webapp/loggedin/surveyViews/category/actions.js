@@ -6,13 +6,16 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { SurveyState, CategoriesActions } from '@webapp/store/survey'
 import { AppSavingActions, JobActions } from '@webapp/store/app'
 
-import * as NodeDefStorage from '@webapp/loggedin/surveyViews/nodeDef/store/storage'
+import * as NodeDefStorage from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/storage'
+import * as NodeDefState from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/state'
 import * as CategoryState from './categoryState'
 
 export const categoryViewCategoryUpdate = 'categoryView/category/update'
@@ -76,12 +79,15 @@ export const createCategory = (history, analysis, nodeDefState) => async (dispat
 
   dispatch({ type: CategoriesActions.categoryCreate, category })
 
+  const categoryUuid = Category.getUuid(category)
   // Navigate to category edit module
   if (nodeDefState) {
-    NodeDefStorage.setNodeDefState(nodeDefState)
+    // update and save node def state to local storage
+    const nodeDefStateUpdated = NodeDefState.assocNodeDefProp(NodeDef.propKeys.categoryUuid, categoryUuid)(nodeDefState)
+    NodeDefStorage.setNodeDefState(nodeDefStateUpdated)
   }
   const categoryModule = analysis ? analysisModules.category : designerModules.category
-  history.push(`${appModuleUri(categoryModule)}${Category.getUuid(category)}/`)
+  history.push(`${appModuleUri(categoryModule)}${categoryUuid}/`)
 
   return category
 }
@@ -254,7 +260,7 @@ export const setCategoryImportSummaryColumnDataType = (columnName, dataType) => 
 // ====== MANAGER
 // ======
 
-export const openCategoriesManager = ({ history, analysis, nodeDefState }) => () => {
+export const navigateToCategoriesManager = ({ history, analysis, nodeDefState }) => () => {
   if (nodeDefState) {
     NodeDefStorage.setNodeDefState(nodeDefState)
   }

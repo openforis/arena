@@ -14,7 +14,7 @@ import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/ac
 import * as NodeDefState from './state'
 import * as NodeDefStorage from './storage'
 
-export const useNodeDefState = () => {
+export const useNodeDefEdit = () => {
   const { nodeDefUuid } = useParams()
 
   const dispatch = useDispatch()

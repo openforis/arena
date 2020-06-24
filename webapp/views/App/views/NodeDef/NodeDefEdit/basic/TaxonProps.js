@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/components/form/input'
 import Dropdown from '@webapp/components/form/dropdown'
@@ -13,8 +13,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
 import { useSurvey } from '@webapp/store/survey'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { createTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
+import { createTaxonomy, navigateToTaxonomiesManager } from '@webapp/loggedin/surveyViews/taxonomy/actions'
 import * as NodeDefState from '../store/state'
 
 import { useActions } from '../store/actions/index'
@@ -60,17 +59,20 @@ const TaxonProps = (props) => {
             type="button"
             className="btn btn-s"
             style={{ justifySelf: 'center' }}
-            onClick={async () => {
-              updateTaxonomyProp(await dispatch(createTaxonomy(history)))
-            }}
+            onClick={() => dispatch(createTaxonomy(history, nodeDefState))}
           >
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
-          <Link className="btn btn-s" style={{ justifySelf: 'center' }} to={appModuleUri(designerModules.taxonomies)}>
-            <span className="icon icon-list icon-12px icon-left" />
+          <button
+            type="button"
+            className="btn btn-s"
+            style={{ justifySelf: 'center' }}
+            onClick={() => dispatch(navigateToTaxonomiesManager({ history, nodeDefState }))}
+          >
+            <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.manage')}
-          </Link>
+          </button>
         </div>
       </FormItem>
     </>

@@ -8,7 +8,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
-import ExpressionsProp from './expressionsProp'
+import ExpressionsProp from './ExpressionsProp'
 
 import * as NodeDefState from '../../store/state'
 import { useActions } from '../../store/actions'

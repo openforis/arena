@@ -15,8 +15,8 @@ import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/store/state'
-import * as NodeDefStorage from '@webapp/loggedin/surveyViews/nodeDef/store/storage'
+import * as NodeDefState from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/state'
+import * as NodeDefStorage from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/storage'
 import { createCategory, deleteCategory } from '../category/actions'
 import ItemsView from '../items/itemsView'
 
@@ -46,8 +46,10 @@ const CategoriesView = (props) => {
 
   const onClose = () => {
     if (nodeDef) {
-      const nodeDefUpdated = NodeDef.mergeProps({ [NodeDef.propKeys.categoryUuid]: nodeDefCategoryUuid })(nodeDef)
-      const nodeDefStateUpdated = NodeDefState.assocNodeDef(nodeDefUpdated)(nodeDefState)
+      const nodeDefStateUpdated = NodeDefState.assocNodeDefProp(
+        NodeDef.propKeys.categoryUuid,
+        nodeDefCategoryUuid
+      )(nodeDefState)
       NodeDefStorage.setNodeDefState(nodeDefStateUpdated)
       history.goBack()
     }

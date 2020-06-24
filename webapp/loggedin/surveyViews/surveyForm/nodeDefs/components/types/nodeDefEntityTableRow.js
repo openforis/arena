@@ -8,7 +8,7 @@ import { elementOffset } from '@webapp/utils/domUtils'
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 import { useDispatch } from 'react-redux'
-import { useActions } from '@webapp/loggedin/surveyViews/nodeDef/store/actions'
+import { useActions } from '@webapp/views/App/views/NodeDef/NodeDefEdit/store/actions'
 
 const NodeDefEntityTableRow = (props) => {
   const { edit, nodeDef, nodeDefColumns, node, canEditRecord, canEditDef, renderType, i = 'header', removeNode } = props
