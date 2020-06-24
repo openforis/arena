@@ -17,11 +17,7 @@ import Dropdown from '@webapp/components/form/dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { checkCanSelectNodeDef, navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
-import {
-  updateCalculationAttribute,
-  resetCalculation,
-  createNodeDefAnalysis,
-} from '@webapp/loggedin/modules/analysis/calculation/actions'
+import { resetCalculation, createNodeDefAnalysis } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 import useCalculationState from './useCalculationState'
 
@@ -83,7 +79,7 @@ const CalculationView = (props) => {
             itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
             onBeforeChange={(attrDef) => dispatch(checkCanSelectNodeDef(attrDef))}
-            onChange={(def) => dispatch(updateCalculationAttribute(def))}
+            onChange={(def) => calculationActions.updateAttribute({ attrDef: def })}
           />
           <button
             type="button"
