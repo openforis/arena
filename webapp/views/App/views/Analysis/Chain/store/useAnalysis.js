@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-
 import { useState, useEffect } from 'react'
 
 import { useActions } from './actions/index'
@@ -16,7 +15,7 @@ export const useAnalysis = () => {
     { dirty, setDirty, chain, setChain, step, setStep }
   )
 
-  const { onInit, onDismiss } = useActions({
+  const { onInit, onDismiss, canSelectNodeDef } = useActions({
     chain,
     setChain,
     dirty,
@@ -53,6 +52,7 @@ export const useAnalysis = () => {
       onSave: () => ({}),
       openRButton: () => ({}),
       onDismiss,
+      canSelectNodeDef,
     },
   }
 }
