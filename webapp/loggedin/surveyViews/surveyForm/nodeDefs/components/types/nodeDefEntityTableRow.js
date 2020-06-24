@@ -80,9 +80,9 @@ const NodeDefEntityTableRow = (props) => {
           parentNode={node}
           canEditDef={canEditDef}
           renderType={renderType}
-          onDragStart={(e) => dragStart(e)}
-          onDragOver={(e) => dragOver(e)}
-          onDragEnd={(e) => dragEnd(e)}
+          onDragStart={dragStart}
+          onDragOver={dragOver}
+          onDragEnd={dragEnd}
         />
       ))}
 
