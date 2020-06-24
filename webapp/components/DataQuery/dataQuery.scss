@@ -1,0 +1,11 @@
+.data-query {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-column-gap: 10px;
+  justify-content: center;
+  height: 100%;
+}
+
+.data-query.nodedefs-selector-off {
+  grid-template-columns: 0 1fr;
+}

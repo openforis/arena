@@ -1,0 +1,47 @@
+import * as A from '@core/arena'
+
+import { keys, modes, displayTypes } from './keys'
+import { defaults } from './defaults'
+
+// ====== CREATE
+export const create = ({ entityDefUuid = null } = {}) => ({
+  ...defaults,
+  [keys.nodeDefUuidTable]: entityDefUuid,
+})
+
+// ====== READ
+export { displayTypes }
+export const getMode = A.prop(keys.mode)
+export const getDisplayType = A.prop(keys.displayType)
+export const getFilter = A.prop(keys.filter)
+export const getSort = A.prop(keys.sort)
+export const getNodeDefUuidTable = A.prop(keys.nodeDefUuidTable)
+export const getNodeDefUuidCols = A.prop(keys.nodeDefUuidCols)
+export const getDimensions = A.prop(keys.dimensions)
+export const getMeasures = A.prop(keys.measures)
+
+// mode
+const isMode = (mode) => (query) => getMode(query) === mode
+export const isModeAggregate = isMode(modes.aggregate)
+export const isModeRawEdit = isMode(modes.rawEdit)
+
+// utils
+export const hasSelection = (query) =>
+  isModeAggregate(query)
+    ? !A.isEmpty(getNodeDefUuidTable(query)) && !A.isEmpty(getMeasures(query)) && !A.isEmpty(getDimensions(query))
+    : !A.isEmpty(getNodeDefUuidTable(query)) && !A.isEmpty(getNodeDefUuidCols(query))
+
+// ====== UPDATE
+export const assocNodeDefUuidCols = A.assoc(keys.nodeDefUuidCols)
+export const assocDimensions = A.assoc(keys.dimensions)
+export const assocMeasures = A.assoc(keys.measures)
+
+// mode
+export const toggleModeAggregate = (query) => ({
+  ...create({ entityDefUuid: getNodeDefUuidTable(query) }),
+  [keys.mode]: isModeAggregate(query) ? modes.raw : modes.aggregate,
+})
+export const toggleModeEdit = (query) => ({
+  ...query,
+  [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
+})

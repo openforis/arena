@@ -1,2 +1,3 @@
-export { Query } from './query'
-export { Table } from './table'
+import * as Query from './query'
+
+export { Query }
