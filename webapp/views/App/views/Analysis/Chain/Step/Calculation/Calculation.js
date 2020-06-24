@@ -16,7 +16,7 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
-import { checkCanSelectNodeDef, navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
+import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
 import { resetCalculation, createNodeDefAnalysis } from '@webapp/loggedin/modules/analysis/calculation/actions'
 
 import useCalculationState from './useCalculationState'
@@ -32,7 +32,7 @@ const CalculationView = (props) => {
     calculation,
   })
 
-  const { calculation: calculationActions } = analysisActions
+  const { canSelectNodeDef, calculation: calculationActions } = analysisActions
 
   const calculationDirty = calculation // TO REFACTOR
 
@@ -78,7 +78,7 @@ const CalculationView = (props) => {
             itemKeyProp={Calculation.keys.uuid}
             itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
-            onBeforeChange={(attrDef) => dispatch(checkCanSelectNodeDef(attrDef))}
+            onBeforeChange={canSelectNodeDef}
             onChange={(def) => calculationActions.updateAttribute({ attrDef: def })}
           />
           <button
