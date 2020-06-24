@@ -7,7 +7,7 @@ import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModule
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesView'
 import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
-import NodeDefView from '@webapp/loggedin/surveyViews/nodeDef/nodeDefView'
+import NodeDefView from '@webapp/views/App/views/NodeDef'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ChainView from '@webapp/loggedin/modules/analysis/chain/view'
 

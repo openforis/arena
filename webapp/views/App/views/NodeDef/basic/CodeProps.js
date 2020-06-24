@@ -15,7 +15,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
-import * as NodeDefState from '../nodeDefState'
+import * as NodeDefState from '../../../../../loggedin/surveyViews/nodeDef/nodeDefState'
 
 const CodeProps = (props) => {
   const {

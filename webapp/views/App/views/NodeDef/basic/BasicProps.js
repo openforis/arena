@@ -19,11 +19,11 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import NodeDefExpressionsProp from '@webapp/loggedin/surveyViews/nodeDef/advanced/expressionsProp/nodeDefExpressionsProp'
+import NodeDefExpressionsProp from '@webapp/views/App/views/NodeDef/advanced/ExpressionsProp/NodeDefExpressionsProp'
 
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
-import CodeProps from './codeProps'
-import TaxonProps from './taxonProps'
+import CodeProps from './CodeProps'
+import TaxonProps from './TaxonProps'
 
 const BasicProps = (props) => {
   const {

@@ -1,4 +1,4 @@
-import './expressionsProp.scss'
+import './ExpressionsProp.scss'
 
 import React from 'react'
 import { useDispatch } from 'react-redux'
@@ -12,7 +12,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { FormItem } from '@webapp/components/form/input'
 import ValidationTooltip from '@webapp/components/validationTooltip'
-import ExpressionProp from './expressionProp'
+import ExpressionProp from './ExpressionProp'
 
 const ExpressionsProp = (props) => {
   const { values, label, validation, multiple, onChange } = props
