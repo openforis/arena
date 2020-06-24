@@ -13,3 +13,6 @@ export { default as useOnResize } from './useOnResize'
 export { default as useFileDrop } from './useFileDrop'
 export { default as useOnIntersect } from './useOnIntersect'
 export { default as useInterval } from './useInterval'
+
+// rxjs hooks
+export { usePost } from './usePost'
