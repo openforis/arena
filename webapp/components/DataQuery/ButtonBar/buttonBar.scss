@@ -1,0 +1,30 @@
+@import 'webapp/style/vars';
+
+.data-query-button-bar {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-column-gap: 15px;
+
+  > div {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid $greyBorder;
+    border-left: 1px solid $greyBorder;
+    border-right: 1px solid $greyBorder;
+  }
+
+  button,
+  a {
+    border: unset;
+    padding: 0.5rem 0.8rem;
+    &.highlight {
+      background-color: $yellowHighlight;
+    }
+  }
+}
+
+.data-query__container.no-content .data-query-button-bar {
+  > div {
+    border-bottom: 1px solid $greyBorder;
+  }
+}

@@ -30,7 +30,7 @@ const ExpansionPanel = (props) => {
               setContentHeight()
             }}
           >
-            <span className="icon icon-cross icon-10px" />
+            <span className="icon icon-play3 icon-10px" />
           </button>
           {i18n.t(buttonLabel, buttonLabelParams)}
         </div>
