@@ -21,7 +21,7 @@ const getTypes = (i18n) =>
     R.keys,
     R.map((type) => ({
       key: type,
-      label: i18n.t(`processingStepCalculationView.types.${type}`),
+      label: i18n.t(`processingStepCalculation.types.${type}`),
     }))
   )(Calculation.type)
 
@@ -30,7 +30,7 @@ const getAggregateFns = (i18n) =>
     R.keys,
     R.map((fn) => ({
       key: fn,
-      label: i18n.t(`processingStepCalculationView.aggregateFunctions.${fn}`),
+      label: i18n.t(`processingStepCalculation.aggregateFunctions.${fn}`),
     }))
   )(Calculation.aggregateFn)
 

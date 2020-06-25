@@ -73,7 +73,7 @@ const CalculationView = () => {
           />
         </FormItem>
 
-        <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
+        <FormItem label={i18n.t('processingStepCalculation.attribute')}>
           <div className="calculation__attribute-container">
             <Dropdown
               items={attributes}
@@ -105,7 +105,7 @@ const CalculationView = () => {
         </FormItem>
 
         {aggregateFunctionEnabled && (
-          <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
+          <FormItem label={i18n.t('processingStepCalculation.aggregateFunction')}>
             <ButtonGroup
               selectedItemKey={Calculation.getAggregateFunction(calculation)}
               onChange={(aggregateFn) =>

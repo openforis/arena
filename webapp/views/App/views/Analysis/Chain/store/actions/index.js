@@ -1,9 +1,30 @@
 import { useOnInit } from './useOnInit'
 import { useOnDismiss } from './useOnDismiss'
 import { useCanSelectNodeDef } from './useCanSelectNodeDef'
+import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
+import { useAddEntityVirtual } from './useAddEntityVirtual'
+import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
 
-export const useActions = ({ chain, setChain, dirty, setDirty, step, setStep, calculation, setCalculation }) => ({
+export const useActions = ({
+  attributesUuidsOtherChains,
+  setAtrributesUuidsOtherChains,
+  chain,
+  setChain,
+  dirty,
+  setDirty,
+  step,
+  setStep,
+  calculation,
+  setCalculation,
+}) => ({
   onInit: useOnInit({ chain, setChain, step, setStep, calculation, setCalculation }),
   onDismiss: useOnDismiss({ chain, setChain, dirty, setDirty }),
   canSelectNodeDef: useCanSelectNodeDef({ chain }),
+  getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
+    attributesUuidsOtherChains,
+    setAtrributesUuidsOtherChains,
+    chain,
+  }),
+  addEntityVirtual: useAddEntityVirtual(),
+  addNodeDefAnalysis: useAddNodeDefAnalysis({ step, calculation }),
 })

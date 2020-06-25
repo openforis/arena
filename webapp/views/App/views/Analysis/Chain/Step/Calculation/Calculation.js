@@ -1,58 +1,44 @@
 import './Calculation.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+
 import { useHistory } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Calculation from '@common/analysis/processingStepCalculation'
 import * as Validation from '@core/validation/validation'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+
 import { useI18n } from '@webapp/store/system'
-import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { FormItem } from '@webapp/components/form/input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/dropdown'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
-import { navigateToNodeDefEdit } from '@webapp/loggedin/modules/analysis/chain/actions'
-import { resetCalculation, createNodeDefAnalysis } from '@webapp/loggedin/modules/analysis/calculation/actions'
-
 import useCalculationState from './useCalculationState'
 
-const CalculationView = (props) => {
+const CalculationComponent = (props) => {
   const { analysisState, analysisActions } = props
 
   const i18n = useI18n()
-  const { chain, step, calculation, editingCalculation } = analysisState
+  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation } = analysisState
   const { validation, attributes, attribute, aggregateFunctionEnabled, types, aggregateFns } = useCalculationState({
+    attributesUuidsOtherChains,
     chain,
     step,
     calculation,
   })
 
-  const { canSelectNodeDef, calculation: calculationActions } = analysisActions
+  const { canSelectNodeDef, addNodeDefAnalysis, calculation: calculationActions } = analysisActions
 
-  const calculationDirty = calculation // TO REFACTOR
-
-  const dispatch = useDispatch()
   const history = useHistory()
   const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
 
   return (
     <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
-      <button
-        type="button"
-        className="btn-s btn-close"
-        onClick={() =>
-          calculationDirty
-            ? dispatch(
-                DialogConfirmActions.showDialogConfirm({ key: 'common.cancelConfirm', onOk: resetCalculation() })
-              )
-            : dispatch(resetCalculation())
-        }
-      >
+      <button type="button" className="btn-s btn-close" onClick={calculationActions.delete}>
         <span className="icon icon-10px icon-cross" />
       </button>
 
@@ -70,7 +56,7 @@ const CalculationView = (props) => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('processingStepCalculationView.attribute')}>
+      <FormItem label={i18n.t('processingStepCalculation.attribute')}>
         <div className="calculation__attribute-container">
           <Dropdown
             items={attributes}
@@ -84,13 +70,13 @@ const CalculationView = (props) => {
           <button
             type="button"
             className="btn btn-s btn-edit"
-            onClick={() => dispatch(navigateToNodeDefEdit(history, nodeDefUuid))}
+            onClick={() => history.push(`${appModuleUri(analysisModules.nodeDef)}${nodeDefUuid}/`)}
             aria-disabled={!nodeDefUuid}
           >
             <span className="icon icon-pencil2 icon-12px icon-left" />
             {i18n.t('common.edit')}
           </button>
-          <button type="button" className="btn btn-s btn-add" onClick={() => dispatch(createNodeDefAnalysis(history))}>
+          <button type="button" className="btn btn-s btn-add" onClick={addNodeDefAnalysis}>
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
@@ -98,7 +84,7 @@ const CalculationView = (props) => {
       </FormItem>
 
       {aggregateFunctionEnabled && (
-        <FormItem label={i18n.t('processingStepCalculationView.aggregateFunction')}>
+        <FormItem label={i18n.t('processingStepCalculation.aggregateFunction')}>
           <ButtonGroup
             selectedItemKey={Calculation.getAggregateFunction(calculation)}
             onChange={(aggregateFn) =>
@@ -113,9 +99,9 @@ const CalculationView = (props) => {
   )
 }
 
-CalculationView.propTypes = {
+CalculationComponent.propTypes = {
   analysisState: PropTypes.object.isRequired,
   analysisActions: PropTypes.object.isRequired,
 }
 
-export default CalculationView
+export default CalculationComponent

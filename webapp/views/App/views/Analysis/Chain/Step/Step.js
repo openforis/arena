@@ -16,7 +16,6 @@ import { useI18n } from '@webapp/store/system'
 
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
-import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
 import Calculation from './Calculation'
@@ -29,11 +28,10 @@ const getClassName = ({ editingStep, editingCalculation }) => {
 }
 
 const StepComponent = ({ analysisState, analysisActions }) => {
-  const { chain, step, calculation, editingStep, editingCalculation } = analysisState
-  const { step: stepActions } = analysisActions
+  const { chain, step, editingStep, editingCalculation } = analysisState
+  const { step: stepActions, addEntityVirtual } = analysisActions
   const history = useHistory()
   const i18n = useI18n()
-  const addEntityVirtual = useAddEntityVirtual()
 
   const stepNext = Chain.getStepNext(step)(chain)
 
@@ -114,7 +112,6 @@ const StepComponent = ({ analysisState, analysisActions }) => {
       </div>
 
       <Calculation analysisState={analysisState} analysisActions={analysisActions} />
-      <p>{JSON.stringify(calculation)}</p>
     </div>
   )
 }
