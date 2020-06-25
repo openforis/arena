@@ -3,17 +3,16 @@ import { useDispatch } from 'react-redux'
 import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useNodeDefParentByUuid } from '@webapp/store/survey'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
-import * as NodeDefState from './state'
-import { useIsKeyEditDisabled } from '../hooks/useKeyEditDisabled'
-import { useIsMultipleEditDisabled } from '../hooks/useMultipleEditDisabled'
+import * as NodeDefState from '../state'
+import { useIsKeyEditDisabled } from './useKeyEditDisabled'
+import { useIsMultipleEditDisabled } from './useMultipleEditDisabled'
 
 export const useNodeDef = () => {
   const { nodeDefUuid } = useParams()
@@ -32,7 +31,7 @@ export const useNodeDef = () => {
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
-  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
+  const nodeDefParent = useNodeDefParentByUuid(nodeDefUuid)
 
   useEffect(() => {
     // Editing a nodeDef

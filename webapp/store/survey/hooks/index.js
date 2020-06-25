@@ -28,6 +28,11 @@ export const useNodeDefRootKeys = () => Survey.getNodeDefRootKeys(useSurvey())
 
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
+export const useNodeDefParentByUuid = (nodeDefUuid) => {
+  const survey = useSurvey()
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  return Survey.getNodeDefParent(nodeDef)(survey)
+}
 
 // ==== Categories
 export const useCategoryByUuid = (uuid) => Survey.getCategoryByUuid(uuid)(useSurvey())
