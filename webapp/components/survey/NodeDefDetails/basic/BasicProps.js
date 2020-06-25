@@ -19,7 +19,7 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import NodeDefExpressionsProp from '@webapp/views/App/views/NodeDef/advanced/ExpressionsProp/NodeDefExpressionsProp'
+import NodeDefExpressionsProp from '@webapp/components/survey/NodeDefDetails/advanced/ExpressionsProp/NodeDefExpressionsProp'
 
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 import CodeProps from './CodeProps'

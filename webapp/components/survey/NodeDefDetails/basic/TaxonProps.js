@@ -13,9 +13,9 @@ import * as Validation from '@core/validation/validation'
 
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import * as NodeDefState from '../../../../../loggedin/surveyViews/nodeDef/nodeDefState'
+import * as NodeDefState from '../../../../loggedin/surveyViews/nodeDef/nodeDefState'
 
-import { createTaxonomy, deleteTaxonomy } from '../../../../../loggedin/surveyViews/taxonomy/actions'
+import { createTaxonomy, deleteTaxonomy } from '../../../../loggedin/surveyViews/taxonomy/actions'
 
 const { propKeys } = NodeDef
 

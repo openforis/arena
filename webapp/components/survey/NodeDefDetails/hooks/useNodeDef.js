@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { matchPath, useHistory, useLocation, useParams } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
@@ -10,7 +11,9 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
-import * as NodeDefState from './state'
+import * as NodeDefState from '../store/state'
+import { useIsKeyEditDisabled } from './useKeyEditDisabled'
+import { useIsMultipleEditDisabled } from './useMultipleEditDisabled'
 
 export const useNodeDef = () => {
   const { nodeDefUuid } = useParams()
@@ -24,21 +27,24 @@ export const useNodeDef = () => {
 
   const [nodeDefState, setNodeDefState] = useState({})
 
-  const editingNodeDefFromDesigner = Boolean(
-    matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`)
-  )
+  const editingFromDesigner = Boolean(matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`))
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const keyEditDisabled = useIsKeyEditDisabled(nodeDef)
+  const multipleEditDisabled = useIsMultipleEditDisabled(nodeDef)
+  const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
 
   useEffect(() => {
     // Editing a nodeDef
     if (nodeDefUuid) {
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const validation = Survey.getNodeDefValidation(nodeDef)(survey)
-      setNodeDefState(NodeDefState.createNodeDefState({ nodeDef, validation }))
+      const nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
+      setNodeDefState(NodeDefState.createNodeDefState({ nodeDef: nodeDefSurvey, validation }))
     }
   }, [])
 
   useOnUpdate(() => {
-    if (editingNodeDefFromDesigner) {
+    if (editingFromDesigner) {
       history.goBack()
     } else {
       dispatch(navigateToChainsView(history))
@@ -46,10 +52,13 @@ export const useNodeDef = () => {
   }, [surveyCycleKey])
 
   return {
-    survey,
-    surveyCycleKey,
     nodeDefState,
     setNodeDefState,
-    editingNodeDefFromDesigner,
+    survey,
+    surveyCycleKey,
+    nodeDefParent,
+    editingFromDesigner,
+    keyEditDisabled,
+    multipleEditDisabled,
   }
 }
