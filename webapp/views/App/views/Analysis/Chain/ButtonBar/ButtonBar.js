@@ -11,18 +11,8 @@ const ButtonBar = (props) => {
   const i18n = useI18n()
 
   const { analysis } = props
-  const {
-    chain,
-    dirty: chainDirty,
-    step,
-    editingChain,
-    editingStep,
-    calculation,
-    editingCalculation,
-    Actions,
-  } = analysis
+  const { chain, dirty, step, editingChain, editingStep, calculation, editingCalculation, Actions } = analysis
 
-  const dirty = chainDirty
   const stepNext = Chain.getStepNext(step)(chain)
 
   return (
@@ -31,7 +21,7 @@ const ButtonBar = (props) => {
         {editingChain && !editingStep && !editingCalculation && (
           <button type="button" className="btn-s btn-cancel" onClick={Actions.onDismiss}>
             <span className="icon icon-cross icon-left icon-10px" />
-            {i18n.t(chainDirty ? 'common.cancel' : 'common.back')}
+            {i18n.t(dirty ? 'common.cancel' : 'common.back')}
           </button>
         )}
 
