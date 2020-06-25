@@ -24,8 +24,7 @@ export const useAddEntityVirtual = () => {
         true,
         true
       )
-      dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
-
+      await dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef })
       history.push(`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
     })()
   }

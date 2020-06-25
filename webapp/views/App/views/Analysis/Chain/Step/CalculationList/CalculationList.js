@@ -13,9 +13,8 @@ import CalculationItem from './CalculationItem'
 import useDragDrop from './useDragDrop'
 
 const CalculationList = (props) => {
-  const { analysisState, analysisActions } = props
-  const { chain, step, calculation, editingCalculation } = analysisState
-  const { calculation: calculationActions } = analysisActions
+  const { analysis } = props
+  const { chain, step, calculation, editingCalculation, Actions } = analysis
 
   const i18n = useI18n()
   const calculations = Step.getCalculations(step)
@@ -25,7 +24,7 @@ const CalculationList = (props) => {
   const placeholderRef = useRef(null)
   const { dragging, onDragStart, onDragEnd, onDragOver } = useDragDrop({
     placeholderRef,
-    onDragEndFn: calculationActions.move,
+    onDragEndFn: Actions.calculation.move,
   })
 
   return (
@@ -35,7 +34,7 @@ const CalculationList = (props) => {
           <ValidationTooltip validation={calculationsValidation}>
             {i18n.t('processingStepView.calculationSteps')}
           </ValidationTooltip>
-          <button type="button" className="btn-s btn-transparent" onClick={calculationActions.create}>
+          <button type="button" className="btn-s btn-transparent" onClick={Actions.calculation.create}>
             <span className="icon icon-plus icon-14px" />
           </button>
         </div>
@@ -53,8 +52,8 @@ const CalculationList = (props) => {
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
-            onDeleteCalculation={calculationActions.delete}
-            analysisState={analysisState}
+            onDeleteCalculation={Actions.calculation.delete}
+            analysis={analysis}
           />
         ))}
 
@@ -68,8 +67,7 @@ const CalculationList = (props) => {
 }
 
 CalculationList.propTypes = {
-  analysisState: PropTypes.object.isRequired,
-  analysisActions: PropTypes.object.isRequired,
+  analysis: PropTypes.object.isRequired,
 }
 
 export default CalculationList

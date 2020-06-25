@@ -367,7 +367,7 @@ $t(common.cantUndoWarning)`,
     virtualEntity: 'Virtual Entity',
   },
 
-  processingStepCalculationView: {
+  processingStepCalculation: {
     attribute: 'Attribute',
     types: {
       quantitative: 'Quantitative',

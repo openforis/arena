@@ -1,7 +1,6 @@
 import './Step.scss'
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
-
 import { useHistory } from 'react-router'
 
 import * as Category from '@core/survey/category'
@@ -17,10 +16,9 @@ import { useI18n } from '@webapp/store/system'
 
 import CategorySelector from '@webapp/components/survey/CategorySelector'
 
-import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
-import { useAddEntityVirtual } from '../store/hooks'
 import EntitySelector from './EntitySelector'
 import CalculationList from './CalculationList'
+import Calculation from './Calculation'
 
 const getClassName = ({ editingStep, editingCalculation }) => {
   let className = 'step chain-form'
@@ -29,46 +27,35 @@ const getClassName = ({ editingStep, editingCalculation }) => {
   return className
 }
 
-const StepComponent = ({ analysisState, analysisActions }) => {
-  const { chain, step, calculation, editingStep, editingCalculation } = analysisState
-  const { step: stepActions } = analysisActions
+const StepComponent = (props) => {
+  const { analysis } = props
+  const { chain, step, editingStep, editingCalculation, Actions } = analysis
   const history = useHistory()
   const i18n = useI18n()
 
-  // TO REFACTOR
-  const { stepNext, stepPrev } = useChainEdit()
+  const stepNext = Chain.getStepNext(step)(chain)
 
   const validation = Chain.getItemValidationByUuid(Step.getUuid(step))(chain)
   const hasCalculationSteps = (Step.getCalculationsCount(step) || []).length > 0
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
   const entityUuid = Step.getEntityUuid(step)
 
-  /* useOnUpdate(() => {
-    // Validate step on calculation editor close (calculations may have been added / deleted)
-    if (!editingCalculation) {
-      dispatch(validateStep())
-    }
-  }, [editingCalculation]) */
-
-  const className = getClassName({ editingStep, editingCalculation })
-
-  const onAddEntityVirtual = () => React.useCallback(useAddEntityVirtual(), [])
+  const className = useMemo(() => getClassName({ editingStep, editingCalculation }), [editingStep, editingCalculation])
 
   return (
     <div className={className}>
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={stepActions.delete}>
+            <button type="button" className="btn-s btn-close" onClick={Actions.step.delete}>
               <span className="icon icon-10px icon-cross" />
             </button>
 
             <EntitySelector
-              step={step}
-              stepPrev={stepPrev}
+              analysis={analysis}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
-                stepActions.update({
+                Actions.step.update({
                   [Step.keysProps.entityUuid]: entityUuidUpdate,
                   [Step.keysProps.categoryUuid]: null,
                 })
@@ -87,7 +74,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
               <button
                 type="button"
                 className="btn btn-s btn-add"
-                onClick={onAddEntityVirtual}
+                onClick={Actions.addEntityVirtual}
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
@@ -104,7 +91,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
                 showManage={false}
                 showAdd={false}
                 onChange={(category) => {
-                  stepActions.update({
+                  Actions.step.update({
                     [Step.keysProps.entityUuid]: null,
                     [Step.keysProps.categoryUuid]: Category.getUuid(category),
                   })
@@ -113,17 +100,16 @@ const StepComponent = ({ analysisState, analysisActions }) => {
             </div>
           </>
         )}
-        <CalculationList analysisState={analysisState} analysisActions={analysisActions} />
+        <CalculationList analysis={analysis} />
       </div>
 
-      <p>{JSON.stringify(calculation)}</p>
+      <Calculation analysis={analysis} />
     </div>
   )
 }
 
 StepComponent.propTypes = {
-  analysisState: PropTypes.object.isRequired,
-  analysisActions: PropTypes.object.isRequired,
+  analysis: PropTypes.object.isRequired,
 }
 
 export default StepComponent

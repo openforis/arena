@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-
 import { useState, useEffect } from 'react'
 
 import { useActions } from './actions/index'
@@ -9,6 +8,7 @@ import { useCalculation } from './calculation'
 
 export const useAnalysis = () => {
   const [dirty, setDirty] = useState(false)
+  const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
   const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
   const { step, setStep, actions: stepActions } = useStep({}, { dirty, setDirty, chain, setChain })
   const { calculation, setCalculation, actions: calculationActions } = useCalculation(
@@ -16,7 +16,16 @@ export const useAnalysis = () => {
     { dirty, setDirty, chain, setChain, step, setStep }
   )
 
-  const { onInit, onDismiss } = useActions({
+  const {
+    onInit,
+    onDismiss,
+    canSelectNodeDef,
+    getAttributeUuidsOtherChains,
+    addEntityVirtual,
+    addNodeDefAnalysis,
+  } = useActions({
+    attributesUuidsOtherChains,
+    setAtrributesUuidsOtherChains,
     chain,
     setChain,
     dirty,
@@ -31,16 +40,20 @@ export const useAnalysis = () => {
     onInit()
   }, [])
 
+  useEffect(() => {
+    getAttributeUuidsOtherChains()
+  }, [chain])
+
   return {
-    state: {
-      chain,
-      step,
-      calculation,
-      dirty,
-      editingStep: !R.isEmpty(step) || false,
-      editingCalculation: !R.isEmpty(calculation) || false,
-    },
-    actions: {
+    attributesUuidsOtherChains,
+    chain,
+    step,
+    calculation,
+    dirty,
+    editingStep: !R.isEmpty(step) || false,
+    editingCalculation: !R.isEmpty(calculation) || false,
+
+    Actions: {
       chain: {
         ...chainActions,
       },
@@ -53,6 +66,9 @@ export const useAnalysis = () => {
       onSave: () => ({}),
       openRButton: () => ({}),
       onDismiss,
+      canSelectNodeDef,
+      addEntityVirtual,
+      addNodeDefAnalysis,
     },
   }
 }
