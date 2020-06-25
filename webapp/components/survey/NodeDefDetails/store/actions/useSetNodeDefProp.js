@@ -60,13 +60,13 @@ export const useSetNodeDefProp = ({ nodeDefState, setNodeDefState }) => (key, va
     !value &&
     NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
   ) {
-    survey = Survey.updateLayoutProp(
+    survey = Survey.updateNodeDefLayoutProp({
       surveyCycleKey,
-      nodeDefUpdated,
-      NodeDefLayout.keys.renderType,
-      NodeDefLayout.renderType.form
-    )
-    nodeDefUpdated = Survey.getNodeDef(NodeDef.getUuid(nodeDefUpdated))(survey)
+      nodeDef: nodeDefUpdated,
+      key: NodeDefLayout.keys.renderType,
+      value: NodeDefLayout.renderType.form,
+    })
+    nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(survey)
   }
 
   const nodeDefValidation = await SurveyValidator.validateNodeDef(survey, nodeDefUpdated)

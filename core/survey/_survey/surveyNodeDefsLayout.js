@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
-export const updateLayoutProp = (surveyCycleKey, nodeDef, key, value) => (survey) => {
+export const updateNodeDefLayoutProp = ({ surveyCycleKey, nodeDef, key, value }) => (survey) => {
   let nodeDefLayout = R.pipe(
     NodeDefLayout.getLayout,
     NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)

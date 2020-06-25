@@ -121,7 +121,7 @@ export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependenci
 
 // ====== UPDATE
 export const { assocNodeDefs, assocNodeDef } = SurveyNodeDefs
-export const { updateNodeDefLayout } = SurveyNodeDefsLayout
+export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
