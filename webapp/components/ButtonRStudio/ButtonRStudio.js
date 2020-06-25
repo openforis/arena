@@ -1,4 +1,4 @@
-import './buttonRStudio.scss'
+import './ButtonRStudio.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
