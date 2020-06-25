@@ -11,7 +11,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
-import ExpressionsProp from './expressionsProp/expressionsProp'
+import ExpressionsProp from './ExpressionsProp/ExpressionsProp'
 
 const ValidationsProps = props => {
   const { nodeDef, validation, nodeDefParent, readOnly, setNodeDefProp } = props
