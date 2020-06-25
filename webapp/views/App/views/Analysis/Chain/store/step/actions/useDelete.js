@@ -21,7 +21,7 @@ export const useDelete = ({ chain, setChain, step, setStep }) => {
       if (step) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
-            key: 'common.cancelConfirm',
+            key: 'processingStepView.deleteConfirm',
             onOk: resetStep,
           })
         )

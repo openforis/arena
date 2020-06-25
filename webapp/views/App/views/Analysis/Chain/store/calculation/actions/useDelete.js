@@ -21,7 +21,7 @@ export const useDelete = ({ step, setStep, calculation, setCalculation }) => {
       if (calculationDirty) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
-            key: 'common.cancelConfirm',
+            key: 'processingStepCalculation.deleteConfirm',
             onOk: resetCalculation,
           })
         )

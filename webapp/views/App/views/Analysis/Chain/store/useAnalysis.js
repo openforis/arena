@@ -16,14 +16,7 @@ export const useAnalysis = () => {
     { dirty, setDirty, chain, setChain, step, setStep }
   )
 
-  const {
-    onInit,
-    onDismiss,
-    canSelectNodeDef,
-    getAttributeUuidsOtherChains,
-    addEntityVirtual,
-    addNodeDefAnalysis,
-  } = useActions({
+  const actions = useActions({
     attributesUuidsOtherChains,
     setAtrributesUuidsOtherChains,
     chain,
@@ -37,11 +30,11 @@ export const useAnalysis = () => {
   })
 
   useEffect(() => {
-    onInit()
+    actions.onInit()
   }, [])
 
   useEffect(() => {
-    getAttributeUuidsOtherChains()
+    actions.getAttributeUuidsOtherChains()
   }, [chain])
 
   return {
@@ -50,6 +43,7 @@ export const useAnalysis = () => {
     step,
     calculation,
     dirty,
+    editingChain: !R.isEmpty(chain) || false,
     editingStep: !R.isEmpty(step) || false,
     editingCalculation: !R.isEmpty(calculation) || false,
 
@@ -63,12 +57,8 @@ export const useAnalysis = () => {
       calculation: {
         ...calculationActions,
       },
-      onSave: () => ({}),
+      ...actions,
       openRButton: () => ({}),
-      onDismiss,
-      canSelectNodeDef,
-      addEntityVirtual,
-      addNodeDefAnalysis,
     },
   }
 }
