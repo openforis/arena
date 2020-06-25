@@ -45,10 +45,10 @@ const getEntities = (survey, processingStepPrev, lang) => {
 }
 
 const EntitySelector = (props) => {
-  const { readOnly, validation, children, onChange, analysisState, analysisActions } = props
+  const { readOnly, validation, children, onChange, analysis } = props
 
-  const { chain, step } = analysisState
-  const { canSelectNodeDef } = analysisActions
+  const { chain, step, Actions } = analysis
+
   const i18n = useI18n()
   const survey = useSurvey()
   const stepPrev = Chain.getStepPrev(step)(chain)
@@ -67,7 +67,7 @@ const EntitySelector = (props) => {
         selection={entity}
         readOnly={readOnly}
         validation={validation}
-        onBeforeChange={canSelectNodeDef}
+        onBeforeChange={Actions.canSelectNodeDef}
         onChange={(item) => onChange(R.prop('key', item))}
       />
 
@@ -80,8 +80,7 @@ EntitySelector.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
-  analysisState: PropTypes.object.isRequired,
-  analysisActions: PropTypes.object.isRequired,
+  analysis: PropTypes.object.isRequired,
   validation: PropTypes.object.isRequired,
 }
 

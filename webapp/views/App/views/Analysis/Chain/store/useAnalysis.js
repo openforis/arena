@@ -45,16 +45,15 @@ export const useAnalysis = () => {
   }, [chain])
 
   return {
-    state: {
-      attributesUuidsOtherChains,
-      chain,
-      step,
-      calculation,
-      dirty,
-      editingStep: !R.isEmpty(step) || false,
-      editingCalculation: !R.isEmpty(calculation) || false,
-    },
-    actions: {
+    attributesUuidsOtherChains,
+    chain,
+    step,
+    calculation,
+    dirty,
+    editingStep: !R.isEmpty(step) || false,
+    editingCalculation: !R.isEmpty(calculation) || false,
+
+    Actions: {
       chain: {
         ...chainActions,
       },
