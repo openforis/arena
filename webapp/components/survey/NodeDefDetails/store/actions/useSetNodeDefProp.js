@@ -63,7 +63,7 @@ export const useSetNodeDefProp = ({ nodeDefState, setNodeDefState }) => (key, va
       nodeDef: nodeDefUpdated,
       key: NodeDefLayout.keys.renderType,
       value: NodeDefLayout.renderType.form,
-    })
+    })(survey)
     nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(survey)
   }
 
