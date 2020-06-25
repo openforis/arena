@@ -36,13 +36,15 @@ const ColumnHeader = (props) => {
         )}
       </div>
 
-      {noCols > 1 &&
-        !modeEdit &&
-        colNames.map((colName) => (
-          <div key={colName} style={{ width: widthInner }}>
-            {i18n.t(getColLabelKey({ colName, nodeDef }))}
-          </div>
-        ))}
+      {noCols > 1 && !modeEdit && (
+        <div className="table__inner-cell">
+          {colNames.map((colName) => (
+            <div key={colName} style={{ width: widthInner }}>
+              {i18n.t(getColLabelKey({ colName, nodeDef }))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
