@@ -18,16 +18,14 @@ import StepList from './StepList'
 import Step from './Step'
 
 const ChainComponent = () => {
-  const { state: analysisState, actions: analysisActions } = useAnalysis()
-  const { chain, dirty, editingStep } = analysisState
-  const { chain: chainActions, onSave, openRButton, onDismiss } = analysisActions
-
+  const analysis = useAnalysis()
+  const { chain, dirty, editingStep, Actions } = analysis
   const validation = Chain.getValidation(chain)
-
   const surveyInfo = useSurveyInfo()
+
   return (
     <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-      <ButtonRStudio onClick={openRButton} disabled={Survey.isDraft(surveyInfo) || dirty} />
+      <ButtonRStudio onClick={Actions.openRButton} disabled={Survey.isDraft(surveyInfo) || dirty} />
 
       <div className="form">
         <LabelsEditor
@@ -35,7 +33,7 @@ const ChainComponent = () => {
           formLabelKey="processingChainView.formLabel"
           readOnly={editingStep}
           validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-          onChange={(labels) => chainActions.update({ name: Chain.keysProps.labels, value: labels })}
+          onChange={(labels) => Actions.chain.update({ name: Chain.keysProps.labels, value: labels })}
         />
 
         {!editingStep && (
@@ -44,23 +42,23 @@ const ChainComponent = () => {
               formLabelKey="common.description"
               labels={Chain.getDescriptions(chain)}
               onChange={(descriptions) =>
-                chainActions.update({ name: Chain.keysProps.descriptions, value: descriptions })
+                Actions.chain.update({ name: Chain.keysProps.descriptions, value: descriptions })
               }
             />
 
             <CyclesSelector
               cyclesKeysSelected={Chain.getCycles(chain)}
-              onChange={(cycles) => chainActions.update({ name: Chain.keysProps.cycles, value: cycles })}
+              onChange={(cycles) => Actions.chain.update({ name: Chain.keysProps.cycles, value: cycles })}
             />
           </>
         )}
 
-        <StepList analysisState={analysisState} analysisActions={analysisActions} />
+        <StepList analysis={analysis} />
       </div>
 
-      <Step analysisState={analysisState} analysisActions={analysisActions} />
+      <Step analysis={analysis} />
 
-      <ButtonBar dirty={dirty} onDismiss={onDismiss} onSave={onSave} />
+      <ButtonBar dirty={dirty} onDismiss={Actions.onDismiss} onSave={Actions.onSave} />
     </div>
   )
 }

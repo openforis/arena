@@ -27,9 +27,9 @@ const getClassName = ({ editingStep, editingCalculation }) => {
   return className
 }
 
-const StepComponent = ({ analysisState, analysisActions }) => {
-  const { chain, step, editingStep, editingCalculation } = analysisState
-  const { step: stepActions, addEntityVirtual } = analysisActions
+const StepComponent = (props) => {
+  const { analysis } = props
+  const { chain, step, editingStep, editingCalculation, Actions } = analysis
   const history = useHistory()
   const i18n = useI18n()
 
@@ -40,13 +40,6 @@ const StepComponent = ({ analysisState, analysisActions }) => {
   const disabledEntityOrCategory = hasCalculationSteps || editingCalculation || Boolean(stepNext)
   const entityUuid = Step.getEntityUuid(step)
 
-  /* useOnUpdate(() => {
-    // Validate step on calculation editor close (calculations may have been added / deleted)
-    if (!editingCalculation) {
-      dispatch(validateStep())
-    }
-  }, [editingCalculation]) */
-
   const className = useMemo(() => getClassName({ editingStep, editingCalculation }), [editingStep, editingCalculation])
 
   return (
@@ -54,16 +47,15 @@ const StepComponent = ({ analysisState, analysisActions }) => {
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={stepActions.delete}>
+            <button type="button" className="btn-s btn-close" onClick={Actions.step.delete}>
               <span className="icon icon-10px icon-cross" />
             </button>
 
             <EntitySelector
-              analysisActions={analysisActions}
-              analysisState={analysisState}
+              analysis={analysis}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
-                stepActions.update({
+                Actions.step.update({
                   [Step.keysProps.entityUuid]: entityUuidUpdate,
                   [Step.keysProps.categoryUuid]: null,
                 })
@@ -82,7 +74,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
               <button
                 type="button"
                 className="btn btn-s btn-add"
-                onClick={addEntityVirtual}
+                onClick={Actions.addEntityVirtual}
                 aria-disabled={hasCalculationSteps}
               >
                 <span className="icon icon-plus icon-12px icon-left" />
@@ -99,7 +91,7 @@ const StepComponent = ({ analysisState, analysisActions }) => {
                 showManage={false}
                 showAdd={false}
                 onChange={(category) => {
-                  stepActions.update({
+                  Actions.step.update({
                     [Step.keysProps.entityUuid]: null,
                     [Step.keysProps.categoryUuid]: Category.getUuid(category),
                   })
@@ -108,17 +100,16 @@ const StepComponent = ({ analysisState, analysisActions }) => {
             </div>
           </>
         )}
-        <CalculationList analysisState={analysisState} analysisActions={analysisActions} />
+        <CalculationList analysis={analysis} />
       </div>
 
-      <Calculation analysisState={analysisState} analysisActions={analysisActions} />
+      <Calculation analysis={analysis} />
     </div>
   )
 }
 
 StepComponent.propTypes = {
-  analysisState: PropTypes.object.isRequired,
-  analysisActions: PropTypes.object.isRequired,
+  analysis: PropTypes.object.isRequired,
 }
 
 export default StepComponent

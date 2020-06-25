@@ -20,10 +20,10 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import useCalculationState from './useCalculationState'
 
 const CalculationComponent = (props) => {
-  const { analysisState, analysisActions } = props
+  const { analysis } = props
 
   const i18n = useI18n()
-  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation } = analysisState
+  const { attributesUuidsOtherChains, chain, step, calculation, editingCalculation, Actions } = analysis
   const { validation, attributes, attribute, aggregateFunctionEnabled, types, aggregateFns } = useCalculationState({
     attributesUuidsOtherChains,
     chain,
@@ -31,27 +31,25 @@ const CalculationComponent = (props) => {
     calculation,
   })
 
-  const { canSelectNodeDef, addNodeDefAnalysis, calculation: calculationActions } = analysisActions
-
   const history = useHistory()
   const nodeDefUuid = Calculation.getNodeDefUuid(calculation)
 
   return (
     <div className={`calculation chain-form${editingCalculation ? ' show' : ''}`}>
-      <button type="button" className="btn-s btn-close" onClick={calculationActions.delete}>
+      <button type="button" className="btn-s btn-close" onClick={Actions.calculation.delete}>
         <span className="icon icon-10px icon-cross" />
       </button>
 
       <LabelsEditor
         labels={Calculation.getLabels(calculation)}
         validation={Validation.getFieldValidation(Calculation.keysProps.labels)(validation)}
-        onChange={(labels) => calculationActions.updateProp({ prop: Calculation.keysProps.labels, value: labels })}
+        onChange={(labels) => Actions.calculation.updateProp({ prop: Calculation.keysProps.labels, value: labels })}
       />
 
       <FormItem label={i18n.t('common.type')}>
         <ButtonGroup
           selectedItemKey={Calculation.getType(calculation)}
-          onChange={(type) => calculationActions.updateProp({ prop: Calculation.keysProps.type, value: type })}
+          onChange={(type) => Actions.calculation.updateProp({ prop: Calculation.keysProps.type, value: type })}
           items={types}
         />
       </FormItem>
@@ -64,8 +62,8 @@ const CalculationComponent = (props) => {
             itemKeyProp={Calculation.keys.uuid}
             itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
             validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
-            onBeforeChange={canSelectNodeDef}
-            onChange={(def) => calculationActions.updateAttribute({ attrDef: def })}
+            onBeforeChange={Actions.canSelectNodeDef}
+            onChange={(def) => Actions.calculation.updateAttribute({ attrDef: def })}
           />
           <button
             type="button"
@@ -76,7 +74,7 @@ const CalculationComponent = (props) => {
             <span className="icon icon-pencil2 icon-12px icon-left" />
             {i18n.t('common.edit')}
           </button>
-          <button type="button" className="btn btn-s btn-add" onClick={addNodeDefAnalysis}>
+          <button type="button" className="btn btn-s btn-add" onClick={Actions.addNodeDefAnalysis}>
             <span className="icon icon-plus icon-12px icon-left" />
             {i18n.t('common.add')}
           </button>
@@ -88,7 +86,7 @@ const CalculationComponent = (props) => {
           <ButtonGroup
             selectedItemKey={Calculation.getAggregateFunction(calculation)}
             onChange={(aggregateFn) =>
-              calculationActions.updateProp({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn })
+              Actions.calculation.updateProp({ prop: Calculation.keysProps.aggregateFn, value: aggregateFn })
             }
             items={aggregateFns}
             deselectable
@@ -100,8 +98,7 @@ const CalculationComponent = (props) => {
 }
 
 CalculationComponent.propTypes = {
-  analysisState: PropTypes.object.isRequired,
-  analysisActions: PropTypes.object.isRequired,
+  analysis: PropTypes.object.isRequired,
 }
 
 export default CalculationComponent

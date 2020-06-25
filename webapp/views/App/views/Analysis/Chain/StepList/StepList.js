@@ -12,9 +12,8 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import StepItem from './StepItem'
 
 const StepList = (props) => {
-  const { analysisState, analysisActions } = props
-  const { chain, editingStep } = analysisState
-  const { step: stepActions } = analysisActions
+  const { analysis } = props
+  const { chain, editingStep, Actions } = analysis
   const i18n = useI18n()
 
   const validation = Chain.getValidation(chain)
@@ -32,7 +31,7 @@ const StepList = (props) => {
           <button
             type="button"
             className="btn-s btn-transparent"
-            onClick={stepActions.create}
+            onClick={Actions.step.create}
             aria-disabled={lastStepHasCategory}
           >
             <span className="icon icon-plus icon-14px" />
@@ -42,12 +41,7 @@ const StepList = (props) => {
 
       <div className="chain-list">
         {steps.map((processingStep) => (
-          <StepItem
-            key={Step.getIndex(processingStep)}
-            step={processingStep}
-            analysisState={analysisState}
-            analysisActions={analysisActions}
-          />
+          <StepItem key={Step.getIndex(processingStep)} step={processingStep} analysis={analysis} />
         ))}
       </div>
     </div>
@@ -55,8 +49,7 @@ const StepList = (props) => {
 }
 
 StepList.propTypes = {
-  analysisState: PropTypes.object.isRequired,
-  analysisActions: PropTypes.object.isRequired,
+  analysis: PropTypes.object.isRequired,
 }
 
 export default StepList
