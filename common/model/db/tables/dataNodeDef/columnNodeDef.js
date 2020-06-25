@@ -1,4 +1,7 @@
 import * as R from 'ramda'
+import camelize from 'camelize'
+import * as toSnakeCase from 'to-snake-case'
+
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as SQL from '../../sql'
 
@@ -35,6 +38,9 @@ const getColNames = (nodeDef) => {
   }
   return [nodeDefName]
 }
+
+const extractColName = ({ nodeDef, colName }) =>
+  camelize(colName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
 
 /**
  * A nodeDef data table column.
@@ -80,3 +86,4 @@ export default class ColumnNodeDef {
 
 ColumnNodeDef.getColNames = getColNames
 ColumnNodeDef.getColName = R.pipe(ColumnNodeDef.getColNames, R.head)
+ColumnNodeDef.extractColName = extractColName
