@@ -13,7 +13,7 @@ export const fromAjax = ({ ajax, dispatch }) =>
           iif(
             () => i > 4, // If it has tried 4 times already throw error
             throwError(error), // Otherwise we pipe this back into our stream and delay the retry
-            of(error).pipe(delay(1000))
+            of(error).pipe(delay(500))
           )
         )
       )

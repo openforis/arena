@@ -1,4 +1,6 @@
 import { useState } from 'react'
+
+import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -11,7 +13,7 @@ const defaults = {
 
 export const useDataQuery = ({ query }) => {
   const defaultValues = defaults[Query.getDisplayType(query)]
-  const [data, setData] = useState([])
+  const [data, setData] = useState(null)
   const [limit] = useState(defaultValues.limit)
   const [offset, setOffset] = useState(defaultValues.offset)
 
@@ -24,17 +26,23 @@ export const useDataQuery = ({ query }) => {
 
   // on entity def uuid update, reset data
   useOnUpdate(() => {
-    setData([])
+    Actions.resetData()
   }, [entityDefUuid])
 
-  // offset, attributeDefUuids, dimensions, measures fetch or reset data
+  // on update offset, attributeDefUuids, dimensions, measures fetch or reset data
   useOnUpdate(() => {
-    if (Query.hasSelection(query)) Actions.fetchData({ offset, limit, query })
-    else setData([])
+    if (Query.hasSelection(query)) {
+      Actions.fetchData({ offset, limit, query })
+    } else {
+      Actions.resetData()
+    }
   }, [offset, attributeDefUuids, dimensions, measures])
 
   return {
-    data,
+    data: data && data.data,
+    dataEmpty: data ? A.isEmpty(data.data) : true,
+    dataLoaded: data ? data.loaded && Query.hasSelection(query) : false,
+    dataLoading: data ? data.loading : false,
     limit,
     offset,
     setOffset,
