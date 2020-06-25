@@ -20,7 +20,7 @@ import { useChainEdit } from '@webapp/loggedin/modules/analysis/hooks'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import StepView from '@webapp/loggedin/modules/analysis/step/view'
-import ButtonRStudio from '@webapp/components/buttonRStudio'
+import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import {
   fetchChain,

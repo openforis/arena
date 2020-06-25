@@ -7,8 +7,7 @@ import * as Chain from '@common/analysis/processingChain'
 
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import ButtonRStudio from '@webapp/components/buttonRStudio'
-import ButtonBar from '@webapp/loggedin/modules/analysis/chain/view/components/buttonBar'
+import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 
@@ -16,6 +15,7 @@ import { useAnalysis } from './store'
 
 import StepList from './StepList'
 import Step from './Step'
+import ButtonBar from './ButtonBar'
 
 const ChainComponent = () => {
   const analysis = useAnalysis()
@@ -58,7 +58,7 @@ const ChainComponent = () => {
 
       <Step analysis={analysis} />
 
-      <ButtonBar dirty={dirty} onDismiss={Actions.onDismiss} onSave={Actions.onSave} />
+      <ButtonBar analysis={analysis} />
     </div>
   )
 }
