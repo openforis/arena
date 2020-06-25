@@ -7,7 +7,7 @@ import * as Chain from '@common/analysis/processingChain'
 
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import ButtonRStudio from '@webapp/components/buttonRStudio'
+import ButtonRStudio from '@webapp/components/ButtonRStudio'
 import ButtonBar from '@webapp/loggedin/modules/analysis/chain/view/components/buttonBar'
 
 import { useSurveyInfo } from '@webapp/store/survey'
