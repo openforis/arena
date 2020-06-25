@@ -29,3 +29,10 @@ export const persistCalculation = ({ calculation }) => {
 export const getCalculation = () => AnalysisStorage.getCalculation()
 
 export const resetCalculation = () => AnalysisStorage.clearCalculation()
+
+// ==== Analysus
+export const resetAnalysis = () => {
+  resetChain()
+  resetStep()
+  resetCalculation()
+}

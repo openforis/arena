@@ -16,11 +16,10 @@ const StepList = (props) => {
   const { chain, editingStep, Actions } = analysis
   const i18n = useI18n()
 
-  const validation = Chain.getValidation(chain)
+  const validation = Chain.getItemValidationByUuid(Chain.getUuid(chain))(chain)
   const stepsValidation = Validation.getFieldValidation(Chain.keys.processingSteps)(validation)
   const steps = Chain.getProcessingSteps(chain)
   const lastStepHasCategory = R.pipe(R.last, Step.hasCategory)(steps)
-
   return (
     <div className={`form-item${editingStep ? ' chain-list__editing-step' : ''}`}>
       {!editingStep && (

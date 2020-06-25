@@ -4,6 +4,7 @@ import { useCanSelectNodeDef } from './useCanSelectNodeDef'
 import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChains'
 import { useAddEntityVirtual } from './useAddEntityVirtual'
 import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
+import { useOnSave } from './useOnSave'
 
 export const useActions = ({
   attributesUuidsOtherChains,
@@ -19,6 +20,7 @@ export const useActions = ({
 }) => ({
   onInit: useOnInit({ chain, setChain, step, setStep, calculation, setCalculation }),
   onDismiss: useOnDismiss({ chain, setChain, dirty, setDirty }),
+  onSave: useOnSave({ chain, setChain, step, calculation }),
   canSelectNodeDef: useCanSelectNodeDef({ chain }),
   getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
     attributesUuidsOtherChains,
