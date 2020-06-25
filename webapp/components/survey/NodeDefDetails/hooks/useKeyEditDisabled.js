@@ -3,7 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey } from '@webapp/store/survey'
 
-export const useIsKeyEditDisabled = (nodeDef) => {
+export const useIsKeyEditDisabled = ({ nodeDef }) => {
   const survey = useSurvey()
   return (
     !nodeDef ||

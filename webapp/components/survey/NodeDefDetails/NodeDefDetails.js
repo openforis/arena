@@ -14,12 +14,11 @@ import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { useNodeDef } from './hooks'
-import * as NodeDefState from './store/state'
+import { NodeDefState, useNodeDef } from './store'
 import ButtonBar from './ButtonBar'
-import ValidationsProps from './advanced/ValidationsProps'
-import AdvancedProps from './advanced/AdvancedProps'
-import BasicProps from './basic/BasicProps'
+import ValidationsProps from './ValidationsProps'
+import AdvancedProps from './AdvancedProps'
+import BasicProps from './BasicProps'
 
 const NodeDefDetails = () => {
   const i18n = useI18n()

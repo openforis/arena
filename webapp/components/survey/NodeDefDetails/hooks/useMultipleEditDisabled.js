@@ -4,7 +4,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-export const useIsMultipleEditDisabled = (nodeDef) => {
+export const useIsMultipleEditDisabled = ({ nodeDef }) => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
 

@@ -1,1 +1,1 @@
-export { useNodeDef } from './useNodeDef'
+export { useNodeDef } from '../store/useNodeDef'
