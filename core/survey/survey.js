@@ -6,6 +6,7 @@ import * as Srs from '@core/geo/srs'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
+import * as SurveyNodeDefsLayout from './_survey/surveyNodeDefsLayout'
 import * as SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation'
 import * as SurveyCategories from './_survey/surveyCategories'
 import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
@@ -120,6 +121,7 @@ export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependenci
 
 // ====== UPDATE
 export const { assocNodeDefs, assocNodeDef } = SurveyNodeDefs
+export const { updateNodeDefLayout } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies

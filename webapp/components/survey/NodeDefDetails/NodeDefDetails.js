@@ -14,7 +14,7 @@ import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { NodeDefState, useNodeDef } from './store'
+import { NodeDefState, useNodeDef, useActions } from './store'
 import ButtonBar from './ButtonBar'
 import ValidationsProps from './ValidationsProps'
 import AdvancedProps from './AdvancedProps'
@@ -24,12 +24,21 @@ const NodeDefDetails = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  const { nodeDefState, editingFromDesigner, nodeDefParent, keyEditDisabled, multipleEditDisabled } = useNodeDef()
+  const {
+    nodeDefState,
+    setNodeDefState,
+    editingFromDesigner,
+    nodeDefParent,
+    keyEditDisabled,
+    multipleEditDisabled,
+  } = useNodeDef()
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
 
   const nodeDefType = NodeDef.getType(nodeDef)
+
+  const Actions = useActions({ nodeDefState, setNodeDefState })
 
   return nodeDef ? (
     <>
@@ -40,7 +49,7 @@ const NodeDefDetails = () => {
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>
-                dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
+                dispatch(Actions.setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
               }
             />
             <div className="attribute-selector">
@@ -61,7 +70,7 @@ const NodeDefDetails = () => {
                   nodeDefMultipleEditDisabled: multipleEditDisabled,
                   editingNodeDefFromDesigner: editingFromDesigner,
                   setNodeDefParentUuid: (...args) => dispatch(NodeDefsActions.setNodeDefParentUuid(...args)),
-                  setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
+                  setNodeDefProp: (...args) => dispatch(Actions.setNodeDefProp(...args)),
                   putNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.putNodeDefLayoutProp(...args)),
                   setNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.setNodeDefLayoutProp(...args)),
                 },
@@ -76,7 +85,7 @@ const NodeDefDetails = () => {
                         nodeDef,
                         validation,
                         nodeDefParent,
-                        setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
+                        setNodeDefProp: (...args) => dispatch(Actions.setNodeDefProp(...args)),
                       },
                     },
                     {
@@ -86,7 +95,7 @@ const NodeDefDetails = () => {
                         nodeDef,
                         validation,
                         nodeDefParent,
-                        setNodeDefProp: (...args) => dispatch(NodeDefsActions.setNodeDefProp(...args)),
+                        setNodeDefProp: (...args) => dispatch(Actions.setNodeDefProp(...args)),
                       },
                     },
                   ]),
