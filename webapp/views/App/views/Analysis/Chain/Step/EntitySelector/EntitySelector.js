@@ -80,7 +80,6 @@ EntitySelector.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
-  step: PropTypes.object.isRequired,
   analysisState: PropTypes.object.isRequired,
   analysisActions: PropTypes.object.isRequired,
   validation: PropTypes.object.isRequired,

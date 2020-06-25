@@ -75,7 +75,7 @@ const ButtonBar = () => {
           onClick={() => {
             let messageKeyPrefix = 'processingChainView'
             if (editingStep) messageKeyPrefix = 'processingStepView'
-            if (editingCalculation) messageKeyPrefix = 'processingStepCalculationView'
+            if (editingCalculation) messageKeyPrefix = 'processingStepCalculation'
             const messageKey = `${messageKeyPrefix}.deleteConfirm`
 
             let deleteAction = deleteChain(history)

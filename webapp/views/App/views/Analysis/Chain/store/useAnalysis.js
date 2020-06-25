@@ -8,6 +8,7 @@ import { useCalculation } from './calculation'
 
 export const useAnalysis = () => {
   const [dirty, setDirty] = useState(false)
+  const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
   const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
   const { step, setStep, actions: stepActions } = useStep({}, { dirty, setDirty, chain, setChain })
   const { calculation, setCalculation, actions: calculationActions } = useCalculation(
@@ -15,7 +16,16 @@ export const useAnalysis = () => {
     { dirty, setDirty, chain, setChain, step, setStep }
   )
 
-  const { onInit, onDismiss, canSelectNodeDef } = useActions({
+  const {
+    onInit,
+    onDismiss,
+    canSelectNodeDef,
+    getAttributeUuidsOtherChains,
+    addEntityVirtual,
+    addNodeDefAnalysis,
+  } = useActions({
+    attributesUuidsOtherChains,
+    setAtrributesUuidsOtherChains,
     chain,
     setChain,
     dirty,
@@ -30,8 +40,13 @@ export const useAnalysis = () => {
     onInit()
   }, [])
 
+  useEffect(() => {
+    getAttributeUuidsOtherChains()
+  }, [chain])
+
   return {
     state: {
+      attributesUuidsOtherChains,
       chain,
       step,
       calculation,
@@ -53,6 +68,8 @@ export const useAnalysis = () => {
       openRButton: () => ({}),
       onDismiss,
       canSelectNodeDef,
+      addEntityVirtual,
+      addNodeDefAnalysis,
     },
   }
 }
