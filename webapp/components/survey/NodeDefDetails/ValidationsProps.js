@@ -1,4 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -11,34 +13,43 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
-import ExpressionsProp from './ExpressionsProp/ExpressionsProp'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import ExpressionsProp from './ExpressionsProp'
 
-const ValidationsProps = props => {
-  const { nodeDef, validation, nodeDefParent, readOnly, setNodeDefProp } = props
+import { NodeDefState, useActions } from './store'
 
-  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
+const ValidationsProps = (props) => {
+  const { nodeDefState, setNodeDefState } = props
 
+  const dispatch = useDispatch()
+  const readOnly = !useAuthCanEditSurvey()
+
+  const Actions = useActions({ nodeDefState, setNodeDefState })
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const validation = NodeDefState.getValidation(nodeDefState)
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
+  const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
-  const handleValidationsUpdate = validations =>
-    setNodeDefProp(NodeDef.keysPropsAdvanced.validations, validations, true)
+  const onValidationsUpdate = (validations) =>
+    dispatch(Actions.setNodeDefProp(NodeDef.keysPropsAdvanced.validations, validations, true))
 
   const i18n = useI18n()
 
   return (
     <div className="form">
-      {NodeDef.isMultiple(nodeDef) ? (
-        <React.Fragment>
+      {NodeDef.isMultiple(nodeDef) && (
+        <>
           <FormItem label={i18n.t('nodeDefEdit.validationsProps.minCount')}>
             <Input
               value={NodeDefValidations.getMinCount(nodeDefValidations)}
               disabled={readOnly}
               validation={R.pipe(
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.min),
+                Validation.getFieldValidation(NodeDefValidations.keys.min)
               )(validation)}
               mask={InputMasks.integer}
-              onChange={value => handleValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
+              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
             />
           </FormItem>
           <FormItem label={i18n.t('nodeDefEdit.validationsProps.maxCount')}>
@@ -47,37 +58,38 @@ const ValidationsProps = props => {
               disabled={readOnly}
               validation={R.pipe(
                 Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.max),
+                Validation.getFieldValidation(NodeDefValidations.keys.max)
               )(validation)}
               mask={InputMasks.integer}
-              onChange={value => handleValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
+              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
             />
           </FormItem>
-        </React.Fragment>
-      ) : !NodeDef.isKey(nodeDef) ? (
+        </>
+      )}
+      {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (
         <FormItem label={i18n.t('common.required')}>
           <Checkbox
             checked={NodeDefValidations.isRequired(nodeDefValidations)}
             disabled={readOnly}
-            onChange={checked => handleValidationsUpdate(NodeDefValidations.assocRequired(checked)(nodeDefValidations))}
+            onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocRequired(checked)(nodeDefValidations))}
           />
         </FormItem>
-      ) : null}
+      )}
       {NodeDef.isAttribute(nodeDef) && (
         <ExpressionsProp
           label={i18n.t('nodeDefEdit.validationsProps.expressions')}
           readOnly={readOnly}
-          applyIf={true}
-          hideAdvanced={true}
-          showLabels={true}
-          severity={true}
+          applyIf
+          hideAdvanced
+          showLabels
+          severity
           values={NodeDefValidations.getExpressions(nodeDefValidations)}
           validation={R.pipe(
             Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-            Validation.getFieldValidation(NodeDefValidations.keys.expressions),
+            Validation.getFieldValidation(NodeDefValidations.keys.expressions)
           )(validation)}
-          onChange={expressions =>
-            handleValidationsUpdate(NodeDefValidations.assocExpressions(expressions)(nodeDefValidations))
+          onChange={(expressions) =>
+            onValidationsUpdate(NodeDefValidations.assocExpressions(expressions)(nodeDefValidations))
           }
           nodeDefUuidContext={nodeDefUuidContext}
           nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
@@ -85,6 +97,11 @@ const ValidationsProps = props => {
       )}
     </div>
   )
+}
+
+ValidationsProps.propTypes = {
+  nodeDefState: PropTypes.object.isRequired,
+  setNodeDefState: PropTypes.func.isRequired,
 }
 
 export default ValidationsProps

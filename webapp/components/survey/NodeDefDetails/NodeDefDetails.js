@@ -23,14 +23,7 @@ const NodeDefDetails = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  const {
-    nodeDefState,
-    setNodeDefState,
-    editingFromDesigner,
-    nodeDefParent,
-    keyEditDisabled,
-    multipleEditDisabled,
-  } = useNodeDef()
+  const { nodeDefState, setNodeDefState, editingFromDesigner } = useNodeDef()
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
@@ -65,8 +58,6 @@ const NodeDefDetails = () => {
                 props: {
                   nodeDefState,
                   setNodeDefState,
-                  keyEditDisabled,
-                  multipleEditDisabled,
                   editingFromDesigner,
                 },
               },
@@ -85,10 +76,8 @@ const NodeDefDetails = () => {
                       label: i18n.t('nodeDefEdit.validations'),
                       component: ValidationsProps,
                       props: {
-                        nodeDef,
-                        validation,
-                        nodeDefParent,
-                        setNodeDefProp: (...args) => dispatch(Actions.setNodeDefProp(...args)),
+                        nodeDefState,
+                        setNodeDefState,
                       },
                     },
                   ]),
