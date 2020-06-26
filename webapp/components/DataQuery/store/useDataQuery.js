@@ -57,5 +57,6 @@ export const useDataQuery = ({ query }) => {
     limit,
     offset,
     setOffset,
+    setData: (dataUpdated) => setData({ ...data, data: dataUpdated }),
   }
 }
