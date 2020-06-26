@@ -1,14 +1,15 @@
 import './NodeDefsSelector.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import classNames from 'classnames'
 
+import * as A from '@core/arena'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyLang } from '@webapp/store/survey'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefUiProps from '../../../loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
+import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -30,15 +31,13 @@ const NodeDefsSelector = (props) => {
   const lang = useSurveyLang()
 
   const [filterTypes, setFilterTypes] = useState([])
-  const [showSettings, setShowSettings] = useState(false)
+  const [showFilter, setShowFilter] = useState(false)
 
   const onToggleAttribute = (nodeDefUuid) => {
-    const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefUuidsAttributes)
-    const isDeleted = idx >= 0
-    const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
-
-    const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
-    onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
+    const attributeDefUuidsUpdated = nodeDefUuidsAttributes.includes(nodeDefUuid)
+      ? nodeDefUuidsAttributes.filter((_nodeDefUuid) => _nodeDefUuid !== nodeDefUuid)
+      : [...nodeDefUuidsAttributes, nodeDefUuid]
+    onChangeAttributes(attributeDefUuidsUpdated)
   }
 
   return (
@@ -52,28 +51,32 @@ const NodeDefsSelector = (props) => {
 
       <button
         type="button"
-        className="btn btn-s btn-toggle-settings"
-        aria-disabled={R.isNil(nodeDefUuidEntity)}
-        onClick={() => setShowSettings(!showSettings)}
+        className={classNames('btn', 'btn-s', 'btn-toggle-filter', { highlight: showFilter || filterTypes.length > 0 })}
+        aria-disabled={A.isEmpty(nodeDefUuidEntity)}
+        onClick={() => setShowFilter(!showFilter)}
       >
-        <span className="icon icon-cog icon-12px" />
+        <span className="icon icon-filter icon-12px" />
       </button>
 
-      {showSettings && (
+      {showFilter && (
         <div className="node-defs-selector__settings">
-          {R.keys(NodeDef.nodeDefType).map((type) =>
+          {Object.keys(NodeDef.nodeDefType).map((type) =>
             NodeDef.nodeDefType.entity !== type ? (
               <button
                 type="button"
                 key={type}
-                className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
+                  active: filterTypes.includes(type),
+                })}
                 onClick={() => {
-                  const idx = R.findIndex(R.equals(type), filterTypes)
-                  const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
-                  setFilterTypes(fn(filterTypes))
+                  const filterTypesUpdated = filterTypes.includes(type)
+                    ? filterTypes.filter((_type) => _type !== type)
+                    : [...filterTypes, type]
+                  setFilterTypes(filterTypesUpdated)
                 }}
               >
-                {NodeDefUiProps.getIconByType(type)} {i18n.t(type)}
+                <span>{i18n.t(type)}</span>
+                {NodeDefUiProps.getIconByType(type)}
               </button>
             ) : null
           )}
