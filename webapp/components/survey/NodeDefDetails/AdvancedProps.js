@@ -10,7 +10,6 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 
-import { useNodeDefParentByUuid } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { NodeDefState, useActions } from './store'
@@ -24,9 +23,7 @@ const AdvancedProps = (props) => {
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
-
-  const nodeDefParent = useNodeDefParentByUuid(NodeDef.getUuid(nodeDef))
-  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
+  const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
   const i18n = useI18n()
 

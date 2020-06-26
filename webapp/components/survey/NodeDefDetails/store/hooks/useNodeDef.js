@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useSurvey, useSurveyCycleKey, useNodeDefParentByUuid } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
@@ -25,7 +25,6 @@ export const useNodeDef = () => {
   const [nodeDefState, setNodeDefState] = useState({})
 
   const editingFromDesigner = Boolean(matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`))
-  const nodeDefParent = useNodeDefParentByUuid(nodeDefUuid)
 
   useEffect(() => {
     // Editing a nodeDef
@@ -49,7 +48,6 @@ export const useNodeDef = () => {
     setNodeDefState,
     survey,
     surveyCycleKey,
-    nodeDefParent,
     editingFromDesigner,
   }
 }
