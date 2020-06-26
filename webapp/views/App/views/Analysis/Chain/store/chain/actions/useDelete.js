@@ -22,7 +22,7 @@ export const useDelete = ({ chain }) => {
 
     if (chainUuid) {
       await axios.delete(`/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}`)
-      dispatch(SurveyActions.chainElementDelete())
+      dispatch(SurveyActions.chainItemDelete())
     }
 
     history.push(appModuleUri(analysisModules.processingChains))

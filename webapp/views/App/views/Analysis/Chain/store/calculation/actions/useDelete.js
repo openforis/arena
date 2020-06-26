@@ -21,7 +21,7 @@ export const useDelete = ({ step, setStep, calculation, setCalculation }) => {
 
     if (chainUuid && !Calculation.isTemporary(calculation)) {
       await axios.delete(`/api/survey/${surveyId}/processing-step/${Step.getUuid(step)}/calculation/${calculationUuid}`)
-      dispatch(SurveyActions.chainElementDelete())
+      dispatch(SurveyActions.chainItemDelete())
     }
 
     AnalysisActions.persistStep({ step: stepWithOutCalculation })
