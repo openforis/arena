@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { AnalysisActions } from '@webapp/service/storage'
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
@@ -27,6 +27,7 @@ export const useDelete = ({ chain, setChain, step, setStep }) => {
     const newChain = { ...chain, ...withoutSteps }
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
+    dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }
 
   return () => {

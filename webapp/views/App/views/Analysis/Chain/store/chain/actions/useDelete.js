@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { useHistory, useParams } from 'react-router'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { AnalysisActions } from '@webapp/service/storage'
@@ -24,7 +24,7 @@ export const useDelete = ({ chain }) => {
       await axios.delete(`/api/survey/${surveyId}/processing-chain/${Chain.getUuid(chain)}`)
       dispatch(SurveyActions.chainItemDelete())
     }
-
+    dispatch(NotificationActions.notifyInfo({ key: 'processingChainView.deleteComplete' }))
     history.push(appModuleUri(analysisModules.processingChains))
   }
 
