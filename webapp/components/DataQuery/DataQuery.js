@@ -5,16 +5,19 @@ import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
+import { Paginator } from '@webapp/components/Table'
+
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
+import LoadingBar from './LoadingBar'
 import Visualizer from './Visualizer'
 
 const DataQuery = (props) => {
   const { query, onChangeQuery } = props
 
   const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
-  const { data, dataEmpty, dataLoaded, dataLoading, offset } = useDataQuery({ query })
+  const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setOffset } = useDataQuery({ query })
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
@@ -26,6 +29,8 @@ const DataQuery = (props) => {
           'no-content': !dataLoaded,
         })}
       >
+        {dataLoading && <LoadingBar />}
+
         <div className="table__header">
           <ButtonBar
             dataEmpty={dataEmpty}
@@ -35,18 +40,21 @@ const DataQuery = (props) => {
             onChangeQuery={onChangeQuery}
             setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
           />
-          {/* TODO: Add table paginator here */}
+
+          {dataLoaded && Query.getDisplayType(query) === Query.displayTypes.table && count && (
+            <Paginator count={count} limit={limit} offset={offset} setOffset={setOffset} />
+          )}
         </div>
 
-        <Visualizer
-          query={query}
-          data={data}
-          dataEmpty={dataEmpty}
-          dataLoaded={dataLoaded}
-          dataLoading={dataLoading}
-          nodeDefsSelectorVisible={nodeDefsSelectorVisible}
-          offset={offset}
-        />
+        {dataLoaded && (
+          <Visualizer
+            query={query}
+            data={data}
+            dataEmpty={dataEmpty}
+            nodeDefsSelectorVisible={nodeDefsSelectorVisible}
+            offset={offset}
+          />
+        )}
       </div>
     </div>
   )
