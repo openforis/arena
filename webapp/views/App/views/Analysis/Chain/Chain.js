@@ -30,7 +30,7 @@ const ChainComponent = () => {
 
   return (
     <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-      <ButtonRStudio onClick={Actions.openRButton} disabled={Survey.isDraft(surveyInfo) || dirty} />
+      <ButtonRStudio onClick={Actions.openRStudio} disabled={Survey.isDraft(surveyInfo) || dirty} />
 
       <div className="form">
         <LabelsEditor
