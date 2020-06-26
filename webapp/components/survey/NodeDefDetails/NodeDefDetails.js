@@ -77,10 +77,8 @@ const NodeDefDetails = () => {
                       label: i18n.t('nodeDefEdit.advanced'),
                       component: AdvancedProps,
                       props: {
-                        nodeDef,
-                        validation,
-                        nodeDefParent,
-                        setNodeDefProp: (...args) => dispatch(Actions.setNodeDefProp(...args)),
+                        nodeDefState,
+                        setNodeDefState,
                       },
                     },
                     {

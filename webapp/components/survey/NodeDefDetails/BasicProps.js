@@ -168,9 +168,8 @@ const BasicProps = (props) => {
             />
           </FormItem>
           <NodeDefExpressionsProp
-            nodeDef={nodeDef}
-            nodeDefValidation={validation}
-            setNodeDefProp={(...args) => dispatch(setNodeDefProp(...args))}
+            nodeDefState={nodeDefState}
+            setNodeDefState={setNodeDefState}
             label={i18n.t('nodeDefEdit.basicProps.formula')}
             propName={NodeDef.keysPropsAdvanced.formula}
             applyIf={false}
