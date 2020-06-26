@@ -4,6 +4,7 @@ import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
 
+export const throttleTime = 250
 export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
 const getBody = ({ cycle, offset, limit, query }) => ({
@@ -19,7 +20,7 @@ const getBody = ({ cycle, offset, limit, query }) => ({
 export const useFetchData = ({ setData }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const { post, reset } = usePost({ subscribe: setData, throttle: 250 })
+  const { post, reset } = usePost({ subscribe: setData, throttle: throttleTime })
 
   return {
     fetchData: useCallback(
