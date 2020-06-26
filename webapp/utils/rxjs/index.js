@@ -1,0 +1,1 @@
+export { fromAjax } from './fromAjax'

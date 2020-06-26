@@ -29,6 +29,7 @@ export {
   useSurveyLangs,
   useOnSurveyCycleUpdate,
   useNodeDefByUuid,
+  useNodeDefsByUuids,
   useCategoryByUuid,
   useNodeDefRootKeys,
 } from './hooks'

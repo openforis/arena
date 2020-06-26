@@ -13,14 +13,13 @@ import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
 
 const ButtonBar = (props) => {
-  const { nodeDefsSelectorVisible, query, onChangeQuery, setNodeDefsSelectorVisible } = props
+  const { dataEmpty, dataLoaded, nodeDefsSelectorVisible, query, onChangeQuery, setNodeDefsSelectorVisible } = props
 
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const modeEdit = Query.isModeRawEdit(query)
   const modeAggregate = Query.isModeAggregate(query)
   const hasSelection = Query.hasSelection(query)
-  const hasData = false // TODO
 
   return (
     <div className="data-query-button-bar">
@@ -43,9 +42,9 @@ const ButtonBar = (props) => {
         {canEdit && hasSelection && (
           <button
             type="button"
-            className={`btn btn-s btn-edit${modeEdit ? ' highlight' : ''}`}
+            className={classNames('btn', 'btn-s', 'btn-edit', { highlight: modeEdit })}
             onClick={() => onChangeQuery(Query.toggleModeEdit(query))}
-            aria-disabled={appSaving || modeAggregate || !hasData}
+            aria-disabled={appSaving || modeAggregate || dataEmpty || !dataLoaded}
           >
             <span className="icon icon-pencil2 icon-14px" />
           </button>
@@ -54,9 +53,9 @@ const ButtonBar = (props) => {
 
       {hasSelection && (
         <div>
-          <ButtonFilter query={query} disabled={modeEdit} />
-          <ButtonSort query={query} disabled={modeEdit || !hasData} />
-          <ButtonDownload query={query} disabled={modeEdit || !hasData} />
+          <ButtonFilter query={query} disabled={modeEdit || !dataLoaded} />
+          <ButtonSort query={query} disabled={modeEdit || !dataLoaded} />
+          <ButtonDownload query={query} disabled={modeEdit || !dataLoaded} />
         </div>
       )}
     </div>
@@ -64,6 +63,8 @@ const ButtonBar = (props) => {
 }
 
 ButtonBar.propTypes = {
+  dataEmpty: PropTypes.bool.isRequired,
+  dataLoaded: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
