@@ -53,7 +53,7 @@ const ChainComponent = () => {
 
             <CyclesSelector
               cyclesKeysSelected={Chain.getCycles(chain)}
-              onChange={(cycles) => Actions.chain.update({ name: Chain.keysProps.cycles, value: cycles })}
+              onChange={(cycles) => Actions.chain.updateCycles({ cycles })}
             />
           </>
         )}
