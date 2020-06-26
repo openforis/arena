@@ -3,9 +3,8 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 
 import * as SurveyState from '@webapp/store/survey/state'
 
+import { NodeDefsActions } from '@webapp/store/survey'
 import * as NodeDefState from '../state'
-
-import types from './types'
 
 export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => ({ nodeDef }) => async (
   dispatch,
@@ -23,5 +22,5 @@ export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => ({ node
   setNodeDefState(NodeDefState.assocNodeDefAndValidation(nodeDef, nodeDefValidation)(nodeDefState))
 
   // Dispatch update action
-  dispatch({ type: types.NODE_DEF_PROPS_UPDATE, nodeDef })
+  dispatch({ type: NodeDefsActions.nodeDefPropsUpdate, nodeDef })
 }
