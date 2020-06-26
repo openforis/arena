@@ -4,7 +4,7 @@ import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
 
-const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
+export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
 const getBody = ({ cycle, offset, limit, query }) => ({
   cycle,
@@ -30,6 +30,6 @@ export const useFetchData = ({ setData }) => {
         }),
       [cycle, surveyId, post]
     ),
-    resetData: useCallback(() => reset(), []),
+    resetData: useCallback(() => reset(), [reset]),
   }
 }
