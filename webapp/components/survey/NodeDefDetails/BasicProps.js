@@ -24,7 +24,7 @@ import CodeProps from './CodeProps'
 import TaxonProps from './TaxonProps'
 
 const BasicProps = (props) => {
-  const { nodeDefState, setNodeDefState, keyEditDisabled, multipleEditDisabled, editingFromDesigner } = props
+  const { nodeDefState, setNodeDefState, editingFromDesigner } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -37,6 +37,8 @@ const BasicProps = (props) => {
     displayInEnabled,
     displayAsTableDisabled,
     displayInParentPageDisabled,
+    keyEditDisabled,
+    multipleEditDisabled,
     cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
@@ -186,8 +188,6 @@ const BasicProps = (props) => {
 BasicProps.propTypes = {
   nodeDefState: PropTypes.object.isRequired,
   setNodeDefState: PropTypes.func.isRequired,
-  keyEditDisabled: PropTypes.bool.isRequired,
-  multipleEditDisabled: PropTypes.bool.isRequired,
   editingFromDesigner: PropTypes.bool.isRequired,
 }
 

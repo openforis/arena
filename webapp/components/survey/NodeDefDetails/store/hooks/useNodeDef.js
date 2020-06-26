@@ -11,8 +11,6 @@ import { useSurvey, useSurveyCycleKey, useNodeDefParentByUuid } from '@webapp/st
 import { navigateToChainsView } from '@webapp/loggedin/modules/analysis/chain/actions'
 
 import * as NodeDefState from '../state'
-import { useIsKeyEditDisabled } from './useKeyEditDisabled'
-import { useIsMultipleEditDisabled } from './useMultipleEditDisabled'
 
 export const useNodeDef = () => {
   const { nodeDefUuid } = useParams()
@@ -27,10 +25,6 @@ export const useNodeDef = () => {
   const [nodeDefState, setNodeDefState] = useState({})
 
   const editingFromDesigner = Boolean(matchPath(pathname, `${appModuleUri(designerModules.nodeDef)}:nodeDefUuid`))
-
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-  const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
-  const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
   const nodeDefParent = useNodeDefParentByUuid(nodeDefUuid)
 
   useEffect(() => {
@@ -57,7 +51,5 @@ export const useNodeDef = () => {
     surveyCycleKey,
     nodeDefParent,
     editingFromDesigner,
-    keyEditDisabled,
-    multipleEditDisabled,
   }
 }

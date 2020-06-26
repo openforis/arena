@@ -6,6 +6,9 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
+import { useIsKeyEditDisabled } from './useKeyEditDisabled'
+import { useIsMultipleEditDisabled } from './useMultipleEditDisabled'
+
 import * as NodeDefState from '../state'
 
 export const useBasicProps = (props) => {
@@ -21,8 +24,9 @@ export const useBasicProps = (props) => {
   const displayAsEnabled = isEntityAndNotRoot
   const displayInEnabled = isEntityAndNotRoot
   const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
-
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
+  const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
+  const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -47,6 +51,8 @@ export const useBasicProps = (props) => {
     displayInEnabled,
     displayAsTableDisabled,
     displayInParentPageDisabled,
+    keyEditDisabled,
+    multipleEditDisabled,
     cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
