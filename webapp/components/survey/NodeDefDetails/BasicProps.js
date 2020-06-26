@@ -35,10 +35,8 @@ const BasicProps = (props) => {
     validation,
     displayAsEnabled,
     displayInEnabled,
-    displayAsFormDisabled,
     displayAsTableDisabled,
     displayInParentPageDisabled,
-    displayInOwnPageDisabled,
     cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
@@ -109,7 +107,6 @@ const BasicProps = (props) => {
               {
                 key: NodeDefLayout.renderType.form,
                 label: i18n.t('nodeDefEdit.basicProps.form'),
-                disabled: displayAsFormDisabled,
               },
               {
                 key: NodeDefLayout.renderType.table,
@@ -142,7 +139,6 @@ const BasicProps = (props) => {
               {
                 key: NodeDefLayout.displayIn.ownPage,
                 label: i18n.t('nodeDefEdit.basicProps.ownPage'),
-                disabled: displayInOwnPageDisabled,
               },
             ]}
           />

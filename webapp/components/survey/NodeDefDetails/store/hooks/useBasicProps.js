@@ -20,11 +20,9 @@ export const useBasicProps = (props) => {
   const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
   const displayAsEnabled = isEntityAndNotRoot
   const displayInEnabled = isEntityAndNotRoot
-  const displayAsFormDisabled = false
   const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
 
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
-  const displayInOwnPageDisabled = false
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -47,10 +45,8 @@ export const useBasicProps = (props) => {
     validation,
     displayAsEnabled,
     displayInEnabled,
-    displayAsFormDisabled,
     displayAsTableDisabled,
     displayInParentPageDisabled,
-    displayInOwnPageDisabled,
     cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
