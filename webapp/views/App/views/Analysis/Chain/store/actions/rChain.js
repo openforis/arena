@@ -1,4 +1,4 @@
-import axios from 'axios'
+/* import axios from 'axios'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as Chain from '@common/analysis/processingChain'
@@ -34,3 +34,6 @@ export const openRChain = () => async (dispatch, getState) => {
   // Open RStudio in a new page
   window.open(_getRStudioUrl(), 'rstudio')
 }
+
+export const openRChain = () => async (dispatch, getState) => {}
+*/

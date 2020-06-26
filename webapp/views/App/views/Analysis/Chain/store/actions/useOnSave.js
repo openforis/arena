@@ -64,7 +64,7 @@ export const useOnSave = ({ chain, setChain, step, calculation }) => {
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         AnalysisActions.resetAnalysis()
-        history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}/edit`)
+        history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {
         setChain(chainToSave)
         dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
