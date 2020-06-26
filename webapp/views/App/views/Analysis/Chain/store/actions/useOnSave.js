@@ -64,7 +64,7 @@ export const useOnSave = ({ chain, setChain, step, calculation }) => {
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         AnalysisActions.resetAnalysis()
-        dispatch(SurveyActions.surveyChainSave())
+        dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {
         setChain(chainToSave)

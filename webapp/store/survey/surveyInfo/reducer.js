@@ -30,6 +30,7 @@ const actionHandlers = {
 
   // Chain/Analysis
   [SurveyActions.surveyChainSave]: SurveyInfoState.markDraft,
+  [SurveyActions.surveyChainElementDelete]: SurveyInfoState.markDraft,
 
   // NodeDef
   [NodeDefsActions.nodeDefCreate]: SurveyInfoState.markDraft,

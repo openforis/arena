@@ -20,7 +20,7 @@ export const useDelete = ({ chain, setChain, step, setStep }) => {
     setStep({})
     if (chainUuid && !Step.isTemporary(step)) {
       await axios.delete(`/api/survey/${surveyId}/processing-step/${stepUuid}`)
-      dispatch(SurveyActions.surveyChainElementDelete())
+      dispatch(SurveyActions.chainElementDelete())
     }
 
     const withoutSteps = Chain.dissocProcessingStepTemporary(chain)
