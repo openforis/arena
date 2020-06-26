@@ -1,3 +1,8 @@
+import './chainView.scss'
+import './chainList.scss'
+import './chainListItem.scss'
+import './chainForm.scss'
+
 import React from 'react'
 
 import * as Validation from '@core/validation/validation'
@@ -25,7 +30,7 @@ const ChainComponent = () => {
 
   return (
     <div className={`chain ${editingStep ? 'show-step' : ''}`}>
-      <ButtonRStudio onClick={Actions.openRButton} disabled={Survey.isDraft(surveyInfo) || dirty} />
+      <ButtonRStudio onClick={Actions.openRStudio} disabled={Survey.isDraft(surveyInfo) || dirty} />
 
       <div className="form">
         <LabelsEditor

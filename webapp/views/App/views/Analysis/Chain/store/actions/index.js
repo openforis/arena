@@ -5,6 +5,7 @@ import { useGetAttributeUuidsOtherChains } from './useGetAttributeUuidsOtherChai
 import { useAddEntityVirtual } from './useAddEntityVirtual'
 import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
 import { useOnSave } from './useOnSave'
+import { useOpenRStudio } from './useOpenRStudio'
 
 export const useActions = ({
   attributesUuidsOtherChains,
@@ -29,4 +30,5 @@ export const useActions = ({
   }),
   addEntityVirtual: useAddEntityVirtual(),
   addNodeDefAnalysis: useAddNodeDefAnalysis({ step, calculation }),
+  openRStudio: useOpenRStudio({ chain }),
 })

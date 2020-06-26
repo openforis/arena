@@ -58,7 +58,6 @@ export const useAnalysis = () => {
         ...calculationActions,
       },
       ...actions,
-      openRButton: () => ({}),
     },
   }
 }
