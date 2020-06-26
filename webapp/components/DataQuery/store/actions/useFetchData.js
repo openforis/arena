@@ -11,7 +11,7 @@ const getBody = ({ cycle, offset, limit, query }) => ({
   nodeDefUuidCols: JSON.stringify(Query.getAttributeDefUuids(query)),
   offset,
   limit,
-  filter: null, // TODO filter ? JSON.stringify(filter) : null,
+  filter: Query.getFilter(query) ? JSON.stringify(Query.getFilter(query)) : null,
   sort: JSON.stringify([]), // TODO DataSort.toHttpParams(sort),
   editMode: Query.isModeRawEdit(query),
 })
@@ -19,7 +19,7 @@ const getBody = ({ cycle, offset, limit, query }) => ({
 export const useFetchData = ({ setData }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const { post, reset } = usePost({ subscribe: setData, throttle: 500 })
+  const { post, reset } = usePost({ subscribe: setData, throttle: 250 })
 
   return {
     fetchData: useCallback(
