@@ -8,12 +8,17 @@
   justify-items: stretch;
   align-content: start;
 
-  .btn-toggle-settings {
+  .btn-toggle-filter {
     position: absolute;
     padding: 0;
     height: 30px;
     width: 30px;
     left: 0;
+    border: 1px solid $greyBorder;
+
+    &.highlight {
+      background-color: $yellowHighlight;
+    }
   }
 
   .entity-selector {
@@ -43,17 +48,21 @@
 }
 
 .node-defs-selector__settings {
-  background-color: rgba($grey, 0.5);
-  display: flex;
-  flex-wrap: wrap;
+  background-color: rgba($greyBorder, 0.8);
   padding: 1rem;
-  justify-content: center;
   margin-top: -0.3rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 
   .btn-node-def-type {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 400;
     padding: 0.3rem 0.5rem;
+    height: 30px;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     .icon-left {
       margin-left: 0 !important;
@@ -61,10 +70,6 @@
 
     .icon {
       font-size: 14px !important;
-    }
-
-    &.active {
-      pointer-events: auto;
     }
   }
 }
