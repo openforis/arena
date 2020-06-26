@@ -1,4 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,12 +10,14 @@ import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './ExpressionsProp'
 
-const NodeDefExpressionsProp = props => {
+import { NodeDefState, useActions } from '../store'
+
+const NodeDefExpressionsProp = (props) => {
   const {
-    nodeDef,
+    nodeDefState,
+    setNodeDefState,
     nodeDefUuidContext,
     propName,
-    nodeDefValidation,
     label,
     multiple,
     applyIf,
@@ -24,13 +28,19 @@ const NodeDefExpressionsProp = props => {
     isBoolean,
     hideAdvanced,
     mode,
-    setNodeDefProp,
   } = props
+
+  const dispatch = useDispatch()
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const nodeDefValidation = NodeDefState.getValidation(nodeDefState)
 
   const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
-  const onChange = expressions => {
-    setNodeDefProp(propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true)
+  const Actions = useActions({ nodeDefState, setNodeDefState })
+
+  const onChange = (expressions) => {
+    dispatch(Actions.setNodeDefProp(propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true))
   }
 
   return (
@@ -54,11 +64,28 @@ const NodeDefExpressionsProp = props => {
   )
 }
 
+NodeDefExpressionsProp.propTypes = {
+  nodeDefState: PropTypes.object.isRequired,
+  setNodeDefState: PropTypes.func.isRequired,
+
+  nodeDefUuidContext: PropTypes.string,
+  propName: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  mode: PropTypes.string,
+
+  applyIf: PropTypes.bool,
+  showLabels: PropTypes.bool,
+  multiple: PropTypes.bool,
+  readOnly: PropTypes.bool,
+
+  isContextParent: PropTypes.bool,
+  canBeConstant: PropTypes.bool,
+  isBoolean: PropTypes.bool,
+  hideAdvanced: PropTypes.bool,
+}
+
 NodeDefExpressionsProp.defaultProps = {
-  nodeDef: null,
-  nodeDefValidation: {},
   nodeDefUuidContext: null,
-  propName: null,
   label: '',
   mode: Expression.modes.json,
 
@@ -67,12 +94,10 @@ NodeDefExpressionsProp.defaultProps = {
   multiple: true,
   readOnly: false,
 
-  validation: null,
   isContextParent: false,
   canBeConstant: false,
   isBoolean: true,
-
-  setNodeDefProp: null,
+  hideAdvanced: false,
 }
 
 export default NodeDefExpressionsProp

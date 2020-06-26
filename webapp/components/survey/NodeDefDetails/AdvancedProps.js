@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,11 +10,22 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
 
+import { useNodeDefParentByUuid } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
+import { NodeDefState, useActions } from './store'
 
 const AdvancedProps = (props) => {
-  const { nodeDef, validation, nodeDefParent, setNodeDefProp, readOnly } = props
+  const { nodeDefState, setNodeDefState } = props
 
+  const dispatch = useDispatch()
+  const readOnly = !useAuthCanEditSurvey()
+  const Actions = useActions({ nodeDefState, setNodeDefState })
+
+  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+  const validation = NodeDefState.getValidation(nodeDefState)
+
+  const nodeDefParent = useNodeDefParentByUuid(NodeDef.getUuid(nodeDef))
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const i18n = useI18n()
@@ -27,14 +39,13 @@ const AdvancedProps = (props) => {
               checked={NodeDef.isReadOnly(nodeDef)}
               disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-              onChange={(checked) => setNodeDefProp(NodeDef.propKeys.readOnly, checked)}
+              onChange={(checked) => dispatch(Actions.setNodeDefProp(NodeDef.propKeys.readOnly, checked))}
             />
           </FormItem>
 
           <NodeDefExpressionsProp
-            nodeDef={nodeDef}
-            nodeDefValidation={validation}
-            setNodeDefProp={setNodeDefProp}
+            nodeDefState={nodeDefState}
+            setNodeDefState={setNodeDefState}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
             readOnly={readOnly}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
@@ -46,9 +57,8 @@ const AdvancedProps = (props) => {
       )}
 
       <NodeDefExpressionsProp
-        nodeDef={nodeDef}
-        nodeDefValidation={validation}
-        setNodeDefProp={setNodeDefProp}
+        nodeDefState={nodeDefState}
+        setNodeDefState={setNodeDefState}
         label={i18n.t('nodeDefEdit.advancedProps.relevantIf')}
         readOnly={readOnly}
         propName={NodeDef.keysPropsAdvanced.applicable}
@@ -63,15 +73,8 @@ const AdvancedProps = (props) => {
 }
 
 AdvancedProps.propTypes = {
-  nodeDef: PropTypes.object.isRequired,
-  nodeDefParent: PropTypes.object.isRequired,
-  readOnly: PropTypes.bool,
-  setNodeDefProp: PropTypes.func.isRequired,
-  validation: PropTypes.object.isRequired,
-}
-
-AdvancedProps.defaultProps = {
-  readOnly: false,
+  nodeDefState: PropTypes.object.isRequired,
+  setNodeDefState: PropTypes.func.isRequired,
 }
 
 export default AdvancedProps
