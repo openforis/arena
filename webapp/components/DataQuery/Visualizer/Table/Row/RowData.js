@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { ColumnData } from './Column'
+import { ColumnData, ColumnDataEdit } from './Column'
 import LinkRecord from './LinkRecord'
 
 const RowData = (props) => {
@@ -16,10 +16,19 @@ const RowData = (props) => {
         {Query.isModeRawEdit(query) ? <LinkRecord row={row} rowNo={rowNo} /> : rowNo}
       </div>
 
-      {nodeDefCols.map((nodeDef) => (
-        // TODO add ColumnDataEdit
-        <ColumnData key={NodeDef.getUuid(nodeDef)} query={query} colWidth={colWidth} nodeDef={nodeDef} row={row} />
-      ))}
+      {nodeDefCols.map((nodeDef) =>
+        Query.isModeRawEdit(query) ? (
+          <ColumnDataEdit
+            key={NodeDef.getUuid(nodeDef)}
+            colWidth={colWidth}
+            nodeDef={nodeDef}
+            query={query}
+            row={row}
+          />
+        ) : (
+          <ColumnData key={NodeDef.getUuid(nodeDef)} query={query} colWidth={colWidth} nodeDef={nodeDef} row={row} />
+        )
+      )}
     </div>
   )
 }

@@ -25,6 +25,6 @@ export const useFetchCount = ({ setCount }) => {
         }),
       [cycle, surveyId, post]
     ),
-    resetCount: useCallback(() => reset(), [reset]),
+    resetCount: useCallback(reset, [reset]),
   }
 }

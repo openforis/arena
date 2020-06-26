@@ -17,7 +17,7 @@ const DataQuery = (props) => {
   const { query, onChangeQuery } = props
 
   const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
-  const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setOffset } = useDataQuery({ query })
+  const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setOffset, setData } = useDataQuery({ query })
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
@@ -53,6 +53,7 @@ const DataQuery = (props) => {
             dataEmpty={dataEmpty}
             nodeDefsSelectorVisible={nodeDefsSelectorVisible}
             offset={offset}
+            setData={setData}
           />
         )}
       </div>

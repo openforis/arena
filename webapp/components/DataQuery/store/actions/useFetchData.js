@@ -30,6 +30,6 @@ export const useFetchData = ({ setData }) => {
         }),
       [cycle, surveyId, post]
     ),
-    resetData: useCallback(() => reset(), [reset]),
+    resetData: useCallback(reset, [reset]),
   }
 }

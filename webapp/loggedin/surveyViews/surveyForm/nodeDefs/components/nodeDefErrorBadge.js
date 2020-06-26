@@ -1,8 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Validation from '@core/validation/validation'
-
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import useValidation from './useValidation'
@@ -11,24 +9,17 @@ const NodeDefErrorBadge = (props) => {
   const { children, edit, node, nodeDef, nodes, parentNode } = props
   const validation = useValidation({ edit, node, nodeDef, nodes, parentNode })
 
-  const valid = Validation.isValid(validation)
-
-  if (valid && children) {
-    return children
-  }
-  if (!valid) {
-    return (
-      <ErrorBadge
-        validation={validation}
-        showLabel={false}
-        showKeys={false}
-        className="error-badge-inverse survey-form__node-def-error-badge"
-      >
-        {children}
-      </ErrorBadge>
-    )
-  }
-  return null
+  return (
+    <ErrorBadge
+      validation={validation}
+      showIcon
+      showLabel={false}
+      showKeys={false}
+      className="error-badge-inverse survey-form__node-def-error-badge"
+    >
+      {children}
+    </ErrorBadge>
+  )
 }
 
 NodeDefErrorBadge.propTypes = {
