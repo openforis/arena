@@ -28,6 +28,9 @@ const actionHandlers = {
   [SurveyInfoActions.surveyInfoValidationUpdate]: (state, { validation }) =>
     SurveyInfoState.assocValidation(validation)(state),
 
+  // Chain/Analysis
+  [SurveyActions.surveyChainSave]: SurveyInfoState.markDraft,
+
   // NodeDef
   [NodeDefsActions.nodeDefCreate]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefDelete]: SurveyInfoState.markDraft,
