@@ -5,7 +5,7 @@
   top: 0;
   right: 0;
   z-index: $zIndex18PanelRight;
-  height: 100vw;
+  height: 100vh;
   animation: panel-enter 0.2s cubic-bezier(0, 0, 0, 1);
   display: grid;
   grid-template-rows: $headerHeight 1fr;

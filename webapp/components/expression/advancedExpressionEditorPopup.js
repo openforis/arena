@@ -67,7 +67,7 @@ const AdvancedExpressionEditorPopup = (props) => {
     <>
       {validation.error ? (
         <div className="expression-editor__query-container">
-          <div className={`query${!validation.error ? '' : ' invalid'}`}>{validation.message}</div>
+          <div className="query invalid">{validation.message}</div>
         </div>
       ) : (
         <div style={{ height: '34px' }} />
