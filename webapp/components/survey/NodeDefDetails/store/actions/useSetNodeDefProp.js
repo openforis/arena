@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
-import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -9,9 +8,8 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import { NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
 
+import { useValidateNodeDef } from './useValidateNodeDef'
 import * as NodeDefState from '../state'
-
-import types from './types'
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
@@ -65,16 +63,10 @@ export const useSetNodeDefProp = ({ nodeDefState, setNodeDefState }) => (key, va
       nodeDef: nodeDefUpdated,
       key: NodeDefLayout.keys.renderType,
       value: NodeDefLayout.renderType.form,
-    })
+    })(survey)
     nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(survey)
   }
 
-  const nodeDefValidation = await SurveyValidator.validateNodeDef(survey, nodeDefUpdated)
-
-  setNodeDefState(NodeDefState.assocNodeDefAndValidation(nodeDefUpdated, nodeDefValidation)(nodeDefState))
-
-  dispatch({
-    type: types.NODE_DEF_PROPS_UPDATE,
-    nodeDef,
-  })
+  const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
+  dispatch(validateNodeDef({ nodeDef: nodeDefUpdated }))
 }

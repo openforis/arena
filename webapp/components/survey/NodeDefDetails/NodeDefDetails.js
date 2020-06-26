@@ -8,7 +8,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions } from '@webapp/store/survey'
 
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
@@ -64,15 +63,11 @@ const NodeDefDetails = () => {
                 label: i18n.t('nodeDefEdit.basic'),
                 component: BasicProps,
                 props: {
-                  nodeDef,
-                  validation,
-                  nodeDefKeyEditDisabled: keyEditDisabled,
-                  nodeDefMultipleEditDisabled: multipleEditDisabled,
-                  editingNodeDefFromDesigner: editingFromDesigner,
-                  setNodeDefParentUuid: (...args) => dispatch(NodeDefsActions.setNodeDefParentUuid(...args)),
-                  setNodeDefProp: (...args) => dispatch(Actions.setNodeDefProp(...args)),
-                  putNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.putNodeDefLayoutProp(...args)),
-                  setNodeDefLayoutProp: (...args) => dispatch(NodeDefsActions.setNodeDefLayoutProp(...args)),
+                  nodeDefState,
+                  setNodeDefState,
+                  keyEditDisabled,
+                  multipleEditDisabled,
+                  editingFromDesigner,
                 },
               },
               ...(NodeDef.isRoot(nodeDef)

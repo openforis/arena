@@ -1,16 +1,13 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/input'
 import Checkbox from '@webapp/components/form/checkbox'
@@ -19,53 +16,37 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import NodeDefExpressionsProp from '@webapp/components/survey/NodeDefDetails/ExpressionsProp/NodeDefExpressionsProp'
+import { NodeDefExpressionsProp } from './ExpressionsProp'
 
-import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
+import { useActions, useBasicProps } from './store'
+
 import CodeProps from './CodeProps'
 import TaxonProps from './TaxonProps'
 
 const BasicProps = (props) => {
-  const {
-    validation,
-    nodeDefKeyEditDisabled,
-    nodeDefMultipleEditDisabled,
-    editingNodeDefFromDesigner,
+  const { nodeDefState, setNodeDefState, editingFromDesigner } = props
 
-    setNodeDefParentUuid,
-    setNodeDefProp,
-    setNodeDefLayoutProp,
-  } = props
-
-  const survey = useSurvey()
-  const surveyCycleKey = useSurveyCycleKey()
-  const nodeDef = useSelector(NodeDefState.getNodeDef)
-
+  const dispatch = useDispatch()
   const i18n = useI18n()
 
-  const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
-  const displayAsEnabled = isEntityAndNotRoot
-  const displayInEnabled = isEntityAndNotRoot
-  const displayAsFormDisabled = false
-  const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
+  const {
+    surveyCycleKey,
+    nodeDef,
+    validation,
+    displayAsEnabled,
+    displayInEnabled,
+    displayAsTableDisabled,
+    displayInParentPageDisabled,
+    keyEditDisabled,
+    multipleEditDisabled,
+    cyclesKeysParent,
+    entitySourceHierarchy,
+    renderType,
+    displayIn,
+    cyclesNodeDef,
+  } = useBasicProps(props)
 
-  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
-  const displayInOwnPageDisabled = false
-
-  // Survey cycles
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
-  const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
-
-  // Analysis
-  const entitySourceHierarchy = Survey.getHierarchy(
-    (nodeDefCurrent) => NodeDef.isEntity(nodeDefCurrent) && !NodeDef.isAnalysis(nodeDefCurrent),
-    true
-  )(survey)
-
-  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
-  const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
-  const cyclesNodeDef = NodeDef.getCycles(nodeDef)
+  const { setNodeDefProp, setNodeDefLayoutProp, setNodeDefParentUuid } = useActions({ nodeDefState, setNodeDefState })
 
   return (
     <div className="form">
@@ -77,13 +58,13 @@ const BasicProps = (props) => {
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={(labels) => setNodeDefProp(NodeDef.propKeys.labels, labels)}
+        onChange={(labels) => dispatch(setNodeDefProp(NodeDef.propKeys.labels, labels))}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={(descriptions) => setNodeDefProp(NodeDef.propKeys.descriptions, descriptions)}
+        onChange={(descriptions) => dispatch(setNodeDefProp(NodeDef.propKeys.descriptions, descriptions))}
       />
 
       {NodeDef.isCode(nodeDef) && (
@@ -99,13 +80,12 @@ const BasicProps = (props) => {
       {NodeDef.isTaxon(nodeDef) && (
         <TaxonProps nodeDef={nodeDef} validation={validation} setNodeDefProp={setNodeDefProp} />
       )}
-
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
-            disabled={nodeDefKeyEditDisabled}
-            onChange={(checked) => setNodeDefProp(NodeDef.propKeys.key, checked)}
+            disabled={keyEditDisabled}
+            onChange={(checked) => dispatch(setNodeDefProp(NodeDef.propKeys.key, checked))}
           />
         </FormItem>
       )}
@@ -114,22 +94,21 @@ const BasicProps = (props) => {
         <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
-            disabled={nodeDefMultipleEditDisabled}
-            onChange={(checked) => setNodeDefProp(NodeDef.propKeys.multiple, checked)}
+            disabled={multipleEditDisabled}
+            onChange={(checked) => dispatch(setNodeDefProp(NodeDef.propKeys.multiple, checked))}
           />
         </FormItem>
       )}
 
-      {displayAsEnabled && editingNodeDefFromDesigner && (
+      {displayAsEnabled && editingFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={renderType}
-            onChange={(value) => setNodeDefLayoutProp(NodeDefLayout.keys.renderType, value)}
+            onChange={(value) => dispatch(setNodeDefLayoutProp(NodeDefLayout.keys.renderType, value))}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
                 label: i18n.t('nodeDefEdit.basicProps.form'),
-                disabled: displayAsFormDisabled,
               },
               {
                 key: NodeDefLayout.renderType.table,
@@ -141,14 +120,16 @@ const BasicProps = (props) => {
         </FormItem>
       )}
 
-      {displayInEnabled && editingNodeDefFromDesigner && (
+      {displayInEnabled && editingFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={displayIn}
             onChange={(value) =>
-              setNodeDefLayoutProp(
-                NodeDefLayout.keys.pageUuid,
-                value === NodeDefLayout.displayIn.parentPage ? null : uuidv4()
+              dispatch(
+                setNodeDefLayoutProp(
+                  NodeDefLayout.keys.pageUuid,
+                  value === NodeDefLayout.displayIn.parentPage ? null : uuidv4()
+                )
               )
             }
             items={[
@@ -160,7 +141,6 @@ const BasicProps = (props) => {
               {
                 key: NodeDefLayout.displayIn.ownPage,
                 label: i18n.t('nodeDefEdit.basicProps.ownPage'),
-                disabled: displayInOwnPageDisabled,
               },
             ]}
           />
@@ -171,8 +151,8 @@ const BasicProps = (props) => {
         <CyclesSelector
           cyclesKeysSelectable={cyclesKeysParent}
           cyclesKeysSelected={cyclesNodeDef}
-          disabled={NodeDef.isRoot(nodeDef) || !editingNodeDefFromDesigner}
-          onChange={(cycles) => setNodeDefProp(NodeDef.propKeys.cycles, cycles)}
+          disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner}
+          onChange={(cycles) => dispatch(setNodeDefProp(NodeDef.propKeys.cycles, cycles))}
         />
       )}
 
@@ -184,13 +164,13 @@ const BasicProps = (props) => {
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
               lang={i18n.lang}
               validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
-              onChange={(uuid) => setNodeDefParentUuid(uuid)}
+              onChange={(uuid) => dispatch(setNodeDefParentUuid(uuid))}
             />
           </FormItem>
           <NodeDefExpressionsProp
             nodeDef={nodeDef}
             nodeDefValidation={validation}
-            setNodeDefProp={setNodeDefProp}
+            setNodeDefProp={(...args) => dispatch(setNodeDefProp(...args))}
             label={i18n.t('nodeDefEdit.basicProps.formula')}
             propName={NodeDef.keysPropsAdvanced.formula}
             applyIf={false}
@@ -206,14 +186,9 @@ const BasicProps = (props) => {
 }
 
 BasicProps.propTypes = {
-  validation: PropTypes.object.isRequired,
-  nodeDefKeyEditDisabled: PropTypes.bool.isRequired,
-  nodeDefMultipleEditDisabled: PropTypes.bool.isRequired,
-  editingNodeDefFromDesigner: PropTypes.bool.isRequired,
-
-  setNodeDefParentUuid: PropTypes.func.isRequired,
-  setNodeDefProp: PropTypes.func.isRequired,
-  setNodeDefLayoutProp: PropTypes.func.isRequired,
+  nodeDefState: PropTypes.object.isRequired,
+  setNodeDefState: PropTypes.func.isRequired,
+  editingFromDesigner: PropTypes.bool.isRequired,
 }
 
 export default BasicProps

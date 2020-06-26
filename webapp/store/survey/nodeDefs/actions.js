@@ -19,7 +19,6 @@ import { I18nState } from '@webapp/store/system'
 
 import * as SurveyState from '../state'
 
-
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
@@ -45,6 +44,8 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 
   return nodeDef
 }
+
+export const updateNodeDef = ({ nodeDef }) => ({ type: nodeDefUpdate, nodeDef })
 
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
@@ -102,13 +103,7 @@ const _validateAndNotifyNodeDefUpdate = (nodeDef, props = {}, propsAdvanced = {}
   const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
-  // Validate node def
-  const surveyUpdated = R.pipe(
-    // Associate updated node def
-    Survey.assocNodeDef(nodeDef),
-    // Build and associate dependency graph
-    Survey.buildAndAssocDependencyGraph
-  )(survey)
+  const surveyUpdated = Survey.assocNodeDef({ nodeDef, updateDependencyGraph: true })(survey)
 
   const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDef)
 
