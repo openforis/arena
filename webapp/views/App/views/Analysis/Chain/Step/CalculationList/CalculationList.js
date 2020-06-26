@@ -52,7 +52,6 @@ const CalculationList = (props) => {
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
-            onDeleteCalculation={Actions.calculation.delete}
             analysis={analysis}
           />
         ))}
