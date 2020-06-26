@@ -18,8 +18,10 @@ export const useDataQuery = ({ query }) => {
   const [limit] = useState(defaultValues.limit)
   const [offset, setOffset] = useState(defaultValues.offset)
 
+  const hasSelection = Query.hasSelection(query)
+  const mode = Query.getMode(query)
   const dataEmpty = data ? A.isEmpty(data.data) : true
-  const dataLoaded = data ? data.loaded && Query.hasSelection(query) : false
+  const dataLoaded = data ? data.loaded && hasSelection : false
   const dataLoading = data ? data.loading : false
 
   const entityDefUuid = Query.getEntityDefUuid(query)
@@ -36,7 +38,7 @@ export const useDataQuery = ({ query }) => {
 
   // on update offset, attributeDefUuids, dimensions, measures fetch or reset data
   useOnUpdate(() => {
-    if (Query.hasSelection(query)) {
+    if (hasSelection) {
       Actions.fetchData({ offset, limit, query })
       if (!dataLoaded) {
         Actions.fetchCount({ query })
@@ -44,7 +46,7 @@ export const useDataQuery = ({ query }) => {
     } else {
       Actions.resetData()
     }
-  }, [offset, attributeDefUuids, dimensions, measures])
+  }, [offset, attributeDefUuids, dimensions, measures, mode])
 
   return {
     count: count && count.data,
