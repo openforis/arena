@@ -120,7 +120,15 @@ export const {
 export const { getNodeDefDependencies, isNodeDefDependentOn } = SurveyDependencies
 
 // ====== UPDATE
-export const { assocNodeDefs, assocNodeDef } = SurveyNodeDefs
+const updateNodeDefs = ({ updateFn, updateDependencyGraph }) =>
+  R.pipe(updateFn, R.when(R.always(updateDependencyGraph), SurveyDependencies.buildAndAssocDependencyGraph))
+
+export const assocNodeDefs = ({ nodeDefs, updateDependencyGraph = false }) =>
+  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDefs(nodeDefs), updateDependencyGraph })
+
+export const assocNodeDef = ({ nodeDef, updateDependencyGraph = false }) =>
+  updateNodeDefs({ updateFn: SurveyNodeDefs.assocNodeDef(nodeDef), updateDependencyGraph })
+
 export const { updateNodeDefLayoutProp } = SurveyNodeDefsLayout
 export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph

@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 
@@ -16,13 +14,7 @@ export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => ({ node
   const state = getState()
   const survey = SurveyState.getSurvey(state)
 
-  // Update survey with updated node def
-  const surveyUpdated = R.pipe(
-    // Associate updated node def
-    Survey.assocNodeDef(nodeDef),
-    // Build and associate dependency graph
-    Survey.buildAndAssocDependencyGraph
-  )(survey)
+  const surveyUpdated = Survey.assocNodeDef({ nodeDef, updateDependencyGraph: true })(survey)
 
   // Validate node def
   const nodeDefValidation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDef)
