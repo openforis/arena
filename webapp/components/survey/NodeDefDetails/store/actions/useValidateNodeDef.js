@@ -22,5 +22,5 @@ export const useValidateNodeDef = ({ nodeDefState, setNodeDefState }) => ({ node
   setNodeDefState(NodeDefState.assocNodeDefAndValidation(nodeDef, nodeDefValidation)(nodeDefState))
 
   // Dispatch update action
-  dispatch({ type: NodeDefsActions.nodeDefPropsUpdate, nodeDef })
+  dispatch(NodeDefsActions.updateNodeDef({ nodeDef }))
 }

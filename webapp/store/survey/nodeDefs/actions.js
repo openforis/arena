@@ -45,6 +45,8 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
   return nodeDef
 }
 
+export const updateNodeDef = ({ nodeDef }) => ({ type: nodeDefUpdate, nodeDef })
+
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
