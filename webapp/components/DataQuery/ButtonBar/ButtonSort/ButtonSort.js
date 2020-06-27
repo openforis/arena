@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 
 import Tooltip from '@webapp/components/tooltip'
 
-const SortEditor = () => <div /> // TODO: restore SortEditor
+import SortEditor from './SortEditor'
 
 const ButtonSort = (props) => {
   const { disabled, query } = props
