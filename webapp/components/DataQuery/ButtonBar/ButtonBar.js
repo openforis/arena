@@ -54,7 +54,7 @@ const ButtonBar = (props) => {
       {hasSelection && (
         <div>
           <ButtonFilter query={query} disabled={modeEdit || !dataLoaded} onChangeQuery={onChangeQuery} />
-          <ButtonSort query={query} disabled={modeEdit || !dataLoaded} />
+          <ButtonSort query={query} disabled={modeEdit || !dataLoaded} onChangeQuery={onChangeQuery} />
           <ButtonDownload query={query} disabled={modeEdit || !dataLoaded} />
         </div>
       )}

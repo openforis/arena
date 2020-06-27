@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as DataSort from '@common/surveyRdb/dataSort'
-import { Query } from '@common/model/query'
+import { Query, Sort } from '@common/model/query'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -11,9 +12,7 @@ import Tooltip from '@webapp/components/tooltip'
 import SortEditor from './SortEditor'
 
 const ButtonSort = (props) => {
-  const { disabled, query } = props
-  const entityDefUuid = Query.getEntityDefUuid(query)
-  const attributeDefUuids = Query.getAttributeDefUuids(query)
+  const { disabled, query, onChangeQuery } = props
   const sort = Query.getSort(query)
 
   const i18n = useI18n()
@@ -31,7 +30,7 @@ const ButtonSort = (props) => {
       <Tooltip messages={sortMsg && [sortMsg]}>
         <button
           type="button"
-          className={`btn btn-s btn-edit${sort.length > 0 ? ' highlight' : ''}`}
+          className={classNames('btn', 'btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
           onClick={toggleSortEditor}
           aria-disabled={disabled}
         >
@@ -41,11 +40,9 @@ const ButtonSort = (props) => {
 
       {showSortEditor && (
         <SortEditor
-          nodeDefUuidCols={attributeDefUuids}
-          nodeDefUuidContext={entityDefUuid}
           sort={sort}
-          onChange={() => {
-            // TODO dispatch(updateTableSort(sortUpdate))
+          onChange={(sortUpdated) => {
+            onChangeQuery(Query.assocSort(sortUpdated))
           }}
           onClose={toggleSortEditor}
         />
@@ -57,6 +54,7 @@ const ButtonSort = (props) => {
 ButtonSort.propTypes = {
   disabled: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
 }
 
 export default ButtonSort
