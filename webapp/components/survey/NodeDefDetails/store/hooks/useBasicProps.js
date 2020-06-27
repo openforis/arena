@@ -44,7 +44,6 @@ export const useBasicProps = (props) => {
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
   return {
-    surveyCycleKey,
     nodeDef,
     validation,
     displayAsEnabled,
