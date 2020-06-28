@@ -14,37 +14,47 @@ const defaults = {
 export const useDataQuery = ({ query }) => {
   const defaultValues = defaults[Query.getDisplayType(query)]
   const [data, setData] = useState(null)
+  const [count, setCount] = useState(null)
   const [limit] = useState(defaultValues.limit)
   const [offset, setOffset] = useState(defaultValues.offset)
+
+  const hasSelection = Query.hasSelection(query)
+  const mode = Query.getMode(query)
+  const dataEmpty = data ? A.isEmpty(data.data) : true
+  const dataLoaded = data ? data.loaded && hasSelection : false
+  const dataLoading = data ? data.loading : false
 
   const entityDefUuid = Query.getEntityDefUuid(query)
   const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
   const measures = Query.getMeasures(query)
+  const filter = Query.getFilter(query)
 
-  const Actions = useActions({ setData })
+  const Actions = useActions({ setData, setCount })
 
-  // on entity def uuid update, reset data
+  // on entity def uuid or filter update: reset data
+  useOnUpdate(Actions.reset, [entityDefUuid, filter])
+
+  // on update offset, attributeDefUuids, dimensions, measures: fetch or reset
   useOnUpdate(() => {
-    Actions.resetData()
-  }, [entityDefUuid])
+    if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
+    else Actions.reset()
+  }, [offset, attributeDefUuids, dimensions, measures, mode])
 
-  // on update offset, attributeDefUuids, dimensions, measures fetch or reset data
+  // on filter update: fetch data and count
   useOnUpdate(() => {
-    if (Query.hasSelection(query)) {
-      Actions.fetchData({ offset, limit, query })
-    } else {
-      Actions.resetData()
-    }
-  }, [offset, attributeDefUuids, dimensions, measures])
+    Actions.fetch({ offset, limit, query, includesCount: true })
+  }, [filter])
 
   return {
+    count: count && count.data,
     data: data && data.data,
-    dataEmpty: data ? A.isEmpty(data.data) : true,
-    dataLoaded: data ? data.loaded && Query.hasSelection(query) : false,
-    dataLoading: data ? data.loading : false,
+    dataEmpty,
+    dataLoaded,
+    dataLoading,
     limit,
     offset,
     setOffset,
+    setData: (dataUpdated) => setData({ ...data, data: dataUpdated }),
   }
 }

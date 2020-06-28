@@ -8,10 +8,10 @@ import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
 const Table = (props) => {
-  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset } = props
+  const { query, data, dataEmpty, nodeDefsSelectorVisible, offset, setData } = props
 
   const i18n = useI18n()
-  const { nodeDefCols, colWidth, colIndexWidth } = useTable({ query, nodeDefsSelectorVisible })
+  const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, query, nodeDefsSelectorVisible, setData })
 
   if (!colWidth) return null
 
@@ -49,6 +49,7 @@ Table.propTypes = {
   dataEmpty: PropTypes.bool.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
+  setData: PropTypes.func.isRequired,
 }
 
 export default Table

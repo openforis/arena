@@ -4,14 +4,15 @@ import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
 
-const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
+export const throttleTime = 250
+export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
 const getBody = ({ cycle, offset, limit, query }) => ({
   cycle,
   nodeDefUuidCols: JSON.stringify(Query.getAttributeDefUuids(query)),
   offset,
   limit,
-  filter: null, // TODO filter ? JSON.stringify(filter) : null,
+  filter: Query.getFilter(query) ? JSON.stringify(Query.getFilter(query)) : null,
   sort: JSON.stringify([]), // TODO DataSort.toHttpParams(sort),
   editMode: Query.isModeRawEdit(query),
 })
@@ -19,7 +20,7 @@ const getBody = ({ cycle, offset, limit, query }) => ({
 export const useFetchData = ({ setData }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const { post, reset } = usePost({ subscribe: setData, throttle: 500 })
+  const { post, reset } = usePost({ subscribe: setData, throttle: throttleTime })
 
   return {
     fetchData: useCallback(
@@ -30,6 +31,6 @@ export const useFetchData = ({ setData }) => {
         }),
       [cycle, surveyId, post]
     ),
-    resetData: useCallback(() => reset(), []),
+    resetData: useCallback(reset, [reset]),
   }
 }

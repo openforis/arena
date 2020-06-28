@@ -36,6 +36,7 @@ export const hasSelection = (query) =>
 export const assocAttributeDefUuids = A.assoc(keys.attributeDefUuids)
 export const assocDimensions = A.assoc(keys.dimensions)
 export const assocMeasures = A.assoc(keys.measures)
+export const assocFilter = A.assoc(keys.filter)
 
 // mode
 export const toggleModeAggregate = (query) => ({
