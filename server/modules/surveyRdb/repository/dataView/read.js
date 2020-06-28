@@ -13,7 +13,6 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { Sort } from '../../../../../common/model/query'
-import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
 import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef, TableRecord } from '../../../../../common/model/db'
 import { getSurveyDBSchema } from '../../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -151,7 +150,7 @@ export const fetchViewData = async (params, client = db) => {
   const fromClause = _getFromClause(params)
 
   // WHERE clause
-  const { clause: filterClause, params: filterParams } = filter ? DataFilter.getWherePreparedStatement(filter) : {}
+  const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
 
   // SORT clause
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
@@ -185,9 +184,7 @@ export const fetchViewData = async (params, client = db) => {
 
 export const runCount = async (surveyId, cycle, tableName, filterExpr, client = db) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const { clause: filterClause, params: filterParams } = filterExpr
-    ? DataFilter.getWherePreparedStatement(filterExpr)
-    : {}
+  const { clause: filterClause, params: filterParams } = filterExpr ? Expression.toSql(filterExpr) : {}
 
   const countRS = await client.one(
     `
