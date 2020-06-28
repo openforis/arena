@@ -40,9 +40,10 @@ const ButtonSort = (props) => {
 
       {showSortEditor && (
         <SortEditor
-          sort={sort}
+          query={query}
           onChange={(sortUpdated) => {
             onChangeQuery(Query.assocSort(sortUpdated))
+            toggleSortEditor()
           }}
           onClose={toggleSortEditor}
         />

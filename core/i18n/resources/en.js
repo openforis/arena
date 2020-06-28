@@ -5,6 +5,7 @@ export const enTranslation = {
   common: {
     add: 'Add',
     apply: 'Apply',
+    ascending: 'Ascending',
     back: 'Back',
     cancel: 'Cancel',
     cancelConfirm: `**There are unsaved changes**.
@@ -23,6 +24,7 @@ Do you want to cancel them?`,
     dateLastModified: 'Date last modified',
     delete: 'Delete',
     deleted: 'Deleted!',
+    descending: 'Descending',
     description: 'Description',
     description_plural: 'Descriptions',
     dimension: 'Dimension',
@@ -317,12 +319,6 @@ Do you want to cancel them?`,
     invalidRecord: 'Invalid record',
     dataVis: {
       noData: 'This query returned no data',
-      dataSort: {
-        orderBy: 'Order by:',
-        thenBy: 'Then by:',
-        ascending: 'ascending',
-        descending: 'descending',
-      },
     },
   },
 
