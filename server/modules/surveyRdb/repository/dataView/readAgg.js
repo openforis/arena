@@ -6,7 +6,6 @@ import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
 import { Sort } from '../../../../../common/model/query'
-import * as SortCriteria from '../../../../../common/surveyRdb/sortCriteria'
 import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
 import { ViewDataNodeDef } from '../../../../../common/model/db'
 
