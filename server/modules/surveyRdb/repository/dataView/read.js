@@ -12,7 +12,7 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
-import * as DataSort from '../../../../../common/surveyRdb/dataSort'
+import { Sort } from '../../../../../common/model/query'
 import * as SortCriteria from '../../../../../common/surveyRdb/sortCriteria'
 import * as DataFilter from '../../../../../common/surveyRdb/dataFilter'
 import { ViewDataNodeDef, TableNode, TableResultNode, ColumnNodeDef, TableRecord } from '../../../../../common/model/db'
@@ -155,7 +155,7 @@ export const fetchViewData = async (params, client = db) => {
   const { clause: filterClause, params: filterParams } = filter ? DataFilter.getWherePreparedStatement(filter) : {}
 
   // SORT clause
-  const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
+  const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
 
   const select = `
     SELECT 

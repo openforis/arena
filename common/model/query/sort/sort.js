@@ -19,3 +19,16 @@ export const updateSortCriteria = (idx, sortCriteria) => (sort) => {
 export const addSortCriteria = (sortCriteria) => (sort) => [...sort, sortCriteria]
 
 export const deleteSortCriteria = (idx) => (sort) => sort.filter((sortCriteria, i) => i !== idx)
+
+// ====== SQL utils
+export const toSql = (sort) =>
+  sort.reduce(
+    (accumulator, sortCriteria, idx) => {
+      const paramName = `sort_${idx}`
+      return {
+        clause: `${accumulator.clause}${idx ? ', ' : ''} $/${paramName}:name/ ${SortCriteria.getOrder(sortCriteria)}`,
+        params: { ...accumulator.params, [paramName]: SortCriteria.getVariable(sortCriteria) },
+      }
+    },
+    { clause: '', params: {} }
+  )
