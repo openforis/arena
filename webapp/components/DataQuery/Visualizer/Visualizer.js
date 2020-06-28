@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
@@ -27,16 +27,12 @@ const Visualizer = (props) => {
 }
 
 Visualizer.propTypes = {
-  query: PropTypes.object.isRequired,
-  data: PropTypes.array,
+  data: PropTypes.array.isRequired,
   dataEmpty: PropTypes.bool.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
+  query: PropTypes.object.isRequired,
   setData: PropTypes.func.isRequired,
 }
 
-Visualizer.defaultProps = {
-  data: null,
-}
-
-export default Visualizer
+export default memo(Visualizer)

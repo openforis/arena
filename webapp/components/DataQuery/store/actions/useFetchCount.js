@@ -1,20 +1,20 @@
 import { useCallback } from 'react'
 
-// import { Query } from '@common/model/query'
+import { Query } from '@common/model/query'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { usePost } from '@webapp/components/hooks'
 
-import { getUrl } from './useFetchData'
+import { getUrl, throttleTime } from './useFetchData'
 
-const getBody = ({ cycle }) => ({
+const getBody = ({ cycle, query }) => ({
   cycle,
-  filter: null, // TODO filter ? JSON.stringify(filter) : null,
+  filter: Query.getFilter(query) ? JSON.stringify(Query.getFilter(query)) : null,
 })
 
 export const useFetchCount = ({ setCount }) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const { post, reset } = usePost({ subscribe: setCount, throttle: 500 })
+  const { post, reset } = usePost({ subscribe: setCount, throttle: throttleTime })
 
   return {
     fetchCount: useCallback(

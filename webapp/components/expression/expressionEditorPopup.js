@@ -7,7 +7,8 @@ import * as R from 'ramda'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
-import Popup from '../popup'
+
+import PanelRight from '@webapp/components/PanelRight'
 
 import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 
@@ -54,49 +55,56 @@ const ExpressionEditorPopup = (props) => {
   const i18n = useI18n()
 
   return (
-    <Popup className="expression-editor-popup" onClose={onClose} padding={20}>
-      <button
-        type="button"
-        className="expression-editor-popup__toggle-advanced"
-        hidden={hideAdvanced}
-        onClick={onToggleAdvancedEditor}
-      >
-        {advanced ? i18n.t('nodeDefEdit.basic') : i18n.t('nodeDefEdit.advanced')}
-      </button>
-
-      {advanced ? (
-        <AdvancedExpressionEditorPopup
-          nodeDefCurrent={nodeDefCurrent}
-          query={query}
-          setExpressionCanBeApplied={setExpressionCanBeApplied}
-          updateDraftQuery={updateDraftQuery}
-          variables={variables}
-        />
-      ) : (
-        <BasicExpressionEditorPopup
-          exprDraft={exprDraft}
-          exprDraftValid={exprDraftValid}
-          isBoolean={isBoolean}
-          nodeDefCurrent={nodeDefCurrent}
-          query={query}
-          queryDraft={queryDraft}
-          updateDraftExpr={updateDraftExpr}
-          variables={variables}
-        />
-      )}
-
-      <div className="expression-editor-popup__footer">
-        <button type="button" className="btn btn-xs" onClick={() => onChange('')} aria-disabled={R.isEmpty(query)}>
-          <span className="icon icon-undo2 icon-12px" />
-          {i18n.t('common.reset')}
+    <PanelRight onClose={onClose} width={1020}>
+      <div className="expression-editor-popup">
+        <button
+          type="button"
+          className="expression-editor-popup__toggle-advanced btn-s"
+          hidden={hideAdvanced}
+          onClick={onToggleAdvancedEditor}
+        >
+          {advanced ? i18n.t('nodeDefEdit.basic') : i18n.t('nodeDefEdit.advanced')}
         </button>
 
-        <button type="button" className="btn btn-xs" onClick={onApply} aria-disabled={!expressionCanBeApplied}>
-          <span className="icon icon-checkmark icon-12px" />
-          {i18n.t('common.apply')}
-        </button>
+        {advanced ? (
+          <AdvancedExpressionEditorPopup
+            nodeDefCurrent={nodeDefCurrent}
+            query={query}
+            setExpressionCanBeApplied={setExpressionCanBeApplied}
+            updateDraftQuery={updateDraftQuery}
+            variables={variables}
+          />
+        ) : (
+          <BasicExpressionEditorPopup
+            exprDraft={exprDraft}
+            exprDraftValid={exprDraftValid}
+            isBoolean={isBoolean}
+            nodeDefCurrent={nodeDefCurrent}
+            query={query}
+            queryDraft={queryDraft}
+            updateDraftExpr={updateDraftExpr}
+            variables={variables}
+          />
+        )}
+
+        <div className="expression-editor-popup__footer">
+          <button type="button" className="btn btn-s" onClick={() => onChange('')} aria-disabled={R.isEmpty(query)}>
+            <span className="icon icon-undo2 icon-12px" />
+            {i18n.t('common.reset')}
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-s btn-primary"
+            onClick={onApply}
+            aria-disabled={!expressionCanBeApplied}
+          >
+            <span className="icon icon-checkmark icon-12px" />
+            {i18n.t('common.apply')}
+          </button>
+        </div>
       </div>
-    </Popup>
+    </PanelRight>
   )
 }
 

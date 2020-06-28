@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import 'webapp/style/vars';
 
 .expression-editor {
   display: grid;
@@ -10,16 +10,16 @@
   align-items: center;
 
   .query {
-    padding: .5rem 1rem;
-    font-size: .9rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
 
     .placeholder {
-      opacity: .8;
+      opacity: 0.8;
       font-style: italic;
     }
 
     &.invalid {
-      background-color: rgba($red, .8);
+      background-color: rgba($red, 0.8);
       color: white;
     }
   }

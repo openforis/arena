@@ -8,7 +8,7 @@ import Tooltip from '@webapp/components/tooltip'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
 
 const ButtonFilter = (props) => {
-  const { disabled, query } = props
+  const { disabled, query, onChangeQuery } = props
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -31,16 +31,11 @@ const ButtonFilter = (props) => {
       {showExpressionEditor && (
         <ExpressionEditorPopup
           nodeDefUuidContext={entityDefUuid}
-          expr={filter}
+          query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
           hideAdvanced
           onChange={(_, expr) => {
-            if (expr) {
-              // TODO: dispatch(updateTableFilter(expr))
-            } else {
-              // TODO: dispatch(resetTableFilter())
-            }
-
+            onChangeQuery(Query.assocFilter(expr))
             toggleExpressionEditor()
           }}
           onClose={toggleExpressionEditor}
@@ -53,6 +48,7 @@ const ButtonFilter = (props) => {
 ButtonFilter.propTypes = {
   disabled: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
 }
 
 export default ButtonFilter

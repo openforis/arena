@@ -28,25 +28,23 @@ export const useDataQuery = ({ query }) => {
   const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
   const measures = Query.getMeasures(query)
+  const filter = Query.getFilter(query)
 
   const Actions = useActions({ setData, setCount })
 
-  // on entity def uuid update, reset data
-  useOnUpdate(() => {
-    Actions.resetData()
-  }, [entityDefUuid])
+  // on entity def uuid or filter update: reset data
+  useOnUpdate(Actions.reset, [entityDefUuid, filter])
 
-  // on update offset, attributeDefUuids, dimensions, measures fetch or reset data
+  // on update offset, attributeDefUuids, dimensions, measures: fetch or reset
   useOnUpdate(() => {
-    if (hasSelection) {
-      Actions.fetchData({ offset, limit, query })
-      if (!dataLoaded) {
-        Actions.fetchCount({ query })
-      }
-    } else {
-      Actions.resetData()
-    }
+    if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
+    else Actions.reset()
   }, [offset, attributeDefUuids, dimensions, measures, mode])
+
+  // on filter update: fetch data and count
+  useOnUpdate(() => {
+    Actions.fetch({ offset, limit, query, includesCount: true })
+  }, [filter])
 
   return {
     count: count && count.data,
