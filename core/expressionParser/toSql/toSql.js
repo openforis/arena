@@ -120,4 +120,4 @@ const functionsByType = {
 
 _toSql = (expression, params = {}) => functionsByType[expression.type](expression, params)
 
-export const toSql = _toSql.bind({})
+export const toSql = _toSql
