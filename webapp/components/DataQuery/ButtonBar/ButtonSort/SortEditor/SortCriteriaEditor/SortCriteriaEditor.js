@@ -23,7 +23,10 @@ const SortCriteriaEditor = (props) => {
         selection={selection}
         itemLabelProp="label"
         itemKeyProp="value"
-        onChange={(variable) => variable && onChange(SortCriteria.assocVariable(variable.value)(sortCriteria))}
+        onChange={(variable) =>
+          variable &&
+          onChange(SortCriteria.assocVariable({ variable: variable.value, label: variable.label })(sortCriteria))
+        }
       />
 
       <div className="sort-criteria-editor__order">
