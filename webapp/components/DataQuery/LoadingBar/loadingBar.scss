@@ -1,0 +1,15 @@
+.data-query-loading-bar {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+
+  .progress-bar {
+    top: 10px;
+    width: 20%;
+    height: 10px;
+  }
+}

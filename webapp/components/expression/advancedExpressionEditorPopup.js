@@ -64,25 +64,24 @@ const AdvancedExpressionEditorPopup = (props) => {
   }, [query, ...variablesIds])
 
   return (
-    <div>
-      <div className="expression-editor-popup__expr-container" style={{ fontSize: '1rem' }}>
-        <div>
-          <textarea ref={inputRef} />
-          <div className="expression-editor-popup__editor-help">
-            <p>{i18n.t('nodeDefEdit.editorHelp')}</p>
-            <p>
-              <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
-            </p>
-          </div>
+    <>
+      {validation.error ? (
+        <div className="expression-editor__query-container">
+          <div className="query invalid">{validation.message}</div>
         </div>
+      ) : (
+        <div style={{ height: '34px' }} />
+      )}
+      <div className="expression-editor-popup__expr-container">
+        <textarea ref={inputRef} />
       </div>
-
-      <br />
-
-      <div className="expression-editor__query-container">
-        <div className={`query${!validation.error ? '' : ' invalid'}`}>{validation.message}</div>
+      <div className="expression-editor-popup__editor-help">
+        <p>{i18n.t('nodeDefEdit.editorHelp')}</p>
+        <p>
+          <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
+        </p>
       </div>
-    </div>
+    </>
   )
 }
 
