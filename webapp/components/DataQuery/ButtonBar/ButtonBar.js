@@ -13,7 +13,15 @@ import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
 
 const ButtonBar = (props) => {
-  const { dataEmpty, dataLoaded, nodeDefsSelectorVisible, query, onChangeQuery, setNodeDefsSelectorVisible } = props
+  const {
+    dataEmpty,
+    dataLoaded,
+    dataLoading,
+    nodeDefsSelectorVisible,
+    query,
+    onChangeQuery,
+    setNodeDefsSelectorVisible,
+  } = props
 
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
@@ -53,9 +61,9 @@ const ButtonBar = (props) => {
 
       {hasSelection && (
         <div>
-          <ButtonFilter query={query} disabled={modeEdit || !dataLoaded} onChangeQuery={onChangeQuery} />
-          <ButtonSort query={query} disabled={modeEdit || !dataLoaded} onChangeQuery={onChangeQuery} />
-          <ButtonDownload query={query} disabled={modeEdit || !dataLoaded} />
+          <ButtonFilter query={query} disabled={modeEdit || !dataLoaded || dataLoading} onChangeQuery={onChangeQuery} />
+          <ButtonSort query={query} disabled={modeEdit || !dataLoaded || dataLoading} onChangeQuery={onChangeQuery} />
+          <ButtonDownload query={query} disabled={modeEdit || !dataLoaded || dataLoading} />
         </div>
       )}
     </div>
@@ -65,6 +73,7 @@ const ButtonBar = (props) => {
 ButtonBar.propTypes = {
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
+  dataLoading: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
