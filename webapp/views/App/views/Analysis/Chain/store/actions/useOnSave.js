@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { AnalysisActions } from '@webapp/service/storage'
 import { NotificationActions } from '@webapp/store/ui'
-import { useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { AppSavingActions } from '@webapp/store/app'
 import { useLang } from '@webapp/store/system'
@@ -64,6 +64,7 @@ export const useOnSave = ({ chain, setChain, step, calculation }) => {
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         AnalysisActions.resetAnalysis()
+        dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {
         setChain(chainToSave)
