@@ -32,28 +32,28 @@ class Dropdown extends React.Component {
   componentDidUpdate(prevProps) {
     const { items, selection, autocompleteMinChars } = this.props
     const { items: prevItems, selection: prevSelection } = prevProps
+    const displayValue = selection ? this.getItemLabel(selection) : null
 
     if (!R.equals(prevItems, items)) {
       this.setState({
-        displayValue: this.getItemLabel(selection),
+        displayValue,
         items: autocompleteMinChars > 0 ? [] : items,
       })
     }
 
     if (!R.equals(selection, prevSelection)) {
-      const displayValue = selection ? this.getItemLabel(selection) : null
-
       this.setState({ displayValue })
     }
   }
 
   toggleOpened(callback = null) {
     if (!(this.props.readOnly || this.props.disabled)) {
-      this.setState( prevState => ({
-        ...prevState,
-        opened: !prevState.opened,
-      }),
-        callback,
+      this.setState(
+        (prevState) => ({
+          ...prevState,
+          opened: !prevState.opened,
+        }),
+        callback
       )
     }
   }
@@ -63,25 +63,16 @@ class Dropdown extends React.Component {
   }
 
   async onSelectionChange(item) {
-    const { onBeforeChange, onChange, clearOnSelection, itemsLookupFunction } = this.props
-    const { items } = this.state
+    const { onBeforeChange, onChange, clearOnSelection } = this.props
 
-    let changed = false
     if (!onBeforeChange || (await onBeforeChange(item))) {
+      this.setState((statePrev) => ({
+        ...statePrev,
+        displayValue: clearOnSelection ? '' : this.getItemLabel(item),
+        opened: false,
+      }))
       await onChange(item)
-      changed = true
     }
-
-    // If not changed (cannot select item) do not update displayValue in state
-    this.setState({
-      ...(changed
-        ? {
-            displayValue: clearOnSelection ? '' : this.getItemLabel(item),
-          }
-        : {}),
-      items: itemsLookupFunction ? [] : items,
-      opened: false,
-    })
   }
 
   async onInputChange(value = '') {
@@ -96,7 +87,7 @@ class Dropdown extends React.Component {
         ? []
         : itemsLookupFunction
         ? await itemsLookupFunction(searchValue)
-        : items.filter(item => {
+        : items.filter((item) => {
             if (R.is(Object)(item)) {
               const key = this.getItemKey(item)
               const label = this.getItemLabel(item)
@@ -171,7 +162,7 @@ class Dropdown extends React.Component {
 
     const { items, displayValue } = this.state
 
-    const DropdownItemRenderer = props => {
+    const DropdownItemRenderer = (props) => {
       const { item, ...otherProps } = props
 
       return (
@@ -182,7 +173,7 @@ class Dropdown extends React.Component {
     }
 
     return (
-      <div ref={this.dropdown} className={`dropdown ${className}`} style={style} onBlur={e => this.onBlur(e)}>
+      <div ref={this.dropdown} className={`dropdown ${className}`} style={style} onBlur={(e) => this.onBlur(e)}>
         <Input
           ref={this.input}
           placeholder={placeholder}
@@ -190,13 +181,13 @@ class Dropdown extends React.Component {
           validation={validation}
           readOnly={readOnly || readOnlyInput}
           disabled={disabled}
-          onChange={value => this.onInputChange(value)}
-          onFocus={e => this.onInputFocus(e)}
+          onChange={(value) => this.onInputChange(value)}
+          onFocus={(e) => this.onInputFocus(e)}
         />
 
         <span
           className="icon icon-play3 icon-12px"
-          onClick={e => {
+          onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
             this.toggleOpened()
@@ -208,14 +199,14 @@ class Dropdown extends React.Component {
               <AutocompleteDialog
                 items={items}
                 itemRenderer={DropdownItemRenderer}
-                itemKeyFunction={item => this.getItemKey(item)}
+                itemKeyFunction={(item) => this.getItemKey(item)}
                 inputField={this.getInputField()}
                 sourceElement={sourceElement || this.dropdown.current}
-                onItemSelect={item => this.onSelectionChange(item)}
+                onItemSelect={(item) => this.onSelectionChange(item)}
                 onClose={() => this.toggleOpened()}
                 className={autocompleteDialogClassName}
               />,
-              document.body,
+              document.body
             )
           : null}
       </div>
