@@ -33,7 +33,7 @@ export const useSetProp = ({ nodeDefState, setNodeDefState }) => {
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
   const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
 
-  return (key, value = null, advanced = false) => {
+  return ({ key, value = null, advanced = false }) => {
     const nodeDef = NodeDefState.getNodeDef(nodeDefState)
 
     if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {

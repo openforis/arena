@@ -44,8 +44,8 @@ const CodeProps = (props) => {
   const disabled = !canUpdateCategory
 
   const setCategoryProp = (category) => {
-    actions.setProp(NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
-    actions.setProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))
+    actions.setProp({ key: NodeDef.propKeys.parentCodeDefUuid, value: null }) // Reset parent code
+    actions.setProp({ key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(category) })
   }
 
   return (
@@ -75,7 +75,9 @@ const CodeProps = (props) => {
                 selection={parentCodeDef}
                 itemKeyProp="uuid"
                 itemLabelFunction={NodeDef.getName}
-                onChange={(def) => actions.setProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
+                onChange={(def) =>
+                  actions.setProp({ key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
+                }
               />
             </div>
           </FormItem>
@@ -83,7 +85,7 @@ const CodeProps = (props) => {
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-              onChange={(render) => actions.setLayoutProp(NodeDefLayout.keys.renderType, render)}
+              onChange={(value) => actions.setLayoutProp({ key: NodeDefLayout.keys.renderType, value })}
               items={displayAsItems}
             />
           </FormItem>

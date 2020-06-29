@@ -34,9 +34,8 @@ const NodeDefExpressionsProp = (props) => {
 
   const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
-  const onChange = (expressions) => {
-    actions.setProp(propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true)
-  }
+  const onChange = (expressions) =>
+    actions.setProp({ key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions), advanced: true })
 
   return (
     <ExpressionsProp

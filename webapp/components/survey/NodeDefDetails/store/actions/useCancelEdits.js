@@ -1,11 +1,8 @@
 import { useDispatch } from 'react-redux'
-
-import * as NodeDef from '@core/survey/nodeDef'
-
-import * as NodeDefActions from '@webapp/store/survey/nodeDefs/actions'
-
-import * as NodeDefState from '../state'
 import { useHistory } from 'react-router'
+
+import { NodeDefsActions } from '@webapp/store/survey'
+import * as NodeDefState from '../state'
 
 export const useCancelEdits = ({ nodeDefState }) => {
   const history = useHistory()
@@ -16,12 +13,7 @@ export const useCancelEdits = ({ nodeDefState }) => {
       const nodeDef = NodeDefState.getNodeDef(nodeDefState)
       const nodeDefOriginal = NodeDefState.getNodeDefOriginal(nodeDefState)
 
-      await dispatch({
-        type: NodeDefActions.nodeDefPropsUpdateCancel,
-        nodeDef,
-        nodeDefOriginal,
-        isNodeDefNew: NodeDef.isTemporary(nodeDef),
-      })
+      await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
 
       history.goBack()
     })()

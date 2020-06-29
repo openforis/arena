@@ -36,7 +36,9 @@ const NodeDefDetails = () => {
             <Input
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-              onChange={(value) => actions.setProp(NodeDef.propKeys.name, StringUtils.normalizeName(value))}
+              onChange={(value) =>
+                actions.setProp({ key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
+              }
             />
             <div className="attribute-selector">
               {nodeDefType} {NodeDefUiProps.getIconByType(nodeDefType)}

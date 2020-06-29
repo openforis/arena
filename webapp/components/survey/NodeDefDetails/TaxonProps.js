@@ -50,7 +50,7 @@ const TaxonProps = (props) => {
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={(taxonomySelected) =>
-              actions.setProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomySelected))
+              actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
             }
           />
           <button

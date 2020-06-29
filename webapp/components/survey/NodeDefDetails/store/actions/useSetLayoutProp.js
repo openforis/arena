@@ -13,7 +13,7 @@ export const useSetLayoutProp = ({ nodeDefState, setNodeDefState }) => {
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
   const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
 
-  return (key, value) => {
+  return ({ key, value }) => {
     const nodeDef = NodeDefState.getNodeDef(nodeDefState)
 
     const nodeDefUpdated = R.pipe(

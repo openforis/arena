@@ -1,4 +1,4 @@
-import { useSetProp } from './useSetNodeDefProp'
+import { useSetProp } from './useSetProp'
 import { useSetParentUuid } from './useSetParentUuid'
 import { useSetLayoutProp } from './useSetLayoutProp'
 import { useSaveEdits } from './useSaveEdits'

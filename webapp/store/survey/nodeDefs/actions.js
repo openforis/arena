@@ -40,6 +40,13 @@ export const saveNodeDef = ({ nodeDef, nodeDefParent, surveyCycleKey, nodeDefVal
   nodeDefValidation,
 })
 
+export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
+  type: nodeDefPropsUpdateCancel,
+  nodeDef,
+  nodeDefOriginal,
+  isNodeDefNew: NodeDef.isTemporary(nodeDef),
+})
+
 // ==== CREATE
 
 export const createNodeDef = (parent, type, props, history) => async (dispatch, getState) => {
