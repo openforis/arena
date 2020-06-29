@@ -1,0 +1,12 @@
+@import 'webapp/style/vars';
+
+.sort-criteria-editor {
+  display: grid;
+  grid-template-columns: 300px auto auto auto;
+  grid-column-gap: 15px;
+}
+
+.sort-criteria-editor__order {
+  display: flex;
+  border: 1px solid $greyBorder;
+}

@@ -29,6 +29,7 @@ export const useDataQuery = ({ query }) => {
   const dimensions = Query.getDimensions(query)
   const measures = Query.getMeasures(query)
   const filter = Query.getFilter(query)
+  const sort = Query.getSort(query)
 
   const Actions = useActions({ setData, setCount })
 
@@ -39,7 +40,7 @@ export const useDataQuery = ({ query }) => {
   useOnUpdate(() => {
     if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
     else Actions.reset()
-  }, [offset, attributeDefUuids, dimensions, measures, mode])
+  }, [offset, attributeDefUuids, dimensions, measures, mode, sort])
 
   // on filter update: fetch data and count
   useOnUpdate(() => {

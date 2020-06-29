@@ -1,19 +1,17 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
-import * as DataSort from '@common/surveyRdb/dataSort'
-import { Query } from '@common/model/query'
+import { Query, Sort, SortCriteria } from '@common/model/query'
 
 import { useI18n } from '@webapp/store/system'
 
 import Tooltip from '@webapp/components/tooltip'
 
-const SortEditor = () => <div /> // TODO: restore SortEditor
+import SortEditor from './SortEditor'
 
 const ButtonSort = (props) => {
-  const { disabled, query } = props
-  const entityDefUuid = Query.getEntityDefUuid(query)
-  const attributeDefUuids = Query.getAttributeDefUuids(query)
+  const { disabled, query, onChangeQuery } = props
   const sort = Query.getSort(query)
 
   const i18n = useI18n()
@@ -21,17 +19,17 @@ const ButtonSort = (props) => {
   const [showSortEditor, setShowSortEditor] = useState(false)
   const toggleSortEditor = () => setShowSortEditor(!showSortEditor)
 
-  const sortMsg = DataSort.getViewExpr(
-    i18n.t('dataView.dataVis.dataSort.ascending'),
-    i18n.t('dataView.dataVis.dataSort.descending')
-  )(sort)
+  const tooltipMessages = sort.map(
+    (sortCriteria) =>
+      `${SortCriteria.getLabel(sortCriteria)} (${i18n.t(`common.${SortCriteria.getOrder(sortCriteria)}ending`)})`
+  )
 
   return (
     <>
-      <Tooltip messages={sortMsg && [sortMsg]}>
+      <Tooltip messages={tooltipMessages}>
         <button
           type="button"
-          className={`btn btn-s btn-edit${sort.length > 0 ? ' highlight' : ''}`}
+          className={classNames('btn', 'btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
           onClick={toggleSortEditor}
           aria-disabled={disabled}
         >
@@ -41,11 +39,10 @@ const ButtonSort = (props) => {
 
       {showSortEditor && (
         <SortEditor
-          nodeDefUuidCols={attributeDefUuids}
-          nodeDefUuidContext={entityDefUuid}
-          sort={sort}
-          onChange={() => {
-            // TODO dispatch(updateTableSort(sortUpdate))
+          query={query}
+          onChange={(sortUpdated) => {
+            onChangeQuery(Query.assocSort(sortUpdated))
+            toggleSortEditor()
           }}
           onClose={toggleSortEditor}
         />
@@ -57,6 +54,7 @@ const ButtonSort = (props) => {
 ButtonSort.propTypes = {
   disabled: PropTypes.bool.isRequired,
   query: PropTypes.object.isRequired,
+  onChangeQuery: PropTypes.func.isRequired,
 }
 
 export default ButtonSort

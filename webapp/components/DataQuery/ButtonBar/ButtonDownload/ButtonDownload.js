@@ -1,8 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as DataSort from '@common/surveyRdb/dataSort'
-
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import DownloadButton from '@webapp/components/form/downloadButton'
@@ -20,7 +18,7 @@ const ButtonDownload = (props) => {
 
   const requestParams = {
     filter: JSON.stringify(filter),
-    sort: DataSort.toHttpParams(sort),
+    sort: JSON.stringify(sort),
     nodeDefUuidCols: JSON.stringify(attributeDefUuids),
     cycle: surveyCycleKey,
   }
