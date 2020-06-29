@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -16,16 +15,14 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
-import { NodeDefState, useActions } from './store'
+import { NodeDefState } from './store'
 
 const CodeProps = (props) => {
-  const { nodeDefState, setNodeDefState } = props
+  const { nodeDefState, actions } = props
 
-  const dispatch = useDispatch()
   const i18n = useI18n()
   const surveyCycleKey = useSurveyCycleKey()
   const survey = useSurvey()
-  const Actions = useActions({ nodeDefState, setNodeDefState })
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
@@ -47,8 +44,8 @@ const CodeProps = (props) => {
   const disabled = !canUpdateCategory
 
   const setCategoryProp = (category) => {
-    dispatch(Actions.setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, null)) // Reset parent code
-    dispatch(Actions.setNodeDefProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category)))
+    actions.setProp(NodeDef.propKeys.parentCodeDefUuid, null) // Reset parent code
+    actions.setProp(NodeDef.propKeys.categoryUuid, Category.getUuid(category))
   }
 
   return (
@@ -78,9 +75,7 @@ const CodeProps = (props) => {
                 selection={parentCodeDef}
                 itemKeyProp="uuid"
                 itemLabelFunction={NodeDef.getName}
-                onChange={(def) =>
-                  dispatch(Actions.setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def)))
-                }
+                onChange={(def) => actions.setProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
               />
             </div>
           </FormItem>
@@ -88,7 +83,7 @@ const CodeProps = (props) => {
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
-              onChange={(render) => dispatch(Actions.setNodeDefLayoutProp(NodeDefLayout.keys.renderType, render))}
+              onChange={(render) => actions.setLayoutProp(NodeDefLayout.keys.renderType, render)}
               items={displayAsItems}
             />
           </FormItem>
@@ -100,7 +95,7 @@ const CodeProps = (props) => {
 
 CodeProps.propTypes = {
   nodeDefState: PropTypes.object.isRequired,
-  setNodeDefState: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired,
 }
 
 export default CodeProps

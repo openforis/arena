@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,27 +8,21 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import NodeDefSwitch from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefSwitch'
 
-import { NodeDefsActions } from '@webapp/store/survey'
+import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
+
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const NodeDefEntityFormGrid = (props) => {
-  const {
-    surveyInfo,
-    surveyCycleKey,
-    nodeDef,
-    childDefs,
-    recordUuid,
-    node,
-    edit,
-    entry,
-    preview,
-    canEditDef,
-    canEditRecord,
-    canAddNode,
-  } = props
+  const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
 
   const dispatch = useDispatch()
+
+  const surveyInfo = useSelector(SurveyState.getSurveyInfo)
+  const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
+
+  const canEditDef = useAuthCanEditSurvey()
 
   const [mounted, setMounted] = useState(false)
 
@@ -88,8 +82,6 @@ const NodeDefEntityFormGrid = (props) => {
 }
 
 NodeDefEntityFormGrid.propTypes = {
-  surveyInfo: PropTypes.any.isRequired,
-  surveyCycleKey: PropTypes.string.isRequired,
   nodeDef: PropTypes.any.isRequired,
   childDefs: PropTypes.array,
   recordUuid: PropTypes.string,
@@ -98,7 +90,6 @@ NodeDefEntityFormGrid.propTypes = {
   edit: PropTypes.bool,
   entry: PropTypes.bool,
   preview: PropTypes.bool,
-  canEditDef: PropTypes.bool,
   canEditRecord: PropTypes.bool,
   canAddNode: PropTypes.bool,
 }
@@ -110,7 +101,6 @@ NodeDefEntityFormGrid.defaultProps = {
   edit: false,
   entry: false,
   preview: false,
-  canEditDef: false,
   canEditRecord: false,
   canAddNode: false,
 }

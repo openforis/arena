@@ -80,10 +80,10 @@ export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutC
 
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
 
-export const copyLayoutSurveyCycle = (surveyCycleKeyFrom, surveyCycleKeysNodeDef) => (nodeDef) => {
-  const layoutCycle = getLayoutCycle(surveyCycleKeyFrom)(nodeDef)
-  const layoutUpdated = surveyCycleKeysNodeDef
-    .filter((cycleKey) => cycleKey !== surveyCycleKeyFrom)
+export const copyLayout = ({ cycleFrom, cyclesTo }) => (nodeDef) => {
+  const layoutCycle = getLayoutCycle(cycleFrom)(nodeDef)
+  const layoutUpdated = cyclesTo
+    .filter((cycleKey) => cycleKey !== cycleFrom)
     .reduce((layoutAcc, cycleKey) => assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), getLayout(nodeDef))
   return assocLayout(layoutUpdated)(nodeDef)
 }

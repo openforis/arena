@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from 'react-redux'
+
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -25,48 +27,47 @@ const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
   return true
 }
 
-export const useSetNodeDefProp = ({ nodeDefState, setNodeDefState }) => (key, value = null, advanced = false) => async (
-  dispatch,
-  getState
-) => {
-  const state = getState()
-  let survey = SurveyState.getSurvey(state)
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-
-  const nodeDef = NodeDefState.getNodeDef(nodeDefState)
-
-  if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
-    return
-  }
-
-  const props = advanced ? {} : { [key]: value }
-  const propsAdvanced = advanced ? { [key]: value } : {}
-
-  if (key === NodeDef.propKeys.multiple) {
-    // Reset validations required or count
-    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = value
-      ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
-      : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
-  }
-
-  let nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
-
-  // If setting "multiple" and nodeDef is single entity and renderType is table, set renderType to Form
-  if (
-    key === NodeDef.propKeys.multiple &&
-    NodeDef.isEntity(nodeDef) &&
-    !value &&
-    NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
-  ) {
-    survey = Survey.updateNodeDefLayoutProp({
-      surveyCycleKey,
-      nodeDef: nodeDefUpdated,
-      key: NodeDefLayout.keys.renderType,
-      value: NodeDefLayout.renderType.form,
-    })(survey)
-    nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(survey)
-  }
-
+export const useSetProp = ({ nodeDefState, setNodeDefState }) => {
+  const dispatch = useDispatch()
+  let survey = useSelector(SurveyState.getSurvey)
+  const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
   const validateNodeDef = useValidateNodeDef({ nodeDefState, setNodeDefState })
-  dispatch(validateNodeDef({ nodeDef: nodeDefUpdated }))
+
+  return (key, value = null, advanced = false) => {
+    const nodeDef = NodeDefState.getNodeDef(nodeDefState)
+
+    if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
+      return
+    }
+
+    const props = advanced ? {} : { [key]: value }
+    const propsAdvanced = advanced ? { [key]: value } : {}
+
+    if (key === NodeDef.propKeys.multiple) {
+      // Reset validations required or count
+      propsAdvanced[NodeDef.keysPropsAdvanced.validations] = value
+        ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
+        : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
+    }
+
+    let nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
+
+    // If setting "multiple" and nodeDef is single entity and renderType is table, set renderType to Form
+    if (
+      key === NodeDef.propKeys.multiple &&
+      NodeDef.isEntity(nodeDef) &&
+      !value &&
+      NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
+    ) {
+      survey = Survey.updateNodeDefLayoutProp({
+        surveyCycleKey,
+        nodeDef: nodeDefUpdated,
+        key: NodeDefLayout.keys.renderType,
+        value: NodeDefLayout.renderType.form,
+      })(survey)
+      nodeDefUpdated = Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDefUpdated))(survey)
+    }
+
+    validateNodeDef({ nodeDef: nodeDefUpdated })
+  }
 }

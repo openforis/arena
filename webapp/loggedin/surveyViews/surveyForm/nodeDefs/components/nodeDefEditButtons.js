@@ -53,8 +53,8 @@ const NodeDefEditButtons = (props) => {
               min="1"
               max="12"
               step="1"
-              onChange={(e) => {
-                const value = Number(e.target.value)
+              onChange={(event) => {
+                const value = Number(event.target.value)
                 if (value > 0)
                   dispatch(
                     NodeDefsActions.putNodeDefLayoutProp({

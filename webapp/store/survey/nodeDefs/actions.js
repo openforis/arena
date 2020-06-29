@@ -29,6 +29,17 @@ export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
 export const nodeDefsDelete = 'survey/nodeDefs/delete'
 
+// ==== PLAIN ACTIONS
+export const updateNodeDef = ({ nodeDef }) => ({ type: nodeDefUpdate, nodeDef })
+
+export const saveNodeDef = ({ nodeDef, nodeDefParent, surveyCycleKey, nodeDefValidation }) => ({
+  type: nodeDefSave,
+  nodeDef,
+  nodeDefParent,
+  surveyCycleKey,
+  nodeDefValidation,
+})
+
 // ==== CREATE
 
 export const createNodeDef = (parent, type, props, history) => async (dispatch, getState) => {
@@ -43,8 +54,6 @@ export const createNodeDef = (parent, type, props, history) => async (dispatch, 
 
   return nodeDef
 }
-
-export const updateNodeDef = ({ nodeDef }) => ({ type: nodeDefUpdate, nodeDef })
 
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
@@ -164,7 +173,7 @@ const _updateLayoutProp = (nodeDef, key, value) => (_, getState) => {
 }
 
 // Updates the specified layout prop of a node def and persists the change
-export const putNodeDefLayoutProp = ({ nodeDef, key, value }) => async (dispatch) => {
+export const putNodeDefLayoutProp = ({ nodeDef, key, value }) => (dispatch) => {
   const layoutUpdated = dispatch(_updateLayoutProp(nodeDef, key, value))
   const props = { [NodeDefLayout.keys.layout]: layoutUpdated }
   const nodeDefUpdated = NodeDef.mergeProps(props)(nodeDef)

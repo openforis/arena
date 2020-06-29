@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -16,23 +15,19 @@ import * as Validation from '@core/validation/validation'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import ExpressionsProp from './ExpressionsProp'
 
-import { NodeDefState, useActions } from './store'
+import { NodeDefState } from './store'
 
 const ValidationsProps = (props) => {
-  const { nodeDefState, setNodeDefState } = props
+  const { nodeDefState, actions } = props
 
-  const dispatch = useDispatch()
   const readOnly = !useAuthCanEditSurvey()
-
-  const Actions = useActions({ nodeDefState, setNodeDefState })
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
 
-  const onValidationsUpdate = (validations) =>
-    dispatch(Actions.setNodeDefProp(NodeDef.keysPropsAdvanced.validations, validations, true))
+  const onValidationsUpdate = (validations) => actions.setProp(NodeDef.keysPropsAdvanced.validations, validations, true)
 
   const i18n = useI18n()
 
@@ -101,7 +96,7 @@ const ValidationsProps = (props) => {
 
 ValidationsProps.propTypes = {
   nodeDefState: PropTypes.object.isRequired,
-  setNodeDefState: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired,
 }
 
 export default ValidationsProps

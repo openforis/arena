@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,12 +9,12 @@ import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './ExpressionsProp'
 
-import { NodeDefState, useActions } from '../store'
+import { NodeDefState } from '../store'
 
 const NodeDefExpressionsProp = (props) => {
   const {
     nodeDefState,
-    setNodeDefState,
+    actions,
     nodeDefUuidContext,
     propName,
     label,
@@ -30,17 +29,13 @@ const NodeDefExpressionsProp = (props) => {
     mode,
   } = props
 
-  const dispatch = useDispatch()
-
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const nodeDefValidation = NodeDefState.getValidation(nodeDefState)
 
   const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
-  const Actions = useActions({ nodeDefState, setNodeDefState })
-
   const onChange = (expressions) => {
-    dispatch(Actions.setNodeDefProp(propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true))
+    actions.setProp(propName, R.reject(NodeDefExpression.isPlaceholder, expressions), true)
   }
 
   return (
@@ -66,7 +61,7 @@ const NodeDefExpressionsProp = (props) => {
 
 NodeDefExpressionsProp.propTypes = {
   nodeDefState: PropTypes.object.isRequired,
-  setNodeDefState: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired,
 
   nodeDefUuidContext: PropTypes.string,
   propName: PropTypes.string.isRequired,
