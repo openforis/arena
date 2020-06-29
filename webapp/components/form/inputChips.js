@@ -114,13 +114,10 @@ const InputChips = props => {
         <Dropdown
           items={dropdownItems}
           itemsLookupFunction={dropdownItemsLookupFunction}
-          itemKeyProp={itemKeyProp}
-          itemKeyFunction={itemKeyFunction}
-          itemLabelFunction={itemLabelFunction}
-          itemLabelProp={itemLabelProp}
+          itemKey={itemKeyProp || itemKeyFunction}
+          itemLabel={itemLabelProp || itemLabelFunction}
           onChange={onDropdownChange}
           selection={null}
-          clearOnSelection={true}
           autocompleteMinChars={dropdownAutocompleteMinChars}
           readOnly={readOnly}
           disabled={disabled}
@@ -134,10 +131,10 @@ const InputChips = props => {
 InputChips.defaultProps = {
   items: [],
   itemsLookupFunction: null, // Async function to find items by specified value
-  itemKeyProp: null,
+  itemKeyProp: 'key',
   itemKeyFunction: null,
   itemLabelFunction: null,
-  itemLabelProp: null,
+  itemLabelProp: 'value',
   selection: [],
   requiredItems: 0,
   dropdownAutocompleteMinChars: 0,
