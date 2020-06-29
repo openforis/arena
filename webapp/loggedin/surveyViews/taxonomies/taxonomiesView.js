@@ -12,7 +12,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
+import { SurveyState } from '@webapp/store/survey'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
 import { createTaxonomy, deleteTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
@@ -67,9 +67,10 @@ const TaxonomiesView = (props) => {
       canDelete={canDelete}
       onDelete={onDelete}
       canSelect={canSelect}
-      onSelect={(taxonomy) =>
-        dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy)))
-      }
+      onSelect={() => {
+        //TODO update node def taxonomy on select when refactoring
+        //dispatch(NodeDefsActions.setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy)))
+      }}
       onClose={onClose}
       readOnly={readOnly}
       columns={[...ItemsView.defaultProps.columns, columnDescription]}
