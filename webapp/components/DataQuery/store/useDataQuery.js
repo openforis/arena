@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import * as A from '@core/arena'
 import { Query } from '@common/model/query'
@@ -36,8 +36,8 @@ export const useDataQuery = ({ query }) => {
   // on entity def uuid or filter update: reset data
   useOnUpdate(Actions.reset, [entityDefUuid, filter])
 
-  // on update offset, attributeDefUuids, dimensions, measures: fetch or reset
-  useOnUpdate(() => {
+  // on mount or on update offset, attributeDefUuids, dimensions, measures: fetch or reset
+  useEffect(() => {
     if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: !dataLoaded })
     else Actions.reset()
   }, [offset, attributeDefUuids, dimensions, measures, mode, sort])
