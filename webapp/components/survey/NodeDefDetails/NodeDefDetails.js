@@ -84,7 +84,7 @@ const NodeDefDetails = () => {
             ]}
           />
 
-          <ButtonBar nodeDefState={nodeDefState} />
+          <ButtonBar nodeDefState={nodeDefState} setNodeDefState={setNodeDefState} />
         </div>
       </div>
     </>

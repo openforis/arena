@@ -6,7 +6,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -14,7 +13,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { I18nState } from '@webapp/store/system'
 
 import * as SurveyState from '../state'
@@ -56,12 +55,10 @@ const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) =>
   }
 }
 
-const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, getState) => {
+export const putNodeDefProps = ({ nodeDefUuid, parentUuid, props, propsAdvanced }) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const parentUuid = NodeDef.getParentUuid(nodeDef)
 
   const {
     data: { nodeDefsValidation, nodeDefsUpdated },
@@ -75,22 +72,28 @@ const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, get
   dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
 
-const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
-  debounceAction(_putNodeDefProps(nodeDef, props, propsAdvanced), `${nodeDefUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`)
+export const postNodeDef = ({ nodeDef }) => async (dispatch, getState) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
 
-const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
-  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
-    // NodeDef has default values, cannot change into multiple
-    dispatch(
-      NotificationActions.notifyWarning({
-        key: 'nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues',
-      })
-    )
-    return false
-  }
+  const {
+    data: { nodeDefsValidation, nodeDefsUpdated },
+  } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef })
 
-  return true
+  dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
 }
+
+const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
+  debounceAction(
+    putNodeDefProps({
+      nodeDefUuid: NodeDef.getUuid(nodeDef),
+      parentUuid: NodeDef.getParentUuid(nodeDef),
+      props,
+      propsAdvanced,
+    }),
+    `${nodeDefUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`
+  )
 
 /**
  * Applies changes only to node def in state.
@@ -160,134 +163,14 @@ const _updateLayoutProp = (nodeDef, key, value) => (_, getState) => {
   return nodeDefLayout
 }
 
-export const setNodeDefProp = (key, value = null, advanced = false) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-  const nodeDef = NodeDefState.getNodeDef(state)
-
-  if (!_checkCanChangeProp(dispatch, nodeDef, key, value)) {
-    return
-  }
-
-  const props = advanced ? {} : { [key]: value }
-  const propsAdvanced = advanced ? { [key]: value } : {}
-
-  if (key === NodeDef.propKeys.multiple) {
-    // Reset validations required or count
-    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = value
-      ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
-      : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
-  }
-
-  let nodeDefUpdated = R.pipe(NodeDef.mergeProps(props), NodeDef.mergePropsAdvanced(propsAdvanced))(nodeDef)
-
-  // If setting "multiple" and nodeDef is single entity and renderType is table, set renderType to Form
-  if (
-    key === NodeDef.propKeys.multiple &&
-    NodeDef.isEntity(nodeDef) &&
-    !value &&
-    NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)
-  ) {
-    const layoutUpdated = dispatch(
-      _updateLayoutProp(nodeDefUpdated, NodeDefLayout.keys.renderType, NodeDefLayout.renderType.form)
-    )
-    nodeDefUpdated = NodeDefLayout.assocLayout(layoutUpdated)(nodeDefUpdated)
-    props[NodeDefLayout.keys.layout] = layoutUpdated
-  }
-
-  dispatch(_validateAndNotifyNodeDefUpdate(nodeDefUpdated, props, propsAdvanced))
-}
-
-// Updates the specified layout prop of the node def being edited, without persisting the change
-export const setNodeDefLayoutProp = (key, value) => async (dispatch, getState) => {
-  const state = getState()
-  const nodeDef = NodeDefState.getNodeDef(state)
-  const layoutUpdated = dispatch(_updateLayoutProp(nodeDef, key, value))
-
-  dispatch(setNodeDefProp(NodeDefLayout.keys.layout, layoutUpdated))
-}
-
 // Updates the specified layout prop of a node def and persists the change
-export const putNodeDefLayoutProp = (nodeDef, key, value) => async (dispatch) => {
+export const putNodeDefLayoutProp = ({ nodeDef, key, value }) => async (dispatch) => {
   const layoutUpdated = dispatch(_updateLayoutProp(nodeDef, key, value))
   const props = { [NodeDefLayout.keys.layout]: layoutUpdated }
   const nodeDefUpdated = NodeDef.mergeProps(props)(nodeDef)
   dispatch({ type: nodeDefUpdate, nodeDef: nodeDefUpdated })
 
   dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDefLayout.keys.layout, props))
-}
-
-export const cancelNodeDefEdits = (history) => async (dispatch, getState) => {
-  const state = getState()
-  const nodeDef = NodeDefState.getNodeDef(state)
-  const nodeDefOriginal = NodeDefState.getNodeDefOriginal(state)
-
-  await dispatch({
-    type: nodeDefPropsUpdateCancel,
-    nodeDef,
-    nodeDefOriginal,
-    isNodeDefNew: NodeDef.isTemporary(nodeDef),
-  })
-
-  history.goBack()
-}
-
-// Persists the temporary changes applied to the node def in the state
-export const saveNodeDefEdits = () => async (dispatch, getState) => {
-  const state = getState()
-  const nodeDef = NodeDefState.getNodeDef(state)
-  const validation = NodeDefState.getValidation(state)
-
-  if (SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) {
-    dispatch(LoaderActions.showLoader())
-
-    const survey = SurveyState.getSurvey(state)
-    const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
-
-    const surveyId = Survey.getId(survey)
-    const isNodeDefNew = NodeDef.isTemporary(nodeDef)
-    const nodeDefCycleKeys = NodeDef.getCycles(nodeDef)
-    let nodeDefUpdated = NodeDef.dissocTemporary(nodeDef)
-
-    if (isNodeDefNew) {
-      if (nodeDefCycleKeys.length > 1) {
-        // copy layout of current cycle to all selected cycles
-        const layoutCycle = NodeDefLayout.getLayoutCycle(surveyCycleKey)(nodeDefUpdated)
-        const layoutUpdated = nodeDefCycleKeys
-          .filter((cycleKey) => cycleKey !== surveyCycleKey)
-          .reduce(
-            (layoutAcc, cycleKey) => NodeDefLayout.assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc),
-            NodeDefLayout.getLayout(nodeDef)
-          )
-        nodeDefUpdated = NodeDefLayout.assocLayout(layoutUpdated)(nodeDefUpdated)
-      }
-      const {
-        data: { nodeDefsValidation, nodeDefsUpdated },
-      } = await axios.post(`/api/survey/${surveyId}/nodeDef`, { surveyCycleKey, nodeDef: nodeDefUpdated })
-      dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-    } else {
-      const props = NodeDefState.getPropsUpdated(state)
-      const propsAdvanced = NodeDefState.getPropsAdvancedUpdated(state)
-
-      await dispatch(_putNodeDefProps(nodeDefUpdated, props, propsAdvanced))
-    }
-
-    // Update node def edit state
-    dispatch({
-      type: nodeDefSave,
-      nodeDef: nodeDefUpdated,
-      nodeDefParent: Survey.getNodeDefParent(nodeDef)(survey),
-      surveyCycleKey,
-      nodeDefValidation: NodeDefState.getValidation(state),
-    })
-
-    dispatch(LoaderActions.hideLoader())
-
-    dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
-  } else {
-    // Cannot save node def: show notification
-    dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
-  }
 }
 
 // ==== DELETE
