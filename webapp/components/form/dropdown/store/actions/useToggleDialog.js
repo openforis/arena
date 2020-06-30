@@ -20,7 +20,7 @@ export const useToggleDialog = ({
         const itemsDialog = await getItemsDialog({
           autocompleteMinChars,
           items,
-          value: inputValue,
+          value: autocompleteMinChars > 0 ? inputValue : '', // show all items if autocompleteMinChars is 0
           getItemKey,
           getItemLabel,
         })

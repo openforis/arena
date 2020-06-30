@@ -5,6 +5,7 @@ export const useUpdateInputValue = ({
   items,
   getItemKey,
   getItemLabel,
+  onChange,
   setInputValue,
   setItemsDialog,
 }) => ({ value = '' }) => {
@@ -13,5 +14,6 @@ export const useUpdateInputValue = ({
 
     setInputValue(value.trim())
     setItemsDialog(itemsDialog)
+    onChange(null)
   })()
 }

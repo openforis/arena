@@ -5,17 +5,18 @@ export const getItemsDialog = async ({ autocompleteMinChars, items, value, getIt
   const searchValue = value.trim()
 
   if (autocompleteMinChars <= 0 && searchValue.length === 0) {
-    return items
+    return items.constructor === Array ? items : items(searchValue)
   }
 
   if (autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars) {
     return []
   }
-  // TODO lookup function
 
-  return items.filter((item) =>
-    item.constructor === String
-      ? StringUtils.contains(searchValue, item)
-      : StringUtils.contains(searchValue, getItemKey(item)) || StringUtils.contains(searchValue, getItemLabel(item))
-  )
+  return items.constructor === Array
+    ? items.filter((item) =>
+        item.constructor === String
+          ? StringUtils.contains(searchValue, item)
+          : StringUtils.contains(searchValue, getItemKey(item)) || StringUtils.contains(searchValue, getItemLabel(item))
+      )
+    : items(value)
 }

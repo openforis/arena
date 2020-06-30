@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import { useState } from 'react'
 import { useOnUpdate } from '@webapp/components/hooks'
 
@@ -6,6 +7,7 @@ import { useActions } from './actions'
 export const useDropdown = ({
   autocompleteMinChars,
   disabled,
+  inputRef,
   itemKey,
   itemLabel,
   items,
@@ -17,7 +19,7 @@ export const useDropdown = ({
   // utility getters
   const getItemKey = (item) => (itemKey.constructor === String ? item[itemKey] : itemKey(item))
   const getItemLabel = (item) => (itemLabel.constructor === String ? item[itemLabel] : itemLabel(item))
-  const getSelectionLabel = () => (selection ? getItemLabel(selection) : '')
+  const getSelectionLabel = () => (A.isEmpty(selection) ? '' : getItemLabel(selection))
 
   // state/action properties
   const [inputValue, setInputValue] = useState(getSelectionLabel())
@@ -43,7 +45,7 @@ export const useDropdown = ({
 
   // on update selection: update input value
   useOnUpdate(() => {
-    setInputValue(getSelectionLabel())
+    setInputValue(selection ? getSelectionLabel() : inputRef.current.value)
   }, [selection])
 
   return {
