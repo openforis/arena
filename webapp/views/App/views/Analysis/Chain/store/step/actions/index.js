@@ -30,6 +30,16 @@ export const useActions = ({
     setStepDirty,
   }),
   delete: useDelete({ chain, setChain, step, setStep, stepDirty, setStepDirty }),
-  dismiss: useDismiss({ chain, setChain, step, setStep, stepDirty, setStepDirty, originalStep, setOriginalStep }),
+  dismiss: useDismiss({
+    setDirty,
+    chain,
+    setChain,
+    step,
+    setStep,
+    stepDirty,
+    setStepDirty,
+    originalStep,
+    setOriginalStep,
+  }),
   select: useSelect({ chain, setChain, step, setStep, stepDirty, setStepDirty, originalStep, setOriginalStep }),
 })
