@@ -62,13 +62,19 @@ export const useOnSave = ({
   return () => {
     ;(async () => {
       dispatch(AppSavingActions.showAppSaving())
-      const stepValidation = step ? await ChainValidator.validateStep(step) : null
-      const calculationValidation = calculation ? await ChainValidator.validateCalculation(calculation, lang) : null
+      const stepValidation = !R.isEmpty(step) ? await ChainValidator.validateStep(step) : null
+      const calculationValidation = !R.isEmpty(calculation)
+        ? await ChainValidator.validateCalculation(calculation, lang)
+        : null
       const params = { lang, step, stepValidation, calculation, calculationValidation }
       const [chainToSave, chainValidation] = await _getChainAndValidation(params)(chain)
 
       if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
-        const data = { chain: Chain.dissocProcessingSteps(chainToSave), step: _getStepParam(step), calculation }
+        const data = {
+          chain: Chain.dissocProcessingSteps(chainToSave),
+          step: _getStepParam(step),
+          calculation: !R.isEmpty(calculation) ? calculation : null,
+        }
         await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
@@ -81,7 +87,7 @@ export const useOnSave = ({
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {
         setChain(chainToSave)
-        dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave' }))
+        dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
       }
 
       dispatch(AppSavingActions.hideAppSaving())

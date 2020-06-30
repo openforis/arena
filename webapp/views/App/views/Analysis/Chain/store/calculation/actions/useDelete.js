@@ -16,7 +16,7 @@ export const useDelete = ({ step, setStep, calculation, calculationDirty, setCal
   const resetCalculation = async () => {
     const calculationUuid = Calculation.getUuid(calculation)
     AnalysisActions.resetCalculation()
-    setCalculation({})
+    setCalculation(null)
     const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
 
     if (chainUuid && !Calculation.isTemporary(calculation)) {
