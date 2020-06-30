@@ -82,11 +82,11 @@ const CategoriesView = (props) => {
       />
       {editedCategory && (
         <PanelRight
-          width="80vw"
+          width="100vw"
           header={i18n.t('categoryEdit.header')}
           onClose={() => dispatch(CategoryActions.setCategoryForEdit(null))}
         >
-          <CategoryView />
+          <CategoryView showClose={false} />
         </PanelRight>
       )}
     </>

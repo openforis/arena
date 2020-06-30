@@ -61,18 +61,6 @@ const CategorySelector = (props) => {
           {i18n.t('common.add')}
         </button>
       )}
-      {showCategoryPanel && (
-        <PanelRight
-          width="90vw"
-          onClose={async () => {
-            await dispatch(CategoryActions.setCategoryForEdit(null))
-            setShowCategoryPanel(false)
-          }}
-          header={i18n.t('categoryEdit.header')}
-        >
-          <CategoryView showClose={false} />
-        </PanelRight>
-      )}
       {showManage && (
         <button
           type="button"
@@ -84,8 +72,24 @@ const CategorySelector = (props) => {
           {i18n.t('common.manage')}
         </button>
       )}
+      {showCategoryPanel && (
+        <PanelRight
+          width="100vw"
+          onClose={async () => {
+            await dispatch(CategoryActions.setCategoryForEdit(null))
+            setShowCategoryPanel(false)
+          }}
+          header={i18n.t('categoryEdit.header')}
+        >
+          <CategoryView showClose={false} />
+        </PanelRight>
+      )}
       {showCategoriesPanel && (
-        <PanelRight width="90vw" onClose={() => setShowCategoriesPanel(false)} header={i18n.t('appModules.categories')}>
+        <PanelRight
+          width="100vw"
+          onClose={() => setShowCategoriesPanel(false)}
+          header={i18n.t('appModules.categories')}
+        >
           <CategoriesView canSelect selectedItemUuid={categoryUuid} onSelect={onChange} />
         </PanelRight>
       )}

@@ -114,7 +114,7 @@ CategoryView.propTypes = {
 }
 
 CategoryView.defaultProps = {
-  showClose: false,
+  showClose: true,
 }
 
 export default CategoryView
