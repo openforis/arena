@@ -9,7 +9,7 @@ import * as Step from '@common/analysis/processingStep'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
-export const useDelete = ({ chain, setChain, step, setStep }) => {
+export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDirty }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
@@ -27,12 +27,13 @@ export const useDelete = ({ chain, setChain, step, setStep }) => {
     const newChain = { ...chain, ...withoutSteps }
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
+    setStepDirty(false)
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }
 
   return () => {
     ;(async () => {
-      if (step) {
+      if (stepDirty) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'processingStepView.deleteConfirm',

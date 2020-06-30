@@ -15,10 +15,10 @@ export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalcula
   return ({ calculationUpdated }) => {
     const stepUpdated = Step.assocCalculation(calculationUpdated)(step)
     setStep(stepUpdated)
-    AnalysisActions.persistStep({ step: stepUpdated })
+    AnalysisActions.persistStep({ step: stepUpdated, stepDirty: true })
 
     setCalculation(calculationUpdated)
-    AnalysisActions.persistCalculation({ calculation: calculationUpdated })
+    AnalysisActions.persistCalculation({ calculation: calculationUpdated, calculationDirty: true })
 
     const calculationValidation = ChainValidator.validateCalculation(calculationUpdated, surveyDefaultLang)
     const chainUpdated = Chain.assocItemValidation(

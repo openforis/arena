@@ -50,6 +50,7 @@ export const useOnSave = ({
   step,
   calculation,
   setStepDirty,
+  setOriginalStep,
   setCalculationDirty,
   setOriginalCalculation,
 }) => {
@@ -72,7 +73,7 @@ export const useOnSave = ({
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         setStepDirty(false)
-
+        setOriginalStep(step)
         setCalculationDirty(false)
         setOriginalCalculation(calculation)
         AnalysisActions.resetAnalysis()

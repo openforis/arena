@@ -18,13 +18,14 @@ export const useActions = ({
   setStep,
   stepDirty,
   setStepDirty,
+  setOriginalStep,
   calculation,
   setCalculation,
   calculationDirty,
   setCalculationDirty,
   setOriginalCalculation,
 }) => ({
-  onInit: useOnInit({ chain, setChain, step, setStep, calculation, setCalculation }),
+  onInit: useOnInit({ chain, setChain, step, setStep, setStepDirty, calculation, setCalculation, setCalculationDirty }),
   onDismiss: useOnDismiss({ chain, setChain, dirty, setDirty }),
   onSave: useOnSave({
     chain,
@@ -33,6 +34,7 @@ export const useActions = ({
     calculation,
     stepDirty,
     setStepDirty,
+    setOriginalStep,
     calculationDirty,
     setCalculationDirty,
     setOriginalCalculation,

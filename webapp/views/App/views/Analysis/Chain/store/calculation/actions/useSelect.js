@@ -38,7 +38,7 @@ export const useSelect = ({
   const select = ({ calculationSelected }) => {
     setCalculation(calculationSelected)
     setOriginalCalculation(calculationSelected)
-    AnalysisActions.persistCalculation({ calculation: calculationSelected })
+    AnalysisActions.persistCalculation({ calculation: calculationSelected, calculationDirty: false })
     setCalculationDirty(false)
   }
 

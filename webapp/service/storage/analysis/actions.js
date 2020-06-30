@@ -14,9 +14,9 @@ export const getChain = () => AnalysisStorage.getChain()
 export const resetChain = () => AnalysisStorage.clearChain()
 
 // ===== step
-export const persistStep = ({ step }) => {
+export const persistStep = ({ step, stepDirty }) => {
   if (A.isEmpty(step)) return
-  AnalysisStorage.setStep({ step })
+  AnalysisStorage.setStep({ step, stepDirty })
   window.dispatchEvent(new CustomEvent(AnalysisStorage.eventTypes.setStep))
 }
 
@@ -25,9 +25,9 @@ export const getStep = () => AnalysisStorage.getStep()
 export const resetStep = () => AnalysisStorage.clearStep()
 
 // ===== calculation
-export const persistCalculation = ({ calculation }) => {
+export const persistCalculation = ({ calculation, calculationDirty }) => {
   if (A.isEmpty(calculation)) return
-  AnalysisStorage.setCalculation({ calculation })
+  AnalysisStorage.setCalculation({ calculation, calculationDirty })
   window.dispatchEvent(new CustomEvent(AnalysisStorage.eventTypes.setCalculation))
 }
 

@@ -8,7 +8,7 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useDelete = ({ step, setStep, calculation, setCalculation, setCalculationDirty }) => {
+export const useDelete = ({ step, setStep, calculation, calculationDirty, setCalculation, setCalculationDirty }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
@@ -24,14 +24,13 @@ export const useDelete = ({ step, setStep, calculation, setCalculation, setCalcu
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    AnalysisActions.persistStep({ step: stepWithOutCalculation })
+    AnalysisActions.persistStep({ step: stepWithOutCalculation, stepDirty: true })
     setStep(stepWithOutCalculation)
     setCalculationDirty(false)
   }
 
   return () => {
     ;(async () => {
-      const calculationDirty = true
       if (calculationDirty) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({

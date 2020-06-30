@@ -1,15 +1,14 @@
 import * as Chain from '@common/analysis/processingChain'
-import * as Step from '@common/analysis/processingStep'
 
 import { AnalysisActions } from '@webapp/service/storage'
 
-export const useUpdate = ({ step, setStep, chain, setChain, setDirty }) => (props) => {
-  const stepUpdated = Step.mergeProps(props)(step)
+export const useUpdate = ({ setStep, chain, setChain, setDirty, setStepDirty }) => ({ stepUpdated }) => {
   const chainUpdated = Chain.assocProcessingStep(stepUpdated)(chain)
 
   setDirty(true)
   setChain(chainUpdated)
   setStep(stepUpdated)
-  AnalysisActions.persistStep({ step: stepUpdated })
+  setStepDirty(true)
+  AnalysisActions.persistStep({ step: stepUpdated, stepDirty: true })
   AnalysisActions.persistChain({ chain: chainUpdated })
 }

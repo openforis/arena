@@ -47,7 +47,7 @@ const StepComponent = (props) => {
       <div className="form">
         {!editingCalculation && (
           <>
-            <button type="button" className="btn-s btn-close" onClick={Actions.step.delete}>
+            <button type="button" className="btn-s btn-close" onClick={Actions.step.dismiss}>
               <span className="icon icon-10px icon-cross" />
             </button>
 
@@ -55,7 +55,7 @@ const StepComponent = (props) => {
               analysis={analysis}
               validation={Validation.getFieldValidation(ChainValidator.keys.entityOrCategory)(validation)}
               onChange={(entityUuidUpdate) => {
-                Actions.step.update({
+                Actions.step.updateProps({
                   [Step.keysProps.entityUuid]: entityUuidUpdate,
                   [Step.keysProps.categoryUuid]: null,
                 })
@@ -91,7 +91,7 @@ const StepComponent = (props) => {
                 showManage={false}
                 showAdd={false}
                 onChange={(category) => {
-                  Actions.step.update({
+                  Actions.step.updateProps({
                     [Step.keysProps.entityUuid]: null,
                     [Step.keysProps.categoryUuid]: Category.getUuid(category),
                   })

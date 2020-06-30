@@ -1,5 +1,9 @@
 import * as A from '@core/arena'
 
+import * as Step from '@common/analysis/processingStep'
+
+import { AnalysisActions } from '@webapp/service/storage'
+
 import { useUpdate } from './useUpdate'
 
 export const useReset = ({
@@ -25,9 +29,21 @@ export const useReset = ({
     setCalculationDirty,
   })
 
+  const resetCalculation = async () => {
+    AnalysisActions.resetCalculation()
+    setCalculation({})
+    const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
+
+    AnalysisActions.persistStep({ step: stepWithOutCalculation, stepDirty: true })
+    setStep(stepWithOutCalculation)
+    setCalculationDirty(false)
+  }
+
   return () => {
     if (!A.isEmpty(originalCalculation)) {
       update({ calculationUpdated: originalCalculation })
+    } else {
+      resetCalculation()
     }
   }
 }

@@ -20,7 +20,16 @@ export const useActions = ({
   originalCalculation,
   setOriginalCalculation,
 }) => ({
-  create: useCreate({ chain, setChain, step, setStep, setCalculation, calculationDirty, setCalculationDirty }),
+  create: useCreate({
+    chain,
+    setChain,
+    step,
+    setStep,
+    setCalculation,
+    calculationDirty,
+    setCalculationDirty,
+    setOriginalCalculation,
+  }),
   select: useSelect({
     chain,
     setChain,

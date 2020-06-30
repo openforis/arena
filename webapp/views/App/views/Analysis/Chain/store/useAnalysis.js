@@ -10,7 +10,7 @@ export const useAnalysis = () => {
   const [dirty, setDirty] = useState(false)
   const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
   const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
-  const { step, setStep, stepDirty, setStepDirty, actions: stepActions } = useStep(
+  const { step, setStep, stepDirty, setStepDirty, setOriginalStep, actions: stepActions } = useStep(
     {},
     { dirty, setDirty, chain, setChain }
   )
@@ -34,6 +34,7 @@ export const useAnalysis = () => {
     setStep,
     stepDirty,
     setStepDirty,
+    setOriginalStep,
     calculation,
     setCalculation,
     calculationDirty,
@@ -59,6 +60,7 @@ export const useAnalysis = () => {
     editingStep: !R.isEmpty(step) || false,
     stepDirty,
     editingCalculation: !R.isEmpty(calculation) || false,
+    calculationDirty,
 
     Actions: {
       chain: {

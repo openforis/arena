@@ -8,13 +8,13 @@ import { AnalysisActions } from '@webapp/service/storage'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useOnInit = ({ setChain, setStep, setCalculation }) => {
+export const useOnInit = ({ setChain, setStep, setCalculation, setStepDirty, setCalculationDirty }) => {
   const surveyCycleKey = useSurveyCycleKey()
   const surveyId = useSurveyId()
 
   const chainSaved = AnalysisActions.getChain()
-  const stepSaved = AnalysisActions.getStep()
-  const calculationSaved = AnalysisActions.getCalculation()
+  const { step: stepSaved, stepDirty } = AnalysisActions.getStep()
+  const { calculation: calculationSaved, calculationDirty } = AnalysisActions.getCalculation()
 
   const { chainUuid } = useParams()
 
@@ -23,8 +23,10 @@ export const useOnInit = ({ setChain, setStep, setCalculation }) => {
       setChain(chainSaved)
       if (stepSaved) {
         setStep(stepSaved)
+        setStepDirty(stepDirty)
         if (calculationSaved) {
           setCalculation(calculationSaved)
+          setCalculationDirty(calculationDirty)
         }
       }
     }
