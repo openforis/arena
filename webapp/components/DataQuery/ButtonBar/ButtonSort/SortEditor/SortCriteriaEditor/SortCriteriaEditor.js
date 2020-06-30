@@ -19,10 +19,10 @@ const SortCriteriaEditor = (props) => {
   return (
     <div className="sort-criteria-editor">
       <Dropdown
-        items={[...variablesAvailable, selection]}
+        items={selection ? [...variablesAvailable, selection] : variablesAvailable}
         selection={selection}
-        itemLabelProp="label"
-        itemKeyProp="value"
+        itemLabel="label"
+        itemKey="value"
         onChange={(variable) =>
           variable &&
           onChange(SortCriteria.assocVariable({ variable: variable.value, label: variable.label })(sortCriteria))

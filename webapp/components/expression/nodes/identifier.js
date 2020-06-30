@@ -7,8 +7,8 @@ const Identifier = ({ node, variables, onChange }) => (
   <Dropdown
     items={variables}
     selection={R.find(R.propEq('value', node.name), variables)}
-    itemLabelProp="label"
-    itemKeyProp="value"
+    itemLabel="label"
+    itemKey="value"
     onChange={item => onChange(R.assoc('name', R.propOr('', 'value', item), node))}
   />
 )

@@ -34,8 +34,8 @@ const CategorySelector = (props) => {
       <Dropdown
         disabled={disabled}
         items={categories}
-        itemKeyProp={Category.keys.uuid}
-        itemLabelFunction={Category.getName}
+        itemKey={Category.keys.uuid}
+        itemLabel={Category.getName}
         validation={validation}
         selection={category}
         onChange={onChange}

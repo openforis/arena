@@ -46,8 +46,8 @@ const TaxonProps = (props) => {
         >
           <Dropdown
             items={taxonomies}
-            itemKeyProp={'uuid'}
-            itemLabelFunction={Taxonomy.getName}
+            itemKey={'uuid'}
+            itemLabel={Taxonomy.getName}
             validation={Validation.getFieldValidation(propKeys.taxonomyUuid)(validation)}
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}

@@ -61,8 +61,8 @@ const NodeDefCoordinate = props => {
     <Dropdown
       readOnly={entryDisabled}
       items={surveySrs}
-      itemKeyProp="code"
-      itemLabelProp="name"
+      itemKey="code"
+      itemLabel="name"
       selection={selectedSrs}
       onChange={selection => handleInputChange(node, 'srs', R.prop('code')(selection))}
     />

@@ -43,8 +43,8 @@ const NodeDefCodeDropdown = props => {
           readOnly={entryDisabled}
           items={items}
           disabled={disabled}
-          itemKeyProp="uuid"
-          itemLabelFunction={CategoryItem.getLabel(lang)}
+          itemKey="uuid"
+          itemLabel={CategoryItem.getLabel(lang)}
           selection={R.head(selectedItems)}
           onChange={item => {
             // NB: onItemRemove is not possible?

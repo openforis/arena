@@ -74,8 +74,8 @@ const CodeProps = (props) => {
                 disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
                 items={candidateParentCodeNodeDefs}
                 selection={parentCodeDef}
-                itemKeyProp={'uuid'}
-                itemLabelFunction={NodeDef.getName}
+                itemKey={'uuid'}
+                itemLabel={NodeDef.getName}
                 onChange={(def) => setNodeDefProp(NodeDef.propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}
               />
             </div>

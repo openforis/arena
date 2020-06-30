@@ -12,7 +12,7 @@ export const useUpdateInputValue = ({
   ;(async () => {
     const itemsDialog = await getItemsDialog({ autocompleteMinChars, items, value, getItemKey, getItemLabel })
 
-    setInputValue(value.trim())
+    setInputValue(value)
     setItemsDialog(itemsDialog)
     onChange(null)
   })()

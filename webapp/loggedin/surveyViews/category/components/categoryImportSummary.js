@@ -53,7 +53,7 @@ const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataT
           <Dropdown
             readOnlyInput={true}
             items={Object.keys(Category.itemExtraDefDataTypes)}
-            itemLabelFunction={dataType => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
+            itemLabel={dataType => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
             selection={dataType}
             onChange={dataType => setCategoryImportSummaryColumnDataType(columnName, dataType)}
           />

@@ -78,8 +78,8 @@ const CalculationView = () => {
             <Dropdown
               items={attributes}
               selection={attribute}
-              itemKeyProp={Calculation.keys.uuid}
-              itemLabelFunction={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
+              itemKey={Calculation.keys.uuid}
+              itemLabel={(attrDef) => NodeDef.getLabel(attrDef, i18n.lang)}
               validation={Validation.getFieldValidation(Calculation.keys.nodeDefUuid)(validation)}
               onBeforeChange={(attrDef) => dispatch(checkCanSelectNodeDef(attrDef))}
               onChange={(def) => dispatch(updateCalculationAttribute(def))}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
@@ -51,35 +51,25 @@ const Literal = (props) => {
       params: { ...literalSearchParams, value: nodeValue },
     }
   )
-  const [items, setItems] = useState([])
 
   const onChangeValue = (val) => {
-    const value = getValue(nodeDefCurrent, val)
+    const value = val && getValue(nodeDefCurrent, val)
     onChange(R.pipe(R.assoc('raw', value), R.assoc('value', value))(node))
   }
 
-  if (literalSearchParams) {
-    useEffect(() => {
-      ;(async () => {
-        if (nodeValue) fetchItem()
-        const itemsUpdate = await loadItems({
-          ...literalSearchParams,
-          value: '',
-        })
-        setItems(itemsUpdate)
-      })()
-    }, [])
-  }
+  // on nodeValue update, if literalSearchParams is passed as prop, fetches the selection item for dropdown
+  useEffect(() => {
+    if (literalSearchParams) fetchItem()
+  }, [nodeValue])
 
   const getRenderer = () => {
     if (literalSearchParams) {
       return (
         <Dropdown
-          items={items}
-          itemsLookupFunction={(value) => loadItems({ ...literalSearchParams, value })}
-          itemKeyProp="key"
-          itemLabelProp="label"
-          onChange={(itm) => itm && onChangeValue(itm.key)}
+          items={(value) => loadItems({ ...literalSearchParams, value })}
+          itemKey="key"
+          itemLabel="label"
+          onChange={(itm) => onChangeValue(itm ? itm.key : null)}
           selection={item}
         />
       )
