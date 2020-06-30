@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 import { useActions } from './actions/index'
 
-export const useStep = (initialState = {}, { dirty, setDirty, chain, setChain }) => {
-  const [step, setStep] = useState(initialState)
+export const useStep = (initialState, { dirty, setDirty, chain, setChain }) => {
+  const [step, setStep] = useState(null)
   const [originalStep, setOriginalStep] = useState(initialState)
   const [stepDirty, setStepDirty] = useState(false)
 

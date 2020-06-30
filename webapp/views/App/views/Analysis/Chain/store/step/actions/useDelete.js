@@ -17,7 +17,9 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
   const resetStep = async () => {
     const stepUuid = Step.getUuid(step)
     AnalysisActions.resetStep()
+    AnalysisActions.resetCalculation()
     setStep({})
+
     if (chainUuid && !Step.isTemporary(step)) {
       await axios.delete(`/api/survey/${surveyId}/processing-step/${stepUuid}`)
       dispatch(SurveyActions.chainItemDelete())

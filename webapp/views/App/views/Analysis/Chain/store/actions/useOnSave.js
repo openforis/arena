@@ -72,7 +72,7 @@ export const useOnSave = ({
       if (R.all(Validation.isValid, [chainValidation, stepValidation, calculationValidation])) {
         const data = {
           chain: Chain.dissocProcessingSteps(chainToSave),
-          step: _getStepParam(step),
+          step: !R.isEmpty(step) ? _getStepParam(step) : null,
           calculation: !R.isEmpty(calculation) ? calculation : null,
         }
         await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
