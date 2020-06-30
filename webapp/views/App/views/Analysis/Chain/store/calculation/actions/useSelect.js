@@ -57,7 +57,7 @@ export const useSelect = ({
           })
         )
       } else {
-        await select({ calculationSelected })
+        select({ calculationSelected })
       }
     })()
   }

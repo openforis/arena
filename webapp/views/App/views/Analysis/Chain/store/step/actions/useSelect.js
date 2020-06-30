@@ -41,7 +41,7 @@ export const useSelect = ({ stepDirty, chain, setChain, step, setStep, setDirty,
           })
         )
       } else {
-        await select({ stepSelected })
+        select({ stepSelected })
       }
     })()
   }
