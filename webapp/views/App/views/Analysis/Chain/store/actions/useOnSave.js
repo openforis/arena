@@ -71,10 +71,11 @@ export const useOnSave = ({
         await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
-        AnalysisActions.resetAnalysis()
         setStepDirty(false)
+
         setCalculationDirty(false)
         setOriginalCalculation(calculation)
+        AnalysisActions.resetAnalysis()
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {

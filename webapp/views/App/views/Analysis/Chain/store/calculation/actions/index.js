@@ -22,6 +22,14 @@ export const useActions = ({
 }) => ({
   create: useCreate({ chain, setChain, step, setStep, setCalculation, calculationDirty, setCalculationDirty }),
   select: useSelect({
+    chain,
+    setChain,
+    dirty,
+    setDirty,
+    step,
+    setStep,
+    calculation,
+
     setCalculation,
     calculationDirty,
     setCalculationDirty,
