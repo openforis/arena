@@ -7,45 +7,13 @@ import { useAddNodeDefAnalysis } from './useAddNodeDefAnalysis'
 import { useOnSave } from './useOnSave'
 import { useOpenRStudio } from './useOpenRStudio'
 
-export const useActions = ({
-  attributesUuidsOtherChains,
-  setAtrributesUuidsOtherChains,
-  chain,
-  setChain,
-  dirty,
-  setDirty,
-  step,
-  setStep,
-  stepDirty,
-  setStepDirty,
-  setOriginalStep,
-  calculation,
-  setCalculation,
-  calculationDirty,
-  setCalculationDirty,
-  setOriginalCalculation,
-}) => ({
-  onInit: useOnInit({ chain, setChain, step, setStep, setStepDirty, calculation, setCalculation, setCalculationDirty }),
-  onDismiss: useOnDismiss({ chain, setChain, dirty, setDirty }),
-  onSave: useOnSave({
-    chain,
-    setChain,
-    step,
-    calculation,
-    stepDirty,
-    setStepDirty,
-    setOriginalStep,
-    calculationDirty,
-    setCalculationDirty,
-    setOriginalCalculation,
-  }),
-  canSelectNodeDef: useCanSelectNodeDef({ chain }),
-  getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains({
-    attributesUuidsOtherChains,
-    setAtrributesUuidsOtherChains,
-    chain,
-  }),
+export const useActions = (dependencies) => ({
+  onInit: useOnInit(dependencies),
+  onDismiss: useOnDismiss(dependencies),
+  onSave: useOnSave(dependencies),
+  canSelectNodeDef: useCanSelectNodeDef(dependencies),
+  getAttributeUuidsOtherChains: useGetAttributeUuidsOtherChains(dependencies),
   addEntityVirtual: useAddEntityVirtual(),
-  addNodeDefAnalysis: useAddNodeDefAnalysis({ step, calculation }),
-  openRStudio: useOpenRStudio({ chain }),
+  addNodeDefAnalysis: useAddNodeDefAnalysis(dependencies),
+  openRStudio: useOpenRStudio(dependencies),
 })
