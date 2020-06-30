@@ -59,7 +59,7 @@ export const useActions = ({
     calculationDirty,
     setCalculationDirty,
   }),
-  delete: useDelete({ step, setStep, calculation, setCalculation }),
+  delete: useDelete({ step, setStep, calculation, setCalculation, setCalculationDirty }),
   updateProp: useUpdateProp({
     chain,
     setChain,

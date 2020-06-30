@@ -101,24 +101,6 @@ export const assocProcessingSteps = R.assoc(keys.processingSteps)
 
 export const assocProcessingStep = (step) => R.assocPath([keys.processingSteps, Step.getIndex(step)], step)
 
-const _updateSteps = (fn) => (chain) =>
-  R.pipe(getProcessingSteps, fn, (steps) => assocProcessingSteps(steps)(chain))(chain)
-
-export const dissocProcessingStepLast = R.pipe(
-  // Get last processing step calculation uuids
-  getProcessingSteps,
-  R.last,
-  Step.getCalculations,
-  R.pluck(Calculation.keys.uuid),
-  // Remove last step from chain
-  _updateSteps(R.dropLast(1))
-)
-
-export const dissocProcessingStepTemporary = R.when(
-  R.pipe(getProcessingSteps, R.last, Step.isTemporary),
-  dissocProcessingStepLast
-)
-
 // ====== VALIDATION
 // The validation object contains the validation of chain, steps, calculations, index by uuids
 export const { getValidation } = Validation

@@ -19,7 +19,6 @@ export const useReset = ({ chain, setChain, step, setStep, setDirty, originalSte
         (processingStep) => !Step.isTemporary(processingStep)
       ),
     }
-    console.log({ chain, newChain })
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
     setStepDirty(false)
