@@ -6,7 +6,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import { useRecordsSummary, useTimeRanges } from './store'
 

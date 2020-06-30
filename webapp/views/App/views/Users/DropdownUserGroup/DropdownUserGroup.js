@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 
 import { useUser } from '@webapp/store/user'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const DropdownUserGroup = (props) => {
   const { editingLoggedUser, groupUuid, disabled, validation, onChange } = props

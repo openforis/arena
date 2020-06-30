@@ -3,7 +3,7 @@ import React from 'react'
 import { getLanguageLabel, languages } from '@core/app/languages'
 
 import { useI18n } from '@webapp/store/system'
-import Dropdown from './dropdown'
+import Dropdown from './Dropdown'
 
 const LanguageDropdown = props => {
   const { selection, onChange, validation } = props

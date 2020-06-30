@@ -7,7 +7,7 @@ import { SortCriteria } from '@common/model/query'
 
 import { useI18n } from '@webapp/store/system'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import Tooltip from '@webapp/components/tooltip'
 
 const SortCriteriaEditor = (props) => {

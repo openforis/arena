@@ -3,7 +3,7 @@ import './inputChips.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import Dropdown from './dropdown'
+import Dropdown from './Dropdown'
 
 const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
   R.is(Object, item)

@@ -1,4 +1,4 @@
-import { getItemsDialog } from '@webapp/components/form/dropdown/store/actions/getItemsDialog'
+import { getItemsDialog } from './getItemsDialog'
 
 export const useToggleDialog = ({
   autocompleteMinChars,

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
 import { FormItem } from '@webapp/components/form/input'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 import { useI18n } from '@webapp/store/system'
 
 import * as Survey from '@core/survey/survey'

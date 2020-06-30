@@ -12,7 +12,7 @@ import * as ProcessingStep from '@common/analysis/processingStep'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import { checkCanSelectNodeDef } from '@webapp/loggedin/modules/analysis/chain/actions'
 

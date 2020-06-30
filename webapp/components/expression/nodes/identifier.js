@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const Identifier = ({ node, variables, onChange }) => (
   <Dropdown

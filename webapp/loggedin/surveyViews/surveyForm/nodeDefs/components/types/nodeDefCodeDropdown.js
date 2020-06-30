@@ -2,7 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import InputChips from '@webapp/components/form/inputChips'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'

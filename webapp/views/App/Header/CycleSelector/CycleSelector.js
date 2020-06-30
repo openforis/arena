@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const CycleSelector = (props) => {
   const { surveyInfo, surveyCycleKey, onChange } = props

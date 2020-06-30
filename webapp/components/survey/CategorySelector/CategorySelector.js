@@ -10,7 +10,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useI18n } from '@webapp/store/system'
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 

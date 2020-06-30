@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as InputMasks from '@webapp/components/form/inputMasks'
 
-import Dropdown from '@webapp/components/form/dropdown'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
