@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useSelector, useDispatch } from 'react-redux'
-import { matchPath, useLocation } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { matchPath, useHistory, useLocation } from 'react-router'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -11,7 +11,7 @@ import * as Category from '@core/survey/category'
 
 import PanelRight from '@webapp/components/PanelRight'
 
-import { designerModules, appModuleUri } from '@webapp/app/appModules'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
@@ -29,6 +29,7 @@ const CategoriesView = (props) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const { pathname } = useLocation()
+  const history = useHistory()
 
   const inCategoriesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.categories)))
 
@@ -51,6 +52,7 @@ const CategoriesView = (props) => {
     if (onSelect) {
       onSelect(category)
     }
+    history.push(`${appModuleUri(designerModules.category)}${Category.getUuid(category)}`)
   }
 
   const onDelete = (category) =>

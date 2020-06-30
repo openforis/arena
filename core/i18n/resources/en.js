@@ -503,6 +503,7 @@ $t(common.cantUndoWarning)`,
   },
 
   taxonomy: {
+    header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     edit: {
