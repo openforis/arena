@@ -8,7 +8,7 @@ import * as Calculation from '@common/analysis/processingStepCalculation'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useDelete = ({ step, setStep, calculation, setCalculation }) => {
+export const useDelete = ({ step, setStep, calculation, setCalculation, setCalculationDirty }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const { chainUuid } = useParams()
@@ -26,6 +26,7 @@ export const useDelete = ({ step, setStep, calculation, setCalculation }) => {
 
     AnalysisActions.persistStep({ step: stepWithOutCalculation })
     setStep(stepWithOutCalculation)
+    setCalculationDirty(false)
   }
 
   return () => {

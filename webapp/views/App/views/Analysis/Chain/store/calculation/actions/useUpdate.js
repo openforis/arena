@@ -8,7 +8,7 @@ import * as Survey from '@core/survey/survey'
 
 import { AnalysisActions } from '@webapp/service/storage'
 
-export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalculation }) => {
+export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalculation, setCalculationDirty }) => {
   const surveyInfo = useSurveyInfo()
   const surveyDefaultLang = Survey.getDefaultLanguage(surveyInfo)
 
@@ -29,6 +29,7 @@ export const useUpdate = ({ chain, setChain, step, setStep, setDirty, setCalcula
     setChain(chainUpdated)
     AnalysisActions.persistChain({ chain: chainUpdated })
 
+    setCalculationDirty(true)
     setDirty(true)
   }
 }

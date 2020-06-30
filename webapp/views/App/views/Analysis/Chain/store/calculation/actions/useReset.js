@@ -1,16 +1,15 @@
-import * as Calculation from '@common/analysis/processingStepCalculation'
-
-import * as NodeDef from '@core/survey/nodeDef'
+import * as A from '@core/arena'
 
 import { useUpdate } from './useUpdate'
 
-export const useUpdateAttribute = ({
+export const useReset = ({
   chain,
   setChain,
   step,
   setStep,
   setDirty,
   calculation,
+  originalCalculation,
   setCalculation,
   setCalculationDirty,
 }) => {
@@ -21,12 +20,14 @@ export const useUpdateAttribute = ({
     setStep,
     setDirty,
     calculation,
+    originalCalculation,
     setCalculation,
     setCalculationDirty,
   })
 
-  return ({ attrDef }) => {
-    const calculationUpdated = Calculation.assocNodeDefUuid(NodeDef.getUuid(attrDef))(calculation)
-    update({ calculationUpdated })
+  return () => {
+    if (!A.isEmpty(originalCalculation)) {
+      update({ calculationUpdated: originalCalculation })
+    }
   }
 }

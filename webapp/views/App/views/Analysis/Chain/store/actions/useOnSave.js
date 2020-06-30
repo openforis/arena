@@ -44,7 +44,15 @@ const _getStepParam = (step) =>
     )
   )(step)
 
-export const useOnSave = ({ chain, setChain, step, calculation }) => {
+export const useOnSave = ({
+  chain,
+  setChain,
+  step,
+  calculation,
+  setStepDirty,
+  setCalculationDirty,
+  setOriginalCalculation,
+}) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const surveyId = useSurveyId()
@@ -64,6 +72,9 @@ export const useOnSave = ({ chain, setChain, step, calculation }) => {
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
         AnalysisActions.resetAnalysis()
+        setStepDirty(false)
+        setCalculationDirty(false)
+        setOriginalCalculation(calculation)
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)
       } else {

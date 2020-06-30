@@ -1,7 +1,7 @@
 import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 
-export const useCreate = ({ chain, setChain, step, setStep, setCalculation }) => {
+export const useCreate = ({ chain, setChain, step, setStep, setCalculation, setCalculationDirty }) => {
   return () => {
     const calculation = Chain.newProcessingStepCalculation(step)
 
@@ -11,5 +11,6 @@ export const useCreate = ({ chain, setChain, step, setStep, setCalculation }) =>
     setChain(chainWithStep)
     setStep(stepWithCalculation)
     setCalculation(calculation)
+    setCalculationDirty(false)
   }
 }
