@@ -50,16 +50,18 @@ export const useAnalysis = () => {
     actions.getAttributeUuidsOtherChains()
   }, [chain])
 
+  const isNotNullAndNotEmpty = (item) => !(R.isNil(item) || R.isEmpty(item))
+
   return {
     attributesUuidsOtherChains,
     chain,
     step,
     calculation,
     dirty,
-    editingChain: R.isNil(chain) ? false : !R.isEmpty(chain) || false,
-    editingStep: R.isNil(step) ? false : !R.isEmpty(step) || false,
+    editingChain: isNotNullAndNotEmpty(chain),
+    editingStep: isNotNullAndNotEmpty(step),
     stepDirty,
-    editingCalculation: R.isNil(calculation) ? false : !R.isEmpty(calculation) || false,
+    editingCalculation: isNotNullAndNotEmpty(calculation),
     calculationDirty,
 
     Actions: {
