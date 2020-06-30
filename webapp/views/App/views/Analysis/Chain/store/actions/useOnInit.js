@@ -38,17 +38,17 @@ export const useOnInit = ({ setChain, setStep, setCalculation, setStepDirty, set
 
     setChain(newChain)
   }
-  const recoverOrCreate = chainSaved ? recover : create
+  const recoverOrCreate = chainSaved && Chain.isTemporary(chainSaved) ? recover : create
 
   const fetchOrRecoverChain = async () => {
     const { data: chain } = await axios.get(`/api/survey/${surveyId}/processing-chain/${chainUuid}`)
 
-    if (!A.isEmpty(chainSaved) && Chain.getUuid(chainSaved) === chainUuid) {
+    if (!A.isNull(chainSaved) && Chain.getUuid(chainSaved) === chainUuid) {
       recover()
     } else {
       setChain(chain)
     }
   }
 
-  return chainUuid ? fetchOrRecoverChain : recoverOrCreate
+  return !A.isNull(chainUuid) ? fetchOrRecoverChain : recoverOrCreate
 }
