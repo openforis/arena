@@ -27,7 +27,7 @@ PanelRight.propTypes = {
 
 PanelRight.defaultProps = {
   header: '',
-  width: 500,
+  width: '500px',
 }
 
 export default PanelRight
