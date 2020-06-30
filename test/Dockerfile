@@ -5,8 +5,8 @@
 FROM node:12.16.0 AS test
 
 # add Gauge key
-RUN apt-key adv --no-tty --keyserver hkp://keyserver.ubuntu.com --recv-keys 023EDB0B
-RUN echo deb http://dl.bintray.com/gauge/gauge-deb stable main | tee -a /etc/apt/sources.list
+#RUN apt-key adv --no-tty --keyserver hkp://keyserver.ubuntu.com --recv-keys 023EDB0B
+#RUN echo deb http://dl.bintray.com/gauge/gauge-deb stable main | tee -a /etc/apt/sources.list
 
 # Install Chromium dependencies, git and netcat
 RUN apt-get update; \
@@ -20,13 +20,13 @@ RUN apt-get update; \
     git netcat; \
     apt-get autoremove; apt-get autoclean;
 # Install Gauge
-RUN npm install -g @getgauge/cli --unsafe-perm
+#RUN npm install -g @getgauge/cli --unsafe-perm
 # Install Gauge plugins
-RUN gauge install js && gauge install html-report && gauge install screenshot
+#RUN gauge install js && gauge install html-report && gauge install screenshot
 # Install Chromium
 RUN npm install -g chromium --unsafe-perm
 # Install PM2
-RUN npm install pm2 -g
+#RUN npm install pm2 -g
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
@@ -37,5 +37,8 @@ COPY .git /app/.git
 RUN cd /app; git reset --hard; yarn build:server:dev
 
 WORKDIR /app
+RUN cat /app/test/scripts/test_start.sh
+RUN chmod +x /app/test/scripts/test_start.sh
+CMD ["/app/test/scripts/test_start.sh"]
 
 ############################################################
