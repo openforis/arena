@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 
+import * as A from '@core/arena'
+
 import { Input } from '@webapp/components/form/input'
 import AutocompleteDialog from '@webapp/components/form/autocompleteDialog'
 
@@ -13,6 +15,7 @@ import { useDropdown } from './store'
 const Dropdown = (props) => {
   const {
     autocompleteDialogClassName,
+    autocompleteMinChars,
     className,
     disabled,
     itemLabel,
@@ -31,11 +34,30 @@ const Dropdown = (props) => {
   const dropdownRef = useRef(null)
   const inputRef = useRef(null)
 
-  const dropdown = useDropdown({ disabled, itemKey, itemLabel, readOnly, onBeforeChange, onChange, selection })
-  const { Actions, inputValue, opened, getItemKey, getItemLabel, toggleOpened } = dropdown
+  const dropdown = useDropdown({
+    autocompleteMinChars,
+    disabled,
+    itemKey,
+    itemLabel,
+    items,
+    readOnly,
+    onBeforeChange,
+    onChange,
+    selection,
+  })
+  const { Actions, inputValue, itemsDialog, showDialog, getItemKey, getItemLabel } = dropdown
 
   return (
-    <div ref={dropdownRef} className={classNames('dropdown', className)} onBlur={() => {}}>
+    <div
+      ref={dropdownRef}
+      className={classNames('dropdown', className)}
+      onBlur={(event) => {
+        const { className: classNameTarget = [] } = event.relatedTarget || {}
+        if (showDialog && classNameTarget !== ItemDialog.className) {
+          Actions.toggleDialog()
+        }
+      }}
+    >
       <Input
         ref={inputRef}
         placeholder={placeholder}
@@ -43,8 +65,12 @@ const Dropdown = (props) => {
         validation={validation}
         readOnly={readOnly || readOnlyInput}
         disabled={disabled}
-        // onChange={(value) => this.onInputChange(value)}
-        // onFocus={(e) => this.onInputFocus(e)}
+        onChange={(value) => Actions.updateInputValue({ value })}
+        onFocus={() => {
+          if (!showDialog && !A.isEmpty(itemsDialog)) {
+            Actions.toggleDialog()
+          }
+        }}
       />
 
       <button
@@ -53,14 +79,14 @@ const Dropdown = (props) => {
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
-          toggleOpened()
+          Actions.toggleDialog()
         }}
         aria-disabled={disabled}
       >
         <span className="icon icon-play3 icon-12px" />
       </button>
 
-      {opened &&
+      {showDialog &&
         ReactDOM.createPortal(
           <AutocompleteDialog
             className={autocompleteDialogClassName}
@@ -68,9 +94,9 @@ const Dropdown = (props) => {
             itemLabel={getItemLabel}
             itemKeyFunction={getItemKey}
             itemRenderer={ItemDialog}
-            items={items}
+            items={itemsDialog}
             onItemSelect={Actions.updateSelection}
-            onClose={toggleOpened}
+            onClose={Actions.toggleDialog}
             sourceElement={sourceElement || dropdownRef.current}
           />,
           document.body
@@ -80,8 +106,8 @@ const Dropdown = (props) => {
 }
 
 Dropdown.propTypes = {
-  // autocompleteMinChars: PropTypes.number,
   autocompleteDialogClassName: PropTypes.string,
+  autocompleteMinChars: PropTypes.number,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
@@ -94,13 +120,13 @@ Dropdown.propTypes = {
   readOnly: PropTypes.bool,
   readOnlyInput: PropTypes.bool,
   selection: PropTypes.object,
-  sourceElement: PropTypes.element, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
+  sourceElement: PropTypes.object, // Used to calculate the size of the autocomplete-dialog if available, otherwise the dropdownRef.current is used
   validation: PropTypes.object,
 }
 
 Dropdown.defaultProps = {
-  // autocompleteMinChars: 0,
   autocompleteDialogClassName: null,
+  autocompleteMinChars: 0,
   className: '',
   disabled: false,
   itemKey: 'key',

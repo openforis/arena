@@ -3,20 +3,41 @@ import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useActions } from './actions'
 
-export const useDropdown = ({ disabled, itemKey, itemLabel, readOnly, onBeforeChange, onChange, selection }) => {
+export const useDropdown = ({
+  autocompleteMinChars,
+  disabled,
+  itemKey,
+  itemLabel,
+  items,
+  onBeforeChange,
+  onChange,
+  readOnly,
+  selection,
+}) => {
   // utility getters
   const getItemKey = (item) => (itemKey.constructor === String ? item[itemKey] : itemKey(item))
   const getItemLabel = (item) => (itemLabel.constructor === String ? item[itemLabel] : itemLabel(item))
-  const getSelectionLabel = () => (selection ? getItemLabel(selection) : null)
+  const getSelectionLabel = () => (selection ? getItemLabel(selection) : '')
 
   // state/action properties
   const [inputValue, setInputValue] = useState(getSelectionLabel())
-  const [opened, setOpened] = useState(false)
+  const [itemsDialog, setItemsDialog] = useState(items)
+  const [showDialog, setShowDialog] = useState(false)
 
-  const Actions = useActions({ onBeforeChange, onChange, setOpened })
-
-  // utility setters
-  const toggleOpened = () => (!disabled && !readOnly ? setOpened((openedPrev) => !openedPrev) : null)
+  const Actions = useActions({
+    autocompleteMinChars,
+    disabled,
+    readOnly,
+    items,
+    showDialog,
+    getItemKey,
+    getItemLabel,
+    onBeforeChange,
+    onChange,
+    setInputValue,
+    setItemsDialog,
+    setShowDialog,
+  })
 
   // on update selection: update input value
   useOnUpdate(() => {
@@ -27,10 +48,10 @@ export const useDropdown = ({ disabled, itemKey, itemLabel, readOnly, onBeforeCh
     Actions,
 
     inputValue,
-    opened,
+    itemsDialog,
+    showDialog,
 
     getItemKey,
     getItemLabel,
-    toggleOpened,
   }
 }

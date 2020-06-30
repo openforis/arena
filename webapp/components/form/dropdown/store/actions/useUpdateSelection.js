@@ -1,8 +1,9 @@
-export const useUpdateSelection = ({ onBeforeChange, onChange, setOpened }) => {
+export const useUpdateSelection = ({ onBeforeChange, onChange, setInputValue, setShowDialog }) => {
   return (item) => {
     ;(async () => {
       if (!onBeforeChange || (await onBeforeChange(item))) {
-        setOpened(false)
+        setShowDialog(false)
+        setInputValue('')
         await onChange(item)
       }
     })()
