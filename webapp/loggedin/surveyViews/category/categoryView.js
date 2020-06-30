@@ -1,8 +1,9 @@
 import './categoryView.scss'
 
 import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
@@ -20,10 +21,12 @@ import LevelEdit from './components/levelEdit'
 
 import * as Actions from './actions'
 
-const CategoryView = () => {
+const CategoryView = (props) => {
+  const { showClose } = props
   const { categoryUuid } = useParams()
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const history = useHistory()
 
   const category = useSelector(CategoryState.getCategoryForEdit)
   const importSummary = useSelector(CategoryState.getImportSummary)
@@ -31,6 +34,8 @@ const CategoryView = () => {
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
+
+  const inCategoriesPath = Boolean(categoryUuid)
 
   useEffect(() => {
     if (categoryUuid) {
@@ -82,15 +87,34 @@ const CategoryView = () => {
         </div>
 
         <div className="button-bar">
-          <button type="button" className="btn" onClick={() => dispatch(Actions.setCategoryForEdit(null))}>
-            {i18n.t('common.done')}
-          </button>
+          {showClose && (
+            <button
+              type="button"
+              className="btn"
+              onClick={async () => {
+                await dispatch(Actions.setCategoryForEdit(null))
+                if (inCategoriesPath) {
+                  history.goBack()
+                }
+              }}
+            >
+              {i18n.t('common.done')}
+            </button>
+          )}
         </div>
       </div>
 
       {importSummary && <CategoryImportSummary summary={importSummary} />}
     </>
   ) : null
+}
+
+CategoryView.propTypes = {
+  showClose: PropTypes.bool,
+}
+
+CategoryView.defaultProps = {
+  showClose: false,
 }
 
 export default CategoryView

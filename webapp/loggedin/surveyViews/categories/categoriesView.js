@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
+import { matchPath, useLocation } from 'react-router'
 import * as R from 'ramda'
 
 import { useI18n } from '@webapp/store/system'
@@ -9,6 +10,8 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import PanelRight from '@webapp/components/PanelRight'
+
+import { designerModules, appModuleUri } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
@@ -25,6 +28,9 @@ const CategoriesView = (props) => {
 
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const { pathname } = useLocation()
+
+  const inCategoriesPath = Boolean(matchPath(pathname, appModuleUri(designerModules.categories)))
 
   const survey = useSelector(SurveyState.getSurvey)
   const readOnly = !useAuthCanEditSurvey()
@@ -61,9 +67,12 @@ const CategoriesView = (props) => {
       <ItemsView
         itemLabelFunction={Category.getName}
         items={categories}
+        itemLink={inCategoriesPath ? appModuleUri(designerModules.category) : null}
         selectedItemUuid={selectedItemUuid}
         onAdd={onAdd}
-        onEdit={(category) => dispatch(CategoryActions.setCategoryForEdit(Category.getUuid(category)))}
+        onEdit={(category) =>
+          !inCategoriesPath && dispatch(CategoryActions.setCategoryForEdit(Category.getUuid(category)))
+        }
         canDelete={canDeleteCategory}
         onDelete={onDelete}
         canSelect={canSelect}

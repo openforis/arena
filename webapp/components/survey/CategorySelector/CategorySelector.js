@@ -16,6 +16,7 @@ import CategoriesView from '@webapp/loggedin/surveyViews/categories/categoriesVi
 import { useSurvey } from '@webapp/store/survey'
 
 import * as CategoryActions from '@webapp/loggedin/surveyViews/category/actions'
+import CategoryView from '@webapp/loggedin/surveyViews/category/categoryView'
 
 const CategorySelector = (props) => {
   const { disabled, categoryUuid, validation, showManage, showAdd, onChange } = props
@@ -25,10 +26,17 @@ const CategorySelector = (props) => {
   const dispatch = useDispatch()
 
   const [showCategoriesPanel, setShowCategoriesPanel] = useState(false)
+  const [showCategoryPanel, setShowCategoryPanel] = useState(false)
 
   const survey = useSurvey()
   const categories = Survey.getCategoriesArray(survey)
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+
+  const onAdd = async () => {
+    const newCategory = await dispatch(CategoryActions.createCategory())
+    onChange(newCategory)
+    setShowCategoryPanel(true)
+  }
 
   return (
     <div className="category-selector">
@@ -46,16 +54,24 @@ const CategorySelector = (props) => {
           type="button"
           className="btn btn-s"
           style={{ justifySelf: 'center' }}
-          onClick={async () => {
-            const newCategory = await dispatch(CategoryActions.createCategory())
-            onChange(newCategory)
-            setShowCategoriesPanel(true)
-          }}
+          onClick={onAdd}
           aria-disabled={disabled}
         >
           <span className="icon icon-plus icon-12px icon-left" />
           {i18n.t('common.add')}
         </button>
+      )}
+      {showCategoryPanel && (
+        <PanelRight
+          width="90vw"
+          onClose={async () => {
+            await dispatch(CategoryActions.setCategoryForEdit(null))
+            setShowCategoryPanel(false)
+          }}
+          header={i18n.t('categoryEdit.header')}
+        >
+          <CategoryView showClose={false} />
+        </PanelRight>
       )}
       {showManage && (
         <button
