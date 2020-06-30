@@ -56,10 +56,10 @@ export const useAnalysis = () => {
     step,
     calculation,
     dirty,
-    editingChain: !R.isEmpty(chain) || false,
-    editingStep: !R.isEmpty(step) || false,
+    editingChain: R.isNil(chain) ? false : !R.isEmpty(chain) || false,
+    editingStep: R.isNil(step) ? false : !R.isEmpty(step) || false,
     stepDirty,
-    editingCalculation: !R.isEmpty(calculation) || false,
+    editingCalculation: R.isNil(calculation) ? false : !R.isEmpty(calculation) || false,
     calculationDirty,
 
     Actions: {
