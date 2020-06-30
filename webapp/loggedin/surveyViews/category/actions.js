@@ -6,7 +6,6 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { SurveyState, CategoriesActions } from '@webapp/store/survey'
@@ -22,6 +21,24 @@ export const categoryViewImportSummaryColumnDataTypeUpdate = 'categoryView/impor
 
 export const dispatchCategoryUpdate = (dispatch, category) =>
   dispatch({ type: CategoriesActions.categoryUpdate, category })
+
+// ======
+// ====== READ
+// ======
+
+// load items for specified level
+const loadLevelItems = (categoryUuid, levelIndex = 0, parentUuid = null) => async (dispatch, getState) => {
+  // Reset level items first
+  dispatch({ type: CategoriesActions.categoryItemsUpdate, levelIndex, items: null })
+
+  const surveyId = SurveyState.getSurveyId(getState())
+  const {
+    data: { items },
+  } = await axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
+    params: { draft: true, parentUuid },
+  })
+  dispatch({ type: CategoriesActions.categoryItemsUpdate, levelIndex, items })
+}
 
 // ======
 // ====== SET FOR EDIT
@@ -49,17 +66,15 @@ export const setCategoryItemForEdit = (category, level, item, edit = true) => as
 // ====== CREATE
 // ======
 
-export const createCategory = (history, analysis) => async (dispatch, getState) => {
+export const createCategory = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
   const {
     data: { category },
   } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
 
-  dispatch({ type: CategoriesActions.categoryCreate, category })
+  await dispatch({ type: CategoriesActions.categoryCreate, category })
 
-  // Navigate to category edit module
-  const categoryModule = analysis ? analysisModules.category : designerModules.category
-  history.push(`${appModuleUri(categoryModule)}${Category.getUuid(category)}/`)
+  await dispatch(setCategoryForEdit(Category.getUuid(category)))
 
   return category
 }
@@ -91,24 +106,6 @@ export const createCategoryLevelItem = (category, level, parentItem) => async (d
 
   dispatchCategoryUpdate(dispatch, data.category)
   dispatch({ type: CategoriesActions.categoryItemUpdate, level, item: data.item })
-}
-
-// ======
-// ====== READ
-// ======
-
-// load items for specified level
-const loadLevelItems = (categoryUuid, levelIndex = 0, parentUuid = null) => async (dispatch, getState) => {
-  // Reset level items first
-  dispatch({ type: CategoriesActions.categoryItemsUpdate, levelIndex, items: null })
-
-  const surveyId = SurveyState.getSurveyId(getState())
-  const {
-    data: { items },
-  } = await axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
-    params: { draft: true, parentUuid },
-  })
-  dispatch({ type: CategoriesActions.categoryItemsUpdate, levelIndex, items })
 }
 
 // ======

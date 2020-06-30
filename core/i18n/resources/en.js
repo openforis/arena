@@ -515,6 +515,7 @@ $t(common.cantUndoWarning)`,
   },
 
   categoryEdit: {
+    header: 'Category',
     addLevel: 'Add level',
     categoryName: 'Category name',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,

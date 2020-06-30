@@ -55,7 +55,7 @@ const ExpressionEditorPopup = (props) => {
   const i18n = useI18n()
 
   return (
-    <PanelRight onClose={onClose} width={1020}>
+    <PanelRight onClose={onClose} width="1020px">
       <div className="expression-editor-popup">
         <button
           type="button"
