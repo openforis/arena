@@ -1,48 +1,41 @@
 import './categoryView.scss'
 
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { useHistory, useParams } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
-import * as Authorizer from '@core/auth/authorizer'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { UserState } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { FormItem, Input } from '@webapp/components/form/input'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import { SurveyState } from '@webapp/store/survey'
 import * as CategoryState from './categoryState'
 import CategoryImportSummary from './components/categoryImportSummary'
 import LevelEdit from './components/levelEdit'
 
-import { putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory } from './actions'
+import * as Actions from './actions'
 
-
-const CategoryView = props => {
-  const {
-    category,
-    readOnly,
-    importSummary,
-    putCategoryProp,
-    createCategoryLevel,
-    setCategoryForEdit,
-    uploadCategory,
-  } = props
-
-  const history = useHistory()
+const CategoryView = () => {
   const { categoryUuid } = useParams()
   const i18n = useI18n()
+  const dispatch = useDispatch()
+
+  const category = useSelector(CategoryState.getCategoryForEdit)
+  const importSummary = useSelector(CategoryState.getImportSummary)
+  const readOnly = !useAuthCanEditSurvey()
 
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
   useEffect(() => {
-    setCategoryForEdit(categoryUuid)
+    if (categoryUuid) {
+      dispatch(Actions.setCategoryForEdit(categoryUuid))
+    }
   }, [])
 
   return category ? (
@@ -53,7 +46,9 @@ const CategoryView = props => {
             <Input
               value={Category.getName(category)}
               validation={Validation.getFieldValidation(Category.props.name)(validation)}
-              onChange={value => putCategoryProp(category, Category.props.name, StringUtils.normalizeName(value))}
+              onChange={(value) =>
+                dispatch(Actions.putCategoryProp(category, Category.props.name, StringUtils.normalizeName(value)))
+              }
               readOnly={readOnly}
             />
           </FormItem>
@@ -62,21 +57,22 @@ const CategoryView = props => {
             <UploadButton
               label={i18n.t('common.csvImport')}
               accept=".csv"
-              onChange={files => uploadCategory(Category.getUuid(category), files[0])}
+              onChange={(files) => dispatch(Actions.uploadCategory(Category.getUuid(category), files[0]))}
               disabled={Category.isPublished(category)}
             />
           )}
         </div>
 
         <div className="category__levels">
-          {levels.map(level => (
+          {levels.map((level) => (
             <LevelEdit key={CategoryLevel.getUuid(level)} level={level} />
           ))}
 
           {!readOnly && (
             <button
+              type="button"
               className="btn btn-s btn-add-level"
-              onClick={() => createCategoryLevel(category)}
+              onClick={() => dispatch(Actions.createCategoryLevel(category))}
               aria-disabled={levels.length === 5}
             >
               <span className="icon icon-plus icon-16px icon-left" />
@@ -86,13 +82,7 @@ const CategoryView = props => {
         </div>
 
         <div className="button-bar">
-          <button
-            className="btn"
-            onClick={() => {
-              history.goBack()
-              setCategoryForEdit(null)
-            }}
-          >
+          <button type="button" className="btn" onClick={() => dispatch(Actions.setCategoryForEdit(null))}>
             {i18n.t('common.done')}
           </button>
         </div>
@@ -103,15 +93,4 @@ const CategoryView = props => {
   ) : null
 }
 
-const mapStateToProps = state => ({
-  category: CategoryState.getCategoryForEdit(state),
-  readOnly: !Authorizer.canEditSurvey(UserState.getUser(state), SurveyState.getSurveyInfo(state)),
-  importSummary: CategoryState.getImportSummary(state),
-})
-
-export default connect(mapStateToProps, {
-  putCategoryProp,
-  createCategoryLevel,
-  setCategoryForEdit,
-  uploadCategory,
-})(CategoryView)
+export default CategoryView
