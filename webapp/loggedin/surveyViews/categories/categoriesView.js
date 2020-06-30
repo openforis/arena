@@ -12,7 +12,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, designerModules, analysisModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
+import { SurveyState } from '@webapp/store/survey'
 import { UserState } from '@webapp/store/user'
 import * as NodeDefState from '@webapp/loggedin/surveyViews/nodeDef/nodeDefState'
 
@@ -85,5 +85,6 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
   createCategory,
   deleteCategory,
-  setNodeDefProp: NodeDefsActions.setNodeDefProp,
+  //TODO update node def category on category selection when refactoring
+  setNodeDefProp: () => {},
 })(CategoriesView)

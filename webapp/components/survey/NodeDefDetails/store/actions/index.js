@@ -1,9 +1,13 @@
-import { useSetNodeDefProp } from './useSetNodeDefProp'
-import { useSetNodeDefParentUuid } from './useSetNodeDefParentUuid'
-import { useSetNodeDefLayoutProp } from './useSetNodeDefLayoutProp'
+import { useSetProp } from './useSetProp'
+import { useSetParentUuid } from './useSetParentUuid'
+import { useSetLayoutProp } from './useSetLayoutProp'
+import { useSaveEdits } from './useSaveEdits'
+import { useCancelEdits } from './useCancelEdits'
 
 export const useActions = ({ nodeDefState, setNodeDefState }) => ({
-  setNodeDefProp: useSetNodeDefProp({ nodeDefState, setNodeDefState }),
-  setNodeDefParentUuid: useSetNodeDefParentUuid({ nodeDefState, setNodeDefState }),
-  setNodeDefLayoutProp: useSetNodeDefLayoutProp({ nodeDefState, setNodeDefState }),
+  setProp: useSetProp({ nodeDefState, setNodeDefState }),
+  setParentUuid: useSetParentUuid({ nodeDefState, setNodeDefState }),
+  setLayoutProp: useSetLayoutProp({ nodeDefState, setNodeDefState }),
+  saveEdits: useSaveEdits({ nodeDefState, setNodeDefState }),
+  cancelEdits: useCancelEdits({ nodeDefState }),
 })

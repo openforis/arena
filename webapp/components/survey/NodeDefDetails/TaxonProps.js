@@ -16,17 +16,16 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useSurvey } from '@webapp/store/survey'
 import { createTaxonomy } from '@webapp/loggedin/surveyViews/taxonomy/actions'
 
-import { NodeDefState, useActions } from './store'
+import { NodeDefState } from './store'
 
 const TaxonProps = (props) => {
-  const { nodeDefState, setNodeDefState } = props
+  const { nodeDefState, actions } = props
 
   const dispatch = useDispatch()
   const history = useHistory()
 
   const survey = useSurvey()
   const i18n = useI18n()
-  const Actions = useActions({ nodeDefState, setNodeDefState })
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
@@ -51,7 +50,7 @@ const TaxonProps = (props) => {
             selection={taxonomy}
             disabled={!canUpdateTaxonomy}
             onChange={(taxonomySelected) =>
-              dispatch(Actions.setNodeDefProp(NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomySelected)))
+              actions.setProp({ key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
             }
           />
           <button
@@ -75,7 +74,7 @@ const TaxonProps = (props) => {
 
 TaxonProps.propTypes = {
   nodeDefState: PropTypes.object.isRequired,
-  setNodeDefState: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired,
 }
 
 export default TaxonProps

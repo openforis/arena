@@ -9,10 +9,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
-import * as NodeDefState from './store/state'
+
+import { NodeDefState } from './store'
 
 const ButtonBar = (props) => {
-  const { nodeDefState } = props
+  const { nodeDefState, actions } = props
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const dirty = NodeDefState.isDirty(nodeDefState)
@@ -31,10 +32,10 @@ const ButtonBar = (props) => {
             ? dispatch(
                 DialogConfirmActions.showDialogConfirm({
                   key: 'common.cancelConfirm',
-                  onOk: NodeDefsActions.cancelNodeDefEdits(history),
+                  onOk: actions.cancelEdits,
                 })
               )
-            : dispatch(NodeDefsActions.cancelNodeDefEdits(history))
+            : actions.cancelEdits()
         }
       >
         {i18n.t(dirty ? 'common.cancel' : 'common.back')}
@@ -42,7 +43,7 @@ const ButtonBar = (props) => {
       <button
         type="button"
         className="btn btn-primary"
-        onClick={() => dispatch(NodeDefsActions.saveNodeDefEdits())}
+        onClick={() => actions.saveEdits()}
         aria-disabled={!dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))}
       >
         <span className="icon icon-floppy-disk icon-left icon-12px" />
@@ -64,6 +65,7 @@ const ButtonBar = (props) => {
 
 ButtonBar.propTypes = {
   nodeDefState: PropTypes.object.isRequired,
+  actions: PropTypes.object.isRequired,
 }
 
 export default ButtonBar

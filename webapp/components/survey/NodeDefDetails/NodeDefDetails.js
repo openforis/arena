@@ -1,7 +1,6 @@
 import './NodeDefDetails.scss'
 
 import React from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,7 +12,7 @@ import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/input'
 import * as NodeDefUiProps from '@webapp/loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
-import { NodeDefState, useNodeDef, useActions } from './store'
+import { NodeDefState, useNodeDefDetails } from './store'
 import ButtonBar from './ButtonBar'
 import ValidationsProps from './ValidationsProps'
 import AdvancedProps from './AdvancedProps'
@@ -21,16 +20,13 @@ import BasicProps from './BasicProps'
 
 const NodeDefDetails = () => {
   const i18n = useI18n()
-  const dispatch = useDispatch()
 
-  const { nodeDefState, setNodeDefState, editingFromDesigner } = useNodeDef()
+  const { nodeDefState, actions, editingFromDesigner } = useNodeDefDetails()
 
   const nodeDef = NodeDefState.getNodeDef(nodeDefState)
   const validation = NodeDefState.getValidation(nodeDefState)
 
   const nodeDefType = NodeDef.getType(nodeDef)
-
-  const Actions = useActions({ nodeDefState, setNodeDefState })
 
   return nodeDef ? (
     <>
@@ -41,7 +37,7 @@ const NodeDefDetails = () => {
               value={NodeDef.getName(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
               onChange={(value) =>
-                dispatch(Actions.setNodeDefProp(NodeDef.propKeys.name, StringUtils.normalizeName(value)))
+                actions.setProp({ key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
               }
             />
             <div className="attribute-selector">
@@ -57,7 +53,7 @@ const NodeDefDetails = () => {
                 component: BasicProps,
                 props: {
                   nodeDefState,
-                  setNodeDefState,
+                  actions,
                   editingFromDesigner,
                 },
               },
@@ -69,7 +65,7 @@ const NodeDefDetails = () => {
                       component: AdvancedProps,
                       props: {
                         nodeDefState,
-                        setNodeDefState,
+                        actions,
                       },
                     },
                     {
@@ -77,14 +73,14 @@ const NodeDefDetails = () => {
                       component: ValidationsProps,
                       props: {
                         nodeDefState,
-                        setNodeDefState,
+                        actions,
                       },
                     },
                   ]),
             ]}
           />
 
-          <ButtonBar nodeDefState={nodeDefState} />
+          <ButtonBar nodeDefState={nodeDefState} actions={actions} />
         </div>
       </div>
     </>
