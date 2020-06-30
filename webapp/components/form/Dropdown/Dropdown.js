@@ -1,5 +1,5 @@
 import './dropdown.scss'
-import React, { useRef } from 'react'
+import React, { memo, useRef } from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
@@ -140,4 +140,4 @@ Dropdown.defaultProps = {
   validation: {},
 }
 
-export default Dropdown
+export default memo(Dropdown)
