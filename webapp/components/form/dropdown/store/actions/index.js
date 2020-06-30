@@ -5,8 +5,10 @@ import { useUpdateInputValue } from './useUpdateInputValue'
 export const useActions = ({
   autocompleteMinChars,
   disabled,
+  inputValue,
   items,
   readOnly,
+  selection,
   showDialog,
   getItemKey,
   getItemLabel,
@@ -16,8 +18,19 @@ export const useActions = ({
   setItemsDialog,
   setShowDialog,
 }) => ({
-  toggleDialog: useToggleDialog({ disabled, items, readOnly, showDialog, setItemsDialog, setShowDialog }),
-  updateSelection: useUpdateSelection({ onBeforeChange, onChange, setInputValue, setShowDialog }),
+  toggleDialog: useToggleDialog({
+    autocompleteMinChars,
+    disabled,
+    inputValue,
+    items,
+    readOnly,
+    showDialog,
+    getItemKey,
+    getItemLabel,
+    setItemsDialog,
+    setShowDialog,
+  }),
+  updateSelection: useUpdateSelection({ selection, onBeforeChange, onChange, setInputValue, setShowDialog }),
   updateInputValue: useUpdateInputValue({
     autocompleteMinChars,
     items,

@@ -27,8 +27,10 @@ export const useDropdown = ({
   const Actions = useActions({
     autocompleteMinChars,
     disabled,
-    readOnly,
+    inputValue,
     items,
+    readOnly,
+    selection,
     showDialog,
     getItemKey,
     getItemLabel,

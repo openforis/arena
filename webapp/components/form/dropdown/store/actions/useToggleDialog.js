@@ -1,11 +1,33 @@
-export const useToggleDialog = ({ disabled, items, readOnly, showDialog, setItemsDialog, setShowDialog }) => () => {
-  if (!disabled && !readOnly) {
-    // when opening dialog and selection is set, restore items dialog (user might have previously selected item by filtering them)
-    if (!showDialog) {
-      // show original items
-      setItemsDialog(items)
-    }
+import { getItemsDialog } from '@webapp/components/form/dropdown/store/actions/getItemsDialog'
 
-    setShowDialog((showDialogPrev) => !showDialogPrev)
+export const useToggleDialog = ({
+  autocompleteMinChars,
+  disabled,
+  inputValue,
+  items,
+  readOnly,
+  showDialog,
+  getItemKey,
+  getItemLabel,
+  setItemsDialog,
+  setShowDialog,
+}) => () => {
+  if (!disabled && !readOnly) {
+    ;(async () => {
+      // when opening dialog and selection is set, restore items dialog (user might have previously selected item by filtering them)
+      if (!showDialog) {
+        // show original items
+        const itemsDialog = await getItemsDialog({
+          autocompleteMinChars,
+          items,
+          value: inputValue,
+          getItemKey,
+          getItemLabel,
+        })
+        setItemsDialog(itemsDialog)
+      }
+
+      setShowDialog((showDialogPrev) => !showDialogPrev)
+    })()
   }
 }
