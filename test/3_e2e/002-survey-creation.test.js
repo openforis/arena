@@ -1,4 +1,4 @@
-const { closeBrowser, $, evaluate, button, write, click, into, textBox, text } = require('taiko')
+const { closeBrowser, $, evaluate, button, write, link, click, into, textBox, text } = require('taiko')
 
 const { openBrowser, LoginSuccessful } = require('./fixtures')
 
@@ -14,7 +14,7 @@ const ContainsByText = ({ textOfElement }) => async () => {
 
 const ClickHeaderUserBtn = ({ buttonLabel }) => async () => {
   await evaluate(button({ class: 'header__btn-user' }), (e) => e.click())
-  await click(buttonLabel)
+  await evaluate(link(buttonLabel), (e) => e.click())
 }
 
 describe('Survey creation', () => {
