@@ -1,11 +1,11 @@
-const { closeBrowser, $, evaluate, button, write, link, click, into, textBox, text } = require('taiko')
+const { closeBrowser, $, evaluate, button, write, link, into, textBox, text } = require('taiko')
 
 const { openBrowser, LoginSuccessful } = require('./fixtures')
 
 export const FillSurvey = ({ name, label }) => async () => {
   await write(name, into(textBox({ placeholder: 'Name' })))
   await write(label, into(textBox({ placeholder: 'Label' })))
-  await click('Create Survey')
+  await evaluate(button('Create Survey'), (e) => e.click())
 }
 const ContainsByText = ({ textOfElement }) => async () => {
   const elementContained = await text(textOfElement).exists()
@@ -49,7 +49,7 @@ describe('Survey creation', () => {
       test('Page contains "Survey 2"', ContainsByText({ textOfElement: 'Survey 2' }))
 
       test('Click on "Survey 1"', async () => {
-        await click('Survey 1')
+        await evaluate('Survey 1', (e) => e.parentNode.click())
       })
 
       test('Page contains .dashboard', async () => {

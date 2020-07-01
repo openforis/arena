@@ -19,7 +19,7 @@
     "_test": "mochapack --timeout 30000 --display-error-details --webpack-config test/webpack.config.test.babel.js \"test/*/*.js\"",
     "test:docker": "test/run_docker_tests.sh",
     "test:browser": "gauge run -d test/__browser/",
-    "test:e2e": "jest -i",
+    "test:e2e": "jest -i --verbose",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
     "server:migrate": "cross-env MIGRATE_ONLY=true node dist/server.js",
@@ -188,7 +188,7 @@
       "@server/(.*)": "<rootDir>/server/$1",
       "@webapp/(.*)": "<rootDir>/webapp/$1",
       "@test/(.*)": "<rootDir>/test/$1"
-
-    }
+    },
+    "testTimeout": 30000
   }
 }
