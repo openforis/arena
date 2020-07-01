@@ -25,12 +25,7 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
       dispatch(SurveyActions.chainItemDelete())
     }
 
-    const newChain = {
-      ...chain,
-      [Chain.keys.processingSteps]: chain[Chain.keys.processingSteps]
-        .filter((processingStep) => !Step.isTemporary(processingStep))
-        .filter((processingStep) => !Step.isEqual(processingStep)(step)),
-    }
+    const newChain = Chain.dissocProcessingStep(step)(Chain.dissocProcessingStepTemporary(chain))
 
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })

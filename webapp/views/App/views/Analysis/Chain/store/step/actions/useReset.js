@@ -3,7 +3,6 @@ import * as A from '@core/arena'
 import { AnalysisActions } from '@webapp/service/storage'
 
 import * as Chain from '@common/analysis/processingChain'
-import * as Step from '@common/analysis/processingStep'
 import { useUpdate } from './useUpdate'
 
 export const useReset = ({ chain, setChain, step, setStep, setDirty, stepOriginal, setStepDirty }) => {
@@ -13,12 +12,7 @@ export const useReset = ({ chain, setChain, step, setStep, setDirty, stepOrigina
     AnalysisActions.resetStep()
     setStep(null)
 
-    const newChain = {
-      ...chain,
-      [Chain.keys.processingSteps]: chain[Chain.keys.processingSteps].filter(
-        (processingStep) => !Step.isTemporary(processingStep)
-      ),
-    }
+    const newChain = Chain.dissocProcessingStepTemporary(chain)
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
     setStepDirty(null)
