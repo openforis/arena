@@ -7,8 +7,6 @@ set -x
 
 printenv
 
-yarn scxzvx
-
 mkdir -p $TEMP_FOLDER $ANALYSIS_OUTPUT_DIR;
 
 # wait for postgres to startup
