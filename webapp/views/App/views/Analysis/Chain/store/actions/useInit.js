@@ -8,7 +8,7 @@ import { AnalysisActions } from '@webapp/service/storage'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useParams } from 'react-router'
 
-export const useOnInit = ({ setChain, setStep, setCalculation, setStepDirty, setCalculationDirty }) => {
+export const useInit = ({ setChain, setStep, setCalculation, setStepDirty, setCalculationDirty }) => {
   const surveyCycleKey = useSurveyCycleKey()
   const surveyId = useSurveyId()
 

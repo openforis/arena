@@ -50,12 +50,12 @@ export const setCalculation = ({ calculation, calculationDirty }) => {
   window.localStorage.setItem(keys.calculationDirty, JSON.stringify(calculationDirty))
 }
 // ====== DELETE
-export const clearChain = () => window.localStorage.removeItem(keys.chain)
-export const clearStep = () => {
+export const removeChain = () => window.localStorage.removeItem(keys.chain)
+export const removeStep = () => {
   window.localStorage.removeItem(keys.step)
   window.localStorage.removeItem(keys.stepDirty)
 }
-export const clearCalculation = () => {
+export const removeCalculation = () => {
   window.localStorage.removeItem(keys.calculation)
   window.localStorage.removeItem(keys.calculationDirty)
 }

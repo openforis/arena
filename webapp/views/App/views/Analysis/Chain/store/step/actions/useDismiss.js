@@ -5,7 +5,7 @@ import { AnalysisActions } from '@webapp/service/storage'
 
 import { useReset } from './useReset'
 
-export const useDismiss = ({ chain, setChain, step, setStep, setDirty, originalStep, stepDirty, setStepDirty }) => {
+export const useDismiss = ({ chain, setChain, step, setStep, setDirty, stepOriginal, stepDirty, setStepDirty }) => {
   const dispatch = useDispatch()
 
   const reset = useReset({
@@ -14,15 +14,15 @@ export const useDismiss = ({ chain, setChain, step, setStep, setDirty, originalS
     step,
     setStep,
     setDirty,
-    originalStep,
+    stepOriginal,
     setStepDirty,
   })
 
   const resetStep = async () => {
     reset()
     AnalysisActions.resetStep()
-    setStep({})
-    setStepDirty(false)
+    setStep(null)
+    setStepDirty(null)
   }
 
   return () => {

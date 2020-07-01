@@ -5,7 +5,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { AnalysisActions } from '@webapp/service/storage'
 
-export const useOnDismiss = ({ dirty }) => {
+export const useDismiss = ({ dirty }) => {
   const dispatch = useDispatch()
   const history = useHistory()
 

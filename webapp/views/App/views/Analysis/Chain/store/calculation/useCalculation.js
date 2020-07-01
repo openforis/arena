@@ -4,8 +4,8 @@ import { useActions } from './actions'
 
 export const useCalculation = (initialState, { dirty, setDirty, chain, setChain, step, setStep }) => {
   const [calculation, setCalculation] = useState(null)
-  const [originalCalculation, setOriginalCalculation] = useState(initialState)
-  const [calculationDirty, setCalculationDirty] = useState(false)
+  const [calculationOriginal, setCalculationOriginal] = useState(initialState)
+  const [calculationDirty, setCalculationDirty] = useState(null)
 
   const actions = useActions({
     dirty,
@@ -16,8 +16,8 @@ export const useCalculation = (initialState, { dirty, setDirty, chain, setChain,
     setStep,
     calculation,
     setCalculation,
-    originalCalculation,
-    setOriginalCalculation,
+    calculationOriginal,
+    setCalculationOriginal,
     calculationDirty,
     setCalculationDirty,
   })
@@ -27,8 +27,8 @@ export const useCalculation = (initialState, { dirty, setDirty, chain, setChain,
     setCalculation,
     calculationDirty,
     setCalculationDirty,
-    originalCalculation,
-    setOriginalCalculation,
+    calculationOriginal,
+    setCalculationOriginal,
     actions,
   }
 }

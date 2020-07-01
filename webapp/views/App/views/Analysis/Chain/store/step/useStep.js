@@ -4,8 +4,8 @@ import { useActions } from './actions/index'
 
 export const useStep = (initialState, { dirty, setDirty, chain, setChain }) => {
   const [step, setStep] = useState(null)
-  const [originalStep, setOriginalStep] = useState(initialState)
-  const [stepDirty, setStepDirty] = useState(false)
+  const [stepOriginal, setStepOriginal] = useState(initialState)
+  const [stepDirty, setStepDirty] = useState(null)
 
   const actions = useActions({
     dirty,
@@ -14,8 +14,8 @@ export const useStep = (initialState, { dirty, setDirty, chain, setChain }) => {
     setChain,
     step,
     setStep,
-    originalStep,
-    setOriginalStep,
+    stepOriginal,
+    setStepOriginal,
     stepDirty,
     setStepDirty,
   })
@@ -25,8 +25,8 @@ export const useStep = (initialState, { dirty, setDirty, chain, setChain }) => {
     setStep,
     stepDirty,
     setStepDirty,
-    originalStep,
-    setOriginalStep,
+    stepOriginal,
+    setStepOriginal,
     actions,
   }
 }

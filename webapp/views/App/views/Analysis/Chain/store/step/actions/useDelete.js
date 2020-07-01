@@ -18,7 +18,7 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
     const stepUuid = Step.getUuid(step)
     AnalysisActions.resetStep()
     AnalysisActions.resetCalculation()
-    setStep({})
+    setStep(null)
 
     if (chainUuid && !Step.isTemporary(step)) {
       await axios.delete(`/api/survey/${surveyId}/processing-step/${stepUuid}`)
@@ -34,7 +34,7 @@ export const useDelete = ({ chain, setChain, step, stepDirty, setStep, setStepDi
 
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
-    setStepDirty(false)
+    setStepDirty(null)
     dispatch(NotificationActions.notifyInfo({ key: 'processingStepView.deleteComplete' }))
   }
 

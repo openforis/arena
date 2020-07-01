@@ -8,7 +8,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useReset } from './useReset'
 
-export const useSelect = ({ stepDirty, chain, setChain, step, setStep, setDirty, originalStep, setStepDirty }) => {
+export const useSelect = ({ stepDirty, chain, setChain, step, setStep, setDirty, stepOriginal, setStepDirty }) => {
   const dispatch = useDispatch()
 
   const reset = useReset({
@@ -17,7 +17,7 @@ export const useSelect = ({ stepDirty, chain, setChain, step, setStep, setDirty,
     step,
     setStep,
     setDirty,
-    originalStep,
+    stepOriginal,
     setStepDirty,
   })
 

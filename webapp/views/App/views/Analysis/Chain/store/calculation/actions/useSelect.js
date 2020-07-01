@@ -13,12 +13,12 @@ export const useSelect = ({
   setStep,
   setDirty,
   calculation,
-  originalCalculation,
+  calculationOriginal,
 
   calculationDirty,
 
   setCalculation,
-  setOriginalCalculation,
+  setCalculationOriginal,
   setCalculationDirty,
 }) => {
   const dispatch = useDispatch()
@@ -30,16 +30,16 @@ export const useSelect = ({
     setStep,
     setDirty,
     calculation,
-    originalCalculation,
+    calculationOriginal,
     setCalculation,
     setCalculationDirty,
   })
 
   const select = ({ calculationSelected }) => {
     setCalculation(calculationSelected)
-    setOriginalCalculation(calculationSelected)
+    setCalculationOriginal(calculationSelected)
     AnalysisActions.persistCalculation({ calculation: calculationSelected, calculationDirty: false })
-    setCalculationDirty(false)
+    setCalculationDirty(null)
   }
 
   const selectWithReset = ({ calculationSelected }) => () => {

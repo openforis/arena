@@ -6,12 +6,12 @@ import * as Chain from '@common/analysis/processingChain'
 import * as Step from '@common/analysis/processingStep'
 import { useUpdate } from './useUpdate'
 
-export const useReset = ({ chain, setChain, step, setStep, setDirty, originalStep, setStepDirty }) => {
+export const useReset = ({ chain, setChain, step, setStep, setDirty, stepOriginal, setStepDirty }) => {
   const update = useUpdate({ step, setStep, chain, setChain, setDirty, setStepDirty })
 
   const resetStep = async () => {
     AnalysisActions.resetStep()
-    setStep({})
+    setStep(null)
 
     const newChain = {
       ...chain,
@@ -21,12 +21,12 @@ export const useReset = ({ chain, setChain, step, setStep, setDirty, originalSte
     }
     setChain(newChain)
     AnalysisActions.persistChain({ chain: newChain })
-    setStepDirty(false)
+    setStepDirty(null)
   }
 
   return () => {
-    if (!A.isEmpty(originalStep)) {
-      update({ stepUpdated: originalStep })
+    if (!A.isEmpty(stepOriginal)) {
+      update({ stepUpdated: stepOriginal })
     } else {
       resetStep()
     }

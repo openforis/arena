@@ -44,15 +44,15 @@ const _getStepParam = (step) =>
     )
   )(step)
 
-export const useOnSave = ({
+export const useSave = ({
   chain,
   setChain,
   step,
   calculation,
   setStepDirty,
-  setOriginalStep,
+  setStepOriginal,
   setCalculationDirty,
-  setOriginalCalculation,
+  setCalculationOriginal,
 }) => {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -78,10 +78,10 @@ export const useOnSave = ({
         await axios.put(`/api/survey/${surveyId}/processing-chain/`, data)
 
         dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
-        setStepDirty(false)
-        setOriginalStep(step)
-        setCalculationDirty(false)
-        setOriginalCalculation(calculation)
+        setStepDirty(null)
+        setStepOriginal(step)
+        setCalculationDirty(null)
+        setCalculationOriginal(calculation)
         AnalysisActions.resetAnalysis()
         dispatch(SurveyActions.chainSave())
         history.push(`${appModuleUri(analysisModules.processingChain)}${Chain.getUuid(chainToSave)}`)

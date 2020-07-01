@@ -12,7 +12,7 @@ export const useDismiss = ({
   setStep,
   setDirty,
   calculation,
-  originalCalculation,
+  calculationOriginal,
   setCalculation,
   calculationDirty,
   setCalculationDirty,
@@ -26,7 +26,7 @@ export const useDismiss = ({
     setStep,
     setDirty,
     calculation,
-    originalCalculation,
+    calculationOriginal,
     setCalculation,
     setCalculationDirty,
   })
@@ -34,8 +34,8 @@ export const useDismiss = ({
   const resetCalculation = async () => {
     reset()
     AnalysisActions.resetCalculation()
-    setCalculation({})
-    setCalculationDirty(false)
+    setCalculation(null)
+    setCalculationDirty(null)
   }
 
   return () => {

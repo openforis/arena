@@ -13,7 +13,7 @@ export const useReset = ({
   setStep,
   setDirty,
   calculation,
-  originalCalculation,
+  calculationOriginal,
   setCalculation,
   setCalculationDirty,
 }) => {
@@ -24,24 +24,24 @@ export const useReset = ({
     setStep,
     setDirty,
     calculation,
-    originalCalculation,
+    calculationOriginal,
     setCalculation,
     setCalculationDirty,
   })
 
   const resetCalculation = async () => {
     AnalysisActions.resetCalculation()
-    setCalculation({})
+    setCalculation(null)
     const stepWithOutCalculation = Step.dissocCalculation(calculation)(step)
 
     AnalysisActions.persistStep({ step: stepWithOutCalculation, stepDirty: true })
     setStep(stepWithOutCalculation)
-    setCalculationDirty(false)
+    setCalculationDirty(null)
   }
 
   return () => {
-    if (!A.isEmpty(originalCalculation)) {
-      update({ calculationUpdated: originalCalculation })
+    if (!A.isEmpty(calculationOriginal)) {
+      update({ calculationUpdated: calculationOriginal })
     } else {
       resetCalculation()
     }

@@ -19,13 +19,13 @@ const ButtonBar = (props) => {
     <>
       <div className="button-bar">
         {editingChain && !editingStep && !editingCalculation && (
-          <button type="button" className="btn-s btn-cancel" onClick={Actions.onDismiss}>
+          <button type="button" className="btn-s btn-cancel" onClick={Actions.dismiss}>
             <span className="icon icon-cross icon-left icon-10px" />
             {i18n.t(dirty ? 'common.cancel' : 'common.back')}
           </button>
         )}
 
-        <button type="button" className="btn-s btn-primary" onClick={Actions.onSave} aria-disabled={!dirty}>
+        <button type="button" className="btn-s btn-primary" onClick={Actions.save} aria-disabled={!dirty}>
           <span className="icon icon-floppy-disk icon-left icon-12px" />
           {i18n.t('common.save')}
         </button>

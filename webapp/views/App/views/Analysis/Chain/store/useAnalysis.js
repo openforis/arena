@@ -7,10 +7,10 @@ import { useStep } from './step'
 import { useCalculation } from './calculation'
 
 export const useAnalysis = () => {
-  const [dirty, setDirty] = useState(false)
+  const [dirty, setDirty] = useState(null)
   const [attributesUuidsOtherChains, setAtrributesUuidsOtherChains] = useState([])
   const { chain, setChain, actions: chainActions } = useChain({}, { dirty, setDirty })
-  const { step, setStep, stepDirty, setStepDirty, setOriginalStep, actions: stepActions } = useStep(
+  const { step, setStep, stepDirty, setStepDirty, setStepOriginal, actions: stepActions } = useStep(
     {},
     { dirty, setDirty, chain, setChain }
   )
@@ -19,7 +19,7 @@ export const useAnalysis = () => {
     setCalculation,
     calculationDirty,
     setCalculationDirty,
-    setOriginalCalculation,
+    setCalculationOriginal,
     actions: calculationActions,
   } = useCalculation({}, { dirty, setDirty, chain, setChain, step, setStep })
 
@@ -34,16 +34,16 @@ export const useAnalysis = () => {
     setStep,
     stepDirty,
     setStepDirty,
-    setOriginalStep,
+    setStepOriginal,
     calculation,
     setCalculation,
     calculationDirty,
     setCalculationDirty,
-    setOriginalCalculation,
+    setCalculationOriginal,
   })
 
   useEffect(() => {
-    actions.onInit()
+    actions.init()
   }, [])
 
   useEffect(() => {

@@ -8,7 +8,7 @@ export const useCreate = ({
   setStep,
   setCalculation,
   setCalculationDirty,
-  setOriginalCalculation,
+  setCalculationOriginal,
 }) => {
   return () => {
     const calculation = Chain.newProcessingStepCalculation(step)
@@ -19,7 +19,7 @@ export const useCreate = ({
     setChain(chainWithStep)
     setStep(stepWithCalculation)
     setCalculation(calculation)
-    setOriginalCalculation({})
+    setCalculationOriginal({})
     setCalculationDirty(true)
   }
 }
