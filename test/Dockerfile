@@ -26,7 +26,7 @@ RUN apt-get update; \
 # Install Chromium
 RUN npm install -g chromium --unsafe-perm
 # Install PM2
-#RUN npm install pm2 -g
+RUN npm install pm2 -g
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/

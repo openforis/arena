@@ -12,10 +12,8 @@ trap cleanup EXIT
 cleanup
 
 # Run commands until server_test is finished:
-docker-compose -f test/docker-compose.yml build --force-rm --no-cache && docker-compose -f test/docker-compose.yml \
+docker-compose -f test/docker-compose.yml \
     up \
-    --force-recreate \
     --build \
     --abort-on-container-exit \
-    --exit-code-from arena_test \
-
+    --exit-code-from arena_test

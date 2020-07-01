@@ -17,16 +17,16 @@ cp test/db/migrations/*.js server/db/migration/public/migrations
 cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
 
 # Run unit and integration tests
-yarn run test:e2e
+# yarn run test:e2e
 
 # Run acceptance tests (Gauge)
 # Build and start Arena
-# npm run build:server:prod; npm run build-prod;
-# ln -s dist/server.js .
-# exec pm2-runtime server.js &
+npm run build:server:prod; npm run build-prod;
+ln -s dist/server.js .
+exec pm2-runtime server.js &
 
 # wait for Arena localhost port 9090 to be available
-# while ! nc -z localhost 9090; do sleep 5; done;
+while ! nc -z localhost 9090; do sleep 5; done;
 
 # gauge run -d test/browser/
-# yarn run test:e2e
+yarn run test:e2e
