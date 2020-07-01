@@ -35,6 +35,7 @@ RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-s
 
 COPY .git /app/.git
 RUN cd /app; git reset --hard; yarn build:server:dev
+#RUN cd /app; yarn build:server:dev
 
 WORKDIR /app
 
