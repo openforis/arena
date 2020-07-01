@@ -17,9 +17,8 @@ cp test/db/migrations/*.js server/db/migration/public/migrations
 cp test/db/migrations/sqls/*.sql server/db/migration/public/migrations/sqls
 
 # Run unit and integration tests
-yarn run npm-run-all server:migrate test
+yarn run npm-run-all server:migrate
 
-# Run acceptance tests (Gauge)
 # Build and start Arena
 npm run build:server:prod; npm run build-prod;
 ln -s dist/server.js .

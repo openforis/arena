@@ -2,7 +2,7 @@ const { openBrowser, closeBrowser, $, goto, waitFor, press, write, click, into, 
 
 const headless = Boolean(process.env.HEADLESS_CHROME)
 
-describe('Getting Started with Jest and Taiko', () => {
+describe('The user must be able to login with correct credentials and receive an error message with incorrect credentials', () => {
   beforeAll(async () => {
     await openBrowser({
       headless,
@@ -20,12 +20,12 @@ describe('Getting Started with Jest and Taiko', () => {
     })
   })
 
-  describe('Search Taiko Repository', () => {
-    test('Goto getgauge github page', async () => {
+  describe('Unsuccessful Login', () => {
+    test('Goto Arena login page', async () => {
       await goto('localhost:9090')
     })
 
-    test('Search for "Taiko"', async () => {
+    test('Login with "test@arena.com" and "error""', async () => {
       const username = 'test@arena.com'
 
       const password = 'error'
@@ -34,18 +34,18 @@ describe('Getting Started with Jest and Taiko', () => {
       await click('Login')
     })
 
-    test('Page contains "getgauge/taiko"', async () => {
-      const a = await text('User not found. Make sure email and password are correct').exists()
-      await expect(a).toBeTruthy()
+    test('Page contains "User not found. Make sure email and password are correct"', async () => {
+      const errorMessage = await text('User not found. Make sure email and password are correct').exists()
+      await expect(errorMessage).toBeTruthy()
     })
   })
 
-  describe('Search Taiko Repository', () => {
-    test('Goto getgauge github page', async () => {
+  describe('Successful Login', () => {
+    test('Goto Arena login page', async () => {
       await goto('localhost:9090')
     })
 
-    test('Search for "Taiko"', async () => {
+    test('Login with "test@arena.com" and "test"', async () => {
       const username = 'test@arena.com'
       const password = 'test'
       await write(username, into(textBox({ placeholder: 'Your email' })))
@@ -53,9 +53,9 @@ describe('Getting Started with Jest and Taiko', () => {
       await click('Login')
     })
 
-    test('Page contains "getgauge/taiko"', async () => {
-      const a = await $('.home-dashboard').exists()
-      await expect(a).toBeTruthy()
+    test('Page contains .header', async () => {
+      const header = await $('.header').exists()
+      await expect(header).toBeTruthy()
     })
   })
 
