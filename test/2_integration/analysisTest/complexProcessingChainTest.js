@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as ProcessingStepCalculation from '@common/analysis/processingStepCalculation'
@@ -102,7 +101,7 @@ export const chainWithSimpleEntityTest = async () => {
 
   // No aggregated views expected
   const entityAggregatedViews = await SurveyRdbManager.getEntityAggregatedViews(survey)
-  expect(R.isEmpty(entityAggregatedViews)).to.equal(true)
+  expect(R.isEmpty(entityAggregatedViews)).toBe(true)
 }
 
 export const chainWithVirtualEntityTest = async () => {
@@ -121,7 +120,7 @@ export const chainWithVirtualEntityTest = async () => {
 
   // No aggregated views expected
   const entityAggregatedViews = await SurveyRdbManager.getEntityAggregatedViews(survey)
-  expect(R.isEmpty(entityAggregatedViews)).to.equal(true)
+  expect(R.isEmpty(entityAggregatedViews)).toBe(true)
 }
 
 export const chainWithVirtualEntityAndAggregationTest = async () => {
@@ -142,5 +141,5 @@ export const chainWithVirtualEntityAndAggregationTest = async () => {
 
   // One aggregated view expected
   const entityAggregatedViews = await SurveyRdbManager.getEntityAggregatedViews(survey)
-  expect(R.isEmpty(entityAggregatedViews)).to.equal(false)
+  expect(R.isEmpty(entityAggregatedViews)).toBe(false)
 }

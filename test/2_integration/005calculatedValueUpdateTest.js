@@ -1,5 +1,3 @@
-import { expect } from 'chai'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
@@ -39,7 +37,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
 
   const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
 
-  expect(Node.getValue(nodeDependent)).to.equal(dependentExpectedValue)
+  expect(Node.getValue(nodeDependent)).toBe(dependentExpectedValue)
   return record
 }
 

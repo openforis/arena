@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import { expect } from 'chai'
-
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -16,7 +14,7 @@ export const createCategoryTest = async () => {
   const category = await CategoryManager.insertCategory(user, surveyId, categoryReq)
 
   /* eslint-disable no-unused-expressions */
-  expect(Category.getUuid(category)).to.exist
+  expect(Category.getUuid(category)).toBeDefined()
 
   const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid(
     surveyId,
@@ -25,7 +23,7 @@ export const createCategoryTest = async () => {
     true
   )
 
-  expect(reloadedCategory).to.deep.equal(category)
+  expect(reloadedCategory).toEqual(category)
 }
 
 const _fetchFirstCategory = async (surveyId) => {
@@ -42,10 +40,10 @@ export const createCategoryLevelTest = async () => {
   const levelReq = Category.newLevel(category)
   const { level } = await CategoryManager.insertLevel(user, surveyId, levelReq)
 
-  expect(CategoryLevel.getName(level)).to.be.equal(CategoryLevel.getName(levelReq))
+  expect(CategoryLevel.getName(level)).toBe(CategoryLevel.getName(levelReq))
 
   // Inserted level should be the 2nd
-  expect(level.index).to.be.equal(1)
+  expect(level.index).toBe(1)
 
   const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid(
     surveyId,
@@ -55,7 +53,7 @@ export const createCategoryLevelTest = async () => {
   )
 
   // Levels must be 2
-  expect(Category.getLevelsArray(reloadedCategory).length).to.be.equal(2)
+  expect(Category.getLevelsArray(reloadedCategory).length).toBe(2)
 }
 
 export const createCategoryItemTest = async () => {
@@ -76,8 +74,8 @@ export const createCategoryItemTest = async () => {
 
   const { item } = await CategoryManager.insertItem(user, surveyId, Category.getUuid(category), itemReq)
 
-  expect(CategoryItem.getCode(item)).to.be.equal(itemCode)
-  expect(CategoryItem.getLabel('en')(item)).to.be.equal(itemLabel)
+  expect(CategoryItem.getCode(item)).toBe(itemCode)
+  expect(CategoryItem.getLabel('en')(item)).toBe(itemLabel)
 }
 
 export const updateCategoryTest = async () => {
@@ -95,5 +93,5 @@ export const updateCategoryTest = async () => {
     newName
   )
 
-  expect(Category.getName(updatedCategory)).to.be.equal(newName)
+  expect(Category.getName(updatedCategory)).toBe(newName)
 }

@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -35,11 +34,11 @@ export const createNodeDefsTest = async () => {
     const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
     /* eslint-disable no-unused-expressions */
-    expect(nodeDefDb.id).to.not.be.undefined
-    expect(nodeDefDb.type).to.equal(nodeType)
-    expect(nodeDefDb.parentUuid).to.equal(NodeDef.getParentUuid(nodeDefReq))
-    expect(nodeDefDb.uuid).to.equal(NodeDef.getUuid(nodeDefReq))
-    expect(nodeDefDb.props).to.eql(nodeDefReq.props)
+    expect(nodeDefDb.id).toBeDefined()
+    expect(nodeDefDb.type).toBe(nodeType)
+    expect(nodeDefDb.parentUuid).toBe(NodeDef.getParentUuid(nodeDefReq))
+    expect(nodeDefDb.uuid).toBe(NodeDef.getUuid(nodeDefReq))
+    expect(nodeDefDb.props).toEqual(nodeDefReq.props)
   })
 }
 
@@ -60,15 +59,15 @@ export const updateNodeDefTest = async () => {
     NodeDef.getParentUuid(nodeDef1),
     { name: newName }
   )
-  expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
+  expect(NodeDef.getName(updatedNodeDef)).toBe(newName)
 
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, Survey.cycleOneKey, true)
 
   // Only one node def with that name
-  expect(R.filter((n) => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)
+  expect(R.filter((n) => NodeDef.getName(n) === newName, nodeDefs).length).toBe(1)
 
   // Do not modify existing nodes
   const reloadedNodeDef2 = R.find((n) => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
-  expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
-  expect(NodeDef.getName(reloadedNodeDef2)).to.equal(NodeDef.getName(nodeDef2))
+  expect(NodeDef.getType(reloadedNodeDef2)).toBe(NodeDef.getType(nodeDef2))
+  expect(NodeDef.getName(reloadedNodeDef2)).toBe(NodeDef.getName(nodeDef2))
 }

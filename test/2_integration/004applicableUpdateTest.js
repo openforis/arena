@@ -1,5 +1,3 @@
-import { expect } from 'chai'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -88,7 +86,7 @@ describe('Applicable Test', () => {
 
       const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
 
-      expect(applicable).to.equal(expectedValue, sourceValue)
+      expect(applicable).toBe(expectedValue)
     })
   })
 
@@ -97,7 +95,7 @@ describe('Applicable Test', () => {
     const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, record)
 
     // Tree_dbh should be not applicable (plot_no <= 10)
-    expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).to.be.equal(false)
+    expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).toBe(false)
   })
 
   it('Applicable in multiple entity update', async () => {
@@ -109,6 +107,6 @@ describe('Applicable Test', () => {
     const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, recordUpdated)
 
     // Tree_dbh should be applicable (plot_no > 10)
-    expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).to.be.equal(true)
+    expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).toBe(true)
   })
 })

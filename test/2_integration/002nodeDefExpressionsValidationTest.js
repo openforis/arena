@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as SurveyValidator from '@core/survey/surveyValidator'
@@ -29,7 +28,7 @@ const validateExpression = async (survey, nodeDefName, expression) => {
  * n = context node
  * e = expression
  * v = true/false expected to be valid or not
- * }
+ * }.
  */
 const expressions = [
   {
@@ -106,8 +105,8 @@ describe('NodeDefExpressions Validation Test', async () => {
   expressions.forEach((expr) => {
     it(expr.t, async () => {
       const validation = await validateExpression(survey, expr.n, expr.e)
-      expect(expr.v).to.equal(Validation.isValid(validation))
-      expect(expr.v).to.equal(Validation.isValid(Validation.getFieldValidation('0')(validation)))
+      expect(expr.v).toBe(Validation.isValid(validation))
+      expect(expr.v).toBe(Validation.isValid(Validation.getFieldValidation('0')(validation)))
     })
   })
 })

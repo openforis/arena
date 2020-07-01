@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -38,7 +37,7 @@ const _updateNodeAndExpectValidationToBe = async (nodePath, value, validationExp
 
   const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
 
-  expect(Validation.isValid(nodeValidation)).to.equal(validationExpected)
+  expect(Validation.isValid(nodeValidation)).toBe(validationExpected)
 }
 
 const _deleteNodeAndExpectCountToBe = async (parentNodePath, childNodeName, childNodePosition, expectedValidation) => {
@@ -49,7 +48,7 @@ const _deleteNodeAndExpectCountToBe = async (parentNodePath, childNodeName, chil
 
   const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(record)
 
-  expect(Validation.isValid(validationCount)).to.equal(expectedValidation)
+  expect(Validation.isValid(validationCount)).toBe(expectedValidation)
 }
 
 const _addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, expectedValidation) => {
@@ -62,7 +61,7 @@ const _addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, expecte
 
   const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(record)
 
-  expect(Validation.isValid(validationCount)).to.equal(expectedValidation)
+  expect(Validation.isValid(validationCount)).toBe(expectedValidation)
 }
 
 const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
@@ -79,14 +78,14 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
 
   // Expect validation to be invalid
   const nodePlotNumValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNum))(Record.getValidation(record))
-  expect(Validation.isValid(nodePlotNumValidation)).to.equal(false)
+  expect(Validation.isValid(nodePlotNumValidation)).toBe(false)
 
   // Expect duplicate node validation to be invalid
   const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
     Record.getValidation(record)
   )
-  expect(Validation.isValid(nodePlotNumDuplicateValidation)).to.equal(false)
+  expect(Validation.isValid(nodePlotNumDuplicateValidation)).toBe(false)
 }
 
 const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () => {
@@ -98,7 +97,7 @@ const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
     Record.getValidation(record)
   )
-  expect(Validation.isValid(nodePlotNumDuplicateValidation)).to.equal(true)
+  expect(Validation.isValid(nodePlotNumDuplicateValidation)).toBe(true)
 }
 
 describe('Record Validation Test', () => {
@@ -247,7 +246,7 @@ describe('Record Validation Test', () => {
       Record.getValidation,
       RecordValidation.getValidationChildrenCount(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild))
     )(record)
-    expect(Validation.isValid(validationCount)).to.be.equals(false) // Min count = 1
+    expect(Validation.isValid(validationCount)).toBe(false) // Min count = 1
 
     await _deleteNode(Record.getParentNode(nodeParent)(record), 'plot', 5)
 
@@ -261,7 +260,7 @@ describe('Record Validation Test', () => {
     )
     // Children count validation should be deleted
     /* eslint-disable no-unused-expressions */
-    expect(validationCountUpdated).to.be.undefined
+    expect(validationCountUpdated).toBeUndefined()
   })
 
   // ========== expressions

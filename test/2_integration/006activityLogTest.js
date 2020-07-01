@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import { expect } from 'chai'
 
 import { uuidv4 } from '../../core/uuid'
 import * as Survey from '../../core/survey/survey'
@@ -33,7 +32,7 @@ describe('Activity Log Test', () => {
       ActivityLog.type.surveyCreate,
     ])
 
-    expect(surveyCreateLogs).to.have.lengthOf(1)
+    expect(surveyCreateLogs).toHaveLength(1)
 
     await SurveyManager.deleteSurvey(surveyId)
   })
@@ -50,13 +49,13 @@ describe('Activity Log Test', () => {
     const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
 
     const logs = await ActivityLogRepository.fetch(Survey.getSurveyInfo(survey), [ActivityLog.type.recordCreate])
-    expect(logs.length).to.be.at.least(1)
+    expect(logs.length).toBeGreaterThanOrEqual(1)
 
     const recordCreateLogs = R.filter(
       (activity) => ObjectUtils.getUuid(ActivityLog.getContent(activity)) === Record.getUuid(record)
     )(logs)
 
-    expect(recordCreateLogs).to.have.lengthOf(1)
+    expect(recordCreateLogs).toHaveLength(1)
 
     await SurveyManager.deleteSurvey(surveyId)
   })

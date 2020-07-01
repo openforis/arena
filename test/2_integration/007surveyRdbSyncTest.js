@@ -1,5 +1,3 @@
-import { expect } from 'chai'
-
 import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
@@ -19,7 +17,8 @@ const expectSchemaToExist = async (schemaName, exists = true) => {
     `,
     [schemaName]
   )
-  expect(result.res, `schema ${schemaName} ${exists ? 'exists' : 'not exists'}`).to.equal(exists)
+  // schema ${schemaName} ${exists ? 'exists' : 'not exists'}
+  expect(result.res).toBe(exists)
 }
 
 describe('Survey RDB Sync Test', () => {

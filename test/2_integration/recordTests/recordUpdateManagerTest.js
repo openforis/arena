@@ -1,5 +1,3 @@
-import { expect } from 'chai'
-
 import * as R from 'ramda'
 
 import { db } from '@server/db/db'
@@ -45,9 +43,9 @@ export const recordCreationTest = async () => {
   const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(record))
 
   /* eslint-disable no-unused-expressions */
-  expect(reloadedRecord).to.not.be.undefined
+  expect(reloadedRecord).toBeDefined()
 
-  expect(R.isEmpty(nodes)).to.equal(false)
+  expect(R.isEmpty(nodes)).toBe(false)
 }
 
 export const defaultValueAppliedTest = async () => {
@@ -77,6 +75,6 @@ export const defaultValueAppliedTest = async () => {
     const reloadedNode = R.head(nodes)
 
     // Compare value with default value
-    expect(Node.getValue(reloadedNode)).to.equal('default value 2')
+    expect(Node.getValue(reloadedNode)).toBe('default value 2')
   })
 }

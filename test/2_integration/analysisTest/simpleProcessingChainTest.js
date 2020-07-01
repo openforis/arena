@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
@@ -97,5 +96,5 @@ export const simpleTest = async () => {
   // console.log('empty test')
 
   /* eslint-disable no-unused-expressions */
-  expect(processingChain).to.be.not.undefined
+  expect(processingChain).toBeDefined()
 }
