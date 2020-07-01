@@ -1,10 +1,9 @@
-/* globals beforeSuite, afterSuite */
-const { openBrowser, closeBrowser } = require('taiko')
+const { openBrowser: openBrowserTaiko, closeBrowser: closeBrowserTaiko } = require('taiko')
 
 const headless = Boolean(process.env.HEADLESS_CHROME)
 
-beforeSuite(async () => {
-  await openBrowser({
+export const openBrowser = async () => {
+  await openBrowserTaiko({
     headless,
     args: headless
       ? [
@@ -18,8 +17,8 @@ beforeSuite(async () => {
         ]
       : [],
   })
-})
+}
 
-afterSuite(async () => {
-  await closeBrowser()
-})
+export const closeBrowser = async () => {
+  await closeBrowserTaiko()
+}
