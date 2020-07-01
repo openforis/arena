@@ -86,8 +86,8 @@ const TaxonProps = (props) => {
       {showTaxonomyPanel && (
         <PanelRight
           width="100vw"
-          onClose={async () => {
-            await dispatch(TaxonomyActions.setTaxonomyForEdit(null))
+          onClose={() => {
+            dispatch(TaxonomyActions.setTaxonomyForEdit(null))
             setShowTaxonomyPanel(false)
           }}
           header={i18n.t('taxonomy.header')}

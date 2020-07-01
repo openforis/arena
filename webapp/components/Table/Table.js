@@ -18,7 +18,7 @@ const Table = (props) => {
     restParams,
     rowComponent,
     rowHeaderComponent,
-    otherProps,
+    rowProps,
   } = props
 
   const { list, offset, limit, count } = useTable({ moduleApiUri, module, restParams })
@@ -37,7 +37,7 @@ const Table = (props) => {
         onRowClick={onRowClick}
         rowComponent={rowComponent}
         rowHeaderComponent={rowHeaderComponent}
-        otherProps={otherProps}
+        rowProps={rowProps}
       />
     </div>
   )
@@ -57,7 +57,7 @@ Table.propTypes = {
   restParams: PropTypes.object,
   rowComponent: PropTypes.elementType,
   rowHeaderComponent: PropTypes.elementType,
-  otherProps: PropTypes.object,
+  rowProps: PropTypes.object,
 }
 
 Table.defaultProps = {
@@ -71,7 +71,7 @@ Table.defaultProps = {
   restParams: {},
   rowHeaderComponent: DummyComponent,
   rowComponent: DummyComponent,
-  otherProps: {},
+  rowProps: {},
 }
 
 export default Table

@@ -58,7 +58,7 @@ const TaxonomyView = (props) => {
         rowHeaderComponent={TaxaTableRowHeader}
         rowComponent={TaxaTableRow}
         noItemsLabelKey="taxonomy.edit.taxaNotImported"
-        otherProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
+        rowProps={{ surveyId, vernacularLanguageCodes, taxonomy, readOnly: !canEdit }}
       />
 
       {showClose && (
