@@ -1,5 +1,3 @@
-import { assert, expect } from 'chai'
-
 import jsep from '@core/expressionParser/helpers/jsep'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -86,7 +84,7 @@ describe('dataFilter test', () => {
   goodExpressions.forEach(({ q, r }) => {
     it(q, () => {
       const ps = Expression.toSql(jsep(q))
-      assert.deepEqual(ps, r)
+      expect(ps).toEqual(r)
     })
   })
 

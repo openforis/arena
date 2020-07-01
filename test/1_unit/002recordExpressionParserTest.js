@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import { assert } from 'chai'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -16,7 +15,7 @@ let node = {}
 // Let dbh = {}
 
 describe('RecordExpressionParser Test', () => {
-  before(async () => {
+  beforeAll(async () => {
     const user = getContextUser()
 
     survey = SB.survey(
@@ -90,9 +89,9 @@ describe('RecordExpressionParser Test', () => {
       const res = RecordExpressionParser.evalNodeQuery(survey, record, node, q)
 
       if (R.isEmpty(resKeys)) {
-        assert.equal(res, r)
+        expect(res).toEqual(r)
       } else {
-        resKeys.forEach((key) => assert.equal(res[key], r[key]))
+        resKeys.forEach((key) => expect(res[key]).toEqual(r[key]))
       }
     })
   })

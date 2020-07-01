@@ -1,5 +1,3 @@
-import { assert } from 'chai'
-
 import * as A from '@core/arena'
 
 const tests = [
@@ -30,7 +28,7 @@ const tests = [
 describe('A.isEmpty', () => {
   tests.forEach(({ value, expected }) => {
     it(`${JSON.stringify(value)} `, () => {
-      assert.deepEqual(expected, A.isEmpty(value))
+      expect(expected).toEqual(A.isEmpty(value))
     })
   })
 })
