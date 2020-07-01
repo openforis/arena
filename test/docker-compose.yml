@@ -26,3 +26,5 @@ services:
       SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
       HEADLESS_CHROME: 'true'
       TAIKO_BROWSER_PATH: /usr/local/lib/node_modules/chromium/lib/chromium/chrome-linux/chrome
+
+    command: ./test/scripts/test_start.sh

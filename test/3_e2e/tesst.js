@@ -4,6 +4,7 @@ describe('Getting Started with Jest and Taiko', () => {
 
   beforeAll(async () => {
     await openBrowser({ headless: false });
+
   });
 
   describe('Search Taiko Repository', () => {

@@ -37,8 +37,5 @@ COPY .git /app/.git
 RUN cd /app; git reset --hard; yarn build:server:dev
 
 WORKDIR /app
-RUN cat /app/test/scripts/test_start.sh
-RUN chmod +x /app/test/scripts/test_start.sh
-CMD ["/app/test/scripts/test_start.sh"]
 
 ############################################################
