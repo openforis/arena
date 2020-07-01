@@ -44,7 +44,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
 }
 
 describe('Calculated value test', () => {
-  before(async () => {
+  beforeAll(async () => {
     const user = getContextUser()
 
     survey = await SB.survey(
@@ -77,7 +77,7 @@ describe('Calculated value test', () => {
     ).buildAndStore()
   })
 
-  after(async () => {
+  afterAll(async () => {
     if (survey) {
       await SurveyManager.deleteSurvey(Survey.getId(survey))
     }

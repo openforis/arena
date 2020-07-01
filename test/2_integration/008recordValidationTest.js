@@ -102,7 +102,7 @@ const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =
 }
 
 describe('Record Validation Test', () => {
-  before(async () => {
+  beforeAll(async () => {
     await initTestContext()
     const user = getContextUser()
 
@@ -157,7 +157,7 @@ describe('Record Validation Test', () => {
     ).buildAndStore()
   })
 
-  after(async () => {
+  afterAll(async () => {
     if (survey) {
       await SurveyManager.deleteSurvey(Survey.getId(survey))
     }

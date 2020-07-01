@@ -19,7 +19,7 @@ import * as TaxonomyUtils from './taxonomyUtils'
 const taxonomyNameDefault = 'species_list'
 let survey = null
 
-before(async () => {
+beforeAll(async () => {
   const user = getContextUser()
   survey = await SB.survey(
     user,
@@ -36,7 +36,7 @@ before(async () => {
     .buildAndStore(false)
 })
 
-after(async () => {
+afterAll(async () => {
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
   }
@@ -73,7 +73,7 @@ export const taxonomyUpdateTest = async () => {
 }
 
 /**
- * Insert new taxa and expect taxa count to become 5
+ * Insert new taxa and expect taxa count to become 5.
  */
 export const taxaInsertTest = async () => {
   const user = getContextUser()
@@ -98,7 +98,7 @@ export const taxaInsertTest = async () => {
 }
 
 /**
- * Update existing taxon with new props
+ * Update existing taxon with new props.
  */
 export const taxonUpdateTest = async () => {
   const user = getContextUser()

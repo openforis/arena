@@ -17,7 +17,7 @@ import * as TaxonomyUtils from './taxonomyUtils'
 const taxonomyName = 'species_list'
 let survey = null
 
-before(async () => {
+beforeAll(async () => {
   const user = getContextUser()
 
   survey = await SB.survey(
@@ -36,7 +36,7 @@ before(async () => {
     .buildAndStore()
 })
 
-after(async () => {
+afterAll(async () => {
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
   }

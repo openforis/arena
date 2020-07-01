@@ -6,7 +6,7 @@ import * as SurveyIntegrationTest from './surveyTests/surveyTest'
 import * as CategoryTest from './surveyTests/categoryTest'
 import * as NodeDefTest from './surveyTests/nodeDefTest'
 
-before(initTestContext)
+beforeAll(initTestContext)
 
 describe('Survey Test', () => {
   // ==== SURVEY
@@ -30,4 +30,4 @@ describe('Survey Test', () => {
   it('Update Node Def', async () => NodeDefTest.updateNodeDefTest())
 })
 
-after(destroyTestContext)
+afterAll(destroyTestContext)

@@ -1,5 +1,3 @@
-import { assert } from 'chai'
-
 import { uuidv4 } from '../../../core/uuid'
 import * as Survey from '../../../core/survey/survey'
 import * as User from '../../../core/user/user'
@@ -22,8 +20,8 @@ export const createSurveyTest = async () => {
 
   const surveyInfo = Survey.getSurveyInfo(survey)
 
-  assert.equal(Survey.getName(surveyInfo), Survey.getName(surveyInfoTest))
+  expect(Survey.getName(surveyInfo)).toEqual(Survey.getName(surveyInfoTest))
   const expectedDefaultLanguage = Survey.getDefaultLanguage(surveyInfoTest)
-  assert.equal(Survey.getDefaultLanguage(surveyInfo), expectedDefaultLanguage)
-  assert.equal(Survey.getDefaultLabel(surveyInfo), Survey.getDefaultLabel(surveyInfoTest))
+  expect(Survey.getDefaultLanguage(surveyInfo)).toEqual(expectedDefaultLanguage)
+  expect(Survey.getDefaultLabel(surveyInfo)).toEqual(Survey.getDefaultLabel(surveyInfoTest))
 }

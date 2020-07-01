@@ -16,7 +16,7 @@ let survey = null
 const records = []
 let processingChain = null
 
-before(async () => {
+beforeAll(async () => {
   const user = getContextUser()
 
   survey = await SB.survey(
@@ -83,7 +83,7 @@ before(async () => {
   ).build()
 })
 
-after(async () => {
+afterAll(async () => {
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
   }

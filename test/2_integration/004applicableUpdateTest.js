@@ -19,7 +19,7 @@ let survey
 let record
 
 describe('Applicable Test', () => {
-  before(async () => {
+  beforeAll(async () => {
     const user = getContextUser()
 
     survey = await SB.survey(
@@ -49,7 +49,7 @@ describe('Applicable Test', () => {
     ).buildAndStore()
   })
 
-  after(async () => {
+  afterAll(async () => {
     if (survey) {
       await SurveyManager.deleteSurvey(Survey.getId(survey))
     }
