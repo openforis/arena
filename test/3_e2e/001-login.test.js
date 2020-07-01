@@ -54,7 +54,7 @@ describe('Getting Started with Jest and Taiko', () => {
     })
 
     test('Page contains "getgauge/taiko"', async () => {
-      const a = await text('----').exists()
+      const a = await $('.home-dashboard').exists()
       await expect(a).toBeTruthy()
     })
   })
